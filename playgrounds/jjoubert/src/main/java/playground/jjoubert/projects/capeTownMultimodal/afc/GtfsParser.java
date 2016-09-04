@@ -30,22 +30,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.contrib.cadyts.pt.TransitStopFacilityLookUp;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.ActivityFacilitiesFactory;
-import org.matsim.facilities.Facility;
 import org.matsim.pt.router.FakeFacility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.mrieser.pt.fares.api.TransitFares;
 import playground.southafrica.utilities.Header;
 
 /**
@@ -55,6 +49,9 @@ import playground.southafrica.utilities.Header;
  */
 public class GtfsParser {
 	final private static Logger LOG = Logger.getLogger(GtfsParser.class);
+	private Scenario sc;
+	private TransitRouterConfig trConfig;
+	private TransitRouter trRouter;
 
 	/**
 	 * @param args
@@ -65,54 +62,71 @@ public class GtfsParser {
 		String networkFile = args[0];
 		String scheduleFile = args[1];
 		
-		Scenario sc = parseSchedule(scheduleFile, networkFile);
+		GtfsParser gp = new GtfsParser(networkFile, scheduleFile);
 		int from = 1;
 		int to = 25;
-		double dist = findRoute(sc, from, to, Time.parseTime("08:00:00"));
-		LOG.info("Distance from " + from + " to " + to + ": " + dist + "m");
+		double dist = gp.findRouteDistance(from, to, Time.parseTime("08:00:00"));
+		LOG.info(String.format("Distance from %d to %d: %.0fm", from, to, dist));
 		
 		Header.printFooter();
 	}
 	
 	
+	/**
+	 * Construct an instance of the GTFS scenario and router. This is currently
+	 * mainly set up to work for the MyCiTi scenario for the City of Cape Town. 
+	 * @param network
+	 * @param schedule
+	 */
+	public GtfsParser(String network, String schedule) {
+		this.sc = parseSchedule(schedule, network);
+		this.trConfig = new TransitRouterConfig(sc.getConfig());
+		this.trRouter = new TransitRouterImpl(this.trConfig , sc.getTransitSchedule());
+	}
+	
+	/**
+	 * Parse all the necessary networks and transit schedules.
+	 * @param scheduleFile
+	 * @param networkFile
+	 * @return
+	 */
 	private static Scenario parseSchedule(String scheduleFile, String networkFile){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		new MatsimNetworkReader(sc.getNetwork()).parse(networkFile);
 		new TransitScheduleReader(sc).readFile(scheduleFile);
-		
-		ActivityFacilitiesFactory aff = sc.getActivityFacilities().getFactory();
-		
 		return sc;
 	}
 	
-	private static double findRoute(Scenario sc, int from, int to, double time){
-		
-		TransitRouterConfig tc = new TransitRouterConfig(sc.getConfig());
-		TransitRouter tr = new TransitRouterImpl(tc , sc.getTransitSchedule());
-		
-		FakeFacility fFrom = new FakeFacility(sc.getNetwork().getNodes().get(Id.createNodeId("MyCiTi_" + from)).getCoord());
-		FakeFacility fTo = new FakeFacility(sc.getNetwork().getNodes().get(Id.createNodeId("MyCiTi_" + to)).getCoord());
-		
-		List<Leg> route = tr.calcRoute(fFrom, fTo, time, sc.getPopulation().getFactory().createPerson(Id.createPersonId("dummy")));
-
+	/**
+	 * Calculates the shortest route's distance on the GTFS network between 
+	 * two given stop IDs and at a specified time. 
+	 * @param from
+	 * @param to
+	 * @param time
+	 * @return
+	 */
+	public double findRouteDistance(int from, int to, double time){
 		double dist = 0.0;
-		for(Leg l : route){
-			if(l.getRoute() != null){
-				dist += l.getRoute().getDistance();
-			}
-		}
 		
+		Node fNode = sc.getNetwork().getNodes().get(Id.createNodeId("MyCiTi_" + from));
+		Node tNode = sc.getNetwork().getNodes().get(Id.createNodeId("MyCiTi_" + to));
+		
+		if(fNode != null && tNode != null){
+			FakeFacility fFrom = new FakeFacility(fNode.getCoord());
+			FakeFacility fTo = new FakeFacility(tNode.getCoord());
+			List<Leg> route = trRouter.calcRoute(fFrom, fTo, time, sc.getPopulation().getFactory().createPerson(Id.createPersonId("dummy")));
+			
+			for(Leg l : route){
+				if(l.getRoute() != null){
+					dist += l.getRoute().getDistance();
+				}
+			}
+		} else{
+			LOG.error("Either origin (" + from + ") or destination (" + to + ") node, or both, could not be found. Returning zero distance.");
+		}
 		return dist;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
 	
 
 }

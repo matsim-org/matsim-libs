@@ -40,8 +40,8 @@ public class AfcUtils {
 
 	
 	/**
-	 * Parses the stops.txt file and builds a map linking stop names to the 
-	 * stop IDs.
+	 * Parses the stops.txt file (from a GTFS feed) and builds a map linking 
+	 * stop names to the stop IDs.
 	 *  
 	 * @param filename
 	 * @return
@@ -73,7 +73,28 @@ public class AfcUtils {
 		
 		return stopMap;
 	}
-
+	
+	
+	/**
+	 * Simplifies the raw data's transaction description to a single letter:
+	 * 'B' for boarding; 'A' for alighting; and 'C' for connecting.
+	 * @param s
+	 * @return
+	 */
+	public static String getTransactionAbbreviation(String s){
+		String abbreviation = null;
+		if(s.equalsIgnoreCase("1st boarding")){
+			abbreviation = "B";
+		} else if(s.equalsIgnoreCase("Alighting")){
+			abbreviation = "A";
+		} else if(s.equalsIgnoreCase("Connection")){
+			abbreviation = "C";
+		} else{
+			throw new RuntimeException("Don't know what transaction type '" + s + "' is.");
+		}
+		return abbreviation;
+	}
+	
 	
 	/**
 	 * The stop IDs form the AFC and GTFS data do not coincide. Some stops can

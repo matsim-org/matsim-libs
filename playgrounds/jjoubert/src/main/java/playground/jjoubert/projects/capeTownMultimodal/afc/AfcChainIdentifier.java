@@ -93,7 +93,7 @@ public class AfcChainIdentifier {
 					cardMap.put(idLength, oldCount+1);
 				}
 				
-				String act = getTransactionAbbreviation(sa[6]);
+				String act = AfcUtils.getTransactionAbbreviation(sa[6]);
 				if(!personMap.containsKey(id)){
 					personMap.put(id, act);
 				} else{
@@ -118,7 +118,15 @@ public class AfcChainIdentifier {
 		
 		Map<String, Integer> chainMap = new HashMap<String, Integer>();
 		counter = new Counter("  persons # ");
-		for(String chain : personMap.values()){
+		for(String pid : personMap.keySet()){
+			String chain = personMap.get(pid);
+			
+			/*TODO Remove after debugging... */
+			if(chain.contains("B-A-C-A")){
+				LOG.info("Stop here for 'B-A-C-A' - " + pid);
+			}
+			
+			
 			if(!chainMap.containsKey(chain)){
 				chainMap.put(chain, 1);
 			} else{
@@ -194,21 +202,6 @@ public class AfcChainIdentifier {
 		LOG.info("  Stops with +: " + stopsWithMoreIds);
 		LOG.info("-----------------------------------------");
 	}
-	
-	private static String getTransactionAbbreviation(String s){
-		String abbreviation = null;
-		if(s.equalsIgnoreCase("1st boarding")){
-			abbreviation = "B";
-		} else if(s.equalsIgnoreCase("Alighting")){
-			abbreviation = "A";
-		} else if(s.equalsIgnoreCase("Connection")){
-			abbreviation = "C";
-		} else{
-			throw new RuntimeException("Don't know what transaction type '" + s + "' is.");
-		}
-		return abbreviation;
-	}
-	
 	
 
 }

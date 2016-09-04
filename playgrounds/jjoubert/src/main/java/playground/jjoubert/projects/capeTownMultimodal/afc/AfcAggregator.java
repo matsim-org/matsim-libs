@@ -35,8 +35,8 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.core.utils.misc.Time;
 
-import edu.uci.ics.jung.graph.util.Pair;
 import playground.southafrica.utilities.Header;
 
 /**
@@ -61,7 +61,10 @@ public class AfcAggregator {
 
 		gtfsStopMap = AfcUtils.parseStopIdFromGtfs(args[4]);
 		
-		processInput(input, seconds, output, odDurations);
+		String network = args[5];
+		String schedule = args[6];
+		
+		processInput(input, seconds, output, odDurations, network, schedule);
 		
 		Header.printFooter();
 	}
@@ -70,9 +73,20 @@ public class AfcAggregator {
 		/* Hide constructor. */
 	}
 	
-	
-	public static void processInput(String input, int binSize, String output, String odFile){
+	/**
+	 * 
+	 * @param input the automated fare collection (AFC) file provided by the
+	 * 			City of Cape Town;
+	 * @param binSize in minutes;
+	 * @param output where the aggregated trip data is written to;
+	 * @param odFile where the person-specific origin-destination results are
+	 * 			written to. 
+	 */
+	public static void processInput(String input, int binSize, String output, String odFile, String network, String schedule){
 		LOG.info("Processing input file " + input);
+		
+		GtfsParser gp = new GtfsParser(network, schedule);
+		
 		int unknownLeavers = 0;
 		Map<String, Integer> mapBoarding = new TreeMap<String, Integer>();
 		Map<String, Integer> mapAlighting = new TreeMap<String, Integer>();
@@ -176,8 +190,12 @@ public class AfcAggregator {
 							} else{
 								dGtfs = AfcUtils.getGtfsStationIdFromName(dName);
 							}
-							String entry = String.format("%s,%d,%s,%d,%s,%s,%d", 
-									id, oGtfs, oName, dGtfs, dName, time, duration);
+							
+							/* Calculate the OD pair distance. */
+							double dist = gp.findRouteDistance(oGtfs, dGtfs, Time.parseTime(time));
+							
+							String entry = String.format("%s,%d,%s,%d,%s,%s,%d,%.0f", 
+									id, oGtfs, oName, dGtfs, dName, time, duration, dist);
 							odPairDurations.add(entry);
 							
 							fullChains++;
@@ -211,6 +229,12 @@ public class AfcAggregator {
 		LOG.info("Number of alightings with cost: " + alightAtCost);
 		LOG.info("Number of complete chains: " + fullChains);
 		LOG.info("Number of staff transactions: " + staffTransactions);
+		
+		/* Try and estimate trip-chains. */
+		
+		
+		
+		
 		
 		LOG.info("Writing bin data to file...");
 		BufferedWriter bw = IOUtils.getBufferedWriter(output);
@@ -262,7 +286,7 @@ public class AfcAggregator {
 		LOG.info("Writing OD durations to file.");
 		bw = IOUtils.getBufferedWriter(odFile);
 		try{
-			bw.write("id,o,oName,d,dName,time,dur");
+			bw.write("id,o,oName,d,dName,time,dur,dist");
 			bw.newLine();
 			for(String s : odPairDurations){
 				bw.write(s);
