@@ -60,7 +60,7 @@ public class CountsInserter {
 	public static void main(String[] args) {
 		String inputFolder = PatnaUtils.INPUT_FILES_DIR;
 		CountsInserter jcg = new CountsInserter();
-		jcg.processInputFile( inputFolder+"/raw/counts/urbanDemandCountsFile/innerCordon_excl_rckw_incl_truck_shpNetwork.txt" );
+		jcg.processInputFile( inputFolder+"/raw/counts/urbanDemandCountsFile/innerCordon_excl_rckw_shpNetwork.txt" );
 		jcg.processInputFile( inputFolder+"/raw/counts/externalDemandCountsFile/outerCordonData_allCounts_shpNetwork.txt" );
 		jcg.run();
 	}

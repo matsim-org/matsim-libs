@@ -43,8 +43,8 @@ public class UrbanCountsGenerator {
 	
 	public static void main(String[] args) {
 	
-		String innerCordonFile = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/urbanDemandCountsFile/innerCordon_excl_rckw_incl_truck_"+PatnaUtils.PATNA_NETWORK_TYPE+".txt";
-		String outCountsFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/"+PatnaUtils.PATNA_NETWORK_TYPE+"/urbanCounts_excl_rckw_incl_truck.xml.gz";
+		String innerCordonFile = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/urbanDemandCountsFile/innerCordon_excl_rckw_"+PatnaUtils.PATNA_NETWORK_TYPE+".txt";
+		String outCountsFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/urban/"+PatnaUtils.PATNA_NETWORK_TYPE+"/urbanCounts_excl_rckw.xml.gz";
 		
 		UrbanCountsGenerator pcg = new UrbanCountsGenerator();
 		pcg.readFileAndStoreCountInfo(innerCordonFile);
@@ -80,8 +80,14 @@ public class UrbanCountsGenerator {
  				String surveyLocation = parts[0];
  				Id<Link> linkId = Id.createLinkId( parts[1] );
  				Integer time = Integer.valueOf(parts[2]);
-// 				Double count = Double.valueOf(parts[3]); // if only total counts,
- 				Double count = Double.valueOf(parts[7]); // it car, motorbike, bike, truck and total counts are in input counts
+ 				double sum = 0.;
+ 				for (int index = 3; index<parts.length-1;index++){
+ 					sum += Double.valueOf( parts[index] );
+ 				}
+ 				
+ 				double count = Double.valueOf(parts[parts.length-1]); 
+ 				if(sum!=count) throw new RuntimeException("sum of individual modal counts does not match total count.");
+ 				
  				Tuple<Id<Link>,String> myCountStationInfo = new Tuple<>( linkId, surveyLocation);
  				if(countStation2time2countInfo.containsKey(myCountStationInfo)){
  					Map<Integer, Double> time2count = countStation2time2countInfo.get(myCountStationInfo);

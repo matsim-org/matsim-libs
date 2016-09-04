@@ -106,7 +106,7 @@ public class JointCalibrationControler {
 
 	private static boolean isUsingCadyts = true;
 
-	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/incomeDependent/multiModalCadyts/c0/";
+	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/"+PatnaUtils.PCU_2W.toString()+"pcu/c0/";
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
@@ -129,11 +129,14 @@ public class JointCalibrationControler {
 		} else {
 			config = pjc.createBasicConfigSettings();
 
-			config.planCalcScore().getOrCreateModeParams("car").setConstant(0.);
+			config.planCalcScore().getOrCreateModeParams("car").setConstant(-0.58);
 			config.planCalcScore().getOrCreateModeParams("bike").setConstant(0.);
-			config.planCalcScore().getOrCreateModeParams("motorbike").setConstant(0.);
-			config.planCalcScore().getOrCreateModeParams("pt").setConstant(0.);
+			config.planCalcScore().getOrCreateModeParams("motorbike").setConstant(-0.37);
+			config.planCalcScore().getOrCreateModeParams("pt").setConstant(-0.58);
 			config.planCalcScore().getOrCreateModeParams("walk").setConstant(0.);
+			
+			config.planCalcScore().getOrCreateModeParams("bike").setMarginalUtilityOfDistance(0.00006);
+			config.planCalcScore().getOrCreateModeParams("walk").setMarginalUtilityOfDistance(0.00014);
 		}
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);

@@ -33,6 +33,7 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -58,8 +59,8 @@ public class PatnaVehiclesGenerator {
 
 		for (String vehicleType : modes) {
 			VehicleType veh = VehicleUtils.getFactory().createVehicleType(Id.create(vehicleType,VehicleType.class));
-			veh.setMaximumVelocity( MixedTrafficVehiclesUtils.getSpeed( vehicleType.split("_")[0] ) );// this should not harm other use cases.
-			veh.setPcuEquivalents( MixedTrafficVehiclesUtils.getPCU( vehicleType.split("_")[0] ) );
+			veh.setMaximumVelocity( MixedTrafficVehiclesUtils.getSpeed( vehicleType ) );// this should not harm other use cases.
+			veh.setPcuEquivalents( vehicleType.equals("bike")||vehicleType.equals("motorbike") ? PatnaUtils.PCU_2W : MixedTrafficVehiclesUtils.getPCU(vehicleType) );
 
 			modeTypes.put(vehicleType, veh);
 			vehicles.addVehicleType(veh);
