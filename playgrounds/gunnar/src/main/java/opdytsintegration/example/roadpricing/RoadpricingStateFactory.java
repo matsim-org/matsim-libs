@@ -1,6 +1,7 @@
 package opdytsintegration.example.roadpricing;
 
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.controler.Controler;
 
 import floetteroed.utilities.math.Vector;
 import opdytsintegration.MATSimState;
@@ -31,6 +32,12 @@ public class RoadpricingStateFactory implements MATSimStateFactory<TollLevels> {
 			final Vector stateVector, final TollLevels decisionVariable) {
 		return new RoadpricingState(population, stateVector, decisionVariable,
 				this.timeDiscretization, this.occupancyScale, this.tollScale);
+	}
+
+	@Override
+	public void registerControler(Controler controler) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
