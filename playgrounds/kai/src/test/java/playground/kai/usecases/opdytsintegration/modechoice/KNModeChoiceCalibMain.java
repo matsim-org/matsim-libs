@@ -78,11 +78,7 @@ class KNModeChoiceCalibMain {
 		
 		Simulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>( stateFactory, scenario, new TimeDiscretization(5 * 3600, 10 * 60, 18)); 
 
-		final ObjectiveFunction objectiveFunction = null ;
-//		final ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(experiencedPlansService);
-		if ( true ) {
-			throw new RuntimeException("no idea how to get access to ExperiencedPlansService here" ) ;
-		}
+		final ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction();
 
 		final FixedIterationNumberConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion( 100, 10);
 

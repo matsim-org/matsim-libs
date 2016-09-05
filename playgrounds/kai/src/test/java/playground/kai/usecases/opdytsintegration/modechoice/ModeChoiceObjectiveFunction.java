@@ -8,6 +8,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.controler.Injector;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -23,15 +24,10 @@ import floetteroed.opdyts.SimulatorState;
  */
 public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 	
-	private final ExperiencedPlansService experiencedPlansService;
-	private final StageActivityTypes stageActivities;
 	private final List<String> modeHierarchy = new ArrayList<>() ;
 	private final Map< String, Double > shares = new HashMap<>() ;
 
-	ModeChoiceObjectiveFunction(ExperiencedPlansService experiencedPlansService, StageActivityTypes stageActivities ) {
-		this.experiencedPlansService = experiencedPlansService;
-		this.stageActivities = stageActivities;
-		
+	ModeChoiceObjectiveFunction() {
 		modeHierarchy.add( TransportMode.walk ) ;
 		modeHierarchy.add( TransportMode.bike ) ;
 		modeHierarchy.add( TransportMode.pt ) ;
@@ -44,18 +40,15 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 	}
 
 	@Override public double value(SimulatorState state) {
+		ModeChoiceState mcState = (ModeChoiceState) state ;
+		
 		long[] cnt = new long[ modeHierarchy.size() ] ; 
 		double sum = 0 ;
 
-		for ( Plan plan : experiencedPlansService.getExperiencedPlans().values() ) {
-			List<Trip> trips = TripStructureUtils.getTrips(plan, stageActivities) ;
+		for ( Plan plan : mcState.getExperiencedPlans().values() ) {
+			List<Trip> trips = TripStructureUtils.getTrips(plan, mcState.getStageActivities() ) ;
 			for ( Trip trip : trips ) {
-				String mainMode = TransportMode.walk ;
-				for ( Leg leg : trip.getLegsOnly() ) {
-					if (  modeHierarchy.indexOf( leg.getMode() ) > modeHierarchy.indexOf( mainMode ) ) {
-						mainMode = leg.getMode();
-					}
-				}
+				String mainMode = mcState.getMainModeIdentifier().identifyMainMode(trip.getTripElements()) ;
 				cnt[ modeHierarchy.indexOf( mainMode ) ]++ ;
 				sum++ ;
 			}
