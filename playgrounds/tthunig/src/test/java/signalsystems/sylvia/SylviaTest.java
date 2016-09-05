@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -89,6 +90,7 @@ public class SylviaTest {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
+	@Ignore
 	public void testDemandAB(){
 		double[] noPersons = {3600, 3600};
 		TtSignalAnalysisTool signalAnalyzer = runScenario(noPersons);
@@ -111,6 +113,7 @@ public class SylviaTest {
 	}
 
 	@Test
+	@Ignore
 	public void testDemandA(){
 		double[] noPersons = {3600, 0};
 		TtSignalAnalysisTool signalAnalyzer = runScenario(noPersons);
@@ -133,6 +136,7 @@ public class SylviaTest {
 	}
 	
 	@Test
+	@Ignore
 	public void testDemandB(){
 		double[] noPersons = {0, 3600};
 		TtSignalAnalysisTool signalAnalyzer = runScenario(noPersons);
