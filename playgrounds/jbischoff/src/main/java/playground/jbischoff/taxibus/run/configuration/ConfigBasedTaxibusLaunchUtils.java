@@ -60,12 +60,12 @@ public class ConfigBasedTaxibusLaunchUtils {
 		Scenario scenario = controler.getScenario();
 		final TaxibusConfigGroup tbcg = (TaxibusConfigGroup) scenario.getConfig().getModule("taxibusConfig");
         final VrpData vrpData = new VrpDataImpl();
-        new VehicleReader(scenario.getNetwork(), vrpData).readFile(tbcg.getVehiclesFile());
+        new VehicleReader(scenario.getNetwork(), vrpData).parse(tbcg.getVehiclesFileUrl(scenario.getConfig().getContext()));
         final TaxibusPassengerOrderManager orderManager;
         final LineDispatcher dispatcher;
         final StateLookupTable lookuptable;
 		if (tbcg.getAlgorithmConfig().endsWith("ine")){
-			dispatcher = LinesUtils.createLineDispatcher(tbcg.getLinesFile(), tbcg.getZonesXmlFile(), tbcg.getZonesShpFile(),vrpData,tbcg);}
+			dispatcher = LinesUtils.createLineDispatcher(tbcg.getLinesFileUrl(scenario.getConfig().getContext()).getFile(), tbcg.getZonesXmlFileUrl(scenario.getConfig().getContext()).getFile(),tbcg.getZonesShpFileUrl(scenario.getConfig().getContext()).getFile(),vrpData,tbcg);}
 		else  {
 			dispatcher = null;}
 		if (tbcg.getAlgorithmConfig().equals("stateBased")){

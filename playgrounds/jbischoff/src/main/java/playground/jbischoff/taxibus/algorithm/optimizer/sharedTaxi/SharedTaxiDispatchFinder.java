@@ -32,6 +32,7 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
+import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.router.ImaginaryNode;
 import org.matsim.core.router.InitialNode;
 import org.matsim.core.router.MultiNodeDijkstra;
@@ -141,9 +142,9 @@ public class SharedTaxiDispatchFinder {
 			}
 
 			TaxibusRequest firstRequest = (TaxibusRequest) currentRequests.toArray()[0];
-			double pickup2pickupDist = CoordUtils.calcEuclideanDistance(firstRequest.getFromLink().getCoord(), req.getFromLink().getCoord());
-			double firstEuclidDist = CoordUtils.calcEuclideanDistance(firstRequest.getFromLink().getCoord(),firstRequest.getToLink().getCoord());
-			if (pickup2pickupDist>firstEuclidDist*maximumDetourFactor){
+			double pickup2pickupDist = 	DistanceUtils.calculateSquaredDistance(firstRequest.getFromLink().getCoord(), req.getFromLink().getCoord());
+			double firstEuclidDist = DistanceUtils.calculateSquaredDistance(firstRequest.getFromLink().getCoord(),firstRequest.getToLink().getCoord());
+			if (pickup2pickupDist>firstEuclidDist){
 				continue;
 			}
 			
