@@ -1,6 +1,41 @@
 <html>
 <body>
-Signals and lanes are currently (still) part of the core. The contrib contains a documentation in-the-making, which may also be accessed <a href="https://svn.code.sf.net/p/matsim/source/contrib/trunk/signals/docs/user-guide/">here</a>.
+The MATSim contrib for traffic lights is able to simulate traffic signals microscopically. 
+For fixed-time control a default implementation is provided.  
+No programming is required to simulate fixed-time traffic signal control. 
+Traffic-responsive signal control needs custom implementation but can benefit from the provided infrastructure. 
+
+<h2> Terminology </h2>
+
+<table> 
+  <tr>
+    <th>MATSim term</th>
+	<th>Real world term</th>
+	<th>Description</th>
+  </tr>
+  <tr>
+    <td>signal</td>
+	<td>traffic light, traffic signal</td>
+	<td>A physical box standing somewhere on the transport network indicating driving allowed/permitted</td>
+  </tr>
+  <tr>
+    <td>signal group</td>
+	<td>a group of traffic lights</td>
+	<td>Logical group of traffic lights, all lights display same color at the same time</td>
+  </tr>
+  <tr>
+    <td>signal control</td>
+	<td>traffic controller</td>
+	<td>Algorithm or control scheme that determines which colors are displayed by the different Signal Groups, e.g. fixed-time control</td>
+  </tr>
+  <tr>
+    <td>signal system</td>
+	<td>signalized crossing</td>
+	<td>Collection of Signal Groups that is controlled by the same Signal Control</td>
+</table>
+
+
+<IMG SRC="data/RunCreateTrafficSignalScenarioExampleNetwork.pdf" ALT="RunCreateTrafficSignalScenarioExampleNetwork">
 
  </body>
 </html>
