@@ -8,8 +8,6 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.carsharing.events.EndRentalEvent;
-import org.matsim.contrib.carsharing.events.StartRentalEvent;
 import org.matsim.contrib.carsharing.manager.demand.AgentRentals;
 import org.matsim.contrib.carsharing.manager.demand.DemandHandler;
 import org.matsim.contrib.carsharing.manager.demand.RentalInfo;
@@ -26,13 +24,6 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 
 	
 	private Config config;	
-	private double totalffRentalTime = 0.0;
-	private double totalowRentalTime = 0.0;
-	private double totaltwRentalTime = 0.0;	
-	
-	private Stats ffStats;
-	private Stats owStats;
-	private Stats twStats;
 	
 	private CostsCalculatorContainer costsCalculatorContainer;
 	private DemandHandler demandHandler;
@@ -55,41 +46,11 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 		this.demandHandler = demandHandler;
 		this.carsharingSupplyContainer = carsharingSupplyContainer;
 		this.costsCalculatorContainer = costsCalculatorContainer;
-		this.personId = personId;
-		totalffRentalTime = 0.0;
-		totalowRentalTime = 0.0;
-		totaltwRentalTime = 0.0;
-		ffStats = new Stats();
-		owStats= new Stats();
-		twStats= new Stats();
+		this.personId = personId;		
 	}
 
 	@Override
 	public void handleEvent(Event event) {
-		if ( event instanceof EndRentalEvent ) {
-			
-			
-			if (((EndRentalEvent) event).getvehicleId().startsWith("FF")) {
-				totalffRentalTime += event.getTime();
-			}
-			else if (((EndRentalEvent) event).getvehicleId().startsWith("OW")) {
-				totalowRentalTime += event.getTime();
-			}
-			else if (((EndRentalEvent) event).getvehicleId().startsWith("TW")) {
-				totaltwRentalTime += event.getTime();
-			}
-		
-		}
-		else if (event instanceof StartRentalEvent) {
-			
-			if (((StartRentalEvent) event).getvehicleId().startsWith("FF"))
-				totalffRentalTime -= event.getTime();
-			else if (((StartRentalEvent) event).getvehicleId().startsWith("OW"))
-				totalowRentalTime -= event.getTime();
-			else if (((StartRentalEvent) event).getvehicleId().startsWith("TW"))
-				totaltwRentalTime -= event.getTime();
-			
-		}
 		super.handleEvent(event);		
 	}	
 	
@@ -104,32 +65,8 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 			for(RentalInfo rentalInfo : agentRentals.getArr()) {
 				CSVehicle vehicle = this.carsharingSupplyContainer.getAllVehicles().get(rentalInfo.getVehId().toString());
 				score += this.costsCalculatorContainer.getCost(vehicle.getCompanyId(), rentalInfo.getCarsharingType(), rentalInfo);
-			}
-			
-		}
-		
-			
-		/*	score += this.ffStats.distance * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("distanceFeeFreeFloating"));
-			score += this.ffStats.drivingTime * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("timeFeeFreeFloating"));
-			score += (this.totalffRentalTime - this.ffStats.drivingTime) * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("timeParkingFeeFreeFloating"));
-			
-		
-		
-		
-			
-			score += this.owStats.distance * Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("distanceFeeOneWayCarsharing"));
-			score += this.owStats.drivingTime * Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("timeFeeOneWayCarsharing"));
-			score += (this.totalowRentalTime - this.owStats.drivingTime) * Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("timeParkingFeeOneWayCarsharing"));		
-
-			
-		
-				
-			score += this.twStats.distance * Double.parseDouble(this.config.getModule("TwoWayCarsharing").getParams().get("distanceFeeTwoWayCarsharing"));
-			score += this.totaltwRentalTime * Double.parseDouble(this.config.getModule("TwoWayCarsharing").getParams().get("timeFeeTwoWayCarsharing"));
-				//score += (s.endTime - s.startTime - s.drivingTime) * Double.parseDouble(this.config.getModule("TwoWayCarsharing").getParams().get("timeParkingFeeFreeFloating"));
-			
-		*/			
-				
+			}			
+		}				
 	}	
 	
 	@Override
@@ -137,18 +74,10 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 		
 		
 		double tmpScore = 0.0D;
-		double distance = leg.getRoute().getDistance();
 		double travelTime = arrivalTime - departureTime;
 		String mode = leg.getMode();
 		if (carsharingLegs.contains(mode)) {
-			if (mode.equals("freefloating"))
-				this.ffStats.distance += distance;
-			else if (mode.equals("oneway"))
-				this.owStats.distance += distance;
-			else if (mode.equals("twoway"))
-				this.twStats.distance += distance;
-			
-			
+					
 			if (("oneway").equals(mode)) {				
 				tmpScore += Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("constantOneWayCarsharing"));
 				tmpScore += travelTime * Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("travelingOneWayCarsharing")) / 3600.0;
@@ -172,8 +101,6 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 			tmpScore += getWalkScore(leg.getRoute().getDistance(), travelTime);
 			
 		}			
-		
-		
 		return tmpScore;
 	}
 
@@ -185,11 +112,4 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 
 		return score;
 	}
-		
-	private class Stats {
-		private double distance;
-		private double drivingTime = 0.0;
-		
-	}
-	
 }
