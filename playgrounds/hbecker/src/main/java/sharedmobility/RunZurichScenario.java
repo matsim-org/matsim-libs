@@ -132,8 +132,7 @@ public class RunZurichScenario {
 	}
 
 	public static void installCarSharing(final Controler controler) {
-		Scenario sc = controler.getScenario() ;
-		
+	
 		controler.addOverridingModule( new AbstractModule() {
 			@Override
 			public void install() {
@@ -150,7 +149,7 @@ public class RunZurichScenario {
 			}
 		});
 
-		controler.addOverridingModule(CarsharingUtils.createModule());		
+		controler.addOverridingModule(CarsharingUtils.createRoutingModule());		
 	}
 
 
