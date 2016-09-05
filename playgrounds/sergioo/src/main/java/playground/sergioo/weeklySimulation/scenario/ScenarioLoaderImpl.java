@@ -180,7 +180,7 @@ public class ScenarioLoaderImpl {
 				network.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 			}
 			new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkFileName);
-			if ((this.config.network().getChangeEventsInputFileUrl(this.config.getContext()).getFile() != null)
+			if ((this.config.network().getChangeEventsInputFile() != null)
 					&& this.config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from "
 						+ this.config.network().getChangeEventsInputFileUrl(this.config.getContext()).getFile());

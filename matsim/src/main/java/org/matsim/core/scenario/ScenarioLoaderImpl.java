@@ -140,7 +140,7 @@ class ScenarioLoaderImpl {
 				new MatsimNetworkReader( transformation , this.scenario.getNetwork() ).parse(networkUrl);
 			}
 
-			if ((this.config.network().getChangeEventsInputFileUrl(this.config.getContext()).getFile() != null) && this.config.network().isTimeVariantNetwork()) {
+			if ((this.config.network().getChangeEventsInputFile()!= null) && this.config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from " + this.config.network().getChangeEventsInputFileUrl(this.config.getContext()).getFile());
 				Network network = this.scenario.getNetwork();
 				List<NetworkChangeEvent> changeEvents = new ArrayList<>() ;
