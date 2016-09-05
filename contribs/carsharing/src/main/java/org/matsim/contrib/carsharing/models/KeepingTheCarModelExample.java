@@ -17,7 +17,7 @@ public class KeepingTheCarModelExample implements KeepingTheCarModel {
 	}
 	
 	@Override
-	public boolean keepTheCarDuringNextACtivity(double durationOfActivity, Person person, String csType) {
+	public boolean keepTheCarDuringNextActivity(double durationOfActivity, Person person, String csType) {
 
 		return true;
 		//if (durationOfActivity < 2 *3600) {

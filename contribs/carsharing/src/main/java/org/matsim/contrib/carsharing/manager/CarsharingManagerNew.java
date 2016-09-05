@@ -57,7 +57,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 
 		boolean willHaveATripFromLocation = willUseTheVehicleLaterFromLocation(destinationLink.getId(), plan, legToBeRouted);
 		
-		boolean keepTheCar = keepTheCarModel.keepTheCarDuringNextACtivity(0.0, plan.getPerson(), carsharingType);	
+		boolean keepTheCar = keepTheCarModel.keepTheCarDuringNextActivity(0.0, plan.getPerson(), carsharingType);	
 		//TODO: create a method for getting the search distance
 		double searchDistance = 5000.0;
 		if (vehicle != null) {

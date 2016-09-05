@@ -12,6 +12,6 @@ public interface RouterProvider {
 	
 	public List<PlanElement> routeCarsharingTrip(Plan plan, double time, Leg legToBeRouted,
 			String carsharingType, CSVehicle vehicle, Link vehicleLinkLocation, 
-			Link parkingLocation, boolean keepTheCarForLaterUse, boolean ahsVehicle);
+			Link parkingLocation, boolean keepTheCarForLaterUse, boolean hasVehicle);
 
 }
