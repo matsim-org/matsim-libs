@@ -27,13 +27,13 @@ public class BestTimeResponseStrategyProvider implements Provider<PlanStrategy> 
 
 	// -------------------- MEMBERS --------------------
 
+	private final boolean interpolate = true;
+
 	private final PlanSelector<Plan, Person> randomPlanSelector;
 
 	private final TimeDiscretization timeDiscr;
 
 	private final Scenario scenario;
-
-	private final Map<String, TravelTime> mode2tt;
 
 	private final CharyparNagelScoringParametersForPerson scoringParams;
 
@@ -50,10 +50,10 @@ public class BestTimeResponseStrategyProvider implements Provider<PlanStrategy> 
 		final int binSize_s = scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize();
 		final int binCnt = (int) Math.ceil(Units.S_PER_D / binSize_s);
 		this.timeDiscr = new TimeDiscretization(startTime_s, binSize_s, binCnt);
-		this.myTravelTime = new BestTimeResponseTravelTimes(this.timeDiscr, mode2tt, scenario.getNetwork());
+		this.myTravelTime = new BestTimeResponseTravelTimes(this.timeDiscr, mode2tt, scenario.getNetwork(),
+				this.interpolate);
 
 		this.scenario = scenario;
-		this.mode2tt = mode2tt;
 		this.scoringParams = scoringParams;
 	}
 
@@ -62,7 +62,7 @@ public class BestTimeResponseStrategyProvider implements Provider<PlanStrategy> 
 	@Override
 	public PlanStrategy get() {
 		final PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(this.randomPlanSelector);
-		final BestTimeResponseStrategyModule module = new BestTimeResponseStrategyModule(this.scenario, this.mode2tt,
+		final BestTimeResponseStrategyModule module = new BestTimeResponseStrategyModule(this.scenario,
 				this.scoringParams, this.timeDiscr, this.myTravelTime);
 		builder.addStrategyModule(module);
 		return builder.build();

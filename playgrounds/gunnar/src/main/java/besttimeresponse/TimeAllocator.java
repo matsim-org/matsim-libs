@@ -20,20 +20,25 @@ import opdytsintegration.utils.TimeDiscretization;
  * 
  * @author Gunnar Flötteröd
  *
+ * @param L
+ *            the location type (generic such that both link-to-link and
+ *            zone-to-zone are supported)
+ * @param M
+ *            the mode type
  */
-public class TimeAllocator {
+public class TimeAllocator<L, M> {
 
 	// -------------------- CONSTANTS --------------------
 
 	private final TimeDiscretization timeDiscretization;
 
-	private final TripTravelTimes travelTimes;
+	private final TripTravelTimes<L, M> travelTimes;
 
-	private final boolean repairTimeStructure = true;
+	private final boolean repairTimeStructure;
 
-	private final boolean interpolateTravelTimes = false;
+	private final boolean interpolateTravelTimes;
 
-	private final boolean randomSmoothing = false;
+	private final boolean randomSmoothing;
 
 	private final double betaDur_1_s;
 
@@ -45,29 +50,33 @@ public class TimeAllocator {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public TimeAllocator(final TimeDiscretization timeDiscretization, final TripTravelTimes travelTimes,
+	public TimeAllocator(final TimeDiscretization timeDiscretization, final TripTravelTimes<L, M> travelTimes,
 			final double betaDur_1_s, final double betaTravel_1_s, final double betaLateArr_1_s,
-			final double betaEarlyDpt_1_s) {
+			final double betaEarlyDpt_1_s, final boolean repairTimeStructure, final boolean interpolateTravelTimes,
+			final boolean randomSmoothing) {
 		this.timeDiscretization = timeDiscretization;
 		this.travelTimes = travelTimes;
 		this.betaDur_1_s = betaDur_1_s;
 		this.betaTravel_1_s = betaTravel_1_s;
 		this.betaLateArr_1_s = betaLateArr_1_s;
 		this.betaEarlyDpt_1_s = betaEarlyDpt_1_s;
+		this.repairTimeStructure = repairTimeStructure;
+		this.interpolateTravelTimes = interpolateTravelTimes;
+		this.randomSmoothing = randomSmoothing;
 	}
 
 	// -------------------- INTERNALS --------------------
 
-	private TimeAllocationProblem newTimeAllocationProblem(final List<PlannedActivity> plannedActivities,
+	private TimeAllocationProblem newTimeAllocationProblem(final List<PlannedActivity<L, M>> plannedActivities,
 			double[] initialDptTimes_s) {
 		if (initialDptTimes_s == null) {
 			initialDptTimes_s = new double[plannedActivities.size()];
-			for (int i = 0; i < initialDptTimes_s.length; i++) {
-				initialDptTimes_s[i] = MatsimRandom.getRandom().nextDouble() * Units.S_PER_D;
+			for (int q = 0; q < initialDptTimes_s.length; q++) {
+				initialDptTimes_s[q] = MatsimRandom.getRandom().nextDouble() * Units.S_PER_D;
 			}
 			Arrays.sort(initialDptTimes_s);
 		}
-		final RealizedActivitiesBuilder builder = new RealizedActivitiesBuilder(this.timeDiscretization,
+		final RealizedActivitiesBuilder<L, M> builder = new RealizedActivitiesBuilder<L, M>(this.timeDiscretization,
 				this.travelTimes, this.repairTimeStructure, this.interpolateTravelTimes);
 		for (int q = 0; q < plannedActivities.size(); q++) {
 			builder.addActivity(plannedActivities.get(q), initialDptTimes_s[q]);
@@ -79,12 +88,12 @@ public class TimeAllocator {
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	public double[] optimizeDepartureTimes(final List<PlannedActivity> plannedActivities,
+	public double[] optimizeDepartureTimes(final List<PlannedActivity<L, M>> plannedActivities,
 			final double[] initialDptTimes_s) {
 
 		TimeAllocationProblem problem = this.newTimeAllocationProblem(plannedActivities, initialDptTimes_s);
 
-		double[] currentDptTimes_s = problem.realizedDptTimes_s();
+		double[] currentDptTimes_s = problem.getInitialSolution();
 		LinearObjectiveFunction objFct = problem.getObjectiveFunction();
 		double currentScore = objFct.value(currentDptTimes_s);
 		RealVector currentGradient = objFct.getCoefficients();
@@ -96,7 +105,6 @@ public class TimeAllocator {
 
 			final double[] newDptTimes_s = (new SimplexSolver())
 					.optimize(problem.getObjectiveFunction(), problem.getConstraints(), GoalType.MAXIMIZE).getPoint();
-
 			problem = this.newTimeAllocationProblem(plannedActivities, newDptTimes_s);
 			objFct = problem.getObjectiveFunction();
 			final double newScore = objFct.value(newDptTimes_s);
@@ -111,7 +119,7 @@ public class TimeAllocator {
 				if (deltaDptTimeNorm_s >= 1e-8) {
 					final double g0 = deltaDptTime_s.dotProduct(currentGradient) / deltaDptTimeNorm_s;
 					final double g1 = deltaDptTime_s.dotProduct(newGradient) / deltaDptTimeNorm_s;
-					if (g0 > 0 && g1 < 0) {
+					if ((g0 > 0) && (g1 < 0)) {
 						final double _Q0 = currentScore;
 						final double _Q1 = newScore;
 
@@ -164,11 +172,12 @@ public class TimeAllocator {
 				}
 
 				if (this.randomSmoothing) {
-					for (int i = 0; i < currentDptTimes_s.length; i++) {
-						currentDptTimes_s[i] += this.timeDiscretization.getBinSize_s()
+					for (int q = 0; q < currentDptTimes_s.length; q++) {
+						currentDptTimes_s[q] += this.timeDiscretization.getBinSize_s()
 								* (MatsimRandom.getRandom().nextDouble() - 0.5);
 					}
 				}
+
 				return currentDptTimes_s;
 			}
 

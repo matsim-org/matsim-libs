@@ -3,7 +3,6 @@ package besttimeresponse;
 import static besttimeresponse.PlannedActivity.MINACTDUR_S;
 import static java.lang.Math.log;
 import static java.lang.Math.max;
-import static java.util.Collections.unmodifiableList;
 import static org.apache.commons.math3.optim.linear.Relationship.GEQ;
 import static org.apache.commons.math3.optim.linear.Relationship.LEQ;
 
@@ -19,16 +18,16 @@ import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
 /**
  * 
  * @author Gunnar Flötteröd
- *
+ * 
  */
 class TimeAllocationProblem {
 
 	// -------------------- MEMBERS --------------------
 
 	// chronological list of realized activities
-	private final List<RealizedActivity> realizedActivities;
+	private final List<RealizedActivity<?, ?>> realizedActivities;
 
-	// coefficient for duration of an activity
+	// coefficient for activity duration
 	private final double betaDur_1_s;
 
 	// coefficient for travel duration
@@ -40,36 +39,35 @@ class TimeAllocationProblem {
 	// coefficient for late arrival
 	private final double betaLateArr_1_s;
 
-	// overlap between piecewise linear functions
+	// overlap between travel time bins
 	private final double slack_s = 1.0;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	TimeAllocationProblem(final List<RealizedActivity> realizedActivities, final double betaDur_1_s,
+	<L, M> TimeAllocationProblem(final List<RealizedActivity<L, M>> realizedActivities, final double betaDur_1_s,
 			final double betaTravel_1_s, final double betaLateArr_1_s, final double betaEarlyDpt_1_s) {
-		this.realizedActivities = unmodifiableList(realizedActivities);
+		this.realizedActivities = new ArrayList<RealizedActivity<?, ?>>(realizedActivities);
 		this.betaDur_1_s = betaDur_1_s;
 		this.betaTravel_1_s = betaTravel_1_s;
 		this.betaLateArr_1_s = betaLateArr_1_s;
 		this.betaEarlyDpt_1_s = betaEarlyDpt_1_s;
 	}
 
-	// -------------------- MISC --------------------
-	
-	double[] realizedDptTimes_s() {
+	// -------------------- IMPLEMENTATION --------------------
+
+	double[] getInitialSolution() {
 		double[] result = new double[this.realizedActivities.size()];
 		for (int q = 0; q < this.realizedActivities.size(); q++) {
 			result[q] = this.realizedActivities.get(q).realizedDptTime_s;
 		}
 		return result;
 	}
-	// -------------------- IMPLEMENTATION --------------------
 
-	private double getScore() {
+	double getTimeScoreAtInitialSolution() {
 		final int _N = this.realizedActivities.size();
 		double result = 0.0;
 		for (int q = 0; q < _N; q++) {
-			final RealizedActivity act = this.realizedActivities.get(q);
+			final RealizedActivity<?, ?> act = this.realizedActivities.get(q);
 			result += this.betaDur_1_s * act.plannedActivity.desiredDur_s
 					* log(max(MINACTDUR_S, act.effectiveDuration_s()));
 			if (act.isLateArrival()) {
@@ -79,12 +77,12 @@ class TimeAllocationProblem {
 				result += this.betaEarlyDpt_1_s * (act.plannedActivity.earliestDptTime_s - act.realizedDptTime_s);
 			}
 			result += this.betaTravel_1_s
-					* (this.realizedActivities.get(q < _N - 1 ? q + 1 : 0).realizedArrTime_s - act.realizedDptTime_s);
+					* (this.realizedActivities.get(q + 1 < _N ? q + 1 : 0).realizedArrTime_s - act.realizedDptTime_s);
 		}
 		return result;
 	}
 
-	private RealVector get__dScore_dDptTimes__1_s() {
+	RealVector get__dScore_dDptTimes__1_s() {
 
 		// For consistency with formula write-up.
 
@@ -96,8 +94,8 @@ class TimeAllocationProblem {
 
 		for (int q = 0; q < _N; q++) {
 
-			final RealizedActivity act = this.realizedActivities.get(q);
-			final RealizedActivity nextAct = this.realizedActivities.get((q < _N - 1) ? (q + 1) : 0);
+			final RealizedActivity<?, ?> act = this.realizedActivities.get(q);
+			final RealizedActivity<?, ?> nextAct = this.realizedActivities.get((q + 1 < _N) ? (q + 1) : 0);
 			final double a = act.nextTripTravelTime.dTT_dDptTime;
 
 			// travel time
@@ -131,10 +129,8 @@ class TimeAllocationProblem {
 
 	LinearObjectiveFunction getObjectiveFunction() {
 		final RealVector coeffs = this.get__dScore_dDptTimes__1_s();
-		double offset = this.getScore();
-		for (int q = 0; q < this.realizedActivities.size(); q++) {
-			offset -= coeffs.getEntry(q) * this.realizedActivities.get(q).realizedDptTime_s;
-		}
+		final double offset = this.getTimeScoreAtInitialSolution()
+				- coeffs.dotProduct(new ArrayRealVector(this.getInitialSolution()));
 		return new LinearObjectiveFunction(coeffs, offset);
 	}
 

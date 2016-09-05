@@ -58,10 +58,10 @@ class RealizedActivity<L, M> {
 
 	double effectiveDuration_s() {
 		if (this.realizedArrTime_s > this.realizedDptTime_s) {
-			// Overnight activity, always open.
+			// An overnight activity, always open.
 			return this.realizedDptTime_s + (Units.S_PER_D - this.realizedArrTime_s);
 		} else {
-			// Within-day activity, possibly closed.
+			// Probably a within-day activity, possibly closed.
 			return MathHelpers.overlap(this.realizedDptTime_s, this.realizedArrTime_s,
 					(this.plannedActivity.openingTime_s != null) ? this.plannedActivity.openingTime_s
 							: NEGATIVE_INFINITY,

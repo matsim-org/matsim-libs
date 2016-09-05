@@ -19,11 +19,9 @@ import opdytsintegration.utils.TimeDiscretization;
  * @author Gunnar Flötteröd
  *
  */
-class BestTimeResponseTravelTimes implements TripTravelTimes, TravelTime, TravelDisutility {
+class BestTimeResponseTravelTimes implements TripTravelTimes<Link, String>, TravelTime, TravelDisutility {
 
 	// -------------------- MEMBERS --------------------
-
-	private final boolean interpolate = false;
 
 	private final TimeDiscretization timeDiscr;
 
@@ -31,20 +29,23 @@ class BestTimeResponseTravelTimes implements TripTravelTimes, TravelTime, Travel
 
 	private final Dijkstra router;
 
+	private final boolean interpolate;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	BestTimeResponseTravelTimes(final TimeDiscretization timeDiscr, final Map<String, TravelTime> mode2tt,
-			final Network network) {
+			final Network network, final boolean interpolate) {
 		this.timeDiscr = timeDiscr;
 		this.carTT = mode2tt.get("car");
 		this.router = new Dijkstra(network, this, this);
+		this.interpolate = interpolate;
 	}
 
 	// --------------- IMPLEMENTATION OF TripTravelTimes ---------------
 
 	@Override
-	public synchronized double getTravelTime_s(final Object origin, final Object destination, final double dptTime_s,
-			final Object mode) {
+	public synchronized double getTravelTime_s(final Link origin, final Link destination, final double dptTime_s,
+			final String mode) {
 		final Path path = this.getCarPath(origin, destination, dptTime_s);
 		if ("car".equals(mode)) {
 			return path.travelTime;
@@ -55,9 +56,26 @@ class BestTimeResponseTravelTimes implements TripTravelTimes, TravelTime, Travel
 		}
 	}
 
-	public Path getCarPath(final Object origin, final Object destination, final double dptTime_s) {
-		return this.router.calcLeastCostPath(((Link) origin).getToNode(), ((Link) destination).getFromNode(), dptTime_s,
-				null, null);
+	public Path getCarPath(final Link origin, final Link destination, final double dptTime_s) {
+		return this.router.calcLeastCostPath(origin.getToNode(), destination.getFromNode(), dptTime_s, null, null);
+	}
+
+	// --------------- IMPLEMENTATION OF TravelDisutility ---------------
+
+	/*
+	 * TODO This is likely to be inconsistent with what the actual re-planning
+	 * perceives as travel disutility.
+	 */
+
+	@Override
+	public double getLinkTravelDisutility(final Link link, final double entryTime_s, final Person person,
+			final Vehicle vehicle) {
+		return this.getLinkTravelTime(link, entryTime_s, person, vehicle);
+	}
+
+	@Override
+	public double getLinkMinimumTravelDisutility(final Link link) {
+		return link.getLength() / link.getFreespeed();
 	}
 
 	// -------------------- IMPLEMENTATION OF TravelTime --------------------
@@ -92,18 +110,5 @@ class BestTimeResponseTravelTimes implements TripTravelTimes, TravelTime, Travel
 			return this.carTT.getLinkTravelTime(link, entryTime_s, null, null);
 
 		}
-	}
-
-	// --------------- IMPLEMENTATION OF TravelDisutility ---------------
-
-	@Override
-	public double getLinkTravelDisutility(final Link link, final double entryTime_s, final Person person,
-			final Vehicle vehicle) {
-		return this.getLinkTravelTime(link, entryTime_s, person, vehicle);
-	}
-
-	@Override
-	public double getLinkMinimumTravelDisutility(final Link link) {
-		return link.getLength() / link.getFreespeed();
 	}
 }
