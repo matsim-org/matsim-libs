@@ -21,7 +21,7 @@ package tutorial.fixedTimeSignals;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.otfvis.OTFVisWithSignals;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -32,26 +32,20 @@ import org.matsim.core.scenario.ScenarioUtils;
  * This class contains a simple example how to visualize a scenario with lanes and signalized intersections.
  * 
  * @author dgrether
- * 
- * @see org.matsim.signals
- * @see http://matsim.org/node/384
  */
 public class VisTrafficSignalScenarioWithLanes {
 
+	private static final String INPUT_DIR = "./examples/tutorial/example90TrafficLights/useSignalInput/withLanes/";
+
 	private void run() {
-		String configFile = new RunCreateTrafficSignalScenarioWithLanesExample().run();
-		Config config = ConfigUtils.loadConfig(configFile);
+		Config config = ConfigUtils.loadConfig(INPUT_DIR + "config.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-				new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
+				new SignalsDataLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
 		OTFVisWithSignals.playScenario(scenario);
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		new VisTrafficSignalScenarioWithLanes().run();
 	}
-
 }

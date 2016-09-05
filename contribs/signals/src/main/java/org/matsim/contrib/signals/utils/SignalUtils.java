@@ -23,6 +23,9 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsDataImpl;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
@@ -41,6 +44,15 @@ import org.matsim.lanes.data.v20.Lane;
  * 
  */
 public class SignalUtils {
+
+	/**
+	 * create an empty SignalsData object
+	 * 
+	 * @param signalSystemsConfigGroup
+	 */
+	public static SignalsData createSignalsData(SignalSystemsConfigGroup signalSystemsConfigGroup) {
+		return new SignalsDataImpl(signalSystemsConfigGroup);
+	}
 
 	/**
 	 * Creates a SignalGroupData instance for each SignalData instance of the

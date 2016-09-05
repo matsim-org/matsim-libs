@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsWriter20;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsWriter20;
@@ -321,7 +321,7 @@ public class TtRunCottbusSimulation {
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		if (signalsConfigGroup.isUseSignalSystems()) {
 			scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-					new SignalsScenarioLoader(signalsConfigGroup).loadSignalsData());
+					new SignalsDataLoader(signalsConfigGroup).loadSignalsData());
 		}
 		
 		if (WRITE_INITIAL_FILES) 

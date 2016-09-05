@@ -23,7 +23,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesWriter10;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -37,13 +37,13 @@ import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 
 
 /**
- * This Example shows how to create an intergreens input file for the CreateSimpleTrafficSignalScenario Example. 
+ * This example shows how to create an intergreens input file for the CreateSignalScenario example.
+ *  
  * @author dgrether
- *
  */
-public class RunCreateIntergreensExample {
+public class CreateIntergreensExample {
 
-	private static final Logger log = Logger.getLogger(RunCreateIntergreensExample.class);
+	private static final Logger log = Logger.getLogger(CreateIntergreensExample.class);
 	
 	private static void createIntergreens(SignalsData sd){
 		IntergreenTimesData ig = sd.getIntergreenTimesData();
@@ -61,18 +61,18 @@ public class RunCreateIntergreensExample {
 		ig.addIntergreensForSignalSystem(ig4);
 	}
 	
-	
 	public static void main(String[] args) throws IOException {
-		String configFile = new RunCreateTrafficSignalScenarioExample().run();
+		String configFile = new CreateSignalInputExample().run();
 		Config config = ConfigUtils.loadConfig(configFile);
-		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseIntergreenTimes(true);
-		SignalsScenarioLoader loader = new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
-		SignalsData signalsData = loader.loadSignalsData();
+		SignalSystemsConfigGroup signalSystemsConfigGroup = 
+				ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+		signalSystemsConfigGroup.setUseIntergreenTimes(true);
+		SignalsDataLoader signalsDataLoader = new SignalsDataLoader(signalSystemsConfigGroup);
+		SignalsData signalsData = signalsDataLoader.loadSignalsData();
 		createIntergreens(signalsData);
 		IntergreenTimesWriter10 writer = new IntergreenTimesWriter10(signalsData.getIntergreenTimesData());
 		String intergreensFilename = "output/example90TrafficLights/intergreens.xml";
 		writer.write(intergreensFilename);
 		log.info("Intergreens written to " + intergreensFilename);
 	}
-
 }

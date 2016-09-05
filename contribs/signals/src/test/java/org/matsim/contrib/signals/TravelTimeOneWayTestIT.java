@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
@@ -98,7 +98,7 @@ public class TravelTimeOneWayTestIT {
 		signalsConfig.setAmberTimesFile(amberTimesFile);
 		
 		MutableScenario data = (MutableScenario) ScenarioUtils.loadScenario(conf);
-		data.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(signalsConfig).loadSignalsData());
+		data.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(signalsConfig).loadSignalsData());
 		return data;
 	}
 

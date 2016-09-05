@@ -23,7 +23,7 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.otfvis.OTFVisWithSignals;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -36,30 +36,20 @@ import org.matsim.core.scenario.ScenarioUtils;
  * with signalized intersections.
  * 
  * @author dgrether
- *
- * @see org.matsim.signals
- * @see http://matsim.org/node/384
- *
  */
-public class VisSimpleTrafficSignalScenario {
+public class VisSimpleTrafficSignalScenario {	
 
+	private static final String INPUT_DIR = "./examples/tutorial/example90TrafficLights/useSignalInput/woLanes/";
 	
 	private void run() throws IOException {
-		String configFile = new RunCreateTrafficSignalScenarioExample().run();
-		Config config = ConfigUtils.loadConfig(configFile);
+		Config config = ConfigUtils.loadConfig(INPUT_DIR + "config.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-				new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
+				new SignalsDataLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
 		OTFVisWithSignals.playScenario(scenario);
 	}
 	
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
 	public static void main(String[] args) throws IOException {
 		new VisSimpleTrafficSignalScenario().run();
 	}
-
-
 }

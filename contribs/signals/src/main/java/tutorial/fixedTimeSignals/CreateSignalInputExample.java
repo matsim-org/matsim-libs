@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
@@ -59,24 +58,14 @@ import org.matsim.core.scenario.ScenarioUtils;
  * with signalized intersections.
  * 
  * @author dgrether
- *
- * @see org.matsim.signalsystems
- * @see http://matsim.org/node/384
- *
  */
-public class RunCreateTrafficSignalScenarioExample {
+public class CreateSignalInputExample {
 
-	
-	private static final Logger log = Logger.getLogger(RunCreateTrafficSignalScenarioExample.class);
-
-	private static final String INPUT_DIR = "./examples/tutorial/example90TrafficLights/";
-
+	private static final Logger log = Logger.getLogger(CreateSignalInputExample.class);
+	private static final String INPUT_DIR = "./examples/tutorial/example90TrafficLights/createSignalInput/";
 	private static final String OUTPUT_DIR = "output/example90TrafficLights/";
 	
-	private void createSignalSystemsAndGroups(Scenario scenario, SignalsData signalsData){
-		SignalSystemsData systems = signalsData.getSignalSystemsData();
-		SignalGroupsData groups = signalsData.getSignalGroupsData();
-		
+	private void createSignalSystemsAndGroups(Scenario scenario, SignalSystemsData systems, SignalGroupsData groups){		
 		//signal system 3
 		SignalSystemData sys = systems.getFactory().createSignalSystemData(Id.create("3", SignalSystem.class));
 		systems.addSignalSystemData(sys);
@@ -87,7 +76,6 @@ public class RunCreateTrafficSignalScenarioExample {
 		sys.addSignalData(signal);
 		signal.setLinkId(Id.create("43", Link.class));
 		SignalUtils.createAndAddSignalGroups4Signals(groups, sys);
-		
 		
 		//signal system 4
 		sys = systems.getFactory().createSignalSystemData(Id.create("4", SignalSystem.class));
@@ -123,9 +111,8 @@ public class RunCreateTrafficSignalScenarioExample {
 		SignalUtils.createAndAddSignalGroups4Signals(groups, sys);
 	}
 	
-	private SignalControlData createSignalControl(Scenario scenario, SignalsData sd) {
+	private SignalControlData createSignalControl(Scenario scenario, SignalControlData control) {
 		int cycle = 120;
-		SignalControlData control = sd.getSignalControlData();
 		
 		//signal system 3, 4 control
 		List<Id<SignalSystem>> ids = new LinkedList<Id<SignalSystem>>();
@@ -172,9 +159,6 @@ public class RunCreateTrafficSignalScenarioExample {
 		return control;
 	}
 	
-
-	
-	
 	public String run() throws IOException {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(INPUT_DIR + "network.xml.gz");
@@ -184,44 +168,37 @@ public class RunCreateTrafficSignalScenarioExample {
 		config.qsim().setNodeOffset(20.0);
 		config.controler().setMobsim("qsim");
 		config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
+		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		SignalsData signalsData = new SignalsScenarioLoader(signalSystemsConfigGroup).loadSignalsData();
-		this.createSignalSystemsAndGroups(scenario, signalsData);
-		this.createSignalControl(scenario, signalsData);
+		SignalsData signalsData = SignalUtils.createSignalsData(signalSystemsConfigGroup);
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, signalsData);
+		
+		this.createSignalSystemsAndGroups(scenario, signalsData.getSignalSystemsData(), signalsData.getSignalGroupsData());
+		this.createSignalControl(scenario, signalsData.getSignalControlData());
 		
 		Files.createDirectories(Paths.get(OUTPUT_DIR));
 		
+		signalSystemsConfigGroup.setSignalSystemFile(OUTPUT_DIR  + "signal_systems.xml");
+		signalSystemsConfigGroup.setSignalGroupsFile(OUTPUT_DIR  + "signal_groups.xml");
+		signalSystemsConfigGroup.setSignalControlFile(OUTPUT_DIR  + "signal_control.xml");
+		
 		//write to file
 		String configFile = OUTPUT_DIR  + "config.xml";
-		String signalSystemsFile = OUTPUT_DIR  + "signal_systems.xml";
-		String signalGroupsFile = OUTPUT_DIR  + "signal_groups.xml";
-		String signalControlFile = OUTPUT_DIR  + "signal_control.xml";
-
+		ConfigWriter configWriter = new ConfigWriter(config);
+		configWriter.write(configFile);		
 		
 		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
-		signalsWriter.setSignalSystemsOutputFilename(signalSystemsFile);
-		signalsWriter.setSignalGroupsOutputFilename(signalGroupsFile);
-		signalsWriter.setSignalControlOutputFilename(signalControlFile);
+		signalsWriter.setSignalSystemsOutputFilename(signalSystemsConfigGroup.getSignalSystemFile());
+		signalsWriter.setSignalGroupsOutputFilename(signalSystemsConfigGroup.getSignalGroupsFile());
+		signalsWriter.setSignalControlOutputFilename(signalSystemsConfigGroup.getSignalControlFile());
 		signalsWriter.writeSignalsData(scenario);
-
-		signalSystemsConfigGroup.setSignalSystemFile(signalSystemsFile);
-		signalSystemsConfigGroup.setSignalGroupsFile(signalGroupsFile);
-		signalSystemsConfigGroup.setSignalControlFile(signalControlFile);
-		ConfigWriter configWriter = new ConfigWriter(config);
-		configWriter.write(configFile);
 		
 		log.info("Config of simple traffic light scenario is written to " + configFile);
 		log.info("Visualize scenario by calling VisSimpleTrafficSignalScenario in the same package.");
 		return configFile;
 	}
 	
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
 	public static void main(String[] args) throws IOException {
-		new RunCreateTrafficSignalScenarioExample().run();
+		new CreateSignalInputExample().run();
 	}
-
-
 }

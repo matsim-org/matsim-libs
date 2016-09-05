@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
@@ -100,7 +100,7 @@ public class DgFigure9ScenarioGenerator {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(config);
 		ScenarioUtils.loadScenario(sc);
 		
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(ConfigUtils.addOrGetModule(sc.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
+		SignalsDataLoader signalsLoader = new SignalsDataLoader(ConfigUtils.addOrGetModule(sc.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
 		SignalsData signals = signalsLoader.loadSignalsData();
 		sc.addScenarioElement(SignalsData.ELEMENT_NAME, signals);
 		return sc;

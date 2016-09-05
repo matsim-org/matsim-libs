@@ -34,13 +34,13 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsReader20;
  * @author dgrether
  *
  */
-public class SignalsScenarioLoader {
+public class SignalsDataLoader {
 
-	private static final Logger log = Logger.getLogger(SignalsScenarioLoader.class);
+	private static final Logger log = Logger.getLogger(SignalsDataLoader.class);
 
 	private SignalSystemsConfigGroup signalConfig;
 
-	public SignalsScenarioLoader(SignalSystemsConfigGroup config){
+	public SignalsDataLoader(SignalSystemsConfigGroup config){
 		this.signalConfig = config;
 	}
 

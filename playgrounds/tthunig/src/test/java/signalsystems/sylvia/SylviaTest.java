@@ -41,7 +41,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataFactoryImpl;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
@@ -166,7 +166,7 @@ public class SylviaTest {
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-				new SignalsScenarioLoader(signalsConfigGroup).loadSignalsData());
+				new SignalsDataLoader(signalsConfigGroup).loadSignalsData());
 		
 		createScenarioElements(scenario, noPersons);
 		

@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -85,7 +85,7 @@ public class Fixture {
 
 		this.setSignalSystemConfigValues(signalsConfig, testUtils);
 		Scenario scenario = ScenarioUtils.loadScenario(conf);
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
+		SignalsDataLoader signalsLoader = new SignalsDataLoader(signalsConfig);
 		SignalsData signalsData = signalsLoader.loadSignalsData();
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, signalsData);
 		

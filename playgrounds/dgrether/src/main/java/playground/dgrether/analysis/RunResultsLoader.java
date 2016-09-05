@@ -35,7 +35,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsReader;
 import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 
 import playground.dgrether.DgPaths;
 
@@ -154,7 +154,7 @@ public class RunResultsLoader {
 		ConfigUtils.addOrGetModule(c, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(systemspath);
 		ConfigUtils.addOrGetModule(c, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(groupspath);
 		ConfigUtils.addOrGetModule(c, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(controlpath);
-		SignalsScenarioLoader loader = new SignalsScenarioLoader(ConfigUtils.addOrGetModule(c, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
+		SignalsDataLoader loader = new SignalsDataLoader(ConfigUtils.addOrGetModule(c, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
 		return loader.loadSignalsData();
 	}
 

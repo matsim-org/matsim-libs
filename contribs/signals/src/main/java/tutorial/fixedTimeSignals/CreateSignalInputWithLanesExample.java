@@ -19,32 +19,43 @@
  * *********************************************************************** */
 package tutorial.fixedTimeSignals;
 
+import java.io.File;
+import java.util.Arrays;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
-import org.matsim.contrib.signals.data.signalgroups.v20.*;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactory;
-import org.matsim.contrib.signals.model.*;
+import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
-import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.v11.*;
+import org.matsim.lanes.data.v11.LaneDefinitions11;
+import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
+import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
+import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
+import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
+import org.matsim.lanes.data.v11.LanesUtils11;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
-
-import java.io.File;
-import java.util.Arrays;
 
 /**
  * This class contains some examples how to set up a scenario with lanes and
@@ -52,17 +63,11 @@ import java.util.Arrays;
  * 
  * @author dgrether
  * @author tthunig
- * 
- * @see org.matsim.signalsystems
- *
  */
-public class RunCreateTrafficSignalScenarioWithLanesExample {
+public class CreateSignalInputWithLanesExample {
 
-	private static final Logger log = Logger
-			.getLogger(RunCreateTrafficSignalScenarioWithLanesExample.class);
-	
-	private static final String INPUT_DIR = "./examples/tutorial/example90TrafficLights/";
-
+	private static final Logger log = Logger.getLogger(CreateSignalInputWithLanesExample.class);
+	private static final String INPUT_DIR = "./examples/tutorial/example90TrafficLights/createSignalInput/";
 	private static final String OUTPUT_DIR = "output/example90TrafficLights/";
 
 	private int onset1 = 0;
@@ -214,8 +219,7 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 				scenario.getLanes(), scenario.getNetwork());
 	}
 
-	public String run() {
-		
+	public String run() {		
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(INPUT_DIR + "network.xml.gz");
 		config.plans().setInputFile(INPUT_DIR + "population.xml.gz");
@@ -227,12 +231,10 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(signalSystemsConfigGroup).loadSignalsData());
-
+		SignalsData signalsData = SignalUtils.createSignalsData(signalSystemsConfigGroup);
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, signalsData);
+		
 		this.createLanes((MutableScenario) scenario);
-
-		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 
 		this.createGroupsAndSystem2(scenario, signalsData.getSignalSystemsData(), signalsData.getSignalGroupsData());
 		this.createGroupsAndSystem5(scenario, signalsData.getSignalSystemsData(), signalsData.getSignalGroupsData());
@@ -244,6 +246,7 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 			outputDirectory.mkdir();
 		}
 
+		// TODO delete "OUTPUT_DIR +" here. But what is with network and population above?
 		config.network().setLaneDefinitionsFile(OUTPUT_DIR + "lane_definitions_v2.0.xml");
 		signalSystemsConfigGroup.setSignalSystemFile(OUTPUT_DIR + "signal_systems.xml");
 		signalSystemsConfigGroup.setSignalGroupsFile(OUTPUT_DIR + "signal_groups.xml");
@@ -266,14 +269,9 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 		log.info("Config of traffic light scenario with lanes is written to " + configFile);
 		log.info("Visualize scenario by calling VisTrafficSignalScenarioWithLanes in the same package.");
 		return configFile;
-
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
-		new RunCreateTrafficSignalScenarioWithLanesExample().run();
+		new CreateSignalInputWithLanesExample().run();
 	}
-
 }

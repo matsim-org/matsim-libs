@@ -23,7 +23,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * This config Module can be used to specify the paths to the
- * xml files configuring the signal systems.
+ * xml files configuring the signals.
  *
  * @author dgrether
  *

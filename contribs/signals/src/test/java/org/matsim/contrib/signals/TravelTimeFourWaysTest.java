@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.mobsim.SignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
@@ -78,7 +78,7 @@ public class TravelTimeFourWaysTest {
 	
 	private SignalEngine initSignalEngine(Scenario scenario, EventsManager events) {
 		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
+		SignalsDataLoader signalsLoader = new SignalsDataLoader(signalsConfig);
 		SignalsData signalsData = signalsLoader.loadSignalsData();
 		scenario.addScenarioElement( SignalsData.ELEMENT_NAME , signalsData);
 		
