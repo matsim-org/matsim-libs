@@ -63,7 +63,7 @@ public class XYDataCollector<T extends Identifiable<T>>
 
 
     @Override
-    public void notifyMobsimInitialized(MobsimInitializedEvent e)
+    public void notifyMobsimInitialized(@SuppressWarnings("rawtypes") MobsimInitializedEvent e)
     {
         String file = matsimServices.getControlerIO()
                 .getIterationFilename(matsimServices.getIterationNumber(), outputFile);
@@ -73,7 +73,7 @@ public class XYDataCollector<T extends Identifiable<T>>
 
 
     @Override
-    public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e)
+    public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
         if (e.getSimulationTime() % interval == 0) {
             String time = (int)e.getSimulationTime() + "";
@@ -87,7 +87,7 @@ public class XYDataCollector<T extends Identifiable<T>>
 
 
     @Override
-    public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e)
+    public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e)
     {
         writer.close();
     }

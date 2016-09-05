@@ -60,7 +60,7 @@ public class RuleBasedETaxiOptimizer
 
 
     @Override
-    public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e)
+    public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
         if (isNewDecisionEpoch(e, params.socCheckTimeStep)) {
             chargeIdleUnderchargedVehicles(

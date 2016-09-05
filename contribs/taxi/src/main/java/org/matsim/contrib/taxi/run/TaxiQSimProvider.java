@@ -54,7 +54,7 @@ public class TaxiQSimProvider
 
     protected final TaxiConfigGroup taxiCfg;
     private final VehicleType vehicleType;//TODO resolve this by subclassing (without guice)??
-    private final TaxiOptimizerFactory optimizerFactory;//TODO resolve this subclassing (without guice)??
+    private final TaxiOptimizerFactory optimizerFactory;//TODO resolve this by subclassing (without guice)??
 
 
     @Inject

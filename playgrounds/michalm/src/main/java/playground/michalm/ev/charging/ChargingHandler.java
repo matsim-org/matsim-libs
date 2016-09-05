@@ -49,7 +49,7 @@ public class ChargingHandler
 
 
     @Override
-    public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e)
+    public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e)
     {
         if ( (e.getSimulationTime() + 1) % chargeTimeStep == 0) {
             for (Charger c : chargers) {

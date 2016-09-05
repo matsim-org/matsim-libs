@@ -88,7 +88,7 @@ public class TimeProfileCollector
 
 
     @Override
-    public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e)
+    public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e)
     {
         String file = matsimServices.getControlerIO()
                 .getIterationFilename(matsimServices.getIterationNumber(), outputFile);
