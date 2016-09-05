@@ -32,6 +32,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.core.scenario.Lockable;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+
 /**
  * Default implementation of {@link Person} interface.
  */
@@ -44,6 +46,8 @@ import org.matsim.core.scenario.Lockable;
 
 	private Customizable customizableDelegate;
 	private boolean locked;
+
+	private final Attributes attributes = new Attributes();
 
 	/* deliberately package */ PersonImpl(final Id<Person> id) {
 		this.id = id;
@@ -131,6 +135,11 @@ import org.matsim.core.scenario.Lockable;
 			this.customizableDelegate = CustomizableUtils.createCustomizable();
 		}
 		return this.customizableDelegate.getCustomAttributes();
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
 	}
 
 	@Override

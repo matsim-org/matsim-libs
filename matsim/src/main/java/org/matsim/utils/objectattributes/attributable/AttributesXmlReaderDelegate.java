@@ -11,8 +11,8 @@ import java.util.*;
  * This class is meant to be used as a delegate by any reader that reads an {@link Attributable} object
  * @author thibautd
  */
-public class AttributeXmlReaderDelegate {
-	private final static Logger log = Logger.getLogger(AttributeXmlReaderDelegate.class);
+public class AttributesXmlReaderDelegate {
+	private final static Logger log = Logger.getLogger(AttributesXmlReaderDelegate.class);
 	private final Map<String, AttributeConverter<?>> converters = new HashMap<String, AttributeConverter<?>>();
 	private boolean readCharacters = false;
 
@@ -34,7 +34,7 @@ public class AttributeXmlReaderDelegate {
 
 	private final Set<String> missingConverters = new HashSet<String>();
 
-	public AttributeXmlReaderDelegate() {
+	public AttributesXmlReaderDelegate() {
 		this.converters.put(String.class.getCanonicalName(), STRING_Converter);
 		this.converters.put(Integer.class.getCanonicalName(), INTEGER_Converter);
 		this.converters.put(Float.class.getCanonicalName(), FLOAT_Converter);
@@ -43,13 +43,16 @@ public class AttributeXmlReaderDelegate {
 		this.converters.put(Long.class.getCanonicalName(), LONG_Converter);
 	}
 
-	public void startTag(String name, org.xml.sax.Attributes atts, Stack<String> context) {
+	public void startTag(String name,
+						 org.xml.sax.Attributes atts,
+						 Stack<String> context,
+						 Attributes currentAttributes ) {
 		if (TAG_ATTRIBUTE.equals(name)) {
 			this.currentAttribute = atts.getValue(ATTR_ATTRIBUTENAME);
 			this.currentAttributeClass = atts.getValue(ATTR_ATTRIBUTECLASS);
 			this.readCharacters = true;
 		} else if (TAG_ATTRIBUTES.equals(name)) {
-			this.currentAttributes = new Attributes();
+			this.currentAttributes = currentAttributes;
 		}
 	}
 
