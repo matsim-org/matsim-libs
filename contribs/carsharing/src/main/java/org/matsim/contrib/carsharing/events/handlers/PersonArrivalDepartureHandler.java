@@ -17,7 +17,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.carsharing.events.EndRentalEvent;
-import org.matsim.contrib.carsharing.manager.CarsharingManagerNew;
+import org.matsim.contrib.carsharing.manager.CarsharingManagerInterface;
 import org.matsim.contrib.carsharing.manager.demand.CurrentTotalDemand;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyContainer;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
@@ -32,7 +32,7 @@ import com.google.inject.Inject;
 public class PersonArrivalDepartureHandler implements PersonDepartureEventHandler, PersonLeavesVehicleEventHandler, 
 	PersonArrivalEventHandler, PersonEntersVehicleEventHandler {	
 
-	@Inject	private CarsharingManagerNew carsharingManager;
+	@Inject	private CarsharingManagerInterface carsharingManager;
 	//@Inject private CSPersonVehicle csPersonVehicles;
 	@Inject private CurrentTotalDemand currentDemand;
 	@Inject private CarsharingSupplyContainer carsharingSupply;

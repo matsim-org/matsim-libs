@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.carsharing.manager.CarsharingManagerNew;
+import org.matsim.contrib.carsharing.manager.CarsharingManagerInterface;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -24,30 +24,24 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.withinday.utils.EditRoutes;
 
 
 public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, PTPassengerAgent {
-	/** 
-	 * <li> {@link EditRoutes} could probably be used to re-route the car leg. 
-	 * <li> It should be possible to extract the agent behavior into something analog to {@link NetworkRoutingInclAccessEgressModule}.
-	 * </ul> kai, feb'16
-	 */
+	
 
-	private CarsharingManagerNew carsharingManager;
+	private CarsharingManagerInterface carsharingManager;
 
 	private final BasicPlanAgentImpl basicAgentDelegate;
 	private final TransitAgentImpl transitAgentDelegate;
 	private final PlanBasedDriverAgentImpl driverAgentDelegate;
 
-	public CarsharingPersonDriverAgentImpl(final Plan plan, final Netsim simulation, CarsharingManagerNew carsharingManager) {
+	public CarsharingPersonDriverAgentImpl(final Plan plan, final Netsim simulation, CarsharingManagerInterface carsharingManager) {
 		Scenario scenario = simulation.getScenario() ;
 		this.carsharingManager = carsharingManager;
 		this.basicAgentDelegate = new BasicPlanAgentImpl( plan, scenario, simulation.getEventsManager(), simulation.getSimTimer() ) ;

@@ -3,7 +3,7 @@ package org.matsim.contrib.carsharing.qsim;
 import javax.inject.Inject;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.carsharing.manager.CarsharingManagerNew;
+import org.matsim.contrib.carsharing.manager.CarsharingManagerInterface;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyContainer;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -25,7 +25,7 @@ public class CarsharingQsimFactoryNew implements Provider<Mobsim>{
 	@Inject Scenario scenario;
 	@Inject EventsManager eventsManager;
 	@Inject CarsharingSupplyContainer carsharingSupply;
-	@Inject private CarsharingManagerNew carsharingManager;
+	@Inject private CarsharingManagerInterface carsharingManager;
 
 	@Override
 	public Mobsim get() {

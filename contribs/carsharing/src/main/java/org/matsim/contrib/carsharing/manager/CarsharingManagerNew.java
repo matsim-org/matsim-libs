@@ -154,24 +154,13 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 			}
 		}
 		return willUseVehicle;
-	}
-	public void returnCarsharingVehicle(Id<Person> personId, Id<Link> linkId, double time, String vehicleId) {
-		CSVehicle vehicle = this.carsharingSupplyContainer.getVehicleqWithId(vehicleId);
-
-		Network network = scenario.getNetwork();
-		Link link = network.getLinks().get(linkId);
-		
-		CompanyContainer companyContainer = this.carsharingSupplyContainer.getCompany(vehicle.getCompanyId());
-		VehiclesContainer vehiclesContainer = companyContainer.getVehicleContainer(vehicle.getCsType());
-		
-		vehiclesContainer.parkVehicle(vehicle, link);
-		
 	}	
 	private CSVehicle getVehicleAtLocation(Link currentLink, Person person, String carsharingType) {
 
 		return this.currentDemand.getVehicleOnLink(person.getId(), currentLink, carsharingType);	
 		
 	}	
+	@Override
 	public void freeParkingSpot(String vehicleId, Id<Link> linkId) {
 		
 		CSVehicle vehicle = this.carsharingSupplyContainer.getVehicleqWithId(vehicleId);

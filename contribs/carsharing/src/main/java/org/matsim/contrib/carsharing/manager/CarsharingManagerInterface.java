@@ -15,5 +15,5 @@ public interface CarsharingManagerInterface {
 	
 	public boolean parkVehicle(String vehicleId, Id<Link> linkId);
 	public List<PlanElement> reserveAndrouteCarsharingTrip(Plan plan, String carsharingType, Leg legToBeRouted, Double time);
-
+	public void freeParkingSpot(String vehicleId, Id<Link> linkId);
 }
