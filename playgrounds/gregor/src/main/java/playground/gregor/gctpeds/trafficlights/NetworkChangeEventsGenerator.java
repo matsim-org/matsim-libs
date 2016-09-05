@@ -105,7 +105,7 @@ public class NetworkChangeEventsGenerator {
 		new NetworkChangeEventsGenerator(sc).run();
 
 		c.network().setChangeEventsInputFile( "/Users/laemmel/devel/nyc/gct_vicinity/changeevents.xml.gz");
-		new NetworkChangeEventsWriter().write(c.network().getChangeEventsInputFile(), NetworkUtils.getNetworkChangeEvents(((Network)sc.getNetwork())));
+		new NetworkChangeEventsWriter().write(c.network().getChangeEventsInputFileUrl(c.getContext()).getFile(), NetworkUtils.getNetworkChangeEvents(((Network)sc.getNetwork())));
 		new ConfigWriter(c).write("/Users/laemmel/devel/nyc/gct_vicinity/config.xml.gz");
 	}
 

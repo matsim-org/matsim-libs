@@ -172,14 +172,14 @@ public class ScenarioLoaderImpl {
 				network.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 			}
 			new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkFileName);
-			if ((config.network().getChangeEventsInputFile() != null) && config.network().isTimeVariantNetwork()) {
-				log.info("loading network change events from " + config.network().getChangeEventsInputFile());
+			if ((this.config.network().getChangeEventsInputFileUrl(this.config.getContext()).getFile() != null) && this.config.network().isTimeVariantNetwork()) {
+				log.info("loading network change events from " + this.config.network().getChangeEventsInputFileUrl(this.config.getContext()).getFile());
 				List<NetworkChangeEvent> changeEvents = new ArrayList<>() ;
-				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network, changeEvents );
-				parser.readFile(config.network().getChangeEventsInputFile());
-				NetworkUtils.setNetworkChangeEvents(network,changeEvents) ;
+				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network,changeEvents);
+				parser.parse(this.config.network().getChangeEventsInputFileUrl(config.getContext()));
+				NetworkUtils.setNetworkChangeEvents(network,changeEvents);
 			}
-		}
+			}
 	}
 
 	/**
