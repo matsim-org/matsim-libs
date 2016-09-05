@@ -13,7 +13,7 @@ import org.matsim.contrib.carsharing.events.StartRentalEvent;
 import org.matsim.contrib.carsharing.manager.demand.AgentRentals;
 import org.matsim.contrib.carsharing.manager.demand.DemandHandler;
 import org.matsim.contrib.carsharing.manager.demand.RentalInfo;
-import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyContainer;
+import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContainer;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.core.config.Config;
@@ -37,7 +37,7 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 	private CostsCalculatorContainer costsCalculatorContainer;
 	private DemandHandler demandHandler;
 	private Id<Person> personId;
-	private CarsharingSupplyContainer carsharingSupplyContainer;
+	private CarsharingSupplyInterface carsharingSupplyContainer;
 	
 	private static final  Set<String> walkingLegs = ImmutableSet.of("egress_walk_ow", "access_walk_ow",
 			"egress_walk_tw", "access_walk_tw", "egress_walk_ff", "access_walk_ff");
@@ -47,7 +47,7 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 	
 	public CarsharingLegScoringFunction(CharyparNagelScoringParameters params, 
 			Config config,  Network network, DemandHandler demandHandler,
-			CostsCalculatorContainer costsCalculatorContainer, CarsharingSupplyContainer carsharingSupplyContainer,
+			CostsCalculatorContainer costsCalculatorContainer, CarsharingSupplyInterface carsharingSupplyContainer,
 			Id<Person> personId)
 	{
 		super(params, network);

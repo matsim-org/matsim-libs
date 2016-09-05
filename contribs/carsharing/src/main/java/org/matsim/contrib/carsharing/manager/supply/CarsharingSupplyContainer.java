@@ -13,44 +13,56 @@ import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 /** 
  * @author balac
  */
-public class CarsharingSupplyContainer {
+public class CarsharingSupplyContainer implements CarsharingSupplyInterface {
 	private Map<String, CompanyContainer> companies = new HashMap<String, CompanyContainer>();
 	private Map<String, CSVehicle> allVehicles = new HashMap<String, CSVehicle>();
 	private Map<CSVehicle, Link> allVehicleLocations = new HashMap<CSVehicle, Link>();
 	private Set<String> companyNames;
-	
-	
-	public Map<CSVehicle, Link> getAllVehicleLocations() {
-		return allVehicleLocations;
-	}
-
-	public Map<String, CSVehicle> getAllVehicles() {
-		return allVehicles;
-	}
-
 	private Scenario scenario;
 	
 	public CarsharingSupplyContainer(Scenario scenario) {
 		this.scenario = scenario;
+	}	
+	
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface#getAllVehicleLocations()
+	 */
+	@Override
+	public Map<CSVehicle, Link> getAllVehicleLocations() {
+		return allVehicleLocations;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface#getAllVehicles()
+	 */
+	@Override
+	public Map<String, CSVehicle> getAllVehicles() {
+		return allVehicles;
 	}
 	
-	public void addCompany(CompanyContainer companyContainer) {
-		
-		this.companies.put(companyContainer.getCompanyId(), companyContainer);
-		
-	}
-	
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface#getCompany(java.lang.String)
+	 */
+	@Override
 	public CompanyContainer getCompany(String companyId) {
 		
 		return this.companies.get(companyId);
 	}
 	
 	
-	public CSVehicle getVehicleqWithId (String vehicleId) {
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface#getVehicleWithId(java.lang.String)
+	 */
+	@Override
+	public CSVehicle getVehicleWithId (String vehicleId) {
 		
 		return this.allVehicles.get(vehicleId);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface#findClosestAvailableVehicle(org.matsim.api.core.v01.network.Link, java.lang.String, java.lang.String, java.lang.String, double)
+	 */
+	@Override
 	public CSVehicle findClosestAvailableVehicle(Link startLink, String carsharingType, String typeOfVehicle,
 			String companyId, double searchDistance) {
 		
@@ -59,6 +71,10 @@ public class CarsharingSupplyContainer {
 		return vehiclesContainer.findClosestAvailableVehicle(startLink, typeOfVehicle, searchDistance);		
 	}		
 
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface#findClosestAvailableParkingSpace(org.matsim.api.core.v01.network.Link, java.lang.String, java.lang.String, double)
+	 */
+	@Override
 	public Link findClosestAvailableParkingSpace(Link destinationLink, String carsharingType,
 			String companyId, double searchDistance) {
 		CompanyContainer companyContainer = this.companies.get(companyId);
@@ -66,6 +82,10 @@ public class CarsharingSupplyContainer {
 		return vehiclesContainer.findClosestAvailableParkingLocation(destinationLink, searchDistance);	
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface#populateSupply()
+	 */
+	@Override
 	public void populateSupply() {
 
 		Network network = this.scenario.getNetwork();
@@ -82,6 +102,10 @@ public class CarsharingSupplyContainer {
 		this.companyNames = reader.getCompanyNames();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface#getCompanyNames()
+	 */
+	@Override
 	public Set<String> getCompanyNames() {
 		return companyNames;
 	}	

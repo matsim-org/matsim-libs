@@ -17,7 +17,7 @@ import org.matsim.contrib.carsharing.events.EndRentalEvent;
 import org.matsim.contrib.carsharing.events.StartRentalEvent;
 import org.matsim.contrib.carsharing.events.handlers.EndRentalEventHandler;
 import org.matsim.contrib.carsharing.events.handlers.StartRentalEventHandler;
-import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyContainer;
+import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -28,7 +28,7 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler,
 PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler, EndRentalEventHandler {
 	
 	@Inject Scenario scenario;
-	@Inject CarsharingSupplyContainer carsharingSupplyContainer;
+	@Inject CarsharingSupplyInterface carsharingSupplyContainer;
 	private Map<Id<Person>, AgentRentals> agentRentalsMap = new HashMap<Id<Person>, AgentRentals>();	
 	
 	private Map<Id<Vehicle>, Id<Person>> vehiclePersonMap = new HashMap<Id<Vehicle>, Id<Person>>();

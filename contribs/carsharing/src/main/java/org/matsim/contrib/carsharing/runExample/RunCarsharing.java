@@ -15,6 +15,7 @@ import org.matsim.contrib.carsharing.manager.demand.CurrentTotalDemand;
 import org.matsim.contrib.carsharing.manager.demand.DemandHandler;
 import org.matsim.contrib.carsharing.manager.demand.membership.MembershipContainer;
 import org.matsim.contrib.carsharing.manager.demand.membership.MembershipReader;
+import org.matsim.contrib.carsharing.manager.routers.RouteCarsharingTrip;
 import org.matsim.contrib.carsharing.manager.routers.RouteCarsharingTripImpl;
 import org.matsim.contrib.carsharing.manager.routers.RouterProvider;
 import org.matsim.contrib.carsharing.manager.routers.RouterProviderImpl;
@@ -89,6 +90,7 @@ public class RunCarsharing {
 		final RouterProvider routerProvider = new RouterProviderImpl();
 		final CurrentTotalDemand currentTotalDemand = new CurrentTotalDemand(controler.getScenario().getNetwork());
 		final CarsharingManagerInterface carsharingManager = new CarsharingManagerNew();
+		final RouteCarsharingTrip routeCarsharingTrip = new RouteCarsharingTripImpl();
 		
 		//===adding carsharing objects on supply and demand infrastructure ===
 		
@@ -101,7 +103,7 @@ public class RunCarsharing {
 				bind(ChooseTheCompany.class).toInstance(chooseCompany);
 				bind(RouterProvider.class).toInstance(routerProvider);
 				bind(CurrentTotalDemand.class).toInstance(currentTotalDemand);
-				bind(RouteCarsharingTripImpl.class).asEagerSingleton();
+				bind(RouteCarsharingTrip.class).toInstance(routeCarsharingTrip);
 				bind(CostsCalculatorContainer.class).toInstance(costsCalculatorContainer);
 				bind(MembershipContainer.class).toInstance(memberships);
 			    bind(CarsharingSupplyContainer.class).toInstance(carsharingSupplyContainer);

@@ -12,7 +12,7 @@ import com.google.inject.Inject;
 
 public class RouterProviderImpl implements RouterProvider {
 
-	@Inject private RouteCarsharingTripImpl carsharingTripRouter;
+	@Inject private RouteCarsharingTrip carsharingTripRouter;
 
 	@Override
 	public List<PlanElement> routeCarsharingTrip(Plan plan, double time, Leg legToBeRouted, String carsharingType,

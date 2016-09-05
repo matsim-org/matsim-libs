@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.carsharing.events.StartRentalEvent;
 import org.matsim.contrib.carsharing.manager.demand.CurrentTotalDemand;
 import org.matsim.contrib.carsharing.manager.routers.RouterProvider;
-import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyContainer;
+import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.manager.supply.CompanyContainer;
 import org.matsim.contrib.carsharing.manager.supply.OneWayContainer;
 import org.matsim.contrib.carsharing.manager.supply.TwoWayContainer;
@@ -40,7 +40,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 	@Inject private CurrentTotalDemand currentDemand;
 	@Inject private KeepingTheCarModel keepTheCarModel;
 	@Inject private ChooseTheCompany chooseCompany;
-	@Inject private CarsharingSupplyContainer carsharingSupplyContainer;
+	@Inject private CarsharingSupplyInterface carsharingSupplyContainer;
 	@Inject private EventsManager eventsManager;
 	@Inject private RouterProvider routerProvider;
 	
@@ -163,7 +163,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 	@Override
 	public void freeParkingSpot(String vehicleId, Id<Link> linkId) {
 		
-		CSVehicle vehicle = this.carsharingSupplyContainer.getVehicleqWithId(vehicleId);
+		CSVehicle vehicle = this.carsharingSupplyContainer.getVehicleWithId(vehicleId);
 		Network network = scenario.getNetwork();
 		Link link = network.getLinks().get(linkId);
 		CompanyContainer companyContainer = this.carsharingSupplyContainer.getCompany(vehicle.getCompanyId());
@@ -174,7 +174,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 
 	@Override
 	public boolean parkVehicle(String vehicleId, Id<Link> linkId) {
-		CSVehicle vehicle = this.carsharingSupplyContainer.getVehicleqWithId(vehicleId);
+		CSVehicle vehicle = this.carsharingSupplyContainer.getVehicleWithId(vehicleId);
 		Network network = scenario.getNetwork();
 		Link link = network.getLinks().get(linkId);
 		this.carsharingSupplyContainer.getCompany(vehicle.getCompanyId()).parkVehicle(vehicle, link);

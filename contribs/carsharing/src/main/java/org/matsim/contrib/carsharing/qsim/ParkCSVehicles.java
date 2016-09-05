@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyContainer;
+import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -21,11 +21,11 @@ public class ParkCSVehicles implements AgentSource {
 	private QSim qsim;
 	private Map<String, VehicleType> modeVehicleTypes;
 	private Collection<String> mainModes;
-	private CarsharingSupplyContainer carsharingSupply;
+	private CarsharingSupplyInterface carsharingSupply;
 	//private final static Logger log = Logger.getLogger(ParkCSVehicles.class);
 	
 	public ParkCSVehicles(QSim qSim,
-			CarsharingSupplyContainer carsharingSupply) {
+			CarsharingSupplyInterface carsharingSupply) {
 		
 		this.qsim = qSim;  
 		this.modeVehicleTypes = new HashMap<String, VehicleType>();

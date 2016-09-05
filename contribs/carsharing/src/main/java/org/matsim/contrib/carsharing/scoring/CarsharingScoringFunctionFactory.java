@@ -3,7 +3,7 @@ package org.matsim.contrib.carsharing.scoring;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.carsharing.manager.demand.DemandHandler;
-import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyContainer;
+import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContainer;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -22,10 +22,10 @@ public class CarsharingScoringFunctionFactory implements ScoringFunctionFactory 
 	private final CharyparNagelScoringParametersForPerson params;
 	private final DemandHandler demandHandler;
 	private final CostsCalculatorContainer costsCalculatorContainer;
-	private final CarsharingSupplyContainer carsharingSupplyContainer;
+	private final CarsharingSupplyInterface carsharingSupplyContainer;
 	@Inject
 	CarsharingScoringFunctionFactory( final Scenario sc, final DemandHandler demandHandler,
-			final CostsCalculatorContainer costsCalculatorContainer, final CarsharingSupplyContainer carsharingSupplyContainer) {
+			final CostsCalculatorContainer costsCalculatorContainer, final CarsharingSupplyInterface carsharingSupplyContainer) {
 		this.scenario = sc;
 		this.params = new SubpopulationCharyparNagelScoringParameters( sc );
 		this.demandHandler = demandHandler;
