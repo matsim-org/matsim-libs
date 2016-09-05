@@ -20,6 +20,7 @@ import org.matsim.contrib.carsharing.manager.routers.RouteCarsharingTripImpl;
 import org.matsim.contrib.carsharing.manager.routers.RouterProvider;
 import org.matsim.contrib.carsharing.manager.routers.RouterProviderImpl;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyContainer;
+import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContainer;
 import org.matsim.contrib.carsharing.models.ChooseTheCompany;
 import org.matsim.contrib.carsharing.models.ChooseTheCompanyExample;
@@ -83,7 +84,7 @@ public class RunCarsharing {
 		final CostsCalculatorContainer costsCalculatorContainer = CarsharingUtils.createCompanyCostsStructure(carsharingCompanies);
 		
 		final CarsharingListener carsharingListener = new CarsharingListener();
-		final CarsharingSupplyContainer carsharingSupplyContainer = new CarsharingSupplyContainer(controler.getScenario());
+		final CarsharingSupplyInterface carsharingSupplyContainer = new CarsharingSupplyContainer(controler.getScenario());
 		carsharingSupplyContainer.populateSupply();
 		final KeepingTheCarModel keepingCarModel = new KeepingTheCarModelExample();
 		final ChooseTheCompany chooseCompany = new ChooseTheCompanyExample();
@@ -106,7 +107,7 @@ public class RunCarsharing {
 				bind(RouteCarsharingTrip.class).toInstance(routeCarsharingTrip);
 				bind(CostsCalculatorContainer.class).toInstance(costsCalculatorContainer);
 				bind(MembershipContainer.class).toInstance(memberships);
-			    bind(CarsharingSupplyContainer.class).toInstance(carsharingSupplyContainer);
+			    bind(CarsharingSupplyInterface.class).toInstance(carsharingSupplyContainer);
 			    bind(CarsharingManagerInterface.class).toInstance(carsharingManager);
 			    bind(DemandHandler.class).asEagerSingleton();
 			}			
