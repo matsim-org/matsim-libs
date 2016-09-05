@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.attributeconverters.*;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -18,6 +19,15 @@ public class AttributesXmlWriterDelegate {
 
 	private final Map<String, AttributeConverter<?>> converters = new HashMap<>();
 	private final Set<Class<?>> missingConverters = new HashSet<>();
+
+	public AttributesXmlWriterDelegate() {
+		this.converters.put(String.class.getCanonicalName(), new StringConverter());
+		this.converters.put(Integer.class.getCanonicalName(), new IntegerConverter());
+		this.converters.put(Float.class.getCanonicalName(), new FloatConverter());
+		this.converters.put(Double.class.getCanonicalName(), new DoubleConverter());
+		this.converters.put(Boolean.class.getCanonicalName(), new BooleanConverter());
+		this.converters.put(Long.class.getCanonicalName(), new LongConverter());
+	}
 
 	public final void writeAttributes(final String indentation,
 									  final BufferedWriter writer,
@@ -40,9 +50,9 @@ public class AttributesXmlWriterDelegate {
 				if (conv != null) {
 					writer.write( indentation + "\t" );
 					writer.write( "<attribute name=\"" + objAttribute.getKey() + "\" " );
-					writer.write( "class=\"" + clazz.getCanonicalName() + "\" > " );
+					writer.write( "class=\"" + clazz.getCanonicalName() + "\" >" );
 					writer.write( conv.convertToString( objAttribute.getValue() ) );
-					writer.write( "<attribute/>" );
+					writer.write( "</attribute>" );
 					writer.newLine();
 				} else {
 					if (missingConverters.add(clazz)) {

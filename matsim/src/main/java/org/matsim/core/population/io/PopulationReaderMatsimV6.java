@@ -152,19 +152,27 @@ import java.util.Stack;
 
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
-		if (PERSON.equals(name)) {
-			this.plans.addPerson(this.currperson);
-			this.currperson = null;
-		} else if (PLAN.equals(name)) {
-			if (this.currplan.getPlanElements() instanceof ArrayList<?>) {
-				((ArrayList<?>) this.currplan.getPlanElements()).trimToSize();
-			}
-			this.currplan = null;
-		} else if (ACT.equals(name)) {
-			this.prevAct = this.curract;
-			this.curract = null;
-		} else if (ROUTE.equals(name)) {
-			endRoute(content);
+		switch ( name ) {
+			case PERSON:
+				this.plans.addPerson(this.currperson);
+				this.currperson = null;
+				break;
+			case ATTRIBUTE:
+				this.attributesReader.endTag( name , content , context );
+				break;
+			case PLAN:
+				if (this.currplan.getPlanElements() instanceof ArrayList<?>) {
+					((ArrayList<?>) this.currplan.getPlanElements()).trimToSize();
+				}
+				this.currplan = null;
+				break;
+			 case ACT:
+				this.prevAct = this.curract;
+				this.curract = null;
+				 break;
+			case ROUTE:
+				endRoute(content);
+				break;
 		}
 	}
 

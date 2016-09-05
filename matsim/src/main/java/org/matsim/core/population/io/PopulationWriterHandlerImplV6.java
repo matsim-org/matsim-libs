@@ -129,9 +129,10 @@ import java.io.IOException;
 			out.write((PersonUtils.isEmployed(person) ? "yes" : "no"));
 			out.write("\"");
 		}
-		attributesWriter.writeAttributes( "\t" , out , person.getAttributes() );
 
 		out.write(">\n");
+		attributesWriter.writeAttributes( "\t" , out , person.getAttributes() );
+
 	}
 
 	private static void endPerson(final BufferedWriter out) throws IOException {

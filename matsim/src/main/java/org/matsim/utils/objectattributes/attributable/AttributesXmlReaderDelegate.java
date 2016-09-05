@@ -25,22 +25,15 @@ public class AttributesXmlReaderDelegate {
 	/*package*/ final static String ATTR_ATTRIBUTENAME = "name";
 	/*package*/ final static String ATTR_ATTRIBUTECLASS = "class";
 
-	private static final StringConverter STRING_Converter = new StringConverter();
-	private static final IntegerConverter INTEGER_Converter = new IntegerConverter();
-	private static final FloatConverter FLOAT_Converter = new FloatConverter();
-	private static final DoubleConverter DOUBLE_Converter = new DoubleConverter();
-	private static final BooleanConverter BOOLEAN_Converter = new BooleanConverter();
-	private static final LongConverter LONG_Converter = new LongConverter();
-
 	private final Set<String> missingConverters = new HashSet<String>();
 
 	public AttributesXmlReaderDelegate() {
-		this.converters.put(String.class.getCanonicalName(), STRING_Converter);
-		this.converters.put(Integer.class.getCanonicalName(), INTEGER_Converter);
-		this.converters.put(Float.class.getCanonicalName(), FLOAT_Converter);
-		this.converters.put(Double.class.getCanonicalName(), DOUBLE_Converter);
-		this.converters.put(Boolean.class.getCanonicalName(), BOOLEAN_Converter);
-		this.converters.put(Long.class.getCanonicalName(), LONG_Converter);
+		this.converters.put(String.class.getCanonicalName(), new StringConverter());
+		this.converters.put(Integer.class.getCanonicalName(), new IntegerConverter());
+		this.converters.put(Float.class.getCanonicalName(), new FloatConverter());
+		this.converters.put(Double.class.getCanonicalName(), new DoubleConverter());
+		this.converters.put(Boolean.class.getCanonicalName(), new BooleanConverter());
+		this.converters.put(Long.class.getCanonicalName(), new LongConverter());
 	}
 
 	public void startTag(String name,
@@ -65,7 +58,7 @@ public class AttributesXmlReaderDelegate {
 					log.warn("No AttributeConverter found for class " + this.currentAttributeClass + ". Not all attribute values can be read.");
 				}
 			} else {
-				Object o = this.converters.get(this.currentAttributeClass).convert(content);
+				Object o = c.convert(content);
 				this.currentAttributes.putAttribute( this.currentAttribute, o);
 			}
 		}
