@@ -33,6 +33,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+
 /** 
  * @author balac
  */
@@ -87,6 +88,9 @@ public class RunCarsharing {
 		final RouterProvider routerProvider = new RouterProviderImpl();
 		final CurrentTotalDemand currentTotalDemand = new CurrentTotalDemand(controler.getScenario().getNetwork());
 		
+		
+		//===adding carsharing objects on supply and demand infrastructure ===
+		
 		controler.addOverridingModule(new AbstractModule() {
 
 			@Override
@@ -99,9 +103,13 @@ public class RunCarsharing {
 				bind(RouteCarsharingTripImpl.class).asEagerSingleton();
 				bind(CostsCalculatorContainer.class).toInstance(costsCalculatorContainer);
 				bind(MembershipContainer.class).toInstance(memberships);
+			    bind(CarsharingSupplyContainer.class).toInstance(carsharingSupplyContainer);
+			    bind(CarsharingManagerNew.class).asEagerSingleton();
+			    bind(DemandHandler.class).asEagerSingleton();
 			}			
 		});		
 		
+		//=== carsharing specific replanning strategies ===
 		
 		controler.addOverridingModule( new AbstractModule() {
 			@Override
@@ -111,22 +119,31 @@ public class RunCarsharing {
 			}
 		});
 		
+		//=== adding qsimfactory, controller listeners and event handlers
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bindMobsim().toProvider(CarsharingQsimFactoryNew.class);
 		        addControlerListenerBinding().toInstance(carsharingListener);
 		        addControlerListenerBinding().to(CarsharingManagerNew.class);		        
-				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
-		        bind(CarsharingSupplyContainer.class).toInstance(carsharingSupplyContainer);
-		        bind(CarsharingManagerNew.class).asEagerSingleton();
-		        bind(DemandHandler.class).asEagerSingleton();
+				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);		      
 		        addEventHandlerBinding().to(PersonArrivalDepartureHandler.class);
 		        addEventHandlerBinding().to(DemandHandler.class);
 			}
 		});
+		//=== adding carsharing specific scoring factory ===
+		controler.addOverridingModule(new AbstractModule() {
+			
+			@Override
+			public void install() {
+				        
+				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);	
+			}
+		});
 
-		controler.addOverridingModule(CarsharingUtils.createModule());			
+		//=== routing moduels for carsharing trips ===
+
+		controler.addOverridingModule(CarsharingUtils.createRoutingModule());			
 	}
 
 }
