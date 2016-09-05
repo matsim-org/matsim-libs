@@ -20,7 +20,6 @@
 package playground.michalm.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.run.VrpQSimConfigConsistencyChecker;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.*;
@@ -50,7 +49,7 @@ public class RunETaxiScenario
     {
         TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
         EvConfigGroup evCfg = EvConfigGroup.get(config);
-        config.addConfigConsistencyChecker(new VrpQSimConfigConsistencyChecker());
+        config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
         config.checkConsistency();
 
         Scenario scenario = ScenarioUtils.loadScenario(config);

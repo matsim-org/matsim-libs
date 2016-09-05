@@ -78,11 +78,6 @@ public class TaxiQSimProvider
     @Override
     public Mobsim get()
     {
-        //TODO add this to Config checkers
-        if (taxiCfg.isVehicleDiversion() && !taxiCfg.isOnlineVehicleTracker()) {
-            throw new IllegalStateException("Diversion requires online tracking");
-        }
-
         QSim qSim = QSimUtils.createQSim(scenario, eventsManager, plugins);
 
         TaxiOptimizer optimizer = createTaxiOptimizer(qSim);
