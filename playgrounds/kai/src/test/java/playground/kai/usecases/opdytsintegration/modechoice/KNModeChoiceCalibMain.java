@@ -9,9 +9,16 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import floetteroed.opdyts.DecisionVariableRandomizer;
@@ -32,13 +39,39 @@ import opdytsintegration.utils.TimeDiscretization;
 class KNModeChoiceCalibMain {
 
 	static void solveFictitiousProblem() {
+		OutputDirectoryLogging.catchLogEntries();
 
 		System.out.println("STARTED ...");
 
-		final Config config = ConfigUtils.loadConfig("examples/equil/config.xml");
+		final Config config = ConfigUtils.loadConfig("examples/equil-extended/config.xml");
+
 		config.controler() .setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(100);
-		config.global().setRandomSeed(new Random().nextLong());
+		config.controler().setLastIteration(10);
+
+		config.global().setRandomSeed(4711);
+
+		config.plans().setRemovingUnneccessaryPlanAttributes(true);
+
+		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
+			params.setTypicalDurationScoreComputation( TypicalDurationScoreComputation.relative );
+		}
+		{
+			StrategySettings stratSets = new StrategySettings() ;
+			stratSets.setStrategyName( DefaultSelector.ChangeExpBeta.name() );
+			stratSets.setWeight(0.9);
+			config.strategy().addStrategySettings(stratSets);
+		}
+		{
+			StrategySettings stratSets = new StrategySettings() ;
+			stratSets.setStrategyName( DefaultStrategy.ChangeTripMode.name() );
+			stratSets.setWeight(0.1);
+			config.strategy().addStrategySettings(stratSets);
+		}
+		
+		config.changeMode().setIgnoreCarAvailability(true);
+		config.changeMode().setModes( new String[] {TransportMode.car, TransportMode.pt} );
+
+		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn);
 		
 		// ===
 		
@@ -48,12 +81,12 @@ class KNModeChoiceCalibMain {
 
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> randomizer = new DecisionVariableRandomizer<ModeChoiceDecisionVariable>() {
 			@Override public List<ModeChoiceDecisionVariable> newRandomVariations( ModeChoiceDecisionVariable decisionVariable ) {
-				final PlanCalcScoreConfigGroup scoreConfig = decisionVariable.getScoreConfig();
+				final PlanCalcScoreConfigGroup oldScoringConfig = decisionVariable.getScoreConfig();
 				List<ModeChoiceDecisionVariable> result = new ArrayList<>() ;
 				for ( int ii=0 ; ii<2 ; ii++ ) {
 					PlanCalcScoreConfigGroup newScoringConfig = new PlanCalcScoreConfigGroup() ;
 					{
-						ModeParams oldModeParams = scoreConfig.getModes().get( TransportMode.car ) ;
+						ModeParams oldModeParams = oldScoringConfig.getModes().get( TransportMode.car ) ;
 						ModeParams newModeParams = new ModeParams(TransportMode.car) ;
 						newModeParams.setConstant( oldModeParams.getConstant() + 0.1 * MatsimRandom.getRandom().nextGaussian() );
 						newModeParams.setMarginalUtilityOfDistance( oldModeParams.getMarginalUtilityOfDistance() + 0.1 * MatsimRandom.getRandom().nextGaussian() );

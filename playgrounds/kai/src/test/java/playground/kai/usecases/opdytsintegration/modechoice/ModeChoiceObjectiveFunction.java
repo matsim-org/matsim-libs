@@ -56,7 +56,8 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 		
 		double obj = 0 ; 
 		for ( String mode : modeHierarchy ) {
-			obj += ( cnt[ modeHierarchy.indexOf(mode) ]/sum - shares.get(mode) ) ; 
+			final double diff = cnt[ modeHierarchy.indexOf(mode) ]/sum - shares.get(mode);
+			obj += diff * diff ; 
 		}
 		return obj ;
 		
