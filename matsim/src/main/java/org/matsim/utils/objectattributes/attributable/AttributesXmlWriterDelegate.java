@@ -32,7 +32,7 @@ public class AttributesXmlWriterDelegate {
 	public final void writeAttributes(final String indentation,
 									  final BufferedWriter writer,
 									  final Attributes attributes) {
-		if ( attributes.map.isEmpty() ) return;
+		if ( attributes.keys.length == 0 ) return;
 		try {
 			writer.write(indentation);
 			writer.write("<attributes>");
@@ -40,8 +40,8 @@ public class AttributesXmlWriterDelegate {
 
 			// sort attributes by name
 			Map<String, Object> objAttributes = new TreeMap<>();
-			for (Map.Entry<String, Object> objAttribute : attributes.map.entrySet()) {
-				objAttributes.put(objAttribute.getKey(), objAttribute.getValue());
+			for ( int i=0; i < attributes.keys.length; i++ ) {
+				objAttributes.put( attributes.keys[ i ] , attributes.values[ i ] );
 			}
 
 			// write attributes

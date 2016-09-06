@@ -28,8 +28,8 @@ public class MatsimXmlWriterWithAttributes extends MatsimXmlWriter {
 
 		// sort attributes by name
 		Map<String, Object> objAttributes = new TreeMap<>();
-		for (Map.Entry<String, Object> objAttribute : attributes.map.entrySet()) {
-			objAttributes.put(objAttribute.getKey(), objAttribute.getValue());
+		for ( int i=0; i < attributes.keys.length; i++ ) {
+			objAttributes.put( attributes.keys[ i ] , attributes.values[ i ] );
 		}
 
 		// write attributes

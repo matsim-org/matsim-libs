@@ -13,8 +13,8 @@ public class AttributesUtils {
 	 * which should be fine for 99.9% of the usecases of Attributes (value objects)
 	 */
 	public static void copyTo( Attributes from , Attributes to ) {
-		for ( Map.Entry<String, Object> e : from.map.entrySet() ) {
-			to.putAttribute( e.getKey() , e.getValue() );
+		for ( int i=0; i < from.keys.length; i++ ) {
+			to.putAttribute( from.keys[ i ] , to.keys[ i ] );
 		}
 	}
 
