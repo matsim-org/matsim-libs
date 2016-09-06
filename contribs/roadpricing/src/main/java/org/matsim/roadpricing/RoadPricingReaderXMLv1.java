@@ -50,7 +50,7 @@ public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 
 	private RoadPricingSchemeImpl scheme = null;
 
-	private Id currentLinkId = null;
+	private Id<Link> currentLinkId = null;
 
 	private boolean hasLinkCosts = false;
 
