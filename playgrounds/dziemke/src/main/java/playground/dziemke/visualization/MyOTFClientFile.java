@@ -97,5 +97,4 @@ public class MyOTFClientFile implements Runnable {
 		otfClient.setSize(800, 800);
 		otfClient.show();
 	}
-
 }

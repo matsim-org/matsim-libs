@@ -21,7 +21,7 @@ public class MovieFileCreator {
 		// Files
 		String eventFile = runOutputRoot + "/output_events.xml.gz";
 		String networkFile = runOutputRoot + "/output_network.xml.gz";
-		String mviFile = runOutputRoot + "/movie.mvi";
+		String mviFile = runOutputRoot + "/otfvis.mvi";
 
 		// Add network to scenario
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
