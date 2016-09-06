@@ -32,6 +32,7 @@ public class AttributesXmlWriterDelegate {
 	public final void writeAttributes(final String indentation,
 									  final BufferedWriter writer,
 									  final Attributes attributes) {
+		if ( attributes.map.isEmpty() ) return;
 		try {
 			writer.write(indentation);
 			writer.write("<attributes>");

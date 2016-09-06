@@ -20,6 +20,21 @@ public class PopulationV6IOTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
+	public void testEmptyAttributesIO() {
+		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
+
+		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
+		population.addPerson( person );
+
+		final String file = utils.getOutputDirectory()+"/population.xml";
+		new PopulationWriter( population ).writeV6( file );
+
+		// just check everything works without attributes (dtd validation etc)
+		final Scenario readScenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		new PopulationReader( readScenario ).readFile( file );
+	}
+
+	@Test
 	public void testAttributesIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
