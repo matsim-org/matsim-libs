@@ -29,38 +29,30 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  *
  */
 public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
+	
 	private static final String USE_SIGNALSYSTEMS = "useSignalsystems";
-
-	public  static final String SIGNALSYSTEM_FILE = "signalsystems";
-	public  static final String SIGNALCONTROL_FILE = "signalcontrol";
-	public  static final String SIGNALGROUPS_FILE = "signalgroups";
-	public  static final String USE_AMBER_TIMES = "useAmbertimes";
-	public  static final String AMBERTIMES_FILE = "ambertimes";
-	public  static final String INTERGREENTIMES_FILE = "intergreentimes";
-	public  static final String USE_INTERGREEN_TIMES = "useIntergreentimes";
-	public  static final String ACTION_ON_INTERGREEN_VIOLATION = "actionOnIntergreenViolation";
+	public static final String SIGNALSYSTEM_FILE = "signalsystems";
+	public static final String SIGNALCONTROL_FILE = "signalcontrol";
+	public static final String SIGNALGROUPS_FILE = "signalgroups";
+	public static final String USE_AMBER_TIMES = "useAmbertimes";
+	public static final String AMBERTIMES_FILE = "ambertimes";
+	public static final String INTERGREENTIMES_FILE = "intergreentimes";
+	public static final String USE_INTERGREEN_TIMES = "useIntergreentimes";
+	public static final String ACTION_ON_INTERGREEN_VIOLATION = "actionOnIntergreenViolation";
 	public static final String WARN_ON_INTERGREEN_VIOLATION = "warn";
 	public static final String EXCEPTION_ON_INTERGREEN_VIOLATION = "exception";
-	
 	public static final String GROUPNAME = "signalsystems";
 
 	private String signalSystemFile;
 	private String signalControlFile;
-
 	private String signalGroupsFile;
-
 	private String amberTimesFile;
-	
 	private String intergreenTimesFile;
-
 	private boolean useIntergreens = false;
-	
 	private boolean useAmbertimes = false;
-	
-	private String actionOnIntergreenViolation = WARN_ON_INTERGREEN_VIOLATION;
-
 	private boolean useSignalSystems = false;
-
+	private String actionOnIntergreenViolation = WARN_ON_INTERGREEN_VIOLATION;
+	
 	public SignalSystemsConfigGroup() {
 		super(GROUPNAME);
 	}
@@ -89,8 +81,8 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	}
 	
 	@StringSetter( SIGNALGROUPS_FILE )
-	public void setSignalGroupsFile(String filename){
-		this.signalGroupsFile = filename;
+	public void setSignalGroupsFile(String signalGroupsFile){
+		this.signalGroupsFile = signalGroupsFile;
 	}
 
 	@StringGetter( AMBERTIMES_FILE )
@@ -99,8 +91,8 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	}
 	
 	@StringSetter( AMBERTIMES_FILE )
-	public void setAmberTimesFile(String filename){
-		this.amberTimesFile = filename;
+	public void setAmberTimesFile(String amberTimesFile){
+		this.amberTimesFile = amberTimesFile;
 	}
 	
 	@StringGetter( INTERGREENTIMES_FILE )
@@ -119,8 +111,8 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	}
 	
 	@StringSetter( SIGNALCONTROL_FILE )
-	public void setSignalControlFile(String filename){
-		this.signalControlFile = filename;
+	public void setSignalControlFile(String signalControlFile){
+		this.signalControlFile = signalControlFile;
 	}
 
 	@StringGetter( USE_INTERGREEN_TIMES )
@@ -132,14 +124,12 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	public void setUseIntergreenTimes(boolean useIntergreens){
 		this.useIntergreens = useIntergreens;
 	}
-
 	
 	@StringGetter( ACTION_ON_INTERGREEN_VIOLATION )
 	public String getActionOnIntergreenViolation() {
 		return actionOnIntergreenViolation;
 	}
 
-	
 	@StringSetter( ACTION_ON_INTERGREEN_VIOLATION )
 	public void setActionOnIntergreenViolation(String actionOnIntergreenViolation) {
 		// TODO conceptually, this is an enum... change that?
@@ -150,13 +140,11 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 
 		this.actionOnIntergreenViolation = actionOnIntergreenViolation;
 	}
-
 	
 	@StringGetter( USE_AMBER_TIMES )
 	public boolean isUseAmbertimes() {
 		return useAmbertimes;
 	}
-
 	
 	@StringSetter( USE_AMBER_TIMES )
 	public void setUseAmbertimes(boolean useAmbertimes) {
@@ -172,7 +160,4 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	public void setUseSignalSystems(final boolean useSignalSystems) {
 		this.useSignalSystems = useSignalSystems;
 	}
-
-
-
 }
