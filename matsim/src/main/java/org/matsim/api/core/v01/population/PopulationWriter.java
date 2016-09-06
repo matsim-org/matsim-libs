@@ -71,11 +71,11 @@ public final class PopulationWriter implements MatsimWriter {
 	}
 
 	/**
-	 * Writes the population in the most current format (currently population_v5.dtd).
+	 * Writes the population in the most current format (currently population_v6.dtd).
 	 */
 	@Override
 	public void write(final String filename) {
-		new org.matsim.core.population.io.PopulationWriter(transformation , this.population, this.network).write(filename);
+		writeV6( filename );
 	}
 
 	/**
