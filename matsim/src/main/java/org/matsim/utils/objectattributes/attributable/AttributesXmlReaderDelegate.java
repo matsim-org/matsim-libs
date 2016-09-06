@@ -14,7 +14,6 @@ import java.util.*;
 public class AttributesXmlReaderDelegate {
 	private final static Logger log = Logger.getLogger(AttributesXmlReaderDelegate.class);
 	private final Map<String, AttributeConverter<?>> converters = new HashMap<String, AttributeConverter<?>>();
-	private boolean readCharacters = false;
 
 	private Attributes currentAttributes = null;
 	private String currentAttribute = null;
@@ -43,7 +42,6 @@ public class AttributesXmlReaderDelegate {
 		if (TAG_ATTRIBUTE.equals(name)) {
 			this.currentAttribute = atts.getValue(ATTR_ATTRIBUTENAME);
 			this.currentAttributeClass = atts.getValue(ATTR_ATTRIBUTECLASS);
-			this.readCharacters = true;
 		} else if (TAG_ATTRIBUTES.equals(name)) {
 			this.currentAttributes = currentAttributes;
 		}
@@ -51,7 +49,6 @@ public class AttributesXmlReaderDelegate {
 
 	public void endTag(String name, String content, Stack<String> context) {
 		if (TAG_ATTRIBUTE.equals(name)) {
-			this.readCharacters = false;
 			AttributeConverter<?> c = this.converters.get(this.currentAttributeClass);
 			if (c == null) {
 				if (missingConverters.add(this.currentAttributeClass)) {
@@ -79,7 +76,6 @@ public class AttributesXmlReaderDelegate {
 		return this.converters.put(clazz.getCanonicalName(), converter);
 	}
 
-	@Inject
 	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
 		for ( Map.Entry<Class<?>, AttributeConverter<?>> e : converters.entrySet() ) {
 			putAttributeConverter( e.getKey() , e.getValue() );

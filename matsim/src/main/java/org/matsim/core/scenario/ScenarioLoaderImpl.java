@@ -195,7 +195,9 @@ class ScenarioLoaderImpl {
 			log.info("loading population from " + populationFileName);
 
 			if ( config.plans().getInputCRS() == null ) {
-				new PopulationReader(this.scenario).parse(populationFileName);
+				final PopulationReader reader = new PopulationReader(this.scenario);
+				reader.putAttributeConverters( attributeConverters );
+				reader.parse( populationFileName );
 			}
 			else {
 				final String inputCRS = config.plans().getInputCRS();
@@ -208,7 +210,9 @@ class ScenarioLoaderImpl {
 								inputCRS,
 								internalCRS );
 
-				new PopulationReader(transformation , this.scenario).parse(populationFileName);
+				final PopulationReader reader = new PopulationReader(transformation , this.scenario);
+				reader.putAttributeConverters( attributeConverters );
+				reader.parse( populationFileName );
 			}
 
 			PopulationUtils.printPlansCount(this.scenario.getPopulation()) ;

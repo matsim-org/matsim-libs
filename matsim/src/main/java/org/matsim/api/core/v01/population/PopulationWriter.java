@@ -24,6 +24,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.utils.objectattributes.AttributeConverter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author nagel
@@ -33,6 +37,7 @@ public final class PopulationWriter implements MatsimWriter {
 	private final CoordinateTransformation transformation;
 	private final Population population;
 	private final Network network;
+	private final Map<Class<?>,AttributeConverter<?>> attributeConverters = new HashMap<>();
 
 	public PopulationWriter(
 			final CoordinateTransformation transformation,
@@ -54,6 +59,15 @@ public final class PopulationWriter implements MatsimWriter {
 	public PopulationWriter(Population population) {
 		// w/o network works for V5
 		this( new IdentityTransformation() , population , null );
+	}
+
+
+	public <T> void putAttributeConverter(Class<T> clazz, AttributeConverter<T> converter) {
+		this.attributeConverters.put( clazz , converter );
+	}
+
+	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
+		this.attributeConverters.putAll( converters );
 	}
 
 	/**
@@ -82,4 +96,15 @@ public final class PopulationWriter implements MatsimWriter {
 		new org.matsim.core.population.io.PopulationWriter( transformation , this.population, this.network).writeV5(filename);
 	}
 
+	/**
+	 * Writes the population in the format of population_v5.dtd
+	 *
+	 * @param filename
+	 */
+	public void writeV6(final String filename) {
+		final org.matsim.core.population.io.PopulationWriter writer =
+				new org.matsim.core.population.io.PopulationWriter( transformation , this.population, this.network);
+		writer.putAttributeConverters( attributeConverters );
+		writer.writeV6(filename);
+	}
 }

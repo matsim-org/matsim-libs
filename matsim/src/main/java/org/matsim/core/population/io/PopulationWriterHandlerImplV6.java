@@ -27,10 +27,12 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author thibautd
@@ -47,6 +49,10 @@ import java.io.IOException;
 
 	PopulationWriterHandlerImplV6(CoordinateTransformation coordinateTransformation) {
 		this.coordinateTransformation = coordinateTransformation;
+	}
+
+	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
+		attributesWriter.putAttributeConverters( converters );
 	}
 
 	@Override

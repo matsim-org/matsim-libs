@@ -20,6 +20,8 @@
 
 package org.matsim.core.population.io;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -29,6 +31,7 @@ import org.matsim.core.population.io.StreamingPopulationReader.StreamingPopulati
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.utils.objectattributes.AttributeConverter;
 import org.xml.sax.Attributes;
 
 /**
@@ -50,6 +53,8 @@ public class PopulationReader extends MatsimXmlParser implements MatsimReader {
 
 	private MatsimXmlParser delegate = null;
 	private final Scenario scenario;
+
+	private Map<Class<?>, AttributeConverter<?>> attributeConverters = new HashMap<>();
 
 	private static final Logger log = Logger.getLogger(PopulationReader.class);
 
@@ -74,6 +79,14 @@ public class PopulationReader extends MatsimXmlParser implements MatsimReader {
 		this.scenario = scenario;
 	}
 
+	public void putAttributeConverter( final Class<?> clazz , AttributeConverter<?> converter ) {
+		attributeConverters.put( clazz , converter );
+	}
+
+	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
+		attributeConverters.putAll( converters );
+	}
+
 	@Override
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 		this.delegate.startTag(name, atts, context);
@@ -93,6 +106,7 @@ public class PopulationReader extends MatsimXmlParser implements MatsimReader {
 						new PopulationReaderMatsimV6(
 								coordinateTransformation,
 								this.scenario);
+				((PopulationReaderMatsimV6) delegate).putAttributeConverters( attributeConverters );
 				log.info("using population_v6-reader.");
 				break;
 			case POPULATION_V5:

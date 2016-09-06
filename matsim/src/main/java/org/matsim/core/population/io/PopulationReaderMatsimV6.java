@@ -19,6 +19,7 @@
 
 package org.matsim.core.population.io;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,11 +37,13 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -117,6 +120,15 @@ import java.util.Stack;
 		this.coordinateTransformation = coordinateTransformation;
 		this.scenario = scenario;
 		this.plans = scenario.getPopulation();
+	}
+
+	public void putAttributeConverter( final Class<?> clazz , AttributeConverter<?> converter ) {
+		attributesReader.putAttributeConverter( clazz , converter );
+	}
+
+	@Inject
+	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
+		attributesReader.putAttributeConverters( converters );
 	}
 
 	@Override

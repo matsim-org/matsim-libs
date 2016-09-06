@@ -17,16 +17,16 @@ public class AttributesXmlWriterDelegate {
 
 	private final static Logger log = Logger.getLogger( AttributesXmlWriterDelegate.class);
 
-	private final Map<String, AttributeConverter<?>> converters = new HashMap<>();
+	private final Map<Class<?>, AttributeConverter<?>> converters = new HashMap<>();
 	private final Set<Class<?>> missingConverters = new HashSet<>();
 
 	public AttributesXmlWriterDelegate() {
-		this.converters.put(String.class.getCanonicalName(), new StringConverter());
-		this.converters.put(Integer.class.getCanonicalName(), new IntegerConverter());
-		this.converters.put(Float.class.getCanonicalName(), new FloatConverter());
-		this.converters.put(Double.class.getCanonicalName(), new DoubleConverter());
-		this.converters.put(Boolean.class.getCanonicalName(), new BooleanConverter());
-		this.converters.put(Long.class.getCanonicalName(), new LongConverter());
+		this.converters.put(String.class, new StringConverter());
+		this.converters.put(Integer.class, new IntegerConverter());
+		this.converters.put(Float.class, new FloatConverter());
+		this.converters.put(Double.class, new DoubleConverter());
+		this.converters.put(Boolean.class, new BooleanConverter());
+		this.converters.put(Long.class, new LongConverter());
 	}
 
 	public final void writeAttributes(final String indentation,
@@ -47,7 +47,7 @@ public class AttributesXmlWriterDelegate {
 			// write attributes
 			for (Map.Entry<String, Object> objAttribute : objAttributes.entrySet()) {
 				Class<?> clazz = objAttribute.getValue().getClass();
-				AttributeConverter<?> conv = this.converters.get(clazz.getCanonicalName());
+				AttributeConverter<?> conv = this.converters.get(clazz);
 				if (conv != null) {
 					writer.write( indentation + "\t" );
 					writer.write( "<attribute name=\"" + objAttribute.getKey() + "\" " );
@@ -69,5 +69,9 @@ public class AttributesXmlWriterDelegate {
 		catch (IOException e) {
 			throw new UncheckedIOException( e );
 		}
+	}
+
+	public void putAttributeConverters(Map<Class<?>, AttributeConverter<?>> converters) {
+		this.converters.putAll( converters );
 	}
 }
