@@ -63,23 +63,23 @@ IterationEndsListener, ShutdownListener {
 	final static private Logger log = Logger.getLogger(RoadPricingControlerListener.class);
 
 	private final RoadPricingScheme scheme;
-    private final CalcPaidToll calcPaidToll;
-    private final CalcAverageTolledTripLength cattl;
+	private final CalcPaidToll calcPaidToll;
+	private final CalcAverageTolledTripLength cattl;
 	private EventsManager eventsManager;
 	private OutputDirectoryHierarchy controlerIO;
 
 	@Inject
-    RoadPricingControlerListener(RoadPricingScheme scheme, CalcPaidToll calcPaidToll, CalcAverageTolledTripLength cattl, EventsManager eventsManager, OutputDirectoryHierarchy controlerIO) {
+	RoadPricingControlerListener(RoadPricingScheme scheme, CalcPaidToll calcPaidToll, CalcAverageTolledTripLength cattl, EventsManager eventsManager, OutputDirectoryHierarchy controlerIO) {
 		this.scheme = scheme;
-        this.calcPaidToll = calcPaidToll;
-        this.cattl = cattl;
+		this.calcPaidToll = calcPaidToll;
+		this.cattl = cattl;
 		this.eventsManager = eventsManager;
 		this.controlerIO = controlerIO;
 		Gbl.printBuildInfo("RoadPricing", "/org.matsim.contrib/roadpricing/revision.txt");
 	}
 
-    @Override
-    public void notifyStartup(final StartupEvent event) {}
+	@Override
+	public void notifyStartup(final StartupEvent event) {}
 
 	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {

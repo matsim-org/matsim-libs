@@ -44,7 +44,8 @@ public final class RunRoadPricingExample {
 
 		// use the road pricing module.
         // (loads the road pricing scheme, uses custom travel disutility including tolls, etc.)
-        controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+//        controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+		controler.addOverridingModule(new RoadPricingModule());
 
         // run the controler:
 		controler.run() ;

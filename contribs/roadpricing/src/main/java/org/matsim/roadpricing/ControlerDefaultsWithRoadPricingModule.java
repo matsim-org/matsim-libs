@@ -28,20 +28,16 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-
-import com.google.inject.Singleton;
 
 public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 
-	private final RoadPricingScheme roadPricingScheme;
+	final RoadPricingScheme roadPricingScheme;
 
 	public ControlerDefaultsWithRoadPricingModule() {
 		this.roadPricingScheme = null;
@@ -57,36 +53,10 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 		// But I am not quite sure yet how to best handle custom scenario elements. mz
 
 		// use ControlerDefaults configuration, replacing the TravelDisutility with a toll-dependent one
-		install(AbstractModule.override(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()), new AbstractModule() {
-			@Override
-			public void install() {
-				ConfigUtils.addOrGetModule(getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-				if (roadPricingScheme != null) {
-					bind(RoadPricingScheme.class).toInstance(roadPricingScheme);
-				} else {
-					bind(RoadPricingScheme.class).toProvider(RoadPricingSchemeProvider.class).in(Singleton.class);
-				}
-				bind(RoadPricingInitializer.class).asEagerSingleton();
-				bind(PlansCalcRouteWithTollOrNot.class);
-				addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
-				addTravelDisutilityFactoryBinding(TransportMode.car).toProvider(TravelDisutilityIncludingTollFactoryProvider.class).asEagerSingleton();
-				addTravelDisutilityFactoryBinding("car_with_payed_area_toll").toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig().planCalcScore()));
-				addRoutingModuleBinding("car_with_payed_area_toll").toProvider(new RoadPricingNetworkRouting());
-
-				addControlerListenerBinding().to(RoadPricingControlerListener.class);
-
-				// add the events handler to calculate the tolls paid by agents
-				bind(CalcPaidToll.class).in(Singleton.class);
-				addEventHandlerBinding().to(CalcPaidToll.class);
-
-				bind(CalcAverageTolledTripLength.class).in(Singleton.class);
-				addEventHandlerBinding().to(CalcAverageTolledTripLength.class);
-			}
-		}));
-
+		install(AbstractModule.override(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()), new RoadPricingModule(roadPricingScheme)));
 	}
 
-	private static class RoadPricingInitializer {
+	static class RoadPricingInitializer {
 		@Inject
 		RoadPricingInitializer(RoadPricingScheme roadPricingScheme, Scenario scenario) {
 			RoadPricingScheme scenarioRoadPricingScheme = (RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
@@ -101,7 +71,7 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 	}
 
 
-	private static class RoadPricingSchemeProvider implements Provider<RoadPricingScheme> {
+	static class RoadPricingSchemeProvider implements Provider<RoadPricingScheme> {
 
 		private final Config config;
 		private Scenario scenario;
@@ -119,6 +89,7 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 				return scenarioRoadPricingScheme;
 			} else {
 				RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+				
 				String tollLinksFile = rpConfig.getTollLinksFile();
 				if ( tollLinksFile == null ) {
 					throw new RuntimeException("Road pricing inserted but neither toll links file nor RoadPricingScheme given.  "
@@ -132,7 +103,7 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 		}
 	}
 
-	private static class TravelDisutilityIncludingTollFactoryProvider implements Provider<TravelDisutilityFactory> {
+	static class TravelDisutilityIncludingTollFactoryProvider implements Provider<TravelDisutilityFactory> {
 
 		private final Scenario scenario;
 		private final RoadPricingScheme scheme;
