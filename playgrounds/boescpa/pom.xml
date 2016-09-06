@@ -14,5 +14,25 @@
           <artifactId>ivtExt</artifactId>
           <version>0.9.0-SNAPSHOT</version>
       </dependency>
+      <dependency>
+          <groupId>org.matsim.contrib</groupId>
+          <artifactId>taxi</artifactId>
+          <version>0.9.0-SNAPSHOT</version>
+      </dependency>
   </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>playground.boescpa.ivtBaseline.RunIVTBaselineWithGUI</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
