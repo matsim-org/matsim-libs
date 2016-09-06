@@ -41,123 +41,123 @@ import com.google.inject.Singleton;
 
 public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 
-    private final RoadPricingScheme roadPricingScheme;
+	private final RoadPricingScheme roadPricingScheme;
 
-    public ControlerDefaultsWithRoadPricingModule() {
-        this.roadPricingScheme = null;
-    }
+	public ControlerDefaultsWithRoadPricingModule() {
+		this.roadPricingScheme = null;
+	}
 
-    public ControlerDefaultsWithRoadPricingModule(RoadPricingScheme roadPricingScheme) {
-        this.roadPricingScheme = roadPricingScheme;
-    }
+	public ControlerDefaultsWithRoadPricingModule(RoadPricingScheme roadPricingScheme) {
+		this.roadPricingScheme = roadPricingScheme;
+	}
 
-    @Override
-    public void install() {
-        ConfigUtils.addOrGetModule(getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-        // This is not optimal yet. Modules should not need to have parameters.
-        // But I am not quite sure yet how to best handle custom scenario elements. mz
-        if (this.roadPricingScheme != null) {
-            bind(RoadPricingScheme.class).toInstance(this.roadPricingScheme);
-        } else {
-            bind(RoadPricingScheme.class).toProvider(RoadPricingSchemeProvider.class).in(Singleton.class);
-        }
-        bind(RoadPricingInitializer.class).asEagerSingleton();
-        bind(PlansCalcRouteWithTollOrNot.class);
-        addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
+	@Override
+	public void install() {
+		// This is not optimal yet. Modules should not need to have parameters.
+		// But I am not quite sure yet how to best handle custom scenario elements. mz
 
-        // use ControlerDefaults configuration, replacing the TravelDisutility with a toll-dependent one
-        install(AbstractModule.override(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()), new AbstractModule() {
-            @Override
-            public void install() {
-                addTravelDisutilityFactoryBinding(TransportMode.car).toProvider(TravelDisutilityIncludingTollFactoryProvider.class).asEagerSingleton();
-            }
-        }));
+		// use ControlerDefaults configuration, replacing the TravelDisutility with a toll-dependent one
+		install(AbstractModule.override(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()), new AbstractModule() {
+			@Override
+			public void install() {
+				ConfigUtils.addOrGetModule(getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+				if (roadPricingScheme != null) {
+					bind(RoadPricingScheme.class).toInstance(roadPricingScheme);
+				} else {
+					bind(RoadPricingScheme.class).toProvider(RoadPricingSchemeProvider.class).in(Singleton.class);
+				}
+				bind(RoadPricingInitializer.class).asEagerSingleton();
+				bind(PlansCalcRouteWithTollOrNot.class);
+				addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
+				addTravelDisutilityFactoryBinding(TransportMode.car).toProvider(TravelDisutilityIncludingTollFactoryProvider.class).asEagerSingleton();
+				addTravelDisutilityFactoryBinding("car_with_payed_area_toll").toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig().planCalcScore()));
+				addRoutingModuleBinding("car_with_payed_area_toll").toProvider(new RoadPricingNetworkRouting());
 
-        addTravelDisutilityFactoryBinding("car_with_payed_area_toll").toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig().planCalcScore()));
-        addRoutingModuleBinding("car_with_payed_area_toll").toProvider(new RoadPricingNetworkRouting());
+				addControlerListenerBinding().to(RoadPricingControlerListener.class);
 
-        addControlerListenerBinding().to(RoadPricingControlerListener.class);
+				// add the events handler to calculate the tolls paid by agents
+				bind(CalcPaidToll.class).in(Singleton.class);
+				addEventHandlerBinding().to(CalcPaidToll.class);
 
-        // add the events handler to calculate the tolls paid by agents
-        bind(CalcPaidToll.class).in(Singleton.class);
-        addEventHandlerBinding().to(CalcPaidToll.class);
+				bind(CalcAverageTolledTripLength.class).in(Singleton.class);
+				addEventHandlerBinding().to(CalcAverageTolledTripLength.class);
+			}
+		}));
 
-        bind(CalcAverageTolledTripLength.class).in(Singleton.class);
-        addEventHandlerBinding().to(CalcAverageTolledTripLength.class);
-    }
+	}
 
-    private static class RoadPricingInitializer {
-        @Inject
-        RoadPricingInitializer(RoadPricingScheme roadPricingScheme, Scenario scenario) {
-            RoadPricingScheme scenarioRoadPricingScheme = (RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
-            if (scenarioRoadPricingScheme == null) {
-                scenario.addScenarioElement(RoadPricingScheme.ELEMENT_NAME, roadPricingScheme);
-            } else {
-                if (roadPricingScheme != scenarioRoadPricingScheme) {
-                    throw new RuntimeException();
-                }
-            }
-        }
-    }
+	private static class RoadPricingInitializer {
+		@Inject
+		RoadPricingInitializer(RoadPricingScheme roadPricingScheme, Scenario scenario) {
+			RoadPricingScheme scenarioRoadPricingScheme = (RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
+			if (scenarioRoadPricingScheme == null) {
+				scenario.addScenarioElement(RoadPricingScheme.ELEMENT_NAME, roadPricingScheme);
+			} else {
+				if (roadPricingScheme != scenarioRoadPricingScheme) {
+					throw new RuntimeException();
+				}
+			}
+		}
+	}
 
 
-    private static class RoadPricingSchemeProvider implements Provider<RoadPricingScheme> {
+	private static class RoadPricingSchemeProvider implements Provider<RoadPricingScheme> {
 
-        private final Config config;
-        private Scenario scenario;
+		private final Config config;
+		private Scenario scenario;
 
-        @Inject
-        RoadPricingSchemeProvider(Config config, Scenario scenario) {
-            this.config = config;
-            this.scenario = scenario;
-        }
+		@Inject
+		RoadPricingSchemeProvider(Config config, Scenario scenario) {
+			this.config = config;
+			this.scenario = scenario;
+		}
 
-        @Override
-        public RoadPricingScheme get() {
-            RoadPricingScheme scenarioRoadPricingScheme = (RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
-            if (scenarioRoadPricingScheme != null) {
-                return scenarioRoadPricingScheme;
-            } else {
-                RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-                String tollLinksFile = rpConfig.getTollLinksFile();
-                if ( tollLinksFile == null ) {
-                    throw new RuntimeException("Road pricing inserted but neither toll links file nor RoadPricingScheme given.  "
-                            + "Such an execution path is not allowed.  If you want a base case without toll, "
-                            + "construct a zero toll file and insert that. ") ;
-                }
-                RoadPricingSchemeImpl rpsImpl = new RoadPricingSchemeImpl() ;
-                new RoadPricingReaderXMLv1(rpsImpl).readFile(tollLinksFile);
-                return rpsImpl;
-            }
-        }
-    }
+		@Override
+		public RoadPricingScheme get() {
+			RoadPricingScheme scenarioRoadPricingScheme = (RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
+			if (scenarioRoadPricingScheme != null) {
+				return scenarioRoadPricingScheme;
+			} else {
+				RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+				String tollLinksFile = rpConfig.getTollLinksFile();
+				if ( tollLinksFile == null ) {
+					throw new RuntimeException("Road pricing inserted but neither toll links file nor RoadPricingScheme given.  "
+							+ "Such an execution path is not allowed.  If you want a base case without toll, "
+							+ "construct a zero toll file and insert that. ") ;
+				}
+				RoadPricingSchemeImpl rpsImpl = new RoadPricingSchemeImpl() ;
+				new RoadPricingReaderXMLv1(rpsImpl).readFile(tollLinksFile);
+				return rpsImpl;
+			}
+		}
+	}
 
-    private static class TravelDisutilityIncludingTollFactoryProvider implements Provider<TravelDisutilityFactory> {
+	private static class TravelDisutilityIncludingTollFactoryProvider implements Provider<TravelDisutilityFactory> {
 
-        private final Scenario scenario;
-        private final RoadPricingScheme scheme;
+		private final Scenario scenario;
+		private final RoadPricingScheme scheme;
 
-        @Inject
-        TravelDisutilityIncludingTollFactoryProvider(Scenario scenario, RoadPricingScheme scheme) {
-            this.scenario = scenario;
-            this.scheme = scheme;
-        }
+		@Inject
+		TravelDisutilityIncludingTollFactoryProvider(Scenario scenario, RoadPricingScheme scheme) {
+			this.scenario = scenario;
+			this.scheme = scheme;
+		}
 
-        @Override
-        public TravelDisutilityFactory get() {
-            final Config config = scenario.getConfig();
-            final TravelDisutilityFactory originalTravelDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
-//			if (!scheme.getType().equals(RoadPricingScheme.TOLL_TYPE_AREA)) {
-                RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(
-                        originalTravelDisutilityFactory, scheme, config.planCalcScore().getMarginalUtilityOfMoney()
-                );
-                travelDisutilityFactory.setSigma(config.plansCalcRoute().getRoutingRandomness());
-                return travelDisutilityFactory;
-//            } else {
-//                return originalTravelDisutilityFactory;
-//            }
-        }
+		@Override
+		public TravelDisutilityFactory get() {
+			final Config config = scenario.getConfig();
+			final TravelDisutilityFactory originalTravelDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
+			//			if (!scheme.getType().equals(RoadPricingScheme.TOLL_TYPE_AREA)) {
+			RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(
+					originalTravelDisutilityFactory, scheme, config.planCalcScore().getMarginalUtilityOfMoney()
+					);
+			travelDisutilityFactory.setSigma(config.plansCalcRoute().getRoutingRandomness());
+			return travelDisutilityFactory;
+			//            } else {
+			//                return originalTravelDisutilityFactory;
+			//            }
+		}
 
-    }
+	}
 
 }
