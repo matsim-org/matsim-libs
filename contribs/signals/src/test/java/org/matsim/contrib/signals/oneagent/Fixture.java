@@ -80,7 +80,7 @@ public class Fixture {
 		if (useIntergreens) {
 			signalsConfig.setIntergreenTimesFile(testUtils.getClassInputDirectory() + "testIntergreenTimes_v1.0.xml");
 			signalsConfig.setUseIntergreenTimes(true);
-			signalsConfig.setActionOnIntergreenViolation(SignalSystemsConfigGroup.EXCEPTION_ON_INTERGREEN_VIOLATION);
+			signalsConfig.setActionOnIntergreenViolation(SignalSystemsConfigGroup.ActionOnIntergreenViolation.EXCEPTION);
 		}			
 
 		this.setSignalSystemConfigValues(signalsConfig, testUtils);

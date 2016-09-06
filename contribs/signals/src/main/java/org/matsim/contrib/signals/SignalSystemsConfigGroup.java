@@ -29,8 +29,9 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  *
  */
 public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
-	
-	private static final String USE_SIGNALSYSTEMS = "useSignalsystems";
+
+	public static final String GROUPNAME = "signalsystems";
+	public static final String USE_SIGNALSYSTEMS = "useSignalsystems";
 	public static final String SIGNALSYSTEM_FILE = "signalsystems";
 	public static final String SIGNALCONTROL_FILE = "signalcontrol";
 	public static final String SIGNALGROUPS_FILE = "signalgroups";
@@ -39,9 +40,9 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	public static final String INTERGREENTIMES_FILE = "intergreentimes";
 	public static final String USE_INTERGREEN_TIMES = "useIntergreentimes";
 	public static final String ACTION_ON_INTERGREEN_VIOLATION = "actionOnIntergreenViolation";
-	public static final String WARN_ON_INTERGREEN_VIOLATION = "warn";
-	public static final String EXCEPTION_ON_INTERGREEN_VIOLATION = "exception";
-	public static final String GROUPNAME = "signalsystems";
+	public enum ActionOnIntergreenViolation{
+		WARN, EXCEPTION
+	}
 
 	private String signalSystemFile;
 	private String signalControlFile;
@@ -51,7 +52,7 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	private boolean useIntergreens = false;
 	private boolean useAmbertimes = false;
 	private boolean useSignalSystems = false;
-	private String actionOnIntergreenViolation = WARN_ON_INTERGREEN_VIOLATION;
+	private ActionOnIntergreenViolation actionOnIntergreenViolation = ActionOnIntergreenViolation.WARN;
 	
 	public SignalSystemsConfigGroup() {
 		super(GROUPNAME);
@@ -126,19 +127,23 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	}
 	
 	@StringGetter( ACTION_ON_INTERGREEN_VIOLATION )
-	public String getActionOnIntergreenViolation() {
+	public ActionOnIntergreenViolation getActionOnIntergreenViolation() {
 		return actionOnIntergreenViolation;
 	}
 
 	@StringSetter( ACTION_ON_INTERGREEN_VIOLATION )
-	public void setActionOnIntergreenViolation(String actionOnIntergreenViolation) {
-		// TODO conceptually, this is an enum... change that?
-		if ( !WARN_ON_INTERGREEN_VIOLATION.equalsIgnoreCase( actionOnIntergreenViolation ) &&
-			 !EXCEPTION_ON_INTERGREEN_VIOLATION.equalsIgnoreCase( actionOnIntergreenViolation ) ){
-			throw new IllegalArgumentException("The value " + actionOnIntergreenViolation + " for key : " + ACTION_ON_INTERGREEN_VIOLATION + " is not supported by this config group");
-		 }
-
-		this.actionOnIntergreenViolation = actionOnIntergreenViolation;
+	public void setActionOnIntergreenViolation(ActionOnIntergreenViolation actionOnIntergreenViolation) {
+		switch (actionOnIntergreenViolation){
+		// set the value for the supported actions
+		case WARN:
+		case EXCEPTION:
+			this.actionOnIntergreenViolation = actionOnIntergreenViolation;
+			break;
+		// throw an exception if the value is not supported
+		default:
+			throw new IllegalArgumentException("The value " + actionOnIntergreenViolation 
+					+ " for key : " + ACTION_ON_INTERGREEN_VIOLATION + " is not supported by this config group");
+		}
 	}
 	
 	@StringGetter( USE_AMBER_TIMES )
