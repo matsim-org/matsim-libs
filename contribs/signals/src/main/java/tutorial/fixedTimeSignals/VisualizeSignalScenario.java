@@ -37,7 +37,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * 
  * @author dgrether
  */
-public class VisSimpleTrafficSignalScenario {	
+public class VisualizeSignalScenario {	
 
 	private static final String INPUT_DIR = "./examples/tutorial/example90TrafficLights/useSignalInput/woLanes/";
 	
@@ -50,6 +50,6 @@ public class VisSimpleTrafficSignalScenario {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		new VisSimpleTrafficSignalScenario().run();
+		new VisualizeSignalScenario().run();
 	}
 }

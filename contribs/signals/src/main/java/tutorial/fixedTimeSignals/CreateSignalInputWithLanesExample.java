@@ -58,8 +58,9 @@ import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
 /**
- * This class contains some examples how to set up a scenario with lanes and
- * signalized intersections.
+ * Example for how to create signal input files for a scenario with lanes from code.
+ * 
+ * @link VisualizeSignalScenarioWithLanes for how to visualize this scenario.
  * 
  * @author dgrether
  * @author tthunig

@@ -52,10 +52,10 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.scenario.ScenarioUtils;
 
-
 /**
- * This class contains some simple examples how to set up a simple scenario
- * with signalized intersections.
+ * Example for how to create signal input files from code.
+ * 
+ * @link VisualizeSignalScenario for how to visualize this scenario.
  * 
  * @author dgrether
  */

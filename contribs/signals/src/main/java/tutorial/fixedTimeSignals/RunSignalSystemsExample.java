@@ -44,64 +44,76 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
  */
 public class RunSignalSystemsExample {
 
-	/**
-	 * @param args is ignored
-	 */
+	private static final String INPUT_DIR = "./../../matsim/examples/equil-extended/";
+	
 	public static void main(String[] args) {
 		run(true);
 	}
 
-	static void run(boolean usingOTFVis) {
-		String inputDir = "./../../matsim/examples/equil-extended/";
-		
-		Config config = ConfigUtils.loadConfig(inputDir + "config.xml") ;
-		
-		config.controler().setLastIteration(0); // use higher values if you want to iterate
+	static void run(boolean useOTFVis) {
+		// load a config (without signal information)
+		Config config = ConfigUtils.loadConfig(INPUT_DIR + "config.xml") ;
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists);
+		
+		// use higher values if you want to iterate
+		config.controler().setLastIteration(0); 
 		
 		config.network().setInputFile("network.xml");
 		config.plans().setInputFile("plans2000.xml.gz");
 		
+		// simulate traffic dynamics with holes (default would be without)
 		config.qsim().setTrafficDynamics(TrafficDynamics.withHoles);
 		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
 		config.qsim().setNodeOffset(5.);
 		
-		SignalSystemsConfigGroup signalConfig = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class ) ;
+		// add the signal config group to the config file
+		SignalSystemsConfigGroup signalConfig = 
+				ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class ) ;
 		
-		// the following makes the contrib load the signalSystems files, but not to do anything with them:
+		// the following makes the contrib load the signal input files, but not to do anything with them
 		// (this switch will eventually go away)
 		signalConfig.setUseSignalSystems(true);
 
-		// these are the paths to the signal systems definition files:
-		signalConfig.setSignalSystemFile(inputDir + "signalSystems_v2.0.xml");
-		signalConfig.setSignalGroupsFile(inputDir + "signalGroups_v2.0.xml");
-		signalConfig.setSignalControlFile(inputDir + "signalControl_v2.0.xml");
+		// set the paths to the signal systems definition files
+		signalConfig.setSignalSystemFile(INPUT_DIR + "signalSystems_v2.0.xml");
+		signalConfig.setSignalGroupsFile(INPUT_DIR + "signalGroups_v2.0.xml");
+		signalConfig.setSignalControlFile(INPUT_DIR + "signalControl_v2.0.xml");
 		
+//		// here is how to switch on link to link travel times if lanes are used
 //		config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
 //		config.controler().setLinkToLinkRoutingEnabled(true);
 		
-		if (usingOTFVis) {
-			OTFVisConfigGroup otfvisConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
-			otfvisConfig.setScaleQuadTreeRect(true); // make links visible beyond screen edge
+		if (useOTFVis) {
+			// add the OTFVis config group
+			OTFVisConfigGroup otfvisConfig = 
+					ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
+			// make links visible beyond screen edge
+			otfvisConfig.setScaleQuadTreeRect(true); 
 			otfvisConfig.setColoringScheme(ColoringScheme.byId);
 			otfvisConfig.setAgentSize(240);
 		}
 
 		// --- create the scenario
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+		/* load the information about signals data (i.e. fill the SignalsData object)
+		 * and add it to the scenario as scenario element */
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(signalConfig).loadSignalsData());
 		
 		// --- create the controler
 		Controler c = new Controler( scenario );
 
-		// add the signals module to the simulation
+		/* add the signals module to the simulation
+		 * such that SignalsData is not only contained in the scenario 
+		 * but also used in the simulation */
 		c.addOverridingModule(new SignalsModule());
-		// add the visualization module to the simulation
-		if ( usingOTFVis ) {
+		
+		/* add the visualization module to the simulation
+		 * such that it is used */
+		if ( useOTFVis ) {
 			c.addOverridingModule( new OTFVisWithSignalsLiveModule() );
 		}
 		
-		//do it, do it, do it, now
+		// run the simulation
 		c.run();
 	}
 }

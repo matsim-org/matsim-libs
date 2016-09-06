@@ -35,15 +35,21 @@ import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 
-
 /**
- * This example shows how to create an intergreens input file for the CreateSignalScenario example.
+ * This example shows how to create an intergreens input file for a given scenario.
+ *
+ * If there is no intergreen data available for your scenario you may use the
+ * intergreen times of a correct fixed time signal control, i.e. a signal control
+ * with realistic intergreen times where no collisions may occur.
+ * @link TtCalculateSimplifiedIntergreens for how to extract intergreen times from a fixed time control
  *  
  * @author dgrether
  */
 public class CreateIntergreensExample {
 
 	private static final Logger log = Logger.getLogger(CreateIntergreensExample.class);
+	
+	private static final String INPUT_DIR = "./examples/tutorial/example90TrafficLights/useSignalInput/woLanes/";
 	
 	private static void createIntergreens(SignalsData sd){
 		IntergreenTimesData ig = sd.getIntergreenTimesData();
@@ -62,8 +68,7 @@ public class CreateIntergreensExample {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		String configFile = new CreateSignalInputExample().run();
-		Config config = ConfigUtils.loadConfig(configFile);
+		Config config = ConfigUtils.loadConfig(INPUT_DIR + "config.xml");
 		SignalSystemsConfigGroup signalSystemsConfigGroup = 
 				ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		signalSystemsConfigGroup.setUseIntergreenTimes(true);
