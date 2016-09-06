@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!ELEMENT population     (person)*>
+<!ELEMENT population     (attributes?,person*)>
 <!ATTLIST population
           desc           CDATA   #IMPLIED>
 

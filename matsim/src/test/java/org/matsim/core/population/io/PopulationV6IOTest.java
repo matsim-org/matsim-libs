@@ -20,7 +20,7 @@ public class PopulationV6IOTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testEmptyAttributesIO() {
+	public void testEmptyPersonAttributesIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
@@ -35,7 +35,7 @@ public class PopulationV6IOTest {
 	}
 
 	@Test
-	public void testAttributesIO() {
+	public void testPersonAttributesIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 
 		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
@@ -59,5 +59,27 @@ public class PopulationV6IOTest {
 		Assert.assertEquals( "Unexpected String attribute in " + readPerson.getAttributes(),
 				person.getAttributes().getAttribute( "party" ) ,
 				readPerson.getAttributes().getAttribute( "party" ) );
+	}
+
+	@Test
+	public void testPopulationAttributesIO() {
+		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
+
+		population.getAttributes().putAttribute( "type" , "candidates" );
+		population.getAttributes().putAttribute( "number" , 2 );
+
+		final String file = utils.getOutputDirectory()+"/population.xml";
+		new PopulationWriter( population ).writeV6( file );
+
+		final Scenario readScenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		new PopulationReader( readScenario ).readFile( file );
+
+		Assert.assertEquals( "Unexpected numeric attribute in " + readScenario.getPopulation().getAttributes(),
+				population.getAttributes().getAttribute( "number" ) ,
+				readScenario.getPopulation().getAttributes().getAttribute( "number" ) );
+
+		Assert.assertEquals( "Unexpected String attribute in " + readScenario.getPopulation().getAttributes(),
+				population.getAttributes().getAttribute( "type" ) ,
+				readScenario.getPopulation().getAttributes().getAttribute( "type" ) );
 	}
 }

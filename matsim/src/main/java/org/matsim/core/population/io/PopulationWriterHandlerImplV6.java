@@ -62,6 +62,10 @@ import java.io.IOException;
 			out.write(" desc=\"" + plans.getName() + "\"");
 		}
 		out.write(">\n\n");
+
+		attributesWriter.writeAttributes( "\t" , out , plans.getAttributes() );
+
+		out.write("\n\n");
 	}
 
 	@Override
@@ -131,7 +135,7 @@ import java.io.IOException;
 		}
 
 		out.write(">\n");
-		attributesWriter.writeAttributes( "\t" , out , person.getAttributes() );
+		attributesWriter.writeAttributes( "\t\t" , out , person.getAttributes() );
 
 	}
 

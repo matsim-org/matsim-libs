@@ -103,6 +103,7 @@ import java.util.Stack;
 	private Leg currleg = null;
 	private Route currRoute = null;
 	private String routeDescription = null;
+	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes = null;
 
 	private Activity prevAct = null;
 
@@ -128,10 +129,19 @@ import java.util.Stack;
 				startPerson(atts);
 				break;
 			case ATTRIBUTES:
-				attributesReader.startTag( name , atts ,context , currperson.getAttributes() );
-				break;
+				switch( context.peek() ) {
+					case POPULATION:
+						currAttributes = scenario.getPopulation().getAttributes();
+						break;
+					case PERSON:
+						currAttributes = currperson.getAttributes();
+						break;
+					default:
+						throw new RuntimeException( context.peek() );
+				}
+				// deliberate fall-through
 			case ATTRIBUTE:
-				attributesReader.startTag( name , atts ,context , currperson.getAttributes() );
+				attributesReader.startTag( name , atts ,context , currAttributes );
 				break;
 			case PLAN:
 				startPlan(atts);
