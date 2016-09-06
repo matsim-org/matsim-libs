@@ -79,7 +79,15 @@ public class RunSignalSystemsExample {
 		signalConfig.setSignalGroupsFile(INPUT_DIR + "signalGroups_v2.0.xml");
 		signalConfig.setSignalControlFile(INPUT_DIR + "signalControl_v2.0.xml");
 		
-//		// here is how to switch on link to link travel times if lanes are used
+//		// here is how to also use intergreen and amber times:
+//		signalConfig.setUseIntergreenTimes(true);
+//		signalConfig.setIntergreenTimesFile(intergreenTimesFile);
+//		// set a suitable action for the case that intergreens are violated
+//		signalConfig.setActionOnIntergreenViolation(SignalSystemsConfigGroup.ActionOnIntergreenViolation.WARN);
+//		signalConfig.setUseAmbertimes(true);
+//		signalConfig.setAmberTimesFile(amberTimesFile);
+		
+//		// here is how to switch on link to link travel times if lanes are used:
 //		config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
 //		config.controler().setLinkToLinkRoutingEnabled(true);
 		

@@ -220,7 +220,7 @@ public class CreateSignalInputWithLanesExample {
 				scenario.getLanes(), scenario.getNetwork());
 	}
 
-	public String run() {		
+	public void run() {		
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(INPUT_DIR + "network.xml.gz");
 		config.plans().setInputFile(INPUT_DIR + "population.xml.gz");
@@ -247,7 +247,6 @@ public class CreateSignalInputWithLanesExample {
 			outputDirectory.mkdir();
 		}
 
-		// TODO delete "OUTPUT_DIR +" here. But what is with network and population above?
 		config.network().setLaneDefinitionsFile(OUTPUT_DIR + "lane_definitions_v2.0.xml");
 		signalSystemsConfigGroup.setSignalSystemFile(OUTPUT_DIR + "signal_systems.xml");
 		signalSystemsConfigGroup.setSignalGroupsFile(OUTPUT_DIR + "signal_groups.xml");
@@ -269,7 +268,6 @@ public class CreateSignalInputWithLanesExample {
 
 		log.info("Config of traffic light scenario with lanes is written to " + configFile);
 		log.info("Visualize scenario by calling VisTrafficSignalScenarioWithLanes in the same package.");
-		return configFile;
 	}
 
 	public static void main(String[] args) {
