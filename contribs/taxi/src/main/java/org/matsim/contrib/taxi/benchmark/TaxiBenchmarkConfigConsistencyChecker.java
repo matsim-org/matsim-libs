@@ -36,12 +36,12 @@ public class TaxiBenchmarkConfigConsistencyChecker
         super.checkConsistency(config);
 
         if (config.network().isTimeVariantNetwork()
-                && config.network().getChangeEventsInputFileUrl(config.getContext()).getFile() == null) {
+                && config.network().getChangeEventsInputFile() == null) {
             log.warn("No change events provided for the time variant network");
         }
 
         if (!config.network().isTimeVariantNetwork()
-                && config.network().getChangeEventsInputFileUrl(config.getContext()).getFile() != null) {
+                && config.network().getChangeEventsInputFile() != null) {
             log.warn("Change events ignored, because the network is not time variant");
         }
 
