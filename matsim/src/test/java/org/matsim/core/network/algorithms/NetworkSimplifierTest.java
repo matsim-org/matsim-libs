@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-public class NetworkSimplifierThresholdTest {
+public class NetworkSimplifierTest {
 
 	@Test
 	public void testBuildNetwork(){
@@ -44,7 +44,7 @@ public class NetworkSimplifierThresholdTest {
 	public void testRun() {
 		Network network = buildNetwork();
 
-		NetworkSimplifierThreshold nst = new NetworkSimplifierThreshold();
+		NetworkSimplifier nst = new NetworkSimplifier();
 		nst.run(network, 20.0);
 		assertEquals("Wrong number of links", 3, network.getLinks().size());
 		assertNotNull("Expected link not found.", network.getLinks().get(Id.createLinkId("AB-BC")));
@@ -57,7 +57,7 @@ public class NetworkSimplifierThresholdTest {
 	public void testRunMergeLinkStats() {
 		Network network = buildNetwork();
 		
-		NetworkSimplifierThreshold nst = new NetworkSimplifierThreshold();
+		NetworkSimplifier nst = new NetworkSimplifier();
 		nst.setMergeLinkStats(true);
 		nst.run(network, 20.0);
 		assertEquals("Wrong number of links", 2, network.getLinks().size());

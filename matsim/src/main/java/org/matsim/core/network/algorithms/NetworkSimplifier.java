@@ -45,17 +45,36 @@ import java.util.TreeSet;
  * on {@link NetworkSimplifier}. It goes through the network in two steps. 
  * First it merges links if <i>both</i> are shorter then the threshold. It then
  * goes through the network a <i>second</i> time and merges links that are
- * shorter than the threshold with either of the links' mergeable neighbours.
+ * shorter than the threshold with either of the links' mergeable neighbours.<br><br>
+ * 
+ * If no link threshold is given, an infinite threshold is assumed. This should
+ * behave the same as a 'clean' network.
  *
  * @author aneumann, jwjoubert
  *
  */
-public class NetworkSimplifierThreshold {
+public class NetworkSimplifier {
 
-	private static final Logger log = Logger.getLogger(NetworkSimplifierThreshold.class);
+	private static final Logger log = Logger.getLogger(NetworkSimplifier.class);
 	private boolean mergeLinkStats = false;
 	private Collection<Integer> nodeTopoToMerge = Arrays.asList( NetworkCalcTopoType.PASS1WAY , NetworkCalcTopoType.PASS2WAY );
 
+	
+	/**
+	 * Merges all qualifying links, ignoring length threshold.
+	 * @param network
+	 */
+	public void run(final Network network){
+		run(network, Double.POSITIVE_INFINITY, thresholdExceeded.EITHER);
+	}
+	
+	
+	/**
+	 * Merges all qualifying links while ensuring no link is shorter than the
+	 * given threshold. 
+	 * @param network
+	 * @param thresholdLength
+	 */
 	public void run(final Network network, double thresholdLength){
 		run(network, thresholdLength, thresholdExceeded.BOTH);
 		run(network, thresholdLength, thresholdExceeded.EITHER);
@@ -264,7 +283,7 @@ public class NetworkSimplifierThreshold {
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile( inNetworkFile );
 
-		NetworkSimplifierThreshold nsimply = new NetworkSimplifierThreshold();
+		NetworkSimplifier nsimply = new NetworkSimplifier();
 		nsimply.setNodesToMerge(nodeTypesToMerge);
 //		nsimply.setMergeLinkStats(true);
 		nsimply.run(network, Double.NEGATIVE_INFINITY);
