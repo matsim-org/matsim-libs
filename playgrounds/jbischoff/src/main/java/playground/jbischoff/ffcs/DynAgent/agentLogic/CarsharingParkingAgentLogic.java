@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.StaticDynActivity;
 import org.matsim.contrib.dynagent.StaticPassengerDynLeg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -40,7 +41,9 @@ import org.matsim.vehicles.Vehicle;
 import playground.jbischoff.ffcs.FFCSConfigGroup;
 import playground.jbischoff.ffcs.FFCSUtils;
 import playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager;
+import playground.jbischoff.parking.ParkingUtils;
 import playground.jbischoff.parking.DynAgent.agentLogic.ParkingAgentLogic;
+import playground.jbischoff.parking.DynAgent.agentLogic.ParkingAgentLogic.LastParkActionState;
 import playground.jbischoff.parking.choice.ParkingChoiceLogic;
 import playground.jbischoff.parking.manager.ParkingManager;
 import playground.jbischoff.parking.manager.WalkLegFactory;
@@ -58,6 +61,7 @@ public class CarsharingParkingAgentLogic extends ParkingAgentLogic {
 
 	private FreefloatingCarsharingManager ffcmanager;
 	FFCSConfigGroup ffcsconfig;
+	private Id<Vehicle> currentlyAssignedVehicleId = null;
 	/**
 	 * @param plan
 	 * @param parkingManager
@@ -74,6 +78,18 @@ public class CarsharingParkingAgentLogic extends ParkingAgentLogic {
 		super(plan, parkingManager, walkLegFactory, parkingRouter, events, parkingLogic, timer, teleportationLogic);
 		this.ffcmanager = ffcmanager;
 		this.ffcsconfig = ffcsconfig;
+	}
+	
+	@Override
+	protected DynAction nextStateAfterCarTrip(DynAction oldAction, double now) {
+		
+		// car trip is complete, we have found a parking space (not part of the logic), block it and start to park
+		if (this.parkingManager.parkVehicleHere(this.currentlyAssignedVehicleId, agent.getCurrentLinkId(), now)){
+		this.ffcmanager.endRental(agent.getCurrentLinkId(), agent.getId(), this.currentlyAssignedVehicleId, now);
+		this.lastParkActionState = LastParkActionState.PARKACTIVITY;
+		this.currentlyAssignedVehicleId = null;
+		return new StaticDynActivity(ParkingUtils.PARKACTIVITYTYPE,now + ParkingUtils.PARKDURATION);}
+		else throw new RuntimeException ("No parking possible");
 	}
 	
 	@Override
@@ -94,10 +110,11 @@ public class CarsharingParkingAgentLogic extends ParkingAgentLogic {
 			Id<Link> telePortedParkLink = this.teleportationLogic.getVehicleLocation(agent.getCurrentLinkId(), vehicleId, parkLink, now);
 			Leg walkleg = walkLegFactory.createWalkLeg(agent.getCurrentLinkId(), telePortedParkLink, now, TransportMode.access_walk);
 			this.lastParkActionState = LastParkActionState.WALKTOPARK;
+			this.currentlyAssignedVehicleId = vehicleId;
 			return new StaticPassengerDynLeg(walkleg.getRoute(), walkleg.getMode());
 		}
 		else if (currentLeg.getMode().equals(FFCSUtils.FREEFLOATINGMODE)){
-			Id<Link> vehicleLocationLink = ffcmanager.findAndReserveFreefloatingVehicleForLeg(currentLeg, agent.getId(), now);
+			Tuple<Id<Link>,Id<Vehicle>> vehicleLocationLink = ffcmanager.findAndReserveFreefloatingVehicleForLeg(currentLeg, agent.getId(), now);
 			if (vehicleLocationLink == null){
 				currentLeg.setMode(TransportMode.pt);
 				this.lastParkActionState = LastParkActionState.NONCARTRIP;
@@ -108,7 +125,8 @@ public class CarsharingParkingAgentLogic extends ParkingAgentLogic {
 				
 			}
 
-			Leg walkleg = walkLegFactory.createWalkLeg(agent.getCurrentLinkId(), vehicleLocationLink, now, TransportMode.access_walk);
+			Leg walkleg = walkLegFactory.createWalkLeg(agent.getCurrentLinkId(), vehicleLocationLink.getFirst(), now, TransportMode.access_walk);
+			this.currentlyAssignedVehicleId = vehicleLocationLink.getSecond();
 			this.lastParkActionState = LastParkActionState.WALKTOPARK;
 			return new StaticPassengerDynLeg(walkleg.getRoute(), walkleg.getMode());
 		}

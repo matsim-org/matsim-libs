@@ -60,7 +60,6 @@ public class FacilityBasedParkingManager implements ParkingManager {
 	
 	Map<Id<Vehicle>,Id<Link>> parkingLocationsOutsideFacilities = new HashMap<>();
 	Map<Id<Link>,Set<Id<ActivityFacility>>> facilitiesPerLink = new HashMap<>();
-	Map<Id<Link>,Id<Link>> backLinkId = new HashMap<>();
 	
 	
 	Network network;
@@ -90,9 +89,7 @@ public class FacilityBasedParkingManager implements ParkingManager {
 		Logger.getLogger(getClass()).info("link added with parking restriction: "+linkId);
 		Link link = network.getLinks().get(linkId);
 		Link backLink = getBackLink(link);
-		if (backLink!=null){
-//			this.backLinkId.put(linkId, backLink.getId());
-		}
+		
 	}
 	}
 		
@@ -104,17 +101,11 @@ public class FacilityBasedParkingManager implements ParkingManager {
 	@Override
 	public boolean reserveSpaceIfVehicleCanParkHere(Id<Vehicle> vehicleId, Id<Link> linkId) {
 		boolean canPark = false;
-		Id<Link> backLinkId = (this.backLinkId.containsKey(linkId)?this.backLinkId.get(linkId):null);
 		
 		if (linkIdHasAvailableParkingForVehicle(linkId,vehicleId)){
 			canPark = true;
 		}
-		else if (backLinkId!=null){
-			if (linkIdHasAvailableParkingForVehicle(backLinkId,vehicleId)){
-				canPark = true;
-			}	
-		}
-//		Logger.getLogger(getClass()).info("veh: "+vehicleId+" link "+linkId + " can park "+canPark);
+		//		Logger.getLogger(getClass()).info("veh: "+vehicleId+" link "+linkId + " can park "+canPark);
 
 		return canPark;
 	}
@@ -165,13 +156,7 @@ public class FacilityBasedParkingManager implements ParkingManager {
 		if(parkVehicleAtLink(vehicleId,linkId,time)){
 			return true;
 		}
-		else {
-			Id<Link> backLinkId = (this.backLinkId.containsKey(linkId)?this.backLinkId.get(linkId):null);
-			if (backLinkId!=null){
-			if(parkVehicleAtLink(vehicleId,backLinkId,time)){
-				return true;
-			}}
-		}
+		else 
 		return false;
 	}
 
