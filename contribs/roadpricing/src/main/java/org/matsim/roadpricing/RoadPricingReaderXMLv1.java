@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.roadpricing.io;
+package org.matsim.roadpricing;
 
 import java.util.Stack;
 
@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.xml.sax.Attributes;
 
 /**

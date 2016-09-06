@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.roadpricing.io;
+package org.matsim.roadpricing;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,10 +29,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
+import org.matsim.roadpricing.RoadPricingWriterXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
-import org.matsim.roadpricing.io.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.io.RoadPricingWriterXMLv1;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 

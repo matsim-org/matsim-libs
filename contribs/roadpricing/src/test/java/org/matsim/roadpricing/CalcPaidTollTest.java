@@ -39,7 +39,6 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
-import org.matsim.roadpricing.io.RoadPricingReaderXMLv1;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

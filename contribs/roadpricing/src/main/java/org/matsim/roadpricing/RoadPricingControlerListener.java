@@ -34,7 +34,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.roadpricing.io.RoadPricingWriterXMLv1;
 
 import javax.inject.Inject;
 
