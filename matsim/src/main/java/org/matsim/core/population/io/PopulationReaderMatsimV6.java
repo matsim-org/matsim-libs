@@ -57,7 +57,7 @@ import java.util.Stack;
 	private final static String ATTRIBUTES = "attributes";
 	private final static String ATTRIBUTE = "attribute";
 	private final static String PLAN = "plan";
-	private final static String ACT = "act";
+	private final static String ACT = "activity";
 	private final static String LEG = "leg";
 	private final static String ROUTE = "route";
 
@@ -135,6 +135,12 @@ import java.util.Stack;
 						break;
 					case PERSON:
 						currAttributes = currperson.getAttributes();
+						break;
+					case ACT:
+						currAttributes = curract.getAttributes();
+						break;
+					case LEG:
+						currAttributes = currleg.getAttributes();
 						break;
 					default:
 						throw new RuntimeException( context.peek() );

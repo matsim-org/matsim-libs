@@ -20,14 +20,14 @@
           name        CDATA #REQUIRED
           class       CDATA #REQUIRED>
 
-<!ELEMENT plan           (act|leg)*>
+<!ELEMENT plan           (activity|leg)*>
 <!ATTLIST plan
           score          CDATA    #IMPLIED
           type           CDATA    #IMPLIED
           selected       (yes|no) "no">
 
-<!ELEMENT act            EMPTY>
-<!ATTLIST act
+<!ELEMENT activity            (attributes?)>
+<!ATTLIST activity
           type           CDATA #REQUIRED
           x              CDATA #IMPLIED
           y              CDATA #IMPLIED
@@ -37,7 +37,7 @@
           end_time       CDATA #IMPLIED
           max_dur        CDATA #IMPLIED>
 
-<!ELEMENT leg            (route)?>
+<!ELEMENT leg            (attributes?,route?)>
 <!ATTLIST leg
           mode           CDATA                                                 #REQUIRED
           dep_time       CDATA                                                 #IMPLIED

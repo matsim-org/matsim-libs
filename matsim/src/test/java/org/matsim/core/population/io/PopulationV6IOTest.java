@@ -3,10 +3,10 @@ package org.matsim.core.population.io;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -59,6 +59,69 @@ public class PopulationV6IOTest {
 		Assert.assertEquals( "Unexpected String attribute in " + readPerson.getAttributes(),
 				person.getAttributes().getAttribute( "party" ) ,
 				readPerson.getAttributes().getAttribute( "party" ) );
+	}
+
+	@Test
+	public void testActivityAttributesIO() {
+		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
+
+		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
+		population.addPerson( person );
+
+		final Plan plan = population.getFactory().createPlan();
+		person.addPlan( plan );
+		final Activity act = population.getFactory().createActivityFromCoord( "speech" , new Coord( 0 , 0 ) );
+		plan.addActivity( act );
+
+		act.getAttributes().putAttribute( "makes sense" , false );
+		act.getAttributes().putAttribute( "length" , 1895L );
+
+		final String file = utils.getOutputDirectory()+"/population.xml";
+		new PopulationWriter( population ).writeV6( file );
+
+		final Scenario readScenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		new PopulationReader( readScenario ).readFile( file );
+
+		final Person readPerson = readScenario.getPopulation().getPersons().get( Id.createPersonId( "Donald Trump" ) );
+		final Activity readAct = (Activity) readPerson.getSelectedPlan().getPlanElements().get( 0 );
+
+		Assert.assertEquals( "Unexpected boolean attribute in " + readAct.getAttributes(),
+				act.getAttributes().getAttribute( "makes sense" ) ,
+				readAct.getAttributes().getAttribute( "makes sense" ) );
+
+		Assert.assertEquals( "Unexpected Long attribute in " + readAct.getAttributes(),
+				act.getAttributes().getAttribute( "length" ) ,
+				readAct.getAttributes().getAttribute( "length" ) );
+	}
+
+	@Test
+	public void testLegAttributesIO() {
+		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
+
+		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
+		population.addPerson( person );
+
+		final Plan plan = population.getFactory().createPlan();
+		person.addPlan( plan );
+		final Leg leg = population.getFactory().createLeg( "SUV" );
+		plan.addActivity( population.getFactory().createActivityFromLinkId( "speech" , Id.createLinkId( 1 )));
+		plan.addLeg( leg );
+		plan.addActivity( population.getFactory().createActivityFromLinkId( "tweet" , Id.createLinkId( 2 )));
+
+		leg.getAttributes().putAttribute( "mpg" , 0.000001d );
+
+		final String file = utils.getOutputDirectory()+"/population.xml";
+		new PopulationWriter( population ).writeV6( file );
+
+		final Scenario readScenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		new PopulationReader( readScenario ).readFile( file );
+
+		final Person readPerson = readScenario.getPopulation().getPersons().get( Id.createPersonId( "Donald Trump" ) );
+		final Leg readLeg = (Leg) readPerson.getSelectedPlan().getPlanElements().get( 1 );
+
+		Assert.assertEquals( "Unexpected Double attribute in " + readLeg.getAttributes(),
+				leg.getAttributes().getAttribute( "mpg" ) ,
+				readLeg.getAttributes().getAttribute( "mpg" ) );
 	}
 
 	@Test

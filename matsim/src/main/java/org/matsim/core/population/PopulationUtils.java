@@ -66,6 +66,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author nagel, ikaddoura
@@ -190,6 +191,12 @@ public final class PopulationUtils {
 		public String toString() {
 			return this.delegate.toString() ;
 		}
+
+		@Override
+		public Attributes getAttributes() {
+			// attributes should be made unmodifiable
+			return delegate.getAttributes();
+		}
 	}
 	
 	public static Activity unmodifiableActivity( Activity act ) {
@@ -277,6 +284,11 @@ public final class PopulationUtils {
 			throw new RuntimeException("not implemented") ;
 		}
 
+		@Override
+		public Attributes getAttributes() {
+			// attributes should be made unmodifiable
+			return delegate.getAttributes();
+		}
 	}
 
 	/**

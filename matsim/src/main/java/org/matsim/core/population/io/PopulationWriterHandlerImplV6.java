@@ -81,7 +81,7 @@ import java.io.IOException;
 				}
 				else if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
-					PopulationWriterHandlerImplV6.startLeg(leg, out);
+					this.startLeg(leg, out);
 					// route
 					Route route = leg.getRoute();
 					if (route != null) {
@@ -170,7 +170,7 @@ import java.io.IOException;
 	}
 
 	private void writeAct(final Activity act, final BufferedWriter out) throws IOException {
-		out.write("\t\t\t<act type=\"");
+		out.write("\t\t\t<activity type=\"");
 		out.write(act.getType());
 		out.write("\"");
 		if (act.getLinkId() != null) {
@@ -209,10 +209,14 @@ import java.io.IOException;
 			out.write(Time.writeTime(act.getEndTime()));
 			out.write("\"");
 		}
-		out.write(" />\n");
+		out.write(" >\n");
+
+		attributesWriter.writeAttributes( "\t\t\t\t" , out , act.getAttributes() );
+
+		out.write("\t\t\t</activity>\n");
 	}
 
-	private static void startLeg(final Leg leg, final BufferedWriter out) throws IOException {
+	private void startLeg(final Leg leg, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<leg mode=\"");
 		out.write(leg.getMode());
 		out.write("\"");
@@ -237,6 +241,8 @@ import java.io.IOException;
 		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16
 
 		out.write(">\n");
+
+		attributesWriter.writeAttributes( "\t\t\t\t" , out , leg.getAttributes() );
 	}
 
 	private static void endLeg(final BufferedWriter out) throws IOException {
