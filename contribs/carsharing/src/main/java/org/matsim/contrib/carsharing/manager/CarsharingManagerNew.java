@@ -19,6 +19,7 @@ import org.matsim.contrib.carsharing.manager.supply.OneWayContainer;
 import org.matsim.contrib.carsharing.manager.supply.TwoWayContainer;
 import org.matsim.contrib.carsharing.manager.supply.VehiclesContainer;
 import org.matsim.contrib.carsharing.models.ChooseTheCompany;
+import org.matsim.contrib.carsharing.models.ChooseVehicleType;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModel;
 import org.matsim.contrib.carsharing.stations.CarsharingStation;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
@@ -40,6 +41,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 	@Inject private CurrentTotalDemand currentDemand;
 	@Inject private KeepingTheCarModel keepTheCarModel;
 	@Inject private ChooseTheCompany chooseCompany;
+	@Inject private ChooseVehicleType chooseVehicleType;
 	@Inject private CarsharingSupplyInterface carsharingSupplyContainer;
 	@Inject private EventsManager eventsManager;
 	@Inject private RouterProvider routerProvider;
@@ -95,9 +97,11 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 		else {
 			
 			//=== agent does not hold the vehicle, therefore must find a one from the supply side===
+			//=== here he chooses the company, type of vehicle and in the end vehicle ===
+			//=== possibly this could be moved to one method which decides based on the supply which vehicle to take
 			
 			String companyId = chooseCompany.pickACompany(plan, legToBeRouted);
-			String typeOfVehicle = "car";
+			String typeOfVehicle = chooseVehicleType.getPreferredVehicleType(plan, legToBeRouted);
 			vehicle = this.carsharingSupplyContainer.findClosestAvailableVehicle(startLink,
 					carsharingType, typeOfVehicle, companyId, searchDistance);
 			if (vehicle == null)
