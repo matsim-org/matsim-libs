@@ -51,7 +51,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
  *
  * @author mrieser
  */
-public class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+public final class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	Logger log = Logger.getLogger( CalcPaidToll.class ) ;
 
@@ -68,8 +68,9 @@ public class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersTraffic
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
     @Inject
-	CalcPaidToll(final Network network, final RoadPricingScheme scheme) {
+	CalcPaidToll(final Network network, final RoadPricingScheme scheme, EventsManager events ) {
 		super();
+		events.addHandler(this);
 		this.network = network;
 		this.scheme = scheme;
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType())) {

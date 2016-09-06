@@ -101,8 +101,7 @@ public class SanralRoadPricing implements StartupListener, AfterMobsimListener, 
 //			});
 		}
 
-        this.cattl = new CalcAverageTolledTripLength(controler.getScenario().getNetwork(), this.scheme);
-		controler.getEvents().addHandler(this.cattl);
+	        this.cattl = new CalcAverageTolledTripLength(controler.getScenario().getNetwork(), this.scheme, controler.getEvents() ) ;
 	}
 
 	@Override
