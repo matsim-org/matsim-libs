@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.roadpricing;
+package org.matsim.roadpricing.io;
 
 import java.util.Stack;
 
@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.xml.sax.Attributes;
 
 /**
@@ -74,7 +75,7 @@ public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 				// (interpretation: an undefined toll end time very presumably means that it should last until +infty. kai, jan'14)
 			}
 			if (TAG_COST.equals(name) && this.currentLinkId == null) {
-				this.scheme.addCost(Time.parseTime(atts.getValue(ATTR_START_TIME)),
+				this.scheme.createAndAddCost(Time.parseTime(atts.getValue(ATTR_START_TIME)),
 						endTime, Double.parseDouble(atts.getValue(ATTR_AMOUNT)));
 			} else if (TAG_COST.equals(name) && this.currentLinkId != null){
 				this.scheme.addLinkCost(this.currentLinkId, Time.parseTime(atts.getValue(ATTR_START_TIME)),

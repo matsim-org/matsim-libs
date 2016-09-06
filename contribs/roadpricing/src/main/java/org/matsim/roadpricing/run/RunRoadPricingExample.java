@@ -30,7 +30,6 @@ import org.matsim.roadpricing.RoadPricingConfigGroup;
  * Basic "script" to use roadpricing.
  * 
  * @author nagel
- *
  */
 public final class RunRoadPricingExample {
 	// to not change class name: referenced from book.  kai, dec'14

@@ -25,13 +25,14 @@ import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
+import javax.inject.Provider;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -59,8 +60,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestUtils;
 
-import javax.inject.Provider;
-
 /**
  * Tests the correct working of {@link TravelDisutilityIncludingToll} by using it
  * to calculate some routes with {@link PlansCalcRoute}.
@@ -85,7 +84,7 @@ public class TollTravelCostCalculatorTest {
 		scheme.addLink(link5Id);
 		final Id<Link> link11Id = Id.create("11", Link.class);
 		scheme.addLink(link11Id);
-		scheme.addCost(0, 10*3600, 0.0007); 
+		scheme.createAndAddCost(0, 10*3600, 0.0007); 
 
 
 		TravelTime timeCalculator = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
@@ -168,7 +167,7 @@ public class TollTravelCostCalculatorTest {
 				costCalc );
 		Fixture.compareRoutes("2 5 6", (NetworkRoute) ((Leg) (person1.getPlans().get(0).getPlanElements().get(carLegIndex))).getRoute());
 
-		Cost morningCost = toll.addCost(6*3600, 10*3600, 0.0006); // 0.0006 * link_length(100m) = 0.06, which is slightly below the threshold of 0.0666
+		Cost morningCost = toll.createAndAddCost(6*3600, 10*3600, 0.0006); // 0.0006 * link_length(100m) = 0.06, which is slightly below the threshold of 0.0666
 		// 2nd case: with a low toll, agent still chooses shortest path
 		clearRoutes(population);
 		routePopulation(
@@ -188,7 +187,7 @@ public class TollTravelCostCalculatorTest {
 
 		// 3rd case: with a higher toll, agent decides to drive around tolled link
 		toll.removeCost(morningCost);
-		toll.addCost(6*3600, 10*3600, 0.0007); // new morning toll, this should be slightly over the threshold
+		toll.createAndAddCost(6*3600, 10*3600, 0.0007); // new morning toll, this should be slightly over the threshold
 		clearRoutes(population);
 		routePopulation(
 				scenario,
@@ -261,7 +260,7 @@ public class TollTravelCostCalculatorTest {
 		}
 		Fixture.compareRoutes("2 5 6", (NetworkRoute) ((Leg) (planElements2.get(carLegIndex))).getRoute());
 
-		Cost morningCost = toll.addCost(6*3600, 10*3600, 0.06); // 0.06, which is slightly below the threshold of 0.0666
+		Cost morningCost = toll.createAndAddCost(6*3600, 10*3600, 0.06); // 0.06, which is slightly below the threshold of 0.0666
 		// 2nd case: with a low toll, agent still chooses shortest path
 		clearRoutes(population);
 		routePopulation(
@@ -283,7 +282,7 @@ public class TollTravelCostCalculatorTest {
 
 		// 3rd case: with a higher toll, agent decides to drive around tolled link
 		toll.removeCost(morningCost);
-		toll.addCost(6*3600, 10*3600, 0.07); // new morning toll, this should be slightly over the threshold
+		toll.createAndAddCost(6*3600, 10*3600, 0.07); // new morning toll, this should be slightly over the threshold
 		clearRoutes(population);
 		routePopulation(
 				scenario,
@@ -342,7 +341,7 @@ public class TollTravelCostCalculatorTest {
 		Fixture.compareRoutes("2 5 6", (NetworkRoute) ((Leg) (person1.getPlans().get(0).getPlanElements().get(carLegIndex))).getRoute());
 
 		// 2nd case: with a low toll, agent still chooses shortest path and pay the toll
-		Cost morningCost = toll.addCost(6*3600, 10*3600, 0.06);
+		Cost morningCost = toll.createAndAddCost(6*3600, 10*3600, 0.06);
 		clearRoutes(population);
 		routePopulation(
 				scenario,
@@ -361,7 +360,7 @@ public class TollTravelCostCalculatorTest {
 		Fixture.compareRoutes("2 5 6", (NetworkRoute) ((Leg) (person1.getPlans().get(0).getPlanElements().get(carLegIndex))).getRoute());
 
 		// 3rd case: with a higher toll, agent decides to drive around tolled link
-		toll.addCost(6*3600, 10*3600, 0.067);
+		toll.createAndAddCost(6*3600, 10*3600, 0.067);
 		clearRoutes(population);
 		routePopulation(
 				scenario,

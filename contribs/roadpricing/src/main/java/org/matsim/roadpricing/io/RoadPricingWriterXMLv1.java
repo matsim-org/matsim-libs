@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.roadpricing;
+package org.matsim.roadpricing.io;
 
 import java.io.IOException;
 import java.util.List;
@@ -27,6 +27,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
 /**

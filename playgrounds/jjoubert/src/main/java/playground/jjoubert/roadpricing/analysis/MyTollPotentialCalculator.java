@@ -36,9 +36,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
+import org.matsim.roadpricing.io.RoadPricingReaderXMLv1;
 import org.matsim.vehicles.Vehicle;
 
 public class MyTollPotentialCalculator {

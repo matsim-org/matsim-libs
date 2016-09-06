@@ -36,6 +36,7 @@ import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.roadpricing.io.RoadPricingReaderXMLv1;
 
 import com.google.inject.Singleton;
 

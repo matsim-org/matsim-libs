@@ -63,7 +63,8 @@ public class PlansCalcRouteWithTollOrNotTest {
 	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 
 	/**
-	 * Tests a few cases where the router can decide if it is better to pay the toll or not.
+	 * Tests a few cases where the router can decide if it is better to pay the 
+	 * toll or not.
 	 */
 	@Test
 	public void testBestAlternatives() {
@@ -79,7 +80,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		toll.setType("area");
 		toll.addLink(Id.createLinkId("5"));
 		toll.addLink(Id.createLinkId("11"));
-		Cost morningCost = toll.addCost(6 * 3600, 10 * 3600, 0.12);
+		Cost morningCost = toll.createAndAddCost(6 * 3600, 10 * 3600, 0.12);
 		/* Start with a rather low toll. The toll is also so low, because we only
 		 * have small network with short links: the cost to travel across one link
 		 * is: 20s * (-6 EUR / h) = 20 * (-6) / 3600 = 0.03333
@@ -88,7 +89,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
 
-		Id id1 = Id.createPersonId("1");
+		Id<Person> id1 = Id.createPersonId("1");
 
 		// case 1: toll only in morning, it is cheaper to drive around
 		log.warn( "access/egress?" + config.plansCalcRoute().isInsertingAccessEgressWalk() );
@@ -98,7 +99,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		Fixture.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 
 		// case 2: now add a toll in the afternoon too, so it is cheaper to pay the toll
-		Cost afternoonCost = toll.addCost(14*3600, 18*3600, 0.12);
+		Cost afternoonCost = toll.createAndAddCost(14*3600, 18*3600, 0.12);
 		log.warn( "access/egress? " + config.plansCalcRoute().isInsertingAccessEgressWalk() );
 		runOnAll(testee(scenario, toll), population);
 		log.warn( "access/egress? " + config.plansCalcRoute().isInsertingAccessEgressWalk() );
@@ -116,14 +117,14 @@ public class PlansCalcRouteWithTollOrNotTest {
 		// case 4: now remove the costs and add them again, but with a higher amount
 		toll.removeCost(morningCost);
 		toll.removeCost(afternoonCost);
-		toll.addCost(6*3600, 10*3600, 0.7);
-		toll.addCost(14*3600, 18*3600, 0.7);
+		toll.createAndAddCost(6*3600, 10*3600, 0.7);
+		toll.createAndAddCost(14*3600, 18*3600, 0.7);
 		// the agent should now decide to drive around
 		runOnAll(testee(scenario, toll), population);
 		Fixture.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 	}
 
-	private static Leg getLeg1(Config config, Population population, Id id1) {
+	private static Leg getLeg1(Config config, Population population, Id<Person> id1) {
 		final List<PlanElement> planElements = population.getPersons().get(id1).getPlans().get(0).getPlanElements();
 		for ( PlanElement pe : planElements ) {
 			log.warn( pe );
@@ -164,13 +165,13 @@ public class PlansCalcRouteWithTollOrNotTest {
 		RoadPricingSchemeImpl toll = new RoadPricingSchemeImpl();
 		toll.setType("area");
 		Id.createLinkId("7");
-		toll.addCost(6*3600, 10*3600, 0.06);
+		toll.createAndAddCost(6*3600, 10*3600, 0.06);
 
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
 
 		runOnAll(testee(scenario, toll), population);
-		Id id1 = Id.createPersonId("1");
+		Id<Person> id1 = Id.createPersonId("1");
 
 		Fixture.compareRoutes("2 5 6", (NetworkRoute) getLeg1(config, population, id1).getRoute()); // agent should take shortest route
 		Fixture.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
@@ -191,20 +192,20 @@ public class PlansCalcRouteWithTollOrNotTest {
 		toll.setType("area");
 		toll.addLink(Id.createLinkId("3"));
 		toll.addLink(Id.createLinkId("5"));
-		toll.addCost(6*3600, 10*3600, 0.06);
+		toll.createAndAddCost(6*3600, 10*3600, 0.06);
 
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
 
 
 		runOnAll(testee(scenario, toll), population);
-		Id id1 = Id.createPersonId("1");
+		Id<Person> id1 = Id.createPersonId("1");
 
 		Fixture.compareRoutes("2 5 6", (NetworkRoute) getLeg1(config, population, id1).getRoute()); // agent should take shortest route
 		Fixture.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 	}
 
-	private static Leg getLeg3(Config config, Population population, Id id1) {
+	private static Leg getLeg3(Config config, Population population, Id<Person> id1) {
 		List<PlanElement> planElements = population.getPersons().get(id1).getPlans().get(0).getPlanElements() ;
 		if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
 			return (Leg) (planElements.get(3));
@@ -239,14 +240,14 @@ public class PlansCalcRouteWithTollOrNotTest {
 		toll.setType("area");
 		toll.addLink(Id.createLinkId("5"));
 		toll.addLink(Id.createLinkId("11"));
-		toll.addCost(8*3600, 10*3600, 1.0); // high costs!
+		toll.createAndAddCost(8*3600, 10*3600, 1.0); // high costs!
 
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
 
 
 		runOnAll(testee(scenario, toll), population);
-		Id id1 = Id.createPersonId("1");
+		Id<Person> id1 = Id.createPersonId("1");
 		Leg leg1 = getLeg1(config, population, id1);
 		Leg leg2 = getLeg3(config, population, id1);
 

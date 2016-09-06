@@ -43,9 +43,9 @@ import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
-import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingSchemeUsingTollFactor;
+import org.matsim.roadpricing.io.RoadPricingReaderXMLv1;
 import org.matsim.vehicles.Vehicle;
 
 import playground.southafrica.utilities.Header;

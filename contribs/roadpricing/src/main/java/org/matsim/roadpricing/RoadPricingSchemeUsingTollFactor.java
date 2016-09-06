@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
+import org.matsim.roadpricing.io.RoadPricingReaderXMLv1;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -42,9 +43,9 @@ public class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme {
 	private static final Logger log = Logger.getLogger( RoadPricingSchemeUsingTollFactor.class ) ;
 
 	private RoadPricingScheme delegate = null ;
-	private final TollFactorI tollFactor ;
+	private final TollFactor tollFactor ;
 	
-	public RoadPricingSchemeUsingTollFactor( String tollLinksFileName, TollFactorI tollFactor ) {
+	public RoadPricingSchemeUsingTollFactor( String tollLinksFileName, TollFactor tollFactor ) {
 		
 		// read the road pricing scheme from file
 		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();

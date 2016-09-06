@@ -80,6 +80,7 @@ import junit.framework.TestCase;
 		Node node6 = NetworkUtils.createAndAddNode(network, Id.create(6, Node.class), new Coord((double) 500, (double) 0));
 		final Node fromNode = node1;
 		final Node toNode = node2;
+		
 		// freespeed 18km/h = 5m/s --> 20s for 100m
 		NetworkUtils.createAndAddLink(network,Id.create(0, Link.class), fromNode, toNode, (double) 100, (double) 5, (double) 100, (double) 1 );
 		final Node fromNode1 = node2;
@@ -100,7 +101,7 @@ import junit.framework.TestCase;
 	static void createNetwork2(final MutableScenario scenario) {
 		/* This creates the following network:
 		 *
-		 *            3 /----(3)----\ 4
+		 *            3 .----(3)----. 4
 		 *             /             \
 		 * (1)-------(2)--------------(4)-------(5)
 		 *  |    2            5             6    |
@@ -114,7 +115,7 @@ import junit.framework.TestCase;
 		 *  |    12          11             8    |
 		 * (10)------(9)--------------(7)-------(6)
 		 *             \             /
-		 *           10 \----(8)----/ 9
+		 *           10 `----(8)----' 9
 		 *
 		 * each link is 100m long and can be traveled along with 18km/h = 5m/s = 20s for 100m
 		 */
@@ -217,7 +218,7 @@ import junit.framework.TestCase;
 		Fixture.addPersonToPopulation(Fixture.createPerson2(1, "07:00", network.getLinks().get(Id.create("1", Link.class)), network.getLinks().get(Id.create("7", Link.class)), network.getLinks().get(Id.create("13", Link.class))), population);
 	}
 
-	private static Person createPerson1(final int personId, final String startTime, final Id homeLinkId, final List<Id<Link>> routeLinkIds, final Id workLinkId) {
+	private static Person createPerson1(final int personId, final String startTime, final Id<Link> homeLinkId, final List<Id<Link>> routeLinkIds, final Id<Link> workLinkId) {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(personId, Person.class));
 		Plan plan = PopulationUtils.createPlan(person);
 		person.addPlan(plan);
@@ -270,7 +271,7 @@ import junit.framework.TestCase;
 
 		StringBuilder strBuilder = new StringBuilder();
 		
-		for (Id linkId : realRoute.getLinkIds()) {
+		for (Id<Link> linkId : realRoute.getLinkIds()) {
 			strBuilder.append(linkId.toString());
 			strBuilder.append(' ');
 		}
