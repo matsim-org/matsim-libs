@@ -35,7 +35,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
  *
  * @author mrieser
  */
-public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
+public final class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 	// needs to be public. kai, sep'14
 
 	private final RoadPricingScheme scheme;

@@ -35,7 +35,7 @@ import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
-public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
+public final class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 
 	final RoadPricingScheme roadPricingScheme;
 

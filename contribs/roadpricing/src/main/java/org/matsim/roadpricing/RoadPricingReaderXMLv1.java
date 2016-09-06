@@ -33,7 +33,7 @@ import org.xml.sax.Attributes;
  *
  * @author mrieser
  */
-public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
+public final class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 	// currently needs to be public. kai, sep'14
 
 	private final static String TAG_ROADPRICING = "roadpricing";

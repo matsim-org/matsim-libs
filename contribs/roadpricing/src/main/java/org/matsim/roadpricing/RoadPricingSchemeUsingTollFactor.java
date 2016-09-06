@@ -35,7 +35,7 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  *
  */
-public class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme {
+public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme {
 	// needs to be public. kai, sep'14
 	
 	@SuppressWarnings("unused")

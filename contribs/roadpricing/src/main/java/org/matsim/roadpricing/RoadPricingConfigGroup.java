@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-public class RoadPricingConfigGroup extends ReflectiveConfigGroup {
+public final class RoadPricingConfigGroup extends ReflectiveConfigGroup {
 	// has to be public
 
 	/* Reason for removing "usingRoadPricing" switch: We found it hard to 

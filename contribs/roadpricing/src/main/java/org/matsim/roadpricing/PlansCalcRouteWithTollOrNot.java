@@ -37,7 +37,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.Map;
 
-public class PlansCalcRouteWithTollOrNot implements PlanAlgorithm {
+ class PlansCalcRouteWithTollOrNot implements PlanAlgorithm {
 
 	public static final String CAR_WITH_PAYED_AREA_TOLL = "car_with_payed_area_toll";
 	private RoadPricingScheme roadPricingScheme;

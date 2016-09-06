@@ -47,7 +47,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
  *
  * @author mrieser
  */
-public class CalcAverageTolledTripLength implements LinkEnterEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+public final class CalcAverageTolledTripLength implements LinkEnterEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(CalcAverageTolledTripLength.class);

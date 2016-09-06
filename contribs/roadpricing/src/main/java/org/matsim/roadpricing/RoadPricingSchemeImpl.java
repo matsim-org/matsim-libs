@@ -39,7 +39,7 @@ import org.matsim.vehicles.Vehicle;
  *
  * @author mrieser
  */
-public class RoadPricingSchemeImpl implements RoadPricingScheme {
+public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 	// currently needs to be public. kai, sep'14
 	
 	private static Logger log = Logger.getLogger( RoadPricingSchemeImpl.class ) ;

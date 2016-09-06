@@ -31,7 +31,7 @@ import java.util.Set;
  *
  * TODO I'm sure this can be made easier and more flexible (michaz 2016)
  */
-public class RoadPricingNetworkRouting implements Provider<RoutingModule> {
+ class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 
 	@Inject
     Map<String, TravelTime> travelTimes;
