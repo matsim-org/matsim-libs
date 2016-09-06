@@ -19,7 +19,9 @@
  * *********************************************************************** */
 package tutorial.fixedTimeSignals;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.apache.log4j.Logger;
@@ -220,7 +222,7 @@ public class CreateSignalInputWithLanesExample {
 				scenario.getLanes(), scenario.getNetwork());
 	}
 
-	public void run() {		
+	public void run() throws IOException {		
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(INPUT_DIR + "network.xml.gz");
 		config.plans().setInputFile(INPUT_DIR + "population.xml.gz");
@@ -242,11 +244,9 @@ public class CreateSignalInputWithLanesExample {
 		this.createSystem2Control(scenario, signalsData.getSignalControlData());
 		this.createSystem5Control(scenario, signalsData.getSignalControlData());
 
-		File outputDirectory = new File(OUTPUT_DIR);
-		if (!outputDirectory.exists()) {
-			outputDirectory.mkdir();
-		}
-
+		// create the path to the output directory if it does not exist yet
+		Files.createDirectories(Paths.get(OUTPUT_DIR));
+				
 		config.network().setLaneDefinitionsFile(OUTPUT_DIR + "lane_definitions_v2.0.xml");
 		signalSystemsConfigGroup.setSignalSystemFile(OUTPUT_DIR + "signal_systems.xml");
 		signalSystemsConfigGroup.setSignalGroupsFile(OUTPUT_DIR + "signal_groups.xml");
@@ -270,7 +270,7 @@ public class CreateSignalInputWithLanesExample {
 		log.info("Visualize scenario by calling VisTrafficSignalScenarioWithLanes in the same package.");
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		new CreateSignalInputWithLanesExample().run();
 	}
 }
