@@ -46,8 +46,8 @@ import com.google.inject.Inject;
 /**
  * Example for a responsive signal.
  * 
- * It updates the signal control depending on the average delay every i-th iteration, 
- * whereby i is a multiple of the value defined in the variable INTERVAL.
+ * It updates the fixed signal control depending on the average delay every i-th iteration, 
+ * whereby i is defined in the variable INTERVAL.
  * 
  * @author tthunig
  *
