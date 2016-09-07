@@ -49,10 +49,6 @@ public class VehicleReaderV1 extends MatsimXmlParser {
 		this.builder = this.vehicles.getFactory();
 	}
 
-	public void readFile(final String filename) throws UncheckedIOException {
-		parse(filename);
-	}
-
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (VehicleSchemaV1Names.DESCRIPTION.equalsIgnoreCase(name) && (content.trim().length() > 0)){

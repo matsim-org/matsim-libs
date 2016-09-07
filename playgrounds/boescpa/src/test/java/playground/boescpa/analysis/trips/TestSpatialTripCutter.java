@@ -123,6 +123,12 @@ public class TestSpatialTripCutter {
 		throw new RuntimeException("not implemented") ;
 	}
 
+	@Override
+	public void setCoord(Coord coord) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
     }
     private class DummyLink implements Link {
         private final Node to;
@@ -227,6 +233,18 @@ public class TestSpatialTripCutter {
         public Set<String> getAllowedModes() {
             return null;
         }
+
+	@Override
+	public double getFlowCapacityPerSec() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public double getFlowCapacityPerSec(double time) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
 
     }
 

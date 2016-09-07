@@ -16,7 +16,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -354,9 +354,9 @@ public class MainEventAnalyzer {
 	public static void main(String[] args) throws IOException {
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario.getNetwork()).parse("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
 		scenario.getConfig().transit().setUseTransit(true);
-		new TransitScheduleReaderV1(scenario).parse("./data/MATSim-Sin-2.0/input/transit/transitScheduleWAM.xml");
+		new TransitScheduleReaderV1(scenario).readFile("./data/MATSim-Sin-2.0/input/transit/transitScheduleWAM.xml");
 		TravelTimeCalculator ttc = new TravelTimeCalculator(scenario.getNetwork(), 15*60, 30*3600, scenario.getConfig().travelTimeCalculator());
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		events.addHandler(ttc);

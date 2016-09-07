@@ -67,7 +67,7 @@ public class FacilityEntropyDataExtractor {
 		
 		/* Parse population. */
 		DigicoreVehicles dv = new DigicoreVehicles("WGS_SA_Albers");
-		new DigicoreVehiclesReader(dv).parse(inputFile);
+		new DigicoreVehiclesReader(dv).readFile(inputFile);
 		
 		/* Executing the extraction. */
 		FacilityEntropyDataExtractor.extract(dv, outputFile);

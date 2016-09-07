@@ -25,11 +25,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.*;
@@ -100,7 +100,7 @@ public class MixedLaneTestFixture {
 	private void init() {
 
 		Network n = sc.getNetwork();
-		NetworkFactoryImpl nb = (NetworkFactoryImpl) n.getFactory();
+		NetworkFactory nb = (NetworkFactory) n.getFactory();
 
 		// create network
 		Node node = null;

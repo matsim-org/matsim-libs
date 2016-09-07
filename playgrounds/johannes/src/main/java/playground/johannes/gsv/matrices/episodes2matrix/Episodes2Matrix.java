@@ -62,7 +62,7 @@ public class Episodes2Matrix {
         logger.info("Loading persons...");
         XMLHandler reader = new XMLHandler(new PlainFactory());
         reader.setValidating(false);
-        reader.parse(in);
+        reader.readFile(in);
         Collection<PlainPerson> persons = (Set<PlainPerson>)reader.getPersons();
         logger.info(String.format("Loaded %s persons.", persons.size()));
 

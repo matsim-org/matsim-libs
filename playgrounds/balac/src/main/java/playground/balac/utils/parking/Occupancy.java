@@ -76,7 +76,7 @@ public class Occupancy implements BasicEventHandler {
 		events.addHandler(occ); 
 
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(args[0]);
+		reader.readFile(args[0]);
 		
 		int[] count = occ.getCounts();
 		

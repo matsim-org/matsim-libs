@@ -34,11 +34,11 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.StreamingPopulationReader;
-import org.matsim.core.population.StreamingUtils;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -87,7 +87,7 @@ public class DistanceAnalysis {
 	@SuppressWarnings("unchecked")
 	private void readPlansAndNetwork(String plans, String network) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new NetworkReaderMatsimV1(sc.getNetwork()).parse(network);
+		new NetworkReaderMatsimV1(sc.getNetwork()).readFile(network);
 		this.eventsHandler.addLinks((Map<Id<Link>, Link>) sc.getNetwork().getLinks());
 		
 //		final Population reader = (Population) sc.getPopulation();

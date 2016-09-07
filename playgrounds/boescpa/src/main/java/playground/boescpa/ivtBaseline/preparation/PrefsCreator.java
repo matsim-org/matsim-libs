@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -356,7 +356,7 @@ public class PrefsCreator {
     private static ObjectAttributes getObjectAttributes(String pathToInputPrefs) {
         ObjectAttributes prefs = new ObjectAttributes();
         ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(prefs);
-        reader.parse(pathToInputPrefs);
+        reader.readFile(pathToInputPrefs);
         return prefs;
     }
 

@@ -25,10 +25,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.households.Household;
@@ -74,8 +74,11 @@ public class GenerateHouseholdVehiclesBasedOnCarAvailability {
 		if ( args.isSwitched( "--cliques" ) ) {
 			log.info( "read households using cliques reader" );
 
-			new MatsimXmlParser( false ) {
+			new MatsimXmlParser(  ) {
 				HouseholdImpl currentHousehold = null;
+				{
+					this.setValidating(false);
+				}
 				@Override
 				public void startTag(
 						final String name,
@@ -96,7 +99,7 @@ public class GenerateHouseholdVehiclesBasedOnCarAvailability {
 						final String name,
 						final String content,
 						final Stack<String> context) {}
-			}.parse( inhh );
+			}.readFile( inhh );
 		}
 		else {
 			log.info( "read households using households reader" );

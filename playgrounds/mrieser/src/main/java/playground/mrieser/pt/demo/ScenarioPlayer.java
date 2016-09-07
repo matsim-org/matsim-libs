@@ -33,7 +33,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
@@ -72,7 +72,7 @@ public class ScenarioPlayer {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/pt-tutorial/multimodalnetwork.xml");
 
 		TransitSchedule schedule = ((MutableScenario) scenario).getTransitSchedule();
-		new TransitScheduleReaderV1(scenario).parse("test/scenarios/pt-tutorial/transitschedule.xml");
+		new TransitScheduleReaderV1(scenario).readFile("test/scenarios/pt-tutorial/transitschedule.xml");
 		new CreateVehiclesForSchedule(schedule, ((MutableScenario) scenario).getTransitVehicles()).run();
 
 		final EventsManager events = EventsUtils.createEventsManager();

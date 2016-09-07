@@ -87,7 +87,7 @@ public class RunSimulationWithThinnedRouterNetwork {
 		final TransitRouterNetwork transitRouterNetwork = new TransitRouterNetwork();
 		new TransitRouterNetworkReader(
 				scenario.getTransitSchedule(),
-				transitRouterNetwork ).parse(
+				transitRouterNetwork ).readFile(
 					routingNetworkFile );
 
 		final TransitRouterWithThinnedNetworkFactory transitRouterFactory =
@@ -133,12 +133,12 @@ public class RunSimulationWithThinnedRouterNetwork {
 			// this is not necessary in the vast majority of applications.
 			if ( config.transit().getTransitLinesAttributesFile() != null ) {
 				log.info("loading transit lines attributes from " + config.transit().getTransitLinesAttributesFile());
-				new ObjectAttributesXmlReader( scenario.getTransitSchedule().getTransitLinesAttributes() ).parse(
+				new ObjectAttributesXmlReader( scenario.getTransitSchedule().getTransitLinesAttributes() ).readFile(
 						config.transit().getTransitLinesAttributesFile() );
 			}
 			if ( config.transit().getTransitStopsAttributesFile() != null ) {
 				log.info("loading transit stop facilities attributes from " + config.transit().getTransitStopsAttributesFile() );
-				new ObjectAttributesXmlReader( scenario.getTransitSchedule().getTransitStopsAttributes() ).parse(
+				new ObjectAttributesXmlReader( scenario.getTransitSchedule().getTransitStopsAttributes() ).readFile(
 						config.transit().getTransitStopsAttributesFile() );
 			}
 		}

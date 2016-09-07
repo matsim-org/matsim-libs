@@ -21,10 +21,10 @@
 package playground.gregor.casim.helper;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
@@ -59,8 +59,8 @@ public class ReadNetwork {
 
 		reader.parse(osmFile);
 		// max density is set to 5.4 p/m^2
-		((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.6);
-		((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.31);
+		((Network) sc.getNetwork()).setEffectiveLaneWidth(.6);
+		((Network) sc.getNetwork()).setEffectiveCellSize(.31);
 		
 		new NetworkWriter(sc.getNetwork()).write("/Users/laemmel/devel/venice/input/network.xml.gz");
 	}

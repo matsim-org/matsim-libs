@@ -20,15 +20,14 @@ package tutorial.programming.timeDependentNetwork;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -50,22 +49,23 @@ public class RunTimeDependentNetworkExample {
 		
 		// ---
 
-		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl() ;
 		for ( Link link : scenario.getNetwork().getLinks().values() ) {
 			double speed = link.getFreespeed() ;
 			final double threshold = 5./3.6;
 			if ( speed > threshold ) {
 				{
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(7.*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold/10 ));
+					NetworkChangeEvent event = new NetworkChangeEvent(7.*3600.) ;
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  threshold/10 ));
 					event.addLink(link);
-					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+					final NetworkChangeEvent event1 = event;
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 				}
 				{
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(11.5*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
+					NetworkChangeEvent event = new NetworkChangeEvent(11.5*3600.) ;
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  speed ));
 					event.addLink(link);
-					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+					final NetworkChangeEvent event1 = event;
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 				}
 			}
 		}

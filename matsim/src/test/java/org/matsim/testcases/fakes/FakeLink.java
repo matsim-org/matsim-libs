@@ -161,4 +161,16 @@ public class FakeLink implements Link {
 	public String toString() {
 		return "FakeLink_" + this.id.toString();
 	}
+
+	@Override
+	public double getFlowCapacityPerSec() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public double getFlowCapacityPerSec(double time) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
 }

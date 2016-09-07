@@ -53,6 +53,7 @@ import org.matsim.facilities.Facility;
  * @author thibautd, nagel
  */
 public final class NetworkRoutingInclAccessEgressModule implements RoutingModule {
+	private static final Logger log = Logger.getLogger( NetworkRoutingInclAccessEgressModule.class );
 
 	private final class AccessEgressStageActivityTypes implements StageActivityTypes {
 		@Override public boolean isStageActivity(String activityType) {
@@ -109,35 +110,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		Gbl.assertNotNull(fromFacility);
 		Gbl.assertNotNull(toFacility);
 
-		Link accessActLink = null ;
-		if ( fromFacility.getLinkId()!=null ) {
-			accessActLink = this.network.getLinks().get( fromFacility.getLinkId() );
-			// i.e. if street address is in mode-specific subnetwork, I just use that, and do not search for another (possibly closer)
-			// other link.
-			
-		} 
-		
-		if ( accessActLink==null ) {
-			// this is the case where the postal address link is NOT in the subnetwork, i.e. does NOT serve the desired mode,
-			// OR the facility does not have a street address link in the first place.
+		Link accessActLink = decideOnLink(fromFacility);
 
-			if( fromFacility.getCoord()==null ) {
-				throw new RuntimeException("access/egress bushwhacking leg not possible when neither facility link id nor facility coordinate given") ;
-			}
-			
-			accessActLink = NetworkUtils.getNearestLink(this.network, fromFacility.getCoord()) ;
-			Gbl.assertNotNull(accessActLink);
-		}
-
-		Link egressActLink = null ;
-		if ( toFacility.getLinkId()!=null ) {  
-			egressActLink = 	this.network.getLinks().get( toFacility.getLinkId() );
-		}
-		if ( egressActLink==null ) {
-			// this is the case where the postal address link is NOT in the subnetwork, i.e. does NOT serve the desired mode.
-			egressActLink = NetworkUtils.getNearestLink(this.network, toFacility.getCoord()) ;
-			Gbl.assertNotNull(egressActLink);
-		}
+		Link egressActLink = decideOnLink(toFacility);
 		
 		double now = departureTime ;
 
@@ -158,11 +133,11 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				// yyyy might be possible to set the link ids to null. kai & dominik, may'16
 				
 				result.add( accessLeg ) ;
-				Logger.getLogger(this.getClass()).warn( accessLeg );
+//				log.warn( accessLeg );
 
 				final Activity interactionActivity = createInteractionActivity(accessActCoord, accessActLink.getId() );
 				result.add( interactionActivity ) ;
-				Logger.getLogger(this.getClass()).warn( interactionActivity );
+//				log.warn( interactionActivity );
 			}
 		}
 
@@ -173,7 +148,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			now += routeLeg( person, newLeg, accessActLink, egressActLink, now );
 
 			result.add( newLeg ) ;
-			Logger.getLogger(this.getClass()).warn( newLeg );
+//			log.warn( newLeg );
 		}
 
 		// === egress:
@@ -185,18 +160,41 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 				final Activity interactionActivity = createInteractionActivity( egressActCoord, egressActLink.getId() );
 				result.add( interactionActivity ) ;
-				Logger.getLogger(this.getClass()).warn( interactionActivity );
+//				log.warn( interactionActivity );
 
 				Leg egressLeg = this.populationFactory.createLeg( TransportMode.egress_walk ) ;
 				egressLeg.setDepartureTime( now );
 				now += routeBushwhackingLeg(person, egressLeg, egressActCoord, toFacility.getCoord(), now, egressActLink.getId(), egressActLink.getId() ) ;
 				result.add( egressLeg ) ;
-				Logger.getLogger(this.getClass()).warn( egressLeg );
+//				log.warn( egressLeg );
 			}
-			Logger.getLogger(this.getClass()).warn( "===" );
+//			log.warn( "===" );
 		}
 
 		return result ;
+	}
+
+	private Link decideOnLink(final Facility fromFacility) {
+		Link accessActLink = null ;
+		if ( fromFacility.getLinkId()!=null ) {
+			accessActLink = this.network.getLinks().get( fromFacility.getLinkId() );
+			// i.e. if street address is in mode-specific subnetwork, I just use that, and do not search for another (possibly closer)
+			// other link.
+			
+		} 
+		
+		if ( accessActLink==null ) {
+			// this is the case where the postal address link is NOT in the subnetwork, i.e. does NOT serve the desired mode,
+			// OR the facility does not have a street address link in the first place.
+
+			if( fromFacility.getCoord()==null ) {
+				throw new RuntimeException("access/egress bushwhacking leg not possible when neither facility link id nor facility coordinate given") ;
+			}
+			
+			accessActLink = NetworkUtils.getNearestLink(this.network, fromFacility.getCoord()) ;
+			Gbl.assertNotNull(accessActLink);
+		}
+		return accessActLink;
 	}
 
 	private Activity createInteractionActivity(final Coord interactionCoord, final Id<Link> interactionLink) {
@@ -208,7 +206,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 	private double routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime, Id<Link> dpLinkId, Id<Link> arLinkId) {
 		// I don't think that it makes sense to use a RoutingModule for this, since that again makes assumptions about how to
-		// map facilities, and if you follow throgh to the teleportation routers one even finds activity wrappers, which is yet another
+		// map facilities, and if you follow through to the teleportation routers one even finds activity wrappers, which is yet another
 		// complication which I certainly don't want here.  kai, dec'15
 
 		// dpLinkId, arLinkId need to be in Route for lots of code to function.   So I am essentially putting in the "street address"

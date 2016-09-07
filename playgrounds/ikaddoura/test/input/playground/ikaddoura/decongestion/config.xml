@@ -1,0 +1,146 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="coordinateSystem" value="Atlantis" />
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="network.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="population_7200trips.xml" />
+		<param name="removingUnnecessaryPlanAttributes" value="true" />
+	</module>
+	
+	<module name="travelTimeCalculator" >
+		<param name="travelTimeBinSize" value="300" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="5" />
+		<param name="mobsim" value="qsim" />
+		<param name="snapshotFormat" value="" />
+		<param name="writeEventsInterval" value="5" />
+	</module>
+
+	<module name="qsim">
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="00:00:00" />
+	
+		<param name="snapshotperiod" value="00:00:00"/>
+
+		<param name="trafficDynamics" value="withHoles" />
+		<param name="snapshotStyle" value="withHoles" />
+		
+		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="false" />
+		<param name="usingFastCapacityUpdate" value="false" />
+
+	</module>
+
+	<module name="planCalcScore">
+		<param name="BrainExpBeta" value="1.0" />
+		<param name="PathSizeLogitBeta" value="1.0" />
+		<param name="fractionOfIterationsToStartScoreMSA" value="null" />
+		<param name="learningRate" value="1.0" />
+		
+		<parameterset type="scoringParameters" >
+			<param name="earlyDeparture" value="-0.0" />
+			<param name="lateArrival" value="-18.0" />
+			<param name="marginalUtilityOfMoney" value="1.0" />
+			<param name="performing" value="0.0" />
+			<param name="subpopulation" value="null" />
+			<param name="utilityOfLineSwitch" value="-0.0" />
+			<param name="waiting" value="-6.0" />
+			<param name="waitingPt" value="-0.0" />
+
+			<parameterset type="activityParams" >
+				<param name="activityType" value="home" />
+				<param name="closingTime" value="undefined" />
+				<param name="earliestEndTime" value="undefined" />
+				<param name="latestStartTime" value="undefined" />
+				<param name="minimalDuration" value="undefined" />
+				<param name="openingTime" value="undefined" />
+				<param name="priority" value="1.0" />
+				<param name="scoringThisActivityAtAll" value="true" />
+				<param name="typicalDuration" value="16:00:00" />
+				<param name="typicalDurationScoreComputation" value="relative" />
+			</parameterset>
+
+			<parameterset type="activityParams" >
+				<param name="activityType" value="work" />
+				<param name="closingTime" value="20:00:00" />
+				<param name="earliestEndTime" value="undefined" />
+				<param name="latestStartTime" value="08:30:00" />
+				<param name="minimalDuration" value="undefined" />
+				<param name="openingTime" value="08:30:00" />
+				<param name="priority" value="1.0" />
+				<param name="scoringThisActivityAtAll" value="true" />
+				<param name="typicalDuration" value="08:00:00" />
+				<param name="typicalDurationScoreComputation" value="relative" />
+			</parameterset>
+
+			<parameterset type="modeParams" >
+				<param name="constant" value="0.0" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-12.0" />
+				<param name="mode" value="car" />
+				<param name="monetaryDistanceRate" value="-0.0" />
+			</parameterset>
+			
+			<parameterset type="modeParams" >
+				<param name="constant" value="0.0" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-0.0" />
+				<param name="mode" value="pt" />
+				<param name="monetaryDistanceRate" value="-0.0" />
+			</parameterset>
+			
+			<parameterset type="modeParams" >
+				<param name="constant" value="0.0" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-0.0" />
+				<param name="mode" value="bike" />
+				<param name="monetaryDistanceRate" value="-0.0" />
+			</parameterset>
+			
+			<parameterset type="modeParams" >
+				<param name="constant" value="0.0" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-0.0" />
+				<param name="mode" value="walk" />
+				<param name="monetaryDistanceRate" value="-0.0" />
+			</parameterset>
+			
+		</parameterset>
+		
+	</module>
+	
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
+
+		<param name="fractionOfIterationsToDisableInnovation" value="0.8" />
+
+		<param name="ModuleProbability_1" value="0.7" />
+		<param name="Module_1" value="ChangeExpBeta" />
+
+		<param name="ModuleProbability_2" value="0.3" />
+		<param name="Module_2" value="TimeAllocationMutator" />	
+	
+	</module>
+
+	<module name="TimeAllocationMutator" >
+		<param name="mutationAffectsDuration" value="true" />
+		<param name="mutationRange" value="7200" />
+	</module>
+	
+	<module name="vspExperimental" >
+		<param name="vspDefaultsCheckingLevel" value="warn" />
+	</module>
+
+</config>

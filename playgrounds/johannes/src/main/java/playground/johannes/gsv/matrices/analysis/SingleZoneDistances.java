@@ -50,7 +50,7 @@ public class SingleZoneDistances {
 	public static void main(String[] args) throws IOException {
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse("/home/johannes/gsv/matrices/simmatrices/miv.695.xml");
+		reader.readFile("/home/johannes/gsv/matrices/simmatrices/miv.695.xml");
 		NumericMatrix m = reader.getMatrix();
 
 		ZoneCollection zones = new ZoneCollection(null);

@@ -62,7 +62,7 @@ public class DigicorePathDependentNetworkReader_v2 extends MatsimXmlParser {
 	public static void main(String[] args){
 		String input = args[0];
 		DigicorePathDependentNetworkReader_v2 nr = new DigicorePathDependentNetworkReader_v2();
-		nr.parse(input);
+		nr.readFile(input);
 		nr.network.writeNetworkStatisticsToConsole();
 	}
 	

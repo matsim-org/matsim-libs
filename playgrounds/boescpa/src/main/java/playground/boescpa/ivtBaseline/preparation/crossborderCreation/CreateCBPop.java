@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.*;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -211,10 +211,10 @@ public class CreateCBPop {
 		plansReader.readFile(pathToMainPop);
 		Population scenarioPopulation = scenario.getPopulation();
 		ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(scenarioPopulation.getPersonAttributes());
-		attributesReader.parse(pathToMainPop.substring(0, pathToMainPop.indexOf(".xml")) + "_Attributes.xml.gz");
+		attributesReader.readFile(pathToMainPop.substring(0, pathToMainPop.indexOf(".xml")) + "_Attributes.xml.gz");
 		// add the freight population to the scenario population
 		plansReader.readFile(pathToAdditionalPop);
-		attributesReader.parse(pathToAdditionalPop.substring(0, pathToAdditionalPop.indexOf(".xml")) + "_Attributes.xml.gz");
+		attributesReader.readFile(pathToAdditionalPop.substring(0, pathToAdditionalPop.indexOf(".xml")) + "_Attributes.xml.gz");
 		// write the new, merged population and its attributes:
 		PopulationWriter writer = new PopulationWriter(scenarioPopulation);
 		writer.write(pathToOutputPop);

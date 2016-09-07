@@ -54,7 +54,7 @@ public class ExtractStationsXyDataForVia {
 
 		log.info( "read bike sharing facilities..." );
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new BikeSharingFacilitiesReader( scenario ).parse( facilitiesFile );
+		new BikeSharingFacilitiesReader( scenario ).readFile( facilitiesFile );
 		log.info( "read bike sharing facilities... DONE" );
 
 		log.info( "Parse events..." );

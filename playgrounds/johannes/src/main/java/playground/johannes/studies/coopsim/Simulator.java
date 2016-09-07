@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -42,9 +43,8 @@ import org.matsim.contrib.socnetgen.sna.util.MultiThreading;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -88,7 +88,7 @@ public class Simulator {
 
 	private static SocialGraph graph;
 	
-	private static NetworkImpl network;
+	private static Network network;
 	
 	private static ActivityFacilities facilities;
 	
@@ -232,7 +232,7 @@ public class Simulator {
 		LoggerUtils.setVerbose(false);
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(config.getParam("network", "inputNetworkFile"));
-		network = (NetworkImpl) scenario.getNetwork();
+		network = (Network) scenario.getNetwork();
 		LoggerUtils.setVerbose(true);
 		logger.info(String.format("%1$s nodes, %2$s links.", network.getNodes().size(), network.getLinks().size()));
 		

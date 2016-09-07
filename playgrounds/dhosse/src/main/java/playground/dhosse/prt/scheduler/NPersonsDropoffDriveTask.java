@@ -22,7 +22,7 @@ public class NPersonsDropoffDriveTask extends TaxiOccupiedDriveTask {
 	}
 	
 	@Override
-    public void removeFromRequest()
+    public void disconnectFromRequest()
     {
 		for(TaxiRequest request : this.requests){
 			request.setOccupiedDriveTask(null);

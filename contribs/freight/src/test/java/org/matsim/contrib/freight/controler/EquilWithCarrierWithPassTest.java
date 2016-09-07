@@ -87,7 +87,7 @@ public class EquilWithCarrierWithPassTest {
 	@Test
 	public void testScoringInMeters(){
 		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).read(planFile);
+		new CarrierPlanXmlReaderV2(carriers).readFile(planFile);
 		controler.addOverridingModule(new CarrierModule(carriers));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -49,7 +50,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripRouter;
@@ -91,15 +92,28 @@ public class JointTripRouterFactoryTest {
 
 		Scenario sc = ScenarioUtils.createScenario(
 				ConfigUtils.createConfig() );
-		NetworkImpl net = (NetworkImpl) sc.getNetwork();
-		Node node1inst = net.createAndAddNode( node1 , new Coord((double) 0, (double) 1));
-		Node node2inst = net.createAndAddNode( node2 , new Coord((double) 0, (double) 2));
-		Node node3inst = net.createAndAddNode( node3 , new Coord((double) 0, (double) 3));
-		Node node4inst = net.createAndAddNode( node4 , new Coord((double) 0, (double) 4));
+		Network net = (Network) sc.getNetwork();
+		final Id<Node> id5 = node1;
+		Node node1inst = NetworkUtils.createAndAddNode(net, id5, new Coord((double) 0, (double) 1));
+		final Id<Node> id6 = node2;
+		Node node2inst = NetworkUtils.createAndAddNode(net, id6, new Coord((double) 0, (double) 2));
+		final Id<Node> id7 = node3;
+		Node node3inst = NetworkUtils.createAndAddNode(net, id7, new Coord((double) 0, (double) 3));
+		final Id<Node> id8 = node4;
+		Node node4inst = NetworkUtils.createAndAddNode(net, id8, new Coord((double) 0, (double) 4));
+		final Id<Link> id2 = link1;
+		final Node fromNode = node1inst;
+		final Node toNode = node2inst;
 
-		net.createAndAddLink( link1 , node1inst , node2inst , 1 , 1 , 1 , 1 );
-		net.createAndAddLink( link2 , node2inst , node3inst , 1 , 1 , 1 , 1 );
-		net.createAndAddLink( link3 , node3inst , node4inst , 1 , 1 , 1 , 1 );
+		NetworkUtils.createAndAddLink(net,id2, fromNode, toNode, (double) 1, (double) 1, (double) 1, (double) 1 );
+		final Id<Link> id3 = link2;
+		final Node fromNode1 = node2inst;
+		final Node toNode1 = node3inst;
+		NetworkUtils.createAndAddLink(net,id3, fromNode1, toNode1, (double) 1, (double) 1, (double) 1, (double) 1 );
+		final Id<Link> id4 = link3;
+		final Node fromNode2 = node3inst;
+		final Node toNode2 = node4inst;
+		NetworkUtils.createAndAddLink(net,id4, fromNode2, toNode2, (double) 1, (double) 1, (double) 1, (double) 1 );
 
 		Population pop = sc.getPopulation();
 		Id<Person> driverId = Id.create( "driver" , Person.class );

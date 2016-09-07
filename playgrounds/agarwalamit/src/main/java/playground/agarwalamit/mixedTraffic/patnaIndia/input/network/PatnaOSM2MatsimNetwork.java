@@ -28,14 +28,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.run.NetworkCleaner;
 
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils.PatnaNetworkType;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
@@ -45,8 +46,8 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class PatnaOSM2MatsimNetwork {
 	
-	private static final String osmNetworkFile = PatnaUtils.INPUT_FILES_DIR + "/network/osmNetworkFile.osm"; // this file has been already modified.
-	private static final String out_osmNetworkFile = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/osmNetworkFile_requiredLinksAdded.xml.gz"; 
+	private static final String osmNetworkFile = PatnaUtils.INPUT_FILES_DIR + "/raw/network/osmNetworkFile.osm"; // this file has been already modified.
+	private static final String out_osmNetworkFile = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/"+PatnaNetworkType.osmNetwork.toString()+"/network.xml.gz"; 
 	
 	public static void main(String[] args) {
 		
@@ -67,8 +68,8 @@ public class PatnaOSM2MatsimNetwork {
 		NetworkSimplifier simplifier = new NetworkSimplifier();
 		simplifier.run(sc.getNetwork());
 		
-		String uncleanedNetworkFile = PatnaUtils.INPUT_FILES_DIR +"/simulationInputs/network/networkFromOSM.xml.gz";
-		String cleanedNetworkFile = PatnaUtils.INPUT_FILES_DIR +"/simulationInputs/network/networkFromOSM_cleaned.xml.gz";
+		String uncleanedNetworkFile = PatnaUtils.INPUT_FILES_DIR +"/simulationInputs/network/"+PatnaNetworkType.osmNetwork.toString()+"/networkFromOSM.xml.gz";
+		String cleanedNetworkFile = PatnaUtils.INPUT_FILES_DIR +"/simulationInputs/network/"+PatnaNetworkType.osmNetwork.toString()+"/networkFromOSM_cleaned.xml.gz";
 		
 		new NetworkWriter(sc.getNetwork()).write(uncleanedNetworkFile);
 		
@@ -81,34 +82,40 @@ public class PatnaOSM2MatsimNetwork {
 		{//Ganga setu links
 			Node fromNode = createAndReturnNode(network, new Coord(85.195394, 25.6001837), "3009300239");
 			Node toNode = createAndReturnNode(network, new Coord(85.2026634, 25.6134719), "gangaSetuNode_1");
+			final Node fromNode1 = fromNode;
+			final Node toNode1 = toNode;
 			
-			((NetworkImpl)network).createAndAddLink(Id.createLinkId("gangaSetuLink_1"), fromNode, toNode, CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()), 
-					80/3.6, 3000.0, 2.0);
+			NetworkUtils.createAndAddLink(((Network)network),Id.createLinkId("gangaSetuLink_1"), fromNode1, toNode1, CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()), 80/3.6, 3000.0, 2.0 );
 			
 			fromNode = createAndReturnNode(network, new Coord(85.2028137, 25.6134009), "gangaSetuNode_2");
 			toNode = createAndReturnNode(network, new Coord(85.1938243, 25.5970135), "1133765005");
+			final Node fromNode2 = fromNode;
+			final Node toNode2 = toNode;
 			
-			((NetworkImpl)network).createAndAddLink(Id.createLinkId("gangaSetuLink_2"), fromNode, toNode, CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()), 
-					80/3.6, 3000.0, 2.0);
+			NetworkUtils.createAndAddLink(((Network)network),Id.createLinkId("gangaSetuLink_2"), fromNode2, toNode2, CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()), 80/3.6, 3000.0, 2.0 );
 			
 			{// demand from outer cordon ("OC4")
 				Node additionalNode = createAndReturnNode(network,new Coord(85.204251,25.6155418), "OC4Node"); // close to river
 				Node fNode = network.getNodes().get(Id.createNodeId("gangaSetuNode_1"));
-				((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC4_out"), fNode, additionalNode, 
-						CoordUtils.calcEuclideanDistance(fNode.getCoord(), additionalNode.getCoord()), 80./3.6, 3000., 2);
+				final Node fromNode3 = fNode;
+				final Node toNode3 = additionalNode;
+				NetworkUtils.createAndAddLink(((Network)network),Id.createLinkId("OC4_out"), fromNode3, toNode3, CoordUtils.calcEuclideanDistance(fNode.getCoord(), additionalNode.getCoord()), 80./3.6, 3000., (double) 2 );
 				Node tNode = network.getNodes().get(Id.createNodeId("gangaSetuNode_2"));
-				((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC4_in"), additionalNode, tNode,
-						CoordUtils.calcEuclideanDistance(additionalNode.getCoord(), tNode.getCoord()), 80./3.6, 3000., 2);
+				final Node fromNode4 = additionalNode;
+				final Node toNode4 = tNode;
+				NetworkUtils.createAndAddLink(((Network)network),Id.createLinkId("OC4_in"), fromNode4, toNode4, CoordUtils.calcEuclideanDistance(additionalNode.getCoord(), tNode.getCoord()), 80./3.6, 3000., (double) 2 );
 			}
 		}
 		{// demand from outer cordon ("OC2") -- using existing node 315974339
 			Node oc2NearestNode = network.getNodes().get(Id.createNodeId("315974339")); 
 			Node oc2Node = createAndReturnNode(network,new Coord(85.27708,25.5479753), "OC2Node");
+			final Node fromNode = oc2Node;
+			final Node toNode = oc2NearestNode;
 					
-			((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC2_in"), oc2Node, oc2NearestNode, 
-					CoordUtils.calcEuclideanDistance(oc2Node.getCoord(), oc2NearestNode.getCoord()), 80./3.6, 1500., 1);
-			((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC2_out"), oc2NearestNode, oc2Node, 
-					CoordUtils.calcEuclideanDistance(oc2NearestNode.getCoord(), oc2Node.getCoord()), 80./3.6, 1500., 1);
+			NetworkUtils.createAndAddLink(((Network)network),Id.createLinkId("OC2_in"), fromNode, toNode, CoordUtils.calcEuclideanDistance(oc2Node.getCoord(), oc2NearestNode.getCoord()), 80./3.6, 1500., (double) 1 );
+			final Node fromNode1 = oc2NearestNode;
+			final Node toNode1 = oc2Node;
+			NetworkUtils.createAndAddLink(((Network)network),Id.createLinkId("OC2_out"), fromNode1, toNode1, CoordUtils.calcEuclideanDistance(oc2NearestNode.getCoord(), oc2Node.getCoord()), 80./3.6, 1500., (double) 1 );
 		}
 		
 		// allow all main modes on the links
@@ -140,7 +147,4 @@ public class PatnaOSM2MatsimNetwork {
 		return n;
 	}
 
-}
-
-
-	
+}	

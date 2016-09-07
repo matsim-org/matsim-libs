@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeData;
 import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
@@ -40,9 +41,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -388,9 +388,9 @@ public class TransitQueryEngineForR implements Serializable {
 
     public void loadFacilities(String fileName) {
         new MatsimFacilitiesReader(scenario).readFile(fileName);
-        NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+        Network network = (Network) scenario.getNetwork();
         for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values())
-            ((ActivityFacilityImpl) facility).setLinkId(network.getNearestLinkExactly(facility.getCoord()).getId());
+            ((ActivityFacilityImpl) facility).setLinkId(NetworkUtils.getNearestLinkExactly(network,facility.getCoord()).getId());
         //create a lookup map that relates all facilities to links that provide access
         links2Facilities = new HashMap<>();
         int total = scenario.getActivityFacilities().getFacilities().size();
@@ -1276,9 +1276,10 @@ public class TransitQueryEngineForR implements Serializable {
             double density = 0;
             //prevent repeated calculation
             if (this.intDensities.get(toNode) == null) {
-                NetworkImpl net = (NetworkImpl) scenario.getNetwork();
+                Network net = (Network) scenario.getNetwork();
                 Set<Node> nearestNodes = new HashSet<>();
-                nearestNodes.addAll(net.getNearestNodes(toNode.getCoord(), densityDistance));
+		final double distance = densityDistance;
+                nearestNodes.addAll(NetworkUtils.getNearestNodes(net,toNode.getCoord(), distance));
 
                 double intersectionCount = nearestNodes.size();
                 density = intersectionCount / getDensityArea();

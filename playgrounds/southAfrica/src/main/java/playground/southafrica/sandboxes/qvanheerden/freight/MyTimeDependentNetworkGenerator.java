@@ -1,17 +1,20 @@
 package playground.southafrica.sandboxes.qvanheerden.freight;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.*;
+import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.network.NetworkChangeEventsWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.southafrica.utilities.Header;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import playground.southafrica.utilities.Header;
 
 public class MyTimeDependentNetworkGenerator {
 
@@ -40,38 +43,36 @@ public class MyTimeDependentNetworkGenerator {
 	
 	public static Collection<NetworkChangeEvent> getNetworkChangeEvents(Scenario scenario, double amStart, double amEnd, double pmStart, double pmEnd) {
 		Collection<NetworkChangeEvent> events = new ArrayList<NetworkChangeEvent>();
-		
-		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl() ;
-		
+				
 		for ( Link link : scenario.getNetwork().getLinks().values() ) {
 			double speed = link.getFreespeed() ;
 			double kmph = 1;
 			final double threshold = kmph/3.6; //convert to m/s
 			if ( speed > threshold ) {
 				{//morning peak starts
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(amStart*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
+					NetworkChangeEvent event = new NetworkChangeEvent(amStart*3600.) ;
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  threshold ));
 					event.addLink(link);
 					//((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
 					events.add(event);
 				}
 				{//morning peak ends
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(amEnd*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
+					NetworkChangeEvent event = new NetworkChangeEvent(amEnd*3600.) ;
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  speed ));
 					event.addLink(link);
 					//((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
 					events.add(event);
 				}
 				{//afternoon peak starts
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(pmStart*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
+					NetworkChangeEvent event = new NetworkChangeEvent(pmStart*3600.) ;
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  threshold ));
 					event.addLink(link);
 					//((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
 					events.add(event);
 				}
 				{//afternoon peak ends
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(pmEnd*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
+					NetworkChangeEvent event = new NetworkChangeEvent(pmEnd*3600.) ;
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  speed ));
 					event.addLink(link);
 					//((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
 					events.add(event);

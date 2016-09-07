@@ -18,14 +18,13 @@ public interface ChargingPoint extends Identifiable<ChargingPoint> {
 	ChargingSite getChargingSite();
 	
 	Collection<ChargingPlug> getAllChargingPlugs();
-	Collection<ChargingPlug> getAllChargingPlugsOfPlugType(ChargingPlugType plugType);
+	Collection<ChargingPlug> getAvailableChargingPlugsOfPlugType(ChargingPlugType plugType);
 	
 	// We assume that one charging plug can potentially serve multiple parking spots located adjacent to it. But only one parked car at a time can use it.
 	// For example in the scenarios it could be assumed that the charger is released when charging is finished (e.g. electronic unlock - chargingPlugStatus=AVAILABLE).
 	int getNumberOfAvailableParkingSpots();
 	
-	void registerVehicleArrival(Id<Vehicle> vehicleId); 
-	void registerVehicleDeparture(Id<Vehicle> vehicleId);
+	void registerVehicleDeparture(VehicleAgent agent);
 	
 	void addChargingPlug(ChargingPlug plug);
 	
@@ -34,4 +33,10 @@ public interface ChargingPoint extends Identifiable<ChargingPoint> {
 	void createSlowChargingQueue(int numberOfAvailableParkingSpots);
 
 	void handleEndChargingSession(ChargingPlug plug, VehicleAgent agent);
+
+	void removeVehicleFromQueue(ChargingPlug plug, VehicleAgent vehicle);
+
+	void registerPlugAvailable(ChargingPlug chargingPlugImpl);
+
+	void registerPlugUnavailable(ChargingPlug chargingPlugImpl);
 }

@@ -20,13 +20,43 @@
 
 package org.matsim.contrib.analysis.kai;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -42,11 +72,6 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.Vehicle;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.*;
-import java.util.Map.Entry;
-
 /**
  * @author knagel, originally based on
  * @author mrieser
@@ -55,7 +80,7 @@ public class KNAnalysisEventsHandler implements
 PersonDepartureEventHandler, PersonArrivalEventHandler, 
 PersonMoneyEventHandler, 
 LinkLeaveEventHandler, LinkEnterEventHandler, 
-PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private final static Logger log = Logger.getLogger(KNAnalysisEventsHandler.class);
 
@@ -82,10 +107,10 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 	private double controlStatisticsSum;
 	private double controlStatisticsCnt;
 
-	private  Set<Id<Link>> tolledLinkIds = new HashSet<Id<Link>>() ;
+	private  Set<Id<Link>> tolledLinkIds = new HashSet<>() ;
 	// (initializing with empty set, meaning output will say no vehicles at gantries).
 	
-	private Set<Id<Link>> otherTolledLinkIds = new HashSet<Id<Link>>() ;
+	private Set<Id<Link>> otherTolledLinkIds = new HashSet<>() ;
 
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
@@ -113,7 +138,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 			RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 			RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 			try {
-				rpReader.parse( otherTollLinkFile  );
+				rpReader.readFile( otherTollLinkFile  );
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -130,7 +155,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 			RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 			RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 			try {
-				rpReader.parse( tollLinksFileName  );
+				rpReader.readFile( tollLinksFileName  );
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -222,7 +247,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 			final Activity toAct = (Activity)plan.getPlanElements().get(index + 2);
 
 			// this defines to which legTypes this leg should belong for the statistical averaging:
-			List<String> legTypes = new ArrayList<String>() ;
+			List<String> legTypes = new ArrayList<>() ;
 
 			// register the leg by activity type pair:
 			legTypes.add(fromAct.getType() + "---" + toAct.getType()) ;
@@ -361,7 +386,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 
 	@Override
 	public void handleEvent(PersonMoneyEvent event) {
-		List<String> legTypes = new ArrayList<String>() ;
+		List<String> legTypes = new ArrayList<>() ;
 
 		final Population pop = this.scenario.getPopulation();
 		Person person = pop.getPersons().get( event.getPersonId() ) ;
@@ -393,7 +418,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 		// score statistics:
 		for ( Person person : pop.getPersons().values() ) {
 			// this defines to which categories this person should belong for the statistical averaging:
-			List<String> categories = new ArrayList<String>() ;
+			List<String> categories = new ArrayList<>() ;
 
 			categories.add( this.getSubpopName(person) ) ;
 
@@ -410,9 +435,8 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 		//write statistics:
 		for ( StatType type : StatType.values() ) {
 			String filename = filenameTmp + type.toString() + ".txt" ;
-			BufferedWriter legStatsFile = IOUtils.getBufferedWriter(filename);
-			writeStatsHorizontal(type, legStatsFile );
-			try {
+			try ( BufferedWriter legStatsFile = IOUtils.getBufferedWriter(filename) ) {
+				writeStatsHorizontal(type, legStatsFile );
 				legStatsFile.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -421,7 +445,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 
 		// toll analysis:
 		double maxPayment = Double.NEGATIVE_INFINITY ;
-		Set<String> subPopTypes = new HashSet<String>() ;
+		Set<String> subPopTypes = new HashSet<>() ;
 		for ( Person person : pop.getPersons().values() ) {
 			Double payment = (Double) pop.getPersonAttributes().getAttribute( person.getId().toString(), PAYMENTS ) ;
 			if ( payment==null ) continue ;
@@ -435,8 +459,8 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 		final int nBins = 100 ;
 		final double binSize = maxPayment/nBins ; // not so great for commercial vs. private
 
-		Map<String,double[]> sum = new HashMap<String,double[]>();
-		Map<String,double[]> cnt = new HashMap<String,double[]>();
+		Map<String,double[]> sum = new HashMap<>();
+		Map<String,double[]> cnt = new HashMap<>();
 		for ( String subPopType : subPopTypes ) {
 			sum.put( subPopType, new double[nBins+1] ) ;
 			cnt.put( subPopType, new double[nBins+1] ) ;
@@ -451,11 +475,10 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 			cnt.get(subPopType)[bin] ++ ;
 		}
 
-		try {
-			for ( String subPopType : subPopTypes ) {
-				double sum2 = 0. ;
-				final String filename = filenameTmp + "payment_" + subPopType.toString() + ".txt" ;
-				BufferedWriter out = IOUtils.getBufferedWriter(filename) ;
+		for ( String subPopType : subPopTypes ) {
+			double sum2 = 0. ;
+			final String filename = filenameTmp + "payment_" + subPopType.toString() + ".txt" ;
+			try ( BufferedWriter out = IOUtils.getBufferedWriter(filename) ) {
 				out.write( 0 + "\t" + 0 + "\n" ) ;
 				for ( int ii=0 ; ii<cnt.get(subPopType).length ; ii++ ) {
 					if ( cnt.get(subPopType)[ii] > 0 ) {
@@ -464,9 +487,9 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 					}
 				}
 				out.close();
+			} catch ( IOException e ) {
+				e.printStackTrace();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 
 
@@ -479,15 +502,10 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 		new ObjectAttributesXmlWriter( this.linkAttribs ).writeFile("networkAttributes.xml.gz");
 
 		{
-			BufferedWriter writer = IOUtils.getBufferedWriter("gantries.txt") ;
-			for (  Entry<Id<Vehicle>, Double> entry : this.vehicleGantryCounts.entrySet() ) {
-				try {
+			try ( BufferedWriter writer = IOUtils.getBufferedWriter("gantries.txt") ) {
+				for (  Entry<Id<Vehicle>, Double> entry : this.vehicleGantryCounts.entrySet() ) {
 					writer.write( entry.getKey() + "\t" + entry.getValue() + "\t 1 ") ; // the "1" makes automatic processing a bit easier. kai, mar'14
-				} catch (IOException e) {
-					e.printStackTrace();
 				}
-			}
-			try {
 				writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -562,7 +580,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 
 	private Map<Id<Vehicle>,Double> vehicleEnterTimes = new HashMap<>() ;
 
-	private Map<Id<Vehicle>,Double> vehicleGantryCounts = new HashMap<Id<Vehicle>,Double>() ;
+	private Map<Id<Vehicle>,Double> vehicleGantryCounts = new HashMap<>() ;
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
@@ -603,13 +621,16 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 	}
 
 	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		// do we need to do anything here?
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		delegate.handleEvent(event); // !!!!
+
 	}
 
 	private static int wrnCnt = 0 ;
 	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event); // !!!!
+
 		Double result = vehicleEnterTimes.remove( event.getVehicleId() ) ;
 		if ( result == null ) {
 			if ( wrnCnt==0 ) {
@@ -620,16 +641,6 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 				Logger.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
 			}
 		}
-	}
-
-	@Override
-	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		delegate.handleEvent(event);
-	}
-
-	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event) {
-		delegate.handleEvent(event);
 	}
 
 }

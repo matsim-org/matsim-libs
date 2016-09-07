@@ -21,10 +21,10 @@ import com.jogamp.opengl.util.texture.TextureCoords;
  */
 public class OGLSimpleQuadDrawer extends OTFGLAbstractDrawableReceiver {
 
-	 final Point2D.Float[] quad = new Point2D.Float[4];
-	 float coloridx = 0;
-	 char[] id;
-	 int nrLanes;
+	 private final Point2D.Float[] quad = new Point2D.Float[4];
+	 private float coloridx = 0;
+	 private char[] id;
+	 private int nrLanes;
 	private SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 
 	@Override
@@ -69,10 +69,6 @@ public class OGLSimpleQuadDrawer extends OTFGLAbstractDrawableReceiver {
 		return new Point2D.Float((float)dx,(float)dy);
 	}
 
-	public void setQuad(float startX, float startY, float endX, float endY) {
-		setQuad(startX, startY,endX, endY, 1);
-	}
-
 	public void setQuad(float startX, float startY, float endX, float endY, int nrLanes) {
 		this.quad[0] = new Point2D.Float(startX, startY);
 		this.quad[1] = new Point2D.Float(endX, endY);
@@ -89,7 +85,6 @@ public class OGLSimpleQuadDrawer extends OTFGLAbstractDrawableReceiver {
 	
 	@Override
 	public void addToSceneGraph(SceneGraph graph) {
-		graph.addStaticItem(this);
 	}
 	
 }

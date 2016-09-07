@@ -1,5 +1,6 @@
 package playground.jbischoff.taxibus.run.configuration;
 
+import java.net.URL;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -168,9 +169,11 @@ public class TaxibusConfigGroup extends ConfigGroup {
 	public String getDestinationLinkId() {
 		return destinationLinkId;
 	}
-	public String getVehiclesFile() {
-		return vehiclesFile;
+	
+	public URL getVehiclesFileUrl(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.vehiclesFile);
 	}
+	
 
 	public String getRanksFile() {
 		return ranksFile;
@@ -200,18 +203,17 @@ public class TaxibusConfigGroup extends ConfigGroup {
 		return otfvis;
 	}
 
-	public String getLinesFile() {
-		return linesFile;
+	public URL getLinesFileUrl(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.linesFile);
+	}	
+
+	public URL getZonesShpFileUrl(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.zonesShpFile);
 	}
 
-	public String getZonesShpFile() {
-		return zonesShpFile;
+	public URL getZonesXmlFileUrl(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.zonesXmlFile);
 	}
-
-	public String getZonesXmlFile() {
-		return zonesXmlFile;
-	}
-
 	public String getBalancingMethod() {
 		return balancingMethod;
 	};

@@ -38,6 +38,7 @@ import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -58,7 +59,6 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
@@ -123,14 +123,14 @@ public class GenerateFundamentalDiagramData {
 			
 			args = new String [8];
 			
-			String myDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/holes/car_SW/";
-			String outFolder ="/car/";
+			String myDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run315/holes/1lane/";
+			String outFolder ="/carMotorbikeBikeSeepage_bikeSeep/";
 			
 			args[0] = myDir + outFolder ;
-			args[1] = "car"; // travel (main) modes
-			args[2] = "5.0"; // modal split in pcu
-			args[3] = TrafficDynamics.queue.toString(); // isUsingHoles
-			args[4] = LinkDynamics.FIFO.toString(); // isPassingAllowed
+			args[1] = "car,motorbike,bike"; // travel (main) modes
+			args[2] = "1.0,1.0,1.0"; // modal split in pcu
+			args[3] = TrafficDynamics.withHoles.toString(); // isUsingHoles
+			args[4] = LinkDynamics.SeepageQ.toString(); // isPassingAllowed
 			args[5] = "1"; // reduce number of data points by this factor
 			args[6] = "false"; // is plotting modal split distribution
 		}
@@ -258,7 +258,7 @@ public class GenerateFundamentalDiagramData {
 		}
 		
 		//set up number of Points to run.
-		double cellSizePerPCU = ((NetworkImpl) scenario.getNetwork()).getEffectiveCellSize();
+		double cellSizePerPCU = ((Network) scenario.getNetwork()).getEffectiveCellSize();
 		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
 		double sumOfPCUInEachStep = 0;
 	
@@ -299,7 +299,7 @@ public class GenerateFundamentalDiagramData {
 		this.startingPoint = new Integer[] {1,1};
 
 		maxAgentDistribution = new Integer [travelModes.length];
-		double cellSizePerPCU = ((NetworkImpl) this.scenario.getNetwork()).getEffectiveCellSize();
+		double cellSizePerPCU = ((Network) this.scenario.getNetwork()).getEffectiveCellSize();
 		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
 
 		for(int ii=0;ii<maxAgentDistribution.length;ii++){
@@ -368,10 +368,9 @@ public class GenerateFundamentalDiagramData {
 		EventsManager events = EventsUtils.createEventsManager();
 
 		globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator( this.mode2FlowData);
-		passingEventsUpdator  = new PassingEventsUpdator();
+		passingEventsUpdator  = new PassingEventsUpdator(scenario.getConfig().qsim().getSeepModes());
 
 		events.addHandler(globalFlowDynamicsUpdator);
-		
 		if(travelModes.length > 1)	events.addHandler(passingEventsUpdator);
 
 		EventWriterXML eventWriter = null;
@@ -397,6 +396,7 @@ public class GenerateFundamentalDiagramData {
 				this.bindMobsim().toInstance( qSim );
 			}
 		});
+		
 		controler.run();
 		
 		if(! inputs.getSnapshotFormats().isEmpty()) {
@@ -430,7 +430,7 @@ public class GenerateFundamentalDiagramData {
 		if(!globalFlowDynamicsUpdator.isPermanent()) stableState=false;
 
 		// sometimes higher density points are also executed (stuck time), to exclude them density check.
-		double cellSizePerPCU = ((NetworkImpl) scenario.getNetwork()).getEffectiveCellSize();
+		double cellSizePerPCU = ((Network) scenario.getNetwork()).getEffectiveCellSize();
 		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
 
 		if(stableState){
@@ -459,8 +459,6 @@ public class GenerateFundamentalDiagramData {
 			if( travelModes.length > 1 ) {
 
 				writer.format("%.2f\t", passingEventsUpdator.getNoOfCarsPerKm());
-
-				writer.format("%.2f\t", passingEventsUpdator.getTotalBikesPassedByAllCarsPerKm());
 
 				writer.format("%.2f\t", passingEventsUpdator.getAvgBikesPassingRate());
 			}
@@ -590,8 +588,6 @@ public class GenerateFundamentalDiagramData {
 		
 		if( travelModes.length > 1 ) {
 			writer.print("noOfCarsPerkm \t");
-
-			writer.print("totalBikesPassedByAllCarsPerKm \t");
 
 			writer.print("avgBikePassingRatePerkm \t");
 		}
@@ -792,13 +788,11 @@ public class GenerateFundamentalDiagramData {
 
 		@Override
 		public Facility<? extends Facility<?>> getCurrentFacility() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
 		public Facility<? extends Facility<?>> getDestinationFacility() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 	}

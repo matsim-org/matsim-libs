@@ -31,24 +31,26 @@ import playground.michalm.ev.data.*;
 public class AuxDischargingHandler
     implements MobsimAfterSimStepListener
 {
-    private final Iterable<? extends ElectricVehicle> vehicles;
+    private final Iterable<? extends ElectricVehicle> eVehicles;
     private final int auxDischargeTimeStep;
 
 
     @Inject
     public AuxDischargingHandler(EvData evData, EvConfigGroup evConfig)
     {
-        this.vehicles = evData.getElectricVehicles().values();
+        this.eVehicles = evData.getElectricVehicles().values();
         this.auxDischargeTimeStep = evConfig.getAuxDischargeTimeStep();
     }
 
 
     @Override
-    public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e)
+    public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e)
     {
         if ( (e.getSimulationTime() + 1) % auxDischargeTimeStep == 0) {
-            for (ElectricVehicle v : vehicles) {
-                v.getAuxEnergyConsumption().consumeEnergy(auxDischargeTimeStep);
+            for (ElectricVehicle ev : eVehicles) {
+                double energy = ev.getAuxEnergyConsumption()
+                        .calcEnergyConsumption(auxDischargeTimeStep);
+                ev.getBattery().discharge(energy);
             }
         }
     }

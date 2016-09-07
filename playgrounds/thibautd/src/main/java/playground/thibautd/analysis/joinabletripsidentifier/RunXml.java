@@ -26,7 +26,7 @@ public class RunXml {
 	public static void main(final String[] args) {
 		// TODO: logging
 		JoinableTripsXmlReader reader = new JoinableTripsXmlReader();
-		reader.parse(args[0]+"trips.xml");
+		reader.readFile(args[0]+"trips.xml");
 
 		JoinableTrips joinableTripData = reader.getJoinableTrips();
 

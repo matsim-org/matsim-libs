@@ -29,7 +29,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkUtils;
 
 import playground.gregor.rtcadyts.io.SensorDataFrame;
 import playground.gregor.rtcadyts.io.SensorDataVehicle;
@@ -40,7 +41,7 @@ public class Frames2Counts {
 	
 	private List<SensorDataFrame> frames;
 	private Scenario sc;
-	private NetworkImpl net;
+	private Network net;
 	private double minTime = Double.POSITIVE_INFINITY;
 
 	private final Map<Id<Link>,LinkInfo> lis = new HashMap<>();
@@ -48,7 +49,7 @@ public class Frames2Counts {
 	public Frames2Counts(Scenario sc, List<SensorDataFrame> frames) {
 		this.sc = sc;
 		this.frames = frames;
-		this.net = (NetworkImpl) sc.getNetwork();
+		this.net = (Network) sc.getNetwork();
 	}
 
 	public void run() {
@@ -114,7 +115,7 @@ public class Frames2Counts {
 	}
 
 	private void handleVehicle(SensorDataVehicle veh) {
-		Link tentativeLink = net.getNearestLinkExactly(new Coord(veh.getX(), veh.getY()));
+		Link tentativeLink = NetworkUtils.getNearestLinkExactly(net,new Coord(veh.getX(), veh.getY()));
 		LinkInfo li = this.lis.get(tentativeLink.getId());
 		if (li == null) {
 			li = new LinkInfo(tentativeLink);

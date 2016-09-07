@@ -173,7 +173,7 @@ public class Events2PTCounts implements VehicleArrivesAtFacilityEventHandler, Ve
 		events.addHandler(this);
 		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(filename);
+		reader.readFile(filename);
 	}
 
 	@Override

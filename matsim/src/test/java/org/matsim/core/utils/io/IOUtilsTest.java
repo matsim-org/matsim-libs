@@ -26,7 +26,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -458,6 +461,14 @@ public class IOUtilsTest {
 		File file = new File(filename);
 		Assert.assertTrue(file.exists());
 		Assert.assertEquals("test+test.txt", file.getCanonicalFile().getName());
+	}
+
+	@Test
+	public void testNewUrl() throws MalformedURLException {
+		URL context = Paths.get("").toUri().toURL();
+		System.out.println(context.toString());
+		URL url = IOUtils.newUrl(context, "C:\\windows\\directory\\filename.txt");
+		System.out.println(url.toString());
 	}
 
 }

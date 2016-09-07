@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.*;
 import org.matsim.core.network.*;
+import org.matsim.core.network.io.MatsimNetworkReader;
 
 import com.vividsolutions.jts.geom.Geometry;
 

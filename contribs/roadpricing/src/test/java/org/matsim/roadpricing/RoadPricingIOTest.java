@@ -29,6 +29,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
+import org.matsim.roadpricing.RoadPricingWriterXMLv1;
+import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
@@ -57,7 +61,7 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		// first, read the scheme from file
 		RoadPricingSchemeImpl scheme1 = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 reader1 = new RoadPricingReaderXMLv1(scheme1);
-		reader1.parse(origFile);
+		reader1.readFile(origFile);
 
 		// compare it with what's expected
 		assertEquals("distance-toll-1", scheme1.getName());
@@ -100,7 +104,7 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		 */
 		RoadPricingSchemeImpl scheme2 = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 reader2 = new RoadPricingReaderXMLv1(scheme2);
-		reader2.parse(tmpFile1);
+		reader2.readFile(tmpFile1);
 
 		// write the scheme to a file
 		RoadPricingWriterXMLv1 writer2 = new RoadPricingWriterXMLv1(scheme2);

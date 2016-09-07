@@ -35,7 +35,7 @@ import org.matsim.contrib.wagonSim.schedule.OTTDataContainer;
 import org.matsim.contrib.wagonSim.schedule.OTTDataToMATSimScheduleConverter;
 import org.matsim.contrib.wagonSim.schedule.OTTScheduleParser;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;

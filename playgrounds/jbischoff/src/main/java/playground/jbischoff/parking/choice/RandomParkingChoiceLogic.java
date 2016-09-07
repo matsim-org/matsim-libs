@@ -24,10 +24,8 @@ package playground.jbischoff.parking.choice;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
-import javax.inject.Inject;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -41,7 +39,7 @@ import org.matsim.core.gbl.MatsimRandom;
 
 public class RandomParkingChoiceLogic implements ParkingChoiceLogic {
 
-	private final Network network;
+	private Network network;
 	private final Random random = MatsimRandom.getLocalInstance();
 
 	/**

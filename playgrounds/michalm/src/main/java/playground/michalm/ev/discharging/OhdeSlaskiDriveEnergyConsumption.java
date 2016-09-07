@@ -21,8 +21,6 @@ package playground.michalm.ev.discharging;
 
 import org.matsim.api.core.v01.network.Link;
 
-import playground.michalm.ev.data.ElectricVehicle;
-
 
 /**
  * Parametrised for the Nissan Leaf. All values in SI units.
@@ -69,20 +67,15 @@ public class OhdeSlaskiDriveEnergyConsumption
     }
 
 
-    private final ElectricVehicle ev;
-
-
-    public OhdeSlaskiDriveEnergyConsumption(ElectricVehicle ev)
-    {
-        this.ev = ev;
-    }
-
-
     @Override
-    public void consumeEnergy(Link link, double travelTime)
+    public double calcEnergyConsumption(Link link, double travelTime)
     {
+        if (travelTime == 0) {
+            return 0;
+        }
+        
         double avgSpeed = link.getLength() / travelTime;
         int idx = (int)Math.round(avgSpeed * speedStepsPerUnit);
-        ev.getBattery().discharge(power[idx] * travelTime);
+        return power[idx] * travelTime;
     }
 }

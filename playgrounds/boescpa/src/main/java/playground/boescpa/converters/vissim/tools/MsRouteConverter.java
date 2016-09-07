@@ -43,7 +43,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -115,7 +115,7 @@ public class MsRouteConverter extends AbstractRouteConverter {
 		});
 		if (path2EventsFile.endsWith(".xml.gz")) { // if events-File is in the newer xml-format
 			EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-			reader.parse(path2EventsFile);
+			reader.readFile(path2EventsFile);
 		}
 		else {
 			throw new IllegalArgumentException("Given events-file not of known format.");

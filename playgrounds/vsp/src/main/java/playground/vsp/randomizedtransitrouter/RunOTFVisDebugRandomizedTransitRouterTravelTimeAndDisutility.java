@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.vsp.randomizedtransitrouter;
 
-import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.common.randomizedtransitrouter.RandomizingTransitRouterModule;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -36,6 +36,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+
+import com.google.inject.Provider;
 
 
 /**
@@ -67,7 +69,7 @@ public class RunOTFVisDebugRandomizedTransitRouterTravelTimeAndDisutility {
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
-		ctrl.addOverridingModule(new RandomizedTransitRouterModule());
+		ctrl.addOverridingModule(new RandomizingTransitRouterModule());
 		
 		if (doVisualization){
 			ctrl.addOverridingModule(new AbstractModule() {

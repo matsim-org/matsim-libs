@@ -8,11 +8,12 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -31,8 +32,8 @@ public class BuslaneGenerator_fullPriority {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
 
-		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkPath);
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(networkPath);
+		Network network = (Network) scenario.getNetwork();
 
 		new TransitScheduleReader(scenario).readFile(transitSchedulePath);
 		TransitSchedule transitSchedule = scenario.getTransitSchedule();
@@ -76,10 +77,15 @@ public class BuslaneGenerator_fullPriority {
 						if (link.toString().equals(lastLinkId.toString())) {
 							newNodeId = network.getLinks().get(link).getToNode().getId();
 						} else {
-							network.createAndAddNode(newNodeId, newBusNodeCoord);
+							final Id<Node> id1 = newNodeId;
+							final Coord coord = newBusNodeCoord;
+							NetworkUtils.createAndAddNode(network, id1, coord);
 						}
-						network.createAndAddLink(newLinkId, network.getNodes().get(fromNodeId),
-								network.getNodes().get(newNodeId), length, freespeed, laneCapacity, 1);
+						final Id<Link> id = newLinkId;
+						final double length1 = length;
+						final double freespeed1 = freespeed;
+						final double capacity = laneCapacity;
+						NetworkUtils.createAndAddLink(network,id, network.getNodes().get(fromNodeId), network.getNodes().get(newNodeId), length1, freespeed1, capacity, (double) 1 );
 						network.getLinks().get(newLinkId).setAllowedModes(allowedModesPT);
 						busLinksList.add(newLinkId);
 						transitSchedule.getFacilities().get(link).setLinkId(newLinkId);

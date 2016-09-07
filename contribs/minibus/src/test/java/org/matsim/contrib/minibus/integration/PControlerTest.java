@@ -64,9 +64,7 @@ public class PControlerTest implements TabularFileHandler{
 
 		final String configFile = inputPath + "config_" + scenarioName + ".xml";
 
-		Config config = new Config();
-		config.addModule(new PConfigGroup());
-		ConfigUtils.loadConfig(config, configFile);
+		Config config = ConfigUtils.loadConfig(configFile, new PConfigGroup());
 
 		config.controler().setLastIteration(numberOfIterations);
 

@@ -96,7 +96,7 @@ public class AggregateNetworkDegreeToHexagons {
 		
 		/* Parse the network. */
 		DigicorePathDependentNetworkReader_v2 nr = new DigicorePathDependentNetworkReader_v2();
-		nr.parse(network);
+		nr.readFile(network);
 		PathDependentNetwork pdn = nr.getPathDependentNetwork();
 		pdn.writeNetworkStatisticsToConsole();
 		

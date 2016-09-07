@@ -32,7 +32,7 @@ import org.matsim.core.router.util.TravelTime;
 
 import javax.inject.Inject;
 
-public class RoadPricingTravelDisutilityFactory implements TravelDisutilityFactory {
+public final class RoadPricingTravelDisutilityFactory implements TravelDisutilityFactory {
 	private final RoadPricingScheme scheme;
 	private final double marginalUtilityOfMoney ;
 	private TravelDisutilityFactory previousTravelDisutilityFactory;

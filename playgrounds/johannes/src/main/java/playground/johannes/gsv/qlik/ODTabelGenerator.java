@@ -38,7 +38,7 @@ public class ODTabelGenerator {
     public static void main(String args[]) throws IOException {
         XMLHandler reader = new XMLHandler(new PlainFactory());
         reader.setValidating(false);
-        reader.parse(args[0]);
+        reader.readFile(args[0]);
 
         Collection<PlainPerson> persons = (Set<PlainPerson>)reader.getPersons();
 

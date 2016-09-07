@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -32,8 +33,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -59,18 +60,23 @@ public class TestXmls {
 		
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		NetworkImpl network = (NetworkImpl) sc.getNetwork();
+		Network network = (Network) sc.getNetwork();
 		for(int i=0; i<10; i++){
 			for(int j=0; j<10; j++ ){
 				Coord coordA = new Coord((double) (i * 10 + 5), (double) (j * 10 + 5));
 				String nodeAs = "Node "+i+"_"+j+"A";
+				final Coord coord = coordA;
 				//Node node1 = network.createAndAddNode(sc.createId("node 1"), sc.createCoord(-20000.0,     0.0));
-				Node nodeA = network.createAndAddNode(Id.create(nodeAs, Node.class), coordA);
+				Node nodeA = NetworkUtils.createAndAddNode(network, Id.create(nodeAs, Node.class), coord);
 				Coord coordB = new Coord((double) (i * 10 + 6), (double) (j * 10 + 6));
 				String nodeBs = "Node "+i+"_"+j+"B";
-				Node nodeB = network.createAndAddNode(Id.create(nodeBs, Node.class), coordB);
+				final Coord coord1 = coordB;
+				Node nodeB = NetworkUtils.createAndAddNode(network, Id.create(nodeBs, Node.class), coord1);
 				Id<Link> linkId = Id.create("link_"+i+"_"+j, Link.class);
-				network.createAndAddLink(linkId, nodeA, nodeB, 20., 30., 3600, 1, null, null);
+				final Id<Link> id = linkId;
+				final Node fromNode = nodeA;
+				final Node toNode = nodeB;
+				NetworkUtils.createAndAddLink(network,id, fromNode, toNode, 20., 30., (double) 3600, (double) 1, null, null);
 			}
 		}
 		

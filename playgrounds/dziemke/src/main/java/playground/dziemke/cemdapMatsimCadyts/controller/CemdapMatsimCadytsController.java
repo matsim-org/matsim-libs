@@ -48,6 +48,7 @@ public class CemdapMatsimCadytsController {
 	
 	public static void main(String[] args) {
 		final Config config = ConfigUtils.createConfig();
+		final double cadytsScoringWeight = 15.0 * config.planCalcScore().getBrainExpBeta();
 		
 		config.global().setCoordinateSystem("GK4");
 		
@@ -55,7 +56,7 @@ public class CemdapMatsimCadytsController {
 		
 		config.plans().setInputFile("../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/24/plans.xml.gz");
 		
-		config.counts().setCountsFileName("../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/vmz_di-do.xml");
+		config.counts().setInputFile("../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/vmz_di-do.xml");
 		config.counts().setCountsScaleFactor(100);
 		config.counts().setOutputFormat("all"); // default is "txt"
 		
@@ -76,7 +77,8 @@ public class CemdapMatsimCadytsController {
 			strategySettings.setStrategyName("ChangeExpBeta");
 			strategySettings.setWeight(1.0);
 			config.strategy().addStrategySettings(strategySettings);
-		}{
+		}
+		{
 			StrategySettings strategySettings = new StrategySettings();
 			strategySettings.setStrategyName("ReRoute");
 			strategySettings.setWeight(0.5);
@@ -117,21 +119,20 @@ public class CemdapMatsimCadytsController {
 //		controler.getConfig().getModule("cadytsCar").addParam("startTime", "00:00:00"); // TODO reactivate
 //		controler.getConfig().getModule("cadytsCar").addParam("endTime", "24:00:00");
 
-		/* Add Cadyts component to scoring function */
+		// Scoring
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Inject private CadytsContext cadytsContext;
 			@Inject CharyparNagelScoringParametersForPerson parameters;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
-
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
+				
+				final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
 				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
 				final CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, cadytsContext);
-				final double cadytsScoringWeight = 15.0 * config.planCalcScore().getBrainExpBeta();
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight);
 				sumScoringFunction.addScoringFunction(scoringFunction);
 

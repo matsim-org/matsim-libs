@@ -31,6 +31,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.utils.MapUtils;
+import playground.agarwalamit.utils.PersonFilter;
 
 /**
  * (1) This excludes the departure of transit drivers.
@@ -44,13 +45,18 @@ import playground.agarwalamit.utils.MapUtils;
 public class ModalShareFromEvents implements ModalShare {
 
 	private final String eventsFile;
-	private final ModalShareEventHandler mseh;
+	private final FilteredModalShareEventHandler mseh;
 	private SortedMap<String, Integer> mode2numberOflegs = new TreeMap<>();
 	private SortedMap<String, Double> mode2PctOflegs = new TreeMap<>();
 
 	public ModalShareFromEvents(final String eventsFile){
 		this.eventsFile = eventsFile;
-		this.mseh = new ModalShareEventHandler();
+		this.mseh = new FilteredModalShareEventHandler();
+	}
+	
+	public ModalShareFromEvents(final String eventsFile, final String userGroup, final PersonFilter personFilter){
+		this.eventsFile = eventsFile;
+		this.mseh = new FilteredModalShareEventHandler(userGroup,personFilter);
 	}
 
 	public void run(){

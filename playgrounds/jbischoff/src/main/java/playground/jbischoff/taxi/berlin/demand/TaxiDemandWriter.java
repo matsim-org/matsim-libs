@@ -25,11 +25,13 @@ import java.util.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.contrib.zone.Zone;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.*;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -38,7 +40,7 @@ import org.matsim.core.utils.io.tabularFileParser.*;
 
 import com.vividsolutions.jts.geom.*;
 
-import playground.michalm.berlin.BerlinZoneUtils;
+import playground.michalm.TaxiBerlin.TaxiBerlinZoneUtils;
 
 
 /**
@@ -50,7 +52,7 @@ public class TaxiDemandWriter
     private static final Logger log = Logger.getLogger(TaxiDemandWriter.class);
     private Map<String, Geometry> municipalityMap;
     private Population population;
-    private NetworkImpl network;
+    private Network network;
     private Scenario scenario;
 
     private Random rnd = new Random(17);
@@ -141,7 +143,7 @@ public class TaxiDemandWriter
         scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         ;
         new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORKFILE);
-        this.network = (NetworkImpl)scenario.getNetwork();
+        this.network = (Network)scenario.getNetwork();
     }
 
 
@@ -289,19 +291,19 @@ public class TaxiDemandWriter
         Plan plan = population.getFactory().createPlan();
         Coord fromCoord;
         Coord toCoord;
-        if (from.equals(BerlinZoneUtils.TXL_LOR_ID)) {
+        if (from.equals(TaxiBerlinZoneUtils.TXL_LOR_ID)) {
 
-            fromCoord = BerlinZoneUtils.createFromTxlCoord();
+            fromCoord = TaxiBerlinZoneUtils.createFromTxlCoord();
             TaxiDemandWriter.fromTXL++;
         }
         else {
             fromCoord = this.shoot(from);
         }
-        if (to.equals(BerlinZoneUtils.TXL_LOR_ID)) {
+        if (to.equals(TaxiBerlinZoneUtils.TXL_LOR_ID)) {
 
-            toCoord = BerlinZoneUtils.createToTxlCoord();
+            toCoord = TaxiBerlinZoneUtils.createToTxlCoord();
             TaxiDemandWriter.toTXL++;
-            if (from.equals(BerlinZoneUtils.TXL_LOR_ID)) {
+            if (from.equals(TaxiBerlinZoneUtils.TXL_LOR_ID)) {
                 fromCoord = this.shoot(from);
                 toCoord = this.shoot(to);
                 //quite a lot of trips are TXL to TXL
@@ -311,19 +313,19 @@ public class TaxiDemandWriter
             toCoord = this.shoot(to);
         }
 
-        if (from.equals(BerlinZoneUtils.SXF_LOR_ID)) {
+        if (from.equals(TaxiBerlinZoneUtils.SXF_LOR_ID)) {
 
-            fromCoord = BerlinZoneUtils.createSxfCentroid();
+            fromCoord = TaxiBerlinZoneUtils.createSxfCentroid();
             //TaxiDemandWriter.fromTXL++; // SXF?, michalm
         }
         else {
             fromCoord = this.shoot(from);
         }
-        if (to.equals(BerlinZoneUtils.SXF_LOR_ID)) {
+        if (to.equals(TaxiBerlinZoneUtils.SXF_LOR_ID)) {
 
-            toCoord = BerlinZoneUtils.createSxfCentroid();
+            toCoord = TaxiBerlinZoneUtils.createSxfCentroid();
             //TaxiDemandWriter.toTXL++; // SXF?, michalm
-            if (from.equals(BerlinZoneUtils.SXF_LOR_ID)) {
+            if (from.equals(TaxiBerlinZoneUtils.SXF_LOR_ID)) {
                 fromCoord = this.shoot(from);
                 toCoord = this.shoot(to);
                 //quite a lot of trips are TXL to TXL
@@ -337,9 +339,11 @@ public class TaxiDemandWriter
             return null;
         if (toCoord == null)
             return null;
+	final Coord coord = fromCoord;
 
-        Link fromLink = network.getNearestLinkExactly(fromCoord);
-        Link toLink = network.getNearestLinkExactly(toCoord);
+        Link fromLink = NetworkUtils.getNearestLinkExactly(network,coord);
+	final Coord coord1 = toCoord;
+        Link toLink = NetworkUtils.getNearestLinkExactly(network,coord1);
 
         double activityStart = Math.round(hr * 3600. + rnd.nextDouble() * 3600.);
         //		if (hr == 27 )  activityStart = Math.round(hr * 3600. + rnd.nextDouble() * 1200.);
@@ -386,7 +390,7 @@ public class TaxiDemandWriter
         if (this.municipalityMap.containsKey(zoneId.toString())) {
             point = getRandomPointInFeature(this.rnd, this.municipalityMap.get(zoneId.toString()));
             Coord coord = new Coord(point.getX(), point.getY());
-            return BerlinZoneUtils.ZONE_TO_NETWORK_COORD_TRANSFORMATION.transform(coord);
+            return TaxiBerlinZoneUtils.ZONE_TO_NETWORK_COORD_TRANSFORMATION.transform(coord);
         }
         else {
             log.error(zoneId.toString() + "does not exist in shapedata");

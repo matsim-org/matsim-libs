@@ -55,7 +55,7 @@ public class CorridorRun {
 
 		ObjectAttributes incomes = new ObjectAttributes();
 		ObjectAttributesXmlReader incomesReader = new ObjectAttributesXmlReader(incomes);
-		incomesReader.parse(input+"income.xml");
+		incomesReader.readFile(input+"income.xml");
 
 
 		HashMap<Id, Integer> incomeMap = new HashMap<Id, Integer>();

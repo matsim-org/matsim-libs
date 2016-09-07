@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -49,9 +49,9 @@ public class PlansConverter {
 					if (pe instanceof Activity){
 						Coord coord =((Activity) pe).getCoord();
 						Coord newCoord = ct.transform(coord);
-						coord.setX(newCoord.getX());
-						coord.setY(newCoord.getY());
-						
+//						coord.setX(newCoord.getX());
+//						coord.setY(newCoord.getY());
+						((Activity) pe).setCoord(newCoord);
 					}
 				}
 			}

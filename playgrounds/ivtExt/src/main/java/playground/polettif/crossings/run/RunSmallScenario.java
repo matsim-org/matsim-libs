@@ -24,20 +24,23 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
+/**
+ * Runs a small scenario with a given config
+ */
 public class RunSmallScenario {
 
 	public static void main(String[] args) {
-		String base = "C:/Users/polettif/Desktop/crossings/";
+		String base = "";
 		String scenarioName = "small";
 
 		String inputBase = base + "input/" + scenarioName + "/";
 
 		// run 1 iteration of scenario
 		Config config = ConfigUtils.loadConfig(inputBase+"config.xml");
-		config.setParam("controler", "outputDirectory", 		base+"output/"+scenarioName+"/");
-		config.setParam("network", 	"inputNetworkFile", 		inputBase+"network.xml");
-		config.setParam("plans", 	"inputPlansFile", 			inputBase+"population.xml");
-		config.setParam("network", "inputChangeEventsFile", inputBase + "networkChangeEvents.xml");
+		config.controler().setOutputDirectory(base+"output/"+scenarioName+"/");
+		config.network().setInputFile(inputBase+"network.xml");
+		config.plans().setInputFile(inputBase+"population.xml");
+		config.network().setChangeEventsInputFile(inputBase + "networkChangeEvents.xml");
 //		config.network().setTimeVariantNetwork(true);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);

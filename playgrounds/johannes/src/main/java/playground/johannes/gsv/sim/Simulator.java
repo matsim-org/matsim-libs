@@ -46,7 +46,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsManagerModule;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
@@ -167,7 +166,7 @@ public class Simulator {
         logger.info("Loading person attributes...");
         ObjectAttributesXmlReader oaReader = new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes());
         oaReader.putAttributeConverter(ArrayList.class, new Proxy2Matsim.Converter());
-        oaReader.parse(gsvConfigGroup.getAttributesFile());
+        oaReader.readFile(gsvConfigGroup.getAttributesFile());
 
         controler.run();
 
@@ -181,7 +180,7 @@ public class Simulator {
 			 * connect facilities to links
 			 */
             logger.info("Connecting facilities to links...");
-            NetworkImpl network = (NetworkImpl) event.getServices().getScenario().getNetwork();
+            Network network = (Network) event.getServices().getScenario().getNetwork();
             for (ActivityFacility facility : event.getServices().getScenario().getActivityFacilities().getFacilities().values()) {
                 Coord coord = facility.getCoord();
                 Link link = NetworkUtils.getNearestLink(network, coord);

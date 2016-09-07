@@ -18,20 +18,15 @@
  * *********************************************************************** */
 package playground.kai.usecases.assignmentEmulatingQLane;
 
-import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.qsim.qnetsimengine.AssignmentEmulatingQLaneNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -45,35 +40,29 @@ public class AssignmentEmulatingQLaneMain {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final Config config = ConfigUtils.createConfig();
+		final Config config = ConfigUtils.loadConfig("../../../matsim/matsim/examples/equil/config.xml");
+		
+		config.plans().setInputFile("plans2000.xml.gz");
+		
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setLastIteration(0);
+		
+		config.qsim().setNumberOfThreads(1);
+		
+		config.parallelEventHandling().setNumberOfThreads(1);
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 
 		final Controler controler = new Controler( scenario ) ;
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Override
-					public Mobsim get() {
-						return new MobsimFactory() {
-							@Override
-							public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
-								final String mobsim = config.controler().getMobsim();
-								if (MobsimType.qsim.toString().equals(mobsim)) {
-									throw new RuntimeException("the following will only work for " + MobsimType.qsim.toString());
-								}
-								// ===
-								final QSim simulation = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager);
-								simulation.addMobsimEngine(new QNetsimEngine(simulation, new AssignmentEmulatingQLaneNetworkFactory()));
-								return simulation;
-								// note: this is called before "enrichSimulation" so we do not need to worry about that.
-							}
-						}.createMobsim(controler.getScenario(), controler.getEvents());
-					}
-				});
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install() {
+				bind( QNetworkFactory.class ).to( AssignmentEmulatingQLaneNetworkFactory.class ) ;
 			}
 		});
+		
+		controler.addOverridingModule( new OTFVisLiveModule() );
+		
+		controler.run();
 	}
 
 }

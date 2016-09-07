@@ -98,7 +98,7 @@ public class EmissionsAnalyzer extends AbstractAnalysisModule{
 		eventsManager.addHandler(this.warmHandler);
 		eventsManager.addHandler(this.coldHandler);
 		
-		emissionReader.parse(this.emissionEventsFile);
+		emissionReader.readFile(this.emissionEventsFile);
 	}
 
 	@Override

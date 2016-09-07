@@ -35,8 +35,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 
@@ -73,7 +73,7 @@ public class ModeReporter {
 	 */
 	public ModeReporter(String populationFile) {
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc).parse(populationFile);
+		new PopulationReader(sc).readFile(populationFile);
 	}
 	
 	public void reportModeShare(){

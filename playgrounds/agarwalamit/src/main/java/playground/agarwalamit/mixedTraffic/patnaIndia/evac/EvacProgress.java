@@ -37,7 +37,7 @@ public class EvacProgress {
 	private final int shortestPathRunIteration = 0;
 	private final int NERunIteration = 100;
 
-	private final String dir = "../../../repos/runs-svn/patnaIndia/run105/1pct/evac_passing/";
+	private final String dir = "../../../../repos/runs-svn/patnaIndia/run109/evac_SeepageQ/";
 
 	public static void main(String[] args) {
 		new EvacProgress().runAndWrite();

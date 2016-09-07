@@ -217,7 +217,7 @@ public class RunNationalFreight {
 
 		public NewDigicorePlanStrategyModule() {
 			DigicorePathDependentNetworkReader_v1 nr = new DigicorePathDependentNetworkReader_v1();
-			nr.parse(PATH_DEPENDENT_NETWORK);
+			nr.readFile(PATH_DEPENDENT_NETWORK);
 			network = nr.getPathDependentNetwork();
 		}
 

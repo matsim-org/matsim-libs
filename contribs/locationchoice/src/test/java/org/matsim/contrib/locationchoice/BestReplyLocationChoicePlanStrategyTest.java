@@ -59,8 +59,8 @@ public class BestReplyLocationChoicePlanStrategyTest {
 //		
 //		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
 //		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
-//		controler.getScenario().addScenarioElement(DestinationChoiceBestResponseContext.ELEMENT_NAME, lcContext);
-//		controler.getScenario().addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME, dcScore);
+//		controler.getTestScenarioURL().addScenarioElement(DestinationChoiceBestResponseContext.ELEMENT_NAME, lcContext);
+//		controler.getTestScenarioURL().addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME, dcScore);
 //		
 //		BestReplyLocationChoicePlanStrategy planStrategy = new BestReplyLocationChoicePlanStrategy(scenario);	
 //		

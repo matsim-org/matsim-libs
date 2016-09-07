@@ -59,7 +59,7 @@ public class AnalyzeAsArentze {
 
 		log.info( "reading social network" );
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new SocialNetworkReader( sc ).parse( inputSocialNetwork );
+		new SocialNetworkReader( sc ).readFile( inputSocialNetwork );
 	
 		log.info( "computing clustering" );
 		final SocialNetwork socialNetwork = (SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME );

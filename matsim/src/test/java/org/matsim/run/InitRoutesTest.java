@@ -35,10 +35,10 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -63,7 +63,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		// prepare data like world and network
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).parse(NETWORK_FILE);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILE);
 
 		// create one person with missing link in act
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
@@ -92,7 +92,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		// now perform some tests
 		assertTrue("no output generated.", new File(PLANS_FILE_TESTOUTPUT).exists());
 		Population population2 = scenario.getPopulation();
-		new PopulationReader(scenario).parse(PLANS_FILE_TESTOUTPUT);
+		new PopulationReader(scenario).readFile(PLANS_FILE_TESTOUTPUT);
 		assertEquals("wrong number of persons.", 1, population2.getPersons().size());
 		Person person2 = population2.getPersons().get(Id.create("1", Person.class));
 		assertNotNull("person 1 missing", person2);

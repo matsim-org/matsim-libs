@@ -6,10 +6,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.carsharing.manager.demand.membership.MembershipContainer;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.algorithms.PermissibleModesCalculator;
 
@@ -18,11 +20,12 @@ public class CarsharingSubTourPermissableModesCalculator implements PermissibleM
 	private final Scenario scenario;
 	private final List<String> availableModes;
 	private final List<String> availableModesWithoutCar;
-	
-	public CarsharingSubTourPermissableModesCalculator(final Scenario scenario, final String[] availableModes) {
+	private MembershipContainer memberships;
+	public CarsharingSubTourPermissableModesCalculator(final Scenario scenario, final String[] availableModes, 
+			MembershipContainer memberships) {
 		this.scenario = scenario;
 		this.availableModes = Arrays.asList(availableModes);
-		
+		this.memberships = memberships;
 		if ( this.availableModes.contains( TransportMode.car ) ) {
 			final List<String> l = new ArrayList<String>( this.availableModes );
 			while ( l.remove( TransportMode.car ) ) {}
@@ -36,9 +39,11 @@ public class CarsharingSubTourPermissableModesCalculator implements PermissibleM
 	@Override
 	public Collection<String> getPermissibleModes(Plan plan) {
 		final Person person;
+		Id<Person> personId;
 		List<String> l; 
 		try {
 			person = plan.getPerson();
+			personId = person.getId();
 		}
 		catch (ClassCastException e) {
 			throw new IllegalArgumentException( "I need a PersonImpl to get car availability" );
@@ -54,10 +59,10 @@ public class CarsharingSubTourPermissableModesCalculator implements PermissibleM
 		
 		 if (Boolean.parseBoolean(scenario.getConfig().getModule("TwoWayCarsharing").getParams().get("useTwoWayCarsharing"))
 		
-				 && Boolean.parseBoolean((String) scenario.getPopulation().getPersonAttributes().getAttribute(person.getId().toString(), "RT_CARD"))) {
+				 && this.memberships.getPerPersonMemberships().get(personId).getMembershipsPerCSType().containsKey("twoway")) {
 			 
 			 
-			 l.add("twowaycarsharing");
+			 l.add("twoway");
 			 
 		 }
 		

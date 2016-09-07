@@ -99,4 +99,16 @@ public interface Network extends MatsimToplevelContainer {
 	 */
 	public Link removeLink(final Id<Link> linkId);
 
+	void setCapacityPeriod(double capPeriod);
+
+	void setEffectiveCellSize(double effectiveCellSize);
+
+	void setEffectiveLaneWidth(double effectiveLaneWidth);
+
+	void setName(String name);
+
+	String getName();
+
+	double getEffectiveCellSize();
+
 }

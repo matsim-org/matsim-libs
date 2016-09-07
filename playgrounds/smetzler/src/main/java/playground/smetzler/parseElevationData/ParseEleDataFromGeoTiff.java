@@ -37,22 +37,22 @@ public class ParseEleDataFromGeoTiff {
 //		
 //////		//berlin
 //		File tiffFile = new File(
-//				"../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_berlin/srtm3/srtm_39_02.tif");
-		//berlin EU-DEM
-//		File tiffFile = new File(
-//				"../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_berlin/BerlinEUDEM.tif");
+//				"../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_berlin/srtm3/srtm_39_02.tif");
+	//	berlin EU-DEM
+		File tiffFile = new File(
+				"../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_berlin/BerlinEUDEM.tif");
 		
 
 //		//paris
 //		File tiffFile = new File(
-//				"../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_paris/srtm_37_03.tif");
+//				"../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_paris/srtm_37_03.tif");
 //		//stuttgart
 //		File tiffFile = new File(
-//				"../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_stuttgart/srtm_38_03.tif");
+//				"../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_stuttgart/srtm_38_03.tif");
 		
-//		//brasilia srtm3
-		File tiffFile = new File(
-				"../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_brasilia/srtm_27_16.tif");
+////		//brasilia srtm3
+//		File tiffFile = new File(
+//				"../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_brasilia/srtm_27_16.tif");
 		
 		
 		GeoTiffReader reader = new GeoTiffReader(tiffFile);
@@ -69,7 +69,7 @@ public class ParseEleDataFromGeoTiff {
 		//da die GeoTiff in WGS84 ist, jedoch das MAtsim Netz in DHDN, müssen die übergebenen Koordinaten von DHDN in WGS84 transformiert werden
 
 		//new
-		CoordinateReferenceSystem sourceCRS = CRS.decode("EPSG:4326", true);//"EPSG:31468", true); // DHDN / 3-degree Gauss-Kruger zone 4
+		CoordinateReferenceSystem sourceCRS = CRS.decode("EPSG:31468", true);//"EPSG:31468", true); // DHDN / 3-degree Gauss-Kruger zone 4
 		CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:4326", true);  //WGS84
 
 		MathTransform mathTransform = CRS.findMathTransform(sourceCRS, targetCRS, true);
@@ -83,7 +83,8 @@ public class ParseEleDataFromGeoTiff {
 		// envelope is the size in the target projection
 		double[] pixel = new double[1];
 		double[] data = gridData.getPixel(posGrid.x, posGrid.y, pixel);
-		return data[0];
+	//	return data[0];
+		return 0;
 	}
 	
 }

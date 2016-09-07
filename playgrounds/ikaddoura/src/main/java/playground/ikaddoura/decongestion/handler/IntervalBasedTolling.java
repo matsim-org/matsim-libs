@@ -53,7 +53,7 @@ public class IntervalBasedTolling implements LinkLeaveEventHandler {
 		if (decongestionInfo.getlinkInfos().containsKey(event.getLinkId())) {
 			
 			int currentTimeBin = (int) (event.getTime() / this.decongestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
-						
+									
 			if (decongestionInfo.getlinkInfos().get(event.getLinkId()).getTime2toll().containsKey(currentTimeBin)) {
 				double toll = decongestionInfo.getlinkInfos().get(event.getLinkId()).getTime2toll().get(currentTimeBin);
 				this.eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), this.decongestionInfo.getVehicleId2personId().get(event.getVehicleId()), -1. * toll));

@@ -35,10 +35,10 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
@@ -279,7 +279,7 @@ abstract class AbstractQLink extends QLinkI {
 		this.waitingList.clear();
 	}
 
-	void makeVehicleAvailableToNextDriver(QVehicle veh, double now) {
+	void makeVehicleAvailableToNextDriver(QVehicle veh) {
 
 		/*
 		 * Insert waiting passengers into vehicle.
@@ -291,7 +291,7 @@ abstract class AbstractQLink extends QLinkI {
 			List<MobsimAgent> passengersToHandle = new ArrayList<>(passengers);
 			for (MobsimAgent passenger : passengersToHandle) {
 				this.unregisterPassengerAgentWaitingForCar(passenger, vehicleId);
-				this.insertPassengerIntoVehicle(passenger, vehicleId, now);
+				this.insertPassengerIntoVehicle(passenger, vehicleId);
 			}
 		}
 
@@ -321,12 +321,14 @@ abstract class AbstractQLink extends QLinkI {
 				assert r == driversWaitingForCar;
 			}
 			removeParkedVehicle( veh.getId() );
-			this.letVehicleDepart(veh, now);
+			this.letVehicleDepart(veh);
 		}
 	}
 
 	@Override
-	final void letVehicleDepart(QVehicle vehicle, double now) {
+	final void letVehicleDepart(QVehicle vehicle) {
+		double now = context.getSimTimer().getTimeOfDay();
+		
 		MobsimDriverAgent driver = vehicle.getDriver();
 		if (driver == null) throw new RuntimeException("Vehicle cannot depart without a driver!");
 
@@ -341,7 +343,9 @@ abstract class AbstractQLink extends QLinkI {
 	 * the waiting list and return false.
 	 */
 	@Override
-	final boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id<Vehicle> vehicleId, double now) {
+	final boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id<Vehicle> vehicleId) {
+		double now = context.getSimTimer().getTimeOfDay();
+		
 		QVehicle vehicle = this.getParkedVehicle(vehicleId);
 
 		// if the vehicle is not parked at the link, mark the agent as passenger waiting for vehicle

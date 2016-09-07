@@ -95,12 +95,12 @@ public class MyShoppingReaderTest {
 		/* Read facilities and its attributes. */
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		FacilitiesReaderMatsimV1 fr = new FacilitiesReaderMatsimV1(sc);
-		fr.parse(utils.getOutputDirectory() + "facilities.xml");
+		fr.readFile(utils.getOutputDirectory() + "facilities.xml");
 		ActivityFacilities afi = sc.getActivityFacilities();
 		
 		ObjectAttributes oa = new ObjectAttributes();
 		ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(oa);
-		oar.parse(utils.getOutputDirectory() + "facilityAttributes.xml");
+		oar.readFile(utils.getOutputDirectory() + "facilityAttributes.xml");
 		
 		Assert.assertNotNull("Should find the facility.", afi.getFacilities().get(Id.create("1713491", ActivityFacility.class)));
 		Assert.assertEquals("Wrong number of facilties found.", 1, afi.getFacilities().size());

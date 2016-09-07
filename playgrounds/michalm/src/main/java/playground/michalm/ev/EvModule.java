@@ -52,7 +52,8 @@ public class EvModule
         addMobsimListenerBinding().to(ChargingHandler.class);
 
         if (EvConfigGroup.get(getConfig()).getTimeProfiles()) {
-            addMobsimListenerBinding().toProvider(EvTimeProfileCollectorProvider.class);
+            addMobsimListenerBinding().toProvider(SocHistogramTimeProfileCollectorProvider.class);
+            addMobsimListenerBinding().toProvider(IndividualSocTimeProfileCollectorProvider.class);
             //add more time profiles if necessary
         }
 

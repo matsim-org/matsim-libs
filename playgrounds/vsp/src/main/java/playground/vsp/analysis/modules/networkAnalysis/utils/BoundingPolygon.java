@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
@@ -87,7 +86,7 @@ public class BoundingPolygon {
 			for(Coordinate coord : coordinates){
 			
 				//search the nearest node from the current coordinate
-				Node node = ((NetworkImpl)this.network).getNearestNode(MGC.coordinate2Coord(coord));
+				Node node = NetworkUtils.getNearestNode(((Network)this.network),MGC.coordinate2Coord(coord));
 				
 				//if the nearest node is not yet a corner of the bounding polygon, add it to the collection
 				//and add the node's coordinate to the collection of the corners

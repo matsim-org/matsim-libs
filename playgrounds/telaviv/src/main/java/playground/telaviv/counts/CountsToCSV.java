@@ -45,7 +45,7 @@ public class CountsToCSV {
 	
 	public CountsToCSV(String countsInFile, String countsOutFile) throws IOException {
 		Counts <Link>counts = new Counts();
-		new CountsReaderMatsimV1(counts).parse(countsInFile);
+		new CountsReaderMatsimV1(counts).readFile(countsInFile);
 		
 		BufferedWriter writer = IOUtils.getBufferedWriter(countsOutFile, charset);
 		writeHeader(writer);

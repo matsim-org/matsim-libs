@@ -22,40 +22,35 @@ public class DemandGeneratorOnePersonV2 {
 	private static final Logger log = Logger.getLogger(DemandGeneratorOnePersonV2.class);
 
 	public static void main(String[] args) {
-		// main parameters
-		//double scalingFactor = 0.01;
-		double scalingFactor = 0.1;
-		double carShareBE = 0.37;
-		double carShareBB = 0.55;
+		// Parameters
+		double scalingFactor = 0.01;
+		double carShareInterior = 1.;
+		double carShareExterior = 1.;
 		double allWorkersToSociallySecuredWorkersRatio = 1.52;
 		double adultsToWorkersRatio = 1.9;
 		double expansionFactor = 1.;
-		//int numberOfPlansPerPerson = 10;
 		int numberOfPlansPerPerson = 3;
-		// Gemeindeschluessel of Berlin is 11000000
+		// Gemeindeschluessel of Berlin is 11000000 (Gemeindeebene) and 11000 (Landkreisebene)
 		Integer planningAreaId = 11000000;
 		
+		// Input and output files
+		String commuterFileIn = "../../../../CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ge.txt";
+		String commuterFileOut = "../../../../CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ga.txt";
 		
-		// input and output files
-		String commuterFileIn = "D:/VSP/CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ge.txt";
-		String commuterFileOut = "D:/VSP/CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ga.txt";
+		String shapeFileMunicipalities = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenBerlin.shp";
+		String shapeFileLors = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Bezirksregion_EPSG_25833.shp";
 		
-		String shapeFileMunicipalities = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/gemeindenBerlin.shp";
-		String shapeFileLors = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Bezirksregion_EPSG_25833.shp";
-		
-		String outputBase = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/";
+		String outputBase = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/25/";
 		
 		LogToOutputSaver.setOutputDirectory(outputBase);
 		
-		
-		// create a PendlerMatrixReader and store its output to a list
-		CommuterFileReader commuterFileReader = new CommuterFileReader(shapeFileMunicipalities, commuterFileIn, carShareBB,	commuterFileOut, 
-				//carShareBE, scalingFactor * socialSecurityFactor * adultsWorkersFactor * expansionFactor, planningAreaId.toString());
-				carShareBE, scalingFactor * allWorkersToSociallySecuredWorkersRatio * adultsToWorkersRatio * expansionFactor, planningAreaId);
+		// Create a PendlerMatrixReader and store its output to a list
+		CommuterFileReader commuterFileReader = new CommuterFileReader(shapeFileMunicipalities, commuterFileIn,
+				carShareExterior, commuterFileOut, carShareInterior, scalingFactor * allWorkersToSociallySecuredWorkersRatio
+				* adultsToWorkersRatio * expansionFactor, planningAreaId);
 		List<CommuterRelation> commuterRelationList = commuterFileReader.getCommuterRelations();
 		
-		
-		// create storage objects
+		// Create storage objects
 		Map<Integer, String> lors = new HashMap<Integer, String>();
 		Map<Integer, Household> householdMap = new HashMap<Integer, Household>();
 		Map<Integer, Map<String, SimplePerson>> mapOfPersonMaps = new HashMap<Integer, Map<String, SimplePerson>>();
@@ -64,14 +59,11 @@ public class DemandGeneratorOnePersonV2 {
 			mapOfPersonMaps.put(i, persons);
 		}
 		
-		
-		// read in LORs	
+		// Read in LORs	
 		TwoAttributeShapeReader.readShape(shapeFileLors, lors, "SCHLUESSEL", "LOR");
 		
-		
-		// create households and persons
+		// Create households and persons
 		int householdIdCounter = 1;
-		
 		
 		for (int i = 0; i<commuterRelationList.size(); i++){
 			int quantity = commuterRelationList.get(i).getQuantity();
@@ -80,7 +72,7 @@ public class DemandGeneratorOnePersonV2 {
 			int sink = commuterRelationList.get(i).getTo();
 	        	
 			for (int j = 0; j<quantity; j++){
-				// create households
+				// Create households
 				int householdId = householdIdCounter;
 				int homeTSZLocation;
 					
@@ -92,8 +84,7 @@ public class DemandGeneratorOnePersonV2 {
 				Household household = new Household(householdId, homeTSZLocation);
 				householdMap.put(householdId, household);
 				
-				
-				// create persons
+				// Create persons
 				int sex = getSex();			
 				int age = getAge();
 				String personId = householdId + "01";
@@ -106,7 +97,7 @@ public class DemandGeneratorOnePersonV2 {
 				}
 				
 				int student;
-				// we make the assumption that stundets are not employed at the same time and that students are
+				// We make the assumption that students are not employed at the same time and that students are
 				// aged less than 30 years
 				if (employed == 0 && age < 30) {
 					student = getStudent();
@@ -116,7 +107,6 @@ public class DemandGeneratorOnePersonV2 {
 				
 				for (int k=1; k<=numberOfPlansPerPerson; k++) {
 					int locationOfWork;
-					//if (sink == 11000000){
 					if (sink == planningAreaId){
 						locationOfWork = getRandomLor(lors);
 					} else {
@@ -128,7 +118,6 @@ public class DemandGeneratorOnePersonV2 {
 					}
 					
 					int locationOfSchool;
-					//if (sink == 11000000){
 					if (sink == planningAreaId){
 						locationOfSchool = getRandomLor(lors);
 					} else {
@@ -139,16 +128,17 @@ public class DemandGeneratorOnePersonV2 {
 						locationOfSchool = -99;
 					}
 
-					SimplePerson person = new SimplePerson(personId, householdId, employed, student, locationOfWork, locationOfSchool, sex, age);
+					SimplePerson person = new SimplePerson(personId, householdId, employed, student, locationOfWork,
+							locationOfSchool, sex, age);
 					mapOfPersonMaps.get(k).put(personId, person);
 				}	
 				householdIdCounter++;
 				}
 			}
 		
-			writeToHouseholdsFile(mapOfPersonMaps.get(1), householdMap, outputBase + "households.dat");
+			writeHouseholdsFile(mapOfPersonMaps.get(1), householdMap, outputBase + "households.dat");
 			for (int i=1; i<=numberOfPlansPerPerson; i++) {
-				writeToPersonsFile(mapOfPersonMaps.get(i), outputBase + "persons" + i + ".dat");
+				writePersonsFile(mapOfPersonMaps.get(i), outputBase + "persons" + i + ".dat");
 			}
 		}
 		
@@ -168,10 +158,6 @@ public class DemandGeneratorOnePersonV2 {
 	
 	private static int getAge() {
 		int ageRange = getAgeRange();
-		
-        // Es ist wichtig darauf zu achten, dass nach Ausführung einer Anweisung der Schleifendurchlauf mit "break"
-        // unterbrochen wird, da die folgenden Sprungmarken sonst ebenfalls geprüft und ggf. ausgeführt werden.
-        // Trifft keine Übereinstimmung zu, kann optional mit der Sprungmarke default eine Standardanweisung ausgeführt werden. 
         switch (ageRange) {
             case 1:	return getAgeInRange(18, 19);
             case 2:	return getAgeInRange(20, 24);
@@ -184,7 +170,6 @@ public class DemandGeneratorOnePersonV2 {
             case 9:	return getAgeInRange(65, 90);
             default: 
             	throw new RuntimeException("No age range met.");
-            	//return -1;
         }
 	}
 	
@@ -205,7 +190,6 @@ public class DemandGeneratorOnePersonV2 {
 		if (randomNumber < 54469+222434+284440+277166+228143+256192+755482+198908+654933) {return 9;}
 		else {
 			throw new RuntimeException("No age selected.");
-			//return -1;
 		}
 	}
 	
@@ -233,10 +217,9 @@ public class DemandGeneratorOnePersonV2 {
 	private static int getStudent() {
 		Random r = new Random();
 		double randomNumber = r.nextDouble();
-		// OLD: Number of  students in Berlin (150000) divided by non-employed population aged 18-29 (266000)
+		// Old (used in V2 until cemdap_berlin/21: No. of  students in Berlin (150000) divided by non-employed population aged 18-29 (266000)
 		// Number of  students in Berlin (150000) divided by non-employed population aged 18-29 (181000)
-		//TODO Correctly it has to be 150/181.
-		if (randomNumber < 150/266.) {
+		if (randomNumber < 150/181.) {
 			return 1;
 		} else {
 			return 0;
@@ -252,7 +235,7 @@ public class DemandGeneratorOnePersonV2 {
 	}
 	
 		
-	public static void writeToPersonsFile(Map <String, SimplePerson> persons, String fileName) {
+	public static void writePersonsFile(Map <String, SimplePerson> persons, String fileName) {
 		BufferedWriter bufferedWriterPersons = null;
 		
 		try {
@@ -260,17 +243,17 @@ public class DemandGeneratorOnePersonV2 {
     		FileWriter fileWriterPersons = new FileWriter(personFile);
     		bufferedWriterPersons = new BufferedWriter(fileWriterPersons);
     		    		    		
-    		for (String key : persons.keySet()) {
-    			int householdId = persons.get(key).getHouseholdId();
-    			String personId = persons.get(key).getpersonId();
-    			int employed = persons.get(key).getEmployed();
-    			int student = persons.get(key).getStudent();
-    			int driversLicence = persons.get(key).getDriversLicence();
-    			int locationOfWork = persons.get(key).getLocationOfWork();
-    			int locationOfSchool = persons.get(key).getLocationOfSchool();
-    			int female = persons.get(key).getSex();
-    			int age = persons.get(key).getAge();
-    			int parent = persons.get(key).getParent();
+    		for (SimplePerson person : persons.values()) {
+    			int householdId = person.getHouseholdId();
+    			String personId = person.getpersonId();
+    			int employed = person.getEmployed();
+    			int student = person.getStudent();
+    			int driversLicence = person.getDriversLicence();
+    			int locationOfWork = person.getLocationOfWork();
+    			int locationOfSchool = person.getLocationOfSchool();
+    			int female = person.getSex();
+    			int age = person.getAge();
+    			int parent = person.getParent();
     			
     			// altogether this creates 59 columns = number in query file
     			// TODO check if column position is correct, especially for "age" and "parent"
@@ -304,7 +287,8 @@ public class DemandGeneratorOnePersonV2 {
     }
 	
 
-	public static void writeToHouseholdsFile(Map <String, SimplePerson> persons, Map<Integer, Household> households, String fileName) {
+	public static void writeHouseholdsFile(Map <String, SimplePerson> persons, Map<Integer, Household> households,
+			String fileName) {
 		BufferedWriter bufferedWriterHouseholds = null;
 		
 		try {
@@ -314,9 +298,8 @@ public class DemandGeneratorOnePersonV2 {
 
     		int householdIdFromPersonBefore = 0;
     		
-    		// use map of persons to write a household for every person
-    		// under the condition that the household does not already exist (written from another persons)
-    		// this procedure is used to enable the potential use of multiple-person households
+    		// Use map of persons to write a household for every person under the condition that the household does not
+    		// already exist (written from another persons); used to enable the potential use of multiple-person households.
     		// TODO use proper household sizes
     		for (String key : persons.keySet()) {
     			int householdId = persons.get(key).getHouseholdId();
@@ -328,7 +311,7 @@ public class DemandGeneratorOnePersonV2 {
     				int numberOfChildren = households.get(householdId).getNumberOfChildren();
     				int householdStructure = households.get(householdId).getHouseholdStructure();
     				
-    				// altogether this creates 32 columns = number in query file
+    				// Altogether this creates 32 columns = number in query file
     				bufferedWriterHouseholds.write(householdId + "\t" + numberOfAdults + "\t" + totalNumberOfHouseholdVehicles
     						 + "\t" + homeTSZLocation + "\t" + numberOfChildren + "\t" + householdStructure + "\t" + 0
     						 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0

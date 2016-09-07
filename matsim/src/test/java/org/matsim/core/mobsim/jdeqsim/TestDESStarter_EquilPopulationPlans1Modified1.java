@@ -11,7 +11,7 @@ public class TestDESStarter_EquilPopulationPlans1Modified1 extends AbstractJDEQS
 
 	public void test_EquilPopulationPlans1Modified1_TestHandlerDetailedEventChecker() {
 		Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
-		config.plans().setInputFile("test/scenarios/equil/plans1.xml");
+		config.plans().setInputFile("plans1.xml");
 		MatsimRandom.reset(config.global().getRandomSeed());
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		ScenarioUtils.loadScenario(scenario);

@@ -20,8 +20,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingUtils;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
@@ -95,7 +95,7 @@ public class CarTravelTimes {
 		
 		final Population plans = (Population) sc.getPopulation();
 		StreamingUtils.setIsStreaming(plans, true);
-		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
+		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(plans, network);
 		plansWriter.startStreaming(outputPlansFile);
 		
 		// add algorithm to map coordinates to links

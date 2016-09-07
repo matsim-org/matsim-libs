@@ -22,73 +22,53 @@ package org.matsim.contrib.signals.data.ambertimes.v10;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes.XMLSignalSystem;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes.XMLSignalSystem.XMLSignal;
-import org.matsim.contrib.signals.model.Signal;
-import org.matsim.contrib.signals.model.SignalSystem;
 import org.xml.sax.SAXException;
 
 /**
  * @author jbischoff
  * @author dgrether
  */
-public class AmberTimesReader10 extends MatsimJaxbXmlParser {
+public class AmberTimesReader10 implements MatsimReader {
 
 	private static final Logger log = Logger.getLogger(AmberTimesReader10.class);
 	private AmberTimesData amberTimesData;
 
-	public AmberTimesReader10(AmberTimesData amberTimesData, String schemaLocation) {
-		super(schemaLocation);
+	public AmberTimesReader10(AmberTimesData amberTimesData) {
 		this.amberTimesData = amberTimesData;
 	}
 
-	public AmberTimesReader10(AmberTimesData amberTimesData) {
-		this(amberTimesData, AmberTimesWriter10.AMBERTIMES10);
-	}
-	
-	
+
 	@Override
 	public void readFile(final String filename) {
 		// create jaxb infrastructure
 		JAXBContext jc;
-		XMLAmberTimes xmlatdefs = null;
-		InputStream stream = null;
-		try {
+		XMLAmberTimes xmlatdefs;
+		try (InputStream stream = IOUtils.getInputStream(filename)) {
 			jc = JAXBContext.newInstance(org.matsim.jaxb.amberTimes10.ObjectFactory.class);
 			Unmarshaller u = jc.createUnmarshaller();
 			// validate XML file
 			log.info("starting to validate " + filename);
-			super.validateFile(filename, u);
+			u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/amberTimes_v1.0.xsd")));
 			log.info("starting unmarshalling " + filename);
-			stream = IOUtils.getInputStream(filename);
 			xmlatdefs = (XMLAmberTimes) u.unmarshal(stream);
-		} catch (IOException e) {
+		} catch (JAXBException | SAXException | IOException e) {
 			throw new UncheckedIOException(e);
-		} catch (JAXBException e) {
-			throw new UncheckedIOException(e);
-		} catch (SAXException e) {
-			throw new UncheckedIOException(e);
-		} catch (ParserConfigurationException e) {
-			throw new UncheckedIOException(e);
-		} finally {
-			try {
-				if (stream != null) {
-					stream.close();
-				}
-			} catch (IOException e) {
-				log.warn("Could not close stream.", e);
-			}
 		}
 
 		// convert from Jaxb types to MATSim-API conform types

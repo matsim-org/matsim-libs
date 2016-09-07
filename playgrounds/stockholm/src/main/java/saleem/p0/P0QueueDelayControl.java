@@ -15,15 +15,14 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkImpl;
 
 
 public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEventHandler, PersonArrivalEventHandler{
-	NetworkImpl network;
+	Network network;
 	double lastarrivaltime;
 	Link link2, link4, link5;
 	double delaylink2, delaylink4;
@@ -45,7 +44,7 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 	String str="";
 	public static List<NetworkChangeEvent> events = new ArrayList<NetworkChangeEvent>() ;
 	int iter;
-	P0QueueDelayControl(NetworkImpl network, int iter){
+	P0QueueDelayControl(Network network, int iter){
 		this.iter=iter;
 		this.network=network;
 		 link2 = network.getLinks().get(Id.create("2", Link.class));
@@ -56,9 +55,9 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 		 satcapacity5 = link5.getCapacity();
 		 events = new ArrayList<NetworkChangeEvent>() ;
 		 
-		 NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(21600 + Math.random()/10000);//Assuming the simulations start at 06:00
+		 NetworkChangeEvent change = new NetworkChangeEvent(21600 + Math.random()/10000);//Assuming the simulations start at 06:00
 		 change.addLink(link2);
-		 change.setFlowCapacityChange((new ChangeValue(ChangeType.ABSOLUTE, 500.0/3600.0)));
+		 change.setFlowCapacityChange((new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 500.0/3600.0)));
 		 addNetworkChangeEvent(change);
 	}
 	public void printDelayStats(){
@@ -117,7 +116,7 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 				 if(capacity4 == satcapacity4){
 					 capacity4=satcapacity4*satcapacity5/combinedsatcapacity;
 				 }
-				 NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(21600 + Math.random()/10000);//Assuming the simulations start at 06:00
+				 NetworkChangeEvent change = new NetworkChangeEvent(21600 + Math.random()/10000);//Assuming the simulations start at 06:00
 				 change.addLink(link2);
 				 //change.setFlowCapacityChange((new ChangeValue(ChangeType.FACTOR, capacity2/satcapacity5)));
 				 change.setFlowCapacityChange((new ChangeValue(ChangeType.FACTOR, capacity2/satcapacity5)));
@@ -125,7 +124,7 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 				 //network.addNetworkChangeEvent(change);
 				 //addNetworkChangeEvent(change);
 				 str = "Time: " + change.getStartTime() + " Link: " + ((Link)change.getLinks().toArray()[0]).getId() + " Factor: " + change.getFlowCapacityChange().getValue() + " Iter: " + iter + "\n";
-				 NetworkChangeEvent change1 = network.getFactory().createNetworkChangeEvent(21600 + Math.random()/10000);
+				 NetworkChangeEvent change1 = new NetworkChangeEvent(21600 + Math.random()/10000);
 				 change1.addLink(link4);
 				 change1.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, capacity4/satcapacity5));//Allowing due share
 				 //addNetworkChangeEvent(change1);
@@ -227,12 +226,12 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 	   capacity4 = link4.getCapacity();
 	   //double factor = 200/(iter+1);//To make the capacity change dependent on number of day/iteration
 	   double factor = 200;
-	   ((LinkImpl)link4).getFlowCapacityPerSec();
+	   ((Link)link4).getFlowCapacityPerSec();
 	   double abs = Math.abs(p2-p4);
 	   //-100 for starting from start of time bin,  (iter+1)/1000 + Math.random()/10000 for ordering the events based on iteration number as well as limiting it from exceptions due to two events on same time
 	   if (p2>p4 && factor2<0.8 && ctevents<iter){
 		   		ctevents++;
-			   	NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(time);//To ensure the change takes effect at the start of the time bin
+			   	NetworkChangeEvent change = new NetworkChangeEvent(time);//To ensure the change takes effect at the start of the time bin
 				change.addLink(link2);
 				change.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 1+factor/capacity2));
 				 //addNetworkChangeEvent(change);
@@ -241,7 +240,7 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 				 str += "Time: " + change.getStartTime() + " Link: " + ((Link)change.getLinks().toArray()[0]).getId() + " Factor: " + change.getFlowCapacityChange().getValue() + " Iter: " + iter + "\n";
 				 factor2=factor2*(1+factor/capacity2);
 				
-				NetworkChangeEvent change1 = network.getFactory().createNetworkChangeEvent(time);
+				NetworkChangeEvent change1 = new NetworkChangeEvent(time);
 				change1.addLink(link4);
 				change1.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 1-factor/capacity4));
 				//addNetworkChangeEvent(change1);
@@ -252,7 +251,7 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 	   }
 	   else if (p4>p2 && factor4<0.8 && ctevents<iter){
 		   		ctevents++;
-			   	NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(time);
+			   	NetworkChangeEvent change = new NetworkChangeEvent(time);
 				change.addLink(link2);
 				change.setFlowCapacityChange(new NetworkChangeEvent.ChangeValue(ChangeType.FACTOR, 1-factor/capacity2));
 				//network.addNetworkChangeEvent(change);
@@ -261,7 +260,7 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 				 str += "Time: " + change.getStartTime() + " Link: " + ((Link)change.getLinks().toArray()[0]).getId() + " Factor: " + change.getFlowCapacityChange().getValue() + " Iter: " + iter + "\n";
 				 factor2=factor2*(1-factor/capacity2);
 				
-				NetworkChangeEvent change1 = network.getFactory().createNetworkChangeEvent(time);
+				NetworkChangeEvent change1 = new NetworkChangeEvent(time);
 				change1.addLink(link4);
 				change1.setFlowCapacityChange(new NetworkChangeEvent.ChangeValue(ChangeType.FACTOR, 1+factor/capacity4));
 				//network.addNetworkChangeEvent(change1);

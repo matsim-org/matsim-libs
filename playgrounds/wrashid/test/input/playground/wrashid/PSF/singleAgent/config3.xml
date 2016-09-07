@@ -13,15 +13,15 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="&TESTBASE;/network.xml" />
+		<param name="inputNetworkFile" value="network.xml" />
 	</module>
 
 	<module name="facilities">
-		<param name="inputFacilitiesFile" value="&TESTBASE;/facilities.xml" />
+		<param name="inputFacilitiesFile" value="facilities.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="&TESTBASE;/plans2.xml" />
+		<param name="inputPlansFile" value="plans2.xml" />
 	</module>
 
 	<module name="controler">

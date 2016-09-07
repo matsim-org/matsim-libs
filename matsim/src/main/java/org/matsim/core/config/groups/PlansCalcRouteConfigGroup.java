@@ -293,9 +293,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 				pars.setLocked(); 
 			}
 			final String mode = ((ModeRoutingParams) pars).getMode();
-			final ModeRoutingParams old =
-				map.put( mode ,
-					(ModeRoutingParams)	pars );
+			final ModeRoutingParams old = map.put( mode , (ModeRoutingParams)	pars );
 			if ( old != null ) throw new IllegalStateException( "several parameter sets for mode "+mode );
 		}
 

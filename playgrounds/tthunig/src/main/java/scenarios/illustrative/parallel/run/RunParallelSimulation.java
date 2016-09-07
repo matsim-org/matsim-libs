@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsWriter20;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsWriter20;
@@ -45,7 +45,7 @@ import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeC
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
@@ -115,7 +115,7 @@ public final class RunParallelSimulation {
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		if (signalsConfigGroup.isUseSignalSystems()) {
 			scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-					new SignalsScenarioLoader(signalsConfigGroup).loadSignalsData());
+					new SignalsDataLoader(signalsConfigGroup).loadSignalsData());
 			createSignals(scenario);
 		}
 		

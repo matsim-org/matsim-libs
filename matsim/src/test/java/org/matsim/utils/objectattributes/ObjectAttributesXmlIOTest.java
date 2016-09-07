@@ -46,7 +46,7 @@ public class ObjectAttributesXmlIOTest {
 		new ObjectAttributesXmlWriter(oa1).writeFile(this.utils.getOutputDirectory() + "oa.xml");
 
 		ObjectAttributes oa2 = new ObjectAttributes();
-		new ObjectAttributesXmlReader(oa2).parse(this.utils.getOutputDirectory() + "oa.xml");
+		new ObjectAttributesXmlReader(oa2).readFile(this.utils.getOutputDirectory() + "oa.xml");
 		Assert.assertEquals("A", oa2.getAttribute("one", "a"));
 		Assert.assertEquals(Integer.valueOf(1), oa2.getAttribute("one", "b"));
 		Assert.assertEquals(Double.valueOf(1.5), oa2.getAttribute("two", "c"));
@@ -68,7 +68,7 @@ public class ObjectAttributesXmlIOTest {
 		ObjectAttributes oa2 = new ObjectAttributes();
 		ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(oa2);
 		reader.putAttributeConverter(MyTuple.class, new MyTupleConverter());
-		reader.parse(this.utils.getOutputDirectory() + "oa.xml");
+		reader.readFile(this.utils.getOutputDirectory() + "oa.xml");
 		
 		Object o = oa2.getAttribute("1", "A");
 		Assert.assertNotNull(o);

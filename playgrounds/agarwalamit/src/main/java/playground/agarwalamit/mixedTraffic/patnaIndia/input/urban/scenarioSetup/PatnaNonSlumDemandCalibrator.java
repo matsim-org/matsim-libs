@@ -81,7 +81,7 @@ public class PatnaNonSlumDemandCalibrator {
 	}
 
 	public static void main(String[] args) {
-		String outputFile = PatnaUtils.INPUT_FILES_DIR+"/plans/tripDiaryDataIncome/nonSlum_27-42_imputed.txt";
+		String outputFile = PatnaUtils.INPUT_FILES_DIR+"/raw/plans/tripDiaryDataIncome/nonSlum_27-42_imputed.txt";
 		new PatnaNonSlumDemandCalibrator().processForZone27To42(outputFile);
 	}
 
@@ -98,10 +98,17 @@ public class PatnaNonSlumDemandCalibrator {
 			}
 		}
 
-		List<Integer> destinationZones = new ArrayList<>();
+		List<Integer> destinationZones_HBE = new ArrayList<>(); 
+		{ // for education .. // zones are OuterCordonUtils.getAreaType2ZoneIds().get("Educational");
+			for (int idx = 0; idx < REQUIRED_HBE_PLANS; idx++) {
+				destinationZones_HBE.add(RandomNumberUtils.getUniformlyRandomNumber(37, 42));
+			}
+		}
+		
+		List<Integer> destinationZones_HBS_HBO = new ArrayList<>();
 		{//destination zones == can be anything between 1 to 72.
-			for (int idx = 0; idx < TOTAL_PLANS_REQUIRED; idx++) {
-				destinationZones.add(RandomNumberUtils.getUniformlyRandomNumber(1, 72));
+			for (int idx = 0; idx < REQUIRED_HBS_PLANS+REQUIRED_HBO_PLANS; idx++) {
+				destinationZones_HBS_HBO.add(RandomNumberUtils.getUniformlyRandomNumber(1, 72));
 			}
 		}
 
@@ -139,34 +146,6 @@ public class PatnaNonSlumDemandCalibrator {
 			modes.addAll( RandomNumberUtils.getRandomStringsFromDiscreteDistribution(groupNumbers, REQUIRED_HBO_PLANS ) );
 		}
 
-		// daily cost == can be anything between 1 to 5; see Table 5-8
-		// nonSlum; (interval -share) 1-22, 2-52, 3-14, 4-8, 5-3
-		List<String> dailyCostInterval = new ArrayList<>();
-		{
-			SortedMap<String, Double> groupNumbers = new TreeMap<>();
-			groupNumbers.put("1", 0.22);
-			groupNumbers.put("2", 0.52);
-			groupNumbers.put("3", 0.14);
-			groupNumbers.put("4", 0.08);
-			groupNumbers.put("5", 0.03);
-			dailyCostInterval = RandomNumberUtils.getRandomStringsFromDiscreteDistribution(groupNumbers, TOTAL_PLANS_REQUIRED);
-		}
-
-		// incomeInterval == can be anything between 1 to 7; see Table 5-7
-		// nonSlum; (interval - cummulative) 1 - 1, 2- 2, 3 -23, 4-50, 5-68, 6-81, 7-100
-		List<String> incomeInterval = new ArrayList<>();
-		{
-			SortedMap<String, Double> groupNumbers = new TreeMap<>();
-			groupNumbers.put("1", 0.01);
-			groupNumbers.put("2", 0.01);
-			groupNumbers.put("3", 0.21);
-			groupNumbers.put("4", 0.27);
-			groupNumbers.put("5", 0.18);
-			groupNumbers.put("6", 0.13);
-			groupNumbers.put("7", 0.19);
-			incomeInterval = RandomNumberUtils.getRandomStringsFromDiscreteDistribution(groupNumbers, TOTAL_PLANS_REQUIRED);
-		}
-
 		// now write the data
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try {
@@ -177,16 +156,25 @@ public class PatnaNonSlumDemandCalibrator {
 
 			for( int index = 0; index< originZones.size(); index++ ) {
 				writer.write( "NA\tNA\tNA\tNA\tNA\t" ); //all NA's
-				writer.write( incomeInterval.get( index ) + "\t" );
-				writer.write( dailyCostInterval.get( index ) + "\t" );
-				writer.write( originZones.get( index ) + "\t" );
-				writer.write( destinationZones.get( index ) + "\t" );
 
 				String tripPurpose ;
-				if( index < REQUIRED_HBE_PLANS ) tripPurpose = HBE;
-				else if( index < REQUIRED_HBE_PLANS + REQUIRED_HBS_PLANS ) tripPurpose = HBS;
-				else tripPurpose = HBO;
+				String destinationZone ;
+				if( index < REQUIRED_HBE_PLANS ) {
+					tripPurpose = HBE;
+					destinationZone = String.valueOf( destinationZones_HBE.get(index) );
+				} else if( index < REQUIRED_HBE_PLANS + REQUIRED_HBS_PLANS ) {
+					tripPurpose = HBS;
+					destinationZone = String.valueOf( destinationZones_HBS_HBO.get(index-REQUIRED_HBE_PLANS) );
+				} else {
+					tripPurpose = HBO;
+					destinationZone = String.valueOf( destinationZones_HBS_HBO.get(index-REQUIRED_HBE_PLANS-REQUIRED_HBS_PLANS) );
+				}
 
+				writer.write( "a" + "\t" );
+				writer.write( "a" + "\t" );
+				writer.write( originZones.get( index ) + "\t" );
+				writer.write( destinationZone + "\t" );
+				
 				writer.write( tripPurpose + "\t");
 				writer.write( modes.get(index) + "\t");
 				writer.write( "NA\n" );	

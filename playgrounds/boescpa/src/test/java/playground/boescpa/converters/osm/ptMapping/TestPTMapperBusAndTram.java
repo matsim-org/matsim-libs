@@ -25,7 +25,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;

@@ -35,8 +35,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
@@ -77,7 +78,7 @@ public class Example3D_PtaSample {
 
 		/* Parse MATSim network. */
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc.getNetwork()).parse(path + "data/networks/pta_" + network + ".xml.gz");
+		new MatsimNetworkReader(sc.getNetwork()).readFile(path + "data/networks/pta_" + network + ".xml.gz");
 		
 		/* Build the regular grid. */
 		buildElevationGrid(sc.getNetwork(), -5.0);
@@ -98,7 +99,7 @@ public class Example3D_PtaSample {
 			Coord c = coordinateTransformer.transform(n.getCoord());
 			try{
 				double elevation = srtmTile.getElevation(c.getX(), c.getY());
-				n.getCoord().setZ(elevation);
+				n.setCoord(CoordUtils.createCoord(c.getX(), c.getY(), elevation));
 				nodesWithElevation++;
 			} catch(Exception e){
 				/* Ignore the node. */

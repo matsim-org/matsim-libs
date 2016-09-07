@@ -34,9 +34,9 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.population.algorithms.XY2Links;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class SampleFromCommercialPlans {
@@ -85,7 +85,7 @@ public class SampleFromCommercialPlans {
 		PopulationFactory pf = sNew.getPopulation().getFactory();
 		// Network.
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sNew.getNetwork());
-		nr.parse(networkFile);
+		nr.readFile(networkFile);
 		XY2Links xy = new XY2Links(sNew.getNetwork(), null);
 
 		int id = Integer.parseInt(firstId);
@@ -96,7 +96,7 @@ public class SampleFromCommercialPlans {
 			String filename = root + "plansGauteng5000_Sample" + i + ".xml";
 			Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			PopulationReader pr = new PopulationReader(s);
-			pr.parse(filename);
+			pr.readFile(filename);
 			listSc.add(s);
 		}
 		
@@ -145,7 +145,7 @@ public class SampleFromCommercialPlans {
 			log.info("Combining car and commercial vehicles.");
 			Scenario car = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			PopulationReader pr = new PopulationReader(car);
-			pr.parse(carFile);
+			pr.readFile(carFile);
 			
 			for(Id idCar : car.getPopulation().getPersons().keySet()){
 				Person carPerson = car.getPopulation().getPersons().get(idCar);

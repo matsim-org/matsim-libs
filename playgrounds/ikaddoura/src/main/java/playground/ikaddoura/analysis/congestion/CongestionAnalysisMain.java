@@ -78,7 +78,7 @@ public class CongestionAnalysisMain {
 		reader.readFile(eventsFile);
 		
 		CongestionEventsReader congestionEventsReader = new CongestionEventsReader(events);		
-		congestionEventsReader.parse(eventsFile);
+		congestionEventsReader.readFile(eventsFile);
 
 		System.out.println("Delay sum from marginal congestion effects: " + handler1.getDelaySum() );
 		System.out.println("Delay sum from each link leave event: " + handler2.getTActMinusT0Sum() );

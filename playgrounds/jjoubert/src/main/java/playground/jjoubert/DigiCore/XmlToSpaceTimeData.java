@@ -50,7 +50,7 @@ public class XmlToSpaceTimeData {
 		for(String s : files){
 			/* Read in the Digicore vehicle's xml file. */
 			DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-			dvr.parse(args[0] + s + ".xml.gz");
+			dvr.readFile(args[0] + s + ".xml.gz");
 			DigicoreVehicle vehicle = dvr.getVehicle(); 
 			
 			/* Create the writer. */

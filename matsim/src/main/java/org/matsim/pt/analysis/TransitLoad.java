@@ -38,7 +38,6 @@ import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
@@ -56,10 +55,6 @@ public class TransitLoad implements TransitDriverStartsEventHandler, VehicleArri
 	private final Map<Id<Vehicle>, VehicleData> vehicleData = new HashMap<>();
 
 	public TransitLoad() {
-	}
-
-	@Deprecated
-	public TransitLoad(final TransitSchedule schedule) {
 	}
 
 	public int getLoadAtDeparture(final TransitLine line, final TransitRoute route, final TransitStopFacility stopFacility, final Departure departure) {
@@ -127,9 +122,7 @@ public class TransitLoad implements TransitDriverStartsEventHandler, VehicleArri
 	@Override
 	public void reset(final int iteration) {
 		this.vehicleFacilityMap.clear();
-		if (this.vehicleData != null) {
-			this.vehicleData.clear();
-		}
+		this.vehicleData.clear();
 	}
 
 	private StopInformation getStopInformation(final Id<TransitLine> lineId, final Id<TransitRoute> routeId, final Id<TransitStopFacility> stopFacilityId, final Id<Departure> departureId, final boolean createIfMissing) {
@@ -194,7 +187,7 @@ public class TransitLoad implements TransitDriverStartsEventHandler, VehicleArri
 	}
 
 	/*package*/ static class RouteData {
-		public final Map<Id<TransitStopFacility>, StopData> stopData = new HashMap<Id<TransitStopFacility>, StopData>(); // use stopFacilityId as key
+		public final Map<Id<TransitStopFacility>, StopData> stopData = new HashMap<>(); // use stopFacilityId as key
 	}
 
 	/*package*/ static class StopData {

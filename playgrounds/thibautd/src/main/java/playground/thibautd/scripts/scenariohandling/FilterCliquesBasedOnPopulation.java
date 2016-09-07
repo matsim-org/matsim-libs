@@ -45,10 +45,10 @@ public class FilterCliquesBasedOnPopulation {
 		final String outCliques = args[2];
 
 		PlansParser plansParser = new PlansParser();
-		plansParser.parse( plansFile );
+		plansParser.readFile( plansFile );
 
 		CliquesParser cliquesParser = new CliquesParser( plansParser );
-		cliquesParser.parse( cliquesFile );
+		cliquesParser.readFile( cliquesFile );
 
 		(new CliquesWriter( cliquesParser.cliques )).writeFile( outCliques );
 	}
@@ -82,7 +82,7 @@ public class FilterCliquesBasedOnPopulation {
 		private boolean isToKeep = false;
 
 		public CliquesParser(final PlansParser plans) {
-			super( false );
+			setValidating( false );
 			agentsToKeep = new TreeSet<>(plans.ids);
 		}
 

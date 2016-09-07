@@ -33,6 +33,7 @@ import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
+import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 
 
 /**
@@ -149,7 +150,7 @@ public class OTFClientQuadTree extends QuadTree<OTFDataReader> {
 	 * I think that this requests the scene graph for a given time step and for the rectangle that is visible.  
 	 */
 	private SceneGraph createSceneGraph(final int time, Rect rect) {
-		List<Rect> rects = new LinkedList<Rect>();
+		List<Rect> rects = new LinkedList<>();
 		/*
 		 * This hack ensures that vehicles on links are drawn even if their center is not visible
 		 */

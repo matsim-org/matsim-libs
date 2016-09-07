@@ -24,11 +24,11 @@ import java.io.File;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -66,7 +66,7 @@ public class GVPopConverter {
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();
-		MatsimPopulationReader popReader = new PopulationReader(sc);
+		MatsimReader popReader = new PopulationReader(sc);
 		popReader.readFile(inPlansFile + ".xml.gz");
 
 		DuplicatePlans dp = new DuplicatePlans(net, inPop, "tmp.xml.gz", numberOfAdditionalCopies);

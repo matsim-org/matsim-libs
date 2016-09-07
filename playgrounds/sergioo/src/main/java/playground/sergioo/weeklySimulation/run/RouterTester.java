@@ -8,7 +8,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;

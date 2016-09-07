@@ -68,7 +68,7 @@ public class DTVAnalyzer implements IterationEndsListener, IterationStartsListen
 	public DTVAnalyzer(String countsfile, LinkOccupancyCalculator calculator, double factor) {
 		obsCounts = new Counts();
 		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(obsCounts);
-		reader.parse(countsfile);
+		reader.readFile(countsfile);
 		
 		this.simCounts = calculator;
 		this.factor = factor;

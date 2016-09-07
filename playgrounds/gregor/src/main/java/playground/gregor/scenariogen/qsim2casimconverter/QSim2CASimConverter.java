@@ -33,15 +33,15 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.NetworkWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class QSim2CASimConverter {
@@ -54,12 +54,12 @@ public class QSim2CASimConverter {
 		Config c = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(c);
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc.getNetwork());
-		nr.parse(inputDir + "/output_network.xml.gz");
+		nr.readFile(inputDir + "/output_network.xml.gz");
 		convertNet(sc.getNetwork());
 		NetworkWriter nw = new NetworkWriter(sc.getNetwork());
 		nw.write(outputDir + "/network.xml.gz");
 
-		MatsimPopulationReader pr = new PopulationReader(sc);
+		MatsimReader pr = new PopulationReader(sc);
 		pr.readFile(inputDir + "/ITERS/it.0/0.plans.xml.gz");
 		convertPlans(sc.getPopulation());
 		PopulationWriter pw = new PopulationWriter(sc.getPopulation(),

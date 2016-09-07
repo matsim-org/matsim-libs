@@ -33,6 +33,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.utils.ListUtils;
+import playground.agarwalamit.utils.PersonFilter;
 
 /**
  * @author amit
@@ -46,11 +47,16 @@ public class ModalTravelTimeAnalyzer {
 	private final SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TotalTravelTime = new TreeMap<String, Map<Id<Person>,Double>>();
 	private final SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2AvgTravelTime = new TreeMap<String, Map<Id<Person>,Double>>();
 	
-	private final ModalTripTravelTimeHandler travelTimeHandler = new ModalTripTravelTimeHandler();
+	private final FilteredModalTripTravelTimeHandler travelTimeHandler ;
 	private final String eventsFile;
 	
 	public ModalTravelTimeAnalyzer(final String inputEventsFile) {
+		this(inputEventsFile,null,null);
+	}
+	
+	public ModalTravelTimeAnalyzer(final String inputEventsFile, final String userGroup, final PersonFilter pf) {
 		this.eventsFile = inputEventsFile;
+		travelTimeHandler = new FilteredModalTripTravelTimeHandler(userGroup, pf);
 	}
 	
 	public static void main(String[] args) {

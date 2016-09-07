@@ -26,8 +26,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.incidents.data.TrafficItem;
@@ -108,7 +109,7 @@ public class TMCAlerts {
 			} else {
 				
 				Network network = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
-				NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
+				NetworkFactory nf = network.getFactory();
 								
 				// closed roads
 				if (containsOrEndsWith(trafficItem, "C1")

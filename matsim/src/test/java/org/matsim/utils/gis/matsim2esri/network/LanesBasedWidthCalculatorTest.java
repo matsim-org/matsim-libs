@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 
 /**
@@ -46,8 +45,8 @@ public class LanesBasedWidthCalculatorTest {
 
 
 		Assert.assertEquals("The default in the Network is set to a value that is possibly not conform to the default in network_v1.dtd", 3.75, net.getEffectiveLaneWidth(), 1e-10);
-		((NetworkImpl)net).setEffectiveLaneWidth(1.0);
-		double w = new LanesBasedWidthCalculator((NetworkImpl) net, 1.0).getWidth(l1);
+		((Network)net).setEffectiveLaneWidth(1.0);
+		double w = new LanesBasedWidthCalculator((Network) net, 1.0).getWidth(l1);
 		Assert.assertFalse(Double.isNaN(w));
 		Assert.assertEquals(2.0, w, 1e-10);
 	}

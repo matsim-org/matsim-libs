@@ -31,7 +31,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.ReplayEvents;
 import org.matsim.core.events.EventsManagerModule;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
@@ -64,7 +64,7 @@ public class EventsToExperiencedPlans {
 		final String inPopFile = args[ 1 ];
 		final String outputPlansFile = args[ 2 ];
 
-		new PopulationReader( inputSc ).parse( inPopFile );
+		new PopulationReader( inputSc ).readFile( inPopFile );
 
 		final EventsToPlans eventsToPlans =
 			new EventsToPlans(

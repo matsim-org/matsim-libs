@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.counts.*;
 
@@ -49,19 +49,19 @@ public class OSM2MatsimCounts {
 
 		Counts<Link> counts = new Counts();
 		CountsReaderMatsimV1 cReader = new CountsReaderMatsimV1(counts);
-		cReader.parse(osmCountsFile);
+		cReader.readFile(osmCountsFile);
 
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(scenario.getNetwork());
-		nReader.parse(networkFile);
+		nReader.readFile(networkFile);
 
 		Network network = scenario.getNetwork();
 
 		Map<String, Link> mapping = new HashMap<String, Link>();
 
 		for (Link link : network.getLinks().values()) {
-			String tokens[] = ((LinkImpl) link).getOrigId().split(",");
+			String tokens[] = NetworkUtils.getOrigId( ((Link) link) ).split(",");
 			for (String token : tokens) {
 				mapping.put(token, link);
 			}

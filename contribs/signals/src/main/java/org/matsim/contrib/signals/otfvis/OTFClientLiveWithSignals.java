@@ -63,7 +63,6 @@ public class OTFClientLiveWithSignals {
 				connectionManager.connectLinkToWriter(OTFLinkAgentsHandler.Writer.class);
 				connectionManager.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 				connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
-				connectionManager.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);
 				connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
 				
 				if (config.transit().isUseTransit()) {
@@ -92,10 +91,9 @@ public class OTFClientLiveWithSignals {
 				OTFClientControl.getInstance().setOTFVisConfig(visconf); // has to be set before OTFClientQuadTree.getConstData() is invoked!
 				OTFServerQuadTree serverQuadTree = server.getQuad(connectionManager);
 				OTFClientQuadTree clientQuadTree = serverQuadTree.convertToClient(server, connectionManager);
-				clientQuadTree.getConstData();
 				OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, otfVisConfigGroup, canvas, hostControl);
 				OTFControlBar hostControlBar = new OTFControlBar(server, hostControl, mainDrawer);
-				OTFQueryControl queryControl = new OTFQueryControl(server, hostControlBar, visconf);
+				OTFQueryControl queryControl = new OTFQueryControl(server, visconf);
 				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, visconf);
 				queryControl.setQueryTextField(queryControlBar.getTextField());
 				OTFClient otfClient = new OTFClient(canvas, server, hostControlBar, mainDrawer, saver);

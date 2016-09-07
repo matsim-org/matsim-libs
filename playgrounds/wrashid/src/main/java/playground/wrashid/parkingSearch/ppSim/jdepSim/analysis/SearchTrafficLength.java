@@ -50,7 +50,7 @@ public class SearchTrafficLength {
 		events.addHandler(trafficOnRoadsCount);
 		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(eventsFile);
+		reader.readFile(eventsFile);
 		
 		trafficOnRoadsCount.printTravelDistances();
 	}

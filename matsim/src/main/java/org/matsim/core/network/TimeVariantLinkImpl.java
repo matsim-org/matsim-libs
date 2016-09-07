@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.*;
  * @author illenberger
  *
  */
-public class TimeVariantLinkImpl extends LinkImpl {
+ final class TimeVariantLinkImpl extends LinkImpl {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -38,44 +38,44 @@ public class TimeVariantLinkImpl extends LinkImpl {
 
 	private TreeMap<Double,NetworkChangeEvent> changeEvents;
 
-    private final TimeVariantAttribute variableFreespeed;
-    private final TimeVariantAttribute variableFlowCapacity;
-    private final TimeVariantAttribute variableLanes;
-	
+	private final TimeVariantAttribute variableFreespeed;
+	private final TimeVariantAttribute variableFlowCapacity;
+	private final TimeVariantAttribute variableLanes;
+
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-    public static TimeVariantLinkImpl createLinkWithVariableIntervalAttributes(final Id<Link> id,
-            final Node from, final Node to, final Network network, final double length,
-            final double freespeed, final double capacity, final double lanes) {
-        return new TimeVariantLinkImpl(id, from, to, network, length, freespeed, capacity, lanes,
-                new VariableIntervalTimeVariantAttribute(),
-                new VariableIntervalTimeVariantAttribute(),
-                new VariableIntervalTimeVariantAttribute());
-    }
+	public static TimeVariantLinkImpl createLinkWithVariableIntervalAttributes(final Id<Link> id,
+			final Node from, final Node to, final Network network, final double length,
+			final double freespeed, final double capacity, final double lanes) {
+		return new TimeVariantLinkImpl(id, from, to, network, length, freespeed, capacity, lanes,
+				new VariableIntervalTimeVariantAttribute(),
+				new VariableIntervalTimeVariantAttribute(),
+				new VariableIntervalTimeVariantAttribute());
+	}
 
 
-    public static TimeVariantLinkImpl createLinkWithFixedIntervalAttributes(final Id<Link> id,
-            final Node from, final Node to, final Network network, final double length,
-            final double freespeed, final double capacity, final double lanes, final int interval,
-            final int maxTime) {
-        return new TimeVariantLinkImpl(id, from, to, network, length, freespeed, capacity, lanes,
-                new FixedIntervalTimeVariantAttribute(interval, maxTime),
-                new FixedIntervalTimeVariantAttribute(interval, maxTime),
-                new FixedIntervalTimeVariantAttribute(interval, maxTime));
-    }
+	public static TimeVariantLinkImpl createLinkWithFixedIntervalAttributes(final Id<Link> id,
+			final Node from, final Node to, final Network network, final double length,
+			final double freespeed, final double capacity, final double lanes, final int interval,
+			final int maxTime) {
+		return new TimeVariantLinkImpl(id, from, to, network, length, freespeed, capacity, lanes,
+				new FixedIntervalTimeVariantAttribute(interval, maxTime),
+				new FixedIntervalTimeVariantAttribute(interval, maxTime),
+				new FixedIntervalTimeVariantAttribute(interval, maxTime));
+	}
 
-   
-    TimeVariantLinkImpl(final Id<Link> id, final Node from, final Node to, final Network network,
-            final double length, final double freespeed, final double capacity, final double lanes,
-            TimeVariantAttribute variableFreespeed, TimeVariantAttribute variableFlowCapacity,
-            TimeVariantAttribute variableLanes) {
-        super(id, from, to, network, length, freespeed, capacity, lanes);
-        this.variableFreespeed = variableFreespeed;
-        this.variableFlowCapacity = variableFlowCapacity;
-        this.variableLanes = variableLanes;
-    }
+
+	TimeVariantLinkImpl(final Id<Link> id, final Node from, final Node to, final Network network,
+			final double length, final double freespeed, final double capacity, final double lanes,
+			TimeVariantAttribute variableFreespeed, TimeVariantAttribute variableFlowCapacity,
+			TimeVariantAttribute variableLanes) {
+		super(id, from, to, network, length, freespeed, capacity, lanes);
+		this.variableFreespeed = variableFreespeed;
+		this.variableFlowCapacity = variableFlowCapacity;
+		this.variableLanes = variableLanes;
+	}
 
 
 	/**
@@ -136,15 +136,11 @@ public class TimeVariantLinkImpl extends LinkImpl {
 		this.recalcFreespeed();
 	}
 
-
-	/**
-	 * @param time - the time in seconds.
-	 * @return the freespeed travel time at time <tt>time</tt>.
-	 */
-	@Override
-	public synchronized double getFreespeedTravelTime(final double time) {
-		return getLength()/getFreespeed(time);
-	}
+	// ---
+	// The standard LinkImpl memorizes the raw capacity, and computes the capacity_per_sec when demanded.
+	// The TimeVariantLinkImpl memorizes the capacity_per_sec, and computes the raw capacity when demanded.
+	// The reason presumably is that the setters are so, and you don't want to return slightly changed numbers
+	// because of rounding errors.  
 
 	/**
 	 * @param time - the time in seconds.
@@ -159,7 +155,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 
 		return variableFlowCapacity.getValue(time);
 	}
-	
+
 	@Override
 	public final void setCapacity(double capacityPerNetworkCapcityPeriod){
 		super.setCapacity(capacityPerNetworkCapcityPeriod);
@@ -179,6 +175,12 @@ public class TimeVariantLinkImpl extends LinkImpl {
 		return getFlowCapacityPerSec(time) * getCapacityPeriod();
 	}
 
+	private synchronized void recalcFlowCapacity() {
+		double baseFlowCapacityPerSec = this.getCapacity() / getCapacityPeriod();
+		variableFlowCapacity.recalc(changeEvents, TimeVariantAttribute.FLOW_CAPACITY_GETTER, baseFlowCapacityPerSec);
+	}
+
+	// ---
 
 	/**
 	 * @param time - the time in seconds.
@@ -205,14 +207,9 @@ public class TimeVariantLinkImpl extends LinkImpl {
 		this.recalcLanes();
 	}
 
-	
-	private synchronized void recalcFreespeed() {
-	    variableFreespeed.recalc(changeEvents, TimeVariantAttribute.FREESPEED_GETTER, this.getFreespeed() );
-	}
 
-	private synchronized void recalcFlowCapacity() {
-	    double baseFlowCapacity = this.getCapacity() / getCapacityPeriod();
-	    variableFlowCapacity.recalc(changeEvents, TimeVariantAttribute.FLOW_CAPACITY_GETTER, baseFlowCapacity);
+	private synchronized void recalcFreespeed() {
+		variableFreespeed.recalc(changeEvents, TimeVariantAttribute.FREESPEED_GETTER, this.getFreespeed() );
 	}
 
 	private synchronized void recalcLanes() {

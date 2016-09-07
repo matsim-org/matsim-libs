@@ -33,7 +33,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.mrieser.svi.data.ActivityToZoneMappingReader;

@@ -128,7 +128,7 @@ public class EquilEmissionTest {
 		MyEmissionEventHandler emissEventHandler = new MyEmissionEventHandler();
 		events.addHandler(emissEventHandler);
 		int lastIt = sc.getConfig().controler().getLastIteration();
-		reader.parse(outputDirectory + "/ITERS/it."+lastIt+"/"+lastIt+".emission.events.xml.gz");
+		reader.readFile(outputDirectory + "/ITERS/it."+lastIt+"/"+lastIt+".emission.events.xml.gz");
 
 		// first check for cold emission, which are generated only on departure link.
 		for (ColdEmissionEvent e : emissEventHandler.coldEvents ) {

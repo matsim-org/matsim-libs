@@ -29,7 +29,7 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
  * @author nagel
  */
 public final class PopulationWriter implements MatsimWriter {
-
+	
 	private final CoordinateTransformation transformation;
 	private final Population population;
 	private final Network network;
@@ -61,7 +61,7 @@ public final class PopulationWriter implements MatsimWriter {
 	 */
 	@Override
 	public void write(final String filename) {
-		new org.matsim.core.population.PopulationWriter(transformation , this.population, this.network).write(filename);
+		new org.matsim.core.population.io.PopulationWriter(transformation , this.population, this.network).write(filename);
 	}
 
 	/**
@@ -70,7 +70,7 @@ public final class PopulationWriter implements MatsimWriter {
 	 * @param filename
 	 */
 	public void writeV4(final String filename) {
-		new org.matsim.core.population.PopulationWriter(transformation , this.population, this.network).writeV4(filename);
+		new org.matsim.core.population.io.PopulationWriter(transformation , this.population, this.network).writeV4(filename);
 	}
 
 	/**
@@ -79,7 +79,7 @@ public final class PopulationWriter implements MatsimWriter {
 	 * @param filename
 	 */
 	public void writeV5(final String filename) {
-		new org.matsim.core.population.PopulationWriter( transformation , this.population, this.network).writeV5(filename);
+		new org.matsim.core.population.io.PopulationWriter( transformation , this.population, this.network).writeV5(filename);
 	}
 
 }

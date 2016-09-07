@@ -20,9 +20,12 @@
 
 package org.matsim.core.config.groups;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 public final class PlansConfigGroup extends ReflectiveConfigGroup {
@@ -101,7 +104,11 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	public void setInputFile(final String inputFile) {
 		this.inputFile = inputFile;
 	}
-	
+
+	public URL getInputFileURL(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.inputFile);
+	}
+
 	@StringGetter( INPUT_PERSON_ATTRIBUTES_FILE )
 	public String getInputPersonAttributeFile() {
 		return this.inputPersonAttributeFile;
@@ -110,6 +117,14 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( INPUT_PERSON_ATTRIBUTES_FILE )
 	public void setInputPersonAttributeFile(final String inputPersonAttributeFile) {
 		this.inputPersonAttributeFile = inputPersonAttributeFile;
+	}
+
+	public URL getInputPersonAttributeFileURL(URL context) {
+		try {
+			return new URL(context, this.inputPersonAttributeFile);
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@StringGetter( NETWORK_ROUTE_TYPE )

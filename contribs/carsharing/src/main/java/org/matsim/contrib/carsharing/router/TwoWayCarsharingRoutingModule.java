@@ -21,7 +21,7 @@ public class TwoWayCarsharingRoutingModule implements RoutingModule {
 			Facility toFacility, double departureTime, Person person) {
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
 		
-		final Leg leg1 = PopulationUtils.createLeg("twowaycarsharing");
+		final Leg leg1 = PopulationUtils.createLeg("twoway");
 		LinkNetworkRouteImpl route1 = new LinkNetworkRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
 		leg1.setRoute(route1);
 		

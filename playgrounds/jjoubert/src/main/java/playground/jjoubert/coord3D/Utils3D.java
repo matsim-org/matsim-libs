@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -79,7 +79,7 @@ public class Utils3D {
 		LOG.info("Calculating the grade for each link in a network and writing it to file...");
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc.getNetwork()).parse(network);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(network);
 		
 		/* Provide elevation to each node in the network. */
 		LOG.info("Estimating elevation for each network node...");
@@ -87,7 +87,7 @@ public class Utils3D {
 		for(Node node : sc.getNetwork().getNodes().values()){
 			Coord cWgs = ct.transform(node.getCoord());
 			double elev = estimateSrtmElevation(tilePath, cWgs);
-			node.getCoord().setZ(elev);
+			node.setCoord(CoordUtils.createCoord(cWgs.getX(), cWgs.getY(), elev));
 			nodeCounter.incCounter();
 		}
 		nodeCounter.printCounter();
@@ -126,7 +126,8 @@ public class Utils3D {
 	
 	
 	public static double calculateAngle(Link link){
-		if(!link.getFromNode().getCoord().hasZ() || !link.getToNode().getCoord().hasZ()){
+		if(link.getFromNode().getCoord().getZ() == Double.NEGATIVE_INFINITY || 
+				link.getToNode().getCoord().getZ() == Double.NEGATIVE_INFINITY){
 			LOG.error("From node: " + link.getFromNode().getCoord().toString());
 			LOG.error("To node: " + link.getToNode().getCoord().toString());
 			throw new IllegalArgumentException("Cannot calculate angle if both nodes on the link do not have elevation (z) set.");
@@ -142,7 +143,8 @@ public class Utils3D {
 	}
 
 	public static double calculateGrade(Link link){
-		if(!link.getFromNode().getCoord().hasZ() || !link.getToNode().getCoord().hasZ()){
+		if(link.getFromNode().getCoord().getZ() == Double.NEGATIVE_INFINITY || 
+				link.getToNode().getCoord().getZ() == Double.NEGATIVE_INFINITY){
 			LOG.error("From node: " + link.getFromNode().getCoord().toString());
 			LOG.error("To node: " + link.getToNode().getCoord().toString());
 			throw new IllegalArgumentException("Cannot calculate grade if both nodes on the link do not have elevation (z) set.");
@@ -161,29 +163,45 @@ public class Utils3D {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		/* Read in the basic equil network. */
-		new MatsimNetworkReader(sc.getNetwork()).parse("../../matsim/examples/equil/network.xml");
+		new MatsimNetworkReader(sc.getNetwork()).readFile("../../matsim/examples/equil/network.xml");
 		
 		/* Give elevation details to the nodes. The upper nodes are elevated
 		 * by increments of 1%, and the lower nodes by increments of -1%. The
 		 * result is that the shorter section will have double the grade, but
 		 * with the opposite sign. */
-		sc.getNetwork().getNodes().get(Id.createNodeId("3")).getCoord().setZ(400.0);
-		sc.getNetwork().getNodes().get(Id.createNodeId("4")).getCoord().setZ(300.0);
-		sc.getNetwork().getNodes().get(Id.createNodeId("5")).getCoord().setZ(200.0);
-		sc.getNetwork().getNodes().get(Id.createNodeId("6")).getCoord().setZ(100.0);
-		sc.getNetwork().getNodes().get(Id.createNodeId("8")).getCoord().setZ(-100.0);
-		sc.getNetwork().getNodes().get(Id.createNodeId("9")).getCoord().setZ(-200.0);
-		sc.getNetwork().getNodes().get(Id.createNodeId("10")).getCoord().setZ(-300.0);
-		sc.getNetwork().getNodes().get(Id.createNodeId("11")).getCoord().setZ(-400.0);
+		Node n;
+		n = sc.getNetwork().getNodes().get(Id.createNodeId("3"));
+		n.setCoord(CoordUtils.createCoord(n.getCoord().getX(), n.getCoord().getY(), 400.0));
+		n = sc.getNetwork().getNodes().get(Id.createNodeId("4"));
+		n.setCoord(CoordUtils.createCoord(n.getCoord().getX(), n.getCoord().getY(), 300.0));
+		n = sc.getNetwork().getNodes().get(Id.createNodeId("5"));
+		n.setCoord(CoordUtils.createCoord(n.getCoord().getX(), n.getCoord().getY(), 200.0));
+		n = sc.getNetwork().getNodes().get(Id.createNodeId("6"));
+		n.setCoord(CoordUtils.createCoord(n.getCoord().getX(), n.getCoord().getY(), 100.0));
+		n = sc.getNetwork().getNodes().get(Id.createNodeId("8"));
+		n.setCoord(CoordUtils.createCoord(n.getCoord().getX(), n.getCoord().getY(), -100.0));
+		n = sc.getNetwork().getNodes().get(Id.createNodeId("9"));
+		n.setCoord(CoordUtils.createCoord(n.getCoord().getX(), n.getCoord().getY(), -200.0));
+		n = sc.getNetwork().getNodes().get(Id.createNodeId("10"));
+		n.setCoord(CoordUtils.createCoord(n.getCoord().getX(), n.getCoord().getY(), -300.0));
+		n = sc.getNetwork().getNodes().get(Id.createNodeId("11"));
+		n.setCoord(CoordUtils.createCoord(n.getCoord().getX(), n.getCoord().getY(), -400.0));
 		
 		/* The remaining nodes MUST have elevation set, so we set them to 0. */
-		sc.getNetwork().getNodes().get(Id.createNodeId("1")).getCoord().setZ(0.0);
-		sc.getNetwork().getNodes().get(Id.createNodeId("2")).getCoord().setZ(0.0);
-		sc.getNetwork().getNodes().get(Id.createNodeId("7")).getCoord().setZ(0.0);
-		sc.getNetwork().getNodes().get(Id.createNodeId("12")).getCoord().setZ(0.0);
-		sc.getNetwork().getNodes().get(Id.createNodeId("13")).getCoord().setZ(0.0);
-		sc.getNetwork().getNodes().get(Id.createNodeId("14")).getCoord().setZ(0.0);
-		sc.getNetwork().getNodes().get(Id.createNodeId("15")).getCoord().setZ(0.0);
+		n = sc.getNetwork().getNodes().get(Id.createNodeId("1"));
+		n.setCoord(CoordUtils.createCoord(n.getCoord().getX(), n.getCoord().getY(), 0.0));
+		n = sc.getNetwork().getNodes().get(Id.createNodeId("2"));
+		n.setCoord(CoordUtils.createCoord(n.getCoord().getX(), n.getCoord().getY(), 0.0));
+		n = sc.getNetwork().getNodes().get(Id.createNodeId("7"));
+		n.setCoord(CoordUtils.createCoord(n.getCoord().getX(), n.getCoord().getY(), 0.0));
+		n = sc.getNetwork().getNodes().get(Id.createNodeId("12"));
+		n.setCoord(CoordUtils.createCoord(n.getCoord().getX(), n.getCoord().getY(), 0.0));
+		n = sc.getNetwork().getNodes().get(Id.createNodeId("13"));
+		n.setCoord(CoordUtils.createCoord(n.getCoord().getX(), n.getCoord().getY(), 0.0));
+		n = sc.getNetwork().getNodes().get(Id.createNodeId("14"));
+		n.setCoord(CoordUtils.createCoord(n.getCoord().getX(), n.getCoord().getY(), 0.0));
+		n = sc.getNetwork().getNodes().get(Id.createNodeId("15"));
+		n.setCoord(CoordUtils.createCoord(n.getCoord().getX(), n.getCoord().getY(), 0.0));
 		
 		/* Adjust all links to have 2 lanes. */
 		for(Link link : sc.getNetwork().getLinks().values()){

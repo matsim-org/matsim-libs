@@ -73,7 +73,7 @@ public class ActivityStartTimeRunable implements Runnable {
 	public void run() {
 		/* Read the vehicle file. */
 		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-		dvr.parse(this.vehicleFile.getAbsolutePath());
+		dvr.readFile(this.vehicleFile.getAbsolutePath());
 		DigicoreVehicle vehicle = dvr.getVehicle();
 		
 		/* Analyse all the activities. */

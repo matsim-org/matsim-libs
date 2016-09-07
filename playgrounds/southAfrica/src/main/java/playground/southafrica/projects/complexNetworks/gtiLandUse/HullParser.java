@@ -55,7 +55,7 @@ public class HullParser {
 		String outputFilename = args[2];
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new FacilitiesReaderMatsimV1(sc).parse(facilitiesFile);
+		new FacilitiesReaderMatsimV1(sc).readFile(facilitiesFile);
 		
 		ObjectAttributes oa = new ObjectAttributes();
 		ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(oa);
@@ -63,7 +63,7 @@ public class HullParser {
 		oar.putAttributeConverter(Point.class, new HullConverter() );
 		oar.putAttributeConverter(LineString.class, new HullConverter() );
 		oar.putAttributeConverter(Polygon.class, new HullConverter() );
-		oar.parse(facilityAttributeFile);
+		oar.readFile(facilityAttributeFile);
 		
 		LOG.info("Number of facilities to convert: " + sc.getActivityFacilities().getFacilities().size());
 		Counter counter = new Counter("   facilities # ");

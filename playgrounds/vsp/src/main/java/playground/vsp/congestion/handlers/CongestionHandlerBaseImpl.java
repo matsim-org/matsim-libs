@@ -39,8 +39,8 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
@@ -57,14 +57,15 @@ import playground.vsp.congestion.events.CongestionEvent;
  * @author ikaddoura
  *
  */
-public class CongestionHandlerBaseImpl implements CongestionHandler {
+class CongestionHandlerBaseImpl implements CongestionHandler {
+	// if someone needs this public, it should also be final.  kai, aug'16
 
 	private final static Logger log = Logger.getLogger(CongestionHandlerBaseImpl.class);
 
 	private final Scenario scenario;
 	private final EventsManager events;
-	private final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<Id<Vehicle>>();
-	private final Map<Id<Link>, LinkCongestionInfo> linkId2congestionInfo = new HashMap<Id<Link>, LinkCongestionInfo>();
+	private final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<>();
+	private final Map<Id<Link>, LinkCongestionInfo> linkId2congestionInfo = new HashMap<>();
 
 	private double totalDelay = 0.;
 	private double delayNotInternalized_roundingErrors = 0.;

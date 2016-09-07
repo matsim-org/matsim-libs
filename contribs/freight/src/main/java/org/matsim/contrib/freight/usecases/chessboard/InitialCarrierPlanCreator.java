@@ -28,7 +28,7 @@ import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class InitialCarrierPlanCreator {
@@ -139,10 +139,10 @@ public class InitialCarrierPlanCreator {
         new MatsimNetworkReader(scenario.getNetwork()).readFile("input/usecases/chessboard/network/grid9x9_cap20.xml");
 
         Carriers carriers = new Carriers();
-        new CarrierPlanXmlReaderV2(carriers).read("input/usecases/chessboard/freight/carrierPlansWithoutRoutes_10minTW.xml");
+        new CarrierPlanXmlReaderV2(carriers).readFile("input/usecases/chessboard/freight/carrierPlansWithoutRoutes_10minTW.xml");
 
         CarrierVehicleTypes types = new CarrierVehicleTypes();
-        new CarrierVehicleTypeReader(types).read("input/usecases/chessboard/freight/vehicleTypes.xml");
+        new CarrierVehicleTypeReader(types).readFile("input/usecases/chessboard/freight/vehicleTypes.xml");
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 
         for(Carrier carrier : carriers.getCarriers().values()){

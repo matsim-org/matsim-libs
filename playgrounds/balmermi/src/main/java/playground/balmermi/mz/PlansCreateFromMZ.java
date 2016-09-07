@@ -120,18 +120,29 @@ public class PlansCreateFromMZ {
 				entries[3] = Integer.toString(departure);
 
 				// start coordinate (round to hectare)
-				Coord from = new Coord(Double.parseDouble(entries[4].trim()), Double.parseDouble(entries[5].trim()));
-				from.setX(Math.round(from.getX()/100.0)*100);
-				from.setY(Math.round(from.getY()/100.0)*100);
-				entries[4] = Double.toString(from.getX());
-				entries[5] = Double.toString(from.getY());
+//				Coord from = new Coord(Double.parseDouble(entries[4].trim()), Double.parseDouble(entries[5].trim()));
+//				from.setX(Math.round(from.getX()/100.0)*100);
+//				from.setY(Math.round(from.getY()/100.0)*100);
+//				entries[4] = Double.toString(from.getX());
+//				entries[5] = Double.toString(from.getY());
+				double fromX = Double.parseDouble(entries[4].trim()) ;
+				double fromY = Double.parseDouble(entries[5].trim());
+				fromX = Math.round(fromX/100.0)*100;
+				fromY = Math.round(fromY/100.0)*100;
+				entries[4] = Double.toString(fromX);
+				entries[5] = Double.toString(fromY);
 
 				// start coordinate (round to hectare)
-				Coord to = new Coord(Double.parseDouble(entries[6].trim()), Double.parseDouble(entries[7].trim()));
-				to.setX(Math.round(to.getX()/100.0)*100);
-				to.setY(Math.round(to.getY()/100.0)*100);
-				entries[6] = Double.toString(to.getX());
-				entries[7] = Double.toString(to.getY());
+//				to.setX(Math.round(to.getX()/100.0)*100);
+//				to.setY(Math.round(to.getY()/100.0)*100);
+//				entries[6] = Double.toString(to.getX());
+//				entries[7] = Double.toString(to.getY());
+				double toX = Double.parseDouble(entries[6].trim());
+				double toY = Double.parseDouble(entries[7].trim());
+				toX = Math.round(toX/100.0)*100;
+				toY = Math.round(toY/100.0)*100;
+				entries[6] = Double.toString(toX);
+				entries[7] = Double.toString(toY);
 
 				// departure time (min => sec.). A few arrival times are not given, setting to departure time (trav_time=0)
 				int arrival = departure;
@@ -229,19 +240,21 @@ public class PlansCreateFromMZ {
 					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());
 					final String type1 = acttype;
-					final Coord coord = to;
-					Activity act = PopulationUtils.createAndAddActivityFromCoord(((Plan) plan), type1, coord);
+//					final Coord coord = to;
+//					Activity act = PopulationUtils.createAndAddActivityFromCoord(((Plan) plan), type1, coord);
+					Activity act = PopulationUtils.createAndAddActivityFromCoord((plan), type1, new Coord( toX, toY ) );
 					act.setStartTime(arrival);
 
 					// coordinate consistency check
-					if ((from_act.getCoord().getX() != from.getX()) || (from_act.getCoord().getY() != from.getY())) {
+					if ((from_act.getCoord().getX() != fromX) || (from_act.getCoord().getY() != fromY)) {
 //						System.out.println("        pid=" + person.getId() + ": previous destination not equal to the current origin (dist=" + from_act.getCoord().calcDistance(from) + ")");
 						coord_err_pids.add(pid);
 					}
 				}
 				else {
-					final Coord coord = from;
-					Activity homeAct = PopulationUtils.createAndAddActivityFromCoord(((Plan) plan), (String) HOME, coord);
+//					final Coord coord = from;
+//					Activity homeAct = PopulationUtils.createAndAddActivityFromCoord(((Plan) plan), (String) HOME, coord);
+					Activity homeAct = PopulationUtils.createAndAddActivityFromCoord(((Plan) plan), (String) HOME, new Coord( fromX, fromY ) );
 					homeAct.setEndTime(departure);
 					Leg leg = PopulationUtils.createAndAddLeg( ((Plan) plan), (String) mode );
 					leg.setDepartureTime(departure);
@@ -253,8 +266,9 @@ public class PlansCreateFromMZ {
 					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());
 					final String type1 = acttype;
-					final Coord coord1 = to;
-					Activity act = PopulationUtils.createAndAddActivityFromCoord(((Plan) plan), type1, coord1);
+//					final Coord coord1 = to;
+//					Activity act = PopulationUtils.createAndAddActivityFromCoord(((Plan) plan), type1, coord1);
+					Activity act = PopulationUtils.createAndAddActivityFromCoord((plan), type1, new Coord( toX, toY ) );
 					act.setStartTime(arrival);
 				}
 			}

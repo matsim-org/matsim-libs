@@ -22,7 +22,7 @@ package playground.andreas.P.init;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -32,20 +32,20 @@ import playground.andreas.osmBB.extended.TransitScheduleImpl;
 @Deprecated
 public class CreateStops {
 	
-	private final NetworkImpl net;
+	private final Network net;
 	private final double gridDistance;
 	private final Coord minXY;
 	private final Coord maxXY;
 	
 	private TransitSchedule transitSchedule;
 	
-	public static TransitSchedule createStops(NetworkImpl network, double gridDistance, Coord minXY, Coord maxXY){
+	public static TransitSchedule createStops(Network network, double gridDistance, Coord minXY, Coord maxXY){
 		CreateStops cS = new CreateStops(network, gridDistance, minXY, maxXY);
 		cS.run();
 		return cS.getTransitSchedule();
 	}
 
-	public CreateStops(NetworkImpl net, double gridDistance, Coord minXY, Coord maxXY) {
+	public CreateStops(Network net, double gridDistance, Coord minXY, Coord maxXY) {
 		this.net = net;
 		this.gridDistance = gridDistance;
 		this.minXY = minXY;

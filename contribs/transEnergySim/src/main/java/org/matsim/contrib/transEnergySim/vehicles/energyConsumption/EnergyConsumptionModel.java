@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.transEnergySim.vehicles.energyConsumption;
 
+import java.io.Serializable;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.network.Link;
@@ -31,7 +32,7 @@ import org.matsim.contrib.parking.lib.DebugLib;
  * 			jbischoff
  * 
  */
-public interface EnergyConsumptionModel {
+public interface EnergyConsumptionModel extends Serializable{
 
 	public abstract double getEnergyConsumptionForLinkInJoule(Link link, double averageSpeedDriven);
 	

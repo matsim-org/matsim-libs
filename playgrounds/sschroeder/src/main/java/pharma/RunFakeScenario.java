@@ -37,10 +37,10 @@ public class RunFakeScenario {
         Controler controler = new Controler(config);
 
         final Carriers carriers = new Carriers();
-        new CarrierPlanXmlReaderV2(carriers).read("in/carriers.xml");
+        new CarrierPlanXmlReaderV2(carriers).readFile("in/carriers.xml");
 
         CarrierVehicleTypes types = new CarrierVehicleTypes();
-        new CarrierVehicleTypeReader(types).read("in/vehicleTypes.xml");
+        new CarrierVehicleTypeReader(types).readFile("in/vehicleTypes.xml");
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
         CarrierPlanStrategyManagerFactory strategyManagerFactory = createStrategyManagerFactory(types, controler);
         CarrierScoringFunctionFactory scoringFunctionFactory = createScoringFunctionFactory(controler.getScenario().getNetwork());

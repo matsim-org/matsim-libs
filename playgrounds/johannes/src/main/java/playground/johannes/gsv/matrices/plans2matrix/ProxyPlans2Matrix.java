@@ -177,7 +177,7 @@ public class ProxyPlans2Matrix {
 		logger.info("Loading persons...");
 		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
-		parser.parse(args[0]);
+		parser.readFile(args[0]);
 		logger.info(String.format("Loaded %s persons...", parser.getPersons().size()));
 
 		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();

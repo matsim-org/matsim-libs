@@ -54,8 +54,8 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingUtils;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class MasterControler implements AfterMobsimListener, ShutdownListener, StartupListener, IterationStartsListener {
@@ -977,7 +977,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             Population temp = (Population) PopulationUtils.createPopulation(config);
             StreamingUtils.setIsStreaming(temp, true);
             OutputDirectoryHierarchy controlerIO = matsimControler.getControlerIO();
-            PopulationWriter pw = new PopulationWriter(
+            StreamingPopulationWriter pw = new StreamingPopulationWriter(
                     temp, scenario.getNetwork());
             pw.startStreaming(controlerIO.getIterationFilename(iteration, "FULLplans_slave_" + myNumber + ".xml.gz"));
             slaveLogger.warn("Dumping population of " + currentPopulationSize + " agents on slave number " + myNumber);

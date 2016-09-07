@@ -23,6 +23,7 @@ package playground.jbischoff.taxibus.run.sim;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -58,6 +59,11 @@ public class TaxibusServiceRoutingModule implements RoutingModule {
 
 		
 		Leg taxiLeg = PopulationUtils.createLeg(TaxibusUtils.TAXIBUS_MODE);
+		
+		if (fromFacility.getLinkId() == toFacility.getLinkId()){
+			taxiLeg.setMode(TransportMode.walk);
+		}
+		
 		taxiLeg.setTravelTime( travelTime );
 		NetworkRoute route = 
 				((PopulationFactory)controler.getScenario().getPopulation().getFactory()).getRouteFactories().createRoute(NetworkRoute.class, fromFacility.getLinkId(), toFacility.getLinkId());

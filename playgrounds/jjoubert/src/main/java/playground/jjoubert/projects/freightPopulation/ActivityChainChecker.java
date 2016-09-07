@@ -321,7 +321,7 @@ public class ActivityChainChecker {
 		public List<String> call() throws Exception {
 			/* Read the vehicle */
 			DigicoreVehicleReader dvr = new DigicoreVehicleReader();
-			dvr.parse(this.vehicle.getAbsolutePath());
+			dvr.readFile(this.vehicle.getAbsolutePath());
 			DigicoreVehicle dv = dvr.getVehicle();
 			
 			/* Check each chain start date. */

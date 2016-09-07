@@ -1,7 +1,9 @@
 package org.matsim.contrib.carsharing.config;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
-
+/** 
+ * @author balac
+ */
 
 public class OneWayCarsharingConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "OneWayCarsharing";

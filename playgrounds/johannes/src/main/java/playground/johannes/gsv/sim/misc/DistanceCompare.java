@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -58,7 +58,7 @@ public class DistanceCompare {
 		ObjectAttributes oAttrs = scenario.getPopulation().getPersonAttributes();
 		ObjectAttributesXmlReader oaReader = new ObjectAttributesXmlReader(oAttrs);
 		oaReader.putAttributeConverter(ArrayList.class, new Proxy2Matsim.Converter());
-		oaReader.parse(args[1]);
+		oaReader.readFile(args[1]);
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter(args[2]));
 		writer.write("mid\tsim");

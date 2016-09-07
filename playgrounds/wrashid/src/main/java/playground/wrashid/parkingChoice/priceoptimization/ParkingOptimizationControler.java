@@ -36,6 +36,13 @@ public static void main(final String[] args) throws IOException {
 				}
 		    }
 		    );
+		    
+		    controler.addOverridingModule( new AbstractModule() {
+				@Override
+				public void install() {
+					this.addPlanStrategyBinding("SubtourModeChoiceStrategy").to( playground.balac.allcsmodestest.replanning.SubtourModeChoiceStrategy.class ) ;
+				}
+			});
 		   	
 		    controler.run();
 		}		

@@ -16,10 +16,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.router.TransitRouterNetwork;
@@ -71,7 +70,7 @@ public class FixedLocations {
 		new MatsimNetworkReader(allNetwork).readFile(args[1]);
 		Set<String> carMode = new HashSet<String>();
 		carMode.add("car");
-		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
+		Network network = (Network) NetworkUtils.createNetwork();
 		new TransportModeNetworkFilter(allNetwork).filter(network, carMode);
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -84,7 +83,8 @@ public class FixedLocations {
 			String id = result.getString("postcode");
 			if(!locs.contains(id)) {
 				Coord coord = coords.get(id);
-				Node carNode = ((NetworkImpl)network).getNearestNode(coord);
+				final Coord coord1 = coord;
+				Node carNode = NetworkUtils.getNearestNode(((Network)network),coord1);
 				TransitRouterNetworkNode ptNode = networkPT.getNearestNode(coord);
 				writer.println(id+","+coord.getX()+","+coord.getY()+","+carNode.getId().toString()+","+CoordUtils.calcEuclideanDistance(coord, carNode.getCoord())*WALK_BL/WALK_SPEED+","+ptNode.getStop().getStopFacility().getId().toString()+","+CoordUtils.calcEuclideanDistance(coord, ptNode.getCoord())*WALK_BL/WALK_SPEED);
 				locs.add(id);
@@ -95,7 +95,8 @@ public class FixedLocations {
 			String id = result.getString("facility_id");
 			if(!locs.contains(id)) {
 				Coord coord = coords.get(id);
-				Node carNode = ((NetworkImpl)network).getNearestNode(coord);
+				final Coord coord1 = coord;
+				Node carNode = NetworkUtils.getNearestNode(((Network)network),coord1);
 				TransitRouterNetworkNode ptNode = networkPT.getNearestNode(coord);
 				writer.println(id+","+coord.getX()+","+coord.getY()+","+carNode.getId().toString()+","+CoordUtils.calcEuclideanDistance(coord, carNode.getCoord())*WALK_BL/WALK_SPEED+","+ptNode.getStop().getStopFacility().getId().toString()+","+CoordUtils.calcEuclideanDistance(coord, ptNode.getCoord())*WALK_BL/WALK_SPEED);
 				locs.add(id);
@@ -106,7 +107,8 @@ public class FixedLocations {
 			String id = result.getString("schoolpostalcode");
 			if(!locs.contains(id)) {
 				Coord coord = coords.get(id);
-				Node carNode = ((NetworkImpl)network).getNearestNode(coord);
+				final Coord coord1 = coord;
+				Node carNode = NetworkUtils.getNearestNode(((Network)network),coord1);
 				TransitRouterNetworkNode ptNode = networkPT.getNearestNode(coord);
 				writer.println(id+","+coord.getX()+","+coord.getY()+","+carNode.getId().toString()+","+CoordUtils.calcEuclideanDistance(coord, carNode.getCoord())*WALK_BL/WALK_SPEED+","+ptNode.getStop().getStopFacility().getId().toString()+","+CoordUtils.calcEuclideanDistance(coord, ptNode.getCoord())*WALK_BL/WALK_SPEED);
 				locs.add(id);

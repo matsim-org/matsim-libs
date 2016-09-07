@@ -29,5 +29,5 @@ public interface TaxiTaskWithRequest
 
 
     //called (when removing a task) in order to update the request2task assignment 
-    void removeFromRequest();
+    void disconnectFromRequest();
 }

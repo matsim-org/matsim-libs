@@ -23,9 +23,9 @@ package playground.jjoubert.roadpricing.demand;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.io.PopulationReader;
 
 public class MyIdEvaluator {
 	private final static Logger log = Logger.getLogger(MyIdEvaluator.class);
@@ -35,7 +35,7 @@ public class MyIdEvaluator {
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader pr = new PopulationReader(sc);
-		pr.parse(args[0]);
+		pr.readFile(args[0]);
 		
 		Integer minId = Integer.MAX_VALUE;
 		Integer maxId = Integer.MIN_VALUE;

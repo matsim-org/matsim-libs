@@ -40,6 +40,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
@@ -53,9 +54,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 
-import com.google.inject.Binder;
-
 import playground.santiago.SantiagoScenarioConstants;
+import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.TollHandler;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -65,28 +67,28 @@ import javax.inject.Provider;
  *
  */
 public class SantiagoScenarioRunner {
-	private static String inputPath = "../../../runs-svn/santiago/policy1/input/";
-//	private static String inputPath = "net/ils4/lcamus/runs-svn/santiago/cluster_2/input/";
+	
+	
+	private static String caseName = "baseCase1pct";
+	private static String inputPath = "../../../runs-svn/santiago/"+caseName+"/";
 	private static boolean doModeChoice = true;
-//	private static boolean mapActs2Links = true;
 	private static boolean mapActs2Links = false;
 	
-	private static boolean pricing = false;
-	private static double sigma = 3.0;
-	
+	private static String policy = "0"; //0: BASE-CASE, 1: FIRST-BEST, 2: CORDON, 3: SOME OTHER POLICY.
 	private static String configFile;
+	
+	//ALWAYS NECESSARY
+	private static double sigma=3;	
+	private static String gantriesFile = inputPath + "input/gantries.xml";
+	
+	//ONLY POLICY CASE NUMBER 2. CORDON FILE = GANTRIES + CORDON LINKS
+	private static String cordonFile = inputPath + "input/outerCordon.xml";
+	
 	
 	public static void main(String args[]){
 
-		if(args.length==0){
-			configFile = inputPath + "new-input/randomized_config_final.xml";
-//			configFile = inputPath + "config_triangleCordon.xml";
-		} else {
-			configFile = args[0];
-			mapActs2Links = Boolean.parseBoolean(args[1]);
-			pricing = Boolean.parseBoolean(args[2]);
-		}
-		
+
+		configFile = inputPath + "config_baseCase1pct.xml";		
 		Config config = ConfigUtils.loadConfig(configFile);
 //		config.controler().setOutputDirectory(outputDirectory);
 //		config.qsim().setNumberOfThreads(1);
@@ -112,22 +114,48 @@ public class SantiagoScenarioRunner {
 		// mapping agents' activities to links on the road network to avoid being stuck on the transit network
 		if(mapActs2Links) mapActivities2properLinks(scenario);
 		
-		if (pricing){			
+		
+		switch (policy){
+		
+		case "0":
+			RoadPricingConfigGroup gantriesPricing = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+			gantriesPricing.setTollLinksFile(gantriesFile);
+			config.plansCalcRoute().setRoutingRandomness(sigma); 
+			controler.setModules(new ControlerDefaultsWithRoadPricingModule());
 			
-		RoadPricingConfigGroup rpcg = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-		rpcg.setTollLinksFile(inputPath + "outerCordon.xml");
-		// adding some randomness to the router so to explore more possible routes.
-		config.plansCalcRoute().setRoutingRandomness(sigma); 
-		// adding roadpricing contrib for cordon policies
-		controler.setModules(new ControlerDefaultsWithRoadPricingModule());
-	
-
+			
+			break;
+		
+//		case "1": //FIRST-BEST
+//			
+//			TollHandler tollHandler = new TollHandler(scenario);
+//			EventHandler congestionHandler = new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario());
+//			controler.addControlerListener(
+//					new MarginalCongestionPricingContolerListener(controler.getScenario(),
+//							tollHandler, congestionHandler));
+//			break;
+//			
+//		case "2": //CORDON-TOLL
+//			
+//			RoadPricingConfigGroup rpcg = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+//			rpcg.setTollLinksFile(cordonFile);
+//			config.plansCalcRoute().setRoutingRandomness(sigma); 
+//			controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+//			
+//			break;
+//			
+//		case "3": //SOME-OTHER-POLICY
+//			
+//			break;
 		
 		}
+
 		
 		controler.run();
 	}
 
+
+	
 	private static void mapActivities2properLinks(Scenario scenario) {
 		Network subNetwork = getNetworkWithProperLinksOnly(scenario.getNetwork());
 		for(Person person : scenario.getPopulation().getPersons().values()){

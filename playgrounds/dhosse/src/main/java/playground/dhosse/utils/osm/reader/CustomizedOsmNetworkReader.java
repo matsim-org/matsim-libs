@@ -41,8 +41,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -241,14 +240,14 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 			if (stream != null) {
 				parser.parse(new InputSource(stream));
 			} else {
-				parser.parse(osmFilename);
+				parser.readFile(osmFilename);
 			}
 			log.info("parsing osm file second time: loading required nodes and ways");
 			parser.enableOptimization(2);
 			if (stream != null) {
 				parser.parse(new InputSource(stream));
 			} else {
-				parser.parse(osmFilename);
+				parser.readFile(osmFilename);
 			}
 			log.info("done loading data");
 		} else {
@@ -256,7 +255,7 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 			if (stream != null) {
 				parser.parse(new InputSource(stream));
 			} else {
-				parser.parse(osmFilename);
+				parser.readFile(osmFilename);
 			}
 		}
 		convert();
@@ -371,8 +370,8 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 	}
 	
 	private void convert() {
-		if (this.network instanceof NetworkImpl) {
-			((NetworkImpl) this.network).setCapacityPeriod(3600);
+		if (this.network instanceof Network) {
+			((Network) this.network).setCapacityPeriod(3600);
 		}
 		
 		Iterator<Entry<Long, OsmRelation>> rIt = this.reations.entrySet().iterator();
@@ -826,8 +825,9 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				l.setAllowedModes(allowedModes);
-				if (l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
+				if (l instanceof Link) {
+					final String id1 = origId;
+					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				}
 				network.addLink(l);
 				this.wayId2LinkId.put(way.id, l.getId());
@@ -841,8 +841,9 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				l.setAllowedModes(allowedModes);
-				if (l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
+				if (l instanceof Link) {
+					final String id1 = origId;
+					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				}
 				network.addLink(l);
 				this.id++;
@@ -876,7 +877,7 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 		public final long id;
 		public boolean used = false;
 		public int ways = 0;
-		public final Coord coord;
+		public /*final*/ Coord coord;
 		public final Map<String, String> tags = new HashMap<String, String>(4);
 
 		public OsmNode(final long id, final Coord coord) {
@@ -975,11 +976,6 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 		}
 		
 		@Override
-		protected void parse(InputSource input) throws UncheckedIOException {
-			super.parse(input);
-		}
-
-		@Override
 		public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 			if ("node".equals(name)) {
 				if (this.loadNodes) {
@@ -997,7 +993,8 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 						double lat = Double.parseDouble(atts.getValue("lat"));
 						double lon = Double.parseDouble(atts.getValue("lon"));
 						Coord c = this.transform.transform(new Coord(lon, lat));
-						node.coord.setXY(c.getX(), c.getY());
+//						node.coord.setXY(c.getX(), c.getY());
+						node.coord = c ;
 						this.nodeCounter.incCounter();
 						this.currentNode = node;
 					}

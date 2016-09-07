@@ -189,7 +189,7 @@ public class LanesTest {
 	}
 	
 	 Config createConfig(){
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setStorageCapFactor(1.0);

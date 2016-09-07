@@ -39,7 +39,7 @@ public class UccCarrierCreatorTest {
 		final ArrayList<String> retailerNames = null ;
     		
 		Carriers carriers = new Carriers() ;
-		new CarrierPlanXmlReaderV2(carriers).read(CARRIERS_FILE) ;
+		new CarrierPlanXmlReaderV2(carriers).readFile(CARRIERS_FILE) ;
 		
 		UccCarrierCreator creator = new UccCarrierCreator(carriers, null, null, null, retailerNames, null);
 		Carriers extCarriers = creator.extractCarriers(carriers, retailerNames);
@@ -59,7 +59,7 @@ public class UccCarrierCreatorTest {
 			
 		
 		Carriers carriers = new Carriers() ;
-		new CarrierPlanXmlReaderV2(carriers).read(CARRIERS_FILE) ;
+		new CarrierPlanXmlReaderV2(carriers).readFile(CARRIERS_FILE) ;
 		
 		UccCarrierCreator creator = new UccCarrierCreator(carriers, null, null, null, retailerNames, null);
 		Carriers extCarriers = creator.extractCarriers(carriers, retailerNames);
@@ -82,10 +82,10 @@ public class UccCarrierCreatorTest {
     	final String VEHTYPES_FILE = utils.getClassInputDirectory() + "vehTypes.xml";
     	
     	CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-    	new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPES_FILE) ;
+    	new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES_FILE) ;
 
     	Carriers carriers = new Carriers() ;
-    	new CarrierPlanXmlReaderV2(carriers).read(CARRIERS_FILE) ;
+    	new CarrierPlanXmlReaderV2(carriers).readFile(CARRIERS_FILE) ;
     	new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes) ;
 
     	UccCarrierCreator creator = new UccCarrierCreator(carriers, null);
@@ -156,10 +156,10 @@ public class UccCarrierCreatorTest {
     	}
 
     	CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-    	new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPES_FILE) ;
+    	new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES_FILE) ;
 
     	Carriers carriers = new Carriers() ;
-    	new CarrierPlanXmlReaderV2(carriers).read(CARRIERS_FILE) ;
+    	new CarrierPlanXmlReaderV2(carriers).readFile(CARRIERS_FILE) ;
     	// assign vehicle types to the carriers
     	new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes) ;
 
@@ -214,10 +214,10 @@ public class UccCarrierCreatorTest {
     	final String NON_UCC_CARRIERS_FILE = utils.getInputDirectory() + "carriers_nonUcc.xml";
     	
     	Carriers uccCarriers = new Carriers() ;
-    	new CarrierPlanXmlReaderV2(uccCarriers).read(UCC_CARRIERS_FILE) ;
+    	new CarrierPlanXmlReaderV2(uccCarriers).readFile(UCC_CARRIERS_FILE) ;
     	
     	Carriers nonUccCarriers = new Carriers() ;
-    	new CarrierPlanXmlReaderV2(nonUccCarriers).read(NON_UCC_CARRIERS_FILE) ;
+    	new CarrierPlanXmlReaderV2(nonUccCarriers).readFile(NON_UCC_CARRIERS_FILE) ;
 
     	UccCarrierCreator creator = new UccCarrierCreator(null, null, null, "UCC-", null, null);
     	Carriers nonUCCCinclSrvToUcc = creator.createServicesToUCC(uccCarriers, nonUccCarriers);

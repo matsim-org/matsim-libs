@@ -26,10 +26,6 @@ public interface SimulationViewForQueries {
 
 	EventsManager getEvents();
 
-	void addTrackedAgent(Id<Person> agentId);
-
-	void removeTrackedAgent(Id<Person> agentId);
-	
 	VisNetwork getVisNetwork();
 
 	OTFServerQuadTree getNetworkQuadTree();

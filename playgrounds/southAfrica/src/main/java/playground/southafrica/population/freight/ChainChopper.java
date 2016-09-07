@@ -39,8 +39,8 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
@@ -72,7 +72,7 @@ public class ChainChopper {
 		
 		Scenario scInput = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scOutput = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scInput).parse(inputPopulation);;
+		new PopulationReader(scInput).readFile(inputPopulation);;
 		for(Person person : scInput.getPopulation().getPersons().values()){
 			Plan plan = person.getSelectedPlan();
 			List<Plan> list = ChainChopper.chop(plan); 

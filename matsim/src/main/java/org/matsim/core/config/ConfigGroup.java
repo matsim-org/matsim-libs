@@ -20,6 +20,9 @@
 
 package org.matsim.core.config;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,6 +32,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * Implements a generic config-group that stores all parameters in a simple Map.
@@ -203,5 +207,12 @@ public class ConfigGroup implements MatsimExtensionPoint {
 		if ( locked ) {
 			throw new RuntimeException( "This config group is locked since material from this config group has already been used.") ;
 		}
+	}
+
+	public static URL getInputFileURL(URL context, String filename) {
+		if (filename.startsWith("~" + File.separator)) {
+			filename = System.getProperty("user.home") + filename.substring(1);
+		}
+		return IOUtils.newUrl(context, filename);
 	}
 }

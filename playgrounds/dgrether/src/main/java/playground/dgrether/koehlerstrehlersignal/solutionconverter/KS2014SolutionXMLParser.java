@@ -38,11 +38,15 @@ public class KS2014SolutionXMLParser extends MatsimXmlParser {
 	private List<KS2010CrossingSolution> crossingSolutions = new ArrayList<KS2010CrossingSolution>();
 	private Map<Id<DgStreet>, Double> streetFlow = new HashMap<>();
 	
-	public void readFile(final String filename) {
+	public KS2014SolutionXMLParser() {
 		this.setValidating(false);
-		parse(filename);
-		log.info("Read " + crossingSolutions.size() + " solutions");
 	}
+	
+//	public void readFile(final String filename) {
+//		this.setValidating(false);
+//		readFile(filename);
+//		log.info("Read " + crossingSolutions.size() + " solutions");
+//	}
 	
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {

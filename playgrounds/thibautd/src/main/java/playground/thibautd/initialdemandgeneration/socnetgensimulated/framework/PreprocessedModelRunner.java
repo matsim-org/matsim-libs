@@ -111,7 +111,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 			}
 		}
 		else {
-			this.preprocess = new WeightedSocialNetworkReader().read( config.getInputPreprocessedNetwork() );
+			this.preprocess = new WeightedSocialNetworkReader().createAndReadSocialNetwork( config.getInputPreprocessedNetwork() );
 			this.updateSecondaryPreprocess( lowestStoredPrimary );
 		}
 	}

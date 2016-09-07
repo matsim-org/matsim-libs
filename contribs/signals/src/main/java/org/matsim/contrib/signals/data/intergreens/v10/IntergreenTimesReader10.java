@@ -22,61 +22,48 @@ package org.matsim.contrib.signals.data.intergreens.v10;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.MatsimJaxbXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.jaxb.intergreenTimes10.XMLEndingSignalGroupType;
-import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes;
-import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes.XMLSignalSystem;
 import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesData;
 import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesDataFactory;
 import org.matsim.contrib.signals.data.ambertimes.v10.IntergreensForSignalSystemData;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.core.api.internal.MatsimReader;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.jaxb.intergreenTimes10.XMLEndingSignalGroupType;
+import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes;
+import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes.XMLSignalSystem;
 import org.xml.sax.SAXException;
 
 /**
  * @author dgrether
  */
-public class IntergreenTimesReader10 extends MatsimJaxbXmlParser {
+public class IntergreenTimesReader10 implements MatsimReader {
 
 	private static final Logger log = Logger.getLogger(IntergreenTimesReader10.class);
 	
 	private IntergreenTimesData intergreensData;
 
-	public IntergreenTimesReader10(IntergreenTimesData intergreenTimesData, String schemaLocation) {
-		super(schemaLocation);
-		this.intergreensData = intergreenTimesData;
-	}
-
 	public IntergreenTimesReader10(IntergreenTimesData intergreenTimesData) {
-		this(intergreenTimesData, IntergreenTimesWriter10.INTERGREENTIMES10);
+		this.intergreensData = intergreenTimesData;
 	}
 	
 	
 	@Override
 	public void readFile(final String filename) throws UncheckedIOException {
-		// create jaxb infrastructure
-		JAXBContext jc;
-		XMLIntergreenTimes xmlIntergreenTimes = null;
-		InputStream stream = null;
-		try {
-
-		jc = JAXBContext.newInstance(org.matsim.jaxb.intergreenTimes10.ObjectFactory.class);
-		Unmarshaller u = jc.createUnmarshaller();
-		// validate XML file
-		log.info("starting to validate " + filename);
-		super.validateFile(filename, u);
-		log.info("starting unmarshalling " + filename);
-			stream = IOUtils.getInputStream(filename);
-			xmlIntergreenTimes = (XMLIntergreenTimes) u.unmarshal(stream);
+		try (InputStream stream = IOUtils.getInputStream(filename)){
+			Unmarshaller u = JAXBContext.newInstance(org.matsim.jaxb.intergreenTimes10.ObjectFactory.class).createUnmarshaller();
+			u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/intergreenTimes_v1.0.xsd")));
+			log.info("starting unmarshalling " + filename);
+			XMLIntergreenTimes xmlIntergreenTimes = (XMLIntergreenTimes) u.unmarshal(stream);
 			IntergreenTimesDataFactory factory = this.intergreensData.getFactory();
 			for (XMLSignalSystem xmlSignalSystem : xmlIntergreenTimes.getSignalSystem()){
 				Id<SignalSystem> signalSystemId = Id.create(xmlSignalSystem.getRefId(), SignalSystem.class);
@@ -90,23 +77,8 @@ public class IntergreenTimesReader10 extends MatsimJaxbXmlParser {
 					}
 				}
 			}
-			
-		} catch (JAXBException e) {
+		} catch (JAXBException | SAXException | IOException e) {
 			throw new UncheckedIOException(e);
-		} catch (SAXException e) {
-			throw new UncheckedIOException(e);
-		} catch (ParserConfigurationException e) {
-			throw new UncheckedIOException(e);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);			
-		} finally {
-			try {
-				if (stream != null) {
-					stream.close();
-				}
-			} catch (IOException e) {
-				log.warn("Could not close stream.", e);
-			}
 		}
 	}
 

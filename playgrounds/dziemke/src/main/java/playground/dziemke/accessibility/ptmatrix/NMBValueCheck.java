@@ -18,8 +18,7 @@ import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.FakeFacility;
 import org.matsim.pt.transitSchedule.api.*;
-//import org.matsim.pt.router.TransitRouterImpl;
-import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitRouterImpl;
+import org.matsim.pt.router.TransitRouterImpl;
 
 import java.util.ArrayList;
 import java.util.List;

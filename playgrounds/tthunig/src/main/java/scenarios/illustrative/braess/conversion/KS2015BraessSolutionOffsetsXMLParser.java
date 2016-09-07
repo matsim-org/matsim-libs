@@ -52,10 +52,13 @@ public class KS2015BraessSolutionOffsetsXMLParser extends MatsimXmlParser{
 	private Map<String, List<KS2010CrossingSolution>> braessOffsets = new HashMap<String, List<KS2010CrossingSolution>>();
 	private String currentCoord;
 	
-	public void readFile(final String filename) {
+	public KS2015BraessSolutionOffsetsXMLParser() {
 		this.setValidating(false);
-		parse(filename);
 	}
+	
+//	public void readFile(final String filename) {
+//		readFile(filename);
+//	}
 	
 	
 	@Override

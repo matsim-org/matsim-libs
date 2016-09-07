@@ -22,16 +22,20 @@ package org.matsim.contrib.signals.data.signalsystems.v20;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.signalsystems20.XMLIdRefType;
 import org.matsim.jaxb.signalsystems20.XMLSignalSystemType;
@@ -40,10 +44,6 @@ import org.matsim.jaxb.signalsystems20.XMLSignalType;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLLane;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLTurningMoveRestrictions;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
-import org.matsim.contrib.signals.model.Signal;
-import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.contrib.signals.MatsimSignalSystemsReader;
 import org.xml.sax.SAXException;
 
 
@@ -51,53 +51,19 @@ import org.xml.sax.SAXException;
  * @author dgrether
  *
  */
-public class SignalSystemsReader20 extends MatsimJaxbXmlParser {
+public class SignalSystemsReader20 implements MatsimReader {
 
 	private static final Logger log = Logger.getLogger(SignalSystemsReader20.class);
 
 	private SignalSystemsData signalSystemsData;
 
-
-	public SignalSystemsReader20(SignalSystemsData signalSystemData, String schemaLocation) {
-		super(schemaLocation);
-		this.signalSystemsData = signalSystemData;
-	}
-
 	public SignalSystemsReader20(SignalSystemsData signalSystemData) {
-		this(signalSystemData, MatsimSignalSystemsReader.SIGNALSYSTEMS20);
+		this.signalSystemsData = signalSystemData;
 	}
 
 	@Override
 	public void readFile(final String filename) throws UncheckedIOException {
-		// create jaxb infrastructure
-		JAXBContext jc;
-		XMLSignalSystems xmlssdefs = null;
-		InputStream stream = null;
-		try {
-			jc = JAXBContext
-					.newInstance(org.matsim.jaxb.signalsystems20.ObjectFactory.class);
-			Unmarshaller u = jc.createUnmarshaller();
-			// validate XML file
-			log.info("starting to validate " + filename);
-			super.validateFile(filename, u);
-			log.info("starting unmarshalling " + filename);
-			stream = IOUtils.getInputStream(filename);
-			xmlssdefs = (XMLSignalSystems) u.unmarshal(stream);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		} catch (JAXBException e) {
-			throw new UncheckedIOException(e);
-		} catch (SAXException e) {
-			throw new UncheckedIOException(e);
-		} catch (ParserConfigurationException e) {
-			throw new UncheckedIOException(e);
-		} finally {
-			try {
-				if (stream != null) { stream.close();	}
-			} catch (IOException e) {
-				log.warn("Could not close stream.", e);
-			}
-		}
+		XMLSignalSystems xmlssdefs = readXmlSignalSystems(filename);
 
 		//convert from Jaxb types to MATSim-API conform types
 		SignalSystemsDataFactory builder = this.signalSystemsData.getFactory();
@@ -122,6 +88,18 @@ public class SignalSystemsReader20 extends MatsimJaxbXmlParser {
 			}
 		}
 
+	}
+
+	private XMLSignalSystems readXmlSignalSystems(String filename) {
+		try (InputStream stream = IOUtils.getInputStream(filename)) {
+			JAXBContext jc = JAXBContext.newInstance(org.matsim.jaxb.signalsystems20.ObjectFactory.class);
+			Unmarshaller u = jc.createUnmarshaller();
+			u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/signalSystems_v2.0.xsd")));
+			log.info("starting unmarshalling " + filename);
+			return (XMLSignalSystems) u.unmarshal(stream);
+		} catch (IOException | JAXBException | SAXException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 }

@@ -16,6 +16,7 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
@@ -42,9 +43,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
@@ -103,10 +102,10 @@ public class MyCarrierSimulation {
 
 		//read carriers and their capabilities
 		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).read(carrierPlanFile);
+		new CarrierPlanXmlReaderV2(carriers).readFile(carrierPlanFile);
 
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader(vehicleTypes).read(vehicleTypesFile);
+		new CarrierVehicleTypeReader(vehicleTypes).readFile(vehicleTypesFile);
 
 		//assign them to their corresponding vehicles - carriers already have vehicles in the carrier plan file
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
@@ -140,8 +139,6 @@ public class MyCarrierSimulation {
 	public static void getNetworkChangeEvents(Scenario scenario, double amStart, double amEnd, double pmStart, double pmEnd) {
 		Collection<NetworkChangeEvent> events = new ArrayList<NetworkChangeEvent>();
 
-		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl();
-
 		for ( Link link : scenario.getNetwork().getLinks().values() ) {
 			double speed = link.getFreespeed() ;
 //			double speed = 0 ;
@@ -149,35 +146,37 @@ public class MyCarrierSimulation {
 			final double threshold = kmph/3.6; //convert to m/s
 			if ( speed > threshold ) {
 				{//morning peak starts
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(amStart*3600.) ;
+					NetworkChangeEvent event = new NetworkChangeEvent(amStart*3600.) ;
 					event.addLink(link);
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  threshold ));
+					final NetworkChangeEvent event1 = event;
 //					ni.addNetworkChangeEvent(event);
-					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 //					events.add(event);
 				}
 				{//morning peak ends
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(amEnd*3600.) ;
+					NetworkChangeEvent event = new NetworkChangeEvent(amEnd*3600.) ;
 					event.addLink(link);
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  speed ));
 //					ni.addNetworkChangeEvent(event);
 //					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
 //					events.add(event);
 				}
 				{//afternoon peak starts
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(pmStart*3600.) ;
+					NetworkChangeEvent event = new NetworkChangeEvent(pmStart*3600.) ;
 					event.addLink(link);
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  threshold ));
 //					ni.addNetworkChangeEvent(event);
 //					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
 //					events.add(event);
 				}
 				{//afternoon peak ends
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(pmEnd*3600.) ;
+					NetworkChangeEvent event = new NetworkChangeEvent(pmEnd*3600.) ;
 					event.addLink(link);
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  speed ));
+					final NetworkChangeEvent event1 = event;
 //					ni.addNetworkChangeEvent(event);
-					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 //					events.add(event);
 				}
 			}

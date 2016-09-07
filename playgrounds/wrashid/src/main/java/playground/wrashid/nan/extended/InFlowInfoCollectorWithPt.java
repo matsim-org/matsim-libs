@@ -19,9 +19,9 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler
 	private boolean isOldEventFile;
 	int setAggregationLevel=5; // do not forget to set the aggregation level!!!!!!
 	
-	public InFlowInfoCollectorWithPt(Map<Id<Link>, Link> filteredEquilNetLinks,
+	public InFlowInfoCollectorWithPt(Map<Id<Link>, ? extends Link> links,
 			boolean isOldEventFile, int binSizeInSeconds) {
-		this.filteredEquilNetLinks = filteredEquilNetLinks;
+		this.filteredEquilNetLinks = (Map<Id<Link>, Link>) links;
 		this.isOldEventFile = isOldEventFile;
 		this.binSizeInSeconds=binSizeInSeconds;
 	}

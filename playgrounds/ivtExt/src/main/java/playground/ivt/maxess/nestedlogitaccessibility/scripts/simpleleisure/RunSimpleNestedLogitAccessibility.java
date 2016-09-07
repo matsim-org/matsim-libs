@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
@@ -76,7 +75,7 @@ public class RunSimpleNestedLogitAccessibility {
 			filter.filter( carNetwork, Collections.singleton( "car" ) );
 			new WorldConnectLocations( config ).connectFacilitiesWithLinks(
 					scenario.getActivityFacilities(),
-					(NetworkImpl) carNetwork );
+					(Network) carNetwork );
 
 			new XY2Links( carNetwork , scenario.getActivityFacilities() ).run( scenario.getPopulation() );
 

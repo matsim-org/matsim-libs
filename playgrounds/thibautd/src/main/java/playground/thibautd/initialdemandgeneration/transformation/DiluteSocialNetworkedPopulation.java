@@ -26,7 +26,7 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkReader;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.MoreIOUtils;
@@ -65,7 +65,7 @@ public class DiluteSocialNetworkedPopulation {
 			final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 
 			new PopulationReader( scenario ).readFile( inpopfile );
-			new SocialNetworkReader( scenario ).parse( insocnet );
+			new SocialNetworkReader( scenario ).readFile( insocnet );
 
 			switch ( dilutionType ) {
 				case area_all_alters:

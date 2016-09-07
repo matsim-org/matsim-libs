@@ -25,8 +25,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -139,7 +139,7 @@ public class OSM2MixedIVT {
 				transformation.transform(cutNW), transformation.transform(cutSE))).cutSchedule();
 
 		// **************** Route Schedule ****************
-		new NetworkReaderMatsimV1(mixedScenario.getNetwork()).parse(networkPath);
+		new NetworkReaderMatsimV1(mixedScenario.getNetwork()).readFile(networkPath);
 		final Network mixedNetwork = mixedScenario.getNetwork();
 		new PTMapperOnlyBusses(mixedSchedule).routePTLines(mixedNetwork);
 		final String path_MixedSchedule = outbase + "MixedSchedule.xml.gz";

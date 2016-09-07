@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -22,7 +22,7 @@ public class NodeDistances {
 	public NodeDistances(String networkPath){
 	
 		scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkPath);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(networkPath);
 		network = scenario.getNetwork();
 		Map<Id<Node>, ? extends Node> nodes = network.getNodes();
 		

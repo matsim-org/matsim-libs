@@ -23,12 +23,12 @@ package playground.toronto.timeblur;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -49,7 +49,7 @@ public class BlurPlanTimes {
 		PersonBlurTimes pbt = new PersonBlurTimes(scenario.getConfig(), mutationRange);
 		final PersonAlgorithm algo = pbt;
 		StreamingUtils.addAlgorithm(population, algo);
-		PopulationWriter pw = new PopulationWriter(population, network);
+		StreamingPopulationWriter pw = new StreamingPopulationWriter(population, network);
 		pw.startStreaming(outputPlansFile);
 		final PersonAlgorithm algo1 = pw;
 		StreamingUtils.addAlgorithm(population, algo1);
@@ -73,7 +73,7 @@ public class BlurPlanTimes {
 		PersonUniformBlurTimesPerTimeBin pubtptb = new PersonUniformBlurTimesPerTimeBin(binSize);
 		final PersonAlgorithm algo = pubtptb;
 		StreamingUtils.addAlgorithm(population, algo);
-		PopulationWriter pw = new PopulationWriter(population, network);
+		StreamingPopulationWriter pw = new StreamingPopulationWriter(population, network);
 		pw.startStreaming(outputPlansFile);
 		final PersonAlgorithm algo1 = pw;
 		StreamingUtils.addAlgorithm(population, algo1);
@@ -98,7 +98,7 @@ public class BlurPlanTimes {
 		PersonBlurTimesPerTimeBin pbtptb = new PersonBlurTimesPerTimeBin(mutationRange,binSize);
 		final PersonAlgorithm algo = pbtptb;
 		StreamingUtils.addAlgorithm(population, algo);
-		PopulationWriter pw = new PopulationWriter(population, network);
+		StreamingPopulationWriter pw = new StreamingPopulationWriter(population, network);
 		pw.startStreaming(outputPlansFile);
 		final PersonAlgorithm algo1 = pw;
 		StreamingUtils.addAlgorithm(population, algo1);

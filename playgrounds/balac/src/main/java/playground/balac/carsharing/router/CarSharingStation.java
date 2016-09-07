@@ -5,7 +5,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.facilities.Facility;
 
 public class CarSharingStation implements Facility<CarSharingStation>
@@ -13,16 +12,16 @@ public class CarSharingStation implements Facility<CarSharingStation>
   private final Id<CarSharingStation> id;
   private Coord coord;
   private int cars = 0;
-  private LinkImpl link;
+  private Link link;
 
-  CarSharingStation(Id<CarSharingStation> id, Coord coord, LinkImpl link)
+  CarSharingStation(Id<CarSharingStation> id, Coord coord, Link link)
   {
     this.id = id;
     this.coord = coord;
     this.link = link;
   }
 
-  CarSharingStation(Id<CarSharingStation> id, Coord coord, LinkImpl link, int cars)
+  CarSharingStation(Id<CarSharingStation> id, Coord coord, Link link, int cars)
   {
     this.id = id;
     this.coord = coord;
@@ -40,7 +39,7 @@ public class CarSharingStation implements Facility<CarSharingStation>
     return this.coord;
   }
 
-  public LinkImpl getLink() {
+  public Link getLink() {
     return this.link;
   }
 
@@ -64,7 +63,7 @@ public class CarSharingStation implements Facility<CarSharingStation>
     this.coord = coord2;
   }
 
-  public void setLink(LinkImpl stationLink) {
+  public void setLink(Link stationLink) {
     this.link = stationLink;
   }
 }

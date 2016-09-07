@@ -28,10 +28,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
@@ -47,10 +48,12 @@ public class LegHistogramTest extends MatsimTestCase {
 	 * handled correctly.
 	 */
 	public void testDeparturesMiscModes() {
-		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
-		Link link = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000.0, 100.0, 1.0, 1);
+		Network network = NetworkUtils.createNetwork();
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		Link link = NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, 1000.0, 100.0, 1.0, (double) 1 );
 		Id<Link> linkId = link.getId();
 
 		Person person1 = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -99,10 +102,12 @@ public class LegHistogramTest extends MatsimTestCase {
 	 * do not lead to an exception.
 	 */
 	public void testNofBins() {
-		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
-		Link link = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000.0, 100.0, 1.0, 1);
+		Network network = NetworkUtils.createNetwork();
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		Link link = NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, 1000.0, 100.0, 1.0, (double) 1 );
 		Id<Link> linkId = link.getId();
 
 		Person person1 = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -138,10 +143,12 @@ public class LegHistogramTest extends MatsimTestCase {
 	}
 
 	public void testReset() {
-		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new Coord((double) 0, (double) 0));
-		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
-		Link link = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000.0, 100.0, 1.0, 1);
+		Network network = NetworkUtils.createNetwork();
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 1000, (double) 0));
+		final Node fromNode = node1;
+		final Node toNode = node2;
+		Link link = NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, 1000.0, 100.0, 1.0, (double) 1 );
 		Id<Link> linkId = link.getId();
 
 		Person person1 = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));

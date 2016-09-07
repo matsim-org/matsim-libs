@@ -104,6 +104,7 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.L
 		}
 	}
 
+	@Override
 	synchronized public void handleEvent(Event o) {
 		// this is for the stuff that is directly based on events.
 		// note that this passes on _all_ person events, even those which are aggregated into legs and activities.
@@ -124,6 +125,7 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.L
 		}
 	}
 
+	@Override
 	synchronized public void handleLeg(PersonExperiencedLeg o) {
 		Id<Person> agentId = o.getAgentId();
 		Leg leg = o.getLeg();
@@ -135,6 +137,7 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.L
 		}
 	}
 
+	@Override
 	synchronized public void handleActivity(PersonExperiencedActivity o) {
 		Id<Person> agentId = o.getAgentId();
 		Activity activity = o.getActivity();

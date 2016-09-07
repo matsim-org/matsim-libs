@@ -35,7 +35,7 @@ import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -832,18 +832,30 @@ public class TestEmissionUtils {
 	
 	private void addLinksToNetwork(Scenario sc) {
 		//intern method to set up a network with nodes and links
-		NetworkImpl network = (NetworkImpl) sc.getNetwork();
-		Node node1 = network.createAndAddNode(Id.create("node1", Node.class), new Coord(.0, .0));
-		Node node2 = network.createAndAddNode(Id.create("node2", Node.class), new Coord(.0, 1000.));
-		Node node3 = network.createAndAddNode(Id.create("node3", Node.class), new Coord(1000., .0));
-		Node node4 = network.createAndAddNode(Id.create("node4", Node.class), new Coord(1000., 1000.));
+		Network network = (Network) sc.getNetwork();
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("node1", Node.class), new Coord(.0, .0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("node2", Node.class), new Coord(.0, 1000.));
+		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("node3", Node.class), new Coord(1000., .0));
+		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("node4", Node.class), new Coord(1000., 1000.));
+		final Node fromNode = node1;
+		final Node toNode = node2;
 		
-		network.createAndAddLink(Id.create("link12", Link.class), node1, node2, 1000., 20., 3600, 2); //w/o orig id and type
-		network.createAndAddLink(Id.create("link13", Link.class), node1, node3, 1000., 20., 3600, 2); //w/o orig id and type
-		network.createAndAddLink(Id.create("link14", Link.class), node1, node4, 1000., 20., 3600, 2); //w/o orig id and type
-		network.createAndAddLink(Id.create("link23", Link.class), node2, node3, 1000., 20., 3600, 2); //w/o orig id and type
-		network.createAndAddLink(Id.create("link24", Link.class), node2, node4, 1000., 20., 3600, 2); //w/o orig id and type
-		network.createAndAddLink(Id.create("link34", Link.class), node3, node4, 1000., 20., 3600, 2); //w/o orig id and type
+		NetworkUtils.createAndAddLink(network,Id.create("link12", Link.class), fromNode, toNode, 1000., 20., (double) 3600, (double) 2 );
+		final Node fromNode1 = node1;
+		final Node toNode1 = node3; //w/o orig id and type
+		NetworkUtils.createAndAddLink(network,Id.create("link13", Link.class), fromNode1, toNode1, 1000., 20., (double) 3600, (double) 2 );
+		final Node fromNode2 = node1;
+		final Node toNode2 = node4; //w/o orig id and type
+		NetworkUtils.createAndAddLink(network,Id.create("link14", Link.class), fromNode2, toNode2, 1000., 20., (double) 3600, (double) 2 );
+		final Node fromNode3 = node2;
+		final Node toNode3 = node3; //w/o orig id and type
+		NetworkUtils.createAndAddLink(network,Id.create("link23", Link.class), fromNode3, toNode3, 1000., 20., (double) 3600, (double) 2 );
+		final Node fromNode4 = node2;
+		final Node toNode4 = node4; //w/o orig id and type
+		NetworkUtils.createAndAddLink(network,Id.create("link24", Link.class), fromNode4, toNode4, 1000., 20., (double) 3600, (double) 2 );
+		final Node fromNode5 = node3;
+		final Node toNode5 = node4; //w/o orig id and type
+		NetworkUtils.createAndAddLink(network,Id.create("link34", Link.class), fromNode5, toNode5, 1000., 20., (double) 3600, (double) 2 ); //w/o orig id and type
 	}
 
 	@Test

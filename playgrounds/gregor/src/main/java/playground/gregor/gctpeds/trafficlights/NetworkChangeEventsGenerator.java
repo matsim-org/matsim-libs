@@ -19,20 +19,19 @@
 package playground.gregor.gctpeds.trafficlights;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkChangeEventsWriter;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.casim.simulation.physics.AbstractCANetwork;
@@ -52,11 +51,10 @@ public class NetworkChangeEventsGenerator {
 
 	private void run() {
 		List<NetworkChangeEvent> events = new ArrayList<>();
-		NetworkChangeEventFactoryImpl fac = new NetworkChangeEventFactoryImpl();
 		for (double time = 6*3600; time < 20*3600; time += green) {
 			{
-				NetworkChangeEvent e0 = fac.createNetworkChangeEvent(time);
-				ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE, 0.01);
+				NetworkChangeEvent e0 = new NetworkChangeEvent(time);
+				ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 0.01);
 				e0.setFreespeedChange(freespeedChange);
 				e0.addLink(this.sc.getNetwork().getLinks().get(Id.createLinkId(0)));
 				e0.addLink(this.sc.getNetwork().getLinks().get(Id.createLinkId(2)));
@@ -64,8 +62,8 @@ public class NetworkChangeEventsGenerator {
 			}
 			time += red;
 			{
-				NetworkChangeEvent e0 = fac.createNetworkChangeEvent(time);
-				ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE, AbstractCANetwork.V_HAT);
+				NetworkChangeEvent e0 = new NetworkChangeEvent(time);
+				ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, AbstractCANetwork.V_HAT);
 				e0.setFreespeedChange(freespeedChange);
 				e0.addLink(this.sc.getNetwork().getLinks().get(Id.createLinkId(0)));
 				e0.addLink(this.sc.getNetwork().getLinks().get(Id.createLinkId(2)));
@@ -75,8 +73,8 @@ public class NetworkChangeEventsGenerator {
 
 		for (double time = 6*3600; time < 20*3600; time += red) {
 			{
-				NetworkChangeEvent e0 = fac.createNetworkChangeEvent(time);
-				ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE,  AbstractCANetwork.V_HAT);
+				NetworkChangeEvent e0 = new NetworkChangeEvent(time);
+				ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS,  AbstractCANetwork.V_HAT);
 				e0.setFreespeedChange(freespeedChange);
 				e0.addLink(this.sc.getNetwork().getLinks().get(Id.createLinkId(494)));
 				e0.addLink(this.sc.getNetwork().getLinks().get(Id.createLinkId(470)));
@@ -84,15 +82,16 @@ public class NetworkChangeEventsGenerator {
 			}
 			time += green;
 			{
-				NetworkChangeEvent e0 = fac.createNetworkChangeEvent(time);
-				ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE,0.01);
+				NetworkChangeEvent e0 = new NetworkChangeEvent(time);
+				ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS,0.01);
 				e0.setFreespeedChange(freespeedChange);
 				e0.addLink(this.sc.getNetwork().getLinks().get(Id.createLinkId(494)));
 				e0.addLink(this.sc.getNetwork().getLinks().get(Id.createLinkId(470)));
 				events.add(e0);
 			}
 		}
-		((NetworkImpl)sc.getNetwork()).setNetworkChangeEvents(events);
+		final List<NetworkChangeEvent> events1 = events;
+		NetworkUtils.setNetworkChangeEvents(((Network)sc.getNetwork()),events1);
 
 	}
 
@@ -106,7 +105,7 @@ public class NetworkChangeEventsGenerator {
 		new NetworkChangeEventsGenerator(sc).run();
 
 		c.network().setChangeEventsInputFile( "/Users/laemmel/devel/nyc/gct_vicinity/changeevents.xml.gz");
-		new NetworkChangeEventsWriter().write(c.network().getChangeEventsInputFile(), ((NetworkImpl)sc.getNetwork()).getNetworkChangeEvents());
+		new NetworkChangeEventsWriter().write(c.network().getChangeEventsInputFileUrl(c.getContext()).getFile(), NetworkUtils.getNetworkChangeEvents(((Network)sc.getNetwork())));
 		new ConfigWriter(c).write("/Users/laemmel/devel/nyc/gct_vicinity/config.xml.gz");
 	}
 

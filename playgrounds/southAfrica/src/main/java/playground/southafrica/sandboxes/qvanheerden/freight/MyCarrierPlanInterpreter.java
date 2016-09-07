@@ -23,7 +23,7 @@ import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -62,7 +62,7 @@ public class MyCarrierPlanInterpreter {
 		for(File file : listOfPlans){
 			Carriers carriers = new Carriers();
 			carriers.getCarriers().clear();
-			new CarrierPlanXmlReaderV2(carriers).read(file.getAbsolutePath());
+			new CarrierPlanXmlReaderV2(carriers).readFile(file.getAbsolutePath());
 			Carrier carrier = carriers.getCarriers().get(Id.create("MyCarrier", Carrier.class));
 			CarrierPlan plan = carrier.getSelectedPlan();
 

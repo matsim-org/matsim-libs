@@ -57,7 +57,7 @@ public class Analyzer {
 		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 		
-		parser.parse(personFile);
+		parser.readFile(personFile);
 
 		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		

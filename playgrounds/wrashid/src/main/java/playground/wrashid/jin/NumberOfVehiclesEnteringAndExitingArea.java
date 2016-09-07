@@ -44,7 +44,7 @@ public class NumberOfVehiclesEnteringAndExitingArea {
 
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 
-		reader.parse(eventsFile);
+		reader.readFile(eventsFile);
 
 		// handler.printOutput("C:\\tmp\\New folder\\Area1_60SecBin.txt");
 		handler.printOutput();

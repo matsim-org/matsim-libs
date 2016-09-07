@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -102,7 +102,7 @@ public class PlansFromEzLink_JourneysToPersons_Routed extends MatsimXmlWriter{
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		new NetworkReaderMatsimV1(scenario.getNetwork()).parse("C:/Work/MATSim/inputMATSimSingapore2.2/network/network100.xml.gz");
+		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile("C:/Work/MATSim/inputMATSimSingapore2.2/network/network100.xml.gz");
 		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile("C:/Work/MATSim/inputMATSimSingapore2.2/transit/transitSchedule.xml.gz");		
 

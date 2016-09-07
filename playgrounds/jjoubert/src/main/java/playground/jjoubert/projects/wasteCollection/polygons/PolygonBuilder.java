@@ -24,7 +24,6 @@ package playground.jjoubert.projects.wasteCollection.polygons;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -36,8 +35,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -78,7 +76,7 @@ public class PolygonBuilder {
 	private static void buildPolygons(String network, String output, double buffer){
 		LOG.info("Parsing network...");
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc.getNetwork()).parse(network);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(network);
 		LOG.info("Done parsing network.");
 		
 		LOG.info("Build polygons... (" + sc.getNetwork().getLinks().size() + " links)");

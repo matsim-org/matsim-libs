@@ -397,7 +397,7 @@ public class SpatialAveragingDemandEmissions {
 		this.coldHandler = new EmissionsPerLinkColdEventHandler(this.simulationEndTime, noOfTimeBins);
 		eventsManager.addHandler(this.warmHandler);
 		eventsManager.addHandler(this.coldHandler);
-		emissionReader.parse(emissionFile);
+		emissionReader.readFile(emissionFile);
 	}
 
 	private Scenario loadScenario(String netFile) {

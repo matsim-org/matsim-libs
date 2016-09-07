@@ -13,8 +13,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 public class FreeFloatingVehicleLocationGeneration {
@@ -67,13 +67,14 @@ public class FreeFloatingVehicleLocationGeneration {
 			
 			this.network = network;		}
 		
-		public LinkImpl getClosestLink(Coord coord) {
+		public Link getClosestLink(Coord coord) {
 			
 			double distance = (1.0D / 0.0D);
 		    Id<Link> closestLinkId = Id.create(0L, Link.class);
 		    for (Link link : network.getLinks().values()) {
-		      LinkImpl mylink = (LinkImpl)link;
-		      Double newDistance = Double.valueOf(mylink.calcDistance(coord));
+		      Link mylink = (Link)link;
+			final Coord coord1 = coord;
+		      Double newDistance = Double.valueOf(CoordUtils.distancePointLinesegment(mylink.getFromNode().getCoord(), mylink.getToNode().getCoord(), coord1));
 		      if (newDistance.doubleValue() < distance) {
 		        distance = newDistance.doubleValue();
 		        closestLinkId = link.getId();
@@ -81,7 +82,7 @@ public class FreeFloatingVehicleLocationGeneration {
 
 		    }
 
-		    return (LinkImpl)network.getLinks().get(closestLinkId);
+		    return (Link)network.getLinks().get(closestLinkId);
 			
 			
 		}

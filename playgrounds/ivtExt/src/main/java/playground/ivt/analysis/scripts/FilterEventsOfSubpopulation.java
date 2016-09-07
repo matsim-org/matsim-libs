@@ -49,14 +49,14 @@ public class FilterEventsOfSubpopulation {
 		final String subpopulationName = args.getValue( "-s" );
 
 		final ObjectAttributes atts = new ObjectAttributes();
-		new ObjectAttributesXmlReader( atts ).parse( personAttributesFile );
+		new ObjectAttributesXmlReader( atts ).readFile( personAttributesFile );
 
 		final EventWriterXML writer = new EventWriterXML( outputEventsFile );
 		final SubpopulationFilteringEventsManager events =
 			new SubpopulationFilteringEventsManager( atts , subpopulationName );
 		events.addHandler( writer );
 
-		new EventsReaderXMLv1( events ).parse( inputEventsFile );
+		new EventsReaderXMLv1( events ).readFile( inputEventsFile );
 
 		writer.closeFile();
 	}

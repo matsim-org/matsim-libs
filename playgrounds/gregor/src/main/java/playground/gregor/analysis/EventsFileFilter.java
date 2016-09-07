@@ -53,7 +53,7 @@ public class EventsFileFilter implements BasicEventHandler {
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(em2);
 		EventWriterXML writer = new EventWriterXML(output);
 		em1.addHandler(writer);
-		reader.parse(input);
+		reader.readFile(input);
 		writer.closeFile();
 	}
 

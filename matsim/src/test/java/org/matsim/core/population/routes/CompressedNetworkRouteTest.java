@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
 
@@ -44,7 +43,7 @@ import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
 public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
-	public NetworkRoute getNetworkRouteInstance(final Id<Link> fromLinkId, final Id<Link> toLinkId, final NetworkImpl network) {
+	public NetworkRoute getNetworkRouteInstance(final Id<Link> fromLinkId, final Id<Link> toLinkId, final Network network) {
 		SubsequentLinksAnalyzer subsequent = new SubsequentLinksAnalyzer(network);
 		return new CompressedNetworkRouteImpl(fromLinkId, toLinkId, network, subsequent.getSubsequentLinks());
 	}
@@ -57,7 +56,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	 */
 	@Test
 	public void testGetLinks_setLinks() {
-		NetworkImpl network = createTestNetwork();
+		Network network = createTestNetwork();
 		Link link1 = network.getLinks().get(Id.create("1", Link.class));
 		Link link22 = network.getLinks().get(Id.create("22", Link.class));
 		Link link12 = network.getLinks().get(Id.create("12", Link.class));
@@ -79,7 +78,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Test
 	public void testGetLinks_onlySubsequentLinks() {
-		NetworkImpl network = createTestNetwork();
+		Network network = createTestNetwork();
 		Link link0 = network.getLinks().get(Id.create("0", Link.class));
 		Link link1 = network.getLinks().get(Id.create("1", Link.class));
 		Link link2 = network.getLinks().get(Id.create("2", Link.class));
@@ -111,7 +110,7 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	 */
 	@Test
 	public void testGetLinkIds_incompleteInitialization() {
-		NetworkImpl network = createTestNetwork();
+		Network network = createTestNetwork();
 		Link link0 = network.getLinks().get(Id.create("0", Link.class));
 		Link link1 = network.getLinks().get(Id.create("1", Link.class));
 		Link link2 = network.getLinks().get(Id.create("2", Link.class));

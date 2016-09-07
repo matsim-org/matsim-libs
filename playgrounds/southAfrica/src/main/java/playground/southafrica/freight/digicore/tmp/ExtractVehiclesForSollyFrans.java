@@ -65,7 +65,7 @@ public class ExtractVehiclesForSollyFrans {
 			
 			for(File f : list){
 				DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-				dvr.parse(f.getAbsolutePath());
+				dvr.readFile(f.getAbsolutePath());
 				DigicoreVehicle v = dvr.getVehicle();
 				bw.write(v.getId().toString());
 				bw.write(",");

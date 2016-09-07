@@ -66,8 +66,7 @@ public class OTFClientLive {
 				
 				connectionManager.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 				connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
-				connectionManager.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);
-				
+
 				connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
 				// I think that this only works if at least one corresponding OTFDataWriter is added via OnTheFlyServer.addAdditionalElement(...).
 				
@@ -87,13 +86,12 @@ public class OTFClientLive {
 				OTFClientControl.getInstance().setOTFVisConfig(visconf); // has to be set before OTFClientQuadTree.getConstData() is invoked!
 				OTFServerQuadTree serverQuadTree = server.getQuad(connectionManager);
 				OTFClientQuadTree clientQuadTree = serverQuadTree.convertToClient(server, connectionManager);
-				clientQuadTree.getConstData();
 
 				OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, visconf, canvas, hostControl);
 				OTFControlBar hostControlBar = new OTFControlBar(server, hostControl, mainDrawer);
 				OTFClient otfClient = new OTFClient(canvas, server, hostControlBar, mainDrawer, saver);
 
-				OTFQueryControl queryControl = new OTFQueryControl(server, hostControlBar, visconf);
+				OTFQueryControl queryControl = new OTFQueryControl(server, visconf);
 				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, visconf);
 				queryControl.setQueryTextField(queryControlBar.getTextField());
 				otfClient.getContentPane().add(queryControlBar, BorderLayout.SOUTH);

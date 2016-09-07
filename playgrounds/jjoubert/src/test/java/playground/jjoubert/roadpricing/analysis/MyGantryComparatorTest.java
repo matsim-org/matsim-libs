@@ -237,8 +237,8 @@ public class MyGantryComparatorTest{
 
 	private void createLinkstatsFiles(){
 		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "config.xml");
-		config.network().setInputFile(utils.getClassInputDirectory() + "networkSmall.xml.gz");
-		config.plans().setInputFile(utils.getClassInputDirectory() + "50.plans100.xml.gz");
+		config.network().setInputFile("networkSmall.xml.gz");
+		config.plans().setInputFile("50.plans100.xml.gz");
 		config.controler().setOutputDirectory(utils.getOutputDirectory() + "Output1/");
 		
 		config.controler().setWriteEventsInterval(0);
@@ -249,7 +249,7 @@ public class MyGantryComparatorTest{
 		c.getConfig().controler().setDumpDataAtEnd(false);
 		c.run();
 		
-		config.plans().setInputFile(utils.getClassInputDirectory() + "50.plans110.xml.gz");
+		config.plans().setInputFile("50.plans110.xml.gz");
 		config.controler().setOutputDirectory(utils.getOutputDirectory() + "Output2/");
 		
 		c = new Controler(config);

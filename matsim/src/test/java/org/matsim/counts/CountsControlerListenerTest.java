@@ -248,13 +248,13 @@ public class CountsControlerListenerTest {
 	
 	@Test
 	public void test_writeCountsInterval() {
-		Config config = this.util.loadConfig(null);
+		Config config = this.util.createConfig(util.getTestScenarioURL("triangle"));
 		CountsConfigGroup cConfig = config.counts();
 		
 		cConfig.setWriteCountsInterval(3);
 		cConfig.setAverageCountsOverIterations(1);
 		cConfig.setOutputFormat("txt");
-		cConfig.setCountsFileName("test/scenarios/triangle/counts.xml"); // just any file to activate the counts feature
+		cConfig.setInputFile("counts.xml"); // just any file to activate the counts feature
 		
 		final Controler controler = new Controler(ScenarioUtils.createScenario(config));
 		controler.addOverridingModule(new AbstractModule() {
@@ -284,15 +284,15 @@ public class CountsControlerListenerTest {
 	
 	@Test
 	public void testReset_CorrectlyExecuted() throws IOException {
-		Config config = this.util.loadConfig(null);
-		config.network().setInputFile("test/scenarios/triangle/network.xml");	// network file which is used by the counts file
+		Config config = this.util.createConfig(util.getTestScenarioURL("triangle"));
+		config.network().setInputFile("network.xml");	// network file which is used by the counts file
 		
 		CountsConfigGroup cConfig = config.counts();
 		
 		cConfig.setWriteCountsInterval(3);
 		cConfig.setAverageCountsOverIterations(2);
 		cConfig.setOutputFormat("txt");
-		cConfig.setCountsFileName("test/scenarios/triangle/counts.xml"); // just any file to activate the counts feature
+		cConfig.setInputFile("counts.xml"); // just any file to activate the counts feature
 		
 		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
 		controler.addOverridingModule(new AbstractModule() {
@@ -325,15 +325,15 @@ public class CountsControlerListenerTest {
 	
 	@Test
 	public void testFilterAnalyzedModes() throws IOException {
-		Config config = this.util.loadConfig(null);
-		config.network().setInputFile("test/scenarios/triangle/network.xml");	// network file which is used by the counts file
+		Config config = util.createConfig(util.getTestScenarioURL("triangle"));
+		config.network().setInputFile("network.xml");	// network file which is used by the counts file
 		
 		CountsConfigGroup cConfig = config.counts();
 		
 		cConfig.setWriteCountsInterval(3);
 		cConfig.setAverageCountsOverIterations(2);
 		cConfig.setOutputFormat("txt");
-		cConfig.setCountsFileName("test/scenarios/triangle/counts.xml"); // just any file to activate the counts feature
+		cConfig.setInputFile("counts.xml"); // just any file to activate the counts feature
 		
 		config.controler().setMobsim("dummy");
 		config.controler().setFirstIteration(0);

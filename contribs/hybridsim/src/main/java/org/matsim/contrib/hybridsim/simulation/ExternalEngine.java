@@ -20,6 +20,10 @@
 package org.matsim.contrib.hybridsim.simulation;
 
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -32,6 +36,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.hybridsim.grpc.GRPCExternalClient;
 import org.matsim.contrib.hybridsim.proto.HybridSimProto;
 import org.matsim.contrib.hybridsim.run.Example;
+import org.matsim.contrib.hybridsim.utils.IdIntMapper;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
@@ -40,8 +45,6 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkInternalIAdapter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-
-import java.util.*;
 
 public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceGrpc.MATSimInterfaceService {
 
@@ -54,12 +57,14 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 	private final Netsim sim;
 	private final Network net;
 	private final Scenario sc;
+    private final IdIntMapper mapper;
 //	private final CyclicBarrier clientBarrier = new CyclicBarrier(2);
 
 	private GRPCExternalClient client;
 
-	public ExternalEngine(EventsManager eventsManager, Netsim sim) {
-		this.em = eventsManager;
+    public ExternalEngine(EventsManager eventsManager, Netsim sim, IdIntMapper mapper) {
+        this.mapper = mapper;
+        this.em = eventsManager;
 		this.sim = sim;
 		this.net = sim.getScenario().getNetwork();
 		this.client = new GRPCExternalClient(Example.REMOTE_HOST, Example.REMOTE_PORT);
@@ -284,8 +289,9 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 		boolean extRd = false;
 
 		HybridSimProto.Agent.Builder ab = HybridSimProto.Agent.newBuilder();
-		ab.setId(driver.getId().toString());
-		HybridSimProto.Leg.Builder lb = ab.getLegBuilder();
+        ab.setId(mapper.getIntPerson(driver.getId()));
+        ab.setEnterLocationId(mapper.getIntLink(currentLinkId));
+        HybridSimProto.Leg.Builder lb = ab.getLegBuilder();
 //		ab.setLeg(lb);
 
 		for (Id<Link> linkId : linkIds) {
@@ -301,12 +307,14 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 					break;
 				}
 				HybridSimProto.Link.Builder llb = HybridSimProto.Link.newBuilder();
-				llb.setId(linkId.toString());
-				HybridSimProto.Coordinate.Builder cb = HybridSimProto.Coordinate.newBuilder();
+                llb.setId(mapper.getIntLink(linkId));
+                HybridSimProto.Coordinate.Builder cb = HybridSimProto.Coordinate.newBuilder();
 				cb.setX(l.getCoord().getX());
 				cb.setY(l.getCoord().getY());
 				llb.setCentroid(cb);
-				lb.addLink(llb);
+                llb.setFrTr(mapper.getIntNode(l.getFromNode().getId()));
+                llb.setToTr(mapper.getIntNode(l.getToNode().getId()));
+                lb.addLink(llb);
 
 				ab.setLeaveLocation(HybridSimProto.Coordinate.newBuilder().setX(l.getToNode().getCoord().getX()).setY(l.getToNode().getCoord().getY()));
 			}

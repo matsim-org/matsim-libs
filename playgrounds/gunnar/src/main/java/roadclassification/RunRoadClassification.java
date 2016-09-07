@@ -221,7 +221,7 @@ public class RunRoadClassification {
 				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		final Counts counts = new Counts();
 		final CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(counts);
-		countsReader.parse(countsFileName);
+		countsReader.readFile(countsFileName);
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.addScenarioElement(Counts.ELEMENT_NAME, counts);

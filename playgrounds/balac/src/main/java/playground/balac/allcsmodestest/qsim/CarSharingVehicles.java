@@ -8,8 +8,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.balac.freefloating.config.FreeFloatingConfigGroup;
@@ -153,17 +152,18 @@ public class CarSharingVehicles {
 		
 	private class LinkUtils {
 		
-		NetworkImpl network;
+		Network network;
 		
 		public LinkUtils(Network network) {
 			
-			this.network = (NetworkImpl) network;		}
+			this.network = (Network) network;		}
 		
-		public LinkImpl getClosestLink(Coord coord) {
+		public Link getClosestLink(Coord coord) {
 			
 			
 
-		    return (LinkImpl)network.getNearestLinkExactly(coord);
+		    final Coord coord1 = coord;
+		return (Link)NetworkUtils.getNearestLinkExactly(network,coord1);
 			
 			
 		}

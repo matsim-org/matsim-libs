@@ -8,17 +8,17 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="test/scenarios/equil/network.xml" />
+		<param name="inputNetworkFile" value="../../../../../../../scenarios/equil/network.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="test/scenarios/equil/plans1.xml" />
+		<param name="inputPlansFile" value="../../../../../../../scenarios/equil/plans1.xml" />
 	</module>
 
 	<module name="transit">
 		<param name="useTransit" value="true" />
-		<param name="transitScheduleFile" value="test/input/org/matsim/core/scenario/ScenarioLoaderImplTest/transitSchedule.xml" />
-		<param name="vehiclesFile" value="test/input/org/matsim/core/scenario/ScenarioLoaderImplTest/transitVehicles.xml" />
+		<param name="transitScheduleFile" value="transitSchedule.xml" />
+		<param name="vehiclesFile" value="transitVehicles.xml" />
 		<param name="transitModes" value="pt" />
 	</module>
 

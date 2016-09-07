@@ -21,13 +21,13 @@ package playground.andreas.utils.pop;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingUtils;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -60,10 +60,10 @@ public class FilterSelectedPlan {
 		StreamingUtils.setIsStreaming(plans, true);
 		StreamingUtils.addAlgorithm(plans, new PersonFilterSelectedPlan());
 		
-		final PopulationWriter plansWriter = new PopulationWriter(plans, sc.getNetwork());
+		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(plans, sc.getNetwork());
 		plansWriter.startStreaming(outPlansFile);
 		StreamingUtils.addAlgorithm(plans, plansWriter);
-		MatsimPopulationReader plansReader = new PopulationReader(sc);		
+		MatsimReader plansReader = new PopulationReader(sc);		
 
 		log.info("Reading plans file from " + inPlansFile);
 		plansReader.readFile(inPlansFile);

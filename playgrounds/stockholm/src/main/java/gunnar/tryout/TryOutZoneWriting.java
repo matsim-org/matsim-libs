@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;

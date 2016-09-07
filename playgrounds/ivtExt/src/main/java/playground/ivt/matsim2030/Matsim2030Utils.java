@@ -42,12 +42,11 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.XY2Links;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.MapUtils;
@@ -338,7 +337,7 @@ public class Matsim2030Utils {
 		// allocate a link here (before loading the PT part of the network)
 		for ( ActivityFacility fac : sc.getActivityFacilities().getFacilities().values() ) {
 			if ( fac.getLinkId() == null ) {
-				final NetworkImpl net = (NetworkImpl) sc.getNetwork();
+				final Network net = (Network) sc.getNetwork();
 				((ActivityFacilityImpl) fac).setLinkId( NetworkUtils.getNearestLink(net, fac.getCoord()).getId() );
 			}
 		}
@@ -417,7 +416,7 @@ public class Matsim2030Utils {
 			final TransitRouterNetwork transitRouterNetwork = new TransitRouterNetwork();
 			new TransitRouterNetworkReader(
 					scenario.getTransitSchedule(),
-					transitRouterNetwork ).parse(
+					transitRouterNetwork ).readFile(
 						matsim2030conf.getThinnedTransitRouterNetworkFile() );
 	
 			final TransitRouterWithThinnedNetworkFactory transitRouterFactory =

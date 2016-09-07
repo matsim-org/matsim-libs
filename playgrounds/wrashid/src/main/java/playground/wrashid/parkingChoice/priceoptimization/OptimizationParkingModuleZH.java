@@ -1,13 +1,12 @@
 package playground.wrashid.parkingChoice.priceoptimization;
 
-import java.util.ArrayList;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.PC2.GeneralParkingModule;
 import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
-import org.matsim.contrib.parking.PC2.simulation.ParkingArrivalEvent;
-import org.matsim.contrib.parking.PC2.simulation.ParkingDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -17,20 +16,22 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis.AverageWalkDistanceStatsZH;
 import playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis.ParkingGroupOccupanciesZH;
+import playground.wrashid.parkingChoice.priceoptimization.analysis.ArrivalDepartureParkingHandler;
 import playground.wrashid.parkingChoice.priceoptimization.infrastracture.OptimizableParking;
 
-public class OptimizationParkingModuleZH extends GeneralParkingModule implements IterationStartsListener, IterationEndsListener{
+public class OptimizationParkingModuleZH extends GeneralParkingModule implements IterationStartsListener, 
+	IterationEndsListener{
+	
 	private AverageWalkDistanceStatsZH averageWalkDistanceStatsZH;
 	private ParkingGroupOccupanciesZH parkingGroupOccupanciesZH;
+	private ArrivalDepartureParkingHandler arrivalDepartureParkingHandler;
 	private EventsManager eventsManager;
 	private EventWriterXML eventsWriter;
 	private Controler controler;
-	
-	ArrayList<ParkingArrivalEvent> rentableArrival = new ArrayList<ParkingArrivalEvent>();
-	ArrayList<ParkingDepartureEvent> rentableDeparture = new ArrayList<ParkingDepartureEvent>();
 	
 	public OptimizationParkingModuleZH(Controler controler) {
 		super(controler);
@@ -43,9 +44,8 @@ public class OptimizationParkingModuleZH extends GeneralParkingModule implements
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		
-		HashMap<Id<PC2Parking>, Double> rentableDur = new HashMap<Id<PC2Parking>, Double>();
 		
-		for (ParkingArrivalEvent rA: rentableArrival) {
+		/*for (ParkingArrivalEvent rA: rentableArrival) {
 			for (ParkingDepartureEvent rD: rentableDeparture) {
 				double rentedTime = 0;
 				if (rA.getParkingId(rA.getAttributes()).equals(rD.getParkingId(rD.getAttributes())) && rD.getTime() > rA.getTime()){
@@ -60,9 +60,9 @@ public class OptimizationParkingModuleZH extends GeneralParkingModule implements
 					break;
 				}
 			}
-		}
+		}*/
 		//Save rentable parking information
-		HashMap<String, ArrayList<String>> rentableInfo = new HashMap<String, ArrayList<String>>();
+		/*HashMap<String, ArrayList<String>> rentableInfo = new HashMap<String, ArrayList<String>>();
 		for (PC2Parking parking : getParkingInfrastructure().getAllParkings().values()) {
 			if (parking instanceof OptimizableParking){
 				OptimizableParking par = (OptimizableParking) parking;
@@ -83,44 +83,15 @@ public class OptimizationParkingModuleZH extends GeneralParkingModule implements
 				info.add(Double.toString(parking.getCoordinate().getY()));
 				rentableInfo.put(parking.getId().toString(), info);
 			}
-		}
+		}*/
+		
+		
 		
 		//String outputFolder = event.getControler().getControlerIO().getIterationPath(iter);
 		//CsvFileWriter.writeCsvFile(outputFolder+"/rentableParkingInfo.csv", rentableInfo);
 		
 		
-		//Get occupancy of rentable time in %, if higher than 70% => go up with the price
-		//==================== Setting new prices for rentable parking dependig on the usage
-		for (PC2Parking parking : getParkingInfrastructure().getAllParkings().values()) {
-			double occup = 0;
-			if (parking instanceof OptimizableParking){
-				OptimizableParking par = (OptimizableParking) parking;
-
-				double oldPrice = par.getCostPerHour();
-				if (!(rentableDur.get(par.getId()) == null)){
-					//Check if rentable parking was used (is in list)
-					occup = rentableDur.get(par.getId())/(24 * 60 * 60);
-					if (occup > 0.85){
-					//If occupancy was > 0.75, increase price by 0.5, else decrease price by 0.5
-						if (oldPrice < 200){
-							par.setCostPerHour(oldPrice+0.5);
-						}
-					} else {
-						if (oldPrice >= 1) {
-							par.setCostPerHour(oldPrice-0.5);	
-						}
-					}
-				}
-				//rentable space was not used at all (is not in list) => also decrease price by 0.5
-				else {
-					if (oldPrice >= 1) {
-						par.setCostPerHour(oldPrice - 0.5);	
-					}
-				}
-				
-								
-			}
-		}
+		
 		//====================
 	
 		
@@ -133,6 +104,10 @@ public class OptimizationParkingModuleZH extends GeneralParkingModule implements
 		eventsManager.addHandler(parkingGroupOccupanciesZH);
 		averageWalkDistanceStatsZH = new AverageWalkDistanceStatsZH(getParkingInfrastructureManager().getAllParkings());
 		eventsManager.addHandler(averageWalkDistanceStatsZH);
+		
+		arrivalDepartureParkingHandler = new ArrivalDepartureParkingHandler();
+		eventsManager.addHandler(arrivalDepartureParkingHandler);
+
 		eventsManager.resetHandlers(0);
 		eventsWriter.init(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));
 		
@@ -145,8 +120,221 @@ public class OptimizationParkingModuleZH extends GeneralParkingModule implements
 		
 	}
 	
+	/*@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		//TODO send output to file
+		int iteration = event.getIteration();
+		final BufferedWriter outLink = IOUtils.getBufferedWriter(this.controler.getControlerIO().getIterationFilename(iteration, "prices.txt"));
+		HashMap<Id<PC2Parking>, double[]> rentableDurW = this.arrivalDepartureParkingHandler.getRentableDurPerHour();
+
+		try {
+			for (PC2Parking parking : getParkingInfrastructure().getAllParkings().values()) {
+				if (parking instanceof OptimizableParking){
+					OptimizableParking par = (OptimizableParking) parking;
+
+					double oldPrice = par.getCostPerHour();
+					
+					outLink.write(par.getId() + ";" + Double.toString(oldPrice) + ";" + par.getCoordinate().getX() + ";" +
+					par.getCoordinate().getY() + ";" + par.getMaximumParkingCapacity());
+					if (!(rentableDurW.get(par.getId()) == null)) {
+						
+						double[] durations = rentableDurW.get(par.getId());
+						for (int i = 0; i < 24; i++) {
+							outLink.write(";" + durations[i]/(60 * 60 * par.getMaximumParkingCapacity()));
+						}						
+						
+					}
+					else {
+						for (int i = 0; i < 24; i++) 
+							outLink.write(";0.0");
+						
+					}
+					
+					if (par.getGroupName().equals("streetParking")) {
+						boolean hight = par.isHighTariff();
+						for (int i = 0; i < 24; i++) {
+							if (hight)
+								outLink.write(";" + par.getCostPerHour(i) * 2);
+
+							else
+								outLink.write(";" + par.getCostPerHour(i));
+						}
+					
+					}
+					else {
+						for (int i = 0; i < 24; i++) 
+							outLink.write(";" + par.getCostPerHour(i));
+						
+					}
+				
+					outLink.newLine();
+			}
+								
+			}
+			outLink.flush();
+			outLink.close();
+		}
+		 catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		HashMap<Id<PC2Parking>, Double> rentableDur = this.arrivalDepartureParkingHandler.getRentableDur();
+
+				//==================== Setting new prices for rentable parking dependig on the usage
+				for (PC2Parking parking : getParkingInfrastructure().getAllParkings().values()) {
+					double occup = 0;
+					if (parking instanceof OptimizableParking){
+						OptimizableParking par = (OptimizableParking) parking;
+
+						double oldPrice = par.getCostPerHour();
+						if (!(rentableDur.get(par.getId()) == null)){
+							//Check if rentable parking was used (is in list)
+							occup = rentableDur.get(par.getId())/(24 * 60 * 60 * par.getMaximumParkingCapacity());
+							if (occup > 1.0)
+								System.out.println();
+							if (occup > 0.85){
+							//If occupancy was > 0.85, increase price by 0.25, else decrease price by 0.25
+								if (oldPrice < 200){
+									par.setCostPerHour(oldPrice + 0.25);
+								}
+							} else {
+								if (oldPrice >= 0.25) {
+									par.setCostPerHour(oldPrice - 0.25);	
+								}
+								else
+									par.setCostPerHour(0.0);
+							}
+						}
+						//rentable space was not used at all (is not in list) => also decrease price by 0.25
+						else {
+							if (oldPrice >= 0.25) {
+								par.setCostPerHour(oldPrice - 0.25);	
+							}
+							else
+								par.setCostPerHour(0.0);
+						}
+						
+										
+					}
+				}
+		
+		
+		
+		parkingGroupOccupanciesZH.savePlot(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "parkingGroupOccupancy.png"));
+		averageWalkDistanceStatsZH.printStatistics();
+		
+		eventsManager.finishProcessing();
+		eventsWriter.reset(0);		
+	}*/
+
+
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
+		//TODO send output to file
+		int iteration = event.getIteration();
+		final BufferedWriter outLink = IOUtils.getBufferedWriter(this.controler.getControlerIO().getIterationFilename(iteration, "prices.txt"));
+		HashMap<Id<PC2Parking>, double[]> rentableDur = this.arrivalDepartureParkingHandler.getRentableDurPerHour();
+
+		try {
+			for (PC2Parking parking : getParkingInfrastructure().getAllParkings().values()) {
+				if (parking instanceof OptimizableParking){
+					OptimizableParking par = (OptimizableParking) parking;
+
+					double oldPrice = par.getCostPerHour();
+					
+					outLink.write(par.getId() + ";" + Double.toString(oldPrice) + ";" + par.getCoordinate().getX() + ";" +
+					par.getCoordinate().getY() + ";" + par.getMaximumParkingCapacity());
+					if (!(rentableDur.get(par.getId()) == null)) {
+						
+						double[] durations = rentableDur.get(par.getId());
+						for (int i = 0; i < 24; i++) {
+							outLink.write(";" + durations[i]/(60 * 60 * par.getMaximumParkingCapacity()));
+						}						
+						
+					}
+					else {
+						for (int i = 0; i < 24; i++) 
+							outLink.write(";0.0");
+						
+					}
+					
+					if (par.getGroupName().equals("streetParking")) {
+						boolean hight = par.isHighTariff();
+						for (int i = 0; i < 24; i++) {
+							if (hight)
+								outLink.write(";" + par.getCostPerHour(i) * 2);
+
+							else
+								outLink.write(";" + par.getCostPerHour(i));
+						}
+					
+					}
+					else {
+						for (int i = 0; i < 24; i++) 
+							outLink.write(";" + par.getCostPerHour(i));
+						
+					}
+				
+					outLink.newLine();
+			}
+								
+			}
+			outLink.flush();
+			outLink.close();
+		}
+		 catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+				//==================== Setting new prices for rentable parking dependig on the usage
+				for (PC2Parking parking : getParkingInfrastructure().getAllParkings().values()) {
+					double occup = 0;
+					if (parking instanceof OptimizableParking){
+						OptimizableParking par = (OptimizableParking) parking;
+
+						if (!(rentableDur.get(par.getId()) == null)){
+
+							double[] durations = rentableDur.get(par.getId());
+							for (int i = 0; i < 24; i++) {
+							
+								occup = durations[i]/(60 * 60 * par.getMaximumParkingCapacity());
+								if (occup > 1.0)
+									System.out.println();
+								
+								double oldPrice = par.getCostPerHour(i);
+								if (occup > 0.85){
+								//If occupancy was > 0.85, increase price by 0.25, else decrease price by 0.25
+									if (oldPrice < 200){
+										par.setCostPerHour(oldPrice + 0.25,i);
+									}
+								} else {
+									if (oldPrice >= 0.25) {
+										par.setCostPerHour(oldPrice - 0.25,i);	
+									}
+									else
+										par.setCostPerHour(0.0,i);
+								}
+							}
+						}
+						//rentable space was not used at all (is not in list) => also decrease price by 0.25
+						else {
+							for (int i = 0; i < 24; i++) {
+								double oldPrice = par.getCostPerHour(i);
+
+								if (oldPrice >= 0.25) {
+									par.setCostPerHour(oldPrice - 0.25, i);	
+								}
+								else
+									par.setCostPerHour(0.0, i);
+							}
+						}
+						
+										
+					}
+				}
+		
+		
 		
 		parkingGroupOccupanciesZH.savePlot(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "parkingGroupOccupancy.png"));
 		averageWalkDistanceStatsZH.printStatistics();

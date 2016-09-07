@@ -21,7 +21,7 @@ public class DemandAnalyzer {
 	public static void run(final String demandFile) {
 
 		final ObjectAttributes personAttributes = new ObjectAttributes();
-		(new ObjectAttributesXmlReader(personAttributes)).parse(demandFile);
+		(new ObjectAttributesXmlReader(personAttributes)).readFile(demandFile);
 
 		System.out.println();
 		System.out.println("FILE SUMMARY " + demandFile);

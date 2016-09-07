@@ -57,10 +57,8 @@ public class RoadPricingWithoutTravelDisutilityModule extends AbstractModule {
 
         // add the events handler to calculate the tolls paid by agents
         bind(CalcPaidToll.class).in(Singleton.class);
-        addEventHandlerBinding().to(CalcPaidToll.class);
 
         bind(CalcAverageTolledTripLength.class).in(Singleton.class);
-        addEventHandlerBinding().to(CalcAverageTolledTripLength.class);
     }
 
     private static class RoadPricingSchemeProvider implements Provider<RoadPricingScheme> {
@@ -82,7 +80,7 @@ public class RoadPricingWithoutTravelDisutilityModule extends AbstractModule {
                         + "construct a zero toll file and insert that. ") ;
             }
             RoadPricingSchemeImpl rpsImpl = new RoadPricingSchemeImpl() ;
-            new RoadPricingReaderXMLv1(rpsImpl).parse(tollLinksFile);
+            new RoadPricingReaderXMLv1(rpsImpl).readFile(tollLinksFile);
             return rpsImpl;
         }
     }

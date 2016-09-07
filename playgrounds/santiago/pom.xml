@@ -37,10 +37,13 @@
   		<scope>compile</scope>
   	</dependency>
 
+	
 	<dependency>
-		<groupId>org.matsim.contrib</groupId>
-		<artifactId>gtfs2matsimtransitschedule</artifactId>
-		<version>0.9.0-SNAPSHOT</version>
+  		<groupId>playground</groupId>  
+		<artifactId>agarwalamit</artifactId>
+  		<version>0.9.0-SNAPSHOT</version>
+ 		 <scope>compile</scope>
 	</dependency>
+	
   </dependencies>
 </project>

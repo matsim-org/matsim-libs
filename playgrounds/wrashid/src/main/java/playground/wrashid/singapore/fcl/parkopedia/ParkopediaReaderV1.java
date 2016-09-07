@@ -30,7 +30,7 @@ public class ParkopediaReaderV1 extends MatsimXmlParser implements MatsimSomeRea
 	boolean priceFound=false;
 	
 	public ParkopediaReaderV1() {
-		super(false);
+		setValidating(false);
 	}
 
 	@Override

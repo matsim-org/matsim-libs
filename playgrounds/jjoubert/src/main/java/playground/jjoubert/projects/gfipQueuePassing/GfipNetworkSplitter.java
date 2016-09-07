@@ -30,8 +30,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.southafrica.utilities.Header;
@@ -60,7 +60,7 @@ public class GfipNetworkSplitter {
 		String inputNetwork = args[1];
 		String outputNetworkPrefix = args[2];
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc.getNetwork()).parse(networkFolder + inputNetwork);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFolder + inputNetwork);
 		
 		List<Double> thresholds = new ArrayList<>();
 		for(int i = 3; i < args.length; i++){

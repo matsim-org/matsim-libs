@@ -34,21 +34,20 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingUtils;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -79,7 +78,7 @@ public class MATSimUtils {
 	private final String networkFile;
 	private String plansFile;
 	private DataBaseAdmin dba;
-	private NetworkImpl network;
+	private Network network;
 	private String outPlansFile;
 
 
@@ -110,7 +109,7 @@ public class MATSimUtils {
 		MatsimRandom.reset(123);
 		
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.networkFile);
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		
 		new PopulationReader(scenario).readFile(this.plansFile);
 		final Population plans = (Population) scenario.getPopulation();
@@ -147,14 +146,14 @@ public class MATSimUtils {
 		MatsimRandom.reset(123);
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(this.networkFile);
-		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
+		Network network = (Network) this.scenario.getNetwork();
 		
 		new PopulationReader(this.scenario).readFile(this.plansFile);		
 		final Population plans = (Population) this.scenario.getPopulation();
 		StreamingUtils.setIsStreaming(plans, true);
 		
-		final MatsimPopulationReader plansReader = new PopulationReader(this.scenario);
-		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
+		final MatsimReader plansReader = new PopulationReader(this.scenario);
+		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(plans, network);
 		
 
 		StreamingUtils.addAlgorithm(plans, plansWriter);
@@ -173,7 +172,7 @@ public class MATSimUtils {
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.networkFile);
-		this.network = (NetworkImpl) scenario.getNetwork();
+		this.network = (Network) scenario.getNetwork();
 	}
 	
 	
@@ -184,7 +183,7 @@ public class MATSimUtils {
 	public void changeNetworkSpeeds(double factor, String outfile) {
 //		multiplies network free speed by factor
 		if(network==null) initNetwork();
-		Map<Id<Link>, Link> links = network.getLinks();
+		Map<Id<Link>, ? extends Link> links = network.getLinks();
         for (Link currLink : links.values()) {
             currLink.setFreespeed(currLink.getFreespeed() * factor);
         }
@@ -211,7 +210,7 @@ public class MATSimUtils {
 			remapString.put((e[0]+"_"+e[1]+"_"+e[2]), new String[]{e[3],e[4],e[5]});
 			line = reader.readLine();
 		}
-		Map<Id<Link>, Link> links = network.getLinks();
+		Map<Id<Link>, ? extends Link> links = network.getLinks();
         for (Link currLink : links.values()) {
             if (currLink.getId().toString().equals("SW7_SW8")) {
                 System.out.println();
@@ -240,8 +239,8 @@ public class MATSimUtils {
 	}
 	void writeLinkInfoToSQL(DataBaseAdmin dba) throws SQLException, NoConnectionException{
 		if(network==null) initNetwork();
-		Map<Id<Link>, Link> links = network.getLinks();
-		Iterator<Link> linkIt = links.values().iterator();
+		Map<Id<Link>, ? extends Link> links = network.getLinks();
+		Iterator<? extends Link> linkIt = links.values().iterator();
 		dba.executeStatement("drop table if exists linkmap;");
 		dba.executeStatement("create table linkmap(linkid varchar(45), modes varchar(45), freespeed double, capacity double, lanes double, length double);");
 		while(linkIt.hasNext()){

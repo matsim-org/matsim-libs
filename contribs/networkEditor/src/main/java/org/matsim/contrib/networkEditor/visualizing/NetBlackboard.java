@@ -41,10 +41,11 @@ import javax.swing.SwingUtilities;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.networkEditor.utils.GeometryTools;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.CalcBoundingBox;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -56,6 +57,15 @@ import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.LinearRing;
 
 /**
+ * This class just underwent fairly extensive manual refactoring because I wanted to get rid in the setX/Y in the standard {@link Coord} implementation.
+ * The way forward consisted of the following elements:<ul>
+ * <li> A new class {@link MutableCoord}, which has the setters, and is in general used in the present class.
+ * <li> A new interface {@link CoordI}, which just has the getters.
+ * <li> Make the <i>static</i> core methods accept the interface.  The core should remain on the {@link Coord} class, to be sure that
+ * the values are immutable.
+ * <ul>
+ * kai, jul'16
+ * 
  * @author danielmaxx
  */
 public class NetBlackboard extends javax.swing.JPanel {
@@ -63,7 +73,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	/**
 	 * The working network
 	 */
-	protected NetworkImpl net;
+	protected Network net;
 	/**
 	 * The counts for validation
 	 */
@@ -83,7 +93,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	/**
 	 * The active link to be marked when painting
 	 */
-	protected LinkImpl activeLink;
+	protected Link activeLink;
 	/**
 	 * The active node to be marked when painting
 	 */
@@ -151,7 +161,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * Creates a new form NetBlackboard from a net
 	 * @param Net
 	 */
-	public NetBlackboard(NetworkImpl Net) {
+	public NetBlackboard(Network Net) {
 		initVars();
 		setNetwork(Net);
 		initComponents();
@@ -208,7 +218,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * Sets the network to the board
 	 * @param Net
 	 */
-	public void setNetwork(NetworkImpl Net) {
+	public void setNetwork(Network Net) {
 		net = Net;
 		diffManager = new DifferenceManager(net);
 		controls.setDifferenceManager(diffManager);
@@ -466,7 +476,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 			if(this.line.active) {
 				line.active = false;
 			} else {
-				centerAt(inverseTransform(new Coord((double) evt.getPoint().x, (double) evt.getPoint().y)));
+				centerAt(inverseTransform(new MutableCoord((double) evt.getPoint().x, (double) evt.getPoint().y)));
 				this.zoom(0.05);
 			}
 			this.repaint();
@@ -477,14 +487,14 @@ public class NetBlackboard extends javax.swing.JPanel {
 			if(actualMode == Mode.NONE)
 				return;
 			else if(actualMode == Mode.SELECTION) {
-				Coord mousePos = new Coord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
+				MutableCoord mousePos = new MutableCoord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
 				this.setActiveSomething(mousePos);
 				this.controls.updateTable();
 				/*if(activeLink != null)
                     addLinkInSelectedLinkList(activeLink, true);*/
 			} else if(actualMode == Mode.PAINTING) {
 				if(line.active == false) {
-					Coord c = new Coord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
+					MutableCoord c = new MutableCoord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
 					LinkNodeCoord lnc = setLinePoint(c);
 					line.start = inverseTransform(lnc.coord);
 					line.linkClosestToStart = null;//lnc.link;
@@ -492,7 +502,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 					//System.out.println(line.start);
 					line.active = true;
 				} else {
-					Coord c = new Coord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
+					MutableCoord c = new MutableCoord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
 					LinkNodeCoord lnc = setLinePoint(c);
 					line.end = lnc.coord;
 					line.start = transform(line.start);
@@ -506,7 +516,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 					javax.swing.JOptionPane.showMessageDialog(this, "You must select a link.", null, javax.swing.JOptionPane.INFORMATION_MESSAGE);
 					return;
 				}
-				Coord c = new Coord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
+				MutableCoord c = new MutableCoord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
 				if(this.splitActiveLink(inverseTransform(c))==false)
 					javax.swing.JOptionPane.showMessageDialog(this, "Invalid selection, link not cut.", null, javax.swing.JOptionPane.WARNING_MESSAGE);
 			}
@@ -518,8 +528,8 @@ public class NetBlackboard extends javax.swing.JPanel {
 		Point p = this.getMousePosition();
 		if(p==null)
 			return;
-		Coord mousePos = new Coord((double) p.x, (double) p.y);
-		Coord transformed = inverseTransform(mousePos);
+		MutableCoord mousePos = new MutableCoord((double) p.x, (double) p.y);
+		MutableCoord transformed = inverseTransform(mousePos);
 		this.lblCoordinates.setText("("+String.format("%d", (int)transformed.getX())+","+String.format("%d", (int)transformed.getY())+")");
 		this.repaint();
 	}//GEN-LAST:event_formMouseMoved
@@ -590,26 +600,26 @@ public class NetBlackboard extends javax.swing.JPanel {
 	private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
 		if(actualMode == Mode.MOVING && move.active == false) {
 			move.active = true;
-			move.start = new Coord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
+			move.start = new MutableCoord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
 		} else if(actualMode == Mode.SELECTION && selectionSquare.active == false) {
 			if(isControlPressed == false)
 				this.selectedLinkList.clear();
 			selectionSquare.active = true;
-			selectionSquare.start = new Coord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
+			selectionSquare.start = new MutableCoord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
 			this.repaint();
 		}
 	}//GEN-LAST:event_formMousePressed
 
 	private void formMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseReleased
 		if (actualMode == Mode.MOVING && move.active == true) {
-			move.end = new Coord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
+			move.end = new MutableCoord((double) this.getMousePosition().x, (double) this.getMousePosition().y);
 			this.moveViewBox(-(move.end.getX()-move.start.getX()), -(move.end.getY()-move.start.getY()));
 			move.active = false;
 			this.repaint();
 		} else if(actualMode == Mode.SELECTION && (this.net != null) && selectionSquare.active == true) {
 			Point p = this.getMousePosition();
 			if(p != null) {
-				selectionSquare.end = new Coord((double) p.x, (double) p.y);
+				selectionSquare.end = new MutableCoord((double) p.x, (double) p.y);
 				addLinkInsideSquareOnList();
 			}
 			selectionSquare.active = false;
@@ -650,7 +660,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 			javax.swing.JOptionPane.showMessageDialog(this, "El enlace ya es doble vía", "", javax.swing.JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		activeLink = (LinkImpl)makeDoubleWay(activeLink);
+		activeLink = (Link)makeDoubleWay(activeLink);
 		controls.updateTable();
 		repaint();
 	}//GEN-LAST:event_jButton2ActionPerformed
@@ -829,17 +839,26 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @param coord
 	 * @return The closest link
 	 */
-	protected Link getNearestLinkBrute(Coord coord){
+	protected Link getNearestLinkBrute(MutableCoord coord){
 		Link selected = null;
 		double minDist = Double.MAX_VALUE;
 		for(Link link:net.getLinks().values()){
-			double thisDist = ((LinkImpl) link).calcDistance(coord);
+			final MutableCoord coord1 = coord;
+			Link r = ((Link) link);
+			double thisDist = distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1);
 			if(thisDist < minDist) {
 				minDist = thisDist;
 				selected = link;
 			}
 		}
 		return selected;        
+	}
+	
+	private static double distancePointLinesegment( Coord coordA, Coord coordB, MutableCoord coord1 ) {
+		return CoordUtils.distancePointLinesegment( coordA, coordB, new Coord( coord1.getX(), coord1.getY() ) ) ;
+	}
+	private static double distancePointLinesegment( MutableCoord coordA, MutableCoord coordB, MutableCoord coord1 ) {
+		return CoordUtils.distancePointLinesegment( new Coord(coordA.getX(), coordA.getY()), new Coord(coordB.getX(), coordB.getY()), new Coord( coord1.getX(), coord1.getY() ) ) ;
 	}
 
 	/**
@@ -850,20 +869,26 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @param dist
 	 * @return The nearest link
 	 */
-	protected Link getNearestLinkImproved(Coord coord, double dist){
+	protected Link getNearestLinkImproved(MutableCoord coord, double dist){
 		Link selectedLink = null;
-		Collection<Node> nodes = net.getNearestNodes(coord, dist);
+		final MutableCoord coord2 = coord;
+		final double distance = dist;
+		Collection<Node> nodes = getNearestNodes2(net,coord2, distance);
 		double minDist = Double.MAX_VALUE;
 		for(Node node:nodes) {
 			for(Link link:node.getInLinks().values()) {
-				double curDist = ((LinkImpl) link).calcDistance(coord);
+				final MutableCoord coord1 = coord;
+				Link r = ((Link) link);
+				double curDist = distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1);
 				if(curDist < minDist) {
 					selectedLink = link;
 					minDist = curDist;
 				}
 			}
 			for(Link link:node.getOutLinks().values()) {
-				double curDist = ((LinkImpl) link).calcDistance(coord);
+				final MutableCoord coord1 = coord;
+				Link r = ((Link) link);
+				double curDist = distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1);
 				if(curDist < minDist) {
 					selectedLink = link;
 					minDist = curDist;
@@ -872,12 +897,16 @@ public class NetBlackboard extends javax.swing.JPanel {
 		}
 		return selectedLink;
 	}
+	
+	private static Collection<Node> getNearestNodes2( Network net, MutableCoord coord, double distance ) {
+		return NetworkUtils.getNearestNodes(net, new Coord( coord.getX(), coord.getY() ), distance) ;
+	}
 
-	private boolean insideSquare(Link l, Coord startS, Coord endS) {
+	private boolean insideSquare(Link l, MutableCoord startS, MutableCoord endS) {
 		Coordinate start = new Coordinate(l.getFromNode().getCoord().getX(), l.getFromNode().getCoord().getY());
 		Coordinate end = new Coordinate(l.getToNode().getCoord().getX(), l.getToNode().getCoord().getY());
 		LineSegment lineSegment = new LineSegment(start, end);
-		Coord p1 = inverseTransform(startS), p2 = inverseTransform(endS);
+		MutableCoord p1 = inverseTransform(startS), p2 = inverseTransform(endS);
 		Coordinate c1 = new Coordinate(p1.getX(), p1.getY()), c2 = new Coordinate(p2.getX(), p2.getY());
 		boolean flag = GeometryTools.intersectRectangle(c1, c2, lineSegment)
 				|| GeometryTools.isInside(GeometryTools.getRectangle(c1, c2), lineSegment);
@@ -889,11 +918,12 @@ public class NetBlackboard extends javax.swing.JPanel {
 	private void addLinkInsideSquareOnList() {
 		final double midX = (selectionSquare.start.getX()+selectionSquare.end.getX())/2.0;
 		final double midY = (selectionSquare.start.getY()+selectionSquare.end.getY())/2.0;
-		Coord mid = inverseTransform(new Coord(midX, midY));
-		final double dist = CoordUtils.calcEuclideanDistance(mid, inverseTransform(selectionSquare.end));
+		MutableCoord mid = inverseTransform(new MutableCoord(midX, midY));
+		final double dist = calcEuclideanDistance(mid, inverseTransform(selectionSquare.end));
+		final MutableCoord coord = mid;
 		//System.out.println("mid = " + mid + ", dist = " + dist);
-		Collection<Node> nodes = net.getNearestNodes(mid, dist*8);
-		Coord start = new Coord(selectionSquare.start.getX(), selectionSquare.start.getY()), end = new Coord(selectionSquare.end.getX(), selectionSquare.end.getY());
+		Collection<Node> nodes = getNearestNodes2(net,coord, dist*8);
+		MutableCoord start = new MutableCoord(selectionSquare.start.getX(), selectionSquare.start.getY()), end = new MutableCoord(selectionSquare.end.getX(), selectionSquare.end.getY());
 		for(Node node : nodes) {
 			for(Link l : node.getInLinks().values()) {
 				if(insideSquare(l, start, end))
@@ -904,6 +934,13 @@ public class NetBlackboard extends javax.swing.JPanel {
 					this.addLinkInSelectedLinkList(l, false);
 			}
 		}
+	}
+	
+	private static double calcEuclideanDistance( MutableCoord coord1, MutableCoord coord2 ) {
+		return CoordUtils.calcEuclideanDistance( new Coord( coord1.getX(), coord1.getY() ) , new Coord( coord2.getX(), coord2.getY() ) ) ;
+	}
+	private static double calcEuclideanDistance( MutableCoord coord1, Coord coord2 ) {
+		return CoordUtils.calcEuclideanDistance( new Coord( coord1.getX(), coord1.getY() ) , coord2 ) ;
 	}
 
 	/**
@@ -929,7 +966,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 			//System.out.println("Adding link " + link.getId());
 			selectedLinkList.add(link);
 		}
-		activeLink = (LinkImpl)link;
+		activeLink = (Link)link;
 		return true;
 	}
 
@@ -979,12 +1016,9 @@ public class NetBlackboard extends javax.swing.JPanel {
 	private void unifyLinks(Link segment1, Link segment2) {
 		if(segment1.getToNode().getId().equals(segment2.getFromNode().getId()) == false)
 			return;
-		Link newLink = net.getFactory().createLink(this.getRandomLinkId(),
-				segment1.getFromNode(), segment2.getToNode(), net,
-				segment1.getLength()+segment2.getLength(),
-				(segment1.getFreespeed()+segment2.getFreespeed())/2.0,
-				(segment1.getCapacity()+segment2.getCapacity())/2.0,
-				Math.min(segment1.getNumberOfLanes(), segment2.getNumberOfLanes()));
+		final Network network = net;
+		NetworkFactory r = net.getFactory();
+		Link newLink = NetworkUtils.createLink(this.getRandomLinkId(), segment1.getFromNode(), segment2.getToNode(), network, segment1.getLength()+segment2.getLength(), (segment1.getFreespeed()+segment2.getFreespeed())/2.0, (segment1.getCapacity()+segment2.getCapacity())/2.0, Math.min(segment1.getNumberOfLanes(), segment2.getNumberOfLanes()));
 		net.addLink(newLink);
 		net.removeLink(segment1.getId());
 		net.removeLink(segment2.getId());
@@ -1019,12 +1053,14 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @param dist
 	 * @return The nearest node from the coordinates at a radius distance of dist
 	 */
-	protected Node getNearestNodes(Coord coord, double dist) {
-		Collection<Node> nodes = net.getNearestNodes(coord, dist);
+	protected Node getNearestNodes(MutableCoord coord, double dist) {
+		final MutableCoord coord1 = coord;
+		final double distance = dist;
+		Collection<Node> nodes = getNearestNodes2(net,coord1, distance);
 		double minDist = Double.MAX_VALUE;
 		Node selectedNode = null;
 		for(Node node:nodes) {            
-			double curDist = CoordUtils.calcEuclideanDistance(coord, node.getCoord());
+			double curDist = calcEuclideanDistance(coord, node.getCoord());
 			if(curDist < minDist) {
 				selectedNode = node;
 				minDist = curDist;
@@ -1038,8 +1074,11 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @param coord
 	 * @return The nearest Node
 	 */
-	protected Node getNearestNode(Coord coord) {
-		return net.getNearestNode(coord);
+	protected Node getNearestNode(MutableCoord coord) {
+		return NetworkUtils.getNearestNode(net, new Coord( coord.getX(), coord.getY() ) ) ;
+	}
+	protected static Node getNearestNode(Network net, MutableCoord coord) {
+		return NetworkUtils.getNearestNode(net, new Coord( coord.getX(), coord.getY() ) ) ;
 	}
 
 	/**
@@ -1049,7 +1088,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 *         cannot be non-null at the same time. If they are null, it means
 	 *         that no nearest link or node can be picked.
 	 */
-	private LinkNodeCoord setLinePoint(Coord mouse) {
+	private LinkNodeCoord setLinePoint(MutableCoord mouse) {
 		LinkNodeCoord lnc = new LinkNodeCoord();
 		PairLinkNode p = this.getClosestThing(mouse);
 		if(p.node != null) {
@@ -1070,7 +1109,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		return lnc;
 	}
 
-	private LinkNodeCoord setLinePointForceNode(Coord mouse) {
+	private LinkNodeCoord setLinePointForceNode(MutableCoord mouse) {
 		LinkNodeCoord lnc = new LinkNodeCoord();
 		Node nearest = getNearestNode(inverseTransform(mouse));
 		lnc.coord = transform(nearest.getCoord());
@@ -1086,14 +1125,14 @@ public class NetBlackboard extends javax.swing.JPanel {
 	public void moveViewBox(double dx, double dy) {
 		if(Math.abs(dx) > getWidth() || Math.abs(dy) > getHeight())
 			return;
-		Coord origin = inverseTransform(new Coord((double) 0, (double) 0));
-		Coord moves = inverseTransform(new Coord(dx, dy));
+		MutableCoord origin = inverseTransform(new MutableCoord((double) 0, (double) 0));
+		MutableCoord moves = inverseTransform(new MutableCoord(dx, dy));
 		curX += (moves.getX()-origin.getX());
 		curY += (moves.getY()-origin.getY());
 	}
 
-	public void centerAt(Coord point) {
-		Coord mid = getMidPoint();
+	public void centerAt(MutableCoord point) {
+		MutableCoord mid = getMidPoint();
 		curX += point.getX() - mid.getX();
 		curY += point.getY() - mid.getY();
 	}
@@ -1114,15 +1153,18 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @param coord
 	 * @return The transformed coordinate
 	 */
-	protected Coord transform(Coord coord) {
+	protected MutableCoord transform(MutableCoord coord) {
 		double x = coord.getX() - curX, y = coord.getY() - curY;
 		final double boxSizeX = offX + offX*0.05;
 		final double boxSizeY = offY + offY*0.05;
 		x = (x*this.getWidth())/boxSizeX + 10;
 		y = (y*this.getHeight())/boxSizeY + 10;
 		y = getHeight() - y;
-		Coord result = new Coord(x, y);
+		MutableCoord result = new MutableCoord(x, y);
 		return result;
+	}
+	private MutableCoord transform( Coord coord ) {
+		return transform( new MutableCoord( coord ) ) ;
 	}
 
 	/**
@@ -1130,7 +1172,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @param coord
 	 * @return The transformed coordinate
 	 */
-	protected Coord inverseTransform(Coord coord) {
+	protected MutableCoord inverseTransform(MutableCoord coord) {
 		final double boxSizeX = offX + offX*0.05;
 		final double boxSizeY = offY + offY*0.05;
 		double x = coord.getX() - 10, y = coord.getY() + 10;
@@ -1139,7 +1181,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		y = (y*boxSizeY)/getHeight();
 		x = x + curX;
 		y = y + curY;
-		Coord result = new Coord(x, y);
+		MutableCoord result = new MutableCoord(x, y);
 		return result;
 	}
 
@@ -1148,12 +1190,12 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @param coord
 	 * @return A random Id node
 	 */
-	private Node getRandomNode(Coord coord) {
+	private Node getRandomNode(MutableCoord coord) {
 		Random r = new Random();
 		Id<Node> id = Id.create(r.nextInt(net.getNodes().size()*3), Node.class); //PARCHE
 		while(net.getNodes().keySet().contains(id))
 			id = Id.create(r.nextInt(net.getNodes().size()*3), Node.class); //PARCHE
-		Node result = net.getFactory().createNode(id, coord);
+		Node result = net.getFactory().createNode(id, new Coord(coord.getX(),coord.getY() ) );
 		return result;
 	}
 
@@ -1170,7 +1212,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	}
 
 	public Link makeDoubleWay(Link link){
-		LinkImpl newLink = (LinkImpl)net.getFactory().createLink(getRandomLinkId(), link.getToNode(), link.getFromNode());
+		Link newLink = (Link)net.getFactory().createLink(getRandomLinkId(), link.getToNode(), link.getFromNode());
 		newLink.setCapacity(link.getCapacity());
 		newLink.setLength(link.getLength());
 		newLink.setFreespeed(link.getFreespeed());
@@ -1204,8 +1246,8 @@ public class NetBlackboard extends javax.swing.JPanel {
 			endAdded = true;
 		}
 		Id<Link> id = getRandomLinkId();
-		LinkImpl newLink = (LinkImpl)net.getFactory().createLink(id, start, end);
-		newLink.setLength(newLink.getEuklideanLength());
+		Link newLink = (Link)net.getFactory().createLink(id, start, end);
+		newLink.setLength(CoordUtils.calcEuclideanDistance(newLink.getFromNode().getCoord(), newLink.getToNode().getCoord()));
 		newLink.setCapacity(600.0);
 		newLink.setFreespeed(8.3333);
 		net.addLink(newLink);
@@ -1230,10 +1272,10 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @return true if the link can be cutted, that is, p is perpendicular to
 	 *          the active link.
 	 */
-	public boolean splitActiveLink(Coord p) {
-		Coord projection = calculatePointOnLine(activeLink.getFromNode().getCoord(), activeLink.getToNode().getCoord(), p);
+	public boolean splitActiveLink(MutableCoord p) {
+		MutableCoord projection = calculatePointOnLine(new MutableCoord(activeLink.getFromNode().getCoord()), new MutableCoord(activeLink.getToNode().getCoord()), p);
 		//System.out.println(projection);
-		double rel = calculateRelation(activeLink.getFromNode().getCoord(), activeLink.getToNode().getCoord(), projection);
+		double rel = calculateRelation(new MutableCoord(activeLink.getFromNode().getCoord()), new MutableCoord(activeLink.getToNode().getCoord()), projection);
 		if(rel <= 0.0 || rel >=1.0)
 			return false;
 		else {
@@ -1249,7 +1291,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @param toCut link to be cut
 	 * @param p coordinate to cut
 	 */
-	private pairLinkLink cutLink(Link toCut, Coord p) {
+	private pairLinkLink cutLink(Link toCut, MutableCoord p) {
 		Node endPoint = getRandomNode(p);
 		net.addNode(endPoint);
 		pairLinkLink pair = fixLink(toCut, endPoint);
@@ -1270,7 +1312,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		Node from = toFix.getFromNode();
 		Node to = toFix.getToNode();
 		net.removeLink(toFix.getId());
-		double rel = calculateRelation(toFix.getFromNode().getCoord(), toFix.getToNode().getCoord(), endPoint.getCoord());
+		double rel = calculateRelation(new MutableCoord(toFix.getFromNode().getCoord()), new MutableCoord(toFix.getToNode().getCoord()), new MutableCoord(endPoint.getCoord()));
 		System.out.println(rel);
 		Id<Link> aux = getRandomLinkId();
 		Link newLink1 = createLinkFromExistent(toFix, rel, aux, from, endPoint);
@@ -1291,15 +1333,20 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @return
 	 */
 	private Link createLinkFromExistent(Link source, double distRelation, Id<Link> id, Node from, Node to) {
-		return net.getFactory().createLink(id, from, to, net, source.getLength()*distRelation, source.getFreespeed(), source.getCapacity(), source.getNumberOfLanes());
+		final Id<Link> id1 = id;
+		final Node from1 = from;
+		final Node to1 = to;
+		final Network network = net;
+		NetworkFactory r = net.getFactory();
+		return NetworkUtils.createLink(id1, from1, to1, network, source.getLength()*distRelation, source.getFreespeed(), source.getCapacity(), source.getNumberOfLanes());
 	}
 
 	/**
 	 * Gets the mid point of the view box.
 	 * @return
 	 */
-	protected Coord getMidPoint() {
-		return new Coord(curX + offX / 2, curY + offY / 2);
+	protected MutableCoord getMidPoint() {
+		return new MutableCoord(curX + offX / 2, curY + offY / 2);
 	}
 
 	/*
@@ -1318,7 +1365,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @return true if P3 is inside the bounding box of the segment formed by
 	 * P1 and P2.
 	 */
-	protected boolean isOutside(Coord P1, Coord P2, Coord P3) {
+	protected boolean isOutside(MutableCoord P1, MutableCoord P2, MutableCoord P3) {
 		double minx = Math.min(P1.getX(), P2.getX()), miny = Math.min(P1.getY(), P2.getY());
 		double maxx = Math.max(P1.getX(), P2.getX()), maxy = Math.max(P1.getY(), P2.getY());
 		double x = P3.getX(), y = P3.getY();
@@ -1336,7 +1383,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @param P3 the point to be projected
 	 * @return a Coord where is the projected point is located
 	 */
-	protected Coord calculatePointOnLine(Coord P1, Coord P2, Coord P3) {
+	protected MutableCoord calculatePointOnLine(MutableCoord P1, MutableCoord P2, MutableCoord P3) {
 		double rel = calculateRelation(P1, P2, P3);
 		double dx = Math.abs(P1.getX()-P2.getX()), dy = Math.abs(P1.getY()-P2.getY());
 		double nx = P1.getX()+dx*rel, ny = P1.getY()+dy*rel;
@@ -1344,7 +1391,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 			nx = P1.getX()-dx*rel;
 		if(P1.getY()>P2.getY())
 			ny = P1.getY()-dy*rel;
-		Coord result = new Coord(nx, ny);
+		MutableCoord result = new MutableCoord(nx, ny);
 		return result;
 	}
 
@@ -1356,11 +1403,11 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @param P3
 	 * @return A number in the range [0, 1].
 	 */
-	private double calculateRelation(Coord P1, Coord P2, Coord P3) {
-		double d = CoordUtils.distancePointLinesegment(P1, P2, P3);
-		double r = CoordUtils.calcEuclideanDistance(P1, P3);
+	private double calculateRelation(MutableCoord P1, MutableCoord P2, MutableCoord P3) {
+		double d = distancePointLinesegment(P1, P2, P3);
+		double r = calcEuclideanDistance(P1, P3);
 		double dist1 = Math.sqrt((r*r)-(d*d)); //distance from P1 to the point;
-		double dist2 = CoordUtils.calcEuclideanDistance(P1, P2);
+		double dist2 = calcEuclideanDistance(P1, P2);
 		double rel = dist1/dist2;
 		return rel;
 	}
@@ -1370,7 +1417,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @param coord
 	 * @return true if it's inside, false if not.
 	 */
-	protected boolean isInside(Coord coord) {
+	protected boolean isInside(MutableCoord coord) {
 		if(coord.getX() < 0 || coord.getY() < 0)
 			return false;
 		if(coord.getX() > getWidth() || coord.getY() > getHeight())
@@ -1383,7 +1430,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * coordinate system to the network coordinate system.
 	 * @param coord
 	 */
-	protected void invertY(Coord coord){
+	protected void invertY(MutableCoord coord){
 		coord.setY(getHeight()-coord.getY());
 	}
 
@@ -1393,7 +1440,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @param m
 	 * @param b
 	 */
-	protected void fixPoint(Coord P, double m, double b) {
+	protected void fixPoint(MutableCoord P, double m, double b) {
 		if(m == Double.POSITIVE_INFINITY) {
 			if(P.getY()<0)
 				P.setY(0.0);
@@ -1420,7 +1467,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @param P1
 	 * @param P2
 	 */
-	protected void fixLine(Coord P1, Coord P2) {
+	protected void fixLine(MutableCoord P1, MutableCoord P2) {
 		if(!isInside(P1)&&!isInside(P2)) return;
 		if(isInside(P1)&&isInside(P2)) return;
 		invertY(P1);
@@ -1446,7 +1493,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 			g2.setColor(Color.RED);
 		else
 			g2.setColor(Color.BLUE);
-		Coord transformed = transform(node.getCoord());
+		MutableCoord transformed = transform(node.getCoord());
 		g2.fillRect((int)transformed.getX()-2, (int)transformed.getY()-2, 4, 4);
 	}
 
@@ -1483,8 +1530,8 @@ public class NetBlackboard extends javax.swing.JPanel {
 	protected void paintLinks(Collection<? extends Link> links, Graphics2D g2) {
 		g2.setColor(Color.BLACK);
 		for(Link link:links){            
-			Coord transformed = transform(link.getFromNode().getCoord());
-			Coord transformed2 = transform(link.getToNode().getCoord());
+			MutableCoord transformed = transform(link.getFromNode().getCoord());
+			MutableCoord transformed2 = transform(link.getToNode().getCoord());
 			fixLine(transformed, transformed2);
 			if(capacityToggle.isSelected())
 				setLinkColor(link, g2);
@@ -1500,8 +1547,8 @@ public class NetBlackboard extends javax.swing.JPanel {
 		if(selectedLinkList.isEmpty())
 			return;
 		for(Link link : selectedLinkList) {
-			Coord P1 = transform(link.getFromNode().getCoord());
-			Coord P2 = transform(link.getToNode().getCoord());
+			MutableCoord P1 = transform(link.getFromNode().getCoord());
+			MutableCoord P2 = transform(link.getToNode().getCoord());
 			g2.setColor(Color.CYAN);
 			g2.drawLine((int)P1.getX(), (int)P1.getY(), (int)P2.getX(), (int)P2.getY());
 			paintActiveLinkArrow(g2, link);
@@ -1515,8 +1562,8 @@ public class NetBlackboard extends javax.swing.JPanel {
 	protected void paintActiveLinkArrow(Graphics2D g2, Link activeLink) {
 		if(activeLink == null)
 			return;
-		Coord P1 = transform(activeLink.getFromNode().getCoord());
-		Coord P2 = transform(activeLink.getToNode().getCoord());
+		MutableCoord P1 = transform(activeLink.getFromNode().getCoord());
+		MutableCoord P2 = transform(activeLink.getToNode().getCoord());
 		AffineTransform tx = new AffineTransform();
 		Line2D.Double lines = new Line2D.Double(P1.getX(),P1.getY(),P2.getX(),P2.getY());
 
@@ -1583,7 +1630,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * Set the active Link/Node
 	 * @param Pos
 	 */
-	protected void setActiveSomething(Coord Pos){
+	protected void setActiveSomething(MutableCoord Pos){
 		PairLinkNode result = getClosestThing(Pos);
 		activeNode = result.node;
 		if(activeLink != null && result.link!=null && activeLink.getId().equals(result.link.getId())) {
@@ -1602,20 +1649,21 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @return a pairLinkNode with the selected Link/Node. If no Link/Node can
 	 *          be choose, return null in one or both components.
 	 */
-	protected PairLinkNode getClosestThing(Coord Pos) {
-		Coord transformed = inverseTransform(Pos);
+	protected PairLinkNode getClosestThing(MutableCoord Pos) {
+		MutableCoord transformed = inverseTransform(Pos);
 		Link link = getNearestLinkImproved(transformed, offX/4.0);
-		Coord P1 = new Coord(Double.MAX_VALUE, Double.MAX_VALUE), P2 = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
+		MutableCoord P1 = new MutableCoord(Double.MAX_VALUE, Double.MAX_VALUE), P2 = new MutableCoord(Double.MAX_VALUE, Double.MAX_VALUE);
 		if(link != null) {
 			P1 = transform(link.getFromNode().getCoord());
 			P2 = transform(link.getToNode().getCoord());
 		}
-		double dist1 = CoordUtils.distancePointLinesegment(P1, P2, Pos);
-		Node node = net.getNearestNode(transformed);
+		double dist1 = distancePointLinesegment(P1, P2, Pos);
+		final MutableCoord coord = transformed;
+		Node node = getNearestNode(net,coord);
 		if(node == null && link == null)
 			return new PairLinkNode(null, null);
-		Coord P3 = transform(node.getCoord());
-		double dist2 = CoordUtils.calcEuclideanDistance(P3, Pos);
+		MutableCoord P3 = transform(node.getCoord());
+		double dist2 = calcEuclideanDistance(P3, Pos);
 		//System.out.println("dist1 = " + dist1 + ", dist2 = " + dist2 + ", tolerance = " + tolerance*(getWidth()+getHeight())/2.0);
 		if(dist1 > (tolerance*(getWidth()+getHeight())/2.0))
 			link = null;
@@ -1633,7 +1681,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		g.setColor(Color.GRAY);
 		Point p = this.getMousePosition();
 		if(p == null) return;
-		Coord end = new Coord(p.getX(), p.getY());
+		MutableCoord end = new MutableCoord(p.getX(), p.getY());
 		LinearRing ring = GeometryTools.getRectangle(GeometryTools.MATSimCoordToCoordinate(selectionSquare.start), GeometryTools.MATSimCoordToCoordinate(end));
 		Polygon poly = GeometryTools.toJavaPolygon(ring);
 		g.drawPolygon(poly);
@@ -1646,12 +1694,12 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 */
 	protected void paintLine(Graphics g) {
 		g.setColor(Color.RED);
-		Coord transformed = transform(line.start);
+		MutableCoord transformed = transform(line.start);
 		g.fillOval((int)transformed.getX()-2, (int)transformed.getY()-2, 4, 4);
-		Coord end;
+		MutableCoord end;
 		Point p = this.getMousePosition();
 		if(p == null) return;
-		end = new Coord(p.getX(), p.getY());
+		end = new MutableCoord(p.getX(), p.getY());
 		g.setColor(Color.BLACK);
 		//System.out.println(end.getX() + " " + end.getY());
 		g.drawLine((int)transformed.getX(), (int)transformed.getY(), (int)end.getX(), (int)end.getY());
@@ -1664,7 +1712,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		if(net==null) return;
 		Graphics2D g2 = (Graphics2D)g;
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		Collection<Node> nodeList = net.getNearestNodes(getMidPoint(), getMidDistance());
+		Collection<Node> nodeList = getNearestNodes2(net,getMidPoint(), getMidDistance());
 		for(Node node: nodeList) {
 			paintNode(node, g2);
 			paintLinks(node.getOutLinks().values(), g2);
@@ -1702,9 +1750,9 @@ public class NetBlackboard extends javax.swing.JPanel {
 	private class LinkNodeCoord {
 		public Node node;
 		public Link link;
-		public Coord coord;
+		public MutableCoord coord;
 		LinkNodeCoord(){}
-		LinkNodeCoord(Link l, Node n, Coord c) {
+		LinkNodeCoord(Link l, Node n, MutableCoord c) {
 			node = n;
 			link = l;
 			coord = c;
@@ -1712,36 +1760,36 @@ public class NetBlackboard extends javax.swing.JPanel {
 	}
 
 	class LineOnBoard {
-		public Coord start, end;
+		public MutableCoord start, end;
 		public Node nodeClosestToStart, nodeClosestToEnd;
 		public Link linkClosestToStart, linkClosestToEnd;
 		boolean active;
 		LineOnBoard() {
 			active = false;
-			start = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
-			end = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
+			start = new MutableCoord(Double.MAX_VALUE, Double.MAX_VALUE);
+			end = new MutableCoord(Double.MAX_VALUE, Double.MAX_VALUE);
 			nodeClosestToStart = nodeClosestToEnd = null;
 			linkClosestToStart = linkClosestToEnd = null;
 		}
 	}
 
 	class MoveOnBoard {
-		public Coord start, end;
+		public MutableCoord start, end;
 		boolean active;
 		MoveOnBoard() {
 			active = false;
-			start = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
-			end = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
+			start = new MutableCoord(Double.MAX_VALUE, Double.MAX_VALUE);
+			end = new MutableCoord(Double.MAX_VALUE, Double.MAX_VALUE);
 		}
 	}
 
 	class SquareOnBoard{
-		public Coord start, end;
+		public MutableCoord start, end;
 		boolean active;
 		SquareOnBoard() {
 			active = false;
-			start = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
-			end = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
+			start = new MutableCoord(Double.MAX_VALUE, Double.MAX_VALUE);
+			end = new MutableCoord(Double.MAX_VALUE, Double.MAX_VALUE);
 		}
 	}
 

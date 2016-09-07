@@ -42,6 +42,8 @@ import com.google.inject.name.Named;
 
 import playground.michalm.ev.data.EvData;
 import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.assignment.*;
+import playground.michalm.taxi.optimizer.rules.*;
 import playground.michalm.taxi.scheduler.ETaxiScheduler;
 import playground.michalm.taxi.vrpagent.ETaxiActionCreator;
 
@@ -76,8 +78,20 @@ public class ETaxiQSimProvider
 
         Configuration optimizerConfig = new MapConfiguration(
                 taxiCfg.getOptimizerConfigGroup().getParams());
-        return new RuleBasedETaxiOptimizer(optimContext,
-                new RuleBasedETaxiOptimizerParams(optimizerConfig));
+
+        String type = optimizerConfig.getString("type");
+        switch (type) {
+            case "E_RULE_BASED":
+                return new RuleBasedETaxiOptimizer(optimContext,
+                        new RuleBasedETaxiOptimizerParams(optimizerConfig));
+
+            case "E_ASSIGNMENT":
+                return new AssignmentETaxiOptimizer(optimContext,
+                        new AssignmentETaxiOptimizerParams(optimizerConfig));
+
+            default:
+                throw new RuntimeException();
+        }
     }
 
 

@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
@@ -58,7 +58,7 @@ public class ConvertFigure9Solution2Matsim {
 		
 		//load config and signals
 		Config config = ConfigUtils.loadConfig(matsimConfig);
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
+		SignalsDataLoader signalsLoader = new SignalsDataLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
 		SignalsData signals = signalsLoader.loadSignalsData();
 		
 		//convert solution to signal plans

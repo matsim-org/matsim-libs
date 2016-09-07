@@ -23,6 +23,7 @@ package playground.singapore.transitLocationChoice;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -31,7 +32,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.timegeography.ManageSubchains;
 import org.matsim.contrib.locationchoice.timegeography.SubChain;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationUtils;
@@ -49,7 +49,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 	private double recursionTravelSpeedChange = 0.1;
 	private double recursionTravelSpeed = 30.0;
 	protected int maxRecursions = 10;
-	private NetworkImpl justCarNetwork = NetworkImpl.createNetwork();
+	private Network justCarNetwork = NetworkUtils.createNetwork();
 	private TripRouter router;
 
 	public RecursiveLocationMutator(final Scenario scenario, TripRouter router,

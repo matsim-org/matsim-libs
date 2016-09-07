@@ -138,6 +138,12 @@ public class RunTeleportationMobsimWithCustomRoutingExample {
 			public Map<String, ActivityOption> getActivityOptions() {
 				throw new UnsupportedOperationException();
 			}
+
+			@Override
+			public void setCoord(Coord coord) {
+				// TODO Auto-generated method stub
+				throw new RuntimeException("not implemented") ;
+			}
 		};
 	}
 }

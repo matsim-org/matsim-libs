@@ -51,7 +51,7 @@ public class Analyzer implements PersonDepartureEventHandler, PersonArrivalEvent
 		EventsManagerImpl m = new EventsManagerImpl();
 		Analyzer handl = new Analyzer();
 		m.addHandler(handl);
-		new EventsReaderXMLv1(m).parse(events);
+		new EventsReaderXMLv1(m).readFile(events);
 		BufferedWriter w = new BufferedWriter(new FileWriter(new File(outp)));
 		System.out.println(handl);
 		w.append(handl.toString());

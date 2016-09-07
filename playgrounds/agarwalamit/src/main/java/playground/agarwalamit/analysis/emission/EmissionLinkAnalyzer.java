@@ -40,13 +40,12 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.emission.filtering.FilteredColdEmissionHandler;
-import playground.agarwalamit.analysis.emission.filtering.FilteredWarmEmissionHandler;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
+import playground.agarwalamit.utils.AreaFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
 import playground.benjamin.internalization.EmissionCostFactors;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
@@ -72,8 +71,9 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 		super(EmissionLinkAnalyzer.class.getSimpleName());
 		this.emissionEventsFile = emissionEventFile;
 		LOG.info("Aggregating emissions for each "+simulationEndTime/noOfTimeBins+" sec time bin.");
-		this.warmHandler = new FilteredWarmEmissionHandler(simulationEndTime, noOfTimeBins, shapeFile, network, userGroup);
-		this.coldHandler = new FilteredColdEmissionHandler(simulationEndTime, noOfTimeBins, shapeFile, network, userGroup);
+		AreaFilter af = new AreaFilter(shapeFile);
+		this.warmHandler = new FilteredWarmEmissionHandler(simulationEndTime, noOfTimeBins, userGroup, new MunichPersonFilter(), network, af);
+		this.coldHandler = new FilteredColdEmissionHandler(simulationEndTime, noOfTimeBins, userGroup, new MunichPersonFilter(), network, af);
 	}
 
 	/**
@@ -81,7 +81,6 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 	 */
 	public EmissionLinkAnalyzer(final double simulationEndTime, final String emissionEventFile, final int noOfTimeBins, final String shapeFile, final Network network ) {
 		this(simulationEndTime,emissionEventFile,noOfTimeBins,shapeFile,network,null);
-
 	}
 
 	/**
@@ -118,7 +117,6 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 //		}
 
 	public static void main(String[] args) {
-		ExtendedPersonFilter pf = new ExtendedPersonFilter();
 		String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
 		String [] runCases =  {"bau","ei","5ei","10ei","15ei","20ei","25ei"};
 //		String shapeFileCity = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
@@ -129,10 +127,10 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 		try{
 			writer.write("scenario \t userGroup \t totalCostEUR \n");
 			for(String str : runCases){
-				for(UserGroup ug :UserGroup.values()) {
+				for(MunichUserGroup ug :MunichUserGroup.values()) {
 					String emissionEventFile = dir+str+"/ITERS/it.1500/1500.emission.events.xml.gz";
-					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileMMA, sc.getNetwork(), pf.getMyUserGroup(ug));
-//					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileCity, sc.getNetwork(), ug);
+					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileMMA, sc.getNetwork(), ug.toString());
+//					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileCity, sc.getNetwork(), ug.toString());
 					ela.preProcessData();
 					ela.postProcessData();
 					ela.writeTotalEmissions(dir+str+"/analysis/","MMA_"+ug.toString());
@@ -157,7 +155,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
 		eventsManager.addHandler(this.warmHandler);
 		eventsManager.addHandler(this.coldHandler);
-		emissionReader.parse(this.emissionEventsFile);
+		emissionReader.readFile(this.emissionEventsFile);
 	}
 
 	@Override

@@ -31,7 +31,7 @@ public class OSMTest {
 	public static void main(String[] args) {
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
-		parser.parse("/home/johannes/Downloads/map (5).osm");
+		parser.readFile("/home/johannes/Downloads/map (5).osm");
 		
 		System.out.println(String.format("%s nodes,  %s ways", parser.getNodes().size(), parser.getWays().size()));
 

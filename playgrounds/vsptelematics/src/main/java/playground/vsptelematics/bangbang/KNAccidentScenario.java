@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
@@ -40,7 +41,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -51,20 +51,12 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.replanning.strategies.KeepLastExecuted;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-import org.matsim.withinday.controller.ExecutedPlansService;
-import org.matsim.withinday.controller.ExecutedPlansServiceImpl;
-import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
 /**
@@ -74,6 +66,7 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 public class KNAccidentScenario {
 	private static final Logger log = Logger.getLogger(KNAccidentScenario.class) ;
 	
+	@SuppressWarnings("unused")
 	private static final String KEEP_LAST_EXECUTED = "keepLastExecuted" ;
 
 	static final class MyIterationCounter implements IterationStartsListener {
@@ -101,17 +94,16 @@ public class KNAccidentScenario {
 
 		// ===
 
-		final Config config = ConfigUtils.loadConfig("/Users/nagel/kairuns/telematics/baseconfig.xml") ;
+		final Config config = ConfigUtils.loadConfig("../../../../shared-svn/studies/countries/de/berlin/telematics/funkturm-example/baseconfig.xml") ;
 
-		config.network().setInputFile("/Users/nagel/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz");
+		config.network().setInputFile("../../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz");
 		config.network().setTimeVariantNetwork(true);
 
-		//		config.plans().setInputFile("/Users/nagel/kairuns/a100/7dec13-base/output_plans.xml.gz");
-		config.plans().setInputFile("/Users/nagel/kairuns/telematics/reduced-plans.xml.gz");
+		config.plans().setInputFile("../../../../shared-svn/studies/countries/de/berlin/telematics/funkturm-example/reduced-plans.xml.gz");
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 
 		config.controler().setLastIteration(10);
-		config.controler().setOutputDirectory("/Users/nagel/kairuns/telematics/output");
+		config.controler().setOutputDirectory("./output/telematics/funkturm-example");
 		config.controler().setWriteEventsInterval(100);
 		config.controler().setWritePlansInterval(100);
 
@@ -198,9 +190,8 @@ public class KNAccidentScenario {
 
 	private static void scheduleAccident(final Scenario scenario) {
 		List<NetworkChangeEvent> events = new ArrayList<>() ;
-		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl() ;
 		{
-			NetworkChangeEvent event = cef.createNetworkChangeEvent(8*3600.) ;
+			NetworkChangeEvent event = new NetworkChangeEvent(8*3600.) ;
 			event.addLink( scenario.getNetwork().getLinks().get( accidentLinkId ) ) ;
 			ChangeValue change = new ChangeValue( ChangeType.FACTOR, 0.1 ) ;
 			event.setFlowCapacityChange(change);
@@ -209,7 +200,7 @@ public class KNAccidentScenario {
 			events.add(event) ;
 		}
 		{
-			NetworkChangeEvent event = cef.createNetworkChangeEvent(9*3600.) ;
+			NetworkChangeEvent event = new NetworkChangeEvent(9*3600.) ;
 			event.addLink( scenario.getNetwork().getLinks().get( accidentLinkId ) );
 			ChangeValue change = new ChangeValue( ChangeType.FACTOR, 10. ) ;
 			event.setFlowCapacityChange(change);
@@ -217,7 +208,8 @@ public class KNAccidentScenario {
 			event.setLanesChange(lanesChange);
 			events.add(event) ;
 		}
-		((NetworkImpl) scenario.getNetwork()).setNetworkChangeEvents(events);
+		final List<NetworkChangeEvent> events1 = events;
+		NetworkUtils.setNetworkChangeEvents(((Network) scenario.getNetwork()),events1);
 	}
 
 	private static void preparePopulation(final Scenario scenario) {

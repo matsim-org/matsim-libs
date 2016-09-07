@@ -14,16 +14,16 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 import au.com.bytecode.opencsv.CSVReader;
 
 public class StockholmP0Helper {
-	NetworkImpl network;
-	Map<Id<Link>,Link> alllinks;
-	public StockholmP0Helper(NetworkImpl network){
+	Network network;
+	Map<Id<Link>,? extends Link> alllinks;
+	public StockholmP0Helper(Network network){
 		this.network=network;
 		this.alllinks = network.getLinks();
 	}
@@ -95,13 +95,13 @@ public class StockholmP0Helper {
 		}
 		return timednodescordinates;
 	}
-	public Map<String, List<Link>> getInLinksForJunctions(List<String> timednodes, NetworkImpl network){
+	public Map<String, List<Link>> getInLinksForJunctions(List<String> timednodes, Network network){
 		Map<String, List<Link>> incominglinks = new HashMap<String, List<Link>>();
 		Iterator<String> tnodesiter = timednodes.iterator();
 		while(tnodesiter.hasNext()) {
 			incominglinks.put(tnodesiter.next(), new ArrayList<Link>());
 		}
-		Map<Id<Link>,Link> alllinks = network.getLinks();
+		Map<Id<Link>,? extends Link> alllinks = network.getLinks();
 		Iterator<Id<Link>> alllinksiter = alllinks.keySet().iterator();
 		while(alllinksiter.hasNext()){
 			Link link = alllinks.get(alllinksiter.next());
@@ -111,7 +111,7 @@ public class StockholmP0Helper {
 		}
 		return incominglinks;
 	}
-	public Map<String, List<Link>> getOutLinksForJunctions(List<String> timednodes, NetworkImpl network){
+	public Map<String, List<Link>> getOutLinksForJunctions(List<String> timednodes, Network network){
 		Map<String, List<Link>> outgoinglinks = new HashMap<String, List<Link>>();
 		Iterator<String> tnodesiter = timednodes.iterator();
 		while(tnodesiter.hasNext()) {

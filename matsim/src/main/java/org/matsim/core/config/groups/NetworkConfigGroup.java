@@ -20,7 +20,10 @@
 
 package org.matsim.core.config.groups;
 
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+
+import java.net.URL;
 
 import java.util.Map;
 
@@ -72,13 +75,23 @@ public final class NetworkConfigGroup extends ReflectiveConfigGroup {
 		this.inputFile = inputFile;
 	}
 
+	public URL getInputFileURL(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.inputFile);
+	}
+
 	@StringSetter( CHANGE_EVENTS_INPUT_FILE )
 	public void setChangeEventsInputFile(final String changeEventsInputFile) {
 		this.changeEventsInputFile = changeEventsInputFile;
 	}
+	
 	@StringGetter( CHANGE_EVENTS_INPUT_FILE )
 	public String getChangeEventsInputFile() {
-		return this.changeEventsInputFile;
+		return changeEventsInputFile;
+	}
+	
+	
+	public URL getChangeEventsInputFileUrl(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.changeEventsInputFile);
 	}
 
 	@StringSetter( TIME_VARIANT_NETWORK )

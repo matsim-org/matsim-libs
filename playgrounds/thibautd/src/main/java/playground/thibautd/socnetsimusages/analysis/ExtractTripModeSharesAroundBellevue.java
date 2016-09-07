@@ -39,10 +39,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.jointtrips.JointMainModeIdentifier;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.StreamingUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.MainModeIdentifier;
@@ -147,13 +147,13 @@ public class ExtractTripModeSharesAroundBellevue {
 		}
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		if ( facilitiesFile != null ) new MatsimFacilitiesReader( scenario ).parse( facilitiesFile );
-		if ( networkFile != null ) new MatsimNetworkReader(scenario.getNetwork()).parse( networkFile );
+		if ( facilitiesFile != null ) new MatsimFacilitiesReader( scenario ).readFile( facilitiesFile );
+		if ( networkFile != null ) new MatsimNetworkReader(scenario.getNetwork()).readFile( networkFile );
 
 		final Population pop = (Population) scenario.getPopulation();
 
 		if ( attributesFile != null ) {
-			new ObjectAttributesXmlReader( pop.getPersonAttributes() ).parse( attributesFile );
+			new ObjectAttributesXmlReader( pop.getPersonAttributes() ).readFile( attributesFile );
 		}
 
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outputFile );
@@ -184,7 +184,7 @@ public class ExtractTripModeSharesAroundBellevue {
 				}			
 			}
 		});
-		new PopulationReader( scenario ).parse( plansFile );
+		new PopulationReader( scenario ).readFile( plansFile );
 
 		writer.close();
 	}

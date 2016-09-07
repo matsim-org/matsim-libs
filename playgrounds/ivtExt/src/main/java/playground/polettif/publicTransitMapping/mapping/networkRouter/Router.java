@@ -36,6 +36,7 @@ import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.Li
  *
  * @author polettif
  */
+@Deprecated
 public interface Router extends TravelDisutility, TravelTime {
 
     /**

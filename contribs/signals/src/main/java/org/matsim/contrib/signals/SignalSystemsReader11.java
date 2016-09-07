@@ -22,29 +22,25 @@ package org.matsim.contrib.signals;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.jaxb.signalsystems11.XMLSignalSystems;
 import org.xml.sax.SAXException;
 
 /**
  * @author dgrether
  */
-public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
+public class SignalSystemsReader11 {
 
 	private static final Logger log = Logger.getLogger(SignalSystemsReader11.class);
 
-
-	public SignalSystemsReader11(String schemaLocation) {
-		super(schemaLocation);
-	}
-	
 	public XMLSignalSystems readSignalSystems11File(String filename) throws JAXBException, SAXException, ParserConfigurationException, IOException{
 		// create jaxb infrastructure
 		JAXBContext jc;
@@ -52,8 +48,7 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 		jc = JAXBContext
 				.newInstance(org.matsim.jaxb.signalsystems11.ObjectFactory.class);
 		Unmarshaller u = jc.createUnmarshaller();
-		// validate XML file
-		super.validateFile(filename, u);
+		u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/signalSystems_v1.1.xsd")));
 		log.info("starting unmarshalling " + filename);
 		InputStream stream = null;
 		try {
@@ -73,9 +68,4 @@ public class SignalSystemsReader11 extends MatsimJaxbXmlParser {
 	}
 	
 
-	@Override
-	public void readFile(final String filename) throws JAXBException,
-			SAXException, ParserConfigurationException, IOException {
-		throw new UnsupportedOperationException("Use readSignalSystems11File() method");
-	}
 }

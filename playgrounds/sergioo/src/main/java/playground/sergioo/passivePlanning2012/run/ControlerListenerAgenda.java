@@ -23,6 +23,7 @@ package playground.sergioo.passivePlanning2012.run;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.MatsimServices;
@@ -31,7 +32,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -59,12 +60,12 @@ public class ControlerListenerAgenda implements StartupListener, IterationStarts
 	public void notifyStartup(StartupEvent event) {
 		MatsimServices controler = event.getServices();
         TransportModeNetworkFilter filter = new TransportModeNetworkFilter(controler.getScenario().getNetwork());
-		NetworkImpl net = NetworkImpl.createNetwork();
+		Network net = NetworkUtils.createNetwork();
 		HashSet<String> carMode = new HashSet<String>();
 		carMode.add(TransportMode.car);
 		filter.filter(net, carMode);
 		for(ActivityFacility facility:((MutableScenario)controler.getScenario()).getActivityFacilities().getFacilities().values())
-			((ActivityFacilityImpl)facility).setLinkId(net.getNearestLinkExactly(facility.getCoord()).getId());
+			((ActivityFacilityImpl)facility).setLinkId(NetworkUtils.getNearestLinkExactly(net,facility.getCoord()).getId());
         Map<Id<Person>, ? extends Person> persons = event.getServices().getScenario().getPopulation().getPersons();
 		Collection<Person> toBeAdded = new ArrayList<Person>();
 		Set<String> modes = new HashSet<String>();
@@ -101,7 +102,7 @@ public class ControlerListenerAgenda implements StartupListener, IterationStarts
 	public static void main(String[] args) {
 		Scenario scenario = new ScenarioSocialNetwork(ConfigUtils.loadConfig(args.length>0 ? args[0] : null));
 		ScenarioUtils.loadScenario(scenario);
-		new SocialNetworkReader(scenario).parse(args.length>1 ? args[1] : null);
+		new SocialNetworkReader(scenario).readFile(args.length>1 ? args[1] : null);
 		org.matsim.core.controler.Controler controler = new org.matsim.core.controler.Controler(scenario);
 		controler.getConfig().plansCalcRoute().getTeleportedModeFreespeedFactors().put("empty", 0.0);
 		controler.getConfig().controler().setOverwriteFileSetting(

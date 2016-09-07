@@ -111,7 +111,6 @@ public final class OTFClient extends JFrame {
 		this.server = server;
 		this.hostControlBar = hostControlBar;
 		this.mainDrawer = mainDrawer;
-		OTFClientControl.getInstance().setMainOTFDrawer(mainDrawer);
 		log.info("got OTFVis config");
 		getContentPane().add(this.hostControlBar, BorderLayout.NORTH);
 		buildMenu(saver);

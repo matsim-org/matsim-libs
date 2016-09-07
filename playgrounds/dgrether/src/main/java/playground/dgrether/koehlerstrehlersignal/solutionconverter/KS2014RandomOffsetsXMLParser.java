@@ -41,13 +41,17 @@ public class KS2014RandomOffsetsXMLParser extends MatsimXmlParser {
 	private Map<Integer, List<KS2010CrossingSolution>> randomOffsets = new HashMap<Integer, List<KS2010CrossingSolution>>();
 	private Integer currentList = 0;
 	// remark: min coord = minimal total travel time = best coordination
-
-	public void readFile(final String filename) {
+	
+	public KS2014RandomOffsetsXMLParser() {
 		this.setValidating(false);
-		parse(filename);
-		log.info("Read " + randomOffsets.get(0).size() + " + " + randomOffsets.get(1).size() + " + " + 
-				randomOffsets.get(2).size() + " + " + randomOffsets.get(3).size() + " solutions");
 	}
+
+//	public void readFile(final String filename) {
+//		this.setValidating(false);
+//		readFile(filename);
+//		log.info("Read " + randomOffsets.get(0).size() + " + " + randomOffsets.get(1).size() + " + " + 
+//				randomOffsets.get(2).size() + " + " + randomOffsets.get(3).size() + " solutions");
+//	}
 	
 	@Override
 	public void startTag(String elementName, Attributes atts, Stack<String> context) {

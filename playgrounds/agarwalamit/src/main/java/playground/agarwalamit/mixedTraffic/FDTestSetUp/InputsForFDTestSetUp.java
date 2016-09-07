@@ -41,9 +41,8 @@ import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -84,7 +83,9 @@ public class InputsForFDTestSetUp {
 			throw new RuntimeException("Modal split for each travel mode is necessray parameter, it is not defined correctly. Check your static variable!!! \n Aborting ...");
 		}
 
-		stuckTime = this.travelModes.length==1 && (this.travelModes[0]=="car" || this.travelModes[0]=="truck") ? 60 : 10;
+		if(this.travelModes.length==1 && this.travelModes[0].equals("car")) this.stuckTime = 60;
+		else  if (this.travelModes.length==1 && this.travelModes[0].equals("truck")) this.stuckTime = 180;
+
 		setUpConfig();
 		createTriangularNetwork();
 		fillTravelModeData();
@@ -116,7 +117,7 @@ public class InputsForFDTestSetUp {
 		}
 		
 		if(linkDynamics.equals(LinkDynamics.SeepageQ)){
-			config.qsim().setSeepMode("bike");
+			config.qsim().setSeepModes(Arrays.asList("bike"));
 			config.qsim().setSeepModeStorageFree(false);
 			config.qsim().setRestrictingSeepage(true);
 		}
@@ -151,7 +152,7 @@ public class InputsForFDTestSetUp {
 
 		if(isTimeDependentNetwork) {
 			scenario.getConfig().network().setTimeVariantNetwork(true);
-			NetworkImpl netImpl = (NetworkImpl) scenario.getNetwork();
+			Network netImpl = (Network) scenario.getNetwork();
 			netImpl.getFactory().setLinkFactory( new VariableIntervalTimeVariantLinkFactory() );
 		}
 

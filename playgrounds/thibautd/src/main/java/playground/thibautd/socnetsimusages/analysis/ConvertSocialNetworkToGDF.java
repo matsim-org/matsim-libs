@@ -46,7 +46,7 @@ public class ConvertSocialNetworkToGDF {
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		final Map<Id<Person>, Coord> coords = ConvertSocialNetworkToLocatedMatsimNetwork.parsePopulation( popFile );
-		new SocialNetworkReader( sc ).parse( socNetFile );
+		new SocialNetworkReader( sc ).readFile( socNetFile );
 
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outNetwork );
 		writeEgos(

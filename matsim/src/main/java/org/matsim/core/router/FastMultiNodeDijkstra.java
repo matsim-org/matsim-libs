@@ -83,13 +83,13 @@ public class FastMultiNodeDijkstra extends MultiNodeDijkstra {
 		Node routingNetworkToNode;
 		
 		if (fromNode instanceof ImaginaryNode) {
-			Collection<InitialNode> initialNodes = ((ImaginaryNode) fromNode).initialNodes;
+			Collection<? extends InitialNode> initialNodes = ((ImaginaryNode) fromNode).initialNodes;
 			for (InitialNode initialNode : initialNodes) initialNode.node = routingNetwork.getNodes().get(initialNode.node.getId());
 			routingNetworkFromNode = fromNode;
 		} else routingNetworkFromNode = routingNetwork.getNodes().get(fromNode.getId());
 
 		if (toNode instanceof ImaginaryNode) {
-			Collection<InitialNode> initialNodes = ((ImaginaryNode) toNode).initialNodes;
+			Collection<? extends InitialNode> initialNodes = ((ImaginaryNode) toNode).initialNodes;
 			for (InitialNode initialNode : initialNodes) initialNode.node = routingNetwork.getNodes().get(initialNode.node.getId());
 			routingNetworkToNode = toNode;
 		} else routingNetworkToNode = routingNetwork.getNodes().get(toNode.getId());
@@ -152,7 +152,7 @@ public class FastMultiNodeDijkstra extends MultiNodeDijkstra {
 			double initialCost = 0.0;
 			double initialTime = 0.0;
 			
-			Iterator<InitialNode> iter = imaginaryNode.initialNodes.iterator();
+			Iterator<? extends InitialNode> iter = imaginaryNode.initialNodes.iterator();
 			while (iter.hasNext()) {
 				InitialNode initialNode = iter.next();
 				if (initialNode.node.getId().equals(pathFromNode.getId())) {

@@ -13,7 +13,6 @@ import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -87,8 +86,8 @@ public final class AccessibilityCalculator {
 
 	@Inject
 	public
-	AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario, AccessibilityConfigGroup config) {
-		AccessibilityConfigGroup moduleAPCM = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+	AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
+		config = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
 
@@ -105,7 +104,7 @@ public final class AccessibilityCalculator {
 			log.error("monetary distance cost rate for walk different from zero but not used in accessibility computations");
 		}
 
-		useRawSum = moduleAPCM.isUsingRawSumsWithoutLn();
+		useRawSum = config.isUsingRawSumsWithoutLn();
 		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
 		inverseOfLogitScaleParameter = 1 / (logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
 		walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
@@ -115,7 +114,6 @@ public final class AccessibilityCalculator {
 		betaWalkTMC = -planCalcScoreConfigGroup.getMarginalUtilityOfMoney();
 
 		this.scenario = scenario;
-		this.config = config;
 		calculators.put(
 				Modes4Accessibility.car,
 				new NetworkModeAccessibilityContributionCalculator(
@@ -169,38 +167,16 @@ public final class AccessibilityCalculator {
 		for ( ActivityFacility opportunity : opportunities.getFacilities().values() ) {
 			bar.update();
 
-			Node nearestNode = ((NetworkImpl)network).getNearestNode( opportunity.getCoord() );
+			Node nearestNode = NetworkUtils.getNearestNode(((Network)network),opportunity.getCoord());
 
 			// get Euclidian distance to nearest node
 			double distance_meter 	= NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
-			double walkTravelTime_h = distance_meter / this.walkSpeedMeterPerHour;
-
-			double VjkWalkTravelTime	= this.betaWalkTT * walkTravelTime_h;
-			double VjkWalkPowerTravelTime=0.; // this.betaWalkTTPower * (walkTravelTime_h * walkTravelTime_h);
-			double VjkWalkLnTravelTime	= 0.; // this.betaWalkLnTT * Math.log(walkTravelTime_h);
-
+			double VjkWalkTravelTime	= this.betaWalkTT * (distance_meter / this.walkSpeedMeterPerHour);
 			double VjkWalkDistance 		= this.betaWalkTD * distance_meter;
-			double VjkWalkPowerDistnace	= 0.; //this.betaWalkTDPower * (distance_meter * distance_meter);
-			double VjkWalkLnDistance 	= 0.; //this.betaWalkLnTD * Math.log(distance_meter);
 
-			double VjkWalkMoney			= this.betaWalkTMC * 0.; 			// no monetary costs for walking
-			double VjkWalkPowerMoney	= 0.; //this.betaWalkTDPower * 0.; 	// no monetary costs for walking
-			double VjkWalkLnMoney		= 0.; //this.betaWalkLnTMC *0.; 	// no monetary costs for walking
+			double expVjk					= Math.exp(this.logitScaleParameter * (VjkWalkTravelTime + VjkWalkDistance ) );
 
-			double expVjk					= Math.exp(this.logitScaleParameter * (VjkWalkTravelTime + VjkWalkPowerTravelTime + VjkWalkLnTravelTime +
-					VjkWalkDistance   + VjkWalkPowerDistnace   + VjkWalkLnDistance +
-					VjkWalkMoney      + VjkWalkPowerMoney      + VjkWalkLnMoney) );
 			// add Vjk to sum
-//			if( opportunityClusterMap.containsKey( nearestNode.getId() ) ){
-//				AggregationObject jco = opportunityClusterMap.get( nearestNode.getId() );
-//				jco.addObject( opportunity.getId(), expVjk);
-//			} else {
-//				// assign Vjk to given network node
-//				opportunityClusterMap.put(
-//						nearestNode.getId(),
-//						new AggregationObject(opportunity.getId(), null, null, nearestNode, expVjk) 
-//						);
-//			}
 			AggregationObject jco = opportunityClusterMap.get( nearestNode.getId() ) ;
 			if ( jco == null ) {
 				jco = new AggregationObject(opportunity.getId(), null, null, nearestNode, 0. ); // initialize with zero!
@@ -212,6 +188,7 @@ public final class AccessibilityCalculator {
 				log.warn(Gbl.ONLYONCE);
 			}
 			jco.addObject( opportunity.getId(), expVjk ) ;
+			
 			// yyyy if we knew the activity type, we could to do capacities as follows:
 //			ActivityOption opt = opportunity.getActivityOptions().get("type") ;
 //			Assert.assertNotNull(opt);
@@ -229,7 +206,7 @@ public final class AccessibilityCalculator {
 	}
 
 	
-	public final void computeAccessibilities( Scenario scenario, Double departureTime , ActivityFacilities opportunities) {
+	public final void computeAccessibilities( Double departureTime, ActivityFacilities opportunities) {
 		aggregateOpportunities(opportunities, scenario.getNetwork());
 		SumOfExpUtils[] gcs = new SumOfExpUtils[Modes4Accessibility.values().length] ;
 		// this could just be a double array, or a Map.  Not using a Map for computational speed reasons (untested);
@@ -245,7 +222,7 @@ public final class AccessibilityCalculator {
 		for ( ActivityFacility aFac : measuringPoints.getFacilities().values() ) {
 
 			// determine nearest network node (from- or toNode) based on the link
-			Node fromNode = NetworkUtils.getCloserNodeOnLink(aFac.getCoord(), ((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(aFac.getCoord()));
+			Node fromNode = NetworkUtils.getCloserNodeOnLink(aFac.getCoord(), NetworkUtils.getNearestLinkExactly(((Network)scenario.getNetwork()),aFac.getCoord()));
 
 			// this is used as a key for hash map lookups
 			Id<Node> nodeId = fromNode.getId();

@@ -208,7 +208,7 @@ public class BuildingSynthesizer {
 		parser.setValidating(false);
 
 		logger.info("Parsing osm file...");
-		parser.parse(args[0]);
+		parser.readFile(args[0]);
 
 		double defaultSize = Double.parseDouble(args[2]);
 

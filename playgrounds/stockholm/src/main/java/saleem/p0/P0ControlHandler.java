@@ -14,17 +14,17 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkImpl;
 
 import saleem.stockholmscenario.utils.CollectionUtil;
 
 public class P0ControlHandler implements BasicEventHandler{
 	Link link2, link4, link5;
-	NetworkImpl network;
+	Network network;
 	int iter;
 	double capacity2, capacity4, satcapacity2, satcapacity4, satcapacity5, bintime=0;
 	public Map<Double, Double> capacitiesLink2 = new HashMap<Double, Double>();
@@ -47,7 +47,7 @@ public class P0ControlHandler implements BasicEventHandler{
 	double totaldelaylink2=0, totaldelaylink4=0, averagedelaylink2=0, averagedelaylink4=0;
 	int countvehlink2=0, countvehlink4=0;
 	int totalcountvehlink2=0, totalcountvehlink4=0;
-	public P0ControlHandler(NetworkImpl network) {
+	public P0ControlHandler(Network network) {
 		this.network=network;
 	}
 	public void initialise(int iter){
@@ -78,14 +78,14 @@ public class P0ControlHandler implements BasicEventHandler{
 		this.initialcapacitiesLink2.add(this.capacity2);
 		this.initialcapacitiesLink4.add(this.capacity4);
 		 if(iter==0){
-			 NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(21600 + Math.random()/10000);//Assuming the simulations start at 06:00
+			 NetworkChangeEvent change = new NetworkChangeEvent(21600 + Math.random()/10000);//Assuming the simulations start at 06:00
 			 change.addLink(link2);
-			 change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, capacity2/3600));
+			 change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, capacity2/3600));
 			 events.add(change);
 			 
-			 NetworkChangeEvent change1 = network.getFactory().createNetworkChangeEvent(21600 + Math.random()/10000);//Assuming the simulations start at 06:00
+			 NetworkChangeEvent change1 = new NetworkChangeEvent(21600 + Math.random()/10000);//Assuming the simulations start at 06:00
 			 change1.addLink(link4);
-			 change1.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, capacity4/3600));
+			 change1.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, capacity4/3600));
 			 events.add(change1);
 			 
 			}
@@ -225,14 +225,14 @@ public class P0ControlHandler implements BasicEventHandler{
 			   		if(capacity2+factor2<satcapacity2  && capacity4-factor4>50){
 			   			capacity2=capacity2+factor2;
 				   		capacity4=capacity4-factor4;
-			   			NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(time+Math.random()/10000);//To ensure the change takes effect at the start of the time bin
+			   			NetworkChangeEvent change = new NetworkChangeEvent(time+Math.random()/10000);//To ensure the change takes effect at the start of the time bin
 						change.addLink(link2);
-						change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, capacity2/3600));
+						change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, capacity2/3600));
 						events.add(change);
 						
-						NetworkChangeEvent change1 = network.getFactory().createNetworkChangeEvent(time+Math.random()/10000);
+						NetworkChangeEvent change1 = new NetworkChangeEvent(time+Math.random()/10000);
 						change1.addLink(link4);
-						change1.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, capacity4/3600));
+						change1.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, capacity4/3600));
 						events.add(change1);
 			   		}
 		   }
@@ -240,14 +240,14 @@ public class P0ControlHandler implements BasicEventHandler{
 		   	   	if(capacity4+factor4<satcapacity4 && capacity2-factor2>50){
 		   	   		capacity2=capacity2-factor2;
 		   	   		capacity4=capacity4+factor4;
-		   			NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(time+Math.random()/10000);//To ensure the change takes effect at the start of the time bin
+		   			NetworkChangeEvent change = new NetworkChangeEvent(time+Math.random()/10000);//To ensure the change takes effect at the start of the time bin
 					change.addLink(link2);
-					change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, capacity2/3600));
+					change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, capacity2/3600));
 					events.add(change);
 					
-					NetworkChangeEvent change1 = network.getFactory().createNetworkChangeEvent(time+Math.random()/10000);
+					NetworkChangeEvent change1 = new NetworkChangeEvent(time+Math.random()/10000);
 					change1.addLink(link4);
-					change1.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, capacity4/3600));
+					change1.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, capacity4/3600));
 					events.add(change1);
 		   		}
 		   }

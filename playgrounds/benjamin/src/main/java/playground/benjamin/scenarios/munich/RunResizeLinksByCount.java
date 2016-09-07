@@ -51,7 +51,7 @@ public class RunResizeLinksByCount extends AbstractResizeLinksByCount{
 
 		Counts counts = new Counts();
 		CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(counts);
-		countsReader.parse(countsFile);
+		countsReader.readFile(countsFile);
 
 		RunResizeLinksByCount rrc = new RunResizeLinksByCount(networkFile, counts, 1.1);
 		rrc.run(outputFile);

@@ -117,14 +117,13 @@ public class CALink extends QLinkI {
 	}
 
 	@Override
-	void letVehicleDepart(QVehicle vehicle, double now) {
+	void letVehicleDepart(QVehicle vehicle) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id vehicleId,
-			double now) {
+	boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id vehicleId) {
 		// TODO Auto-generated method stub
 		return false;
 	}

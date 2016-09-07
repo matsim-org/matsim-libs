@@ -9,7 +9,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.TimeVariantLink;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -28,7 +28,7 @@ class NewNetworkChangeEventsEngine implements MobsimEngine {
 
 	@Override
 	public void onPrepareSim() {
-		Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl) network).getNetworkChangeEvents();
+		Collection<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(((Network) network));
 		for (final NetworkChangeEvent changeEvent : changeEvents) {
 			Message m = new Message() {
 				@Override

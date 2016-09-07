@@ -57,7 +57,7 @@ public class RunnableChainReconstructor implements Runnable {
 		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
 		
 		try{
-			dvr.parse(vehicleFile.getAbsolutePath());
+			dvr.readFile(vehicleFile.getAbsolutePath());
 			DigicoreVehicle dv = dvr.getVehicle();
 			
 			for(DigicoreChain dc : dv.getChains()){

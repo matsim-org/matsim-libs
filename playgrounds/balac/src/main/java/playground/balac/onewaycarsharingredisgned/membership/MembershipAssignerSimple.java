@@ -6,10 +6,12 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.*;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -28,10 +30,10 @@ final private int numMembers = 20850;
 		
 		ObjectAttributes bla = new ObjectAttributes();
 		
-		new ObjectAttributesXmlReader(bla).parse(args[0]);		
+		new ObjectAttributesXmlReader(bla).readFile(args[0]);		
 		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader populationReader = new PopulationReader(scenario);
+		MatsimReader populationReader = new PopulationReader(scenario);
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(args[1]);
 		populationReader.readFile(args[2]);

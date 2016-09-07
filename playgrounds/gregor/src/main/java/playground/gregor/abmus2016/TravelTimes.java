@@ -60,14 +60,18 @@ public class TravelTimes implements PersonDepartureEventHandler, PersonArrivalEv
 	public static void main(String[] args) throws IOException {
 		String baseDir = "/Users/laemmel/svn/unimb/ABMUS2016/scenario/results/";
 //		String scenario = "base_scenario_NE/";
-		String scenario = "separated_OPT/";
+//		String scenario = "largeStairs_SP/";
+        String scenario = "nonSep_newRes/";
 
-		String it = "49";
+
+		String it = "0";
 
 		String baseOutputDir = "/Users/laemmel/svn/unimb/ABMUS2016/paper/figs/plots/";
 
-		String scDir = baseDir + scenario;
-		String outDir = baseOutputDir + scenario + "it." + it + "/";
+		String scDir = baseDir + scenario + "ITERS/";
+		String outDir = baseOutputDir + scenario + "/it." + it + "/";
+
+		new File(outDir).mkdirs();
 //
 //		String cf = scDir+"output_config.xml.gz";
 //
@@ -81,7 +85,7 @@ public class TravelTimes implements PersonDepartureEventHandler, PersonArrivalEv
 		em.addHandler(tt);
 
 		EventsReaderXMLv1 r = new EventsReaderXMLv1(em);
-		r.parse(scDir + "it." + it + "/" + it + ".events.xml.gz");
+		r.readFile(scDir + "it." + it + "/" + it + ".events.xml.gz");
 
 		tt.done();
 	}

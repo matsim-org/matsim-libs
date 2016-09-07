@@ -18,7 +18,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -339,7 +340,7 @@ public class ModdedConverter {
 		c.setPop(scenario.getPopulation());
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(oldPlansFilename);
-			PopulationWriter writer = new PopulationWriter(c.pop, scenario.getNetwork());
+			StreamingPopulationWriter writer = new StreamingPopulationWriter(c.pop, scenario.getNetwork());
 			writer.writeStartPlans(newPlansFilename);
 			String line;
 			do {

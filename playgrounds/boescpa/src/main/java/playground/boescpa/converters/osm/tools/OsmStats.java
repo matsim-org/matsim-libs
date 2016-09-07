@@ -90,7 +90,7 @@ public class OsmStats {
 	}
 
 	private void getStats(final String osmFilePath, final String outputFilePath) {
-		parser.parse(osmFilePath);
+		parser.readFile(osmFilePath);
 		if (this.cutter == null) {
 			writeStats(outputFilePath, this.histLengthsOut);
 		} else {
@@ -178,7 +178,7 @@ public class OsmStats {
 		public OsmXmlParser(final Map<Long, Map<String, Long>> histLengthIn,
 							final Map<Long, Map<String, Long>> histLengthOut,
 							CoordinateTransformation transform) {
-			super(false);
+			setValidating(false);
 			this.transform = transform;
 			this.histLengthIn = histLengthIn;
 			this.histLengthOut = histLengthOut;

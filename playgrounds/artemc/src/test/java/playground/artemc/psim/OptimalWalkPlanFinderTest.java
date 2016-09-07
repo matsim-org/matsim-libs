@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
@@ -30,7 +31,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -235,7 +236,7 @@ public class OptimalWalkPlanFinderTest {
 		private Person person = null;
 		private Plan plan = null;
 		private Scenario scenario;
-		private NetworkImpl network;
+		private Network network;
 		private int firstLegStartTime;
 		private int firstLegTravelTime;
 		private int secondLegTravelTime;
@@ -282,11 +283,13 @@ public class OptimalWalkPlanFinderTest {
 
 
 			this.scenario = ScenarioUtils.createScenario(config);
-			this.network = (NetworkImpl) this.scenario.getNetwork();
-			Node node1 = this.network.createAndAddNode(Id.create("1", Node.class), new Coord(0.0, 0.0));
-			Node node2 = this.network.createAndAddNode(Id.create("2", Node.class), new Coord(1000.0, 0.0));
+			this.network = (Network) this.scenario.getNetwork();
+			Node node1 = NetworkUtils.createAndAddNode(this.network, Id.create("1", Node.class), new Coord(0.0, 0.0));
+			Node node2 = NetworkUtils.createAndAddNode(this.network, Id.create("2", Node.class), new Coord(1000.0, 0.0));
+			final Node fromNode = node1;
+			final Node toNode = node2;
 
-			Link link1 = this.network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 25, 3600, 1);
+			Link link1 = NetworkUtils.createAndAddLink(this.network,Id.create("1", Link.class), fromNode, toNode, (double) 1000, (double) 25, (double) 3600, (double) 1 );
 
 			this.person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 			this.plan = PersonUtils.createAndAddPlan(this.person, true);

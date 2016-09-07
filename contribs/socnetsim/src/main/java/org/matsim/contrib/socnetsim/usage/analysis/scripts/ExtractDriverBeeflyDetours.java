@@ -38,7 +38,7 @@ public class ExtractDriverBeeflyDetours {
 	public static void main(final String[] args) {
 		final String plansFile = args[ 0 ];
 		final String outFile = args[ 1 ];
-		(new PlansParser( outFile )).parse( plansFile );
+		(new PlansParser( outFile )).readFile( plansFile );
 	}
 
 	private static class PlansParser extends MatsimXmlParser {

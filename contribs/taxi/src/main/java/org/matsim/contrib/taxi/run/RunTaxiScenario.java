@@ -21,7 +21,6 @@ package org.matsim.contrib.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.run.VrpQSimConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
@@ -45,12 +44,12 @@ public class RunTaxiScenario
     public static Controler createControler(Config config, boolean otfvis)
     {
         TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
-        config.addConfigConsistencyChecker(new VrpQSimConfigConsistencyChecker());
+        config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
         config.checkConsistency();
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
         TaxiData taxiData = new TaxiData();
-        new VehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
+        new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
         return createControler(scenario, taxiData, otfvis);
     }
 

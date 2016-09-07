@@ -24,14 +24,13 @@ import java.lang.reflect.Method;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.v11.LaneDefinitonsV11ToV20Converter;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
@@ -56,14 +55,10 @@ public class Fixture {
 		try {
 			Method m = this.getClass().getMethod("createAndLoadTestScenario", Boolean.class);
 			testUtils.initWithoutJUnitForFixture(this.getClass(), m);
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		} catch (SecurityException e) {
+		} catch (NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
 		}
-		String plansFile = testUtils.getClassInputDirectory() + "plans1Agent.xml";
-		Config conf = ConfigUtils.createConfig();
-		conf.controler().setMobsim("qsim");
+		Config conf = ConfigUtils.createConfig(testUtils.classInputResourcePath());
 		ActivityParams params = new ActivityParams("h");
 		params.setTypicalDuration(24.0 * 3600.0);
 		conf.planCalcScore().addActivityParams(params);
@@ -72,12 +67,9 @@ public class Fixture {
 		settings.setStrategyName("ChangeExpBeta");
 		settings.setWeight(1.0);
 		conf.strategy().addStrategySettings(settings);
-		conf.network().setInputFile(testUtils.getClassInputDirectory() + "network.xml.gz");
-		String laneDefinitions = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
-		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
-		new LaneDefinitonsV11ToV20Converter().convert(laneDefinitions,lanes20, conf.network().getInputFile());
-		conf.network().setLaneDefinitionsFile(lanes20);
-		conf.plans().setInputFile(plansFile);
+		conf.network().setInputFile("network.xml.gz");
+		conf.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
+		conf.plans().setInputFile("plans1Agent.xml");
 		conf.qsim().setUseLanes(true);
 		ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 		//as signals are configured below we don't need signals on
@@ -88,12 +80,12 @@ public class Fixture {
 		if (useIntergreens) {
 			signalsConfig.setIntergreenTimesFile(testUtils.getClassInputDirectory() + "testIntergreenTimes_v1.0.xml");
 			signalsConfig.setUseIntergreenTimes(true);
-			signalsConfig.setActionOnIntergreenViolation(SignalSystemsConfigGroup.EXCEPTION_ON_INTERGREEN_VIOLATION);
+			signalsConfig.setActionOnIntergreenViolation(SignalSystemsConfigGroup.ActionOnIntergreenViolation.EXCEPTION);
 		}			
 
 		this.setSignalSystemConfigValues(signalsConfig, testUtils);
 		Scenario scenario = ScenarioUtils.loadScenario(conf);
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
+		SignalsDataLoader signalsLoader = new SignalsDataLoader(signalsConfig);
 		SignalsData signalsData = signalsLoader.loadSignalsData();
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, signalsData);
 		

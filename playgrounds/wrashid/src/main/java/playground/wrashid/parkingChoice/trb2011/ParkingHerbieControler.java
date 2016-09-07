@@ -221,7 +221,7 @@ public class ParkingHerbieControler {
 
 	public static void readParkings(double parkingCalibrationFactor, String parkingsFile, LinkedList<PParking> parkingCollection) {
 		FlatParkingFormatReaderV1 flatParkingFormatReaderV1 = new FlatParkingFormatReaderV1();
-		flatParkingFormatReaderV1.parse(parkingsFile);
+		flatParkingFormatReaderV1.readFile(parkingsFile);
 
 		LinkedList<PParking> parkings = flatParkingFormatReaderV1.getParkings();
 		calibarteParkings(parkings, parkingCalibrationFactor);

@@ -20,7 +20,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -48,7 +48,7 @@ public class EventsToTrips {
 		networkReader.readFile(networkFile);
 
     	events.addHandler(eventsToTripsHandler);
-    	reader.parse(s);
+    	reader.readFile(s);
 		final BufferedWriter outLink = IOUtils.getBufferedWriter(outputFile);
 
     	HashMap<Id<Vehicle>, ArrayList<RouteInfo>> routes = eventsToTripsHandler.getRoutes();

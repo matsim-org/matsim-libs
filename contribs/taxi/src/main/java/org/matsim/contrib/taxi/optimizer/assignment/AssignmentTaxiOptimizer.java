@@ -40,6 +40,7 @@ public class AssignmentTaxiOptimizer
     private final AssignmentTaxiOptimizerParams params;
     protected final FastMultiNodeDijkstra router;
     protected final BackwardFastMultiNodeDijkstra backwardRouter;
+    private final FastAStarEuclidean euclideanRouter;
     private final VehicleAssignmentProblem<TaxiRequest> assignmentProblem;
     private final TaxiToRequestAssignmentCostProvider assignmentCostProvider;
 
@@ -67,10 +68,19 @@ public class AssignmentTaxiOptimizer
                 optimContext.travelDisutility, optimContext.travelTime, preProcessDijkstra,
                 fastRouterFactory, true);
 
-        assignmentProblem = new VehicleAssignmentProblem<>(optimContext.travelTime, router,
-                backwardRouter,
-                StraightLineKnnFinders.createRequestEntryFinder(params.nearestRequestsLimit),
-                StraightLineKnnFinders.createVehicleDepartureFinder(params.nearestVehiclesLimit));
+        PreProcessEuclidean preProcessEuclidean = new PreProcessEuclidean(
+                optimContext.travelDisutility);
+        preProcessEuclidean.run(optimContext.network);
+
+        RoutingNetwork euclideanRoutingNetwork = new ArrayRoutingNetworkFactory(preProcessEuclidean)
+                .createRoutingNetwork(optimContext.network);
+        euclideanRouter = new FastAStarEuclidean(euclideanRoutingNetwork, preProcessEuclidean,
+                optimContext.travelDisutility, optimContext.travelTime,
+                optimContext.scheduler.getParams().AStarEuclideanOverdoFactor, fastRouterFactory);
+
+        assignmentProblem = new VehicleAssignmentProblem<TaxiRequest>(optimContext.travelTime,
+                router, backwardRouter, euclideanRouter, params.nearestRequestsLimit,
+                params.nearestVehiclesLimit);
 
         assignmentCostProvider = new TaxiToRequestAssignmentCostProvider(params);
     }
@@ -107,6 +117,7 @@ public class AssignmentTaxiOptimizer
                 TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
         double vehPlanningHorizon = idleVehs < rData.getUrgentReqCount() ? //
                 params.vehPlanningHorizonUndersupply : params.vehPlanningHorizonOversupply;
-        return new VehicleData(optimContext, vehPlanningHorizon);
+        return new VehicleData(optimContext, optimContext.taxiData.getVehicles().values(),
+                vehPlanningHorizon);
     }
 }

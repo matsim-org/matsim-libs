@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
-import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.roadpricing.RoadPricingSchemeUsingTollFactor;
+import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
 
 

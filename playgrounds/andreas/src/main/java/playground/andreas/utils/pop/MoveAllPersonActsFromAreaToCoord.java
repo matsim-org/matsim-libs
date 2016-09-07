@@ -31,12 +31,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
@@ -93,7 +93,8 @@ public class MoveAllPersonActsFromAreaToCoord extends NewPopulation {
 					if(this.kmlOutputEnabled){
 						this.kmlWriter.addActivity(PopulationUtils.createActivity(act));
 					}
-					act.getCoord().setXY(this.targetCoord.getX(), this.targetCoord.getY());
+//					act.getCoord().setXY(this.targetCoord.getX(), this.targetCoord.getY());
+					act.setCoord( new Coord(this.targetCoord.getX(), this.targetCoord.getY()));
                     PopulationUtils.changePersonId( ((Person) person), Id.create(person.getId().toString() + "_source-target", Person.class) ) ;
                 }
 			}
@@ -125,7 +126,7 @@ public class MoveAllPersonActsFromAreaToCoord extends NewPopulation {
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();
-		MatsimPopulationReader popReader = new PopulationReader(sc);
+		MatsimReader popReader = new PopulationReader(sc);
 		popReader.readFile(inPlansFile);
 
 		MoveAllPersonActsFromAreaToCoord dp = new MoveAllPersonActsFromAreaToCoord(net, inPop, outPlansFile, minSourceCoord, maxSourceCoord, targetCoord);

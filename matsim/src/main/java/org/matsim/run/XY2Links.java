@@ -22,17 +22,14 @@ package org.matsim.run;
 
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.StreamingPopulationReader;
-import org.matsim.core.population.StreamingUtils;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
@@ -108,14 +105,14 @@ public class XY2Links {
 		MutableScenario scenario = ScenarioUtils.createMutableScenario(this.config);
 //		scenario.setPopulation( PopulationUtils.createStreamingPopulation( config.plans(), null)) ;
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.config.network().getInputFile());
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		this.config = scenario.getConfig();
 
 //		final Population plans = (Population) scenario.getPopulation();
 		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
 //		StreamingUtils.setIsStreaming(reader, true);
 //		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
-		final PopulationWriter plansWriter = new PopulationWriter(null, network);
+		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(null, network);
 		plansWriter.startStreaming(this.plansfile);
 		reader.addAlgorithm(new org.matsim.core.population.algorithms.XY2Links(scenario));
 		reader.addAlgorithm(plansWriter);

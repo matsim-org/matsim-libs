@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.vehicles.Vehicle;
 
-public class VehicleLeavesTrafficEvent extends Event implements HasPersonId {
+public class VehicleLeavesTrafficEvent extends Event implements HasPersonId, HasLinkId {
 
 	public static final String EVENT_TYPE = "vehicle leaves traffic";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
@@ -60,6 +60,7 @@ public class VehicleLeavesTrafficEvent extends Event implements HasPersonId {
 		return this.driverId;
 	}	
 	
+	@Override
 	public Id<Link> getLinkId() {
 		return this.linkId;
 	}

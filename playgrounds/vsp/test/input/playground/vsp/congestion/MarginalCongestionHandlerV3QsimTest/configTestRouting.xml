@@ -3,11 +3,11 @@
 <config>
 
 	<module name="network" >
-		<param name="inputNetworkFile" value="test/input/playground/vsp/congestion/MarginalCongestionHandlerV3QsimTest/networkTestRouting.xml" />
+		<param name="inputNetworkFile" value="networkTestRouting.xml" />
 	</module>
 	
 	<module name="plans" >
-		 <param name="inputPlansFile" value="test/input/playground/vsp/congestion/MarginalCongestionHandlerV3QsimTest/populationTestRouting.xml" />
+		 <param name="inputPlansFile" value="populationTestRouting.xml" />
 	</module>
 	
 	<module name="controler">

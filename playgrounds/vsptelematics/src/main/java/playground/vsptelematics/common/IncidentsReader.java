@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -97,7 +96,7 @@ public class IncidentsReader extends DefaultHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		if(INCIDENT_TAG.equalsIgnoreCase(qName)) {
-			NetworkChangeEvent event =  ((NetworkFactoryImpl)network.getFactory()).createNetworkChangeEvent(0.0);
+			NetworkChangeEvent event =  new NetworkChangeEvent(0.0);
 			/*
 			 * link id
 			 */

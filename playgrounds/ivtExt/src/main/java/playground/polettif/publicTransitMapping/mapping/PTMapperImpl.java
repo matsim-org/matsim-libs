@@ -61,6 +61,7 @@ import java.util.*;
  *
  * @author polettif
  */
+@Deprecated
 public class PTMapperImpl implements PTMapper {
 
 	protected static Logger log = Logger.getLogger(RunPublicTransitMapper.class);
@@ -443,7 +444,7 @@ public class PTMapperImpl implements PTMapper {
 
 	private static void setLogLevels() {
 		Logger.getLogger(org.matsim.core.router.Dijkstra.class).setLevel(Level.ERROR); // suppress no route found warnings
-		Logger.getLogger(org.matsim.core.network.NetworkImpl.class).setLevel(Level.WARN);
+		Logger.getLogger(org.matsim.api.core.v01.network.Network.class).setLevel(Level.WARN);
 		Logger.getLogger(org.matsim.core.network.filter.NetworkFilterManager.class).setLevel(Level.WARN);
 		Logger.getLogger(org.matsim.core.router.util.PreProcessDijkstra.class).setLevel(Level.WARN);
 		Logger.getLogger(org.matsim.core.router.util.PreProcessDijkstra.class).setLevel(Level.WARN);

@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.wrashid.parkingChoice.priceoptimization;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -40,15 +42,16 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
-import playground.balac.freefloating.scoring.FreeFloatingParkingScoringFunctionFactory;
 import playground.wrashid.ABMT.rentParking.ParkingCostModelZH;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.priceoptimization.infrastracture.OptimizableParking;
+import playground.wrashid.parkingChoice.priceoptimization.scoring.FreeFloatingParkingScoringFunctionFactory;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingLoader;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.CityZone;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.CityZones;
@@ -59,7 +62,7 @@ public class SetupParkingForOptimizationScenario {
 
 	public static void prepare(OptimizationParkingModuleZH parkingModule, MatsimServices controler){
 		
-		
+
 		Config config = controler.getConfig();
 		
 		String baseDir = config.getParam("parkingChoice.ZH", "parkingDataDirectory");
@@ -106,24 +109,27 @@ public class SetupParkingForOptimizationScenario {
 					else {
 						CityZone closestZone = cityZones.getClosestZone(parking.getCoord());
 						
-						if (MatsimRandom.getRandom().nextInt(100)<closestZone.getPctNonFreeParking()){
-						
-							if (highTariffParkingZone.isInHighTariffZone(parking.getCoord())){
-								cost = 3.0;
-							} else {
+						if (MatsimRandom.getRandom().nextInt(100) < closestZone.getPctNonFreeParking()){						
+							
+							if (highTariffParkingZone.isInHighTariffZone(parking.getCoord()))
+								cost = 1.5;
+							else
 								cost = 0.5;
-							}
+							
 						}
+						else
+							cost = 0.0;
 						
 					}
 					publicParking = new OptimizableParking(Id.create(parking.getId(), 
 							org.matsim.contrib.parking.PC2.infrastructure.PC2Parking.class), 
-							parking.getIntCapacity(), parking.getCoord(),pcm,groupName,cost);
+							parking.getIntCapacity(), parking.getCoord(), pcm, groupName, cost, cost,
+							highTariffParkingZone.isInHighTariffZone(parking.getCoord()));
 				}
 				else {
 					publicParking = new PublicParking(Id.create(parking.getId(), 
 						org.matsim.contrib.parking.PC2.infrastructure.PC2Parking.class), 
-						parking.getIntCapacity(), parking.getCoord(),pcm,groupName);
+						parking.getIntCapacity(), parking.getCoord(), pcm, groupName);
 				}
 				publicParkings.add(publicParking);
 			} else {
@@ -192,31 +198,54 @@ public class SetupParkingForOptimizationScenario {
 	
 	// based on: playground.wrashid.parkingSearch.withindayFW.controllers.kti.HUPCControllerKTIzh.getHouseHoldIncomeCantonZH
 	public static DoubleValueHashMap<Id> getHouseHoldIncomeCantonZH(Population population) {
-		DoubleValueHashMap<Id> houseHoldIncome=new DoubleValueHashMap<Id>();
 		
+		final BufferedWriter outLink = IOUtils.getBufferedWriter("./incomedis.txt");
+
+		DoubleValueHashMap<Id> houseHoldIncome=new DoubleValueHashMap<Id>();
+		try {
 		for (Id<Person> personId : population.getPersons().keySet()) {
 			double rand = MatsimRandom.getRandom().nextDouble();
+			double x = 0.0;
 			if (rand<0.032) {
-				houseHoldIncome.put(personId, 1000+MatsimRandom.getRandom().nextDouble()*1000);
+				x = 1000+MatsimRandom.getRandom().nextDouble()*1000;
 			} else if (rand<0.206) {
-				houseHoldIncome.put(personId, 2000+MatsimRandom.getRandom().nextDouble()*2000);
+				x = 2000+MatsimRandom.getRandom().nextDouble()*2000;
+
 			} else if (rand<0.471) {
-				houseHoldIncome.put(personId, 4000+MatsimRandom.getRandom().nextDouble()*2000);
+				x = 4000+MatsimRandom.getRandom().nextDouble()*2000;
+
 			} else if (rand<0.674) {
-				houseHoldIncome.put(personId, 6000+MatsimRandom.getRandom().nextDouble()*2000);
+				x = 6000+MatsimRandom.getRandom().nextDouble()*2000;
+
 			}else if (rand<0.803) {
-				houseHoldIncome.put(personId, 8000+MatsimRandom.getRandom().nextDouble()*2000);
+				x = 8000+MatsimRandom.getRandom().nextDouble()*2000;
+
 			}else if (rand<0.885) {
-				houseHoldIncome.put(personId, 10000+MatsimRandom.getRandom().nextDouble()*2000);
+				x = 10000+MatsimRandom.getRandom().nextDouble()*2000;
+
 			}else if (rand<0.927) {
-				houseHoldIncome.put(personId, 12000+MatsimRandom.getRandom().nextDouble()*2000);
+				x = 12000+MatsimRandom.getRandom().nextDouble()*2000;
+
 			}else if (rand<0.952) {
-				houseHoldIncome.put(personId, 14000+MatsimRandom.getRandom().nextDouble()*2000);
+				x = 14000+MatsimRandom.getRandom().nextDouble()*2000;
+
 			} else {
-				houseHoldIncome.put(personId, 16000+MatsimRandom.getRandom().nextDouble()*16000);
+				x = 16000+MatsimRandom.getRandom().nextDouble()*16000;
+
 			}
+			
+				outLink.write(personId.toString() + ";" + Double.toString(x));
+			
+			outLink.newLine();
+			houseHoldIncome.put(personId, x);
+
 		}
-		
+		outLink.flush();
+		outLink.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return houseHoldIncome;
 	}
 	
@@ -226,7 +255,7 @@ public class SetupParkingForOptimizationScenario {
 		Map<Id<Link>, Double> linkSlopes=new HashMap<>();
 		String linkSlopeAttributeFile = controler.getConfig().getParam("parkingChoice.ZH", "networkLinkSlopes");
 		ObjectAttributes lp = new ObjectAttributes();
-		new ObjectAttributesXmlReader(lp).parse(linkSlopeAttributeFile);
+		new ObjectAttributesXmlReader(lp).readFile(linkSlopeAttributeFile);
 
         for (Id<Link> linkId : controler.getScenario().getNetwork().getLinks().keySet()) {
 			linkSlopes.put(linkId, (Double) lp.getAttribute(linkId.toString(), "slope"));

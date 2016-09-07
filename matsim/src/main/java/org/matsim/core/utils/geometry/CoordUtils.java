@@ -28,6 +28,10 @@ public abstract class CoordUtils {
 		return new Coord(xx, yy);
 	}
 	
+	public static Coord createCoord( final double xx, final double yy, final double zz){
+		return new Coord(xx, yy, zz);
+	}
+	
 	public static Coord plus ( Coord coord1, Coord coord2 ) {
 		double xx = coord1.getX() + coord2.getX();
 		double yy = coord1.getY() + coord2.getY();
@@ -37,27 +41,37 @@ public abstract class CoordUtils {
 	public static Coord minus ( Coord coord1, Coord coord2 ) {
 		double xx = coord1.getX() - coord2.getX();
 		double yy = coord1.getY() - coord2.getY();
+		
+		//TODO Check and add z;
 		return new Coord(xx, yy);
 	}
 	
 	public static Coord scalarMult( double alpha, Coord coord ) {
 		double xx = alpha * coord.getX() ;
 		double yy = alpha * coord.getY() ;
+		
+		//TODO Check and add z;
 		return new Coord(xx, yy);
 	}
 	
 	public static Coord getCenter( Coord coord1, Coord coord2 ) {
 		double xx = 0.5*( coord1.getX() + coord2.getX() ) ;
 		double yy = 0.5*( coord1.getY() + coord2.getY() ) ;
+		
+		//TODO Check and add z;
 		return new Coord(xx, yy);
 	}
 	
 	public static double length( Coord coord1 ) {
+		
+		//TODO Check and add z;
 		return Math.sqrt( coord1.getX()*coord1.getX() + coord1.getY()*coord1.getY() ) ;
 	}
 	
 	public static Coord rotateToRight( Coord coord1 ) {
 		final double y = -coord1.getX();
+		
+		//TODO Check and add z;
 		return new Coord(coord1.getY(), y);
 	}
 	
@@ -65,6 +79,8 @@ public abstract class CoordUtils {
 		Coord fromTo = minus( coord2, coord1 ) ;
 		Coord offset = scalarMult( 0.1 , rotateToRight( fromTo ) ) ;
 		Coord centerWOffset = plus( getCenter( coord1, coord2 ) , offset ) ;
+		
+		//TODO Check and add z;
 		return centerWOffset ;
 	}
 
@@ -78,6 +94,8 @@ public abstract class CoordUtils {
 		//of code robustness, performance and so on ... [gl]
 		double xDiff = other.getX()-coord.getX();
 		double yDiff = other.getY()-coord.getY();
+		
+		//TODO Check and add z;
 		return Math.sqrt((xDiff*xDiff) + (yDiff*yDiff));
 	}
 
@@ -132,6 +150,8 @@ public abstract class CoordUtils {
 			// (x | y) is not on the line segment, but after lineTo
 			return calcEuclideanDistance(lineTo, point);
 		}
+		
+		//TODO Check and add z;
 		return calcEuclideanDistance(new Coord(lineFrom.getX() + u * lineDX, lineFrom.getY() + u * lineDY), point);
 	}
 

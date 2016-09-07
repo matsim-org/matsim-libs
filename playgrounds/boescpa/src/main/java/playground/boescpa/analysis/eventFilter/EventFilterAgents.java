@@ -32,7 +32,7 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -79,7 +79,7 @@ public class EventFilterAgents {
 		log.info("Reading events file...");
 		if (eventsFile.endsWith(".xml.gz")) { // if events-File is in the newer xml-format
 			EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-			reader.parse(eventsFile);
+			reader.readFile(eventsFile);
 		}
 		else {
 			throw new IllegalArgumentException("Given events-file not of known format.");

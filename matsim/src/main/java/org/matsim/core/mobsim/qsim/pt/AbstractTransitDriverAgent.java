@@ -19,9 +19,6 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.util.List;
-import java.util.ListIterator;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,7 +33,6 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -48,11 +44,13 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.List;
+import java.util.ListIterator;
+
 public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, PlanAgent {
 
 	private static final Logger log = Logger.getLogger(AbstractTransitDriverAgent.class);
 
-	private Scenario scenario;
 	private EventsManager eventsManager;
 
 	private TransitVehicle vehicle = null;
@@ -85,9 +83,9 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	AbstractTransitDriverAgent(InternalInterface internalInterface, TransitStopAgentTracker agentTracker2) {
 		super();
 		this.internalInterface = internalInterface;
-		this.scenario = ((QSim) internalInterface.getMobsim()).getScenario();
-		this.eventsManager = ((QSim) internalInterface.getMobsim()).getEventsManager();
-		accessEgress = new PassengerAccessEgressImpl(this.internalInterface, agentTracker2, this.scenario, eventsManager);
+		Scenario scenario = internalInterface.getMobsim().getScenario();
+		this.eventsManager = internalInterface.getMobsim().getEventsManager();
+		accessEgress = new PassengerAccessEgressImpl(this.internalInterface, agentTracker2, scenario, eventsManager);
 	}
 
 	final void init() {
@@ -260,10 +258,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	}
 
 	private boolean isBadDouble(double d){
-		if (Double.isNaN(d) || Double.isInfinite(d)){
-			return true;
-		}
-		return false;
+		return Double.isNaN(d) || Double.isInfinite(d);
 	}
 
 	private void depart(final double now) {
@@ -336,11 +331,11 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	 *
 	 * @author mrieser
 	 */
-	protected final class NetworkRouteWrapper implements NetworkRoute, Cloneable {
+	private final class NetworkRouteWrapper implements NetworkRoute, Cloneable {
 
 		private final NetworkRoute delegate;
 
-		public NetworkRouteWrapper(final NetworkRoute route) {
+		/*package*/ NetworkRouteWrapper(final NetworkRoute route) {
 			this.delegate = route;
 		}
 

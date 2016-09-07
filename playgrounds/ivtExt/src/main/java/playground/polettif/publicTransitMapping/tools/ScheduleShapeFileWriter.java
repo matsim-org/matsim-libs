@@ -39,6 +39,7 @@ import java.util.*;
  *
  * @author polettif
  */
+@Deprecated
 public class ScheduleShapeFileWriter {
 
 	private static final Logger log = Logger.getLogger(ScheduleShapeFileWriter.class);

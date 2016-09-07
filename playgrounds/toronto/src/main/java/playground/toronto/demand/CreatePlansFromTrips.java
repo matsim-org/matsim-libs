@@ -23,19 +23,18 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -285,7 +284,7 @@ public class CreatePlansFromTrips {
 	}
 		
 	private void writePlans(String filename){
-		PopulationWriter writer = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
+		StreamingPopulationWriter writer = new StreamingPopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		writer.writeStartPlans(filename);
 		writer.writePersons();
 		writer.writeEndPlans();
@@ -510,21 +509,21 @@ public class CreatePlansFromTrips {
 		if (networkFileName == "" || networkFileName == null) return;
 		
 		//Load the network
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFileName);
 		
 		
 		//Remove highway links and non-car links from the network. DON'T EXPORT!!!
 		HashSet<Id<Link>> linksToRemove = new HashSet<>();
 		for (Link l : network.getLinks().values()){
-			LinkImpl L = (LinkImpl) l;
+			Link L = (Link) l;
 			
-			if (L.getType() == null) continue; //Assumes that links without a type are OK.
+			if (NetworkUtils.getType(L) == null) continue; //Assumes that links without a type are OK.
 			
 			//Highway links (& on/off ramps)
-			if (L.getType().equals("Highway") || L.getType().equals("Toll Highway") 
-					|| L.getType().equals("On/Off Ramp") || L.getType().equals("Turn") ||
-					L.getType().equals("LOOP")) linksToRemove.add(L.getId());
+			if (NetworkUtils.getType(L).equals("Highway") || NetworkUtils.getType(L).equals("Toll Highway") 
+					|| NetworkUtils.getType(L).equals("On/Off Ramp") || NetworkUtils.getType(L).equals("Turn") ||
+					NetworkUtils.getType(L).equals("LOOP")) linksToRemove.add(L.getId());
 			
 			//Transit EX-ROW links
 			if (!L.getAllowedModes().contains("Car") || !L.getAllowedModes().contains("car")) linksToRemove.add(L.getId());

@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.testcases.fakes.FakeLink;
@@ -52,7 +51,7 @@ public class NetworkUtilsTest {
 
 	@Test
 	public void testGetNodes_Empty() {
-		NetworkImpl network = getTestNetwork();
+		Network network = getTestNetwork();
 		List<Node> nodes = NetworkUtils.getNodes(network, "");
 		assertEquals(0, nodes.size());
 
@@ -65,14 +64,14 @@ public class NetworkUtilsTest {
 
 	@Test
 	public void testGetNodes_Null() {
-		NetworkImpl network = getTestNetwork();
+		Network network = getTestNetwork();
 		List<Node> nodes = NetworkUtils.getNodes(network, null);
 		assertEquals(0, nodes.size());
 	}
 
 	@Test
 	public void testGetNodes_mixedDelimiters() {
-		NetworkImpl network = getTestNetwork();
+		Network network = getTestNetwork();
 		List<Node> nodes = NetworkUtils.getNodes(network, " 1\t\t2 \n4\t \t5      3 ");
 		assertEquals(5, nodes.size());
 		assertEquals(network.getNodes().get(Id.create(1, Node.class)), nodes.get(0));
@@ -84,7 +83,7 @@ public class NetworkUtilsTest {
 
 	@Test
 	public void testGetNodes_NonExistant() {
-		NetworkImpl network = getTestNetwork();
+		Network network = getTestNetwork();
 		try {
 			NetworkUtils.getNodes(network, "1 3 ab 5");
 			fail("expected Exception, but didn't happen.");
@@ -95,7 +94,7 @@ public class NetworkUtilsTest {
 
 	@Test
 	public void testGetLinks_Empty() {
-		NetworkImpl network = getTestNetwork();
+		Network network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, "");
 		assertEquals(0, links.size());
 
@@ -108,14 +107,14 @@ public class NetworkUtilsTest {
 
 	@Test
 	public void testGetLinks_StringNull() {
-		NetworkImpl network = getTestNetwork();
+		Network network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, (String)null);
 		assertEquals(0, links.size());
 	}
 
 	@Test
 	public void testGetLinks_mixedDelimiters() {
-		NetworkImpl network = getTestNetwork();
+		Network network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, " 1\t\t2 \n4\t \t      3 ");
 		assertEquals(4, links.size());
 		assertEquals(network.getLinks().get(Id.create(1, Link.class)), links.get(0));
@@ -126,7 +125,7 @@ public class NetworkUtilsTest {
 
 	@Test
 	public void testGetLinks_NonExistant() {
-		NetworkImpl network = getTestNetwork();
+		Network network = getTestNetwork();
 		try {
 			NetworkUtils.getLinks(network, "1 3 ab 4");
 			fail("expected Exception, but didn't happen.");
@@ -315,31 +314,31 @@ public class NetworkUtilsTest {
 		}
 	}
 
-	private NetworkImpl getTestNetwork() {
+	private Network getTestNetwork() {
 		int numOfLinks = 5;
 
-		NetworkImpl network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		Node[] nodes = new Node[numOfLinks+1];
 		for (int i = 0; i <= numOfLinks; i++) {
-			nodes[i] = network.createAndAddNode(Id.create(i, Node.class), new Coord((double) (1000 * i), (double) 0));
+			nodes[i] = NetworkUtils.createAndAddNode(network, Id.create(i, Node.class), new Coord((double) (1000 * i), (double) 0));
 		}
 		for (int i = 0; i < numOfLinks; i++) {
-			network.createAndAddLink(Id.create(i, Link.class), nodes[i], nodes[i+1], 1000.0, 10.0, 3600.0, 1);
+			NetworkUtils.createAndAddLink(network,Id.create(i, Link.class), nodes[i], nodes[i+1], 1000.0, 10.0, 3600.0, (double) 1 );
 		}
 		return network;
 	}
 
 	private static class MultimodalFixture {
-		/*package*/ final NetworkImpl network = NetworkImpl.createNetwork();
+		/*package*/ final Network network = NetworkUtils.createNetwork();
 		Node[] nodes = new Node[6];
 		Link[] links = new Link[this.nodes.length - 1];
 
 		public MultimodalFixture() {
 			for (int i = 0; i < this.nodes.length; i++) {
-				this.nodes[i] = this.network.createAndAddNode(Id.create(i, Node.class), new Coord((double) (1000 * i), (double) 0));
+				this.nodes[i] = NetworkUtils.createAndAddNode(this.network, Id.create(i, Node.class), new Coord((double) (1000 * i), (double) 0));
 			}
 			for (int i = 0; i < this.links.length; i++) {
-				this.links[i] = this.network.createAndAddLink(Id.create(i, Link.class), this.nodes[i], this.nodes[i+1], 1000.0, 10.0, 3600.0, 1);
+				this.links[i] = NetworkUtils.createAndAddLink(this.network,Id.create(i, Link.class), this.nodes[i], this.nodes[i+1], 1000.0, 10.0, 3600.0, (double) 1 );
 			}
 		}
 	}

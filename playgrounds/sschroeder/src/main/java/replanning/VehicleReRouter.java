@@ -12,6 +12,7 @@ import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import jsprit.core.problem.solution.route.activity.TourActivity;
 import jsprit.core.problem.vehicle.Vehicle;
 import jsprit.core.util.Solutions;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;

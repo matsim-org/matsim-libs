@@ -22,23 +22,22 @@ package org.matsim.lanes.data.v11;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.jaxb.lanedefinitions11.ObjectFactory;
 import org.matsim.jaxb.lanedefinitions11.XMLIdRefType;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneDefinitions;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneType;
 import org.matsim.jaxb.lanedefinitions11.XMLLanesToLinkAssignmentType;
-import org.matsim.lanes.data.v20.LaneDefinitionsReader;
 import org.matsim.lanes.data.v20.Lane;
 import org.xml.sax.SAXException;
 
@@ -49,7 +48,7 @@ import org.xml.sax.SAXException;
  * @author dgrether
  *
  */
-public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser implements MatsimSomeReader {
+public class LaneDefinitionsReader11 implements MatsimReader {
 
 	private static final Logger log = Logger
 			.getLogger(LaneDefinitionsReader11.class);
@@ -62,49 +61,33 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser implements Mats
 	 */
 	@Deprecated
 	public LaneDefinitionsReader11(LaneDefinitions11 laneDefs, String schemaLocation) {
-		super(schemaLocation);
 		this.laneDefinitions = laneDefs;
 		builder = this.laneDefinitions.getFactory();
 	}
-	
-	public LaneDefinitionsReader11(LaneDefinitions11 laneDefs) {
-		super(LaneDefinitionsReader.SCHEMALOCATIONV11);
-		this.laneDefinitions = laneDefs;
-		builder = this.laneDefinitions.getFactory();
-	}
-	
 
-	/**
-	 * @see org.matsim.core.utils.io.MatsimJaxbXmlParser#readFile(java.lang.String)
-	 */
+	public LaneDefinitionsReader11(LaneDefinitions11 laneDefs) {
+		this.laneDefinitions = laneDefs;
+		builder = this.laneDefinitions.getFactory();
+	}
+
 	@Override
 	public void readFile(String filename) throws RuntimeException {
 		//create jaxb infrastructure
 		JAXBContext jc;
 		XMLLaneDefinitions xmlLaneDefinitions;
-			try {
-				jc = JAXBContext
-						.newInstance(org.matsim.jaxb.lanedefinitions11.ObjectFactory.class);
+		try {
+			jc = JAXBContext
+					.newInstance(org.matsim.jaxb.lanedefinitions11.ObjectFactory.class);
 			ObjectFactory fac = new ObjectFactory();
 			Unmarshaller u = jc.createUnmarshaller();
 			// validate XML file
-				super.validateFile(filename, u);
+			u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/laneDefinitions_v1.1.xsd")));
 			log.info("starting unmarshalling " + filename);
-			InputStream stream = null;
-			try {
-			  stream = IOUtils.getInputStream(filename);
+
+			try (InputStream stream = IOUtils.getInputStream(filename)) {
 				xmlLaneDefinitions = (XMLLaneDefinitions) u.unmarshal(stream);
 			}
-			finally {
-				try {
-					if (stream != null) { stream.close();	}
-				} catch (IOException e) {
-					log.warn("Could not close stream.", e);
-					e.printStackTrace();
-					throw new RuntimeException(e.getMessage());
-				}
-			}
-			
+
 			//convert the parsed xml-instances to basic instances
 			LanesToLinkAssignment11 l2lAssignment;
 			LaneData11 lane = null;
@@ -131,21 +114,11 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser implements Mats
 				}
 				this.laneDefinitions.addLanesToLinkAssignment(l2lAssignment);
 			}
-			} catch (JAXBException e1) {
-				e1.printStackTrace();
-				throw new RuntimeException(e1.getMessage());
-			} 	catch (SAXException e1) {
-				e1.printStackTrace();
-				throw new RuntimeException(e1.getMessage());
-			} catch (ParserConfigurationException e1) {
-				e1.printStackTrace();
-				throw new RuntimeException(e1.getMessage());
-			} catch (IOException e1) {
-				e1.printStackTrace();
-				throw new RuntimeException(e1.getMessage());
-			}
+		} catch (JAXBException | SAXException | IOException e1) {
+			throw new RuntimeException(e1);
+		}
 
-		
+
 	}
 
 }

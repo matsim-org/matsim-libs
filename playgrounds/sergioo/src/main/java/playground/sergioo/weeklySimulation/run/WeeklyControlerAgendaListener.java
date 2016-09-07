@@ -35,7 +35,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.*;
@@ -83,7 +82,7 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 		carMode.add(TransportMode.car);
 		filter.filter(net, carMode);
 		for(ActivityFacility facility:((MutableScenario)controler.getScenario()).getActivityFacilities().getFacilities().values())
-			((ActivityFacilityImpl)facility).setLinkId(((NetworkImpl)net).getNearestLinkExactly(facility.getCoord()).getId());
+			((ActivityFacilityImpl)facility).setLinkId(NetworkUtils.getNearestLinkExactly(((Network)net),facility.getCoord()).getId());
 		Collection<Person> toBeAdded = new ArrayList<Person>();
 		Set<String> modes = new HashSet<String>();
 		modes.addAll(controler.getConfig().plansCalcRoute().getNetworkModes());
@@ -111,7 +110,7 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 	//Main
 	public static void main(String[] args) {
 		final Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0]));
-		new SocialNetworkReader(scenario).parse(args.length>1 ? args[1] : null);
+		new SocialNetworkReader(scenario).readFile(args.length>1 ? args[1] : null);
 		final Controler controler = new Controler(scenario);
 		controler.getConfig().plansCalcRoute().getTeleportedModeFreespeedFactors().put("empty", 0.0);
 		controler.getConfig().controler().setOverwriteFileSetting(

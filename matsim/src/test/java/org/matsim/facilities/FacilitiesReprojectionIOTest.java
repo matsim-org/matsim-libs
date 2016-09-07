@@ -12,13 +12,13 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author thibautd
  */
 public class FacilitiesReprojectionIOTest {
-	private static final String TEST_FILE = "test/scenarios/chessboard/facilities.xml";
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
@@ -28,8 +28,8 @@ public class FacilitiesReprojectionIOTest {
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Scenario reprojectedScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		new MatsimFacilitiesReader( originalScenario ).readFile( TEST_FILE );
-		new MatsimFacilitiesReader( new Transformation() , reprojectedScenario ).readFile( TEST_FILE );
+		new MatsimFacilitiesReader( originalScenario ).parse(IOUtils.newUrl(utils.getTestScenarioURL("chessboard"), "facilities.xml"));
+		new MatsimFacilitiesReader( new Transformation() , reprojectedScenario ).parse(IOUtils.newUrl(utils.getTestScenarioURL("chessboard"), "facilities.xml"));
 
 		assertScenarioReprojectedCorrectly(originalScenario, reprojectedScenario);
 	}
@@ -37,7 +37,7 @@ public class FacilitiesReprojectionIOTest {
 	@Test
 	public void testReprojectionAtExport() {
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimFacilitiesReader( originalScenario ).readFile( TEST_FILE );
+		new MatsimFacilitiesReader( originalScenario ).parse(IOUtils.newUrl(utils.getTestScenarioURL("chessboard"), "facilities.xml"));
 
 		final String outFile = utils.getOutputDirectory()+"/facilities.xml.gz";
 
@@ -57,10 +57,10 @@ public class FacilitiesReprojectionIOTest {
 		final double epsilon = 0.01;
 
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimFacilitiesReader( originalScenario ).readFile( TEST_FILE );
+		new MatsimFacilitiesReader( originalScenario ).parse(IOUtils.newUrl(utils.getTestScenarioURL("chessboard"), "facilities.xml"));
 
 		final Config config = ConfigUtils.createConfig();
-		config.facilities().setInputFile( TEST_FILE );
+		config.facilities().setInputFile( IOUtils.newUrl(utils.getTestScenarioURL("chessboard"), "facilities.xml").toString() );
 
 		config.facilities().setInputCRS(TransformationFactory.CH1903_LV03_GT );
 		// web mercator. This would be a pretty silly choice for simulation,

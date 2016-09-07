@@ -19,13 +19,17 @@
 
 package playground.michalm.barcelona;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.*;
-import org.matsim.core.network.NetworkChangeEvent.*;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkChangeEvent.ChangeType;
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.network.NetworkChangeEventsWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -35,7 +39,6 @@ public class BarcelonaNetworkChangeEventsGenerator
     private final static double[] SCALING_FACTORS = { 1, 1, 1, 1, 1, 1, 1, .8, .5, .5, .65, .8, .85,
             .8, .65, .6, .5, .5, .5, .65, .7, .8, .95, 1 };
 
-    private final NetworkChangeEventFactory factory = new NetworkChangeEventFactoryImpl();
     private final List<NetworkChangeEvent> networkChangeEvents = new ArrayList<NetworkChangeEvent>();
     private final Network network;
 
@@ -54,7 +57,7 @@ public class BarcelonaNetworkChangeEventsGenerator
             prevFactor = SCALING_FACTORS[i];
 
             if (relativeFactor != 1) {
-                NetworkChangeEvent e = factory.createNetworkChangeEvent(i * 3600);
+                NetworkChangeEvent e = new NetworkChangeEvent((double) (i * 3600));
                 e.setFreespeedChange(new ChangeValue(ChangeType.FACTOR, relativeFactor));
                 e.addLinks(network.getLinks().values());
                 this.networkChangeEvents.add(e);

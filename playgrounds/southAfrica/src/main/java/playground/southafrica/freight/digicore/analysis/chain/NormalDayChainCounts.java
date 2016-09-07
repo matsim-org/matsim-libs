@@ -72,7 +72,7 @@ public class NormalDayChainCounts {
 		
 		for(File f : vehicleFiles){
 			DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-			dvr.parse(f.getAbsolutePath());
+			dvr.readFile(f.getAbsolutePath());
 			DigicoreVehicle vehicle = dvr.getVehicle();
 			
 			for(DigicoreChain chain : vehicle.getChains()){

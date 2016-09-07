@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia.evac;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -26,11 +25,14 @@ import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.vsp.congestion.handlers.TollHandler;
-import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
+import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
+import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 /**
  * @author amit
@@ -41,66 +43,61 @@ public class EvacPatnaControler {
 	public static void main(String[] args) {
 
 		String configFile ;
-		boolean  isUsingSeepage;
+		LinkDynamics linkDynamics;
 		String outDir;
-		boolean congestionPricing;
+		boolean isSeepModeStorageFree ;
 
 		if(args.length==0){
-			configFile = "../../../repos/runs-svn/patnaIndia/run105/input/patna_evac_config.xml.gz";
-			isUsingSeepage = false;
-			outDir = "../../../repos/runs-svn/patnaIndia/run105/100pct/";
-			congestionPricing = true;
+			configFile = "../../../../repos/runs-svn/patnaIndia/run109/input/patna_evac_config.xml.gz";
+			outDir = "../../../../repos/runs-svn/patnaIndia/run109/100pct/";
+			linkDynamics = LinkDynamics.PassingQ;
+			isSeepModeStorageFree = false;
 		} else {
 			configFile = args[0];
-			isUsingSeepage = Boolean.valueOf(args[1]);
-			outDir = args[2];
-			congestionPricing = Boolean.valueOf(args[3]);
+			outDir = args[1];
+			linkDynamics = LinkDynamics.valueOf(args[2]);
+			isSeepModeStorageFree = Boolean.valueOf(args[3]);
 		}
 
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.controler().setOutputDirectory(outDir);
 
-		if(congestionPricing) config.controler().setOutputDirectory(config.controler().getOutputDirectory()+"/congestionPricing/");
-		
-		if(isUsingSeepage){	
-			config.qsim().setLinkDynamics(LinkDynamics.SeepageQ.toString());
-			config.qsim().setSeepMode("bike");
-			config.qsim().setSeepModeStorageFree(false);
-			config.qsim().setRestrictingSeepage(true);
-			
-			String outputDir = config.controler().getOutputDirectory()+"/evac_seepage/";
-			config.controler().setOutputDirectory(outputDir);
-		} else {
-			String outputDir = config.controler().getOutputDirectory()+"/evac_passing/";
-			config.controler().setOutputDirectory(outputDir);
-		}
+		config.qsim().setLinkDynamics(linkDynamics.name());
+		config.qsim().setSeepModeStorageFree(isSeepModeStorageFree);
+		config.controler().setOutputDirectory(config.controler().getOutputDirectory()+"/evac_"+linkDynamics.name()+"/");
+		config.controler().setDumpDataAtEnd(true);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.vspExperimental().setWritingOutputEvents(true);
 
 		Scenario sc = ScenarioUtils.loadScenario(config); 
 
-		sc.getConfig().qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
-		
-		Logger.getLogger(EvacPatnaControler.class).error("Check the modes in the following call first. jan 16");
-//		PatnaUtils.createAndAddVehiclesToScenario(sc);
+		sc.getConfig().qsim().setVehiclesSource(VehiclesSource.modeVehicleTypesFromVehiclesData);
+		PatnaUtils.createAndAddVehiclesToScenario(sc, PatnaUtils.URBAN_MAIN_MODES);
 
 		final Controler controler = new Controler(sc);
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.getConfig().controler().setDumpDataAtEnd(true);
 
-		if(isUsingSeepage){
-			Logger.getLogger(EvacPatnaControler.class).error("Removed seepage network factory. Should work without it if not, check is passing is allowed.");
-		}
-		
-		if(congestionPricing) {
-			TollHandler tollHandler = new TollHandler(controler.getScenario());
-			final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler, config.planCalcScore());
-			controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
-				}
-			});
-//			services.addControlerListener(new MarginalCongestionPricingContolerListener(services.getScenario(),tollHandler, new CongestionHandlerImplV6(services.getEvents(), (ScenarioImpl)services.getScenario()) ));
-		}
+		final RandomizingTimeDistanceTravelDisutilityFactory builder_bike =  new RandomizingTimeDistanceTravelDisutilityFactory("bike", config.planCalcScore());
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+
+				addTravelTimeBinding("bike").to(FreeSpeedTravelTimeForBike.class);
+				addTravelDisutilityFactoryBinding("bike").toInstance(builder_bike);
+
+				addTravelTimeBinding("motorbike").to(networkTravelTime());
+				addTravelDisutilityFactoryBinding("motorbike").to(carTravelDisutilityFactoryKey());					
+			}
+		});
+
+		controler.addOverridingModule(new AbstractModule() { // ploting modal share over iterations
+			@Override
+			public void install() {
+				this.bind(ModalTripTravelTimeHandler.class);
+				this.addControlerListenerBinding().to(ModalTravelTimeControlerListner.class);
+			}
+		});
+
 		controler.run();
 	}
 }

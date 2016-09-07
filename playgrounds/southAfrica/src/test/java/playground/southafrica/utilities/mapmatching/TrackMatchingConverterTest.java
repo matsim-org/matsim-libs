@@ -17,7 +17,7 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.testcases.MatsimTestUtils;
@@ -36,7 +36,7 @@ public class TrackMatchingConverterTest {
 		setup();
 		TrackMatchingXmlReader tmx = new TrackMatchingXmlReader();
 		tmx.setValidating(false);
-		tmx.parse(utils.getClassInputDirectory() + "test.xml");
+		tmx.readFile(utils.getClassInputDirectory() + "test.xml");
 		List<Tuple<Id<Node>, Id<Node>>> nodes = tmx.getLargestRoute();
 		
 		TrackMatchingConverter tmc = new TrackMatchingConverter(utils.getOutputDirectory() + "network.xml");

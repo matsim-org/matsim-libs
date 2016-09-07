@@ -38,17 +38,21 @@ public class FacilitiesSummary {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 		int f_cnt = 0;
 		int act_cnt = 0;
-		Coord min_coord = new Coord(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-		Coord max_coord = new Coord(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
+//		Coord min_coord = new Coord(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+//		Coord max_coord = new Coord(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
+		double min_coordX = Double.POSITIVE_INFINITY;
+		double min_coordY = Double.POSITIVE_INFINITY;
+		double max_coordX = Double.NEGATIVE_INFINITY;
+		double max_coordY = Double.NEGATIVE_INFINITY;
 		//            home,work,education,shop,leisure
 		int caps[] = {0   ,   0,        0,   0,      0};
 		int unlimit_cap_cnt = 0;
 		for (ActivityFacility f : facilities.getFacilities().values()) {
 			f_cnt++;
-			if (f.getCoord().getX() > max_coord.getX()) { max_coord.setX(f.getCoord().getX()); }
-			if (f.getCoord().getY() > max_coord.getY()) { max_coord.setY(f.getCoord().getY()); }
-			if (f.getCoord().getX() < min_coord.getX()) { min_coord.setX(f.getCoord().getX()); }
-			if (f.getCoord().getY() < min_coord.getY()) { min_coord.setY(f.getCoord().getY()); }
+			if (f.getCoord().getX() > max_coordX) { max_coordX=f.getCoord().getX(); }
+			if (f.getCoord().getY() > max_coordY) { max_coordY=f.getCoord().getY(); }
+			if (f.getCoord().getX() < min_coordX) { min_coordX=f.getCoord().getX(); }
+			if (f.getCoord().getY() < min_coordY) { min_coordY=f.getCoord().getY(); }
 
 			Iterator<? extends ActivityOption> a_it = f.getActivityOptions().values().iterator();
 			while (a_it.hasNext()) {
@@ -83,8 +87,8 @@ public class FacilitiesSummary {
 		}
 		System.out.println("      Number of Facilities:             " + f_cnt);
 		System.out.println("      Number of Activities:             " + act_cnt);
-		System.out.println("      Min Coord:                        " + min_coord.toString());
-		System.out.println("      Max Coord:                        " + max_coord.toString());
+		System.out.println("      Min Coord:                        " + min_coordX + " " + min_coordY );
+		System.out.println("      Max Coord:                        " + max_coordX + " " + max_coordY ) ;
 		System.out.println("      total home cap:                   " + caps[0]);
 		System.out.println("      total work cap:                   " + caps[1]);
 		System.out.println("      total education cap:              " + caps[2]);

@@ -335,7 +335,7 @@ public class CadytsCarIT {
 			config.planCalcScore().addActivityParams(params ) ;
 			params.setTypicalDuration(8*60*60.) ;
 		}
-		config.counts().setCountsFileName(inputDir + "counts5.xml");
+		config.counts().setInputFile(inputDir + "counts5.xml");
 		return config;
 	}
 

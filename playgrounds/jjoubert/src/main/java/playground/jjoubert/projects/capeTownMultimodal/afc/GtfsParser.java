@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.FakeFacility;
@@ -93,7 +93,7 @@ public class GtfsParser {
 	private static Scenario parseSchedule(String scheduleFile, String networkFile){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		new MatsimNetworkReader(sc.getNetwork()).parse(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 		new TransitScheduleReader(sc).readFile(scheduleFile);
 		return sc;
 	}

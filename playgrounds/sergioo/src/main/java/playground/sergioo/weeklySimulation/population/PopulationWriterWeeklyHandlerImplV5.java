@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PopulationWriterHandler;
+import org.matsim.core.population.io.PopulationWriterHandler;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 

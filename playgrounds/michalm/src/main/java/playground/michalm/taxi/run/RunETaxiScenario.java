@@ -20,7 +20,6 @@
 package playground.michalm.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.run.VrpQSimConfigConsistencyChecker;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.*;
@@ -31,6 +30,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.michalm.ev.*;
 import playground.michalm.ev.data.*;
+import playground.michalm.ev.data.file.ChargerReader;
 import playground.michalm.taxi.data.file.EvrpVehicleReader;
 import playground.michalm.taxi.ev.*;
 
@@ -49,14 +49,14 @@ public class RunETaxiScenario
     {
         TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
         EvConfigGroup evCfg = EvConfigGroup.get(config);
-        config.addConfigConsistencyChecker(new VrpQSimConfigConsistencyChecker());
+        config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
         config.checkConsistency();
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
         TaxiData taxiData = new TaxiData();
-        new EvrpVehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
+        new EvrpVehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
         EvData evData = new EvDataImpl();
-        new ChargerReader(scenario, evData).parse(evCfg.getChargerFile());
+        new ChargerReader(scenario.getNetwork(), evData).readFile(evCfg.getChargerFile());
         ETaxiUtils.initEvData(taxiData, evData);
 
         Controler controler = RunTaxiScenario.createControler(scenario, taxiData, otfvis);
@@ -67,7 +67,8 @@ public class RunETaxiScenario
             @Override
             public void install()
             {
-                addMobsimListenerBinding().toProvider(ETaxiTimeProfileCollectorProvider.class);
+                addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
+                addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyXYDataProvider.class);
             }
         });
 

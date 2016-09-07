@@ -32,10 +32,12 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
+import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.router.ImaginaryNode;
 import org.matsim.core.router.InitialNode;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizerContext;
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
@@ -138,7 +140,14 @@ public class SharedTaxiDispatchFinder {
 			if (currentRequests.size()>1){
 				throw new IllegalStateException("Not supported by this optimizer");
 			}
+
 			TaxibusRequest firstRequest = (TaxibusRequest) currentRequests.toArray()[0];
+			double pickup2pickupDist = 	DistanceUtils.calculateSquaredDistance(firstRequest.getFromLink().getCoord(), req.getFromLink().getCoord());
+			double firstEuclidDist = DistanceUtils.calculateSquaredDistance(firstRequest.getFromLink().getCoord(),firstRequest.getToLink().getCoord());
+			if (pickup2pickupDist>firstEuclidDist){
+				continue;
+			}
+			
 			Path firstToSecondPickup = router.calcLeastCostPath(firstRequest.getFromLink().getToNode(), req.getFromLink().getFromNode(), currTime, null, null);
 			Path currentDirectPath = router.calcLeastCostPath(req.getFromLink().getToNode(), req.getToLink().getFromNode(), currTime+ firstToSecondPickup.travelTime, null,null);
 			Path firstDirectPath = router.calcLeastCostPath(firstRequest.getFromLink().getToNode(), firstRequest.getToLink().getFromNode(), currTime, null,null);
@@ -182,7 +191,7 @@ public class SharedTaxiDispatchFinder {
 		}
 		if (bestSharedPath != null)
 			{
-			Logger.getLogger(getClass()).info("Shared Ride :" + bestSharedPath.vehicle.getId() + " no "+ sharedRides++);
+//			Logger.getLogger(getClass()).info("Shared Ride :" + bestSharedPath.vehicle.getId() + " no "+ sharedRides++);
 		}
 		if ((bestSharedPath == null)&&(bestNewPath!=null) ){
 			bestNewPath.addPath(VrpPaths.calcAndCreatePath(req.getFromLink(), req.getToLink(), currTime + bestNewVehDispatchTime, router, optimContext.travelTime));

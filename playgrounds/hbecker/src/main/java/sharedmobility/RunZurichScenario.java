@@ -22,13 +22,13 @@ package sharedmobility;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.*;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -37,7 +37,7 @@ import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
 import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
 import org.matsim.contrib.carsharing.control.listeners.CarsharingListener;
-import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactory;
+import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactoryNew;
 import org.matsim.contrib.carsharing.replanning.CarsharingSubtourModeChoiceStrategy;
 import org.matsim.contrib.carsharing.replanning.RandomTripToCarsharingStrategy;
 import org.matsim.contrib.carsharing.runExample.CarsharingUtils;
@@ -105,7 +105,7 @@ public class RunZurichScenario {
 	private static void connectFacilitiesWithNetwork(MatsimServices controler) {
         ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 		//log.warn("number of facilities: " +facilities.getFacilities().size());
-        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
+        Network network = (Network) controler.getScenario().getNetwork();
 		//log.warn("number of links: " +network.getLinks().size());
 
 		WorldConnectLocations wcl = new WorldConnectLocations(controler.getConfig());
@@ -132,8 +132,7 @@ public class RunZurichScenario {
 	}
 
 	public static void installCarSharing(final Controler controler) {
-		Scenario sc = controler.getScenario() ;
-		
+	
 		controler.addOverridingModule( new AbstractModule() {
 			@Override
 			public void install() {
@@ -145,18 +144,12 @@ public class RunZurichScenario {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindMobsim().toProvider( CarsharingQsimFactory.class );
+				bindMobsim().toProvider( CarsharingQsimFactoryNew.class );
+		        addControlerListenerBinding().to(CarsharingListener.class);
 			}
 		});
 
-		controler.addOverridingModule(CarsharingUtils.createModule());
-
-		//setting up the scoring function factory, inside different scoring functions are set-up
-		//controler.setScoringFunctionFactory( new CarsharingScoringFunctionFactory( sc ) );
-		
-		final CarsharingConfigGroup csConfig = (CarsharingConfigGroup) sc.getConfig().getModule(CarsharingConfigGroup.GROUP_NAME);
-		controler.addControlerListener(new CarsharingListener(controler,
-				csConfig.getStatsWriterFrequency() ) ) ;
+		controler.addOverridingModule(CarsharingUtils.createRoutingModule());		
 	}
 
 

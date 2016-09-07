@@ -18,6 +18,12 @@
  * *********************************************************************** */
 
 package playground.jbischoff.parking;
+
+import java.util.Random;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
+
 /**
  * @author  jbischoff
  *
@@ -33,6 +39,17 @@ public class ParkingUtils {
 	
 	public ParkingUtils() {
 		// TODO Auto-generated constructor stub
+	}
+	
+	public static Coord getRandomPointAlongLink(Random rnd, Link link){
+		Coord fromNodeCoord = link.getFromNode().getCoord();
+		Coord toNodeCoord = link.getToNode().getCoord();
+		double r = rnd.nextDouble();
+		
+		double x = (fromNodeCoord.getX()*r)+(toNodeCoord.getX()*(1-r));
+		double y = (fromNodeCoord.getY()*r)+(toNodeCoord.getY()*(1-r));
+		
+		return new Coord(x,y);
 	}
 
 }

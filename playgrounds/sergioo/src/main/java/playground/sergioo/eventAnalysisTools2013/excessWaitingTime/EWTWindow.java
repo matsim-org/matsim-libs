@@ -15,7 +15,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -70,7 +70,7 @@ public class EWTWindow extends LayersWindow {
 		//ObjectInputStream ois = new ObjectInputStream(new FileInputStream(args[5]));
 		final ExcessWaitingTimeCalculator eWTCalculator = /*(ExcessWaitingTimeCalculator) ois.readObject();*/new ExcessWaitingTimeCalculator();
 		events.addHandler(eWTCalculator);
-		new EventsReaderXMLv1(events).parse(args[2]);
+		new EventsReaderXMLv1(events).readFile(args[2]);
 		/*ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(args[5]));
 		oos.writeObject(eWTCalculator);
 		oos.close();

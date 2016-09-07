@@ -434,7 +434,7 @@ public class MATSimDummy {
 					final ObjectAttributes linkAttributes = new ObjectAttributes();
 					final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
 							linkAttributes);
-					reader.parse(linkAttributeFileName);
+					reader.readFile(linkAttributeFileName);
 					Logger.getLogger(MATSimDummy.class.getName())
 							.warning(
 									"Removing all expanded links. This *should* have no "

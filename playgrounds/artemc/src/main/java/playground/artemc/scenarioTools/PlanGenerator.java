@@ -13,12 +13,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.StreamingUtils;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -51,7 +51,7 @@ public class PlanGenerator {
 		Population population = (Population) scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
 		StreamingUtils.setIsStreaming(population, true);
-		PopulationWriter popWriter = new PopulationWriter(population, scenario.getNetwork());
+		StreamingPopulationWriter popWriter = new StreamingPopulationWriter(population, scenario.getNetwork());
 		popWriter.startStreaming(populationPath);
 		
 		/*Get Population*/

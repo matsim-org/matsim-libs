@@ -25,10 +25,21 @@ public class MyNewProjectScript {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				this.bindMobsim().toProvider(MyMobsimProvider.class);
+//				this.bindMobsim().toProvider(MyMobsimProvider.class);
+//				this.bindMobsim().toProvider(new Provider<Mobsim>() {
+//					@Override
+//					public Mobsim get() {
+//						MyMobsim mobsim = new MyMobsim();
+//						mobsim.setSomeOption(true);
+//						return mobsim;
+//						// the provider could also re-use objects
+//					}
+//				});
+				this.bindMobsim().to(MyMobsim.class);
 //				this.addEventHandlerBinding().to(MyEventHandler.class);
 				this.bind(MyDummyClass.class).toInstance(new MyDummyClass());
 //				this.bind(MyDummyClass.class).to(MyDummyClassImpl.class); // alternative; a new instance will be created every time, like a factory
+//				this.bind(MyDummyClass.class); // alternative to the above, but without interface/implementation
 //				this.bindMobsim().to(JDEQSimulation.class);
 				
 //				this.install(otherModule); // include setup from other "modules", might overwrite previous bindings

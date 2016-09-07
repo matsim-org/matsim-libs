@@ -32,20 +32,26 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.utils.misc.Time;
 
 import javax.inject.Inject;
 
 /**
- * Integrates the RoadPricing functionality into the MATSim Controler.  Does the following:
+ * Integrates the RoadPricing functionality into the MATSim Controler.  Does the 
+ * following:
  * <p/>
- * Initialization:<ul>
- * <li> Reads the road pricing scheme and adds it as a scenario element.
- * <li> Adds the CalcPaidToll events listener (to calculate the toll per agent).
- * <li> Adds the toll to the TravelDisutility for the router (by wrapping the pre-existing Travel Disutility object).
+ * Initialization:
+ * <ul>
+ * 		<li> Reads the road pricing scheme and adds it as a scenario element.
+ * 		<li> Adds the {@link CalcPaidToll} events listener (to calculate the 
+ * 			 toll per agent).
+ * 		<li> Adds the toll to the {@link TravelDisutility} for the router (by 
+ * 			 wrapping the pre-existing {@link TravelDisutility} object).
  * </ul>
- * After mobsim:<ul>
- * <li> Send toll as money events to agents.
+ * After mobsim:
+ * <ul>
+ * 		<li> Send toll as money events to agents.
  * </ul>
  * Will also generate and output some statistics ...
  *
@@ -57,23 +63,23 @@ IterationEndsListener, ShutdownListener {
 	final static private Logger log = Logger.getLogger(RoadPricingControlerListener.class);
 
 	private final RoadPricingScheme scheme;
-    private final CalcPaidToll calcPaidToll;
-    private final CalcAverageTolledTripLength cattl;
+	private final CalcPaidToll calcPaidToll;
+	private final CalcAverageTolledTripLength cattl;
 	private EventsManager eventsManager;
 	private OutputDirectoryHierarchy controlerIO;
 
 	@Inject
-    RoadPricingControlerListener(RoadPricingScheme scheme, CalcPaidToll calcPaidToll, CalcAverageTolledTripLength cattl, EventsManager eventsManager, OutputDirectoryHierarchy controlerIO) {
+	RoadPricingControlerListener(RoadPricingScheme scheme, CalcPaidToll calcPaidToll, CalcAverageTolledTripLength cattl, EventsManager eventsManager, OutputDirectoryHierarchy controlerIO) {
 		this.scheme = scheme;
-        this.calcPaidToll = calcPaidToll;
-        this.cattl = cattl;
+		this.calcPaidToll = calcPaidToll;
+		this.cattl = cattl;
 		this.eventsManager = eventsManager;
 		this.controlerIO = controlerIO;
 		Gbl.printBuildInfo("RoadPricing", "/org.matsim.contrib/roadpricing/revision.txt");
 	}
 
-    @Override
-    public void notifyStartup(final StartupEvent event) {}
+	@Override
+	public void notifyStartup(final StartupEvent event) {}
 
 	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {

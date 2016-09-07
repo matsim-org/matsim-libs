@@ -13,7 +13,13 @@
 			<act type="w" facility="3" x="1000.0" y="-250.0" start_time="08:00:00" max_dur="08:00:00" />
             <leg mode="car">
 			</leg>
-			<act type="h" facility="0" x="0.0" y="-375.0" start_time="08:00:00" max_dur="08:00:00" end_time="16:00:00" />
+			<act type="h" facility="0" x="0.0" y="-375.0" start_time="08:00:00" max_dur="08:00:00" />
+			<leg mode="car">
+			</leg>
+			<act type="w" facility="3" x="1000.0" y="-250.0" start_time="08:00:00" max_dur="08:00:00" />
+            <leg mode="car">
+			</leg>
+			<act type="h" facility="0" x="0.0" y="-375.0" start_time="08:00:00" />
 		</plan>
 
 	</person>

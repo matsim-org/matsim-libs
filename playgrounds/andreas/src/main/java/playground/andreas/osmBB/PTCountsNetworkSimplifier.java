@@ -36,9 +36,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
@@ -105,7 +105,7 @@ public class PTCountsNetworkSimplifier {
 		} else {
 			this.inCounts = new Counts();
 			CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(this.inCounts);
-			countsReader.parse(inCounts);
+			countsReader.readFile(inCounts);
 		}
 		
 		this.countsOutFile = countsOutFile;
@@ -223,12 +223,12 @@ public class PTCountsNetworkSimplifier {
 				List<Link> iLinks = new ArrayList<Link> (node.getInLinks().values());
 
 				for (Link iL : iLinks) {
-					LinkImpl inLink = (LinkImpl) iL;
+					Link inLink = (Link) iL;
 
 					List<Link> oLinks = new ArrayList<Link> (node.getOutLinks().values());
 
 					for (Link oL : oLinks) {
-						LinkImpl outLink = (LinkImpl) oL;
+						Link outLink = (Link) oL;
 
 						if(inLink != null && outLink != null){
 
@@ -252,7 +252,7 @@ public class PTCountsNetworkSimplifier {
 										// freespeed depends on total length and time needed for inLink and outLink
 										link.setFreespeed(
 												(inLink.getLength() + outLink.getLength()) /
-												(inLink.getFreespeedTravelTime() + outLink.getFreespeedTravelTime())
+												(NetworkUtils.getFreespeedTravelTime(inLink) + NetworkUtils.getFreespeedTravelTime(outLink))
 										);
 
 										// the capacity and the new links end is important, thus it will be set to the minimum
@@ -406,7 +406,7 @@ public class PTCountsNetworkSimplifier {
 		}
 	}
 
-	private boolean removeLinksFromTransitSchedule(Link link, LinkImpl inLink, LinkImpl outLink) {
+	private boolean removeLinksFromTransitSchedule(Link link, Link inLink, Link outLink) {
 		// Link can only be merged, if all routes contain a) both links in direct following order and b) no route contain only one of those links
 		for (TransitLine transitLine : this.transitSchedule.getTransitLines().values()) {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
@@ -514,7 +514,7 @@ public class PTCountsNetworkSimplifier {
 	/**
 	 * Compare link attributes. Return whether they are the same or not.
 	 */
-	private boolean bothLinksHaveSameLinkStats(LinkImpl linkA, LinkImpl linkB){
+	private boolean bothLinksHaveSameLinkStats(Link linkA, Link linkB){
 
 		boolean bothLinksHaveSameLinkStats = true;
 

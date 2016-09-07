@@ -449,7 +449,7 @@ public class RCEToolBox extends AbstractToolBox {
 		} else if (e.getActionCommand() == locale.btSave()) {
 			if (this.roadClosures.size() > 0) {
 				boolean saved = ConfigIO.saveRoadClosures(controller,
-						roadClosures);
+						roadClosures, controller.getScenarioPath()+"/changeEvents.xml");
 				// TODO add confirmation dialog?
 
 			}

@@ -40,7 +40,7 @@ public class RunSharedTaxiExample {
 
 	public static void main(String[] args) {
 		
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configShared.xml", new TaxibusConfigGroup());
+		Config config = ConfigUtils.loadConfig(args[0], new TaxibusConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 	
 		Scenario scenario = ScenarioUtils.loadScenario(config);

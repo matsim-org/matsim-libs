@@ -34,13 +34,13 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingPopulationReader;
-import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -139,7 +139,7 @@ public class TransportModeGeoAnalysis extends AbstractPersonAlgorithm {
 		Logger log = Logger.getLogger(TransportModeGeoAnalysis.class);
 		try {
 			log.info("reading network");
-			new MatsimNetworkReader(scenario.getNetwork()).parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1S7/output_network.xml.gz");
+			new MatsimNetworkReader(scenario.getNetwork()).readFile("/Volumes/Data/VSP/projects/diss/runs/tr100pct1S7/output_network.xml.gz");
 			log.info("analyzing plans");
 			BufferedWriter infoFile = IOUtils.getBufferedWriter("/Volumes/Data/VSP/projects/diss/runs/tr100pct1S7/coordsGmde.txt");
 			infoFile.write("X\tY\tID\tTYPE\tGID\tGNAME\n");
@@ -150,8 +150,8 @@ public class TransportModeGeoAnalysis extends AbstractPersonAlgorithm {
 			analysis.readGemeindegrenzen("/Users/cello/Desktop/Gemeindegrenzen/gemeindegrenzen2008/g1g08_shp_080606/G1G08.shp");
 			final PersonAlgorithm algo = analysis;
 			reader.addAlgorithm(algo);
-			new PopulationReader(scenario).parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1S7/output_plans.xml.gz");
-			reader.parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1S7/output_plans.xml.gz");
+			new PopulationReader(scenario).readFile("/Volumes/Data/VSP/projects/diss/runs/tr100pct1S7/output_plans.xml.gz");
+			reader.readFile("/Volumes/Data/VSP/projects/diss/runs/tr100pct1S7/output_plans.xml.gz");
 			PopulationUtils.printPlansCount(reader) ;
 			infoFile.close();
 			log.info("done");

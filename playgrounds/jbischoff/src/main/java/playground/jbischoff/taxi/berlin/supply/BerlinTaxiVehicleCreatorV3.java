@@ -29,12 +29,12 @@ import org.matsim.contrib.dvrp.data.file.VehicleWriter;
 import org.matsim.contrib.util.random.WeightedRandomSelection;
 import org.matsim.contrib.zone.Zone;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.tabularFileParser.*;
 import org.matsim.matrices.*;
 
-import playground.michalm.berlin.BerlinZoneUtils;
+import playground.michalm.TaxiBerlin.TaxiBerlinZoneUtils;
 import playground.michalm.util.matrices.MatrixUtils;
 
 
@@ -105,7 +105,7 @@ public class BerlinTaxiVehicleCreatorV3
     {
         scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
-        zones = BerlinZoneUtils.readZones(zoneXmlFile, zoneShpFile);
+        zones = TaxiBerlinZoneUtils.readZones(zoneXmlFile, zoneShpFile);
     }
 
 
@@ -177,7 +177,7 @@ public class BerlinTaxiVehicleCreatorV3
         Matrix avestatus = MatrixUtils.readMatrices(statusMatrixFile).getMatrix("avg");
 
         for (Map.Entry<String, ArrayList<Entry>> fromLOR : avestatus.getFromLocations().entrySet()) {
-            if (BerlinZoneUtils.isInBerlin(fromLOR.getKey())) {
+            if (TaxiBerlinZoneUtils.isInBerlin(fromLOR.getKey())) {
                 wrs.add(Id.create(fromLOR.getKey(), Zone.class), MatrixUtils.calculateTotalValue(fromLOR.getValue()));
             }
         }

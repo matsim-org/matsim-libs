@@ -20,7 +20,7 @@ public class CountUsedVehiclesFF {
 		Purpose purpose = new Purpose();
     	
     	events.addHandler(purpose);
-    	reader.parse(s);
+    	reader.readFile(s);
     	System.out.println(purpose.IDS().size());
     }
     

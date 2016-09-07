@@ -41,6 +41,7 @@ import java.util.*;
  *
  * @author polettif
  */
+@Deprecated
 public class ScheduleCleaner {
 
 	protected static Logger log = Logger.getLogger(ScheduleTools.class);

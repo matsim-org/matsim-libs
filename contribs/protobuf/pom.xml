@@ -15,12 +15,18 @@
 
         <!--<protobuf.input.directory>/Users/laemmel/svn/codesprint/matsim/contribs/protobuf/src/main/proto/</protobuf.input.directory>-->
         <protobuf.input.directory>${project.basedir}/src/main/proto</protobuf.input.directory>
-        <protobuf.output.directory>"${project.build.directory}/generated-sources"</protobuf.output.directory>
+        <protobuf.output.directory>${project.build.directory}/generated-sources</protobuf.output.directory>
 
 	<!-- It fails because ${project.build.directory} has spaces in it,
 	and other commands (presumably from the protobuf side) cannot
 	deal with that.  I don't know what the solution is; trying
 	around ... kai, jun'16 -->
+
+        <!--<protobuf.output.directory>"${project.build.directory}/generated-sources"</protobuf.output.directory>-->
+
+        <!-- The above produces directories named " on my machine, and in the wrong place. - mz  -->
+        <!-- I think we just have to say that this plug-ing doesn't work with paths with spaces.
+        https://issues.jenkins-ci.org/browse/JENKINS-20600 -->
 
         <!-- library versions -->
         <build-helper-maven-plugin.version>1.9.1</build-helper-maven-plugin.version>
@@ -128,6 +134,9 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
             </plugin>
         </plugins>
         <pluginManagement>

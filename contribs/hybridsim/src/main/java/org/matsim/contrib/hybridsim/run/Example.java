@@ -1,22 +1,27 @@
-/****************************************************************************/
-// SUMO, Simulation of Urban MObility; see http://sumo.dlr.de/
-// Copyright (C) 2001-2016 DLR (http://www.dlr.de/) and contributors
-/****************************************************************************/
-//
-//   This file is part of SUMO.
-//   SUMO is free software: you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation, either version 3 of the License, or
-//   (at your option) any later version.
-//
-/****************************************************************************/
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 
 package org.matsim.contrib.hybridsim.run;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Provider;
-import com.google.inject.util.Providers;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -25,9 +30,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.hybridsim.proto.HybridSimProto;
 import org.matsim.contrib.hybridsim.simulation.HybridMobsimProvider;
+import org.matsim.contrib.hybridsim.utils.IdIntMapper;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -35,21 +46,16 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.HybridNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashSet;
-import java.util.Set;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Provider;
 
 /**
  * Created by laemmel on 09.03.16.
@@ -61,6 +67,9 @@ public class Example {
 	public static int REMOTE_PORT = 9000;
 
 	private static final Logger log = Logger.getLogger(Example.class);
+
+    private static final IdIntMapper idIntMapper = new IdIntMapper();
+
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 
@@ -74,7 +83,7 @@ public class Example {
 		c.controler().setLastIteration(0);
 		c.controler().setWriteEventsInterval(1);
 
-
+        c.qsim().setEndTime(3600);
 
 
 		final Scenario sc = ScenarioUtils.createScenario(c);
@@ -95,7 +104,8 @@ public class Example {
 				bind(EventsManager.class).toInstance(eventsManager);
 				bind(HybridNetworkFactory.class).toInstance(new HybridNetworkFactory());
 				bind(QNetworkFactory.class).to(HybridNetworkFactory.class); ;
-			}
+                bind(IdIntMapper.class).toInstance(idIntMapper);
+            }
 
 		});
 		final Provider<Mobsim> mobsimProvider = mobsimProviderInjector.getInstance(HybridMobsimProvider.class);
@@ -117,9 +127,8 @@ public class Example {
 		HybridSimProto.Environment.Builder eb = scb.getEnvironmentBuilder();
 		HybridSimProto.Room.Builder rb = eb.addRoomBuilder();
 
-
-		rb.setId(0);
-		rb.setCaption("hall");
+        rb.setId(idIntMapper.getIntLink(Id.createLinkId("JPS0")));
+        rb.setCaption("hall");
 		HybridSimProto.Subroom.Builder srb = rb.addSubroomBuilder();
 		srb.setId(0);
 		srb.setClosed(0);
@@ -145,8 +154,8 @@ public class Example {
 		}
 		{
 			HybridSimProto.Transition.Builder tb = eb.addTransitionBuilder();
-			tb.setId(0);
-			tb.setCaption("exit");
+            tb.setId(idIntMapper.getIntNode(Id.createNodeId("3")));
+            tb.setCaption("exit");
 			tb.setType("emergency");
 			tb.setRoom1Id(0);
 			tb.setSubroom1Id(0);
@@ -161,8 +170,8 @@ public class Example {
 		}
 		{
 			HybridSimProto.Transition.Builder tb = eb.addTransitionBuilder();
-			tb.setId(1);
-			tb.setCaption("entrance");
+            tb.setId(idIntMapper.getIntNode(Id.createNodeId("2")));
+            tb.setCaption("entrance");
 			tb.setType("emergency");
 			tb.setRoom1Id(0);
 			tb.setSubroom1Id(0);
@@ -178,8 +187,8 @@ public class Example {
 
 		{
 			HybridSimProto.Goal.Builder gb = scb.addGoalBuilder();
-			gb.setId(0);
-			gb.setFinal(true);
+            gb.setId(idIntMapper.getIntNode(Id.createNodeId("3")));
+            gb.setFinal(true);
 			gb.setCaption("goal0");
 			HybridSimProto.Polygon.Builder pb = gb.getPBuilder();
 			HybridSimProto.Coordinate.Builder cb1 = pb.addCoordinateBuilder();
@@ -200,8 +209,8 @@ public class Example {
 		}
 		{
 			HybridSimProto.Goal.Builder gb = scb.addGoalBuilder();
-			gb.setId(1);
-			gb.setFinal(true);
+            gb.setId(idIntMapper.getIntNode(Id.createNodeId("2")));
+            gb.setFinal(true);
 			gb.setCaption("goal1");
 			HybridSimProto.Polygon.Builder pb = gb.getPBuilder();
 			HybridSimProto.Coordinate.Builder cb1 = pb.addCoordinateBuilder();
@@ -377,9 +386,9 @@ public class Example {
 
 	private static void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
-		((NetworkImpl)net).setCapacityPeriod(1);
-		((NetworkImpl)net).setEffectiveLaneWidth(0.71);
-		((NetworkImpl)net).setEffectiveCellSize(0.26);
+		net.setCapacityPeriod(1);
+		net.setEffectiveLaneWidth(0.71);
+		net.setEffectiveCellSize(0.26);
 		NetworkFactory fac = net.getFactory();
 		Node n0 = fac.createNode(Id.createNodeId(0), CoordUtils.createCoord(93.85, 110.1));
 		net.addNode(n0);

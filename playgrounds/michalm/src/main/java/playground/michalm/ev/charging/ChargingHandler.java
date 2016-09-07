@@ -19,6 +19,7 @@
 
 package playground.michalm.ev.charging;
 
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
@@ -36,19 +37,23 @@ public class ChargingHandler
 
 
     @Inject
-    public ChargingHandler(EvData evData, EvConfigGroup evConfig)
+    public ChargingHandler(EvData evData, EvConfigGroup evConfig, EventsManager eventsManager)
     {
         this.chargers = evData.getChargers().values();
         this.chargeTimeStep = evConfig.getChargeTimeStep();
+        
+        for (Charger c : chargers) {
+            c.getLogic().initEventsHandling(eventsManager);
+        }
     }
 
 
     @Override
-    public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e)
+    public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e)
     {
         if ( (e.getSimulationTime() + 1) % chargeTimeStep == 0) {
             for (Charger c : chargers) {
-                c.getLogic().chargeVehicles(chargeTimeStep);
+                c.getLogic().chargeVehicles(chargeTimeStep, e.getSimulationTime());
             }
         }
     }

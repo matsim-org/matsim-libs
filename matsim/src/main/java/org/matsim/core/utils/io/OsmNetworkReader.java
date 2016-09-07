@@ -39,8 +39,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Counter;
@@ -133,12 +132,27 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			this.setHighwayDefaults(2, "trunk_link",    1,  50.0/3.6, 1.0, 1500);
 			this.setHighwayDefaults(3, "primary",       1,  80.0/3.6, 1.0, 1500);
 			this.setHighwayDefaults(3, "primary_link",  1,  60.0/3.6, 1.0, 1500);
-			this.setHighwayDefaults(4, "secondary",     1,  60.0/3.6, 1.0, 1000);
-			this.setHighwayDefaults(5, "tertiary",      1,  45.0/3.6, 1.0,  600);
-			this.setHighwayDefaults(6, "minor",         1,  45.0/3.6, 1.0,  600);
+			
+//			this.setHighwayDefaults(4, "secondary",     1,  60.0/3.6, 1.0, 1000);
+//			this.setHighwayDefaults(5, "tertiary",      1,  45.0/3.6, 1.0,  600);
+//			this.setHighwayDefaults(6, "minor",         1,  45.0/3.6, 1.0,  600);
+//			this.setHighwayDefaults(6, "unclassified",  1,  45.0/3.6, 1.0,  600);
+//			this.setHighwayDefaults(6, "residential",   1,  30.0/3.6, 1.0,  600);
+//			this.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300);
+
+			// Setting the following to considerably smaller values, since there are often traffic signals/non-prio intersections. 
+			// If someone does a systematic study, please report.  kai, jul'16
+			this.setHighwayDefaults(4, "secondary",     1,  30.0/3.6, 1.0, 1000);
+			this.setHighwayDefaults(4, "secondary_link",     1,  30.0/3.6, 1.0, 1000);
+			this.setHighwayDefaults(5, "tertiary",      1,  25.0/3.6, 1.0,  600);
+			this.setHighwayDefaults(5, "tertiary_link",      1,  25.0/3.6, 1.0,  600);
+			this.setHighwayDefaults(6, "minor",         1,  20.0/3.6, 1.0,  600);
+			this.setHighwayDefaults(6, "residential",   1,  15.0/3.6, 1.0,  600);
+			this.setHighwayDefaults(6, "living_street", 1,  10.0/3.6, 1.0,  300);
+			// changing the speed values failed the evacuation ScenarioGenerator test because of a different network -- DESPITE
+			// the fact that all the speed values are reset to some other value there.  No idea what happens there. kai, jul'16
+
 			this.setHighwayDefaults(6, "unclassified",  1,  45.0/3.6, 1.0,  600);
-			this.setHighwayDefaults(6, "residential",   1,  30.0/3.6, 1.0,  600);
-			this.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300);
 		}
 	}
 
@@ -182,14 +196,14 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			if (stream != null) {
 				parser.parse(new InputSource(stream));
 			} else {
-				parser.parse(osmFilename);
+				parser.readFile(osmFilename);
 			}
 			log.info("parsing osm file second time: loading required nodes and ways");
 			parser.enableOptimization(2);
 			if (stream != null) {
 				parser.parse(new InputSource(stream));
 			} else {
-				parser.parse(osmFilename);
+				parser.readFile(osmFilename);
 			}
 			log.info("done loading data");
 		} else {
@@ -197,7 +211,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			if (stream != null) {
 				parser.parse(new InputSource(stream));
 			} else {
-				parser.parse(osmFilename);
+				parser.readFile(osmFilename);
 			}
 			log.info("done loading data");
 		}
@@ -306,8 +320,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	}
 	
 	private void convert() {
-		if (this.network instanceof NetworkImpl) {
-			((NetworkImpl) this.network).setCapacityPeriod(3600);
+		if (this.network instanceof Network) {
+			((Network) this.network).setCapacityPeriod(3600);
 		}
 
 		log.info("Remove ways that have at least one node that was not read previously ...");
@@ -564,9 +578,11 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				l.setFreespeed(freespeed);
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
-				if (l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
-					((LinkImpl) l).setType( highway );
+				if (l instanceof Link) {
+					final String id1 = origId;
+					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
+					final String type = highway;
+					NetworkUtils.setType( ((Link) l), type);
 				}
 				network.addLink(l);
 				this.id++;
@@ -577,9 +593,11 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				l.setFreespeed(freespeed);
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
-				if (l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
-					((LinkImpl) l).setType( highway );
+				if (l instanceof Link) {
+					final String id1 = origId;
+					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
+					final String type = highway;
+					NetworkUtils.setType( ((Link) l), type);
 				}
 				network.addLink(l);
 				this.id++;
@@ -631,7 +649,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		public final long id;
 		public boolean used = false;
 		public int ways = 0;
-		public final Coord coord;
+		public Coord coord;
 
 		public OsmNode(final long id, final Coord coord) {
 			this.id = id;
@@ -718,7 +736,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 						double lat = Double.parseDouble(atts.getValue("lat"));
 						double lon = Double.parseDouble(atts.getValue("lon"));
 						Coord c = this.transform.transform(new Coord(lon, lat));
-						node.coord.setXY(c.getX(), c.getY());
+//						node.coord.setXY(c.getX(), c.getY());
+						node.coord = c ;
 						this.nodeCounter.incCounter();
 					}
 				}

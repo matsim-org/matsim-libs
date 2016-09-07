@@ -68,7 +68,7 @@ public class PLZ8Compare {
 		
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
-		parser.parse("/home/johannes/gsv/osm/hessen-shops2.xml");
+		parser.readFile("/home/johannes/gsv/osm/hessen-shops2.xml");
 //		parser.parse("/home/johannes/gsv/osm/hessen-buildings.osm");
 //		parser.parse("/home/johannes/gsv/osm/hessen-landuse.osm");
 		Map<String, OSMWay> ways = parser.getWays();

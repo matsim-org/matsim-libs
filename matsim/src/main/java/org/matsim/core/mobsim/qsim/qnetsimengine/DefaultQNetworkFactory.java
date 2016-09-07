@@ -24,6 +24,7 @@ import javax.inject.Inject;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -32,7 +33,6 @@ import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
@@ -76,13 +76,14 @@ public final class DefaultQNetworkFactory extends QNetworkFactory {
 	@Override
 	void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
 		this.netsimEngine = netsimEngine1;
-		double effectiveCellSize = ((NetworkImpl) scenario.getNetwork()).getEffectiveCellSize() ;
+		double effectiveCellSize = scenario.getNetwork().getEffectiveCellSize() ;
+
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( scenario.getConfig().qsim().getLinkWidthForVis() );
-		if (! Double.isNaN( scenario.getNetwork().getEffectiveLaneWidth())){
-			linkWidthCalculator.setLaneWidth( scenario.getNetwork().getEffectiveLaneWidth() );
-		}
+		linkWidthCalculator.setLaneWidth( scenario.getNetwork().getEffectiveLaneWidth() );
+
 		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
+
 		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, scenario.getConfig().qsim(), 
 				mobsimTimer, linkWidthCalculator );
 	}

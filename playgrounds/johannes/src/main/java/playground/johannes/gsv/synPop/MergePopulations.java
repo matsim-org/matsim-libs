@@ -51,12 +51,12 @@ public class MergePopulations {
 //		parser.addToBlacklist("delete");
 		
 		logger.info("Loading persons...");
-		parser.parse(args[0]);
+		parser.readFile(args[0]);
 		Set<PlainPerson> persons1 = (Set<PlainPerson>)parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons1.size()));
 
 		logger.info("Loading persons...");
-		parser.parse(args[1]);
+		parser.readFile(args[1]);
 		Set<PlainPerson> persons2 = (Set<PlainPerson>)parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons2.size()));
 

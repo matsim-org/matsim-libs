@@ -50,7 +50,7 @@ public class RunExampleSocialSimulation {
 		final SocialNetworkConfigGroup snConf = (SocialNetworkConfigGroup)
 				config.getModule( SocialNetworkConfigGroup.GROUP_NAME );
 
-		new SocialNetworkReader( scenario ).parse( snConf.getInputFile() );
+		new SocialNetworkReader( scenario ).readFile( snConf.getInputFile() );
 
 		final SocialNetwork sn = (SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME );
 		for ( Id p : scenario.getPopulation().getPersons().keySet() ) {

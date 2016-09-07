@@ -23,6 +23,7 @@ package org.matsim.api.core.v01.network;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.core.network.LinkFactory;
 
 /**
  * @author dgrether
@@ -31,6 +32,7 @@ import org.matsim.core.api.internal.MatsimFactory;
 public interface NetworkFactory extends MatsimFactory {
 
 	public Node createNode(final Id<Node> id, final Coord coord);
+	// this is NOT CoordI, since it wants to rely on the fact that coord is immutable! kai, jul'16
 
 	/**
 	 * Creates a link with the given id leading from one node to another.
@@ -41,5 +43,7 @@ public interface NetworkFactory extends MatsimFactory {
 	 * @return the newly created link
 	 */
 	public Link createLink(final Id<Link> id, final Node fromNode, final Node toNode);
+
+	void setLinkFactory(LinkFactory factory);
 
 }

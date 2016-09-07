@@ -46,9 +46,8 @@ public class TestScenarioAnalyzer {
 
 	@Before
 	public void prepareTests() {
-		// Run Scenario "equil"
-		final Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "config.xml");
-		config.setParam("controler", "outputDirectory", utils.getOutputDirectory());
+		final Config config = utils.loadConfig("test/scenarios/pt-tutorial/config.xml");
+		ConfigUtils.loadConfig(config, utils.getClassInputDirectory() + "config.xml");
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		final Controler controler = new Controler(scenario);
 		controler.run();

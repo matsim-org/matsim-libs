@@ -168,7 +168,7 @@ static void prepareConfig(Config config, boolean useCadyts){
 	
 	CountsConfigGroup counts = config.counts();
 	counts.setAnalyzedModes("car");
-	counts.setCountsFileName(basedir+"counts.xml");
+	counts.setInputFile(basedir+"counts.xml");
 	counts.setCountsScaleFactor(1.0/scale);
 	
 	if (useCadyts){

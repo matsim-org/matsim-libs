@@ -37,7 +37,7 @@ public class RunVehicleCount
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         VrpData data = new VrpDataImpl();
         VehicleReader reader = new VehicleReader(scenario.getNetwork(), data);
-        reader.parse(
+        reader.readFile(
                 "d:/svn-vsp/sustainability-w-michal-and-dlr/data/scenarios/2015_02_strike/taxis.xml0.0.xml");
 
         VehicleCounter counter = new VehicleCounter(data.getVehicles().values());

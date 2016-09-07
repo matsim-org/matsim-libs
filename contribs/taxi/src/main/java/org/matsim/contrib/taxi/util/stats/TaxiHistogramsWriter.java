@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.util.Map;
+import java.util.*;
 
 import org.matsim.contrib.util.*;
 import org.matsim.contrib.util.histogram.*;
@@ -28,10 +28,10 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class TaxiHistogramsWriter
 {
-    private final Map<String, TaxiStats> taxiStats;
+    private final List<TaxiStats> taxiStats;
 
 
-    public TaxiHistogramsWriter(Map<String, TaxiStats> taxiStats)
+    public TaxiHistogramsWriter(List<TaxiStats> taxiStats)
     {
         this.taxiStats = taxiStats;
     }
@@ -51,7 +51,7 @@ public class TaxiHistogramsWriter
     private void writePassengerWaitTime(CompactCSVWriter writer)
     {
         writeHistogramHeader(writer, "Passenger Wait Time [min]", new UniformHistogram(2.5, 25));
-        for (TaxiStats s : taxiStats.values()) {
+        for (TaxiStats s : taxiStats) {
             writeHistogramValues(writer, s.id,
                     UniformHistogram.create(2.5 * 60, 25, s.passengerWaitTime.getValues()));
         }
@@ -62,7 +62,7 @@ public class TaxiHistogramsWriter
     private void writeVehicleEmptyDriveRatio(CompactCSVWriter writer)
     {
         writeHistogramHeader(writer, "Vehicle Empty Drive Ratio", new UniformHistogram(0.05, 20));
-        for (TaxiStats s : taxiStats.values()) {
+        for (TaxiStats s : taxiStats) {
             writeHistogramValues(writer, s.id,
                     UniformHistogram.create(0.05, 20, s.vehicleEmptyDriveRatio.getValues()));
         }
@@ -73,7 +73,7 @@ public class TaxiHistogramsWriter
     private void writeVehicleStayRatio(CompactCSVWriter writer)
     {
         writeHistogramHeader(writer, "Vehicle Wait Ratio", new UniformHistogram(0.05, 20));
-        for (TaxiStats s : taxiStats.values()) {
+        for (TaxiStats s : taxiStats) {
             writeHistogramValues(writer, s.id,
                     UniformHistogram.create(0.05, 20, s.vehicleStayRatio.getValues()));
         }
@@ -90,7 +90,7 @@ public class TaxiHistogramsWriter
         double[] bounds = { 0, 0.01, 0.25, 0.5, 0.75, 1, 1.00000001 };
 
         writeHistogramHeader(writer, "Vehicle Wait Ratio Counts", new BoundedHistogram(bounds));
-        for (TaxiStats s : taxiStats.values()) {
+        for (TaxiStats s : taxiStats) {
             writeHistogramValues(writer, s.id,
                     BoundedHistogram.create(bounds, s.vehicleStayRatio.getValues()));
         }
@@ -106,7 +106,7 @@ public class TaxiHistogramsWriter
         for (int i = 0; i < histogram.getBinCount(); i++) {
             lineBuilder.addf("%.2f+", histogram.getBin(i));
         }
-        writer.writeNext(lineBuilder.build());
+        writer.writeNext(lineBuilder);
     }
 
 
@@ -116,6 +116,6 @@ public class TaxiHistogramsWriter
         for (int i = 0; i < histogram.getBinCount(); i++) {
             lineBuilder.add(histogram.getCount(i) + "");
         }
-        writer.writeNext(lineBuilder.build());
+        writer.writeNext(lineBuilder);
     }
 }

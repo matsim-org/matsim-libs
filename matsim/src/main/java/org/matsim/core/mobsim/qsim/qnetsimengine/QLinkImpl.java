@@ -32,7 +32,6 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
@@ -165,7 +164,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	@Override public void recalcTimeVariantAttributes() {
 		double now = context.getSimTimer().getTimeOfDay() ;
-		qlane.changeUnscaledFlowCapacityPerSecond( ((LinkImpl) this.getLink()).getFlowCapacityPerSec(now) );
+		qlane.changeUnscaledFlowCapacityPerSecond( ((Link) this.getLink()).getFlowCapacityPerSec(now) );
 		qlane.changeEffectiveNumberOfLanes(this.getLink().getNumberOfLanes(now));
 		qlane.changeSpeedMetersPerSecond( getLink().getFreespeed(now) ) ;
 	}

@@ -64,15 +64,6 @@ public class MatsimMatricesReader extends MatsimXmlParser {
 		this.delegate.endTag(name, content, context);
 	}
 
-	/**
-	 * Parses the specified matrices file. This method is the same as {@link #parse(String)}.
-	 *
-	 * @param filename The name of the file to parse.
-	 */
-	public void readFile(final String filename) {
-		parse(filename);
-	}
-
 	@Override
 	protected void setDoctype(final String doctype) {
 		super.setDoctype(doctype);
