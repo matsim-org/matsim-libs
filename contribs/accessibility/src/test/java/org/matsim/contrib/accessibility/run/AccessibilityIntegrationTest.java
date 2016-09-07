@@ -453,6 +453,7 @@ public class AccessibilityIntegrationTest {
 		public void install() {
 			addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
 				@Inject Scenario scenario;
+				@Inject Config config;
 				@Inject ActivityFacilities opportunities;
 				@Inject Map<String, TravelTime> travelTimes;
 				@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;

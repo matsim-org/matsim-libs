@@ -23,7 +23,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -76,10 +75,11 @@ public final class AccessibilityCalculator {
 
 	private final ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 
-	private final boolean useRawSum	; //= false;
-	private final double logitScaleParameter;
-	private final double inverseOfLogitScaleParameter;
-		private double walkSpeedMeterPerHour = -1;
+	private boolean useRawSum	; //= false;
+	private double logitScaleParameter;
+	private double inverseOfLogitScaleParameter;
+	
+	private double walkSpeedMeterPerHour = -1;
 
 	// counter for warning that capacities are not used so far ... in order not to give the same warning multiple times; dz, apr'14
 	private static int cnt = 0 ;
@@ -94,12 +94,14 @@ public final class AccessibilityCalculator {
 	
 	@Inject
 	public
-//	AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
-	AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario, AccessibilityConfigGroup config) {
+	AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
+//	AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario, AccessibilityConfigGroup config) {
+		this.acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+
+		
 		this.travelTimes = travelTimes;
 		this.travelDisutilityFactories = travelDisutilityFactories;
 		this.scenario = scenario;
-		this.acg = config;
 	}
 
 	
@@ -185,7 +187,7 @@ public final class AccessibilityCalculator {
 		for ( ActivityFacility opportunity : opportunities.getFacilities().values() ) {
 			bar.update();
 
-			Node nearestNode = ((NetworkImpl)network).getNearestNode( opportunity.getCoord() );
+			Node nearestNode = NetworkUtils.getNearestNode(((Network)network),opportunity.getCoord());
 			
 			double walkUtility = -this.walkTravelDisutility.getCoord2CoordTravelDisutility(opportunity.getCoord(), nearestNode.getCoord());
 			double expVjk = Math.exp(this.logitScaleParameter * walkUtility);
@@ -217,8 +219,8 @@ public final class AccessibilityCalculator {
 	}
 
 	
-//	public final void computeAccessibilities( Double departureTime, ActivityFacilities opportunities) {
-	final void computeAccessibilities(Scenario scenario, Double departureTime) {
+	public final void computeAccessibilities( Double departureTime, ActivityFacilities opportunities) {
+//	final void computeAccessibilities(Scenario scenario, Double departureTime) {
 		SumOfExpUtils[] gcs = new SumOfExpUtils[Modes4Accessibility.values().length] ;
 		// this could just be a double array, or a Map.  Not using a Map for computational speed reasons (untested);
 		// not using a simple double array for type safety in long argument lists. kai, feb'14
@@ -227,8 +229,7 @@ public final class AccessibilityCalculator {
 		}
 
 		// Condense measuring points (origins) that have the same nearest node on the network
-		Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins = aggregateMeasurePointsWithSameNearestNode(
-				scenario);
+		Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins = aggregateMeasurePointsWithSameNearestNode(scenario);
 		log.info("Now going through all origins:");
 		ProgressBar bar = new ProgressBar(aggregatedOrigins.size());
 		
@@ -303,7 +304,9 @@ public final class AccessibilityCalculator {
 
 			// determine nearest network node (from- or toNode) based on the link
 			Node fromNode = NetworkUtils.getCloserNodeOnLink(measuringPoint.getCoord(),
-					((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(measuringPoint.getCoord()));
+					NetworkUtils.getNearestLinkExactly(((Network)scenario.getNetwork()), measuringPoint.getCoord()));
+//			Node fromNode = NetworkUtils.getCloserNodeOnLink(measuringPoint.getCoord(),
+//					((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(measuringPoint.getCoord()));
 
 			// this is used as a key for hash map lookups
 			Id<Node> nodeId = fromNode.getId();
@@ -366,17 +369,25 @@ public final class AccessibilityCalculator {
 	}
 
 	
+//	public final void setPtMatrix(PtMatrix ptMatrix) {
+//		this.ptMatrix = ptMatrix;
+//	}
+	
 	public final void setPtMatrix(PtMatrix ptMatrix) {
-		this.ptMatrix = ptMatrix;
+		calculators.put(
+				Modes4Accessibility.pt,
+				PtMatrixAccessibilityContributionCalculator.create(
+						ptMatrix,
+						scenario.getConfig()));
 	}
 
 	
-	ActivityFacilitiesImpl getMeasuringPoints() {
-		return measuringPoints;
-	}
+//	ActivityFacilitiesImpl getMeasuringPoints() {
+//		return measuringPoints;
+//	}
 
 	
-	void setMeasuringPoints(ActivityFacilitiesImpl measuringPoints) {
+	public void setMeasuringPoints(ActivityFacilitiesImpl measuringPoints) {
 		this.measuringPoints = measuringPoints;
 	}
 }
