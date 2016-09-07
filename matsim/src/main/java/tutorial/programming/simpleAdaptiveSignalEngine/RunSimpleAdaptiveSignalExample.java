@@ -37,10 +37,19 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
  */
 public class RunSimpleAdaptiveSignalExample {
 
+	private static String outputDir = "output/simpleAdaptiveSignalEngineExample/";
+	
+	/**
+	 * @param args if not null it gives the output directory for the intergreens file
+	 */
 	public static void main(String[] args) {
-		
+		if (args != null){
+			// use the given output if args is not null
+			outputDir = args[0];
+		}
+		// load the daganzo example
 		final Config config = ConfigUtils.loadConfig("examples/daganzo/config.xml");
-		config.controler().setOutputDirectory("output/simpleAdaptiveSignalEngineExample/");
+		config.controler().setOutputDirectory(outputDir);
 		config.controler().setWriteEventsInterval(config.controler().getLastIteration());
 		config.vspExperimental().setWritingOutputEvents(true);
 		// remove unmaterialized module from the config

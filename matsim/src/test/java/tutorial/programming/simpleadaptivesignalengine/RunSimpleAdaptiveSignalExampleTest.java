@@ -36,16 +36,15 @@ import tutorial.programming.simpleAdaptiveSignalEngine.RunSimpleAdaptiveSignalEx
 public class RunSimpleAdaptiveSignalExampleTest {
 	
 	@Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
-
-	private static final String OUTPUT_DIR = "./output/simpleAdaptiveSignalEngineExample/";
 	
 	@Test
 	public void testRunSimpleAdaptiveSignalExample(){
-		RunSimpleAdaptiveSignalExample.main(null);
+		String[] args = {testUtils.getOutputDirectory()};
+		RunSimpleAdaptiveSignalExample.main(args);
 		
 		// compare event files
 		Assert.assertEquals("different event files", 
-				CRCChecksum.getCRCFromFile(OUTPUT_DIR + "output_events.xml.gz"), 
+				CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "output_events.xml.gz"), 
 				CRCChecksum.getCRCFromFile(testUtils.getClassInputDirectory() + "output_events.xml.gz"));
 	}
 	
