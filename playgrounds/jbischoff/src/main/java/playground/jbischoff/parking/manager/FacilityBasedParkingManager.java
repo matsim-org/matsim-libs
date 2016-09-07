@@ -104,7 +104,7 @@ public class FacilityBasedParkingManager implements ParkingManager {
 		
 		if (linkIdHasAvailableParkingForVehicle(linkId,vehicleId)){
 			canPark = true;
-			Logger.getLogger(getClass()).info("veh: "+vehicleId+" link "+linkId + " can park "+canPark);
+//			Logger.getLogger(getClass()).info("veh: "+vehicleId+" link "+linkId + " can park "+canPark);
 		}
 
 		return canPark;
