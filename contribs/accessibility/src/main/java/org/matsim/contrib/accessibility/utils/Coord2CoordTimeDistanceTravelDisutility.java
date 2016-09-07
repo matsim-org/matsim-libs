@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -41,7 +41,8 @@ public final class Coord2CoordTimeDistanceTravelDisutility implements TravelDisu
 
 	private static final Logger log = Logger.getLogger(Coord2CoordTimeDistanceTravelDisutility.class);
 
-	private final RandomizingTimeDistanceTravelDisutility delegate;
+//	private final RandomizingTimeDistanceTravelDisutility delegate;
+	private final TravelDisutility delegate;
 	private final double marginalCostOfTime_s;
 	private final double marginalCostOfDistance_m;
 
@@ -109,7 +110,8 @@ public final class Coord2CoordTimeDistanceTravelDisutility implements TravelDisu
 					+ " in order to obtain meaningful results.");
 		}
 		
-		final RandomizingTimeDistanceTravelDisutility.Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder(TransportMode.walk, cnScoringGroup);
+//		final RandomizingTimeDistanceTravelDisutility.Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder(TransportMode.walk, cnScoringGroup);
+		RandomizingTimeDistanceTravelDisutilityFactory builder = new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.walk, cnScoringGroup);
 		this.delegate = builder.createTravelDisutility(timeCalculator);
 	}
 
