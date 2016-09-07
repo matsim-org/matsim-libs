@@ -71,7 +71,6 @@ public class CreateSignalInputWithLanesExample {
 
 	private static final Logger log = Logger.getLogger(CreateSignalInputWithLanesExample.class);
 	private static final String INPUT_DIR = "./examples/tutorial/example90TrafficLights/createSignalInput/";
-	private static final String OUTPUT_DIR = "output/example90TrafficLights/";
 
 	private int onset1 = 0;
 	private int dropping1 = 55;
@@ -222,7 +221,7 @@ public class CreateSignalInputWithLanesExample {
 				scenario.getLanes(), scenario.getNetwork());
 	}
 
-	public void run() throws IOException {		
+	public void run(String outputDir) throws IOException {		
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(INPUT_DIR + "network.xml.gz");
 		config.plans().setInputFile(INPUT_DIR + "population.xml.gz");
@@ -245,15 +244,15 @@ public class CreateSignalInputWithLanesExample {
 		this.createSystem5Control(scenario, signalsData.getSignalControlData());
 
 		// create the path to the output directory if it does not exist yet
-		Files.createDirectories(Paths.get(OUTPUT_DIR));
+		Files.createDirectories(Paths.get(outputDir));
 				
-		config.network().setLaneDefinitionsFile(OUTPUT_DIR + "lane_definitions_v2.0.xml");
-		signalSystemsConfigGroup.setSignalSystemFile(OUTPUT_DIR + "signal_systems.xml");
-		signalSystemsConfigGroup.setSignalGroupsFile(OUTPUT_DIR + "signal_groups.xml");
-		signalSystemsConfigGroup.setSignalControlFile(OUTPUT_DIR + "signal_control.xml");
+		config.network().setLaneDefinitionsFile(outputDir + "lane_definitions_v2.0.xml");
+		signalSystemsConfigGroup.setSignalSystemFile(outputDir + "signal_systems.xml");
+		signalSystemsConfigGroup.setSignalGroupsFile(outputDir + "signal_groups.xml");
+		signalSystemsConfigGroup.setSignalControlFile(outputDir + "signal_control.xml");
 
 		// write to file
-		String configFile = OUTPUT_DIR + "config.xml";
+		String configFile = outputDir + "config.xml";
 		ConfigWriter configWriter = new ConfigWriter(config);
 		configWriter.write(configFile);
 		
@@ -271,6 +270,6 @@ public class CreateSignalInputWithLanesExample {
 	}
 
 	public static void main(String[] args) throws IOException {
-		new CreateSignalInputWithLanesExample().run();
+		new CreateSignalInputWithLanesExample().run("output/example90TrafficLights/");
 	}
 }

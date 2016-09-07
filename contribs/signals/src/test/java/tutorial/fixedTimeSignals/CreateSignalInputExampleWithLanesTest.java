@@ -25,8 +25,10 @@ import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author tthunig
@@ -35,29 +37,29 @@ import org.matsim.core.utils.misc.CRCChecksum;
 public class CreateSignalInputExampleWithLanesTest {
 
 	private static final String DIR_TO_COMPARE_WITH = "./examples/tutorial/example90TrafficLights/useSignalInput/withLanes/";
-	private static final String TEST_OUTPUT_DIR = "./output/example90TrafficLights/";
 	
-	@Ignore
+	@Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
+	
 	@Test
 	public void testCreateSignalInputExampleWithLanes(){
 		try {
-			(new CreateSignalInputWithLanesExample()).run();
+			(new CreateSignalInputWithLanesExample()).run(testUtils.getOutputDirectory());
 		} catch (IOException e) {
 			e.printStackTrace();
 			Assert.fail("something went wrong") ;
 		}
 		// compare signal output
 		Assert.assertEquals("different signal system files", 
-				CRCChecksum.getCRCFromFile(TEST_OUTPUT_DIR + "signal_systems.xml"), 
+				CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "signal_systems.xml"), 
 				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "signal_systems.xml"));
 		Assert.assertEquals("different signal group files", 
-				CRCChecksum.getCRCFromFile(TEST_OUTPUT_DIR + "signal_groups.xml"),
+				CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "signal_groups.xml"),
 				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "signal_groups.xml"));
 		Assert.assertEquals("different signal control files", 
-				CRCChecksum.getCRCFromFile(TEST_OUTPUT_DIR + "signal_groups.xml"),
+				CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "signal_groups.xml"),
 				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "signal_groups.xml"));
 		Assert.assertEquals("different lane files", 
-				CRCChecksum.getCRCFromFile(TEST_OUTPUT_DIR + "lane_definitions_v2.0.xml"),
+				CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "lane_definitions_v2.0.xml"),
 				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "lane_definitions_v2.0.xml"));
 	}
 	

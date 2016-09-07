@@ -63,7 +63,6 @@ public class CreateSignalInputExample {
 
 	private static final Logger log = Logger.getLogger(CreateSignalInputExample.class);
 	private static final String INPUT_DIR = "./examples/tutorial/example90TrafficLights/createSignalInput/";
-	private static final String OUTPUT_DIR = "output/example90TrafficLights/";
 	
 	/**
 	 * This method creates the locations of signals, i.e. it specifies signalized intersections.
@@ -180,7 +179,7 @@ public class CreateSignalInputExample {
 	 * 
 	 * @throws IOException
 	 */
-	public void run() throws IOException {
+	public void run(String outputDir) throws IOException {
 		// create an empty config
 		Config config = ConfigUtils.createConfig();
 		
@@ -216,15 +215,15 @@ public class CreateSignalInputExample {
 		this.createSignalControl(signalsData.getSignalControlData());
 		
 		// create the path to the output directory if it does not exist yet
-		Files.createDirectories(Paths.get(OUTPUT_DIR));
+		Files.createDirectories(Paths.get(outputDir));
 		
 		// set output filenames
-		signalSystemsConfigGroup.setSignalSystemFile(OUTPUT_DIR  + "signal_systems.xml");
-		signalSystemsConfigGroup.setSignalGroupsFile(OUTPUT_DIR  + "signal_groups.xml");
-		signalSystemsConfigGroup.setSignalControlFile(OUTPUT_DIR  + "signal_control.xml");
+		signalSystemsConfigGroup.setSignalSystemFile(outputDir  + "signal_systems.xml");
+		signalSystemsConfigGroup.setSignalGroupsFile(outputDir  + "signal_groups.xml");
+		signalSystemsConfigGroup.setSignalControlFile(outputDir  + "signal_control.xml");
 		
 		//write config to file
-		String configFile = OUTPUT_DIR  + "config.xml";
+		String configFile = outputDir  + "config.xml";
 		ConfigWriter configWriter = new ConfigWriter(config);
 		configWriter.write(configFile);		
 		
@@ -240,6 +239,6 @@ public class CreateSignalInputExample {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		new CreateSignalInputExample().run();
+		new CreateSignalInputExample().run("output/example90TrafficLights/");
 	}
 }

@@ -49,7 +49,8 @@ public class CreateIntergreensExample {
 
 	private static final Logger log = Logger.getLogger(CreateIntergreensExample.class);
 	
-	private static final String INPUT_DIR = "./examples/tutorial/example90TrafficLights/useSignalInput/woLanes/";
+	private static final String INPUT_DIR = "examples/tutorial/example90TrafficLights/useSignalInput/woLanes/";
+	private static String outputDir = "output/example90TrafficLights/";
 	
 	private static void createIntergreens(SignalsData sd){
 		IntergreenTimesData ig = sd.getIntergreenTimesData();
@@ -67,7 +68,16 @@ public class CreateIntergreensExample {
 		ig.addIntergreensForSignalSystem(ig4);
 	}
 	
+	/**
+	 * @param args if not null it gives the output directory for the intergreens file
+	 * @throws IOException
+	 */
 	public static void main(String[] args) throws IOException {
+		if (args != null){
+			// use the given output if args is not null
+			outputDir = args[0];
+		}
+		// read in the existing scenario and add the intergreens data
 		Config config = ConfigUtils.loadConfig(INPUT_DIR + "config.xml");
 		SignalSystemsConfigGroup signalSystemsConfigGroup = 
 				ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
@@ -75,8 +85,9 @@ public class CreateIntergreensExample {
 		SignalsDataLoader signalsDataLoader = new SignalsDataLoader(signalSystemsConfigGroup);
 		SignalsData signalsData = signalsDataLoader.loadSignalsData();
 		createIntergreens(signalsData);
+		// write the intergreens file
 		IntergreenTimesWriter10 writer = new IntergreenTimesWriter10(signalsData.getIntergreenTimesData());
-		String intergreensFilename = "output/example90TrafficLights/intergreens.xml";
+		String intergreensFilename = outputDir + "intergreens.xml";
 		writer.write(intergreensFilename);
 		log.info("Intergreens written to " + intergreensFilename);
 	}

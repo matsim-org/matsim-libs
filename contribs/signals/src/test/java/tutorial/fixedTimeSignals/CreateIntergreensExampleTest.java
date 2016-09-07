@@ -25,8 +25,10 @@ import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author tthunig
@@ -35,20 +37,21 @@ import org.matsim.core.utils.misc.CRCChecksum;
 public class CreateIntergreensExampleTest {
 
 	private static final String DIR_TO_COMPARE_WITH = "./examples/tutorial/example90TrafficLights/useSignalInput/";
-	private static final String TEST_OUTPUT_DIR = "./output/example90TrafficLights/";
+
+	@Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
-	@Ignore
 	@Test
 	public void testIntergreenExample(){
 		try {
-			CreateIntergreensExample.main(null);
+			String[] args = {testUtils.getOutputDirectory()};
+			CreateIntergreensExample.main(args);
 		} catch (IOException e) {
 			e.printStackTrace();
 			Assert.fail("something went wrong") ;
 		}
 		// compare intergreen output
 		Assert.assertEquals("different intergreen files", 
-				CRCChecksum.getCRCFromFile(TEST_OUTPUT_DIR + "intergreens.xml"), 
+				CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "intergreens.xml"), 
 				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "intergreens.xml"));
 	}
 	
