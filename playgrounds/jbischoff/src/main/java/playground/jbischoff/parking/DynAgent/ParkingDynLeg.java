@@ -127,8 +127,7 @@ public class ParkingDynLeg implements DriverDynLeg {
 	@Override
 	public Id<Vehicle> getPlannedVehicleId()
 	{
-	    // TODO Auto-generated method stub
-	    return null;
+	    return this.vehicleId;
 	}
 	
 	

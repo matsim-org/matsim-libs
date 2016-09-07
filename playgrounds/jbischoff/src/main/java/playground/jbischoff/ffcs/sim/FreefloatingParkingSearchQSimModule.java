@@ -54,13 +54,13 @@ class FreefloatingParkingSearchQSimModule extends com.google.inject.AbstractModu
 			result.add(new com.google.inject.AbstractModule() {
 				@Override
 				protected void configure() {
-					bind(FreefloatingPopulationAgentSource.class).asEagerSingleton();
-					bind(FFCSVehicleAgentSource.class).asEagerSingleton();
 					if (getConfig().transit().isUseTransit()) {
 						throw new RuntimeException("parking search together with transit is not implemented (should not be difficult)") ;
 					} else {
 						bind(AgentFactory.class).to(FreefloatingParkingAgentFactory.class).asEagerSingleton(); // (**)
 					}
+					bind(FFCSVehicleAgentSource.class).asEagerSingleton();
+					bind(FreefloatingPopulationAgentSource.class).asEagerSingleton();
 				}
 			});
 			return result;
@@ -69,6 +69,7 @@ class FreefloatingParkingSearchQSimModule extends com.google.inject.AbstractModu
 		public Collection<Class<? extends AgentSource>> agentSources() {
 			Collection<Class<? extends AgentSource>> result = new ArrayList<>();
 			result.add(FreefloatingPopulationAgentSource.class);
+			result.add(FFCSVehicleAgentSource.class);
 			return result;
 		}
 	}

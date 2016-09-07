@@ -47,7 +47,7 @@ public static void main(String[] args) {
 	config.facilities().setInputFile("parkingFacilities.xml");
 	config.controler().setOutputDirectory("../../../shared-svn/projects/bmw_carsharing/example/ffcs_output");
 	config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-	config.controler().setLastIteration(0);
+	config.controler().setLastIteration(10);
 	config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
 	
 	Scenario scenario = ScenarioUtils.loadScenario(config);

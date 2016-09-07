@@ -72,7 +72,7 @@ public final class FreefloatingPopulationAgentSource implements AgentSource {
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;  
 		this.modeVehicleTypes = new HashMap<>();
-		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
+		this.mainModes = new HashSet<String>( qsim.getScenario().getConfig().qsim().getMainModes());
 		this.mainModes.remove(FFCSUtils.FREEFLOATINGMODE);
 		switch ( qsimConfig.getVehiclesSource() ) {
 		case defaultVehicle:
