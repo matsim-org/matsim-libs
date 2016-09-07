@@ -19,46 +19,50 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package org.matsim.contrib.signals.data;
+package org.matsim.contrib.signals.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
+import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
+import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
 import org.matsim.contrib.signals.model.Signal;
-import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.Lanes;
 
 /**
- * Class to write the (x,y,t) signals csv file for via. 
+ * Write a csv file for visualizing signals in via based on the events.
  * 
  * @author tthunig
  *
  */
-@Deprecated
-public class SignalsViaCSVWriter {
+public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHandler, IterationEndsListener, IterationStartsListener{
 
-	private static final Logger log = Logger.getLogger(SignalsViaCSVWriter.class);
+	private static final Logger log = Logger.getLogger(SignalEvents2ViaCSVWriter.class);
 	
 	private static final String SIGNAL_ID = "signal id";
 	private static final String X_COORD = "x";
 	private static final String Y_COORD = "y";
 	private static final String TIME = "time";
 	private static final String SIGNAL_STATE = "signal state";
-	private static final String SIGNAL_STATE_GREEN = "GREEN";
-	private static final String SIGNAL_STATE_RED = "RED";	
 		
 	/**
 	 * distance between signal (the coordinate that will be drawn) 
@@ -71,84 +75,74 @@ public class SignalsViaCSVWriter {
 	 */
 	private static final double SIGNAL_COORD_LINK_OFFSET = 5.0;
 
+	private BufferedWriter signalsCSVWriter;
 	private SignalsData signalsData;
-	private Scenario scenario;
-
-	public SignalsViaCSVWriter(Scenario scenario){
-		this.scenario = scenario;
-		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-	}
+	@Inject Scenario scenario;
 	
-	public void writeSignalsCSV(String filename){		
-		try{
-//			log.info("Initializing SignalsCSVWriter ...");
-			BufferedWriter signalsCSVWriter = IOUtils.getBufferedWriter( filename );
-			log.info("Writing signals csv data for via to " + filename + " ...");
-			
-			// create header
+	private Map<Id<Signal>, Coord> signal2Coord = new HashMap<>();
+
+	@Override
+	public void reset(int iteration) {}
+	
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		if (event.getIteration() == 0){
+			/* do all the stuff that is needed only once a simulation: 
+			 * - calculating coordinations for the via file
+			 * - getting the signals data out of the scenario */
+			init();
+		}
+		
+		String signalCSVFilname = scenario.getConfig().controler().getOutputDirectory() + "ITERS/it." 
+				+ event.getIteration() + "/signalEvents2Via.csv";
+		
+//		log.info("Initializing SignalsCSVWriter ...");
+		signalsCSVWriter = IOUtils.getBufferedWriter( signalCSVFilname );
+		log.info("Writing signal events of iteration " + event.getIteration() + " as csv file for via to " + signalCSVFilname + " ...");
+		
+		// create header
+		try {
 			signalsCSVWriter.write(SIGNAL_ID + ";" + X_COORD + ";" + Y_COORD + ";" + TIME + ";" + SIGNAL_STATE);
 			signalsCSVWriter.newLine();
-			
-			// iterate over all signal systems
-			for (SignalSystemData signalSystem : signalsData.getSignalSystemsData().getSignalSystemData().values()){
-				SignalSystemControllerData signalSystemControl = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(signalSystem.getId());
-				// iterate over all signal plans. mostly, only one exists (with id 1)
-				for (SignalPlanData signalPlan : signalSystemControl.getSignalPlanData().values()) {
-					// iterate over all signal groups of the signal system
-					for (SignalGroupData signalGroup : signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(signalSystem.getId()).values()) {
-						SignalGroupSettingsData signalGroupSetting = signalPlan.getSignalGroupSettingsDataByGroupId().get(signalGroup.getId());
-						// iterate over all signals of the signal group
-						for (Id<Signal> signalId : signalGroup.getSignalIds()) {
-							SignalData signal = signalSystem.getSignalData().get(signalId);
-							Coord signalCoord = calculateSignalCoordinate(signalSystem.getId(), signal.getId());
-
-							// create lines for every signal state switch during
-							// the qsim running time
-							Double time = signalPlan.getStartTime();
-							if (time == null) {
-								// use start time of the simulation
-								time = scenario.getConfig().qsim().getStartTime();
-							}
-//							log.info("Writing signal states for signal " + signal.getId() + " for the whole simulation time ...");
-							Double endTime = signalPlan.getEndTime();
-							if (endTime == null) {
-								// use end time of the simulation
-								endTime = scenario.getConfig().qsim().getEndTime();
-							}
-							// handle case start time = end time
-							if (time.equals(endTime)){
-								// a whole day is meant
-								endTime += 24*3600;
-							}
-							// add the signal plan offset to the start time
-							time += signalPlan.getOffset();
-							while (time <= endTime) {
-								signalsCSVWriter.write(signal.getId() + ";" + signalCoord.getX() + ";" + signalCoord.getY() + ";" + (time + signalGroupSetting.getOnset()) + ";" + SIGNAL_STATE_GREEN);
-								signalsCSVWriter.newLine();
-								signalsCSVWriter.write(signal.getId() + ";" + signalCoord.getX() + ";" + signalCoord.getY() + ";" + (time + signalGroupSetting.getDropping()) + ";" + SIGNAL_STATE_RED);
-								signalsCSVWriter.newLine();
-
-								time += signalPlan.getCycleTime();
-							}
-//							log.info("... done!");
-						}
-					}
-				}
-			}
-			
-			signalsCSVWriter.flush();
-			signalsCSVWriter.close();
-			log.info("... done!");
+		} catch (IOException e) {
+			e.printStackTrace();
+			log.error("Something went wrong while writing the header of the signals csv file.");
 		}
-		catch(IOException e){ 
-			e.printStackTrace(); 
+	}
+
+	private void init(){
+		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+		
+		// calculate coordinates of all signals and remember them
+		for (SignalSystemData signalSystem : signalsData.getSignalSystemsData().getSignalSystemData().values()){
+			for (SignalData signalData : signalSystem.getSignalData().values()){
+				Coord signalCoord = calculateSignalCoordinate(signalData);
+				signal2Coord.put(signalData.getId(), signalCoord);
+			}
+		}
+	}
+
+	@Override
+	public void handleEvent(SignalGroupStateChangedEvent event) {
+		SignalGroupData signalGroupData = signalsData.getSignalGroupsData().
+				getSignalGroupDataBySystemId(event.getSignalSystemId()).get(event.getSignalGroupId());
+		// write a line for each signal of the group
+		for (Id<Signal> signalId : signalGroupData.getSignalIds()){
+			Coord signalCoord = signal2Coord.get(signalId);
+			try {
+				signalsCSVWriter.write(signalId + ";" + signalCoord.getX() + ";" + signalCoord.getY() + ";" 
+						+ event.getTime() + ";" + event.getNewState());
+				signalsCSVWriter.newLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+				log.error("Something went wrong while adding a line for the signal state switch of signal " + signalId);
+			}
 		}
 	}
 	
-	private Coord calculateSignalCoordinate(Id<SignalSystem> signalSystemId, Id<Signal> signalId){
+	private Coord calculateSignalCoordinate(SignalData signalData){
 //		log.info("Calculating coordinate for signal " + signalId + " of signal system " + signalSystemId + " ...");
 		
-		SignalData signalData = signalsData.getSignalSystemsData().getSignalSystemData().get(signalSystemId).getSignalData().get(signalId);
 		Id<Link> signalLinkId = signalData.getLinkId();
 		Link signalLink = scenario.getNetwork().getLinks().get(signalLinkId);
 		Coord toNodeCoord = signalLink.getToNode().getCoord();
@@ -194,4 +188,18 @@ public class SignalsViaCSVWriter {
 //		log.info("... done!");
 		return new Coord(x, y);
 	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		// close the stream of this iteration
+		try {
+			signalsCSVWriter.flush();
+			signalsCSVWriter.close();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			log.error("Something went wrong while closing the signals csv writer stream.");
+		}
+		log.info("... done for this iteration");
+	}
+	
 }

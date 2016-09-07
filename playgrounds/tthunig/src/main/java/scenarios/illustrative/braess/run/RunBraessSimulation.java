@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
@@ -304,6 +305,10 @@ public final class RunBraessSimulation {
 				public void install() {
 					bind(ResponsiveLocalDelayMinimizingSignal.class).asEagerSingleton();
 					addControlerListenerBinding().to(ResponsiveLocalDelayMinimizingSignal.class);
+		            // bind tool to write information about signal states for via
+					bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
+		            addEventHandlerBinding().to(SignalEvents2ViaCSVWriter.class);
+		            addControlerListenerBinding().to(SignalEvents2ViaCSVWriter.class);
 				}
 			});
 		}
