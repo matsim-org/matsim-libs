@@ -20,20 +20,14 @@
 /**
  * 
  */
-package playground.jbischoff.ffcs.manager;
+package playground.jbischoff.ffcs.data;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
-
-import com.google.inject.Inject;
-
-import playground.jbischoff.ffcs.FFCSConfigGroup;
-import playground.jbischoff.parking.manager.ParkingManager;
 
 /**
  * @author  jbischoff
@@ -42,36 +36,17 @@ import playground.jbischoff.parking.manager.ParkingManager;
 /**
  *
  */
-public class FreeFloatingCarsharingManagerImpl implements FreefloatingCarsharingManager {
+public class CarsharingData {
+    private final Map<Id<Vehicle>, Id<Link>> vehiclesStartLocations = new LinkedHashMap<>();
 
-	
-	/**
-	 * 
+    /**
+	 * @return the vehiclesStartLocations
 	 */
-	@Inject
-	public FreeFloatingCarsharingManagerImpl(Scenario scenario, ParkingManager parkingManager, FFCSConfigGroup ffcsconfig) {
-		
-		
+	public Map<Id<Vehicle>, Id<Link>> getVehiclesStartLocations() {
+		return vehiclesStartLocations;
 	}
 	
-	
-	/* (non-Javadoc)
-	 * @see playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager#findAndReserveFreefloatingVehicleForLeg(org.matsim.api.core.v01.population.Leg, org.matsim.api.core.v01.Id, double)
-	 */
-	@Override
-	public Tuple<Id<Link>, Id<Vehicle>> findAndReserveFreefloatingVehicleForLeg(Leg leg, Id<Person> personId, double time) {
-		// TODO Auto-generated method stub
-		return null;
+	public void addVehicle(Id<Vehicle> vehicle, Id<Link> startLocationLinkId){
+		this.vehiclesStartLocations.put(vehicle, startLocationLinkId);
 	}
-
-
-	/* (non-Javadoc)
-	 * @see playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager#endRental(org.matsim.api.core.v01.Id, org.matsim.api.core.v01.Id, org.matsim.api.core.v01.Id, double)
-	 */
-	@Override
-	public boolean endRental(Id<Link> linkId, Id<Person> personId, Id<Vehicle> vehicleId, double time) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 }

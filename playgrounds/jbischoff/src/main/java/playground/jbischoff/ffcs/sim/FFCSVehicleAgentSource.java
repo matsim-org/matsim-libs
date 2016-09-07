@@ -17,26 +17,54 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.parking.routing;
+/**
+ * 
+ */
+package playground.jbischoff.ffcs.sim;
+
+
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
+
+import com.google.inject.Inject;
+
+import playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager;
 
 /**
  * @author  jbischoff
  *
  */
-public interface ParkingRouter {
-	/**
-	 * *
-	 * @param intendedRoute: may be a network route (car trips) or may be generic (carsharing etc.) 
-	 * @param departureTime
-	 * @param startLinkId
-	 * @return
-	 */
+/**
+ *
+ */
+public class FFCSVehicleAgentSource implements AgentSource {
 
-	NetworkRoute getRouteFromParkingToDestination(Route intendedRoute, double departureTime, Id<Link> startLinkId);
 	
+	private final QSim qsim;
+	private final FreefloatingCarsharingManager manager;
+	/**
+	 * 
+	 */
+	@Inject
+	public FFCSVehicleAgentSource(QSim qsim, FreefloatingCarsharingManager manager) {
+		this.qsim = qsim;
+		this.manager = manager;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.matsim.core.mobsim.framework.AgentSource#insertAgentsIntoMobsim()
+	 */
+	@Override
+	public void insertAgentsIntoMobsim() {
+		for (Entry<Id<Vehicle>, Id<Link>> e: manager.getIdleVehicleLocations().entrySet()){
+			qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(e.getKey(), VehicleUtils.getDefaultVehicleType()), e.getValue());
+		}
+	}
+
 }

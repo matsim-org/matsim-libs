@@ -1,4 +1,4 @@
-package playground.jbischoff.parking.sim;
+package playground.jbischoff.ffcs.sim;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +23,7 @@ import com.google.inject.Module;
 import com.google.inject.Provides;
 
 
-class ParkingSearchQSimModule extends com.google.inject.AbstractModule {
+class FreefloatingParkingSearchQSimModule extends com.google.inject.AbstractModule {
 	@Override 
 	protected void configure() {
 		bind(Mobsim.class).toProvider(QSimProvider.class);
@@ -54,11 +54,12 @@ class ParkingSearchQSimModule extends com.google.inject.AbstractModule {
 			result.add(new com.google.inject.AbstractModule() {
 				@Override
 				protected void configure() {
-					bind(PopulationAgentSource.class).asEagerSingleton();
+					bind(FreefloatingPopulationAgentSource.class).asEagerSingleton();
+					bind(FFCSVehicleAgentSource.class).asEagerSingleton();
 					if (getConfig().transit().isUseTransit()) {
 						throw new RuntimeException("parking search together with transit is not implemented (should not be difficult)") ;
 					} else {
-						bind(AgentFactory.class).to(ParkingAgentFactory.class).asEagerSingleton(); // (**)
+						bind(AgentFactory.class).to(FreefloatingParkingAgentFactory.class).asEagerSingleton(); // (**)
 					}
 				}
 			});
@@ -67,7 +68,7 @@ class ParkingSearchQSimModule extends com.google.inject.AbstractModule {
 		@Override 
 		public Collection<Class<? extends AgentSource>> agentSources() {
 			Collection<Class<? extends AgentSource>> result = new ArrayList<>();
-			result.add(PopulationAgentSource.class);
+			result.add(FreefloatingPopulationAgentSource.class);
 			return result;
 		}
 	}

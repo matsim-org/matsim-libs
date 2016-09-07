@@ -17,26 +17,61 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.parking.routing;
+/**
+ * 
+ */
+package playground.jbischoff.ffcs.data;
+
+import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.vehicles.Vehicle;
+import org.xml.sax.Attributes;
 
 /**
  * @author  jbischoff
  *
  */
-public interface ParkingRouter {
-	/**
-	 * *
-	 * @param intendedRoute: may be a network route (car trips) or may be generic (carsharing etc.) 
-	 * @param departureTime
-	 * @param startLinkId
-	 * @return
-	 */
+/**
+ *
+ */
+public class CarsharingVehiclesReader  extends MatsimXmlParser
+{
+    private static final String VEHICLE = "vehicle";
 
-	NetworkRoute getRouteFromParkingToDestination(Route intendedRoute, double departureTime, Id<Link> startLinkId);
+
+    private CarsharingData data;
+
+
+    public CarsharingVehiclesReader(CarsharingData data)
+    {
+        this.data = data;
+
+    }
+
+
+    @Override
+    public void startTag(String name, Attributes atts, Stack<String> context)
+    {
+        if (VEHICLE.equals(name)) {
+            Id<Vehicle> id = Id.create(atts.getValue("id"), Vehicle.class);
+            Id<Link> linkId = Id.createLinkId(atts.getValue("start_link"));
+            this.data.addVehicle(id, linkId);
+        }
+    }
+
+
+    @Override
+    public void endTag(String name, String content, Stack<String> context)
+    {}
+
+
+   
+    
+    
+   
+
 	
 }

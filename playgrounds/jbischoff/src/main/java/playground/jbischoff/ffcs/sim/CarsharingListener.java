@@ -17,26 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.parking.routing;
+/**
+ * 
+ */
+package playground.jbischoff.ffcs.sim;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+
+import com.google.inject.Inject;
+
+import playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager;
+import playground.jbischoff.parking.manager.ParkingManager;
 
 /**
  * @author  jbischoff
  *
  */
-public interface ParkingRouter {
-	/**
-	 * *
-	 * @param intendedRoute: may be a network route (car trips) or may be generic (carsharing etc.) 
-	 * @param departureTime
-	 * @param startLinkId
-	 * @return
-	 */
+/**
+ *
+ */
+public class CarsharingListener implements IterationEndsListener {
 
-	NetworkRoute getRouteFromParkingToDestination(Route intendedRoute, double departureTime, Id<Link> startLinkId);
 	
+	@Inject
+	FreefloatingCarsharingManager manager;
+	@Inject
+	OutputDirectoryHierarchy output;
+	
+	/* (non-Javadoc)
+	 * @see org.matsim.core.controler.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.controler.events.IterationEndsEvent)
+	 */
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		manager.reset(event.getIteration());
+	}
+
 }

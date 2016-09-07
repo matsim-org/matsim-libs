@@ -22,7 +22,10 @@
  */
 package playground.jbischoff.ffcs;
 
+import java.net.URL;
+
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
@@ -37,11 +40,13 @@ public class FFCSConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "freefloating";
 	public static final String FFCS_VEHICLES_FILE = "vehiclesFile";
 	public static final String PUNISHMENTFORMODESWITCH = "punishmentForModeSwitch";
+	public static final String MAXIMUMWALKDISTANCE = "maximumWalkDistance_m";
 	
 	
 	
 	private String vehiclesFiles = null;
 	private double punishMentForModeSwitch = 0.0;
+	private double maximumWalkDistance = 1500;
 
 	public static FFCSConfigGroup get(Config config) {
 		return (FFCSConfigGroup) config.getModule(GROUP_NAME);
@@ -57,6 +62,11 @@ public class FFCSConfigGroup extends ReflectiveConfigGroup {
 	 */
 	public String getVehiclesFiles() {
 		return vehiclesFiles;
+	}
+	
+	public URL getVehiclesFileUrl(URL context){
+		return ConfigGroup.getInputFileURL(context, this.vehiclesFiles);
+
 	}
 
 	@StringSetter(FFCS_VEHICLES_FILE)
@@ -83,5 +93,19 @@ public class FFCSConfigGroup extends ReflectiveConfigGroup {
 	public void setPunishMentForModeSwitch(double punishMentForModeSwitch) {
 		this.punishMentForModeSwitch = punishMentForModeSwitch;
 	}
-	
+
+	/**
+	 * @return the maximumWalkDistance
+	 */
+	@StringGetter(MAXIMUMWALKDISTANCE)
+	public double getMaximumWalkDistance() {
+		return maximumWalkDistance;
+	}
+	/**
+	 * @param maximumWalkDistance the maximumWalkDistance to set
+	 */
+	@StringSetter(MAXIMUMWALKDISTANCE)
+	public void setMaximumWalkDistance(double maximumWalkDistance) {
+		this.maximumWalkDistance = maximumWalkDistance;
+	}
 }

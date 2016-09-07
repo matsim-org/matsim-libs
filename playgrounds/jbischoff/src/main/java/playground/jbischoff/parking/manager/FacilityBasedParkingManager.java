@@ -104,8 +104,8 @@ public class FacilityBasedParkingManager implements ParkingManager {
 		
 		if (linkIdHasAvailableParkingForVehicle(linkId,vehicleId)){
 			canPark = true;
+			Logger.getLogger(getClass()).info("veh: "+vehicleId+" link "+linkId + " can park "+canPark);
 		}
-		//		Logger.getLogger(getClass()).info("veh: "+vehicleId+" link "+linkId + " can park "+canPark);
 
 		return canPark;
 	}
@@ -176,7 +176,7 @@ public class FacilityBasedParkingManager implements ParkingManager {
 				this.parkingLocations.put(vehicleId, fac);
 				return true;
 			}else{
-				throw new RuntimeException("no parking reservation found for arrival on link with parking restriction");
+				throw new RuntimeException("no parking reservation found for vehicle "+vehicleId.toString()+ "arrival on link "+linkId+" with parking restriction");
 			}
 		}
 				

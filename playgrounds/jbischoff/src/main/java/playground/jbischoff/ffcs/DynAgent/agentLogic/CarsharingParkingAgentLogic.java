@@ -61,7 +61,6 @@ public class CarsharingParkingAgentLogic extends ParkingAgentLogic {
 
 	private FreefloatingCarsharingManager ffcmanager;
 	FFCSConfigGroup ffcsconfig;
-	private Id<Vehicle> currentlyAssignedVehicleId = null;
 	/**
 	 * @param plan
 	 * @param parkingManager
@@ -71,6 +70,8 @@ public class CarsharingParkingAgentLogic extends ParkingAgentLogic {
 	 * @param parkingLogic
 	 * @param timer
 	 * @param teleportationLogic
+	 * @param FreefloatingCarsharingManager
+	 * @param FFCSConfigGroup
 	 */
 	public CarsharingParkingAgentLogic(Plan plan, ParkingManager parkingManager, WalkLegFactory walkLegFactory,
 			ParkingRouter parkingRouter, EventsManager events, ParkingChoiceLogic parkingLogic, MobsimTimer timer,
