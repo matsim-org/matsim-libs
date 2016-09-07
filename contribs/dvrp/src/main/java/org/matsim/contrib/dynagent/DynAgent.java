@@ -169,13 +169,9 @@ public final class DynAgent
     @Override
     public final Id<Vehicle> getPlannedVehicleId()
     {
-        if (state != State.LEG) {
-            throw new IllegalStateException();// return null;
-        }
-
-        // according to PersonDriverAgentImpl:
-        // we still assume the vehicleId is the agentId if no vehicleId is given.
-        return Id.create(id, Vehicle.class);
+        Id<Vehicle> vehId = ((DriverDynLeg)dynLeg).getPlannedVehicleId();
+        // according to BasicPlanAgentImpl
+        return vehId != null ? vehId : Id.create(id, Vehicle.class);
     }
 
 

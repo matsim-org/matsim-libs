@@ -21,6 +21,7 @@ package org.matsim.contrib.dynagent;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 
 
 public interface DriverDynLeg
@@ -30,4 +31,7 @@ public interface DriverDynLeg
 
 
     void movedOverNode(Id<Link> newLinkId);
+
+
+    Id<Vehicle> getPlannedVehicleId();
 }

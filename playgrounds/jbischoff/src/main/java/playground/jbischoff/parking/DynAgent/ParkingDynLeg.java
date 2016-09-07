@@ -123,6 +123,15 @@ public class ParkingDynLeg implements DriverDynLeg {
 		return mode;
 	}
 
+	
+	@Override
+	public Id<Vehicle> getPlannedVehicleId()
+	{
+	    // TODO Auto-generated method stub
+	    return null;
+	}
+	
+	
 	@Override
 	public void arrivedOnLinkByNonNetworkMode(Id<Link> linkId) {
 		if (!getDestinationLinkId().equals(linkId)) {
