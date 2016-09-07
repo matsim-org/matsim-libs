@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -85,7 +85,7 @@ public class CreateLegHistogramForSubpopulation {
 		final double radius = 1000 * args.getDoubleValue( "-r" );
 
 		final ObjectAttributes atts = new ObjectAttributes();
-		new ObjectAttributesXmlReader( atts ).parse( personAttributesFile );
+		new ObjectAttributesXmlReader( atts ).readFile( personAttributesFile );
 
 		final LegHistogram histogram = new LegHistogram( 300 );
 		final SubpopulationFilteringEventsManager events =
@@ -97,7 +97,7 @@ public class CreateLegHistogramForSubpopulation {
 					network,
 					histogram ) );
 
-		new EventsReaderXMLv1( events ).parse( inputEventsFile );
+		new EventsReaderXMLv1( events ).readFile( inputEventsFile );
 
 		if ( outputDataFile != null ) histogram.write( outputDataFile );
 		if ( outputFigure != null ) LegHistogramChart.writeGraphic(histogram, outputFigure);

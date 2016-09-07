@@ -19,7 +19,7 @@ class TravelDistanceStatsControlerListener implements IterationEndsListener, Shu
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		travelDistanceStats.addIteration(event.getIteration(), experiencedPlansService.getAgentRecords());
+		travelDistanceStats.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
 	}
 
 	@Override

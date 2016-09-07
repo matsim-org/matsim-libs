@@ -37,9 +37,9 @@ public class RunTaxibusExample {
 
 	public static void main(String[] args) {
 		
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configShared.xml", new TaxibusConfigGroup());
+		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/nolearning_configStatebased_ta_0.9_100.xml", new TaxibusConfigGroup());
 //		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Desktop/public/config.xml", new TaxibusConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 	
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 

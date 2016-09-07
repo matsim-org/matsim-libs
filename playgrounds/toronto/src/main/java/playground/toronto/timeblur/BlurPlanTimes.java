@@ -21,11 +21,14 @@
 package playground.toronto.timeblur;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -41,15 +44,17 @@ public class BlurPlanTimes {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(inputNetworkFile);
-		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
-		population.setIsStreaming(true);
+		Population population = (Population) scenario.getPopulation();
+		StreamingUtils.setIsStreaming(population, true);
 		PersonBlurTimes pbt = new PersonBlurTimes(scenario.getConfig(), mutationRange);
-		population.addAlgorithm(pbt);
-		PopulationWriter pw = new PopulationWriter(population, network);
+		final PersonAlgorithm algo = pbt;
+		StreamingUtils.addAlgorithm(population, algo);
+		StreamingPopulationWriter pw = new StreamingPopulationWriter(population, network);
 		pw.startStreaming(outputPlansFile);
-		population.addAlgorithm(pw);
-		new MatsimPopulationReader(scenario).readFile(inputPlansFile);
-		population.printPlansCount();
+		final PersonAlgorithm algo1 = pw;
+		StreamingUtils.addAlgorithm(population, algo1);
+		new PopulationReader(scenario).readFile(inputPlansFile);
+		PopulationUtils.printPlansCount(population) ;
 		pw.closeStreaming();
 		System.out.println("done.");
 	}
@@ -63,15 +68,17 @@ public class BlurPlanTimes {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(inputNetworkFile);
-		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
-		population.setIsStreaming(true);
+		Population population = (Population) scenario.getPopulation();
+		StreamingUtils.setIsStreaming(population, true);
 		PersonUniformBlurTimesPerTimeBin pubtptb = new PersonUniformBlurTimesPerTimeBin(binSize);
-		population.addAlgorithm(pubtptb);
-		PopulationWriter pw = new PopulationWriter(population, network);
+		final PersonAlgorithm algo = pubtptb;
+		StreamingUtils.addAlgorithm(population, algo);
+		StreamingPopulationWriter pw = new StreamingPopulationWriter(population, network);
 		pw.startStreaming(outputPlansFile);
-		population.addAlgorithm(pw);
-		new MatsimPopulationReader(scenario).readFile(inputPlansFile);
-		population.printPlansCount();
+		final PersonAlgorithm algo1 = pw;
+		StreamingUtils.addAlgorithm(population, algo1);
+		new PopulationReader(scenario).readFile(inputPlansFile);
+		PopulationUtils.printPlansCount(population) ;
 		pw.closeStreaming();
 		System.out.println("done.");
 	}
@@ -86,15 +93,17 @@ public class BlurPlanTimes {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(inputNetworkFile);
-		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
-		population.setIsStreaming(true);
+		Population population = (Population) scenario.getPopulation();
+		StreamingUtils.setIsStreaming(population, true);
 		PersonBlurTimesPerTimeBin pbtptb = new PersonBlurTimesPerTimeBin(mutationRange,binSize);
-		population.addAlgorithm(pbtptb);
-		PopulationWriter pw = new PopulationWriter(population, network);
+		final PersonAlgorithm algo = pbtptb;
+		StreamingUtils.addAlgorithm(population, algo);
+		StreamingPopulationWriter pw = new StreamingPopulationWriter(population, network);
 		pw.startStreaming(outputPlansFile);
-		population.addAlgorithm(pw);
-		new MatsimPopulationReader(scenario).readFile(inputPlansFile);
-		population.printPlansCount();
+		final PersonAlgorithm algo1 = pw;
+		StreamingUtils.addAlgorithm(population, algo1);
+		new PopulationReader(scenario).readFile(inputPlansFile);
+		PopulationUtils.printPlansCount(population) ;
 		pw.closeStreaming();
 		System.out.println("done.");
 	}

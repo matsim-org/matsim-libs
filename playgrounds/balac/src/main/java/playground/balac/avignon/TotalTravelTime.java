@@ -7,17 +7,17 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class TotalTravelTime {
 	MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-	PopulationReader populationReader = new MatsimPopulationReader(scenario);
+	MatsimReader populationReader = new PopulationReader(scenario);
 	MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 	public void run(String plansFilePath, String networkFilePath) throws IOException {
 		

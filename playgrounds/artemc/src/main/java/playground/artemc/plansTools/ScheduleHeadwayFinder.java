@@ -24,8 +24,7 @@ public class ScheduleHeadwayFinder {
 	private Map<Id<Departure>,Departure> departures = new HashMap();
 	
 	/**
-	 * @param args
-	 * @throws ParseException 
+	 * @throws ParseException
 	 */
 	
 	public String findHeadway(String time, TransitLine line, TransitRoute route, TransitStopFacility stop, TransitSchedule schedule) throws ParseException {

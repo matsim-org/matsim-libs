@@ -15,10 +15,14 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -27,7 +31,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -66,17 +70,21 @@ public class OptimalWalkPlanFinderTest {
 
 		Double bestScore = calcScore(f, optimalPlan);
 
-		((ActivityImpl) optimalPlan.getPlanElements().get(0)).setEndTime(8.5 * 3600 + 60);
-		((LegImpl) optimalPlan.getPlanElements().get(1)).setDepartureTime(((LegImpl) optimalPlan.getPlanElements().get(1)).getDepartureTime() + 60);
-		((LegImpl) optimalPlan.getPlanElements().get(1)).setArrivalTime(((LegImpl) optimalPlan.getPlanElements().get(1)).getArrivalTime() + 60);
-		((ActivityImpl) optimalPlan.getPlanElements().get(2)).setStartTime(((ActivityImpl) optimalPlan.getPlanElements().get(2)).getStartTime() + 60);
+		((Activity) optimalPlan.getPlanElements().get(0)).setEndTime(8.5 * 3600 + 60);
+		((Leg) optimalPlan.getPlanElements().get(1)).setDepartureTime(((Leg) optimalPlan.getPlanElements().get(1)).getDepartureTime() + 60);
+		Leg r = ((Leg) optimalPlan.getPlanElements().get(1));
+		Leg r2 = ((Leg) optimalPlan.getPlanElements().get(1));
+		r2.setTravelTime( r.getDepartureTime() + r.getTravelTime() + 60 - r2.getDepartureTime() );
+		((Activity) optimalPlan.getPlanElements().get(2)).setStartTime(((Activity) optimalPlan.getPlanElements().get(2)).getStartTime() + 60);
 
 		Double altScore1 =calcScore(f, optimalPlan);
 
-		((ActivityImpl) optimalPlan.getPlanElements().get(2)).setEndTime(18 * 3600 - 60);
-		((LegImpl) optimalPlan.getPlanElements().get(3)).setDepartureTime((((ActivityImpl) optimalPlan.getPlanElements().get(2))).getEndTime());
-		((LegImpl) optimalPlan.getPlanElements().get(3)).setArrivalTime(((LegImpl) optimalPlan.getPlanElements().get(3)).getDepartureTime() + ((LegImpl) optimalPlan.getPlanElements().get(3)).getTravelTime());
-		((ActivityImpl) optimalPlan.getPlanElements().get(4)).setStartTime(((LegImpl) optimalPlan.getPlanElements().get(3)).getArrivalTime());
+		((Activity) optimalPlan.getPlanElements().get(2)).setEndTime(18 * 3600 - 60);
+		((Leg) optimalPlan.getPlanElements().get(3)).setDepartureTime((((Activity) optimalPlan.getPlanElements().get(2))).getEndTime());
+		Leg r3 = ((Leg) optimalPlan.getPlanElements().get(3));
+		r3.setTravelTime( ((Leg) optimalPlan.getPlanElements().get(3)).getDepartureTime() + ((Leg) optimalPlan.getPlanElements().get(3)).getTravelTime() - r3.getDepartureTime() );
+		Leg r1 = ((Leg) optimalPlan.getPlanElements().get(3));
+		((Activity) optimalPlan.getPlanElements().get(4)).setStartTime(r1.getDepartureTime() + r1.getTravelTime());
 
 		Double altScore2 = calcScore(f, optimalPlan);
 
@@ -134,8 +142,8 @@ public class OptimalWalkPlanFinderTest {
 		OptimalWalkPlanFinder optimalWalkPlanFinder = new OptimalWalkPlanFinder(f.scenario.getConfig());
 		Plan optimalPlan = optimalWalkPlanFinder.findOptimalWalkPlan(f.plan);
 
-		assertEquals(8.5 * 3600, ((ActivityImpl) optimalPlan.getPlanElements().get(0)).getEndTime(), EPSILON);
-		assertEquals(18.0 * 3600, ((ActivityImpl) optimalPlan.getPlanElements().get(2)).getEndTime(), EPSILON);
+		assertEquals(8.5 * 3600, ((Activity) optimalPlan.getPlanElements().get(0)).getEndTime(), EPSILON);
+		assertEquals(18.0 * 3600, ((Activity) optimalPlan.getPlanElements().get(2)).getEndTime(), EPSILON);
 
 		runScoreTest(optimalPlan, f);
 	}
@@ -161,8 +169,8 @@ public class OptimalWalkPlanFinderTest {
 		OptimalWalkPlanFinder optimalWalkPlanFinder = new OptimalWalkPlanFinder(f.scenario.getConfig());
 		Plan optimalPlan = optimalWalkPlanFinder.findOptimalWalkPlan(f.plan);
 
-		assertEquals(8.5*3600,((ActivityImpl) optimalPlan.getPlanElements().get(0)).getEndTime(),EPSILON);
-		assertEquals(18.0*3600,((ActivityImpl) optimalPlan.getPlanElements().get(2)).getEndTime(),EPSILON);
+		assertEquals(8.5*3600,((Activity) optimalPlan.getPlanElements().get(0)).getEndTime(),EPSILON);
+		assertEquals(18.0*3600,((Activity) optimalPlan.getPlanElements().get(2)).getEndTime(),EPSILON);
 
 		runScoreTest(optimalPlan, f);
 	}
@@ -187,8 +195,8 @@ public class OptimalWalkPlanFinderTest {
 		OptimalWalkPlanFinder optimalWalkPlanFinder = new OptimalWalkPlanFinder(f.scenario.getConfig());
 		Plan optimalPlan = optimalWalkPlanFinder.findOptimalWalkPlan(f.plan);
 
-		assertEquals(8.5*3600,((ActivityImpl) optimalPlan.getPlanElements().get(0)).getEndTime(),EPSILON);
-		assertEquals((9*3600+9*(23/22)*3600),((ActivityImpl) optimalPlan.getPlanElements().get(2)).getEndTime(),EPSILON);
+		assertEquals(8.5*3600,((Activity) optimalPlan.getPlanElements().get(0)).getEndTime(),EPSILON);
+		assertEquals((9*3600+9*(23/22)*3600),((Activity) optimalPlan.getPlanElements().get(2)).getEndTime(),EPSILON);
 
 		runScoreTest(optimalPlan, f);
 	}
@@ -216,8 +224,8 @@ public class OptimalWalkPlanFinderTest {
 		OptimalWalkPlanFinder optimalWalkPlanFinder = new OptimalWalkPlanFinder(f.scenario.getConfig());
 		Plan optimalPlan = optimalWalkPlanFinder.findOptimalWalkPlan(f.plan);
 
-		assertEquals(8.5*3600,((ActivityImpl) optimalPlan.getPlanElements().get(0)).getEndTime(),EPSILON);
-		assertEquals(17*3600,((ActivityImpl) optimalPlan.getPlanElements().get(2)).getEndTime(),EPSILON);
+		assertEquals(8.5*3600,((Activity) optimalPlan.getPlanElements().get(0)).getEndTime(),EPSILON);
+		assertEquals(17*3600,((Activity) optimalPlan.getPlanElements().get(2)).getEndTime(),EPSILON);
 
 		runScoreTest(optimalPlan, f);
 	}
@@ -226,9 +234,9 @@ public class OptimalWalkPlanFinderTest {
 	private static class Fixture {
 		protected Config config = null;
 		private Person person = null;
-		private PlanImpl plan = null;
+		private Plan plan = null;
 		private Scenario scenario;
-		private NetworkImpl network;
+		private Network network;
 		private int firstLegStartTime;
 		private int firstLegTravelTime;
 		private int secondLegTravelTime;
@@ -275,42 +283,47 @@ public class OptimalWalkPlanFinderTest {
 
 
 			this.scenario = ScenarioUtils.createScenario(config);
-			this.network = (NetworkImpl) this.scenario.getNetwork();
-			Node node1 = this.network.createAndAddNode(Id.create("1", Node.class), new Coord(0.0, 0.0));
-			Node node2 = this.network.createAndAddNode(Id.create("2", Node.class), new Coord(1000.0, 0.0));
+			this.network = (Network) this.scenario.getNetwork();
+			Node node1 = NetworkUtils.createAndAddNode(this.network, Id.create("1", Node.class), new Coord(0.0, 0.0));
+			Node node2 = NetworkUtils.createAndAddNode(this.network, Id.create("2", Node.class), new Coord(1000.0, 0.0));
+			final Node fromNode = node1;
+			final Node toNode = node2;
 
-			Link link1 = this.network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 25, 3600, 1);
+			Link link1 = NetworkUtils.createAndAddLink(this.network,Id.create("1", Link.class), fromNode, toNode, (double) 1000, (double) 25, (double) 3600, (double) 1 );
 
-			this.person = PopulationUtils.createPerson(Id.create("1", Person.class));
+			this.person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 			this.plan = PersonUtils.createAndAddPlan(this.person, true);
 
 			Coord homeLocation = new Coord(0.0, 1.0);
 			Coord workLocation = new Coord(1153.8461538461538, 1.0);
+			final Coord coord = homeLocation;
 
-			ActivityImpl firstActivity = this.plan.createAndAddActivity("home", homeLocation);
+			Activity firstActivity = PopulationUtils.createAndAddActivityFromCoord(this.plan, (String) "home", coord);
 			firstActivity.setEndTime(firstLegStartTime);
 
-			Leg leg = this.plan.createAndAddLeg(TransportMode.walk);
+			Leg leg = PopulationUtils.createAndAddLeg( this.plan, (String) TransportMode.walk );
 			leg.setDepartureTime(firstLegStartTime);
 			leg.setTravelTime(firstLegTravelTime);
 			Route route1 = new GenericRouteImpl(link1.getId(), link1.getId());
 			route1.setTravelTime(firstLegTravelTime);
 			route1.setDistance(CoordUtils.calcEuclideanDistance(homeLocation, workLocation));
 			leg.setRoute(route1);
+			final Coord coord1 = workLocation;
 
-			ActivityImpl secondActivity = this.plan.createAndAddActivity("work", workLocation);
+			Activity secondActivity = PopulationUtils.createAndAddActivityFromCoord(this.plan, (String) "work", coord1);
 			secondActivity.setStartTime(firstLegStartTime + firstLegTravelTime);
 			secondActivity.setEndTime(secondLegStartTime);
 
-			leg = this.plan.createAndAddLeg(TransportMode.walk);
+			leg = PopulationUtils.createAndAddLeg( this.plan, (String) TransportMode.walk );
 			leg.setDepartureTime(secondLegStartTime);
 			leg.setTravelTime(secondLegTravelTime);
 			Route route2 = new GenericRouteImpl(link1.getId(), link1.getId());
 			route2.setTravelTime(secondLegTravelTime);
 			route2.setDistance(CoordUtils.calcEuclideanDistance(homeLocation, workLocation));
 			leg.setRoute(route2);
+			final Coord coord2 = homeLocation;
 
-			ActivityImpl lastActivity = this.plan.createAndAddActivity("home", homeLocation);
+			Activity lastActivity = PopulationUtils.createAndAddActivityFromCoord(this.plan, (String) "home", coord2);
 			lastActivity.setStartTime(secondLegStartTime + secondLegTravelTime);
 
 			this.scenario.getPopulation().addPerson(this.person);

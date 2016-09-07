@@ -8,7 +8,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 
 import java.util.HashMap;
@@ -30,7 +29,7 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {
 				for (Person person : population.getPersons().values()) {
-					agentRecords.put(person.getId(), new PlanImpl());
+					agentRecords.put(person.getId(), PopulationUtils.createPlan());
 				}
 			}
 		});
@@ -38,7 +37,10 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 		eventsToLegs.addLegHandler(this);
 	}
 
+	@Override
 	synchronized public void handleLeg(PersonExperiencedLeg o) {
+		// Has to be synchronized because the thing which sends Legs and the thing which sends Activities can run
+		// on different threads. Will go away when/if we get a more Actor or Reactive Streams like event infrastructure.
 		Id<Person> agentId = o.getAgentId();
 		Leg leg = o.getLeg();
 		Plan plan = agentRecords.get(agentId);
@@ -47,7 +49,10 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 		}
 	}
 
+	@Override
 	synchronized public void handleActivity(PersonExperiencedActivity o) {
+		// Has to be synchronized because the thing which sends Legs and the thing which sends Activities can run
+		// on different threads. Will go away when/if we get a more Actor or Reactive Streams like event infrastructure.
 		Id<Person> agentId = o.getAgentId();
 		Activity activity = o.getActivity();
 		Plan plan = agentRecords.get(agentId);
@@ -60,7 +65,7 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 	public void writeExperiencedPlans(String iterationFilename) {
 		Population tmpPop = PopulationUtils.createPopulation(config);
 		for (Map.Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
-			Person person = PopulationUtils.createPerson(entry.getKey());
+			Person person = PopulationUtils.getFactory().createPerson(entry.getKey());
 			Plan plan = entry.getValue();
 			if (scoringFunctionsForPopulation != null) {
 				plan.setScore(scoringFunctionsForPopulation.getScoringFunctionForAgent(person.getId()).getScore());
@@ -78,7 +83,7 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 	}
 
 	@Override
-	public Map<Id<Person>, Plan> getAgentRecords() {
+	public Map<Id<Person>, Plan> getExperiencedPlans() {
 		return this.agentRecords;
 	}
 

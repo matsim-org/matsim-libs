@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -42,10 +43,9 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkChangeEventsWriter;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -115,7 +115,7 @@ public class PopulationGenerator {
 		Population pop = sc.getPopulation();
 		pop.getPersons().clear();
 		PopulationFactory fac = pop.getFactory();
-		NetworkImpl net = (NetworkImpl) sc.getNetwork();
+		Network net = (Network) sc.getNetwork();
 		String crs = conf.global().getCoordinateSystem();
 		transformCRS(r, crs);
 		
@@ -127,7 +127,7 @@ public class PopulationGenerator {
 			MultiPolygon p = (MultiPolygon) ft.getDefaultGeometry();
 			Coordinate c = p.getCentroid().getCoordinate();
 
-			Link l = net.getNearestLinkExactly(new Coord(c.x, c.y));
+			Link l = NetworkUtils.getNearestLinkExactly(net,new Coord(c.x, c.y));
 			double dist = c.distance(new Coordinate(l.getCoord().getX(),l.getCoord().getY()));
 			if (dist > CUTOFF_DIST) {
 				continue;
@@ -183,7 +183,6 @@ public class PopulationGenerator {
 
 	private static void createNetworkChangeEvents(Scenario sc) {
 		Collection<NetworkChangeEvent> events = new LinkedList<NetworkChangeEvent>();
-		NetworkChangeEventFactoryImpl fac = new NetworkChangeEventFactoryImpl();
 
 
 		double time = 0;
@@ -191,7 +190,7 @@ public class PopulationGenerator {
 
 			int ii = 0;
 			{
-				NetworkChangeEvent e = fac.createNetworkChangeEvent(time);
+				NetworkChangeEvent e = new NetworkChangeEvent(time);
 				for (Link l : sc.getNetwork().getLinks().values()) {
 					if (CoordUtils.calcEuclideanDistance(to1, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcEuclideanDistance(to1, l.getFromNode().getCoord()) < 0.1) {
 						l.setCapacity(4*3600);
@@ -207,7 +206,7 @@ public class PopulationGenerator {
 							l.setLength(.26);
 							l.setFreespeed(0.5);
 							e.addLink(l);
-							ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0);
+							ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 0);
 							e.setFlowCapacityChange(cv);
 //							ChangeValue cxv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0.01);
 //							e.setFreespeedChange(cxv);
@@ -232,7 +231,7 @@ public class PopulationGenerator {
 			}
 			int jj = 0;
 			{
-				NetworkChangeEvent e = fac.createNetworkChangeEvent(time+ 2*60+30);
+				NetworkChangeEvent e = new NetworkChangeEvent(time+ 2*60+30);
 				for (Link l : sc.getNetwork().getLinks().values()) {
 					if (CoordUtils.calcEuclideanDistance(to2, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcEuclideanDistance(to2, l.getFromNode().getCoord()) < 0.1) {
 						l.setCapacity(4*3600);
@@ -246,7 +245,7 @@ public class PopulationGenerator {
 						l.setLength(.26);
 						l.setFreespeed(0.5);
 						e.addLink(l);
-						ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0);
+						ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 0);
 						e.setFlowCapacityChange(cv);
 //						ChangeValue cxv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0.01);
 //						e.setFreespeedChange(cxv);
@@ -261,7 +260,7 @@ public class PopulationGenerator {
 //				continue;
 //			}
 			{
-				NetworkChangeEvent e = fac.createNetworkChangeEvent(time);
+				NetworkChangeEvent e = new NetworkChangeEvent(time);
 				for (Link l : sc.getNetwork().getLinks().values()) {
 					if (CoordUtils.calcEuclideanDistance(to1, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcEuclideanDistance(to1, l.getFromNode().getCoord()) < 0.1) {
 						l.setCapacity(4*3600);
@@ -270,7 +269,7 @@ public class PopulationGenerator {
 					}
 					for (Link ll : l.getToNode().getOutLinks().values()){
 						if (CoordUtils.calcEuclideanDistance(to1, ll.getToNode().getCoord()) < 0.1){
-							ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0.5);
+							ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 0.5);
 							e.setFlowCapacityChange(cv);
 //							ChangeValue cxv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 1.34);
 //							e.setFreespeedChange(cxv);
@@ -288,7 +287,7 @@ public class PopulationGenerator {
 				events.add(e);
 			}
 			{
-				NetworkChangeEvent e = fac.createNetworkChangeEvent(time + 2*60+30);
+				NetworkChangeEvent e = new NetworkChangeEvent(time + 2*60+30);
 				for (Link l : sc.getNetwork().getLinks().values()) {
 					if (CoordUtils.calcEuclideanDistance(to2, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcEuclideanDistance(to2, l.getFromNode().getCoord()) < 0.1) {
 						l.setCapacity(4*3600);
@@ -298,7 +297,7 @@ public class PopulationGenerator {
 					}
 					if (t2.contains(MGC.coord2Point(l.getToNode().getCoord()))) {
 						e.addLink(l);
-						ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0.5);
+						ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 0.5);
 						e.setFlowCapacityChange(cv);
 //						ChangeValue cxv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 1.34);
 //						e.setFreespeedChange(cxv);

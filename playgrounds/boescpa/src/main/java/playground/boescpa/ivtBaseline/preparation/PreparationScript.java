@@ -2,14 +2,14 @@ package playground.boescpa.ivtBaseline.preparation;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.*;
@@ -127,7 +127,7 @@ public class PreparationScript {
 	private static void createNewScenario() throws IOException {
         log.info(" ------- Create New Scenario ------- ");
         Files.move(Paths.get(pathConfig), Paths.get(pathScenario + CONFIG));
-        Files.move(Paths.get(pathLCConfig), Paths.get(pathScenario + LC_CONFIG));
+        //Files.move(Paths.get(pathLCConfig), Paths.get(pathScenario + LC_CONFIG));
         Files.move(Paths.get(pathFacilities), Paths.get(pathScenario + FACILITIES));
         Files.move(Paths.get(pathHouseholds), Paths.get(pathScenario + HOUSEHOLDS));
         Files.move(Paths.get(pathHouseholdAttributes), Paths.get(pathScenario + HOUSEHOLD_ATTRIBUTES));
@@ -164,21 +164,21 @@ public class PreparationScript {
 		log.info(" ------- Merge in the Sub-Populations ------- ");
 		// read the scenario population
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
+		PopulationReader plansReader = new PopulationReader(scenario);
 		plansReader.readFile(pathPopulation);
 		Population scenarioPopulation = scenario.getPopulation();
 		ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(scenarioPopulation.getPersonAttributes());
-		attributesReader.parse(pathPopulationAttributes);
+		attributesReader.readFile(pathPopulationAttributes);
 		// add tag for main population
 		/*for (Person p : scenarioPopulation.getPersons().values()) {
 			scenarioPopulation.getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "main_pop");
 		}*/
 		// add the freight population to the scenario population
 		plansReader.readFile(pathFreightPopulation);
-		attributesReader.parse(pathFreightPopulationAttributes);
+		attributesReader.readFile(pathFreightPopulationAttributes);
 		// add the cb population to the scenario population
 		plansReader.readFile(pathCBPopulation);
-		attributesReader.parse(pathCBPopulationAttributes);
+		attributesReader.readFile(pathCBPopulationAttributes);
 		// write the new, merged population and its attributes:
 		PopulationWriter writer = new PopulationWriter(scenarioPopulation);
 		writer.write(pathPopulation);
@@ -306,7 +306,7 @@ public class PreparationScript {
             Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
             MatsimFacilitiesReader facilitiesReader = new MatsimFacilitiesReader(scenario);
             facilitiesReader.readFile(pathFacilities);
-            MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
+            PopulationReader plansReader = new PopulationReader(scenario);
             plansReader.readFile(pathPopulation);
 			if (executeFinalScenarioTests) {
 				testFacilityAssignment(scenario);
@@ -323,8 +323,8 @@ public class PreparationScript {
 		boolean continueTest = true;
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			for (PlanElement planElement : p.getSelectedPlan().getPlanElements()) {
-				if (planElement instanceof ActivityImpl) {
-					ActivityImpl act = (ActivityImpl) planElement;
+				if (planElement instanceof Activity) {
+					Activity act = (Activity) planElement;
 					if (act.getFacilityId() != null) {
 						ActivityFacility activityFacility = scenario.getActivityFacilities().getFacilities().get(act.getFacilityId());
 						if (!activityFacility.getActivityOptions().keySet().contains(act.getType())) {

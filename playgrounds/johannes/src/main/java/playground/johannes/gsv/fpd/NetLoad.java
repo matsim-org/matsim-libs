@@ -33,8 +33,8 @@ import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.io.ColorUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -88,7 +88,7 @@ public class NetLoad {
 		 */
 		NumericMatrixXMLReader mReader = new NumericMatrixXMLReader();
 		mReader.setValidating(false);
-		mReader.parse(matrixFile);
+		mReader.readFile(matrixFile);
 		NumericMatrix m = mReader.getMatrix();
 
 		MatrixOperations.applyFactor(m, 1.952898582487276);
@@ -108,7 +108,7 @@ public class NetLoad {
 		 */
 		Counts<Link> counts = new Counts();
 		CountsReaderMatsimV1 cReader = new CountsReaderMatsimV1(counts);
-		cReader.parse(countsFile);
+		cReader.readFile(countsFile);
 		/*
 		 * load zones
 		 */

@@ -24,14 +24,14 @@ import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.LocationMutator;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -73,17 +73,17 @@ public class RandomLocationMutator extends LocationMutator {
 					int length = this.facilitiesOfType.get(act.getType()).length;
 					// only one facility: do not need to do location choice
 					if (length > 1) {
-						this.setNewLocationForAct((ActivityImpl) act, length);
+						this.setNewLocationForAct((Activity) act, length);
 					}
 				}
 			}
 		}
 	}
 
-	private void setNewLocationForAct(ActivityImpl act, int length) {
+	private void setNewLocationForAct(Activity act, int length) {
 		ActivityFacilityImpl facility = this.facilitiesOfType.get(act.getType())[super.random.nextInt(length)];
 		act.setFacilityId(facility.getId());
-		act.setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) this.scenario.getNetwork()), facility.getCoord()).getId());
+		act.setLinkId(NetworkUtils.getNearestLink(((Network) this.scenario.getNetwork()), facility.getCoord()).getId());
 		act.setCoord(facility.getCoord());
 	}
 }

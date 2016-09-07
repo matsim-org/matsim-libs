@@ -25,7 +25,7 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.Date;
@@ -41,7 +41,7 @@ public class GenerateRandomSocialNetwork {
 		final String outputSocialNetworkFile = args[ 2 ];
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimPopulationReader( scenario ).readFile( inputPopulationFile );
+		new PopulationReader( scenario ).readFile( inputPopulationFile );
 
 		final Id[] ids = getIds( scenario );
 

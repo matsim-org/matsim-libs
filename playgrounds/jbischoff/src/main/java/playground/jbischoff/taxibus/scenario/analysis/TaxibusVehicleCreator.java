@@ -27,13 +27,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -98,7 +99,8 @@ public class TaxibusVehicleCreator
 		double x = 593084 + random.nextDouble()*(629810-593084);
 		double y = 5785583 + random.nextDouble()*(5817600-5785583);
 		Coord c = new Coord(x,y);
-		Link link = ((NetworkImpl) scenario.getNetwork()).getNearestLinkExactly(c);
+		final Coord coord = c;
+		Link link = NetworkUtils.getNearestLinkExactly(((Network) scenario.getNetwork()),coord);
         Vehicle v = new VehicleImpl(Id.create("tb"+i, Vehicle.class), link, 8, Math.round(1), Math.round(48*3600));
         vehicles.add(v);
 

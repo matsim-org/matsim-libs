@@ -35,8 +35,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
@@ -67,8 +65,7 @@ public class Incident2NetworkChangeEventsWriter {
 	private TMCAlerts tmc = null;
 	private String crs = null;
 	
-	private final NetworkChangeEventFactory nceFactory = new NetworkChangeEventFactoryImpl();
-		
+
 	public Incident2NetworkChangeEventsWriter(TMCAlerts tmc, Map<String, TrafficItem> trafficItems, Map<String, Path> trafficItemId2path, String crs) {
 		this.tmc = tmc;
 		this.trafficItems = trafficItems;
@@ -312,7 +309,7 @@ public class Incident2NetworkChangeEventsWriter {
 				if (debug) log.warn(incident.parametersToString());
 				
 				// incident start: change values
-				NetworkChangeEvent nceStart = nceFactory.createNetworkChangeEvent(incident.getStartTime());
+				NetworkChangeEvent nceStart = new NetworkChangeEvent(incident.getStartTime());
 				nceStart.addLink(incident.getLink());
 				
 				if (incident.getIncidentLink() == null) {
@@ -320,9 +317,9 @@ public class Incident2NetworkChangeEventsWriter {
 					log.warn("Incident link: " + incident.toString());
 				}
 				
-				nceStart.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, Math.round((incident.getIncidentLink().getCapacity() / 3600.) * 1000) / 1000.0));
-				nceStart.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getIncidentLink().getFreespeed()));
-				nceStart.setLanesChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getIncidentLink().getNumberOfLanes()));
+				nceStart.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, Math.round((incident.getIncidentLink().getCapacity() / 3600.) * 1000) / 1000.0));
+				nceStart.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, incident.getIncidentLink().getFreespeed()));
+				nceStart.setLanesChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, incident.getIncidentLink().getNumberOfLanes()));
 				
 				networkChangeEvents.add(nceStart);
 				
@@ -340,12 +337,12 @@ public class Incident2NetworkChangeEventsWriter {
 				
 				if (setBackToOriginalValues) {
 					// incident end: set back to original values
-					NetworkChangeEvent nceEnd = nceFactory.createNetworkChangeEvent(incident.getEndTime());
+					NetworkChangeEvent nceEnd = new NetworkChangeEvent(incident.getEndTime());
 					nceEnd.addLink(incident.getLink());
 					
-					nceEnd.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, Math.round((incident.getLink().getCapacity() / 3600.) * 1000) / 1000.0));
-					nceEnd.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getLink().getFreespeed()));
-					nceEnd.setLanesChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getLink().getNumberOfLanes()));
+					nceEnd.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, Math.round((incident.getLink().getCapacity() / 3600.) * 1000) / 1000.0));
+					nceEnd.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, incident.getLink().getFreespeed()));
+					nceEnd.setLanesChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, incident.getLink().getNumberOfLanes()));
 					
 					networkChangeEvents.add(nceEnd);
 				}

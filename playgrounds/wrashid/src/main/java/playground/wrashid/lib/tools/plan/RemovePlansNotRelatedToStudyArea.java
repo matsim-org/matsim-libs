@@ -5,10 +5,13 @@ import java.util.HashSet;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
@@ -27,18 +30,18 @@ public class RemovePlansNotRelatedToStudyArea {
 
 		Scenario scenario = GeneralLib.readScenario(inputPlansFile,
 				inputNetworkFile, inputFacilities);
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 
 		HashSet<Id> isRelevantForStudy = new HashSet<Id>();
 		HashSet<Id> notRelevantForStudy = new HashSet<Id>();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 
-			PersonImpl p = (PersonImpl) person;
+			Person p = (Person) person;
 			PersonUtils.removeUnselectedPlans(p);
 
 			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					ActivityImpl act = (ActivityImpl) pe;
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
 
 					if (GeneralLib.getDistance(
 							network.getLinks().get(act.getLinkId()).getCoord(),
@@ -49,8 +52,8 @@ public class RemovePlansNotRelatedToStudyArea {
 				}
 
 				if (!cut) {
-					if (pe instanceof LegImpl) {
-						LegImpl leg = (LegImpl) pe;
+					if (pe instanceof Leg) {
+						Leg leg = (Leg) pe;
 						if (leg.getMode().equalsIgnoreCase("car")) {
 							LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) leg
 									.getRoute();

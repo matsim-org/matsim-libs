@@ -51,7 +51,7 @@ public class PersonFilter {
 		XMLWriter writer = new XMLWriter();
 		
 		logger.info("Loading persons...");
-		parser.parse("/home/johannes/gsv/mid2008/pop/pop.xml");
+		parser.readFile("/home/johannes/gsv/mid2008/pop/pop.xml");
 //		parser.parse("/Users/jillenberger/Dropbox/work/raw/pop.xml");
 		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));

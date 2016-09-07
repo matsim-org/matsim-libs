@@ -54,9 +54,7 @@ public class GenerateCrossingsPopulation {
 		}
 
 		MatsimWriter popWriter = new PopulationWriter(population, network);
-		popWriter.write("C:/Users/polettif/Desktop/crossings/input/small/population.xml");
-
-
+		popWriter.write("population.xml");
 	}
 }
 

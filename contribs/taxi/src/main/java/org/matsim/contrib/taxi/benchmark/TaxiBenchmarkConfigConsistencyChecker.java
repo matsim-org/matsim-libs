@@ -20,12 +20,12 @@
 package org.matsim.contrib.taxi.benchmark;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.dvrp.run.VrpQSimConfigConsistencyChecker;
+import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.core.config.Config;
 
 
 public class TaxiBenchmarkConfigConsistencyChecker
-    extends VrpQSimConfigConsistencyChecker
+    extends TaxiConfigConsistencyChecker
 {
     private static final Logger log = Logger.getLogger(TaxiBenchmarkConfigConsistencyChecker.class);
 

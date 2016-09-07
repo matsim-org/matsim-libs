@@ -21,7 +21,6 @@ package org.matsim.contrib.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.run.VrpQSimConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
@@ -44,17 +43,24 @@ public class RunTaxiScenario
 
     public static Controler createControler(Config config, boolean otfvis)
     {
-        TaxiConfigGroup taxiCfg = (TaxiConfigGroup)config.getModule(TaxiConfigGroup.GROUP_NAME);
-        config.addConfigConsistencyChecker(new VrpQSimConfigConsistencyChecker());
+        TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+        config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
         config.checkConsistency();
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
         TaxiData taxiData = new TaxiData();
-        new VehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
+        new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
+        return createControler(scenario, taxiData, otfvis);
+    }
 
+
+    public static Controler createControler(Scenario scenario, TaxiData taxiData, boolean otfvis)
+    {
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new TaxiModule(taxiData, taxiCfg));
-        controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule());
+        controler.addOverridingModule(new TaxiModule(taxiData));
+        double expAveragingAlpha = 0.05;//from the AV flow paper 
+        controler.addOverridingModule(
+                VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
         controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
 
         if (otfvis) {

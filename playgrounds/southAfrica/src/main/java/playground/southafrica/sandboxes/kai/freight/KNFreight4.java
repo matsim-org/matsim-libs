@@ -49,13 +49,15 @@ import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
-import org.matsim.core.controler.*;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerDefaults;
+import org.matsim.core.controler.ControlerUtils;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
@@ -220,7 +222,7 @@ public class KNFreight4 {
 
 	private static Carriers createCarriers(CarrierVehicleTypes vehicleTypes) {
 		Carriers carriers = new Carriers() ;
-		new CarrierPlanXmlReaderV2(carriers).read(CARRIERS) ;
+		new CarrierPlanXmlReaderV2(carriers).readFile(CARRIERS) ;
 
 		// assign vehicle types to the carriers (who already have their vehicles (??)):
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes) ;
@@ -230,7 +232,7 @@ public class KNFreight4 {
 
 	private static CarrierVehicleTypes createVehicleTypes() {
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-		new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPES) ;
+		new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPES) ;
 		return vehicleTypes;
 	}
 
@@ -264,22 +266,23 @@ public class KNFreight4 {
 
 
 	private static void configureTimeDependentNetwork(Scenario scenario) {
-		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl() ;
 		for ( Link link : scenario.getNetwork().getLinks().values() ) {
 			double speed = link.getFreespeed() ;
 			final double threshold = 5./3.6;
 			if ( speed > threshold ) {
 				{
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(7.*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold/10 ));
+					NetworkChangeEvent event = new NetworkChangeEvent(7.*3600.) ;
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  threshold/10 ));
 					event.addLink(link);
-					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+					final NetworkChangeEvent event1 = event;
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 				}
 				{
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(11.5*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
+					NetworkChangeEvent event = new NetworkChangeEvent(11.5*3600.) ;
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  speed ));
 					event.addLink(link);
-					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+					final NetworkChangeEvent event1 = event;
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 				}
 			}
 		}

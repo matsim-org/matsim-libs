@@ -29,16 +29,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * @author thibautd
@@ -47,7 +44,7 @@ public class TourModeUnifierAlgorithmTest {
 
 	@Test
 	public void testPlanWithOneSingleTour() throws Exception {
-		final Plan plan = new PlanImpl(PopulationUtils.createPerson(Id.create("jojo", Person.class)));
+		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("jojo", Person.class)));
 
 		final Id<Link> anchorLink1 = Id.create( "anchor1" , Link.class );
 		final Id<Link> anchorLink2 = Id.create( "anchor2" , Link.class );
@@ -56,61 +53,61 @@ public class TourModeUnifierAlgorithmTest {
 		final String stageType = "stage";
 		final String mode = "the_mode";
 
-		plan.addActivity( new ActivityImpl( "h" , anchorLink1 ) );
-		plan.addLeg( new LegImpl( mode ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "w" , anchorLink2 ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( stageType , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( stageType , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( stageType , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "w" , anchorLink2 ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( stageType , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "h" , anchorLink1 ) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", anchorLink1) );
+		plan.addLeg( PopulationUtils.createLeg(mode) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("w", anchorLink2) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId(stageType, Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId(stageType, Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId(stageType, Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("w", anchorLink2) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId(stageType, Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", anchorLink1) );
 
 		final StageActivityTypes types = new StageActivityTypesImpl( stageType );
 		final int nActs = TripStructureUtils.getActivities( plan , types ).size();
@@ -140,7 +137,7 @@ public class TourModeUnifierAlgorithmTest {
 
 	@Test
 	public void testPlanWithTwoToursOnOpenTour() throws Exception {
-		final Plan plan = new PlanImpl(PopulationUtils.createPerson(Id.create("jojo", Person.class)));
+		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("jojo", Person.class)));
 
 		final Id<Link> entranceLink = Id.create( "entrance" , Link.class );
 		final Id<Link> exitLink = Id.create( "exit" , Link.class );
@@ -153,37 +150,37 @@ public class TourModeUnifierAlgorithmTest {
 		final String mode2 = "second_mode";
 		final String modeOfOpenTour = "space_shuttle";
 
-		plan.addActivity( new ActivityImpl( "e" , entranceLink ) );
-		plan.addLeg( new LegImpl( modeOfOpenTour ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( modeOfOpenTour ) );
-		plan.addActivity( new ActivityImpl( stageType , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( modeOfOpenTour ) );
-		plan.addActivity( new ActivityImpl( "h" , anchorLink1 ) );
-		plan.addLeg( new LegImpl( mode1 ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "h" , anchorLink1 ) );
-		plan.addLeg( new LegImpl( modeOfOpenTour ) );
-		plan.addActivity( new ActivityImpl( stageType , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( modeOfOpenTour ) );
-		plan.addActivity( new ActivityImpl( "w" , anchorLink2 ) );
-		plan.addLeg( new LegImpl( mode2 ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "w" , anchorLink2 ) );
-		plan.addLeg( new LegImpl( modeOfOpenTour ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( modeOfOpenTour ) );
-		plan.addActivity( new ActivityImpl( "s" , exitLink ) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("e", entranceLink) );
+		plan.addLeg( PopulationUtils.createLeg(modeOfOpenTour) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg(modeOfOpenTour) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId(stageType, Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg(modeOfOpenTour) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", anchorLink1) );
+		plan.addLeg( PopulationUtils.createLeg(mode1) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", anchorLink1) );
+		plan.addLeg( PopulationUtils.createLeg(modeOfOpenTour) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId(stageType, Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg(modeOfOpenTour) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("w", anchorLink2) );
+		plan.addLeg( PopulationUtils.createLeg(mode2) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("w", anchorLink2) );
+		plan.addLeg( PopulationUtils.createLeg(modeOfOpenTour) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg(modeOfOpenTour) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("s", exitLink) );
 
 
 		final StageActivityTypes types = new StageActivityTypesImpl( stageType );
@@ -240,7 +237,7 @@ public class TourModeUnifierAlgorithmTest {
 
 	@Test
 	public void testPlanWithTwoHomeBasedTours() throws Exception {
-		final Plan plan = new PlanImpl(PopulationUtils.createPerson(Id.create("jojo", Person.class)));
+		final Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create("jojo", Person.class)));
 
 		final Id<Link> anchorLink = Id.create( "anchor" , Link.class );
 		final Random random = new Random( 234 );
@@ -249,25 +246,25 @@ public class TourModeUnifierAlgorithmTest {
 		final String mode1 = "first_mode";
 		final String mode2 = "second_mode";
 
-		plan.addActivity( new ActivityImpl( "h" , anchorLink ) );
-		plan.addLeg( new LegImpl( mode1 ) );
-		plan.addActivity( new ActivityImpl( stageType , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "h" , anchorLink ) );
-		plan.addLeg( new LegImpl( mode2 ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , Id.create( random.nextLong() , Link.class ) ) );
-		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
-		plan.addActivity( new ActivityImpl( "h" , anchorLink ) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", anchorLink) );
+		plan.addLeg( PopulationUtils.createLeg(mode1) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId(stageType, Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", anchorLink) );
+		plan.addLeg( PopulationUtils.createLeg(mode2) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("type-"+random.nextLong(), Id.create( random.nextLong() , Link.class )) );
+		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
+		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", anchorLink) );
 
 		final StageActivityTypes types = new StageActivityTypesImpl( stageType );
 		final int nActs = TripStructureUtils.getActivities( plan , types ).size();

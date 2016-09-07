@@ -46,7 +46,7 @@ public class EventFileSplitter {
 		events.addHandler(setmsf);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		reader.setValidating(false);
-		reader.parse(inFileName);
+		reader.readFile(inFileName);
 		setmsf.writeQueue();
 		setmsf.closeFile();
 		

@@ -105,7 +105,7 @@ public class PersonTripAnalysisTest {
 	
 			log.info("Reading the congestion events file...");
 			CongestionEventsReader congestionEventsReader = new CongestionEventsReader(eventsCongestion);		
-			congestionEventsReader.parse(eventsFile);
+			congestionEventsReader.readFile(eventsFile);
 			log.info("Reading the congestion events file... Done.");		
 		}	
 		
@@ -119,7 +119,7 @@ public class PersonTripAnalysisTest {
 					
 			log.info("Reading noise events file...");
 			NoiseEventsReader noiseEventReader = new NoiseEventsReader(eventsNoise);		
-			noiseEventReader.parse(eventsFile);
+			noiseEventReader.readFile(eventsFile);
 			log.info("Reading noise events file... Done.");	
 		}	
 		

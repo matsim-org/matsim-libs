@@ -31,10 +31,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
+import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.population.algorithms.XY2Links;
 
 import playground.jjoubert.Utilities.roadpricing.MyDemandMatrix;
 
@@ -115,7 +115,7 @@ public class createDemandFromSaturnMatrix {
 		Scenario sc = mdm.generateDemand(list, new Random(5463), populationFraction, "car");
 		
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc.getNetwork());
-		nr.parse(networkFilename);
+		nr.readFile(networkFilename);
 		
 		XY2Links xy = new XY2Links(sc.getNetwork(), null);
 		xy.run(sc.getPopulation());

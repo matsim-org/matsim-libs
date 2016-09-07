@@ -24,18 +24,17 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.algorithms.PersonAlgorithm;
-import org.matsim.population.algorithms.TripsToLegsAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -53,15 +52,15 @@ public class KeepOnlySelectedPlanAndSimplifyTrips {
 
 		final ObjectAttributes atts = new ObjectAttributes();
 		if ( inputAttributes != null ) {
-			new ObjectAttributesXmlReader( atts ).parse( inputAttributes );
+			new ObjectAttributesXmlReader( atts ).readFile( inputAttributes );
 		}
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		final PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
-		pop.setIsStreaming( true );
+		final Population pop = (Population) scenario.getPopulation();
+		StreamingUtils.setIsStreaming(pop, true);
 
-		final PopulationWriter writer =
-			new PopulationWriter(
+		final StreamingPopulationWriter writer =
+			new StreamingPopulationWriter(
 					scenario.getPopulation(),
 					scenario.getNetwork() );
 		writer.writeStartPlans( outPopulation );
@@ -72,16 +71,16 @@ public class KeepOnlySelectedPlanAndSimplifyTrips {
 						PtConstants.TRANSIT_ACTIVITY_TYPE ),
 					new MainModeIdentifierImpl()
 					);
-		pop.addAlgorithm( new PersonAlgorithm() {
+		StreamingUtils.addAlgorithm(pop, new PersonAlgorithm() {
 			@Override
 			public void run(final Person person) {
 				if ( atts.getAttribute( person.getId().toString() , "subpopulation" ) != null ) return;
-				PersonUtils.removeUnselectedPlans(((PersonImpl) person));
+				PersonUtils.removeUnselectedPlans(((Person) person));
 				trips2legs.run( person.getSelectedPlan() );
-
+		
 				for ( PlanElement pe : person.getSelectedPlan().getPlanElements() ) {
 					if ( pe instanceof Activity ) {
-						((ActivityImpl) pe).setLinkId( null );
+						((Activity) pe).setLinkId( null );
 					}
 					if ( pe instanceof Leg ) {
 						((Leg) pe).setRoute( null );
@@ -91,7 +90,7 @@ public class KeepOnlySelectedPlanAndSimplifyTrips {
 			}
 		});
 
-		new MatsimPopulationReader( scenario ).parse( inPopulation );
+		new PopulationReader( scenario ).readFile( inPopulation );
 		writer.writeEndPlans();
 	}
 }

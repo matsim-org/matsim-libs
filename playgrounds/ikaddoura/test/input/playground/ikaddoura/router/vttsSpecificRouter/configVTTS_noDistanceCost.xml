@@ -3,11 +3,11 @@
 <config>
 
 	<module name="network" >
-		<param name="inputNetworkFile" value="test/input/playground/ikaddoura/router/vttsSpecificRouter/networkVTTS.xml" />
+		<param name="inputNetworkFile" value="networkVTTS.xml" />
 	</module>
 	
 	<module name="plans" >
-		 <param name="inputPlansFile" value="test/input/playground/ikaddoura/router/vttsSpecificRouter/populationVTTS.xml" />
+		 <param name="inputPlansFile" value="populationVTTS.xml" />
 	</module>
 	
 	<module name="controler">

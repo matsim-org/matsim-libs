@@ -89,7 +89,7 @@ public class AdjustTypes {
 
         XMLHandler parser = new XMLHandler(new PlainFactory());
         parser.setValidating(false);
-        parser.parse(args[3]);
+        parser.readFile(args[3]);
         Set<? extends Person> persons = parser.getPersons();
         TaskRunner.run(new Route2GeoDistance(new Simulator.Route2GeoDistFunction()), persons);
         TaskRunner.run(new ReplaceActTypes(), persons);

@@ -237,7 +237,7 @@ public class CongestionAnalysisTest {
 //		congestionEventsReader.parse(eventsFile);
 		
 		CNEventsReader reader = new CNEventsReader(events);
-		reader.parse(eventsFile);
+		reader.readFile(eventsFile);
 		
 		log.info("Reading the events file... Done.");
 		return congestionHandler;

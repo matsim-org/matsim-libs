@@ -16,7 +16,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
@@ -29,10 +31,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -325,8 +325,9 @@ public class ReadFromUrbanSimModel {
 				// see reason of this flag below
 				compensationFlag = false;
 				currentZoneLocations	 = new ZoneLocations();
+				final Id<Person> id = personId;
 				
-				Person newPerson = PopulationUtils.createPerson(personId);
+				Person newPerson = PopulationUtils.getFactory().createPerson(id);
 
 				// get home location id
 				Id<ActivityFacility> homeZoneId = Id.create( parts[ indexZoneID_HOME ], ActivityFacility.class );
@@ -345,7 +346,7 @@ public class ReadFromUrbanSimModel {
 				}
 
 				// add home location to plan
-				PlanImpl plan = PersonUtils.createAndAddPlan(newPerson, true);
+				Plan plan = PersonUtils.createAndAddPlan(newPerson, true);
 				CreateHomeWorkHomePlan.makeHomePlan(plan, homeCoord, homeLocation) ;
 
 				// determine employment status
@@ -443,8 +444,9 @@ public class ReadFromUrbanSimModel {
 				
 				// see reason of this flag below
 				compensationFlag = false;
+				final Id<Person> id = personId;
 				
-				Person newPerson = PopulationUtils.createPerson(personId);
+				Person newPerson = PopulationUtils.getFactory().createPerson(id);
 
 				// get home location id
 				Id<ActivityFacility> homeParcelId = Id.create( parts[ indexParcelID_HOME ], ActivityFacility.class );
@@ -460,7 +462,7 @@ public class ReadFromUrbanSimModel {
 				}
 
 				// add home location to plan
-				PlanImpl plan = PersonUtils.createAndAddPlan(newPerson, true);
+				Plan plan = PersonUtils.createAndAddPlan(newPerson, true);
 				CreateHomeWorkHomePlan.makeHomePlan(plan, homeCoord, homeLocation) ;
 
 				// determine employment status
@@ -639,8 +641,8 @@ public class ReadFromUrbanSimModel {
 			}
 			
 			// get home location from old plans file and current UrbanSim data
-			Activity oldHomeAct = ((PlanImpl) oldPerson.getSelectedPlan()).getFirstActivity();
-			Activity newHomeAct = ((PlanImpl) newPerson.getSelectedPlan()).getFirstActivity();
+			Activity oldHomeAct = PopulationUtils.getFirstActivity( ((Plan) oldPerson.getSelectedPlan()) );
+			Activity newHomeAct = PopulationUtils.getFirstActivity( ((Plan) newPerson.getSelectedPlan()) );
 			
 			// for parcels check if activity location has changed. if true accept as new person
 			if ( isParcel && actHasChanged ( oldHomeAct, newHomeAct, network ) ) { // for parcels
@@ -689,8 +691,8 @@ public class ReadFromUrbanSimModel {
 			}
 
 			// check if work act has changed:
-			ActivityImpl oldWorkAct = (ActivityImpl) oldPerson.getSelectedPlan().getPlanElements().get(2);
-			ActivityImpl newWorkAct = (ActivityImpl) newPerson.getSelectedPlan().getPlanElements().get(2);
+			Activity oldWorkAct = (Activity) oldPerson.getSelectedPlan().getPlanElements().get(2);
+			Activity newWorkAct = (Activity) newPerson.getSelectedPlan().getPlanElements().get(2);
 			
 			// for parcels check if activity location has changed. if true accept as new person
 			if ( isParcel && actHasChanged ( oldWorkAct, newWorkAct, network ) ) { // for parcels
@@ -993,7 +995,7 @@ public class ReadFromUrbanSimModel {
 						
 						{ // aggregating persons to nearest network nodes
 							assert( homeLocation.getCoord() != null );
-							Node nearestNode = ((NetworkImpl)network).getNearestNode( homeLocation.getCoord() );
+							Node nearestNode = NetworkUtils.getNearestNode(((Network)network),homeLocation.getCoord());
 							assert( nearestNode != null );
 	
 							if( personClusterMap.containsKey( nearestNode.getId() ) ){

@@ -20,6 +20,7 @@
 
 package org.matsim.pt.transitSchedule.api;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.facilities.Facility;
@@ -53,4 +54,6 @@ public interface TransitStopFacility extends Facility<TransitStopFacility> {
 
 	public void setStopPostAreaId(String stopPostAreaId);
 
+	public void setCoord(Coord coord);
+	
 }

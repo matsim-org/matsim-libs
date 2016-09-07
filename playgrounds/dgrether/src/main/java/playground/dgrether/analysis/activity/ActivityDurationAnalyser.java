@@ -23,15 +23,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
@@ -100,7 +100,7 @@ public class ActivityDurationAnalyser {
 		//reading plans, filter and calculate activity durations
 		for (String file : plansFiles) {
 			Population plans = scenario.getPopulation();
-			MatsimPopulationReader plansParser = new MatsimPopulationReader(scenario);
+			PopulationReader plansParser = new PopulationReader(scenario);
 			plansParser.readFile(file);
 			ActivityDurationCounter adc = new ActivityDurationCounter();
 			System.out.println("Handling plans: " + file);
@@ -116,14 +116,14 @@ public class ActivityDurationAnalyser {
 		}
 	}
 
-	private void calculateActivityDurations(final Map<String, List<ActivityImpl>> typeActivityMap) {
+	private void calculateActivityDurations(final Map<String, List<Activity>> typeActivityMap) {
 		System.out.println("Calculating activity durations...");
 		System.out.println("activity type \t number of activities \t absolute duration \t average duration" );
-		for (List<ActivityImpl> actList : typeActivityMap.values()) {
+		for (List<Activity> actList : typeActivityMap.values()) {
 			double durations = 0.0;
 			double dur, startTime, endTime;
 //			System.out.println("Processing activity type: " + actList.get(0).getType());
-			for (ActivityImpl act : actList) {
+			for (Activity act : actList) {
 				dur = act.getMaximumDuration();
 				ActivityParams actParams = this.config.planCalcScore().getActivityParams(act.getType());
 				if (!(Double.isInfinite(dur) || Double.isNaN(dur))) {
@@ -167,28 +167,28 @@ public class ActivityDurationAnalyser {
 	 */
 	private class ActivityDurationCounter  {
 
-		private final Map<String, List<ActivityImpl>> typeActivityMap;
-		private final Map<String, List<ActivityImpl>> simpleTypeActivityMap;
+		private final Map<String, List<Activity>> typeActivityMap;
+		private final Map<String, List<Activity>> simpleTypeActivityMap;
 
 		ActivityDurationCounter() {
-			this.typeActivityMap = new HashMap<String, List<ActivityImpl>>();
-			this.simpleTypeActivityMap = new HashMap<String, List<ActivityImpl>>();
+			this.typeActivityMap = new HashMap<String, List<Activity>>();
+			this.simpleTypeActivityMap = new HashMap<String, List<Activity>>();
 		}
 
 		public void handlePlan(final Plan plan) {
 //			System.out.println("handling plan " + typeActivityMap);
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					ActivityImpl activity = (ActivityImpl) pe;
+				if (pe instanceof Activity) {
+					Activity activity = (Activity) pe;
 //				System.out.println("handling act: " + activity.getType());
-					List<ActivityImpl> acts = this.typeActivityMap.get(activity.getType());
-					List<ActivityImpl> acts2 = this.simpleTypeActivityMap.get(activity.getType().substring(0,1));
+					List<Activity> acts = this.typeActivityMap.get(activity.getType());
+					List<Activity> acts2 = this.simpleTypeActivityMap.get(activity.getType().substring(0,1));
 					if (acts == null) {
-						acts = new ArrayList<ActivityImpl>();
+						acts = new ArrayList<Activity>();
 						this.typeActivityMap.put(activity.getType(), acts);
 					}
 					if (acts2 == null) {
-						acts2 = new ArrayList<ActivityImpl>();
+						acts2 = new ArrayList<Activity>();
 						this.simpleTypeActivityMap.put(activity.getType().substring(0,1), acts2);
 					}
 					acts.add(activity);
@@ -197,11 +197,11 @@ public class ActivityDurationAnalyser {
 			}
 		}
 
-		public Map<String, List<ActivityImpl>> getTypeActivityMap() {
+		public Map<String, List<Activity>> getTypeActivityMap() {
 			return this.typeActivityMap;
 		}
 
-		public Map<String, List<ActivityImpl>> getSimpleTypeActivityMap() {
+		public Map<String, List<Activity>> getSimpleTypeActivityMap() {
 			return this.simpleTypeActivityMap;
 		}
 	}

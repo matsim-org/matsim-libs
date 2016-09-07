@@ -23,13 +23,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -69,12 +69,12 @@ public class ODAdjustorRun {
 //		facReader.readFile("/home/johannes/gsv/ger/data/facilities.xml.gz");
 		facReader.readFile(args[1]);
 
-		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
+		PopulationReader popReader = new PopulationReader(scenario);
 //		popReader.readFile("/home/johannes/gsv/ger/data/plans.xml.gz");
 		popReader.readFile(args[2]);
 
 		logger.info("Connecting facilities to links...");
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
 			Coord coord = facility.getCoord();
 			Link link = NetworkUtils.getNearestLink(network, coord);
@@ -91,7 +91,7 @@ public class ODAdjustorRun {
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 //		reader.parse("/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml");
-		reader.parse(args[3]);
+		reader.readFile(args[3]);
 		NumericMatrix refMatrix = reader.getMatrix();
 //		MatrixOperations.multiply(refMatrix, 1 / 16.0);
 //		MatrixOperations.multiply(refMatrix, 1 / (4 * 11.8));

@@ -2,7 +2,6 @@ package playground.dziemke.cemdapMatsimCadyts.controller;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,69 +32,61 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.counts.Counts;
 
 public class CadytsEquilControllerBasedOnDistributions {
-	private final static Logger log = Logger.getLogger(CadytsEquilControllerBasedOnDistributions.class);
-//	private final static String CADYTS = "cadytsCar";
+//	private final static Logger LOG = Logger.getLogger(CadytsEquilControllerBasedOnDistributions.class);
 
 	public static void main(final String[] args) {
 		final Config config = ConfigUtils.createConfig();
 
-		// global
+		// Global
 		config.global().setRandomSeed(4711);
 		config.global().setCoordinateSystem("Atlantis");
 
-		// network
-		String inputNetworkFile = "/Users/dominik/SVN/shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/network_diff_lengths2.xml";
+		// Network
+		String inputNetworkFile = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/network_diff_lengths2.xml";
 		config.network().setInputFile(inputNetworkFile);
 
-		// plans
-		String inputPlansFile = "/Users/dominik/SVN/shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/plans1000.xml";
+		// Plans
+		String inputPlansFile = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/plans1000.xml";
 		config.plans().setInputFile(inputPlansFile);
 
-		//simulation
+		// Simulation
 		config.qsim().setStartTime(0.);
 		config.qsim().setEndTime(0.);
 		config.qsim().setSnapshotPeriod(0.);
 
-		// counts
-		//		String countsFileName = "/Users/dominik/Workspace/data/examples/equil/input/counts100-200.xml";
-		//		config.counts().setCountsFileName(countsFileName);
-		//		//config.counts().setCountsScaleFactor(100);
-		//		config.counts().setOutputFormat("all");
+		// Counts
+//		String countsFileName = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/counts100-200.xml";
+//		config.counts().setCountsFileName(countsFileName);
+//		//config.counts().setCountsScaleFactor(100);
+//		config.counts().setOutputFormat("all");
 
-		// vsp experimental
+		// VSP experimental
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn );
 
-		// controller
-		String runId = "80";
-		String outputDirectory = "/Users/dominik/SVN/shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/output/" + runId + "/";
+		// Controller
+		String runId = "80-2016";
+		String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/output/" + runId + "/";
 		config.controler().setRunId(runId);
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(200);
-		//		config.controler().setLastIteration(10);
 		Set<String> snapshotFormat = new HashSet<String>();
-		//snapshotFormat.add("otfvis");
 		config.controler().setSnapshotFormat(snapshotFormat);
 
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 
 		{
-			StrategySettings strategySettings2 = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
-			strategySettings2.setStrategyName( DefaultStrategy.ReRoute.name() );
-			strategySettings2.setWeight(0.1);
-			strategySettings2.setDisableAfter(90);
-			config.strategy().addStrategySettings(strategySettings2);
+			StrategySettings strategySettings = new StrategySettings() ;
+			strategySettings.setStrategyName( DefaultStrategy.ReRoute.name() );
+			strategySettings.setWeight(0.1);
+			strategySettings.setDisableAfter(90);
+			config.strategy().addStrategySettings(strategySettings);
 		}{				
-			StrategySettings strategySettings2 = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
-			strategySettings2.setStrategyName( DefaultSelector.ChangeExpBeta.name() );
-			strategySettings2.setWeight(0.9);
-			config.strategy().addStrategySettings(strategySettings2);
+			StrategySettings strategySettings = new StrategySettings() ;
+			strategySettings.setStrategyName( DefaultSelector.ChangeExpBeta.name() );
+			strategySettings.setWeight(0.9);
+			config.strategy().addStrategySettings(strategySettings);
 		}
-
-		//		StrategySettings strategySettings4 = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
-		//		strategySettings4.setStrategyName(CADYTS);
-		//		strategySettings4.setWeight(1.);
-		//		config.strategy().addStrategySettings(strategySettings4);
 
 		config.strategy().setMaxAgentPlanMemorySize(5);
 
@@ -110,13 +101,13 @@ public class CadytsEquilControllerBasedOnDistributions {
 		workActivity.setClosingTime(18*60*60);
 		config.planCalcScore().addActivityParams(workActivity);
 
-		// start controller
+		// Start controller
 		final Controler controler = new Controler(config);
 
-		final MeasurementCadytsContext cContext2 = new MeasurementCadytsContext(config, buildMeasurements());
-		controler.addControlerListener(cContext2);
+		final MeasurementCadytsContext cadytsContext = new MeasurementCadytsContext(config, buildMeasurements());
+		controler.addControlerListener(cadytsContext);
 
-		// scoring function
+		// Scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
@@ -130,53 +121,51 @@ public class CadytsEquilControllerBasedOnDistributions {
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-				final CadytsScoring<Measurement> scoringFunction2 = new CadytsScoring<>(person.getSelectedPlan(), config, cContext2);
-				final double cadytsScoringWeight2 = config.planCalcScore().getBrainExpBeta() ;
-				scoringFunction2.setWeightOfCadytsCorrection(cadytsScoringWeight2) ;
-				scoringFunctionAccumulator.addScoringFunction(scoringFunction2 );
+				final CadytsScoring<Measurement> cadytsScoring = new CadytsScoring<>(person.getSelectedPlan(), config, cadytsContext);
+				final double cadytsScoringWeight = config.planCalcScore().getBrainExpBeta() ;
+				cadytsScoring.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
+				scoringFunctionAccumulator.addScoringFunction(cadytsScoring );
 
 				return scoringFunctionAccumulator;
 			}
 		}) ;
-
-
-
+		
 		controler.run() ;
 	}
 
 
-	private static TreeMap<Integer, Integer> buildMeasurementsMapCumulative(){
-		TreeMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
-
-		map.put(69200, 10);
-		map.put(69400, 50);
-		map.put(69600, 150);
-		map.put(69800, 300);
-		map.put(70000, 700);
-		map.put(70200, 850);
-		map.put(70400, 950);
-		map.put(70600, 990);
-		map.put(70800, 1000);
-
-		return map;
-	}
-
-
-	private static TreeMap<Integer, Integer> buildMeasurementsMapSingle(){
-		TreeMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
-
-		map.put(69200, 10);
-		map.put(69400, 40);
-		map.put(69600, 100);
-		map.put(69800, 150);
-		map.put(70000, 300);
-		map.put(70200, 150);
-		map.put(70400, 100);
-		map.put(70600, 40);
-		map.put(70800, 10);
-
-		return map;
-	}
+//	private static TreeMap<Integer, Integer> buildMeasurementsMapCumulative(){
+//		TreeMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
+//
+//		map.put(69200, 10);
+//		map.put(69400, 50);
+//		map.put(69600, 150);
+//		map.put(69800, 300);
+//		map.put(70000, 700);
+//		map.put(70200, 850);
+//		map.put(70400, 950);
+//		map.put(70600, 990);
+//		map.put(70800, 1000);
+//
+//		return map;
+//	}
+//
+//
+//	private static TreeMap<Integer, Integer> buildMeasurementsMapSingle(){
+//		TreeMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
+//
+//		map.put(69200, 10);
+//		map.put(69400, 40);
+//		map.put(69600, 100);
+//		map.put(69800, 150);
+//		map.put(70000, 300);
+//		map.put(70200, 150);
+//		map.put(70400, 100);
+//		map.put(70600, 40);
+//		map.put(70800, 10);
+//
+//		return map;
+//	}
 
 
 	private static Tuple<Counts<Measurement>,Measurements> buildMeasurements(){

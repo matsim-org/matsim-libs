@@ -23,20 +23,17 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.router.TripRouterModule;
-import org.matsim.core.scenario.ScenarioByInstanceModule;
+import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
-import org.matsim.population.algorithms.XY2Links;
+
 import playground.ivt.maxess.nestedlogitaccessibility.framework.AccessibilityComputationResult;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.BaseNestedAccessibilityComputationModule;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.InjectionUtils;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitAccessibilityCalculator;
 import playground.ivt.maxess.nestedlogitaccessibility.scripts.AdvantageColumnCalculator;
-import playground.ivt.maxess.nestedlogitaccessibility.scripts.ModeNests;
 import playground.ivt.maxess.nestedlogitaccessibility.scripts.NestedAccessibilityConfigGroup;
 import playground.ivt.maxess.nestedlogitaccessibility.writers.BasicPersonAccessibilityWriter;
 import playground.ivt.router.CachingFreespeedCarRouterModule;
@@ -73,17 +70,17 @@ public class RunCapeTownAccessibility {
 			filter.filter( carNetwork, Collections.singleton( "car" ) );
 			new WorldConnectLocations( config ).connectFacilitiesWithLinks(
 					scenario.getActivityFacilities(),
-					(NetworkImpl) carNetwork );
+					(Network) carNetwork );
 
 			new XY2Links( carNetwork , scenario.getActivityFacilities() ).run( scenario.getPopulation() );
 
-			final NestedLogitAccessibilityCalculator<ModeNests> calculator =
+			final NestedLogitAccessibilityCalculator<CapeTownModeNests> calculator =
 					InjectionUtils.createCalculator(
 							config,
-							new TypeLiteral<ModeNests>() {
+							new TypeLiteral<CapeTownModeNests>() {
 							},
 							InjectionUtils.override(
-									new BaseNestedAccessibilityComputationModule<ModeNests>(
+									new BaseNestedAccessibilityComputationModule<CapeTownModeNests>(
 											scenario ) {},
 									Arrays.asList(
 											new LazyScheduleBasedMatrixModule(),

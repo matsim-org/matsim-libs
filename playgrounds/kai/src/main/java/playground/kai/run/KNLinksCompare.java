@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.analysis.kai.KNAnalysisEventsHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -56,10 +56,10 @@ public class KNLinksCompare {
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 
 		ObjectAttributes net1Attribs = new ObjectAttributes() ;
-		new ObjectAttributesXmlReader( net1Attribs ).parse( args[1] );
+		new ObjectAttributesXmlReader( net1Attribs ).readFile( args[1] );
 
 		ObjectAttributes net2Attribs = new ObjectAttributes() ;
-		new ObjectAttributesXmlReader( net2Attribs ).parse( args[2] );
+		new ObjectAttributesXmlReader( net2Attribs ).readFile( args[2] );
 
 		BufferedWriter writerLo = IOUtils.getBufferedWriter( "linksLo.txt" ) ;
 		BufferedWriter writerHi = IOUtils.getBufferedWriter( "linksHi.txt" ) ;

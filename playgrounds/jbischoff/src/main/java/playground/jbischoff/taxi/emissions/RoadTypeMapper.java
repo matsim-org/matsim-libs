@@ -25,7 +25,8 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.core.config.*;
 import org.matsim.core.network.*;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -41,8 +42,8 @@ public class RoadTypeMapper {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(dir+"berlin_brb.xml");
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		NetworkImpl net2 = (NetworkImpl) NetworkUtils.createNetwork();
+		Network network = (Network) scenario.getNetwork();
+		Network net2 = (Network) NetworkUtils.createNetwork();
 		
 		 for (Node n : network.getNodes().values()){
 	            Node newNode = n;
@@ -51,14 +52,19 @@ public class RoadTypeMapper {
 	            net2.addNode(newNode);
 	        }
 		
-		for (Entry<Id<Link>, Link> e :  network.getLinks().entrySet()){
-			LinkImpl l = (LinkImpl) e.getValue();
+		for (Entry<Id<Link>, ? extends Link> e :  network.getLinks().entrySet()){
+			Link l = (Link) e.getValue();
 			double freespeed = l.getFreespeed();
-			if (freespeed<9) l.setType("75");
-			else if (freespeed<14) l.setType("43");
-			else if (freespeed<17) l.setType("45");
-			else if (freespeed<23) l.setType("14");
-			else  l.setType("11");
+			if (freespeed<9)
+				NetworkUtils.setType( l, (String) "75");
+			else if (freespeed<14)
+				NetworkUtils.setType( l, (String) "43");
+			else if (freespeed<17)
+				NetworkUtils.setType( l, (String) "45");
+			else if (freespeed<23)
+				NetworkUtils.setType( l, (String) "14");
+			else
+				NetworkUtils.setType( l, (String) "11");
 			net2.addLink(l);
 		}
 	new NetworkWriter(net2).write(dir+"berlin_brb_t.xml");

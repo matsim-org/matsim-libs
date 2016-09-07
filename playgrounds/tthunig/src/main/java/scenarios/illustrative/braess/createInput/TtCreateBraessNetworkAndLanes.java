@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.lanes.LanesUtils;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.Lanes;
@@ -69,14 +69,15 @@ public final class TtCreateBraessNetworkAndLanes {
 	private LaneType laneType = LaneType.NONE; 
 	private boolean btuRun = false;
 	private int numberOfPersons;
-	private double capTolerance = 0.0;
 	
-	// capacity at the links that all agents have to use
+	// capacity of the links that all agents have to use
 	private double capFirstLast; // [veh/h]
-	// capacity at middle link
+	// capacity of middle link (use the default capacity if it is 0.0)
 	private double capZ; // [veh/h]
-	// capacity at all other links
-	private double capMain; // [veh/h]
+	// capacity of slow links (24, 35)
+	private double capSlow; // [veh/h]
+	// capacity of fast links (23, 45)
+	private double capFast; // [veh/h]
 	// link length for the inflow links
 	private double inflowLinkLength; // [m]
 	// link length for all links with big travel time
@@ -115,22 +116,30 @@ public final class TtCreateBraessNetworkAndLanes {
 
 	private void initNetworkParams() {
 		if (btuRun){
-			capFirstLast = numberOfPersons;
-			capMain = numberOfPersons;
-			capZ = capMain;
+			/* use defaults if capacities are not set yet */
+			if (capFirstLast == 0.0) capFirstLast = numberOfPersons;
+			if (capSlow == 0.0) capSlow = numberOfPersons;
+			if (capFast == 0.0) capFast = numberOfPersons;
+			if (capZ == 0.0) capZ = capSlow;
+			
 			inflowLinkLength = 7.5 * 1;
 			linkLengthSmall = 200;
 			linkTTMid = 1;
 			linkTTSmall = 10;
 			linkTTBig = 20;
+			
 			minimalLinkTT = 1;
 		} else {
-			capFirstLast = numberOfPersons + 400;
-			capMain = (numberOfPersons / 2 ) * (1 + capTolerance);
-			capZ = capMain;
+			/* use defaults if capacities are not set yet */
+			if (capFirstLast == 0.0) capFirstLast = numberOfPersons;
+			if (capSlow == 0.0) capSlow = numberOfPersons / 2 ;
+			if (capFast == 0.0) capFast = numberOfPersons / 2 ;
+			if (capZ == 0.0) capZ = capSlow;
+			
 			inflowLinkLength = 7.5 * 1;
 			linkLengthSmall = 1000;
 			linkLengthBig = 10000;
+			
 			linkTTMid = 1 * 60;
 			linkTTSmall = 1 * 60;
 			linkTTBig = 10 * 60;
@@ -184,19 +193,19 @@ public final class TtCreateBraessNetworkAndLanes {
 			l = fac.createLink(Id.createLinkId("2_23"),
 					net.getNodes().get(Id.createNodeId(2)),
 					net.getNodes().get(Id.createNodeId(23)));
-			setLinkAttributes(l, capMain, inflowLinkLength, minimalLinkTT);
+			setLinkAttributes(l, capFast, inflowLinkLength, minimalLinkTT);
 			net.addLink(l);
 			
 			l = fac.createLink(Id.createLinkId("23_3"),
 					net.getNodes().get(Id.createNodeId(23)),
 					net.getNodes().get(Id.createNodeId(3)));
-			setLinkAttributes(l, capMain, linkLengthSmall, linkTTSmall - minimalLinkTT);
+			setLinkAttributes(l, capFast, linkLengthSmall, linkTTSmall - minimalLinkTT);
 			net.addLink(l);
 		} else {
 			l = fac.createLink(Id.createLinkId("2_3"),
 					net.getNodes().get(Id.createNodeId(2)),
 					net.getNodes().get(Id.createNodeId(3)));
-			setLinkAttributes(l, capMain, linkLengthSmall, linkTTSmall);
+			setLinkAttributes(l, capFast, linkLengthSmall, linkTTSmall);
 			net.addLink(l);
 		}
 		
@@ -204,19 +213,20 @@ public final class TtCreateBraessNetworkAndLanes {
 			l = fac.createLink(Id.createLinkId("2_24"),
 					net.getNodes().get(Id.createNodeId(2)),
 					net.getNodes().get(Id.createNodeId(24)));
-			setLinkAttributes(l, capMain, inflowLinkLength, minimalLinkTT);
+			setLinkAttributes(l, capSlow, inflowLinkLength, minimalLinkTT);
 			net.addLink(l);
 			
 			l = fac.createLink(Id.createLinkId("24_4"),
 					net.getNodes().get(Id.createNodeId(24)),
 					net.getNodes().get(Id.createNodeId(4)));
-			setLinkAttributes(l, capMain, linkLengthBig, linkTTBig - minimalLinkTT);
+			setLinkAttributes(l, capSlow, linkLengthBig, linkTTBig - minimalLinkTT);
 			net.addLink(l);
 		} else {
 			l = fac.createLink(Id.createLinkId("2_4"),
 					net.getNodes().get(Id.createNodeId(2)),
 					net.getNodes().get(Id.createNodeId(4)));
-			setLinkAttributes(l, capMain, linkLengthBig, linkTTBig);
+			setLinkAttributes(l, capSlow, linkLengthBig, linkTTBig);
+//			setLinkAttributes(l, capMain, linkLengthSmall, linkTTBig); // TODO check
 			net.addLink(l);
 		}
 		
@@ -231,27 +241,28 @@ public final class TtCreateBraessNetworkAndLanes {
 		l = fac.createLink(Id.createLinkId("3_5"),
 				net.getNodes().get(Id.createNodeId(3)),
 				net.getNodes().get(Id.createNodeId(5)));
-		setLinkAttributes(l, capMain, linkLengthBig, linkTTBig);
+		setLinkAttributes(l, capSlow, linkLengthBig, linkTTBig);
+//		setLinkAttributes(l, capMain, linkLengthSmall, linkTTBig); // TODO check
 		net.addLink(l);
 		
 		if (simulateInflowCap){
 			l = fac.createLink(Id.createLinkId("4_45"),
 					net.getNodes().get(Id.createNodeId(4)),
 					net.getNodes().get(Id.createNodeId(45)));
-			setLinkAttributes(l, capMain, inflowLinkLength, minimalLinkTT);
+			setLinkAttributes(l, capFast, inflowLinkLength, minimalLinkTT);
 			net.addLink(l);
 			
 			l = fac.createLink(Id.createLinkId("45_5"),
 					net.getNodes().get(Id.createNodeId(45)),
 					net.getNodes().get(Id.createNodeId(5)));
-			setLinkAttributes(l, capMain, linkLengthSmall, linkTTSmall - minimalLinkTT);
+			setLinkAttributes(l, capFast, linkLengthSmall, linkTTSmall - minimalLinkTT);
 			net.addLink(l);
 		}
 		else{
 			l = fac.createLink(Id.createLinkId("4_5"),
 					net.getNodes().get(Id.createNodeId(4)),
 					net.getNodes().get(Id.createNodeId(5)));
-			setLinkAttributes(l, capMain, linkLengthSmall, linkTTSmall);
+			setLinkAttributes(l, capFast, linkLengthSmall, linkTTSmall);
 			net.addLink(l);
 		}
 		
@@ -348,18 +359,18 @@ public final class TtCreateBraessNetworkAndLanes {
 						.createLinkId("23_3"));
 
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
-						Id.create("23_3.ol", Lane.class), capMain,
+						Id.create("23_3.ol", Lane.class), capFast,
 						linkLengthSmall, 0,	1, null,
 						Arrays.asList(Id.create("23_3.f", Lane.class),
 								Id.create("23_3.r", Lane.class)));
 
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
-						Id.create("23_3.f", Lane.class), capMain,
+						Id.create("23_3.f", Lane.class), capFast,
 						linkLengthSmall / 2, 0, 1,
 						Collections.singletonList(Id.createLinkId("3_5")), null);
 
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
-						Id.create("23_3.r", Lane.class), capMain,
+						Id.create("23_3.r", Lane.class), capFast,
 						linkLengthSmall / 2, 1, 1,
 						Collections.singletonList(Id.createLinkId("3_4")), null);
 
@@ -369,18 +380,18 @@ public final class TtCreateBraessNetworkAndLanes {
 						.createLinkId("2_3"));
 
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
-						Id.create("2_3.ol", Lane.class), capMain,
+						Id.create("2_3.ol", Lane.class), capFast,
 						linkLengthSmall, 0,	1, null,
 						Arrays.asList(Id.create("2_3.f", Lane.class),
 								Id.create("2_3.r", Lane.class)));
 
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
-						Id.create("2_3.f", Lane.class), capMain,
+						Id.create("2_3.f", Lane.class), capFast,
 						linkLengthSmall / 2, 0, 1,
 						Collections.singletonList(Id.createLinkId("3_5")), null);
 
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
-						Id.create("2_3.r", Lane.class), capMain,
+						Id.create("2_3.r", Lane.class), capFast,
 						linkLengthSmall / 2, 1, 1,
 						Collections.singletonList(Id.createLinkId("3_4")), null);
 
@@ -423,12 +434,20 @@ public final class TtCreateBraessNetworkAndLanes {
 		this.numberOfPersons = numberOfPersons;
 	}
 
-	public void setCapTolerance(double capTolerance) {
-		this.capTolerance = capTolerance;
-	}
-
 	public void setCapZ(double capZ) {
 		this.capZ = capZ;
+	}
+
+	public void setCapSlow(double capSlow) {
+		this.capSlow = capSlow;
+	}
+
+	public void setCapFast(double capFast) {
+		this.capFast = capFast;
+	}
+
+	public void setCapFirstLast(double capFirstLast) {
+		this.capFirstLast = capFirstLast;
 	}
 
 }

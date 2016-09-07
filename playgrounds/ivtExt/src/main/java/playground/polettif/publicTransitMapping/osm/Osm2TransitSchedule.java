@@ -25,9 +25,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.*;
-import playground.polettif.publicTransitMapping.osm.core.OsmParser;
-import playground.polettif.publicTransitMapping.osm.core.OsmParserHandler;
-import playground.polettif.publicTransitMapping.osm.core.TagFilter;
+import playground.polettif.publicTransitMapping.osm.lib.OsmParser;
+import playground.polettif.publicTransitMapping.osm.lib.OsmParserHandler;
+import playground.polettif.publicTransitMapping.osm.lib.TagFilter;
 import playground.polettif.publicTransitMapping.osm.lib.OsmTag;
 import playground.polettif.publicTransitMapping.osm.lib.OsmValue;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
@@ -35,8 +35,9 @@ import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 import java.util.*;
 
 /**
- * Convert available public transit data from OSM to a MATSim Transit Schedule (stop facilities,
- * transitRoutes and routeProfiles). Creates an unmapped schedule with missing departures.
+ * Creates an unmapped MATSim transit schedule from OSM. Converts
+ * available public transit data from OSM to a schedule: stop facilities,
+ * transitRoutes and routeProfiles. Departures and link sequences are missing.
  *
  * @author polettif
  */

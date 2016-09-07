@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.config.ConfigReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.scenarios.munich.analysis.filter.LocationFilter;
@@ -117,7 +117,7 @@ public class SpatialAveragingWelfare {
 		
 		Scenario scenario = loadScenario(netFile1);
 		this.network = scenario.getNetwork();		
-		MatsimPopulationReader mpr = new MatsimPopulationReader(scenario);
+		PopulationReader mpr = new PopulationReader(scenario);
 		mpr.readFile(plansFile1);
 		
 		Config config = scenario.getConfig();
@@ -141,7 +141,7 @@ public class SpatialAveragingWelfare {
 		
 		if(compareToBaseCase){
 			Scenario scenario2 = loadScenario(netFile1);
-			MatsimPopulationReader mpr2 = new MatsimPopulationReader(scenario2);
+			PopulationReader mpr2 = new PopulationReader(scenario2);
 			mpr2.readFile(plansFile2);
 			
 			Config config2 = scenario2.getConfig();

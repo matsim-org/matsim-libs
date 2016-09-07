@@ -22,15 +22,15 @@ package playground.balmermi.census2000.modules;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -165,9 +165,9 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 		int plan_row = -1; // plan mode defined as last mode
 		                   // (it's just a trick, since the mode is the same for a plan) (just temporary)
 		for (int i=1; i<acts_legs.size()-1; i=i+2) {
-			ActivityImpl prev_act = (ActivityImpl)acts_legs.get(i-1);
-			LegImpl leg = (LegImpl)acts_legs.get(i);
-			ActivityImpl next_act = (ActivityImpl)acts_legs.get(i+1);
+			Activity prev_act = (Activity)acts_legs.get(i-1);
+			Leg leg = (Leg)acts_legs.get(i);
+			Activity next_act = (Activity)acts_legs.get(i+1);
 
 			// get row (mode type)
 			String trip_mode = leg.getMode();

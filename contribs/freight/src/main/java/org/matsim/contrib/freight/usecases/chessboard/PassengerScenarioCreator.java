@@ -12,10 +12,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -68,7 +68,7 @@ public class PassengerScenarioCreator {
 	private static List<Person> createPersons(Id<Link> homeId, Id<Link> workId,Scenario scenario) {
 		LeastCostPathCalculator lcpa = new DijkstraFactory().createPathCalculator(scenario.getNetwork(), 
 				new FreespeedTravelTimeAndDisutility(-1.0, -1.0, -1.0), new FreespeedTravelTimeAndDisutility(-1.0, -1.0, -1.0));
-        PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+        PopulationFactory popFactory = (PopulationFactory) scenario.getPopulation().getFactory();
 		List<Person> persons = new ArrayList<Person>();
 		for(int agent=0;agent<nuOfAgentsPerHomeLink;agent++){
 			

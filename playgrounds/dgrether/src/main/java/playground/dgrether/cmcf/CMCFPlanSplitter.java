@@ -25,9 +25,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -68,13 +68,15 @@ public class CMCFPlanSplitter {
 		  		idStringBuffer.append("leg");
 		  		idStringBuffer.append(Integer.toString(i));
 
-		  		Person pNew = PopulationUtils.createPerson(Id.create(idStringBuffer.toString(), Person.class));
-		  		PlanImpl planNew = new PlanImpl(pNew);
+		  		Person pNew = PopulationUtils.getFactory().createPerson(Id.create(idStringBuffer.toString(), Person.class));
+		  		Plan planNew = PopulationUtils.createPlan(pNew);
 		  		Leg leg = (Leg) pe;
+				final Leg leg2 = leg;
 
-		  		planNew.addActivity(((PlanImpl) pl).getPreviousActivity(leg));
+		  		planNew.addActivity(PopulationUtils.getPreviousActivity(((Plan) pl), leg2));
 		  		planNew.addLeg(leg);
-		  		planNew.addActivity(((PlanImpl) pl).getNextActivity(leg));
+				final Leg leg1 = leg;
+		  		planNew.addActivity(PopulationUtils.getNextActivity(((Plan) pl), leg1));
 
 		  		pNew.addPlan(planNew);
 

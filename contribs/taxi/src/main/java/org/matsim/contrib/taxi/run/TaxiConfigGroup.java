@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.taxi.run;
 
+import java.util.Map;
+
 import org.matsim.core.config.*;
 
 
@@ -26,6 +28,13 @@ public class TaxiConfigGroup
     extends ReflectiveConfigGroup
 {
     public static final String GROUP_NAME = "taxi";
+
+
+    public static TaxiConfigGroup get(Config config)
+    {
+        return (TaxiConfigGroup)config.getModule(GROUP_NAME);
+    }
+
 
     public static final String DESTINATION_KNOWN = "destinationKnown";
     public static final String VEHICLE_DIVERSION = "vehicleDiversion";
@@ -59,6 +68,38 @@ public class TaxiConfigGroup
     public TaxiConfigGroup()
     {
         super(GROUP_NAME);
+    }
+
+    
+    @Override
+    public Map<String, String> getComments()
+    {
+        Map<String, String> map = super.getComments();
+        map.put(DESTINATION_KNOWN, "If false, the drop-off location remains unknown to the"
+                + " optimizer and scheduler until the end of pickup");
+        map.put(VEHICLE_DIVERSION, "If true, vehicles can be diverted during empty trips."
+                + " Requires online tracking.");
+        map.put(PICKUP_DURATION, "Typically, 120 seconds");
+        map.put(DROPOFF_DURATION, "Typically, 60 seconds");
+        map.put(A_STAR_EUCLIDEAN_OVERDO_FACTOR,
+                "Used in AStarEuclidean for shortest path search for occupied drives."
+                        + " Values above 1.0 (typically, 1.5 to 3.0) speed up the search,"
+                        + " but at the cost of obtaining longer paths");
+        map.put(ONLINE_VEHICLE_TRACKER,
+                "If true, vehicles are (GPS-like) monitored while moving."
+                        + " This helps in getting more accurate estimates on the time of arrival."
+                        + " Online tracking is necessary for vehicle diversion.");
+        map.put(TAXIS_FILE, "An XML file specifying the taxi fleet."
+                + " The file format according to dvrp_vehicles_v1.dtd");
+        map.put(TIME_PROFILES, "If true, time profiles of vehicle statuses (i.e. current task type)"
+                + " and the number of unplanned requests");
+        map.put(DETAILED_STATS,
+                "If true, detailed hourly taxi stats are dumped after each" + " iteration.");
+        map.put(OPTIMIZER_PARAMETER_SET,//currently, comments for parameter sets are not printed
+                "Specifies the type and parameters of the TaxiOptimizer."
+                        + " See: TaxiOptimizerParams and classes implementing it,"
+                        + " e.g. AbstractTaxiOptimizerParams.");
+        return map;
     }
 
 
@@ -192,8 +233,8 @@ public class TaxiConfigGroup
     {
         return getParameterSets(OPTIMIZER_PARAMETER_SET).iterator().next();
     }
-    
-    
+
+
     public void setOptimizerConfigGroup(ConfigGroup optimizerCfg)
     {
         clearParameterSetsForType(OPTIMIZER_PARAMETER_SET);

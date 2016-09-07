@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -67,7 +67,7 @@ public class GtfsConverter {
 		String[] serviceIds = {"daily"};
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc.getNetwork()).parse(network);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(network);
 		LOG.info("Total number of links in (original) network: " + sc.getNetwork().getLinks().size());
 		
 		GTFS2MATSimTransitSchedule g2m = new GTFS2MATSimTransitSchedule(folders, modes, sc.getNetwork(), serviceIds, "WGS84_SA_Albers");

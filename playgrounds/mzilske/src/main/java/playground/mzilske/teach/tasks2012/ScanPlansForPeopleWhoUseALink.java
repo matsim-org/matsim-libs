@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -17,7 +17,7 @@ public class ScanPlansForPeopleWhoUseALink {
 
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario).readFile("output/equil/ITERS/it.1/1.plans.xml");
+		new PopulationReader(scenario).readFile("output/equil/ITERS/it.1/1.plans.xml");
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 			Activity home = (Activity) plan.getPlanElements().get(0);

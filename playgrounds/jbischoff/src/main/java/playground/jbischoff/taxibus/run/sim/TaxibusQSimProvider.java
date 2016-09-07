@@ -21,6 +21,7 @@ package playground.jbischoff.taxibus.run.sim;
 
 import java.util.Collection;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
@@ -45,6 +46,8 @@ import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatche
 import playground.jbischoff.taxibus.algorithm.optimizer.sharedTaxi.SharedTaxiOptimizer;
 import playground.jbischoff.taxibus.algorithm.passenger.*;
 import playground.jbischoff.taxibus.algorithm.scheduler.*;
+import playground.jbischoff.taxibus.algorithm.tubs.StatebasedOptimizer;
+import playground.jbischoff.taxibus.algorithm.tubs.datastructure.StateSpace;
 import playground.jbischoff.taxibus.algorithm.utils.TaxibusUtils;
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
 
@@ -64,13 +67,13 @@ public class TaxibusQSimProvider
     private final TaxibusConfigGroup tbcg;
     private final LineDispatcher dispatcher;
     private final TaxibusPassengerOrderManager orderManager;
-
+    private final StateSpace stateSpace;
 
     @Inject
     TaxibusQSimProvider(Scenario scenario, EventsManager events,
             Collection<AbstractQSimPlugin> plugins, VrpData vrpData,
             @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, TaxibusConfigGroup tbcg,
-            @Nullable LineDispatcher dispatcher, @Nullable TaxibusPassengerOrderManager orderManager)
+            @Nullable LineDispatcher dispatcher, @Nullable TaxibusPassengerOrderManager orderManager, @Nullable StateSpace stateSpace)
     {
         this.scenario = scenario;
         this.events = events;
@@ -80,6 +83,7 @@ public class TaxibusQSimProvider
         this.tbcg = tbcg;
         this.dispatcher = dispatcher;
         this.orderManager = orderManager;
+        this.stateSpace = stateSpace;
     }
 
 
@@ -130,6 +134,8 @@ public class TaxibusQSimProvider
                 return new MultipleFifoOptimizer(optimizerContext, dispatcher, false);
             case "sharedTaxi":
             	return new SharedTaxiOptimizer(optimizerContext, false, tbcg.getDetourFactor());
+            case "stateBased":
+            	return new StatebasedOptimizer(optimizerContext, false, this.stateSpace , tbcg);
             default:
                 throw new RuntimeException(
                         "No config parameter set for algorithm, please check and assign in config");

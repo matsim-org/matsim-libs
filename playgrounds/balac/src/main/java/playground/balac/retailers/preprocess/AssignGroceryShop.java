@@ -26,12 +26,12 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -101,13 +101,13 @@ public class AssignGroceryShop {
 		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkfilePath);
 
 		log.info("  reading file " + plansfilePath);
-		final PopulationReader plansReader = new MatsimPopulationReader(this.scenario);
+		final MatsimReader plansReader = new PopulationReader(this.scenario);
 		plansReader.readFile(plansfilePath);
 	}
 
 	private void writePlans() {
 		
-		new PopulationWriter(this.plans, this.network).writeFileV4(this.outpath + "plans0.xml");
+		new PopulationWriter(this.plans, this.network).writeV4(this.outpath + "plans0.xml");
 	}
 	
 	private void writeFacilities () {

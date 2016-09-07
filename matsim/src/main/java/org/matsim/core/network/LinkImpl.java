@@ -38,12 +38,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 
-public class LinkImpl implements Link {
+/*deliberately package*/ class LinkImpl implements Link {
 
-	private final static Logger log = Logger.getLogger(LinkImpl.class);
+	private final static Logger log = Logger.getLogger(Link.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -65,8 +64,6 @@ public class LinkImpl implements Link {
 
 	private String origid = null;
 
-	private final double euklideanDist;
-
 	private final Network network;
 
 	private static int fsWarnCnt = 0 ;
@@ -87,7 +84,7 @@ public class LinkImpl implements Link {
 		DEFAULT_ALLOWED_MODES = HashSetCache.get(set);
 	}
 
-	protected LinkImpl(final Id<Link> id, final Node from, final Node to, final Network network, final double length, final double freespeed, final double capacity, final double lanes) {
+	/*deliberately package*/ LinkImpl(final Id<Link> id, final Node from, final Node to, final Network network, final double length, final double freespeed, final double capacity, final double lanes) {
 		this.id = id;
 		this.network = network;
 		this.from = from;
@@ -99,21 +96,16 @@ public class LinkImpl implements Link {
 		this.freespeed = freespeed;
 		this.checkFreespeedSemantics();
 		this.capacity = capacity;
-		this.calculateFlowCapacity();
+		this.checkCapacitiySemantics();
 		this.checkCapacitiySemantics();
 		this.nofLanes = lanes;
 		this.checkNumberOfLanesSemantics();
-		this.euklideanDist = CoordUtils.calcEuclideanDistance(this.from.getCoord(), this.to.getCoord());
 		if (this.from.equals(this.to) && (loopWarnCnt < maxLoopWarnCnt)) {
 			loopWarnCnt++ ;
 			log.warn("[from=to=" + this.to + " link is a loop]");
 			if ( loopWarnCnt == maxLoopWarnCnt )
 				log.warn(Gbl.FUTURE_SUPPRESSED ) ;
 		}
-	}
-
-	private void calculateFlowCapacity() {
-		this.checkCapacitiySemantics();
 	}
 
 	private void checkCapacitiySemantics() {
@@ -157,55 +149,7 @@ public class LinkImpl implements Link {
 		}
 	}
 
-	/**
-	 * Calculates the shortest distance of the given point to this link. Note that
-	 * the link has finite length, and thus the shortest distance cannot
-	 * always be the distance on the tangent to the link through <code>coord</code>. 
-	 */
-	public final double calcDistance(final Coord coord) {
-		return CoordUtils.distancePointLinesegment(this.from.getCoord(), this.to.getCoord(), coord);
-		
-		/* should, in my view, call the generalized utils method. kai, jul09 */
-		/*
-		 * Given that this calculates a scalar product, this may indeed
-		 * calculate the orthogonal projection. But it does not say so, and I
-		 * have no time to go through the exact calculation in detail. Maybe
-		 * somebody else can figure it out and document it here. kai, mar'11
-		 */
-		/*
-		 * Probably this calculates the correct distance but the generalized
-		 * utils method also does so. duplicated code is not needed and was
-		 * removed therefore. tt, feb'16
-		 */
-//		Coord fc = this.from.getCoord();
-//		Coord tc =  this.to.getCoord();
-//		double tx = tc.getX();    double ty = tc.getY();
-//		double fx = fc.getX();    double fy = fc.getY();
-//		double zx = coord.getX(); double zy = coord.getY();
-//		double ax = tx-fx;        double ay = ty-fy;
-//		double bx = zx-fx;        double by = zy-fy;
-//		double la2 = ax*ax + ay*ay;
-//		double lb2 = bx*bx + by*by;
-//		if (la2 == 0.0) {  // from == to
-//			return Math.sqrt(lb2);
-//		}
-//		double xla = ax*bx+ay*by; // scalar product
-//		if (xla <= 0.0) {
-//			return Math.sqrt(lb2);
-//		}
-//		if (xla >= la2) {
-//			double cx = zx-tx;
-//			double cy = zy-ty;
-//			return Math.sqrt(cx*cx+cy*cy);
-//		}
-//		// lb2-xla*xla/la2 = lb*lb-x*x
-//		double tmp = xla*xla;
-//		tmp = tmp/la2;
-//		tmp = lb2 - tmp;
-//		// tmp can be slightly negativ, likely due to rounding errors (coord lies on the link!). Therefore, use at least 0.0
-//		tmp = Math.max(0.0, tmp);
-//		return Math.sqrt(tmp);
-	}
+	
 
 	//////////////////////////////////////////////////////////////////////
 	// get methods
@@ -233,43 +177,25 @@ public class LinkImpl implements Link {
 		return true;
 	}
 
-	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
-	public double getFreespeedTravelTime() {
-		return getFreespeedTravelTime(Time.UNDEFINED_TIME);
+	/*deliberately package*/ final String getOrigId2() {
+		return this.origid ;
 	}
 
-	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
-	public double getFreespeedTravelTime(final double time) {
-		return this.length / this.freespeed;
+	/*deliberately package*/ final String getType2() {
+		return this.type ;
 	}
+	
+	// ---
 
-	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
-	public double getFlowCapacityPerSec() {
-		return getFlowCapacityPerSec(Time.UNDEFINED_TIME);
-	}
-
-	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
-	public double getFlowCapacityPerSec(final double time) {
-		return this.capacity / network.getCapacityPeriod();
-	}
-
-	public final String getOrigId() {
-		return this.origid;
-	}
-
-	public final String getType() {
-		return this.type;
-	}
-
-	public final double getEuklideanLength() {
-		// maybe ok to keep this since it is an expensive computation. kai, mar'16
-		return this.euklideanDist;
+	@Override
+	public void setCapacity(double capacityPerNetworkCapcityPeriod){
+		this.capacity = capacityPerNetworkCapcityPeriod;
+		this.checkCapacitiySemantics();
 	}
 
 	@Override
 	public double getCapacity() {
 		return this.capacity;
-//		return getCapacity(Time.UNDEFINED_TIME);
 	}
 
 	@Override
@@ -277,12 +203,24 @@ public class LinkImpl implements Link {
 		return this.capacity;
 	}
 
+
 	@Override
-	public void setCapacity(double capacityPerNetworkCapcityPeriod){
-		this.capacity = capacityPerNetworkCapcityPeriod;
-		this.calculateFlowCapacity();
+	public double getFlowCapacityPerSec() {
+		return getFlowCapacityPerSec(Time.UNDEFINED_TIME);
+	}
+	@Override
+	public double getFlowCapacityPerSec(@SuppressWarnings("unused") final double time) {
+		return this.getCapacity(time) / network.getCapacityPeriod();
+	}
+	
+	double getCapacityPeriod() {
+		// since the link has a back pointer to network, we can as well provide this here (????)
+		// TimeVariantLinkImpl needs this ... but why?
+		return network.getCapacityPeriod() ;
 	}
 
+	// ---
+	
 	@Override
 	public double getFreespeed() {
 		return this.freespeed;
@@ -344,14 +282,9 @@ public class LinkImpl implements Link {
 		this.allowedModes = HashSetCache.get(modes);
 	}
 
-	public final void setOrigId(final String id) {
+	/*deliberately package*/ final void setOrigId2(final String id) {
 		this.origid = id;
 	}
-
-	public void setType(final String type) {
-		this.type = type;
-	}
-
 	private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
 		ois.defaultReadObject();
 		this.from.addOutLink(this);
@@ -384,11 +317,6 @@ public class LinkImpl implements Link {
 		return new Coord((fromXY.getX() + toXY.getX()) / 2.0, (fromXY.getY() + toXY.getY()) / 2.0);
 	}
 
-	double getCapacityPeriod() {
-		// since the link has a back pointer to network, we can as well provide this here (????)
-		return network.getCapacityPeriod() ;
-	}
-
 	/*package*/ abstract static class HashSetCache {
 		private final static Map<Integer, List<Set<String>>> cache = new ConcurrentHashMap<>();
 		public static Set<String> get(final Set<String> set) {
@@ -417,5 +345,9 @@ public class LinkImpl implements Link {
 			return set3;
 		}
 
+	}
+
+	/*deliberately package*/ void setType2(String type2) {
+		this.type = type2 ;
 	}
 }

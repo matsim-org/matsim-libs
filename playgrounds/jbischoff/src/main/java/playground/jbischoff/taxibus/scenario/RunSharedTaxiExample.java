@@ -27,8 +27,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import com.google.inject.Binder;
-
 import playground.jbischoff.taxibus.analysis.SharedTaxiContolerListener;
 import playground.jbischoff.taxibus.analysis.SharedTaxiTripAnalyzer;
 import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
@@ -42,7 +40,7 @@ public class RunSharedTaxiExample {
 
 	public static void main(String[] args) {
 		
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configShared.xml", new TaxibusConfigGroup());
+		Config config = ConfigUtils.loadConfig(args[0], new TaxibusConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 	
 		Scenario scenario = ScenarioUtils.loadScenario(config);

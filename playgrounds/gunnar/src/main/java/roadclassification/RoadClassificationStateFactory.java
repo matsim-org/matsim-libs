@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.controler.Controler;
 import org.matsim.counts.Counts;
 
 import floetteroed.opdyts.DecisionVariable;
@@ -57,6 +58,12 @@ class RoadClassificationStateFactory
 		}
 		return new RoadClassificationState(population, stateVector,
 				linkId2simulatedCounts);
+	}
+
+	@Override
+	public void registerControler(Controler controler) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

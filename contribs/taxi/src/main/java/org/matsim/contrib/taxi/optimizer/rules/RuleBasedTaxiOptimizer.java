@@ -37,7 +37,7 @@ public class RuleBasedTaxiOptimizer
 {
     protected final BestDispatchFinder dispatchFinder;
 
-    private final IdleTaxiZonalRegistry idleTaxiRegistry;
+    protected final IdleTaxiZonalRegistry idleTaxiRegistry;
     private final UnplannedRequestZonalRegistry unplannedRequestRegistry;
 
     private final RuleBasedTaxiOptimizerParams params;
@@ -46,8 +46,7 @@ public class RuleBasedTaxiOptimizer
     public RuleBasedTaxiOptimizer(TaxiOptimizerContext optimContext,
             RuleBasedTaxiOptimizerParams params)
     {
-        this(optimContext, params,
-                new SquareGridSystem(optimContext.getNetwork(), params.cellSize));
+        this(optimContext, params, new SquareGridSystem(optimContext.network, params.cellSize));
     }
 
 
@@ -121,10 +120,10 @@ public class RuleBasedTaxiOptimizer
                             params.nearestVehiclesLimit)
                     : idleTaxiRegistry.getVehicles();
 
-            BestDispatchFinder.Dispatch best = dispatchFinder.findBestVehicleForRequest(req,
-                    selectedVehs);
+            BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder
+                    .findBestVehicleForRequest(req, selectedVehs);
 
-            optimContext.scheduler.scheduleRequest(best.vehicle, best.request, best.path);
+            optimContext.scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
 
             reqIter.remove();
             unplannedRequestRegistry.removeRequest(req);
@@ -147,13 +146,13 @@ public class RuleBasedTaxiOptimizer
                                     params.nearestRequestsLimit)
                             : unplannedRequests;
 
-            BestDispatchFinder.Dispatch best = dispatchFinder.findBestRequestForVehicle(veh,
-                    selectedReqs);
+            BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder
+                    .findBestRequestForVehicle(veh, selectedReqs);
 
-            optimContext.scheduler.scheduleRequest(best.vehicle, best.request, best.path);
+            optimContext.scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
 
-            unplannedRequests.remove(best.request);
-            unplannedRequestRegistry.removeRequest(best.request);
+            unplannedRequests.remove(best.destination);
+            unplannedRequestRegistry.removeRequest(best.destination);
         }
     }
 
@@ -183,7 +182,7 @@ public class RuleBasedTaxiOptimizer
         else {
             if (!Schedules.isFirstTask(schedule.getCurrentTask())) {
                 TaxiTask previousTask = (TaxiTask)Schedules.getPreviousTask(schedule);
-                if (previousTask.getTaxiTaskType() == TaxiTaskType.STAY) {
+                if (isWaitStay(previousTask)) {
                     idleTaxiRegistry.removeVehicle(schedule.getVehicle());
                 }
             }
@@ -194,6 +193,12 @@ public class RuleBasedTaxiOptimizer
     @Override
     protected boolean doReoptimizeAfterNextTask(TaxiTask newCurrentTask)
     {
-        return newCurrentTask.getTaxiTaskType() == TaxiTaskType.STAY;
+        return isWaitStay(newCurrentTask);
+    }
+
+
+    protected boolean isWaitStay(TaxiTask task)
+    {
+        return task.getTaxiTaskType() == TaxiTaskType.STAY;
     }
 }

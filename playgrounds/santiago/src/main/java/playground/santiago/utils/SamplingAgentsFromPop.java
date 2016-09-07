@@ -1,8 +1,5 @@
 package playground.santiago.utils;
 
-import java.io.File;
-import java.util.SortedMap;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -10,40 +7,54 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.santiago.population.ActivityClassifier;
+import org.matsim.pt.config.TransitConfigGroup;
 
 
 
 public class SamplingAgentsFromPop {
 	
-	///Fields///
-	
-	final static String NET_FILENAME = "../../../runs-svn/santiago/casoBase10_NP/input/network_merged_cl.xml.gz";
-	
-	final static String PATH_FOR_SAMPLED_INPUT = "../../../runs-svn/santiago/casoBase10_NP/input/new-input/";
-	final static String INPUT_POP_FILENAME = PATH_FOR_SAMPLED_INPUT + "expanded_plans_final_1.xml.gz";	
-	final static String INPUT_CONFIG_FILENAME = PATH_FOR_SAMPLED_INPUT + "expanded_config_final.xml";
-	final static String OUTPUT_POP_FILENAME = PATH_FOR_SAMPLED_INPUT + "sampled_plans_final_1.xml.gz";
-	
-	final static double ORIGINAL_PERCENTAGE = 0.1; /* This is the original sample rate from expanded_plans_final.xml.gz i.e. " x % " */
-	final static double SAMPLED_PERCENTAGE = 0.1; /* This is the percentage that is desired to extract from a "x %" expanded_plans_final.xml.gz */ 
 
-	///////////
+
+	final String svnWorkingDir = "../../../shared-svn/projects/santiago/scenario/";
+	final String runsSampledDir = "../../../runs-svn/santiago/TMP/";
+
+	final String expandedPlansFolder = svnWorkingDir + "inputForMATSim/plans/2_10pct/";
+	final String expandedPlansFile  = expandedPlansFolder + "randomized_expanded_plans.xml.gz";
 	
-	void sampling( String input_pop , String input_net , String output_pop , double sampledPercentage ) {
+	
+	final String sampledPlansFolder = svnWorkingDir + "inputForMATSim/plans/3_1pct/";
+	final String sampledPlansFile   = sampledPlansFolder + "randomized_sampled_plans.xml.gz";
+		
+	final String configFolder = svnWorkingDir + "inputForMATSim/";	
+	final String expandedConfigFile = configFolder + "randomized_expanded_config.xml";
+	final String sampledConfigFile  = configFolder + "randomized_sampled_config.xml";
+	
+			
+	
+	
+	
+	final static double ORIGINAL_PERCENTAGE = 0.1; /* This is the original sample rate from expanded_plans_final.xml.gz*/
+	final static double SAMPLED_PERCENTAGE = 0.1; /* This is the percentage that is desired to extract*/ 
+
+	
+
+	
+	void sampling( double sampledPercentage ) {
 
 		
-		Config config = ConfigUtils.createConfig() ;
-		config.network().setInputFile( input_net ) ;
-		config.plans().setInputFile( input_pop ) ;
 
-		Population pop = ScenarioUtils.loadScenario(config).getPopulation() ;
+
+		Scenario scenarioTmp = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new PopulationReader(scenarioTmp).readFile(expandedPlansFile);
+		
+		Population pop = scenarioTmp.getPopulation();
 
 		Population newPop = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation() ;
 		
@@ -54,53 +65,66 @@ public class SamplingAgentsFromPop {
 			}
 		}
 		
-
-		PopulationWriter popwriter = new PopulationWriter(newPop,ScenarioUtils.loadScenario(config).getNetwork()) ;
-		popwriter.write( output_pop ) ;
+	
+		PopulationWriter popwriter = new PopulationWriter(newPop) ;
+		popwriter.write( sampledPlansFile );
 
 		System.out.println("done.");
 	}
 
-	void changeAndWriteNewConfigFile (String pathFromSampledInput,
-			String configFile , double originalPercentage , double sampledPercentage , String outputPopFile){
+	void changeAndWriteNewConfigFile () {
 		
-		double finalSampleRate = Math.floor( originalPercentage * sampledPercentage * 1000) / 1000 ;
-		
-		Config oldConfig = ConfigUtils.loadConfig(configFile);		
-		/*QSim stuffs*/		
-		QSimConfigGroup qsim = oldConfig.qsim();
-		//The capacity factor is equal to the percentage used in the clonePersons method.
+		double finalSampleRate = Math.floor( ORIGINAL_PERCENTAGE * SAMPLED_PERCENTAGE * 1000) / 1000 ;
+		Config config = ConfigUtils.loadConfig( expandedConfigFile );		
+
+		QSimConfigGroup qsim = config.qsim();
 		qsim.setFlowCapFactor(finalSampleRate);
-		//storageCapFactor obtained by expression proposed in Nicolai and Nagel, 2013.
-		double storageCapFactor = Math.ceil( ( ( 0.1 / ( Math.pow ( finalSampleRate , 0.25 ) ) ) ) *100 ) / 100;
+		double storageCapFactor = Math.ceil( ( ( finalSampleRate / ( Math.pow ( finalSampleRate , 0.25 ) ) ) ) * 1000 ) / 1000;
 		qsim.setStorageCapFactor(storageCapFactor);
-		////////////////////////////////////////////////////////////////////////
-		
-		/*Path to new plans file*/		
-		PlansConfigGroup plans = oldConfig.plans();
-		plans.setInputFile( outputPopFile );
-		////////////////////////////////////////////////////////////////////////
+
 	
-		/*Counts stuffs*/
-		CountsConfigGroup counts = oldConfig.counts();
+
+		CountsConfigGroup counts = config.counts();
 		counts.setCountsScaleFactor( Math.pow( finalSampleRate , -1 ) );
-		////////////////////////////////////////////////////////////////////////
-		
-		
-		/*Write the new config_file*/
 
-		new ConfigWriter(oldConfig).write( pathFromSampledInput + "sampled_config_final.xml");
-		////////////////////////////////////////////////////////////////////////
+		
+		
+		ControlerConfigGroup cc = config.controler();
+		cc.setOutputDirectory(runsSampledDir + "output/" );
+
+
+		counts.setInputFile(runsSampledDir + "input/counts_merged_VEH_C01.xml" );
+
+		NetworkConfigGroup net = config.network();
+		net.setInputFile(runsSampledDir + "input/network_merged_cl.xml.gz" );
+		
+		PlansConfigGroup plans = config.plans();
+		plans.setInputPersonAttributeFile(runsSampledDir + "input/agentAttributes.xml" );
+		plans.setInputFile( runsSampledDir + "input/randomized_sampled_plans.xml.gz" );
+		plans.setInputPersonAttributeFile( runsSampledDir + "input/sampledAgentAttributes.xml");
+		
+		TransitConfigGroup transit = config.transit();
+		transit.setTransitScheduleFile(runsSampledDir + "input/transitschedule_simplified.xml" );
+		transit.setVehiclesFile(runsSampledDir + "input/transitvehicles.xml" );
+		
+	
+		
+
+		
+		new ConfigWriter(config).write( sampledConfigFile );
+		
+		
+
 	}
 	
-	
+
 	void run() {
-		sampling( INPUT_POP_FILENAME , NET_FILENAME , OUTPUT_POP_FILENAME , SAMPLED_PERCENTAGE );
-		changeAndWriteNewConfigFile ( PATH_FOR_SAMPLED_INPUT , INPUT_CONFIG_FILENAME , ORIGINAL_PERCENTAGE , SAMPLED_PERCENTAGE , OUTPUT_POP_FILENAME);
+		
+		sampling( SAMPLED_PERCENTAGE );
+		changeAndWriteNewConfigFile ( );
+		
 	}
 
-	
-	
 
 	public static void main(final String[] args) {
 		SamplingAgentsFromPop app = new SamplingAgentsFromPop();		
@@ -108,8 +132,6 @@ public class SamplingAgentsFromPop {
 		
 		
 	}
-
-
 
 
 }

@@ -10,14 +10,16 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.FastAStarLandmarks;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -33,15 +35,15 @@ import others.sergioo.util.dataBase.*;
 class PlanFindLegDistances {
 	private final MutableScenario scenario;
 	private final Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities;
-	private final NetworkImpl network;
-	private final RouteFactoryImpl routeFactory;
+	private final Network network;
+	private final RouteFactories routeFactory;
 	private final DataBaseAdmin dba;
 	private final FastAStarLandmarks leastCostPathCalculator;
 
 	public PlanFindLegDistances(Scenario scenario, DataBaseAdmin dba) {
 		super();
 		this.scenario = (MutableScenario) scenario;
-		this.network = (NetworkImpl) scenario.getNetwork();
+		this.network = (Network) scenario.getNetwork();
 		this.facilities = this.scenario.getActivityFacilities().getFacilities();
 		TravelDisutility travelMinCost = new TravelDisutility() {
 
@@ -70,14 +72,16 @@ class PlanFindLegDistances {
 		LeastCostPathCalculatorFactory routerFactory = new FastAStarLandmarksFactory(network, travelMinCost);
 		leastCostPathCalculator = (FastAStarLandmarks) routerFactory.createPathCalculator(network, travelMinCost, timeFunction);
 		this.dba = dba;
-		routeFactory = ((PopulationFactoryImpl) scenario.getPopulation()
-				.getFactory()).getRouteFactory();
+		routeFactory = ((PopulationFactory) scenario.getPopulation()
+				.getFactory()).getRouteFactories();
 	}
 
 	public double getShortestPathDistance(Coord startCoord, Coord endCoord) {
 		double distance = 0;
-		Node startNode = network.getNearestNode(startCoord);
-		Node endNode = network.getNearestNode(endCoord);
+		final Coord coord = startCoord;
+		Node startNode = NetworkUtils.getNearestNode(network,coord);
+		final Coord coord1 = endCoord;
+		Node endNode = NetworkUtils.getNearestNode(network,coord1);
 
 		Path path = leastCostPathCalculator.calcLeastCostPath(startNode,
 				endNode, 0, null, null);
@@ -124,15 +128,15 @@ class PlanFindLegDistances {
 			
 			if (pax.getPlans().size() == 0)
 				continue;
-			PlanImpl plan = (PlanImpl) pax.getPlans().get(0);
+			Plan plan = (Plan) pax.getPlans().get(0);
 //			new TransitActsRemover().run(plan);
 			for (int i = 0; i < plan.getPlanElements().size(); i += 2) {
-				ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(i);
-				if (act.equals(plan.getLastActivity()))
+				Activity act = (Activity) plan.getPlanElements().get(i);
+				if (act.equals(PopulationUtils.getLastActivity(plan)))
 					break;
-				LegImpl leg =  (LegImpl) plan.getPlanElements()
+				Leg leg =  (Leg) plan.getPlanElements()
 						.get(i + 1);
-				ActivityImpl nextact = (ActivityImpl) plan.getPlanElements()
+				Activity nextact = (Activity) plan.getPlanElements()
 						.get(i + 2);
 				Coord startCoord = facilities.get(act.getFacilityId())
 						.getCoord();

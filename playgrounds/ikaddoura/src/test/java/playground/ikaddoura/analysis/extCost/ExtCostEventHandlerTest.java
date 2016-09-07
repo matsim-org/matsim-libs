@@ -34,13 +34,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -85,7 +85,7 @@ public class ExtCostEventHandlerTest {
 		reader.readFile(eventsFile);
 		
 		CongestionEventsReader congestionEventsReader = new CongestionEventsReader(events);		
-		congestionEventsReader.parse(eventsFile);
+		congestionEventsReader.readFile(eventsFile);
 	
 		Map<Double, Double> tripDepTime2avgAmount = handler.getAvgAmountPerTripDepartureTime(TransportMode.car);
 		Map<Double, Double> tripDistance2avgAmount = handler.getAvgAmountPerTripDistance(TransportMode.car);
@@ -135,7 +135,7 @@ public class ExtCostEventHandlerTest {
 		reader.readFile(eventsFile);
 		
 		CongestionEventsReader congestionEventsReader = new CongestionEventsReader(events);		
-		congestionEventsReader.parse(eventsFile);
+		congestionEventsReader.readFile(eventsFile);
 	
 		Map<Double, Double> tripDepTime2avgAmountCar = handler.getAvgAmountPerTripDepartureTime(TransportMode.car);
 		Map<Double, Double> tripDistance2avgAmountCar = handler.getAvgAmountPerTripDistance(TransportMode.car);
@@ -207,7 +207,7 @@ public class ExtCostEventHandlerTest {
 		// (1) -> link1 -> (2)
 		//
 		
-		Config config = testUtils.loadConfig(null);
+		Config config = testUtils.createConfig();
 		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setStorageCapFactor(1.0);
@@ -216,7 +216,7 @@ public class ExtCostEventHandlerTest {
 		qSimConfigGroup.setStuckTime(3600.0);
 		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
 		network.setCapacityPeriod(3600.);
 

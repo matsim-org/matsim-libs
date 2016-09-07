@@ -34,8 +34,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.Lanes;
@@ -138,10 +137,7 @@ public class NetworkLanesSignalsSimplifier {
 								if (linkLengthAccepted(inLink,outLink)){									
 								// Only merge links with same attributes
 								if (bothLinksHaveSameLinkStats(inLink, outLink)) {
-									LinkImpl newLink = ((NetworkImpl) network).createAndAddLink(
-											this.createId(inLink.getId(), outLink.getId()), inLink.getFromNode(), outLink.getToNode(),
-											inLink.getLength() + outLink.getLength(), inLink.getFreespeed(),
-											inLink.getCapacity(), inLink.getNumberOfLanes(), null, null);
+									Link newLink = NetworkUtils.createAndAddLink(((Network) network),this.createId(inLink.getId(), outLink.getId()), inLink.getFromNode(), outLink.getToNode(), inLink.getLength() + outLink.getLength(), inLink.getFreespeed(), inLink.getCapacity(), inLink.getNumberOfLanes(), null, null);
 
 									newLink.setAllowedModes(inLink.getAllowedModes());
 

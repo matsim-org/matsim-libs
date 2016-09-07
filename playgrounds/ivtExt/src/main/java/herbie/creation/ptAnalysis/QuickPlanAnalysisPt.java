@@ -6,10 +6,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -172,7 +170,7 @@ public class QuickPlanAnalysisPt {
 		
 		pop = scenario.getPopulation();
 		
-		new MatsimPopulationReader(scenario).readFile(PLANSFILE);
+		new PopulationReader(scenario).readFile(PLANSFILE);
 		
 		
 //		scenario.getConfig().scenario().setUseVehicles(true);
@@ -272,7 +270,7 @@ public class QuickPlanAnalysisPt {
 				
 				if(pE instanceof Activity){
 					
-					ActivityImpl act = (ActivityImpl) pE;
+					Activity act = (Activity) pE;
 					if(!act.getType().toString().equals("pt interaction")){
 						
 						Double actDuration = act.getEndTime() - act.getStartTime();
@@ -299,7 +297,7 @@ public class QuickPlanAnalysisPt {
 				}
 				
 				if (pE instanceof Leg) {
-					LegImpl leg = (LegImpl) pE;
+					Leg leg = (Leg) pE;
 					if(leg.getMode().equals("pt")){
 						
 						String routeDescription = (leg.getRoute()).getRouteDescription();
@@ -374,12 +372,12 @@ public class QuickPlanAnalysisPt {
 		else if(mode.equals("train")) transportMode.addVal(3d, 1d);
 	}
 
-	private double getTravelTime(LegImpl leg) {
+	private double getTravelTime(Leg leg) {
 		if(leg.getTravelTime() != Double.NaN){
 			return leg.getTravelTime();
 		}
-		else if(leg.getArrivalTime() != Double.NaN || leg.getDepartureTime() != Double.NaN){
-			return leg.getArrivalTime() - leg.getDepartureTime();
+		else if(leg.getDepartureTime() + leg.getTravelTime() != Double.NaN || leg.getDepartureTime() != Double.NaN){
+			return leg.getDepartureTime() + leg.getTravelTime() - leg.getDepartureTime();
 		}
 		else {
 			return Double.NaN;

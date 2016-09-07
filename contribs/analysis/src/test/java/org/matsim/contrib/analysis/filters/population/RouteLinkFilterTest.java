@@ -25,17 +25,21 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.*;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
 
 public class RouteLinkFilterTest extends MatsimTestCase {
@@ -66,41 +70,41 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		Population population = scenario.getPopulation();
 
 		Person person;
-		PlanImpl plan;
-		LegImpl leg;
+		Plan plan;
+		Leg leg;
 		NetworkRoute route;
 
-		person = PopulationUtils.createPerson(Id.create("1", Person.class));
+		person = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 		plan = PersonUtils.createAndAddPlan(person, true);
-		ActivityImpl a = plan.createAndAddActivity("h", link1.getId());
+		Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
 		a.setEndTime(7.0 * 3600);
-		leg = plan.createAndAddLeg(TransportMode.car);
+		leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		route = new LinkNetworkRouteImpl(link1.getId(), link20.getId());
 		route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("6 15"), link20.getId());
 		leg.setRoute(route);
-		plan.createAndAddActivity("w", link20.getId());
+		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", link20.getId());
 		population.addPerson(person);
 
-		person = PopulationUtils.createPerson(Id.create("2", Person.class));
+		person = PopulationUtils.getFactory().createPerson(Id.create("2", Person.class));
 		plan = PersonUtils.createAndAddPlan(person, true);
-		ActivityImpl a2 = plan.createAndAddActivity("h", link1.getId());
+		Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
 		a2.setEndTime(7.0 * 3600 + 5.0 * 60);
-		leg = plan.createAndAddLeg(TransportMode.car);
+		leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		route = new LinkNetworkRouteImpl(link1.getId(), link20.getId());
 		route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("6 15"), link20.getId());
 		leg.setRoute(route);
-		plan.createAndAddActivity("w", link20.getId());
+		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", link20.getId());
 		population.addPerson(person);
 
-		person = PopulationUtils.createPerson(Id.create("3", Person.class));
+		person = PopulationUtils.getFactory().createPerson(Id.create("3", Person.class));
 		plan = PersonUtils.createAndAddPlan(person, true);
-		ActivityImpl a3 = plan.createAndAddActivity("h", link1.getId());
+		Activity a3 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
 		a3.setEndTime(7.0 * 3600 + 10.0 * 60);
-		leg = plan.createAndAddLeg(TransportMode.car);
+		leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		route = new LinkNetworkRouteImpl(link1.getId(), link20.getId());
 		route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("5 14"), link20.getId());
 		leg.setRoute(route);
-		plan.createAndAddActivity("w", link20.getId());
+		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", link20.getId());
 		population.addPerson(person);
 
 		return population;

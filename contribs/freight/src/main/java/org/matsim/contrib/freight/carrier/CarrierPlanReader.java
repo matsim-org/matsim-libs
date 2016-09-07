@@ -100,22 +100,23 @@ public class CarrierPlanReader extends MatsimXmlParser {
 	public CarrierPlanReader(Carriers carriers) {
 		super();
 		this.carriers = carriers;
-	}
-
-	/**
-	 * Reads a xml-file that contains carriers and their plans.
-	 * 
-	 * <p> Builds carriers and plans, and stores them in the carriers-object coming with this constructor.
-	 * 
-	 * @param filename
-	 */
-	public void read(String filename) {
-		logger.info("read carrier plans");
 		this.setValidating(false);
-		parse(filename);
-		logger.info("done");
-
 	}
+
+//	/**
+//	 * Reads a xml-file that contains carriers and their plans.
+//	 * 
+//	 * <p> Builds carriers and plans, and stores them in the carriers-object coming with this constructor.
+//	 * 
+//	 * @param filename
+//	 */
+//	public void read(String filename) {
+//		logger.info("read carrier plans");
+//		this.setValidating(false);
+//		read(filename);
+//		logger.info("done");
+//
+//	}
 	
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {

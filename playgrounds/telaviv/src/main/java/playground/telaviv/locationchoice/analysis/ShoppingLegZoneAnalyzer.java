@@ -34,12 +34,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 
 import playground.telaviv.locationchoice.LocationChoicePlanModule;
 import playground.telaviv.locationchoice.LocationChoiceProbabilityCreator;
@@ -76,7 +76,7 @@ public class ShoppingLegZoneAnalyzer {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 			
 		// load population
-		new MatsimPopulationReader(scenario).readFile(populationFile);
+		new PopulationReader(scenario).readFile(populationFile);
 
 		new ShoppingLegZoneAnalyzer(scenario);
 	}

@@ -22,6 +22,7 @@
 package org.matsim.contrib.signals.data;
 
 import java.io.BufferedWriter;
+import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -138,7 +139,7 @@ public class SignalsViaCSVWriter {
 			signalsCSVWriter.close();
 			log.info("... done!");
 		}
-		catch(Exception e){ 
+		catch(IOException e){ 
 			e.printStackTrace(); 
 		}
 	}

@@ -22,11 +22,12 @@ package playground.ivt.matsim2030.scoring;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 import org.matsim.core.utils.misc.Time;
@@ -42,14 +43,14 @@ public class DestinationEspilonScoring implements ActivityScoring, LegScoring,
 
 	private double score = 0;
 
-	private final PlanImpl currentPlan;
+	private final Plan currentPlan;
 
 	public DestinationEspilonScoring(
 			final Person person,
 			final DestinationChoiceBestResponseContext context ) {
 		this.context = context;
 		this.scoring = new DestinationScoring( context );
-		this.currentPlan = new PlanImpl( person );
+		this.currentPlan = PopulationUtils.createPlan(person);
 	}
 
 	@Override

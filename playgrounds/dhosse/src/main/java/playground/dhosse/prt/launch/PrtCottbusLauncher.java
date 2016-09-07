@@ -56,7 +56,7 @@ public class PrtCottbusLauncher {
 		}
 		
 		for(Person p : personsToRemove){
-			((PopulationImpl)pop).getPersons().remove(p.getId());
+			((Population)pop).getPersons().remove(p.getId());
 		}
 		
 		PopulationWriter writer = new PopulationWriter(pop, scenario.getNetwork());

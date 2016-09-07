@@ -23,21 +23,38 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
+
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand.OuterCordonLinks;
 
 /**
  * @author amit
  */
 
 public class OuterCordonUtils {
-	
+
+	public enum PatnaNetworkType {osmNetwork, shpNetwork /*shp network is from transcad files*/}
 	public static final double SAMPLE_SIZE = 0.1;
-	
-	public static final double E2I_TRIP_REDUCTION_FACTOR = 0.894;
-	
+
+	/**
+	 * modal correction factor only from car/motorbike/truck/bike and not from all vehicles (additionally, walk, cycle rickshaw, pt)
+	 * see {@link OuterCordonModalCountsAdjustmentCalculator}
+	 */
+//	public static final double E2I_TRIP_REDUCTION_FACTOR = 0.853; 
+	public static Map<String,Double> getModalOutTrafficAdjustmentFactor (){
+		Map<String, Double> mode2adjustmentFactor = new HashMap<>();
+		mode2adjustmentFactor.put("car", 0.98);
+		mode2adjustmentFactor.put("motorbike", 0.86);
+		mode2adjustmentFactor.put("bike", 0.68);
+		mode2adjustmentFactor.put("truck", 1.16);
+		mode2adjustmentFactor.put("total", 0.94);
+		return mode2adjustmentFactor;
+	}
+
 	public static Map<String, List<Integer>> getAreaType2ZoneIds(){//(from Fig.4-9 in PatnaReport)
 		Map<String, List<Integer>> areas2zones = new HashMap<>();
 		areas2zones.put("Institutional", Arrays.asList(8,9,20));
@@ -48,56 +65,6 @@ public class OuterCordonUtils {
 		return areas2zones;
 	}
 
-	public enum OuterCordonLinks{
-		/*
-		 * P -- Patna
-		 * F -- Fatua
-		 * PU -- Punpun
-		 * M -- Muzafarpur
-		 * D -- Danapur
-		 * N -- Noera (patna)
-		 */
-		// x=fatua
-		OC1_P2X ("13878-13876"), 
-		OC1_X2P ("1387610000-1387810000"),
-		// x=fatua
-		OC2_P2X ("18237-1823810000-1825010000-1825110000-16398-1851010000-1851310000-1851210000-18505"),
-		OC2_X2P ("1850510000-18512-18513-18510-1639810000-18251-18250-18238-1823710000"),
-		// x=Punpun
-		OC3_P2X ("4908-490910000-4517-4776"),
-		OC3_X2P ("477610000-451710000-4909-490810000"),
-		// x= Muzafarpur
-		OC4_P2X ("1683110000-1683210000-1678010000-1684210000-1678210000-1685010000-1684510000-1684710000-1684410000-16853-1668010000-1727110000-1731610000-1734510000-17268-1735410000-1735510000-1639510000"),
-		OC4_X2P ("16395-17355-17354-1726810000-17345-17316-17271-16680-1685310000-16844-16847-16845-16850-16782-16842-16780-16832-16831"),
-		// x= danapur
-		OC5_P2X ("860310000-8604-852910000-857810000-8568-857410000-856910000-857310000-857110000-854910000-8560-8555-855810000-778310000-7946-794210000-794410000-794310000-7919-7929-789710000-7913-7914-791510000-790310000-791010000-7852-789210000-788510000-7888-7853-786210000-2910000-437-475-476-47310000-474-43910000-446-464-46610000-426"),
-		OC5_X2P ("42610000-466-46410000-44610000-439-47410000-473-47610000-47510000-43710000-29-7862-785310000-788810000-7885-7892-785210000-7910-7903-7915-791410000-791310000-7897-792910000-791910000-7943-7944-7942-794610000-7783-8558-855510000-856010000-8549-8571-8573-8569-8574-856810000-8578-8529-860410000-8603"),
-		 //x = fatua; fatua to noera (Patna)
-		OC6_X2P ("1457-1363-1536-155610000-135810000-169510000-169110000-169610000-170110000-170010000-1349-181410000-181110000-180410000-181710000-177810000-1848"),
-		//x = fatua; noera to fatua
-		OC6_P2X ("184810000-1778-1817-1804-1811-1814-134910000-1700-1701-1696-1691-1695-1358-1556-153610000-136310000-145710000"),
-		// x= danapur
-		OC7_P2X ("219410000-2128"),
-		OC7_X2P ("212810000-2194");
-
-		private final String linkIdAsString;
-
-		private OuterCordonLinks(final String linkId){
-			this.linkIdAsString = linkId;
-		}
-
-		public Id<Link> getLinkId(){
-			return Id.createLinkId( linkIdAsString );
-		}
-		
-		public static OuterCordonLinks getOuterCordonNumberFromLink(String linkId){
-			for(OuterCordonLinks l :OuterCordonLinks.values()){
-				if(l.getLinkId().toString().equals(linkId)) return l;
-			}
-			return null;
-		}
-	}
-	
 	/**
 	 * See, table 3-13 in Patna CMP for the ext-ext trip shares.
 	 */
@@ -171,6 +138,9 @@ public class OuterCordonUtils {
 		return factor;
 	}
 
+	/**
+	 * Table 3-12 in PatnaCMP
+	 */
 	public enum OuterCordonDirectionalFactors{
 		/*
 		 * E -- external
@@ -195,10 +165,6 @@ public class OuterCordonUtils {
 		}
 	}
 
-	public static Id<Link> getCountStationLinkId(final String countingStationKey){
-		return OuterCordonLinks.valueOf(countingStationKey).getLinkId();
-	}
-
 	public static double getDirectionalFactorFromOuterCordonKey(final String countingStationKey, final String extIntKey){
 		List<String> extIntKeys = Arrays.asList("E2I", "I2E", "E2E") ;
 
@@ -219,27 +185,27 @@ public class OuterCordonUtils {
 		String prefix = countingDirection.equalsIgnoreCase("In") ? "X2P" : "P2X" ;
 		return countingStationNumber.toUpperCase()+"_"+prefix.toUpperCase();
 	}
-	
-	public static List<Id<Link>> getExternalToInternalCountStationLinkIds(){
+
+	public static List<Id<Link>> getExternalToInternalCountStationLinkIds(final PatnaNetworkType pnt){
 		List<Id<Link>> links = new ArrayList<>();
-		for(OuterCordonLinks l : OuterCordonLinks.values()){
-			if(l.toString().split("_")[1].equals("X2P")) links.add( l.getLinkId() ) ;
+		for(Entry<String,String> e : new OuterCordonLinks(pnt).getCountingStationToLink().entrySet()){
+			if(e.getKey().toString().split("_")[1].equals("X2P")) links.add( Id.createLinkId(e.getValue()) ) ;
 		}
 		return links;
 	}
-	
-	public static List<Id<Link>> getInternalToExternalCountStationLinkIds(){
+
+	public static List<Id<Link>> getInternalToExternalCountStationLinkIds(final PatnaNetworkType pnt){
 		List<Id<Link>> links = new ArrayList<>();
-		for(OuterCordonLinks l : OuterCordonLinks.values()){
-			if(l.toString().split("_")[1].equals("P2X")) links.add( l.getLinkId() ) ;
+		for(Entry<String,String> e : new OuterCordonLinks(pnt).getCountingStationToLink().entrySet()){
+			if(e.getKey().toString().split("_")[1].equals("P2X")) links.add( Id.createLinkId(e.getValue()) ) ;
 		}
 		return links;
 	}
-	
+
 	public static boolean isVehicleFromThroughTraffic(Id<Vehicle> vehicleId){
 		return vehicleId.toString().split("_")[2].equals("E2E");
 	}
-	
+
 	public static boolean isVehicleCommuter(Id<Vehicle> vehicleId){
 		return vehicleId.toString().split("_")[2].equals("E2I");
 	}

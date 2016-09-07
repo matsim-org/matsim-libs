@@ -12,8 +12,8 @@ import org.matsim.testcases.MatsimTestCase;
 public class BestReplyTest extends MatsimTestCase {
 
 	public void testRunControler() {
-        String configFile = this.getPackageInputDirectory() + "/config.xml";
-        Config config = ConfigUtils.loadConfig(configFile, new DestinationChoiceConfigGroup());
+        Config config = ConfigUtils.loadConfig("test/scenarios/chessboard/config.xml", new DestinationChoiceConfigGroup());
+		ConfigUtils.loadConfig(config, this.getPackageInputDirectory() + "/config.xml");
         config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
         Scenario scenario = ScenarioUtils.loadScenario(config);
 		RunLocationChoiceBestResponse.run(scenario);

@@ -26,8 +26,9 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneLayer;
+import org.matsim.vis.otfvis.opengl.drawer.FastColorizer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
-import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
+import org.matsim.vis.otfvis.opengl.gl.GLUtils;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 
@@ -53,23 +54,23 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 
 	private final static int BUFFERSIZE = 10000;
 
-	private static OTFOGLDrawer.FastColorizer redToGreenColorizer = new OTFOGLDrawer.FastColorizer(
+	private static FastColorizer redToGreenColorizer = new FastColorizer(
 					new double[] { 0.0, 30., 50.}, new Color[] {Color.RED, Color.YELLOW, Color.GREEN});
 
 
 	private int count = 0;
 
-	private static int alpha =200;
+	private static final int ALPHA = 200;
 
 	private ByteBuffer colorsIN = null;
 
 	private FloatBuffer vertexIN = null;
 
-	private List<FloatBuffer> posBuffers = new LinkedList<FloatBuffer>();
+	private List<FloatBuffer> posBuffers = new LinkedList<>();
 
-	private List<ByteBuffer> colBuffers= new LinkedList<ByteBuffer>();
+	private List<ByteBuffer> colBuffers = new LinkedList<>();
 
-	private Map<Integer,Integer> id2coord = new HashMap<Integer,Integer>();
+	private Map<Integer,Integer> id2coord = new HashMap<>();
 
 	private static Texture texture;
 
@@ -81,16 +82,14 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 
 	@Override
 	protected void onInit(GL2 gl) {
-		texture = OTFOGLDrawer.createTexture(gl, MatsimResource.getAsInputStream("icon18.png"));
+		texture = GLUtils.createTexture(gl, MatsimResource.getAsInputStream("icon18.png"));
 	}
-
-	private static int infocnt = 0 ;
 
 	@Override
 	public void onDraw(GL2 gl) {
 		gl.glEnable(GL2.GL_POINT_SPRITE);
 
-		setAgentSize(gl);
+		gl.glPointSize(OTFClientControl.getInstance().getOTFVisConfig().getAgentSize() / 10.f);
 
 		gl.glEnableClientState (GL2.GL_COLOR_ARRAY);
 		gl.glEnableClientState (GL2.GL_VERTEX_ARRAY);
@@ -109,7 +108,18 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 
 		gl.glDepthMask(false);
 
-		this.drawArray(gl);
+		ByteBuffer colors;
+		FloatBuffer vertex;
+		for(int i = 0; i < this.posBuffers.size(); i++) {
+			colors = this.colBuffers.get(i);
+			vertex = this.posBuffers.get(i);
+			int remain = i == this.posBuffers.size()-1 ? this.count %OGLAgentPointLayer.BUFFERSIZE : OGLAgentPointLayer.BUFFERSIZE;
+			colors.position(0);
+			vertex.position(0);
+			gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, colors);
+			gl.glVertexPointer (2, GL.GL_FLOAT, 0, vertex);
+			gl.glDrawArrays (GL.GL_POINTS, 0, remain);
+		}
 
 		gl.glDisableClientState (GL2.GL_COLOR_ARRAY);
 		gl.glDisableClientState (GL2.GL_VERTEX_ARRAY);
@@ -118,41 +128,6 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 		}
 
 		gl.glDisable(GL2.GL_POINT_SPRITE);
-	}
-
-	private static void setAgentSize(GL2 gl) {
-		float agentSize = OTFClientControl.getInstance().getOTFVisConfig().getAgentSize() / 10.f;
-		gl.glPointSize(agentSize);
-	}
-
-	private void drawArray(GL2 gl) {
-
-		// testing if the point sprite is available.  Would be good to not do this in every time step ...
-		// ... move to some earlier place in the calling hierarchy.  kai, feb'11
-		if ( infocnt < 1 ) {
-			infocnt++ ;
-			String[] str = {"glDrawArrays", "glVertexPointer", "glColorPointer"} ;
-			for ( int ii=0 ; ii<str.length ; ii++ ) {
-				if ( gl.isFunctionAvailable(str[ii]) ) {
-					log.info( str[ii] + " is available ") ;
-				} else {
-					log.warn( str[ii] + " is NOT available ") ;
-				}
-			}
-		}
-
-		ByteBuffer colors =  null;
-		FloatBuffer vertex =  null;
-		for(int i = 0; i < this.posBuffers.size(); i++) {
-			colors = this.colBuffers.get(i);
-			vertex = this.posBuffers.get(i);
-			int remain = i == this.posBuffers.size()-1 ? this.count %OGLAgentPointLayer.BUFFERSIZE : OGLAgentPointLayer.BUFFERSIZE; 
-			colors.position(0);
-			vertex.position(0);
-			gl.glColorPointer (4, GL.GL_UNSIGNED_BYTE, 0, colors);
-			gl.glVertexPointer (2, GL.GL_FLOAT, 0, vertex);
-			gl.glDrawArrays (GL.GL_POINTS, 0, remain);
-		}
 	}
 
 	@Override
@@ -212,7 +187,7 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 		this.colorsIN.put( (byte)color.getRed());
 		this.colorsIN.put( (byte)color.getGreen());
 		this.colorsIN.put((byte)color.getBlue());
-		this.colorsIN.put( (byte)alpha);
+		this.colorsIN.put( (byte) ALPHA);
 
 		this.count++;
 	}

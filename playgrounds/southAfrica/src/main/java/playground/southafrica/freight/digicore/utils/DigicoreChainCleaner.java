@@ -109,7 +109,7 @@ public class DigicoreChainCleaner {
 		public void run() {
 			/* Read the vehicle from file. */
 			DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-			dvr.parse(vehicleFile.getAbsolutePath());
+			dvr.readFile(vehicleFile.getAbsolutePath());
 			DigicoreVehicle dv = dvr.getVehicle();
 			
 			int chainIndex = 0;

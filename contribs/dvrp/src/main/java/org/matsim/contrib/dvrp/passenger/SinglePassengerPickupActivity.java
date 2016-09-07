@@ -71,7 +71,7 @@ public class SinglePassengerPickupActivity
     public void doSimStep(double now)
     {
         if (!passengerAboard) {
-            setEndTimeIfWaitingForPassenger(now);
+            setEndTimeIfWaitingForPassenger(now);//TODO use DynActivityEngine.END_ACTIVITY_LATER instead?
         }
     }
 

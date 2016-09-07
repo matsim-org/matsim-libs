@@ -39,8 +39,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -95,7 +95,7 @@ public abstract class DgPrognose2025DemandFilter {
 		netReader.readFile(networkFilename);
 		this.net = scenario.getNetwork();
 		this.linkIdsInShapefile = this.detectLinkIdsInShape(this.net);
-		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario); 
+		PopulationReader popReader = new PopulationReader(scenario); 
 		popReader.readFile(populationFilename);
 		this.pop = scenario.getPopulation();
 	}

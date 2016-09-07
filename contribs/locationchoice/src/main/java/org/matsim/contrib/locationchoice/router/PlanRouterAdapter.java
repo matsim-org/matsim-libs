@@ -22,8 +22,9 @@ package org.matsim.contrib.locationchoice.router;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
@@ -32,8 +33,6 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.PersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import java.util.List;
 
@@ -48,7 +47,7 @@ import java.util.List;
 @Deprecated // use TripRouter instead. kai, dec'13 
 public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 	private final LeastCostPathCalculator routeAlgo;
-    private final RouteFactoryImpl routeFactory;
+    private final RouteFactories routeFactory;
     private final PlanRouter planRouter;
 
 	@Deprecated // use TripRouter instead. kai, dec'13 
@@ -95,7 +94,7 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
         Network network = controler.getScenario().getNetwork();
 		this.routeAlgo = factory.createPathCalculator(network, disutility, time);
         PopulationFactory populationFactory = controler.getScenario().getPopulation().getFactory();
-		this.routeFactory = ((PopulationFactoryImpl) populationFactory).getRouteFactory();
+		this.routeFactory = ((PopulationFactory) populationFactory).getRouteFactories();
 	}
 
 
@@ -138,7 +137,7 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 	}
 
 	@Deprecated // use TripRouter instead. kai, dec'13 
-	public RouteFactoryImpl getRouteFactory() {
+	public RouteFactories getRouteFactory() {
 		return routeFactory;
 	}
 

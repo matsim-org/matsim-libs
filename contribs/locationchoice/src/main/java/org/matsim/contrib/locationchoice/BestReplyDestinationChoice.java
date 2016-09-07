@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.locationchoice.bestresponse.BestResponseLocationMutator;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext.ActivityFacilityWithIndex;
@@ -34,8 +35,8 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.contrib.locationchoice.router.BackwardsFastMultiNodeDijkstraFactory;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.MultiNodeDijkstra;
@@ -51,7 +52,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import javax.inject.Provider;
@@ -111,7 +111,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 
 	private void initLocal() {
 		this.flexibleTypes = this.lcContext.getFlexibleTypes();		
-		((NetworkImpl) this.scenario.getNetwork()).connect();
+//		((NetworkImpl) this.scenario.getNetwork()).connect();
 		this.initTrees(this.scenario.getActivityFacilities(), this.dccg);
 		this.sampler = new DestinationSampler(
 				this.lcContext.getPersonsKValuesArray(), 

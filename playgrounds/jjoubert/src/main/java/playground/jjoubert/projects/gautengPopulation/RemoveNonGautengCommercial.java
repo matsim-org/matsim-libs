@@ -23,9 +23,9 @@
 package playground.jjoubert.projects.gautengPopulation;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -69,8 +69,8 @@ public class RemoveNonGautengCommercial {
 	public static void run(String inputPlansFile, String inputAttributesFile,
 			String shapefile, String outputPlansFile, String outputAttributesFile){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc).parse(inputPlansFile);
-		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).parse(inputAttributesFile);
+		new PopulationReader(sc).readFile(inputPlansFile);
+		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).readFile(inputAttributesFile);
 		
 		/* Checking inside envelope is good enough, setting 'strictlyInside to false */
 		Scenario cleanScenario = InAreaPlanKeeper.run(sc, shapefile, false);

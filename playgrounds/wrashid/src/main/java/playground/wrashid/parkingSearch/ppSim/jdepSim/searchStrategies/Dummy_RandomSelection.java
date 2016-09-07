@@ -24,7 +24,7 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.api.core.v01.population.Activity;
 
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
@@ -46,7 +46,7 @@ public class Dummy_RandomSelection extends Dummy_TakeClosestParking {
 		if (!parkingFound.contains(personId)) {
 			parkingFound.add(personId);
 
-			ActivityImpl nextAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+			Activity nextAct = (Activity) aem.getPerson().getSelectedPlan().getPlanElements()
 					.get(aem.getPlanElementIndex() + 3);
 
 			Id parkingId = AgentWithParking.parkingManager.getFreePrivateParking(nextAct.getFacilityId(),

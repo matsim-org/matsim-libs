@@ -22,12 +22,12 @@ package playground.vsp.parkAndRide.replanning;
 
 import java.util.Random;
 
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
 
 import playground.vsp.parkAndRide.PRConstants;
@@ -61,13 +61,13 @@ public class PRPlanMutateTimeAllocation implements PlanAlgorithm {
 
 		double now = 0;
 		boolean isFirst = true;
-		ActivityImpl lastAct = (ActivityImpl) plan.getPlanElements().listIterator(plan.getPlanElements().size()).previous();
+		Activity lastAct = (Activity) plan.getPlanElements().listIterator(plan.getPlanElements().size()).previous();
 
 		// apply mutation to all activities except the last home activity
 		for (PlanElement pe : plan.getPlanElements()) {
 
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl)pe;
+			if (pe instanceof Activity) {
+				Activity act = (Activity)pe;
 
 				// handle first activity
 				if (isFirst) {
@@ -128,7 +128,7 @@ public class PRPlanMutateTimeAllocation implements PlanAlgorithm {
 				}
 
 			} else {
-				LegImpl leg = (LegImpl) pe;
+				Leg leg = (Leg) pe;
 
 				// assume that there will be no delay between end time of previous activity and departure time
 				leg.setDepartureTime(now);
@@ -136,8 +136,9 @@ public class PRPlanMutateTimeAllocation implements PlanAlgorithm {
 				if (leg.getTravelTime() != Time.UNDEFINED_TIME) {
 					now += leg.getTravelTime();
 				}
+				final double arrTime = now;
 				// set planned arrival time accordingly
-				leg.setArrivalTime(now);
+				leg.setTravelTime( arrTime - leg.getDepartureTime() );
 			}
 		}
 	}

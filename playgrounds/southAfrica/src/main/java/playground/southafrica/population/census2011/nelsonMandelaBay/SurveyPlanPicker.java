@@ -31,9 +31,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.*;
 import org.matsim.core.utils.collections.QuadTree;
@@ -217,15 +220,15 @@ public class SurveyPlanPicker {
 
 				/* Randomly pick any of the closest plans, and make a COPY of it. */
 				Tuple<Plan, Double> randomTuple = closestPlans.get( RandomPermutation.getRandomPermutation(closestPlans.size())[0]-1 );
-				PlanImpl plan = new PlanImpl();
-				plan.copyFrom(randomTuple.getFirst());
+				Plan plan = PopulationUtils.createPlan();
+				PopulationUtils.copyFromTo(randomTuple.getFirst(), plan);
 			
 				distanceList.add(randomTuple.getSecond());
 
 				/* Should have a plan now. Change its home locations. */
 				for(PlanElement pe : plan.getPlanElements()){
-					if(pe instanceof ActivityImpl){
-						ActivityImpl activity = (ActivityImpl) pe;
+					if(pe instanceof Activity){
+						Activity activity = (Activity) pe;
 						/* Set the home location */
 						if(activity.getType().equalsIgnoreCase("h")){
 							activity.setCoord(home);

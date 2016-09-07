@@ -9,9 +9,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
@@ -49,7 +49,7 @@ public class MaxActivityModel extends RetailerModelImpl
     findScenarioShops(this.controlerFacilities.getFacilities().values());
     Gbl.printMemoryUsage();
     for (Person pi : this.persons.values()) {
-      PersonRetailersImpl pr = new PersonRetailersImpl((PersonImpl) pi);
+      PersonRetailersImpl pr = new PersonRetailersImpl((Person) pi);
       this.retailersPersons.put(pr.getId(), pr);
     }
     Utils.setPersonPrimaryActivityQuadTree(Utils.createPersonPrimaryActivityQuadTree(this.controler));

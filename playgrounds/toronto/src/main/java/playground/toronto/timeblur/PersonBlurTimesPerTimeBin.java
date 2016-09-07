@@ -23,14 +23,15 @@ package playground.toronto.timeblur;
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 
 public class PersonBlurTimesPerTimeBin extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -71,7 +72,7 @@ public class PersonBlurTimesPerTimeBin extends AbstractPersonAlgorithm implement
 		for (PlanElement e : plan.getPlanElements()) {
 			if (e instanceof Activity) {
 				Activity a = (Activity)e;
-				if (!a.equals(((PlanImpl) plan).getLastActivity())) {
+				if (!a.equals(PopulationUtils.getLastActivity(((Plan) plan)))) {
 					a.setStartTime(now);
 					int min = now;
 					int endTime = (int)Math.round(a.getEndTime());
@@ -83,10 +84,11 @@ public class PersonBlurTimesPerTimeBin extends AbstractPersonAlgorithm implement
 					now = (int)Math.round(a.getEndTime());
 				}
 			}
-			else if (e instanceof LegImpl) {
-				LegImpl l = (LegImpl)e;
+			else if (e instanceof Leg) {
+				Leg l = (Leg)e;
 				l.setDepartureTime(now);
-				l.setArrivalTime(now);
+				final double arrTime = now;
+				l.setTravelTime( arrTime - l.getDepartureTime() );
 			}
 			else { throw new RuntimeException("Plan element type not known."); }
 		}

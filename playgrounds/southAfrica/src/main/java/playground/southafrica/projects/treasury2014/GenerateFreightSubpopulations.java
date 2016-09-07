@@ -4,12 +4,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -53,8 +53,8 @@ public class GenerateFreightSubpopulations {
 			Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			String inputFreightFile = inputFolder + (inputFolder.endsWith("/") ? "" : "/") + "com_010per_30_15.xml.gz";;
 			String inputFreightAttributeFile = inputFolder + (inputFolder.endsWith("/") ? "" : "/") + "comAttr_010per_30_15.xml.gz";;
-			new MatsimPopulationReader(sc).parse(inputFreightFile);
-			new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).parse(inputFreightAttributeFile);;
+			new PopulationReader(sc).readFile(inputFreightFile);
+			new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).readFile(inputFreightAttributeFile);;
 			
 			sc = InAreaPlanKeeper.run(sc, areaShapefile, false);
 			
@@ -65,7 +65,7 @@ public class GenerateFreightSubpopulations {
 					for(PlanElement pe : plan.getPlanElements()){
 						if(pe instanceof Activity){
 							Activity activity = (Activity)pe;
-							((ActivityImpl)activity).setFacilityId(Id.create("cn_" + activity.getFacilityId().toString(), ActivityFacility.class));
+							((Activity)activity).setFacilityId(Id.create("cn_" + activity.getFacilityId().toString(), ActivityFacility.class));
 						}
 					}
 				}

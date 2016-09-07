@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.noise.events.NoiseEventsReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -41,10 +40,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.BasicPersonTripAnalysisHandler;
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.CongestionAnalysisHandler;
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.NoiseAnalysisHandler;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
-import playground.vsp.congestion.events.CongestionEventsReader;
 
 /**
  * 
@@ -81,10 +77,9 @@ public class PersonTripBasicAnalysisMain {
 			
 		} else {
 			
-			String id = "nce_0";
-			String baiscDirectoryPath = "/Users/ihab/Desktop/ils4/kaddoura/incidents/output/2b_reroute1.0/";
+			String baiscDirectoryPath = "../../../runs-svn/decongestion/output/output_2016-07-12_12-35-56 _V9/";
 						
-			runDirectory = baiscDirectoryPath + id + "/";
+			runDirectory = baiscDirectoryPath;
 			log.info("Could not find run-directory in args. Using the directory " + runDirectory);
 		}
 		
@@ -101,9 +96,9 @@ public class PersonTripBasicAnalysisMain {
 
 	public void run() {
 					
-		String networkFile = runDirectory + "output_network.xml.gz";
+		String networkFile = "output_network.xml.gz";
 		String configFile = runDirectory + "output_config.xml.gz";
-		String populationFile = runDirectory + "output_plans.xml.gz";
+		String populationFile = "output_plans.xml.gz";
 
 		Config config = ConfigUtils.loadConfig(configFile);	
 		config.plans().setInputFile(populationFile);
@@ -112,7 +107,7 @@ public class PersonTripBasicAnalysisMain {
 		
 		int finalIteration = config.controler().getLastIteration();
 		String eventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
-		String outputPath = runDirectory + "ITERS/it." + finalIteration + "/analysis/";
+		String outputPath = runDirectory + "ITERS/it." + finalIteration + "/person-trip-analysis/";
 				
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
@@ -163,8 +158,14 @@ public class PersonTripBasicAnalysisMain {
 		analysis.printPersonInformation(outputPath, null, personId2userBenefit, basicHandler, vttsHandler);	
 		log.info("Print person information... Done.");
 		
-		SortedMap<Double, List<Double>> departureTime2tolls = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), 900., 30 * 3600.);
-		analysis.printAvgValuePerParameter(outputPath + "tollsPerDepartureTime_car.csv", departureTime2tolls);
+		SortedMap<Double, List<Double>> departureTime2tolls1 = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "tollsPerDepartureTime_car_3600.csv", departureTime2tolls1);
+		
+		SortedMap<Double, List<Double>> departureTime2tolls2 = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), 1800., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "tollsPerDepartureTime_car_1800.csv", departureTime2tolls2);
+		
+		SortedMap<Double, List<Double>> departureTime2tolls3 = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), 900., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "tollsPerDepartureTime_car_900.csv", departureTime2tolls3);
 		
 		SortedMap<Double, List<Double>> tripDistance2tolls = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2tripDistance(), basicHandler.getPersonId2tripNumber2payment(), 2000., 40 * 1000.);
 		analysis.printAvgValuePerParameter(outputPath + "tollsPerTripDistance_car.csv", tripDistance2tolls);

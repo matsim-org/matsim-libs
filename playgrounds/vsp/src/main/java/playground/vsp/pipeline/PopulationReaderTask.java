@@ -1,13 +1,14 @@
 package playground.vsp.pipeline;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioUtils;
 
 public class PopulationReaderTask implements PersonSource, Runnable {
 
@@ -30,18 +31,20 @@ public class PopulationReaderTask implements PersonSource, Runnable {
 
 	@Override
 	public void run() {
-		Scenario scenario = new ScenarioBuilder(ConfigUtils.createConfig()).setNetwork(network).build();
-		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
-		population.setIsStreaming(true);
+//		Scenario scenario = new ScenarioBuilder(ConfigUtils.createConfig()).setNetwork(network).build();
+		MutableScenario scenario = ScenarioUtils.createMutableScenario(ConfigUtils.createConfig()) ;
+//		Population population = (Population) scenario.getPopulation();
+		StreamingPopulationReader population = new StreamingPopulationReader( scenario ) ;
+		StreamingUtils.setIsStreaming(population, true);
 		population.addAlgorithm(new PersonAlgorithm() {
-
+		
 			@Override
 			public void run(Person person) {
 				sink.process(person);
 			}
 			
 		});
-		new MatsimPopulationReader(scenario).readFile(filename);
+		new PopulationReader(scenario).readFile(filename);
 		sink.complete();
 	}
 

@@ -29,8 +29,8 @@ import org.matsim.contrib.socnetgen.sna.graph.social.SocialSparseGraph;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialSparseGraphBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -67,7 +67,7 @@ public class Analyzer {
 		MatsimNetworkReader netreader = new MatsimNetworkReader(scenario.getNetwork());
 		netreader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch.xml");
 		
-		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
+		PopulationReader reader = new PopulationReader(scenario);
 //		reader.readFile("/Users/jillenberger/Desktop/run/plans.xml.gz");
 		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/07-09-2011/plans.sun.vcg.xml");
 //		reader.readFile("/Users/jillenberger/Work/socialnets/locationChoice/horni/zh10PctEps.100.plans.xml");

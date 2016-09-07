@@ -33,28 +33,25 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.QuadTree;
 
 /**
  * Design thoughts:<ul>
  * <li> This class is final, since it is sitting behind an interface, and thus delegation can be used for 
  * implementation modifications.  Access to the quad tree might be justified in some cases, but should then be realized
- * by specific methods and not via inheritance of the field (I would think
+ * by specific methods and not via inheritance of the field (I would think).
 
  </ul>
  * 
  * @author nagel
  * @author mrieser
  */
-public final class NetworkImpl implements Network {
+/*deliberately package*/ final class NetworkImpl implements Network, Lockable, TimeDependentNetwork, SearchableNetwork {
 
 	private final static Logger log = Logger.getLogger(NetworkImpl.class);
-
-	@Deprecated // use NetworkUtils.createNetwork() as much as possible.  kai, feb'14
-	public static NetworkImpl createNetwork() {
-		return new NetworkImpl();
-	}
 
 	private double capacityPeriod = 3600.0 ;
 
@@ -63,7 +60,7 @@ public final class NetworkImpl implements Network {
 	private final Map<Id<Link>, Link> links = new LinkedHashMap<>();
 
 	private QuadTree<Node> nodeQuadTree = null;
-	
+
 	private LinkQuadTree linkQuadTree = null;
 
 	private static final double DEFAULT_EFFECTIVE_CELL_SIZE = 7.5;
@@ -72,7 +69,7 @@ public final class NetworkImpl implements Network {
 
 	private double effectiveLaneWidth = 3.75;
 
-	private NetworkFactoryImpl factory;
+	private NetworkFactory factory;
 
 	private final Collection<NetworkChangeEvent> networkChangeEvents = new ArrayList<>();
 
@@ -85,6 +82,8 @@ public final class NetworkImpl implements Network {
 	private int counter2=0;
 
 	private int nextMsg2=1;
+
+	private boolean locked = false ;
 
 	NetworkImpl() {
 		this.factory = new NetworkFactoryImpl(this);
@@ -102,7 +101,7 @@ public final class NetworkImpl implements Network {
 					".\nExisting link: " + testLink + "\nLink to be added: " + link +
 					".\nLink is not added to the network.");
 		}
-		
+
 		/* Check if the link's nodes are in the network. */
 		Node fromNode = nodes.get( link.getFromNode().getId() );
 		if(fromNode == null){
@@ -117,23 +116,26 @@ public final class NetworkImpl implements Network {
 		toNode.addInLink(link);
 
 		links.put(link.getId(), link);
-		
+
 		// show counter
 		this.counter++;
 		if (this.counter % this.nextMsg == 0) {
 			this.nextMsg *= 2;
 			printLinksCount();
 		}
+		if ( this.locked && link instanceof Lockable ) {
+			((Lockable)link).setLocked() ;
+		}
 	}
-	
+
 	private void printLinksCount() {
 		log.info(" link # " + this.counter);
 	}
-	
+
 	private void printNodesCount() {
 		log.info(" node # " + this.counter2);
 	}
-	
+
 	@Override
 	public void addNode(final Node nn) {
 		Id<Node> id = nn.getId() ;
@@ -169,6 +171,10 @@ public final class NetworkImpl implements Network {
 			this.nextMsg2 *= 2;
 			printNodesCount();
 		}
+
+		if ( this.locked && node instanceof Lockable ) {
+			((Lockable)node).setLocked() ;
+		}
 	}
 	// ////////////////////////////////////////////////////////////////////
 	// remove methods
@@ -198,8 +204,10 @@ public final class NetworkImpl implements Network {
 		if (l == null) {
 			return null;
 		}
-		l.getFromNode().getOutLinks().remove(l.getId());
-		l.getToNode().getInLinks().remove(l.getId());
+		//		l.getFromNode().getOutLinks().remove(l.getId());
+		l.getFromNode().removeOutLink(l.getId()) ; 
+		//		l.getToNode().getInLinks().remove(l.getId());
+		l.getToNode().removeInLink(l.getId()) ;
 		return l;
 	}
 
@@ -210,11 +218,14 @@ public final class NetworkImpl implements Network {
 	/**
 	 * @param capPeriod the capacity-period in seconds
 	 */
+	@Override
 	public void setCapacityPeriod(final double capPeriod) {
+		testForLocked() ;
 		this.capacityPeriod = (int) capPeriod;
 	}
-
+	@Override
 	public void setEffectiveCellSize(final double effectiveCellSize) {
+		testForLocked() ;
 		if (this.effectiveCellSize != effectiveCellSize) {
 			if (effectiveCellSize != DEFAULT_EFFECTIVE_CELL_SIZE) {
 				log.warn("Setting effectiveCellSize to a non-default value of " + effectiveCellSize);
@@ -224,8 +235,9 @@ public final class NetworkImpl implements Network {
 			this.effectiveCellSize = effectiveCellSize;
 		}
 	}
-
+	@Override
 	public void setEffectiveLaneWidth(final double effectiveLaneWidth) {
+		testForLocked() ;
 		if (!Double.isNaN(this.effectiveLaneWidth) && this.effectiveLaneWidth != effectiveLaneWidth) {
 			log.warn(this + "[effectiveLaneWidth=" + this.effectiveLaneWidth + " already set. Will be overwritten with " + effectiveLaneWidth + "]");
 		}
@@ -239,12 +251,15 @@ public final class NetworkImpl implements Network {
 	 *
 	 * @param events a list of events.
 	 */
-	public void setNetworkChangeEvents(final List<NetworkChangeEvent> events) {
-        this.networkChangeEvents.clear();
-        for(Link link : getLinks().values()) {
-            if (link instanceof TimeVariantLinkImpl) {
-                ((TimeVariantLinkImpl)link).clearEvents();
-            }
+	@Override public void setNetworkChangeEvents(final List<NetworkChangeEvent> events) {
+		this.networkChangeEvents.clear();
+		for(Link link : getLinks().values()) {
+			if (link instanceof TimeVariantLinkImpl) {
+				((TimeVariantLinkImpl)link).clearEvents();
+			}
+			// Presumably, there is no exception here if this fails because it can be interpreted: maybe only some links are time-dependent
+			// and others are not, and it is sufficient if the time-dependent ones can be configured by the addNetworkChangeEvent method.
+			// kai, jul'16
 		}
 		for (NetworkChangeEvent event : events) {
 			this.addNetworkChangeEvent(event);
@@ -258,6 +273,7 @@ public final class NetworkImpl implements Network {
 	 * @param event
 	 *            a network change event.
 	 */
+	@Override
 	public void addNetworkChangeEvent(final NetworkChangeEvent event) {
 		this.networkChangeEvents.add(event);
 		for (Link link : event.getLinks()) {
@@ -273,7 +289,7 @@ public final class NetworkImpl implements Network {
 	public double getCapacityPeriod() {
 		return this.capacityPeriod;
 	}
-
+	@Override
 	public double getEffectiveCellSize() {
 		return this.effectiveCellSize;
 	}
@@ -285,23 +301,23 @@ public final class NetworkImpl implements Network {
 
 	@Override
 	public Map<Id<Node>, Node> getNodes() {
-		return this.nodes;
+		return Collections.unmodifiableMap(this.nodes);
 	}
 
-    public Link getNearestLinkExactly(final Coord coord) {
+	@Override public Link getNearestLinkExactly(final Coord coord) {
 		if (this.linkQuadTree == null) {
 			buildLinkQuadTree();
 		}
 		return this.linkQuadTree.getNearest(coord.getX(), coord.getY());
 	}
 
-    /**
+	/**
 	 * finds the node nearest to <code>coord</code>
 	 *
 	 * @param coord the coordinate to which the closest node should be found
 	 * @return the closest node found, null if none
 	 */
-	public Node getNearestNode(final Coord coord) {
+	@Override public Node getNearestNode(final Coord coord) {
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
 		return this.nodeQuadTree.getClosest(coord.getX(), coord.getY());
 	}
@@ -313,18 +329,17 @@ public final class NetworkImpl implements Network {
 	 * @param distance the maximum distance a node can have to <code>coord</code> to be found
 	 * @return all nodes within distance to <code>coord</code>
 	 */
-	public Collection<Node> getNearestNodes(final Coord coord, final double distance) {
+	@Override public Collection<Node> getNearestNodes(final Coord coord, final double distance) {
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
 		return this.nodeQuadTree.getDisk(coord.getX(), coord.getY(), distance);
 	}
 
-
+	@Override
 	public Collection<NetworkChangeEvent> getNetworkChangeEvents() {
 		return this.networkChangeEvents;
 	}
-
 	@Override
-	public NetworkFactoryImpl getFactory() {
+	public NetworkFactory getFactory() {
 		return this.factory;
 	}
 
@@ -339,9 +354,10 @@ public final class NetworkImpl implements Network {
 				"[nof_nodes=" + this.nodes.size() + "]";
 	}
 
-	public void connect() {
-		buildQuadTree();
-	}
+	//	public void connect() {
+	//		buildQuadTree();
+	//	}
+	// it is safer if all functionality that could be done here is either done lazily or directly when nodes/links are added.  kai, jul'16
 
 	synchronized private void buildQuadTree() {
 		/* the method must be synchronized to ensure we only build one quadTree
@@ -366,7 +382,7 @@ public final class NetworkImpl implements Network {
 		maxx += 1.0;
 		maxy += 1.0;
 		// yy the above four lines are problematic if the coordinate values are much smaller than one. kai, oct'15
-		
+
 		log.info("building QuadTree for nodes: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		QuadTree<Node> quadTree = new QuadTree<>(minx, miny, maxx, maxy);
 		for (Node n : this.nodes.values()) {
@@ -378,7 +394,7 @@ public final class NetworkImpl implements Network {
 		this.nodeQuadTree = quadTree;
 		log.info("Building QuadTree took " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds.");
 	}
-	
+
 	synchronized private void buildLinkQuadTree() {
 		if (this.linkQuadTree != null) {
 			return;
@@ -399,7 +415,7 @@ public final class NetworkImpl implements Network {
 		maxx += 1.0;
 		maxy += 1.0;
 		// yy the above four lines are problematic if the coordinate values are much smaller than one. kai, oct'15
-		
+
 		log.info("building LinkQuadTree for nodes: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		LinkQuadTree qt = new LinkQuadTree(minx, miny, maxx, maxy);
 		for (Link l : this.links.values()) {
@@ -414,58 +430,37 @@ public final class NetworkImpl implements Network {
 		return Collections.unmodifiableMap(links);
 	}
 
-	 void setFactory(final NetworkFactoryImpl networkFactory) {
+	void setFactory(final NetworkFactory networkFactory) {
 		this.factory = networkFactory;
 	}
 
-	public Node createAndAddNode(final Id<Node> id, final Coord coord) {
-		if (this.nodes.containsKey(id)) {
-			throw new IllegalArgumentException(this + "[id=" + id + " already exists]");
-		}
-		NodeImpl n = this.factory.createNode(id, coord);
-		this.addNode(n) ;
-		return n;
-	}
-
-	public Node createAndAddNode(final Id<Node> id, final Coord coord, final String nodeType) {
-		NodeImpl n = (NodeImpl) createAndAddNode(id, coord);
-		n.setType(nodeType);
-		return n;
-	}
-
-	public Link createAndAddLink(final Id<Link> id, final Node fromNode,
-			final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes) {
-				return createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null);
-			}
-
-	public LinkImpl createAndAddLink(final Id<Link> id, final Node fromNode,
-			final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes,
-			final String origId, final String type) 
-	{
-
-				if (this.nodes.get(fromNode.getId()) == null) {
-					throw new IllegalArgumentException(this+"[from="+fromNode+" does not exist]");
-				}
-
-				if (this.nodes.get(toNode.getId()) == null) {
-					throw new IllegalArgumentException(this+"[to="+toNode+" does not exist]");
-				}
-
-				LinkImpl link = (LinkImpl) this.factory.createLink(id, fromNode, toNode, this, length, freespeed, capacity, numLanes);
-				link.setType(type);
-				link.setOrigId(origId);
-
-				this.addLink( link ) ;
-
-				return link;
-			}
-
+	@Override
 	public String getName() {
 		return this.name;
 	}
-
+	@Override
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	@Override
+	public void setLocked() {
+		this.locked = true ;
+		for ( Link link : this.links.values() ) {
+			if ( link instanceof Lockable ) {
+				((Lockable) link).setLocked();
+			}
+		}
+		for ( Node node : this.nodes.values() ) {
+			if ( node instanceof Lockable ) {
+				((Lockable) node).setLocked();
+			}
+		}
+	}
+	@SuppressWarnings("unused")
+	private void testForLocked() {
+		if ( locked ) {
+			throw new RuntimeException( "Network is locked; too late to do this.  See comments in code.") ;
+		}
+	}
 }

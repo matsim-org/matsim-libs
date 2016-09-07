@@ -32,16 +32,15 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PermissibleModesCalculator;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.population.algorithms.PermissibleModesCalculator;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.singapore.springcalibration.run.TaxiUtils;
 
@@ -56,7 +55,7 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 
 	private final String[] possibleModes;
 	private boolean ignoreCarAvailability = false;
-	private double walkThreshold = 2000.0;
+	private double walkThreshold = 5000.0;
 	private static final Logger log = Logger.getLogger(SingaporeLegModeChange.class);
 	private TaxiUtils taxiUtils;
 	private SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup;
@@ -226,7 +225,8 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 			//((PlanImpl) plan).removeActivity(act2RemoveIndex);
 			
 			int leg2RemoveIndex = plan.getPlanElements().indexOf(walk2taxiLeg);
-			((PlanImpl) plan).removeLeg(leg2RemoveIndex);
+			final int index = leg2RemoveIndex;
+			PopulationUtils.removeLeg(((Plan) plan), index);
 		}
 	}
 	
@@ -234,7 +234,7 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 	 * Is this really the most efficient way of adding an activiyt at a certain plan loc?
 	 */
 	private void newPlanWithTaxiStages(Plan plan, Leg leg) {
-		Plan tmpPlan = new PlanImpl();
+		Plan tmpPlan = PopulationUtils.createPlan();
 		
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {
@@ -248,12 +248,12 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 					double taxiWaitTime = this.taxiUtils.getWaitingTime(coord, hour);
 					double taxiWaitEndTime = currentActivity.getEndTime() + taxiWaitTime;
 					
-					Leg taxiWalkLeg = new LegImpl(TaxiUtils.taxi_walk);
+					Leg taxiWalkLeg = PopulationUtils.createLeg(TaxiUtils.taxi_walk);
 					taxiWalkLeg.setDepartureTime(currentActivity.getEndTime());
 					taxiWalkLeg.setTravelTime(0.0);
 					tmpPlan.addLeg(taxiWalkLeg);
 										
-					Activity taxiWaitAct = new ActivityImpl(TaxiUtils.wait4Taxi, currentActivity.getCoord(), currentActivity.getLinkId());					
+					Activity taxiWaitAct = PopulationUtils.createActivityFromCoordAndLinkId(TaxiUtils.wait4Taxi, currentActivity.getCoord(), currentActivity.getLinkId());					
 					taxiWaitAct.setEndTime(taxiWaitEndTime);	
 					tmpPlan.addActivity(taxiWaitAct);
 				}

@@ -2,7 +2,7 @@ package playground.wrashid.lib.tools.plan;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationWriter;
 
 
 public class PlanShrinker {

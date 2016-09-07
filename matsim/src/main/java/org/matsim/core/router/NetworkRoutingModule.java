@@ -29,9 +29,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -52,7 +51,6 @@ public final class NetworkRoutingModule implements RoutingModule {
 	private final PopulationFactory populationFactory;
 
 	private final Network network;
-	private final RouteFactoryImpl routeFactory;
 	private final LeastCostPathCalculator routeAlgo;
 
 
@@ -60,11 +58,9 @@ public final class NetworkRoutingModule implements RoutingModule {
 			final String mode,
 			final PopulationFactory populationFactory,
 			final Network network,
-			final LeastCostPathCalculator routeAlgo,
-			final RouteFactoryImpl routeFactory) {
+			final LeastCostPathCalculator routeAlgo) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
-		this.routeFactory = routeFactory;
 		this.mode = mode;
 		this.populationFactory = populationFactory;
 	}
@@ -75,8 +71,11 @@ public final class NetworkRoutingModule implements RoutingModule {
 			final Facility<?> toFacility,
 			final double departureTime,
 			final Person person) {
-		Leg newLeg = populationFactory.createLeg( mode );
+		Leg newLeg = this.populationFactory.createLeg( this.mode );
 		newLeg.setDepartureTime( departureTime );
+		
+		Gbl.assertNotNull(fromFacility);
+		Gbl.assertNotNull(toFacility);
 
 		Link fromLink = this.network.getLinks().get(fromFacility.getLinkId());
 		Link toLink = this.network.getLinks().get(toFacility.getLinkId());
@@ -108,7 +107,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 
 	@Override
 	public String toString() {
-		return "[NetworkRoutingModule: mode="+mode+"]";
+		return "[NetworkRoutingModule: mode="+this.mode+"]";
 	}
 
 	private double routeLeg(Person person, Leg leg, Link fromLink, Link toLink, double depTime) {
@@ -123,17 +122,17 @@ public final class NetworkRoutingModule implements RoutingModule {
 			// (a "true" route)
 			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-			NetworkRoute route = this.routeFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
+			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 			route.setTravelTime((int) path.travelTime); // yyyy why int?  kai, dec'15
 			route.setTravelCost(path.travelCost);
-			route.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(route, this.network));
+			route.setDistance(RouteUtils.calcDistance(route, 1.0, 1.0, this.network));
 			leg.setRoute(route);
 			travTime = (int) path.travelTime; // yyyy why int?  kai, dec'15
 		} else {
 			// create an empty route == staying on place if toLink == endLink
 			// note that we still do a route: someone may drive from one location to another on the link. kai, dec'15
-			NetworkRoute route = this.routeFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
+			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			route.setDistance(0.0);
 			leg.setRoute(route);
@@ -142,8 +141,9 @@ public final class NetworkRoutingModule implements RoutingModule {
 
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		if ( leg instanceof LegImpl ) {
-			((LegImpl) leg).setArrivalTime(depTime + travTime); 
+		if ( leg instanceof Leg ) {
+			Leg r = (leg);
+			r.setTravelTime( depTime + travTime - r.getDepartureTime() ); 
 			// (not in interface!)
 		}
 		return travTime;

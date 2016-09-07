@@ -54,7 +54,7 @@ public class BerlinRunCongested implements Runnable {
         Config config = ConfigUtils.loadConfig("/Users/michaelzilske/runs-svn/synthetic-cdr/bluetooth/config.xml");
         config.plans().setInputFile(BERLIN_PATH + "plans/baseplan_car_only.xml.gz");  // 18377 persons
         config.network().setInputFile(BERLIN_PATH + "network/bb_5_v_scaled_simple.xml.gz"); // only till secondary roads (4), dumped from OSM 20090603, contains 35336 nodes and 61920 links
-        config.counts().setCountsFileName(BERLIN_PATH + "counts/counts4bb_5_v_notscaled_simple.xml");
+        config.counts().setInputFile(BERLIN_PATH + "counts/counts4bb_5_v_notscaled_simple.xml");
         config.controler().setOutputDirectory("/Users/michaelzilske/runs-svn/synthetic-cdr/bluetooth/output-berlin");
         config.controler().setMobsim(MobsimType.qsim.toString());
 

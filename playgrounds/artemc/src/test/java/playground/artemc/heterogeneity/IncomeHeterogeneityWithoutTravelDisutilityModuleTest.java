@@ -8,6 +8,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 /**
  * Created by artemc on 25/4/15.
  */
@@ -19,9 +23,10 @@ public class IncomeHeterogeneityWithoutTravelDisutilityModuleTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testControlerWithIncomeHeterogeneityWorks() {
-		Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
-		config.plans().setInputPersonAttributeFile(utils.getClassInputDirectory() + "/personAttributes.xml");
+	public void testControlerWithIncomeHeterogeneityWorks() throws MalformedURLException {
+		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
+		ConfigUtils.loadConfig(config, utils.getClassInputDirectory() + "/config.xml");
+		config.plans().setInputPersonAttributeFile("file://" + new File(utils.getClassInputDirectory() + "/personAttributes.xml").getAbsolutePath());
 		ConfigUtils.addOrGetModule(config, HeterogeneityConfigGroup.GROUP_NAME, HeterogeneityConfigGroup.class);
 		Controler controler = new Controler(config);
 		controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityModule());

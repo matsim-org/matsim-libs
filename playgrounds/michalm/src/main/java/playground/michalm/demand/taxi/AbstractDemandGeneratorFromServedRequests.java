@@ -21,17 +21,17 @@ package playground.michalm.demand.taxi;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.taxi.run.TaxiModule;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 
 
 public abstract class AbstractDemandGeneratorFromServedRequests
 {
     private final Scenario scenario;
-    private final NetworkImpl network;
+    private final Network network;
     private final PopulationFactory pf;
 
 
@@ -39,7 +39,7 @@ public abstract class AbstractDemandGeneratorFromServedRequests
     {
         this.scenario = scenario;
         pf = scenario.getPopulation().getFactory();
-        network = (NetworkImpl)scenario.getNetwork();
+        network = (Network)scenario.getNetwork();
     }
     
     
@@ -71,8 +71,9 @@ public abstract class AbstractDemandGeneratorFromServedRequests
 
     private Activity createActivityFromCoord(String actType, Coord coord)
     {
-        ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
-        Link link = network.getNearestLinkExactly(coord);
+        Activity activity = (Activity)pf.createActivityFromCoord(actType, coord);
+	final Coord coord1 = coord;
+        Link link = NetworkUtils.getNearestLinkExactly(network,coord1);
         activity.setLinkId(link.getId());
         return activity;
     }

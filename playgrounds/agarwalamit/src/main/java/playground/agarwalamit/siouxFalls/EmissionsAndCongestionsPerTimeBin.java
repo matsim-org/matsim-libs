@@ -77,7 +77,7 @@ public class EmissionsAndCongestionsPerTimeBin {
 		SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> time2EmissionsTotal = eLinkAnalyzer.getLink2TotalEmissions();
 		SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> time2EmissionsTotalFilled = setNonCalculatedEmissions(time2EmissionsTotal);
 
-		ExperiencedDelayAnalyzer cLinkAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, this.scenario, noOfTimeBins, scenario.getConfig().qsim().getEndTime());
+		ExperiencedDelayAnalyzer cLinkAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, this.scenario, noOfTimeBins);
 		cLinkAnalyzer.run();
 		cLinkAnalyzer.checkTotalDelayUsingAlternativeMethod();
 

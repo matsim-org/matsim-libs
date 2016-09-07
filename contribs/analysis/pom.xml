@@ -8,11 +8,23 @@
   <groupId>org.matsim.contrib</groupId>
   <artifactId>analysis</artifactId>
   <name>analysis</name>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
   <dependencies>
   	<dependency>
   		<groupId>org.matsim.contrib</groupId>
-  		<artifactId>accessibility</artifactId>
+  		<artifactId>roadpricing</artifactId>
   		<version>0.9.0-SNAPSHOT</version>
   	</dependency>
+  	<dependency>
+    	<groupId>org.osgeo</groupId>
+		<artifactId>proj4j</artifactId>
+		<version>0.1.0</version>
+	</dependency>
   </dependencies>
 </project>

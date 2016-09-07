@@ -111,9 +111,8 @@ public class FixedGroupsTest {
 		final Random random = new Random( 1432 );
 		for (int i=0; i < 100; i++) {
 			scenario.getPopulation().addPerson(
-					PopulationUtils.createPerson(
-							Id.create(
-									"garbage-" + random.nextInt(999999) + "-" + i, Person.class)));
+					PopulationUtils.getFactory().createPerson(Id.create(
+					"garbage-" + random.nextInt(999999) + "-" + i, Person.class)));
 		}
 		return scenario.getPopulation();
 	}

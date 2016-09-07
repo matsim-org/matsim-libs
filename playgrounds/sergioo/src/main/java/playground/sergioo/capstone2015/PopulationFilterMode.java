@@ -8,16 +8,16 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class PopulationFilterMode {
 
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario).readFile(args[0]);
+		new PopulationReader(scenario).readFile(args[0]);
 		int cars = 0, passengers = 0, pts=0;
 		Set<Id<Person>> deleted = new HashSet<>();
 		for(Person person:scenario.getPopulation().getPersons().values()) {

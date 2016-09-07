@@ -29,7 +29,10 @@ import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 import java.util.zip.GZIPInputStream;
 
+import org.apache.log4j.Logger;
+
 public class CRCChecksum {
+	private static final Logger log = Logger.getLogger( CRCChecksum.class );
 
 	private static long getCRCFromStream(final InputStream in) {
 		long check = 0;
@@ -41,6 +44,7 @@ public class CRCChecksum {
 				/* Read until the end of the stream is reached. */
 			}
 			check = crc.getValue();
+			cis.close();
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e);
@@ -62,28 +66,52 @@ public class CRCChecksum {
 	 * @return CRC32-Checksum of the file's content.
 	 */
 	public static long getCRCFromFile(final String filename) {
-		InputStream in = null;
-		try {
-			if (new File(filename).exists()) {
-				if (filename.endsWith(".gz")) {
-					in = new GZIPInputStream(new BufferedInputStream(new FileInputStream(filename)));
-				} else {
-					in = new BufferedInputStream(new FileInputStream(filename));
+		if (new File(filename).exists()) {
+			log.info( "file exists");
+			if (filename.endsWith(".gz")) {
+				log.info( "file ends in gz");
+				try ( InputStream in = new GZIPInputStream(new BufferedInputStream(new FileInputStream(filename))) ) {
+					long result = getCRCFromStream(in);
+					in.close();
+					return result ;
+				} catch (IOException e) {
+					throw new RuntimeException(e);
 				}
-			} else {
-				// (the logic is: if the file cannot be found directly on the file system, this is some method to search
-				// in generic locations (which ones?).  kai, feb'14)
-				InputStream stream = CRCChecksum.class.getClassLoader().getResourceAsStream(filename);
-				if (filename.endsWith(".gz")) {
-					in = new GZIPInputStream(new BufferedInputStream(stream));
-				} else {
-					in = new BufferedInputStream(stream);
+			} else { // not with gz
+				log.info( "file does not end in gz");
+				try ( InputStream in = new BufferedInputStream(new FileInputStream(filename)) ) {
+					long result = getCRCFromStream(in);
+					in.close();
+					return result ;
+				} catch (IOException e) {
+					throw new RuntimeException(e);
 				}
 			}
-			return getCRCFromStream(in);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		} else { // does not exist
+			log.info( "file does not exist; search via class loader");
+			// (the logic is: if the file cannot be found directly on the file system, this is some method to search
+			// in generic locations (which ones?).  kai, feb'14)
+			if (filename.endsWith(".gz")) {
+				log.info( "file ends in gz");
+				try ( InputStream stream = CRCChecksum.class.getClassLoader().getResourceAsStream(filename) ;
+					InputStream in = new GZIPInputStream(new BufferedInputStream(stream)); ) {
+					long result = getCRCFromStream(in);
+					in.close();
+					return result ;
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			} else { // not work gz
+				log.info( "file does not end in gz");
+				try ( InputStream stream = CRCChecksum.class.getClassLoader().getResourceAsStream(filename) ;
+					InputStream in = new BufferedInputStream(stream); ) {
+					long result = getCRCFromStream(in);
+					in.close();
+					return result ;
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
 		}
 	}
-
 }

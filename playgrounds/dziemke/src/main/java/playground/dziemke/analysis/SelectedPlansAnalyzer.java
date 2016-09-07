@@ -15,8 +15,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationReaderMatsimV5;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -25,9 +24,9 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class SelectedPlansAnalyzer {
 	// Parameters
-	private static final  String runId = "run_162";
-	private static final  int numberOfIterations = 100;
-	private static final  int plansFileInterval = 100;
+	private static final  String runId = "run_194b"; // <----------
+	private static final  int numberOfIterations = 150; // <----------
+	private static final  int plansFileInterval = 150; // <----------
 	private static final  boolean useInterimPlans = true;
 	private static final  boolean useOutputPlans = false;
 	
@@ -50,7 +49,7 @@ public class SelectedPlansAnalyzer {
 				
 				Config config = ConfigUtils.createConfig();
 				Scenario scenario = ScenarioUtils.createScenario(config);
-				PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
+				PopulationReader reader = new PopulationReader(scenario);
 				reader.readFile(plansFile);
 				Population population = scenario.getPopulation();
 	
@@ -64,7 +63,7 @@ public class SelectedPlansAnalyzer {
 			
 			Config config = ConfigUtils.createConfig();
 			Scenario scenario = ScenarioUtils.createScenario(config);
-			PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
+			PopulationReader reader = new PopulationReader(scenario);
 			reader.readFile(plansFileOutput);
 			Population population = scenario.getPopulation();
 	
@@ -97,7 +96,7 @@ public class SelectedPlansAnalyzer {
 				
 				for (int i = 0; i< numberOfPlanElements; i++) {
 					if (selectedPlan.getPlanElements().get(i) instanceof Leg) {
-						LegImpl leg = (LegImpl) selectedPlan.getPlanElements().get(i);
+						Leg leg = (Leg) selectedPlan.getPlanElements().get(i);
 						
 						mode = leg.getMode();
 						

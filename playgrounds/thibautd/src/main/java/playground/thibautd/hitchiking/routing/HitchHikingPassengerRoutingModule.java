@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -50,7 +50,7 @@ import java.util.Random;
 public class HitchHikingPassengerRoutingModule implements RoutingModule {
 	private final static double BEEFLY_ESTIMATED_SPEED = 25000d / 3600d;
 	private final RoutingModule ptRoutingModule;
-	private final RouteFactoryImpl routeFactory;
+	private final RouteFactories routeFactory;
 	private final HitchHikingSpots spots;
 	private final SpotWeighter spotWeighter;
 	private final HitchHikingConfigGroup config;
@@ -59,7 +59,7 @@ public class HitchHikingPassengerRoutingModule implements RoutingModule {
 	public HitchHikingPassengerRoutingModule(
 			final RoutingModule ptRoutingModule,
 			final HitchHikingSpots spots,
-			final RouteFactoryImpl factory,
+			final RouteFactories factory,
 			final SpotWeighter spotWeighter,
 			final HitchHikingConfigGroup config,
 			final Random random) {
@@ -93,7 +93,7 @@ public class HitchHikingPassengerRoutingModule implements RoutingModule {
 					departureTime,
 					person ) );
 
-		Leg leg = new LegImpl( HitchHikingConstants.PASSENGER_MODE );
+		Leg leg = PopulationUtils.createLeg(HitchHikingConstants.PASSENGER_MODE);
 		Route route = routeFactory.createRoute(
 					Route.class, // HitchHikingConstants.PASSENGER_MODE,
 					puSpot.getId(),

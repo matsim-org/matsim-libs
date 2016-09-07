@@ -41,10 +41,9 @@ import java.util.Set;
 public class BitfeldAnalyzer {
 	protected static Logger log = Logger.getLogger(BitfeldAnalyzer.class);
 
-	public static Set<Integer> findBitfeldnumbersOfBusiestDay(String FPLAN, String BITFELD) {
+	public static Set<Integer> findBitfeldnumbersOfBusiestDay(String FPLAN, String BITFELD) throws IOException {
 		final Set<Integer> bitfeldNummern = new HashSet<>();
 		final int posMaxFVals = find4DayBlockWithMostFVals(FPLAN, BITFELD);
-		try {
 			BufferedReader readsLines = new BufferedReader(new InputStreamReader(new FileInputStream(BITFELD), "latin1"));
 			String newLine = readsLines.readLine();
 			while (newLine != null) {
@@ -71,9 +70,6 @@ public class BitfeldAnalyzer {
 				newLine = readsLines.readLine();
 			}
 			readsLines.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		bitfeldNummern.add(0);
 		return bitfeldNummern;
 	}
@@ -82,9 +78,6 @@ public class BitfeldAnalyzer {
 	 * Returns the 4-day bitfeld block that has the most F-values. The assumption is that this block is either a
 	 * Monday-Tuesday-Wednesday-Thursday or a Tuesday-Wednesday-Thursday-Friday block because all other blocks have
 	 * at least one Weekend-Day and therefore are less like to produce an F (an F means traveling at all four days).
-	 *
-	 * @param BITFELD
-	 * @return
 	 */
 	private static int find4DayBlockWithMostFVals(String FPLAN, String BITFELD) {
 		Map<Integer, Integer> departuresPerBitfeld = new HashMap<>();

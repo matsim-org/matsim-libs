@@ -14,12 +14,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -76,7 +76,7 @@ public class CalcAverageTripLengthTest {
 		// extend route by one link, test again
 		linkIds.add(l3.getId());
 		route.setLinkIds(l1.getId(), linkIds, l4.getId());
-		((ActivityImpl) act2).setLinkId(l4.getId());
+		((Activity) act2).setLinkId(l4.getId());
 
 		catl = new CalcAverageTripLength(network);
 		catl.run(plan);
@@ -85,7 +85,7 @@ public class CalcAverageTripLengthTest {
 		// don't reset catl, modify route, test average
 		linkIds.remove(1);
 		route.setLinkIds(l1.getId(), linkIds, l3.getId());
-		((ActivityImpl) act2).setLinkId(l3.getId());
+		((Activity) act2).setLinkId(l3.getId());
 
 		catl.run(plan);
 		Assert.assertEquals(500.0, catl.getAverageTripLength(), MatsimTestUtils.EPSILON);

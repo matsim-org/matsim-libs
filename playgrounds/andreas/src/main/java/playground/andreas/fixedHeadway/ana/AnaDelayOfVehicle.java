@@ -49,7 +49,7 @@ public class AnaDelayOfVehicle {
 		}	
 		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(filename);
+		reader.readFile(filename);
 		
 		try {
 			this.writer.append(this.eventsInFile); this.writer.newLine();

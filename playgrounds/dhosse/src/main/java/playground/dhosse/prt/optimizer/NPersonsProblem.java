@@ -23,8 +23,7 @@ public class NPersonsProblem {
     public NPersonsProblem(TaxiOptimizerContext optimConfig)
     {
         this.optimConfig = optimConfig;
-        router = new Dijkstra(optimConfig.getNetwork(),
-                optimConfig.travelDisutility, optimConfig.travelTime);
+        router = new Dijkstra(optimConfig.network, optimConfig.travelDisutility, optimConfig.travelTime);
         
         vrpFinder = new BestDispatchFinder(optimConfig);
     }
@@ -50,10 +49,10 @@ public class NPersonsProblem {
         	if(optimConfig.taxiData.getVehicles().size()>0&&optimConfig.timer.getTimeOfDay() > 32000){
         		System.out.print("");
         	}
-        	List<BestDispatchFinder.Dispatch> requests = new ArrayList<BestDispatchFinder.Dispatch>();
+        	List<BestDispatchFinder.Dispatch<TaxiRequest>> requests = new ArrayList<BestDispatchFinder.Dispatch<TaxiRequest>>();
             TaxiRequest req = unplannedRequests.peek();
 
-            BestDispatchFinder.Dispatch best = vrpFinder.findBestVehicleForRequest(req,
+            BestDispatchFinder.Dispatch<TaxiRequest> best = vrpFinder.findBestVehicleForRequest(req,
                     optimConfig.taxiData.getVehicles().values());
 
             if (best == null) {

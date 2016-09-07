@@ -24,14 +24,14 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
-import org.matsim.population.algorithms.PersonAlgorithm;
 
 public class ReRoutePersons {
 
@@ -52,8 +52,8 @@ public class ReRoutePersons {
 			for (Plan plan:p.getPlans()) {
 
 				for (PlanElement pe : plan.getPlanElements()) {
-					if (pe instanceof ActivityImpl) {
-						ActivityImpl act = (ActivityImpl) pe;
+					if (pe instanceof Activity) {
+						Activity act = (Activity) pe;
 						if (movedFacilities.containsKey(act.getFacilityId())) {
 							act.setLinkId(((ActivityFacilityImpl) facilities.getFacilities().get((act.getFacilityId()))).getLinkId());
 							routeIt = true;

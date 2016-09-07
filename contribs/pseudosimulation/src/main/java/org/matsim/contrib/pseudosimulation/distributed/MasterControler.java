@@ -1,16 +1,44 @@
 package org.matsim.contrib.pseudosimulation.distributed;
 
 
-import org.apache.commons.cli.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.pseudosimulation.distributed.listeners.controler.GenomeAnalysis;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
+import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculatorSerializable;
 import org.matsim.contrib.pseudosimulation.distributed.instrumentation.scorestats.SlaveScoreStats;
+import org.matsim.contrib.pseudosimulation.distributed.listeners.controler.GenomeAnalysis;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.controler.SlaveScoreWriter;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformanceRecorder;
+import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -25,22 +53,10 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
-import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
-import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculatorSerializable;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class MasterControler implements AfterMobsimListener, ShutdownListener, StartupListener, IterationStartsListener {
     public static final Logger masterLogger = Logger.getLogger(MasterControler.class);
@@ -958,10 +974,10 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         }
 
         private void dumpPlans(int iteration) throws IOException, ClassNotFoundException {
-            PopulationImpl temp = (PopulationImpl) PopulationUtils.createPopulation(config);
-            temp.setIsStreaming(true);
+            Population temp = (Population) PopulationUtils.createPopulation(config);
+            StreamingUtils.setIsStreaming(temp, true);
             OutputDirectoryHierarchy controlerIO = matsimControler.getControlerIO();
-            org.matsim.core.population.PopulationWriter pw = new org.matsim.core.population.PopulationWriter(
+            StreamingPopulationWriter pw = new StreamingPopulationWriter(
                     temp, scenario.getNetwork());
             pw.startStreaming(controlerIO.getIterationFilename(iteration, "FULLplans_slave_" + myNumber + ".xml.gz"));
             slaveLogger.warn("Dumping population of " + currentPopulationSize + " agents on slave number " + myNumber);

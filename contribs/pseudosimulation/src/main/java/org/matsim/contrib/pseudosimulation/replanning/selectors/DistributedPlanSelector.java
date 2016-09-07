@@ -29,19 +29,18 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
 import java.util.Map;
 
 
-public class DistributedPlanSelector implements PlanSelector {
+public class DistributedPlanSelector implements PlanSelector<Plan, Person> {
 
     String delegateName;
     PlanCatcher slave;
     MatsimServices controler;
     private double selectionFrequency;
-    private GenericPlanSelector delegate;
+    private PlanSelector delegate;
 
 
     public DistributedPlanSelector(MatsimServices controler, String delegateName, PlanCatcher slave, boolean quickReplanning, int selectionInflationFactor) {
@@ -56,7 +55,7 @@ public class DistributedPlanSelector implements PlanSelector {
     @Override
     public Plan selectPlan(HasPlansAndId<Plan, Person> person) {
         if (delegate == null) {
-            delegate = (GenericPlanSelector) ((GenericPlanStrategyImpl) controler.getInjector().getInstance(Key.get(
+            delegate = (PlanSelector) ((GenericPlanStrategyImpl) controler.getInjector().getInstance(Key.get(
                     new TypeLiteral<Map<String, PlanStrategy>>() {
                     }
             )).get(delegateName)).getPlanSelector();

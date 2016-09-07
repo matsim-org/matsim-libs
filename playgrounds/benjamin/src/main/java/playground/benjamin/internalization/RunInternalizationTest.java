@@ -19,38 +19,47 @@
  * *********************************************************************** */
 package playground.benjamin.internalization;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.*;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
-
-import java.util.HashSet;
-import java.util.Set;
 
 
 /**
@@ -196,16 +205,16 @@ public class RunInternalizationTest {
 	private void createPassiveAgents() {
 		// TODO: make code homogeneous by using factories!
 		for(int i=0; i<10; i++){
-			Person person = PopulationUtils.createPerson(Id.create(i, Person.class));
-			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
+			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
+			Plan plan = PersonUtils.createAndAddPlan(person, true);
 			
-			ActivityImpl home = plan.createAndAddActivity("home", Id.create("11", Link.class));
+			Activity home = PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "home", Id.create("11", Link.class));
 			home.setEndTime(6 * 3600);
 			home.setCoord(new Coord(0.0, 0.0));
 			
-			plan.createAndAddLeg(TransportMode.walk);
+			PopulationUtils.createAndAddLeg( plan, (String) TransportMode.walk );
 			
-			ActivityImpl home2 = plan.createAndAddActivity("home", Id.create("11", Link.class));
+			Activity home2 = PopulationUtils.createAndAddActivityFromLinkId(plan, (String) "home", Id.create("11", Link.class));
 			home2.setCoord(new Coord(0.0, 0.0));
 			
 			scenario.getPopulation().addPerson(person);
@@ -248,41 +257,61 @@ public class RunInternalizationTest {
 	}
 
 	private void createNetwork() {
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 
 		double x7 = -20000.0;
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord(x7, 0.0));
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(x7, 0.0));
 		double x6 = -17500.0;
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord(x6, 0.0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord(x6, 0.0));
 		double x5 = -15500.0;
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord(x5, 0.0));
+		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord(x5, 0.0));
 		double x4 = -2500.0;
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord(x4, 0.0));
-		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new Coord(0.0, 0.0));
+		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord(x4, 0.0));
+		Node node5 = NetworkUtils.createAndAddNode(network, Id.create("5", Node.class), new Coord(0.0, 0.0));
 		double x3 = -5000.0;
 		double y2 = -8660.0;
-		Node node6 = network.createAndAddNode(Id.create("6", Node.class), new Coord(x3, y2));
+		Node node6 = NetworkUtils.createAndAddNode(network, Id.create("6", Node.class), new Coord(x3, y2));
 		double x2 = -15000.0;
 		double y1 = -8660.0;
-		Node node7 = network.createAndAddNode(Id.create("7", Node.class), new Coord(x2, y1));
+		Node node7 = NetworkUtils.createAndAddNode(network, Id.create("7", Node.class), new Coord(x2, y1));
 		double x1 = -7500.0;
-		Node node8 = network.createAndAddNode(Id.create("8", Node.class), new Coord(x1, 2500.0));
+		Node node8 = NetworkUtils.createAndAddNode(network, Id.create("8", Node.class), new Coord(x1, 2500.0));
 		double x = -7500.0;
 		double y = -2500.0;
-		Node node9 = network.createAndAddNode(Id.create("9", Node.class), new Coord(x, y));
+		Node node9 = NetworkUtils.createAndAddNode(network, Id.create("9", Node.class), new Coord(x, y));
+		final Node fromNode = node1;
+		final Node toNode = node2;
         
-        network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 27.78, 3600, 1, null, "22");
-        network.createAndAddLink(Id.create("2", Link.class), node2, node3, 2000, 27.78, 3600, 1, null, "22");
+        NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 1000, 27.78, (double) 3600, (double) 1, null, (String) "22");
+	final Node fromNode1 = node2;
+	final Node toNode1 = node3;
+        NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, (double) 2000, 27.78, (double) 3600, (double) 1, null, (String) "22");
+	final Node fromNode2 = node4;
+	final Node toNode2 = node5;
 //      network.createAndAddLink(Id.create("3", Link.class), node3, node4, 75000, 10.42, 3600, 1, null, "22");
-        network.createAndAddLink(Id.create("4", Link.class), node4, node5, 2000, 27.78, 3600, 1, null, "22");
-        network.createAndAddLink(Id.create("5", Link.class), node5, node6, 1000, 27.78, 3600, 1, null, "22");
-        network.createAndAddLink(Id.create("6", Link.class), node6, node7, 1000, 27.78, 3600, 1, null, "22");
-        network.createAndAddLink(Id.create("7", Link.class), node7, node1, 1000, 27.78, 3600, 1, null, "22");
-        network.createAndAddLink(Id.create("8", Link.class), node3, node8, 5000, 27.78, 3600, 1, null, "22");
-        network.createAndAddLink(Id.create("10", Link.class), node3, node9, 5000, 27.78, 3600, 1, null, "22");
+        NetworkUtils.createAndAddLink(network,Id.create("4", Link.class), fromNode2, toNode2, (double) 2000, 27.78, (double) 3600, (double) 1, null, (String) "22");
+	final Node fromNode3 = node5;
+	final Node toNode3 = node6;
+        NetworkUtils.createAndAddLink(network,Id.create("5", Link.class), fromNode3, toNode3, (double) 1000, 27.78, (double) 3600, (double) 1, null, (String) "22");
+	final Node fromNode4 = node6;
+	final Node toNode4 = node7;
+        NetworkUtils.createAndAddLink(network,Id.create("6", Link.class), fromNode4, toNode4, (double) 1000, 27.78, (double) 3600, (double) 1, null, (String) "22");
+	final Node fromNode5 = node7;
+	final Node toNode5 = node1;
+        NetworkUtils.createAndAddLink(network,Id.create("7", Link.class), fromNode5, toNode5, (double) 1000, 27.78, (double) 3600, (double) 1, null, (String) "22");
+	final Node fromNode6 = node3;
+	final Node toNode6 = node8;
+        NetworkUtils.createAndAddLink(network,Id.create("8", Link.class), fromNode6, toNode6, (double) 5000, 27.78, (double) 3600, (double) 1, null, (String) "22");
+	final Node fromNode7 = node3;
+	final Node toNode7 = node9;
+        NetworkUtils.createAndAddLink(network,Id.create("10", Link.class), fromNode7, toNode7, (double) 5000, 27.78, (double) 3600, (double) 1, null, (String) "22");
+	final Node fromNode8 = node8;
+	final Node toNode8 = node4;
 
-        network.createAndAddLink(Id.create("9", Link.class), node8, node4, 5000, 27.78, 3600, 1, null, "22");
-        network.createAndAddLink(Id.create("11", Link.class), node9, node4, 2500, 13.89, 3600, 1, null, "22");
+        NetworkUtils.createAndAddLink(network,Id.create("9", Link.class), fromNode8, toNode8, (double) 5000, 27.78, (double) 3600, (double) 1, null, (String) "22");
+	final Node fromNode9 = node9;
+	final Node toNode9 = node4;
+        NetworkUtils.createAndAddLink(network,Id.create("11", Link.class), fromNode9, toNode9, (double) 2500, 13.89, (double) 3600, (double) 1, null, (String) "22");
 	}
 
 	public static void main(String[] args) {

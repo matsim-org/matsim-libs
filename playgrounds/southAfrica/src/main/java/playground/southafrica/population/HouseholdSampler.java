@@ -28,10 +28,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -126,7 +126,7 @@ public class HouseholdSampler {
 
 		/* Read just the households. */
 		String householdsFile = inputFolder + (inputFolder.endsWith("/") ? "" : "/") + "households.xml.gz";
-		new HouseholdsReaderV10(sc.getHouseholds()).parse(householdsFile);		
+		new HouseholdsReaderV10(sc.getHouseholds()).readFile(householdsFile);		
 		LOG.info("  original number of households: " + sc.getHouseholds().getHouseholds().size());
 
 		/* Run the sampling algorithm. */
@@ -147,7 +147,7 @@ public class HouseholdSampler {
 		
 		/* Read and clean the population. */
 		String populationFile = inputFolder + (inputFolder.endsWith("/") ? "" : "/") + "population.xml.gz";
-		new MatsimPopulationReader(sc).parse(populationFile);
+		new PopulationReader(sc).readFile(populationFile);
 		counter.reset();
 		LOG.info("  removing " + sampler.getSampledMemberIds().size() + " household members...");
 		for(Id id : sampler.getSampledMemberIds()){
@@ -161,7 +161,7 @@ public class HouseholdSampler {
 		String householdAttributeFile = inputFolder + (inputFolder.endsWith("/") ? "" : "/") + "householdAttributes.xml.gz";
 		ObjectAttributesXmlReader hhar = new ObjectAttributesXmlReader(sc.getHouseholds().getHouseholdAttributes());
 		hhar.putAttributeConverter(Coord.class, new CoordConverter());
-		hhar.parse(householdAttributeFile);
+		hhar.readFile(householdAttributeFile);
 		counter.reset();
 		LOG.info("  removing " + sampler.getSampledIds().size() + " household's attributes...");
 		for(Id id : sampler.getSampledIds()){
@@ -172,7 +172,7 @@ public class HouseholdSampler {
 		
 		/* Read and clean the person attributes. */
 		String personAttributeFile = inputFolder + (inputFolder.endsWith("/") ? "" : "/") + "populationAttributes.xml.gz";
-		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).parse(personAttributeFile);
+		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).readFile(personAttributeFile);
 		counter.reset();
 		LOG.info("  removing " + sampler.getSampledIds().size() + " household members's attributes...");
 		for(Id id : sampler.getSampledMemberIds()){

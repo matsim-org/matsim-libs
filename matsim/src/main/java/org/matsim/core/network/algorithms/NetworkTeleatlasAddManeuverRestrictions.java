@@ -34,11 +34,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkReaderTeleatlas;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
+import org.matsim.core.network.io.NetworkReaderTeleatlas;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -71,14 +70,14 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 	private final String mpDbfFileName; // teleatlas maneuver paths dbf file name
 
 	/**
-	 * option flag: if set, expanded {@link NodeImpl nodes} (nodes that contains maneuver restrictions)
-	 * will not include new virtual {@link LinkImpl links} providing a u-turn maneuver at the
+	 * option flag: if set, expanded {@link Node nodes} (nodes that contains maneuver restrictions)
+	 * will not include new virtual {@link Link links} providing a u-turn maneuver at the
 	 * junction.
 	 */
 	public boolean removeUTurns = false;
 
 	/**
-	 * option parameter: defines the radius how much a {@link NodeImpl node} will be expanded.
+	 * option parameter: defines the radius how much a {@link Node node} will be expanded.
 	 * <p><b>Default:</b> <code>0.000030</code> (appropriate for world coordinate system WGS84)</p>
 	 *
 	 * @see NetworkExpandNode
@@ -86,7 +85,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 	public double expansionRadius = 0.000030; // WGS84
 
 	/**
-	 * option parameter: defines the offset of a in- and out-link pair of an expanded {@link NodeImpl node}.
+	 * option parameter: defines the offset of a in- and out-link pair of an expanded {@link Node node}.
 	 * <p><b>Default:</b> <code>0.000005</code> (appropriate for world coordinate system WGS84)</p>
 	 *
 	 * @see NetworkExpandNode
@@ -123,7 +122,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Reading and assigning (expanding {@link NodeImpl nodes}) maneuver restrictions to the {@link Network network}.
+	 * Reading and assigning (expanding {@link Node nodes}) maneuver restrictions to the {@link Network network}.
 	 *
 	 * <p>It uses the following attributes from the Tele Atlas MultiNet maneuver Shape file:
 	 * <ul>
@@ -152,7 +151,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 	 *   <li>Maneuver restriction sequences that contain links that are not incident to the given
 	 *   junction are ignored</li>
 	 *   <li>Maneuver restrictions will be modelled in the natwork topology by expanding
-	 *   {@link NodeImpl nodes} with {@link NetworkExpandNode node expanding procedure}.</li>
+	 *   {@link Node nodes} with {@link NetworkExpandNode node expanding procedure}.</li>
 	 * </ul></p>
 	 *
 	 * @param network MATSim {@link Network network} created by {@link NetworkReaderTeleatlas}.

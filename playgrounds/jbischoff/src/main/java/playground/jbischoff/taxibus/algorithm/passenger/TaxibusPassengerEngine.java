@@ -19,14 +19,19 @@
 
 package playground.jbischoff.taxibus.algorithm.passenger;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.*;
+import org.matsim.core.mobsim.framework.MobsimAgent.State;
 
 
 /**
@@ -37,6 +42,8 @@ public class TaxibusPassengerEngine
 {
 
     private int abortWarn = 0;
+    List<MobsimAgent> allAgentsHandled  = new ArrayList<>();
+
 
 
     public TaxibusPassengerEngine(String mode, EventsManager eventsManager,
@@ -47,6 +54,18 @@ public class TaxibusPassengerEngine
     }
 
 
+    /* (non-Javadoc)
+     * @see org.matsim.contrib.dvrp.passenger.PassengerEngine#afterSim()
+     */
+    @Override
+    public void afterSim() {
+    	for (MobsimAgent a : this.allAgentsHandled){
+    		if (a.getState() == State.ABORT){
+    			this.eventsManager.processEvent(new PersonStuckEvent(24*3600, a.getId(), a.getCurrentLinkId(), "taxibus"));
+    		}
+    	}
+    }
+    
     @Override
     public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> fromLinkId)
     {
@@ -55,7 +74,6 @@ public class TaxibusPassengerEngine
         }
 
         boolean rejected = (!super.handleDeparture(now, agent, fromLinkId));
-
         //FIXME
         //there is no dismissal of immediate requests; on the other hand, the prior solution was
         //not perfect(??)
@@ -65,6 +83,9 @@ public class TaxibusPassengerEngine
         //optimizer should ignore rejected requests
         
         if (rejected) {
+        	agent.setStateToAbort(now);
+            Logger.getLogger(getClass())
+            .error(agent.getId().toString() + " is aborted, no Taxibus was found");
             if (abortWarn < 10)
                 Logger.getLogger(getClass())
                         .error(agent.getId().toString() + " is aborted, no Taxibus was found");
@@ -73,6 +94,9 @@ public class TaxibusPassengerEngine
                 Logger.getLogger(getClass())
                         .error("no more aborted taxibus agents will be displayed");
             //		        	agent.setStateToAbort(now);
+        }
+        else {
+        	this.allAgentsHandled.add(agent);
         }
         	
         

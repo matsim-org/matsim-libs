@@ -20,9 +20,9 @@
 package playground.duncan.archive;
 
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -38,7 +38,7 @@ public class ConnectHomesAndWorkplacesSimple {
 		fr.readFile( "lsfd" ) ;
 
 		Population population = scenario.getPopulation() ;
-		MatsimPopulationReader pr = new MatsimPopulationReader ( scenario ) ;
+		PopulationReader pr = new PopulationReader ( scenario ) ;
 		pr.readFile( "lsdkjf" ) ;
 
 		// program locachoice here

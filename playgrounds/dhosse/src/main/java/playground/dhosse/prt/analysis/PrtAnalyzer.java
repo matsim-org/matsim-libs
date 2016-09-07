@@ -5,15 +5,16 @@ import java.io.*;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.*;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.*;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-
-import playground.michalm.taxi.data.file.ETaxiReader;
 
 public class PrtAnalyzer {
 	
@@ -38,11 +39,11 @@ public class PrtAnalyzer {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/network_prt.xml");
-		PopulationReader popReader = new MatsimPopulationReader(scenario);
+		MatsimReader popReader = new PopulationReader(scenario);
 		popReader.readFile("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/population_prt_final2.xml");
 		VrpData data = new VrpDataImpl();
-		ETaxiReader vehReader = new ETaxiReader(scenario.getNetwork(), data);
-		vehReader.parse("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/vehicles/" + nVeh + "_vehicles.xml");
+		VehicleReader vehReader = new VehicleReader(scenario.getNetwork(), data);
+		vehReader.readFile("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/vehicles/" + nVeh + "_vehicles.xml");
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		PrtEventsHandler handler = new PrtEventsHandler(scenario);

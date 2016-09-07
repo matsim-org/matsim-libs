@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -337,9 +338,9 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	/*package*/ boolean doSimStep() {
 		if (analyzeRunTimes) this.startTime = System.nanoTime();
 
-		final double time = this.getSimTimer().getTimeOfDay();
+		final double now = this.getSimTimer().getTimeOfDay();
 
-		this.listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
+		this.listenerManager.fireQueueSimulationBeforeSimStepEvent(now);
 		
 		if (analyzeRunTimes) this.qSimInternalTime += System.nanoTime() - this.startTime;
 		
@@ -349,7 +350,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		 */
 		if (this.withindayEngine != null) {
 			if (analyzeRunTimes) startTime = System.nanoTime();
-			this.withindayEngine.doSimStep(time);
+			this.withindayEngine.doSimStep(now);
 			if (analyzeRunTimes) this.mobsimEngineRunTimes.get(this.withindayEngine).addAndGet(System.nanoTime() - this.startTime);
 		}
 
@@ -360,7 +361,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 			// withindayEngine.doSimStep(time) has already been called
 			if (mobsimEngine == this.withindayEngine) continue;
 
-			mobsimEngine.doSimStep(time);
+			mobsimEngine.doSimStep(now);
 			
 			if (analyzeRunTimes) this.mobsimEngineRunTimes.get(mobsimEngine).addAndGet(System.nanoTime() - this.startTime);
 		}
@@ -368,16 +369,26 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		if (analyzeRunTimes) this.startTime = System.nanoTime();
 		
 		// console printout:
-		this.printSimLog(time);
-		boolean doContinue =  (this.agentCounter.isLiving() && (this.stopTime > time));
-		this.events.afterSimStep(time);
-		this.listenerManager.fireQueueSimulationAfterSimStepEvent(time);
+		this.printSimLog(now);
+		boolean doContinue =  (this.agentCounter.isLiving() && (this.stopTime > now));
+		this.events.afterSimStep(now);
+		this.listenerManager.fireQueueSimulationAfterSimStepEvent(now);
+
+		final QSimConfigGroup qsimConfigGroup = this.scenario.getConfig().qsim();
+		if ( qsimConfigGroup.getSimEndtimeInterpretation()==EndtimeInterpretation.onlyUseEndtime ) {
+			if ( now > qsimConfigGroup.getEndTime() ) {
+				doContinue = false ;
+			} else {
+				doContinue = true ;
+			}
+		}
+
 		if (doContinue) {
 			this.simTimer.incrementTime();
 		}
 		
 		if (analyzeRunTimes) this.qSimInternalTime += System.nanoTime() - this.startTime;
-		
+
 		return doContinue;
 	}
 

@@ -25,9 +25,9 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -55,19 +55,19 @@ public class UCSBTAZ2Coord {
 					
 					if (activity.getType().startsWith("home")) {
 						if (homeCoord == null) { homeCoord = UCSBUtils.getRandomCoordinate(zone); }
-						((ActivityImpl)activity).setCoord(homeCoord);
+						((Activity)activity).setCoord(homeCoord);
 					}
 					else if (activity.getType().startsWith("work")) {
 						if (workCoord == null) { workCoord = UCSBUtils.getRandomCoordinate(zone); }
-						((ActivityImpl)activity).setCoord(workCoord);
+						((Activity)activity).setCoord(workCoord);
 					}
 					else if (activity.getType().startsWith("educ")) {
 						if (educCoord == null) { educCoord = UCSBUtils.getRandomCoordinate(zone); }
-						((ActivityImpl)activity).setCoord(educCoord);
+						((Activity)activity).setCoord(educCoord);
 					}
 					else {
 						Coord coord = UCSBUtils.getRandomCoordinate(zone);
-						((ActivityImpl)activity).setCoord(coord);
+						((Activity)activity).setCoord(coord);
 					}
 					actIndex++;
 				}

@@ -21,6 +21,7 @@ package playground.dgrether.analysis.scripts;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -28,7 +29,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -66,7 +66,7 @@ public class Trb09Preprocessing {
 				for (Plan plan : p.getPlans()) {
 					for (PlanElement pe : plan.getPlanElements()){
 						if (pe instanceof Leg) {
-							LegImpl l = (LegImpl)pe;
+							Leg l = (Leg)pe;
 							l.setRoute(null);
 						}
 					}

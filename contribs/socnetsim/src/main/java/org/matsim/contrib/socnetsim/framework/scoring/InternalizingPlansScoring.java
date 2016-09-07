@@ -169,7 +169,7 @@ public class InternalizingPlansScoring implements PlansScoring, ScoringListener 
 		private SocialNetwork readSocialNetwork(final InternalizationConfigGroup group) {
 			final Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig() );
 			// could be added to global scenario somehow
-			new SocialNetworkReader( "sn" , sc ).parse(group.getInternalizationSocialNetworkFile());
+			new SocialNetworkReader( "sn" , sc ).readFile(group.getInternalizationSocialNetworkFile());
 			return (SocialNetwork) sc.getScenarioElement( "sn" );
 		}
 

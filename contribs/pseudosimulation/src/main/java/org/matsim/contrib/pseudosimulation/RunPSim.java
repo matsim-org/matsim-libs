@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover;
-import org.matsim.contrib.common.randomizedtransitrouter.RandomizedTransitRouterModule;
+import org.matsim.contrib.common.randomizedtransitrouter.RandomizingTransitRouterModule;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
@@ -53,7 +53,7 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -221,8 +221,8 @@ public class RunPSim {
             });
         } else {
             //randomized routing for car and transit
-            final Builder disutilityFactory =
-                    new Builder( TransportMode.car, config.planCalcScore() );
+            final RandomizingTimeDistanceTravelDisutilityFactory disutilityFactory =
+                    new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
@@ -230,7 +230,7 @@ public class RunPSim {
                 }
             });
             disutilityFactory.setSigma(0.1);
-            matsimControler.addOverridingModule(new RandomizedTransitRouterModule());
+            matsimControler.addOverridingModule(new RandomizingTransitRouterModule());
         }
 
         if (TrackGenome) {

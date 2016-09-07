@@ -39,18 +39,12 @@ public class RunLeastCostPathCalculatorExample {
 		config.controler().setLastIteration(0);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bindLeastCostPathCalculatorFactory().to(MatsimClassLeastCostPathCalculatorFactory.class);	
 			}
-		}
-
-
-				);
-
+		});
 		controler.run();
 	}
-
 }

@@ -30,11 +30,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
@@ -105,25 +106,28 @@ public class IIDMAssign2Network {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up population objects...");
-		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
-		pop.setIsStreaming(true);
-		PopulationWriter pop_writer = new PopulationWriter(pop, network);
+//		Population reader = (Population) scenario.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
+		StreamingUtils.setIsStreaming(reader, true);
+		StreamingPopulationWriter pop_writer = new StreamingPopulationWriter(null, network);
 		pop_writer.startStreaming(null);//config.plans().getOutputFile());
-		PopulationReader pop_reader = new MatsimPopulationReader(scenario);
+//		PopulationReader pop_reader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  adding person modules... ");
-		pop.addAlgorithm(new PersonAssignToNetwork( scenario ) );
+		reader.addAlgorithm(new PersonAssignToNetwork( scenario ));
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading, processing, writing plans...");
-		pop.addAlgorithm(pop_writer);
-		pop_reader.readFile(config.plans().getInputFile());
-		pop.printPlansCount();
+		final PersonAlgorithm algo = pop_writer;
+		reader.addAlgorithm(algo);
+//		pop_reader.readFile(config.plans().getInputFile());
+		reader.readFile(config.plans().getInputFile());
+		PopulationUtils.printPlansCount(reader) ;
 		pop_writer.closeStreaming();
 		System.out.println("  done.");
 

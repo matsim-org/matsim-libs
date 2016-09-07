@@ -35,12 +35,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
@@ -72,7 +72,7 @@ public class ChainChopper {
 		
 		Scenario scInput = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scOutput = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scInput).parse(inputPopulation);;
+		new PopulationReader(scInput).readFile(inputPopulation);;
 		for(Person person : scInput.getPopulation().getPersons().values()){
 			Plan plan = person.getSelectedPlan();
 			List<Plan> list = ChainChopper.chop(plan); 
@@ -109,7 +109,7 @@ public class ChainChopper {
 
 		double cumTime = 0.0;
 		Coord lastLocation = null;
-		PlanImpl currentPlan = new PlanImpl();
+		Plan currentPlan = PopulationUtils.createPlan();
 		for(int i=0; i<plan.getPlanElements().size(); i+=2){
 			Activity act = (Activity)plan.getPlanElements().get(i);
 			double startTime;
@@ -149,16 +149,16 @@ public class ChainChopper {
 					 * current plan. */
 					Leg leg = (Leg)plan.getPlanElements().get(i-1);
 					currentPlan.addLeg(leg);
-					Activity cutActivityEnd = new ActivityImpl("chopEnd", cCut);
+					Activity cutActivityEnd = PopulationUtils.createActivityFromCoord("chopEnd", cCut);
 					currentPlan.addActivity(cutActivityEnd);
-					PlanImpl segment = new PlanImpl();
-					segment.copyFrom(currentPlan);
+					Plan segment = PopulationUtils.createPlan();
+					PopulationUtils.copyFromTo(currentPlan, segment);
 					segments.add(segment);
 
 					/* Add the remaining portion to the start of the new
 					 * plan. */
-					currentPlan = new PlanImpl();
-					Activity cutActivityStart = new ActivityImpl("chopStart", cCut);
+					currentPlan = PopulationUtils.createPlan();
+					Activity cutActivityStart = PopulationUtils.createActivityFromCoord("chopStart", cCut);
 					cutActivityStart.setEndTime(Time.parseTime("00:01:00"));
 					currentPlan.addActivity(cutActivityStart);
 					lastLocation = cCut;
@@ -173,11 +173,11 @@ public class ChainChopper {
 					currentPlan.addActivity(act);
 					
 					/* Add the final segment to the list. */
-					PlanImpl segment = new PlanImpl();
-					segment.copyFrom(currentPlan);
+					Plan segment = PopulationUtils.createPlan();
+					PopulationUtils.copyFromTo(currentPlan, segment);
 					segments.add(segment);
 					
-					currentPlan = new PlanImpl();
+					currentPlan = PopulationUtils.createPlan();
 				}
 			} else{
 				if(endTime > Time.MIDNIGHT){
@@ -188,17 +188,17 @@ public class ChainChopper {
 
 					/* Split the activity. Add one portion to the end of 
 					 * the current plan. */
-					Activity endPortion = new ActivityImpl(act.getType(), act.getCoord());
+					Activity endPortion = PopulationUtils.createActivityFromCoord(act.getType(), act.getCoord());
 					endPortion.setStartTime(startTime);
 					currentPlan.addActivity(endPortion);
 					endPortion.setMaximumDuration(Time.UNDEFINED_TIME);
-					PlanImpl segment = new PlanImpl();
-					segment.copyFrom(currentPlan);
+					Plan segment = PopulationUtils.createPlan();
+					PopulationUtils.copyFromTo(currentPlan, segment);
 					segments.add(segment);
 
 					/* Add the remainder to the start of the new plan. */
-					currentPlan = new PlanImpl();
-					Activity startPortion = new ActivityImpl(act.getType(), act.getCoord());
+					currentPlan = PopulationUtils.createPlan();
+					Activity startPortion = PopulationUtils.createActivityFromCoord(act.getType(), act.getCoord());
 					startPortion.setEndTime(endTime - Time.MIDNIGHT);
 					currentPlan.addActivity(startPortion);
 
@@ -222,8 +222,8 @@ public class ChainChopper {
 			/* Add the remainder of the current plan to the list of segments. */
 			if(i == plan.getPlanElements().size()-1){
 				if(currentPlan.getPlanElements().size() >= 3){
-					PlanImpl segment = new PlanImpl();
-					segment.copyFrom(currentPlan);
+					Plan segment = PopulationUtils.createPlan();
+					PopulationUtils.copyFromTo(currentPlan, segment);
 					segments.add(segment);
 				}
 			}

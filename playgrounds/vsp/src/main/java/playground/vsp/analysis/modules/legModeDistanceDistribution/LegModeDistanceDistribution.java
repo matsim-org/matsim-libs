@@ -41,10 +41,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.PtConstants;
@@ -116,7 +117,8 @@ public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 						} else {
 							throw new RuntimeException("A transit activity should follow a leg! Aborting...");
 						}
-						((PlanImpl) selectedPlan).removeActivity(i); // also removes the following leg
+						final int index = i;
+						PopulationUtils.removeActivity(((Plan) selectedPlan), index); // also removes the following leg
 						n -= 2;
 						i--;
 					}
@@ -246,14 +248,16 @@ public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 			for(int i = 0; i < this.distanceClasses.size() - 1 ; i++){
 				Integer noOfLegs = 0;
 				for(Person person : pop.getPersons().values()){
-					PlanImpl plan = (PlanImpl) person.getSelectedPlan();
+					Plan plan = (Plan) person.getSelectedPlan();
 					List<PlanElement> planElements = plan.getPlanElements();
 					for(PlanElement pe : planElements){
 						if(pe instanceof Leg){
 							Leg leg = (Leg) pe;
 							String legMode = leg.getMode();
-							Coord from = plan.getPreviousActivity(leg).getCoord();
-							Coord to = plan.getNextActivity(leg).getCoord();
+							final Leg leg2 = leg;
+							Coord from = PopulationUtils.getPreviousActivity(plan, leg2).getCoord();
+							final Leg leg1 = leg;
+							Coord to = PopulationUtils.getNextActivity(plan, leg1).getCoord();
 							Double legBeelineDist = CoordUtils.calcEuclideanDistance(from, to);
 
 							if(legMode.equals(mode)){
@@ -291,13 +295,15 @@ public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 	private double getLongestBeelineDistance(Population pop){
 		double longestBeelineDistance = 0.0;
 		for(Person person : pop.getPersons().values()){
-			PlanImpl plan = (PlanImpl) person.getSelectedPlan();
+			Plan plan = (Plan) person.getSelectedPlan();
 			List<PlanElement> planElements = plan.getPlanElements();
 			for(PlanElement pe : planElements){
 				if(pe instanceof Leg){
 					Leg leg = (Leg) pe;
-					Coord from = plan.getPreviousActivity(leg).getCoord();
-					Coord to = plan.getNextActivity(leg).getCoord();
+					final Leg leg2 = leg;
+					Coord from = PopulationUtils.getPreviousActivity(plan, leg2).getCoord();
+					final Leg leg1 = leg;
+					Coord to = PopulationUtils.getNextActivity(plan, leg1).getCoord();
 					Double legBeelineDist = CoordUtils.calcEuclideanDistance(from, to);
 					
 					if(legBeelineDist > longestBeelineDistance){

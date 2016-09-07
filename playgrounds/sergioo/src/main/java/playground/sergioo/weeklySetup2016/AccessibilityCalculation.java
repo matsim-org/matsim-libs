@@ -22,10 +22,9 @@ import java.util.TreeSet;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -49,6 +48,7 @@ import playground.sergioo.hits2012Scheduling.IncomeEstimation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.eventsBasedPTRouter.SerializableLinkTravelTimes;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
@@ -477,7 +477,7 @@ public class AccessibilityCalculation extends Thread {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[7]);
 		Set<String> carMode = new HashSet<String>();
 		carMode.add("car");
-		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
+		Network network = (Network) NetworkUtils.createNetwork();
 		new TransportModeNetworkFilter(scenario.getNetwork()).filter(network, carMode);
 		new TransitScheduleReader(scenario).readFile(args[8]);
 		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(args[9]));
@@ -502,8 +502,8 @@ public class AccessibilityCalculation extends Thread {
 						Location location = locations.get(trip.getEndPostalCode());
 						Location origin = fixed.get(trip.getStartPostalCode());
 						if(location!=null && origin!=null && (prevAct.equals(Purpose.HOME.text)||prevAct.equals(Purpose.WORK.text)||prevAct.equals(Purpose.EDU.text))) {
-							Node fromNode = ((NetworkImpl)network).getNearestNode(origin.coord);
-							Node toNode = ((NetworkImpl)network).getNearestNode(location.coord);
+							Node fromNode = NetworkUtils.getNearestNode(((Network)network),origin.coord);
+							Node toNode = NetworkUtils.getNearestNode(((Network)network),location.coord);
 							Path pathCar = dijkstra.calcLeastCostPath(fromNode, toNode, 8*3600, null, null);
 							Path pathPt = transitRouter.calcPathRoute(origin.coord, location.coord, 8*3600, null);
 							double walkCar = config.plansCalcRoute().getBeelineDistanceFactors().get("walk")*CoordUtils.calcEuclideanDistance(origin.coord, fromNode.getCoord())/config.plansCalcRoute().getTeleportedModeSpeeds().get("walk");

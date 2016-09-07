@@ -23,6 +23,8 @@ package org.matsim.core.network;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
@@ -35,19 +37,23 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class TimeVariantLinkImplTest extends MatsimTestCase {
 
-	/** Tests the method {@link TimeVariantLinkImpl#getFreespeedTravelTime(double)}.	 */
+	/** Tests the method {@link NetworkUtils#getFreespeedTravelTime(double)}.	 */
 	public void testGetFreespeedTravelTime(){
 	    for (LinkFactory lf : linkFactories(1, 5)) {
-    		final NetworkImpl network = NetworkImpl.createNetwork();
-    		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
+    		final Network network = NetworkUtils.createNetwork();
+    		NetworkFactory nf = network.getFactory();
     		nf.setLinkFactory(lf);
-    		network.setFactory(nf);
-    		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-    		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
-    		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 1000, (double) 2000));
-    		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 2000, (double) 2000));
-    		final Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 1.667, 3600, 1);
-    		final Link link3 = network.createAndAddLink(Id.create("3", Link.class), node3, node4, 1000, 1.667, 3600, 1);
+    		((NetworkImpl)network).setFactory(nf);
+    		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+    		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
+    		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 1000, (double) 2000));
+    		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord((double) 2000, (double) 2000));
+		final Node fromNode = node1;
+		final Node toNode = node2;
+    		final Link link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 1000, 1.667, (double) 3600, (double) 1 );
+		final Node fromNode1 = node3;
+		final Node toNode1 = node4;
+    		final Link link3 = NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), fromNode1, toNode1, (double) 1000, 1.667, (double) 3600, (double) 1 );
     
     		final double [] queryDates = {org.matsim.core.utils.misc.Time.UNDEFINED_TIME, 0., 1., 2., 3., 4.};
     
@@ -55,7 +61,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		final double [] responsesLink1 = {1.667, 1.667, 10., 10., 10., 10.};
     		NetworkChangeEvent event = new NetworkChangeEvent(1);
     		event.addLink(link1);
-    		event.setFreespeedChange(new ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE,10.));
+    		event.setFreespeedChange(new ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS,10.));
     		((TimeVariantLinkImpl)link1).applyEvent(event);
     
     		// link3 change event factor, undef. endtime
@@ -77,23 +83,25 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 */
 	public void testFreespeedChangeAbsolute() {
         for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
-    		final NetworkImpl network = NetworkImpl.createNetwork();
-    		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
+    		final Network network = NetworkUtils.createNetwork();
+    		NetworkFactory nf = network.getFactory();
     		nf.setLinkFactory(lf);
-    		network.setFactory(nf);
+    		((NetworkImpl)network).setFactory(nf);
     
-    		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-    		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
-    		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
+    		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+    		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+		final Node fromNode = node1;
+		final Node toNode = node2;
+    		TimeVariantLinkImpl link = (TimeVariantLinkImpl)NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 10, (double) 3600, (double) 1 );
     
     		// test base values
     		assertEquals(10.0, link.getFreespeed(Time.UNDEFINED_TIME), EPSILON);
-    		assertEquals(10.0, link.getFreespeedTravelTime(Time.UNDEFINED_TIME), EPSILON);
+    		assertEquals(10.0, NetworkUtils.getFreespeedTravelTime(link, Time.UNDEFINED_TIME), EPSILON);
     
     		// add an absolute change
     		NetworkChangeEvent change = new NetworkChangeEvent(7*3600.0);
     		change.addLink(link);
-    		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, 20));
+    		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 20));
     		link.applyEvent(change);
     
     		// do the tests
@@ -104,14 +112,14 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		assertEquals(20.0, link.getFreespeed(8*3600.0), EPSILON); // some time later, still new value
     
     		// test derived values
-    		assertEquals(10.0, link.getFreespeedTravelTime(Time.UNDEFINED_TIME), EPSILON); // and now the same tests for the travel time
-    		assertEquals(10.0, link.getFreespeedTravelTime(7*3600.0 - 1.0), EPSILON);
-    		assertEquals(10.0, link.getFreespeedTravelTime(7*3600.0 - 0.1), EPSILON);
-    		assertEquals(5.0, link.getFreespeedTravelTime(7*3600.0), EPSILON);
-    		assertEquals(5.0, link.getFreespeedTravelTime(8*3600.0), EPSILON);
-    		assertEquals(5.0, link.getFreespeedTravelTime(24*3600.0), EPSILON); // also test if it "wraps around" on 24 hours, it shouldn't
-    		assertEquals(5.0, link.getFreespeedTravelTime(30*3600.0), EPSILON);
-    		assertEquals(5.0, link.getFreespeedTravelTime(36*3600.0), EPSILON);
+    		assertEquals(10.0, NetworkUtils.getFreespeedTravelTime(link, Time.UNDEFINED_TIME), EPSILON); // and now the same tests for the travel time
+    		assertEquals(10.0, NetworkUtils.getFreespeedTravelTime(link, 7*3600.0 - 1.0), EPSILON);
+    		assertEquals(10.0, NetworkUtils.getFreespeedTravelTime(link, 7*3600.0 - 0.1), EPSILON);
+    		assertEquals(5.0, NetworkUtils.getFreespeedTravelTime(link, 7*3600.0), EPSILON);
+    		assertEquals(5.0, NetworkUtils.getFreespeedTravelTime(link, 8*3600.0), EPSILON);
+    		assertEquals(5.0, NetworkUtils.getFreespeedTravelTime(link, 24*3600.0), EPSILON); // also test if it "wraps around" on 24 hours, it shouldn't
+    		assertEquals(5.0, NetworkUtils.getFreespeedTravelTime(link, 30*3600.0), EPSILON);
+    		assertEquals(5.0, NetworkUtils.getFreespeedTravelTime(link, 36*3600.0), EPSILON);
         }
 	}
 
@@ -120,18 +128,20 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 */
 	public void testFreespeedChangeRelative() {
         for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
-    		final NetworkImpl network = NetworkImpl.createNetwork();
-    		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
+    		final Network network = NetworkUtils.createNetwork();
+    		NetworkFactory nf = network.getFactory();
     		nf.setLinkFactory(lf);
-    		network.setFactory(nf);
+    		((NetworkImpl)network).setFactory(nf);
     
-    		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-    		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
-    		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
+    		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+    		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+		final Node fromNode = node1;
+		final Node toNode = node2;
+    		TimeVariantLinkImpl link = (TimeVariantLinkImpl)NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 10, (double) 3600, (double) 1 );
     
     		// test base values
     		assertEquals(10.0, link.getFreespeed(Time.UNDEFINED_TIME), EPSILON);
-    		assertEquals(10.0, link.getFreespeedTravelTime(Time.UNDEFINED_TIME), EPSILON);
+    		assertEquals(10.0, NetworkUtils.getFreespeedTravelTime(link, Time.UNDEFINED_TIME), EPSILON);
     
     		// add a relative change
     		NetworkChangeEvent change = new NetworkChangeEvent(7*3600.0);
@@ -147,14 +157,14 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		assertEquals(5.0, link.getFreespeed(8*3600.0), EPSILON); // some time later, still new value
     
     		// do tests for derived values
-    		assertEquals(10.0, link.getFreespeedTravelTime(Time.UNDEFINED_TIME), EPSILON); // and now the same tests for the travel time
-    		assertEquals(10.0, link.getFreespeedTravelTime(7*3600.0 - 1.0), EPSILON);
-    		assertEquals(10.0, link.getFreespeedTravelTime(7*3600.0 - 0.1), EPSILON);
-    		assertEquals(20.0, link.getFreespeedTravelTime(7*3600.0), EPSILON);
-    		assertEquals(20.0, link.getFreespeedTravelTime(8*3600.0), EPSILON);
-    		assertEquals(20.0, link.getFreespeedTravelTime(24*3600.0), EPSILON); // also test if it "wraps around" on 24 hours, it shouldn't
-    		assertEquals(20.0, link.getFreespeedTravelTime(30*3600.0), EPSILON);
-    		assertEquals(20.0, link.getFreespeedTravelTime(36*3600.0), EPSILON);
+    		assertEquals(10.0, NetworkUtils.getFreespeedTravelTime(link, Time.UNDEFINED_TIME), EPSILON); // and now the same tests for the travel time
+    		assertEquals(10.0, NetworkUtils.getFreespeedTravelTime(link, 7*3600.0 - 1.0), EPSILON);
+    		assertEquals(10.0, NetworkUtils.getFreespeedTravelTime(link, 7*3600.0 - 0.1), EPSILON);
+    		assertEquals(20.0, NetworkUtils.getFreespeedTravelTime(link, 7*3600.0), EPSILON);
+    		assertEquals(20.0, NetworkUtils.getFreespeedTravelTime(link, 8*3600.0), EPSILON);
+    		assertEquals(20.0, NetworkUtils.getFreespeedTravelTime(link, 24*3600.0), EPSILON); // also test if it "wraps around" on 24 hours, it shouldn't
+    		assertEquals(20.0, NetworkUtils.getFreespeedTravelTime(link, 30*3600.0), EPSILON);
+    		assertEquals(20.0, NetworkUtils.getFreespeedTravelTime(link, 36*3600.0), EPSILON);
 	    }
 	}
 
@@ -163,24 +173,26 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 */
 	public void testMultipleFreespeedChanges() {
         for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
-    		final NetworkImpl network = NetworkImpl.createNetwork();
-    		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
+    		final Network network = NetworkUtils.createNetwork();
+    		NetworkFactory nf = network.getFactory();
     		nf.setLinkFactory(lf);
-    		network.setFactory(nf);
+    		((NetworkImpl)network).setFactory(nf);
     
-    		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-    		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
-    		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
+    		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+    		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+		final Node fromNode = node1;
+		final Node toNode = node2;
+    		TimeVariantLinkImpl link = (TimeVariantLinkImpl)NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 10, (double) 3600, (double) 1 );
     
     		// test base values
     		assertEquals(10.0, link.getFreespeed(Time.UNDEFINED_TIME), EPSILON);
-    		assertEquals(10.0, link.getFreespeedTravelTime(Time.UNDEFINED_TIME), EPSILON);
+    		assertEquals(10.0, NetworkUtils.getFreespeedTravelTime(link, Time.UNDEFINED_TIME), EPSILON);
     
     		// add some changes:
     		// - first a change event starting at 7am
     		NetworkChangeEvent change = new NetworkChangeEvent(7*3600.0);
     		change.addLink(link);
-    		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, 20));
+    		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 20));
     		link.applyEvent(change);
     		// - second, a change event starting at from 8am
     		NetworkChangeEvent change2 = new NetworkChangeEvent(8*3600.0);
@@ -190,7 +202,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		// - third a change event starting at 10am
     		NetworkChangeEvent change3 = new NetworkChangeEvent(10*3600.0);
     		change3.addLink(link);
-    		change3.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, 30));
+    		change3.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 30));
     		link.applyEvent(change3);
     
     		/* I would now expect the following speeds:
@@ -215,7 +227,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		// - a change event starting 12am
     		NetworkChangeEvent change4 = new NetworkChangeEvent(12*3600.0);
     		change4.addLink(link);
-    		change4.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, 40));
+    		change4.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 40));
     		link.applyEvent(change4);
     		// - a change event starting 11am
     		NetworkChangeEvent change5 = new NetworkChangeEvent(11*3600.0);
@@ -260,15 +272,17 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 */
 	public void testFlowCapChangeAbsolute() {
         for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
-    		final NetworkImpl network = NetworkImpl.createNetwork();
-    		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
+    		final Network network = NetworkUtils.createNetwork();
+    		NetworkFactory nf = network.getFactory();
     		nf.setLinkFactory(lf);
-    		network.setFactory(nf);
+    		((NetworkImpl)network).setFactory(nf);
     		network.setCapacityPeriod(3600.0);
     
-    		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-    		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
-    		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
+    		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+    		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+		final Node fromNode = node1;
+		final Node toNode = node2;
+    		TimeVariantLinkImpl link = (TimeVariantLinkImpl)NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 10, (double) 3600, (double) 1 );
     
     		// test base values
     		assertEquals(3600.0, link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
@@ -277,7 +291,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		// add an absolute change
     		NetworkChangeEvent change = new NetworkChangeEvent(7*3600.0);
     		change.addLink(link);
-    		change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, 2));
+    		change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 2));
     		link.applyEvent(change);
     
     		// do the tests
@@ -297,15 +311,17 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 */
 	public void testLanesChangeAbsolute() {
         for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
-    		final NetworkImpl network = NetworkImpl.createNetwork();
-    		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
+    		final Network network = NetworkUtils.createNetwork();
+    		NetworkFactory nf = network.getFactory();
     		nf.setLinkFactory(lf);
-    		network.setFactory(nf);
+    		((NetworkImpl)network).setFactory(nf);
     		network.setCapacityPeriod(3600.0);
     
-    		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-    		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
-    		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
+    		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+    		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+		final Node fromNode = node1;
+		final Node toNode = node2;
+    		TimeVariantLinkImpl link = (TimeVariantLinkImpl)NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 10, (double) 3600, (double) 1 );
     
     		// test base values
     		assertEquals(1.0, link.getNumberOfLanes(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
@@ -313,7 +329,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		// add an absolute change
     		NetworkChangeEvent change = new NetworkChangeEvent(7*3600.0);
     		change.addLink(link);
-    		change.setLanesChange(new ChangeValue(ChangeType.ABSOLUTE, 2.0));
+    		change.setLanesChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 2.0));
     		link.applyEvent(change);
     
     		// do the tests

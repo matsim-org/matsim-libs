@@ -25,13 +25,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -914,16 +914,16 @@ public class PlansAndAttributes {
 						startTimeH -= 24*3600;
 						startTimeH = startTimeH+baseTime<endWork?(endWork-baseTime):startTimeH;
 						if(endWork>0)
-							((PlanImpl)plan).addLeg(new EmptyTimeImpl(workFacility.getLinkId(), Math.max(MIN_LEG_TIME,startTimeH+baseTime-endWork)));
+							((Plan)plan).addLeg(new EmptyTimeImpl(workFacility.getLinkId(), Math.max(MIN_LEG_TIME,startTimeH+baseTime-endWork)));
 						endHome = startTimeH+durationH-24*3600;
 						endHome = endHome<0?0:endHome>24*3600?endHome%(24*3600):endHome;
 						endHome = startTime>=0 && endHome>startTime?startTime:endHome;
 						durations.getFirst().addValue(endHome-startTimeH);
 						Activity act = factory.createActivityFromCoord("home_"+bestCluster+"_"+(i%NUM_DAYS), homeFacility.getCoord());
-						((ActivityImpl)act).setFacilityId(homeFacility.getId());
+						((Activity)act).setFacilityId(homeFacility.getId());
 						endHome += baseTime;
 						act.setEndTime(endHome);
-						((PlanImpl)plan).addActivity(act);
+						((Plan)plan).addActivity(act);
 					}
 					if(i<NUM_DAYS) {
 						startTimeH = -1;
@@ -939,14 +939,14 @@ public class PlansAndAttributes {
 						endWork = endHome;
 						if(startTime>=0 && duration>0) {
 							if(endHome>0)
-								((PlanImpl)plan).addLeg(new EmptyTimeImpl(homeFacility.getLinkId(), Math.max(MIN_LEG_TIME,startTime+baseTime-endHome)));
+								((Plan)plan).addLeg(new EmptyTimeImpl(homeFacility.getLinkId(), Math.max(MIN_LEG_TIME,startTime+baseTime-endHome)));
 							endWork = startTime+duration;
 							durations.getSecond().addValue(duration);
 							Activity act = factory.createActivityFromCoord("work_"+bestCluster+"_"+i, workFacility.getCoord());
-							((ActivityImpl)act).setFacilityId(workFacility.getId());
+							((Activity)act).setFacilityId(workFacility.getId());
 							endWork += baseTime;
 							act.setEndTime(endWork);
-							((PlanImpl)plan).addActivity(act);
+							((Plan)plan).addActivity(act);
 						}
 					}
 				}

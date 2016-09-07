@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.analysis.christoph.ActivitiesAnalyzer;
@@ -49,7 +50,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -80,7 +80,7 @@ public class TelAvivControlerListener implements StartupListener, IterationEndsL
 		
 		// connect facilities to links
 		new WorldConnectLocations(config).connectFacilitiesWithLinks(scenario.getActivityFacilities(), 
-				(NetworkImpl) scenario.getNetwork());
+				(Network) scenario.getNetwork());
 		
 		// analysis stuff
 		

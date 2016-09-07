@@ -52,7 +52,24 @@ ControlerListener {
 	private MatsimServices controler;
 	private Config config;
 
+	String sp;
+	String ep;
+	String annealType;
+
 	private static Map<Integer, ArrayList<Double>> replaningRates= new HashMap<Integer, ArrayList<Double>>();
+
+	public SimpleAnnealer(Map<String, String> params) {
+		sp=params.get(START_PROPORTION);
+		ep=params.get(START_PROPORTION);
+		annealType=params.get(ANNEAL_TYPE);
+	}
+
+	public SimpleAnnealer() {
+		sp=null;
+		ep=null;
+		annealType=null;
+	}
+
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
@@ -66,8 +83,6 @@ ControlerListener {
 		}
 		// initialize params
 		if (startProportion < 0) {
-			String sp = config.getParam(modName, START_PROPORTION);
-			String ep = config.getParam(modName, END_PROPORTION);
 			if (sp != null) {
 				startProportion = Double.parseDouble(sp);
 			} else {
@@ -80,7 +95,7 @@ ControlerListener {
 				endProportion = Double.parseDouble(ep);
 			}
 
-			if (config.getParam(modName, ANNEAL_TYPE).equals("geometric")) {
+			if (annealType.equals("geometric")) {
 				isGeometric = true;
 				if (ep != null)
 					log.warn("Using geometric annealing, so endProportion parameter becomes a minimum");
@@ -93,7 +108,7 @@ ControlerListener {
 							+ "so using default of 0.9.");
 
 				}
-			} else if (config.getParam(modName, ANNEAL_TYPE).equals(
+			} else if (annealType.equals(
 					"exponential")) {
 				isExponential = true;
 				if (ep != null)
@@ -108,7 +123,7 @@ ControlerListener {
 							+ "so using default of " + halfLife + " iters.");
 
 				}
-			} else if (config.getParam(modName, ANNEAL_TYPE).equals("linear")) {
+			} else if (annealType.equals("linear")) {
 				if (ep == null)
 					log.warn("No " + END_PROPORTION
 							+ " set, so using default of " + endProportion);
@@ -116,7 +131,7 @@ ControlerListener {
 						/ (controler.getConfig().controler().getFirstIteration() - getInnovationStop(controler.getConfig()));
 			} else {
 				log.error("Incorrect anneal type \""
-						+ config.getParam(modName, ANNEAL_TYPE)
+						+ annealType
 						+ "\". Turning off simulated annealing)");
 				annealSwitch = false;
 				return;

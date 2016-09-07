@@ -163,7 +163,7 @@ public class DeleteShortLongTrips implements EpisodeTask {
 		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 
-		parser.parse("/home/johannes/gsv/mid2008/pop/hesen.car.wo3km.midjourneys.xml");
+		parser.readFile("/home/johannes/gsv/mid2008/pop/hesen.car.wo3km.midjourneys.xml");
 
 		DeleteShortLongTrips task = new DeleteShortLongTrips(100000, false);
 		for (PlainPerson person : (Set<PlainPerson>)parser.getPersons()) {

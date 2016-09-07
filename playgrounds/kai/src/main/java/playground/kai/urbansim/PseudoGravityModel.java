@@ -30,9 +30,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 
@@ -93,18 +94,19 @@ public class PseudoGravityModel {
 	}
 
 	void checkMax( Coord coord ) {
-		double xx = coord.getX();
-		if ( xx < minCoord.getX() ) {
-			minCoord.setX(xx) ;
-		} else if ( xx > maxCoord.getX() ) {
-			maxCoord.setX(xx) ;
-		}
-		double yy = coord.getY() ;
-		if ( yy < minCoord.getY() ) {
-			minCoord.setY(yy) ;
-		} else if ( yy > maxCoord.getY() ) {
-			maxCoord.setY(yy) ;
-		}
+		throw new RuntimeException("not implemented") ;
+//		double xx = coord.getX();
+//		if ( xx < minCoord.getX() ) {
+//			minCoord.setX(xx) ;
+//		} else if ( xx > maxCoord.getX() ) {
+//			maxCoord.setX(xx) ;
+//		}
+//		double yy = coord.getY() ;
+//		if ( yy < minCoord.getY() ) {
+//			minCoord.setY(yy) ;
+//		} else if ( yy > maxCoord.getY() ) {
+//			maxCoord.setY(yy) ;
+//		}
 	}
 
 	// TODO: there should actually a ctor that constructs this w/o coords (i.e. computes them internally)
@@ -120,7 +122,7 @@ public class PseudoGravityModel {
 		// compute the extent of the coordinates for persons:
 		for ( Person person : population.getPersons().values() ) {
 			Plan plan = person.getSelectedPlan() ;
-			Activity act = ((PlanImpl) plan).getFirstActivity();
+			Activity act = PopulationUtils.getFirstActivity( ((Plan) plan) );
 			Coord homeCoord = act.getCoord() ;
 			checkMax( homeCoord ) ;
 		}
@@ -152,7 +154,7 @@ public class PseudoGravityModel {
 		// for every worker, add it to the pseudoCell
 		for ( Person pp : population.getPersons().values() ) {
 			if ( PersonUtils.isEmployed(pp) ) {
-				Coord cc = ((PlanImpl) pp.getSelectedPlan()).getFirstActivity().getCoord(); // awkward
+				Coord cc = PopulationUtils.getFirstActivity( ((Plan) pp.getSelectedPlan()) ).getCoord(); // awkward
 				int bin = binFromXY( cc.getX(), cc.getY() ) ;
 				PseudoCell pc = pseudoCells.get(bin) ;
 //				System.out.println ( "adding a worker" ) ;
@@ -222,7 +224,7 @@ public class PseudoGravityModel {
 			Plan plan = pp.getSelectedPlan();
 
 			// get home coordinates:
-			Coord homeCoord = ((PlanImpl) pp.getSelectedPlan()).getFirstActivity().getCoord(); // awkward
+			Coord homeCoord = PopulationUtils.getFirstActivity( ((Plan) pp.getSelectedPlan()) ).getCoord(); // awkward
 
 			// get relevant bin:
 			int homeBin = binFromXY( homeCoord.getX(), homeCoord.getY() ) ;
@@ -250,7 +252,7 @@ public class PseudoGravityModel {
 			// (it also does not really allocate the workplaces)
 
 			// create work plan in destination pseudoCell:
-			Utils.completePlanToHwh((PlanImpl) plan, workCoord) ;
+			Utils.completePlanToHwh((Plan) plan, workCoord) ;
 
 		}
 	}

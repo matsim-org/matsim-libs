@@ -1,20 +1,22 @@
 package herbie.running.analysis;
 
-import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
-import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
-import herbie.running.population.algorithms.PopulationLegDistanceDistribution;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
+import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
+import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
+import herbie.running.population.algorithms.PopulationLegDistanceDistribution;
 
 public class QuickfixLegDistanceDistributionWriter {
 
@@ -47,8 +49,9 @@ public class QuickfixLegDistanceDistributionWriter {
 		
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		
-		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
-		pop.setIsStreaming(true);
+//		Population reader = (Population) scenario.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
+		StreamingUtils.setIsStreaming(reader, true);
 		
 		Network network = scenario.getNetwork();
 
@@ -60,9 +63,11 @@ public class QuickfixLegDistanceDistributionWriter {
 		}
 		
 		AbstractClassifiedFrequencyAnalysis algo = new PopulationLegDistanceDistribution(out, network);
-		pop.addAlgorithm(algo);
+		final PersonAlgorithm algo1 = algo;
+		reader.addAlgorithm(algo1);
 		
-		new MatsimPopulationReader(scenario).readFile(config.plans().getInputFile());
+//		new MatsimPopulationReader(scenario).readFile(config.plans().getInputFile());
+		reader.readFile(config.plans().getInputFile());
 
 		log.info("Writing results file...");
 		algo.printClasses(CrosstabFormat.ABSOLUTE, false, distanceClasses, out);

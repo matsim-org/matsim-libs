@@ -88,6 +88,7 @@ public class DynActivityEngine
                     dynAgentIter.remove();
                 }
             }
+            //TODO what if not activity?
         }
 
         super.doSimStep(time);

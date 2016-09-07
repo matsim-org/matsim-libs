@@ -31,10 +31,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -117,18 +120,29 @@ public class PlansCreateFromMZ {
 				entries[3] = Integer.toString(departure);
 
 				// start coordinate (round to hectare)
-				Coord from = new Coord(Double.parseDouble(entries[4].trim()), Double.parseDouble(entries[5].trim()));
-				from.setX(Math.round(from.getX()/100.0)*100);
-				from.setY(Math.round(from.getY()/100.0)*100);
-				entries[4] = Double.toString(from.getX());
-				entries[5] = Double.toString(from.getY());
+//				Coord from = new Coord(Double.parseDouble(entries[4].trim()), Double.parseDouble(entries[5].trim()));
+//				from.setX(Math.round(from.getX()/100.0)*100);
+//				from.setY(Math.round(from.getY()/100.0)*100);
+//				entries[4] = Double.toString(from.getX());
+//				entries[5] = Double.toString(from.getY());
+				double fromX = Double.parseDouble(entries[4].trim()) ;
+				double fromY = Double.parseDouble(entries[5].trim());
+				fromX = Math.round(fromX/100.0)*100;
+				fromY = Math.round(fromY/100.0)*100;
+				entries[4] = Double.toString(fromX);
+				entries[5] = Double.toString(fromY);
 
 				// start coordinate (round to hectare)
-				Coord to = new Coord(Double.parseDouble(entries[6].trim()), Double.parseDouble(entries[7].trim()));
-				to.setX(Math.round(to.getX()/100.0)*100);
-				to.setY(Math.round(to.getY()/100.0)*100);
-				entries[6] = Double.toString(to.getX());
-				entries[7] = Double.toString(to.getY());
+//				to.setX(Math.round(to.getX()/100.0)*100);
+//				to.setY(Math.round(to.getY()/100.0)*100);
+//				entries[6] = Double.toString(to.getX());
+//				entries[7] = Double.toString(to.getY());
+				double toX = Double.parseDouble(entries[6].trim());
+				double toY = Double.parseDouble(entries[7].trim());
+				toX = Math.round(toX/100.0)*100;
+				toY = Math.round(toY/100.0)*100;
+				entries[6] = Double.toString(toX);
+				entries[7] = Double.toString(toY);
 
 				// departure time (min => sec.). A few arrival times are not given, setting to departure time (trav_time=0)
 				int arrival = departure;
@@ -195,7 +209,8 @@ public class PlansCreateFromMZ {
 				// creating/getting the matsim person
 				Person person = plans.getPersons().get(pid);
 				if (person == null) {
-					person = PopulationUtils.createPerson(pid);
+					final Id<Person> id = pid;
+					person = PopulationUtils.getFactory().createPerson(id);
 					plans.addPerson(person);
 					PersonUtils.setAge(person, age);
 					PersonUtils.setLicence(person, licence);
@@ -212,38 +227,48 @@ public class PlansCreateFromMZ {
 
 				// adding acts/legs
 				if (plan.getPlanElements().size() != 0) { // already lines parsed and added
-					ActivityImpl from_act = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
+					Activity from_act = (Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 					from_act.setEndTime(departure);
 					from_act.setMaximumDuration(from_act.getEndTime()-from_act.getStartTime());
-					LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
+					Leg leg = PopulationUtils.createAndAddLeg( ((Plan) plan), (String) mode );
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
-					leg.setArrivalTime(arrival);
+					final double arrTime = arrival;
+					leg.setTravelTime( arrTime - leg.getDepartureTime() );
 					NetworkRoute route = new LinkNetworkRouteImpl(null, null);
 					leg.setRoute(route);
 					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());
-					ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype,to);
+					final String type1 = acttype;
+//					final Coord coord = to;
+//					Activity act = PopulationUtils.createAndAddActivityFromCoord(((Plan) plan), type1, coord);
+					Activity act = PopulationUtils.createAndAddActivityFromCoord((plan), type1, new Coord( toX, toY ) );
 					act.setStartTime(arrival);
 
 					// coordinate consistency check
-					if ((from_act.getCoord().getX() != from.getX()) || (from_act.getCoord().getY() != from.getY())) {
+					if ((from_act.getCoord().getX() != fromX) || (from_act.getCoord().getY() != fromY)) {
 //						System.out.println("        pid=" + person.getId() + ": previous destination not equal to the current origin (dist=" + from_act.getCoord().calcDistance(from) + ")");
 						coord_err_pids.add(pid);
 					}
 				}
 				else {
-					ActivityImpl homeAct = ((PlanImpl) plan).createAndAddActivity(HOME,from);
+//					final Coord coord = from;
+//					Activity homeAct = PopulationUtils.createAndAddActivityFromCoord(((Plan) plan), (String) HOME, coord);
+					Activity homeAct = PopulationUtils.createAndAddActivityFromCoord(((Plan) plan), (String) HOME, new Coord( fromX, fromY ) );
 					homeAct.setEndTime(departure);
-					LegImpl leg = ((PlanImpl) plan).createAndAddLeg(mode);
+					Leg leg = PopulationUtils.createAndAddLeg( ((Plan) plan), (String) mode );
 					leg.setDepartureTime(departure);
 					leg.setTravelTime(arrival-departure);
-					leg.setArrivalTime(arrival);
+					final double arrTime = arrival;
+					leg.setTravelTime( arrTime - leg.getDepartureTime() );
 					NetworkRoute route = new LinkNetworkRouteImpl(null, null);
 					leg.setRoute(route);
 					route.setDistance(distance);
 					route.setTravelTime(leg.getTravelTime());
-					ActivityImpl act = ((PlanImpl) plan).createAndAddActivity(acttype,to);
+					final String type1 = acttype;
+//					final Coord coord1 = to;
+//					Activity act = PopulationUtils.createAndAddActivityFromCoord(((Plan) plan), type1, coord1);
+					Activity act = PopulationUtils.createAndAddActivityFromCoord((plan), type1, new Coord( toX, toY ) );
 					act.setStartTime(arrival);
 				}
 			}
@@ -275,9 +300,9 @@ public class PlansCreateFromMZ {
 	private final void setHomeLocations(final Population plans, final Map<Id<Person>,String> person_strings) {
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
-			Activity home = ((PlanImpl) plan).getFirstActivity();
+			Activity home = PopulationUtils.getFirstActivity( ((Plan) plan) );
 			for (int i=2; i<plan.getPlanElements().size(); i=i+2) {
-				Activity act = (ActivityImpl)plan.getPlanElements().get(i);
+				Activity act = (Activity)plan.getPlanElements().get(i);
 				if ((act.getCoord().getX() == home.getCoord().getX()) && (act.getCoord().getY() == home.getCoord().getY())) {
 					if (!act.getType().equals(HOME)) {
 						act.setType(HOME);
@@ -294,7 +319,7 @@ public class PlansCreateFromMZ {
 		Set<Id<Person>> ids = new HashSet<>();
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
-			ActivityImpl last = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
+			Activity last = (Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1);
 			if (!last.getType().equals(HOME)) { ids.add(p.getId()); }
 		}
 		return ids;
@@ -363,18 +388,18 @@ public class PlansCreateFromMZ {
 		for (Person p : plans.getPersons().values()) {
 			boolean has_changed = false;
 			Plan plan = p.getSelectedPlan();
-			PlanImpl plan2 = new org.matsim.core.population.PlanImpl(p);
+			Plan plan2 = PopulationUtils.createPlan(p);
 			plan2.setScore(plan.getScore());
-			plan2.addActivity((ActivityImpl)plan.getPlanElements().get(0));
+			plan2.addActivity((Activity)plan.getPlanElements().get(0));
 
 			for (int i=2; i<plan.getPlanElements().size(); i=i+2) {
-				ActivityImpl prev_act = (ActivityImpl)plan.getPlanElements().get(i-2);
-				LegImpl leg = (LegImpl)plan.getPlanElements().get(i-1);
-				ActivityImpl curr_act = (ActivityImpl)plan.getPlanElements().get(i);
+				Activity prev_act = (Activity)plan.getPlanElements().get(i-2);
+				Leg leg = (Leg)plan.getPlanElements().get(i-1);
+				Activity curr_act = (Activity)plan.getPlanElements().get(i);
 				Coord prevc = prev_act.getCoord();
 				Coord currc = curr_act.getCoord();
 				if ((currc.getX()==prevc.getX())&&(currc.getY()==prevc.getY())) {
-					ActivityImpl act2 = (ActivityImpl)plan2.getPlanElements().get(plan2.getPlanElements().size()-1);
+					Activity act2 = (Activity)plan2.getPlanElements().get(plan2.getPlanElements().size()-1);
 					act2.setEndTime(curr_act.getEndTime());
 					act2.setMaximumDuration(act2.getEndTime()-act2.getStartTime());
 //					System.out.println("        pid=" + p.getId() + ": merging act_nr="+((i-2)/2)+" with act_nr=" + (i/2) + ".");
@@ -415,7 +440,7 @@ public class PlansCreateFromMZ {
 
 			// complete the last act with time info
 			if (p.getSelectedPlan().getPlanElements().size() == 1) {
-				ActivityImpl act = (ActivityImpl)p.getSelectedPlan().getPlanElements().get(0);
+				Activity act = (Activity)p.getSelectedPlan().getPlanElements().get(0);
 				act.setStartTime(0); act.setMaximumDuration(24*3600); act.setEndTime(24*3600);
 			}
 		}
@@ -447,8 +472,8 @@ public class PlansCreateFromMZ {
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					ActivityImpl act = (ActivityImpl) pe;
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
 					if ((act.getCoord().getX()<0) || (act.getCoord().getY()<0)) { ids.add(p.getId()); }
 				}
 			}
@@ -479,7 +504,7 @@ public class PlansCreateFromMZ {
 		for (Person p : plans.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			for (int i=0; i<plan.getPlanElements().size()-2; i=i+2) {
-				ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
+				Activity act = (Activity)plan.getPlanElements().get(i);
 				if (act.getEndTime()<act.getStartTime()) { ids.add(p.getId()); }
 			}
 		}

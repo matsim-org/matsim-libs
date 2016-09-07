@@ -3,13 +3,13 @@ package playground.wrashid.ABMT.vehicleShare;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.LegImpl;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,8 +40,8 @@ public class VehicleInitializer implements IterationStartsListener {
 	
 	public static boolean hasCarLeg(Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof LegImpl) {
-				LegImpl leg = (LegImpl) pe;
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
 				if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
 					return true;
 				}

@@ -85,7 +85,7 @@ public class CadytsPtIT {
 
 		Config config = createTestConfig(inputDir, this.utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
-		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
+		StrategySettings stratSets = new StrategySettings();
 		stratSets.setStrategyName("ccc") ;
 		stratSets.setWeight(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
@@ -133,9 +133,9 @@ public class CadytsPtIT {
 		Assert.assertEquals(0.95, context.getCalibrator().getRegressionInertia(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1.0, context.getCalibrator().getVarianceScale(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(3600.0, context.getCalibrator().getTimeBinSize_s(), MatsimTestUtils.EPSILON);
-
 	}
 
+	
 	@Test
 	public final void testCalibrationAsScoring() throws IOException {
 		final double beta=30. ;
@@ -151,8 +151,8 @@ public class CadytsPtIT {
 		config.planCalcScore().setBrainExpBeta(beta) ;
 
 		StrategySettings stratSets = new StrategySettings() ;
-//				stratSets.setStrategyName("ChangeExpBeta") ;
-		stratSets.setStrategyName("ccc") ;
+				stratSets.setStrategyName("ChangeExpBeta") ;
+//		stratSets.setStrategyName("ccc") ;
 		stratSets.setWeight(1.0) ;
 		config.strategy().addStrategySettings(stratSets) ;
 
@@ -162,25 +162,25 @@ public class CadytsPtIT {
         controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 		controler.addOverridingModule(new CadytsPtModule());
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addPlanStrategyBinding("ccc").toProvider(new javax.inject.Provider<PlanStrategy>() {
-					@Inject Scenario scenario;
-					@Inject CadytsPtContext cContext;
-					@Override
-					public PlanStrategy get() {
-						final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(scenario, cContext);
-						planSelector.setCadytsWeight(0.);
-						// weight 0 is correct: this is only in order to use getCalibrator().addToDemand.
-						// would certainly be cleaner (and less confusing) to write a separate method for this.  (But how?)
-						// kai, may'13
-						//				final PlanSelector planSelector = new ExpBetaPlanChangerWithCadytsPlanRegistration<TransitStopFacility>(beta, cContext) ;
-						return new PlanStrategyImpl(planSelector);
-					}
-				});
-			}
-		});
+//		controler.addOverridingModule(new AbstractModule() { // Now using ChangeExpBeta instead of "ccc", which was apparently only added to provide some infrastructure, dz, jul'16
+//			@Override
+//			public void install() {
+//				addPlanStrategyBinding("ccc").toProvider(new javax.inject.Provider<PlanStrategy>() {
+//					@Inject Scenario scenario;
+//					@Inject CadytsPtContext cContext;
+//					@Override
+//					public PlanStrategy get() {
+//						final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(scenario, cContext);
+//						planSelector.setCadytsWeight(0.);
+//						// weight 0 is correct: this is only in order to use getCalibrator().addToDemand.
+//						// would certainly be cleaner (and less confusing) to write a separate method for this.  (But how?)
+//						// kai, may'13
+//						//				final PlanSelector planSelector = new ExpBetaPlanChangerWithCadytsPlanRegistration<TransitStopFacility>(beta, cContext) ;
+//						return new PlanStrategyImpl(planSelector);
+//					}
+//				});
+//			}
+//		});
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Inject CharyparNagelScoringParametersForPerson parameters;
@@ -203,12 +203,10 @@ public class CadytsPtIT {
 			}
 		}) ;
 
-
 		controler.run();
 
-
 		//scenario data  test
-		Assert.assertNotNull("config is null" , controler.getConfig());
+		Assert.assertNotNull("Config is null" , controler.getConfig());
         Assert.assertEquals("Different number of links in network.", controler.getScenario().getNetwork().getLinks().size() , 23 );
         Assert.assertEquals("Different number of nodes in network.", controler.getScenario().getNetwork().getNodes().size() , 15 );
 		Assert.assertNotNull("Transit schedule is null.", controler.getScenario().getTransitSchedule());
@@ -217,8 +215,8 @@ public class CadytsPtIT {
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
         Assert.assertEquals("Num. of persons in population is wrong.", controler.getScenario().getPopulation().getPersons().size() , 4);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
-		//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
-		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
+		//		Assert.assertEquals("Distance filter is wrong.", controler.getTestScenarioURL().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
+		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getTestScenarioURL().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
 		//counts
 		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
 		Counts occupCounts = new Counts();
@@ -245,7 +243,8 @@ public class CadytsPtIT {
 			Id<TransitStopFacility> stopId2 = Id.create("stop2", TransitStopFacility.class);
 			simValues = reader.getSimulatedValues(stopId2);
 			realValues= reader.getRealValues(stopId2);
-			Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
+//			Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, simValues[6], MatsimTestUtils.EPSILON); // Altered after using ChangeExpBeta instead of "ccc"
 			Assert.assertEquals("Volume of hour 6 is wrong", 1.0, realValues[6] , MatsimTestUtils.EPSILON);
 
 			Id<TransitStopFacility> stopId6 = Id.create("stop6", TransitStopFacility.class);
@@ -257,7 +256,8 @@ public class CadytsPtIT {
 			Id<TransitStopFacility> stopId10 = Id.create("stop10", TransitStopFacility.class);
 			simValues = reader.getSimulatedValues(stopId10);
 			realValues= reader.getRealValues(stopId10);
-			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
+//			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, simValues[6], MatsimTestUtils.EPSILON); // Altered after using ChangeExpBeta instead of "ccc"
 			Assert.assertEquals("Volume of hour 6 is wrong", 5.0, realValues[6], MatsimTestUtils.EPSILON);
 
 			// test calibration statistics
@@ -266,8 +266,10 @@ public class CadytsPtIT {
 			new TabularFileParser().parse(testCalibStatPath, calibrationStatReader);
 
 			CalibrationStatReader.StatisticsData outStatData= calibrationStatReader.getCalStatMap().get(lastIteration);
-			Assert.assertEquals("different Count_ll", "-0.046875", outStatData.getCount_ll() );
-			Assert.assertEquals("different Count_ll_pred_err",  "0.01836234363152515" , outStatData.getCount_ll_pred_err() );
+//			Assert.assertEquals("different Count_ll", "-0.046875", outStatData.getCount_ll() );
+			Assert.assertEquals("different Count_ll", "-0.109375", outStatData.getCount_ll() ); // Altered after using ChangeExpBeta instead of "ccc"
+//			Assert.assertEquals("different Count_ll_pred_err",  "0.01836234363152515" , outStatData.getCount_ll_pred_err() );
+			Assert.assertEquals("different Count_ll_pred_err",  "0.008411478550953913" , outStatData.getCount_ll_pred_err() ); // Altered after using ChangeExpBeta instead of "ccc"
 			//			Assert.assertEquals("different Link_lambda_avg", "-2.2604922388914356E-10", outStatData.getLink_lambda_avg() );
 			//			Assert.assertEquals("different Link_lambda_max", "0.0" , outStatData.getLink_lambda_max() );
 			//			Assert.assertEquals("different Link_lambda_min", "-7.233575164452593E-9", outStatData.getLink_lambda_min() );
@@ -277,7 +279,8 @@ public class CadytsPtIT {
 			//			Assert.assertEquals("different Plan_lambda_max", "-7.233575164452593E-9" , outStatData.getPlan_lambda_max() );
 			//			Assert.assertEquals("different Plan_lambda_min", "-7.233575164452593E-9" , outStatData.getPlan_lambda_min() );
 			//			Assert.assertEquals("different Plan_lambda_stddev", "0.0" , outStatData.getPlan_lambda_stddev());
-			Assert.assertEquals("different Total_ll", "-0.046875", outStatData.getTotal_ll() );
+//			Assert.assertEquals("different Total_ll", "-0.046875", outStatData.getTotal_ll() );
+			Assert.assertEquals("different Total_ll", "-0.109375", outStatData.getTotal_ll() ); // Altered after using ChangeExpBeta instead of "ccc"
 
 
 			//test link offsets
@@ -297,14 +300,17 @@ public class CadytsPtIT {
 			do {
 				binIndex++;
 				isZero = (Math.abs(stopOffsets.getBinValue(stop2 , binIndex) - 0.0) < MatsimTestUtils.EPSILON);
-			}while (isZero && binIndex<86400);
+			} while (isZero && binIndex<86400);
 
 			Assert.assertEquals("Wrong bin index for first link offset", 6, binIndex);
-			Assert.assertEquals("Wrong link offset of stop 10", 0.03515757824042241, stopOffsets.getBinValue(stop10 , binIndex), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Wrong link offset of stop 2", -0.011353248321030008, stopOffsets.getBinValue(stop2 , binIndex), MatsimTestUtils.EPSILON);
+//			Assert.assertEquals("Wrong link offset of stop 10", 0.03515757824042241, stopOffsets.getBinValue(stop10 , binIndex), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Wrong link offset of stop 10", 0.022383938774904025, stopOffsets.getBinValue(stop10 , binIndex), MatsimTestUtils.EPSILON); // Altered after using ChangeExpBeta instead of "ccc"
+//			Assert.assertEquals("Wrong link offset of stop 2", -0.011353248321030008, stopOffsets.getBinValue(stop2 , binIndex), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Wrong link offset of stop 2", -0.008477236625252698, stopOffsets.getBinValue(stop2 , binIndex), MatsimTestUtils.EPSILON); // Altered after using ChangeExpBeta instead of "ccc"
 		}
 	}
 
+	
 	@Test
 	public final void testCalibration() throws IOException {
 		final double beta = 30. ;
@@ -321,7 +327,7 @@ public class CadytsPtIT {
 
 		config.planCalcScore().setBrainExpBeta(beta) ;
 
-		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
+		StrategySettings stratSets = new StrategySettings();
 		stratSets.setStrategyName("ccc") ;
 		stratSets.setWeight(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
@@ -350,7 +356,6 @@ public class CadytsPtIT {
 
 		controler.run();
 
-
 		//scenario data  test
 		Assert.assertNotNull("config is null" , controler.getConfig());
         Assert.assertEquals("Different number of links in network.", controler.getScenario().getNetwork().getLinks().size() , 23 );
@@ -361,8 +366,8 @@ public class CadytsPtIT {
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
         Assert.assertEquals("Num. of persons in population is wrong.", controler.getScenario().getPopulation().getPersons().size() , 4);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
-		//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
-		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
+		//		Assert.assertEquals("Distance filter is wrong.", controler.getTestScenarioURL().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
+		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getTestScenarioURL().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
 		//counts
 		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
 		Counts occupCounts = new Counts();
@@ -423,7 +428,6 @@ public class CadytsPtIT {
 			Assert.assertEquals("different Plan_lambda_stddev", "0.02183671935220152" , outStatData.getPlan_lambda_stddev());
 			Assert.assertEquals("different Total_ll", "-0.046875", outStatData.getTotal_ll() );
 
-
 			//test link offsets
 			final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
 			String linkOffsetFile = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml";
@@ -473,7 +477,7 @@ public class CadytsPtIT {
 
 		config.ptCounts().setPtCountsInterval(1) ;
 
-		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
+		StrategySettings stratSets = new StrategySettings();
 		stratSets.setStrategyName("ccc") ;
 		stratSets.setWeight(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
@@ -519,8 +523,8 @@ public class CadytsPtIT {
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
         Assert.assertEquals("Num. of persons in population is wrong.", controler.getScenario().getPopulation().getPersons().size() , 4);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
-		//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
-		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
+		//		Assert.assertEquals("Distance filter is wrong.", controler.getTestScenarioURL().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
+		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getTestScenarioURL().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
 		//counts
 		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
 		Counts occupCounts = new Counts();
@@ -628,7 +632,6 @@ public class CadytsPtIT {
 	}
 
 
-
 	private static Config createTestConfig(String inputDir, String outputDir) {
 		Config config = ConfigUtils.createConfig() ;
 		// ---
@@ -703,5 +706,4 @@ public class CadytsPtIT {
 			} ;
 		}
 	}
-
 }

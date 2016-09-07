@@ -21,20 +21,14 @@
 package org.matsim.core.replanning;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimManager;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.controler.Injector;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.replanning.modules.ExternalModule;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
 import javax.inject.Inject;
@@ -210,7 +204,8 @@ public class StrategyManager implements MatsimManager {
 	 * @return the chosen strategy
 	 */
 	public GenericPlanStrategy<Plan, Person> chooseStrategy(final Person person, final String subpopulation) {
-		return delegate.chooseStrategy(subpopulation);
+		final GenericPlanStrategy<Plan, Person> strategy = delegate.chooseStrategy(subpopulation);
+		return strategy;
 	}
 
 	/**
@@ -276,7 +271,7 @@ public class StrategyManager implements MatsimManager {
 	 * @see #setMaxPlansPerAgent(int)
 	 */
 	@Inject
-	public final void setPlanSelectorForRemoval(final GenericPlanSelector<Plan, Person> planSelector) {
+	public final void setPlanSelectorForRemoval(final PlanSelector<Plan, Person> planSelector) {
 		delegate.setPlanSelectorForRemoval(planSelector);
 	}
 

@@ -154,8 +154,8 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 			ObjectAttributesXmlReader personsBetasReader = new ObjectAttributesXmlReader(this.personsBetas);
 			ObjectAttributesXmlReader facilitiesAttributesReader = new ObjectAttributesXmlReader(this.facilitiesAttributes);
 			try {
-				personsBetasReader.parse(pBetasFileName);
-				facilitiesAttributesReader.parse(fAttributesFileName);
+				personsBetasReader.readFile(pBetasFileName);
+				facilitiesAttributesReader.readFile(fAttributesFileName);
 				log.info("reading betas and facilities attributes from: \n"+ pBetasFileName + "\n" + fAttributesFileName);
 			} catch  (UncheckedIOException e) {
 				// reading was not successful
@@ -169,7 +169,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		if (prefsFileName != null) {			
 			ObjectAttributesXmlReader prefsReader = new ObjectAttributesXmlReader(this.prefsAttributes);
 			try {
-				prefsReader.parse(prefsFileName);
+				prefsReader.readFile(prefsFileName);
 				log.info("reading prefs attributes from: \n"+ prefsFileName);
 			} catch  (UncheckedIOException e) {
 				// reading was not successful
@@ -364,6 +364,12 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		@Override
 		public void addActivityOption(ActivityOption option) {
 			this.activityFacility.addActivityOption(option);
+		}
+
+		@Override
+		public void setCoord(Coord coord) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
 		}
 	}
 }

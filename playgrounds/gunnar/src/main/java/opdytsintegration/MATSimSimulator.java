@@ -153,6 +153,10 @@ public class MATSimSimulator<U extends DecisionVariable> implements Simulator<U>
 		}
 		// <<<<<<<<<< TODO NEW <<<<<<<<<<
 
+		// >>>>>>>>>> TODO NEW >>>>>>>>>>
+		this.stateFactory.registerControler(controler);
+		// <<<<<<<<<< TODO NEW <<<<<<<<<<
+
 		controler.run();
 		this.nextControlerRun++;
 		return matsimDecisionVariableEvaluator.getFinalState();

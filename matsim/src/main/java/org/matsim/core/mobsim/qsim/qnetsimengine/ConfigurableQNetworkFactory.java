@@ -30,7 +30,6 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
@@ -60,7 +59,7 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 	@Override
 	void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
 		this.netsimEngine = netsimEngine1;
-		double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
+		double effectiveCellSize = ((Network) network).getEffectiveCellSize() ;
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );
 		if (! Double.isNaN(network.getEffectiveLaneWidth())){

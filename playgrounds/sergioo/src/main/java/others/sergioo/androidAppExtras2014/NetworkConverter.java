@@ -13,11 +13,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -68,7 +67,7 @@ public class NetworkConverter {
 	
 	public static Network getNetworkFromShapeFilePolyline(String fileName) {
 		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(fileName);
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		NetworkFactory networkFactory = network.getFactory();
 		long nodeLongId=0, linkLongId=0;
 		for(SimpleFeature feature:features) {
@@ -82,7 +81,8 @@ public class NetworkConverter {
 				if(nodes[n]==null) {
 					nodes[n] = networkFactory.createNode(Id.createNodeId(nodeLongId), coord);
 					nodeLongId++;
-					((NodeImpl)nodes[n]).setOrigId(feature.getAttribute("OBJECTID").toString());
+					Node r = ((Node)nodes[n]);
+					NetworkUtils.setOrigId( r, (String) feature.getAttribute("OBJECTID").toString() ) ;
 				}
 			}
 			Node prevNode = nodes[0];
@@ -91,11 +91,11 @@ public class NetworkConverter {
 					if(n+1==nodes.length-1 || CoordUtils.calcEuclideanDistance(prevNode.getCoord(), nodes[n+1].getCoord())>MIN_DISTANCE) {
 						network.addNode(nodes[n]);
 						Link link = network.getFactory().createLink(Id.createLinkId(linkLongId), prevNode, nodes[n+1]);
-						((LinkImpl)link).setOrigId(feature.getID());
+						NetworkUtils.setOrigId( ((Link)link), (String) feature.getID() ) ;
 						network.addLink(link);
 						linkLongId++;
 						link = network.getFactory().createLink(Id.createLinkId(linkLongId), nodes[n+1], prevNode);
-						((LinkImpl)link).setOrigId(feature.getID());
+						NetworkUtils.setOrigId( ((Link)link), (String) feature.getID() ) ;
 						network.addLink(link);
 						linkLongId++;
 						prevNode = nodes[n+1];
@@ -103,11 +103,11 @@ public class NetworkConverter {
 				}
 				else {
 					Link link = network.getFactory().createLink(Id.createLinkId(linkLongId), prevNode, nodes[n+1]);
-					((LinkImpl)link).setOrigId(feature.getID());
+					NetworkUtils.setOrigId( ((Link)link), (String) feature.getID() ) ;
 					network.addLink(link);
 					linkLongId++;
 					link = network.getFactory().createLink(Id.createLinkId(linkLongId), nodes[n+1], prevNode);
-					((LinkImpl)link).setOrigId(feature.getID());
+					NetworkUtils.setOrigId( ((Link)link), (String) feature.getID() ) ;
 					network.addLink(link);
 					linkLongId++;
 					prevNode = nodes[n+1];

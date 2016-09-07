@@ -19,37 +19,48 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.io.PrintWriter;
 import java.util.*;
 
+import org.jfree.chart.JFreeChart;
+import org.matsim.contrib.taxi.util.stats.TimeProfileCharts.*;
+import org.matsim.contrib.util.CompactCSVWriter;
+import org.matsim.contrib.util.chart.ChartSaveUtils;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.events.*;
 import org.matsim.core.mobsim.framework.listeners.*;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 
 
-public class TimeProfileCollector<T>
+public class TimeProfileCollector
     implements MobsimBeforeSimStepListener, MobsimBeforeCleanupListener
 {
-    public interface ProfileCalculator<S>
+    public interface ProfileCalculator
     {
-        S calcCurrentPoint();
+        String[] getHeader();
+
+
+        String[] calcValues();
     }
 
 
-    private final ProfileCalculator<T> calculator;
-    private final List<T> timeProfile = new ArrayList<>();
+    private final ProfileCalculator calculator;
+    private final List<Double> times = new ArrayList<>();
+    private final List<String[]> timeProfile = new ArrayList<>();
     private final int interval;
-    private final String header;
+    private final String outputFile;
     private final MatsimServices matsimServices;
 
+    private Customizer chartCustomizer;
+    private ChartType[] chartTypes = { ChartType.Line };
 
-    public TimeProfileCollector(ProfileCalculator<T> calculator, int interval, String header,
+
+    public TimeProfileCollector(ProfileCalculator calculator, int interval, String outputFile,
             MatsimServices matsimServices)
     {
         this.calculator = calculator;
         this.interval = interval;
-        this.header = header;
+        this.outputFile = outputFile;
         this.matsimServices = matsimServices;
     }
 
@@ -58,23 +69,55 @@ public class TimeProfileCollector<T>
     public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
         if (e.getSimulationTime() % interval == 0) {
-            timeProfile.add(calculator.calcCurrentPoint());
+            times.add(e.getSimulationTime());
+            timeProfile.add(calculator.calcValues());
         }
     }
 
 
-    @Override
-    public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e)
+    public void setChartCustomizer(TimeProfileCharts.Customizer chartCustomizer)
     {
-        PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(matsimServices.getControlerIO()
-                .getIterationFilename(matsimServices.getIterationNumber(), "taxi_time_profiles.txt")));
+        this.chartCustomizer = chartCustomizer;
+    }
 
-        pw.println("time\t" + header);
 
-        for (int i = 0; i < timeProfile.size(); i++) {
-            pw.println(i * interval + "\t" + timeProfile.get(i));
+    public void setChartTypes(ChartType... chartTypes)
+    {
+        this.chartTypes = chartTypes;
+    }
+
+
+    @Override
+    public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e)
+    {
+        String file = matsimServices.getControlerIO()
+                .getIterationFilename(matsimServices.getIterationNumber(), outputFile);
+        String timeFormat = interval % 60 == 0 ? Time.TIMEFORMAT_HHMM : Time.TIMEFORMAT_HHMMSS;
+
+        try (CompactCSVWriter writer = new CompactCSVWriter(
+                IOUtils.getBufferedWriter(file + ".txt"))) {
+            writer.writeNext("time", calculator.getHeader());
+            for (int i = 0; i < timeProfile.size(); i++) {
+                writer.writeNext(Time.writeTime(times.get(i), timeFormat), timeProfile.get(i));
+            }
         }
 
-        pw.close();
+        for (ChartType t : chartTypes) {
+            generateImage(t);
+        }
+    }
+
+
+    private void generateImage(ChartType chartType)
+    {
+        JFreeChart chart = TimeProfileCharts.chartProfile(calculator.getHeader(), times,
+                timeProfile, chartType);
+        if (chartCustomizer != null) {
+            chartCustomizer.customize(chart, chartType);
+        }
+
+        String imageFile = matsimServices.getControlerIO().getIterationFilename(
+                matsimServices.getIterationNumber(), outputFile + "_" + chartType.name());
+        ChartSaveUtils.saveAsPNG(chart, imageFile, 1500, 1000);
     }
 }

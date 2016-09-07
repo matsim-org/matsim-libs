@@ -13,8 +13,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -35,7 +35,7 @@ public class PlanCorrector {
 	
 	public void run(String plansFile, String facilitiesFile, String plansOutFile) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario).readFile(plansFile);
+		new PopulationReader(scenario).readFile(plansFile);
 		new MatsimFacilitiesReader(scenario).readFile(facilitiesFile);
 		
 		this.addfacilities2Freight(scenario);

@@ -25,45 +25,46 @@ import org.junit.Ignore;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 
 @Ignore
 public class TestsUtil {
 
-	static PlanImpl createPlanFromFacilities(ActivityFacilitiesImpl layer, Person person, String mode, String facString) {
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
+	static Plan createPlanFromFacilities(ActivityFacilitiesImpl layer, Person person, String mode, String facString) {
+		Plan plan = PopulationUtils.createPlan(person);
 		String[] locationIdSequence = facString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
 			BasicLocation location = layer.getFacilities().get(Id.create(locationIdSequence[aa], ActivityFacility.class));
-			ActivityImpl act;
-			act = plan.createAndAddActivity("actAtFacility" + locationIdSequence[aa]);
+			Activity act;
+			act = PopulationUtils.createAndAddActivity(plan, "actAtFacility" + locationIdSequence[aa]);
 			act.setFacilityId(location.getId());
 			act.setEndTime(10*3600);
 			if (aa != (locationIdSequence.length - 1)) {
-				plan.createAndAddLeg(mode);
+				PopulationUtils.createAndAddLeg( plan, mode );
 			}
 		}
 		return plan;
 	}
 
-	static PlanImpl createPlanFromLinks(NetworkImpl layer, Person person, String mode, String linkString) {
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
+	static Plan createPlanFromLinks(Network layer, Person person, String mode, String linkString) {
+		Plan plan = PopulationUtils.createPlan(person);
 		String[] locationIdSequence = linkString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
 			BasicLocation location = layer.getLinks().get(Id.create(locationIdSequence[aa], Link.class));
-			ActivityImpl act;
-			act = plan.createAndAddActivity("actOnLink" + locationIdSequence[aa], location.getId());
+			Activity act;
+			act = PopulationUtils.createAndAddActivityFromLinkId(plan, "actOnLink" + locationIdSequence[aa], (Id<Link>) location.getId());
 			act.setEndTime(10*3600);
 			if (aa != (locationIdSequence.length - 1)) {
-				plan.createAndAddLeg(mode);
+				PopulationUtils.createAndAddLeg( plan, mode );
 			}
 		}
 		return plan;

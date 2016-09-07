@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.scenario.MutableScenario;
 
@@ -154,7 +154,7 @@ public class PRLocationStrategyMod implements PlanStrategyModule {
 		log.info("Choose ParkAndRide Facility depending on weight...");
 		Link rndPrLink = ellipseSearch.getRndPrLink(this.net, this.id2prFacility, prWeights);
 		
-		Activity parkAndRide = new ActivityImpl(PRConstants.PARKANDRIDE_ACTIVITY_TYPE, rndPrLink.getToNode().getCoord(), rndPrLink.getId()); 
+		Activity parkAndRide = PopulationUtils.createActivityFromCoordAndLinkId(PRConstants.PARKANDRIDE_ACTIVITY_TYPE, rndPrLink.getToNode().getCoord(), rndPrLink.getId()); 
 		parkAndRide.setMaximumDuration(this.typicalDuration);
 		
 		return parkAndRide;

@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.RoutingModule;
@@ -126,7 +126,7 @@ public class AccessEgressMultimodalTripRouterModule extends AbstractModule {
 										travelTime);
 			final TravelDisutility nonPersonnalizableDisutility =
 					new TravelDisutility() {
-						private final Person dummy = PopulationUtils.createPerson(Id.create("dummy", Person.class));
+						private final Person dummy = PopulationUtils.getFactory().createPerson(Id.create("dummy", Person.class));
 						@Override
 						public double getLinkTravelDisutility(
 								final Link link,
@@ -214,7 +214,7 @@ public class AccessEgressMultimodalTripRouterModule extends AbstractModule {
 		Network subNetwork = multimodalSubNetworks.get(mode);
 		
 		if (subNetwork == null) {
-			subNetwork = NetworkImpl.createNetwork();
+			subNetwork = NetworkUtils.createNetwork();
 			final Set<String> restrictions = new HashSet<String>();
 			restrictions.add(mode);
 			final TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(network);

@@ -31,9 +31,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.population.algorithms.PersonAlgorithm;
 
 /**
  * Filters all persons out whose routes do not lead at least once through

@@ -37,7 +37,7 @@ import org.xml.sax.InputSource;
  *
  * @author mrieser
  */
-public class ConfigReader extends MatsimXmlParser implements MatsimSomeReader {
+public class ConfigReader extends MatsimXmlParser {
 
 	private final static Logger log = Logger.getLogger(ConfigReader.class);
 
@@ -73,16 +73,6 @@ public class ConfigReader extends MatsimXmlParser implements MatsimSomeReader {
 	}
 
 	/**
-	 * Parses the specified config file. This method calls {@link #parse(String)}.
-	 *
-	 * @param filename The name of the file to parse.
-	 * @throws UncheckedIOException e.g. if the file cannot be found
-	 */
-	public void readFile(final String filename) throws UncheckedIOException {
-		parse(filename);
-	}
-
-	/**
 	 * Parses the specified config file, and uses the given dtd file as a local copy to use as dtd
 	 * if the one specified in the config file cannot be found.
 	 *
@@ -91,9 +81,11 @@ public class ConfigReader extends MatsimXmlParser implements MatsimSomeReader {
 	 * @throws UncheckedIOException e.g. if the file cannot be found
 	 */
 	public void readFile(final String filename, final String dtdFilename) throws UncheckedIOException {
+		// yyyyyy if this is a necessary/useful method, I would prefer it in the superclass.  kai, jul'16
+		
 		log.info("trying to read config from " + filename);
 	  this.localDtd = dtdFilename;
-		parse(filename);
+		readFile(filename);
 		this.localDtd = null;
 	}
 
@@ -114,31 +106,32 @@ public class ConfigReader extends MatsimXmlParser implements MatsimSomeReader {
 		}
 	}
 
-	@Override
-	public InputSource resolveEntity(final String publicId, final String systemId) {
-		InputSource is = super.resolveEntity(publicId, systemId);
-		if (is != null) {
-			// everything is fine, we can access the dtd
-			return is;
-		}
-		// okay, standard procedure failed... let's see if we have it locally
-		if (this.localDtd != null) {
-			File dtdFile = new File(this.localDtd);
-			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
-				log.info("Using the local DTD " + this.localDtd);
-				return new InputSource(this.localDtd);
-			}
-		}
-		// hmm, didn't find the local one either... maybe inside a jar somewhere?
-		int index = systemId.replace('\\', '/').lastIndexOf('/');
-		String shortSystemId = systemId.substring(index + 1);
-		InputStream stream = this.getClass().getResourceAsStream("/dtd/" + shortSystemId);
-		if (stream != null) {
-			log.info("Using local DTD from jar-file " + shortSystemId);
-			return new InputSource(stream);
-		}
-		// we fail...
-		return null;
-	}
+	// The following did override the inherited resolveEntity method.  But I have no idea why that may have made sense.  kai, jul'16
+//	@Override
+//	public InputSource resolveEntity(final String publicId, final String systemId) {
+//		InputSource is = super.resolveEntity(publicId, systemId);
+//		if (is != null) {
+//			// everything is fine, we can access the dtd
+//			return is;
+//		}
+//		// okay, standard procedure failed... let's see if we have it locally
+//		if (this.localDtd != null) {
+//			File dtdFile = new File(this.localDtd);
+//			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
+//				log.info("Using the local DTD " + this.localDtd);
+//				return new InputSource(this.localDtd);
+//			}
+//		}
+//		// hmm, didn't find the local one either... maybe inside a jar somewhere?
+//		int index = systemId.replace('\\', '/').lastIndexOf('/');
+//		String shortSystemId = systemId.substring(index + 1);
+//		InputStream stream = this.getClass().getResourceAsStream("/dtd/" + shortSystemId);
+//		if (stream != null) {
+//			log.info("Using local DTD from jar-file " + shortSystemId);
+//			return new InputSource(stream);
+//		}
+//		// we fail...
+//		return null;
+//	}
 
 }

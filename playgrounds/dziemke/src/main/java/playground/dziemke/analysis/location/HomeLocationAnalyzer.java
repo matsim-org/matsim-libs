@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReaderMatsimV5;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -29,7 +29,7 @@ public class HomeLocationAnalyzer {
 
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
+		PopulationReader reader = new PopulationReader(scenario);
 		reader.readFile(inputPlansFile);
 		Population population = scenario.getPopulation();
 		

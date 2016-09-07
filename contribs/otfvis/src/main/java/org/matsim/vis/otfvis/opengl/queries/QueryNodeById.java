@@ -36,7 +36,7 @@ import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
+import org.matsim.vis.otfvis.opengl.gl.GLUtils;
 
 
 /**
@@ -113,7 +113,7 @@ public class QueryNodeById extends AbstractQuery implements OTFQuery {
 			gl.glEnable(GL.GL_BLEND);
 			gl.glEnable(GL.GL_LINE_SMOOTH);
 			for (Coord c : coords){
-				DrawingUtils.drawCircle(gl, (float) c.getX(), (float) c.getY(), 100);
+				GLUtils.drawCircle(gl, (float) c.getX(), (float) c.getY(), 100);
 			}
 			gl.glDisable(GL.GL_LINE_SMOOTH);
 			gl.glDisable(GL.GL_BLEND);

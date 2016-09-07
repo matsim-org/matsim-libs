@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -95,7 +95,7 @@ public class NetworkMatsim2Shape {
 		Network net = NetworkUtils.createNetwork();
 		RoadPricingSchemeImpl rps = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 rpr = new RoadPricingReaderXMLv1(rps);
-		rpr.parse(linksToFilter);
+		rpr.readFile(linksToFilter);
 		Set<Id<Link>> linkList = rps.getTolledLinkIds();
 		for(Link link : network.getLinks().values()){
 			Id linkId = link.getId();

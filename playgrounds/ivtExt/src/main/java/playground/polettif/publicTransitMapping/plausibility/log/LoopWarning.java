@@ -31,11 +31,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * Plausibility warning if a link sequence passes a node twice
+ *
+ * @author polettif
+ */
 public class LoopWarning extends AbstractPlausibilityWarning {
 
-	public static Map<TransitLine, Integer> lineStat = new HashMap<>();
-	public static Map<TransitRoute, Integer> routeStat = new HashMap<>();
+	public static final Map<TransitLine, Integer> lineStat = new HashMap<>();
+	public static final Map<TransitRoute, Integer> routeStat = new HashMap<>();
 
 	private Node node;
 

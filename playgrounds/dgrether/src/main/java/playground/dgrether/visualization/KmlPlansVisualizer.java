@@ -32,11 +32,11 @@ import org.matsim.contrib.analysis.filters.population.RouteLinkFilter;
 import org.matsim.contrib.analysis.filters.population.SelectedPlanFilter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.population.algorithms.PlanCollectFromAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.population.algorithms.PlanCollectFromAlgorithm;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 

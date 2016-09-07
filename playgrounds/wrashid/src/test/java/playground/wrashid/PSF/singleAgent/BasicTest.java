@@ -18,8 +18,10 @@ import playground.wrashid.PSF.energy.consumption.LogEnergyConsumption;
 import playground.wrashid.PSF.parking.LogParkingTimes;
 import playground.wrashid.PSF.parking.ParkLog;
 import playground.wrashid.PSF.parking.ParkingTimes;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
 public class BasicTest extends MatsimTestCase {
 
@@ -29,6 +31,10 @@ public class BasicTest extends MatsimTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		Config config = loadConfig("test/input/playground/wrashid/PSF/singleAgent/config.xml");
+
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+		// too many things don't work with access/egress walk true. kai, jun'16
+
 		ConfigUtils.addOrGetModule(config, ParametersPSF.PSF_MODULE, ParametersPSF.class);
 
 		controler = new Controler(config);

@@ -21,11 +21,11 @@ package herbie.creation.ptAnalysis;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitRouteImpl;
@@ -105,9 +105,9 @@ public class PtScenarioAdaption {
 		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseVehicles(true);
 		scenario.getConfig().transit().setUseTransit(true);
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
-		new MatsimNetworkReader(scenario.getNetwork()).parse(networkfilePath);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkfilePath);
 		
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		this.transitFactory = schedule.getFactory();

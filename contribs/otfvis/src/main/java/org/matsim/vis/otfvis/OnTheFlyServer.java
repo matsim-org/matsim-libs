@@ -20,15 +20,6 @@
 
 package org.matsim.vis.otfvis;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -53,10 +44,12 @@ import org.matsim.vis.otfvis.interfaces.OTFLiveServer;
 import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 import org.matsim.vis.otfvis.utils.WGS84ToMercator;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
+
+import java.nio.ByteBuffer;
+import java.util.*;
 
 /**
  * OnTheFlyServer is the live server of the OTFVis.
@@ -69,7 +62,9 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
  * @author dstrippgen
  *
  */
-public class OnTheFlyServer extends PlayPauseSimulationControl implements OTFLiveServer {
+public class OnTheFlyServer implements OTFLiveServer {
+
+	private final PlayPauseSimulationControl playPauseSimulationControl;
 
 	private final class CurrentTimeStepView implements SimulationViewForQueries {
 
@@ -104,16 +99,6 @@ public class OnTheFlyServer extends PlayPauseSimulationControl implements OTFLiv
 		}
 
 		@Override
-		public void addTrackedAgent(Id<Person> agentId) {
-
-		}
-
-		@Override
-		public void removeTrackedAgent(Id<Person> agentId) {
-
-		}
-
-		@Override
 		public VisNetwork getVisNetwork() {
 			return visMobsim.getVisNetwork();
 		}
@@ -125,11 +110,7 @@ public class OnTheFlyServer extends PlayPauseSimulationControl implements OTFLiv
 
 		@Override
 		public VisData getNonNetwokAgentSnapshots() {
-			if (visMobsim != null) {
-				return visMobsim.getNonNetworkAgentSnapshots();
-			} else {
-				return visData;
-			}
+			return visMobsim.getNonNetworkAgentSnapshots();
 		}
 
 	}
@@ -138,42 +119,30 @@ public class OnTheFlyServer extends PlayPauseSimulationControl implements OTFLiv
 
 	private OTFServerQuadTree quad;
 
-	private final List<OTFDataWriter<?>> additionalElements= new LinkedList<OTFDataWriter<?>>();
+	private final List<OTFDataWriter<?>> additionalElements= new LinkedList<>();
 
 	private EventsManager events;
 
-	private Collection<AbstractQuery> activeQueries = new ArrayList<AbstractQuery>();
+	private Collection<AbstractQuery> activeQueries = new ArrayList<>();
 
 	private final ByteBuffer buf = ByteBuffer.allocate(80000000);
 
 	private VisMobsim visMobsim;
 
-	@SuppressWarnings("rawtypes") // should work with arbitrary "agent" types. kai, sep'14
-	private Map<Id, AgentSnapshotInfo> snapshots = new LinkedHashMap<Id, AgentSnapshotInfo>();
-
-	private final VisData visData = new VisData() {
-
-		@Override
-		public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
-			return snapshots.values();
-		}
-
-	};
-
 	private final CurrentTimeStepView currentTimeStepView = new CurrentTimeStepView();
 
 	private Scenario scenario;
 
-	private Map<Id<Person>, Plan> plans = new HashMap<Id<Person>, Plan>();
-	
-	OnTheFlyServer(Scenario scenario, EventsManager events) {
+	OnTheFlyServer(Scenario scenario, EventsManager events, VisMobsim qSim) {
 		this.scenario = scenario;
-		this.events = events; 
+		this.events = events;
+		this.visMobsim = qSim;
+		playPauseSimulationControl = new PlayPauseSimulationControl(qSim);
+
 	}
 
-	public static OnTheFlyServer createInstance(Scenario scenario, EventsManager events) {
-		OnTheFlyServer instance = new OnTheFlyServer(scenario, events);
-		return instance;
+	public static OnTheFlyServer createInstance(Scenario scenario, EventsManager events, VisMobsim qSim) {
+		return new OnTheFlyServer(scenario, events, qSim);
 	}
 
 	@Override
@@ -208,19 +177,11 @@ public class OnTheFlyServer extends PlayPauseSimulationControl implements OTFLiv
 
 				});
 			}
-			if (this.visMobsim != null) {
-				quad = new LiveServerQuadTree(this.visMobsim.getVisNetwork());
-				if (ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).isShowTeleportedAgents()) {
-					OTFAgentsListHandler.Writer teleportationWriter;
-					teleportationWriter = new OTFAgentsListHandler.Writer();
-					teleportationWriter.setSrc(this.visMobsim.getNonNetworkAgentSnapshots());
-					quad.addAdditionalElement(teleportationWriter);
-				}
-			} else {
-				quad = new SnapshotWriterQuadTree(this.scenario.getNetwork());
+			quad = new LiveServerQuadTree(this.visMobsim.getVisNetwork());
+			if (ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).isShowTeleportedAgents()) {
 				OTFAgentsListHandler.Writer teleportationWriter;
 				teleportationWriter = new OTFAgentsListHandler.Writer();
-				teleportationWriter.setSrc(visData);
+				teleportationWriter.setSrc(this.visMobsim.getNonNetworkAgentSnapshots());
 				quad.addAdditionalElement(teleportationWriter);
 			}
 			quad.initQuadTree(connect);
@@ -241,7 +202,7 @@ public class OnTheFlyServer extends PlayPauseSimulationControl implements OTFLiv
 	@Override
 	public byte[] getQuadConstStateBuffer() {
 		try {
-			getAccessToQNetwork().acquire();
+			playPauseSimulationControl.getAccessToQNetwork().acquire();
 			byte[] result;
 			buf.position(0);
 			quad.writeConstData(buf);
@@ -253,14 +214,14 @@ public class OnTheFlyServer extends PlayPauseSimulationControl implements OTFLiv
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} finally {
-			getAccessToQNetwork().release();
+			playPauseSimulationControl.getAccessToQNetwork().release();
 		}
 	}
 
 	@Override
 	public byte[] getQuadDynStateBuffer(final QuadTree.Rect bounds) {
 		try {
-			getAccessToQNetwork().acquire();
+			playPauseSimulationControl.getAccessToQNetwork().acquire();
 			byte[] result;
 			buf.position(0);
 			quad.writeDynData(bounds, buf);
@@ -272,19 +233,19 @@ public class OnTheFlyServer extends PlayPauseSimulationControl implements OTFLiv
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} finally {
-			getAccessToQNetwork().release();
+			playPauseSimulationControl.getAccessToQNetwork().release();
 		}
 	}
 
 	@Override
 	public OTFQueryRemote answerQuery(AbstractQuery query) {
 		try {
-			getAccessToQNetwork().acquire();
+			playPauseSimulationControl.getAccessToQNetwork().acquire();
 			query.installQuery(currentTimeStepView);
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} finally {
-			getAccessToQNetwork().release();
+			playPauseSimulationControl.getAccessToQNetwork().release();
 		}
 		activeQueries.add(query);
 		return query;
@@ -308,10 +269,6 @@ public class OnTheFlyServer extends PlayPauseSimulationControl implements OTFLiv
 		this.additionalElements.add(element);
 	}
 
-	public void setSimulation(VisMobsim visMobsim) {
-		this.visMobsim = visMobsim;
-	}
-
 	@Override
 	public OTFVisConfigGroup getOTFVisConfig() {
 		OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(this.scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
@@ -325,62 +282,34 @@ public class OnTheFlyServer extends PlayPauseSimulationControl implements OTFLiv
 		return otfVisConfig ;
 	}
 
-//	public SnapshotWriter getSnapshotReceiver() {
-//		return new SnapshotWriter() {
-//
-//			@Override
-//			public void beginSnapshot(double time) {
-//				snapshots.clear();
-//				setLocalTime((int) time);
-//			}
-//
-//			@Override
-//			public void endSnapshot() {
-//
-//			}
-//
-//			@Override
-//			public void addAgent(AgentSnapshotInfo position) {
-//				snapshots.put(position.getId(), position);
-//			}
-//
-//			@Override
-//			public void finish() {
-//				setStatus(Status.FINISHED);
-//			}
-//
-//		};
-//	}
-	// this does not seem to be used anywhere. kai, mar'15
-
-	public void addAdditionalPlans(Map<Id<Person>, Plan> additionalPlans) {
-		this.plans.putAll(additionalPlans);
+	@Override
+	public void doStep(int time) {
+		playPauseSimulationControl.doStep(time);
 	}
 
 	@Override
-	public boolean requestNewTime(final int time, final TimePreference searchDirection) {
-		if ( isFinished() ) {
-			return true;
-//		} else if( ((searchDirection == TimePreference.RESTART) && (time < getLocalTime()))) { 
-//			doStep(time);
-//			return true;
-			// not doing anything meaningful anywhere (I think).  kai, jan'16
-		} else if (time < getLocalTime()) {
-			// if requested time lies in the past, sorry we cannot do that right now
+	public boolean isFinished() {
+		return playPauseSimulationControl.isFinished();
+	}
 
-			setStepToTime(0);
-			// yyyy I think we could as well call "pause" (and should do that for clarity and encapsulation).  However, I am unsure
-			// if the current pause method releases enough of the monitors. kai, jan'16
-			
-			// if forward search is OK, then the actual timestep is the BEST fit
-			return (searchDirection != TimePreference.EARLIER);
-		} else if (time == getLocalTime()) {
-			setStepToTime(0); // see above
-			return true;
-		} else {
-			doStep(time);
-			return true;
-		}
+	@Override
+	public void requestNewTime(final int time) {
+		doStep(time);
+	}
+
+	@Override
+	public int getLocalTime() {
+		return (int) playPauseSimulationControl.getLocalTime();
+	}
+
+	@Override
+	public void pause() {
+		playPauseSimulationControl.pause();
+	}
+
+	@Override
+	public void play() {
+		playPauseSimulationControl.play();
 	}
 
 }

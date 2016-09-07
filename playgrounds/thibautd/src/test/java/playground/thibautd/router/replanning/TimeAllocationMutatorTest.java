@@ -28,16 +28,17 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PlanMutateTimeAllocation;
+import org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation;
+import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.population.algorithms.PlanMutateTimeAllocation;
-import org.matsim.population.algorithms.TripPlanMutateTimeAllocation;
-import org.matsim.population.algorithms.TripsToLegsAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -56,16 +57,16 @@ public class TimeAllocationMutatorTest {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
-	private List<PlanImpl> plans;
+	private List<Plan> plans;
 
 	@Before
 	public void initPlans() {
 		Scenario s = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		MatsimPopulationReader reader = new MatsimPopulationReader( s );
+		PopulationReader reader = new PopulationReader( s );
 		reader.readFile( utils.getPackageInputDirectory() + "/plans.xml.gz" );
-		plans = new ArrayList<PlanImpl>();
+		plans = new ArrayList<Plan>();
 		for (Person p : s.getPopulation().getPersons().values()) {
-			plans.add( (PlanImpl) p.getSelectedPlan() );
+			plans.add( (Plan) p.getSelectedPlan() );
 		}
 	}
 
@@ -91,14 +92,14 @@ public class TimeAllocationMutatorTest {
 					new MainModeIdentifierImpl() );
 
 		Counter counter = new Counter( getClass().getSimpleName()+": testing plan # " );
-		for (PlanImpl plan : plans) {
+		for (Plan plan : plans) {
 			counter.incCounter();
-			PlanImpl planTransit = new PlanImpl();
-			planTransit.copyFrom( plan );
+			Plan planTransit = PopulationUtils.createPlan();
+			PopulationUtils.copyFromTo( plan, planTransit );
 			transit.run( planTransit );
 
-			PlanImpl planTrips2Legs = new PlanImpl();
-			planTrips2Legs.copyFrom( plan );
+			Plan planTrips2Legs = PopulationUtils.createPlan();
+			PopulationUtils.copyFromTo( plan, planTrips2Legs );
 			trips2legs.run( planTrips2Legs );
 			regular.run( planTrips2Legs );
 

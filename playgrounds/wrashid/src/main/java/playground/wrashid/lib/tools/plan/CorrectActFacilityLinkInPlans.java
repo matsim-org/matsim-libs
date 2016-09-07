@@ -4,13 +4,13 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacility;
 
@@ -44,9 +44,9 @@ public class CorrectActFacilityLinkInPlans {
 			Plan selectedPlan = p.getSelectedPlan();
 
 			for (PlanElement pe : selectedPlan.getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					ActivityImpl act = (ActivityImpl) pe;
-					Id<Link> newLinkId = f2l.get(((ActivityImpl) pe).getFacilityId());
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
+					Id<Link> newLinkId = f2l.get(((Activity) pe).getFacilityId());
 
 					if (!newLinkId.toString().equalsIgnoreCase(
 							act.getLinkId().toString())) {
@@ -58,8 +58,7 @@ public class CorrectActFacilityLinkInPlans {
 
 		}
 
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(),
-				1.0).write(outputPlansFile);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(outputPlansFile);
 	}
 
 }

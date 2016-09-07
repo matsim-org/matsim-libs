@@ -23,7 +23,7 @@ package playground.artemc.heterogeneity.scoring.functions;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.ActivityScoring;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.ActivityScoring;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.utils.misc.Time;
 
@@ -66,7 +66,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 		this.currentActivityStartTime = INITIAL_LAST_TIME;
 		this.firstActivityEndTime = INITIAL_FIRST_ACT_END_TIME;
 		this.score = INITIAL_SCORE;
-		
+
 		firstLastActWarning = 0 ;
 		firstLastActOpeningTimesWarning = 0 ;
 	}
@@ -97,7 +97,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 	@Override
 	public void finish() {
 		if (this.currentActivity != null) {
-			handleOvernightActivity(this.currentActivity); 
+			handleOvernightActivity(this.currentActivity);
 		} else {
 			if (this.firstActivity != null) {
 				handleMorningActivity();
@@ -112,7 +112,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 	public double getScore() {
 		return this.score;
 	}
-	
+
 	private static int wrnCnt = 0 ;
 
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
@@ -215,7 +215,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 								+ "absolutely need the old version.  See https://matsim.atlassian.net/browse/MATSIM-191." );
 						log.warn( Gbl.ONLYONCE ) ;
 					}
-					
+
 					// below zeroUtilityDuration, we linearly extend the slope ...:
 					double slopeAtZeroUtility = this.params.marginalUtilityOfPerforming_s * typicalDuration / ( 3600.*actParams.getZeroUtilityDuration_h() ) ;
 					if ( slopeAtZeroUtility < 0. ) {
@@ -231,7 +231,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 					}
 					tmpScore -= slopeAtZeroUtility * durationUnderrun ;
 				}
-				
+
 			}
 
 			// disutility if stopping too early
@@ -292,7 +292,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 					firstLastActOpeningTimesWarning++;
 				}
 			}
-			
+
 			double calcActScore = calcActScore(this.currentActivityStartTime, this.firstActivityEndTime + 24*3600, lastActivity);
 			this.score += calcActScore; // SCENARIO_DURATION
 		} else {

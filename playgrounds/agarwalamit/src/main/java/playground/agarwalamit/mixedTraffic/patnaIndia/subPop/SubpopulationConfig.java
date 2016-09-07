@@ -56,7 +56,7 @@ public class SubpopulationConfig {
 
 		config.plans().setInputFile("../../../repos/runs-svn/patnaIndia/inputs/plansSubPop.xml.gz");
 		config.plans().setInputPersonAttributeFile("../../../repos/runs-svn/patnaIndia/inputs/personsAttributesSubPop.xml.gz");
-		config.counts().setCountsFileName("../../../repos/runs-svn/patnaIndia/inputs/counts/countsCarMotorbikeBike.xml");
+		config.counts().setInputFile("../../../repos/runs-svn/patnaIndia/inputs/counts/countsCarMotorbikeBike.xml");
 		config.counts().setOutputFormat("all");
 		config.counts().setWriteCountsInterval(100);
 		config.counts().setCountsScaleFactor(94.52); 

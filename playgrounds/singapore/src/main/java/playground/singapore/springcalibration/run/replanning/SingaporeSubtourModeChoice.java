@@ -25,12 +25,12 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.algorithms.ChooseRandomLegModeForSubtour;
+import org.matsim.core.population.algorithms.PermissibleModesCalculator;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.population.algorithms.ChooseRandomLegModeForSubtour;
-import org.matsim.population.algorithms.PermissibleModesCalculator;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
 
 import playground.singapore.springcalibration.run.TaxiUtils;

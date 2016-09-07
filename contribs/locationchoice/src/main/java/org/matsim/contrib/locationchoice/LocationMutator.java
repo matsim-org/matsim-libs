@@ -27,11 +27,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 public abstract class LocationMutator implements PlanAlgorithm {
 

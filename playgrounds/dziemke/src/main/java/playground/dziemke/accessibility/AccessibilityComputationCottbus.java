@@ -1,3 +1,21 @@
+/* *********************************************************************** *
+ * project: org.matsim.*												   *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.dziemke.accessibility;
 
 import java.util.ArrayList;
@@ -7,12 +25,16 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.vividsolutions.jts.geom.Envelope;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.accessibility.AccessibilityCalculator;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
+import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
+import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -29,7 +51,7 @@ import org.matsim.facilities.ActivityFacilities;
 import playground.dziemke.utils.LogToOutputSaver;
 
 public class AccessibilityComputationCottbus {
-	public static final Logger log = Logger.getLogger(AccessibilityComputationNMBNew.class);
+	public static final Logger log = Logger.getLogger(AccessibilityComputationCottbus.class);
 	
 	private static final double cellSize = 200.;
 	
@@ -50,7 +72,7 @@ public class AccessibilityComputationCottbus {
 		Integer range = 9;
 		int symbolSize = 210;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
-		double[] mapViewExtent = {447000,5729000,461000,5740000};
+		Envelope envelope = new Envelope(447000,5729000,461000,5740000);
 		
 		
 		//
@@ -106,16 +128,15 @@ public class AccessibilityComputationCottbus {
 
 						@Override
 						public ControlerListener get() {
-							GridBasedAccessibilityControlerListenerV3 listener =
-									new GridBasedAccessibilityControlerListenerV3(AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType), null, config, scenario, travelTimes, travelDisutilityFactories);
-							listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-							listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-							listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
-							listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, (Scenario) scenario);
+							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(447759., 5729049., 460617., 5740192., cellSize));
+							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, (ActivityFacilities) AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType), null, config, scenario, travelTimes,travelDisutilityFactories, 447759., 5729049., 460617., 5740192., cellSize);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 //							listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-
 							listener.addAdditionalFacilityData(homes);
-							listener.generateGridsAndMeasuringPointsByCustomBoundary(447759., 5729049., 460617., 5740192., cellSize);
 //							listener.generateGridsAndMeasuringPointsByCustomBoundary(447000., 5729000., 461000., 5740000., cellSize);
 							listener.writeToSubdirectoryWithName(actType);
 							listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
@@ -137,9 +158,9 @@ public class AccessibilityComputationCottbus {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);
-					VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 				}
 			}  
 		}

@@ -18,6 +18,14 @@
  * *********************************************************************** */
 package playground.vsp.buildingEnergy.energyCalculation;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -26,24 +34,29 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+
 import playground.vsp.analysis.modules.simpleTripAnalyzer.SimpleTripAnalyzerModule;
 import playground.vsp.buildingEnergy.linkOccupancy.LinkActivityOccupancyCounter;
-
-import java.util.*;
 
 /**
  * @author droeder
@@ -237,11 +250,15 @@ class BuildingEnergyMATSimDataReader {
 			this.links = new ArrayList<Id>(sc.getNetwork().getLinks().keySet());
 		}
 		Collections.sort(links);
+		final PersonAlgorithm algo = plansAna;
 		// TODO[dr] this slows down the very drastic. Streaming is only necessary here because we need a 
 		// filtered population for the berlin-scenario. 
-		((PopulationImpl) sc.getPopulation()).addAlgorithm(plansAna);
-		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
-		new MatsimPopulationReader(sc).readFile(plansFile);
+//		final Population reader = (Population) sc.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( sc ) ;
+		reader.addAlgorithm(algo);
+		StreamingUtils.setIsStreaming(reader, true);
+//		new MatsimPopulationReader(sc).readFile(plansFile);
+		reader.readFile(plansFile);
 		log.info("resulting population contains " + plansAna.getPopulation().getPersons().size() + " persons.");
 		return sc;
 	}
@@ -349,7 +366,7 @@ class BuildingEnergyMATSimDataReader {
 							if(aa.getType().equals("not specified") && BuildingEnergyAnalyzer.berlin){
 								Coord c = aa.getCoord();
 								aa = this.population.getFactory().createActivityFromLinkId(homeType, aa.getLinkId());
-								((ActivityImpl)aa).setCoord(c);
+								((Activity)aa).setCoord(c);
 								if(warn){
 									log.warn("modifying activitytypes for berlin-scenario. Thrown only once...");
 									warn = false;

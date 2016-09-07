@@ -22,7 +22,7 @@ package playground.meisterk.org.matsim.run.westumfahrung;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.analysis.filters.population.AbstractPersonFilter;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
 
 import java.util.regex.Pattern;
 

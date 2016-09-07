@@ -7,8 +7,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -18,27 +18,28 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static playground.polettif.publicTransitMapping.tools.NetworkTools.*;
 
+@Deprecated
 public class NetworkToolsTest {
 
-	private double testDelta = 1/1000.;
+	private final double testDelta = 1/1000.;
 	private Network network;
 
-	private Coord coordA = new Coord(0.0, 0.0);
-	private Coord coordB = new Coord(2.0, 0.0);
-	private Coord coordC = new Coord(2.0, 2.0);
+	private final Coord coordA = new Coord(0.0, 0.0);
+	private final Coord coordB = new Coord(2.0, 0.0);
+	private final Coord coordC = new Coord(2.0, 2.0);
 
-	private Coord coordD = new Coord(0.0, 2.0);
-	private Coord coordE = new Coord(-2.0, 2.0);
-	private Coord coordF = new Coord(-2.0, 0.0);
-	private Coord coordG = new Coord(-2.0, -2.0);
-	private Coord coordH = new Coord(0.0, -2.0);
+	private final Coord coordD = new Coord(0.0, 2.0);
+	private final Coord coordE = new Coord(-2.0, 2.0);
+	private final Coord coordF = new Coord(-2.0, 0.0);
+	private final Coord coordG = new Coord(-2.0, -2.0);
+	private final Coord coordH = new Coord(0.0, -2.0);
 
-	private Coord coordI = new Coord(2.0, -2.0);
-	private Coord coordW = new Coord(-1.0, 3.0);
-	private Coord coordX = new Coord(0.5, 0.5);
-	private Coord coordY = new Coord(1.0, 0.0);
-	private Coord coordP = new Coord(0.7, 0.1);
-	private Coord coordZ = new Coord(1.0, -3.0);
+	private final Coord coordI = new Coord(2.0, -2.0);
+	private final Coord coordW = new Coord(-1.0, 3.0);
+	private final Coord coordX = new Coord(0.5, 0.5);
+	private final Coord coordY = new Coord(1.0, 0.0);
+	private final Coord coordP = new Coord(0.7, 0.1);
+	private final Coord coordZ = new Coord(1.0, -3.0);
 
 	private Node nodeA;
 	private Node nodeB;
@@ -67,7 +68,7 @@ public class NetworkToolsTest {
 	@Before
 	public void prepare() {
 		network = NetworkUtils.createNetwork();
-		NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(network);
+		NetworkFactory networkFactory = network.getFactory();
 
 		nodeA = networkFactory.createNode(Id.createNodeId("A"), coordA);
 		nodeB = networkFactory.createNode(Id.createNodeId("B"), coordB);

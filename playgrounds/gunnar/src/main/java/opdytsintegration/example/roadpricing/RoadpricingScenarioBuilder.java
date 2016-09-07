@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -24,7 +25,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.RandomizedCharyparNagelScoringFunctionFactory;
@@ -73,7 +73,7 @@ class RoadpricingScenarioBuilder {
 	}
 
 	private Node addNode(final String id, final double x, final double y) {
-		final NodeImpl node = new NodeImpl(Id.createNodeId(id));
+		final Node node = NetworkUtils.createNode(Id.createNodeId(id));
 		node.setCoord(new Coord(x * this.linkLength, y * this.linkLength));
 		this.net.addNode(node);
 		return node;

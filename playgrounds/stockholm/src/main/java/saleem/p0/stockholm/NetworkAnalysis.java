@@ -9,18 +9,19 @@ import java.util.Map;
 import org.jfree.chart.plot.XYPlot;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 
@@ -38,16 +39,17 @@ public class NetworkAnalysis {
 		String path = "./ihop2/matsim-input/config - P0.xml";
 		final Config config = ConfigUtils.loadConfig(path);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		NetworkImpl network = (NetworkImpl)scenario.getNetwork();
+		Network network = (Network)scenario.getNetwork();
 		StockholmP0Helper sth = new StockholmP0Helper(network);
 		String nodesfile = "./ihop2/matsim-input/Nodes.csv";
 		List<String> timednodes = sth.getPretimedNodes(nodesfile);
 		Map<String, List<Link>> inlinksforjunctions = sth.getInLinksForJunctions(timednodes, network);
 		Iterator<String> nodes = inlinksforjunctions.keySet().iterator();//List of incoming links for each pretimed node
 		while(nodes.hasNext()){
-			List<Link> inlinks = inlinksforjunctions.get(nodes.next());
+			String node = nodes.next();
+			List<Link> inlinks = inlinksforjunctions.get(node);
 			if(inlinks.size()<2){
-				;
+				System.out.println(node);
 			}
 			else{
 				Iterator<Link> linksiter = inlinks.iterator();
@@ -56,55 +58,55 @@ public class NetworkAnalysis {
 				}
 			}
 		}
-		final EventsManager eventsNoP0 = EventsUtils.createEventsManager(config);
-		EventsHandler handlerNoP0 = new EventsHandler(allincominglinksids, scenario.getNetwork());
-		eventsNoP0.addHandler(handlerNoP0);
-		//events.addHandler(handler);
-		final MatsimEventsReader readerNoP0 = new MatsimEventsReader(eventsNoP0);
-		readerNoP0.readFile("C:\\Results Matsim\\P0\\Gunnar PC\\P0\\matsim-output\\ExpNoP01\\it.1000\\1000.events.xml.gz");
-		
+//		final EventsManager eventsNoP0 = EventsUtils.createEventsManager(config);
+//		EventsHandler handlerNoP0 = new EventsHandler(allincominglinksids, scenario.getNetwork());
+//		eventsNoP0.addHandler(handlerNoP0);
+//		//events.addHandler(handler);
+//		final MatsimEventsReader readerNoP0 = new MatsimEventsReader(eventsNoP0);
+//		readerNoP0.readFile("C:\\Results Matsim\\P0\\Gunnar PC\\NP01\\it.1000\\1000.events.xml.gz");
+//		
 		final EventsManager eventsPlainNoP0 = EventsUtils.createEventsManager(config);
 		EventsHandler handlerPlainNoP0 = new EventsHandler(allincominglinksids, scenario.getNetwork());
 		eventsPlainNoP0.addHandler(handlerPlainNoP0);
 		//events.addHandler(handler);
 		final MatsimEventsReader readerPlainNoP0 = new MatsimEventsReader(eventsPlainNoP0);
-		readerPlainNoP0.readFile("C:\\Results Matsim\\P0\\Gunnar PC\\P0\\matsim-output\\ExpPlainNoP01\\it.1000\\1000.events.xml.gz");
+		readerPlainNoP0.readFile("C:\\Results Matsim\\matsim-output-statsandplots\\PNP04\\it.950\\950.events.xml.gz");
 		
 		final EventsManager eventsP0 = EventsUtils.createEventsManager(config);
 		EventsHandler handlerP0 = new EventsHandler(allincominglinksids, scenario.getNetwork());
 		eventsP0.addHandler(handlerP0);
 		final MatsimEventsReader readerP0 = new MatsimEventsReader(eventsP0);
-		readerP0.readFile("C:\\Results Matsim\\P0\\Gunnar PC\\P0\\matsim-output\\ExpP01\\it.1000\\1000.events.xml.gz");
-		plotDelays("./ihop2/matsim-input/delays.png",handlerP0.getTimes(), handlerP0.getDelays(),handlerNoP0.getDelays(), handlerPlainNoP0.getDelays());
-		plotTravellersThroughNodes("./ihop2/matsim-input/travellersthrooughnodes.png",handlerP0.getTimes(), handlerP0.getNumAgentsThroughIntersections(),handlerNoP0.getNumAgentsThroughIntersections(), handlerPlainNoP0.getNumAgentsThroughIntersections());
-		plotTravellersOnIncomingLinks("./ihop2/matsim-input/travellersonincominglinks.png",handlerP0.getTimes(), handlerP0.getAgentsOnIncomingLinks(),handlerNoP0.getAgentsOnIncomingLinks(), handlerPlainNoP0.getAgentsOnIncomingLinks());
+		readerP0.readFile("C:\\Results Matsim\\matsim-output-statsandplots\\P04\\it.950\\950.events.xml.gz");
+		plotDelays("./ihop2/matsim-input/delays.png",handlerP0.getTimes(), handlerP0.getDelays(),handlerPlainNoP0.getDelays());
+		plotTravellersThroughNodes("./ihop2/matsim-input/travellersthrooughnodes.png",handlerP0.getTimes(), handlerP0.getNumAgentsThroughIntersections(), handlerPlainNoP0.getNumAgentsThroughIntersections());
+		plotTravellersOnIncomingLinks("./ihop2/matsim-input/travellersonincominglinks.png",handlerP0.getTimes(), handlerP0.getAgentsOnIncomingLinks(),handlerPlainNoP0.getAgentsOnIncomingLinks());
 		System.out.println();
 
 	}
-	public void plotDelays(String path, List<Double> times, List<Double> delaysp0, List<Double> delaysnop0, List<Double> delaysplainnop0){
+	public void plotDelays(String path, List<Double> times, List<Double> delaysp0, List<Double> delaysplainnop0){
 		CollectionUtil<Double> cutil = new CollectionUtil<Double>();
 		XYLineChart chart = new XYLineChart("Delay Statistics", "Time (Hour)", "Delay (Sec)");
 		XYPlot plot = (XYPlot)chart.getChart().getPlot();
 		chart.addSeries("P0 Applied", cutil.toArray(times), cutil.toArray(delaysp0));
-		chart.addSeries("P0 Not Applied", cutil.toArray(times), cutil.toArray(delaysnop0));
+//		chart.addSeries("P0 Not Applied", cutil.toArray(times), cutil.toArray(delaysnop0));
 		chart.addSeries("Plain P0 Not Applied", cutil.toArray(times), cutil.toArray(delaysplainnop0));
 		chart.saveAsPng(path, 800, 600);
 	}
-	public void plotTravellersThroughNodes(String path, List<Double> times, List<Double> nump0, List<Double> numnop0, List<Double> numplainnop0){
+	public void plotTravellersThroughNodes(String path, List<Double> times, List<Double> nump0, List<Double> numplainnop0){
 		CollectionUtil<Double> cutil = new CollectionUtil<Double>();
 		XYLineChart chart = new XYLineChart("Number of Travellers Through Pretimed Nodes", "Time (Hour)", "Number");
 		XYPlot plot = (XYPlot)chart.getChart().getPlot();
 		chart.addSeries("P0 Applied", cutil.toArray(times), cutil.toArray(nump0));
-		chart.addSeries("P0 Not Applied", cutil.toArray(times), cutil.toArray(numnop0));
+//		chart.addSeries("P0 Not Applied", cutil.toArray(times), cutil.toArray(numnop0));
 		chart.addSeries("Plain P0 Not Applied", cutil.toArray(times), cutil.toArray(numplainnop0));
 		chart.saveAsPng(path, 800, 600);
 	}
-	public void plotTravellersOnIncomingLinks(String path, List<Double> times, List<Double> nump0, List<Double> numnop0, List<Double> numplainnop0){
+	public void plotTravellersOnIncomingLinks(String path, List<Double> times, List<Double> nump0, List<Double> numplainnop0){
 		CollectionUtil<Double> cutil = new CollectionUtil<Double>();
 		XYLineChart chart = new XYLineChart("Number of Travellers On Incoming Links", "Time (Hour)", "Number");
 		XYPlot plot = (XYPlot)chart.getChart().getPlot();
 		chart.addSeries("P0 Applied", cutil.toArray(times), cutil.toArray(nump0));
-		chart.addSeries("P0 Not Applied", cutil.toArray(times), cutil.toArray(numnop0));
+//		chart.addSeries("P0 Not Applied", cutil.toArray(times), cutil.toArray(numnop0));
 		chart.addSeries("Plain P0 Not Applied", cutil.toArray(times), cutil.toArray(numplainnop0));
 		chart.saveAsPng(path, 800, 600);
 	}
@@ -116,25 +118,30 @@ public class NetworkAnalysis {
 		Config config = ConfigUtils.loadConfig(path);
 	    final Scenario scenario = ScenarioUtils.loadScenario(config);
 	    scenario.getPopulation().getPersons().clear();
-	    final MatsimPopulationReader popReader = new MatsimPopulationReader(
+	    final PopulationReader popReader = new PopulationReader(
 				scenario);
-		popReader.readFile("C:\\Results Matsim\\P0\\Gunnar PC\\P0\\matsim-output\\ExpP01\\it.1000\\1000.plans.xml.gz");
+		popReader.readFile("C:\\Results Matsim\\matsim-output-statsandplots\\PNP01\\it.1000\\1000.plans.xml.gz");
 //	    popReader.readFile("./ihop2/matsim-input/5.plans.xml.gz");
 		Population population = scenario.getPopulation();
 		ArrayList<Person> persons = cutil.toArrayList((Iterator<Person>) population.getPersons().values().iterator());
 		String nodesfile = "./ihop2/matsim-input/Nodes.csv";
-		NetworkImpl network = (NetworkImpl)scenario.getNetwork();
+		Network network = (Network)scenario.getNetwork();
 		StockholmP0Helper sth = new StockholmP0Helper(network);
 		List<String> timednodes = sth.getPretimedNodes(nodesfile);
 		Map<String, List<Link>> inlinksforjunctions = sth.getInLinksForJunctions(timednodes, network);
 		Iterator<String> nodes = inlinksforjunctions.keySet().iterator();//List of incoming links for each pretimed node
 		while(nodes.hasNext()){
-			List<Link> inlinks = inlinksforjunctions.get(nodes.next());
-			Iterator<Link> linksiter = inlinks.iterator();
-			while(linksiter.hasNext()){
-				allincominglinksids.add(linksiter.next().getId().toString());
+			String node = nodes.next();
+			List<Link> inlinks = inlinksforjunctions.get(node);
+			if(inlinks.size()<2){
+				System.out.println(node);
 			}
-			
+			else{
+				Iterator<Link> linksiter = inlinks.iterator();
+				while(linksiter.hasNext()){
+					allincominglinksids.add(linksiter.next().getId().toString());
+				}
+			}
 		}
 		boolean keep = false;
 		int size = persons.size();
@@ -187,7 +194,7 @@ public class NetworkAnalysis {
 		System.out.println("Average Distance Travelled: " + avgdistancetravelled/totalagents);
 		System.out.println("Average Trip Duration: " + avgtripduration/totalagents);
 		System.out.println("Total Agents: " + totalagents);
-		MatsimWriter popWriter = new org.matsim.api.core.v01.population.PopulationWriter(population, network);
+		MatsimWriter popWriter = new PopulationWriter(population, network);
 		popWriter.write("./ihop2/matsim-input/relevantpopulation.xml");
 
 	}

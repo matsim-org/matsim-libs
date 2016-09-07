@@ -24,12 +24,13 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class DistanceStats implements IterationEndsListener {	
@@ -62,7 +63,7 @@ public class DistanceStats implements IterationEndsListener {
 			if (this.dccg.getIdExclusion() == null || !this.isLong(p.getId().toString()) ||
 					Long.parseLong(p.getId().toString()) > this.dccg.getIdExclusion()) continue;
 					
-			PlanImpl plan = (PlanImpl) p.getSelectedPlan();
+			Plan plan = (Plan) p.getSelectedPlan();
 			
 			if (bestOrSelected.equals("best")) {
 				double bestPlanScore = -999.0;
@@ -75,14 +76,14 @@ public class DistanceStats implements IterationEndsListener {
 					}
 					cnt++;
 				}
-				plan = (PlanImpl) p.getPlans().get(bestIndex);	
+				plan = (Plan) p.getPlans().get(bestIndex);	
 				//log.info(plan.getScore() + "\t" + bestIndex + "\tperson " + p.getId());
 			}		
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					if (this.actTypeConverter.convertType(((Activity) pe).getType()).equals(this.actTypeConverter.convertType(type)) &&
-							plan.getPreviousLeg((Activity)pe).getMode().equals(this.mode)) {
-						double distance = CoordUtils.calcEuclideanDistance(((Activity) pe).getCoord(), plan.getPreviousActivity(plan.getPreviousLeg((Activity)pe)).getCoord()); 
+							PopulationUtils.getPreviousLeg(plan, (Activity)pe).getMode().equals(this.mode)) {
+						double distance = CoordUtils.calcEuclideanDistance(((Activity) pe).getCoord(), PopulationUtils.getPreviousActivity(plan, PopulationUtils.getPreviousLeg(plan, (Activity)pe)).getCoord()); 
 						this.bins.addVal(distance, 1.0);
 					}	
 				}

@@ -128,13 +128,5 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 		this.curractivity.addOpeningTime(new OpeningTimeImpl(Time.parseTime(atts.getValue("start_time")), Time.parseTime(atts.getValue("end_time"))));
 	}
 
-	/**
-	 * Parses the specified facilities file. This method calls {@link #parse(String)}.
-	 *
-	 * @param filename The name of the file to parse.
-	 */
-	public void readFile(final String filename) throws UncheckedIOException {
-		parse(filename);
-	}
 
 }

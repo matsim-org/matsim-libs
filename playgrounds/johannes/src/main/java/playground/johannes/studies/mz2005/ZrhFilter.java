@@ -25,12 +25,12 @@ import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.common.gis.EsriShapeIO;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
@@ -55,7 +55,7 @@ public class ZrhFilter {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
+		PopulationReader reader = new PopulationReader(scenario);
 		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/09-12-2011/plans.xml");
 
 		Set<SimpleFeature> features = EsriShapeIO.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/Kanton.shp");

@@ -7,8 +7,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -39,7 +39,7 @@ public class MainTR {
 		//saveRoutes(numTests, startTime, endTime);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
 		(new MatsimNetworkReader(scenario.getNetwork())).readFile(args[1]);
-		(new MatsimPopulationReader(scenario)).readFile(args[2]);
+		(new PopulationReader(scenario)).readFile(args[2]);
 		(new TransitScheduleReader(scenario)).readFile(args[3]);
 		(new VehicleReaderV1(((MutableScenario)scenario).getTransitVehicles())).readFile(args[8]);
 		WaitTimeCalculator waitTimeCalculator = new WaitTimeCalculator(scenario.getTransitSchedule(), (int)binSize, (int) (endTime-startTime));
@@ -55,7 +55,7 @@ public class MainTR {
 		eventsManager.addHandler(stopStopTimeCalculatorTuple);
 		eventsManager.addHandler(travelTimeCalculator);
 		eventsManager.addHandler(vehicleOccupancyCalculator);
-		(new EventsReaderXMLv1(eventsManager)).parse(args[4]);
+		(new EventsReaderXMLv1(eventsManager)).readFile(args[4]);
 		PreparedTransitSchedule preparedTransitSchedule = new PreparedTransitSchedule(scenario.getTransitSchedule());
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig().planCalcScore(),
 				scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(), scenario.getConfig().vspExperimental());

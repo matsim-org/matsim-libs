@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -26,8 +26,8 @@ public class PlanChecker {
 	
 	public void run(String inputFile) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario).readFile(inputFile);
-		this.checkFreight(scenario.getPopulation());
+		new PopulationReader(scenario).readFile(inputFile);
+		this.checkWork(scenario.getPopulation());
 		
 		log.info("finished ##############################################");
 		
@@ -66,6 +66,29 @@ public class PlanChecker {
  			}
 			if (print) log.error("Person " + p.getId().toString() + " plan " + planStr);
 		}
+	}
+	
+	private void checkWork(Population population) {
+		int cnt_1700_bulk = 0;
+		int cnt_work = 0;
+		for (Person p : population.getPersons().values()) {
+			Plan plan = p.getSelectedPlan();
+			for (PlanElement pe : plan.getPlanElements()){	
+				if(pe instanceof Activity){
+					
+					String type = ((Activity) pe).getType();
+					if (type.equals("w_1030_0630") || type.equals("w_0800_1000") || type.equals("w_0900_0845")) {
+						cnt_1700_bulk++;
+					}
+					if (type.startsWith("w_")) {
+						cnt_work++;
+					} 
+					
+ 				}
+ 			}
+			
+		}
+		log.info(100.0 * cnt_1700_bulk / cnt_work);
 	}
 	
 	private void checkFreight(Population population) {

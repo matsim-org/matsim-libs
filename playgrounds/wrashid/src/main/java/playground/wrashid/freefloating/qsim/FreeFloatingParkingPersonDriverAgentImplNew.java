@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingLinkInfo;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingModuleWithFreeFloatingCarSharing;
@@ -30,9 +31,8 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
 import org.matsim.core.router.TripRouter;
@@ -174,7 +174,7 @@ public class FreeFloatingParkingPersonDriverAgentImplNew implements MobsimDriver
 		Scenario scenario = this.basicAgentDelegate.getScenario();
 
 		PopulationFactory pf = scenario.getPopulation().getFactory() ;
-		RouteFactoryImpl routeFactory = ((PopulationFactoryImpl)pf).getRouteFactory() ;
+		RouteFactories routeFactory = ((PopulationFactory)pf).getRouteFactories() ;
 		
 		Leg leg = (Leg)this.basicAgentDelegate.getNextPlanElement();
 		this.parkingModule.makeFFVehicleUnavailable(this.vehID, parkingSpotStart.getParking(), now, this.getId());
@@ -211,7 +211,7 @@ public class FreeFloatingParkingPersonDriverAgentImplNew implements MobsimDriver
 		
 
 		PopulationFactory pf = scenario.getPopulation().getFactory() ;
-		RouteFactoryImpl routeFactory = ((PopulationFactoryImpl)pf).getRouteFactory() ;
+		RouteFactories routeFactory = ((PopulationFactory)pf).getRouteFactories() ;
 		
 		Vehicle vehicle = null ;
 		Network network = scenario.getNetwork();

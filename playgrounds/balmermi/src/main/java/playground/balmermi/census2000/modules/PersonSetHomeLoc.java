@@ -21,16 +21,16 @@
 package playground.balmermi.census2000.modules;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.balmermi.census2000.data.Persons;
 
@@ -105,8 +105,8 @@ public class PersonSetHomeLoc extends AbstractPersonAlgorithm implements PlanAlg
 		ActivityFacility f = this.homeFacQuadTree.getClosest(coord.getX(), coord.getY());
 		Plan plan = person.getSelectedPlan();
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl) pe;
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
 				if (H.equals(act.getType())) {
 					act.setCoord(f.getCoord());
 				}

@@ -8,12 +8,12 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="examples/daganzo/network21.xml" />
+		<param name="inputNetworkFile" value="network21.xml" />
 	</module>
 
 	<module name="plans">
-<!-- 		<param name="inputPlansFile" value="examples/daganzo/plans_long_route_selected.xml.gz" /> -->
-		<param name="inputPlansFile" value="examples/daganzo/plans_short_route_selected.xml.gz" />
+<!-- 		<param name="inputPlansFile" value="plans_long_route_selected.xml.gz" /> -->
+		<param name="inputPlansFile" value="plans_short_route_selected.xml.gz" />
 	</module>
 
 	<module name="controler">
@@ -73,12 +73,12 @@
 
 	</module>
 
-	<module name="otfvis">
-		<param name="coloringScheme" value="byId" />
+	<!--<module name="otfvis">-->
+		<!--<param name="coloringScheme" value="byId" />-->
 
-		<!-- Shortens a link's start and end point in the visualization.  -->
-		<param name="nodeOffset" value="10.0" />
-	</module>
+		<!--&lt;!&ndash; Shortens a link's start and end point in the visualization.  &ndash;&gt;-->
+		<!--<param name="nodeOffset" value="10.0" />-->
+	<!--</module>-->
 
 
 </config>

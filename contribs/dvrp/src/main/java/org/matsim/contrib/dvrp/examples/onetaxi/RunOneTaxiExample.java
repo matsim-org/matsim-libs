@@ -22,9 +22,8 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.router.DynRoutingModule;
 import org.matsim.contrib.dvrp.run.VrpQSimConfigConsistencyChecker;
-import org.matsim.contrib.dynagent.run.DynQSimModule;
+import org.matsim.contrib.dynagent.run.*;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
@@ -56,7 +55,7 @@ public class RunOneTaxiExample
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
         final VrpData vrpData = new VrpDataImpl();
-        new VehicleReader(scenario.getNetwork(), vrpData).parse(oneTaxiCfg.getValue(TAXIS_FILE));
+        new VehicleReader(scenario.getNetwork(), vrpData).readFile(oneTaxiCfg.getValue(TAXIS_FILE));
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new AbstractModule() {

@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -100,7 +100,7 @@ public class DgActivities2KmlWriter {
 	 */
 	public static void main(String[] args) {
 		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
+		PopulationReader reader = new PopulationReader(scenario);
 		reader.readFile(DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/demand/population_pv_1pct.xml");
 		new DgActivities2KmlWriter().writeKml(DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/demand/population_pv_1pct4.kmz", scenario.getPopulation());
 //		reader.readFile(DgPaths.REPOS + "shared-svn/projects/detailedEval/pop/gueterVerkehr/population_gv_bavaria_1pct_wgs84.xml.gz");

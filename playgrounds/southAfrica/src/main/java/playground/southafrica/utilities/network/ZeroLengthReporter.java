@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -56,7 +56,7 @@ public class ZeroLengthReporter {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		String networkFile = args[0];
 		String outputFile = args[1];
-		new MatsimNetworkReader(sc.getNetwork()).parse(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 		
 		reportZeroLengthLinks(sc.getNetwork(), outputFile);
 		
@@ -78,14 +78,14 @@ public class ZeroLengthReporter {
 					/* Write to standard out. */
 					LOG.info("Link " + link.getId().toString() + 
 							" is " + String.format("%.2f", link.getLength()) + "m (OSM " + 
-					((LinkImpl)link).getOrigId() + "); from " + 
+					NetworkUtils.getOrigId( ((Link)link) ) + "); from " + 
 							link.getFromNode().getId().toString() + " to " + 
 					link.getToNode().getId().toString());
 					
 					/* Write to file. */
 					bw.write(String.format("%s,%s,%s,%s,%.1f\n", 
 							link.getId().toString(),
-							((LinkImpl)link).getOrigId(),
+							NetworkUtils.getOrigId( ((Link)link) ),
 							link.getFromNode().getId().toString(),
 							link.getToNode().getId().toString(),
 							link.getLength()));

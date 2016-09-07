@@ -8,8 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 public class NetworkInverter {
 
@@ -17,7 +16,7 @@ public class NetworkInverter {
 
 	private Network originalNetwork;
 
-	private NetworkImpl invertedNetwork = null;
+	private Network invertedNetwork = null;
 
 	public NetworkInverter(Network originalNet) {
 		this.originalNetwork = originalNet;
@@ -31,12 +30,12 @@ public class NetworkInverter {
 	}
 
 	private void invertNetwork(){
-		this.invertedNetwork = NetworkImpl.createNetwork();
+		this.invertedNetwork = NetworkUtils.createNetwork();
 		int numberOfNodesGenerated = 0;
 		int numberOfLinksGenerated = 0;
 
 		for (Link link : this.originalNetwork.getLinks().values()) {
-			this.invertedNetwork.createAndAddNode(Id.create(link.getId(), Node.class), link.getCoord());
+			NetworkUtils.createAndAddNode(this.invertedNetwork, Id.create(link.getId(), Node.class), link.getCoord());
 			numberOfNodesGenerated++;
 		}
 
@@ -52,13 +51,8 @@ public class NetworkInverter {
 	}
 
 	private int createInvertedLink(Link inLink, Link outLink, int numberOfLinksGenerated){
-		Link link = this.invertedNetwork.createAndAddLink(Id.create(inLink.getId().toString() + "zzz" + outLink.getId().toString(), Link.class), // start counting link ids with 1 instead of 0
-				this.invertedNetwork.getNodes().get(inLink.getId()), this.invertedNetwork.getNodes().get(outLink.getId()),
-				outLink.getLength(),
-				outLink.getFreespeed(),
-				outLink.getCapacity(),
-				outLink.getNumberOfLanes());
-		((LinkImpl) link).setType(((LinkImpl) outLink).getType());
+		Link link = NetworkUtils.createAndAddLink(this.invertedNetwork,Id.create(inLink.getId().toString() + "zzz" + outLink.getId().toString(), Link.class), this.invertedNetwork.getNodes().get(inLink.getId()), this.invertedNetwork.getNodes().get(outLink.getId()), outLink.getLength(), outLink.getFreespeed(), outLink.getCapacity(), outLink.getNumberOfLanes() );
+		NetworkUtils.setType( ((Link) link), (String) NetworkUtils.getType(((Link) outLink)));
 		return numberOfLinksGenerated + 1;
 	}
 

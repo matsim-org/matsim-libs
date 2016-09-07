@@ -21,7 +21,7 @@ package playground.kai.usecases.ownscoring;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
@@ -42,7 +42,7 @@ public class MySumScoringFunction implements ScoringFunction {
 		
 		delegate.handleActivity(activity);
 		
-		Activity pseudoActivity = new ActivityImpl( activity ) ;
+		Activity pseudoActivity = PopulationUtils.createActivity(activity) ;
 		pseudoActivity.setStartTime( pseudoActivity.getStartTime() - 1 ) ;
 		pDelegate.handleActivity(pseudoActivity);
 		

@@ -49,4 +49,9 @@ public class Alternative<N extends Enum<N>> {
 		return alternativeId;
 	}
 
+	@Override
+	public String toString() {
+		return "[Alternative NestId="+getNestId()+
+				", "+alternative+"]";
+	}
 }

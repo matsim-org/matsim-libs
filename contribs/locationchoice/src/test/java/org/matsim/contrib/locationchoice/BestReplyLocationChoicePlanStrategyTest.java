@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.*;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -60,8 +59,8 @@ public class BestReplyLocationChoicePlanStrategyTest {
 //		
 //		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
 //		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
-//		controler.getScenario().addScenarioElement(DestinationChoiceBestResponseContext.ELEMENT_NAME, lcContext);
-//		controler.getScenario().addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME, dcScore);
+//		controler.getTestScenarioURL().addScenarioElement(DestinationChoiceBestResponseContext.ELEMENT_NAME, lcContext);
+//		controler.getTestScenarioURL().addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME, dcScore);
 //		
 //		BestReplyLocationChoicePlanStrategy planStrategy = new BestReplyLocationChoicePlanStrategy(scenario);	
 //		

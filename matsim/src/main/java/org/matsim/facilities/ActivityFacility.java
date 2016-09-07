@@ -21,11 +21,15 @@ package org.matsim.facilities;
 
 import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
+
 
 public interface ActivityFacility extends Facility<ActivityFacility> {
 
 	public Map<String, ActivityOption> getActivityOptions();
 
 	void addActivityOption(ActivityOption option);
+
+	void setCoord(Coord coord);
 
 }

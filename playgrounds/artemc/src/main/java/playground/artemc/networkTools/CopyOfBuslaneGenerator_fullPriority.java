@@ -6,11 +6,12 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleImpl;
@@ -27,8 +28,8 @@ public class CopyOfBuslaneGenerator_fullPriority {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
 
-		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkPath);
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(networkPath);
+		Network network = (Network) scenario.getNetwork();
 
 		new TransitScheduleReader(scenario).readFile(transitSchedulePath);
 		TransitScheduleImpl transitSchedule = (TransitScheduleImpl) scenario.getTransitSchedule();
@@ -72,13 +73,19 @@ public class CopyOfBuslaneGenerator_fullPriority {
 						if (link.toString().equals(lastLinkId.toString())) {
 							newNodeId = network.getLinks().get(link).getToNode().getId();
 						} else {
-							network.createAndAddNode(newNodeId, newBusNodeCoord);
+							final Id<Node> id2 = newNodeId;
+							final Coord coord = newBusNodeCoord;
+							NetworkUtils.createAndAddNode(network, id2, coord);
 						}
-						network.createAndAddLink(newLinkId, network.getNodes().get(fromNodeId),
-								network.getNodes().get(newNodeId), length, freespeed, laneCapacity * (numLanes - 1),
-								(numLanes - 1));
-						network.createAndAddLink(reverseLinkId, network.getNodes().get(newNodeId),
-								network.getNodes().get(fromNodeId), length, freespeed, laneCapacity * numLanes, numLanes);
+						final Id<Link> id = newLinkId;
+						final double length1 = length;
+						final double freespeed1 = freespeed;
+						NetworkUtils.createAndAddLink(network,id, network.getNodes().get(fromNodeId), network.getNodes().get(newNodeId), length1, freespeed1, laneCapacity * (numLanes - 1), (numLanes - 1) );
+						final Id<Link> id1 = reverseLinkId;
+						final double length2 = length;
+						final double freespeed2 = freespeed;
+						final double numLanes1 = numLanes;
+						NetworkUtils.createAndAddLink(network,id1, network.getNodes().get(newNodeId), network.getNodes().get(fromNodeId), length2, freespeed2, laneCapacity * numLanes, numLanes1 );
 						network.getLinks().get(newLinkId).setAllowedModes(allowedModesPrivate);
 						fromNodeId = newNodeId;
 					}

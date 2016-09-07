@@ -24,17 +24,17 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriterHandler;
+import org.matsim.core.population.io.PopulationWriterHandler;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 
@@ -149,8 +149,8 @@ import org.matsim.core.utils.misc.Time;
 			out.write(" selected=\"yes\"");
 		else
 			out.write(" selected=\"no\"");
-		if (plan instanceof PlanImpl){
-			PlanImpl p = (PlanImpl)plan;
+		if (plan instanceof Plan){
+			Plan p = (Plan)plan;
 			if ((p.getType() != null)) {
 				out.write(" type=\"");
 				out.write(p.getType());
@@ -190,8 +190,8 @@ import org.matsim.core.utils.misc.Time;
 			out.write(Time.writeTime(act.getStartTime()));
 			out.write("\"");
 		}
-		if (act instanceof ActivityImpl){
-			ActivityImpl a = (ActivityImpl)act;
+		if (act instanceof Activity){
+			Activity a = (Activity)act;
 			if (a.getMaximumDuration() != Time.UNDEFINED_TIME) {
 				out.write(" max_dur=\"");
 				out.write(Time.writeTime(a.getMaximumDuration()));
@@ -220,11 +220,11 @@ import org.matsim.core.utils.misc.Time;
 			out.write(Time.writeTime(leg.getTravelTime()));
 			out.write("\"");
 		}
-		if (leg instanceof LegImpl) {
-			LegImpl l = (LegImpl)leg;
-			if (l.getArrivalTime() != Time.UNDEFINED_TIME) {
+		if (leg instanceof Leg) {
+			Leg l = (Leg)leg;
+			if (l.getDepartureTime() + l.getTravelTime() != Time.UNDEFINED_TIME) {
 				out.write(" arr_time=\"");
-				out.write(Time.writeTime(l.getArrivalTime()));
+				out.write(Time.writeTime(l.getDepartureTime() + l.getTravelTime()));
 				out.write("\"");
 			}
 		}

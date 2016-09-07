@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -38,7 +38,7 @@ public class EvaluateRides {
 
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/vw079.taxiplans_noCarsR.xml.gz");
+		new PopulationReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/vw079.taxiplans_noCarsR.xml.gz");
 		int taxiRiders = 0;
 		for (Person p : scenario.getPopulation().getPersons().values()){
 			Plan plan = p.getSelectedPlan();

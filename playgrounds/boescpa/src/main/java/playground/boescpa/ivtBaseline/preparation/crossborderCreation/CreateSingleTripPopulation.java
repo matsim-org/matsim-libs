@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.*;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -37,8 +37,6 @@ import playground.boescpa.lib.tools.PopulationUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Random;
-
-import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.*;
 
 /**
  * Trunk class for the creation of cross-border (cb) sub-populations.
@@ -55,6 +53,7 @@ public abstract class CreateSingleTripPopulation {
 	private final ActivityFacilities origFacilities;
 	private final ActivityFacilities bcFacilities = FacilitiesUtils.createActivityFacilities();
 	private final double[] cummulativeDepartureProbability;
+	protected final double[] cummulativeDurationProbability;
 	private final double samplePercentage;
 	protected final String mode;
 	protected final Random random;
@@ -73,7 +72,12 @@ public abstract class CreateSingleTripPopulation {
 		this.newCBPopulation = PopulationUtils.getEmptyPopulation();
 		this.origFacilities = FacilityUtils.readFacilities(this.configGroup.getPathToFacilities());
 		addHomeActivityIfNotInFacilityYet(this.origFacilities);
-		this.cummulativeDepartureProbability = readDepartures(this.configGroup.getPathToCumulativeDepartureProbabilities());
+		if (this.configGroup.getPathToCumulativeDepartureProbabilities() != null) {
+			this.cummulativeDepartureProbability = readProbabilities(this.configGroup.getPathToCumulativeDepartureProbabilities(), 24);
+		} else {this.cummulativeDepartureProbability = null;}
+		if (this.configGroup.getPathToCumulativeDurationProbabilities() != null) {
+			this.cummulativeDurationProbability = readProbabilities(this.configGroup.getPathToCumulativeDurationProbabilities(), 48);
+		} else {this.cummulativeDurationProbability = null;}
 		this.samplePercentage = this.configGroup.getSamplePercentage();
 		this.mode = this.configGroup.getMode();
 		this.random = new Random(this.configGroup.getRandomSeed());
@@ -117,7 +121,7 @@ public abstract class CreateSingleTripPopulation {
 		}
 		if (random.nextDouble() > samplePercentage) return;
 		// create and add new agent
-		Person p = org.matsim.core.population.PopulationUtils.createPerson(Id.create(this.configGroup.getTag() + "_" + mode + "_" + subTag + "_" + index++, Person.class));
+		Person p = org.matsim.core.population.PopulationUtils.getFactory().createPerson(Id.create(this.configGroup.getTag() + "_" + mode + "_" + subTag + "_" + index++, Person.class));
 		newCBPopulation.addPerson(p);
 		newCBPopulation.getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", this.configGroup.getTag());
 		// store facilities (if not already stored)
@@ -143,12 +147,12 @@ public abstract class CreateSingleTripPopulation {
 
 	// ******************************* Private Methods ***********************************
 
-	private double[] readDepartures(String pathToCumulativeDepartureProbabilities) {
+	private double[] readProbabilities(String pathToCumulativeDepartureProbabilities, int numberOfBins) {
 		BufferedReader reader = IOUtils.getBufferedReader(pathToCumulativeDepartureProbabilities);
 		double[] cumulativeDepartureProbabilities = null;
 		try {
-			cumulativeDepartureProbabilities = new double[24];
-			for (int i = 0; i < 24; i++) {
+			cumulativeDepartureProbabilities = new double[numberOfBins];
+			for (int i = 0; i < numberOfBins; i++) {
 				String[] line = reader.readLine().split(this.configGroup.getDelimiter());
 				cumulativeDepartureProbabilities[i] = Double.parseDouble(line[1]);
 			}

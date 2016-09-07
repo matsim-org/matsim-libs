@@ -1,9 +1,8 @@
 package playground.dhosse.siouxFalls;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Scenario;
@@ -16,7 +15,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.PopulationReaderMatsimV5;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -25,8 +24,10 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
 
 public class SiouxFallsNetworkAndPopulationUtils {
 
@@ -37,7 +38,7 @@ public class SiouxFallsNetworkAndPopulationUtils {
 		
 		Config config = ConfigUtils.createConfig();
 		scenario = ScenarioUtils.createScenario(config);
-		new PopulationReaderMatsimV5(scenario).readFile("C:/Users/Daniel/Desktop/Siouxfalls_population_initial.xml");
+		new PopulationReader(scenario).readFile("C:/Users/Daniel/Desktop/Siouxfalls_population_initial.xml");
 		
 		String toDirectory = "C:/Users/Daniel/Dropbox/siouxfalls/siouxfalls_network.xml";
 //		generateAndWriteNetwork(toDirectory);

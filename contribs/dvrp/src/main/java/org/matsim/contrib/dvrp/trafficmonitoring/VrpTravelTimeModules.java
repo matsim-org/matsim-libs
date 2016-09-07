@@ -19,22 +19,21 @@
 
 package org.matsim.contrib.dvrp.trafficmonitoring;
 
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeEstimator.Params;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.*;
-
-import com.google.inject.name.Names;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 
 public class VrpTravelTimeModules
 {
-    public static final String DVRP_INITIAL = "dvrp_initial";
     public static final String DVRP_ESTIMATED = "dvrp_estimated";
 
 
-    public static AbstractModule createTravelTimeEstimatorModule()
+    public static AbstractModule createTravelTimeEstimatorModule(double expAveragingAlpha)
     {
-        return createTravelTimeEstimatorModule(new FreeSpeedTravelTime());
+        return createTravelTimeEstimatorModule(new FreeSpeedTravelTime(), expAveragingAlpha);
     }
 
 
@@ -42,46 +41,37 @@ public class VrpTravelTimeModules
      * Travel times recorded during the previous iteration. They are always updated after the mobsim
      * ends. This is the standard approach for running DVRP
      */
-    public static AbstractModule createTravelTimeEstimatorModule(final TravelTime initialTravelTime)
+    public static AbstractModule createTravelTimeEstimatorModule(final TravelTime initialTravelTime,
+            final double expAveragingAlpha)
     {
         return new AbstractModule() {
             public void install()
             {
-                bind(TravelTime.class).annotatedWith(Names.named(DVRP_INITIAL))
-                        .toInstance(initialTravelTime);
+                bind(Params.class).toInstance(new Params(initialTravelTime, expAveragingAlpha));
                 bind(VrpTravelTimeEstimator.class).asEagerSingleton();
-                bind(TravelTime.class).annotatedWith(Names.named(DVRP_ESTIMATED))
-                        .to(VrpTravelTimeEstimator.class);
+                addTravelTimeBinding(DVRP_ESTIMATED).to(VrpTravelTimeEstimator.class);
                 addMobsimListenerBinding().to(VrpTravelTimeEstimator.class);
             }
         };
     }
 
 
-    /**
-     * Travel times are fixed (useful for TimeVariantNetworks with variable free-flow speeds and no
-     * other traffic)
-     */
-    public static AbstractModule createFreespeedTravelTimeModule(boolean disableTTCalculator)
+    public static AbstractModule createFreeSpeedTravelTimeForBenchmarkingModule()
     {
-        return createExternalTravelTimeModule(new FreeSpeedTravelTime(), disableTTCalculator);
+        return createTravelTimeForBenchmarkingModule(new FreeSpeedTravelTime());
     }
 
 
     /**
-     * Travel times are fixed
+     * Instead of TravelTimeCalculatorModule
      */
-    public static AbstractModule createExternalTravelTimeModule(final TravelTime travelTime,
-            final boolean disableTTCalculator)
+    public static AbstractModule createTravelTimeForBenchmarkingModule(final TravelTime travelTime)
     {
         return new AbstractModule() {
             public void install()
             {
-                if (disableTTCalculator) {//overwriting the default calculator
-                    bind(TravelTimeCalculator.class).to(InactiveTravelTimeCalculator.class);
-                }
-
-                bind(TravelTime.class).annotatedWith(Names.named(DVRP_ESTIMATED)).toInstance(travelTime);
+                addTravelTimeBinding(TransportMode.car).toInstance(travelTime);
+                addTravelTimeBinding(DVRP_ESTIMATED).toInstance(travelTime);
             }
         };
     }

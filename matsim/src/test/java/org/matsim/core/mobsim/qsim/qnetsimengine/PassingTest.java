@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -50,7 +51,7 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -271,7 +272,7 @@ public class PassingTest {
 
 		final Config config;
 		final Scenario scenario ;
-		final NetworkImpl network;
+		final Network network;
 		final Population population;
 		final Link link1;
 		final Link link2;
@@ -286,20 +287,26 @@ public class PassingTest {
 			config.qsim().setMainModes(Arrays.asList("car","bike"));
 			config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ.name());
 
-			network = (NetworkImpl) scenario.getNetwork();
+			network = (Network) scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
 			double x = -100.0;
-			Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord(x, 0.0));
-			Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord(0.0, 0.0));
-			Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord(0.0, 1000.0));
-			Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord(0.0, 1100.0));
+			Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(x, 0.0));
+			Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord(0.0, 0.0));
+			Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord(0.0, 1000.0));
+			Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord(0.0, 1100.0));
 
 			Set<String> allowedModes = new HashSet<String>(); 
 			allowedModes.addAll(Arrays.asList("pt","motorbike"));
+			final Node fromNode = node1;
+			final Node toNode = node2;
 
-			link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 25, 60, 1, null, "22"); //capacity is 1 PCU per min.
-			link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1000, 25, 60, 1, null, "22");	
-			link3 = network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 25, 60, 1, null, "22");
+			link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 25, (double) 60, (double) 1, null, "22");
+			final Node fromNode1 = node2;
+			final Node toNode1 = node3; //capacity is 1 PCU per min.
+			link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, (double) 1000, (double) 25, (double) 60, (double) 1, null, "22");
+			final Node fromNode2 = node3;
+			final Node toNode2 = node4;	
+			link3 = NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), fromNode2, toNode2, (double) 100, (double) 25, (double) 60, (double) 1, null, "22");
 			
 			link1.setAllowedModes(allowedModes);
 			link2.setAllowedModes(allowedModes);

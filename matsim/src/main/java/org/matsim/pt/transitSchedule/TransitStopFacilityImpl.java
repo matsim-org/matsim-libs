@@ -38,7 +38,7 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 	
 	private final Id<TransitStopFacility> id;
 	private String stopPostAreaId;
-	private final Coord coord;
+	private Coord coord;
 	private Id<Link> linkId = null;
 	private final boolean isBlockingLane;
 	private String name = null;
@@ -64,6 +64,11 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 	@Override
 	public Coord getCoord() {
 		return this.coord;
+	}
+	
+	@Override
+	public void setCoord(Coord coord) {
+		this.coord = coord;
 	}
 
 	@Override

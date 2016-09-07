@@ -22,12 +22,13 @@ package playground.kai.urbansim;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -61,9 +62,9 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 		MatsimServices controler = event.getServices() ;
 
 		TravelTime ttc = controler.getLinkTravelTimes();
-		LeastCostPathTree st = new LeastCostPathTree(ttc, new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, controler.getConfig().planCalcScore() ).createTravelDisutility(ttc));
+		LeastCostPathTree st = new LeastCostPathTree(ttc, new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, controler.getConfig().planCalcScore() ).createTravelDisutility(ttc));
 
-        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
+        Network network = (Network) controler.getScenario().getNetwork();
 		double dpTime = 8.*3600 ;
 
 		try {
@@ -84,12 +85,14 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 				cnt++ ;
 				Coord coord = fromZone.getCoord() ;
 				assert( coord != null ) ;
-				Node fromNode = network.getNearestNode( coord ) ;
+				final Coord coord1 = coord;
+				Node fromNode = NetworkUtils.getNearestNode(network,coord1) ;
 				assert( fromNode != null ) ;
 				st.calculate(network, fromNode, dpTime) ;
 				for ( ActivityFacility toZone : zones.getFacilities().values() ) {
 					Coord toCoord = toZone.getCoord() ;
-					Node toNode = network.getNearestNode( toCoord ) ;
+					final Coord coord2 = toCoord;
+					Node toNode = NetworkUtils.getNearestNode(network,coord2) ;
 					double arrTime = st.getTree().get(toNode.getId()).getTime();
 					double ttime = arrTime - dpTime ;
 					writer.write ( fromZone.getId().toString()

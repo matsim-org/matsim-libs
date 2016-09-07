@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
@@ -65,7 +65,7 @@ public abstract class ActivityTypeManipulator {
 		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		/* Read the population file. */
-		MatsimPopulationReader mpr = new MatsimPopulationReader(sc);
+		PopulationReader mpr = new PopulationReader(sc);
 		mpr.readFile(population);
 		
 		LOG.info("Population: " + sc.getPopulation().getPersons().size());

@@ -9,10 +9,10 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -70,7 +70,7 @@ public class PopulationWriteTable {
 				for (String type : actOptTypes) { facs.put(type,null); }
 				List<PlanElement> pe = p.getSelectedPlan().getPlanElements();
 				for (int i=0; i<pe.size(); i=i+2) {
-					ActivityImpl a = (ActivityImpl)pe.get(i);
+					Activity a = (Activity)pe.get(i);
 					facs.put(a.getType(),a.getFacilityId());
 				}
 				for (String type : facs.keySet()) { out.write("\t"+facs.get(type)); }

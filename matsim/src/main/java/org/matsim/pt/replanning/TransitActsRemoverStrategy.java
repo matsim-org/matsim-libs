@@ -21,8 +21,8 @@
 package org.matsim.pt.replanning;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.router.TransitActsRemover;
 
 public class TransitActsRemoverStrategy extends AbstractMultithreadedModule {

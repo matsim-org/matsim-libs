@@ -5,9 +5,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class PlanSelectorSelected {
@@ -23,7 +23,7 @@ public class PlanSelectorSelected {
 		/*Create scenario and load population*/
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		log.info("Reading population...");
-		new MatsimPopulationReader(scenario).readFile(inputPopulationFile);
+		new PopulationReader(scenario).readFile(inputPopulationFile);
 		Population population = scenario.getPopulation();
 
 		System.out.println("Number of persons: "+population.getPersons().size());

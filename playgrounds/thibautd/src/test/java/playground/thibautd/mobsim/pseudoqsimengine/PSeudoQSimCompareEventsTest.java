@@ -26,12 +26,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
@@ -39,7 +39,7 @@ import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -128,7 +128,7 @@ public class PSeudoQSimCompareEventsTest {
 	private TripRouter createTripRouter(TravelTimeCalculator travelTime, Scenario scenario) {
 		final TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
 		builder.setTravelDisutility(
-				new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, scenario.getConfig().planCalcScore() ).createTravelDisutility(
+				new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, scenario.getConfig().planCalcScore() ).createTravelDisutility(
 						travelTime.getLinkTravelTimes() ));
 		builder.setTravelTime( travelTime.getLinkTravelTimes() );
 		return builder.build( scenario ).get();
@@ -222,7 +222,7 @@ public class PSeudoQSimCompareEventsTest {
 			for ( Plan plan : person.getPlans() ) {
 				for ( PlanElement pe : plan.getPlanElements() ) {
 					if ( pe instanceof Activity ) {
-						final ActivityImpl act = (ActivityImpl) pe;
+						final Activity act = (Activity) pe;
 						act.setCoord(
 								sc.getNetwork().getLinks().get(
 									act.getLinkId() ).getCoord() );

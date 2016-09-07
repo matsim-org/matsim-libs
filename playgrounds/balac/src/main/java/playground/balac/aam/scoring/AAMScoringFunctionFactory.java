@@ -3,8 +3,8 @@ package playground.balac.aam.scoring;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -40,7 +40,7 @@ public class AAMScoringFunctionFactory implements ScoringFunctionFactory {
 		  SumScoringFunction scoringFunctionSum = new SumScoringFunction();
 
 		  scoringFunctionSum.addScoringFunction(
-	      new AAMLegScoringFunction((PlanImpl)person.getSelectedPlan(),
+	      new AAMLegScoringFunction((Plan)person.getSelectedPlan(),
 				  new CharyparNagelScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build(),
 	      this.config, 
 	      network));

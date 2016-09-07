@@ -9,11 +9,12 @@ import java.io.PrintWriter;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.FastDijkstraFactory;
@@ -57,7 +58,7 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SVY21, TransformationFactory.WGS84_UTM48N);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario.getNetwork()).parse("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
 		new NetworkCleaner().run(scenario.getNetwork());
 		TravelDisutility travelMinCost =  new TravelDisutility() {
 			
@@ -90,7 +91,9 @@ public class Main {
 			String[] parts=line.split(";");
 			Coord start = coordinateTransformation.transform(new Coord(Double.parseDouble(parts[3]), Double.parseDouble(parts[4])));
 			Coord end = coordinateTransformation.transform(new Coord(Double.parseDouble(parts[5]), Double.parseDouble(parts[6])));
-			Path path = leastCostPathCalculator.calcLeastCostPath(((NetworkImpl)scenario.getNetwork()).getNearestNode(start), ((NetworkImpl)scenario.getNetwork()).getNearestNode(end), 0, null, null);
+			final Coord coord = start;
+			final Coord coord1 = end;
+			Path path = leastCostPathCalculator.calcLeastCostPath(NetworkUtils.getNearestNode(((Network)scenario.getNetwork()),coord), NetworkUtils.getNearestNode(((Network)scenario.getNetwork()),coord1), 0, null, null);
 			double distance = 0;
 			for(Link link:path.links)
 				distance+=link.getLength();

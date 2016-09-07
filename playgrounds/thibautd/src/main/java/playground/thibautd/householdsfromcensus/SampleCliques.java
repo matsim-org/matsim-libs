@@ -52,7 +52,7 @@ public class SampleCliques {
 		final String outFile = args[ 2 ];
 
 		Parser parser = new Parser();
-		parser.parse( inFile );
+		parser.readFile( inFile );
 		
 		int popSize = 0;
 		for (Record r : parser.getRecords()) {
@@ -116,7 +116,7 @@ public class SampleCliques {
 		private final Counter counter = new Counter( "importing clique info # " );
 
 		public Parser() {
-			super( false );
+			setValidating( false );
 		}
 
 		@Override

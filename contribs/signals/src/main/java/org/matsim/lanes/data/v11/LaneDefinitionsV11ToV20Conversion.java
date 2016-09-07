@@ -148,7 +148,7 @@ public abstract class LaneDefinitionsV11ToV20Conversion {
 
 			//calculate the alignment and uturn
 			int mostRight = l2lv11.getLanes().size() / 2;
-			SortedMap<Double, Link> outLinksByAngle = NetworkUtils.getOutLinksSortedByAngle(link);
+			SortedMap<Double, Link> outLinksByAngle = NetworkUtils.getOutLinksSortedClockwiseByAngle(link);
 			Lane newLane;
 			Set<LaneData11> assignedLanes = new HashSet<LaneData11>();
 			for (Link outlink : outLinksByAngle.values()){

@@ -19,45 +19,39 @@
 
 package org.matsim.contrib.taxi.optimizer.assignment;
 
-import java.util.*;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
 
 
 class AssignmentRequestData
+    extends AssignmentDestinationData<TaxiRequest>
 {
-    final List<TaxiRequest> requests = new ArrayList<>();
-    final Map<Id<Request>, Integer> reqIdx = new HashMap<>();
-    final int urgentReqCount;
-    final int dimension;
+    private int urgentReqCount = 0;
 
 
-    AssignmentRequestData(TaxiOptimizerContext optimContext,
-            SortedSet<TaxiRequest> unplannedRequests, double planningHorizon)
+    AssignmentRequestData(TaxiOptimizerContext optimContext, double planningHorizon,
+            Iterable<TaxiRequest> unplannedRequests)
     {
         double currTime = optimContext.timer.getTimeOfDay();
         double maxT0 = currTime + planningHorizon;
-        int urgentReqCounter = 0;
+
         int idx = 0;
-
-        for (TaxiRequest req : unplannedRequests) {
-            double t0 = req.getT0();
-            if (t0 <= maxT0) {
-                requests.add(req);
-                reqIdx.put(req.getId(), idx++);
-                
-                //'<=' or '<' does not make difference
-                //(re-optimization is run before activity ends are handled)
-                if (t0 <= currTime) {
-                    urgentReqCounter++;
-                }
+        for (TaxiRequest r : unplannedRequests) {
+            double t0 = r.getT0();
+            if (t0 > maxT0) {//beyond the planning horizon
+                continue;
             }
-        }
 
-        urgentReqCount = urgentReqCounter;
-        dimension = unplannedRequests.size();
+            if (t0 <= currTime) {
+                urgentReqCount++;
+            }
+            entries.add(new DestEntry<TaxiRequest>(idx++, r, r.getFromLink(), t0));
+        }
+    }
+
+
+    public int getUrgentReqCount()
+    {
+        return urgentReqCount;
     }
 }

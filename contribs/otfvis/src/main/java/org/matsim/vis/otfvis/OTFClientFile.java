@@ -20,20 +20,18 @@
 
 package org.matsim.vis.otfvis;
 
-import com.jogamp.opengl.GLAutoDrawable;
 import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.data.fileio.OTFFileReader;
 import org.matsim.vis.otfvis.data.fileio.SettingsSaver;
 import org.matsim.vis.otfvis.gui.OTFHostControl;
-import org.matsim.vis.otfvis.gui.OTFHostControlBar;
+import org.matsim.vis.otfvis.gui.OTFControlBar;
 import org.matsim.vis.otfvis.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
-import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -65,25 +63,21 @@ public class OTFClientFile implements Runnable {
 	}
 
 	private void createDrawer() {
-		GLAutoDrawable canvas = OTFOGLDrawer.createGLCanvas(new OTFVisConfigGroup());
-		OTFClient otfClient = new OTFClient(canvas);
+		Component canvas = OTFOGLDrawer.createGLCanvas(new OTFVisConfigGroup());
 		OTFFileReader otfServer = new OTFFileReader(url);
-		otfClient.setServer(otfServer);
+		final OTFHostControl hostControl = new OTFHostControl(otfServer, canvas);
 		OTFVisConfigGroup otfVisConfig = otfServer.getOTFVisConfig();
 		OTFConnectionManager connect = new OTFConnectionManager();
 		connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connect.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
 		connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
-		connect.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);	
-		OTFHostControlBar hostControlBar = otfClient.getHostControlBar();
-		OTFHostControl otfHostControl = hostControlBar.getOTFHostControl();
-		OTFTimeLine timeLine = new OTFTimeLine("time", otfHostControl);
-		otfClient.getContentPane().add(timeLine, BorderLayout.SOUTH);
 		OTFServerQuadTree servQ = otfServer.getQuad(connect);
 		OTFClientQuadTree clientQ = servQ.convertToClient(otfServer, connect);
-		clientQ.getConstData();
-		OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQ, hostControlBar, otfVisConfig, canvas);
-		otfClient.addDrawerAndInitialize(mainDrawer, new SettingsSaver(url));
+		OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQ, otfVisConfig, canvas, hostControl);
+		OTFControlBar hostControlBar = new OTFControlBar(otfServer, hostControl, mainDrawer);
+		OTFClient otfClient = new OTFClient(canvas, otfServer, hostControlBar, mainDrawer, new SettingsSaver(url));
+		OTFTimeLine timeLine = new OTFTimeLine("time", hostControl);
+		otfClient.getContentPane().add(timeLine, BorderLayout.SOUTH);
 		otfClient.pack();
         otfClient.setVisible(true);
 	}

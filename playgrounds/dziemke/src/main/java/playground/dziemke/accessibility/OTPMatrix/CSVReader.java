@@ -17,7 +17,7 @@ public class CSVReader {
     private BufferedReader data;
 	private boolean isReady = false; 
 	private String seperator;
-    
+
     public CSVReader(String inputCSVFile, String seperator) {
         try {
                 FileReader file = new FileReader(inputCSVFile);
@@ -76,4 +76,11 @@ public class CSVReader {
 		}
     	return null;
     }
+
+	public static int getColumnNumber(String[] line, String column) {
+		for (int i = 0; i < line.length; i++) {
+			if (line[i].equals(column)) return i;
+		}
+		return -1;
+	}
 }

@@ -27,8 +27,8 @@ import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.Matrix;
 import org.matsim.matrices.MatsimMatricesReader;
 
-import playground.nmviljoen.network.NmvLink;
-import playground.nmviljoen.network.NmvNode;
+import playground.nmviljoen.gridExperiments.NmvLink;
+import playground.nmviljoen.gridExperiments.NmvNode;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
@@ -200,7 +200,7 @@ public class SalienceCalculator {
 						f.getAbsolutePath().lastIndexOf("/")+1, 
 						f.getAbsolutePath().length()-7);
 				Matrices m = new Matrices();
-				new MatsimMatricesReader(m, sc).parse(f.getAbsolutePath());
+				new MatsimMatricesReader(m, sc).readFile(f.getAbsolutePath());
 				Matrix matrix = m.getMatrix(matrixName);
 				Entry entry = matrix.getEntry(o, d);
 				if(entry != null){

@@ -12,13 +12,13 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkFactoryImpl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
@@ -92,7 +92,7 @@ import playground.toronto.maneuvers.NetworkAddEmmeManeuverRestrictions;
 public class oldEmme2MatsimConverter {
 
 	private static CoordinateTransformation coordinateTransformation;
-	private static NetworkImpl network;
+	private static Network network;
 	
 	
 	public static void main(String[] args) throws Exception{
@@ -228,7 +228,7 @@ public class oldEmme2MatsimConverter {
 	
 	private static void readNetwork(String filename) throws IOException{
 		
-		network = NetworkImpl.createNetwork();
+		network = NetworkUtils.createNetwork();
 		//capperiod="1:00:00"
 		network.setCapacityPeriod(60 * 60); //1 hour, in sec
 		
@@ -260,12 +260,12 @@ public class oldEmme2MatsimConverter {
 				}
 				boolean isZone = cells[0].contains("*");
 				
-				NodeImpl n = new NodeImpl(Id.create(cells[1], Node.class));
+				Node n = NetworkUtils.createNode(Id.create(cells[1], Node.class));
 				final double y = Double.parseDouble(cells[3].length() == 6 ? "4" + cells[3] : cells[3]);
 				n.setCoord(new Coord(Double.parseDouble(cells[2]), y));
 				//Some EMME networks are restricted to using only 6 characters for the y-coordinate. This appends a '4' to the start if this is the case.
 				
-				n.setType(isZone ? "Zone" : "");
+				NetworkUtils.setType(n,(String) (isZone ? "Zone" : ""));
 				
 				network.addNode(n);
 			}
@@ -288,19 +288,17 @@ public class oldEmme2MatsimConverter {
 				double lanes = Double.parseDouble(cells[6]);
 				if (lanes == 0.0) lanes = 1.0; //ensures that transit-only links have at least one lane.
 				
-				LinkFactoryImpl factory = new LinkFactoryImpl();
+				LinkFactoryImpl factory = NetworkUtils.createLinkFactory();
 				
-				LinkImpl l = (LinkImpl) factory.createLink(Id.create(cells[1] + ">" + cells[2], Link.class), 
-						i, j, network, length, speed, cap, lanes);
-				Link L = factory.createLink(Id.create(cells[1] + ">" + cells[2], Link.class), 
-						i, j, network, length, speed, cap, lanes);
+				Link l = (Link) NetworkUtils.createLink(Id.create(cells[1] + ">" + cells[2], Link.class), i, j, network, length, speed, cap, lanes);
+				Link L = NetworkUtils.createLink(Id.create(cells[1] + ">" + cells[2], Link.class), i, j, network, length, speed, cap, lanes);
 				
 				L.setAllowedModes(convertMode(cells[4]));
-				((LinkImpl) L).setType(createType(cells));
+				NetworkUtils.setType( ((Link) L), (String) createType(cells));
 				
 				
 				l.setAllowedModes(convertMode(cells[4]));
-				l.setType(createType(cells));
+				NetworkUtils.setType( l, (String) createType(cells));
 
 				network.addLink(l);
 				
@@ -360,8 +358,8 @@ public class oldEmme2MatsimConverter {
 		//HOV links
 		ArrayList<Id> hovs = new ArrayList<Id>();
 		for (Link i : network.getLinks().values()) {
-			LinkImpl L = (LinkImpl) i;
-			if(L.getType() == "HOV") hovs.add(L.getId());
+			Link L = (Link) i;
+			if(NetworkUtils.getType(L) == "HOV") hovs.add(L.getId());
 		}
 		
 		System.out.println(hovs.size() + " links are flagged as HOV");
@@ -411,8 +409,8 @@ public class oldEmme2MatsimConverter {
 		//Streetcar ROWs
 		ArrayList<Id> rows = new ArrayList<Id>();
 		for (Link i : network.getLinks().values()) {
-			LinkImpl L = (LinkImpl) i;
-			if(L.getType().equals("Streetcar ROW")) rows.add(L.getId());
+			Link L = (Link) i;
+			if(NetworkUtils.getType(L).equals("Streetcar ROW")) rows.add(L.getId());
 		}
 		
 		for (Id i : rows){
@@ -434,18 +432,18 @@ public class oldEmme2MatsimConverter {
 			//Get incoming transfer link
 			ArrayList<Link> incomingTransfers = new ArrayList<Link>();
 			for (Link L : lrtLane.getFromNode().getInLinks().values()) {
-				LinkImpl l = (LinkImpl) L;
-				if (l.getType().equals("Transfer")) incomingTransfers.add(L);
-				if (l.getType().equals("Streetcar ROW")) hasIncomingTransitLink = true;
+				Link l = (Link) L;
+				if (NetworkUtils.getType(l).equals("Transfer")) incomingTransfers.add(L);
+				if (NetworkUtils.getType(l).equals("Streetcar ROW")) hasIncomingTransitLink = true;
 			}
 			for (Link l : incomingTransfers) linksToRemove.add(l.getId());
 			
 			//Get outgoing transfer link
 			ArrayList<Link> outgoingTransfers = new ArrayList<Link>();
 			for (Link L : lrtLane.getToNode().getOutLinks().values()){
-				LinkImpl l = (LinkImpl) L;
-				if (l.getType().equals("Transfer")) outgoingTransfers.add(L);
-				if (l.getType().equals("Streetcar ROW")) hasOutgoingTransitLink = true;
+				Link l = (Link) L;
+				if (NetworkUtils.getType(l).equals("Transfer")) outgoingTransfers.add(L);
+				if (NetworkUtils.getType(l).equals("Streetcar ROW")) hasOutgoingTransitLink = true;
 			}
 			for (Link l : outgoingTransfers) linksToRemove.add(l.getId());
 	
@@ -473,7 +471,7 @@ public class oldEmme2MatsimConverter {
 				}
 				
 				if (!tweakedNodes.contains(lrtLane.getFromNode().getId())){
-					NodeImpl N = (NodeImpl) lrtLane.getFromNode();
+					Node N = (Node) lrtLane.getFromNode();
 					N.setCoord(new Coord(sumX / incomingTransfers.size(), sumY / incomingTransfers.size()));
 					tweakedNodes.add(N.getId());
 				}
@@ -495,7 +493,7 @@ public class oldEmme2MatsimConverter {
 				}
 				
 				if (!tweakedNodes.contains(lrtLane.getToNode().getId())){
-					NodeImpl N = (NodeImpl) lrtLane.getToNode();
+					Node N = (Node) lrtLane.getToNode();
 					N.setCoord(new Coord(sumX / outgoingTransfers.size(), sumY / outgoingTransfers.size()));
 					tweakedNodes.add(N.getId());
 				}
@@ -520,9 +518,9 @@ public class oldEmme2MatsimConverter {
 		ArrayList<Id> linksToRemove = new ArrayList<Id>();
 		
 		for(Link a : network.getLinks().values()){
-			LinkImpl link = (LinkImpl) a;
+			Link link = (Link) a;
 			
-			if((link.getType() == "CC") || (link.getType() == "Transfer"))
+			if((NetworkUtils.getType(link) == "CC") || (NetworkUtils.getType(link) == "Transfer"))
 				linksToRemove.add(link.getId()); 
 		}
 		
@@ -530,8 +528,8 @@ public class oldEmme2MatsimConverter {
 		
 		ArrayList<Id> nodesToRemove = new ArrayList<Id>();
 		for (Node n : network.getNodes().values()){
-			NodeImpl N = (NodeImpl) n;
-			if (N.getType().equals("Zone")) nodesToRemove.add(N.getId());
+			Node N = (Node) n;
+			if (NetworkUtils.getType( N ).equals("Zone")) nodesToRemove.add(N.getId());
 		}
 		
 		for (Id i : nodesToRemove) network.removeNode(i);

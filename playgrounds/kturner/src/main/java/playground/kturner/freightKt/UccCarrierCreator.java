@@ -203,7 +203,7 @@ class UccCarrierCreator {
 		final RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 		try {
-			rpReader.parse(zonefile);
+			rpReader.readFile(zonefile);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

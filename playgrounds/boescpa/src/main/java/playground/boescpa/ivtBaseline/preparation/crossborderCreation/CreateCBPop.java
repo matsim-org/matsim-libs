@@ -23,10 +23,10 @@ package playground.boescpa.ivtBaseline.preparation.crossborderCreation;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.*;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -58,6 +58,7 @@ public class CreateCBPop {
 		CreateSingleTripPopulationConfigGroup transitConfig = configGroup.copy();
 		transitConfig.setPathToCumulativeDepartureProbabilities(
 				configGroup.getPathToCumulativeDepartureProbabilities() + "CumulativeProbabilityTransitDeparture.txt");
+		transitConfig.setPathToCumulativeDurationProbabilities(null);
 		transitConfig.setPathToOriginsFile(configGroup.getPathToOriginsFile() + "OD_CB-Agents_Transit.txt");
 		transitConfig.setPathToOutput(
 				configGroup.getPathToOutput().substring(0,configGroup.getPathToOutput().indexOf(".xml")) + "_Transit.xml.gz");
@@ -71,6 +72,8 @@ public class CreateCBPop {
 		CreateSingleTripPopulationConfigGroup saConfig = configGroup.copy();
 		saConfig.setPathToCumulativeDepartureProbabilities(
 				configGroup.getPathToCumulativeDepartureProbabilities() + "CumulativeProbabilitySecondaryActivityDeparture.txt");
+		saConfig.setPathToCumulativeDurationProbabilities(
+				configGroup.getPathToCumulativeDurationProbabilities() + "CumulativeProbabilitySecondaryActivityDuration.txt");
 		saConfig.setPathToOriginsFile(configGroup.getPathToOriginsFile() + "OD_CB-Agents_SecondaryActivities.txt");
 		saConfig.setPathToOutput(
 				configGroup.getPathToOutput().substring(0,configGroup.getPathToOutput().indexOf(".xml")) + "_SA.xml.gz");
@@ -84,6 +87,8 @@ public class CreateCBPop {
 		CreateSingleTripPopulationConfigGroup workConfig = configGroup.copy();
 		workConfig.setPathToCumulativeDepartureProbabilities(
 				configGroup.getPathToCumulativeDepartureProbabilities() + "CumulativeProbabilityWorkDeparture.txt");
+		workConfig.setPathToCumulativeDurationProbabilities(
+				configGroup.getPathToCumulativeDurationProbabilities() + "CumulativeProbabilityWorkDuration.txt");
 		workConfig.setPathToOriginsFile(configGroup.getPathToOriginsFile() + "O_CB-Agents_Work.txt");
 		workConfig.setPathToDestinationsFile(configGroup.getPathToDestinationsFile() + "D_CB-Agents_Work.txt");
 		workConfig.setPathToOutput(
@@ -98,6 +103,8 @@ public class CreateCBPop {
 		CreateSingleTripPopulationConfigGroup saPtConfig = configGroup.copy();
 		saPtConfig.setPathToCumulativeDepartureProbabilities(
 				configGroup.getPathToCumulativeDepartureProbabilities() + "CumulativeProbabilitySecondaryActivityDeparture.txt");
+		saPtConfig.setPathToCumulativeDurationProbabilities(
+				configGroup.getPathToCumulativeDurationProbabilities() + "CumulativeProbabilitySecondaryActivityDuration.txt");
 		saPtConfig.setPathToOriginsFile(configGroup.getPathToOriginsFile() + "OD_CB-Agents_SecondaryActivities_PT.txt");
 		saPtConfig.setMode("pt");
 		saPtConfig.setPathToOutput(
@@ -112,6 +119,8 @@ public class CreateCBPop {
 		CreateSingleTripPopulationConfigGroup workPtConfig = configGroup.copy();
 		workPtConfig.setPathToCumulativeDepartureProbabilities(
 				configGroup.getPathToCumulativeDepartureProbabilities() + "CumulativeProbabilityWorkDeparture.txt");
+		workPtConfig.setPathToCumulativeDurationProbabilities(
+				configGroup.getPathToCumulativeDurationProbabilities() + "CumulativeProbabilityWorkDuration.txt");
 		workPtConfig.setPathToOriginsFile(configGroup.getPathToOriginsFile() + "O_CB-Agents_Work_PT.txt");
 		workPtConfig.setPathToDestinationsFile(configGroup.getPathToDestinationsFile() + "D_CB-Agents_Work.txt");
 		workPtConfig.setMode("pt");
@@ -127,6 +136,7 @@ public class CreateCBPop {
 		CreateSingleTripPopulationConfigGroup transitPtConfig = configGroup.copy();
 		transitPtConfig.setPathToCumulativeDepartureProbabilities(
 				configGroup.getPathToCumulativeDepartureProbabilities() + "CumulativeProbabilityTransitDeparture.txt");
+		transitPtConfig.setPathToCumulativeDurationProbabilities(null);
 		transitPtConfig.setPathToOriginsFile(configGroup.getPathToOriginsFile() + "OD_CB-Agents_Transit_PT.txt");
 		transitPtConfig.setMode("pt");
 		transitPtConfig.setPathToOutput(
@@ -197,14 +207,14 @@ public class CreateCBPop {
 	private static void mergeSubpopulations(String pathToMainPop, String pathToAdditionalPop, String pathToOutputPop) {
 		// read the scenario population
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
+		PopulationReader plansReader = new PopulationReader(scenario);
 		plansReader.readFile(pathToMainPop);
 		Population scenarioPopulation = scenario.getPopulation();
 		ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(scenarioPopulation.getPersonAttributes());
-		attributesReader.parse(pathToMainPop.substring(0, pathToMainPop.indexOf(".xml")) + "_Attributes.xml.gz");
+		attributesReader.readFile(pathToMainPop.substring(0, pathToMainPop.indexOf(".xml")) + "_Attributes.xml.gz");
 		// add the freight population to the scenario population
 		plansReader.readFile(pathToAdditionalPop);
-		attributesReader.parse(pathToAdditionalPop.substring(0, pathToAdditionalPop.indexOf(".xml")) + "_Attributes.xml.gz");
+		attributesReader.readFile(pathToAdditionalPop.substring(0, pathToAdditionalPop.indexOf(".xml")) + "_Attributes.xml.gz");
 		// write the new, merged population and its attributes:
 		PopulationWriter writer = new PopulationWriter(scenarioPopulation);
 		writer.write(pathToOutputPop);

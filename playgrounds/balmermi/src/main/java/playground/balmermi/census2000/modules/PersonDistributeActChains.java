@@ -23,12 +23,16 @@ package playground.balmermi.census2000.modules;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.*;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 
 import playground.balmermi.census2000.data.ActChains;
 
@@ -197,7 +201,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 		ArrayList<ArrayList<Integer>> chains = this.actchains.getChains(bitcode);
 		int index = MatsimRandom.getRandom().nextInt(chains.size());
 		ArrayList<Integer> chain = chains.get(index);
-		PlanImpl plan =  PersonUtils.createAndAddPlan(p, true);
+		Plan plan =  PersonUtils.createAndAddPlan(p, true);
 		int time_sum = 0;
 		for (int i=0; i<chain.size(); i=i+2) {
 			int val = chain.get(i);
@@ -214,7 +218,8 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 			if (i == chain.size()-1) {
 				int start_time = time_sum;
 				try {
-					ActivityImpl a = plan.createAndAddActivity(type, new Coord(0.0, 0.0));
+					final String type1 = type;
+					Activity a = PopulationUtils.createAndAddActivityFromCoord(plan, type1, new Coord(0.0, 0.0));
 					a.setStartTime(start_time);
 				}
 				catch (Exception e) { throw new RuntimeException(e); }
@@ -225,12 +230,14 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 				time_sum += dur;
 				int end_time = time_sum;
 				try {
-					ActivityImpl a = plan.createAndAddActivity(type, new Coord(0.0, 0.0));
+					final String type1 = type;
+					Activity a = PopulationUtils.createAndAddActivityFromCoord(plan, type1, new Coord(0.0, 0.0));
 					a.setStartTime(start_time);
 					a.setEndTime(end_time);
 					a.setMaximumDuration(dur);
-					LegImpl l = plan.createAndAddLeg("undefined");
-					l.setArrivalTime(end_time);
+					Leg l = PopulationUtils.createAndAddLeg( plan, (String) "undefined" );
+					final double arrTime = end_time;
+					l.setTravelTime( arrTime - l.getDepartureTime() );
 					l.setTravelTime(0);
 					l.setDepartureTime(end_time);
 				}

@@ -101,7 +101,7 @@ public class Line2StopRelationAnalyzer implements TransitDriverStartsEventHandle
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(ana);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(manager);
-		reader.parse("e:/_runs-svn/run1650/all2all_5min/ITERS/it.10000/all2all_5min.10000.events.xml.gz");
+		reader.readFile("e:/_runs-svn/run1650/all2all_5min/ITERS/it.10000/all2all_5min.10000.events.xml.gz");
 		ana.writeToFile("e:/_runs-svn/run1650/all2all_5min/ITERS/it.10000/all2all_5min.10000.events.ana.txt");
 		
 		

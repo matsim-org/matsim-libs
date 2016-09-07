@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover;
-import org.matsim.contrib.common.randomizedtransitrouter.RandomizedTransitRouterModule;
+import org.matsim.contrib.common.randomizedtransitrouter.RandomizingTransitRouterModule;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
@@ -37,7 +37,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -230,8 +230,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 if (IntelligentRouters)
                     install(new TravelDisutilityModule());
                 else{
-                    final Builder disutilityFactory =
-                            new Builder( TransportMode.car, config.planCalcScore() );
+                    final RandomizingTimeDistanceTravelDisutilityFactory disutilityFactory =
+                            new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
                     matsimControler.addOverridingModule(new AbstractModule() {
                         @Override
                         public void install() {
@@ -272,8 +272,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 }
             });
         } else {
-            final Builder disutilityFactory =
-                    new Builder( TransportMode.car, config.planCalcScore() );
+            final RandomizingTimeDistanceTravelDisutilityFactory disutilityFactory =
+                    new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
@@ -281,7 +281,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 }
             });
             disutilityFactory.setSigma(0.1);
-            matsimControler.addOverridingModule(new RandomizedTransitRouterModule());
+            matsimControler.addOverridingModule(new RandomizingTransitRouterModule());
         }
         if (trackGenome) {
 

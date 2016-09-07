@@ -47,7 +47,7 @@ public class IdentifyAndWriteComponents {
 		final String outputRawFile = args[ 1 ];
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new SocialNetworkReader( sc ).parse( inputSocialNetwork );
+		new SocialNetworkReader( sc ).readFile( inputSocialNetwork );
 	
 		final SocialNetwork sn = (SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME );
 

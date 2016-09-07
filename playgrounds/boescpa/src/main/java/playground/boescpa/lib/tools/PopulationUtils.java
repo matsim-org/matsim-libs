@@ -24,7 +24,7 @@ package playground.boescpa.lib.tools;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReaderMatsimV5;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -42,7 +42,7 @@ public class PopulationUtils {
 	 */
 	public static Population readPopulation(String path2Population) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReaderMatsimV5(scenario).readFile(path2Population);
+		new PopulationReader(scenario).readFile(path2Population);
 		return scenario.getPopulation();
 	}
 

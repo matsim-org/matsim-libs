@@ -64,6 +64,13 @@ public class CSVLineBuilder
     }
 
 
+    public CSVLineBuilder addBuilder(CSVLineBuilder builder)
+    {
+        line.addAll(builder.line);
+        return this;
+    }
+
+
     public String[] build()
     {
         return line.toArray(new String[line.size()]);

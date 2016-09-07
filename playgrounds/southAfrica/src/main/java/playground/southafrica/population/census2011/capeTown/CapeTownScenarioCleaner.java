@@ -37,19 +37,20 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -157,10 +158,10 @@ public class CapeTownScenarioCleaner {
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(personCRS, wantedCRS);
 		
-		new HouseholdsReaderV10(sc.getHouseholds()).parse(folder + "wip/households.xml.gz");
+		new HouseholdsReaderV10(sc.getHouseholds()).readFile(folder + "wip/households.xml.gz");
 		ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(sc.getHouseholds().getHouseholdAttributes());
 		oar.putAttributeConverter(Coord.class, new CoordConverter());
-		oar.parse(folder + "wip/householdAttributes.xml.gz");
+		oar.readFile(folder + "wip/householdAttributes.xml.gz");
 		
 		for(Household hh : sc.getHouseholds().getHouseholds().values()){
 			int householdSize = hh.getMemberIds().size();
@@ -182,7 +183,7 @@ public class CapeTownScenarioCleaner {
 	
 	private static void updateNetworkModes(Scenario sc, String folder, String network){
 		LOG.info("Ensuring network and config has all routed modes.");
-		new MatsimNetworkReader(sc.getNetwork()).parse(network);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(network);
 		
 		/* Update the network modes. */
 		String[] networkModes = {"car", "commercial"};
@@ -242,12 +243,12 @@ public class CapeTownScenarioCleaner {
 		
 		/* Parse the persons. */
 		Scenario scPersons = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scPersons).parse(folder + "persons.xml.gz");
-		new ObjectAttributesXmlReader(scPersons.getPopulation().getPersonAttributes()).parse(folder + "personAttributes.xml.gz");
+		new PopulationReader(scPersons).readFile(folder + "persons.xml.gz");
+		new ObjectAttributesXmlReader(scPersons.getPopulation().getPersonAttributes()).readFile(folder + "personAttributes.xml.gz");
 		for(Id<Person> id : scPersons.getPopulation().getPersons().keySet()){
 			Person person = pf.createPerson(Id.createPersonId("coct_p_" + id.toString()));
-			PlanImpl plan = new PlanImpl();
-			plan.copyFrom(scPersons.getPopulation().getPersons().get(id).getSelectedPlan());
+			Plan plan = PopulationUtils.createPlan();
+			PopulationUtils.copyFromTo(scPersons.getPopulation().getPersons().get(id).getSelectedPlan(), plan);
 			for(PlanElement pe : plan.getPlanElements()){
 				/* Check and add modes. */
 				if(pe instanceof Leg){
@@ -257,7 +258,7 @@ public class CapeTownScenarioCleaner {
 					}
 				} else if (pe instanceof Activity){
 					/* Transform the activity locations. */
-					ActivityImpl act = (ActivityImpl)pe;
+					Activity act = (Activity)pe;
 					Coord oldCoord = act.getCoord();
 					act.setCoord(ctPersons.transform(oldCoord));
 				}
@@ -278,13 +279,13 @@ public class CapeTownScenarioCleaner {
 		
 		/* Parse the commercial vehicles. */
 		Scenario scCom = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scCom).parse(folder + "commercial.xml.gz");
-		new ObjectAttributesXmlReader(scCom.getPopulation().getPersonAttributes()).parse(folder + "commercialAttributes.xml.gz");
+		new PopulationReader(scCom).readFile(folder + "commercial.xml.gz");
+		new ObjectAttributesXmlReader(scCom.getPopulation().getPersonAttributes()).readFile(folder + "commercialAttributes.xml.gz");
 		for(Id<Person> id : scCom.getPopulation().getPersons().keySet()){
 			String[] sa = id.toString().split("_");
 			Person person = pf.createPerson(Id.createPersonId("coct_c_" + sa[1]));
-			PlanImpl plan = new PlanImpl();
-			plan.copyFrom(scCom.getPopulation().getPersons().get(id).getSelectedPlan());
+			Plan plan = PopulationUtils.createPlan();
+			PopulationUtils.copyFromTo(scCom.getPopulation().getPersons().get(id).getSelectedPlan(), plan);
 			for(PlanElement pe : plan.getPlanElements()){
 				if(pe instanceof Leg){
 					/* Check and add modes. */
@@ -299,7 +300,7 @@ public class CapeTownScenarioCleaner {
 					
 					/* Update the coordinate. */
 					Coord oldCoord = act.getCoord();
-					((ActivityImpl)act).setCoord(ctFreight.transform(oldCoord));
+					((Activity)act).setCoord(ctFreight.transform(oldCoord));
 					
 					/* Since chopStart and chopEnd activities will not have 
 					 * facility IDs, they need to be ignored in the next 

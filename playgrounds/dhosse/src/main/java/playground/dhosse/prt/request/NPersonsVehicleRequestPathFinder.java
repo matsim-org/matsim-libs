@@ -33,17 +33,16 @@ public class NPersonsVehicleRequestPathFinder
         this.vehicleCapacity = vehicleCapacity;
         this.scheduler = optimContext.scheduler;
 
-        router = new Dijkstra(optimContext.getNetwork(),
-                optimContext.travelDisutility, optimContext.travelTime);
+        router = new Dijkstra(optimContext.network, optimContext.travelDisutility, optimContext.travelTime);
 
     }
 
 
-    public BestDispatchFinder.Dispatch findBestVehicleForRequest(TaxiRequest req,
+    public BestDispatchFinder.Dispatch<TaxiRequest> findBestVehicleForRequest(TaxiRequest req,
             Iterable<? extends Vehicle> vehicles)
     {
 
-        BestDispatchFinder.Dispatch bestVrp = null;
+        BestDispatchFinder.Dispatch<TaxiRequest> bestVrp = null;
         double bestCost = Double.MAX_VALUE;
 
         for (Vehicle veh : vehicles) {
@@ -54,7 +53,7 @@ public class NPersonsVehicleRequestPathFinder
                 continue;
             }
 
-            BestDispatchFinder.Dispatch vrp = new BestDispatchFinder.Dispatch(veh, req, path);
+            BestDispatchFinder.Dispatch<TaxiRequest> vrp = new BestDispatchFinder.Dispatch<>(veh, req, path);
             double cost = VehicleRequestPaths.TW_COST.getCost(vrp);
 
             if (cost < bestCost) {
@@ -68,10 +67,10 @@ public class NPersonsVehicleRequestPathFinder
     }
 
 
-    public BestDispatchFinder.Dispatch findBestRequestForVehicle(Vehicle veh,
+    public BestDispatchFinder.Dispatch<TaxiRequest> findBestRequestForVehicle(Vehicle veh,
             Iterable<TaxiRequest> unplannedRequests)
     {
-        BestDispatchFinder.Dispatch bestVrp = null;
+        BestDispatchFinder.Dispatch<TaxiRequest> bestVrp = null;
         double bestCost = Double.MAX_VALUE;
 
         for (TaxiRequest req : unplannedRequests) {
@@ -81,7 +80,7 @@ public class NPersonsVehicleRequestPathFinder
                 continue;
             }
 
-            BestDispatchFinder.Dispatch vrp = new BestDispatchFinder.Dispatch(veh, req, path);
+            BestDispatchFinder.Dispatch<TaxiRequest> vrp = new BestDispatchFinder.Dispatch<>(veh, req, path);
             double cost = VehicleRequestPaths.TP_COST.getCost(vrp);
 
             if (cost < bestCost) {

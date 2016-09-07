@@ -35,6 +35,10 @@ import org.matsim.core.controler.ControlerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.ParallelPersonAlgorithmRunner;
+import org.matsim.core.population.algorithms.PersonPrepareForSim;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
@@ -43,10 +47,6 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
-import org.matsim.population.algorithms.PersonPrepareForSim;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * @author nagel

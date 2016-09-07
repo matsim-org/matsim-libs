@@ -20,8 +20,8 @@
 package org.matsim.contrib.taxi.benchmark;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.*;
@@ -46,35 +46,38 @@ public class RunTaxiBenchmark
 {
     public static void run(String configFile, int runs)
     {
-        final TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-        Config config = ConfigUtils.loadConfig(configFile, taxiCfg);
+        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup());
         createControler(config, runs).run();
-
     }
 
 
     public static Controler createControler(Config config, int runs)
     {
-        TaxiConfigGroup taxiCfg = (TaxiConfigGroup)config.getModule(TaxiConfigGroup.GROUP_NAME);
+        TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
         config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
         config.checkConsistency();
 
-        config.controler().setLastIteration(runs - 1);
-
         Scenario scenario = loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
         final TaxiData taxiData = new TaxiData();
-        new VehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
+        new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
+        return createControler(scenario, taxiData, runs);
+    }
+
+
+    public static Controler createControler(Scenario scenario, TaxiData taxiData, int runs)
+    {
+        scenario.getConfig().controler().setLastIteration(runs - 1);
 
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new TaxiModule(taxiData, taxiCfg));
-        controler.addOverridingModule(VrpTravelTimeModules.createFreespeedTravelTimeModule(true));
+        controler.setModules(new TaxiBenchmarkControlerModule());
+        controler.addOverridingModule(new TaxiModule(taxiData));
         controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
 
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install()
             {
-                addControlerListenerBinding().to(TaxiBenchmarkStats.class);
+                addControlerListenerBinding().to(TaxiBenchmarkStats.class).asEagerSingleton();
             };
         });
 
@@ -82,12 +85,12 @@ public class RunTaxiBenchmark
     }
 
 
-    private static Scenario loadBenchmarkScenario(Config config, int interval, int maxTime)
+    public static Scenario loadBenchmarkScenario(Config config, int interval, int maxTime)
     {
         Scenario scenario = new ScenarioBuilder(config).build();
 
         if (config.network().isTimeVariantNetwork()) {
-            ((NetworkImpl)scenario.getNetwork()).getFactory()
+            ((Network)scenario.getNetwork()).getFactory()
                     .setLinkFactory(new FixedIntervalTimeVariantLinkFactory(interval, maxTime));
         }
 

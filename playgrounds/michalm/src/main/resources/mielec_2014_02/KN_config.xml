@@ -22,14 +22,14 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="../../contribs/taxi/src/main/resources/mielec_2014_02/network.xml" />
+		<param name="inputNetworkFile" value="../../../../../../contribs/taxi/src/main/resources/mielec_2014_02/network.xml" />
 		<!-- param name="timeVariantNetwork" value="false" / if timeVariantNetwork -->
 		<!-- param name="inputChangeEventsFile" value=""/ if timeVariantNetwork -->
 	</module>
 
 	<module name="plans">
 		<!-- param name="inputPlansFile" value="../../contribs/taxi/src/main/resources/mielec_2014_02/plans_taxi_1.0.xml.gz" / -->
-		<param name="inputPlansFile" value="../../contribs/taxi/src/main/resources/mielec_2014_02/plans_taxi_4.0.xml.gz" />
+		<param name="inputPlansFile" value="../../../../../../contribs/taxi/src/main/resources/mielec_2014_02/plans_taxi_4.0.xml.gz" />
 	</module>
 
 	<module name="qsim">
@@ -57,10 +57,9 @@
 	</module>
 
 	<module name="strategy">
-		<!-- Either we have only DynAgents, or we want "standard" agents to serve as a background,
-		i.e. not to change their behavior -->
+		<!-- We focus only on DynAgents. "Standard" agents do not change their behaviour -->
 		<param name="maxAgentPlanMemorySize" value="1" />
 		<param name="ModuleProbability_1" value="1.0" />
-		<param name="Module_1" value="BestScore" />
+		<param name="Module_1" value="KeepLastSelected" />
 	</module>
 </config>

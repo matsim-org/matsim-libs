@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -46,7 +47,6 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -370,12 +370,12 @@ public class CrowdednessTest
 		Person p = popFac.createPerson(Id.create("Agent", Person.class));
 		Plan plan = popFac.createPlan();
 			
-		ActivityImpl homeAct = (ActivityImpl) popFac.createActivityFromCoord("home", stops[0].getCoord());
+		Activity homeAct = (Activity) popFac.createActivityFromCoord("home", stops[0].getCoord());
 		homeAct.setEndTime(startTime - 10);
 		plan.addActivity(homeAct);
 		plan.addLeg(popFac.createLeg("pt"));
 			
-		ActivityImpl workAct = (ActivityImpl) popFac.createActivityFromCoord("work", stops[1].getCoord());
+		Activity workAct = (Activity) popFac.createActivityFromCoord("work", stops[1].getCoord());
 		workAct.setEndTime(startTime + workDuration - 10);
 		plan.addActivity(workAct);
 		plan.addLeg(popFac.createLeg("pt"));

@@ -66,7 +66,7 @@ public class MainFlowAnalysisWithPt {
 		
 		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(eventsFile);
+		reader.readFile(eventsFile);
 
 		
 		flowAnalyzer.printLinkFlows();

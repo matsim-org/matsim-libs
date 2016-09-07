@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -119,7 +119,7 @@ public class ConvertBTURoutes2Matsim {
 		(new MatsimNetworkReader(scenario.getNetwork())).readFile(directory + networkFile);
 		this.network = scenario.getNetwork();
 		// save former population (without routes) in scenario
-		(new MatsimPopulationReader(scenario)).readFile(directory
+		(new PopulationReader(scenario)).readFile(directory
 				+ populationFile);
 		this.population = scenario.getPopulation();
 		// create container for the population with routes

@@ -65,7 +65,7 @@ public class DelayEvalStop {
 		handler.addTermStop("812020.2"); //m44 sued
 		events.addHandler(handler);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(filename);
+		reader.readFile(filename);
 		
 		handler.printStats();
 	}

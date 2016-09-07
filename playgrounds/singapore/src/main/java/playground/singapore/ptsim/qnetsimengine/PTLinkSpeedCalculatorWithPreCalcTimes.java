@@ -10,7 +10,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.singapore.ptsim.TransitSheduleToNetwork;
 
@@ -39,7 +39,7 @@ public class PTLinkSpeedCalculatorWithPreCalcTimes implements LinkSpeedCalculato
         if (parts.length == 2) {
             totalCount++;
             travelTime = stopStopTime.getStopStopTime(Id.create(parts[0], TransitStopFacility.class), Id.create(parts[1], TransitStopFacility.class), time);
-            if (((LinkImpl)link).getType().contains("rail")) {//hotfix for mrt links that go too fast, assumes a simple acccelleration and decelleration
+            if (NetworkUtils.getType(((Link)link)).contains("rail")) {//hotfix for mrt links that go too fast, assumes a simple acccelleration and decelleration
                 travelTime = link.getLength() / link.getFreespeed() + timeForMRTAccellerationAndDecelleration / 2;
                 travelTime = timesAreLogarithms ? Math.log(travelTime) : travelTime;
             }

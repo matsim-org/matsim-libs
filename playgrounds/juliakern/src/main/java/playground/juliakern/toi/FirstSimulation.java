@@ -29,8 +29,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class FirstSimulation {
@@ -141,7 +141,7 @@ public class FirstSimulation {
 //		PopulationFactory populationFactory = population.getFactory();
 
 
-		new MatsimPopulationReader(scenario).readFile(plansFile);	
+		new PopulationReader(scenario).readFile(plansFile);	
 		
 		Controler controler = new Controler(config);
 		controler.getConfig().controler().setOverwriteFileSetting(

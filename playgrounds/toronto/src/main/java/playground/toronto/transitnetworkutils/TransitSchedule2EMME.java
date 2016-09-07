@@ -19,10 +19,11 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -48,7 +49,7 @@ public class TransitSchedule2EMME {
 	
 	private static final Logger log = Logger.getLogger(TransitSchedule2EMME.class);
 	
-	private static NetworkImpl network;
+	private static Network network;
 	private static TransitSchedule schedule;
 	
 	private static DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -126,23 +127,23 @@ public class TransitSchedule2EMME {
 				//get node sequence
 				ArrayList<String> nodeIdSequence = new ArrayList<String>();
 				{					
-					LinkImpl currentLink = (LinkImpl) network.getLinks().get(route.getRoute().getStartLinkId());
-					if (currentLink.getType().equals(TorontoLinkTypes.streetcarROW))
+					Link currentLink = (Link) network.getLinks().get(route.getRoute().getStartLinkId());
+					if (NetworkUtils.getType(currentLink).equals(TorontoLinkTypes.streetcarROW))
 						isStreetcarROW = true;
-					if (!currentLink.getType().equals(TorontoLinkTypes.loop)){
+					if (!NetworkUtils.getType(currentLink).equals(TorontoLinkTypes.loop)){
 						nodeIdSequence.add(currentLink.getFromNode().getId().toString());
 					}
 					for (Id i : route.getRoute().getLinkIds()){
-						currentLink = (LinkImpl) network.getLinks().get(i);
-						if (currentLink.getType().equals(TorontoLinkTypes.streetcarROW))
+						currentLink = (Link) network.getLinks().get(i);
+						if (NetworkUtils.getType(currentLink).equals(TorontoLinkTypes.streetcarROW))
 							isStreetcarROW = true;
-						if (currentLink.getType().equals(TorontoLinkTypes.loop)) continue; //Skips loop links
+						if (NetworkUtils.getType(currentLink).equals(TorontoLinkTypes.loop)) continue; //Skips loop links
 						
 						nodeIdSequence.add(currentLink.getFromNode().getId().toString());
 					}
-					currentLink = (LinkImpl) network.getLinks().get(route.getRoute().getEndLinkId());
+					currentLink = (Link) network.getLinks().get(route.getRoute().getEndLinkId());
 					nodeIdSequence.add(currentLink.getFromNode().getId().toString());
-					if (!currentLink.getType().equals(TorontoLinkTypes.loop)){
+					if (!NetworkUtils.getType(currentLink).equals(TorontoLinkTypes.loop)){
 						nodeIdSequence.add(currentLink.getToNode().getId().toString()); //If the route does not end on a loop (not likely) then append the final node to the sequence
 					}
 				}
@@ -286,8 +287,8 @@ public class TransitSchedule2EMME {
 		//figure out line length, in m
 		double length = 0;
 		for (Id i : route.getRoute().getLinkIds()){
-			LinkImpl link = (LinkImpl) network.getLinks().get(i);
-			if (link.getType().equals(TorontoLinkTypes.loop)) continue;
+			Link link = (Link) network.getLinks().get(i);
+			if (NetworkUtils.getType(link).equals(TorontoLinkTypes.loop)) continue;
 			length += link.getLength();
 		}
 		
@@ -377,7 +378,7 @@ public class TransitSchedule2EMME {
 		config.setParam("transit", "transitScheduleFile", scheduleFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		network = (NetworkImpl) scenario.getNetwork();
+		network = (Network) scenario.getNetwork();
 		network.setName(networkFile);
 		schedule = scenario.getTransitSchedule();
 		

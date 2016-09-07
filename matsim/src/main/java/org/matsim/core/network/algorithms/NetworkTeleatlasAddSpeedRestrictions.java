@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.network.NetworkReaderTeleatlas;
+import org.matsim.core.network.io.NetworkReaderTeleatlas;
 import org.matsim.core.utils.io.IOUtils;
 
 /**

@@ -52,6 +52,39 @@ public class CompactCSVWriter
     }
 
 
+    public void writeNext(String first, String[] tail)
+    {
+        writeHeadAndTail(tail, first);
+    }
+
+
+    public void writeNext(String first, String second, String[] tail)
+    {
+        writeHeadAndTail(tail, first, second);
+    }
+
+
+    public void writeNext(String first, String second, String third, String[] tail)
+    {
+        writeHeadAndTail(tail, first, second, third);
+    }
+
+
+    public void writeNext(String first, String second, String third, String fourth, String[] tail)
+    {
+        writeHeadAndTail(tail, first, second, third, fourth);
+    }
+    
+    
+    private void writeHeadAndTail(String[] tail, String... head)
+    {
+        String[] nextLine = new String[head.length + tail.length];
+        System.arraycopy(head, 0, nextLine, 0, head.length);
+        System.arraycopy(tail, 0, nextLine, head.length, tail.length);
+        writeNext(nextLine);
+    }
+
+
     public void writeNextEmpty()
     {
         writeNext(EMPTY_LINE);

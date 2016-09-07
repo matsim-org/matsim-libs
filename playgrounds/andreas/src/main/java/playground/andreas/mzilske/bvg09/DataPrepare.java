@@ -37,10 +37,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
@@ -48,7 +49,6 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufInterpolator;
 import org.matsim.pt.config.TransitConfigGroup;
@@ -96,7 +96,7 @@ public class DataPrepare {
 	private final MutableScenario scenario;
 	private final Config config;
 
-	private NetworkImpl pseudoNetwork;
+	private Network pseudoNetwork;
 
 	public DataPrepare() {
 		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -141,7 +141,7 @@ public class DataPrepare {
 	}
 
 	protected void createNetworkFromSchedule() {
-		this.pseudoNetwork = NetworkImpl.createNetwork();
+		this.pseudoNetwork = NetworkUtils.createNetwork();
 		new CreatePseudoNetwork(this.scenario.getTransitSchedule(), this.pseudoNetwork, "tr_").createNetwork();
 	}
 
@@ -150,15 +150,15 @@ public class DataPrepare {
 		Network transitNetwork = transitScenario.getNetwork();
 		MutableScenario streetScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network streetNetwork = streetScenario.getNetwork();
-		new MatsimNetworkReader(transitScenario.getNetwork()).parse(IntermediateTransitNetworkFile);
-		new MatsimNetworkReader(streetScenario.getNetwork()).parse(InNetworkFile);
-		MergeNetworks.merge(streetNetwork, "", transitNetwork, "", (NetworkImpl) this.scenario.getNetwork());
+		new MatsimNetworkReader(transitScenario.getNetwork()).readFile(IntermediateTransitNetworkFile);
+		new MatsimNetworkReader(streetScenario.getNetwork()).readFile(InNetworkFile);
+		MergeNetworks.merge(streetNetwork, "", transitNetwork, "", (Network) this.scenario.getNetwork());
 		new NetworkWriter(this.scenario.getNetwork()).write(OutMultimodalNetworkFile);
 	}
 
 	protected void routePopulation() {
 		Population pop = this.scenario.getPopulation();
-		new MatsimPopulationReader(this.scenario).parse(InInputPlansFileWithXY2Links);
+		new PopulationReader(this.scenario).readFile(InInputPlansFileWithXY2Links);
 
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
 		FreespeedTravelTimeAndDisutility timeCostCalculator = new FreespeedTravelTimeAndDisutility(this.scenario.getConfig().planCalcScore());

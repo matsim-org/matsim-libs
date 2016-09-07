@@ -19,4 +19,6 @@ public class FacilityTypes {
 	public static final String HOSPITAL = "hospital";
 	public static final String PHARMACY = "pharmacy";
 	public static final String CLINIC = "clinic";
+	
+	public static final String AIRPORT = "airport";
 }

@@ -16,7 +16,7 @@
 	<distributionManagement>
         <repository>
 			<id>bintray</id>
-			<url>https://api.bintray.com/maven/matsim/matsim/contrib</url>
+			<url>https://api.bintray.com/maven/matsim/matsim/matsim</url>
 		</repository>
 		<snapshotRepository>
 			<id>oss-jfrog-artifactory</id>
@@ -122,7 +122,6 @@
 		<module>taxi</module>
 		<module>emissions</module>
 		<module>freight</module>
-		<module>gtfs2matsimtransitschedule</module>
 		<module>signals</module>
 		<module>locationchoice</module>
 		<module>matsim4urbansim</module>
@@ -258,7 +257,7 @@
 		<profile>
 			<id>release</id>
 			<build>
-				<defaultGoal>assembly:assembly</defaultGoal>
+				<defaultGoal>package</defaultGoal>
 				<pluginManagement>
 					<plugins>
 						<plugin>
@@ -268,6 +267,15 @@
 									<descriptor>src/main/assembly/assembly-release.xml</descriptor>
 								</descriptors>
 							</configuration>
+							<executions>
+								<execution>
+									<id>make-assembly</id> <!-- this is used for inheritance merges -->
+									<phase>package</phase> <!-- bind to the packaging phase -->
+									<goals>
+										<goal>single</goal>
+									</goals>
+								</execution>
+							</executions>
 						</plugin>
 						<plugin>
 							<artifactId>maven-jar-plugin</artifactId>

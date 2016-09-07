@@ -24,15 +24,15 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.scoring.ScoringFunctionAdapter;
+import org.matsim.deprecated.scoring.ScoringFunctionAdapter;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
@@ -167,7 +167,7 @@ public class BkScoringFunction extends ScoringFunctionAdapter {
 		initialized = true;
 	}
 
-	protected double calcActScore(final double arrivalTime, final double departureTime, final ActivityImpl act) {
+	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 
 		ActivityUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
@@ -271,7 +271,7 @@ public class BkScoringFunction extends ScoringFunctionAdapter {
 		return tmpScore;
 	}
 
-	protected double[] getOpeningInterval(final ActivityImpl act) {
+	protected double[] getOpeningInterval(final Activity act) {
 
 		ActivityUtilityParameters params = utilParams.get(act.getType());
 		if (params == null) {
@@ -289,7 +289,7 @@ public class BkScoringFunction extends ScoringFunctionAdapter {
 		return openInterval;
 	}
 
-	protected double calcLegScore(final double departureTime, final double arrivalTime, final LegImpl leg) {
+	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 		double dist = 0.0; // distance in meters
@@ -372,19 +372,19 @@ public class BkScoringFunction extends ScoringFunctionAdapter {
 	}
 
 	protected void handleAct(final double time) {
-		ActivityImpl act = (ActivityImpl)this.plan.getPlanElements().get(this.index);
+		Activity act = (Activity)this.plan.getPlanElements().get(this.index);
 		if (this.index == 0) {
 			this.firstActTime = time;
 		} else if (this.index == this.lastActIndex) {
 			String lastActType = act.getType();
-			if (lastActType.equals(((ActivityImpl) this.plan.getPlanElements().get(0)).getType())) {
+			if (lastActType.equals(((Activity) this.plan.getPlanElements().get(0)).getType())) {
 				// the first Act and the last Act have the same type
 				this.score += calcActScore(this.lastTime, this.firstActTime + 24*3600, act); // SCENARIO_DURATION
 			} else {
 				if (scoreActs) {
 					log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
 					// score first activity
-					ActivityImpl firstAct = (ActivityImpl)this.plan.getPlanElements().get(0);
+					Activity firstAct = (Activity)this.plan.getPlanElements().get(0);
 					this.score += calcActScore(0.0, this.firstActTime, firstAct);
 					// score last activity
 					this.score += calcActScore(this.lastTime, 24*3600, act); // SCENARIO_DURATION
@@ -397,7 +397,7 @@ public class BkScoringFunction extends ScoringFunctionAdapter {
 	}
 
 	private void handleLeg(final double time) {
-		LegImpl leg = (LegImpl)this.plan.getPlanElements().get(this.index);
+		Leg leg = (Leg)this.plan.getPlanElements().get(this.index);
 		this.score += calcLegScore(this.lastTime, time, leg);
 		this.index++;
 	}

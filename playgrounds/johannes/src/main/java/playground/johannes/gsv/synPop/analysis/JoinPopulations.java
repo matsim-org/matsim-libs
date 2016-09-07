@@ -41,13 +41,13 @@ public class JoinPopulations {
 		parser.setValidating(false);
 	
 		logger.info("Loading persons 1...");
-		parser.parse(args[0]);
+		parser.readFile(args[0]);
 		Set<PlainPerson> persons = new HashSet<>((Set<PlainPerson>)parser.getPersons());
 		
 		logger.info("Loading persons 2...");
 		parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
-		parser.parse(args[1]);
+		parser.readFile(args[1]);
 		persons.addAll((Set<PlainPerson>)parser.getPersons());
 		
 		logger.info("Writing persons...");

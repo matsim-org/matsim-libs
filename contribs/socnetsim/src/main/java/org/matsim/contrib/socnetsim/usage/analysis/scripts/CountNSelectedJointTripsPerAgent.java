@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -46,7 +46,7 @@ public class CountNSelectedJointTripsPerAgent {
 		final String outFile = args[ 1 ];
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimPopulationReader( sc ).readFile( popFile );
+		new PopulationReader( sc ).readFile( popFile );
 
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outFile );
 

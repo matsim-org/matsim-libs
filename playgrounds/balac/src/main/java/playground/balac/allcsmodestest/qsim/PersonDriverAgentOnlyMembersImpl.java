@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -34,7 +35,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
@@ -455,7 +456,7 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 	//added methods
 	
 	private void initializeCSWalkLeg(String mode, double now, Link startLink, Link destinationLink) {
-		LegImpl walkLeg = new LegImpl(mode);
+		Leg walkLeg = PopulationUtils.createLeg(mode);
 		
 		GenericRouteImpl walkRoute = new GenericRouteImpl(startLink.getId(), destinationLink.getId());
 		final double dist = CoordUtils.calcEuclideanDistance(startLink.getCoord(), destinationLink.getCoord());
@@ -470,7 +471,7 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 		
 		walkLeg.setDepartureTime(now);
 		walkLeg.setTravelTime(travTime);
-		walkLeg.setArrivalTime(now + travTime);
+		walkLeg.setTravelTime( now + travTime - walkLeg.getDepartureTime() );
 		// set the route according to the next leg
 		this.currentLeg = walkLeg;
 		this.cachedRouteLinkIds = null;
@@ -498,7 +499,7 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 			}
 		}
 		
-		LegImpl carLeg = new LegImpl(mode);
+		Leg carLeg = PopulationUtils.createLeg(mode);
 		
 		carLeg.setTravelTime( travelTime );
 		

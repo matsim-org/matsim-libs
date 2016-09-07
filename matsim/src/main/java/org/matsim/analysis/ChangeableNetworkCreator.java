@@ -11,13 +11,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkChangeEventsWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
@@ -56,7 +54,6 @@ public class ChangeableNetworkCreator {
 	}
 	
 	public void createNetworkChangeEvents(Network network, TravelTimeCalculator tcc2) {
-		NetworkChangeEventFactory factory = new NetworkChangeEventFactoryImpl();
 		for (Link l : network.getLinks().values()){
 			if (l.getId().toString().startsWith("pt")) continue;
 			
@@ -67,11 +64,11 @@ public class ChangeableNetworkCreator {
 				
 				double newTravelTime = tcc2.getLinkTravelTimes().getLinkTravelTime(l, time, null, null);
 				if (newTravelTime != previousTravelTime){
-					NetworkChangeEvent nce = factory.createNetworkChangeEvent(time);
+					NetworkChangeEvent nce = new NetworkChangeEvent(time);
 					nce.addLink(l);
 					double newFreespeed = length / newTravelTime;
 					if (newFreespeed < MINIMUMFREESPEED) newFreespeed = MINIMUMFREESPEED;
-					ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE, newFreespeed);
+					ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, newFreespeed);
 					nce.setFreespeedChange(freespeedChange);
 					
 					

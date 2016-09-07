@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
@@ -63,8 +63,8 @@ public class ReportPopulationStatistics {
 	public static void Run(String population, String populationAttributes){
 		/* Read the population and population attributes. */
 		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc).parse(population);
-		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).parse(populationAttributes);
+		new PopulationReader(sc).readFile(population);
+		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).readFile(populationAttributes);
 		
 		/* Parse and report some numbers. */
 		parseAttribute("subpopulation");

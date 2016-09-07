@@ -34,8 +34,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -85,7 +85,7 @@ public class NetworkVisum2Matsim {
 	}
 
 	private void convertNetwork() {
-		final NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		final Network network = (Network) scenario.getNetwork();
 		StreamingVisumNetworkReader streamingVisumNetworkReader = new StreamingVisumNetworkReader();
 
 		final Collection<SimpleFeature> featuresInShape = ShapeFileReader.getAllFeatures(DetailedAreaShape);
@@ -96,7 +96,9 @@ public class NetworkVisum2Matsim {
 			public void handleRow(Map<String, String> row) {
 				Id<Node> id = Id.create(row.get("NR"), Node.class);
 				Coord coord = new Coord(Double.parseDouble(row.get("XKOORD").replace(',', '.')), Double.parseDouble(row.get("YKOORD").replace(',', '.')));
-				network.createAndAddNode(id, coord);
+				final Id<Node> id1 = id;
+				final Coord coord1 = coord;
+				NetworkUtils.createAndAddNode(network, id1, coord1);
 			}
 
 		};
@@ -164,13 +166,29 @@ public class NetworkVisum2Matsim {
 						else{
 							freespeed = getFreespeedTravelTime(edgeTypeId);
 						}
-						network.createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, noOfLanes, null, edgeTypeIdString);
+						final Id<Link> id1 = id;
+						final Node fromNode1 = fromNode;
+						final Node toNode1 = toNode;
+						final double length1 = length;
+						final double freespeed1 = freespeed;
+						final double capacity1 = capacity;
+						final double numLanes = noOfLanes;
+						final String type = edgeTypeIdString;
+						NetworkUtils.createAndAddLink(network,id1, fromNode1, toNode1, length1, freespeed1, capacity1, numLanes, null, type);
 						usedIds.add(edgeTypeIdString);
 					}
 					else {
 						if(isEdgeTypeRelevantForPeriphery(edgeTypeId)){
 							freespeed = getFreespeedTravelTime(edgeTypeId);
-							network.createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, noOfLanes, null, edgeTypeIdString);
+							final Id<Link> id1 = id;
+							final Node fromNode1 = fromNode;
+							final Node toNode1 = toNode;
+							final double length1 = length;
+							final double freespeed1 = freespeed;
+							final double capacity1 = capacity;
+							final double numLanes = noOfLanes;
+							final String type = edgeTypeIdString;
+							NetworkUtils.createAndAddLink(network,id1, fromNode1, toNode1, length1, freespeed1, capacity1, numLanes, null, type);
 							usedIds.add(edgeTypeIdString);
 						}
 					}

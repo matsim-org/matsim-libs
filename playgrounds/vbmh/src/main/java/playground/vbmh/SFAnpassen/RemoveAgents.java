@@ -1,11 +1,11 @@
 package playground.vbmh.SFAnpassen;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -30,7 +30,7 @@ public class RemoveAgents {
 			Person pa = p;
 			//System.out.println(pa.getCarAvail());
 			if(evControl.hasEV(pa.getId())){
-				ActivityImpl act = (ActivityImpl) pa.getSelectedPlan().getPlanElements().get(0);
+				Activity act = (Activity) pa.getSelectedPlan().getPlanElements().get(0);
 				if(act.getFacilityId().toString().contains("B")){
 
 				population.addPerson(pa);

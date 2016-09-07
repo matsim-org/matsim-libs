@@ -147,31 +147,35 @@ public class GenerateTableHubLinkMapping {
 	private static GenericResult getCornerCoordinates(Matrix matrix) {
 		GenericResult genericResult;
 
-		Coord bottomLeft = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
-		Coord topRight = new Coord(Double.MIN_VALUE, Double.MIN_VALUE);
+//		Coord bottomLeft = new Coord(Double.MAX_VALUE, Double.MAX_VALUE);
+//		Coord topRight = new Coord(Double.MIN_VALUE, Double.MIN_VALUE);
+		double bottomLeftX = Double.POSITIVE_INFINITY ;
+		double bottomLeftY = Double.POSITIVE_INFINITY ;
+		double topRightX = Double.NEGATIVE_INFINITY ;
+		double topRightY = Double.NEGATIVE_INFINITY ;
 
 		for (int i = 0; i < matrix.getNumberOfRows(); i++) {
 			double x = matrix.getDouble(i, 1);
 			double y = matrix.getDouble(i, 2);
 
-			if (x < bottomLeft.getX()) {
-				bottomLeft.setX(x);
+			if (x < bottomLeftX) {
+				bottomLeftX = x;
 			}
 
-			if (y < bottomLeft.getY()) {
-				bottomLeft.setY(y);
+			if (y < bottomLeftY) {
+				bottomLeftY=y;
 			}
 
-			if (x > topRight.getX()) {
-				topRight.setX(x);
+			if (x > topRightX) {
+				topRightX=x;
 			}
 
-			if (y > topRight.getY()) {
-				topRight.setY(y);
+			if (y > topRightY) {
+				topRightY=y;
 			}
 		}
 
-		genericResult = new GenericResult(bottomLeft, topRight);
+		genericResult = new GenericResult( new Coord(bottomLeftX,bottomLeftY), new Coord(topRightX,topRightY) );
 		return genericResult;
 	}
 

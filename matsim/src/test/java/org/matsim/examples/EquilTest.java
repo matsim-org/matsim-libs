@@ -29,14 +29,14 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
@@ -85,7 +85,7 @@ public class EquilTest extends MatsimTestCase {
 
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 
-		PopulationReader plansReader = new MatsimPopulationReader(scenario);
+		MatsimReader plansReader = new PopulationReader(scenario);
 		plansReader.readFile(popFileName);
 
 		EventsManager events = EventsUtils.createEventsManager();

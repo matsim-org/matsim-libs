@@ -8,6 +8,10 @@ import org.matsim.api.core.v01.population.*;
 
 public class PopulationUtils
 {
+	private PopulationUtils(){} // do not instantiate
+
+	
+	
     public static void convertLegModes(List<String> passengerIds, String mode, Scenario scenario)
     {
         Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons();

@@ -23,11 +23,11 @@ import java.io.File;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -60,7 +60,7 @@ public class PlanExpander {
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();
-		PopulationReader popReader = new MatsimPopulationReader(sc);
+		MatsimReader popReader = new PopulationReader(sc);
 		popReader.readFile(plansFile + ".xml.gz");
 
 		DuplicatePlans dp = new DuplicatePlans(net, inPop, "tmp.xml.gz", numberOfAdditionalCopies);
@@ -71,7 +71,7 @@ public class PlanExpander {
 		Gbl.printElapsedTime();
 
 		inPop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
-		popReader = new MatsimPopulationReader(new SharedNetScenario(sc, inPop));
+		popReader = new PopulationReader(new SharedNetScenario(sc, inPop));
 		popReader.readFile("tmp.xml.gz");
 
 		ShuffleCoords shuffleCoords = new ShuffleCoords(net, inPop, plansFile + "_" + (numberOfAdditionalCopies + 1) + "x.xml.gz", radiusOfPerimeter, TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.DHDN_GK4));

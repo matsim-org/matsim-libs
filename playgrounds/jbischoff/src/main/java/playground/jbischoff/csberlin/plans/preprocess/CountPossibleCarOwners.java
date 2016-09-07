@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -35,7 +35,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class CountPossibleCarOwners {
 public static void main(String[] args) {
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	new MatsimPopulationReader(scenario).readFile("../../../shared-svn/projects/bmw_carsharing/data/scenario/mierendorff-plans.xml.gz");
+	new PopulationReader(scenario).readFile("../../../shared-svn/projects/bmw_carsharing/data/scenario/mierendorff-plans.xml.gz");
 	int i = 0;
 	for (Person p : scenario.getPopulation().getPersons().values()){
 		Plan plan = p.getSelectedPlan();

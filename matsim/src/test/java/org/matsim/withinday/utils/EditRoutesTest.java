@@ -34,18 +34,18 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.PlanRouter;
@@ -74,7 +74,7 @@ public class EditRoutesTest extends MatsimTestCase {
 	private Plan plan;
 	private TripRouter tripRouter;
 	private LeastCostPathCalculator pathCalculator ;
-	private RouteFactoryImpl routeFactory ;
+	private RouteFactories routeFactory ;
 	
 	/**
 	 * @author cdobler
@@ -234,8 +234,8 @@ public class EditRoutesTest extends MatsimTestCase {
 		
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, routeFactory);
 		
-		ActivityImpl activityW1 = null;
-		ActivityImpl activityH2 = null;
+		Activity activityW1 = null;
+		Activity activityH2 = null;
 		
 //		// expect EditRoutes to return false if the index does not point to a Leg
 //		assertEquals(false, ed.replanCurrentLegRoute(plan, 0, 0, tripRouter, 8.0*3600));
@@ -268,7 +268,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		 */
 		// create new routes for HW-trip
 		createScenario();	// reset scenario
-		activityW1 = (ActivityImpl) plan.getPlanElements().get(2);
+		activityW1 = (Activity) plan.getPlanElements().get(2);
 		activityW1.setLinkId(Id.create("l2", Link.class));	// move Activity location		
 			assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), 0, 8.0*3600 )); // HW, start Link
 
@@ -277,44 +277,44 @@ public class EditRoutesTest extends MatsimTestCase {
 		assertEquals(true, checkRouteValidity(route));
 		
 		createScenario();	// reset scenario
-		activityW1 = (ActivityImpl) plan.getPlanElements().get(2);
+		activityW1 = (Activity) plan.getPlanElements().get(2);
 		activityW1.setLinkId(Id.create("l2", Link.class));	// move Activity location
 			assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), 1, 8.0*3600 ) );	// HW, en-route			
 			assertEquals(true, checkRouteValidity(route));
 		
 		createScenario();	// reset scenario
-		activityW1 = (ActivityImpl) plan.getPlanElements().get(2);
+		activityW1 = (Activity) plan.getPlanElements().get(2);
 		activityW1.setLinkId(Id.create("l2", Link.class));	// move Activity location
 			assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), 2, 8.0*3600 ));	// HW, end Link			
 		assertEquals(true, checkRouteValidity(route));
 		
 		// create new routes for WH-trip
 		createScenario();	// reset scenario
-		activityH2 = (ActivityImpl) plan.getPlanElements().get(4);
+		activityH2 = (Activity) plan.getPlanElements().get(4);
 		activityH2.setLinkId(Id.create("l4", Link.class));	// move Activity location
 			assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 0, 8.0*3600 ));	// WH, start Link			
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
 		
 		createScenario();	// reset scenario
-		activityH2 = (ActivityImpl) plan.getPlanElements().get(4);
+		activityH2 = (Activity) plan.getPlanElements().get(4);
 		activityH2.setLinkId(Id.create("l4", Link.class));	// move Activity location
 			assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 1, 8.0*3600 ));	// WH, en-route
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
 		
 		createScenario();	// reset scenario
-		activityH2 = (ActivityImpl) plan.getPlanElements().get(4);
+		activityH2 = (Activity) plan.getPlanElements().get(4);
 		activityH2.setLinkId(Id.create("l4", Link.class));	// move Activity location
 			assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 2, 8.0*3600 ));	// WH, en-route			
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
 		
 		createScenario();	// reset scenario
-		activityH2 = (ActivityImpl) plan.getPlanElements().get(4);
+		activityH2 = (Activity) plan.getPlanElements().get(4);
 		activityH2.setLinkId(Id.create("l4", Link.class));	// move Activity location
 			assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 3, 8.0*3600 ) );	// WH, en-route			
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
 
 		createScenario();	// reset scenario
-		activityH2 = (ActivityImpl) plan.getPlanElements().get(4);
+		activityH2 = (Activity) plan.getPlanElements().get(4);
 		activityH2.setLinkId(Id.create("l4", Link.class));	// move Activity location
 			assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(scndCarLeg), plan.getPerson(), 4, 8.0*3600 ));	// WH, end Link			
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(scndCarLeg)).getRoute()));
@@ -398,13 +398,13 @@ public class EditRoutesTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	private void createSamplePlan() {
-		plan = new PlanImpl(PopulationUtils.createPerson(Id.create(1, Person.class)));
+		plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		
-		Activity activityH1 = ((PlanImpl) plan).createAndAddActivity("h", Id.create("l1", Link.class));
-		((PlanImpl) plan).createAndAddLeg(TransportMode.car);
-		Activity activityW1 = ((PlanImpl) plan).createAndAddActivity("w", Id.create("l3", Link.class));
-		((PlanImpl) plan).createAndAddLeg(TransportMode.car);
-		Activity activityH2 = ((PlanImpl) plan).createAndAddActivity("h", Id.create("l1", Link.class));
+		Activity activityH1 = PopulationUtils.createAndAddActivityFromLinkId(((Plan) plan), "h", Id.create("l1", Link.class));
+		PopulationUtils.createAndAddLeg( ((Plan) plan), TransportMode.car );
+		Activity activityW1 = PopulationUtils.createAndAddActivityFromLinkId(((Plan) plan), "w", Id.create("l3", Link.class));
+		PopulationUtils.createAndAddLeg( ((Plan) plan), TransportMode.car );
+		Activity activityH2 = PopulationUtils.createAndAddActivityFromLinkId(((Plan) plan), "h", Id.create("l1", Link.class));
 		
 		/*
 		 * set activity start times and durations
@@ -419,9 +419,9 @@ public class EditRoutesTest extends MatsimTestCase {
 		/*
 		 * set coordinates for activities
 		 */
-		((ActivityImpl) activityH1).setCoord(scenario.getNetwork().getLinks().get(activityH1.getLinkId()).getCoord());
-		((ActivityImpl) activityW1).setCoord(scenario.getNetwork().getLinks().get(activityW1.getLinkId()).getCoord());
-		((ActivityImpl) activityH2).setCoord(scenario.getNetwork().getLinks().get(activityH2.getLinkId()).getCoord());
+		((Activity) activityH1).setCoord(scenario.getNetwork().getLinks().get(activityH1.getLinkId()).getCoord());
+		((Activity) activityW1).setCoord(scenario.getNetwork().getLinks().get(activityW1.getLinkId()).getCoord());
+		((Activity) activityH2).setCoord(scenario.getNetwork().getLinks().get(activityH2.getLinkId()).getCoord());
 		
 		/*
 		 * run a PlanRouter to create and set routes
@@ -452,7 +452,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		TravelDisutility costFunction = new OnlyTimeDependentTravelDisutility( timeFunction ) ;
 		this.pathCalculator = new Dijkstra(scenario.getNetwork(), costFunction, timeFunction) ;
 		
-		this.routeFactory = ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getRouteFactory() ;
+		this.routeFactory = ((PopulationFactory)scenario.getPopulation().getFactory()).getRouteFactories() ;
 	}
 	
 	/**

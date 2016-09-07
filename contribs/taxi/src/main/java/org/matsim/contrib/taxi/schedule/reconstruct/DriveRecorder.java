@@ -59,12 +59,12 @@ public class DriveRecorder
         this.reconstructor = reconstructor;
     }
 
-    
+
     boolean hasOngoingDrives()
     {
         return !drives.isEmpty();
     }
-    
+
 
     @Override
     public void handleEvent(PersonEntersVehicleEvent event)

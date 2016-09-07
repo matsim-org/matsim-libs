@@ -7,8 +7,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -22,22 +22,22 @@ public class MergePlans {
 		Scenario base25 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(base25.getNetwork()).readFile("./input/network/singapore7.xml");
 		new MatsimFacilitiesReader((MutableScenario)base25).readFile("C:\\Users\\sergioo\\Documents\\2011\\Work\\FCL\\Operations\\Data\\MATSimXMLCurrentData\\SpecialTrips\\completeFacilities.xml");
-		new MatsimPopulationReader(base25).readFile("C:\\Users\\sergioo\\Documents\\2011\\Work\\FCL\\Operations\\Data\\MATSimXMLCurrentData\\SpecialTrips\\population25.xml.gz");
+		new PopulationReader(base25).readFile("C:\\Users\\sergioo\\Documents\\2011\\Work\\FCL\\Operations\\Data\\MATSimXMLCurrentData\\SpecialTrips\\population25.xml.gz");
 		Scenario specialTrips = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimFacilitiesReader((MutableScenario)specialTrips).readFile("C:\\Users\\sergioo\\Documents\\2011\\Work\\FCL\\Operations\\Data\\MATSimXMLCurrentData\\SpecialTrips\\StFacilitiesST.xml");
-		new MatsimPopulationReader(specialTrips).readFile("C:\\Users\\sergioo\\Documents\\2011\\Work\\FCL\\Operations\\Data\\MATSimXMLCurrentData\\SpecialTrips\\plansCheckpointwtST.xml");
+		new PopulationReader(specialTrips).readFile("C:\\Users\\sergioo\\Documents\\2011\\Work\\FCL\\Operations\\Data\\MATSimXMLCurrentData\\SpecialTrips\\plansCheckpointwtST.xml");
 		for(Person person:specialTrips.getPopulation().getPersons().values())
 			if(!mcycle(person) && Math.random()<0.25)
 				base25.getPopulation().addPerson(person);
 		specialTrips = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimFacilitiesReader((MutableScenario)specialTrips).readFile("C:\\Users\\sergioo\\Documents\\2011\\Work\\FCL\\Operations\\Data\\MATSimXMLCurrentData\\SpecialTrips\\StFacilitiesST.xml");
-		new MatsimPopulationReader(specialTrips).readFile("C:\\Users\\sergioo\\Documents\\2011\\Work\\FCL\\Operations\\Data\\MATSimXMLCurrentData\\SpecialTrips\\plansGVwtST.xml");
+		new PopulationReader(specialTrips).readFile("C:\\Users\\sergioo\\Documents\\2011\\Work\\FCL\\Operations\\Data\\MATSimXMLCurrentData\\SpecialTrips\\plansGVwtST.xml");
 		for(Person person:specialTrips.getPopulation().getPersons().values())
 			if(Math.random()<0.25)
 				base25.getPopulation().addPerson(person);
 		specialTrips = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimFacilitiesReader((MutableScenario)specialTrips).readFile("C:\\Users\\sergioo\\Documents\\2011\\Work\\FCL\\Operations\\Data\\MATSimXMLCurrentData\\SpecialTrips\\StFacilitiesST.xml");
-		new MatsimPopulationReader(specialTrips).readFile("C:\\Users\\sergioo\\Documents\\2011\\Work\\FCL\\Operations\\Data\\MATSimXMLCurrentData\\SpecialTrips\\plansTouristwtST.xml");
+		new PopulationReader(specialTrips).readFile("C:\\Users\\sergioo\\Documents\\2011\\Work\\FCL\\Operations\\Data\\MATSimXMLCurrentData\\SpecialTrips\\plansTouristwtST.xml");
 		for(Person person:specialTrips.getPopulation().getPersons().values())
 			if(Math.random()<0.25)
 				base25.getPopulation().addPerson(person);

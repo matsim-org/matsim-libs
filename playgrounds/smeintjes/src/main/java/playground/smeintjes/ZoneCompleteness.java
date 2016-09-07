@@ -281,7 +281,7 @@ public class ZoneCompleteness {
 
 			/* Parse the vehicle from file. */
 			DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-			dvr.parse(file.getAbsolutePath());
+			dvr.readFile(file.getAbsolutePath());
 			DigicoreVehicle vehicle = dvr.getVehicle();
 
 			/* Check how far EACH activity is. If it is within the threshold,

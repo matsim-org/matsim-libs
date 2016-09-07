@@ -41,15 +41,15 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -779,7 +779,7 @@ public class SurveyParser {
 						Activity act = (Activity)pe;
 						Coord coord = act.getCoord();
 						if(coord.getX() == 0.0 || coord.getY() == 0.0){
-							((ActivityImpl)act).setCoord(sampleActivityLocation(act.getType()));
+							((Activity)act).setCoord(sampleActivityLocation(act.getType()));
 							locationsFixed++;
 						} else{
 							knownLocations++;
@@ -842,8 +842,8 @@ public class SurveyParser {
 					Plan plan = person.getSelectedPlan();
 					if(plan != null){
 						for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
-							if(pe instanceof ActivityImpl){
-								ActivityImpl act = (ActivityImpl)pe;
+							if(pe instanceof Activity){
+								Activity act = (Activity)pe;
 								if(act.getType().equalsIgnoreCase("h")){
 									act.setCoord(homeCoord);
 									homeLocationsFixed++;
@@ -939,7 +939,7 @@ public class SurveyParser {
 				for(PlanElement pe : plan.getPlanElements()){
 					if(pe instanceof Activity){
 						Activity act = (Activity)pe;
-						((ActivityImpl)act).setCoord(ct.transform(act.getCoord()));
+						((Activity)act).setCoord(ct.transform(act.getCoord()));
 					}
 				}
 			}

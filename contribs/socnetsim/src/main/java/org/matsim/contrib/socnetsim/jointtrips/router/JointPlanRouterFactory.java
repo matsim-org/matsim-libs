@@ -20,10 +20,9 @@
 package org.matsim.contrib.socnetsim.jointtrips.router;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.population.algorithms.PlanAlgorithm;
-
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 
 import com.google.inject.Inject;

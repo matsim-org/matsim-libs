@@ -89,7 +89,7 @@ public class OSM2Facility {
 		String type = "shop";
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
-		parser.parse("/home/johannes/gsv/osm/germany-"+type+".osm");
+		parser.readFile("/home/johannes/gsv/osm/germany-"+type+".osm");
 
 		Collection<OSMWay> ways = parser.getWays().values();
 

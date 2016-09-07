@@ -34,11 +34,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -201,9 +200,11 @@ public class TeleatlasConverter45v101 {
 				link.setFreespeed(freespeed);
 				link.setNumberOfLanes(nOfLanes);
 				link.setAllowedModes(modesFT);
-				if (modesFT.size() == 3) { ((LinkImpl)link).setType(type); }
-				else if (type.startsWith("-")) { ((LinkImpl)link).setType(type); }
-				else { ((LinkImpl)link).setType("-"+type); }
+				if (modesFT.size() == 3) { final String type1 = type;
+				NetworkUtils.setType( ((Link)link), type1); }
+				else if (type.startsWith("-")) { final String type1 = type;
+				NetworkUtils.setType( ((Link)link), type1); }
+				else { NetworkUtils.setType( ((Link)link), (String) ("-"+type)); }
 			}
 			if (createTFElement) {
 				Link link = createLink(nwElement, "TF");
@@ -212,10 +213,13 @@ public class TeleatlasConverter45v101 {
 				link.setFreespeed(freespeed);
 				link.setNumberOfLanes(nOfLanes);
 				link.setAllowedModes(modesTF);
-				((LinkImpl)link).setType(type);
-				if (modesTF.size() == 3) { ((LinkImpl)link).setType(type); }
-				else if (type.startsWith("-")) { ((LinkImpl)link).setType(type); }
-				else { ((LinkImpl)link).setType("-"+type); }
+				final String type1 = type;
+				NetworkUtils.setType( ((Link)link), type1);
+				if (modesTF.size() == 3) { final String type2 = type;
+				NetworkUtils.setType( ((Link)link), type2); }
+				else if (type.startsWith("-")) { final String type2 = type;
+				NetworkUtils.setType( ((Link)link), type2); }
+				else { NetworkUtils.setType( ((Link)link), (String) ("-"+type)); }
 			}
 		}
 	}
@@ -513,7 +517,7 @@ public class TeleatlasConverter45v101 {
 		new NetworkWriteAsTable(outputDir.toString()).run(scenario.getNetwork());
 
 		log.info("fix double links...");
-		new NetworkDoubleLinks("d").run((NetworkImpl)scenario.getNetwork());
+		new NetworkDoubleLinks("d").run((Network)scenario.getNetwork());
 
 		log.info("write final version of network...");
 		outputDir = new File(outdir+"/final");

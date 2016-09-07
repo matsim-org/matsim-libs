@@ -39,6 +39,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -73,10 +76,7 @@ import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeC
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -148,7 +148,7 @@ public class ScenarioBuilderTry {
 					  databaseFilesDir + "comunas.csv");
 		
 		Scenario scenarioFromEOD = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenarioFromEOD).readFile(outputDir + "plans/plans_eod.xml.gz");
+		new PopulationReader(scenarioFromEOD).readFile(outputDir + "plans/plans_eod.xml.gz");
 		Population popFromEOD = scenarioFromEOD.getPopulation();
 		
 		//removing all persons with less than 3 plan elements (e.g. "latent demand")
@@ -168,8 +168,8 @@ public class ScenarioBuilderTry {
 		log.info("persons with A0 non equal to AX (and AX ending before midnight): " + populationMap.get(popA0neAX).getPersons().size());
 		
 		Scenario scenarioTmp = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenarioTmp).readFile(outputDir + "plans/plans_A0eAx_coords.xml.gz");
-		new MatsimPopulationReader(scenarioTmp).readFile(outputDir + "plans/plans_A0neAx_coords_beforeMidnight.xml.gz");
+		new PopulationReader(scenarioTmp).readFile(outputDir + "plans/plans_A0eAx_coords.xml.gz");
+		new PopulationReader(scenarioTmp).readFile(outputDir + "plans/plans_A0neAx_coords_beforeMidnight.xml.gz");
 		
 		//define meaningful population for scoring and meaningful (= stated) typical durations
 		ActivityClassifierTry aap = new ActivityClassifierTry(scenarioTmp);
@@ -491,7 +491,7 @@ public class ScenarioBuilderTry {
 		counts.setDistanceFilter(null);
 		counts.setDistanceFilterCenterNode(null);
 		counts.setFilterModes(false);
-		counts.setCountsFileName(pathForMatsim + "input/counts_merged_VEH_C01.xml");
+		counts.setInputFile(pathForMatsim + "input/counts_merged_VEH_C01.xml");
 		counts.setOutputFormat("all");
 		counts.setWriteCountsInterval(writeStuffInterval);
 	}
@@ -960,7 +960,7 @@ public class ScenarioBuilderTry {
 			private Population cutPlansTo24H(Population population){
 				Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 				Population populationOut = scenario.getPopulation();
-				PopulationFactoryImpl popFactory = (PopulationFactoryImpl)populationOut.getFactory();
+				PopulationFactory popFactory = (PopulationFactory)populationOut.getFactory();
 				
 				for(Person person : population.getPersons().values()){
 					
@@ -1058,7 +1058,7 @@ public class ScenarioBuilderTry {
 				} else {
 					log.info("Adding freight population to O-D based population");
 					Scenario scenarioFreight = ScenarioUtils.createScenario(ConfigUtils.createConfig());	
-					new MatsimPopulationReader(scenarioFreight).readFile(freightPlansFile.toString());
+					new PopulationReader(scenarioFreight).readFile(freightPlansFile.toString());
 					for (Person person : scenarioFreight.getPopulation().getPersons().values()){
 						populationOut.addPerson(person);
 					}

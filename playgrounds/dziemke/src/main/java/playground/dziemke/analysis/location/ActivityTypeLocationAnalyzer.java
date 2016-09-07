@@ -16,10 +16,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReaderMatsimV5;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
@@ -57,7 +56,7 @@ public class ActivityTypeLocationAnalyzer {
 
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
+		PopulationReader reader = new PopulationReader(scenario);
 		reader.readFile(INPUT_PLANS_FILE);
 		Population population = scenario.getPopulation();
 		

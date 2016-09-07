@@ -12,16 +12,17 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -66,13 +67,13 @@ public class MinTravelCostsModel extends RetailerModelImpl
     findScenarioShops(this.controlerFacilities.getFacilities().values());
     Gbl.printMemoryUsage();
     for (Person pi : this.persons.values()) {
-      PersonRetailersImpl pr = new PersonRetailersImpl((PersonImpl) pi);
+      PersonRetailersImpl pr = new PersonRetailersImpl((Person) pi);
       this.retailersPersons.put(pr.getId(), pr);
     }
     Utils.setPersonPrimaryActivityQuadTree(Utils.createPersonPrimaryActivityQuadTree(this.controler));
     Utils.setShopsQuadTree(Utils.createShopsQuadTree(this.controler));
 
-      RouteFactoryImpl routeFactory = ((PopulationFactoryImpl) this.controler.getScenario().getPopulation().getFactory()).getRouteFactory();
+      RouteFactories routeFactory = ((PopulationFactory) this.controler.getScenario().getPopulation().getFactory()).getRouteFactories();
     
     for (Integer i = Integer.valueOf(0); i.intValue() < first.size(); i = Integer.valueOf(i.intValue() + 1)) {
       String linkId = this.first.get(i);
@@ -91,7 +92,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
 
         //PlansCalcRoute pcr = new PlansCalcRoute(this.services.getConfig().plansCalcRoute(), network, travelCost, travelTime, this.services.getLeastCostPathCalculatorFactory(), routeFactory);
 
-        LegImpl li = new LegImpl(TransportMode.car);
+        Leg li = PopulationUtils.createLeg(TransportMode.car);
         li.setDepartureTime(0.0D);
         //log.info("fromLink " + link);
         //log.info("toLink " + (Link)this.controler.getNetwork().getLinks().get(ppa.getActivityLinkId()));
@@ -116,7 +117,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
 
   private double getLegScore(Leg leg, ScoringFunction function)
   {
-	  if ((leg instanceof LegImpl))
+	  if ((leg instanceof Leg))
 	    {
 	      function.handleLeg(leg);
 	    }
@@ -162,7 +163,8 @@ public class MinTravelCostsModel extends RetailerModelImpl
 
     leg.setDepartureTime(depTime);
     leg.setTravelTime(travTime);
-    ((LegImpl)leg).setArrivalTime(depTime + travTime);
+Leg r = ((Leg)leg);
+    r.setTravelTime( depTime + travTime - r.getDepartureTime() );
     return travTime;
   }
 

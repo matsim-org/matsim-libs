@@ -1,5 +1,6 @@
 package playground.jbischoff.taxibus.run.configuration;
 
+import java.net.URL;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -29,7 +30,11 @@ public class TaxibusConfigGroup extends ConfigGroup {
 	private static final String BALANCING = "balanceLines";
 	private static final String VEHICLESONDISPATCH = "vehiclesDispatchedAtSameTime";
 	private static final String DISTANCEMEASURE = "distanceCalculationCostCriteria";
+	
 	private static final String PREBOOK = "prebookTrips";
+	
+	private static final String DESTINATIONID = "commonDestinationLinkId";
+	
 	
 
 	private String taxiIdentifier = "taxibus";
@@ -52,6 +57,8 @@ public class TaxibusConfigGroup extends ConfigGroup {
 	private String linesFile = null;
 	private String zonesShpFile = null;
 	private String zonesXmlFile = null;
+	
+	private String destinationLinkId = null;
 
 	private String balancingMethod = "return";
 
@@ -96,7 +103,10 @@ public class TaxibusConfigGroup extends ConfigGroup {
 			this.detourFactor = Double.parseDouble(value);
 		} else if (PREBOOK.equals(key)) {
 			this.prebookTrips= Boolean.parseBoolean(value);
+		}  else if (DESTINATIONID.equals(key)) {
+			this.destinationLinkId = value ;
 		}
+		
 		else {
 			log.error("unknown parameter: " + key + "...");
 		}
@@ -121,6 +131,7 @@ public class TaxibusConfigGroup extends ConfigGroup {
 		map.put(VEHCAP, Integer.toString(vehCap));
 		map.put(DETOURFACTOR, Double.toString(detourFactor));
 		map.put(PREBOOK, Boolean.toString(prebookTrips));
+		map.put(DESTINATIONID, destinationLinkId);
 		return map;
 
 	}
@@ -143,6 +154,7 @@ public class TaxibusConfigGroup extends ConfigGroup {
 		map.put(DISTANCEMEASURE, "Mode in which distance is measured. One of: beeline, earliestArrival");
 		map.put(VEHICLESONDISPATCH, "Number of vehicles dispatched at the same time - per line");
 		map.put(VEHCAP, "Vehicle capacity per vehicle.");
+		map.put(DESTINATIONID, "Common destination link id for statebased optimizer");
 
 		return map;
 	}
@@ -151,9 +163,17 @@ public class TaxibusConfigGroup extends ConfigGroup {
 		return taxiIdentifier;
 	}
 
-	public String getVehiclesFile() {
-		return vehiclesFile;
+	/**
+	 * @return the destinationLinkId
+	 */
+	public String getDestinationLinkId() {
+		return destinationLinkId;
 	}
+	
+	public URL getVehiclesFileUrl(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.vehiclesFile);
+	}
+	
 
 	public String getRanksFile() {
 		return ranksFile;
@@ -183,18 +203,17 @@ public class TaxibusConfigGroup extends ConfigGroup {
 		return otfvis;
 	}
 
-	public String getLinesFile() {
-		return linesFile;
+	public URL getLinesFileUrl(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.linesFile);
+	}	
+
+	public URL getZonesShpFileUrl(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.zonesShpFile);
 	}
 
-	public String getZonesShpFile() {
-		return zonesShpFile;
+	public URL getZonesXmlFileUrl(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.zonesXmlFile);
 	}
-
-	public String getZonesXmlFile() {
-		return zonesXmlFile;
-	}
-
 	public String getBalancingMethod() {
 		return balancingMethod;
 	};

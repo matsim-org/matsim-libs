@@ -15,9 +15,8 @@ import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.opengis.referencing.FactoryException;
@@ -86,7 +85,7 @@ public class IsochronesUI extends UI {
                 public void dragEnd(LMarker.DragEndEvent dragEndEvent) {
                     try {
                         Point point = (Point) JTS.transform(origin.getGeometry(), coordinateTransformation.inverse());
-                        Node nearestNode = ((NetworkImpl) network).getNearestNode(MGC.coordinate2Coord(point.getCoordinate()));
+                        Node nearestNode = NetworkUtils.getNearestNode(((Network) network),MGC.coordinate2Coord(point.getCoordinate()));
                         compute(nearestNode);
                     } catch (TransformException e) {
                         throw new RuntimeException(e);

@@ -11,9 +11,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.*;
@@ -94,7 +97,7 @@ public class BlnPlansGenerator {
 //			log.info("Start generating persons...");
 		for (String[] data : personData) {
 
-			Person person = PopulationUtils.createPerson(Id.create(data[0], Person.class));
+			Person person = PopulationUtils.getFactory().createPerson(Id.create(data[0], Person.class));
 			personList.put(person.getId(), person);
 
 			// approximation: yearOfSurvey - yearOfBirth
@@ -293,13 +296,13 @@ public class BlnPlansGenerator {
 				curPlan = curPerson.getSelectedPlan();
 			}
 
-			ActivityImpl lastAct = null;
+			Activity lastAct = null;
 
 			for (Iterator<String[]> iterator = curTripList.iterator(); iterator.hasNext();) {
 				String[] tripEntry = iterator.next();
 
 				// Read Activity from survey
-				ActivityImpl newAct = new ActivityImpl(this.getActType(tripEntry), new Coord(Double.parseDouble(tripEntry[11]), Double.parseDouble(tripEntry[12])));
+				Activity newAct = PopulationUtils.createActivityFromCoord(this.getActType(tripEntry), new Coord(Double.parseDouble(tripEntry[11]), Double.parseDouble(tripEntry[12])));
 
 				Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMM);
 
@@ -457,13 +460,13 @@ public class BlnPlansGenerator {
 		return actType;
 	}
 
-	private LegImpl createLeg(String[] tripData){
+	private Leg createLeg(String[] tripData){
 
-		LegImpl leg = null;
+		Leg leg = null;
 
 		if(BlnPlansGenerator.setAllLegsToCar == true){
 
-			leg = new LegImpl(TransportMode.car);
+			leg = PopulationUtils.createLeg(TransportMode.car);
 			this.modalSplit[3]++;
 
 		} else {
@@ -471,7 +474,7 @@ public class BlnPlansGenerator {
 			switch (Integer.parseInt(tripData[48])) {
 			case 0:
 				// "keine Angabe"
-				leg = new LegImpl("undefined");
+				leg = PopulationUtils.createLeg("undefined");
 				this.modalSplit[0]++;
 				break;
 			case 1:
@@ -479,42 +482,42 @@ public class BlnPlansGenerator {
 //				leg = new LegImpl(TransportMode.pt);
 //				this.modalSplit[4]++;
 //				break;
-				leg = new LegImpl(TransportMode.walk);
+				leg = PopulationUtils.createLeg(TransportMode.walk);
 				this.modalSplit[1]++;
 				break;
 			case 2:
 				// "Rad"
-				leg = new LegImpl(TransportMode.bike);
+				leg = PopulationUtils.createLeg(TransportMode.bike);
 				this.modalSplit[2]++;
 				break;
 			case 3:
 				// "MIV" TODO [an] BasicLeg.Mode.miv cannot be handled by PersonPrepareForSim.1
-				leg = new LegImpl(TransportMode.car);
+				leg = PopulationUtils.createLeg(TransportMode.car);
 				this.modalSplit[3]++;
 				break;
 			case 4:
 				// "OEV"
-				leg = new LegImpl(TransportMode.pt);
+				leg = PopulationUtils.createLeg(TransportMode.pt);
 				this.modalSplit[4]++;
 				break;
 			case 5:
 				// "Rad/OEV"
-				leg = new LegImpl(TransportMode.pt);
+				leg = PopulationUtils.createLeg(TransportMode.pt);
 				this.modalSplit[5]++;
 				break;
 			case 6:
 				// "IV/OEV"
-				leg = new LegImpl(TransportMode.pt);
+				leg = PopulationUtils.createLeg(TransportMode.pt);
 				this.modalSplit[6]++;
 				break;
 			case 7:
 				// "sonstiges"
-				leg = new LegImpl("undefined");
+				leg = PopulationUtils.createLeg("undefined");
 				this.modalSplit[7]++;
 				break;
 			default:
 				log.error("transport mode not defined");
-			leg = new LegImpl(TransportMode.walk);
+			leg = PopulationUtils.createLeg(TransportMode.walk);
 			this.modalSplit[8]++;
 			}
 

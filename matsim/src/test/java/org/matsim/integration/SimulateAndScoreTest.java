@@ -39,19 +39,17 @@ import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterModule;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.*;
@@ -155,11 +153,11 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		transitSchedule.addStopFacility(stop3);
 		transitSchedule.addTransitLine(line1);
 
-		PopulationFactoryImpl populationFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+		PopulationFactory populationFactory = (PopulationFactory) scenario.getPopulation().getFactory();
 		Person person = populationFactory.createPerson(Id.create("0", Person.class));
 		Plan plan = populationFactory.createPlan();
 		Activity a1 = populationFactory.createActivityFromCoord("h", link1.getCoord());
-		((ActivityImpl) a1).setLinkId(link1.getId());
+		((Activity) a1).setLinkId(link1.getId());
 
 		a1.setEndTime(3);
 		plan.addActivity(a1);
@@ -174,14 +172,14 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 				install(new TripRouterModule());
 				install(new TravelTimeCalculatorModule());
 				install(new EventsManagerModule());
-				addTravelDisutilityFactoryBinding("car").toInstance(new Builder( TransportMode.car, config.planCalcScore() ));
+				addTravelDisutilityFactoryBinding("car").toInstance(new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ));
 			}
 		});
 		final TripRouter tripRouter = injector.getInstance(TripRouter.class);
 		final PlanAlgorithm plansCalcRoute = new PlanRouter(tripRouter);
 
 		Activity a2 = populationFactory.createActivityFromCoord("w", link3.getCoord());
-		((ActivityImpl) a2).setLinkId(link3.getId());
+		((Activity) a2).setLinkId(link3.getId());
 		plan.addActivity(a2);
 
 
@@ -230,7 +228,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		network.addLink(link1);
 		network.addLink(link2);
 		network.addLink(link3);
-		PopulationFactoryImpl populationFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+		PopulationFactory populationFactory = (PopulationFactory) scenario.getPopulation().getFactory();
 		Person person = populationFactory.createPerson(Id.create("0", Person.class));
 		Plan plan = populationFactory.createPlan();
 		Activity a1 = populationFactory.createActivityFromLinkId("h", link1.getId());
@@ -238,7 +236,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		plan.addActivity(a1);
 
 		Leg leg = populationFactory.createLeg(TransportMode.pt);
-		Route ptRoute = populationFactory.createRoute(Route.class, link1.getId(), link3.getId());
+		Route ptRoute = populationFactory.getRouteFactories().createRoute(Route.class, link1.getId(), link3.getId());
 		ptRoute.setTravelTime(3600);
         ptRoute.setDistance(1000);
 		leg.setRoute(ptRoute);

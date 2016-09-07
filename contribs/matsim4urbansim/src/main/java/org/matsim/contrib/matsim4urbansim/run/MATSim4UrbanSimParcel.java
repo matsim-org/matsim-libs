@@ -33,11 +33,15 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.accessibility.AccessibilityCalculator;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.accessibility.gis.GridUtils;
+import org.matsim.contrib.accessibility.gis.SpatialGrid;
+import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
@@ -45,6 +49,7 @@ import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtModule;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
+import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4urbansim.config.Matsim4UrbansimConfigGroup;
@@ -57,13 +62,14 @@ import org.matsim.contrib.matsim4urbansim.utils.io.BackupMATSimOutput;
 import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
 import org.matsim.contrib.matsim4urbansim.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimParcelCSVWriterListener;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.*;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
@@ -71,6 +77,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -311,8 +320,10 @@ class MATSim4UrbanSimParcel{
 						if ( pe instanceof Leg ) {
 							Leg leg = (Leg) pe ;
 							if ( leg.getMode().equals(TransportMode.pt) ) {
-								Activity fromAct = ((PlanImpl)plan).getPreviousActivity(leg) ;
-								Activity toAct = ((PlanImpl)plan).getNextActivity(leg) ;
+								final Leg leg2 = leg;
+								Activity fromAct = PopulationUtils.getPreviousActivity(((Plan)plan), leg2) ;
+								final Leg leg1 = leg;
+								Activity toAct = PopulationUtils.getNextActivity(((Plan)plan), leg1) ;
 								Route route = leg.getRoute() ;
 								route.setDistance( ptMatrix.getPtTravelDistance_meter(fromAct.getCoord(), toAct.getCoord()) ) ;
 							}
@@ -397,24 +408,66 @@ class MATSim4UrbanSimParcel{
 						@Override
 						public ControlerListener get() {
 							// initializing grid based accessibility controler listener
-							GridBasedAccessibilityControlerListenerV3 gbacl =
-									new GridBasedAccessibilityControlerListenerV3( opportunities, ptMatrix, scenario.getConfig(), scenario, travelTimes, travelDisutilityFactories);
-							gbacl.setUrbansimMode(true);
-
-							for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-								gbacl.setComputingAccessibilityForMode(mode, true);
-							}
-							if ( ptMatrix==null ) {
-								gbacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
-								// somewhat stupid fix. kai, jan'2015
-							}
-
+							GridBasedAccessibilityShutdownListenerV3 gbacl;
 							if(computeGridBasedAccessibilitiesUsingShapeFile) {
-								gbacl.generateGridsAndMeasuringPointsByShapeFile(shapeFile, cellSizeInMeter);
+								Geometry boundary = GridUtils.getBoundary(shapeFile);
+								Envelope env = boundary.getEnvelopeInternal();
+								double xMin = env.getMinX();
+								double xMax = env.getMaxX();
+								double yMin = env.getMinY();
+								double yMax = env.getMaxY();
+								Config config = scenario.getConfig();
+								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
+								log.info("Using custom bounding box to determine the area for accessibility computation.");
+
+								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, travelTimes, travelDisutilityFactories, xMin, xMax, yMin, yMax, cellSizeInMeter);
+								accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSizeInMeter));
+
+								gbacl.setUrbansimMode(true);
+
+								for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+									accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
+								}
+								if ( ptMatrix==null ) {
+									accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
+									// somewhat stupid fix. kai, jan'2015
+								}
 							} else if(computeGridBasedAccessibilityUsingBoundingBox) {
-								gbacl.generateGridsAndMeasuringPointsByCustomBoundary(nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
+								Config config = scenario.getConfig();
+								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
+								accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter));
+
+								log.info("Using custom bounding box to determine the area for accessibility computation.");
+								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, travelTimes, travelDisutilityFactories, nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
+								gbacl.setUrbansimMode(true);
+
+								for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+									accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
+								}
+								if ( ptMatrix==null ) {
+									accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
+									// somewhat stupid fix. kai, jan'2015
+								}
 							} else {
-								gbacl.generateGridsAndMeasuringPointsByNetwork(cellSizeInMeter);
+								Config config = scenario.getConfig();
+								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
+								accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter));
+
+								log.info("Using the boundary of the network file to determine the area for accessibility computation.");
+								log.warn("This could lead to memory issues when the network is large and/or the cell size is too fine!");
+								if (cellSizeInMeter <= 0) {
+									throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
+								}
+								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, travelTimes, travelDisutilityFactories,nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
+								gbacl.setUrbansimMode(true);
+
+								for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+									accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
+								}
+								if ( ptMatrix==null ) {
+									accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
+									// somewhat stupid fix. kai, jan'2015
+								}
 							}
 
 							if(isParcelMode){

@@ -152,7 +152,7 @@ public class SpatialAveragingDemandEmissions {
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
 		this.emissionHandler = new EmissionsPerLinkAndTimeIntervalEventHandler(network.getLinks(), this.simulationEndTime, inputData.getNoOfTimeBins(), inputData.getPollutant2analyze());
 		eventsManager.addHandler(emissionHandler);
-		emissionReader.parse(emissionFile);
+		emissionReader.readFile(emissionFile);
 	}
 
 	private void writeOutput(SpatialGrid sGrid, Double endOfTimeInterval)

@@ -13,8 +13,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -30,17 +30,17 @@ public class TripAnalyzerExtended {
 	public static final Logger log = Logger.getLogger(TripAnalyzerExtended.class);
 	
 	/* Parameters */
-	private static final String runId = "run_146c";
-	private static final String usedIteration = "150"; // most frequently used value: 150
+	private static final String runId = "run_200";	// <----------
+	private static final String usedIteration = "300"; // most frequently used value: 150 // <----------
 	private static final String cemdapPersonsInputFileId = "21"; // check if this number corresponds correctly to the runId
 	
 	private static final Integer planningAreaId = 11000000; // 11000000 = Berlin
 
-	private static final boolean onlyCar = false; // "car"; should be used for runs with ChangeLegMode enabled
+	private static final boolean onlyCar = true; // "car"; should be used for runs with ChangeLegMode enabled
 	private static final boolean onlyInterior = false; // "int"
-	private static final boolean onlyBerlinBased = true; // "ber"; usually varied for analysis
+	private static final boolean onlyBerlinBased = true; // "ber"; usually varied for analysis // <----------
 	
-	private static final boolean distanceFilter = true; // "dist"; usually varied for analysis
+	private static final boolean distanceFilter = true; // "dist"; usually varied for analysis // <----------
 	// private static final double double minDistance = 0;
 	private static final double maxDistance_km = 100;
 
@@ -56,7 +56,8 @@ public class TripAnalyzerExtended {
 	private static final int binWidthSpeed_km_h = 1;
 
 	/* Input and output */
-	private static final String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+	private static final String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml"; // <----------
+//	private static final String networkFile = "../../../shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.final.xml.gz"; // <----------
 	private static final String eventsFile = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + 
 			"/" + runId + "." + usedIteration + ".events.xml.gz";
 	private static final String cemdapPersonsInputFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/" + 
@@ -211,9 +212,7 @@ public class TripAnalyzerExtended {
 			outputDirectory = outputDirectory + "_age_" + minAge.toString();
 			outputDirectory = outputDirectory + "_" + maxAge.toString();
 		}
-		outputDirectory = outputDirectory + "_9"; // TODO in case used for double-check
-		
-		/* Create directory */
+		outputDirectory = outputDirectory + "_2";
 		new File(outputDirectory).mkdir();
 	}
 	

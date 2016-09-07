@@ -30,18 +30,19 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * Checks whether a plan contains car trips. If car trips are found, it is
@@ -167,7 +168,7 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 					// if the route is null, create a new one
 					if (leg.getRoute() == null) {
 						
-						PlanImpl newPlan = new PlanImpl(plan.getPerson());
+						Plan newPlan = PopulationUtils.createPlan(plan.getPerson());
 						newPlan.addActivity(previousActivity);
 						newPlan.addLeg(leg);
 						newPlan.addActivity(nextActivity);
@@ -176,8 +177,8 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 							ActivityFacility prevActivityFacility = facilities.get(previousActivity.getFacilityId());
 							ActivityFacility nextActivityFacility = facilities.get(nextActivity.getFacilityId());
 							
-							((ActivityImpl) previousActivity).setLinkId(prevActivityFacility.getLinkId());
-							((ActivityImpl) nextActivity).setLinkId(nextActivityFacility.getLinkId());
+							((Activity) previousActivity).setLinkId(prevActivityFacility.getLinkId());
+							((Activity) nextActivity).setLinkId(nextActivityFacility.getLinkId());
 						}
 						
 						synchronized(routingAlgorithm){

@@ -26,13 +26,13 @@ import org.apache.log4j.Logger;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.counts.Count;
@@ -149,7 +149,7 @@ public class Bast2Counts {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(netFile);
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		
 		
 		logger.info("Linking bast counts...");
@@ -168,7 +168,7 @@ public class Bast2Counts {
 			Point direct1 = factory.createPoint(new Coordinate(data.xDirection1, data.yDirection1));
 			Point direct2 = factory.createPoint(new Coordinate(data.xDirection2, data.yDirection2));
 			
-			Link link1 = network.getNearestLinkExactly(MatsimCoordUtils.pointToCoord(countPos));
+			Link link1 = NetworkUtils.getNearestLinkExactly(network,MatsimCoordUtils.pointToCoord(countPos));
 			Node toNode = link1.getToNode();
 			double dist1 = CoordUtils.calcEuclideanDistance(toNode.getCoord(), MatsimCoordUtils.pointToCoord(direct1));
 			double dist2 = CoordUtils.calcEuclideanDistance(toNode.getCoord(), MatsimCoordUtils.pointToCoord(direct2));
@@ -223,7 +223,7 @@ public class Bast2Counts {
 		}
 	}
 	
-	private static Link getReturnLink(Link link, NetworkImpl network) {
+	private static Link getReturnLink(Link link, Network network) {
 		Collection<Node> fromNodes = getNearestNodes(link.getToNode(), network);
 		Collection<Node> toNodes = getNearestNodes(link.getFromNode(), network);
 		
@@ -239,15 +239,17 @@ public class Bast2Counts {
 		return null;
 	}
 	
-	private static Collection<Node> getNearestNodes(Node node, NetworkImpl network) {
+	private static Collection<Node> getNearestNodes(Node node, Network network) {
 		double delta = 10;
 		double step = 10;
 		double minsize = 5;
+		final double distance = delta;
 		
-		Collection<Node> nodes = network.getNearestNodes(node.getCoord(), delta);
+		Collection<Node> nodes = NetworkUtils.getNearestNodes(network,node.getCoord(), distance);
 		while(nodes.size() < minsize) {
 			delta += step;
-			nodes = network.getNearestNodes(node.getCoord(), delta);
+			final double distance1 = delta;
+			nodes = NetworkUtils.getNearestNodes(network,node.getCoord(), distance1);
 		}
 //		nodes.remove(node);
 		

@@ -3,9 +3,9 @@ package playground.wrashid.parkingSearch.planLevel.strc2010;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.wrashid.lib.GlobalRegistry;
@@ -39,7 +39,7 @@ public class Run18 {
 		return new ParkingFacilityAttributPersonPreferences() {
 			@Override
 			public ParkingAttribute getParkingFacilityAttributPreferencesOfPersonForActivity(
-					Id<Person> personId, ActivityImpl activity) {
+					Id<Person> personId, Activity activity) {
 				if (belongsToElectricVehilcleOwnerGroup(personId)) {
 					return ParkingAttribute.HAS_DEFAULT_ELECTRIC_PLUG;
 				} else {

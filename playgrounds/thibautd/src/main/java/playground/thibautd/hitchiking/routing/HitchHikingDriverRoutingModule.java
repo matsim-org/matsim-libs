@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
@@ -109,7 +109,7 @@ public class HitchHikingDriverRoutingModule implements RoutingModule {
 
 	private List<? extends PlanElement> createTrip(
 			final HitchHikingDriverRoute r) {
-		Leg leg = new LegImpl( HitchHikingConstants.DRIVER_MODE );
+		Leg leg = PopulationUtils.createLeg(HitchHikingConstants.DRIVER_MODE);
 		leg.setRoute( r );
 		return Arrays.asList( leg );
 	}

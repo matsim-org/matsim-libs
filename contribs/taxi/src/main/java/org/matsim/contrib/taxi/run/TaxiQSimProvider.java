@@ -21,20 +21,18 @@ package org.matsim.contrib.taxi.run;
 
 import java.util.Collection;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.scheduler.*;
-import org.matsim.contrib.taxi.util.stats.*;
-import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
-import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.router.util.*;
@@ -47,28 +45,31 @@ import com.google.inject.name.Named;
 public class TaxiQSimProvider
     implements Provider<Mobsim>
 {
-    private final MatsimServices matsimServices;
+    private final EventsManager eventsManager;
     private final Collection<AbstractQSimPlugin> plugins;
 
-    private final TaxiData taxiData;
-    private final TravelTime travelTime;
+    protected final Scenario scenario;
+    protected final TaxiData taxiData;
+    protected final TravelTime travelTime;
 
-    private final TaxiConfigGroup taxiCfg;
-    private final VehicleType vehicleType;
-    private final TaxiOptimizerFactory optimizerFactory;
+    protected final TaxiConfigGroup taxiCfg;
+    private final VehicleType vehicleType;//TODO resolve this by subclassing (without guice)??
+    private final TaxiOptimizerFactory optimizerFactory;//TODO resolve this by subclassing (without guice)??
 
 
     @Inject
-    public TaxiQSimProvider(MatsimServices matsimServices, Collection<AbstractQSimPlugin> plugins,
-            TaxiData taxiData, @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime,
-            TaxiConfigGroup taxiCfg, @Named(TaxiModule.TAXI_MODE) VehicleType vehicleType,
+    public TaxiQSimProvider(EventsManager eventsManager, Collection<AbstractQSimPlugin> plugins,
+            Scenario scenario, TaxiData taxiData,
+            @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime,
+            @Named(TaxiModule.TAXI_MODE) VehicleType vehicleType,
             TaxiOptimizerFactory optimizerFactory)
     {
-        this.matsimServices = matsimServices;
+        this.eventsManager = eventsManager;
         this.plugins = plugins;
+        this.scenario = scenario;
         this.taxiData = taxiData;
         this.travelTime = travelTime;
-        this.taxiCfg = taxiCfg;
+        this.taxiCfg = TaxiConfigGroup.get(scenario.getConfig());
         this.vehicleType = vehicleType;
         this.optimizerFactory = optimizerFactory;
     }
@@ -77,12 +78,7 @@ public class TaxiQSimProvider
     @Override
     public Mobsim get()
     {
-        if (taxiCfg.isVehicleDiversion() && taxiCfg.isOnlineVehicleTracker()) {
-            throw new IllegalStateException("Diversion requires online tracking");
-        }
-
-        QSim qSim = QSimUtils.createQSim(matsimServices.getScenario(), matsimServices.getEvents(),
-                plugins);
+        QSim qSim = QSimUtils.createQSim(scenario, eventsManager, plugins);
 
         TaxiOptimizer optimizer = createTaxiOptimizer(qSim);
         qSim.addQueueSimulationListeners(optimizer);
@@ -95,34 +91,32 @@ public class TaxiQSimProvider
                 vehicleType);
         qSim.addAgentSource(agentSource);
 
-        addTimeProfileCollector(qSim);
         return qSim;
     }
 
 
-    private TaxiOptimizer createTaxiOptimizer(QSim qSim)
+    protected TaxiOptimizer createTaxiOptimizer(QSim qSim)
     {
         TaxiSchedulerParams schedulerParams = new TaxiSchedulerParams(taxiCfg);
         TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
-        TaxiScheduler scheduler = new TaxiScheduler(matsimServices.getScenario(), taxiData,
-                qSim.getSimTimer(), schedulerParams, travelTime, travelDisutility);
+        TaxiScheduler scheduler = new TaxiScheduler(scenario, taxiData, qSim.getSimTimer(),
+                schedulerParams, travelTime, travelDisutility);
 
-        TaxiOptimizerContext optimContext = new TaxiOptimizerContext(taxiData, matsimServices,
-                qSim.getSimTimer(), travelTime, travelDisutility, scheduler);
+        TaxiOptimizerContext optimContext = new TaxiOptimizerContext(taxiData,
+                scenario.getNetwork(), qSim.getSimTimer(), travelTime, travelDisutility, scheduler);
         return optimizerFactory.createTaxiOptimizer(optimContext,
                 taxiCfg.getOptimizerConfigGroup());
     }
 
 
-    private PassengerEngine createPassengerEngine(TaxiOptimizer optimizer)
+    protected PassengerEngine createPassengerEngine(TaxiOptimizer optimizer)
     {
-        return new PassengerEngine(TaxiModule.TAXI_MODE, matsimServices.getEvents(),
-                new TaxiRequestCreator(), optimizer, taxiData,
-                matsimServices.getScenario().getNetwork());
+        return new PassengerEngine(TaxiModule.TAXI_MODE, eventsManager, new TaxiRequestCreator(),
+                optimizer, taxiData, scenario.getNetwork());
     }
 
 
-    private VrpAgentSource createVrpAgentSource(TaxiOptimizer optimizer, QSim qSim,
+    protected VrpAgentSource createVrpAgentSource(TaxiOptimizer optimizer, QSim qSim,
             PassengerEngine passengerEngine, VehicleType vehicleType)
     {
         LegCreator legCreator = taxiCfg.isOnlineVehicleTracker() ? //
@@ -131,22 +125,5 @@ public class TaxiQSimProvider
         TaxiActionCreator actionCreator = new TaxiActionCreator(passengerEngine, legCreator,
                 taxiCfg.getPickupDuration());
         return new VrpAgentSource(actionCreator, taxiData, optimizer, qSim, vehicleType);
-    }
-
-
-    //TODO move outside QSimProvider
-    private void addTimeProfileCollector(QSim qSim)
-    {
-        if (taxiCfg.getTimeProfiles()) {
-            ProfileCalculator<String> dispatchStatsCalc = TimeProfiles.combineProfileCalculators(
-                    TimeProfiles.createCurrentTaxiTaskOfTypeCounter(taxiData), //
-                    TimeProfiles.createRequestsWithStatusCounter(taxiData,
-                            TaxiRequestStatus.UNPLANNED));
-
-            qSim.addQueueSimulationListeners(new TimeProfileCollector<>(dispatchStatsCalc, 300,
-                    TimeProfiles.TAXI_TASK_TYPES_HEADER + //
-                            TaxiRequestStatus.UNPLANNED, //
-                    matsimServices));
-        }
     }
 }

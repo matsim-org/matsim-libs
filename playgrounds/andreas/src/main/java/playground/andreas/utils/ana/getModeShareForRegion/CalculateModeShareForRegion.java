@@ -27,18 +27,18 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -75,8 +75,8 @@ public class CalculateModeShareForRegion {
 			Leg lastLeg = null;
 			
 			for (PlanElement plan_element : plan.getPlanElements()) {
-				if (plan_element instanceof ActivityImpl){
-					ActivityImpl act = (ActivityImpl) plan_element;
+				if (plan_element instanceof Activity){
+					Activity act = (Activity) plan_element;
 					
 					boolean currentActWithinArea = checkIsSourceArea(act);
 					
@@ -124,7 +124,7 @@ public class CalculateModeShareForRegion {
 					lastActWithinArea = currentActWithinArea;
 				}
 				
-				if (plan_element instanceof LegImpl){
+				if (plan_element instanceof Leg){
 					Leg leg = (Leg) plan_element;
 					
 					lastLeg = leg;
@@ -154,7 +154,7 @@ public class CalculateModeShareForRegion {
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();
-		PopulationReader popReader = new MatsimPopulationReader(sc);
+		MatsimReader popReader = new PopulationReader(sc);
 		popReader.readFile(inPlansFile);
 
 		CalculateModeShareForRegion dp = new CalculateModeShareForRegion(minSourceCoord, maxSourceCoord);

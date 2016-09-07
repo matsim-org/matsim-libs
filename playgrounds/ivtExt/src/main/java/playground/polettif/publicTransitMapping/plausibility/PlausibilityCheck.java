@@ -18,17 +18,14 @@
 
 package playground.polettif.publicTransitMapping.plausibility;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -43,44 +40,43 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.utils.TransitScheduleValidator;
 import org.opengis.feature.simple.SimpleFeature;
-import org.xml.sax.SAXException;
 import playground.polettif.publicTransitMapping.plausibility.log.*;
 import playground.polettif.publicTransitMapping.tools.*;
-import playground.polettif.publicTransitMapping.tools.ScheduleShapeFileWriter;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
-import static playground.polettif.publicTransitMapping.tools.CoordTools.getAzimuthDiff;
-import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getLinkIds;
+import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getTransitRouteLinkIds;
 
 /**
  * Performs a plausibility check on the given schedule
- * and network.
+ * and network. Checks for three implausibilities:
+ * <ul>
+ *     <li>loops</li>
+ *     <li>travel time</li>
+ *     <li>direction changes</li>
+ * </ul>
  *
  * @author polettif
  */
 public class PlausibilityCheck {
 
-	protected static Logger log = Logger.getLogger(PlausibilityCheck.class);
+	protected static final Logger log = Logger.getLogger(PlausibilityCheck.class);
 
 	public static final String CsvSeparator = ";";
 
 	private static final double PI = Math.PI;
-	private static final double PI2 = 2 * Math.PI;
 
 	public static final String TRAVEL_TIME_WARNING = "TravelTimeWarning";
 	public static final String LOOP_WARNING = "LoopWarning";
 	public static final String DIRECTION_CHANGE_WARNING = "DirectionChangeWarning";
 
-	private Set<PlausibilityWarning> allWarnings = new HashSet<>();
-	private Map<TransitLine, Map<TransitRoute, Set<PlausibilityWarning>>> warningsSchedule = new HashMap<>();
-	private Map<List<Id<Link>>, Set<PlausibilityWarning>> warningsLinkIds = new HashMap<>();
-	private Map<Id<Link>, Set<PlausibilityWarning>> warningsLinks = new HashMap<>();
+	private final Set<PlausibilityWarning> allWarnings = new HashSet<>();
+	private final Map<TransitLine, Map<TransitRoute, Set<PlausibilityWarning>>> warningsSchedule = new HashMap<>();
+	private final Map<List<Id<Link>>, Set<PlausibilityWarning>> warningsLinkIds = new HashMap<>();
+	private final Map<Id<Link>, Set<PlausibilityWarning>> warningsLinks = new HashMap<>();
 
 	private Map<String, Double> thresholds;
 
@@ -110,11 +106,27 @@ public class PlausibilityCheck {
 
 	/**
 	 * Performs a plausibility check on the given schedule and network files
-	 * and writes the results to the output folder.
-	 * @param scheduleFile
-	 * @param networkFile
+	 * and writes the results to the output folder. The following files are
+	 * created in the ouput folder:
+	 * <ul>
+	 * 	<li>allPlausibilityWarnings.csv: shows all plausibility warnings in a csv file</li>
+	 * 	<li>stopfacilities.csv: the number of child stop facilities for all stop facilities as csv</li>
+	 * 	<li>stopfacilities_histogram.png: a histogram as png showing the number of child stop facilities</li>
+	 * 	<li>shp/warnings/WarningsLoops.shp: Loops warnings as polyline shapefile</li>
+	 * 	<li>shp/warnings/WarningsTravelTime.shp: Travel time warnings as polyline shapefile</li>
+	 * 	<li>shp/warnings/WarningsDirectionChange.shp: Direction change warnings as polyline shapefile</li>
+	 * 	<li>shp/schedule/TransitRoutes.shp: Transit routes of the schedule as polyline shapefile</li>
+	 * 	<li>shp/schedule/StopFacilities.shp: Stop Facilities as point shapefile</li>
+	 * 	<li>shp/schedule/StopFacilities_refLinks.shp: The stop facilities' reference links as polyline shapefile</li>
+	 * </ul>
+	 * Shapefiles can be viewed in an GIS, a recommended open source GIS is QGIS. It is also possible to view them in senozon VIA. However, no
+	 * line attributes can be displayed or viewed there.
+	 * @param scheduleFile the schedule file
+	 * @param networkFile network file
 	 * @param coordinateSystem A name used by {@link MGC}. Use EPSG:* code to avoid problems.
-	 * @param outputFolder
+	 * @param outputFolder the output folder where all csv and shapefiles are written
+	 *
+	 *
 	 */
 	public static void run(String scheduleFile, String networkFile, String coordinateSystem, String outputFolder) {
 		setLogLevels();
@@ -136,31 +148,27 @@ public class PlausibilityCheck {
 			outputFolder = outputFolder + "/";
 		}
 
+		new File(outputFolder).mkdir();
 		new File(outputFolder+"shp/").mkdir();
 		new File(outputFolder+"shp/schedule/").mkdir();
 		new File(outputFolder+"shp/warnings/").mkdir();
 		check.writeCsv(outputFolder + "allPlausibilityWarnings.csv");
 		check.writeResultShapeFiles(outputFolder+"shp/warnings/");
 
-		ScheduleShapeFileWriter schedule2shp = new ScheduleShapeFileWriter(schedule, network);
+		ScheduleShapeFileWriter schedule2shp = new ScheduleShapeFileWriter(schedule, network, coordinateSystem);
 		schedule2shp.routes2Polylines(outputFolder+"shp/schedule/TransitRoutes.shp");
 		schedule2shp.stopFacilities2Shapes(outputFolder+"shp/schedule/StopFacilities.shp", outputFolder+"shp/schedule/StopFacilities_refLinks.shp");
 
 		// stop facility histogram
 		StopFacilityHistogram histogram = new StopFacilityHistogram(schedule);
-		try {
-			histogram.createCsv(outputFolder + "stopfacilities.csv");
-			histogram.createPng(outputFolder + "stopfacilities_histogram.png");
-		} catch (FileNotFoundException | UnsupportedEncodingException e) {
-			log.warn("Could not write stopfacilities.csv");
-		}
+		histogram.createCsv(outputFolder + "stopfacilities.csv");
+		histogram.createPng(outputFolder + "stopfacilities_histogram.png");
 	}
 
 	/**
 	 * Performs the plausibility check on the schedule
 	 */
 	public void runCheck() {
-		log.info("Starting plausbility check...");
 		AbstractPlausibilityWarning.setNetwork(network);
 
 		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
@@ -170,7 +178,7 @@ public class PlausibilityCheck {
 
 				Iterator<TransitRouteStop> stopsIterator = transitRoute.getStops().iterator();
 
-				List<Link> links = NetworkTools.getLinksFromIds(network, getLinkIds(transitRoute));
+				List<Link> links = NetworkTools.getLinksFromIds(network, getTransitRouteLinkIds(transitRoute));
 				Map<Node, Tuple<Link, Link>> nodesInRoute = new HashMap<>();
 				Set<List<Id<Link>>> loops = new HashSet<>();
 
@@ -330,7 +338,7 @@ public class PlausibilityCheck {
 
 			// Travel Time Warnings
 			if(createTravelTimeFeature) {
-				SimpleFeature f = travelTimeWarningsFF.createPolyline(linkIdList2Coordinates(e.getKey()));
+				SimpleFeature f = travelTimeWarningsFF.createPolyline(GtfsShapeFileTools.linkIdList2Coordinates(network, e.getKey()));
 				f.setAttribute("warningIds", CollectionUtils.idSetToString(warningIds));
 				f.setAttribute("routeIds", CollectionUtils.setToString(routeIds));
 				f.setAttribute("linkIds", CollectionUtils.idSetToString(new HashSet<>(e.getKey())));
@@ -343,7 +351,7 @@ public class PlausibilityCheck {
 
 			// Direction Change Warning
 			if(createDirectionChangeFeature) {
-				SimpleFeature f = directionChangeWarnings.createPolyline(linkIdList2Coordinates(e.getKey()));
+				SimpleFeature f = directionChangeWarnings.createPolyline(GtfsShapeFileTools.linkIdList2Coordinates(network, e.getKey()));
 				f.setAttribute("warningIds", CollectionUtils.idSetToString(warningIds));
 				f.setAttribute("routeIds", CollectionUtils.setToString(routeIds));
 				f.setAttribute("linkIds", CollectionUtils.idSetToString(new HashSet<>(e.getKey())));
@@ -354,7 +362,7 @@ public class PlausibilityCheck {
 
 			// Loop Warnings
 			if(createLoopFeature) {
-				SimpleFeature f = loopWarningsFF.createPolyline(linkIdList2Coordinates(e.getKey()));
+				SimpleFeature f = loopWarningsFF.createPolyline(GtfsShapeFileTools.linkIdList2Coordinates(network, e.getKey()));
 				f.setAttribute("warningIds", CollectionUtils.idSetToString(warningIds));
 				f.setAttribute("routeIds", CollectionUtils.setToString(routeIds));
 				f.setAttribute("linkIds", CollectionUtils.idSetToString(new HashSet<>(e.getKey())));
@@ -380,26 +388,13 @@ public class PlausibilityCheck {
 		}
 	}
 
-	/**
-	 * Transforms a list of link ids to an array of coordinates for shp features
-	 */
-	public Coordinate[] linkIdList2Coordinates(List<Id<Link>> linkIdList) {
-		List<Coordinate> coordList = new ArrayList<>();
-		for(Id<Link> linkId : linkIdList) {
-			coordList.add(MGC.coord2Coordinate(network.getLinks().get(linkId).getFromNode().getCoord()));
-		}
-		coordList.add(MGC.coord2Coordinate(network.getLinks().get(linkIdList.get(linkIdList.size() - 1)).getToNode().getCoord()));
-		Coordinate[] coordinates = new Coordinate[coordList.size()];
-		coordList.toArray(coordinates);
-		return coordinates;
-	}
-
 	private static void setLogLevels() {
+		Logger.getLogger(MGC.class).setLevel(Level.ERROR);
 		Logger.getLogger(MatsimFileTypeGuesser.class).setLevel(Level.ERROR);
 		Logger.getLogger(MatsimNetworkReader.class).setLevel(Level.ERROR);
-		Logger.getLogger(NetworkImpl.class).setLevel(Level.ERROR);
-		Logger.getLogger(NodeImpl.class).setLevel(Level.ERROR);
-		Logger.getLogger(LinkImpl.class).setLevel(Level.ERROR);
+		Logger.getLogger(Network.class).setLevel(Level.ERROR);
+		Logger.getLogger(Node.class).setLevel(Level.ERROR);
+		Logger.getLogger(Link.class).setLevel(Level.ERROR);
 		Logger.getLogger(MatsimXmlParser.class).setLevel(Level.ERROR);
 	}
 }

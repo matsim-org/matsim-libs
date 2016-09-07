@@ -19,14 +19,13 @@
 
 package playground.jbischoff.av.evaluation;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.*;
 import org.matsim.core.network.*;
+import org.matsim.core.network.io.MatsimNetworkReader;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -60,6 +59,8 @@ public class RunAVEvaluation {
 //		List<String> list = Arrays.asList(new String[]{"11.0k_AV1.0"}); 
 //		List<String> list = Arrays.asList(new String[]{"00.0k_AV1.0", "02.2k_AV1.0", "02.2k_AV1.5","02.2k_AV2.0","04.4k_AV1.0","04.4k_AV1.5","04.4k_AV2.0","06.6k_AV1.0"});
 		List<String> list = Arrays.asList(new String[]{"06.6k_AV1.5","06.6k_AV2.0","08.8k_AV1.0","08.8k_AV1.5","08.8k_AV2.0","11.0k_AV1.0","11.0k_AV1.5","11.0k_AV2.0"}); 
+		
+//		List<String> list = Collections.singletonList("00.0k_AV1.0_flowCap100");
 		
 		for (String run : list){
 		System.out.println("run "+ run);

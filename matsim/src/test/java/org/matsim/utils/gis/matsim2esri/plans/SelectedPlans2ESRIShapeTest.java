@@ -28,8 +28,8 @@ import junit.framework.Assert;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -51,7 +51,7 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 
 		Population population = scenario.getPopulation();
-		new MatsimPopulationReader(scenario).readFile(populationFilename);
+		new PopulationReader(scenario).readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population, network, crs, outputDir);
@@ -77,7 +77,7 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 
 		Population population = scenario.getPopulation();
-		new MatsimPopulationReader(scenario).readFile(populationFilename);
+		new PopulationReader(scenario).readFile(populationFilename);
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population, network, crs, outputDir);

@@ -35,13 +35,15 @@ import org.matsim.core.gbl.MatsimRandom;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
+ * Activity locations are taken exactly same as the initial person's plan for cloned persons' plans.
+ * In general, this does not seems right. However, just for computational performance, it may look ok. 
  * @author amit
  */
 
 public class PersonsCloner {
 
-	public PersonsCloner(Scenario scenario) {
-		this.sc = scenario;
+	public PersonsCloner(String inputPlans) {
+		this.sc = LoadMyScenarios.loadScenarioFromPlans(inputPlans);
 		this.random = MatsimRandom.getRandom();
 	}
 
@@ -49,14 +51,13 @@ public class PersonsCloner {
 	private Random random;
 
 	public static void main(String[] args) {
-		String plansFile = "../../../../repos/runs-svn/patnaIndia/inputs/SelectedPlansOnly.xml";
-		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(plansFile);
-		PersonsCloner pc = new PersonsCloner(sc);
+		String plansFile = "../../../../repos/runs-svn/patnaIndia/run106/inputs/SelectedPlansOnly.xml";
+		PersonsCloner pc = new PersonsCloner(plansFile);
 		pc.clonePersons(10);
 	}
 
 	/**
-	 * This will clone the persons by mutating the activity duration within (-1,+1)h.
+	 * This will clone the persons by mutating the activity duration within (-1/2,+1/2)h.
 	 */
 	public void clonePersons(final int cloningFactor){
 		Population pop = sc.getPopulation();
@@ -77,7 +78,7 @@ public class PersonsCloner {
 						} else {
 							Activity actIn = (Activity)pe;
 							Activity actOut = pop.getFactory().createActivityFromCoord(actIn.getType(), actIn.getCoord());
-							actOut.setEndTime( actIn.getEndTime() + -1800+ random.nextDouble()*1800 );
+							actOut.setEndTime( actIn.getEndTime() - 1800 + random.nextDouble()*1800 );
 							planOut.addActivity(actOut);
 						}
 					}

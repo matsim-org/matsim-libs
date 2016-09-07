@@ -8,11 +8,12 @@ import java.util.HashSet;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -30,14 +31,15 @@ public class DetermineZonesWithInfeasiblePT {
 
 	//private static TransitSchedule schedule;
 	private HashSet<Node> zones;
-	private NetworkImpl stops;
+	private Network stops;
 	private static final double maxSearchRadius = 1500.0; //1.5 km radius		
 		
 	public DetermineZonesWithInfeasiblePT(){
 	}
 	
 	private boolean isCoordinateFeasible(Coord coord){
-		Collection<Node> N = this.stops.getNearestNodes(coord, maxSearchRadius);
+		final Coord coord1 = coord;
+		Collection<Node> N = NetworkUtils.getNearestNodes(this.stops,coord1, maxSearchRadius);
 		return (N.size() > 0);
 	}
 	
@@ -56,10 +58,10 @@ public class DetermineZonesWithInfeasiblePT {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
-		this.stops = NetworkImpl.createNetwork();
+		this.stops = NetworkUtils.createNetwork();
 		for (TransitStopFacility stop : schedule.getFacilities().values()){
 			Id<TransitStopFacility> stopId = stop.getId();
-			NodeImpl n = new NodeImpl(Id.create(stopId, Node.class));
+			Node n = NetworkUtils.createNode(Id.create(stopId, Node.class));
 			n.setCoord(stop.getCoord());
 			stops.addNode(n);
 		}
@@ -72,7 +74,7 @@ public class DetermineZonesWithInfeasiblePT {
 		while (tr.next()){
 			Id<Node> zid = Id.create(tr.current().get("zone_id"), Node.class);
 			Coord coord = new Coord(Double.parseDouble(tr.current().get("x")), Double.parseDouble(tr.current().get("y")));
-			NodeImpl n = new NodeImpl(zid);
+			Node n = NetworkUtils.createNode(zid);
 			n.setCoord(coord);
 			zones.add(n);
 		}

@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.otfvis.OTFVis;
@@ -40,7 +41,7 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -200,7 +201,7 @@ public class MultipleSpillbackCausingLinksTest {
 	private class createPseudoInputs {
 		Scenario scenario;
 		Config config;
-		NetworkImpl network;
+		Network network;
 		Population population;
 		Link link1;
 		Link link2;
@@ -213,26 +214,40 @@ public class MultipleSpillbackCausingLinksTest {
 		public createPseudoInputs(){
 			config=ConfigUtils.createConfig();
 			this.scenario = ScenarioUtils.loadScenario(config);
-			network =  (NetworkImpl) this.scenario.getNetwork();
+			network =  (Network) this.scenario.getNetwork();
 			population = this.scenario.getPopulation();
 		}
 
 		private void createNetwork(){
 
-			Node node1 = network.createAndAddNode(Id.createNodeId("1"), new Coord((double) 0, (double) 0)) ;
-			Node node2 = network.createAndAddNode(Id.createNodeId("2"), new Coord((double) 0, (double) 100));
-			Node node3 = network.createAndAddNode(Id.createNodeId("3"), new Coord((double) 500, (double) 150));
-			Node node4 = network.createAndAddNode(Id.createNodeId("4"), new Coord((double) 1000, (double) 100));
-			Node node5 = network.createAndAddNode(Id.createNodeId("5"), new Coord((double) 1000, (double) 0));
-			Node node6 = network.createAndAddNode(Id.createNodeId("6"), new Coord((double) 500, (double) 50));
+			Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord((double) 0, (double) 0)) ;
+			Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId("2"), new Coord((double) 0, (double) 100));
+			Node node3 = NetworkUtils.createAndAddNode(network, Id.createNodeId("3"), new Coord((double) 500, (double) 150));
+			Node node4 = NetworkUtils.createAndAddNode(network, Id.createNodeId("4"), new Coord((double) 1000, (double) 100));
+			Node node5 = NetworkUtils.createAndAddNode(network, Id.createNodeId("5"), new Coord((double) 1000, (double) 0));
+			Node node6 = NetworkUtils.createAndAddNode(network, Id.createNodeId("6"), new Coord((double) 500, (double) 50));
+			final Node fromNode = node1;
+			final Node toNode = node2;
 
-			link1 = network.createAndAddLink(Id.createLinkId(String.valueOf("1")), node1, node2,100.0,20.0,3600,1,null,"7");
-			link2 = network.createAndAddLink(Id.createLinkId(String.valueOf("2")), node2, node3,7.0,20.0,360,1,null,"7");
-			link3 = network.createAndAddLink(Id.createLinkId(String.valueOf("3")), node3, node4,100.0,20.0,3600,1,null,"7");
-			link4 = network.createAndAddLink(Id.createLinkId(String.valueOf("4")), node4, node5,100.0,20.0,3600,1,null,"7");
-			link5 = network.createAndAddLink(Id.createLinkId(String.valueOf("5")), node5, node1,100.0,20.0,3600,1,null,"7");
-			link6 = network.createAndAddLink(Id.createLinkId(String.valueOf("6")), node2, node6,7.0,20.0,360,1,null,"7");
-			link7 = network.createAndAddLink(Id.createLinkId(String.valueOf("7")), node6, node4,100.0,20.0,3600,1,null,"7");
+			link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("1")), fromNode, toNode, 100.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
+			final Node fromNode1 = node2;
+			final Node toNode1 = node3;
+			link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("2")), fromNode1, toNode1, 7.0, 20.0, (double) 360, (double) 1, null, (String) "7");
+			final Node fromNode2 = node3;
+			final Node toNode2 = node4;
+			link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("3")), fromNode2, toNode2, 100.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
+			final Node fromNode3 = node4;
+			final Node toNode3 = node5;
+			link4 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("4")), fromNode3, toNode3, 100.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
+			final Node fromNode4 = node5;
+			final Node toNode4 = node1;
+			link5 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("5")), fromNode4, toNode4, 100.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
+			final Node fromNode5 = node2;
+			final Node toNode5 = node6;
+			link6 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("6")), fromNode5, toNode5, 7.0, 20.0, (double) 360, (double) 1, null, (String) "7");
+			final Node fromNode6 = node6;
+			final Node toNode6 = node4;
+			link7 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("7")), fromNode6, toNode6, 100.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
 
 		}
 

@@ -51,17 +51,17 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -95,36 +95,39 @@ public class RunAnalyses {
 	}
 
 	public void readPopulation() {
-		new MatsimPopulationReader(this.scenario).readFile(plansFilename);
+		new PopulationReader(this.scenario).readFile(plansFilename);
 	}
 
 	public void extractSelectedPlansOnly() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(s.getNetwork()).readFile(networkFilename);
-		PopulationImpl pop = (PopulationImpl) s.getPopulation();
-		pop.setIsStreaming(true);
+		Population pop = (Population) s.getPopulation();
+		StreamingUtils.setIsStreaming(pop, true);
 
-		PopulationWriter writer = new PopulationWriter(pop, s.getNetwork());
+		StreamingPopulationWriter writer = new StreamingPopulationWriter(pop, s.getNetwork());
 		writer.startStreaming("selectedPlansOnly.xml.gz");
-		pop.addAlgorithm(new PersonFilterSelectedPlan());
-		pop.addAlgorithm(writer);
-		new MatsimPopulationReader(s).readFile(plansFilename);
+		StreamingUtils.addAlgorithm(pop, new PersonFilterSelectedPlan());
+		final PersonAlgorithm algo = writer;
+		StreamingUtils.addAlgorithm(pop, algo);
+		new PopulationReader(s).readFile(plansFilename);
 		writer.closeStreaming();
 	}
 
 	public void readSelectedPlansOnly() {
-		new MatsimPopulationReader(this.scenario).readFile("selectedPlansOnly.xml.gz");
+		new PopulationReader(this.scenario).readFile("selectedPlansOnly.xml.gz");
 	}
 
 	public void createPersonAttributeTable(final String attributesFilename, final String idsFilename) {
-		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
-		pop.setIsStreaming(true);
+		Population pop = (Population) scenario.getPopulation();
+		StreamingUtils.setIsStreaming(pop, true);
 		try {
 			PersonAttributesWriter attributesWriter = new PersonAttributesWriter(attributesFilename);
-			pop.addAlgorithm(attributesWriter);
+			final PersonAlgorithm algo = attributesWriter;
+			StreamingUtils.addAlgorithm(pop, algo);
 			PersonIdsWriter idsWriter = new PersonIdsWriter(idsFilename);
-			pop.addAlgorithm(idsWriter);
-			new MatsimPopulationReader(scenario).readFile(plansFilename);
+			final PersonAlgorithm algo1 = idsWriter;
+			StreamingUtils.addAlgorithm(pop, algo1);
+			new PopulationReader(scenario).readFile(plansFilename);
 			attributesWriter.close();
 			idsWriter.close();
 		} catch (IOException e) {

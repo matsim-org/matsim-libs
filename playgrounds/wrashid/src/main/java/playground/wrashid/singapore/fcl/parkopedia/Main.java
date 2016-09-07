@@ -24,7 +24,7 @@ public class Main {
 	public static void main(String[] args) {
 		
 		ConvertToCsv convertToCsv=new ConvertToCsv();
-		convertToCsv.parse(args[0]);
+		convertToCsv.readFile(args[0]);
 		System.out.println(convertToCsv.numberOfParkingWithUnknownCapacity);
 		System.out.println(convertToCsv.totalNumberOfParking);
 		System.out.println(convertToCsv.maxPrice);

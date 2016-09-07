@@ -20,32 +20,27 @@
 
 package org.matsim.core.replanning;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 public class StrategyManagerTest {
 
@@ -62,7 +57,7 @@ public class StrategyManagerTest {
 		
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		for (int i = 0; i < 1000; i++) {
-			Person p = PopulationUtils.createPerson(Id.create(i, Person.class));
+			Person p = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			population.addPerson(p);
 		}
 
@@ -152,7 +147,7 @@ public class StrategyManagerTest {
 		
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		for (int i = 0; i < 100; i++) {
-			Person p = PopulationUtils.createPerson(Id.create(i, Person.class));
+			Person p = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			population.addPerson(p);
 		}
 
@@ -210,9 +205,9 @@ public class StrategyManagerTest {
 
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		Person person = null;
-		PlanImpl[] plans = new PlanImpl[10];
+		Plan[] plans = new Plan[10];
 		// create a person with 4 unscored plans
-		person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		plans[0] = PersonUtils.createAndAddPlan(person, false);
 		plans[1] = PersonUtils.createAndAddPlan(person, false);
 		plans[1].setScore(Double.valueOf(0.0));
@@ -262,8 +257,8 @@ public class StrategyManagerTest {
 		manager.addStrategyForDefaultSubpopulation(new PlanStrategyImpl(new RandomPlanSelector()), 1.0);
 
 		// init Population
-		Person p = PopulationUtils.createPerson(Id.create(1, Person.class));
-		PlanImpl[] plans = new PlanImpl[7];
+		Person p = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Plan[] plans = new Plan[7];
 		for (int i = 0; i < plans.length; i++) {
 			plans[i] = PersonUtils.createAndAddPlan(p, false);
 			plans[i].setScore(Double.valueOf(i*10));
@@ -390,7 +385,7 @@ public class StrategyManagerTest {
 
 		private int counter = 0;
 
-		protected StrategyCounter(final GenericPlanSelector<Plan, Person> selector) {
+		protected StrategyCounter(final PlanSelector<Plan, Person> selector) {
 			planStrategyDelegate = new PlanStrategyImpl( selector ) ;
 		}
 
@@ -439,12 +434,12 @@ public class StrategyManagerTest {
 	 *
 	 * @author mrieser
 	 */
-	static private class TestPlanSelector implements PlanSelector {
+	static private class TestPlanSelector implements PlanSelector<Plan, Person> {
 
 		public TestPlanSelector() {
 		}
 		@Override
-		public PlanImpl selectPlan(final HasPlansAndId<Plan, Person> person) {
+		public Plan selectPlan(final HasPlansAndId<Plan, Person> person) {
 			throw new UnsupportedOperationException();
 		}
 

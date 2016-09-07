@@ -31,7 +31,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.signals.MatsimSignalSystemsReader;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.model.Signal;
@@ -71,7 +70,7 @@ public class SignalSystemsData20ReaderWriterTest {
   @Test
   public void testParser() throws IOException, JAXBException, SAXException, ParserConfigurationException {
   	SignalSystemsData lss = new SignalSystemsDataImpl();
-  	SignalSystemsReader20 reader = new SignalSystemsReader20(lss, MatsimSignalSystemsReader.SIGNALSYSTEMS20);
+  	SignalSystemsReader20 reader = new SignalSystemsReader20(lss);
   	reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
   	
   	checkContent(lss);
@@ -83,7 +82,7 @@ public class SignalSystemsData20ReaderWriterTest {
   	log.debug("reading file...");
   	//read the test file
   	SignalSystemsData lss = new SignalSystemsDataImpl();
-  	SignalSystemsReader20 reader = new SignalSystemsReader20(lss, MatsimSignalSystemsReader.SIGNALSYSTEMS20);
+  	SignalSystemsReader20 reader = new SignalSystemsReader20(lss);
   	reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
   	
   	//write the test file
@@ -93,7 +92,7 @@ public class SignalSystemsData20ReaderWriterTest {
   	
   	log.debug("and read it again");
   	lss = new SignalSystemsDataImpl();
-  	reader = new SignalSystemsReader20(lss, MatsimSignalSystemsReader.SIGNALSYSTEMS20);
+  	reader = new SignalSystemsReader20(lss);
   	reader.readFile(testoutput);
   	checkContent(lss);
   }

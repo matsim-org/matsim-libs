@@ -23,9 +23,9 @@ package playground.jjoubert.TemporaryCode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -39,7 +39,7 @@ public class MyNetworkGenerator {
 	public static void main(String [] args) {
 		String osm = "/Users/johanwjoubert/Downloads/map.osm";
 
-		Network net = NetworkImpl.createNetwork();
+		Network net = NetworkUtils.createNetwork();
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, UTM35S);
 
 		OsmNetworkReader onr = new OsmNetworkReader(net,ct);

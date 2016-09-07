@@ -9,11 +9,16 @@ import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.*;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -43,10 +48,10 @@ public class PlanGenerator {
 		HashMap<String, String> sexMap = new HashMap<String, String>();
 		HashMap<String,Integer> carTracker = new HashMap<String, Integer>();
 
-		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
+		Population population = (Population) scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
-		population.setIsStreaming(true);
-		PopulationWriter popWriter = new PopulationWriter(population, scenario.getNetwork());
+		StreamingUtils.setIsStreaming(population, true);
+		StreamingPopulationWriter popWriter = new StreamingPopulationWriter(population, scenario.getNetwork());
 		popWriter.startStreaming(populationPath);
 		
 		/*Get Population*/
@@ -107,10 +112,10 @@ public class PlanGenerator {
 			PersonUtils.setEmployed(person, true);
 
 			//Add home location to the plan
-			ActivityImpl actHome = (ActivityImpl) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
-			ActivityImpl actWork = (ActivityImpl) pf.createActivityFromCoord("work", facilities.get(workFacilityId).getCoord());
+			Activity actHome = (Activity) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
+			Activity actWork = (Activity) pf.createActivityFromCoord("work", facilities.get(workFacilityId).getCoord());
 
-			LegImpl leg = (LegImpl) pf.createLeg(mode);
+			Leg leg = (Leg) pf.createLeg(mode);
 			actHome.setFacilityId(homeFacilityId);
 			actHome.setEndTime(3600.00*7.5 + generator.nextGaussian()*900.0);
 			plan.addActivity(actHome);
@@ -121,7 +126,7 @@ public class PlanGenerator {
 			plan.addActivity(actWork);
 			plan.addLeg(leg);
 
-			ActivityImpl actHome2 = (ActivityImpl) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
+			Activity actHome2 = (Activity) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
 			actHome2.setFacilityId(homeFacilityId);
 			plan.addActivity(actHome2);		
 
@@ -164,11 +169,11 @@ public class PlanGenerator {
 			PersonUtils.setEmployed(person, false);
 
 			//Add home location to the plan
-			ActivityImpl actHome = (ActivityImpl) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
-			ActivityImpl actSecondary = (ActivityImpl) pf.createActivityFromCoord("secondary", facilities.get(secondaryFacilityId).getCoord());
+			Activity actHome = (Activity) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
+			Activity actSecondary = (Activity) pf.createActivityFromCoord("secondary", facilities.get(secondaryFacilityId).getCoord());
 
 			
-			LegImpl leg = (LegImpl) pf.createLeg(mode);
+			Leg leg = (Leg) pf.createLeg(mode);
 			actHome.setFacilityId(homeFacilityId);
 			actHome.setEndTime(3600.00*7.75 + generator.nextDouble()*3600.0*12);
 			plan.addActivity(actHome);
@@ -179,7 +184,7 @@ public class PlanGenerator {
 			plan.addActivity(actSecondary);
 			plan.addLeg(leg);
 
-			ActivityImpl actHome2 = (ActivityImpl) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
+			Activity actHome2 = (Activity) pf.createActivityFromCoord("home", facilities.get(homeFacilityId).getCoord());
 			actHome2.setFacilityId(homeFacilityId);
 			plan.addActivity(actHome2);		
 

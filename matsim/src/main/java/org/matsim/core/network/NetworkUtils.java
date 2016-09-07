@@ -20,6 +20,15 @@
 
 package org.matsim.core.network;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -28,9 +37,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
-
-import java.util.*;
 
 /**
  * Contains several helper methods for working with {@link Network networks}.
@@ -41,18 +49,13 @@ public class NetworkUtils {
 
     private static Logger log = Logger.getLogger(NetworkUtils.class);
 
-    public static Network createNetwork() {
-        return new NetworkImpl() ;
-    }
-
-
     public static Network createNetwork(Config config) {
         return createNetwork(config.network());
     }
 
 
     public static Network createNetwork(NetworkConfigGroup networkConfigGroup) {
-        NetworkImpl network = new NetworkImpl();
+        Network network = new NetworkImpl();
         
         if (networkConfigGroup.isTimeVariantNetwork()) {
             network.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
@@ -202,10 +205,6 @@ public class NetworkUtils {
 		return links;
 	}
 
-	/**
-	 * @param list of links
-	 * @return list of link IDs
-	 */
 	public static List<Id<Link>> getLinkIds(final List<Link> links) {
 		List<Id<Link>> linkIds = new ArrayList<>();
 		if (links != null) {
@@ -229,12 +228,6 @@ public class NetworkUtils {
 		} else {
 			return numberOfLanes;
 		}
-	}
-
-	public static Map<Id<Link>, Link> getIncidentLinks(final Node n) {
-		Map<Id<Link>, Link> links = new TreeMap<>(n.getInLinks());
-		links.putAll(n.getOutLinks());
-		return links;
 	}
 
 	public static boolean isMultimodal(final Network network) {
@@ -365,12 +358,12 @@ public class NetworkUtils {
     // which returns either the nearest 'left' or 'right' entry link, based on a global
     // config param.
     public static Link getNearestRightEntryLink(Network network, final Coord coord) {
-        if (!(network instanceof NetworkImpl)) {
+        if (!(network instanceof Network)) {
             throw new IllegalArgumentException("Only NetworkImpl can be queried like this.");
         }
         Link nearestRightLink = null;
         Link nearestOverallLink = null;
-        Node nearestNode = ((NetworkImpl) network).getNearestNode(coord);
+        Node nearestNode = NetworkUtils.getNearestNode(((Network) network),coord);
 
         double[] coordVector = new double[2];
         coordVector[0] = nearestNode.getCoord().getX() - coord.getX();
@@ -382,7 +375,8 @@ public class NetworkUtils {
         List<Link> incidentLinks = new ArrayList<>(nearestNode.getInLinks().values());
         incidentLinks.addAll(nearestNode.getOutLinks().values());
         for (Link link : incidentLinks) {
-            double dist = ((LinkImpl) link).calcDistance(coord);
+            Link r = ((Link) link);
+		double dist = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord);
             if (dist <= shortestRightDistance) {
                 // Generate a vector representing the link
                 double[] linkVector = new double[2];
@@ -438,11 +432,11 @@ public class NetworkUtils {
      * @return the link found closest to coord
      */
     public static Link getNearestLink(Network network, final Coord coord) {
-        if (!(network instanceof NetworkImpl)) {
+        if (!(network instanceof Network)) {
             throw new IllegalArgumentException("Only NetworkImpl can be queried like this.");
         }
         Link nearestLink = null;
-        Node nearestNode = ((NetworkImpl) network).getNearestNode(coord);
+        Node nearestNode = NetworkUtils.getNearestNode(((Network) network),coord);
         if ( nearestNode == null ) {
             log.warn("[nearestNode not found.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" + network) ;
             return null ;
@@ -459,7 +453,8 @@ public class NetworkUtils {
         // (For Great Britain it would be the "left" side. Could be a global config param...)
         double shortestDistance = Double.MAX_VALUE;
         for (Link link : getIncidentLinks(nearestNode).values()) {
-            double dist = ((LinkImpl) link).calcDistance(coord);
+            Link r = ((Link) link);
+		double dist = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord);
             if (dist < shortestDistance) {
                 shortestDistance = dist;
                 nearestLink = link;
@@ -477,11 +472,11 @@ public class NetworkUtils {
 	 * even if there is only one link going to the right.
 	 *
 	 * @param inLink The inLink given
-	 * @return outLink, or null if there is only one outLink back to the inLinks fromNode.
+	 * @return outLink, or null if there is only one outLink back to the inLink's fromNode.
 	 */
-	public static Link getLeftLane(Link inLink){
+	public static Link getLeftmostTurnExcludingU(Link inLink){
 
-		TreeMap<Double, Link> result = getOutLinksSortedByAngle(inLink);
+		TreeMap<Double, Link> result = getOutLinksSortedClockwiseByAngle(inLink);
 
 		if (result.size() == 0){
 			return null;
@@ -490,19 +485,27 @@ public class NetworkUtils {
 	}
 
 	/**
-	 * Calculates the orientation of downstream links (MATSim slang is 'outLinks') for a given 
-	 * upstream link (slang inLink)beginning from the right if the inLink goes 
+	 * Calculates the orientation of outgoing links for a given 
+	 * incoming link beginning from the right if the inLink goes 
 	 * north to south. The most 'left' outLink comes last. The link back to the 
-	 * inLinks upstream Node (slang fromNode) is ignored. 
-	 *
+	 * inLink's upstream Node is ignored. 
+	 * <br><br>
+	 * Comments/questions:<ul>
+	 * <li> What does the "north to south" part mean?  Can't we just sort outLinks right to left no matter where we come from?  kai, aug'16
+	 * <li> In fact, a test ({@link NetworkUtilsTest#getOutLinksSortedByAngleTest()}) does not confirm the javadoc.  The "north to south"
+	 * is irrelevant.  But instead, it sorts links <i> left to right </i> instead of right to left.
+	 * <br>
+	 * </ul>
+	 * If someone can confirm this, please comment out all these remarks. kai, aug'16
+	 * <br><br>
 	 * @param inLink The inLink given
-	 * @return Collection of outLinks, or an empty collection, if there is only
-	 * one outLink back to the inLinks fromNode.
+	 * @return Collection of outLinks, or an empty collection if there are only
+	 *  outLinks back to the inLink's fromNode.
 	 */
-	public static TreeMap<Double, Link> getOutLinksSortedByAngle(Link inLink){
+	public static TreeMap<Double, Link> getOutLinksSortedClockwiseByAngle(Link inLink){
 		Coord coordInLink = getVector(inLink);
 		double thetaInLink = Math.atan2(coordInLink.getY(), coordInLink.getX());
-		TreeMap<Double, Link> outLinksByOrientation = new TreeMap<Double, Link>();
+		TreeMap<Double, Link> outLinksByOrientation = new TreeMap<>();
 
 		for (Link outLink : inLink.getToNode().getOutLinks().values()) {
 			if (!(outLink.getToNode().equals(inLink.getFromNode()))){
@@ -524,5 +527,244 @@ public class NetworkUtils {
 		double x = link.getToNode().getCoord().getX() - link.getFromNode().getCoord().getX();
 		double y = link.getToNode().getCoord().getY() - link.getFromNode().getCoord().getY();
 		return new Coord(x, y);
+	}
+
+
+	public static Map<Id<Node>, ? extends Node> getOutNodes(Node node) {
+		Map<Id<Node>, Node> nodes = new TreeMap<>();
+		for (Link link : node.getOutLinks().values()) {
+			Node outNode = link.getToNode();
+			nodes.put(outNode.getId(), outNode);
+		}
+		return nodes;
+	}
+
+
+	public static Map<Id<Link>, ? extends Link> getIncidentLinks(Node node) {
+		Map<Id<Link>, Link> links = new TreeMap<>(node.getInLinks());
+		links.putAll(node.getOutLinks());
+		return links;
+	}
+
+
+	public static Map<Id<Node>, ? extends Node> getInNodes(Node node) {
+		Map<Id<Node>, Node> nodes = new TreeMap<>();
+		for (Link link : node.getInLinks().values()) {
+			Node inNode = link.getFromNode();
+			nodes.put(inNode.getId(), inNode);
+		}
+		return nodes;
+	}
+
+
+	public static Map<Id<Node>, ? extends Node> getIncidentNodes(Node node) {
+		Map<Id<Node>, Node> nodes = new TreeMap<>(getInNodes(node));
+		nodes.putAll(getOutNodes(node));
+		return nodes;
+	}
+
+
+	public static Node createNode(Id<Node> id) {
+		return new NodeImpl(id);
+	}
+
+
+	public static Node createNode(Id<Node> id, Coord coord, String type) {
+		return new NodeImpl(id, coord, type);
+	}
+
+
+	public static Node createNode(Id<Node> id, Coord coord) {
+		return new NodeImpl(id, coord);
+	}
+
+
+	public static void setOrigId( final Node node, final String id ) {
+		if ( node instanceof NodeImpl ) {
+			((NodeImpl)node).setOrigId( id ) ;
+		} else {
+			throw new RuntimeException("wrong implementation of interface Node to do this") ;
+		}
+	}
+
+
+	public static void setType(Node node, final String type) {
+		if ( node instanceof NodeImpl ) {
+			((NodeImpl)node).setType( type ) ;
+		} else {
+			throw new RuntimeException("wrong implementation of interface Node to do this") ;
+		}
+	}
+
+
+	public static String getOrigId( Node node ) {
+		if ( node instanceof NodeImpl ) {
+			return ((NodeImpl) node).getOrigId() ;
+		} else {
+			throw new RuntimeException("wrong implementation of interface Node to do this") ;
+		}
+	}
+
+
+	public static String getType( Node node ) {
+		if ( node instanceof NodeImpl ) {
+			return ((NodeImpl) node).getType() ;
+		} else {
+			throw new RuntimeException("wrong implementation of interface Node to do this") ;
+		}
+	}
+
+
+	public static double getFreespeedTravelTime( Link link ) {
+		return link.getLength() / link.getFreespeed() ;
+	}
+	public static double getFreespeedTravelTime( Link link, double time ) {
+		return link.getLength() / link.getFreespeed(time) ;
+	}
+
+
+	public static void setType( Link link , String type ) {
+		if ( link instanceof LinkImpl ) {
+			((LinkImpl)link).setType2( type ) ;
+		} else {
+			throw new RuntimeException("wrong implementation of interface Link to do this") ;
+		}
+	}
+
+
+	public static String getType(Link link) {
+		if ( link instanceof LinkImpl ) {
+			return ((LinkImpl)link).getType2() ;	
+		} else {
+			throw new RuntimeException( "getType not possible for this implementation of interface Link" ) ;
+		}
+	}
+
+
+	public static String getOrigId( Link link ) {
+		if ( link instanceof LinkImpl ) {
+			return ((LinkImpl)link).getOrigId2() ;
+		} else {
+			throw new RuntimeException("wrong implementation of Link interface do getOrigId" ) ;
+		}
+	}
+
+
+	public static void setOrigId( Link link, String id ) {
+		if ( link instanceof LinkImpl ) {
+			((LinkImpl) link).setOrigId2(id);
+		} else {
+			throw new RuntimeException("wrong implementation of interface Link to do setOrigId") ;
+		}
+	}
+
+
+	public static Link createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed,
+			double capacity, double lanes) {
+		return new LinkImpl(id, from, to, network, length, freespeed, capacity, lanes);
+	}
+
+
+	public static Network createNetwork() {
+		return new NetworkImpl();
+	}
+
+
+	public static Link createAndAddLink(Network network, final Id<Link> id, final Node fromNode, final Node toNode, final double length, final double freespeed,
+			final double capacity, final double numLanes) {
+		return createAndAddLink(network, id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null ) ;
+	}
+	
+	public static Link createAndAddLink(Network network, final Id<Link> id, final Node fromNode, final Node toNode, final double length, final double freespeed,
+				final double capacity, final double numLanes, final String origId, final String type) {
+		if (network.getNodes().get(fromNode.getId()) == null) {
+			throw new IllegalArgumentException(network+"[from="+fromNode+" does not exist]");
+		}
+	
+		if (network.getNodes().get(toNode.getId()) == null) {
+			throw new IllegalArgumentException(network+"[to="+toNode+" does not exist]");
+		}
+	
+		Link link = network.getFactory().createLink(id, fromNode, toNode) ;
+		link.setLength(length);
+		link.setFreespeed(freespeed);
+		link.setCapacity(capacity);
+		link.setNumberOfLanes(numLanes);
+		setType( link, type);
+		setOrigId( link, origId ) ;
+	
+		network.addLink( link ) ;
+	
+		return link;
+	}
+
+
+	public static void setNetworkChangeEvents(Network network, List<NetworkChangeEvent> events) {
+		if ( network instanceof TimeDependentNetwork ) {
+			((TimeDependentNetwork)network).setNetworkChangeEvents(events);
+		} else {
+			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + "Network, TimeDependentNetwork" ) ;
+		}
+	}
+
+
+	public static Node createAndAddNode(Network network, final Id<Node> id, final Coord coord) {
+		if (network.getNodes().containsKey(id)) {
+			throw new IllegalArgumentException(network + "[id=" + id + " already exists]");
+		}
+		Node n = network.getFactory().createNode(id, coord);
+		network.addNode(n) ;
+		return n;
+	}
+
+
+	public static void addNetworkChangeEvent( Network network, NetworkChangeEvent event ) {
+		if ( network instanceof TimeDependentNetwork ) {
+			((TimeDependentNetwork) network).addNetworkChangeEvent(event);
+		} else {
+			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + " Network, TimeDependentNetwork " ) ;
+		}
+	}
+
+
+	public static Collection<NetworkChangeEvent> getNetworkChangeEvents( Network network ) {
+		if ( network instanceof TimeDependentNetwork ) {
+			return ((TimeDependentNetwork) network).getNetworkChangeEvents() ;
+		} else {
+			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + " Network, TimeDependentNetwork " ) ;
+		}
+	}
+
+
+	public static Link getNearestLinkExactly(Network network, Coord coord) {
+		if ( network instanceof SearchableNetwork ) {
+			return ((SearchableNetwork) network).getNearestLinkExactly(coord) ;
+		} else {
+			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + " Network, SearchableNetwork " ) ;
+		}
+	}
+
+
+	public static Node getNearestNode(Network network, final Coord coord) {
+		if ( network instanceof SearchableNetwork ) {
+			return ((SearchableNetwork)network).getNearestNode(coord);
+		} else {
+			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + " Network, SearchableNetwork " ) ;
+		}
+	}
+
+
+	public static Collection<Node> getNearestNodes(Network network, final Coord coord, final double distance) {
+		if ( network instanceof SearchableNetwork ) {
+			return ((SearchableNetwork)network).getNearestNodes(coord, distance);
+		} else {
+			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + " Network, SearchableNetwork" ) ;
+		}
+	}
+
+	@Deprecated // use network.getFactory() instead
+	public static LinkFactoryImpl createLinkFactory() {
+		// yyyyyy Make LinkFactoryImpl invisible outside package.  Does the LinkFactory interface have to be public at all?  kai, aug'16
+		return new LinkFactoryImpl();
 	}
 }

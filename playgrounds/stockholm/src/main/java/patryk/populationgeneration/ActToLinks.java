@@ -9,15 +9,15 @@ import java.util.List;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.population.algorithms.XY2Links;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import patryk.utils.LinksRemover;
@@ -47,8 +47,8 @@ public class ActToLinks {
         	Coord linkCoord = null;
         	
         	for (PlanElement planelement : planElements) {
-        		if (planelement instanceof ActivityImpl) {
-        			ActivityImpl activity = (ActivityImpl) planelement;
+        		if (planelement instanceof Activity) {
+        			Activity activity = (Activity) planelement;
         			Network network = scenario.getNetwork();
         			linkCoord = network.getLinks().get(activity.getLinkId()).getCoord();
         			writeCoordinates(linkCoord);

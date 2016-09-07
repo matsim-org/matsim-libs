@@ -28,6 +28,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -38,8 +40,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacility;
@@ -92,7 +92,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 		int firstParkingActIndex = currentLegIndex + 1;
 		int firstWalkLegIndex = currentLegIndex + 2;
 
-		ActivityImpl firstParkingAct = (ActivityImpl) plan.getPlanElements().get(firstParkingActIndex);
+		Activity firstParkingAct = (Activity) plan.getPlanElements().get(firstParkingActIndex);
 		firstParkingAct.setFacilityId(parkingFacilityId);
 		ActivityFacility parkingFacility = ((MutableScenario) scenario).getActivityFacilities().getFacilities()
 				.get(parkingFacilityId);
@@ -108,7 +108,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 			Integer secondWalkgLegIndex = secondParkingActIndex - 1;
 			Integer nextCarLegIndex = secondParkingActIndex + 1;
 
-			ActivityImpl secondParkingAct = (ActivityImpl) plan.getPlanElements().get(secondParkingActIndex);
+			Activity secondParkingAct = (Activity) plan.getPlanElements().get(secondParkingActIndex);
 			secondParkingAct.setFacilityId(parkingFacilityId);
 			secondParkingAct.setLinkId(parkingFacility.getLinkId());
 
@@ -125,7 +125,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 		}
 		int currentLinkIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 		
-		Route preRoute = ((LegImpl) plan.getPlanElements().get(currentLegIndex)).getRoute().clone();
+		Route preRoute = ((Leg) plan.getPlanElements().get(currentLegIndex)).getRoute().clone();
 		
 		throw new RuntimeException( Gbl.PROBLEM_WITH_ACCESS_EGRESS ) ;
 		

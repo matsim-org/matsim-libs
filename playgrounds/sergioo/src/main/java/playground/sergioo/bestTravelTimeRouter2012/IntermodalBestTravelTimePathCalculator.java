@@ -24,7 +24,6 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-//import org.matsim.core.router.util.BestTravelTimePathCalculator;
 
 public interface IntermodalBestTravelTimePathCalculator extends BestTravelTimePathCalculator {
 

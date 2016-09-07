@@ -34,11 +34,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.TripRouter;
@@ -74,12 +74,12 @@ public class EditRoutes {
 
 	private  Network network ;
 	private  LeastCostPathCalculator pathCalculator ;
-	private  RouteFactoryImpl routeFactories ;
+	private  RouteFactories routeFactories ;
 
 	public EditRoutes(){} // for backwards compatibility
 
 	@Deprecated // use ctor with population factory (no need to pass non-API route factory as argument). kai, may'16
-	public EditRoutes( Network network, LeastCostPathCalculator pathCalculator, RouteFactoryImpl routeFactory ) {
+	public EditRoutes( Network network, LeastCostPathCalculator pathCalculator, RouteFactories routeFactory ) {
 		this.network = network ;
 		this.pathCalculator = pathCalculator ;
 		this.routeFactories = routeFactory ;
@@ -88,7 +88,7 @@ public class EditRoutes {
 	public EditRoutes( Network network, LeastCostPathCalculator pathCalculator, PopulationFactory popFactory ) {
 		this.network = network ;
 		this.pathCalculator = pathCalculator ;
-		this.routeFactories = ((PopulationFactoryImpl) popFactory).getRouteFactory() ;
+		this.routeFactories = ((PopulationFactory) popFactory).getRouteFactories() ;
 	}
 
 	/**

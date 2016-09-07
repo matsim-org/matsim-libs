@@ -30,14 +30,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
@@ -61,7 +61,7 @@ public class FacilitiesFromPopulation {
 	private final ActivityFacilities facilities;
 	private boolean oneFacilityPerLink = true;
 	private String idPrefix = "";
-	private NetworkImpl network = null;
+	private Network network = null;
 	private boolean removeLinksAndCoordinates = true;
 	private PlanCalcScoreConfigGroup config = null;
 	
@@ -94,7 +94,7 @@ public class FacilitiesFromPopulation {
 	 * @param doAssignment
 	 * @param network
 	 */
-	public void setAssignLinksToFacilitiesIfMissing(final boolean doAssignment, final NetworkImpl network) {
+	public void setAssignLinksToFacilitiesIfMissing(final boolean doAssignment, final Network network) {
 		if (doAssignment && network == null) {
 			throw new IllegalArgumentException("Network cannot be null if assignment should be done.");
 		}
@@ -142,7 +142,8 @@ public class FacilitiesFromPopulation {
 						ActivityFacility facility = null;
 
 						if (linkId == null && this.network != null) {
-							linkId = this.network.getNearestLinkExactly(c).getId();
+							final Coord coord = c;
+							linkId = NetworkUtils.getNearestLinkExactly(this.network,coord).getId();
 						}
 
 						if (this.oneFacilityPerLink && linkId != null) {
@@ -168,10 +169,10 @@ public class FacilitiesFromPopulation {
 							facility.addActivityOption(option);
 						}
 						
-						((ActivityImpl) a).setFacilityId(facility.getId());
+						((Activity) a).setFacilityId(facility.getId());
 						if (this.removeLinksAndCoordinates) {
-							((ActivityImpl) a).setLinkId(null);
-							((ActivityImpl) a).setCoord(null);
+							((Activity) a).setLinkId(null);
+							((Activity) a).setCoord(null);
 						}
 					}
 				}

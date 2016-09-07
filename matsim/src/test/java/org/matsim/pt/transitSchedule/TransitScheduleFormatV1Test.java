@@ -29,8 +29,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
@@ -58,16 +59,24 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 
 	public void testWriteRead() throws IOException, SAXException, ParserConfigurationException {
 		// prepare required data
-		NetworkImpl network = NetworkImpl.createNetwork();
-		Node n1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-		Node n2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 0, (double) 0));
-		Node n3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 0, (double) 0));
-		Node n4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 0, (double) 0));
-		Node n5 = network.createAndAddNode(Id.create("5", Node.class), new Coord((double) 0, (double) 0));
-		Link l1 = network.createAndAddLink(Id.create("1", Link.class), n1, n2, 1000, 10, 3600, 1.0);
-		Link l2 = network.createAndAddLink(Id.create("2", Link.class), n2, n3, 1000, 10, 3600, 1.0);
-		Link l3 = network.createAndAddLink(Id.create("3", Link.class), n3, n4, 1000, 10, 3600, 1.0);
-		Link l4 = network.createAndAddLink(Id.create("4", Link.class), n4, n5, 1000, 10, 3600, 1.0);
+		Network network = NetworkUtils.createNetwork();
+		Node n1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node n2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 0));
+		Node n3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 0, (double) 0));
+		Node n4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord((double) 0, (double) 0));
+		Node n5 = NetworkUtils.createAndAddNode(network, Id.create("5", Node.class), new Coord((double) 0, (double) 0));
+		final Node fromNode = n1;
+		final Node toNode = n2;
+		Link l1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 1000, (double) 10, (double) 3600, 1.0 );
+		final Node fromNode1 = n2;
+		final Node toNode1 = n3;
+		Link l2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, (double) 1000, (double) 10, (double) 3600, 1.0 );
+		final Node fromNode2 = n3;
+		final Node toNode2 = n4;
+		Link l3 = NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), fromNode2, toNode2, (double) 1000, (double) 10, (double) 3600, 1.0 );
+		final Node fromNode3 = n4;
+		final Node toNode3 = n5;
+		Link l4 = NetworkUtils.createAndAddLink(network,Id.create("4", Link.class), fromNode3, toNode3, (double) 1000, (double) 10, (double) 3600, 1.0 );
 
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule1 = builder.createTransitSchedule();

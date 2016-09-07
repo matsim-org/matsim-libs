@@ -24,15 +24,18 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.*;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -228,7 +231,7 @@ public class CreateFreightTraffic {
 	}
 		
 	private Person createPerson(int originIndex, int destinationIndex, int index) {
-		Person p = PopulationUtils.createPerson(Id.create(this.freightOffset + index, Person.class));
+		Person p = PopulationUtils.getFactory().createPerson(Id.create(this.freightOffset + index, Person.class));
 		PersonUtils.setEmployed(p, true);
 		PersonUtils.setCarAvail(p, "always");
 //		((PersonImpl)p).createDesires("freight");
@@ -306,8 +309,8 @@ public class CreateFreightTraffic {
 		ActivityFacility homeFacility = this.getRandomFacilityFromZone(origin);
 		ActivityFacility freightFacility = this.getRandomFacilityFromZone(destination);
 						
-		Plan plan = new PlanImpl();
-		ActivityImpl actH = new ActivityImpl("freight", homeFacility.getLinkId());
+		Plan plan = PopulationUtils.createPlan();
+		Activity actH = PopulationUtils.createActivityFromLinkId("freight", homeFacility.getLinkId());
 		actH.setFacilityId(homeFacility.getId());
 		actH.setCoord(homeFacility.getCoord());
 		
@@ -315,9 +318,9 @@ public class CreateFreightTraffic {
 		actH.setMaximumDuration(departureTime);
 		actH.setEndTime(departureTime);
 		plan.addActivity(actH);		
-		plan.addLeg(new LegImpl("car"));
+		plan.addLeg(PopulationUtils.createLeg("car"));
 				
-		ActivityImpl actFreight = new ActivityImpl("freight", freightFacility.getLinkId());
+		Activity actFreight = PopulationUtils.createActivityFromLinkId("freight", freightFacility.getLinkId());
 		
 		actFreight.setStartTime(departureTime);
 		actFreight.setMaximumDuration(24.0 * 3600.0 - departureTime);
@@ -365,7 +368,7 @@ public class CreateFreightTraffic {
 		MutableScenario sTmp = (MutableScenario) ScenarioUtils.createScenario(
 				ConfigUtils.createConfig());
 		new MatsimNetworkReader(sTmp.getNetwork()).readFile(networkfilePath);
-		MatsimPopulationReader populationReader = new MatsimPopulationReader(sTmp);
+		PopulationReader populationReader = new PopulationReader(sTmp);
 		populationReader.readFile(crossBorderPlansFilePath);
 		
 //		ActTypeConverter actTypeConverter = new ActTypeConverter(false);
@@ -374,7 +377,7 @@ public class CreateFreightTraffic {
 			for (Plan plan : p.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {
-						ActivityImpl act = (ActivityImpl)pe;
+						Activity act = (Activity)pe;
 						String v2Type = ActTypeConverter.convert2FullType(act.getType());
 						
 						Id facilityID = act.getFacilityId();

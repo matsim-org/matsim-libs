@@ -193,7 +193,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
         RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 		scenario.addScenarioElement( RoadPricingScheme.ELEMENT_NAME , scheme);
 		RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(scheme);
-		reader.parse(tollFile);
+		reader.readFile(tollFile);
 		assertEquals(tollType, scheme.getType());
 
 		Fixture.createPopulation1(scenario);

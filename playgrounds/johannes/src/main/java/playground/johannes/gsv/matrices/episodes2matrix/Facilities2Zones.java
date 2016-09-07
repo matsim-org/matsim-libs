@@ -73,7 +73,7 @@ public class Facilities2Zones {
         logger.info("Loading persons...");
         XMLHandler parser = new XMLHandler(new PlainFactory());
         parser.setValidating(false);
-        parser.parse(popIn);
+        parser.readFile(popIn);
         logger.info(String.format("Loaded %s persons...", parser.getPersons().size()));
 
         Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();

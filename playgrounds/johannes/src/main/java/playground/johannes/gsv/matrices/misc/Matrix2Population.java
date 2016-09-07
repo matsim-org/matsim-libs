@@ -28,8 +28,6 @@ import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -112,7 +110,7 @@ public class Matrix2Population {
 		/*
 		 * home act
 		 */
-		ActivityImpl act = (ActivityImpl) factory.createActivityFromCoord(ActivityTypes.HOME, fac_i.getCoord());
+		Activity act = (Activity) factory.createActivityFromCoord(ActivityTypes.HOME, fac_i.getCoord());
 		act.setStartTime(0);
 		act.setEndTime(8 * 60 * 60);
 		act.setFacilityId(fac_i.getId());
@@ -126,7 +124,7 @@ public class Matrix2Population {
 		/*
 		 * target act
 		 */
-		act = (ActivityImpl) factory.createActivityFromCoord(type, fac_j.getCoord());
+		act = (Activity) factory.createActivityFromCoord(type, fac_j.getCoord());
 		act.setEndTime(17 * 60 * 60);
 		act.setFacilityId(fac_j.getId());
 
@@ -139,7 +137,7 @@ public class Matrix2Population {
 		/*
 		 * home act
 		 */
-		act = (ActivityImpl) factory.createActivityFromCoord(ActivityTypes.HOME, fac_i.getCoord());
+		act = (Activity) factory.createActivityFromCoord(ActivityTypes.HOME, fac_i.getCoord());
 		act.setEndTime(24 * 60 * 60);
 		act.setFacilityId(fac_i.getId());
 

@@ -24,15 +24,17 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkTransform;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.*;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -77,12 +79,12 @@ public class Fcd {
 	public static Set<String> readFcdReturningLinkIdsUsed(String fcdNetInFile, String fcdEventsInFile, String outDir, String matsimNetwork, double minDistanceBetweenTwoActs){
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(sc.getNetwork());
-		reader.parse(matsimNetwork);
+		reader.readFile(matsimNetwork);
 		
 		Fcd fcd = new Fcd(fcdNetInFile, fcdEventsInFile, minDistanceBetweenTwoActs);
 		fcd.writeNetworkFromEvents(outDir + "fcd_netFromEvents.xml.gz");
 		fcd.writeSimplePlansFromEvents(outDir + "fcd_simplePlans.xml.gz");
-		fcd.writeComplexPlansFromEvents(outDir + "fcd_complexPlans.xml.gz", (NetworkImpl) sc.getNetwork());
+		fcd.writeComplexPlansFromEvents(outDir + "fcd_complexPlans.xml.gz", (Network) sc.getNetwork());
 		fcd.writeLinksUsed(outDir + "fcd_linksInUseByFcd.txt");
 		
 		return fcd.linksUsed;
@@ -100,12 +102,12 @@ public class Fcd {
 		
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(sc.getNetwork());
-		reader.parse(matsimNetwork);
+		reader.readFile(matsimNetwork);
 		
 		Fcd fcd = new Fcd(netInFile, fcdEventsInFile, 0.0);
 		fcd.writeNetworkFromEvents(netOutFile);
 		fcd.writeSimplePlansFromEvents(plansOutFile);
-		fcd.writeComplexPlansFromEvents(plansOutFile + ".complex.xml", (NetworkImpl) sc.getNetwork());
+		fcd.writeComplexPlansFromEvents(plansOutFile + ".complex.xml", (Network) sc.getNetwork());
 		fcd.writeLinksUsed(linksUsed);
 	}
 
@@ -139,25 +141,25 @@ public class Fcd {
 			
 			if(lastEvent == null){
 				lastEvent = currentEvent;
-				currentPerson = PopulationUtils.createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
+				currentPerson = PopulationUtils.getFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
-				currentPerson.addPlan(new PlanImpl());
+				currentPerson.addPlan(PopulationUtils.createPlan());
 				currentPerson.getSelectedPlan().addActivity(createActivityFromFcdEvent(currentEvent));
 				continue;
 			}
 			
 			if(lastEvent.getVehId().toString().equalsIgnoreCase(currentEvent.getVehId().toString())){
 				// same track, add activities
-				currentPerson.getSelectedPlan().addLeg(new LegImpl(TransportMode.car));
+				currentPerson.getSelectedPlan().addLeg(PopulationUtils.createLeg(TransportMode.car));
 				currentPerson.getSelectedPlan().addActivity(createActivityFromFcdEvent(currentEvent));
 				
 			} else {
 				// different one, new person
-				currentPerson = PopulationUtils.createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
+				currentPerson = PopulationUtils.getFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
-				currentPerson.addPlan(new PlanImpl());
+				currentPerson.addPlan(PopulationUtils.createPlan());
 				currentPerson.getSelectedPlan().addActivity(createActivityFromFcdEvent(currentEvent));
 			}
 		
@@ -171,7 +173,7 @@ public class Fcd {
 		log.info(pop.getPersons().size() + " plans written to " + plansOutFile);
 	}
 	
-	private void writeComplexPlansFromEvents(String plansOutFile, NetworkImpl net) {
+	private void writeComplexPlansFromEvents(String plansOutFile, Network net) {
 		log.info("Creating plans from fcd events...");
 		int numberOfPlans = 1;
         MutableScenario sc = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
@@ -207,10 +209,10 @@ public class Fcd {
 			
 			if(lastEvent == null){
 				lastEvent = currentEvent;
-				currentPerson = PopulationUtils.createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
+				currentPerson = PopulationUtils.getFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
-				currentPerson.addPlan(new PlanImpl());
+				currentPerson.addPlan(PopulationUtils.createPlan());
 				currentPerson.getSelectedPlan().addActivity(createActivityWithLinkFromFcdEvent(currentEvent, link));
 				this.linksUsed.add(link.getId().toString());
 				continue;
@@ -218,16 +220,16 @@ public class Fcd {
 			
 			if(lastEvent.getVehId().toString().equalsIgnoreCase(currentEvent.getVehId().toString())){
 				// same track, add activities
-				currentPerson.getSelectedPlan().addLeg(new LegImpl(TransportMode.car));
+				currentPerson.getSelectedPlan().addLeg(PopulationUtils.createLeg(TransportMode.car));
 				currentPerson.getSelectedPlan().addActivity(createActivityWithLinkFromFcdEvent(currentEvent, link));
 				this.linksUsed.add(link.getId().toString());
 				
 			} else {
 				// different one, new person
-				currentPerson = PopulationUtils.createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
+				currentPerson = PopulationUtils.getFactory().createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
-				currentPerson.addPlan(new PlanImpl());
+				currentPerson.addPlan(PopulationUtils.createPlan());
 				currentPerson.getSelectedPlan().addActivity(createActivityWithLinkFromFcdEvent(currentEvent, link));
 				this.linksUsed.add(link.getId().toString());
 			}
@@ -244,7 +246,7 @@ public class Fcd {
 	
 	private void writeNetworkFromEvents(String netOutFile) {
 		log.info("Creating network from fcd events...");
-		NetworkImpl net = NetworkImpl.createNetwork();
+		Network net = NetworkUtils.createNetwork();
 		
 		FcdEvent lastEvent = null;
 		for (Iterator<FcdEvent> iterator = this.fcdEventsList.iterator(); iterator.hasNext();) {
@@ -258,15 +260,16 @@ public class Fcd {
 			if(lastEvent.getVehId().toString().equalsIgnoreCase(currentEvent.getVehId().toString())){
 				// same track, create link
 				if(net.getNodes().get(currentEvent.getLinkId()) == null){
-					net.createAndAddNode(currentEvent.getLinkId(), this.coordTransform.transform(this.networkMap.get(currentEvent.getLinkId()).getCoord()));
+					NetworkUtils.createAndAddNode(net, (Id<Node>) currentEvent.getLinkId(), this.coordTransform.transform(this.networkMap.get(currentEvent.getLinkId()).getCoord()));
 				}
 				if(net.getNodes().get(lastEvent.getLinkId()) == null){
-					net.createAndAddNode(lastEvent.getLinkId(), this.coordTransform.transform(this.networkMap.get(lastEvent.getLinkId()).getCoord()));
+					NetworkUtils.createAndAddNode(net, (Id<Node>) lastEvent.getLinkId(), this.coordTransform.transform(this.networkMap.get(lastEvent.getLinkId()).getCoord()));
 				}
 				
 				Id<Link> newLinkId = Id.create(lastEvent.getLinkId().toString() + "-" + currentEvent.getLinkId().toString(), Link.class);
 				if(net.getLinks().get(newLinkId) == null){
-					net.createAndAddLink(newLinkId, net.getNodes().get(lastEvent.getLinkId()), net.getNodes().get(currentEvent.getLinkId()), 999.9, 9.9, 9999.9, 9.9);
+					final Id<Link> id = newLinkId;
+					NetworkUtils.createAndAddLink(net,id, net.getNodes().get(lastEvent.getLinkId()), net.getNodes().get(currentEvent.getLinkId()), 999.9, 9.9, 9999.9, 9.9 );
 				}
 			}			
 
@@ -309,25 +312,25 @@ public class Fcd {
 	// HELPER
 	
 	private Activity createActivityFromFcdEvent(FcdEvent fcdEvent){
-		Activity act = new ActivityImpl("fcd", this.coordTransform.transform(this.networkMap.get(fcdEvent.getLinkId()).getCoord()));
+		Activity act = PopulationUtils.createActivityFromCoord("fcd", this.coordTransform.transform(this.networkMap.get(fcdEvent.getLinkId()).getCoord()));
 		act.setEndTime(fcdEvent.getTime());
 		return act;
 	}
 
 	private Activity createActivityWithLinkFromFcdEvent(FcdEvent fcdEvent, Link link) {
-		Activity act = new ActivityImpl("fcd", this.coordTransform.transform(this.networkMap.get(fcdEvent.getLinkId()).getCoord()), link.getId());
+		Activity act = PopulationUtils.createActivityFromCoordAndLinkId("fcd", this.coordTransform.transform(this.networkMap.get(fcdEvent.getLinkId()).getCoord()), link.getId());
 		act.setEndTime(fcdEvent.getTime());
 		return act;
 	}
 
-	private Link getLinkWithRightDirection(FcdEvent fcdEvent, NetworkImpl net) {
+	private Link getLinkWithRightDirection(FcdEvent fcdEvent, Network net) {
 		Id linkId = fcdEvent.getLinkId();
 		Coord coord = this.networkMap.get(linkId).getCoord();
 		double direction = this.networkMap.get(linkId).getDirection();
 		return getNearestLinkWithRightDirection(net, this.coordTransform.transform(coord), direction);
 	}
 
-	public static Link getNearestLinkWithRightDirection(NetworkImpl net, Coord coord, double direction) {
+	public static Link getNearestLinkWithRightDirection(Network net, Coord coord, double direction) {
 		Link link = NetworkUtils.getNearestLink(net, coord);
 		double directionGiven_rad = direction * 2 * Math.PI / 360.0;
 		Coord vectorGiven = new Coord(Math.cos(directionGiven_rad), Math.sin(directionGiven_rad));

@@ -312,7 +312,7 @@ public class ActivityAnalyser {
 			public List<Double> call() throws Exception {
 				List<Double> list = new ArrayList<Double>();
 				DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-				dvr.parse(this.vehicleFile.getAbsolutePath());
+				dvr.readFile(this.vehicleFile.getAbsolutePath());
 				DigicoreVehicle vehicle = dvr.getVehicle();
 				for(DigicoreChain chain : vehicle.getChains()){
 					for(DigicoreActivity activity : chain.getMinorActivities()){

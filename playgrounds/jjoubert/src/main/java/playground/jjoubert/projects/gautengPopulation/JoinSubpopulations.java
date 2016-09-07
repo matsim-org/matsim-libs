@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -87,20 +87,20 @@ public class JoinSubpopulations {
 	public static void Run(String first, String firstAttribute, String second, String secondAttribute, String output, String outputAttribute){
 		/* Read the first subpopulation. */
 		Scenario sc1 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc1).parse(first);
+		new PopulationReader(sc1).readFile(first);
 		/* Read the (optional) attributes of the first subpopulation. */
 		File f1 = new File(firstAttribute);
 		if(f1.exists() && f1.canRead()){
-			new ObjectAttributesXmlReader(sc1.getPopulation().getPersonAttributes()).parse(firstAttribute);
+			new ObjectAttributesXmlReader(sc1.getPopulation().getPersonAttributes()).readFile(firstAttribute);
 		}
 		
 		/* Read the second subpopulation. */
 		Scenario sc2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc2).parse(second);
+		new PopulationReader(sc2).readFile(second);
 		/* Read the (optional) attributes of the first subpopulation. */
 		File f2 = new File(secondAttribute);
 		if(f2.exists() && f2.canRead()){
-			new ObjectAttributesXmlReader(sc2.getPopulation().getPersonAttributes()).parse(secondAttribute);
+			new ObjectAttributesXmlReader(sc2.getPopulation().getPersonAttributes()).readFile(secondAttribute);
 		}
 		
 		/* Add all the persons from the second to the first subpopulation. */

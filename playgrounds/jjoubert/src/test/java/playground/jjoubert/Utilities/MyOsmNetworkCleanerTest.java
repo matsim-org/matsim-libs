@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
@@ -58,7 +58,7 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader nr = new MatsimNetworkReader(sc.getNetwork());
-		nr.parse(getOutputDirectory() + "network.xml.gz");
+		nr.readFile(getOutputDirectory() + "network.xml.gz");
 
 		assertEquals("Network must have 8 links.", 8, sc.getNetwork().getLinks().size());
 
@@ -93,7 +93,7 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader nr = new MatsimNetworkReader(sc.getNetwork());
-		nr.parse(getOutputDirectory() + "network.xml.gz");
+		nr.readFile(getOutputDirectory() + "network.xml.gz");
 
 		monc.cleanNetwork(sc.getNetwork(), mp);
 		assertNotNull("Cleaned network should exists.", monc.getNewNetwork());

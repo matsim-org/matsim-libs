@@ -29,24 +29,24 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.algorithms.PersonPrepareForSim;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.population.algorithms.PersonAlgorithm;
-import org.matsim.population.algorithms.PersonPrepareForSim;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.utils.EditRoutes;
 
 public class InsertParkingActivities implements PlanAlgorithm {
@@ -55,7 +55,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 	private final PersonAlgorithm personPrepareForSim;
 	private final ParkingInfrastructure parkingInfrastructure;
 	private final TripRouter tripRouter;
-	private final RouteFactoryImpl modeRouteFactory;
+	private final RouteFactories modeRouteFactory;
 
 	
 	// TODO: instead of selecting closest parking, we could select parking from previous day.
@@ -68,7 +68,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 		this.personPrepareForSim = new PersonPrepareForSim(new PlanRouter(tripRouter), scenario);
 		this.parkingInfrastructure = parkingInfrastructure;
 		
-		this.modeRouteFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getRouteFactory();
+		this.modeRouteFactory = ((PopulationFactory) scenario.getPopulation().getFactory()).getRouteFactories();
 	}
 
 	@Override
@@ -157,7 +157,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 		
 		for (int i=0;i<planElements.size();i++){
 			if (planElements.get(i) instanceof Activity){
-				ActivityImpl act=(ActivityImpl) planElements.get(i);
+				Activity act=(Activity) planElements.get(i);
 				
 				if (act.getType().equalsIgnoreCase("parking")){
 					synchronized(parkingInfrastructure) {
@@ -209,8 +209,8 @@ public class InsertParkingActivities implements PlanAlgorithm {
 			EditRoutes editRoutes=new EditRoutes();
 			
 			Activity currentParkingDepartureAct = null;
-			ActivityImpl nextParkingArrivalAct = null;
-			ActivityImpl nextParkingDepartureAct = null;
+			Activity nextParkingArrivalAct = null;
+			Activity nextParkingDepartureAct = null;
 			
 			List<PlanElement> planElements = plan.getPlanElements();
 			int firstPossibleParkingActIndex = 2;
@@ -221,9 +221,9 @@ public class InsertParkingActivities implements PlanAlgorithm {
 						if (currentParkingDepartureAct == null) {
 							currentParkingDepartureAct = act;
 						} else if (nextParkingArrivalAct == null) {
-							nextParkingArrivalAct = (ActivityImpl) act;
+							nextParkingArrivalAct = (Activity) act;
 						} else if (nextParkingDepartureAct == null) {
-							nextParkingDepartureAct = (ActivityImpl) act;
+							nextParkingDepartureAct = (Activity) act;
 						}
 					}
 				}
@@ -266,7 +266,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 	public static Activity createParkingActivity(Scenario sc, Id parkingFacilityId) {
 		ActivityFacility facility = ((MutableScenario) sc).getActivityFacilities().getFacilities().get(parkingFacilityId);
 
-		ActivityImpl activity = (ActivityImpl) sc.getPopulation().getFactory()
+		Activity activity = (Activity) sc.getPopulation().getFactory()
 				.createActivityFromLinkId("parking", facility.getLinkId());
 		activity.setMaximumDuration(180);
 		activity.setCoord(facility.getCoord());
@@ -287,7 +287,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 				.get(parkingFacilityId);
 
 		Id linkId = parkingFacility.getLinkId();
-		ActivityImpl activity = (ActivityImpl) this.scenario.getPopulation().getFactory()
+		Activity activity = (Activity) this.scenario.getPopulation().getFactory()
 				.createActivityFromLinkId("parking", linkId);
 		activity.setMaximumDuration(180);
 		activity.setCoord(parkingFacility.getCoord());
@@ -305,8 +305,8 @@ public class InsertParkingActivities implements PlanAlgorithm {
 		
 		Activity currentParkingArrivalAct = null;
 		Activity currentParkingDepartureAct = null;
-		ActivityImpl nextParkingArrivalAct = null;
-		ActivityImpl nextParkingDepartureAct = null;
+		Activity nextParkingArrivalAct = null;
+		Activity nextParkingDepartureAct = null;
 
 		Plan executedPlan = withinDayAgentUtils.getModifiablePlan(withinDayAgent);
 		int currentPlanElemIndex = withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
@@ -321,9 +321,9 @@ public class InsertParkingActivities implements PlanAlgorithm {
 					} else if (currentParkingDepartureAct == null) {
 						currentParkingDepartureAct = act;
 					} else if (nextParkingArrivalAct == null) {
-						nextParkingArrivalAct = (ActivityImpl) act;
+						nextParkingArrivalAct = (Activity) act;
 					} else if (nextParkingDepartureAct == null) {
-						nextParkingDepartureAct = (ActivityImpl) act;
+						nextParkingDepartureAct = (Activity) act;
 					}
 				}
 			}

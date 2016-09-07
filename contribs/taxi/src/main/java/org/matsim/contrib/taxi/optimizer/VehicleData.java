@@ -30,38 +30,54 @@ import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 public class VehicleData
 {
     public static class Entry
+        extends LinkTimePair
     {
         public final int idx;
         public final Vehicle vehicle;
-        public final Link link;
-        public final double time;
         public final boolean idle;
 
 
-        public Entry(int idx, Vehicle vehicle, LinkTimePair linkTimePair, boolean idle)
+        public Entry(int idx, Vehicle vehicle, Link link, double time, boolean idle)
         {
+            super(link, time);
             this.idx = idx;
             this.vehicle = vehicle;
-            this.link = linkTimePair.link;
-            this.time = linkTimePair.time;
             this.idle = idle;
         }
     }
 
 
-    public final List<Entry> entries = new ArrayList<>();
-    public final int idleCount;
-    public final int dimension;
+    //max 48 hours of departure delay (== not a real constraint)
+    private static final double NO_PLANNING_HORIZON = 2 * 24 * 3600;
+
+    private final List<Entry> entries = new ArrayList<>();
+    private final int idleCount;
 
 
-    public VehicleData(TaxiOptimizerContext optimContext)
+    public VehicleData(Iterable<Entry> vehEntries)
     {
-        this(optimContext, 2 * 24 * 3600);//max 48 hours of departure delay (== not a real constraint)
+        int idx = 0;
+        int idleCounter = 0;
+        for (Entry e : vehEntries) {
+            entries.add(new Entry(idx++, e.vehicle, e.link, e.time, e.idle));
+            if (e.idle) {
+                idleCounter++;
+            }
+        }
+
+        idleCount = idleCounter;
+    }
+
+
+    public VehicleData(TaxiOptimizerContext optimContext, Iterable<Vehicle> vehicles)
+    {
+        this(optimContext, vehicles, NO_PLANNING_HORIZON);
     }
 
 
     //skipping vehicles with departure.time > curr_time + maxDepartureDelay
-    public VehicleData(TaxiOptimizerContext optimContext, double planningHorizon)
+    public VehicleData(TaxiOptimizerContext optimContext, Iterable<Vehicle> vehicles,
+            double planningHorizon)
     {
         double currTime = optimContext.timer.getTimeOfDay();
         double maxDepartureTime = currTime + planningHorizon;
@@ -69,15 +85,13 @@ public class VehicleData
 
         int idx = 0;
         int idleCounter = 0;
-        for (Vehicle v : optimContext.taxiData.getVehicles().values()) {
+        for (Vehicle v : vehicles) {
             LinkTimePair departure = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(v);
 
             if (departure != null && departure.time <= maxDepartureTime) {
                 boolean idle = departure.time == currTime //(small optimization to avoid unnecessary calls to Scheduler.isIdle())
                         && scheduleInquiry.isIdle(v);
-
-                entries.add(new Entry(idx++, v, departure, idle));
-
+                entries.add(new Entry(idx++, v, departure.link, departure.time, idle));
                 if (idle) {
                     idleCounter++;
                 }
@@ -85,6 +99,29 @@ public class VehicleData
         }
 
         idleCount = idleCounter;
-        dimension = entries.size();
+    }
+
+
+    public int getSize()
+    {
+        return entries.size();
+    }
+
+
+    public Entry getEntry(int idx)
+    {
+        return entries.get(idx);
+    }
+
+
+    public List<Entry> getEntries()
+    {
+        return entries;
+    }
+
+
+    public int getIdleCount()
+    {
+        return idleCount;
     }
 }

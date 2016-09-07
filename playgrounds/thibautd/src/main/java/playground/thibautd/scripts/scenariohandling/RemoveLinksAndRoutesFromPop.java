@@ -23,10 +23,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.algorithms.PersonRemoveLinkAndRoute;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.algorithms.PersonAlgorithm;
-import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
 
 /**
  * @author thibautd
@@ -37,7 +37,7 @@ public class RemoveLinksAndRoutesFromPop {
 		final String outPop = args[ 1 ];
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimPopulationReader( sc ).parse( inPop );
+		new PopulationReader( sc ).readFile( inPop );
 
 		final PersonAlgorithm algo = new PersonRemoveLinkAndRoute();
 		for ( Person p : sc.getPopulation().getPersons().values() ) {

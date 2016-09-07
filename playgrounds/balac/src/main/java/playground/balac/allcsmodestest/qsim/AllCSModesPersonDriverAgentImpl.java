@@ -16,9 +16,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -35,8 +37,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
@@ -395,7 +396,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	//added methods
 	
 	private void initializeCSWalkLeg(String mode, double now, Link startLink, Link destinationLink) {
-		LegImpl walkLeg = new LegImpl(mode);
+		Leg walkLeg = PopulationUtils.createLeg(mode);
 		
 		GenericRouteImpl walkRoute = new GenericRouteImpl(startLink.getId(), destinationLink.getId());
 		final double dist = CoordUtils.calcEuclideanDistance(startLink.getCoord(), destinationLink.getCoord());
@@ -410,7 +411,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		
 		walkLeg.setDepartureTime(now);
 		walkLeg.setTravelTime(travTime);
-		walkLeg.setArrivalTime(now + travTime);
+		walkLeg.setTravelTime( now + travTime - walkLeg.getDepartureTime() );
 		// set the route according to the next leg
 		this.currentLeg = walkLeg;
 		this.cachedRouteLinkIds = null;
@@ -439,10 +440,10 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			}
 		}
 		
-		LegImpl carLeg = new LegImpl(mode);
+		Leg carLeg = PopulationUtils.createLeg(mode);
 		
 		carLeg.setTravelTime( travelTime );
-		NetworkRoute route = ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getRouteFactory().createRoute(NetworkRoute.class, startLink.getId(), destinationLink.getId());
+		NetworkRoute route = ((PopulationFactory)scenario.getPopulation().getFactory()).getRouteFactories().createRoute(NetworkRoute.class, startLink.getId(), destinationLink.getId());
 		
 		route.setLinkIds( startLink.getId(), ids, destinationLink.getId());
 		route.setTravelTime( travelTime);

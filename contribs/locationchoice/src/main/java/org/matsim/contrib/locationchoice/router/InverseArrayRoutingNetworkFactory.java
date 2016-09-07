@@ -20,15 +20,23 @@
 
 package org.matsim.contrib.locationchoice.router;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.router.util.*;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.matsim.core.network.LinkFactory;
+import org.matsim.core.router.util.AbstractRoutingNetworkFactory;
+import org.matsim.core.router.util.ArrayRoutingNetwork;
+import org.matsim.core.router.util.ArrayRoutingNetworkFactory;
+import org.matsim.core.router.util.ArrayRoutingNetworkLink;
+import org.matsim.core.router.util.ArrayRoutingNetworkNode;
+import org.matsim.core.router.util.PreProcessDijkstra;
+import org.matsim.core.router.util.RoutingNetworkLink;
+import org.matsim.core.router.util.RoutingNetworkNode;
 
 /**
  * For all links, their from and to nodes are exchanged. As a result,
@@ -105,5 +113,11 @@ public class InverseArrayRoutingNetworkFactory extends AbstractRoutingNetworkFac
 	public ArrayRoutingNetworkLink createRoutingNetworkLink(Link link,
 			RoutingNetworkNode fromNode, RoutingNetworkNode toNode) {
 		return new ArrayRoutingNetworkLink(link, fromNode, toNode, linkArrayIndexCounter++);
+	}
+
+	@Override
+	public void setLinkFactory(LinkFactory factory) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 }

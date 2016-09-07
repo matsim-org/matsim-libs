@@ -20,16 +20,16 @@
 
 package playground.toronto.timeblur;
 
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class PersonBlurTimes extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -71,29 +71,31 @@ public class PersonBlurTimes extends AbstractPersonAlgorithm implements PlanAlgo
 
 	private void shiftPlan(Plan plan, double timeShift){
 		for (PlanElement pe : plan.getPlanElements()){
-			if (pe instanceof ActivityImpl){
-				double start = ((ActivityImpl) pe).getStartTime();
-				double end = ((ActivityImpl) pe).getEndTime();
-				double dur = ((ActivityImpl) pe).getMaximumDuration();
+			if (pe instanceof Activity){
+				double start = ((Activity) pe).getStartTime();
+				double end = ((Activity) pe).getEndTime();
+				double dur = ((Activity) pe).getMaximumDuration();
 				
 				if (start != Time.UNDEFINED_TIME && start != 0){
 					double newStart = start + timeShift;
 					if (newStart < 0) 
 						newStart = 0; //Shouldn't happen, but check to make sure.
-					((ActivityImpl) pe).setStartTime(newStart);
+					((Activity) pe).setStartTime(newStart);
 				}
 				if (end != Time.UNDEFINED_TIME){
 					double newEnd = end + timeShift;
-					((ActivityImpl) pe).setEndTime(newEnd);
+					((Activity) pe).setEndTime(newEnd);
 				}
 				if (dur != Time.UNDEFINED_TIME && dur != Double.POSITIVE_INFINITY){
-					((ActivityImpl) pe).setMaximumDuration(((ActivityImpl) pe).getEndTime() - ((ActivityImpl) pe).getEndTime());
+					((Activity) pe).setMaximumDuration(((Activity) pe).getEndTime() - ((Activity) pe).getEndTime());
 				}
-			}else if(pe instanceof LegImpl){
-				double dep = ((LegImpl) pe).getDepartureTime();
-				double arr = ((LegImpl) pe).getArrivalTime();
-				((LegImpl) pe).setDepartureTime(dep + timeShift);
-				((LegImpl) pe).setArrivalTime(arr + timeShift);
+			}else if(pe instanceof Leg){
+				double dep = ((Leg) pe).getDepartureTime();
+				Leg r = ((Leg) pe);
+				double arr = r.getDepartureTime() + r.getTravelTime();
+				((Leg) pe).setDepartureTime(dep + timeShift);
+				Leg r1 = ((Leg) pe);
+				r1.setTravelTime( arr + timeShift - r1.getDepartureTime() );
 				
 			}else{
 				System.err.println("Cannot recognize plan element!");

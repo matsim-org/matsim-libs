@@ -4,13 +4,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -40,7 +40,7 @@ public class FacilityAdder {
         final String pathToOutputPopulation = args[2];
 
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
+        PopulationReader plansReader = new PopulationReader(scenario);
         plansReader.readFile(pathToInputPopulation);
         Population population = scenario.getPopulation();
         FacilitiesReaderMatsimV1 facilitiesReader = new FacilitiesReaderMatsimV1(scenario);
@@ -60,8 +60,8 @@ public class FacilityAdder {
             counter.incCounter();
             if (p.getSelectedPlan() != null) {
                 for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
-                    if (pe instanceof ActivityImpl) {
-                        ActivityImpl act = (ActivityImpl) pe;
+                    if (pe instanceof Activity) {
+                        Activity act = (Activity) pe;
 						if (act.getFacilityId() != null) {
 							switch (act.getType()) {
 								case HOME: homeFacility = act.getFacilityId(); break;
@@ -111,7 +111,7 @@ public class FacilityAdder {
         }
     }
 
-    private static void addFacilityToActivity(ActivityImpl act, ActivityFacilities facilities) {
+    private static void addFacilityToActivity(Activity act, ActivityFacilities facilities) {
         Coord actCoord = act.getCoord();
         String actType = act.getType();
 

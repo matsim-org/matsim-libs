@@ -25,8 +25,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PersonImpl;
 
 /**
  * 
@@ -51,7 +51,7 @@ public class AgentId2PersonMap {
 		log.debug("Parsing population...");
 		
 		for (Person person : pop.getPersons().values()) {
-			if(person instanceof PersonImpl){
+			if(person instanceof Person){
 				agentId2PersonMap.put(person.getId(), person);
 			} else {
 				log.debug(person + " is not of type PersonImpl, but of type " + person.getClass() + ". Don't know how to handle that one.");

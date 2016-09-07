@@ -20,6 +20,8 @@
 
 package org.matsim.pt.config;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -27,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup.StringGetter;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -61,7 +64,7 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 
 	public TransitConfigGroup() {
 		super(GROUP_NAME);
-		Set<String> modes = new LinkedHashSet<String>();
+		Set<String> modes = new LinkedHashSet<>();
 		modes.add(TransportMode.pt);
 		this.transitModes = Collections.unmodifiableSet(modes);
 	}
@@ -112,6 +115,10 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 		return this.transitScheduleFile;
 	}
 
+	public URL getTransitScheduleFileURL(URL context) {
+		return ConfigGroup.getInputFileURL(context, getTransitScheduleFile() ) ;
+	}
+
 	@StringSetter( VEHICLES_FILE )
 	public void setVehiclesFile(final String filename) {
 		this.vehiclesFile = filename;
@@ -122,8 +129,12 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 		return this.vehiclesFile;
 	}
 
+	public URL getVehiclesFileURL(URL context) {
+		return ConfigGroup.getInputFileURL(context, getVehiclesFile() ) ;
+	}
+
 	public void setTransitModes(final Set<String> modes) {
-		this.transitModes = Collections.unmodifiableSet(new HashSet<String>(modes));
+		this.transitModes = Collections.unmodifiableSet(new HashSet<>(modes));
 	}
 
 	public Set<String> getTransitModes() {
@@ -143,6 +154,9 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	@StringGetter( TRANSIT_STOPS_ATTRIBUTES )
 	public String getTransitStopsAttributesFile() {
 		return this.transitStopsAttributesFile;
+	}
+	public URL getTransitStopsAttributesFileURL(URL context) {
+		return ConfigGroup.getInputFileURL(context, getTransitStopsAttributesFile()) ;
 	}
 	
 	@StringSetter( TRANSIT_STOPS_ATTRIBUTES )

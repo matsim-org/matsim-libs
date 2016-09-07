@@ -20,9 +20,17 @@
 
 package org.matsim.core.mobsim.external;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -33,19 +41,10 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.population.AbstractPopulationWriterHandler;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.PopulationWriterHandlerImplV4;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ExeRunner;
-
-import javax.inject.Inject;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 public class ExternalMobsim implements Mobsim {
 
@@ -78,7 +77,7 @@ public class ExternalMobsim implements Mobsim {
 		this.plansFileName = "ext_plans.xml";
 		this.eventsFileName = "ext_events.txt";
 		this.configFileName = "ext_config.xml";
-		
+
 		this.simConfig = ConfigUtils.addOrGetModule(this.scenario.getConfig(), ExternalMobimConfigGroup.GROUP_NAME, ExternalMobimConfigGroup.class ) ;
 
 		this.executable = this.simConfig.getExternalExe() ;
@@ -126,55 +125,75 @@ public class ExternalMobsim implements Mobsim {
 		new ConfigWriter(extConfig).write(iterationConfigFile);
 	}
 
-	protected void writePlans(final String iterationPlansFile) throws FileNotFoundException, IOException {
+	protected void writePlans(final String iterationPlansFile) {
 		log.info("writing plans for external mobsim");
-		PopulationImpl pop = (PopulationImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
-		pop.setIsStreaming(true);
-		PopulationWriter plansWriter = new PopulationWriter(pop, this.scenario.getNetwork());
-		AbstractPopulationWriterHandler handler = new PopulationWriterHandlerImplV4(this.scenario.getNetwork());
-		plansWriter.setWriterHandler(handler);
-		plansWriter.writeStartPlans(iterationPlansFile);
-		BufferedWriter writer = plansWriter.getWriter();
-		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			Plan plan = person.getSelectedPlan();
-			if (plan != null) {
-				/* we have to re-implement a custom writer here, because we only want to
-				 * write a single plan (the selected one) and not all plans of the person.
-				 */
-				handler.startPerson(person, writer);
-				handler.startPlan(plan, writer);
-
-				// act/leg
-				for (PlanElement pe : plan.getPlanElements()) {
-					if (pe instanceof Activity) {
-						Activity act = (Activity) pe;
-						handler.startAct(act, writer);
-						handler.endAct(writer);
-					} else if (pe instanceof Leg) {
-						Leg leg = (Leg) pe;
-						handler.startLeg(leg, writer);
-						// route
-						if (leg.getRoute() != null) {
-							NetworkRoute r = (NetworkRoute) leg.getRoute();
-							handler.startRoute(r, writer);
-							handler.endRoute(writer);
-						}
-						handler.endLeg(writer);
-					}
-				}
-				handler.endPlan(writer);
-				handler.endPerson(writer);
-				handler.writeSeparator(writer);
-				writer.flush();
-			}
+		log.warn("I don't know if this works; was changed after the streaming api changed, and never tested after that.  Pls let us know. kai, jul'16" ) ;
+		
+		Population pop2 = PopulationUtils.createPopulation( ConfigUtils.createConfig() ) ;
+		PopulationFactory pf = pop2.getFactory() ;
+		for ( Person person : this.scenario.getPopulation().getPersons().values() ) {
+			Person person2 = pf.createPerson( person.getId() ) ;
+			Plan plan2 = pf.createPlan() ;
+			PopulationUtils.copyFromTo( person.getSelectedPlan(), plan2 );
+			person2.addPlan(plan2) ;
+			pop2.addPerson(person2);
 		}
-		handler.endPlans(writer);
-		writer.flush();
-		writer.close();
+		
+		PopulationWriter writer = new PopulationWriter( pop2 ) ;
+		writer.writeV4( iterationPlansFile );
+
+//		Population pop = (Population) ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
+//		// yyyyyy is the streaming really necessary here? kai, jul'16
+//		//		StreamingUtils.setIsStreaming(pop, true);
+//		PopulationWriter plansWriter = new PopulationWriter(pop, this.scenario.getNetwork());
+//		AbstractPopulationWriterHandler handler = new PopulationWriterHandlerImplV4(this.scenario.getNetwork());
+//		plansWriter.setWriterHandler(handler);
+//		plansWriter.writeStartPlans(iterationPlansFile);
+//		BufferedWriter writer = plansWriter.getWriter();
+//		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+//			Plan plan = person.getSelectedPlan();
+//			if (plan != null) {
+//				/* we have to re-implement a custom writer here, because we only want to
+//				 * write a single plan (the selected one) and not all plans of the person.
+//				 * 
+//				 * yy could as well copy only the selected plans to a new population.  That would be closer to our 
+//				 * programming style over the recent years (sacrifice performance for cleaner code at non-critical locations).
+//				 * kai, jul'16
+//				 */
+//				handler.startPerson(person, writer);
+//				handler.startPlan(plan, writer);
+//
+//				// act/leg
+//				for (PlanElement pe : plan.getPlanElements()) {
+//					if (pe instanceof Activity) {
+//						Activity act = (Activity) pe;
+//						handler.startAct(act, writer);
+//						handler.endAct(writer);
+//					} else if (pe instanceof Leg) {
+//						Leg leg = (Leg) pe;
+//						handler.startLeg(leg, writer);
+//						// route
+//						if (leg.getRoute() != null) {
+//							NetworkRoute r = (NetworkRoute) leg.getRoute();
+//							handler.startRoute(r, writer);
+//							handler.endRoute(writer);
+//						}
+//						handler.endLeg(writer);
+//					}
+//				}
+//				handler.endPlan(writer);
+//				handler.endPerson(writer);
+//				handler.writeSeparator(writer);
+//				writer.flush();
+//			}
+//		}
+//		handler.endPlans(writer);
+//		writer.flush();
+//		writer.close();
 	}
 
-//	@SuppressWarnings("unused") /* do now show warnings that this method does not throw any exceptions,
-//	as classes inheriting from this class may throw exceptions in their implementation of this method. */
+	//	@SuppressWarnings("unused") /* do now show warnings that this method does not throw any exceptions,
+	//	as classes inheriting from this class may throw exceptions in their implementation of this method. */
 	protected void runExe(final String iterationConfigFile) throws FileNotFoundException, IOException {
 		String cmd = this.executable + " " + iterationConfigFile;
 		log.info("running command: " + cmd);
@@ -187,8 +206,8 @@ public class ExternalMobsim implements Mobsim {
 		}
 	}
 
-//	@SuppressWarnings("unused") /* do now show warnings that this method does not throw any exceptions,
-//	as classes inheriting from this class may throw exceptions in their implementation of this method. */
+	//	@SuppressWarnings("unused") /* do now show warnings that this method does not throw any exceptions,
+	//	as classes inheriting from this class may throw exceptions in their implementation of this method. */
 	protected void readEvents(final String iterationEventsFile) throws FileNotFoundException, IOException {
 		log.info("reading events from external mobsim");
 		new MatsimEventsReader(this.events).readFile(iterationEventsFile);

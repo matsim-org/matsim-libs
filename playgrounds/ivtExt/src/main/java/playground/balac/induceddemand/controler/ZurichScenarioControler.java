@@ -1,39 +1,31 @@
 package playground.balac.induceddemand.controler;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.inject.name.Names;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.contrib.socnetsim.utils.QuadTreeRebuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.controler.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
-
-import com.google.inject.name.Names;
-
 import playground.balac.induceddemand.config.ActivityStrategiesConfigGroup;
 import playground.balac.induceddemand.controler.listener.ActivitiesAnalysisListener;
 import playground.balac.induceddemand.strategies.activitychainmodifier.ActivityChainModifierStrategy;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringModule;
-import playground.polettif.boescpa.lib.tools.fileCreation.F2LConfigGroup;
+
+import java.io.File;
+import java.util.HashMap;
 
 /**
  * 
@@ -145,7 +137,7 @@ public class ZurichScenarioControler {
 	private static void connectFacilitiesWithNetwork(MatsimServices controler) {
         ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 		//log.warn("number of facilities: " +facilities.getFacilities().size());
-        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
+        Network network = (Network) controler.getScenario().getNetwork();
 		//log.warn("number of links: " +network.getLinks().size());
 
 		WorldConnectLocations wcl = new WorldConnectLocations(controler.getConfig());

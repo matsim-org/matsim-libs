@@ -2,12 +2,12 @@ package playground.boescpa.ivtBaseline.preparation;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -107,8 +107,8 @@ public class PrefsCreator {
 				numH = 0; numRH = 0; numW = 0; numRW = 0; numE = 0; numL = 0; numS = 0; numK = 0; numO = 0;
                 // get number of activities and actChain
                 for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
-                    if (pe instanceof ActivityImpl) {
-                        ActivityImpl act = (ActivityImpl) pe;
+                    if (pe instanceof Activity) {
+                        Activity act = (Activity) pe;
                         actChain = actChain.concat(actCharacteristics.valueOf(act.getType().toUpperCase()).getAbbr());
                         actStartTime = (act.getStartTime() > 0) ? act.getStartTime() : 0;
                         actEndTime = (act.getEndTime() > 0) ? act.getEndTime() : 24*3600;
@@ -190,9 +190,9 @@ public class PrefsCreator {
                 leisure = false;
                 // get number of activities and actChain
                 for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
-                    if (pe instanceof ActivityImpl) {
+                    if (pe instanceof Activity) {
                         nrOfActs += 1;
-                        ActivityImpl act = (ActivityImpl) pe;
+                        Activity act = (Activity) pe;
                         actChain = actChain.concat(act.getType().substring(0, 1));
                         switch (act.getType()) {
                             case WORK:
@@ -356,7 +356,7 @@ public class PrefsCreator {
     private static ObjectAttributes getObjectAttributes(String pathToInputPrefs) {
         ObjectAttributes prefs = new ObjectAttributes();
         ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(prefs);
-        reader.parse(pathToInputPrefs);
+        reader.readFile(pathToInputPrefs);
         return prefs;
     }
 
@@ -366,7 +366,7 @@ public class PrefsCreator {
 
         log.info("Reading plans...");
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        MatsimPopulationReader PlansReader = new MatsimPopulationReader(scenario);
+        PopulationReader PlansReader = new PopulationReader(scenario);
         PlansReader.readFile(pathToPopFile);
         Population population = scenario.getPopulation();
         log.info("Reading plans...done.");

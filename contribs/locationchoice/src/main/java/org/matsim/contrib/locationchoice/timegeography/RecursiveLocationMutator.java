@@ -29,16 +29,17 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.LocationMutator;
 import org.matsim.contrib.locationchoice.router.PlanRouterAdapter;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
@@ -130,7 +131,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 			Iterator<Activity> act_it = subChain.getSlActs().iterator();
 			while (act_it.hasNext()) {
 				Activity act = act_it.next();
-				this.modifyLocation((ActivityImpl) act, subChain.getStartCoord(), subChain.getEndCoord(), Double.MAX_VALUE, 0);
+				this.modifyLocation((Activity) act, subChain.getStartCoord(), subChain.getEndCoord(), Double.MAX_VALUE, 0);
 			}
 			return 0;
 		}
@@ -145,7 +146,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 		while (act_it.hasNext()) {
 			Activity act = act_it.next();
 			double radius = (ttBudget * speed) / 2.0;
-			if (!this.modifyLocation((ActivityImpl) act, startCoord, endCoord, radius, 0)) {
+			if (!this.modifyLocation((Activity) act, startCoord, endCoord, radius, 0)) {
 				return 1;
 			}
 
@@ -165,7 +166,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 		return 0;
 	}
 
-	protected boolean modifyLocation(ActivityImpl act, Coord startCoord, Coord endCoord, double radius, int trialNr) {
+	protected boolean modifyLocation(Activity act, Coord startCoord, Coord endCoord, double radius, int trialNr) {
 
 		ArrayList<ActivityFacility> choiceSet = this.computeChoiceSetCircle(startCoord, endCoord, radius, act.getType());
 
@@ -175,7 +176,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 			final ActivityFacility facility = choiceSet.get(super.random.nextInt(choiceSet.size()));
 
 			act.setFacilityId(facility.getId());
-       		act.setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) this.scenario.getNetwork()), facility.getCoord()).getId());
+       		act.setLinkId(NetworkUtils.getNearestLink(((Network) this.scenario.getNetwork()), facility.getCoord()).getId());
        		act.setCoord(facility.getCoord());
        		return true;
 		}
@@ -184,10 +185,10 @@ public class RecursiveLocationMutator extends LocationMutator {
 	}
 
 	protected double computeTravelTime(Person person, Activity fromAct, Activity toAct) {
-		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
+		Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(0.0);
-		leg.setArrivalTime(0.0);
+		leg.setTravelTime( 0.0 - leg.getDepartureTime() );
 
 		PlanRouterAdapter.handleLeg(router, person, leg, fromAct, toAct, fromAct.getEndTime());
 		return leg.getTravelTime();
@@ -198,17 +199,17 @@ public class RecursiveLocationMutator extends LocationMutator {
 
 		final List<?> actslegs = plan.getPlanElements();
 		for (int j = 0; j < actslegs.size(); j=j+2) {
-			final ActivityImpl act = (ActivityImpl)actslegs.get(j);
+			final Activity act = (Activity)actslegs.get(j);
 
 			if (super.defineFlexibleActivities.getFlexibleTypes().contains(this.defineFlexibleActivities.getConverter().convertType(act.getType()))) { // found secondary activity
-				manager.secondaryActivityFound(act, (LegImpl)actslegs.get(j+1));
+				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));
 			}
 			else {		// found primary activity
 				if (j == (actslegs.size()-1)) {
 					manager.primaryActivityFound(act, null);
 				}
 				else {
-					manager.primaryActivityFound(act, (LegImpl)actslegs.get(j+1));
+					manager.primaryActivityFound(act, (Leg)actslegs.get(j+1));
 				}
 			}
 		}

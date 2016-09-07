@@ -21,8 +21,8 @@ package playground.wrashid.lib.tools.network;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 import playground.wrashid.lib.tools.kml.Color;
@@ -52,7 +52,7 @@ public class MapCoordinateListToLinks {
 		linkCoordinates.add(new Coord(682801.240, 248640.035));
 		linkCoordinates.add(new Coord(682860.600, 248613.556));
 
-		NetworkImpl network= (NetworkImpl) GeneralLib.readNetwork(inputNetworkPath);
+		Network network= (Network) GeneralLib.readNetwork(inputNetworkPath);
 		
 		LinkedList<Link> selectedLinks=new LinkedList<Link>();
 		

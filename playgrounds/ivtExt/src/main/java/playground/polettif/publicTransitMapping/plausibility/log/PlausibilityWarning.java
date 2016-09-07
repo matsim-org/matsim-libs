@@ -18,7 +18,6 @@
 
 package playground.polettif.publicTransitMapping.plausibility.log;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
@@ -28,6 +27,11 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import java.util.List;
 
+/**
+ * Warnings for implausibilities in transit schedules
+ *
+ * @author polettif
+ */
 public interface PlausibilityWarning extends Identifiable<PlausibilityWarning> {
 
 	String getType();

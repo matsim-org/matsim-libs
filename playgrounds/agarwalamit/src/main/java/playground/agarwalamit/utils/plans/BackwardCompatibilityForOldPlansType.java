@@ -32,9 +32,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -115,7 +115,7 @@ public class BackwardCompatibilityForOldPlansType {
 							Route r = leg.getRoute();
 							String routeLinks = r.getRouteDescription();
 							List<Id<Link>> linkIds = convertRouteDescriptionToListOfLinkIds(routeLinks);
-							NetworkRoute nr = popOut.getFactory().createRoute(NetworkRoute.class, r.getStartLinkId(), r.getEndLinkId());
+							NetworkRoute nr = popOut.getFactory().getRouteFactories().createRoute(NetworkRoute.class, r.getStartLinkId(), r.getEndLinkId());
 							//exclude first and last lnik from linkIds
 							if( linkIds.size() == 0) {
 							} else if(linkIds.size()==1) {

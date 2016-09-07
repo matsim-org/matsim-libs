@@ -82,7 +82,7 @@ public class CarTrips implements ActivityEndEventHandler, ActivityStartEventHand
 		events.addHandler(occ); 
 
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(args[0]);
+		reader.readFile(args[0]);
 		
 		System.out.println(occ.avgTripLength());
 		System.out.println(occ.avgTripsPerCar());

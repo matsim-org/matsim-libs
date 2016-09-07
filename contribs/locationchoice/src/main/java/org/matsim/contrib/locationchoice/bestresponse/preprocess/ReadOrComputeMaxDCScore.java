@@ -62,7 +62,7 @@ public class ReadOrComputeMaxDCScore {
 		if (maxEpsValuesFileName != null && arekValsRead) {
 			ObjectAttributesXmlReader maxEpsReader = new ObjectAttributesXmlReader(this.personsMaxDCScoreUnscaled);
 			try {
-				maxEpsReader.parse(maxEpsValuesFileName);
+				maxEpsReader.readFile(maxEpsValuesFileName);
 				log.info("reading maxEpsilons from file:\n"+ maxEpsValuesFileName);
 			} catch  (UncheckedIOException e) {
 				// reading was not successful

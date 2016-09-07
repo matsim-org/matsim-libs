@@ -58,7 +58,7 @@ public class SearchTraffic {
 		events.addHandler(trafficOnRoadsCount);
 		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(eventsFile);
+		reader.readFile(eventsFile);
 	}
 	
 	private static class TrafficOnRoad{

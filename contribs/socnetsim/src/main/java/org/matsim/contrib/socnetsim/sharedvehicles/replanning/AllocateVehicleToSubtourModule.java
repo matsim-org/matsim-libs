@@ -21,10 +21,9 @@ package org.matsim.contrib.socnetsim.sharedvehicles.replanning;
 
 import com.google.inject.Inject;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
-import org.matsim.population.algorithms.PlanAlgorithm;
-
 import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
 
 import javax.inject.Provider;

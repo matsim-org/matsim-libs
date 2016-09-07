@@ -24,8 +24,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * Copy/Paste of TransitTimeAllocationMutator, that calls ParkAndRidePlanMutateTimeAllocation instead

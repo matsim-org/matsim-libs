@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
@@ -39,7 +39,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  */
 
 public class ActivityCounter {
-	private static final ExtendedPersonFilter PF = new ExtendedPersonFilter();
+	private static final MunichPersonFilter PF = new MunichPersonFilter();
 	private final String inputPlansFile ;
 	private final UserGroup ug;
 	private final SortedMap<String, Integer> actTyp2Count = new TreeMap<String, Integer>();

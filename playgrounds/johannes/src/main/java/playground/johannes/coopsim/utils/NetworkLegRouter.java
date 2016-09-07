@@ -25,10 +25,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -43,11 +43,11 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
  public final class NetworkLegRouter implements LegRouter {
 
 	private final Network network;
-	private final RouteFactoryImpl routeFactory;
+	private final RouteFactories routeFactory;
 	private final LeastCostPathCalculator routeAlgo;
 
 	@Deprecated // use TripRouter (with RoutingModule) instead. kai, mar'15
-	public NetworkLegRouter(final Network network, final LeastCostPathCalculator routeAlgo, final RouteFactoryImpl routeFactory) {
+	public NetworkLegRouter(final Network network, final LeastCostPathCalculator routeAlgo, final RouteFactories routeFactory) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
 		this.routeFactory = routeFactory;
@@ -93,7 +93,8 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
+		Leg r = ((Leg) leg);
+		r.setTravelTime( depTime + travTime - r.getDepartureTime() ); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
 		return travTime;
 	}
 

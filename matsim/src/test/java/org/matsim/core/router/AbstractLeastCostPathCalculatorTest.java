@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -49,7 +49,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		Config config = loadConfig(null);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).parse("test/scenarios/equil/network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
 		Node node12 = network.getNodes().get(Id.create("12", Node.class));
 		Node node15 = network.getNodes().get(Id.create("15", Node.class));
 
@@ -70,7 +70,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 	public void testCalcLeastCostPath_SameFromTo() throws SAXException, ParserConfigurationException, IOException {
 		Scenario scenario = ScenarioUtils.createScenario(loadConfig(null));
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).parse("test/scenarios/equil/network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
 		Node node12 = network.getNodes().get(Id.create("12", Node.class));
 
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);

@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.selectors.AbstractPlanSelector;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
+import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.pt.PtConstants;
@@ -61,7 +61,7 @@ import java.util.Map;
  */
 public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector {
 
-	public static final class Builder implements Provider<GenericPlanSelector<Plan, Person>> {
+	public static final class Builder implements Provider<PlanSelector<Plan, Person>> {
 
 		private Network network;
 		private double actTypeWeight = 1.;

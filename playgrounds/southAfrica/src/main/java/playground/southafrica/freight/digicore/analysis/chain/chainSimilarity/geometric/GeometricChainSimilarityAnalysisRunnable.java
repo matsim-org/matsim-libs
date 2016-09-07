@@ -45,7 +45,7 @@ public class GeometricChainSimilarityAnalysisRunnable implements Runnable {
 	public void run() {
 		/* Read the vehicle. */
 		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-		dvr.parse(this.vehicleFile.getAbsolutePath());
+		dvr.readFile(this.vehicleFile.getAbsolutePath());
 		List<DigicoreChain> chains = dvr.getVehicle().getChains();
 		
 		String outputFile = this.outputFolder.getAbsolutePath() + 

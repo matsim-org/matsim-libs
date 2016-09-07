@@ -1,14 +1,15 @@
 package playground.artemc.analysis;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReaderMatsimV5;
-import org.matsim.core.scenario.MutableScenario;
-import org.matsim.core.scenario.ScenarioUtils;
-import playground.artemc.utils.Writer;
-
 import java.io.File;
 import java.util.HashMap;
+
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.artemc.utils.Writer;
 
 /**
  * Created by artemc on 11/3/15.
@@ -36,7 +37,7 @@ public class IndividualSelectedBenefitsCSVWriter {
 
 
 
-				new PopulationReaderMatsimV5(scenario).readFile(populationFile);
+				new PopulationReader(scenario).readFile(populationFile);
 				System.out.println("   Population size: " + scenario.getPopulation().getPersons().size());
 
 				//Read selected plan score

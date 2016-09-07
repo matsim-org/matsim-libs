@@ -26,7 +26,7 @@ public class IncomePopulationReader {
 	public void parse(String filename) {
 
 		log.info("loading income data from " + filename);
-		new ObjectAttributesXmlReader(population.getPersonAttributes()).parse(filename);
+		new ObjectAttributesXmlReader(population.getPersonAttributes()).readFile(filename);
 
 		/*Calculate Income Statistics*/
 		Integer incomeSum=0;

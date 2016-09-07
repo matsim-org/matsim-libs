@@ -27,8 +27,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 
@@ -42,20 +40,14 @@ public class TeleportationRoutingModule implements RoutingModule {
 	private final String mode;
 	private final PopulationFactory populationFactory;
 
-	private final RouteFactoryImpl routeFactory;
-
 	private final double beelineDistanceFactor;
 	private final double networkTravelSpeed;
-
-
 
 	 public TeleportationRoutingModule(
 			final String mode,
 			final PopulationFactory populationFactory,
-			final RouteFactoryImpl routeFactory,
 			final double networkTravelSpeed,
 			final double beelineDistanceFactor) {
-		this.routeFactory = routeFactory;
 		this.networkTravelSpeed = networkTravelSpeed;
 		this.beelineDistanceFactor = beelineDistanceFactor;
 		this.mode = mode;
@@ -68,7 +60,7 @@ public class TeleportationRoutingModule implements RoutingModule {
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
-		Leg newLeg = populationFactory.createLeg( mode );
+		Leg newLeg = this.populationFactory.createLeg( this.mode );
 		newLeg.setDepartureTime( departureTime );
 
 		double travTime = routeLeg(
@@ -91,7 +83,7 @@ public class TeleportationRoutingModule implements RoutingModule {
 
 	@Override
 	public String toString() {
-		return "[TeleportationRoutingModule: mode="+mode+"]";
+		return "[TeleportationRoutingModule: mode="+this.mode+"]";
 	}
 
 
@@ -99,15 +91,16 @@ public class TeleportationRoutingModule implements RoutingModule {
 		// make simple assumption about distance and walking speed
 		double dist = CoordUtils.calcEuclideanDistance(fromAct.getCoord(), toAct.getCoord());
 		// create an empty route, but with realistic travel time
-		Route route = this.routeFactory.createRoute(Route.class, fromAct.getLinkId(), toAct.getLinkId());
-		double estimatedNetworkDistance = dist * beelineDistanceFactor;
-		int travTime = (int) (estimatedNetworkDistance / networkTravelSpeed);
+		Route route = this.populationFactory.getRouteFactories().createRoute(Route.class, fromAct.getLinkId(), toAct.getLinkId());
+		double estimatedNetworkDistance = dist * this.beelineDistanceFactor;
+		int travTime = (int) (estimatedNetworkDistance / this.networkTravelSpeed);
 		route.setTravelTime(travTime);
 		route.setDistance(estimatedNetworkDistance);
 		leg.setRoute(route);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
+		Leg r = (leg);
+		r.setTravelTime( depTime + travTime - r.getDepartureTime() ); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
 		return travTime;
 	}
 

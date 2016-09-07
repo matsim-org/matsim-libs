@@ -13,12 +13,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -235,7 +235,7 @@ public class MembershipAssigner {
 		Logger.getLogger( "org.matsim.core.population.PopulationReaderMatsimV4" ).setLevel(Level.OFF);
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReader populationReader = new MatsimPopulationReader(scenario);
+		MatsimReader populationReader = new PopulationReader(scenario);
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		FacilitiesReaderMatsimV1 facilitiesReader  = new FacilitiesReaderMatsimV1(scenario);
 		networkReader.readFile(args[1]);
@@ -245,7 +245,7 @@ public class MembershipAssigner {
 		
 		ObjectAttributes bla = new ObjectAttributes();
 		
-		new ObjectAttributesXmlReader(bla).parse(args[4]);
+		new ObjectAttributesXmlReader(bla).readFile(args[4]);
 		
 		TwoWayCSVehicleLocation stations = new TwoWayCSVehicleLocation(args[0], scenario);
 		

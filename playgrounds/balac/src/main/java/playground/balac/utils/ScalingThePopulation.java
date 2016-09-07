@@ -2,9 +2,13 @@ package playground.balac.utils;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.*;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -13,7 +17,7 @@ public class ScalingThePopulation {
 	
 	public void run(String plansFilePath, String networkFilePath, String outputFilePath) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReader populationReader = new MatsimPopulationReader(scenario);
+		MatsimReader populationReader = new PopulationReader(scenario);
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(networkFilePath);
 		populationReader.readFile(plansFilePath);
@@ -25,10 +29,10 @@ public class ScalingThePopulation {
 		for (int i = 1; i < size; i++) {
 			if (i % 2 == 0) {
 				
-				PersonImpl p = (PersonImpl)scenario.getPopulation().getFactory().createPerson(Id.create(((Person)arr[i]).getId().toString() + j, Person.class));
+				Person p = (Person)scenario.getPopulation().getFactory().createPerson(Id.create(((Person)arr[i]).getId().toString() + j, Person.class));
 				p.addPlan(((Person)arr[i]).getSelectedPlan());
 			
-				PersonImpl originalPerson = (PersonImpl)((Person)arr[i]);
+				Person originalPerson = (Person)((Person)arr[i]);
 				
 				PersonUtils.setAge(p, PersonUtils.getAge(originalPerson));
 				PersonUtils.setCarAvail(p, PersonUtils.getCarAvail(originalPerson));
@@ -48,7 +52,7 @@ public class ScalingThePopulation {
 			}			
 		}
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(outputFilePath + "/population_150%.xml");		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV4(outputFilePath + "/population_150%.xml");		
 		
 	}
 	

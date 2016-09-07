@@ -39,7 +39,7 @@ class KNJam {
 
 	int XX=1000 ;
 	int YY=1000 ;
-	int sqr = 5 ;
+	int sqr = 2 ;
 
 	private class Car {
 		Id<Vehicle> id ;
@@ -102,7 +102,7 @@ class KNJam {
 				if ( gap < cars[cc].vel ) {
 					cars[cc].vel = gap ;
 				}
-				
+
 				if ( cars[cc].vel >=1 && Math.random() < 0.5 ) {
 					cars[cc].vel -- ;
 				}
@@ -134,17 +134,17 @@ class KNJam {
 				}
 				System.out.println( strb.toString() ) ;
 			}
-			
+
 			for ( int cc = 0 ; cc < cars.length-1 ; cc++ ) {
 				Car car = cars[cc] ;
-				
+
 				double idAsInt = Double.parseDouble( car.id.toString() ) ;
-				
+
 				float brightness = 1 ;
 				float saturation = 1 ;
 				float hue = (float) (idAsInt/10.) ; 
 				int color = Color.HSBtoRGB( hue, saturation, brightness) ;
-				
+
 				final int xx = (int) (sqr*car.pos);
 				final int yy = (int) (sqr*time);
 				for ( int ii=0 ; ii<sqr ; ii++ ) {
@@ -161,7 +161,7 @@ class KNJam {
 				if ( time > 100 ) {
 					for ( int ii=0 ; ii<XX*sqr ; ii++ ) {
 						for ( int jj=0 ; jj<YY*sqr ; jj++ ) {
-//							raster.setPixels(x, y, w, h, iArray);
+//														raster.setPixels(x, y, w, h, iArray);
 						}
 					}
 				}

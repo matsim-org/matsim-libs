@@ -20,9 +20,11 @@
 
 package org.matsim.core.config.groups;
 
-import org.matsim.core.config.ReflectiveConfigGroup;
-
+import java.net.URL;
 import java.util.Map;
+
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author mrieser / Senozon AG
@@ -63,6 +65,10 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( INPUT_FILE )
 	public void setInputFile(final String inputFile) {
 		this.inputFile = inputFile;
+	}
+
+	public URL getInputFileURL(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.inputFile);
 	}
 
 	@StringGetter( INPUT_FACILITY_ATTRIBUTES_FILE )

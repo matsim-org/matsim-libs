@@ -36,12 +36,12 @@ import org.junit.runners.Parameterized.Parameters;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -92,7 +92,7 @@ public class TripStructureUtilsSubtoursTest {
 		final Id<ActivityFacility> facLoc = anchorAtFacilities ? Id.create(loc, ActivityFacility.class) : Id.create( "nowhere", ActivityFacility.class );
 
 		final Activity act = fact.createActivityFromLinkId( type , linkLoc );
-		((ActivityImpl) act).setFacilityId( facLoc );
+		((Activity) act).setFacilityId( facLoc );
 		return act;
 	}
 

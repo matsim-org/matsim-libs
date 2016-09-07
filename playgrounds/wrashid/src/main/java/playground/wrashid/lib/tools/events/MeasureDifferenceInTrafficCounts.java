@@ -68,7 +68,7 @@ public class MeasureDifferenceInTrafficCounts {
 			events.addHandler(this);
 
 			EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-			reader.parse(eventsFilePathA);
+			reader.readFile(eventsFilePathA);
 		}
 		
 		@Override

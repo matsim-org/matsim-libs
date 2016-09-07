@@ -48,7 +48,7 @@ public class ExtractStatePopulation {
 		parser.setValidating(false);
 	
 		logger.info("Loading persons...");
-		parser.parse(infile);
+		parser.readFile(infile);
 		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 		

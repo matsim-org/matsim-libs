@@ -18,6 +18,9 @@
 
 package playground.polettif.publicTransitMapping.osm.lib;
 
+/**
+ * OSM tags used by the converters
+ */
 public class OsmTag {
 
 	public static final String NAME = "name";

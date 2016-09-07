@@ -11,12 +11,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -52,7 +52,7 @@ public class CreateCommutersFromElsewhere {
 		TravelTime ttime = new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore());
 		dijkstra = dijkstraFactory.createPathCalculator(scenario.getNetwork(), tdis, ttime);
 		
-		PopulationFactoryImpl factory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+		PopulationFactory factory = (PopulationFactory) scenario.getPopulation().getFactory();
 		 facilities = scenario.getActivityFacilities().getFacilitiesForActivityType(Global.ActType.work.name());
 		
 		//parse over commuter relations
@@ -228,7 +228,7 @@ public class CreateCommutersFromElsewhere {
 		}while(homeEndTime <= 0 || (mean2 - homeEndTime - ttime) < 0 || (mean2 + ttime) > 24*3600);
 		
 		actHome.setEndTime(homeEndTime);
-		((ActivityImpl)actHome).setLinkId(fromLink.getId());
+		((Activity)actHome).setLinkId(fromLink.getId());
 		plan.addActivity(actHome);
 		
 		plan.addLeg(factory.createLeg(TransportMode.car));
@@ -237,14 +237,14 @@ public class CreateCommutersFromElsewhere {
 		Activity actWork = factory.createActivityFromCoord(Global.ActType.work.name(), workCoord);
 		actWork.setStartTime(actHome.getEndTime() + ttime);
 		actWork.setEndTime(mean2);
-		((ActivityImpl)actWork).setLinkId(toLink.getId());
+		((Activity)actWork).setLinkId(toLink.getId());
 		plan.addActivity(actWork);
 		
 		plan.addLeg(factory.createLeg(TransportMode.car));
 		
 		actHome = factory.createActivityFromCoord(Global.ActType.home.name(), homeCoord);
 		actHome.setStartTime(actWork.getEndTime() + ttime);
-		((ActivityImpl)actHome).setLinkId(fromLink.getId());
+		((Activity)actHome).setLinkId(fromLink.getId());
 		plan.addActivity(actHome);
 		
 		person.addPlan(plan);

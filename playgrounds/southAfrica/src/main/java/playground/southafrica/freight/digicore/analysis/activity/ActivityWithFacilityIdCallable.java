@@ -45,7 +45,7 @@ public class ActivityWithFacilityIdCallable implements Callable<Tuple<Id<Vehicle
 	public Tuple<Id<Vehicle>, Double> call() throws Exception {
 		/* Read the vehicle file. */
 		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-		dvr.parse(this.vehicleFile.getAbsolutePath());
+		dvr.readFile(this.vehicleFile.getAbsolutePath());
 		DigicoreVehicle vehicle = dvr.getVehicle();
 		
 		/* Calculate the percentage of activities with a facility Id. */

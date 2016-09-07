@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.Config;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 

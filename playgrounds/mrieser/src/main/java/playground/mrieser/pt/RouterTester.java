@@ -30,14 +30,14 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.router.FakeFacility;
 import org.matsim.pt.router.TransitActsRemover;
 import org.matsim.pt.router.TransitRouter;
@@ -70,7 +70,8 @@ public class RouterTester {
 
 		Vehicles v = s.getTransitVehicles();
 		TransitSchedule ts = s.getTransitSchedule();
-		PopulationImpl p = (PopulationImpl) s.getPopulation();
+//		Population reader = (Population) s.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( s ) ;
 
 		new MatsimNetworkReader(s.getNetwork()).readFile(NETWORK);
 		new VehicleReaderV1(v).readFile(VEHICLES);
@@ -84,11 +85,13 @@ public class RouterTester {
 
 		PtRouter ptR = new PtRouter(router);
 
-		p.setIsStreaming(true);
-		p.addAlgorithm(ptR);
+		StreamingUtils.setIsStreaming(reader, true);
+		final PersonAlgorithm algo = ptR;
+		reader.addAlgorithm(algo);
 
 		log.info("start processing persons...");
-		new MatsimPopulationReader(s).readFile(PLANS);
+//		new MatsimPopulationReader(s).readFile(PLANS);
+		reader.readFile(PLANS);
 
 		ptR.close();
 	}

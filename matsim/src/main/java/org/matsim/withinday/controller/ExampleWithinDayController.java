@@ -20,16 +20,21 @@
 
 package org.matsim.withinday.controller;
 
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -37,7 +42,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.OnlyTravelTimeDependentScoringFunctionFactory;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
@@ -60,12 +64,6 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-
 /**
  * This class should give an example what is needed to run
  * simulations with WithinDayReplanning.
@@ -80,7 +78,7 @@ import javax.inject.Singleton;
  * @author Christoph Dobler
  */
 @Singleton
-public class ExampleWithinDayController implements StartupListener {
+public final class ExampleWithinDayController implements StartupListener {
 	// yyyy I think that for the now existing guice approach this example has too many factories at too many levels. kai, feb'16
 
 	/*
@@ -88,25 +86,24 @@ public class ExampleWithinDayController implements StartupListener {
 	 * Replanning Strategy. It is possible to assign
 	 * multiple Strategies to the Agents.
 	 */
-	protected double pInitialReplanning = 0.0;
-	protected double pDuringActivityReplanning = 1.0;
-	protected double pDuringLegReplanning = 0.10;
+	private double pInitialReplanning = 0.0;
+	private double pDuringActivityReplanning = 1.0;
+	private double pDuringLegReplanning = 0.10;
 	
-	protected InitialIdentifierFactory initialIdentifierFactory;
-	protected DuringActivityIdentifierFactory duringActivityIdentifierFactory;
-	protected DuringLegIdentifierFactory duringLegIdentifierFactory;
-	protected InitialIdentifier initialIdentifier;
-	protected DuringActivityAgentSelector duringActivityIdentifier;
-	protected DuringLegAgentSelector duringLegIdentifier;
-	protected WithinDayInitialReplannerFactory initialReplannerFactory;
-	protected WithinDayDuringActivityReplannerFactory duringActivityReplannerFactory;
-	protected WithinDayDuringLegReplannerFactory duringLegReplannerFactory;
-	protected ProbabilityFilterFactory initialProbabilityFilterFactory;
-	protected ProbabilityFilterFactory duringActivityProbabilityFilterFactory;
-	protected ProbabilityFilterFactory duringLegProbabilityFilterFactory;
+	private InitialIdentifierFactory initialIdentifierFactory;
+	private DuringActivityIdentifierFactory duringActivityIdentifierFactory;
+	private DuringLegIdentifierFactory duringLegIdentifierFactory;
+	private InitialIdentifier initialIdentifier;
+	private DuringActivityAgentSelector duringActivityIdentifier;
+	private DuringLegAgentSelector duringLegIdentifier;
+	private WithinDayInitialReplannerFactory initialReplannerFactory;
+	private WithinDayDuringActivityReplannerFactory duringActivityReplannerFactory;
+	private WithinDayDuringLegReplannerFactory duringLegReplannerFactory;
+	private ProbabilityFilterFactory initialProbabilityFilterFactory;
+	private ProbabilityFilterFactory duringActivityProbabilityFilterFactory;
+	private ProbabilityFilterFactory duringLegProbabilityFilterFactory;
 	
-	@Inject protected Scenario scenario;
-	@Inject protected WithinDayControlerListener withinDayControlerListener;
+	@Inject private Scenario scenario;
 	@Inject private Provider<TripRouter> tripRouterProvider;
 	@Inject private MobsimDataProvider mobsimDataProvider;
 	@Inject private WithinDayEngine withinDayEngine;
@@ -115,7 +112,6 @@ public class ExampleWithinDayController implements StartupListener {
 	@Inject private LeastCostPathCalculatorFactory pathCalculatorFactory;
 	@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
 	@Inject private Map<String,TravelTime> travelTimes ;
-	@Inject private PlanCalcScoreConfigGroup planCalcScoreConfigGroup ;
 
 
 	/*
@@ -128,25 +124,28 @@ public class ExampleWithinDayController implements StartupListener {
 			System.out.println("No argument given!");
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
-		} else {
-			final Controler controler = new Controler(args);
-			configure(controler);
-			controler.run();
-		}
-		System.exit(0);
+			System.exit(-1);
+		} 
+		final Controler controler = new Controler(args);
+		configure(controler);
+		controler.run();
 	}
 
 	static void configure(Controler controler) {
+		// factored out for testing. kai, jun'16
 		controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                install(new WithinDayModule());
-                addControlerListenerBinding().to(ExampleWithinDayController.class);
-                // Use a Scoring Function, that only scores the travel times!
-                bind(ScoringFunctionFactory.class).toInstance(new OnlyTravelTimeDependentScoringFunctionFactory());
-                addTravelDisutilityFactoryBinding(TransportMode.car).toInstance(new OnlyTimeDependentTravelDisutilityFactory());
-            }
-        });
+			@Override
+			public void install() {
+				install(new WithinDayModule());
+				addControlerListenerBinding().to(ExampleWithinDayController.class);
+
+				addTravelDisutilityFactoryBinding(TransportMode.car).toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+
+				// Use a Scoring Function that only scores the travel times:
+				// (yy but why? kai,  jun'16)
+				bindScoringFunctionFactory().toInstance(new OnlyTravelTimeDependentScoringFunctionFactory());
+			}
+		});
 	}
 
 	@Override
@@ -155,7 +154,7 @@ public class ExampleWithinDayController implements StartupListener {
 	}
 	
 	private void initReplanners() {
-		RouteFactoryImpl routeFactory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getRouteFactory() ;
+		RouteFactories routeFactory = ((PopulationFactory) this.scenario.getPopulation().getFactory()).getRouteFactories() ;
 		Network network = this.scenario.getNetwork() ;
 		
 		TravelTime travelTime = travelTimes.get( TransportMode.car ) ;

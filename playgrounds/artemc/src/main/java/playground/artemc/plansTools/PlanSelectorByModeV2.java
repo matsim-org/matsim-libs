@@ -10,9 +10,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -30,8 +30,8 @@ public class PlanSelectorByModeV2 {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		log.info("Reading population...");
-		new MatsimPopulationReader(scenario).readFile(inputPopulationFile);
-		new MatsimPopulationReader(scenario2).readFile(inputPopulationFile);
+		new PopulationReader(scenario).readFile(inputPopulationFile);
+		new PopulationReader(scenario2).readFile(inputPopulationFile);
 		Population populationPT = ((MutableScenario)scenario).getPopulation();
 		Population populationCar = ((MutableScenario)scenario2).getPopulation();
 		

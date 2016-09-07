@@ -33,11 +33,11 @@ public class PrtScheduler
     }
 
 
-    public void scheduleRequests(BestDispatchFinder.Dispatch best,
-            List<BestDispatchFinder.Dispatch> requests)
+    public void scheduleRequests(BestDispatchFinder.Dispatch<TaxiRequest> best,
+            List<BestDispatchFinder.Dispatch<TaxiRequest>> requests)
     {
 
-        if (best.request.getStatus() != TaxiRequestStatus.UNPLANNED) {
+        if (best.destination.getStatus() != TaxiRequestStatus.UNPLANNED) {
             throw new IllegalStateException();
         }
 
@@ -75,26 +75,26 @@ public class PrtScheduler
 
         List<TaxiRequest> req = new ArrayList<TaxiRequest>();
 
-        for (BestDispatchFinder.Dispatch p : requests) {
-            req.add(p.request);
+        for (BestDispatchFinder.Dispatch<TaxiRequest> p : requests) {
+            req.add(p.destination);
         }
 
         bestSched.addTask(new NPersonsPickupDriveTask(best.path, req));
 
-        double t3 = Math.max(best.path.getArrivalTime(), best.request.getT0())
+        double t3 = Math.max(best.path.getArrivalTime(), best.destination.getT0())
                 + params.pickupDuration;
         bestSched.addTask(new NPersonsPickupStayTask(best.path.getArrivalTime(), t3, req));
 
         if (params.destinationKnown) {
-            appendDriveAndDropoffAfterPickup(bestSched);
+            appendOccupiedDriveAndDropoff(bestSched);
             appendTasksAfterDropoff(bestSched);
         }
 
     }
 
 
-    private void appendRequestToExistingScheduleTasks(BestDispatchFinder.Dispatch best,
-            List<BestDispatchFinder.Dispatch> requests)
+    private void appendRequestToExistingScheduleTasks(BestDispatchFinder.Dispatch<TaxiRequest> best,
+            List<BestDispatchFinder.Dispatch<TaxiRequest>> requests)
     {
 
         Schedule<TaxiTask> sched = TaxiSchedules.asTaxiSchedule(best.vehicle.getSchedule());
@@ -102,10 +102,10 @@ public class PrtScheduler
         for (TaxiTask task : sched.getTasks()) {
 
             if (task instanceof NPersonsPickupStayTask) {
-                for (BestDispatchFinder.Dispatch vrp : requests) {
+                for (BestDispatchFinder.Dispatch<TaxiRequest> vrp : requests) {
                     if (vrp.path.getDepartureTime() < task.getBeginTime()
                             && !task.getStatus().equals(TaskStatus.PERFORMED)) {
-                        ((NPersonsPickupStayTask)task).appendRequest(vrp.request,
+                        ((NPersonsPickupStayTask)task).appendRequest(vrp.destination,
                                 this.params.pickupDuration);
                     }
                 }
@@ -117,7 +117,7 @@ public class PrtScheduler
 
 
     @Override
-    protected void appendDriveAndDropoffAfterPickup(Schedule<TaxiTask> schedule)
+    protected void appendOccupiedDriveAndDropoff(Schedule<TaxiTask> schedule)
     {
         NPersonsPickupStayTask pickupStayTask = (NPersonsPickupStayTask)Schedules
                 .getLastTask(schedule);

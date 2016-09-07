@@ -26,13 +26,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -89,7 +89,7 @@ class PTripRouterFactoryImpl implements Provider<TripRouter> {
         TravelDisutilityFactory travelDisutilityFactory = controler.getTravelDisutilityFactory();
         TravelTime travelTime = controler.getLinkTravelTimes();
         LeastCostPathCalculatorFactory leastCostPathAlgorithmFactory = createDefaultLeastCostPathCalculatorFactory(controler.getScenario());
-        RouteFactoryImpl modeRouteFactory = ((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getRouteFactory();
+        RouteFactories modeRouteFactory = ((PopulationFactory) controler.getScenario().getPopulation().getFactory()).getRouteFactories();
         PopulationFactory populationFactory = controler.getScenario().getPopulation().getFactory();
         Scenario scenario = controler.getScenario();
 		

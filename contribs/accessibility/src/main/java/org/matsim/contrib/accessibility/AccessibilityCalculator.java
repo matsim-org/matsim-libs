@@ -61,7 +61,7 @@ import org.matsim.facilities.ActivityFacility;
  * @author thomas, knagel
  *
  */
-/*package*/ final class AccessibilityCalculator {
+public final class AccessibilityCalculator {
 
 	private static final Logger log = Logger.getLogger(AccessibilityCalculator.class);
 
@@ -70,28 +70,31 @@ import org.matsim.facilities.ActivityFacility;
 	// destinations, opportunities like jobs etc ...
 	private AggregationObject[] aggregatedOpportunities;
 
-	private Map<Modes4Accessibility, AccessibilityContributionCalculator> calculators = new HashMap<>();
+	private final Map<Modes4Accessibility, AccessibilityContributionCalculator> calculators = new HashMap<>();
 
-	private PtMatrix ptMatrix;
+//	private PtMatrix ptMatrix;
 
-	private ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
+	private final ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 
-	private boolean useRawSum	; //= false;
-	private double logitScaleParameter;
-	private double inverseOfLogitScaleParameter;
+	private final boolean useRawSum	; //= false;
+	private final double logitScaleParameter;
+	private final double inverseOfLogitScaleParameter;
+		private double walkSpeedMeterPerHour = -1;
 
 	// counter for warning that capacities are not used so far ... in order not to give the same warning multiple times; dz, apr'14
 	private static int cnt = 0 ;
 	private Map<String, TravelTime> travelTimes;
 	private Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 
-	private Scenario scenario;
-	private AccessibilityConfigGroup acg;
+	private final Scenario scenario;
+	private final AccessibilityConfigGroup acg;
 
 	private Coord2CoordTimeDistanceTravelDisutility walkTravelDisutility;
 
 	
 	@Inject
+	public
+//	AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
 	AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario, AccessibilityConfigGroup config) {
 		this.travelTimes = travelTimes;
 		this.travelDisutilityFactories = travelDisutilityFactories;
@@ -103,6 +106,7 @@ import org.matsim.facilities.ActivityFacility;
 	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface l){
 		this.zoneDataExchangeListeners.add(l);
 	}
+	
 
 	
 	final void initDefaultContributionCalculators() {
@@ -134,11 +138,6 @@ import org.matsim.facilities.ActivityFacility;
 				new ConstantSpeedAccessibilityContributionCalculator(
 						TransportMode.bike,
 						scenario));
-		calculators.put(
-				Modes4Accessibility.pt,
-				new MatrixBasedPtAccessibilityContributionCalculator(
-						ptMatrix,
-						scenario.getConfig()));
 	}
 	
 	
@@ -191,6 +190,16 @@ import org.matsim.facilities.ActivityFacility;
 			double walkUtility = -this.walkTravelDisutility.getCoord2CoordTravelDisutility(opportunity.getCoord(), nearestNode.getCoord());
 			double expVjk = Math.exp(this.logitScaleParameter * walkUtility);
 			
+//			// get Euclidian distance to nearest node
+//			double distance_meter 	= NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
+//			double VjkWalkTravelTime	= this.betaWalkTT * (distance_meter / this.walkSpeedMeterPerHour);
+//			double VjkWalkDistance 		= this.betaWalkTD * distance_meter;
+//
+//			double expVjk					= Math.exp(this.logitScaleParameter * (VjkWalkTravelTime + VjkWalkDistance ) );
+
+			
+			
+			// add Vjk to sum
 			AggregationObject jco = opportunityClusterMap.get( nearestNode.getId() ) ;
 			if ( jco == null ) {
 				jco = new AggregationObject(opportunity.getId(), null, null, nearestNode, 0. ); // initialize with zero!
@@ -208,6 +217,7 @@ import org.matsim.facilities.ActivityFacility;
 	}
 
 	
+//	public final void computeAccessibilities( Double departureTime, ActivityFacilities opportunities) {
 	final void computeAccessibilities(Scenario scenario, Double departureTime) {
 		SumOfExpUtils[] gcs = new SumOfExpUtils[Modes4Accessibility.values().length] ;
 		// this could just be a double array, or a Map.  Not using a Map for computational speed reasons (untested);

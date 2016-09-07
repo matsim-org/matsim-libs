@@ -42,7 +42,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
@@ -67,7 +67,7 @@ public class CharyparNagelLegScoringPtChangeTest {
 		final CharyparNagelLegScoring scoring1 = createScoring( 1 , network );
 		final CharyparNagelLegScoring scoring2 = createScoring( 2 , network );
 
-		final Leg leg = new LegImpl( TransportMode.car );
+		final Leg leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime( 0 );
 		leg.setTravelTime( 120 );
 
@@ -94,12 +94,10 @@ public class CharyparNagelLegScoringPtChangeTest {
 		scoring2.handleEvent( arrival );
 
 		// "scoring"
-		scoring1.startLeg( leg.getDepartureTime() , leg );
-		scoring1.endLeg( leg.getDepartureTime() + leg.getTravelTime() );
+		scoring1.handleLeg(leg);
 		scoring1.finish();
 
-		scoring2.startLeg( leg.getDepartureTime() , leg );
-		scoring2.endLeg( leg.getDepartureTime() + leg.getTravelTime() );
+		scoring2.handleLeg(leg);
 		scoring2.finish();
 
 		// here, we should get the same score.

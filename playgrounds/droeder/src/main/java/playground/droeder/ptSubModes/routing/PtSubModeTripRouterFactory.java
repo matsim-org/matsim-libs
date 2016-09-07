@@ -24,12 +24,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -54,7 +54,7 @@ public class PtSubModeTripRouterFactory implements javax.inject.Provider<TripRou
 	private TravelDisutilityFactory travelDisutilityFactory;
 	private TravelTime travelTime;
 	private LeastCostPathCalculatorFactory leastCostPathAlgorithmFactory;
-	private RouteFactoryImpl modeRouteFactory;
+	private RouteFactories modeRouteFactory;
 	private PopulationFactory populationFactory;
 	private Provider<TransitRouter> transitRouterFactory;
 	private TransitSchedule transitSchedule;
@@ -93,7 +93,7 @@ public class PtSubModeTripRouterFactory implements javax.inject.Provider<TripRou
 //                        routingContext.getTravelDisutility(),
 //                        routingContext.getTravelTime());
 		this.leastCostPathAlgorithmFactory = createDefaultLeastCostPathCalculatorFactory(controler.getScenario());
-		this.modeRouteFactory = ((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getRouteFactory();
+		this.modeRouteFactory = ((PopulationFactory) controler.getScenario().getPopulation().getFactory()).getRouteFactories();
 		this.populationFactory = controler.getScenario().getPopulation().getFactory();
 //		this.transitRouterFactory = controler.getTransitRouterFactory();
 		this.transitSchedule = controler.getScenario().getTransitSchedule();

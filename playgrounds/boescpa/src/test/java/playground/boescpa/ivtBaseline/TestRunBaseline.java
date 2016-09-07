@@ -21,22 +21,23 @@
 
 package playground.boescpa.ivtBaseline;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.*;
 import org.matsim.testcases.MatsimTestUtils;
@@ -60,7 +61,7 @@ public class TestRunBaseline {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
+	@Test @Ignore
 	public void testScenario() {
 		final String pathToOnlyStreetNetwork = utils.getClassInputDirectory() + "onlystreetnetwork.xml";
 		final String pathToNetwork = "test/scenarios/pt-tutorial/multimodalnetwork.xml";
@@ -75,7 +76,7 @@ public class TestRunBaseline {
 
 		Scenario tempScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(tempScenario.getNetwork()).readFile(pathToOnlyStreetNetwork);
-		new MatsimPopulationReader(tempScenario).readFile(pathToInitialPopulation);
+		new PopulationReader(tempScenario).readFile(pathToInitialPopulation);
 		createPrefs(tempScenario, pathToPrefs);
 		createFacilities(tempScenario, pathToFacilities);
 		F2LCreator.createF2L(tempScenario, pathToF2L);
@@ -132,8 +133,8 @@ public class TestRunBaseline {
 			if (person.getSelectedPlan() != null) {
 				List<PlanElement> plan = person.getSelectedPlan().getPlanElements();
 				for (PlanElement planElement : plan) {
-					if (planElement instanceof ActivityImpl) {
-						ActivityImpl act = (ActivityImpl) planElement;
+					if (planElement instanceof Activity) {
+						Activity act = (Activity) planElement;
 						if (!facilities.containsKey(act.getCoord())) {
 							ActivityFacility activityFacility =
 									activityFacilities.getFactory().createActivityFacility(Id.create(facilityId++, ActivityFacility.class), act.getCoord());

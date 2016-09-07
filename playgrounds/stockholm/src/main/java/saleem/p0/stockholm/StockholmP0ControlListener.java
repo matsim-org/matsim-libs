@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -14,21 +15,21 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 import saleem.p0.GenericP0ControlHandler;
 
 // For Generic Junctions
 
 public class StockholmP0ControlListener implements StartupListener, IterationStartsListener,IterationEndsListener {
-	public NetworkImpl network;
+	public Network network;
 	List<GenericP0ControlHandler> handlers = new ArrayList<GenericP0ControlHandler>();
 	 Map<String, List<Link>> incominglinks;
 	 Map<String, List<Link>> outgoinglinks;
 	Scenario scenario;
 	
 	
-	public StockholmP0ControlListener(Scenario scenario, NetworkImpl network, Map<String, List<Link>> incominglinks, Map<String, List<Link>> outgoinglinks){
+	public StockholmP0ControlListener(Scenario scenario, Network network, Map<String, List<Link>> incominglinks, Map<String, List<Link>> outgoinglinks){
 		this.network = network;
 		this.scenario=scenario;
 		this.incominglinks=incominglinks;
@@ -45,7 +46,8 @@ public class StockholmP0ControlListener implements StartupListener, IterationSta
 			allchangeevents.addAll(handler.getChangeEvents());
 			handler.initialise();
 		}
-	    network.setNetworkChangeEvents(allchangeevents);
+		final List<NetworkChangeEvent> events = allchangeevents;
+	    NetworkUtils.setNetworkChangeEvents(network,events);
 	    allchangeevents.removeAll(allchangeevents);
 	}
 	@Override

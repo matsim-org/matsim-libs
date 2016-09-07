@@ -9,8 +9,8 @@ import java.util.Map;
 
 public interface ExperiencedPlansService {
 
-	void writeExperiencedPlans(String iterationFilename);
+	void writeExperiencedPlans(String filename);
 
-	Map<Id<Person>, Plan> getAgentRecords();
+	Map<Id<Person>, Plan> getExperiencedPlans();
 
 }

@@ -21,9 +21,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -171,13 +171,13 @@ public class DistanceDistributionTrip {
 	public static void main(String[] args) throws IOException {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
-		new MatsimNetworkReader(scenario.getNetwork()).parse(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		new TransitScheduleReader(scenario).readFile(args[1]);
 		int lastIteration = new Integer(args[2]);
 		int iterationsInterval = new Integer(args[3]);
 		for(int i=0; i<=lastIteration; i+=iterationsInterval) {
             scenario.setPopulation(PopulationUtils.createPopulation(scenario.getConfig(), scenario.getNetwork()));
-			new MatsimPopulationReader(scenario).readFile(args[4]+"/ITERS/it."+i+"/"+i+".plans.xml.gz");
+			new PopulationReader(scenario).readFile(args[4]+"/ITERS/it."+i+"/"+i+".plans.xml.gz");
 			DistanceDistributionTrip distanceDistribution = new DistanceDistributionTrip(scenario.getPopulation(), scenario.getNetwork(), scenario.getTransitSchedule(), new HashSet<Id<Person>>());
 			distanceDistribution.saveChains();
 			distanceDistribution.printDistribution(distanceDistribution.getDistribution(new String[]{args[5]}, new String[]{"car","pt","walk"}), args[6]+"/distanceDistribution2."+i+".csv");

@@ -20,25 +20,22 @@
 package playground.agarwalamit.analysis.modalShare;
 
 import java.io.BufferedWriter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
+import playground.agarwalamit.utils.PersonFilter;
 
 /**
  * @author amit
@@ -49,19 +46,30 @@ public class ModalShareFromPlans implements ModalShare{
 	private final Population pop ;
 	private SortedMap<String, Integer> mode2numberOflegs = new TreeMap<>();
 	private SortedMap<String, Double> mode2PctOflegs = new TreeMap<>();
+	private final PersonFilter pf;
+	private final String userGroup;
 
 	public ModalShareFromPlans (final String plansFile) {
-		this.pop = LoadMyScenarios.loadScenarioFromPlans(plansFile).getPopulation();
+		this(LoadMyScenarios.loadScenarioFromPlans(plansFile).getPopulation(),null,null);
+	}
+	
+	public ModalShareFromPlans (final Population pop, final String userGroup, final PersonFilter personFilter) {
+		this.pop = pop;
+		this.pf = personFilter;
+		this.userGroup = userGroup;
+		if ( (this.userGroup == null && this.pf != null) || (this.userGroup != null && this.pf == null) ) {
+			throw new RuntimeException("Either of user group or person filter is null. Aborting...");
+		}
 	}
 
 	public ModalShareFromPlans (final Population pop) {
-		this.pop = pop;
+		this(pop,null,null);
 	}
 
 	public void run() {
 		// first store used modes 
 		for(Person person : pop.getPersons().values()){
-			PlanImpl plan = (PlanImpl) person.getSelectedPlan();
+			Plan plan = (Plan) person.getSelectedPlan();
 			List<PlanElement> planElements = plan.getPlanElements();
 			for(PlanElement pe : planElements){
 				if(pe instanceof Leg){
@@ -77,7 +85,11 @@ public class ModalShareFromPlans implements ModalShare{
 		for(String mode : mode2numberOflegs.keySet()){
 			int noOfLegs = 0;
 			for(Person person : pop.getPersons().values()){
-				PlanImpl plan = (PlanImpl) person.getSelectedPlan();
+				if (this.userGroup != null && this.pf != null // => if using filtering  
+					&& ! this.userGroup.equals(this.pf.getUserGroupAsStringFromPersonId(person.getId())) // => and person not from desired user group 
+					) continue; 
+				
+				Plan plan = (Plan) person.getSelectedPlan();
 				List<PlanElement> planElements = plan.getPlanElements();
 				for(PlanElement pe : planElements){
 					if(pe instanceof Leg){
@@ -93,7 +105,7 @@ public class ModalShareFromPlans implements ModalShare{
 			this.mode2numberOflegs.put(mode, noOfLegs);
 		}
 		
-		this.mode2PctOflegs = MapUtils.getPercentShare(this.mode2numberOflegs);
+		this.mode2PctOflegs = MapUtils.getIntPercentShare(this.mode2numberOflegs);
 	}
 
 	@Override

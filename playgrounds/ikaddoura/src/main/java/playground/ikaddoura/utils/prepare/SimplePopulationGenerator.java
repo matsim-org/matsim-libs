@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class SimplePopulationGenerator {
@@ -52,7 +52,7 @@ public class SimplePopulationGenerator {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
-		String populationFile = outputDirectory + "population_" + totalDemand + "trips.xml";
+		String populationFile = outputDirectory + "population_" + totalDemand + "trips_optimal.xml";
 		
 		SimplePopulationGenerator pG = new SimplePopulationGenerator(scenario);
 		pG.writePopulation(totalDemand, populationFile);
@@ -80,7 +80,7 @@ public class SimplePopulationGenerator {
 			Plan plan = this.population.getFactory().createPlan();
 	
 			Activity activity1 = this.population.getFactory().createActivityFromCoord("home", homeCoord);
-			activity1.setEndTime(7 * 3600.);
+			activity1.setEndTime(6.91 * 3600. + i);
 			plan.addActivity(activity1);
 				
 			plan.addLeg(this.population.getFactory().createLeg(TransportMode.car));

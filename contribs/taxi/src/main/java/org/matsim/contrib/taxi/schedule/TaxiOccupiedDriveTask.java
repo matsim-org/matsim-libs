@@ -46,7 +46,7 @@ public class TaxiOccupiedDriveTask
 
 
     @Override
-    public void removeFromRequest()
+    public void disconnectFromRequest()
     {
         request.setOccupiedDriveTask(null);
     }

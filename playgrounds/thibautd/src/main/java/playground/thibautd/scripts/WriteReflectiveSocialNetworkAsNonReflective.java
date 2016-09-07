@@ -39,7 +39,7 @@ public class WriteReflectiveSocialNetworkAsNonReflective {
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 
-		new SocialNetworkReader( sc ).parse( in );
+		new SocialNetworkReader( sc ).readFile( in );
 		final SocialNetwork inSocNet = (SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME );
 
 		final SocialNetwork outSocNet = new SocialNetworkImpl( false );

@@ -21,13 +21,13 @@
 package org.matsim.utils.gis.matsim2esri.network;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.network.Network;
 
 public class CapacityBasedWidthCalculator implements WidthCalculator {
 
 	private final double widthCoefficient;
 
-	public CapacityBasedWidthCalculator(final NetworkImpl network, final Double coef) {
+	public CapacityBasedWidthCalculator(final Network network, final Double coef) {
 		this.widthCoefficient = coef;
 	}
 

@@ -28,7 +28,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -123,7 +123,7 @@ public class ConvertCottbusSolution2Matsim {
 				directory + "output_signal_groups_v2.0.xml.gz");
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(
 				directory + "output_signal_control_v2.0.xml.gz");
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(
+		SignalsDataLoader signalsLoader = new SignalsDataLoader(
 				ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
 		SignalsData signals = signalsLoader.loadSignalsData();
 		return signals;

@@ -47,7 +47,6 @@ import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneData11;
@@ -602,7 +601,7 @@ public class TtCreateParallelScenario {
 			throw new IllegalStateException();
 		}
 		
-		((NetworkImpl) net).setEffectiveLaneWidth(1.0);
+		((Network) net).setEffectiveLaneWidth(1.0);
 		NetworkFactory fac = net.getFactory();
 		net.addNode(fac.createNode(idN1, new Coord(-500, 0)));
 		net.addNode(fac.createNode(idN2, new Coord(-300, 0)));

@@ -21,6 +21,7 @@ package playground.vsptelematics.ub6;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -28,7 +29,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
 import javax.inject.Inject;
@@ -54,7 +54,7 @@ public class Scorer implements IterationEndsListener {
 		for (Person person : population.getPersons().values()){
 			for(Plan plan : person.getPlans()) {
 				double tt = 0;
-				LegImpl leg = (LegImpl) plan.getPlanElements().get(1);
+				Leg leg = (Leg) plan.getPlanElements().get(1);
 				Route route = leg.getRoute();
 				for (Id id : ((NetworkRoute) route).getLinkIds()) {
 					if (id.toString().equals("4")) {

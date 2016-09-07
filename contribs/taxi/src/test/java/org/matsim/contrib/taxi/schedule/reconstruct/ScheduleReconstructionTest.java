@@ -26,9 +26,10 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
+import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 import org.matsim.contrib.taxi.data.*;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
-import org.matsim.contrib.taxi.run.*;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
@@ -47,7 +48,7 @@ public class ScheduleReconstructionTest
     @Test
     public void testMielecReconstruction()
     {
-        runReconstruction("./src/main/resources/mielec_2014_02/config.xml");
+        runReconstruction("./src/main/resources/mielec_2014_02/mielec_taxi_benchmark_config.xml");
     }
 
 
@@ -55,9 +56,8 @@ public class ScheduleReconstructionTest
     {
         Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(),
                 new OTFVisConfigGroup());
-        config.controler().setLastIteration(0);
 
-        Controler controler = RunTaxiScenario.createControler(config, false);
+        Controler controler = RunTaxiBenchmark.createControler(config, 1);
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install()

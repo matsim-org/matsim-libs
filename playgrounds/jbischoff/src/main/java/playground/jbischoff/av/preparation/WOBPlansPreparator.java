@@ -25,20 +25,20 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.algorithms.PersonPrepareForSim;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.population.algorithms.PersonPrepareForSim;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * @author  jbischoff
@@ -51,7 +51,7 @@ public static void main(String[] args) {
 
 
 	
-	new MatsimPopulationReader(sc).readFile("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/vw079.taxiplans_noCars.xml.gz");
+	new PopulationReader(sc).readFile("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/vw079.taxiplans_noCars.xml.gz");
 	for (Person p : sc.getPopulation().getPersons().values()){
 		Plan plan = p.getSelectedPlan();
 		for (int i = 1; i<plan.getPlanElements().size();i=i+2){

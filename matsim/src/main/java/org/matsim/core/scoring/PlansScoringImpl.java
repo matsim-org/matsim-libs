@@ -66,12 +66,12 @@ final class PlansScoringImpl implements PlansScoring, ScoringListener, Iteration
 			final int writePlansInterval = controlerConfigGroup.getWritePlansInterval();
 			if (writePlansInterval > 0 && event.getIteration() % writePlansInterval == 0) {
 				this.experiencedPlansService.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans.xml.gz"));
-				this.scoringFunctionsForPopulation.writePartialScores(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans_scores.xml.gz"));
+				this.scoringFunctionsForPopulation.writePartialScores(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans_scores.txt.gz"));
 			}
 		}
 		if (planCalcScoreConfigGroup.isMemorizingExperiencedPlans() ) {
 			for ( Person person : this.population.getPersons().values() ) {
-				Plan experiencedPlan = this.experiencedPlansService.getAgentRecords().get( person.getId() ) ;
+				Plan experiencedPlan = this.experiencedPlansService.getExperiencedPlans().get( person.getId() ) ;
 				if ( experiencedPlan==null ) {
 					throw new RuntimeException("experienced plan is null; I don't think this should happen") ;
 				}

@@ -33,10 +33,10 @@ import java.util.*;
  * @author illenberger
  * 
  */
-public class NetworkChangeEvent {
+public final class NetworkChangeEvent {
 
 	public static enum ChangeType {
-		ABSOLUTE, FACTOR
+		ABSOLUTE_IN_SI_UNITS, FACTOR
 	}
 
 	public static class ChangeValue {
@@ -85,7 +85,7 @@ public class NetworkChangeEvent {
 	 * @param startTime
 	 *            the time at which the event occurs.
 	 */
-	/*package*/ NetworkChangeEvent(double startTime) {
+	public /*package*/ NetworkChangeEvent(double startTime) {
 		this.startTime = startTime;
 	}
 
@@ -112,10 +112,10 @@ public class NetworkChangeEvent {
 	
 	/**
 	 * 
-	 * @param links a collection of links affected by this event.
+	 * @param links1 a collection of links affected by this event.
 	 */
-	public void addLinks(Collection<? extends Link> links) {
-		this.links.addAll(links);
+	public void addLinks(Collection<? extends Link> links1) {
+		this.links.addAll(links1);
 	}
 	
 	/**

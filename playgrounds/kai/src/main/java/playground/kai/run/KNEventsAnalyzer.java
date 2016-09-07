@@ -19,9 +19,7 @@
 package playground.kai.run;
 
 import java.util.Arrays;
-import java.util.Formatter;
 
-import org.joda.time.DateTime;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.analysis.kai.KNAnalysisEventsHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -29,7 +27,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 
@@ -41,14 +38,14 @@ public class KNEventsAnalyzer {
 
 	public static void main(String[] args) {
 		
-		DateTime date = new org.joda.time.DateTime() ;
+//		DateTime date = new org.joda.time.DateTime() ;
 
-		Formatter formatter = new Formatter() ;
-		String minute = formatter.format( "%02d", date.getMinuteOfHour() ).toString() ;
-		formatter.close();
+//		Formatter formatter = new Formatter() ;
+//		String minute = formatter.format( "%02d", date.getMinuteOfHour() ).toString() ;
+//		formatter.close();
 		
 		if ( args.length < 3 ) {
-			System.out.println("Usage: cmd eventsFile popFile netFile [popAttrFile] [tollFile] [futureTollFile]. Aborting ..." ) ;
+			System.out.println("Usage: cmd eventsFile popFile netFile [popAttrFile] [baseTollFile] [policyTollFile]. Aborting ..." ) ;
 			System.exit(-1);
 		}
 		
@@ -61,14 +58,14 @@ public class KNEventsAnalyzer {
 			popAttrFilename = args[3] ;
 		}
 		
-		String tollFilename = null ;
+		String baseTollFilename = null ;
 		if ( args.length > 4 && args[4]!=null ) {
-			tollFilename = args[4] ;
+			baseTollFilename = args[4] ;
 		}
 		
-		String otherLinksFilename = null ;
+		String policyTollsFilename = null ;
 		if ( args.length > 5 && args[5]!=null ) {
-			otherLinksFilename = args[5] ;
+			policyTollsFilename = args[5] ;
 		}
 		
 		// ===
@@ -82,7 +79,7 @@ public class KNEventsAnalyzer {
 		config.network().setInputFile( networkFilename );
 		config.plans().setInputFile( populationFilename );
 		config.plans().setInputPersonAttributeFile( popAttrFilename );
-        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(tollFilename);
+		ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(baseTollFilename);
 
 		// ===
 		
@@ -96,7 +93,7 @@ public class KNEventsAnalyzer {
 		EventsManager events = new EventsManagerImpl() ;
 		
 		final KNAnalysisEventsHandler.Builder builder = new KNAnalysisEventsHandler.Builder(scenario) ;
-		builder.setOtherTollLinkFile( otherLinksFilename );
+		builder.setOtherTollLinkFile( policyTollsFilename );
 		final KNAnalysisEventsHandler calcLegTimes = builder.build();
 		
 		events.addHandler( calcLegTimes );

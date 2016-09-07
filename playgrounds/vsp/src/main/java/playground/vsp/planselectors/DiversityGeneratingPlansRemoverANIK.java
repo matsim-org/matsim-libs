@@ -25,8 +25,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.selectors.AbstractPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import org.matsim.core.router.StageActivityTypes;
@@ -50,7 +50,7 @@ import org.matsim.pt.PtConstants;
  * class can only delete one plan at a time. Multiple iterations are required in case more than two plans would be considered
  * as <i>similar</i>. Note that the similarity checks depend on the plans of the choice set and may thus yield different results
  * once a plan is removed. Further note that the order in which plans are compared to each other depends on the List implementation
- * in which the plans are stored. As of May 2014 this is an ArrayList ({@link PersonImpl#plans}).
+ * in which the plans are stored. As of May 2014 this is an ArrayList ({@link Person#plans}).
  * 
  * @author aneumann
  * @author ikaddoura

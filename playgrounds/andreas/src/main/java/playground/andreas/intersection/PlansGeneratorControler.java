@@ -20,24 +20,24 @@
 
 package playground.andreas.intersection;
 
+import java.util.LinkedList;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import java.util.LinkedList;
 
 public class PlansGeneratorControler {
 
@@ -160,16 +160,16 @@ public class PlansGeneratorControler {
 
 	/** Generates one Person a time */
 	private void generatePerson(final int ii, final Link fromLink, final Link toLink, final Population population) {
-		Person p = PopulationUtils.createPerson(Id.create(String.valueOf(ii), Person.class));
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
+		Person p = PopulationUtils.getFactory().createPerson(Id.create(String.valueOf(ii), Person.class));
+		Plan plan = PopulationUtils.createPlan(p);
 		try {
-			ActivityImpl act1 = plan.createAndAddActivity("h", new Coord(100., 100.));
+			Activity act1 = PopulationUtils.createAndAddActivityFromCoord(plan, (String) "h", new Coord(100., 100.));
 			act1.setLinkId(fromLink.getId());
 			act1.setStartTime(0.);
 			act1.setEndTime(3 * 60 * 60.);
 //			plan.createAct("h", 100., 100., fromLink, 0., 3 * 60 * 60. + 3600 * MatsimRandom.getLocalInstance().nextDouble(), Time.UNDEFINED_TIME, true);
-			plan.createAndAddLeg(TransportMode.car);
-			ActivityImpl act2 = plan.createAndAddActivity("h", new Coord(200., 200.));
+			PopulationUtils.createAndAddLeg( plan, (String) TransportMode.car );
+			Activity act2 = PopulationUtils.createAndAddActivityFromCoord(plan, (String) "h", new Coord(200., 200.));
 			act2.setLinkId(toLink.getId());
 			act2.setStartTime(8 * 60 * 60);
 

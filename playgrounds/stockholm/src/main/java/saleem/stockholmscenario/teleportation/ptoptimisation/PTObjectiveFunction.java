@@ -3,6 +3,8 @@ package saleem.stockholmscenario.teleportation.ptoptimisation;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import opdytsintegration.MATSimState;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -10,7 +12,6 @@ import org.matsim.api.core.v01.population.Plan;
 
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
-import opdytsintegration.MATSimState;
 
 
 /**
@@ -38,22 +39,25 @@ public class PTObjectiveFunction implements ObjectiveFunction {
 			result -= selectedPlan.getScore();
 		}
 		int currenttotal = scenario.getTransitVehicles().getVehicles().size();
-		int added = currenttotal-totalVeh;
+		ScenarioHelper helper = new ScenarioHelper();
+		int unusedvehs = helper.getUnusedVehs(scenario.getTransitSchedule());
+		int added = currenttotal-totalVeh-unusedvehs;
 		if(added>0){
 			for(int i=0; i<added; i++){
-				result = result + 4.5;//Thats an adverse efffect on total score
+				result = result + 4.0;//Thats an adverse effect on total score
 			}
 		}
 		else if (added<0){
 			added=Math.abs(added);
 			for(int i=0; i<added;i++){
-				result = result - 4.5;//Thats a positive effect due to deleting vehicles
+				result = result - 4.0;//Thats a positive effect due to deleting vehicles
 			}
 		}
+		int vehs = currenttotal-unusedvehs;
 		result /= ptstate.getPersonIdView().size();
-		str = str + result	+ "\n";
+		str = str + result	+ "\t" + vehs + "\n";
 		writeToTextFile(str, "scores.txt");
-		return result;	
+		return result;
 	}
 	public void writeToTextFile(String str, String path){
 		try { 

@@ -22,12 +22,12 @@ package playground.johannes.studies.plans;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -56,7 +56,7 @@ public class PopRndSubSample {
 		
 		Config config = ConfigUtils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
+		PopulationReader popReader = new PopulationReader(scenario);
 		popReader.readFile(input);
 
 		Population pop = scenario.getPopulation();

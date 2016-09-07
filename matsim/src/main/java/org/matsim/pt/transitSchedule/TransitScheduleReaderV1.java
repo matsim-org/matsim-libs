@@ -32,14 +32,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -55,10 +54,10 @@ import org.xml.sax.Attributes;
  *
  * @author mrieser
  */
-public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSomeReader {
+public class TransitScheduleReaderV1 extends MatsimXmlParser {
 
 	private final TransitSchedule schedule;
-	private final RouteFactoryImpl routeFactory;
+	private final RouteFactories routeFactory;
 
 	private TransitLine currentTransitLine = null;
 	private TempTransitRoute currentTransitRoute = null;
@@ -70,20 +69,20 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 	/**
 	 * @param schedule
 	 * @param network
-	 * @deprecated use {@link #TransitScheduleReaderV1(TransitSchedule, RouteFactoryImpl)}
+	 * @deprecated use {@link #TransitScheduleReaderV1(TransitSchedule, RouteFactories)}
 	 */
 	@Deprecated
 	public TransitScheduleReaderV1(final TransitSchedule schedule, final Network network) {
-		this(schedule, new RouteFactoryImpl());
+		this(schedule, new RouteFactories());
 	}
 
-	public TransitScheduleReaderV1(final TransitSchedule schedule, final RouteFactoryImpl routeFactory) {
+	public TransitScheduleReaderV1(final TransitSchedule schedule, final RouteFactories routeFactory) {
 		this( new IdentityTransformation() , schedule , routeFactory );
 	}
 
 	public TransitScheduleReaderV1(final Scenario scenario) {
 		this( scenario.getTransitSchedule(),
-				((PopulationFactoryImpl) (scenario.getPopulation().getFactory())).getRouteFactory() );
+				((PopulationFactory) (scenario.getPopulation().getFactory())).getRouteFactories() );
 	}
 
 	public TransitScheduleReaderV1(
@@ -91,20 +90,16 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 			final Scenario scenario) {
 		this( coordinateTransformation,
 				scenario.getTransitSchedule(),
-				((PopulationFactoryImpl) (scenario.getPopulation().getFactory())).getRouteFactory() );
+				((PopulationFactory) (scenario.getPopulation().getFactory())).getRouteFactories() );
 	}
 
 	public TransitScheduleReaderV1(
 			CoordinateTransformation coordinateTransformation,
 			TransitSchedule schedule,
-			RouteFactoryImpl routeFactory) {
+			RouteFactories routeFactory) {
 		this.coordinateTransformation = coordinateTransformation;
 		this.schedule = schedule;
 		this.routeFactory = routeFactory;
-	}
-
-	public void readFile(final String fileName) throws UncheckedIOException {
-		this.parse(fileName);
 	}
 
 	@Override

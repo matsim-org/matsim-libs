@@ -2,7 +2,7 @@ package playground.singapore.springcalibration.preprocess;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 //import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -22,7 +22,7 @@ public class HitsPlansAnanlyzer {
 		this.outdir = outdir;
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimFacilitiesReader(scenario).readFile(facilitiesfile);
-		new MatsimPopulationReader(scenario).readFile(hitsplansfile);
+		new PopulationReader(scenario).readFile(hitsplansfile);
 		
 		//new PopulationWriter(scenario.getPopulation()).writeFileV5(outdir + "/hitsPlansCompleted.xml.gz");
 		

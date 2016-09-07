@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.util.FastAStarEuclideanFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
@@ -145,7 +145,7 @@ public class PersonalizableDisutilityIntegrationTest {
 			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			new MatsimNetworkReader(this.scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
 			
-			this.person = PopulationUtils.createPerson(Id.create(1, Person.class));
+			this.person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 			
 			this.vehicle = new VehicleImpl(null, null);
 			

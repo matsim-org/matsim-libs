@@ -1,5 +1,9 @@
 package playground.artemc.scenarioTools;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Random;
+
 /**
  * Population generator for a corridor scenario 
  * 
@@ -12,20 +16,22 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.*;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-import playground.artemc.utils.Writer;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Random;
+import playground.artemc.utils.Writer;
 
 public class SimplePopulationGenerator {
 
@@ -47,10 +53,10 @@ public class SimplePopulationGenerator {
 		SimplePopulationGenerator simplePopulationGenerator = new SimplePopulationGenerator();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
+		Population population = (Population) scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
-		population.setIsStreaming(true);
-		PopulationWriter popWriter = new PopulationWriter(population, scenario.getNetwork());
+		StreamingUtils.setIsStreaming(population, true);
+		StreamingPopulationWriter popWriter = new StreamingPopulationWriter(population, scenario.getNetwork());
 		popWriter.startStreaming(outputPath+"/corridorPopulation_"+populationSize+".xml");
 
 		Random generator = new Random();
@@ -97,10 +103,10 @@ public class SimplePopulationGenerator {
 			simplePopulationGenerator.createIncome(person);
 
 			//Add home location to the plan
-			ActivityImpl actHome = (ActivityImpl) pf.createActivityFromCoord("home", homeLocation);
-			ActivityImpl actWork = (ActivityImpl) pf.createActivityFromCoord("work", workLocation);
-			ActivityImpl actHome2 = (ActivityImpl) pf.createActivityFromCoord("home", homeLocation);
-			LegImpl leg = (LegImpl) pf.createLeg("pt");
+			Activity actHome = (Activity) pf.createActivityFromCoord("home", homeLocation);
+			Activity actWork = (Activity) pf.createActivityFromCoord("work", workLocation);
+			Activity actHome2 = (Activity) pf.createActivityFromCoord("home", homeLocation);
+			Leg leg = (Leg) pf.createLeg("pt");
 			actHome.setEndTime(3600.00*8.30 + generator.nextGaussian()*1800);
 			plan.addActivity(actHome);
 			plan.addLeg(leg);

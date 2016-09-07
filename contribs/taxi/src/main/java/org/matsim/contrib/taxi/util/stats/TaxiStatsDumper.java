@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.util.Map;
+import java.util.*;
 
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -36,10 +36,10 @@ public class TaxiStatsDumper
     implements AfterMobsimListener, ShutdownListener
 {
     private static final String[] HEADER = { "iter", null, //
-            "TP_avg", "TP_sd", "TP_95%ile", "TP_max", null, //
-            "RE_fleet", "RE_avg", "RE_sd", null, //
-            "RW_fleet", "RW_avg", "RW_sd", null, //
-            "TO" };
+            "PassWaitTime_avg", "PassWaitTime_sd", "PassWaitTime_95%ile", "PassWaitTime_max", null, //
+            "EmptyDriveRatio_fleetAvg", "EmptyDriveRatio_avg", "EmptyDriveRatio_sd", null, //
+            "StayRatio_fleetAvg", "StayRatio_avg", "StayRatio_sd", null, //
+            "OccupDriveRatio_fleetAvg" };
 
     private final TaxiData taxiData;
     private final TaxiConfigGroup taxiCfg;
@@ -95,7 +95,7 @@ public class TaxiStatsDumper
     }
 
 
-    private void writeDetailedStats(Map<String, TaxiStats> taxiStats, AfterMobsimEvent event)
+    private void writeDetailedStats(List<TaxiStats> taxiStats, AfterMobsimEvent event)
     {
         String prefix = controlerIO.getIterationFilename(event.getIteration(), "taxi_");
 

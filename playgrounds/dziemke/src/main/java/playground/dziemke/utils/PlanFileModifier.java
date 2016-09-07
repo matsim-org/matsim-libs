@@ -11,11 +11,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationReaderMatsimV5;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -29,26 +28,30 @@ public class PlanFileModifier {
 	
 	// Parameters
 	static double selectionProbability = 1.;
-	static boolean onlyTransferSelectedPlan = true;
+	static boolean onlyTransferSelectedPlan = false;
 	static boolean considerHomeStayingAgents = true;
 	static boolean includeStayHomePlans = true;
 	static boolean onlyConsiderPeopleAlwaysGoingByCar = false;
 	static int maxNumberOfAgentsConsidered = 1000000;
-	static String runId = "run_194";
-	static int iteration = 300;
+//	static String runId = "run_194";
+//	static int iteration = 300;
 	static boolean removeLinksAndRoutes = true;
 	
 	
 	// Input and output files
-	static final String INPUT_PLANS_FILE = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
-			+ "/" + runId + "." + iteration + ".plans.xml.gz";
-	static final String OUTPUT_PLANS_FILE = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
-			+ "/" + runId + "." + iteration + ".plans_selected_no_links_routes.xml.gz";
+//	static final String INPUT_PLANS_FILE = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
+//			+ "/" + runId + "." + iteration + ".plans.xml.gz";
+//	static final String OUTPUT_PLANS_FILE = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
+//			+ "/" + runId + "." + iteration + ".plans_selected_no_links_routes.xml.gz";
 //	static final String INPUT_PLANS_FILE = "../../../shared-svn/projects/tum-with-moeckel/data/"
 //			+ "mstm_run/run_04/siloMatsim/population_2000.xml";
 //	static final String OUTPUT_ROOT = "../../../../SVN/shared-svn/projects/tum-with-moeckel/data/"
 //			+ "mstm_run/run_04/siloMatsim/population_2000_half/";
 //	static final String OUTPUT_PLANS_FILE = OUTPUT_ROOT + "population.xml";
+	
+	// In case using input plans that have not yet been iterated
+	static final String INPUT_PLANS_FILE = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/30/plans.xml.gz";
+	static final String OUTPUT_PLANS_FILE = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/30/plans_no_links_routes.xml.gz";
 	
 	
 //	if (onlyTransferSelectedPlan == true) {
@@ -64,7 +67,7 @@ public class PlanFileModifier {
 		
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
+		PopulationReader reader = new PopulationReader(scenario);
 		reader.readFile(INPUT_PLANS_FILE);
 		Population population = scenario.getPopulation();
 		
@@ -103,7 +106,7 @@ public class PlanFileModifier {
 						int numberOfPlanElements = plan.getPlanElements().size();
 						for (int j=0; j < numberOfPlanElements; j++) {
 							if (plan.getPlanElements().get(j) instanceof Leg) {
-								LegImpl leg = (LegImpl) plan.getPlanElements().get(j);
+								Leg leg = (Leg) plan.getPlanElements().get(j);
 								if (!leg.getMode().equals("car")) {
 									considerPerson = false;
 								}

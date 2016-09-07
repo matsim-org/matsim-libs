@@ -26,6 +26,7 @@ import java.util.Vector;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype;
 import org.matsim.contrib.locationchoice.random.RandomLocationMutator;
 import org.matsim.contrib.locationchoice.timegeography.RecursiveLocationMutator;
@@ -35,14 +36,13 @@ import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import javax.inject.Provider;
 
@@ -73,7 +73,7 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 
 	private void initLocal() {
 		this.defineFlexibleActivities = new ActivitiesHandler((DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
-		((NetworkImpl) this.scenario.getNetwork()).connect();
+//		((NetworkImpl) this.scenario.getNetwork()).connect();
 
 		this.actTypeConverter = this.defineFlexibleActivities.getConverter();
 		this.initTrees(this.scenario.getActivityFacilities(), (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));

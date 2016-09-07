@@ -25,6 +25,7 @@ package playground.johannes.gsv.sim;
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -39,7 +40,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -110,7 +110,7 @@ public class RailSimulator {
 					ActivityFacilityImpl fac = ((ActivityFacilitiesImpl)facilities).createAndAddFacility(id, act.getCoord());
 					fac.createAndAddActivityOption(act.getType());
 					
-					((ActivityImpl)act).setFacilityId(id);
+					((Activity)act).setFacilityId(id);
 				}
 
 			}

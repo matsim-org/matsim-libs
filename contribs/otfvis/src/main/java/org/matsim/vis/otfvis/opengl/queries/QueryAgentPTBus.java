@@ -19,6 +19,7 @@
 
 package org.matsim.vis.otfvis.opengl.queries;
 
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.nio.FloatBuffer;
 import java.util.LinkedList;
@@ -27,6 +28,7 @@ import java.util.List;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 
+import com.jogamp.opengl.util.awt.TextRenderer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -43,6 +45,7 @@ import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
+import org.matsim.vis.otfvis.opengl.gl.GLUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 
@@ -66,11 +69,13 @@ public class QueryAgentPTBus extends AbstractQuery {
 
 		@Override
 		public void draw(OTFOGLDrawer drawer) {
+			TextRenderer textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 32), true, false);
+
 			if(this.vertex == null) return;
 
 			OGLAgentPointLayer layer = drawer.getCurrentSceneGraph().getAgentPointLayer();
 
-			if( this.calcOffset == true) {
+			if(this.calcOffset) {
 				float east = (float)drawer.getQuad().offsetEast;
 				float north = (float)drawer.getQuad().offsetNorth;
 
@@ -106,9 +111,9 @@ public class QueryAgentPTBus extends AbstractQuery {
 				gl.glVertex3d((float)pos.x + 50, (float)pos.y + 50,0);
 				gl.glVertex3d((float)pos.x +250, (float)pos.y +250,0);
 				gl.glEnd();
-				drawCircle(gl, (float)pos.x, (float)pos.y, 100.f);
+				GLUtils.drawCircle(gl, (float)pos.x, (float)pos.y, 100.f);
 				InfoText text = new InfoText("Bus " + id, (float)pos.x+ 250, (float)pos.y+ 250);
-				text.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
+				text.draw(textRenderer, OTFClientControl.getInstance().getMainOTFDrawer().getCanvas(), drawer.getViewBoundsAsQuadTreeRect());
 
 			}
 			gl.glDisable(GL.GL_BLEND);
@@ -129,7 +134,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 
 	private String agentId;
 	private Result result;
-	private final List<String> allIds = new LinkedList<String>();
+	private final List<String> allIds = new LinkedList<>();
 
 	private Network net = null;
 
@@ -140,7 +145,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 	}
 
 	private float[] buildRoute(Plan plan) {
-		List<Id<Link>> drivenLinks = new LinkedList<Id<Link>> ();
+		List<Id<Link>> drivenLinks = new LinkedList<>();
 
 		List<PlanElement> actslegs = plan.getPlanElements();
 		for (PlanElement pe : actslegs) {
@@ -184,22 +189,6 @@ public class QueryAgentPTBus extends AbstractQuery {
 		Plan plan = simulationView.getPlans().get(Id.create(allIds.get(0), Person.class));
 		this.result.vertex = buildRoute(plan);
 	}
-
-
-	public static void drawCircle(GL2 gl, float x, float y, float size) {
-		float w = 40;
-
-		gl.glLineWidth(2);
-		gl.glEnable(GL2.GL_LINE_SMOOTH);
-		gl.glBegin(GL2.GL_LINE_STRIP);
-		for (float f = 0; f < w;) {
-			gl.glVertex3d(Math.cos(f)*size + x, Math.sin(f)*size + y,0);
-			f += (2*Math.PI/w);
-		}
-		gl.glEnd();
-		gl.glDisable(GL.GL_LINE_SMOOTH);
-	}
-
 
 
 	@Override

@@ -21,11 +21,11 @@ package playground.johannes.coopsim.mental.planmod;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -37,7 +37,7 @@ import playground.johannes.coopsim.utils.LegRouter;
  */
 public class ActivityFacilityMod implements PlanModifier {
 
-	private final PopulationFactoryImpl factory;
+	private final PopulationFactory factory;
 
 	private final LegRouter router;
 	
@@ -54,7 +54,7 @@ public class ActivityFacilityMod implements PlanModifier {
 	public ActivityFacilityMod(ActivityFacilities facilities, LegRouter router) {
 		this.facilities = facilities;
 		this.router = router;
-        this.factory = (PopulationFactoryImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
+        this.factory = (PopulationFactory) ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
 	}
 	
 	public void setPlanIndex(int planIndex) {
@@ -70,7 +70,7 @@ public class ActivityFacilityMod implements PlanModifier {
 		Activity act = (Activity) plan.getPlanElements().get(planIndex);
 
 		Activity newAct = factory.createActivityFromLinkId(act.getType(), facility.getLinkId());
-		((ActivityImpl) newAct).setFacilityId(facility.getId());
+		((Activity) newAct).setFacilityId(facility.getId());
 
 		newAct.setEndTime(act.getEndTime());
 

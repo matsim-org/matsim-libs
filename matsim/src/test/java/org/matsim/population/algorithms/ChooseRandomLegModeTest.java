@@ -26,12 +26,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.ChooseRandomLegMode;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -41,10 +42,10 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 
 	public void testRandomChoice() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(PopulationUtils.createPerson(Id.create(1, Person.class)));
-		plan.createAndAddActivity("home", new Coord(0, 0));
-		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));
+		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0, 0));
+		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 		boolean foundCarMode = false;
 		boolean foundPtMode = false;
 		boolean foundWalkMode = false;
@@ -70,15 +71,15 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 
 	public void testHandleEmptyPlan() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(PopulationUtils.createPerson(Id.create(1, Person.class)));
+		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
 		algo.run(plan);
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
 	}
 
 	public void testHandlePlanWithoutLeg() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk}, MatsimRandom.getRandom());
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(PopulationUtils.createPerson(Id.create(1, Person.class)));
-		plan.createAndAddActivity("home", new Coord(0, 0));
+		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0, 0));
 		algo.run(plan);
 		// no specific assert, but there should also be no NullPointerException or similar stuff that could theoretically happen
 	}
@@ -88,14 +89,14 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	 */
 	public void testMultipleLegs() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt}, MatsimRandom.getRandom());
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(PopulationUtils.createPerson(Id.create(1, Person.class)));
-		plan.createAndAddActivity("home", new Coord(0, 0));
-		plan.createAndAddLeg(TransportMode.car);
-		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));
-		plan.createAndAddLeg(TransportMode.car);
-		plan.createAndAddActivity("shop", new Coord((double) 0, (double) 0));
-		plan.createAndAddLeg(TransportMode.car);
-		plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
+		Plan plan = PopulationUtils.createPlan(PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)));
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord(0, 0));
+		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
+		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		PopulationUtils.createAndAddActivityFromCoord(plan, "shop", new Coord((double) 0, (double) 0));
+		PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord((double) 0, (double) 0));
 		algo.run(plan);
 		assertEquals("unexpected leg mode in leg 1.", TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode());
 		assertEquals("unexpected leg mode in leg 2.", TransportMode.pt, ((Leg) plan.getPlanElements().get(3)).getMode());
@@ -105,12 +106,12 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	public void testIgnoreCarAvailability_Never() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike}, MatsimRandom.getRandom());
 		algo.setIgnoreCarAvailability(false);
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.setCarAvail(person, "never");
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
-		plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
-		plan.createAndAddLeg(TransportMode.pt);
-		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));
+		Plan plan = PopulationUtils.createPlan(person);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord((double) 0, (double) 0));
+		PopulationUtils.createAndAddLeg( plan, TransportMode.pt );
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 		algo.run(plan);
 		assertEquals("unexpected leg mode in leg 1.", TransportMode.bike, ((Leg) plan.getPlanElements().get(1)).getMode());
 		algo.run(plan);
@@ -122,12 +123,12 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	public void testIgnoreCarAvailability_Never_noChoice() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt}, MatsimRandom.getRandom());
 		algo.setIgnoreCarAvailability(false);
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.setCarAvail(person, "never");
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
-		plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
-		plan.createAndAddLeg(TransportMode.pt);
-		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));
+		Plan plan = PopulationUtils.createPlan(person);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord((double) 0, (double) 0));
+		PopulationUtils.createAndAddLeg( plan, TransportMode.pt );
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 		algo.run(plan);
 		assertEquals("unexpected leg mode in leg 1.", TransportMode.pt, ((Leg) plan.getPlanElements().get(1)).getMode());
 	}
@@ -135,12 +136,12 @@ public class ChooseRandomLegModeTest extends MatsimTestCase {
 	public void testIgnoreCarAvailability_Always() {
 		ChooseRandomLegMode algo = new ChooseRandomLegMode(new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike}, new Random(1));
 		algo.setIgnoreCarAvailability(false);
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.setCarAvail(person, "always");
-		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
-		plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
-		plan.createAndAddLeg(TransportMode.pt);
-		plan.createAndAddActivity("work", new Coord((double) 0, (double) 0));
+		Plan plan = PopulationUtils.createPlan(person);
+		PopulationUtils.createAndAddActivityFromCoord(plan, "home", new Coord((double) 0, (double) 0));
+		PopulationUtils.createAndAddLeg( plan, TransportMode.pt );
+		PopulationUtils.createAndAddActivityFromCoord(plan, "work", new Coord((double) 0, (double) 0));
 		algo.run(plan);
 		assertEquals("unexpected leg mode in leg 1.", TransportMode.bike, ((Leg) plan.getPlanElements().get(1)).getMode());
 		algo.run(plan);

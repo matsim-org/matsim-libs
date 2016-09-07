@@ -41,6 +41,10 @@ public class ParkingIntegrationTestSmall {
 	public void testScenario(){
 		Config config = ConfigUtils.loadConfig( utils.getPackageInputDirectory() + "chessConfig2.xml", new ParkingConfigModule()) ;
 		
+
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+		// too many things don't work with access/egress walk true. kai, jun'16
+
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		
 		Controler controler = new Controler(scenario);

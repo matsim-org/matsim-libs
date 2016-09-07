@@ -19,70 +19,41 @@
 
 package playground.michalm.taxi.ev;
 
-import java.util.*;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.taxi.util.stats.TimeProfiles;
-import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.taxi.data.TaxiData;
 
-import playground.michalm.ev.*;
-import playground.michalm.taxi.data.*;
-import playground.michalm.taxi.util.stats.EStatsCalculators;
+import playground.michalm.ev.data.*;
+import playground.michalm.ev.discharging.*;
+import playground.michalm.ev.discharging.OhdeSlaskiAuxEnergyConsumption.TemperatureProvider;
+import playground.michalm.taxi.data.EvrpVehicle;
+import playground.michalm.taxi.data.EvrpVehicle.Ev;
 
 
 public class ETaxiUtils
 {
-    public static void initChargersAndVehicles(ETaxiData taxiData)
+    public static void initEvData(TaxiData taxiData, EvData evData)
     {
-        // TODO reduce charging speed in winter
-        for (Charger c : taxiData.getChargers().values()) {
-            new PartialFastChargingWithQueueingLogic(c);
+        TemperatureProvider tempProvider = () -> 20;// aux power about 1 kW at 20oC
+        double chargingSpeedFactor = 1.; //full speed
+
+        for (Charger c : evData.getChargers().values()) {
+            new ETaxiChargingLogic(c, chargingSpeedFactor);
         }
 
-        // TODO variable AUX -- depends on weather etc...
-        // TODO add the Leaf consumption model for driving 
-
-        double driveRate = 150. * 3.6; //15 kWh / 100 km == 150 Wh/km; converted into J/m
-        double auxPower = 500; //0.5 kW 
-
-        for (ETaxi t : taxiData.getETaxis().values()) {
-            t.setDriveEnergyConsumption(
-                    EnergyConsumptions.createFixedDriveEnergyConsumption(t, driveRate));
-            t.setAuxEnergyConsumption(new ETaxiAuxEnergyConsumption(t, auxPower));
+        for (Vehicle v : taxiData.getVehicles().values()) {
+            Ev ev = ((EvrpVehicle)v).getEv();
+            ev.setDriveEnergyConsumption(new OhdeSlaskiDriveEnergyConsumption());
+            ev.setAuxEnergyConsumption(
+                    new OhdeSlaskiAuxEnergyConsumption(ev, tempProvider, ETaxiUtils::isTurnedOn));
+            evData.addElectricVehicle(Id.createVehicleId(v.getId()), ev);
         }
     }
 
 
-    public static DriveDischargingHandler createDriveDischargingHandler(ETaxiData taxiData,
-            Network network, TravelTime travelTime, ETaxiParams eTaxiParams)
+    private static boolean isTurnedOn(ElectricVehicle ev)
     {
-        Map<Id<Vehicle>, ETaxi> vehicleToTaxi = new HashMap<>();
-        for (ETaxi t : taxiData.getETaxis().values()) {
-            //we assume: dvrp's vehicle.id == matsim's vehicle.id
-            //see: VrpAgentSource.insertAgentsIntoMobsim() 
-            vehicleToTaxi.put(Id.create(t.getId(), Vehicle.class), t);
-        }
-
-        return new DriveDischargingHandler(vehicleToTaxi, network, travelTime);
-    }
-
-
-    public static ChargingAuxDischargingHandler createChargingAuxDischargingHandler(
-            ETaxiData taxiData, Network network, TravelTime travelTime, ETaxiParams eTaxiParams)
-    {
-        return new ChargingAuxDischargingHandler(taxiData.getChargers().values(),
-                eTaxiParams.chargeTimeStep, taxiData.getETaxis().values(),
-                eTaxiParams.auxDischargeTimeStep);
-    }
-
-
-    public static ProfileCalculator<String> createStatsCollection(ETaxiData taxiData)
-    {
-        return TimeProfiles.combineProfileCalculators(
-                EStatsCalculators.createMeanSocCalculator(taxiData),
-                EStatsCalculators.createDischargedVehiclesCounter(taxiData));
+        return ((Ev)ev).getEvrpVehicle().getSchedule().getStatus() == ScheduleStatus.STARTED;
     }
 }

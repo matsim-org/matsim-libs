@@ -21,17 +21,16 @@ package org.matsim.core.network;
 
 import java.util.*;
 
-import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.*;
 import org.matsim.core.utils.misc.Time;
 
 
 /**
  * This class follows the rules assumed in {@link TravelTimeCalculator}: The constructor arguments
- * {@link timeSlice} and {@link maxTime} have the same meaning, and the last time bin is open ended.
+ * timeSlice and maxTime have the same meaning as there, and the last time bin is open ended.
  */
-public class FixedIntervalTimeVariantAttribute
+ class FixedIntervalTimeVariantAttribute
     implements TimeVariantAttribute
 {
     private final int timeSlice;
@@ -47,7 +46,7 @@ public class FixedIntervalTimeVariantAttribute
     public FixedIntervalTimeVariantAttribute(int timeSlice, int maxTime)
     {
         this.timeSlice = timeSlice;
-        this.numSlots = (maxTime / timeSlice) + 1;
+        this.numSlots = TimeBinUtils.getTimeBinCount(maxTime, timeSlice);
     }
 
 
@@ -61,9 +60,9 @@ public class FixedIntervalTimeVariantAttribute
     //TODO before calling this method we could convert changeEvents into a sequence of non-null changeValues
     @Override
     public void recalc(TreeMap<Double, NetworkChangeEvent> changeEvents,
-            ChangeValueGetter valueGetter, double baseValue)
+            ChangeValueGetter valueGetter, double baseValue1)
     {
-        this.baseValue = baseValue;
+        this.baseValue = baseValue1;
 
         if (eventsCount == 0) {
             return;
@@ -78,7 +77,7 @@ public class FixedIntervalTimeVariantAttribute
 
         int numEvent = 0;
         int fromBin = 0;//inclusive
-        double currentValue = baseValue;
+        double currentValue = baseValue1;
         if (changeEvents != null) {
             for (NetworkChangeEvent event : changeEvents.values()) {
                 ChangeValue value = valueGetter.getChangeValue(event);
@@ -115,11 +114,7 @@ public class FixedIntervalTimeVariantAttribute
             return baseValue;
         }
 
-        int bin = ((int)time) / timeSlice;
-        if (bin >= numSlots) {
-            bin = numSlots - 1;
-        }
-
+        int bin = TimeBinUtils.getTimeBinIndex(time, timeSlice, numSlots);
         return values[bin];
     }
 

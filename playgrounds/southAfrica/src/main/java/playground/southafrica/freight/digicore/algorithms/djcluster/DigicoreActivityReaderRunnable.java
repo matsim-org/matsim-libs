@@ -77,7 +77,7 @@ public class DigicoreActivityReaderRunnable implements Runnable {
 	@Override
 	public void run() {
 		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-		dvr.parse(this.vehicleFile.getAbsolutePath());
+		dvr.readFile(this.vehicleFile.getAbsolutePath());
 		DigicoreVehicle dv = dvr.getVehicle();
 		for(DigicoreChain dc : dv.getChains()){
 			

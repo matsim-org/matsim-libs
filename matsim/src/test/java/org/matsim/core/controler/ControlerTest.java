@@ -50,6 +50,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
@@ -57,7 +58,6 @@ import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
@@ -85,6 +85,7 @@ public class ControlerTest {
 	public static Collection<Object> parameterObjects () {
 		Object [] capacityUpdates = new Object [] { false, true };
 		return Arrays.asList(capacityUpdates);
+		// yyyy I am not sure why it is doing this ... it is necessary to do this around the qsim, but why here?  kai, aug'16
 	}
 	
 	@Test
@@ -146,7 +147,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testTravelTimeCalculation() {
-		Config config = this.utils.loadConfig(null);
+		Config config = this.utils.loadConfig((String) null);
 		Fixture f = new Fixture(config);
 
 		/* Create 2 persons driving from link 1 to link 3, both starting at the
@@ -163,7 +164,7 @@ public class ControlerTest {
 		plan1.addActivity(a1);
 		Leg leg1 = factory.createLeg(TransportMode.car);
 		plan1.addLeg(leg1);
-		NetworkRoute route1 = ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
+		NetworkRoute route1 = ((PopulationFactory) f.scenario.getPopulation().getFactory()).getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 		leg1.setRoute(route1);
 		ArrayList<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		linkIds.add(f.link2.getId());
@@ -179,7 +180,7 @@ public class ControlerTest {
 		plan2.addActivity(a2);
 		Leg leg2 = factory.createLeg(TransportMode.car);
 		plan2.addLeg(leg2);
-		NetworkRoute route2 = ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
+		NetworkRoute route2 = ((PopulationFactory) f.scenario.getPopulation().getFactory()).getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 		leg2.setRoute(route2);
 		route2.setLinkIds(f.link1.getId(), linkIds, f.link3.getId());
 		plan2.addActivity(factory.createActivityFromLinkId("h", f.link3.getId()));
@@ -246,7 +247,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testSetScoringFunctionFactory() {
-		final Config config = this.utils.loadConfig(null);
+		final Config config = this.utils.loadConfig((String) null);
 		config.controler().setLastIteration(0);
 
 		config.qsim().setUsingFastCapacityUpdate( this.isUsingFastCapacityUpdate );
@@ -294,7 +295,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testCalcMissingRoutes() {
-		Config config = this.utils.loadConfig(null);
+		Config config = this.utils.loadConfig((String) null);
 		Fixture f = new Fixture(config);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
@@ -383,7 +384,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testCalcMissingActLinks() {
-		Config config = this.utils.loadConfig(null);
+		Config config = this.utils.loadConfig((String) null);
 		Fixture f = new Fixture(config);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
@@ -397,7 +398,7 @@ public class ControlerTest {
 		Leg leg1 = null;
 		Leg leg2 = null;
 
-		person1 = PopulationUtils.createPerson(Id.create(1, Person.class));
+		person1 = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		// --- plan 1 ---
 		Plan plan1 = factory.createPlan();
 		person1.addPlan(plan1);
@@ -503,9 +504,11 @@ public class ControlerTest {
 		final Controler controler = new Controler(config);
 		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
 				3 == controler.getConfig().controler().getWriteEventsInterval());
+
 		controler.getConfig().controler().setWriteEventsInterval(3);
 		assertEquals(3, controler.getConfig().controler().getWriteEventsInterval());
-        controler.getConfig().controler().setCreateGraphs(false);
+
+		controler.getConfig().controler().setCreateGraphs(false);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

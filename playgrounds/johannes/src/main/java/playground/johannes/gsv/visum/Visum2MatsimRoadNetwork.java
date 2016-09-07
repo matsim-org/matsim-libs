@@ -27,11 +27,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.Map;
@@ -46,7 +47,7 @@ public class Visum2MatsimRoadNetwork {
 	
 	public static void main(String args[]) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		final NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		final Network network = (Network) scenario.getNetwork();
 		StreamingVisumNetworkReader streamingVisumNetworkReader = new StreamingVisumNetworkReader();
 
 		VisumNetworkRowHandler nodeRowHandler = new VisumNetworkRowHandler() {
@@ -55,7 +56,9 @@ public class Visum2MatsimRoadNetwork {
 			public void handleRow(Map<String, String> row) {
 				Id<Node> id = Id.create(row.get("NR"), Node.class);
 				Coord coord = new Coord(Double.parseDouble(row.get("XKOORD").replace(',', '.')), Double.parseDouble(row.get("YKOORD").replace(',', '.')));
-				network.createAndAddNode(id, coord);
+				final Id<Node> id1 = id;
+				final Coord coord1 = coord;
+				NetworkUtils.createAndAddNode(network, id1, coord1);
 			}
 
 		};
@@ -96,7 +99,14 @@ public class Visum2MatsimRoadNetwork {
 
 				if(freespeed >= 80) {
 					freespeed /= 3.6;
-					network.createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, noOfLanes, null, null);
+					final Id<Link> id1 = id;
+					final Node fromNode1 = fromNode;
+					final Node toNode1 = toNode;
+					final double length1 = length;
+					final double freespeed1 = freespeed;
+					final double capacity1 = capacity;
+					final double numLanes = noOfLanes;
+					NetworkUtils.createAndAddLink(network,id1, fromNode1, toNode1, length1, freespeed1, capacity1, numLanes, null, null);
 				}
 			}
 		};

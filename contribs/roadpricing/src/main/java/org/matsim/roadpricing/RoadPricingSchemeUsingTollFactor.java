@@ -50,7 +50,7 @@ public class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme {
 		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 		try {
-			rpReader.parse( tollLinksFileName  );
+			rpReader.readFile( tollLinksFileName  );
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

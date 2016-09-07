@@ -26,17 +26,18 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.algorithms.XY2Links;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.algorithms.XY2Links;
 
 public class InitRouteCreation {
 
@@ -56,31 +57,33 @@ public class InitRouteCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  setting up plans objects...");
-		PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
-		plans.setIsStreaming(true);
-		PopulationWriter plansWriter = new PopulationWriter(plans, network);
+//		Population reader = (Population) scenario.getPopulation();
+		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
+		StreamingUtils.setIsStreaming(reader, true);
+		StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(null, network);
 		plansWriter.startStreaming(null);//config.plans().getOutputFile());
-		PopulationReader plansReader = new MatsimPopulationReader(scenario);
+//		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  adding person modules... ");
-		plans.addAlgorithm(new XY2Links(network, null));
+		reader.addAlgorithm(new XY2Links(network, null));
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
-		plans.addAlgorithm(
-				new PlanRouter(
-				new TripRouterFactoryBuilderWithDefaults().build(
-						scenario ).get(
-				) ) );
+		reader.addAlgorithm(new PlanRouter(
+		new TripRouterFactoryBuilderWithDefaults().build(
+				scenario ).get(
+		) ));
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  reading, processing, writing plans...");
-		plans.addAlgorithm(plansWriter);
-		plansReader.readFile(config.plans().getInputFile());
-		plans.printPlansCount();
+		final PersonAlgorithm algo = plansWriter;
+		reader.addAlgorithm(algo);
+//		plansReader.readFile(config.plans().getInputFile());
+		reader.readFile(config.plans().getInputFile());
+		PopulationUtils.printPlansCount(reader) ;
 		plansWriter.closeStreaming();
 		System.out.println("  done.");
 

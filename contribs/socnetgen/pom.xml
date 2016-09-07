@@ -9,6 +9,13 @@
 	<groupId>org.matsim.contrib</groupId>
 	<artifactId>socnetgen</artifactId>
 	<name>socnetgen</name>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.commons</groupId>

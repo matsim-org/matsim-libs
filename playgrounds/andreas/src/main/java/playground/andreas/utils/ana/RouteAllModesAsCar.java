@@ -36,11 +36,13 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.analysis.filters.population.AbstractPersonFilter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -166,15 +168,15 @@ public class RouteAllModesAsCar extends AbstractPersonFilter {
 
 	private void run(String popFilename) {
 		this.sc.getConfig().plans().setInputFile(popFilename);
-		PopulationImpl pop = (PopulationImpl) this.sc.getPopulation();
-		pop.setIsStreaming(true);
-		MatsimPopulationReader popReader = new MatsimPopulationReader(this.sc);
-		pop.addAlgorithm(this);
+		Population pop = (Population) this.sc.getPopulation();
+		StreamingUtils.setIsStreaming(pop, true);
+		PopulationReader popReader = new PopulationReader(this.sc);
+		StreamingUtils.addAlgorithm(pop, this);
 		Gbl.printMemoryUsage();
 
 		log.info("Start reading population...");
 		popReader.readFile(popFilename);
-		pop.printPlansCount();
+		PopulationUtils.printPlansCount(pop) ;
 		log.info("...done.");
 		Gbl.printMemoryUsage();
 		Gbl.printElapsedTime();

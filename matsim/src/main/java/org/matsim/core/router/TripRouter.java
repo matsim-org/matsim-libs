@@ -33,8 +33,12 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * Class acting as an intermediate between clients needing to
@@ -56,6 +60,16 @@ public final class TripRouter implements MatsimExtensionPoint {
 	private final CompositeStageActivityTypes checker = new CompositeStageActivityTypes();
 
 	private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
+
+	public TripRouter() {}
+
+	@Inject
+	TripRouter(Map<String, Provider<RoutingModule>> routingModules, MainModeIdentifier mainModeIdentifier) {
+		for (Map.Entry<String, Provider<RoutingModule>> entry : routingModules.entrySet()) {
+			setRoutingModule(entry.getKey(), entry.getValue().get());
+		}
+		setMainModeIdentifier(mainModeIdentifier);
+	}
 
 	// /////////////////////////////////////////////////////////////////////////
 	// constructors
@@ -151,6 +165,9 @@ public final class TripRouter implements MatsimExtensionPoint {
 			final double departureTime,
 			final Person person) {
 		
+		Gbl.assertNotNull( fromFacility );
+		Gbl.assertNotNull( toFacility );
+		
 		RoutingModule module = routingModules.get( mainMode );
 
 		if (module != null) {
@@ -168,7 +185,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 			return trip;
 		}
 
-		throw new UnknownModeException( "unregistered main mode "+mainMode+": does not pertain to "+routingModules.keySet() );
+		throw new UnknownModeException( "unregistered main mode |"+mainMode+"|: does not pertain to "+routingModules.keySet() );
 	}
 
 	public static class UnknownModeException extends RuntimeException {
@@ -277,7 +294,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 			}
 			if (pe == destination) {
 				indexOfDestination = currentIndex;
-				if ( indexOfOrigin < 0 ) {
+				if (indexOfDestination < indexOfOrigin ) {
 					throw new RuntimeException(
 							"destination "+destination+" found before origin "+
 							origin+" in "+plan );

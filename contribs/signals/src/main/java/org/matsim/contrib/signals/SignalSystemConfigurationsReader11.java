@@ -22,14 +22,15 @@ package org.matsim.contrib.signals;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemConfig;
 import org.xml.sax.SAXException;
 
@@ -38,21 +39,17 @@ import org.xml.sax.SAXException;
  * Reader for the signalSystemConfigurations_v1.1.xsd file format
  * @author dgrether
  */
-public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
+public class SignalSystemConfigurationsReader11 {
 
 	private final static Logger log = Logger.getLogger(SignalSystemConfigurationsReader11.class);
 
-	public SignalSystemConfigurationsReader11(String schemaLocation) {
-		super(schemaLocation);
-	}
-	
 	public XMLSignalSystemConfig readSignalSystemConfig11File(String filename) throws SAXException, ParserConfigurationException, IOException, JAXBException{
-	  XMLSignalSystemConfig xmlLssConfig;
-  	JAXBContext jc;
+	  	XMLSignalSystemConfig xmlLssConfig;
+  		JAXBContext jc;
 		jc = JAXBContext.newInstance(org.matsim.jaxb.signalsystemsconfig11.ObjectFactory.class);
 		Unmarshaller u = jc.createUnmarshaller();
 		//validate file
-		super.validateFile(filename, u);
+		u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/signalSystemsConfig_v1.1.xsd")));
 		InputStream stream = null;
 		try {
 			stream = IOUtils.getInputStream(filename);
@@ -66,13 +63,6 @@ public class SignalSystemConfigurationsReader11 extends MatsimJaxbXmlParser {
 			}
 		}
 		return xmlLssConfig;
-	}
-
-
-	@Override
-	public void readFile(String filename) throws JAXBException, SAXException,
-			ParserConfigurationException, IOException {
-		throw new UnsupportedOperationException("Use readSignalSystemConfig11File() method");
 	}
 
 }

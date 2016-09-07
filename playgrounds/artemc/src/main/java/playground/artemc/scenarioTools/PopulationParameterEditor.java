@@ -1,17 +1,16 @@
 package playground.artemc.scenarioTools;
 
+import java.util.Random;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReaderMatsimV5;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-
-import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * Created by artemc on 24/4/15.
@@ -26,10 +25,10 @@ public class PopulationParameterEditor {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
+		Population population = (Population) scenario.getPopulation();
 
-		new PopulationReaderMatsimV5(scenario).readFile(populationPath);
-		new ObjectAttributesXmlReader(population.getPersonAttributes()).parse(personAttributePath);
+		new PopulationReader(scenario).readFile(populationPath);
+		new ObjectAttributesXmlReader(population.getPersonAttributes()).readFile(personAttributePath);
 
 //		//Random generator = new Random(10830239345L);
 //		Random generator = new Random(4600062981430244332L);

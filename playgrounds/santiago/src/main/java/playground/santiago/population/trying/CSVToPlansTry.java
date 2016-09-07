@@ -20,14 +20,12 @@
 package playground.santiago.population.trying;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -40,11 +38,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -314,7 +312,7 @@ public class CSVToPlansTry {
 		Map<String, Geometry> geometries = createComunaGeometries();
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = this.scenario.getPopulation();
-		PopulationFactoryImpl popFactory = (PopulationFactoryImpl) population.getFactory();
+		PopulationFactory popFactory = (PopulationFactory) population.getFactory();
 		this.agentAttributes = new ObjectAttributes();
 		
 		for(Persona persona : this.personas.values()){

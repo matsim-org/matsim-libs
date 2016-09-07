@@ -23,9 +23,10 @@ package org.matsim.core.network;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.*;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.router.util.TravelTime;
@@ -45,26 +46,33 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
     		Config config = loadConfig(null);
     
     		// create a network
-    		final NetworkImpl network = NetworkImpl.createNetwork();
-    		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
+    		final Network network = NetworkUtils.createNetwork();
+    		NetworkFactory nf = network.getFactory();
     		nf.setLinkFactory(lf);
-    		network.setFactory(nf);
+    		((NetworkImpl)network).setFactory(nf);
     		network.setCapacityPeriod(3600.0);
     
     		// the netework has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
-    		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-    		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
-    		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 200, (double) 0));
-    		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 300, (double) 0));
-    		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
-    		Link link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 100, 10, 3600, 1);
-    		network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 10, 3600, 1);
+    		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+    		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+    		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 200, (double) 0));
+    		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord((double) 300, (double) 0));
+		final Node fromNode = node1;
+		final Node toNode = node2;
+    		Link link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 10, (double) 3600, (double) 1 );
+		final Node fromNode1 = node2;
+		final Node toNode1 = node3;
+    		Link link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, (double) 100, (double) 10, (double) 3600, (double) 1 );
+		final Node fromNode2 = node3;
+		final Node toNode2 = node4;
+    		NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), fromNode2, toNode2, (double) 100, (double) 10, (double) 3600, (double) 1 );
     
     		// add a freespeed change to 20 at 8am.
-    		NetworkChangeEvent change = nf.createNetworkChangeEvent(8*3600.0);
+    		NetworkChangeEvent change = new NetworkChangeEvent(8*3600.0);
     		change.addLink(link2);
-    		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, 20));
-    		network.addNetworkChangeEvent(change);
+    		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 20));
+		final NetworkChangeEvent event = change;
+    		NetworkUtils.addNetworkChangeEvent(network,event);
     
     		// create a travel time calculator object
     		TravelTime ttcalc = new TravelTimeCalculator(network,config.travelTimeCalculator()).getLinkTravelTimes();
@@ -82,26 +90,33 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
     		Config config = loadConfig(null);
     
     		// create a network
-    		final NetworkImpl network = NetworkImpl.createNetwork();
-    		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
+    		final Network network = NetworkUtils.createNetwork();
+    		NetworkFactory nf = network.getFactory();
     		nf.setLinkFactory(lf);
-    		network.setFactory(nf);
+    		((NetworkImpl)network).setFactory(nf);
     		network.setCapacityPeriod(3600.0);
     
     		// the netework has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
-    		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-    		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 100, (double) 0));
-    		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 200, (double) 0));
-    		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord((double) 300, (double) 0));
-    		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
-    		Link link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 100, 10, 3600, 1);
-    		network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 10, 3600, 1);
+    		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+    		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 100, (double) 0));
+    		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 200, (double) 0));
+    		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord((double) 300, (double) 0));
+		final Node fromNode = node1;
+		final Node toNode = node2;
+    		Link link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 100, (double) 10, (double) 3600, (double) 1 );
+		final Node fromNode1 = node2;
+		final Node toNode1 = node3;
+    		Link link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, (double) 100, (double) 10, (double) 3600, (double) 1 );
+		final Node fromNode2 = node3;
+		final Node toNode2 = node4;
+    		NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), fromNode2, toNode2, (double) 100, (double) 10, (double) 3600, (double) 1 );
     
     		// add a freespeed change to 20 at 8am.
-    		NetworkChangeEvent change = nf.createNetworkChangeEvent(8*3600.0);
+    		NetworkChangeEvent change = new NetworkChangeEvent(8*3600.0);
     		change.addLink(link2);
-    		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, 20));
-    		network.addNetworkChangeEvent(change);
+    		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 20));
+		final NetworkChangeEvent event = change;
+    		NetworkUtils.addNetworkChangeEvent(network,event);
     
     		// create a travel time calculator object
     		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, 15*60, 30*3600, config.travelTimeCalculator());

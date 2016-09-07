@@ -21,6 +21,7 @@ package playground.thibautd.socnetsimusages.run;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.socnetsim.framework.SocialNetworkConfigGroup;
 import org.matsim.contrib.socnetsim.framework.controller.JointDecisionProcessModule;
 import org.matsim.contrib.socnetsim.framework.controller.SocialNetworkModule;
@@ -40,7 +41,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import playground.ivt.analysis.IvtAnalysisModule;
 import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
@@ -104,7 +104,7 @@ public class RunSocialScenarioWithEquity {
 
 		new WorldConnectLocations( config ).connectFacilitiesWithLinks(
 				scenario.getActivityFacilities(),
-				(NetworkImpl) scenario.getNetwork() );
+				(Network) scenario.getNetwork() );
 
 		controller.run();
 	}
@@ -117,7 +117,7 @@ public class RunSocialScenarioWithEquity {
 		final SocialNetworkConfigGroup snConf = (SocialNetworkConfigGroup)
 				config.getModule( SocialNetworkConfigGroup.GROUP_NAME );
 
-		new SocialNetworkReader( scenario ).parse( snConf.getInputFile() );
+		new SocialNetworkReader( scenario ).readFile( snConf.getInputFile() );
 
 		final SocialNetwork sn = (SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME );
 		for ( Id p : scenario.getPopulation().getPersons().keySet() ) {
@@ -134,7 +134,7 @@ public class RunSocialScenarioWithEquity {
 		RunUtils.addConfigGroups( config );
 		config.addModule( new ScenarioMergingConfigGroup() );
 		config.addModule( new EquityConfigGroup() );
-		new ConfigReader( config ).parse( configFile );
+		new ConfigReader( config ).readFile( configFile );
 		return config;
 	}
 }

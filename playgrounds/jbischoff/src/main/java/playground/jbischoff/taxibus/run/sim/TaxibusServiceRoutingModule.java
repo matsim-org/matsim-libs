@@ -23,12 +23,13 @@ package playground.jbischoff.taxibus.run.sim;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
@@ -57,10 +58,15 @@ public class TaxibusServiceRoutingModule implements RoutingModule {
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 
 		
-		Leg taxiLeg = new LegImpl(TaxibusUtils.TAXIBUS_MODE);
+		Leg taxiLeg = PopulationUtils.createLeg(TaxibusUtils.TAXIBUS_MODE);
+		
+		if (fromFacility.getLinkId() == toFacility.getLinkId()){
+			taxiLeg.setMode(TransportMode.walk);
+		}
+		
 		taxiLeg.setTravelTime( travelTime );
 		NetworkRoute route = 
-				((PopulationFactoryImpl)controler.getScenario().getPopulation().getFactory()).getRouteFactory().createRoute(NetworkRoute.class, fromFacility.getLinkId(), toFacility.getLinkId());
+				((PopulationFactory)controler.getScenario().getPopulation().getFactory()).getRouteFactories().createRoute(NetworkRoute.class, fromFacility.getLinkId(), toFacility.getLinkId());
 		route.setTravelTime( travelTime);
 		
 		taxiLeg.setRoute(route);

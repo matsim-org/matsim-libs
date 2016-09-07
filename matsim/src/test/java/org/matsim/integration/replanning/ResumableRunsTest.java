@@ -20,13 +20,19 @@
 
 package org.matsim.integration.replanning;
 
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
+
+import java.io.File;
 
 /**
  * Tests that a run can be started from a given plan-file and generates
@@ -36,7 +42,10 @@ import org.matsim.testcases.MatsimTestCase;
  *
  * @author mrieser
  */
-public class ResumableRunsTest extends MatsimTestCase {
+public class ResumableRunsTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
 	 * Runs a first simulation for 11 iteration, then restarts at iteration 10.
@@ -44,14 +53,15 @@ public class ResumableRunsTest extends MatsimTestCase {
 	 * to ensure the correct initialization of the simulation as well as the
 	 * re-planning, which both could depend on random numbers.
 	 */
+	@Test
 	public void testResumableRuns() {
-		Config config = loadConfig("test/scenarios/equil/config.xml");
+		Config config = utils.loadConfig(IOUtils.newUrl(utils.getTestScenarioURL("equil"), "config.xml"));
 		config.controler().setLastIteration(11);
 		config.controler().setWriteEventsInterval(1);
 		config.global().setNumberOfThreads(1); // only use one thread to rule out other disturbances for the test
 
 		// run1
-		config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
+		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/run1/");
 		/*
 		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
 		 * to store the persons in the population, we have to sort the population manually.  
@@ -65,26 +75,26 @@ public class ResumableRunsTest extends MatsimTestCase {
 		controler1.run();
 
 		// run2
-		config.controler().setOutputDirectory(getOutputDirectory() + "/run2/");
+		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/run2/");
 		config.controler().setFirstIteration(10);
-		config.plans().setInputFile(getOutputDirectory() + "/run1/ITERS/it.10/10.plans.xml.gz");
+		config.plans().setInputFile(new File(utils.getOutputDirectory() + "/run1/ITERS/it.10/10.plans.xml.gz").getAbsolutePath());
 		Controler controler2 = new Controler(config);
         controler2.getConfig().controler().setCreateGraphs(false);
 		controler2.getConfig().controler().setDumpDataAtEnd(false);
 		controler2.run();
 
 		// comparison
-		long cksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it.10/10.plans.xml.gz");
-		long cksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it.10/10.plans.xml.gz");
-		assertEquals("Plans must not be altered just be reading in and writing out again.", cksum1, cksum2);
+		long cksum1 = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/run1/ITERS/it.10/10.plans.xml.gz");
+		long cksum2 = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/run2/ITERS/it.10/10.plans.xml.gz");
+		Assert.assertEquals("Plans must not be altered just be reading in and writing out again.", cksum1, cksum2);
 
-		cksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it.10/10.events.xml.gz");
-		cksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it.10/10.events.xml.gz");
-		assertEquals("The checksums of events must be the same when resuming runs.", cksum1, cksum2);
+		cksum1 = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/run1/ITERS/it.10/10.events.xml.gz");
+		cksum2 = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/run2/ITERS/it.10/10.events.xml.gz");
+		Assert.assertEquals("The checksums of events must be the same when resuming runs.", cksum1, cksum2);
 
-		cksum1 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run1/ITERS/it.11/11.events.xml.gz");
-		cksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "/run2/ITERS/it.11/11.events.xml.gz");
-		assertEquals("The checksums of events must be the same when resuming runs.", cksum1, cksum2);
+		cksum1 = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/run1/ITERS/it.11/11.events.xml.gz");
+		cksum2 = CRCChecksum.getCRCFromFile(utils.getOutputDirectory() + "/run2/ITERS/it.11/11.events.xml.gz");
+		Assert.assertEquals("The checksums of events must be the same when resuming runs.", cksum1, cksum2);
 	}
 
 }

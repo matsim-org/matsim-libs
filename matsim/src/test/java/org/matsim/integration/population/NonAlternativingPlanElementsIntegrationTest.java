@@ -29,8 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -116,7 +115,7 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		
 		Activity home1 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
 		final double x1 = -17000;
-		((ActivityImpl) home1).setCoord(new Coord(x1, (double) 500));
+		((Activity) home1).setCoord(new Coord(x1, (double) 500));
 		home1.setEndTime(7.0 * 3600);
 
 		Leg leg1 = pf.createLeg("transit_walk");
@@ -134,7 +133,7 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		Activity work = pf.createActivityFromLinkId("w", Id.create(21, Link.class));
 		work.setEndTime(17.0 * 3600);
 		final double y = -8000;
-		((ActivityImpl) work).setCoord(new Coord((double) 5000, y));
+		((Activity) work).setCoord(new Coord((double) 5000, y));
 
 		Leg leg4 = pf.createLeg("car");
 		leg4.setRoute(new LinkNetworkRouteImpl(Id.create(21, Link.class), new Id[] {Id.create(22, Link.class), Id.create(23, Link.class)}, Id.create(1, Link.class)));
@@ -142,7 +141,7 @@ public class NonAlternativingPlanElementsIntegrationTest {
 
 		Activity home2 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
 		final double x = -17000;
-		((ActivityImpl) home2).setCoord(new Coord(x, (double) 500));
+		((Activity) home2).setCoord(new Coord(x, (double) 500));
 		
 		plan.addActivity(home1);
 		plan.addLeg(leg1);
@@ -162,7 +161,7 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		
 		Activity home1 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
 		final double x3 = -17000;
-		((ActivityImpl) home1).setCoord(new Coord(x3, (double) 500));
+		((Activity) home1).setCoord(new Coord(x3, (double) 500));
 		home1.setEndTime(7.0 * 3600);
 
 		Leg leg1 = pf.createLeg("walk");
@@ -172,12 +171,12 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		Activity work = pf.createActivityFromLinkId("w", Id.create(21, Link.class));
 		work.setEndTime(17.0 * 3600);
 		final double y1 = -8000;
-		((ActivityImpl) work).setCoord(new Coord((double) 5000, y1));
+		((Activity) work).setCoord(new Coord((double) 5000, y1));
 
 		Activity shop = pf.createActivityFromLinkId("h", Id.create(21, Link.class));
 		shop.setEndTime(17.5 * 3600);
 		final double y = -8000;
-		((ActivityImpl) shop).setCoord(new Coord((double) 5000, y));
+		((Activity) shop).setCoord(new Coord((double) 5000, y));
 
 		Leg leg2 = pf.createLeg("car");
 		leg2.setRoute(new LinkNetworkRouteImpl(Id.create(21, Link.class), new Id[] {Id.create(22, Link.class), Id.create(23, Link.class)}, Id.create(1, Link.class)));
@@ -185,17 +184,17 @@ public class NonAlternativingPlanElementsIntegrationTest {
 
 		Activity home2 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
 		final double x2 = -17000;
-		((ActivityImpl) home2).setCoord(new Coord(x2, (double) 500));
+		((Activity) home2).setCoord(new Coord(x2, (double) 500));
 		home2.setEndTime(21 * 3600);
 
 		Activity home3 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
 		final double x1 = -17000;
-		((ActivityImpl) home2).setCoord(new Coord(x1, (double) 500));
+		((Activity) home2).setCoord(new Coord(x1, (double) 500));
 		home2.setEndTime(22 * 3600);
 
 		Activity home4 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
 		final double x = -17000;
-		((ActivityImpl) home2).setCoord(new Coord(x, (double) 500));
+		((Activity) home2).setCoord(new Coord(x, (double) 500));
 		
 		plan.addActivity(home1);
 		plan.addLeg(leg1);

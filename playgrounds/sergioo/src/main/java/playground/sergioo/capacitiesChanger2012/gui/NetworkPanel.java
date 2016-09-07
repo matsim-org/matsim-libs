@@ -43,7 +43,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.xml.sax.SAXException;
 

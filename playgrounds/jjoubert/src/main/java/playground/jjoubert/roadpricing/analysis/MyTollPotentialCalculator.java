@@ -147,7 +147,7 @@ public class MyTollPotentialCalculator {
 	private List<Id<Link>> readLinkIdsFromRoadPricingScheme(String roadpricingFilename){
 		log.info("Reading tolled links from " + roadpricingFilename);		
 		RoadPricingReaderXMLv1 rpr = new RoadPricingReaderXMLv1(scheme);
-		rpr.parse(roadpricingFilename);		
+		rpr.readFile(roadpricingFilename);		
 		List<Id<Link>> list = new ArrayList<>();
 		for(Id<Link> i : this.scheme.getTolledLinkIds()){
 			list.add(i);

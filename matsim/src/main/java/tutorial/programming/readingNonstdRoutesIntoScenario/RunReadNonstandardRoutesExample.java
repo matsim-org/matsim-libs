@@ -25,13 +25,13 @@ package tutorial.programming.readingNonstdRoutesIntoScenario;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -40,9 +40,9 @@ import org.matsim.core.scenario.ScenarioUtils;
  * <p/>
  * This will generate the route, with start and end link id.  It will also set distance and travel time if they
  * are in the file.  This is sufficient information for teleportation.  Additional information needs to come from elsewhere, 
- * or the corresponding {@link PopulationReader} needs to be modified.
+ * or the corresponding {@link MatsimReader} needs to be modified.
  * <p/>
- * Note, however, that for pure teleportation it is not necessary to set the route factory since the default {@link RouteFactoryImpl} 
+ * Note, however, that for pure teleportation it is not necessary to set the route factory since the default {@link RouteFactories} 
  * will already generate an instance of {@link GenericRoute} when a mode is not registered. 
  * 
  * @author nagel
@@ -54,7 +54,7 @@ public class RunReadNonstandardRoutesExample {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		RouteFactoryImpl modeRouteFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getRouteFactory();
+		RouteFactories modeRouteFactory = ((PopulationFactory) scenario.getPopulation().getFactory()).getRouteFactories();
 		modeRouteFactory.setRouteFactory(MySpecialRoute.class, new RouteFactory() {
 			@Override
 			public Route createRoute(Id<Link> startLinkId, Id<Link> endLinkId) {

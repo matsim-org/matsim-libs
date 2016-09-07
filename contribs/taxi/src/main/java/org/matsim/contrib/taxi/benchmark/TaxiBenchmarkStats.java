@@ -1,10 +1,9 @@
 package org.matsim.contrib.taxi.benchmark;
 
-import java.io.PrintWriter;
-
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.util.stats.*;
+import org.matsim.contrib.util.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
@@ -15,16 +14,15 @@ import com.google.inject.Inject;
 
 public class TaxiBenchmarkStats
     implements AfterMobsimListener, ShutdownListener
-
 {
-    static final String HEADER = "n\tm\t"//
-            + "PassWait\t"//
-            + "PassWait_p95\t"//
-            + "PassWait_max\t"//
-            + "EmptyDriveRatio\t"//
-            + "StayRatio\t";
+    public static final String[] HEADER = { "n", "m", //
+            "PassWaitTime_avg", //
+            "PassWaitTime_95%ile", //
+            "PassWaitTime_max", //
+            "EmptyDriveRatio_fleetAvg", //
+            "StayRatio_fleetAvg" };
 
-    private final TaxiData taxiData;
+    protected final TaxiData taxiData;
     private final OutputDirectoryHierarchy controlerIO;
 
     private final SummaryStatistics passengerWaitTime = new SummaryStatistics();
@@ -61,23 +59,29 @@ public class TaxiBenchmarkStats
     @Override
     public void notifyShutdown(ShutdownEvent event)
     {
-        PrintWriter pw = new PrintWriter(
-                IOUtils.getBufferedWriter(controlerIO.getOutputFilename("benchmark_stats.txt")));
-        pw.println(HEADER);
-        pw.printf(
-                "%d\t%d\t"//
-                        + "%.1f\t%.0f\t%.0f\t"//
-                        + "%.3f\t%.3f\t", //
-                taxiData.getRequests().size(), //
-                taxiData.getVehicles().size(), //
-                //
-                passengerWaitTime.getMean(), //
-                pc95PassengerWaitTime.getMean(), //
-                maxPassengerWaitTime.getMean(), //
-                //
-                emptyDriveRatio.getMean(), //
-                stayRatio.getMean());
+        writeFile("benchmark_stats.txt", HEADER);
+    }
 
-        pw.close();
+
+    protected void writeFile(String file, String[] header)
+    {
+        try (CompactCSVWriter writer = new CompactCSVWriter(
+                IOUtils.getBufferedWriter(controlerIO.getOutputFilename(file)))) {
+            writer.writeNext(header);
+            writer.writeNext(createAndInitLineBuilder());
+        }
+    }
+
+
+    protected CSVLineBuilder createAndInitLineBuilder()
+    {
+        return new CSVLineBuilder()//
+                .addf("%d", taxiData.getRequests().size())//
+                .addf("%d", taxiData.getVehicles().size())//
+                .addf("%.1f", passengerWaitTime.getMean())//
+                .addf("%.0f", pc95PassengerWaitTime.getMean())//
+                .addf("%.0f", maxPassengerWaitTime.getMean())//
+                .addf("%.3f", emptyDriveRatio.getMean())//
+                .addf("%.3f", stayRatio.getMean());
     }
 }

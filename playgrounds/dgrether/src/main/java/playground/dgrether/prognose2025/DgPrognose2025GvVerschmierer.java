@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -30,12 +31,11 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.io.PopulationReader;
 
 import playground.dgrether.DgPaths;
 
@@ -70,7 +70,7 @@ public class DgPrognose2025GvVerschmierer {
 		Verschmierer verschmierer = new Verschmierer(LANDKREISE);
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
+		PopulationReader popReader = new PopulationReader(scenario);
 		popReader.readFile(GV_POPULATION);
 
 		Scenario newScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -83,7 +83,7 @@ public class DgPrognose2025GvVerschmierer {
 			newPerson.addPlan(newPlan);
 			for (PlanElement pe : person.getPlans().get(0).getPlanElements()){
 				if (pe instanceof Activity){
-					ActivityImpl act = (ActivityImpl) pe;
+					Activity act = (Activity) pe;
 					Coord coord = act.getCoord();
 					Coord wgs84Coord = this.transform.getTransformed(coord);
 					act.setCoord(wgs84Coord);

@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Counter;
@@ -74,8 +74,8 @@ public class IntraAreaIdentifier {
 		String attributeName = args[3];
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(sc).parse(populationFile);
-		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).parse(attributesFile);
+		new PopulationReader(sc).readFile(populationFile);
+		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).readFile(attributesFile);
 		
 		IntraAreaIdentifier.run(sc, shapefile, false, attributeName);
 		

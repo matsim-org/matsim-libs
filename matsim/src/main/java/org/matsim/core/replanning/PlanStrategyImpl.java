@@ -20,12 +20,12 @@
 
 package org.matsim.core.replanning;
 
+import java.util.ArrayList;
+
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
-
-import java.util.ArrayList;
+import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
  * A strategy defines how an agent can be modified during re-planning.
@@ -43,9 +43,9 @@ import java.util.ArrayList;
 public final class PlanStrategyImpl extends GenericPlanStrategyImpl<Plan, Person> implements PlanStrategy {
 
 	public final static class Builder {
-		private GenericPlanSelector<Plan, Person> planSelector;
+		private PlanSelector<Plan, Person> planSelector;
 		private final ArrayList<PlanStrategyModule> modules = new ArrayList<>();
-		public Builder( final GenericPlanSelector<Plan,Person> planSelector) {
+		public Builder( final PlanSelector<Plan,Person> planSelector) {
 			this.planSelector = planSelector;
 		}
 		public final Builder addStrategyModule( final PlanStrategyModule module) {
@@ -67,8 +67,8 @@ public final class PlanStrategyImpl extends GenericPlanStrategyImpl<Plan, Person
 	 * @param planSelector the PlanSelector to use
 	 */
 	@Deprecated // "public" is deprecated.  Please use the Builder instead.  Reason: separate "construction interface" from "application interface". kai, nov'14
-	public PlanStrategyImpl(final GenericPlanSelector<Plan, Person> planSelector) {
+	public PlanStrategyImpl(final PlanSelector<Plan, Person> planSelector) {
 		super(planSelector);
 	}
-
+	
 }

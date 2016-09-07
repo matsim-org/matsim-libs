@@ -28,15 +28,21 @@ import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import java.util.*;
 
+/**
+ * Plausibility warning if the travel time given by the schedule
+ * cannot be achieved by a transit route
+ *
+ * @author polettif
+ */
 public class TravelTimeWarning extends AbstractPlausibilityWarning {
 
-	public static Map<TransitLine, Integer> lineStat = new HashMap<>();
-	public static Map<TransitRoute, Integer> routeStat = new HashMap<>();
+	public static final Map<TransitLine, Integer> lineStat = new HashMap<>();
+	public static final Map<TransitRoute, Integer> routeStat = new HashMap<>();
 
 	private final TransitRouteStop fromStop;
 	private final TransitRouteStop toStop;
 	private final double ttActual;
-	private double ttSchedule;
+	private final double ttSchedule;
 
 	public TravelTimeWarning(TransitLine transitLine, TransitRoute transitRoute, TransitRouteStop fromStop, TransitRouteStop toStop, double ttActual, double ttSchedule) {
 		super(PlausibilityCheck.TRAVEL_TIME_WARNING, transitLine, transitRoute);

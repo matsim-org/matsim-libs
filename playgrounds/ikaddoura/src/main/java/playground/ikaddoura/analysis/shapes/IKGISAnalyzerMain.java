@@ -31,7 +31,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -65,7 +65,7 @@ public class IKGISAnalyzerMain {
 		
 		log.info("Loading scenario...");
 		Scenario scenario1 = loadScenario();
-		MatsimPopulationReader mpr = new MatsimPopulationReader(scenario1);
+		PopulationReader mpr = new PopulationReader(scenario1);
 		mpr.readFile(runDirectory1 + "output_plans.xml.gz");
 		log.info("Loading scenario... Done.");
 		

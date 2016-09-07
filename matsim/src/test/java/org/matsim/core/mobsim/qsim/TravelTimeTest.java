@@ -53,7 +53,7 @@ public class TravelTimeTest {
 		MatsimRandom.reset(config.global().getRandomSeed());
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
-		String popFileName = "test/scenarios/equil/plans1.xml";
+		String popFileName = "plans1.xml";
 		config.plans().setInputFile(popFileName);
 
 		ScenarioUtils.loadScenario(scenario);
@@ -81,7 +81,7 @@ public class TravelTimeTest {
 		MatsimRandom.reset(config.global().getRandomSeed());
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
-		String popFileName = "test/scenarios/equil/plans2.xml";
+		String popFileName = "plans2.xml";
 		config.plans().setInputFile(popFileName);
 
 		ScenarioUtils.loadScenario(scenario);

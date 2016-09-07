@@ -40,12 +40,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -176,16 +176,16 @@ public class KMLPersonPlanWriter {
 
 			if (planElement instanceof Activity) {
 
-				ActivityImpl act = (ActivityImpl) planElement;
+				Activity act = (Activity) planElement;
 				fromCoords = act.getCoord();
 
 				AbstractFeatureType abstractFeature = this.networkFeatureFactory.createActFeature(act, this.networkNodeStyle);
 				linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
 			}
 
-			if (planElement instanceof LegImpl) {
+			if (planElement instanceof Leg) {
 
-				Leg leg = (LegImpl) planElement;
+				Leg leg = (Leg) planElement;
 
 				if (leg.getMode() == TransportMode.car) {
 
@@ -217,7 +217,7 @@ public class KMLPersonPlanWriter {
 						for (Iterator<PlanElement> tempIterator = this.personsPlan.getPlanElements().iterator(); tempIterator.hasNext();) {
 							PlanElement tempPlanElement = tempIterator.next();
 							if (tempPlanElement == planElement) {
-								toCoords = ((ActivityImpl) tempIterator.next()).getCoord();
+								toCoords = ((Activity) tempIterator.next()).getCoord();
 							}
 
 						}
@@ -257,7 +257,7 @@ public class KMLPersonPlanWriter {
 							for (Iterator<PlanElement> tempIterator = this.personsPlan.getPlanElements().iterator(); tempIterator.hasNext();) {
 								PlanElement tempPlanElement = tempIterator.next();
 								if (tempPlanElement == planElement) {
-									toCoords = ((ActivityImpl) tempIterator.next()).getCoord();
+									toCoords = ((Activity) tempIterator.next()).getCoord();
 								}
 
 							}

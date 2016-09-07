@@ -20,10 +20,12 @@
 
 package org.matsim.core.config.groups;
 
+import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
@@ -60,7 +62,7 @@ public final class CountsConfigGroup extends ReflectiveConfigGroup {
 	/**
 	 * the path to the file with the counts
 	 */
-	private String countsFileName = null;
+	private String inputFile = null;
 	/**
 	 * the scaling for the counts
 	 */
@@ -72,7 +74,8 @@ public final class CountsConfigGroup extends ReflectiveConfigGroup {
 	private String analyzedModes = TransportMode.car;
 	private boolean filterModes = false;
 	private String inputCRS = null;
-	
+	private URL countsFileURL;
+
 	public CountsConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -143,15 +146,19 @@ public final class CountsConfigGroup extends ReflectiveConfigGroup {
 	 */
 	@StringGetter( COUNTSINPUTFILENAME )
 	public String getCountsFileName() {
-		return this.countsFileName;
+		return this.inputFile;
 	}
 
 	/**
 	 * @param countsFileName the filename of the counts file to be read in
 	 */
 	@StringSetter( COUNTSINPUTFILENAME )
-	public void setCountsFileName(final String countsFileName) {
-		this.countsFileName = countsFileName;
+	public void setInputFile(final String countsFileName) {
+		this.inputFile = countsFileName;
+	}
+
+	public URL getCountsFileURL(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.inputFile);
 	}
 
 	@StringGetter( COUNTSSCALEFACTOR )
@@ -213,4 +220,5 @@ public final class CountsConfigGroup extends ReflectiveConfigGroup {
 	public void setInputCRS(String inputCRS) {
 		this.inputCRS = inputCRS;
 	}
+
 }

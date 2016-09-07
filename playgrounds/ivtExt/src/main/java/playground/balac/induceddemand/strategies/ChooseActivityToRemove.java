@@ -5,9 +5,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import java.util.List;
 import java.util.Random;

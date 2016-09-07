@@ -20,11 +20,11 @@
 package org.matsim.core.replanning.modules;
 
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
-import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.population.algorithms.TripsToLegsAlgorithm;
 
 import javax.inject.Provider;
 
@@ -50,7 +50,6 @@ public class TripsToLegsModule extends AbstractMultithreadedModule {
 	/**
 	 * Initializes an instance, allowing to specify additional activity types to
 	 * consider as stage activities.
-	 * @param controler
 	 * @param additionalBlackList a {@link StageActivityTypes} instance identifying
 	 * @param tripRouterProvider
 	 * @param globalConfigGroup

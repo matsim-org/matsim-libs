@@ -113,7 +113,7 @@ public class ArentzePopulationModule extends AbstractModule {
 			public void endTag( String name, String content,
 					Stack<String> context ) {
 			}
-		}.parse( group.getInputPopulationFile() );
+		}.readFile( group.getInputPopulationFile() );
 
 		counter.printCounter();
 		coordPool.printStats( "Coord pool" );

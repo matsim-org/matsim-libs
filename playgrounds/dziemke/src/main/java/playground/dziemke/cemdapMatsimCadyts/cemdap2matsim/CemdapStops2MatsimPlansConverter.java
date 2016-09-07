@@ -28,13 +28,13 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
+import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.population.algorithms.XY2Links;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -47,24 +47,27 @@ public class CemdapStops2MatsimPlansConverter {
 	private static final Logger log = Logger.getLogger(CemdapStops2MatsimPlansConverter.class);
 	
 	// Parameters
-	private static int numberOfFirstFileLocation = 59;
+	private static int numberOfFirstCemdapOutputFile = 87;
 	private static int numberOfPlans = 3;
 	private static boolean addStayHomePlan = true;
+	private static int numberOfPlansFile = 34;
 	
 	// Input and output
-	private static String outputDirectory = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap2matsim/31/";
-	private static String tazShapeFile = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/gemeindenLOR_DHDN_GK4.shp";
-	private static String networkFile = "D:/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+	private static String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/" + numberOfPlansFile + "/";
+	private static String tazShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenLOR_DHDN_GK4.shp";
+	private static String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+	private static String cemdapOutputRoot = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_output/";
+	
 	
 	public static void main(String[] args) throws IOException {
 		// find respective stops file
-		Map<Integer, String> cemdapStopsFilesMap = new HashMap<Integer, String>();
-//		Map<Integer, String> cemdapToursFilesMap = new HashMap<Integer, String>();
+		Map<Integer, String> cemdapStopsFilesMap = new HashMap<>();
+//		Map<Integer, String> cemdapToursFilesMap = new HashMap<>();
 //		Map<Integer, Map<String,String>> mapOfTourAttributesMaps = new HashMap<Integer, Map<String,String>>();
 		for (int i=0; i<numberOfPlans; i++) {
-			int numberOfCurrentInputFile = numberOfFirstFileLocation + i;
-			String cemdapStopsFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/cemdapOutput/" + numberOfCurrentInputFile + "/stops.out1";
-//			String cemdapToursFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/cemdapOutput/" + numberOfCurrentInputFile + "/tours.out1";
+			int numberOfCurrentInputFile = numberOfFirstCemdapOutputFile + i;
+			String cemdapStopsFile = cemdapOutputRoot + numberOfCurrentInputFile + "/stops.out";
+//			String cemdapToursFile = cemdapOutputRoot + numberOfCurrentInputFile + "/tours.out";
 //			Map<String,String> tourAttributesMap = new HashMap<String,String>();
 			cemdapStopsFilesMap.put(i, cemdapStopsFile);
 //			cemdapToursFilesMap.put(i, cemdapToursFile);
@@ -80,7 +83,7 @@ public class CemdapStops2MatsimPlansConverter {
 		}
 		
 		// read in network
-		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkFile);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(networkFile);
 		
 		// write all (geographic) features of planning area to a map
 		Map<String,SimpleFeature> combinedFeatures = new HashMap<String, SimpleFeature>();
@@ -141,5 +144,4 @@ public class CemdapStops2MatsimPlansConverter {
 		new PopulationWriter(scenario.getPopulation(), null).write(outputDirectory + "plans.xml.gz");
 		//new ObjectAttributesXmlWriter(personObjectAttributesMap.get(0)).writeFile(outputBase+"personObjectAttributes0.xml.gz");
 	}
-
 }

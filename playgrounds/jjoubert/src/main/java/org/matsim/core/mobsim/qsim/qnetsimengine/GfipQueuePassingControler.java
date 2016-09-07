@@ -39,12 +39,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -56,6 +54,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -77,7 +76,6 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.GfipMultimodalQSimFactory.QueueType;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
@@ -172,9 +170,6 @@ public class GfipQueuePassingControler {
 				addTravelDisutilityFactoryBinding(GfipMode.GFIP_C.toString()).to(carTravelDisutilityFactoryKey());
 			}
 		});
-
-
-
 
 		controler.run();
 
@@ -660,7 +655,7 @@ public class GfipQueuePassingControler {
 
 			/* Write the load for each link. */
 			for(Id<Link> linkId : this.countMap.keySet()){
-				String filename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "link_" + linkId.toString() + ".csv");
+				String filename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "link_" + linkId.toString() + ".csv.gz");
 				log.info("Writing link counts to " + filename);
 
 				BufferedWriter bw = IOUtils.getBufferedWriter(filename);
@@ -700,7 +695,7 @@ public class GfipQueuePassingControler {
 			}
 
 			/* Write the space-time observations. */
-			String spaceTimeFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "spaceTime.csv");
+			String spaceTimeFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "spaceTime.csv.gz");
 			log.info("Writing space-time observations to " + spaceTimeFilename);
 
 			BufferedWriter bw = IOUtils.getBufferedWriter(spaceTimeFilename);
@@ -725,7 +720,7 @@ public class GfipQueuePassingControler {
 			}
 
 			/* Write the space-time observations for ALL links. */
-			String allSpaceTimeFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "allSpaceTime.csv");
+			String allSpaceTimeFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "allSpaceTime.csv.gz");
 			log.info("Writing all space-time observations to " + allSpaceTimeFilename);
 
 			BufferedWriter bwAll = IOUtils.getBufferedWriter(allSpaceTimeFilename);
@@ -750,7 +745,7 @@ public class GfipQueuePassingControler {
 			}
 
 			/* Write the rho observations. */
-			String rhoFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "rho.csv");
+			String rhoFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "rho.csv.gz");
 			log.info("Writing space-time observations to " + rhoFilename);
 
 			BufferedWriter bwRho = IOUtils.getBufferedWriter(rhoFilename);
@@ -775,7 +770,7 @@ public class GfipQueuePassingControler {
 			}
 
 			/* Write the estimated versus actual times to file. */
-			String timeFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "timeDiscrepancy.csv");
+			String timeFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "timeDiscrepancy.csv.gz");
 			log.info("Writing space-time observations to " + timeFilename);
 
 			BufferedWriter bwTime = IOUtils.getBufferedWriter(timeFilename);
@@ -803,7 +798,7 @@ public class GfipQueuePassingControler {
 
 			/* Now write the estimated versus actual times for ALL link 2 
 			 * segments to file. */
-			String timeAllFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "timeDiscrepancyAll.csv");
+			String timeAllFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "timeDiscrepancyAll.csv.gz");
 			log.info("Writing time discrepancy observations for ALL link 2 segments to " + timeAllFilename);
 
 			BufferedWriter bwTimeAll = IOUtils.getBufferedWriter(timeAllFilename);

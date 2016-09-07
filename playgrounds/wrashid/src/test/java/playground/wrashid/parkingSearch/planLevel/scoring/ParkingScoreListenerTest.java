@@ -23,6 +23,7 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -38,7 +39,12 @@ public class ParkingScoreListenerTest extends MatsimTestCase implements Iteratio
 	public void testScenario() {
 		Controler controler;
 		String configFilePath = "test/input/playground/wrashid/parkingSearch/planLevel/chessConfig3.xml";
-		controler = new Controler(this.loadConfig(configFilePath));
+		final Config config = this.loadConfig(configFilePath);
+
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+		// too many things don't work with access/egress walk true. kai, jun'16
+
+		controler = new Controler(config);
 
 		ParkingUtils.initializeParking(controler) ;
 

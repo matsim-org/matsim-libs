@@ -27,8 +27,8 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -68,7 +68,7 @@ public class BaseGridCreator implements ConvEvents.BaseGridCreator {
 	public Network createMutualBaseGrid(String path2ZonesFile) {
 
 		Network mutualRepresentation = NetworkUtils.createNetwork();
-		NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(mutualRepresentation);
+		NetworkFactory networkFactory = mutualRepresentation.getFactory();
 		Long[] sides = boundingBoxOfZones(path2ZonesFile);
 
 		long maxLongitude = sides[1];

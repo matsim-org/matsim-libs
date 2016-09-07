@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.util.LinkSlopesReader;
 import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
@@ -37,9 +38,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.RouteFactory;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -98,12 +98,12 @@ public class BikeSharingScenarioUtils {
 		final Config config = sc.getConfig();
 		final BikeSharingConfigGroup confGroup = (BikeSharingConfigGroup)
 			config.getModule( BikeSharingConfigGroup.GROUP_NAME );
-		new BikeSharingFacilitiesReader( sc ).parse( confGroup.getFacilitiesFile() );
+		new BikeSharingFacilitiesReader( sc ).readFile( confGroup.getFacilitiesFile() );
 
 		final BikeSharingFacilities bsFacilities = (BikeSharingFacilities)
 			sc.getScenarioElement( BikeSharingFacilities.ELEMENT_NAME );
 		if ( confGroup.getFacilitiesAttributesFile() != null ) {
-			new ObjectAttributesXmlReader( bsFacilities.getFacilitiesAttributes() ).parse(
+			new ObjectAttributesXmlReader( bsFacilities.getFacilitiesAttributes() ).readFile(
 					confGroup.getFacilitiesAttributesFile() );
 		}
 
@@ -140,10 +140,10 @@ public class BikeSharingScenarioUtils {
 
 		if ( multimodalConfigGroup != null ) {
 			final RouteFactory factory = new AccessEgressNetworkBasedTeleportationRouteFactory( );
-			((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(AccessEgressNetworkBasedTeleportationRoute.class, factory);
+			((PopulationFactory) scenario.getPopulation().getFactory()).getRouteFactories().setRouteFactory(AccessEgressNetworkBasedTeleportationRoute.class, factory);
 		}
 
-		((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory( BikeSharingRoute.class , new BikeSharingRouteFactory() );
+		((PopulationFactory) scenario.getPopulation().getFactory()).getRouteFactories().setRouteFactory( BikeSharingRoute.class , new BikeSharingRouteFactory() );
 	}
 
 	public static AbstractModule createTripRouterFactoryAndConfigureRouteFactories(
@@ -164,7 +164,7 @@ public class BikeSharingScenarioUtils {
 		// PrepareMultiModalScenario.run( scenario );
 
 		final RouteFactory factory = new AccessEgressNetworkBasedTeleportationRouteFactory();
-		((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(AccessEgressNetworkBasedTeleportationRoute.class, factory);
+		((PopulationFactory) scenario.getPopulation().getFactory()).getRouteFactories().setRouteFactory(AccessEgressNetworkBasedTeleportationRoute.class, factory);
 
 		final Map<Id<Link>, Double> linkSlopes = (Map<Id<Link>, Double>)
 			scenario.getScenarioElement( LINK_SLOPES_ELEMENT_NAME );
@@ -221,7 +221,7 @@ public class BikeSharingScenarioUtils {
 			final PlanCalcScoreConfigGroup cnScoringGroup ) {
 		return new SlopeAwareTravelDisutilityFactory(
 				scorer,
-				new RandomizingTimeDistanceTravelDisutility.Builder( mode, cnScoringGroup ) ) ;
+				new RandomizingTimeDistanceTravelDisutilityFactory( mode, cnScoringGroup ) ) ;
 	}
 }
 

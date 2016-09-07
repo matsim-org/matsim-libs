@@ -22,9 +22,9 @@ package playground.jbischoff.taxibus.scenario.run;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.TransitActsRemover;
 
@@ -36,7 +36,7 @@ public class RemoveBSWBPTRoutes {
 
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario)
+		new PopulationReader(scenario)
 				.readFile("../../../shared-svn/projects/vw_rufbus/scenario/input/vw079.output_plans.xml.gz");
 
 		for (Person p : scenario.getPopulation().getPersons().values()) {

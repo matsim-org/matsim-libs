@@ -27,29 +27,27 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.UncheckedIOException;
 import playground.polettif.publicTransitMapping.config.OsmConverterConfigGroup;
-import playground.polettif.publicTransitMapping.config.OsmWayParams;
-import playground.polettif.publicTransitMapping.osm.core.OsmParser;
-import playground.polettif.publicTransitMapping.osm.core.OsmParserHandler;
-import playground.polettif.publicTransitMapping.osm.core.TagFilter;
+import playground.polettif.publicTransitMapping.osm.lib.OsmParser;
+import playground.polettif.publicTransitMapping.osm.lib.OsmParserHandler;
+import playground.polettif.publicTransitMapping.osm.lib.TagFilter;
 import playground.polettif.publicTransitMapping.osm.lib.OsmTag;
 import playground.polettif.publicTransitMapping.osm.lib.OsmValue;
-import playground.polettif.publicTransitMapping.tools.MiscUtils;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
 import java.util.*;
 
 /**
+ * Implemenation of a network converter. Modified version from {@link org.matsim.core.utils.io.OsmNetworkReader}
+ * Uses a config file ({@link OsmConverterConfigGroup}) to store conversion parameters and default
+ * values.
  *
  * @author polettif
  */
@@ -66,8 +64,8 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 	private Map<Long, Set<Long>> relationMembers = new HashMap<>();
 	private final Map<Long, Long> wayIds = new HashMap<>();
 
-	private Map<String, OsmWayParams> highwayParams = new HashMap<>();
-	private Map<String, OsmWayParams> railwayParams = new HashMap<>();
+	private Map<String, OsmConverterConfigGroup.OsmWayParams> highwayParams = new HashMap<>();
+	private Map<String, OsmConverterConfigGroup.OsmWayParams> railwayParams = new HashMap<>();
 
 	/**
 	 *  Maps for unknown entities
@@ -116,8 +114,8 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 	 * reads the params from the config to different containers.
 	 */
 	private void readWayParams() {
-		for(ConfigGroup e : config.getParameterSets(OsmWayParams.SET_NAME)) {
-			OsmWayParams w = (OsmWayParams) e;
+		for(ConfigGroup e : config.getParameterSets(OsmConverterConfigGroup.OsmWayParams.SET_NAME)) {
+			OsmConverterConfigGroup.OsmWayParams w = (OsmConverterConfigGroup.OsmWayParams) e;
 			if(w.getOsmKey().equals(OsmTag.HIGHWAY)) {
 				highwayParams.put(w.getOsmValue(), w);
 			} else if(w.getOsmKey().equals(OsmTag.RAILWAY)) {
@@ -134,6 +132,7 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 		TagFilter parserWayFilter = new TagFilter();
 		parserWayFilter.add(OsmTag.HIGHWAY);
 		parserWayFilter.add(OsmTag.RAILWAY);
+		parserWayFilter.addException(OsmTag.SERVICE);
 
 		TagFilter parserRelationFilter = new TagFilter();
 		parserRelationFilter.add(OsmTag.ROUTE, OsmValue.BUS);
@@ -160,8 +159,8 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 	 * Converts the parsed osm data to MATSim nodes and links.
 	 */
 	private void convertToNetwork() {
-		if(this.network instanceof NetworkImpl) {
-			((NetworkImpl) this.network).setCapacityPeriod(3600);
+		if(this.network instanceof Network) {
+			((Network) this.network).setCapacityPeriod(3600);
 		}
 
 		// store of which relation a way is part of
@@ -344,11 +343,11 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 		// load defaults
 		String highway = way.tags.get(OsmTag.HIGHWAY);
 		String railway = way.tags.get(OsmTag.RAILWAY);
-		OsmWayParams wayValues;
+		OsmConverterConfigGroup.OsmWayParams wayValues;
 		if(highway != null) {
 			wayValues = this.highwayParams.get(highway);
 			if(wayValues == null) {
-				// check if bus route is on link todo bus lane conditions as param?
+				// check if bus route is on link
 				if(way.tags.containsKey(OsmTag.PSV)) {
 					busOnlyLink = true;
 					wayValues = highwayParams.get(OsmValue.UNCLASSIFIED);
@@ -494,8 +493,9 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				l.setAllowedModes(modes);
-				if(l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
+				if(l instanceof Link) {
+					final String id1 = origId;
+					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				}
 				network.addLink(l);
 				this.id++;
@@ -507,8 +507,9 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				l.setAllowedModes(modes);
-				if(l instanceof LinkImpl) {
-					((LinkImpl) l).setOrigId(origId);
+				if(l instanceof Link) {
+					final String id1 = origId;
+					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				}
 				network.addLink(l);
 				this.id++;
@@ -520,11 +521,12 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 	 * Runs the network cleaner on the street network.
 	 */
 	private void cleanNetwork() {
-		Network streetNetwork = NetworkTools.filterNetworkByLinkMode(network, Collections.singleton(TransportMode.car));
-		Network restNetwork = NetworkTools.filterNetworkExceptLinkMode(network, Collections.singleton(TransportMode.car));
-		new NetworkCleaner().run(streetNetwork);
-		NetworkTools.integrateNetwork(streetNetwork, restNetwork);
-		this.network = streetNetwork;
+		Set<String> roadModes = CollectionUtils.stringToSet("car,bus");
+		Network roadNetwork = NetworkTools.filterNetworkByLinkMode(network, roadModes);
+		Network restNetwork = NetworkTools.filterNetworkExceptLinkMode(network, roadModes);
+		new NetworkCleaner().run(roadNetwork);
+		NetworkTools.integrateNetwork(roadNetwork, restNetwork);
+		this.network = roadNetwork;
 	}
 
 	private void writeNetwork() {

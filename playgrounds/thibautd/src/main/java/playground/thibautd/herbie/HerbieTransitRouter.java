@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
@@ -132,7 +132,7 @@ public class HerbieTransitRouter implements TransitRouter {
 		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 		if (directWalkCost < pathCost) {
 			List<Leg> legs = new ArrayList<Leg>();
-			Leg leg = new LegImpl(TransportMode.transit_walk);
+			Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 			Route walkRoute = new GenericRouteImpl(null, null);
 			leg.setRoute(walkRoute);
 			leg.setTravelTime(directWalkTime);
@@ -163,7 +163,7 @@ public class HerbieTransitRouter implements TransitRouter {
 				TransitStopFacility egressStop = l.fromNode.stop.getStopFacility();
 				// it must be one of the "transfer" links. finish the pt leg, if there was one before...
 				if (route != null) {
-					leg = new LegImpl(TransportMode.pt);
+					leg = PopulationUtils.createLeg(TransportMode.pt);
 					ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
 					leg.setRoute(ptRoute);
 					double arrivalOffset = (((TransitRouterNetworkLink) link).getFromNode().stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? ((TransitRouterNetworkLink) link).fromNode.stop.getArrivalOffset() : ((TransitRouterNetworkLink) link).fromNode.stop.getDepartureOffset();
@@ -186,7 +186,7 @@ public class HerbieTransitRouter implements TransitRouter {
 						transitRouteStart = ((TransitRouterNetworkLink) link).getFromNode().stop;
 						if (accessStop != egressStop) {
 							if (accessStop != null) {
-								leg = new LegImpl(TransportMode.transit_walk);
+								leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 								double walkTime = CoordUtils.calcEuclideanDistance(accessStop.getCoord(), egressStop.getCoord()) / this.config.getBeelineWalkSpeed();
 								Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
 								leg.setRoute(walkRoute);
@@ -194,7 +194,7 @@ public class HerbieTransitRouter implements TransitRouter {
 								time += walkTime;
 								legs.add(leg);
 							} else { // accessStop == null, so it must be the first walk-leg
-								leg = new LegImpl(TransportMode.transit_walk);
+								leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 								double walkTime = CoordUtils.calcEuclideanDistance(fromCoord, egressStop.getCoord()) / this.config.getBeelineWalkSpeed();
 								leg.setTravelTime(walkTime);
 								time += walkTime;
@@ -211,7 +211,7 @@ public class HerbieTransitRouter implements TransitRouter {
 		}
 		if (route != null) {
 			// the last part of the path was with a transit route, so add the pt-leg and final walk-leg
-			leg = new LegImpl(TransportMode.pt);
+			leg = PopulationUtils.createLeg(TransportMode.pt);
 			TransitStopFacility egressStop = prevLink.toNode.stop.getStopFacility();
 			ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
 			leg.setRoute(ptRoute);
@@ -226,7 +226,7 @@ public class HerbieTransitRouter implements TransitRouter {
 			accessStop = egressStop;
 		}
 		if (prevLink != null) {
-			leg = new LegImpl(TransportMode.transit_walk);
+			leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 			double walkTime;
 			if (accessStop == null) {
 				walkTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
@@ -239,7 +239,7 @@ public class HerbieTransitRouter implements TransitRouter {
 		if (transitLegCnt == 0) {
 			// it seems, the agent only walked
 			legs.clear();
-			leg = new LegImpl(TransportMode.transit_walk);
+			leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 			double walkTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
 			leg.setTravelTime(walkTime);
 			legs.add(leg);

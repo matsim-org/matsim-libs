@@ -19,26 +19,22 @@
  * *********************************************************************** */
 package org.matsim.lanes.data.v20;
 
-import java.io.IOException;
-import java.io.InputStream;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.jaxb.lanedefinitions20.*;
+import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.MatsimJaxbXmlParser;
-import org.matsim.jaxb.lanedefinitions20.ObjectFactory;
-import org.matsim.jaxb.lanedefinitions20.XMLIdRefType;
-import org.matsim.jaxb.lanedefinitions20.XMLLaneDefinitions;
-import org.matsim.jaxb.lanedefinitions20.XMLLaneType;
-import org.matsim.jaxb.lanedefinitions20.XMLLanesToLinkAssignmentType;
-import org.xml.sax.SAXException;
+import javax.xml.validation.SchemaFactory;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 
 /**
@@ -47,7 +43,7 @@ import org.xml.sax.SAXException;
  * @author dgrether
  *
  */
-class LaneDefinitionsReader20 extends MatsimJaxbXmlParser implements MatsimSomeReader {
+class LaneDefinitionsReader20  {
 
 	private static final Logger log = Logger
 			.getLogger(LaneDefinitionsReader20.class);
@@ -55,89 +51,86 @@ class LaneDefinitionsReader20 extends MatsimJaxbXmlParser implements MatsimSomeR
 	private Lanes laneDefinitions;
 
 	private LaneDefinitionsFactory20 builder;
-	/**
-	 * @param schemaLocation
-	 */
-	public LaneDefinitionsReader20(Lanes laneDefs, String schemaLocation) {
-		super(schemaLocation);
+
+	LaneDefinitionsReader20(Lanes laneDefs) {
 		this.laneDefinitions = laneDefs;
 		builder = this.laneDefinitions.getFactory();
 	}
 
-	/**
-	 * @see org.matsim.core.utils.io.MatsimJaxbXmlParser#readFile(java.lang.String)
-	 */
-	@Override
+
 	public void readFile(String filename) throws JAXBException, SAXException,
 			ParserConfigurationException, IOException {
-		//create jaxb infrastructure
-		JAXBContext jc;
+		InputStream stream = IOUtils.getInputStream(filename);
+		parse(stream);
+	}
+
+	void readURL(URL url) throws JAXBException, SAXException,
+			ParserConfigurationException, IOException {
+		InputStream inputStream = IOUtils.getInputStream(url);
+		parse(inputStream);
+	}
+
+	private void parse(InputStream stream) throws JAXBException, SAXException {
+		ObjectFactory fac = new ObjectFactory();
+		JAXBContext jc = JAXBContext.newInstance(org.matsim.jaxb.lanedefinitions20.ObjectFactory.class);
+		Unmarshaller u = jc.createUnmarshaller();
+		u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/laneDefinitions_v2.0.xsd")));
+
 		XMLLaneDefinitions xmlLaneDefinitions;
-			jc = JAXBContext
-					.newInstance(org.matsim.jaxb.lanedefinitions20.ObjectFactory.class);
-			ObjectFactory fac = new ObjectFactory();
-			Unmarshaller u = jc.createUnmarshaller();
-			// validate XML file
-			super.validateFile(filename, u);
-			log.info("starting unmarshalling " + filename);
-			InputStream stream = null;
+		try {
+			xmlLaneDefinitions = (XMLLaneDefinitions) u.unmarshal(stream);
+		}
+		finally {
 			try {
-			  stream = IOUtils.getInputStream(filename);
-				xmlLaneDefinitions = (XMLLaneDefinitions) u.unmarshal(stream);
+				if (stream != null) { stream.close();	}
+			} catch (IOException e) {
+				log.warn("Could not close stream.", e);
 			}
-			finally {
-				try {
-					if (stream != null) { stream.close();	}
-				} catch (IOException e) {
-					log.warn("Could not close stream.", e);
+		}
+
+		//convert the parsed xml-instances to basic instances
+		for (XMLLanesToLinkAssignmentType lldef : xmlLaneDefinitions
+				.getLanesToLinkAssignment()) {
+			LanesToLinkAssignment20 l2lAssignment = builder.createLanesToLinkAssignment(Id.create(lldef
+					.getLinkIdRef(), Link.class));
+			for (XMLLaneType laneType : lldef.getLane()) {
+				Lane lane = builder.createLane(Id.create(laneType.getId(), Lane.class));
+
+				if (!laneType.getLeadsTo().getToLane().isEmpty()) {
+					for (XMLIdRefType toLaneId : laneType.getLeadsTo().getToLane()){
+						lane.addToLaneId(Id.create(toLaneId.getRefId(), Lane.class));
+					}
 				}
-			}
-			
-			//convert the parsed xml-instances to basic instances
-			LanesToLinkAssignment20 l2lAssignment;
-			Lane lane = null;
-			for (XMLLanesToLinkAssignmentType lldef : xmlLaneDefinitions
-					.getLanesToLinkAssignment()) {
-				l2lAssignment = builder.createLanesToLinkAssignment(Id.create(lldef
-						.getLinkIdRef(), Link.class));
-				for (XMLLaneType laneType : lldef.getLane()) {
-					lane = builder.createLane(Id.create(laneType.getId(), Lane.class));
-					
-					if (!laneType.getLeadsTo().getToLane().isEmpty()) {
-						for (XMLIdRefType toLaneId : laneType.getLeadsTo().getToLane()){
-							lane.addToLaneId(Id.create(toLaneId.getRefId(), Lane.class));
-						}
+				else if (!laneType.getLeadsTo().getToLink().isEmpty()){
+					for (XMLIdRefType toLinkId : laneType.getLeadsTo().getToLink()){
+						lane.addToLinkId(Id.create(toLinkId.getRefId(), Link.class));
 					}
-					else if (!laneType.getLeadsTo().getToLink().isEmpty()){
-						for (XMLIdRefType toLinkId : laneType.getLeadsTo().getToLink()){
-							lane.addToLinkId(Id.create(toLinkId.getRefId(), Link.class));
-						}
-					}
-					
-					if (laneType.getCapacity() == null){
-						log.warn("Capacity not set in lane definition, using default...");
-						laneType.setCapacity(fac.createXMLLaneTypeXMLCapacity());
-					}
-					lane.setCapacityVehiclesPerHour(laneType.getCapacity().getVehiclesPerHour());
-					
-					if (laneType.getRepresentedLanes() == null) {
-						laneType.setRepresentedLanes(fac
-								.createXMLLaneTypeXMLRepresentedLanes());
-					}
-					lane.setNumberOfRepresentedLanes(laneType.getRepresentedLanes()
-							.getNumber());
-					
-					if (laneType.getStartsAt() == null) {
-						laneType.setStartsAt(fac.createXMLLaneTypeXMLStartsAt());
-					}
-					lane.setStartsAtMeterFromLinkEnd(laneType.getStartsAt().getMeterFromLinkEnd());
-					
-					lane.setAlignment(laneType.getAlignment());
-					
-					l2lAssignment.addLane(lane);
 				}
-				this.laneDefinitions.addLanesToLinkAssignment(l2lAssignment);
+
+				if (laneType.getCapacity() == null){
+					log.warn("Capacity not set in lane definition, using default...");
+					laneType.setCapacity(fac.createXMLLaneTypeXMLCapacity());
+				}
+				lane.setCapacityVehiclesPerHour(laneType.getCapacity().getVehiclesPerHour());
+
+				if (laneType.getRepresentedLanes() == null) {
+					laneType.setRepresentedLanes(fac
+							.createXMLLaneTypeXMLRepresentedLanes());
+				}
+				lane.setNumberOfRepresentedLanes(laneType.getRepresentedLanes()
+						.getNumber());
+
+				if (laneType.getStartsAt() == null) {
+					laneType.setStartsAt(fac.createXMLLaneTypeXMLStartsAt());
+				}
+				lane.setStartsAtMeterFromLinkEnd(laneType.getStartsAt().getMeterFromLinkEnd());
+
+				lane.setAlignment(laneType.getAlignment());
+
+				l2lAssignment.addLane(lane);
 			}
+			this.laneDefinitions.addLanesToLinkAssignment(l2lAssignment);
+		}
 	}
 
 }

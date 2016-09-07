@@ -1,8 +1,8 @@
 package playground.wrashid.parkingSearch.planLevel.scoring;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantForParking;
@@ -16,7 +16,7 @@ public class ParkingScoringFunctionTestParkingNumber extends ParkingScoringFunct
 	}
 
 	// TODO: perhaps remove calls (if not used till 1 sep, 2010).
-	public double getScore(ActivityImpl targetActivity, Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo, Id personId,
+	public double getScore(Activity targetActivity, Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo, Id personId,
 			double parkingArrivalDuration, double parkingDepartureDuration, Plan plan, double delta, boolean forRanking) {
 		if (parkingFacilityId.toString().equalsIgnoreCase(personId.toString())){
 			return 1;

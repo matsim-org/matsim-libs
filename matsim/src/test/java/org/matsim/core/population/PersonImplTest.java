@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
@@ -44,9 +45,9 @@ public class PersonImplTest extends MatsimTestCase {
 	public void testGetRandomUnscoredPlan() {
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		Person person = null;
-		PlanImpl[] plans = new PlanImpl[10];
+		Plan[] plans = new Plan[10];
 		// create a person with 4 unscored plans
-		person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		plans[0] = PersonUtils.createAndAddPlan(person, false);
 		plans[1] = PersonUtils.createAndAddPlan(person, false);
 		plans[1].setScore(0.0);
@@ -89,10 +90,10 @@ public class PersonImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testRemoveUnselectedPlans() {
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		PersonUtils.createAndAddPlan(person, false);
 		PersonUtils.createAndAddPlan(person, false);
-		PlanImpl selPlan = PersonUtils.createAndAddPlan(person, true);
+		Plan selPlan = PersonUtils.createAndAddPlan(person, true);
 		PersonUtils.createAndAddPlan(person, false);
 
 		assertEquals("person should have 4 plans.", 4, person.getPlans().size());
@@ -104,12 +105,12 @@ public class PersonImplTest extends MatsimTestCase {
 	}
 
 	public void testRemovePlan() {
-		Person person = PopulationUtils.createPerson(Id.create(5, Person.class));
-		PlanImpl p1 = PersonUtils.createAndAddPlan(person, false);
-		PlanImpl p2 = PersonUtils.createAndAddPlan(person, true);
-		PlanImpl p3 = PersonUtils.createAndAddPlan(person, false);
-		PlanImpl p4 = PersonUtils.createAndAddPlan(person, false);
-		PlanImpl p5 = new PlanImpl(null);
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(5, Person.class));
+		Plan p1 = PersonUtils.createAndAddPlan(person, false);
+		Plan p2 = PersonUtils.createAndAddPlan(person, true);
+		Plan p3 = PersonUtils.createAndAddPlan(person, false);
+		Plan p4 = PersonUtils.createAndAddPlan(person, false);
+		Plan p5 = PopulationUtils.createPlan(null);
 
 		assertEquals("wrong number of plans.", 4, person.getPlans().size());
 		assertEquals("expected different selected plan.", p2, person.getSelectedPlan());
@@ -129,16 +130,16 @@ public class PersonImplTest extends MatsimTestCase {
 	}
 
 	public void testSetSelectedPlan() {
-		Person person = PopulationUtils.createPerson(Id.create(11, Person.class));
-		PlanImpl p1 = PersonUtils.createAndAddPlan(person, false);
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(11, Person.class));
+		Plan p1 = PersonUtils.createAndAddPlan(person, false);
 		assertEquals(p1, person.getSelectedPlan());
-		PlanImpl p2 = PersonUtils.createAndAddPlan(person, false);
+		Plan p2 = PersonUtils.createAndAddPlan(person, false);
 		assertEquals(p1, person.getSelectedPlan());
-		PlanImpl p3 = PersonUtils.createAndAddPlan(person, true);
+		Plan p3 = PersonUtils.createAndAddPlan(person, true);
 		assertEquals(p3, person.getSelectedPlan());
 		person.setSelectedPlan(p2);
 		assertEquals(p2, person.getSelectedPlan());
-		PlanImpl p4 = new PlanImpl(null);
+		Plan p4 = PopulationUtils.createPlan(null);
 		try {
 			person.setSelectedPlan(p4);
 			fail("expected Exception when setting a plan as selected that is not part of person.");
@@ -151,10 +152,10 @@ public class PersonImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testGetBestPlan() {
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
-		Plan p1 = new PlanImpl();
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Plan p1 = PopulationUtils.createPlan();
 		p1.setScore(90.0);
-		Plan p2 = new PlanImpl();
+		Plan p2 = PopulationUtils.createPlan();
 		p2.setScore(89.0);
 		person.addPlan(p1);
 		person.addPlan(p2);
@@ -166,12 +167,12 @@ public class PersonImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testGetBestPlan_multipleBest() {
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
-		Plan p1 = new PlanImpl();
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Plan p1 = PopulationUtils.createPlan();
 		p1.setScore(11.0);
-		Plan p2 = new PlanImpl();
+		Plan p2 = PopulationUtils.createPlan();
 		p2.setScore(5.0);
-		Plan p3 = new PlanImpl();
+		Plan p3 = PopulationUtils.createPlan();
 		p3.setScore(11.0);
 		person.addPlan(p1);
 		person.addPlan(p2);
@@ -184,9 +185,9 @@ public class PersonImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testGetBestPlan_oneWithoutScore() {
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
-		Plan p1 = new PlanImpl();
-		Plan p2 = new PlanImpl();
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Plan p1 = PopulationUtils.createPlan();
+		Plan p2 = PopulationUtils.createPlan();
 		p2.setScore(80.0);
 		person.addPlan(p1);
 		person.addPlan(p2);
@@ -198,9 +199,9 @@ public class PersonImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testGetBestPlan_allWithoutScore() {
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
-		Plan p1 = new PlanImpl();
-		Plan p2 = new PlanImpl();
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Plan p1 = PopulationUtils.createPlan();
+		Plan p2 = PopulationUtils.createPlan();
 		person.addPlan(p1);
 		person.addPlan(p2);
 		Plan p = new BestPlanSelector<Plan, Person>().selectPlan(person);

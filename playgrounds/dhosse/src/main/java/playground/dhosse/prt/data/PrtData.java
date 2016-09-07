@@ -9,12 +9,12 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import playground.michalm.taxi.data.*;
 
-public class PrtData extends ETaxiData {
+public class PrtData extends TaxiDataWithRanks {
 	
 	private Collection<TaxiRank> vehicleRanks;
 	private static QuadTree<TaxiRank> quadTreeRanks;
 	
-	public PrtData(Network network, ETaxiData data){
+	public PrtData(Network network, TaxiDataWithRanks data){
 		this.vehicleRanks = data.getTaxiRanks().values();
 		double[] bb = NetworkUtils.getBoundingBox(network.getNodes().values());
 		this.initRankQuadTree(bb[0], bb[1], bb[2], bb[3]);

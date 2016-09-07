@@ -22,6 +22,7 @@ package playground.jbischoff.taxibus.algorithm.scheduler;
 import java.util.*;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -47,8 +48,9 @@ public class TaxibusScheduler {
 		this.timer = timer;
 		this.params = params;
 
+        vrpData.clearRequestsAndResetSchedules();
+
 		for (Vehicle veh : this.vrpData.getVehicles().values()) {
-			veh.resetSchedule();
 			Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>) veh.getSchedule();
 			schedule.addTask(new TaxibusStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
 		}
@@ -167,7 +169,10 @@ public class TaxibusScheduler {
 //			log.info(path.getFromLink().getId() + " to " + path.getToLink().getId());
 //		}
 //		log.info("End of route");
-//		log.info("scheduled to bus: " + best.requests);
+//		log.info("scheduled to bus: ");
+//		for (TaxibusRequest r : best.requests){
+//			log.info(r+" Agent: "+ r.getPassenger().getId());
+//		}
 		Iterator<VrpPathWithTravelData> iterator = best.path.iterator();
 		double lastEndTime;
 		VrpPathWithTravelData path;
@@ -199,11 +204,14 @@ public class TaxibusScheduler {
 			}
 
 		} else if (lastTask.getTaxibusTaskType() == TaxibusTaskType.PICKUP) {
-			best.failIfRequestNotUnplannedOrDispatched();
+//			best.failIfRequestNotUnplannedOrDispatched();
 			lastEndTime = lastTask.getEndTime();
 			path = iterator.next();
 
 		} else {
+			for (TaxibusTask task : bestSched.getTasks()){
+				log.error(task.toString()+" " +task.getType() +" "+task.getStatus() );
+			}
 			throw new IllegalStateException();
 		}
 
@@ -235,7 +243,6 @@ public class TaxibusScheduler {
 			lastEndTime = scheduleDriveAlongPath(bestSched, path, onBoard, lastEndTime);
 
 		}
-		if (!onBoard.isEmpty()) {
 			// last path, we might have some people to still drop off. Would not
 			// be the case if last path is an empty ride, i.e. back to the
 			// depot:
@@ -244,8 +251,8 @@ public class TaxibusScheduler {
 			if (dropOffsForLink != null) {
 
 				lastEndTime = scheduleDropOffs(bestSched, onBoard, dropOffsForLink, droppedOff, lastEndTime);
+
 			}
-		}
 		if (!onBoard.isEmpty()) {
 			log.error("we forgot someone, expected route: ");
 			for (TaxibusRequest r : onBoard) {
@@ -261,6 +268,7 @@ public class TaxibusScheduler {
 		}
 
 		appendTasksAfterDropoff(bestSched);
+		
 //		log.info("Done Scheduling");
 	}
 

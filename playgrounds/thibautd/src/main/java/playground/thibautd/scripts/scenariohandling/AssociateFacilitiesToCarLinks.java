@@ -28,8 +28,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
@@ -48,7 +47,7 @@ public class AssociateFacilitiesToCarLinks {
 		final String outputf2l = args[ 2 ];
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		final NetworkImpl network = (NetworkImpl) sc.getNetwork();
+		final Network network = (Network) sc.getNetwork();
 
 		new MatsimNetworkReader(sc.getNetwork()).readFile( netFile );
 		new MatsimFacilitiesReader( sc ).readFile( facFile );

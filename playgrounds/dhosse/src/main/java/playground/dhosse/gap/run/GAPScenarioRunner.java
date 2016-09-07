@@ -21,7 +21,7 @@ import org.matsim.contrib.carsharing.config.FreeFloatingConfigGroup;
 import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.control.listeners.CarsharingListener;
-import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactory;
+import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactoryNew;
 import org.matsim.contrib.carsharing.replanning.CarsharingSubtourModeChoiceStrategy;
 import org.matsim.contrib.carsharing.replanning.RandomTripToCarsharingStrategy;
 import org.matsim.contrib.carsharing.router.OneWayCarsharingRoutingModule;
@@ -42,8 +42,9 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -51,7 +52,7 @@ import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -63,7 +64,6 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.population.algorithms.XY2Links;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -148,7 +148,7 @@ public class GAPScenarioRunner {
 		
 		config.plans().setInputFile("/home/dhosse/run12/output_plans.xml.gz");
 		// disable counts
-		 config.counts().setCountsFileName(null);
+		 config.counts().setInputFile(null);
 		 
 		 //set random seed
 		 config.global().setRandomSeed(randomSeed);
@@ -174,7 +174,7 @@ public class GAPScenarioRunner {
 		XY2Links xy2links = new XY2Links(scenario2);
 
 		ObjectAttributes atts = new ObjectAttributes();
-		new ObjectAttributesXmlReader(atts).parse(Global.runInputDir
+		new ObjectAttributesXmlReader(atts).readFile(Global.runInputDir
 				+ "demographicAtts.xml");
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
@@ -258,7 +258,7 @@ public class GAPScenarioRunner {
 								.getConfig().planCalcScore()));
 				addTravelDisutilityFactoryBinding(TransportMode.ride)
 						.toInstance(
-								new RandomizingTimeDistanceTravelDisutility.Builder(
+								new RandomizingTimeDistanceTravelDisutilityFactory(
 										TransportMode.ride, config.planCalcScore()));
 				addRoutingModuleBinding(TransportMode.ride)
 						.toProvider(
@@ -368,7 +368,7 @@ public class GAPScenarioRunner {
 										.plansCalcRoute()));
 						addTravelDisutilityFactoryBinding(mode)
 								.toInstance(
-										new RandomizingTimeDistanceTravelDisutility.Builder(
+										new RandomizingTimeDistanceTravelDisutilityFactory(
 												mode, controler.getConfig().planCalcScore()));
 						addRoutingModuleBinding(mode)
 								.toProvider(
@@ -382,7 +382,7 @@ public class GAPScenarioRunner {
 										.plansCalcRoute()));
 						addTravelDisutilityFactoryBinding(mode)
 								.toInstance(
-										new RandomizingTimeDistanceTravelDisutility.Builder(
+										new RandomizingTimeDistanceTravelDisutilityFactory(
 												mode, controler.getConfig().planCalcScore()));
 						addRoutingModuleBinding(mode)
 								.toProvider(
@@ -886,8 +886,8 @@ public class GAPScenarioRunner {
 			@Override
 			public void install() {
 
-				bindMobsim().toProvider( CarsharingQsimFactory.class );
-				
+				bindMobsim().toProvider( CarsharingQsimFactoryNew.class );
+				addControlerListenerBinding().to(CarsharingListener.class);
 				addRoutingModuleBinding("onewaycarsharing").toInstance(new OneWayCarsharingRoutingModule());
 				
 				bind(MainModeIdentifier.class).toInstance(new MainModeIdentifier() {
@@ -923,10 +923,7 @@ public class GAPScenarioRunner {
 			public void install() {
 				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
 			}
-		});
-
-		controler.addControlerListener(new CarsharingListener(controler,
-				cs.getStatsWriterFrequency() ) ) ;
+		});		
 		
 	}
 

@@ -28,7 +28,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 
 /**
@@ -38,14 +37,14 @@ public class JointPlanFactoryTest {
 	@Test
 	public void testAddAtIndividualLevel() throws Exception {
 		final Id<Person> id1 = Id.createPersonId( 1 );
-		final Person person1 = PopulationUtils.createPerson(id1);
+		final Person person1 = PopulationUtils.getFactory().createPerson(id1);
 
 		final Id id2 = Id.createPersonId( 2 );
-		final Person person2 = PopulationUtils.createPerson(id2);
+		final Person person2 = PopulationUtils.getFactory().createPerson((Id<Person>) id2);
 
 		final Map<Id<Person>, Plan> jp = new LinkedHashMap< >( );
-		jp.put( id1 , new PlanImpl( person1 ) );
-		jp.put( id2 , new PlanImpl( person2 ) );
+		jp.put( id1 , PopulationUtils.createPlan(person1) );
+		jp.put( id2 , PopulationUtils.createPlan(person2) );
 
 		if ( person1.getPlans().size() != 0 ) {
 			throw new RuntimeException( "person should not have plans yet, but has "+person1.getPlans().size() ); 
@@ -67,14 +66,14 @@ public class JointPlanFactoryTest {
 	@Test
 	public void testDoNotAddAtIndividualLevel() throws Exception {
 		final Id id1 = Id.createPersonId( 1 );
-		final Person person1 = PopulationUtils.createPerson(id1);
+		final Person person1 = PopulationUtils.getFactory().createPerson((Id<Person>) id1);
 
 		final Id id2 = Id.createPersonId( 2 );
-		final Person person2 = PopulationUtils.createPerson(id2);
+		final Person person2 = PopulationUtils.getFactory().createPerson((Id<Person>) id2);
 
 		final Map<Id<Person>, Plan> jp = new LinkedHashMap< >( );
-		jp.put( id1 , new PlanImpl( person1 ) );
-		jp.put( id2 , new PlanImpl( person2 ) );
+		jp.put( id1 , PopulationUtils.createPlan(person1) );
+		jp.put( id2 , PopulationUtils.createPlan(person2) );
 
 		if ( person1.getPlans().size() != 0 ) {
 			throw new RuntimeException( "person should not have plans yet, but has "+person1.getPlans().size() ); 

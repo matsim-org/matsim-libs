@@ -20,15 +20,11 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ChangeModeConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.misc.StringUtils;
-import org.matsim.population.algorithms.ChooseRandomLegMode;
-import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.core.population.algorithms.ChooseRandomLegMode;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 
 /**
  * Changes the transportation mode of all legs in a plan to a randomly chosen
@@ -50,7 +46,6 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  * @author mrieser
  */
-@Deprecated // better use ChangeTripMode
 public class ChangeLegMode extends AbstractMultithreadedModule {
 
 	// (I made the above static final variables public so they can be used in scripts-in-java. kai, jun'15)
@@ -58,14 +53,12 @@ public class ChangeLegMode extends AbstractMultithreadedModule {
 	private String[] availableModes;
 	private boolean ignoreCarAvailability;
 
-	@Deprecated // better use ChangeTripMode
 	public ChangeLegMode(final GlobalConfigGroup globalConfigGroup, ChangeModeConfigGroup changeLegModeConfigGroup) {
 		super(globalConfigGroup.getNumberOfThreads());
 		this.availableModes = changeLegModeConfigGroup.getModes();
 		this.ignoreCarAvailability = changeLegModeConfigGroup.getIgnoreCarAvailability();
 	}
 	
-	@Deprecated // better use ChangeTripMode
 	public ChangeLegMode(final int nOfThreads, final String[] modes, final boolean ignoreCarAvailabilty) {
 		super(nOfThreads);
 		this.availableModes = modes.clone();

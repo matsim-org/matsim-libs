@@ -69,6 +69,6 @@ public class WorldMercatorVis {
 		
 		CoordinateConverter conv = new  CoordinateConverter(em,transform);
 		em1.addHandler(conv);
-		new EventsReaderXMLv1ExtendedSim2DVersion(em1).parse("/Users/laemmel/devel/nyc/output/ITERS/it.100/100.events.xml.gz");
+		new EventsReaderXMLv1ExtendedSim2DVersion(em1).readFile("/Users/laemmel/devel/nyc/output/ITERS/it.100/100.events.xml.gz");
 	}
 }

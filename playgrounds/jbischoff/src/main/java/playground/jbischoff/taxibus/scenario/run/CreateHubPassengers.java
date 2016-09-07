@@ -28,10 +28,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.jbischoff.taxibus.algorithm.utils.TaxibusUtils;
@@ -46,11 +46,11 @@ public class CreateHubPassengers {
 	String inputPlans = dir + "VW083PC.output_plans.xml.gz";
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	Population newpop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
-	new MatsimPopulationReader(scenario).readFile(inputPlans);
+	new PopulationReader(scenario).readFile(inputPlans);
 	
 	for (Person p : scenario.getPopulation().getPersons().values()){
 		Plan plan = p.getSelectedPlan();
-		Person newPerson = PopulationUtils.createPerson(p.getId());
+		Person newPerson = PopulationUtils.getFactory().createPerson(p.getId());
 		newPerson.addPlan(plan);
 		newpop.addPerson(newPerson);
 		if (p.getId().toString().startsWith("BS_WB")){

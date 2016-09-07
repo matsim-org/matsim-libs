@@ -179,7 +179,7 @@ public class ExtractActivityDensitiesForCapeTownFromDigicore {
 			
 			/* Read the vehicle file. */
 			DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-			dvr.parse(this.file.getAbsolutePath());
+			dvr.readFile(this.file.getAbsolutePath());
 			DigicoreVehicle vehicle = dvr.getVehicle();
 
 			/* Process the activities. */

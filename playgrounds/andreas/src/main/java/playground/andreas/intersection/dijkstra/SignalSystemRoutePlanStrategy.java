@@ -21,9 +21,9 @@ package playground.andreas.intersection.dijkstra;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
@@ -42,7 +42,7 @@ public class SignalSystemRoutePlanStrategy implements PlanStrategy {
 	public SignalSystemRoutePlanStrategy(MatsimServices controler) {
 		this.psDelegate = new PlanStrategyImpl( new RandomPlanSelector());
         this.addStrategyModule(new ReRouteDijkstraTurningMoves(controler.getConfig(), controler.getScenario().getNetwork(),
-				controler.createTravelDisutilityCalculator(), controler.getLinkTravelTimes(), ((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getRouteFactory()));
+				controler.createTravelDisutilityCalculator(), controler.getLinkTravelTimes(), ((PopulationFactory) controler.getScenario().getPopulation().getFactory()).getRouteFactories()));
 	}
 
 	public void addStrategyModule(PlanStrategyModule module) {

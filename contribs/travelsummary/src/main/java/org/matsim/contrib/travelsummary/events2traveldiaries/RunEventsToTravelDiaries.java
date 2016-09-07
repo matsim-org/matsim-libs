@@ -24,7 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
@@ -90,7 +90,7 @@ public class RunEventsToTravelDiaries {
         }
         Scenario scenario = ScenarioUtils.createScenario(config);
 
-        new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
+        new MatsimNetworkReader(scenario.getNetwork()).parse(config.network().getInputFileURL(config.getContext()));
 
         if (config.transit().isUseTransit() ) {
 

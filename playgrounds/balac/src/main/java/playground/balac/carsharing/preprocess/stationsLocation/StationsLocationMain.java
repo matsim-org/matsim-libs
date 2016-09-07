@@ -7,12 +7,12 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
@@ -81,7 +81,7 @@ public class StationsLocationMain
     new MatsimNetworkReader(this.scenario.getNetwork()).readFile(this.networkfilePath);
 
     log.info("  reading file " + this.plansfilePath);
-    PopulationReader plansReader = new MatsimPopulationReader(this.scenario);
+    MatsimReader plansReader = new PopulationReader(this.scenario);
     plansReader.readFile(this.plansfilePath);
 
     log.info("Reading car stations...");

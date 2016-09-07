@@ -49,7 +49,6 @@ import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitionsReader11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.contrib.signals.MatsimSignalSystemsReader;
 import org.matsim.contrib.signals.SignalSystemsReader11;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsWriter20;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsWriter20;
@@ -94,20 +93,11 @@ public class SignalSystems11To20Converter {
 	}
 
 	private XMLSignalSystems readSignals11(String filename) {
-		SignalSystemsReader11 reader = new SignalSystemsReader11(MatsimSignalSystemsReader.SIGNALSYSTEMS11);
-		XMLSignalSystems xmlSignals = null;
 		try {
-			xmlSignals = reader.readSignalSystems11File(filename);
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+			return new SignalSystemsReader11().readSignalSystems11File(filename);
+		} catch (JAXBException | IOException | ParserConfigurationException | SAXException e) {
+			throw new RuntimeException(e);
 		}
-		return xmlSignals;
 	}
 	
 	
@@ -130,7 +120,7 @@ public class SignalSystems11To20Converter {
 			//search for the system to that the signals should be added
 			String signalSystemId = signalgroupdef11.getSignalSystemDefinition().getRefId();
 			XMLSignalSystemType signalSystem20 = this.findXMLSignalType(signals20, signalSystemId);
-			XMLSignals signalsList20 = null;
+			XMLSignals signalsList20;
 			if (signalSystem20.getSignals() == null){
 				signalsList20 = signals20ObjectFactory.createXMLSignalSystemTypeXMLSignals();
 				signalSystem20.setSignals(signalsList20);
@@ -179,7 +169,7 @@ public class SignalSystems11To20Converter {
 				}
 			}
 		}//end loop signalGroupDefinitions
-		return new Tuple<org.matsim.jaxb.signalsystems20.XMLSignalSystems, XMLSignalGroups>(signals20, signalGroups20);
+		return new Tuple<>(signals20, signalGroups20);
 	}
 	
 	private XMLSignalSystemSignalGroupType findSignalGroupSystem(
@@ -218,9 +208,6 @@ public class SignalSystems11To20Converter {
 		return null;
 	}
 	
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		String base = "./test/input/org/matsim/";
 		//one agent test

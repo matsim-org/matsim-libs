@@ -65,7 +65,7 @@ public class PTCountsOsm2Matsim {
 		
 		Counts counts = new Counts();
 		CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(counts);
-		countsReader.parse(countsFile);
+		countsReader.readFile(countsFile);
 				
 		OsmTransitMain osmTransitMain = new OsmTransitMain(filteredOsmFile, TransformationFactory.WGS84, TransformationFactory.DHDN_GK4, outDir + outName + "_network.xml", outDir + outName + "_schedule.xml", outDir + outName + "_vehicles.xml");
 		osmTransitMain.convertOsm2Matsim(transitFilter);

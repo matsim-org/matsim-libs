@@ -8,15 +8,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 
-public class AllModesLegScoringFunction extends org.matsim.core.scoring.functions.CharyparNagelLegScoring {
+public class AllModesLegScoringFunction extends org.matsim.deprecated.scoring.functions.CharyparNagelLegScoring {
 
-	private PlanImpl plan;
+	private Plan plan;
 	
 	private Config config;
 	
@@ -31,7 +31,7 @@ public class AllModesLegScoringFunction extends org.matsim.core.scoring.function
 	private double distancetw = 0.0;
 	
 	
-	public AllModesLegScoringFunction(PlanImpl plan, CharyparNagelScoringParameters params, Config config,  Network network)
+	public AllModesLegScoringFunction(Plan plan, CharyparNagelScoringParameters params, Config config,  Network network)
 	{
 		super(params, network);
 		this.plan = plan;		

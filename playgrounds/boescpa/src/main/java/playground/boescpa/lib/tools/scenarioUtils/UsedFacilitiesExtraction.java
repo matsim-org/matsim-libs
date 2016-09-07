@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.*;
 import playground.boescpa.lib.tools.fileCreation.F2LCreator;
@@ -49,9 +49,9 @@ public class UsedFacilitiesExtraction {
 
 		// Load scenario:
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
-		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
-		new FacilitiesReaderMatsimV1(scenario).parse(scenario.getConfig().facilities().getInputFile());
-		new MatsimNetworkReader(scenario.getNetwork()).parse(scenario.getConfig().network().getInputFile());
+		new PopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
+		new FacilitiesReaderMatsimV1(scenario).readFile(scenario.getConfig().facilities().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
 
 		// Used facilities:
 		ActivityFacilities usedActivityFacilities = getUsedFacilities(scenario.getPopulation(), scenario.getActivityFacilities());

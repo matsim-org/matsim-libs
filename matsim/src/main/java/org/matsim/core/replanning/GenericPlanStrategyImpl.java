@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
+import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ import java.util.ArrayList;
  */
 public class GenericPlanStrategyImpl<T extends BasicPlan, I> implements GenericPlanStrategy<T, I> {
 
-	private GenericPlanSelector<T, I> planSelector = null;
+	private PlanSelector<T, I> planSelector = null;
 	private GenericPlanStrategyModule<T> firstModule = null;
 	private final ArrayList<GenericPlanStrategyModule<T>> modules = new ArrayList<>();
 	private final ArrayList<T> plans = new ArrayList<>();
@@ -45,7 +45,7 @@ public class GenericPlanStrategyImpl<T extends BasicPlan, I> implements GenericP
 	 * Creates a new strategy using the specified planSelector.
 	 *
 	 */
-	public GenericPlanStrategyImpl(final GenericPlanSelector<T, I> planSelector) {
+	public GenericPlanStrategyImpl(final PlanSelector<T, I> planSelector) {
 		this.planSelector = planSelector;
 	}
 
@@ -141,7 +141,7 @@ public class GenericPlanStrategyImpl<T extends BasicPlan, I> implements GenericP
 		return name.toString();
 	}
 
-	public GenericPlanSelector<T, I> getPlanSelector() {
+	public PlanSelector<T, I> getPlanSelector() {
 		return planSelector;
 	}
 	

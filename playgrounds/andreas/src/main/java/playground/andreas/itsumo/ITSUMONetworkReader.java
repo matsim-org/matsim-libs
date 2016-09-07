@@ -29,8 +29,9 @@ import javax.xml.parsers.SAXParserFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
@@ -40,9 +41,9 @@ import org.xml.sax.XMLReader;
 
 public class ITSUMONetworkReader {
 
-	private final NetworkImpl network;
+	private final Network network;
 
-	public ITSUMONetworkReader(final NetworkImpl network) {
+	public ITSUMONetworkReader(final Network network) {
 		this.network = network;
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		System.out.println("\n##################################################################################################\n" +
@@ -140,7 +141,7 @@ public class ITSUMONetworkReader {
 			} else if (lname.equals("network_name")) {
 
 			} else if (lname.equals("node")) {
-				ITSUMONetworkReader.this.network.createAndAddNode(Id.create(this.nodeId, Node.class), new Coord(Double.parseDouble(this.xCoord), Double.parseDouble(this.yCoord)));
+				NetworkUtils.createAndAddNode(ITSUMONetworkReader.this.network, Id.create(this.nodeId, Node.class), new Coord(Double.parseDouble(this.xCoord), Double.parseDouble(this.yCoord)));
 			} else if (lname.equals("node_id")) {
 				this.nodeId = content.trim();
 			} else if (lname.equals("x_coord")) {
@@ -151,9 +152,11 @@ public class ITSUMONetworkReader {
 
 			} else if (lname.equals("laneset")) {
 				double length = CoordUtils.calcEuclideanDistance(ITSUMONetworkReader.this.network.getNodes().get(Id.create(this.lanesetFrom, Node.class)).getCoord(), ITSUMONetworkReader.this.network.getNodes().get(Id.create(this.lanesetTo, Node.class)).getCoord());
-				double capacity = 3600.0; // TODO calculate capacity from speed
-				ITSUMONetworkReader.this.network.createAndAddLink(Id.create(this.lanesetId, Link.class), ITSUMONetworkReader.this.network.getNodes().get(Id.create(this.lanesetFrom, Node.class)), ITSUMONetworkReader.this.network.getNodes().get(Id.create(this.lanesetTo, Node.class)),
-						length, this.laneSpeed / this.lanesCount, capacity, this.lanesCount);
+				double capacity = 3600.0;
+				final double length1 = length;
+				final double capacity1 = capacity;
+				final double numLanes = this.lanesCount; // TODO calculate capacity from speed
+				NetworkUtils.createAndAddLink(ITSUMONetworkReader.this.network,Id.create(this.lanesetId, Link.class), ITSUMONetworkReader.this.network.getNodes().get(Id.create(this.lanesetFrom, Node.class)), ITSUMONetworkReader.this.network.getNodes().get(Id.create(this.lanesetTo, Node.class)), length1, this.laneSpeed / this.lanesCount, capacity1, numLanes );
 			} else if (lname.equals("laneset_id")) {
 				this.lanesetId = content.trim();
 			} else if (lname.equals("start_node")) {

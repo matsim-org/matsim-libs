@@ -19,15 +19,17 @@
 
 package playground.ikaddoura.incidents;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventsParser;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 /**
 * @author ikaddoura
@@ -55,11 +57,12 @@ public class IncidentControlerListener implements IterationStartsListener {
 
 		log.info("Setting network change events for the next iteration: " + nce);
 						
-		List<NetworkChangeEvent> networkChangeEvents = new NetworkChangeEventsParser(controler.getScenario().getNetwork()).parseEvents(nce);;
+		List<NetworkChangeEvent> events = new ArrayList<>() ;
+		new NetworkChangeEventsParser(controler.getScenario().getNetwork(), events).readFile(nce);;
 				
-		NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
-		network.getNetworkChangeEvents().clear();
-		network.setNetworkChangeEvents(networkChangeEvents);
+		Network network = controler.getScenario().getNetwork();
+		NetworkUtils.getNetworkChangeEvents(network).clear();
+		NetworkUtils.setNetworkChangeEvents(network,events);
 		event.getServices().getConfig().network().setChangeEventsInputFile(nce);
 	}
 

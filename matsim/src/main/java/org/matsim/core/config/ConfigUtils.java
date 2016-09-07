@@ -19,19 +19,38 @@
 
 package org.matsim.core.config;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Iterator;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
-
-import java.io.File;
-import java.util.Iterator;
 
 /**
  * @author mrieser
  */
 public abstract class ConfigUtils implements MatsimExtensionPoint {
-	
+
+	public static Config createConfig(final String filename) {
+		// are there systematic arguments against such a method?  otherwise, users will return to new Controler( filename ), since that
+		// is easier to memorize. kai, jul'16
+		
+		URL url = IOUtils.getUrlFromFileOrResource(filename) ;
+		return createConfig( url ) ;
+	}
+
+	public static Config createConfig(URL context) {
+		Config config = createConfig();
+		config.setContext(context);
+		return config;
+	}
+
 	public static Config createConfig() {
 		Config config = new Config();
 		config.addCoreModules();
@@ -39,28 +58,32 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	}
 
 	public static Config createConfig(ConfigGroup... customModules) {
-		Config config = new Config();
-		config.addCoreModules();
-
+		Config config = createConfig();
         for (ConfigGroup customModule : customModules) {
             config.addModule(customModule);
         }
-
 		return config;
 	}
 
 	public static Config loadConfig(final String filename, ConfigGroup... customModules) throws UncheckedIOException {
+		return loadConfig(IOUtils.getUrlFromFileOrResource(filename), customModules);
+	}
+
+	public static Config loadConfig(final URL url, ConfigGroup... customModules) throws UncheckedIOException {
+		Gbl.assertNotNull(url);
+		
 		Config config = new Config();
 		config.addCoreModules();
 
-        for (ConfigGroup customModule : customModules) {
-            config.addModule(customModule);
-        }
-
-		new ConfigReader(config).parse(filename);
-
+		for (ConfigGroup customModule : customModules) {
+			config.addModule(customModule);
+		}
+		
+		new ConfigReader(config).parse(url);
+		config.setContext(url);
 		return config;
 	}
+
 
 	/**
 	 * This does (hopefully) overwrite config settings if they are defined in the file.  So you can do
@@ -76,7 +99,24 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		if (config.global() == null) {
 			config.addCoreModules();
 		}
-		new ConfigReader(config).parse(filename);
+		new ConfigReader(config).readFile(filename);
+	}
+
+	public static void loadConfig(final Config config, final URL url) throws UncheckedIOException {
+		if (config.global() == null) {
+			config.addCoreModules();
+		}
+		new ConfigReader(config).parse(url);
+	}
+
+
+	public static Config loadConfig(URL url) {
+		Config config = new Config();
+		config.addCoreModules();
+		new ConfigReader(config).parse(url);
+		config.setContext(url);
+		return config;
+
 	}
 
 	/**
@@ -109,7 +149,7 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		config.network().setInputFile(getAbsolutePath(prefix, config.network().getInputFile()));
 		config.plans().setInputFile(getAbsolutePath(prefix, config.plans().getInputFile()));
 		config.facilities().setInputFile(getAbsolutePath(prefix, config.facilities().getInputFile()));
-		config.counts().setCountsFileName(getAbsolutePath(prefix, config.counts().getCountsFileName()));
+		config.counts().setInputFile(getAbsolutePath(prefix, config.counts().getCountsFileName()));
 		config.households().setInputFile(getAbsolutePath(prefix, config.households().getInputFile()));
 	}
 

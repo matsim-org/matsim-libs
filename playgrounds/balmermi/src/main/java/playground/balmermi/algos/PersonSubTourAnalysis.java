@@ -28,13 +28,13 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
@@ -82,7 +82,7 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 
 		// get the subtour mode
 		int idx = -1;
-		String mode = ((LegImpl)plan.getPlanElements().get(start+1)).getMode();
+		String mode = ((Leg)plan.getPlanElements().get(start+1)).getMode();
 		if (mode.equals(TransportMode.walk)) { idx = WALK; }
 		else if (mode.equals(TransportMode.bike)) { idx = BIKE; }
 		else if (mode.equals(TransportMode.car)) { idx = CAR; }
@@ -92,15 +92,15 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 
 		// calculate the SubTour distance (in 1 km time bins)
 		double d = 0.0;
-		Coord prev = ((ActivityImpl)plan.getPlanElements().get(start)).getCoord();
+		Coord prev = ((Activity)plan.getPlanElements().get(start)).getCoord();
 		for (int k=start+2; k<=i; k=k+2) {
-			Coord curr = ((ActivityImpl)plan.getPlanElements().get(k)).getCoord();
+			Coord curr = ((Activity)plan.getPlanElements().get(k)).getCoord();
 			d = d + CoordUtils.calcEuclideanDistance(curr, prev);
 			prev = curr;
 		}
-		prev = ((ActivityImpl)plan.getPlanElements().get(j)).getCoord();
+		prev = ((Activity)plan.getPlanElements().get(j)).getCoord();
 		for (int k=j+2; k<=end; k=k+2) {
-			Coord curr = ((ActivityImpl)plan.getPlanElements().get(k)).getCoord();
+			Coord curr = ((Activity)plan.getPlanElements().get(k)).getCoord();
 			d = d + CoordUtils.calcEuclideanDistance(curr, prev);
 			prev = curr;
 		}
@@ -135,9 +135,9 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 	private final void extractSubTours(Plan plan, int start, int end) {
 		boolean is_leaf = true;
 		for (int i=start+2; i<end-1; i=i+2) {
-			ActivityImpl acti = (ActivityImpl)plan.getPlanElements().get(i);
+			Activity acti = (Activity)plan.getPlanElements().get(i);
 			for (int j=end-2; j>i; j=j-2) {
-				ActivityImpl actj = (ActivityImpl)plan.getPlanElements().get(j);
+				Activity actj = (Activity)plan.getPlanElements().get(j);
 				if ((acti.getCoord().getX() == actj.getCoord().getX()) &&
 				    (acti.getCoord().getY() == actj.getCoord().getY())) {
 					// subtour found: start..i & j..end
@@ -146,14 +146,14 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 
 					// next recursive step
 					int ii = i;
-					ActivityImpl actii = acti;
+					Activity actii = acti;
 					for (int jj=i+2; jj<=j; jj=jj+2) {
-						ActivityImpl actjj = (ActivityImpl)plan.getPlanElements().get(jj);
+						Activity actjj = (Activity)plan.getPlanElements().get(jj);
 						if ((actii.getCoord().getX() == actjj.getCoord().getX()) &&
 						    (actii.getCoord().getY() == actjj.getCoord().getY())) {
 							this.extractSubTours(plan,ii,jj);
 							ii = jj;
-							actii = (ActivityImpl)plan.getPlanElements().get(ii);
+							actii = (Activity)plan.getPlanElements().get(ii);
 						}
 					}
 					return;

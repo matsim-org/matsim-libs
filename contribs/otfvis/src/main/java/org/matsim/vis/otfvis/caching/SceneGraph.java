@@ -28,7 +28,6 @@ import java.util.Comparator;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
-import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
 
 
@@ -46,8 +45,7 @@ class LayerDrawingOrderComparator implements Comparator<SceneLayer>, Serializabl
 
 	@Override
 	public int compare(SceneLayer o1, SceneLayer o2) {
-		int diff = (int)Math.signum(o1.getDrawOrder() - o2.getDrawOrder());
-		return diff;
+		return (int)Math.signum(o1.getDrawOrder() - o2.getDrawOrder());
 	}
 
 }
@@ -66,17 +64,15 @@ public class SceneGraph {
 	private Rect rect;
 	
 	private OGLAgentPointLayer agentLayer = new OGLAgentPointLayer();
-	private OGLSimpleStaticNetLayer networkLayer = new OGLSimpleStaticNetLayer();
 	private SimpleSceneLayer miscellaneousLayer = new SimpleSceneLayer();
 
 	private ArrayList<SceneLayer> drawingLayers;
 
 	public SceneGraph(Rect rect) {
 		this.rect = rect;
-		this.drawingLayers = new ArrayList<SceneLayer>();
+		this.drawingLayers = new ArrayList<>();
 		this.drawingLayers.add(miscellaneousLayer);
-		this.drawingLayers.add(networkLayer);
-		this.drawingLayers.add(agentLayer);	
+		this.drawingLayers.add(agentLayer);
 	}
 
 	public Rect getRect() {
@@ -91,10 +87,6 @@ public class SceneGraph {
 		miscellaneousLayer.addItem(item);
 	}
 
-	public void addStaticItem(OTFGLAbstractDrawable item) {
-		networkLayer.addItem(item);
-	}
-	
 	public void finish() {
 		Collections.sort(drawingLayers, new LayerDrawingOrderComparator());
 	}

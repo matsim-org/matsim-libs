@@ -22,7 +22,7 @@ public class LinkTollCostInCrownes implements TravelDisutility {
 		this.roadPricingScheme = new RoadPricingSchemeImpl();
 		final RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(
 				this.roadPricingScheme);
-		reader.parse(tollFileName);
+		reader.readFile(tollFileName);
 	}
 
 	@Override

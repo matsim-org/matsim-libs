@@ -211,7 +211,7 @@ public class ApplyFactors {
 	private static NumericMatrix loadMatrix(String file) {
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse(file);
+		reader.readFile(file);
 		return reader.getMatrix();
 	}
 

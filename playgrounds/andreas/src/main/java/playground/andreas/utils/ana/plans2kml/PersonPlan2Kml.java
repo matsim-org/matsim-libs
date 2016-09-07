@@ -25,11 +25,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
@@ -93,7 +93,7 @@ public class PersonPlan2Kml extends NewPopulation{
 		new MatsimNetworkReader(s.getNetwork()).readFile(networkFilename);
 
 		Population population = s.getPopulation();
-		PopulationReader plansReader = new MatsimPopulationReader(s);
+		MatsimReader plansReader = new PopulationReader(s);
 		plansReader.readFile(plansFilename);
 
 		PersonPlan2Kml myPP2Kml = new PersonPlan2Kml(network, population, outputDirectory, agentIds);

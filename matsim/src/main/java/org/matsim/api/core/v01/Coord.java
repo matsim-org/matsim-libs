@@ -22,6 +22,8 @@ package org.matsim.api.core.v01;
 
 import java.io.Serializable;
 
+import org.matsim.core.scenario.Lockable;
+
 /**
  * In MATSim, generally Cartesian Coordinates are used, with x increasing
  * to the right, and y increasing to the top:
@@ -32,39 +34,42 @@ import java.io.Serializable;
  *   (0/0) ---->
  * </pre>
  */
-public class Coord implements Serializable {
+public final class Coord implements Serializable, Lockable {
 
 	private static final long serialVersionUID = 1L;
 
 	private double x;
 	private double y;
 
+	private boolean locked = false ;
+
 	public Coord(final double x, final double y) {
 		this.x = x;
 		this.y = y;
 	}
 
-
 	public double getX() {
 		return this.x;
 	}
-
 	public double getY() {
 		return this.y;
 	}
 
-	public void setX(final double x) {
-		this.x = x;
-	}
+//	public void setX(final double x) {
+//		testForLocked() ;
+//		this.x = x;
+//	}
 
-	public void setY(final double y) {
-		this.y = y;
-	}
+//	public void setY(final double y) {
+//		testForLocked() ;
+//		this.y = y;
+//	}
 
-	public void setXY(final double x, final double y) {
-		this.x = x;
-		this.y = y;
-	}
+//	public void setXY(final double x, final double y) {
+//		testForLocked() ;
+//		this.x = x;
+//		this.y = y;
+//	}
 
 	@Override
 	public boolean equals(final Object other) {
@@ -89,6 +94,18 @@ public class Coord implements Serializable {
 	public final String toString() {
 		return "[x=" + this.x + "][y=" + this.y + "]";
 	}
+
+
+	@Override
+	public void setLocked() {
+		this.locked = true ;
+	}
+	private void testForLocked() {
+		if ( locked ) {
+			throw new RuntimeException( "Coord is locked; too late to do this.  See comments in code.") ;
+		}
+	}
+
 
 
 }

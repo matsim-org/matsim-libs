@@ -29,9 +29,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
@@ -53,7 +53,7 @@ public class MyRoutingModule implements RoutingModule {
 
 	private final Provider<RoutingModule> routingDelegate;
 	private final PopulationFactory populationFactory;
-	private final RouteFactoryImpl modeRouteFactory;
+	private final RouteFactories modeRouteFactory;
 	private final Facility station;
 
 	/**
@@ -74,7 +74,7 @@ public class MyRoutingModule implements RoutingModule {
 			final Facility station) {
 		this.routingDelegate = routingDelegate;
 		this.populationFactory = populationFactory;
-		this.modeRouteFactory = ((PopulationFactoryImpl) populationFactory).getRouteFactory();
+		this.modeRouteFactory = ((PopulationFactory) populationFactory).getRouteFactories();
 		this.station = station;
 	}
 

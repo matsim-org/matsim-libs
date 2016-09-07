@@ -28,4 +28,9 @@ public class EnergyConsumptionModelBerlinLow extends
 		this.drivingType="MEDIUM";
 	}
 
+	public double getEnergyConsumptionRateInJoulesPerMeter() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

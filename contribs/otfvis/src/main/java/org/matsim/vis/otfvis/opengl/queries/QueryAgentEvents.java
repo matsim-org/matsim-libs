@@ -20,39 +20,22 @@
 
 package org.matsim.vis.otfvis.opengl.queries;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * 
@@ -61,14 +44,14 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
  * @author michaz
  *
  */
-public class QueryAgentEvents extends AbstractQuery implements PersonDepartureEventHandler, PersonArrivalEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
+public class QueryAgentEvents extends AbstractQuery implements BasicEventHandler {
 
-	private static transient Logger logger = Logger.getLogger(QueryAgentEvents.class);
-	
+	private static Logger logger = Logger.getLogger(QueryAgentEvents.class);
+
 	public static class Result implements OTFQueryResult {
 
 		private String agentId;
-		private List<String> newEventStrings = new ArrayList<String>();
+		private List<String> newEventStrings = new ArrayList<>();
 		
 		@Override
 		public void draw(OTFOGLDrawer drawer) {
@@ -92,11 +75,9 @@ public class QueryAgentEvents extends AbstractQuery implements PersonDepartureEv
 
 	private Id<Person> agentId = null;
 
-	private Id<Vehicle> agentsVehId = null;
-	
 	private EventsManager eventsManager = null;
 	
-	private BlockingQueue<Event> queue = new LinkedBlockingQueue<Event>();
+	private BlockingQueue<Event> queue = new LinkedBlockingQueue<>();
 	
 	private Result result = null;
 	
@@ -117,7 +98,7 @@ public class QueryAgentEvents extends AbstractQuery implements PersonDepartureEv
 	@Override
 	public OTFQueryResult query() {
 		result.newEventStrings.clear();
-		List<Event> newEvents = new ArrayList<Event>();
+		List<Event> newEvents = new ArrayList<>();
 		queue.drainTo(newEvents);
 		for (Event personEvent : newEvents) {
 			result.newEventStrings.add(personEvent.toString());
@@ -142,68 +123,12 @@ public class QueryAgentEvents extends AbstractQuery implements PersonDepartureEv
 	}
 
 	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if(event.getPersonId().equals(this.agentId)){
-			queue.add(event);
-		}
-	}
-
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		if(event.getPersonId().equals(this.agentId)){
-			queue.add(event);
-			
-			// remember the agents vehicle
-			agentsVehId = event.getVehicleId();
-		}
-	}
-
-	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event) {
-		if(event.getPersonId().equals(this.agentId)){
-			queue.add(event);
-		}
-	}
-
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		if(event.getVehicleId().equals(this.agentsVehId)){
-			queue.add(event);
-		}
-	}
-
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		if(event.getVehicleId().equals(this.agentsVehId)){
-			queue.add(event);
-		}
-	}
-
-	@Override
-	public void handleEvent(ActivityEndEvent event) {
-		if(event.getPersonId().equals(this.agentId)){
-			queue.add(event);
-		}
-	}
-
-	@Override
-	public void handleEvent(ActivityStartEvent event) {
-		if(event.getPersonId().equals(this.agentId)){
-			queue.add(event);
-		}
-	}
-
-	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		if(event.getPersonId().equals(this.agentId)){
-			queue.add(event);
-		}
-	}
-
-	@Override
-	public void handleEvent(PersonDepartureEvent event) {
-		if(event.getPersonId().equals(this.agentId)){
-			queue.add(event);
+	public void handleEvent(Event event) {
+		if (event instanceof HasPersonId) {
+			HasPersonId personEvent = (HasPersonId) event;
+			if (personEvent.getPersonId().equals(this.agentId)) {
+				queue.add(event);
+			}
 		}
 	}
 

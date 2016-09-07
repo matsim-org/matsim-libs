@@ -7,12 +7,12 @@ import java.util.Random;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.population.algorithms.PlanAlgorithm;
 /**
  * @author balacm
  */
@@ -64,7 +64,7 @@ public class ChooseRandomTripModeWithTaxi implements PlanAlgorithm {
 					TripRouter.insertTrip(
 							plan,
 							trip.getOriginActivity(),
-							Collections.singletonList( new LegImpl( possibleModes[temp % 3] ) ),
+							Collections.singletonList( PopulationUtils.createLeg(possibleModes[temp % 3]) ),
 							trip.getDestinationActivity());
 			
 			}
@@ -73,7 +73,7 @@ public class ChooseRandomTripModeWithTaxi implements PlanAlgorithm {
 				TripRouter.insertTrip(
 						plan,
 						trip.getOriginActivity(),
-						Collections.singletonList( new LegImpl( possibleModes[temp % 2] ) ),
+						Collections.singletonList( PopulationUtils.createLeg(possibleModes[temp % 2]) ),
 						trip.getDestinationActivity());
 				
 				
@@ -82,7 +82,7 @@ public class ChooseRandomTripModeWithTaxi implements PlanAlgorithm {
 				TripRouter.insertTrip(
 						plan,
 						trip.getOriginActivity(),
-						Collections.singletonList( new LegImpl( possibleModes[0] ) ),
+						Collections.singletonList( PopulationUtils.createLeg(possibleModes[0]) ),
 						trip.getDestinationActivity());
 			}
 			else
@@ -96,7 +96,7 @@ public class ChooseRandomTripModeWithTaxi implements PlanAlgorithm {
 			TripRouter.insertTrip(
 					plan,
 					trip.getOriginActivity(),
-					Collections.singletonList( new LegImpl( possibleModes[0] ) ),
+					Collections.singletonList( PopulationUtils.createLeg(possibleModes[0]) ),
 					trip.getDestinationActivity());
 	
 	}

@@ -21,10 +21,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -54,7 +53,7 @@ public class NetVisualizerPanel extends javax.swing.JPanel {
 		initBoard();
 	}
 
-	public NetVisualizerPanel(NetworkImpl net) {
+	public NetVisualizerPanel(Network net) {
 		initComponents();
 		initBoard();
 		setNetToBoard(net);
@@ -161,7 +160,7 @@ public class NetVisualizerPanel extends javax.swing.JPanel {
 		this.revalidate();
 	}
 
-	public boolean setNetToBoard(NetworkImpl net) {
+	public boolean setNetToBoard(Network net) {
 		//System.out.println("Asignando red:" + net);
 		board.setNetwork(net);
 		board.repaint();
@@ -173,7 +172,7 @@ public class NetVisualizerPanel extends javax.swing.JPanel {
 		Scenario sc = ScenarioUtils.createScenario(config);
 		try {
 			new MatsimNetworkReader(sc.getNetwork()).readFile(path);
-			board.setNetwork((NetworkImpl)sc.getNetwork());
+			board.setNetwork((Network)sc.getNetwork());
 			board.repaint();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -188,7 +187,7 @@ public class NetVisualizerPanel extends javax.swing.JPanel {
 		board.clearCounts();
 		CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(board.counts);
 		try {
-			countsReader.parse(path);            
+			countsReader.readFile(path);            
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -270,7 +269,7 @@ public class NetVisualizerPanel extends javax.swing.JPanel {
 		}
 		//at this point we already have a matsim network...
 		new NetworkCleaner().run(net); //but may be there are isolated (not connected) links. The network cleaner removes those links
-		board.setNetwork((NetworkImpl)net);
+		board.setNetwork((Network)net);
 		board.repaint();
 		return true;
 	}

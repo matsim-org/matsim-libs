@@ -22,14 +22,14 @@ package playground.dgrether.satellic;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.dgrether.DgPaths;
@@ -52,7 +52,7 @@ public class DgSatellicPopulationPostprocessing {
     sc.getConfig().network().setInputFile(NETWORK);
     sc.getConfig().plans().setInputFile(POPIN);
     ScenarioUtils.loadScenario(sc);
-    NetworkImpl network = (NetworkImpl) sc.getNetwork();
+    Network network = (Network) sc.getNetwork();
     Population pop = sc.getPopulation();
     Random random = MatsimRandom.getLocalInstance();
     //do the routing

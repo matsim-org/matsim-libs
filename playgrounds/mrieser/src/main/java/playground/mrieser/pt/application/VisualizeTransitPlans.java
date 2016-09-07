@@ -26,6 +26,7 @@ import java.util.List;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -44,11 +45,10 @@ import org.matsim.core.config.groups.ExternalMobimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -85,7 +85,7 @@ public class VisualizeTransitPlans {
 			new MatsimNetworkReader(this.realScenario.getNetwork()).readFile(NETWORK_FILE);
 		}
 		new TransitScheduleReader(this.realScenario).readFile(TRANSIT_SCHEDULE_FILE);
-		new MatsimPopulationReader(this.realScenario).readFile(POPULATION_FILE);
+		new PopulationReader(this.realScenario).readFile(POPULATION_FILE);
 //		this.realScenario.getPopulation().printPlansCount();
 	}
 
@@ -100,9 +100,9 @@ public class VisualizeTransitPlans {
 			for (Plan plan : person.getPlans()) {
 				Plan visPlan = pb.createPlan();
 				for (PlanElement pe : plan.getPlanElements()) {
-					if (pe instanceof ActivityImpl) {
-						ActivityImpl act = (ActivityImpl) pe;
-						ActivityImpl visAct = (ActivityImpl) pb.createActivityFromCoord(act.getType(), act.getCoord());
+					if (pe instanceof Activity) {
+						Activity act = (Activity) pe;
+						Activity visAct = (Activity) pb.createActivityFromCoord(act.getType(), act.getCoord());
 						visAct.setStartTime(act.getStartTime());
 						visAct.setMaximumDuration((act).getMaximumDuration());
 						visAct.setEndTime(act.getEndTime());

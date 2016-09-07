@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.HashMap;
@@ -48,12 +48,12 @@ public class NetworksComparator {
 
 		Config c0 = ConfigUtils.createConfig();
 		Scenario sc0 = ScenarioUtils.createScenario(c0);
-		new MatsimNetworkReader(sc0.getNetwork()).parse(net0);
+		new MatsimNetworkReader(sc0.getNetwork()).readFile(net0);
 		Network n0 = sc0.getNetwork();
 
 		Config c1 = ConfigUtils.createConfig();
 		Scenario sc1 = ScenarioUtils.createScenario(c1);
-		new MatsimNetworkReader(sc1.getNetwork()).parse(net1);
+		new MatsimNetworkReader(sc1.getNetwork()).readFile(net1);
 		Network n1 = sc1.getNetwork();
 
 		if (n0.getCapacityPeriod() != n1.getCapacityPeriod()) {
@@ -73,7 +73,7 @@ public class NetworksComparator {
 		}
 
 		for (Node n0n : n0.getNodes().values()) {
-			Node n1n = ((NetworkImpl) n1).getNearestNode(n0n.getCoord());
+			Node n1n = NetworkUtils.getNearestNode(((Network) n1),n0n.getCoord());
 			if (!aquivalentNodes(n0n, n1n)) {
 				log.warn("Nodes do not match. Their might be two or more nodes at the same coordinate! Performing a linear search.");
 				boolean found = false;

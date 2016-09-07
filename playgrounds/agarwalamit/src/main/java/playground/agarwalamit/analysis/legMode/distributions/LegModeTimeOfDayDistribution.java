@@ -34,7 +34,8 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
@@ -123,7 +124,7 @@ public class LegModeTimeOfDayDistribution extends AbstractAnalysisModule{
 
 	public class LegModeTimeOfDayHandler implements PersonDepartureEventHandler {
 		private final double timeBinSize;
-		private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
+		private final MunichPersonFilter pf = new MunichPersonFilter();
 		private final SortedMap<Double, SortedMap<String, Integer>> timeBin2Mode2Count = new TreeMap<Double, SortedMap<String,Integer>>();
 		private final UserGroup ug;
 		private final List<String> modes = new ArrayList<String>();
@@ -145,7 +146,7 @@ public class LegModeTimeOfDayDistribution extends AbstractAnalysisModule{
 
 		@Override
 		public void handleEvent(PersonDepartureEvent event) {
-			UserGroup thisUserGroup = this.pf.getUserGroupFromPersonId(event.getPersonId());
+			MunichUserGroup thisUserGroup = this.pf.getMunichUserGroupFromPersonId(event.getPersonId());
 			if(this.ug != null && !this.ug.equals(thisUserGroup)) return;
 
 			Double time = event.getTime();

@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.common.collections.ChoiceSet;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
@@ -36,11 +37,9 @@ import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -261,7 +260,7 @@ public class ODBruteForceCalibrator {
 		Plan plan = fromOD.getPlans().get(planIdx);
 		int legIdx = fromOD.getLegIndices().get(planIdx);
 		int actIdx = legIdx + 1;
-		ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(actIdx);
+		Activity act = (Activity) plan.getPlanElements().get(actIdx);
 
 		if (!act.getType().equalsIgnoreCase(ActivityTypes.HOME)) {
 			List<ActivityFacility> zoneFacilities = facilities2Zones.get(toOD.getToId()).get(act.getType());
@@ -431,11 +430,11 @@ public class ODBruteForceCalibrator {
 		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader(scenario);
 		facReader.readFile("/home/johannes/gsv/ger/data/facilities.xml.gz");
 
-		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
+		PopulationReader popReader = new PopulationReader(scenario);
 		popReader.readFile("/home/johannes/gsv/ger/data/plans.xml.gz");
 
 		logger.info("Connecting facilities to links...");
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
 			Coord coord = facility.getCoord();
 			Link link = NetworkUtils.getNearestLink(network, coord);
@@ -452,7 +451,7 @@ public class ODBruteForceCalibrator {
 
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse("/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml");
+		reader.readFile("/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml");
 		NumericMatrix refMatrix = reader.getMatrix();
 		MatrixOperations.applyFactor(refMatrix, 1 / 16.0);
 		MatrixOperations.applyFactor(refMatrix, 1 / (4 * 11.8));

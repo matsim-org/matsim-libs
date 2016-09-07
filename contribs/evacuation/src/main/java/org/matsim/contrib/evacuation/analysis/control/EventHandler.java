@@ -105,7 +105,7 @@ Runnable, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	public EventHandler(boolean useCellCount, String eventFilename, Scenario sc, double cellSize, Thread readerThread) {
 		this.useCellCount = useCellCount;
 		
-		this.sampleSize = Double.valueOf(sc.getConfig().getModule("evacuation").getValue("sampleSize"));
+		this.sampleSize = sc.getConfig().qsim().getFlowCapFactor();
 		
 		if (useCellCount)
 			this.cellCount = (int)cellSize;

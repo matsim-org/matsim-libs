@@ -5,19 +5,19 @@ import java.util.TreeSet;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 
-public class AAMLegScoringFunction extends org.matsim.core.scoring.functions.CharyparNagelLegScoring {
+public class AAMLegScoringFunction extends org.matsim.deprecated.scoring.functions.CharyparNagelLegScoring {
 
-	private PlanImpl plan;
+	private Plan plan;
 	
 	private Config config;
 	
-	public AAMLegScoringFunction(PlanImpl plan, CharyparNagelScoringParameters params, Config config,  Network network)
+	public AAMLegScoringFunction(Plan plan, CharyparNagelScoringParameters params, Config config,  Network network)
 	{
 		super(params, network);
 		this.plan = plan;		

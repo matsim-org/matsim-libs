@@ -11,17 +11,15 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -127,15 +125,16 @@ public class Converter {
 			endTime = convertTime(tabs[3]);
 			double dur = endTime - this.tmpEndTime;
 
-			LegImpl leg = ((PlanImpl) pl).createAndAddLeg(TransportMode.car);
+			Leg leg = PopulationUtils.createAndAddLeg( ((Plan) pl), (String) TransportMode.car );
 			leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 
 			Coord tmpCoord = getRandomCoordInZone(tabs[9]);
 			if (tabs[7].equals("H")) {
 				tmpCoord = this.tmpHome;
 			}
+			final Coord coord = tmpCoord;
 
-			ActivityImpl act = ((PlanImpl) pl).createAndAddActivity(tabs[7], tmpCoord);
+			Activity act = PopulationUtils.createAndAddActivityFromCoord(((Plan) pl), (String) tabs[7], coord);
 			act.setEndTime(convertTime(tabs[3]));
 			act.setMaximumDuration(dur);
 
@@ -148,7 +147,7 @@ public class Converter {
 				Person p = this.pop.getPersons().get(Id.create(this.tmpPersonId, Person.class));
 				Plan tmpPl = p.getSelectedPlan();
 
-				LegImpl leg = ((PlanImpl) tmpPl).createAndAddLeg(TransportMode.car);
+				Leg leg = PopulationUtils.createAndAddLeg( ((Plan) tmpPl), (String) TransportMode.car );
 				leg.setDepartureTime(convertTime(this.tmpTabs[3]));
 				// ZoneXY lastZoneXY = zoneXYs.get(tmpTabs[12]);
 
@@ -156,11 +155,12 @@ public class Converter {
 				if (this.tmpTabs[10].equals("H")) {
 					tmpCoord2 = this.tmpHome;
 				}
-				ActivityImpl lastAct = ((PlanImpl) tmpPl).createAndAddActivity(this.tmpTabs[10], tmpCoord2);
+				final Coord coord = tmpCoord2;
+				Activity lastAct = PopulationUtils.createAndAddActivityFromCoord(((Plan) tmpPl), (String) this.tmpTabs[10], coord);
 
 				// make a copy of the just finished plan and set it to use public transit mode
-				PlanImpl nonCarPlan = new org.matsim.core.population.PlanImpl(p);
-				nonCarPlan.copyFrom(tmpPl);
+				Plan nonCarPlan = PopulationUtils.createPlan(p);
+				PopulationUtils.copyFromTo(tmpPl, nonCarPlan);
 				for (PlanElement pe : nonCarPlan.getPlanElements()) {
 					if (pe instanceof Leg) {
 						((Leg) pe).setMode(TransportMode.pt);
@@ -169,13 +169,14 @@ public class Converter {
 				p.addPlan(nonCarPlan);
 			}
 
-			Person p = PopulationUtils.createPerson(Id.create(personId, Person.class));
-			PlanImpl pl = new org.matsim.core.population.PlanImpl(p);
+			Person p = PopulationUtils.getFactory().createPerson(Id.create(personId, Person.class));
+			Plan pl = PopulationUtils.createPlan(p);
 			// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
 			endTime = convertTime(tabs[3]);
 
 			this.tmpHome = getRandomCoordInZone(tabs[9]);
-			ActivityImpl homeAct = pl.createAndAddActivity(tabs[7], this.tmpHome);
+			final Coord coord = this.tmpHome;
+			Activity homeAct = PopulationUtils.createAndAddActivityFromCoord(pl, (String) tabs[7], coord);
 			homeAct.setEndTime(convertTime(tabs[3]));
 			p.addPlan(pl);
 			this.pop.addPerson(p);
@@ -252,7 +253,7 @@ public class Converter {
 		c.setPop(((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation());
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(oldPlansFilename);
-			PopulationWriter writer = new PopulationWriter(c.pop, null);
+			StreamingPopulationWriter writer = new StreamingPopulationWriter(c.pop, null);
 			writer.writeStartPlans(newPlansFilename);
 			String line = reader.readLine();
 			do {

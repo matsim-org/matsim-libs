@@ -20,6 +20,9 @@
 
 package org.matsim.core.router.util;
 
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.priorityqueue.HasIndex;
 
@@ -35,5 +38,23 @@ public class ArrayRoutingNetworkNode extends AbstractRoutingNetworkNode implemen
 	@Override
 	public int getArrayIndex() {
 		return this.arrayIndex;
+	}
+
+	@Override
+	public Link removeInLink(Id<Link> linkId) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Link removeOutLink(Id<Link> outLinkId) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public void setCoord(Coord coord) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 }

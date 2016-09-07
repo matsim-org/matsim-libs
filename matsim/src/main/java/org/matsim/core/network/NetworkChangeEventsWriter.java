@@ -39,7 +39,7 @@ import java.util.Collection;
  * @author illenberger
  *
  */
-public class NetworkChangeEventsWriter extends MatsimXmlWriter implements MatsimSomeWriter {
+public final class NetworkChangeEventsWriter extends MatsimXmlWriter implements MatsimSomeWriter {
 	// yy uses syntax 
 	//   write( filename, container ) 
 	// rather than the matsim standard
@@ -180,7 +180,7 @@ public class NetworkChangeEventsWriter extends MatsimXmlWriter implements Matsim
 		this.writer.write(NetworkChangeEventsParser.CHANGE_TYPE_TAG);
 		this.writer.write(EQUALS);
 		this.writer.write(QUOTE);
-		if(value.getType() == ChangeType.ABSOLUTE) {
+		if(value.getType() == ChangeType.ABSOLUTE_IN_SI_UNITS) {
 			this.writer.write(NetworkChangeEventsParser.ABSOLUTE_VALUE);
 		} else if(value.getType() == ChangeType.FACTOR) {
 			this.writer.write(NetworkChangeEventsParser.FACTOR_VALUE);

@@ -68,18 +68,19 @@ public final class TtCreateBraessSignals {
 			.getLogger(TtCreateBraessSignals.class);
 	
 	public enum SignalControlType{
-		NONE, ALL_GREEN, ONE_SECOND_Z, ONE_SECOND_SO, GREEN_WAVE_Z, GREEN_WAVE_SO, SIGNAL4_ONE_SECOND_Z, SIGNAL4_ONE_SECOND_SO, SIGNAL4_SYLVIA_V2Z, SIGNAL4_SYLVIA_Z2V
+		NONE, ALL_GREEN, ONE_SECOND_Z, ONE_SECOND_SO, GREEN_WAVE_Z, GREEN_WAVE_SO, SIGNAL4_X_SECOND_Z, SIGNAL4_SYLVIA_V2Z, SIGNAL4_SYLVIA_Z2V, SIGNAL4_RESPONSIVE
 	}
 	
 	private static final int CYCLE_TIME = 60;
 	private static final int INTERGREEN_TIME = 0;
-
+	
 	private Scenario scenario;
 	
 	private boolean middleLinkExists = true;
 	private LaneType laneType;
 	private SignalControlType signalType;
-	
+	private int secondsZGreen;
+
 	// travel time for the middle link
 	private int linkTTMid;
 	// travel time for the middle route links
@@ -145,13 +146,15 @@ public final class TtCreateBraessSignals {
 	 */
 	private void createSignalSystems() {
 
-		if (signalType.equals(SignalControlType.SIGNAL4_ONE_SECOND_SO) || 
-				signalType.equals(SignalControlType.SIGNAL4_ONE_SECOND_Z) || 
-				signalType.equals(SignalControlType.SIGNAL4_SYLVIA_V2Z) ||
-				signalType.equals(SignalControlType.SIGNAL4_SYLVIA_Z2V)) {
+		switch (signalType){
+		case SIGNAL4_X_SECOND_Z:
+		case SIGNAL4_SYLVIA_V2Z:
+		case SIGNAL4_SYLVIA_Z2V:
+		case SIGNAL4_RESPONSIVE:
 			// create only one signal system at node 4
 			createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(4)));
-		} else {
+			break;
+		default:
 			// create signal systems at nodes 2, 3, 4 and 5
 			for (Node node : this.scenario.getNetwork().getNodes().values()) {
 				switch (node.getId().toString()) {
@@ -230,7 +233,7 @@ public final class TtCreateBraessSignals {
 		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
 		SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
 		SignalControlData signalControl = signalsData.getSignalControlData();
-		SignalControlDataFactory fac = new SignalControlDataFactoryImpl();
+		SignalControlDataFactory fac = signalControl.getFactory();
 		
 		// create a temporary, empty signal control object needed in case sylvia is used
 		SignalControlData tmpSignalControl = new SignalControlDataImpl();		
@@ -272,11 +275,9 @@ public final class TtCreateBraessSignals {
 					signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(
 							fac, signalGroup.getId(), 0, CYCLE_TIME));
 					break;
-				case SIGNAL4_ONE_SECOND_SO:
-					createSignal4SettingFirstZ(fac, signalPlan, signalGroup.getId(), 59);
-					break;
-				case SIGNAL4_ONE_SECOND_Z:
-					createSignal4SettingFirstZ(fac, signalPlan, signalGroup.getId(), 1);
+				case SIGNAL4_X_SECOND_Z:
+				case SIGNAL4_RESPONSIVE:
+					createSignal4SettingFirstZ(fac, signalPlan, signalGroup.getId(), secondsZGreen);
 					break;
 				case SIGNAL4_SYLVIA_V2Z:
 					// create a basis signal plan
@@ -342,7 +343,7 @@ public final class TtCreateBraessSignals {
 			signalSystemOffset = linkTTSmall;
 			break;
 		case "signal23_3.2":
-		case "signal2_32": // signals for going straight on (upper route) at node 3
+		case "signal2_3.2": // signals for going straight on (upper route) at node 3
 			onset = 30;
 			dropping = 60 - INTERGREEN_TIME;
 			signalSystemOffset = linkTTSmall;
@@ -400,7 +401,7 @@ public final class TtCreateBraessSignals {
 			signalSystemOffset = linkTTSmall;
 			break;
 		case "signal23_3.2":
-		case "signal2_32": // signals for going straight on (upper route) at node 3
+		case "signal2_3.2": // signals for going straight on (upper route) at node 3
 			onset = 0;
 			dropping = 30 - INTERGREEN_TIME;
 			signalSystemOffset = linkTTSmall;
@@ -568,6 +569,10 @@ public final class TtCreateBraessSignals {
 
 	public void setSignalType(SignalControlType signalType) {
 		this.signalType = signalType;
+	}
+	
+	public void setSecondsZGreen(int secondsZGreen){
+		this.secondsZGreen = secondsZGreen;
 	}
 
 	public void writeSignalFiles(String directory) {

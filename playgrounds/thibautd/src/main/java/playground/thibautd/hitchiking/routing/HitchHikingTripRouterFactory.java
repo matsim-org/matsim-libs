@@ -20,9 +20,9 @@
 package playground.thibautd.hitchiking.routing;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.TripRouter;
 import playground.thibautd.hitchiking.HitchHikingConfigGroup;
 import playground.thibautd.hitchiking.HitchHikingConstants;
@@ -61,7 +61,7 @@ public class HitchHikingTripRouterFactory /* extends DefaultTripRouterFactoryImp
 				new HitchHikingPassengerRoutingModule(
 					instance.getRoutingModule( TransportMode.pt ),
 					spots,
-					((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getRouteFactory(),
+					((PopulationFactory) controler.getScenario().getPopulation().getFactory()).getRouteFactories(),
 					spotWeighter,
 					config,
 					// XXX here or higher level?

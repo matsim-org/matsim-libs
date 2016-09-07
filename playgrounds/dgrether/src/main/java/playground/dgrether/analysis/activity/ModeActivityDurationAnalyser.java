@@ -21,16 +21,16 @@ package playground.dgrether.analysis.activity;
 import java.io.File;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -74,7 +74,7 @@ public class ModeActivityDurationAnalyser {
 		reader.readFile(NETWORK);
 
 		Population plans = scenario.getPopulation();
-		MatsimPopulationReader plansParser = new MatsimPopulationReader(scenario);
+		PopulationReader plansParser = new PopulationReader(scenario);
 		plansParser.readFile(PLANSFILE);
 
 		double homeActivityDurationsCar = 0.0;
@@ -90,26 +90,26 @@ public class ModeActivityDurationAnalyser {
 		for (Person pers : plans.getPersons().values()){
 			Plan p = pers.getSelectedPlan();
 			for (PlanElement pe : p.getPlanElements()) {
-				if (pe instanceof ActivityImpl) {
-					ActivityImpl act = (ActivityImpl) pe;
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
 					try {
 						durTemp = DeprecatedStaticMethods.calculateSomeDuration(act);
 						if (act.getType().equalsIgnoreCase("h")) {
-							if (((PlanImpl) p).getType().equals(TransportMode.car)) {
+							if (((Plan) p).getType().equals(TransportMode.car)) {
 								homeActivityDurationsCar += durTemp;
 								homeActivityCarCount++;
 							}
-							else if (((PlanImpl) p).getType().equals(TransportMode.pt)){
+							else if (((Plan) p).getType().equals(TransportMode.pt)){
 								homeActivityDurationsNonCar += durTemp;
 								homeActivityNonCarCount++;
 							}
 						}
 						else if (act.getType().equalsIgnoreCase("w")) {
-							if (((PlanImpl) p).getType().equals(TransportMode.car)) {
+							if (((Plan) p).getType().equals(TransportMode.car)) {
 								workActivityDurationsCar += durTemp;
 								workActivityCarCount++;
 							}
-							else if (((PlanImpl) p).getType().equals(TransportMode.pt)){
+							else if (((Plan) p).getType().equals(TransportMode.pt)){
 								workActivityDurationsNonCar += durTemp;
 								workActivityNonCarCount++;
 							}

@@ -29,12 +29,12 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.mobsim.qsim.agents.ActivityDurationUtils;
-import org.matsim.core.population.ActivityImpl;
 
 /**
  * The micro-simulation internal handler for ending a leg.
@@ -71,7 +71,7 @@ public class EndLegMessage extends EventMessage {
 		if ((actsLegs.size() > this.vehicle.getLegIndex())) {
 			this.vehicle.setCurrentLeg((Leg) actsLegs.get(this.vehicle.getLegIndex()));
 			// current act
-			ActivityImpl currentAct = (ActivityImpl) actsLegs.get(this.vehicle.getLegIndex() - 1);
+			Activity currentAct = (Activity) actsLegs.get(this.vehicle.getLegIndex() - 1);
 			// the leg the agent performs
 
 			double departureTime = ActivityDurationUtils.calculateDepartureTime(currentAct, getMessageArrivalTime(), activityDurationInterpretation) ;

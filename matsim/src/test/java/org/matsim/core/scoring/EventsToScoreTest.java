@@ -24,12 +24,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -47,7 +47,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 	public void testAddMoney() {
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         Population population = scenario.getPopulation();
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
 		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
 		EventsManager events = EventsUtils.createEventsManager();
@@ -70,9 +70,9 @@ public class EventsToScoreTest extends MatsimTestCase {
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
         Population population = scenario.getPopulation();
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
-		PlanImpl plan = new PlanImpl() ;
+		Plan plan = PopulationUtils.createPlan() ;
 		person.addPlan(plan);
 		
 		ScoringFunctionFactory sfFactory = new CharyparNagelScoringFunctionFactory( scenario );

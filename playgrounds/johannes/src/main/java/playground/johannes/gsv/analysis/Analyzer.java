@@ -3,19 +3,19 @@ package playground.johannes.gsv.analysis;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.*;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
@@ -35,7 +35,7 @@ public class Analyzer {
 
 	public static void main(String[] args) throws IOException {
 		Config config = ConfigUtils.createConfig();
-		new ConfigReader(config).parse(args[0]);
+		new ConfigReader(config).readFile(args[0]);
 		
 		String eventsFile = args[1];
 		String outputDir = args[2];
@@ -50,7 +50,7 @@ public class Analyzer {
 		TransitScheduleReader schedReader = new TransitScheduleReader(scenario);
 		schedReader.readFile(config.getParam("transit", "transitScheduleFile"));
 		
-		PopulationReader popReader = new MatsimPopulationReader(scenario);
+		MatsimReader popReader = new PopulationReader(scenario);
 		popReader.readFile(config.getParam("plans", "inputPlansFile"));
 		
 		EventsManager events = new EventsManagerImpl();
@@ -97,7 +97,7 @@ public class Analyzer {
 					ActivityFacilityImpl fac = ((ActivityFacilitiesImpl)facilities).createAndAddFacility(id, act.getCoord());
 					fac.createAndAddActivityOption(act.getType());
 					
-					((ActivityImpl)act).setFacilityId(id);
+					((Activity)act).setFacilityId(id);
 				}
 
 			}

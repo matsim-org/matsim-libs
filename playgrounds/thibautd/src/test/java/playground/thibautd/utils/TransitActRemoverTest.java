@@ -26,7 +26,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -38,56 +39,56 @@ import java.util.List;
  * @author thibautd
  */
 public class TransitActRemoverTest {
-	private PlanImpl plan;
+	private Plan plan;
 	private double transitTravelTime;
 
 	@Before
 	public void createPlanWithTransit() {
-		plan = new PlanImpl();
+		plan = PopulationUtils.createPlan();
 
 		double now = 0;
 		transitTravelTime = 0;
 
-		Activity act = plan.createAndAddActivity( "h" );
+		Activity act = PopulationUtils.createAndAddActivity(plan, (String) "h");
 		now += 234;
 		act.setEndTime( now );
 
-		Leg leg = plan.createAndAddLeg( TransportMode.walk );
+		Leg leg = PopulationUtils.createAndAddLeg( plan, (String) TransportMode.walk );
 		leg.setDepartureTime( now );
 		double tt = 945;
 		leg.setTravelTime( tt );
 		transitTravelTime += tt;
 		now += tt;
 
-		act = plan.createAndAddActivity( PtConstants.TRANSIT_ACTIVITY_TYPE );
+		act = PopulationUtils.createAndAddActivity(plan, (String) PtConstants.TRANSIT_ACTIVITY_TYPE);
 		act.setStartTime( now );
 		tt = 2435;
 		now += tt;
 		transitTravelTime += tt;
 		act.setEndTime( now );
 
-		leg = plan.createAndAddLeg( TransportMode.pt );
+		leg = PopulationUtils.createAndAddLeg( plan, (String) TransportMode.pt );
 		leg.setDepartureTime( now );
 		tt = 503;
 		leg.setTravelTime( tt );
 		transitTravelTime += tt;
 		now += tt;
 
-		act = plan.createAndAddActivity( PtConstants.TRANSIT_ACTIVITY_TYPE );
+		act = PopulationUtils.createAndAddActivity(plan, (String) PtConstants.TRANSIT_ACTIVITY_TYPE);
 		act.setStartTime( now );
 		tt = 235;
 		now += tt;
 		transitTravelTime += tt;
 		act.setEndTime( now );
 
-		leg = plan.createAndAddLeg( TransportMode.walk );
+		leg = PopulationUtils.createAndAddLeg( plan, (String) TransportMode.walk );
 		leg.setDepartureTime( now );
 		tt = 4509;
 		leg.setTravelTime( tt );
 		transitTravelTime += tt;
 		now += tt;
 
-		act = plan.createAndAddActivity( "h" );
+		act = PopulationUtils.createAndAddActivity(plan, (String) "h");
 		act.setStartTime( now );
 	}
 

@@ -1,6 +1,7 @@
 package playground.ivt.maxess.tripbased;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
@@ -21,7 +22,7 @@ public class RunPrismicTripChoiceSetConversionTest {
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
+	@Test @Ignore( "see MATSIM-558" )
 	public void runTest() {
 		final PrismicConversionConfigGroup group = new PrismicConversionConfigGroup();
 		final Config config =

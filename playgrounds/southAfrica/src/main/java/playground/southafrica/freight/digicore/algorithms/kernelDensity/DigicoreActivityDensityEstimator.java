@@ -157,7 +157,7 @@ public class DigicoreActivityDensityEstimator {
 		for(File file : files){
 			DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
 			try {
-				dvr.parse(file.getAbsolutePath());
+				dvr.readFile(file.getAbsolutePath());
 				DigicoreVehicle vehicle = dvr.getVehicle(); 
 				Callable<String> job = new DigicoreActivityDensityCallable(area, vehicle, counter, stride, radius, kdeType, color, this.outputFolder.getAbsolutePath());
 				Future<String> submit = threadExecutor.submit(job);

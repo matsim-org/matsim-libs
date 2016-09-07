@@ -74,8 +74,8 @@ public class GTFSRoute {
 
 	/**
 	 * Puts a new trip
-	 * @param key
-	 * @param trip
+	 * @param key id
+	 * @param trip trip
 	 */
 	public void putTrip(String key, Trip trip) {
 		trips.put(key, trip);

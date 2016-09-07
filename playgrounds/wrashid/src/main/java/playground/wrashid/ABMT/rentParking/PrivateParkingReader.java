@@ -5,12 +5,12 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationReaderMatsimV5;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
@@ -31,7 +31,7 @@ public class PrivateParkingReader {
 		
 		
 		
-		PopulationReaderMatsimV5 pReader=new PopulationReaderMatsimV5(scenario);
+		PopulationReader pReader=new PopulationReader(scenario);
 		
 		pReader.readFile("c:/data/abmt/input/plans_1perc.xml");
 		
@@ -46,8 +46,8 @@ public class PrivateParkingReader {
 		for (Person person:scenario.getPopulation().getPersons().values()){
 			
 			for (PlanElement pe:person.getSelectedPlan().getPlanElements()){
-				if (pe instanceof ActivityImpl){
-					ActivityImpl act=(ActivityImpl) pe;
+				if (pe instanceof Activity){
+					Activity act=(Activity) pe;
 					
 					System.out.println(act.getType());
 					System.out.println(act.getCoord());

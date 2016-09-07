@@ -23,7 +23,7 @@ import java.io.File;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.controler.SignalsModule;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
@@ -72,7 +72,7 @@ public class KNSignalSystemsExample {
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-				new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
+				new SignalsDataLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
 		// ---
 
 		// add the signals module to the simulation:

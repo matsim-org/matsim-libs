@@ -8,16 +8,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
@@ -81,10 +81,11 @@ public class FilterPersonActs extends NewPopulation {
 						this.actSXF.put(act.getType(), new Integer(this.actSXF.get(act.getType()).intValue() + 1 ));
 					}
 					if(this.kmlOutputEnabled){
-						this.kmlWriter.addActivity(new ActivityImpl(act));
+						this.kmlWriter.addActivity(PopulationUtils.createActivity(act));
 					}
-					act.getCoord().setXY(this.coordBBI.getX(), this.coordBBI.getY());
-					((PersonImpl) person).setId(Id.create(person.getId().toString() + "_SXF-BBI", Person.class));
+//					act.getCoord().setXY(this.coordBBI.getX(), this.coordBBI.getY());
+					act.setCoord( new Coord(this.coordBBI.getX(), this.coordBBI.getY()));
+					PopulationUtils.changePersonId( ((Person) person), Id.create(person.getId().toString() + "_SXF-BBI", Person.class) ) ;
 				}
 
 				if(checkIsTXL(act)){
@@ -94,10 +95,11 @@ public class FilterPersonActs extends NewPopulation {
 						this.actTXL.put(act.getType(), new Integer(this.actTXL.get(act.getType()).intValue() + 1 ));
 					}
 					if(this.kmlOutputEnabled){
-						this.kmlWriter.addActivity(new ActivityImpl(act));
+						this.kmlWriter.addActivity(PopulationUtils.createActivity(act));
 					}
-					act.getCoord().setXY(this.coordBBI.getX(), this.coordBBI.getY());
-					((PersonImpl) person).setId(Id.create(person.getId().toString() + "_TXL-BBI", Person.class));
+//					act.getCoord().setXY(this.coordBBI.getX(), this.coordBBI.getY());
+					act.setCoord(new Coord(this.coordBBI.getX(), this.coordBBI.getY()));
+					PopulationUtils.changePersonId( ((Person) person), Id.create(person.getId().toString() + "_TXL-BBI", Person.class) ) ;
 				}
 			}
 		}
@@ -147,7 +149,7 @@ public class FilterPersonActs extends NewPopulation {
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();
-		PopulationReader popReader = new MatsimPopulationReader(sc);
+		MatsimReader popReader = new PopulationReader(sc);
 		popReader.readFile(inPlansFile);
 
 		FilterPersonActs dp = new FilterPersonActs(net, inPop, outPlansFile, minSXF, maxSXF, minTXL, maxTXL, coordBBI);

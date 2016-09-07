@@ -159,7 +159,7 @@ public class InductiveStreetCharger implements PersonDepartureEventHandler, Link
 		}
 
 		if (energyToChargeInJoules > 0) {
-			vehicleWithBattery.chargeVehicle(energyToChargeInJoules);
+			vehicleWithBattery.addEnergyToVehicleBattery(energyToChargeInJoules);
 
 			if (loggingEnabled) {
 				ChargingLogRowLinkLevel chargingLogRow = new ChargingLogRowLinkLevel(vehicleId, linkId, linkEnterTime, energyToChargeInJoules

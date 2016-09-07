@@ -7,16 +7,17 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -65,7 +66,7 @@ public class PTTravelTimes {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		TransitRouterNetwork routerNetwork = new TransitRouterNetwork();
-	    new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("./transitRouterNetwork_thinned.xml.gz");
+	    new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).readFile("./transitRouterNetwork_thinned.xml.gz");
 
 	//new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/transitRouterNetwork_thinned.xml.gz");
 		//config.planCalcScore().setUtilityOfLineSwitch(0.0);
@@ -117,8 +118,8 @@ public class PTTravelTimes {
 				i++;
 				//PersonImpl person = new PersonImpl(new IdImpl(arr[0]));
 			//	i++;
-				PlanImpl plan = (PlanImpl) scenario.getPopulation().getFactory().createPlan();
-				ActivityImpl act = new ActivityImpl("home", lStart.getId());
+				Plan plan = (Plan) scenario.getPopulation().getFactory().createPlan();
+				Activity act = PopulationUtils.createActivityFromLinkId("home", lStart.getId());
 				act.setCoord(coordStart);
 				//String[] arr2 = arr[6].split(":");
 				//double h = Double.parseDouble(arr2[0]);
@@ -126,7 +127,7 @@ public class PTTravelTimes {
 				act.setEndTime(m * 60);
 				plan.addActivity(act);
 				
-				LegImpl leg = new LegImpl("pt");
+				Leg leg = PopulationUtils.createLeg("pt");
 				
 				TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("100", TwoWayCSFacility.class), coordStart, lStart.getId());
 						
@@ -210,13 +211,13 @@ public class PTTravelTimes {
 				
 				outLink.write(Double.toString(distance));
 				outLink.newLine();
-				act = new ActivityImpl("leisure", lEnd.getId());
+				act = PopulationUtils.createActivityFromLinkId("leisure", lEnd.getId());
 				act.setCoord(coordEnd);
 				act.setEndTime(48800);
 				plan.addActivity(act);
-				leg = new LegImpl("pt");
+				leg = PopulationUtils.createLeg("pt");
 				plan.addLeg(leg);
-				act = new ActivityImpl("home", lStart.getId());
+				act = PopulationUtils.createActivityFromLinkId("home", lStart.getId());
 				act.setCoord(coordStart);
 				plan.addActivity(act);
 				person.addPlan(plan);
@@ -236,7 +237,7 @@ public class PTTravelTimes {
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()
 //				((ScenarioImpl) scenario).getKnowledges()).writeFileV4("/data/matsim/cdobler/2030/60.plans_with_pt_routes.xml.gz");
 		//		((ScenarioImpl) scenario).getKnowledges()).writeFileV4("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/plans_with_pt_routes_single_plan_"+args[0]+".xml.gz");
-        ).writeFileV4("./plans_pt_trips_"+args[0]+".xml.gz");
+        ).writeV4("./plans_pt_trips_"+args[0]+".xml.gz");
 
 	}
 		

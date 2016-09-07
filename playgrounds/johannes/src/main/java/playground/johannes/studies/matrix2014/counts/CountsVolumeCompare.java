@@ -48,11 +48,11 @@ public class CountsVolumeCompare {
 
 		Counts<Link> refCounts = new Counts();
 		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(refCounts);
-		reader.parse(refFile);
+		reader.readFile(refFile);
 		
 		Counts<Link> targetCounts = new Counts();
 		reader = new CountsReaderMatsimV1(targetCounts);
-		reader.parse(targetFile);
+		reader.readFile(targetFile);
 
 		TDoubleArrayList errors = new TDoubleArrayList();
 		TDoubleArrayList absErrors = new TDoubleArrayList();

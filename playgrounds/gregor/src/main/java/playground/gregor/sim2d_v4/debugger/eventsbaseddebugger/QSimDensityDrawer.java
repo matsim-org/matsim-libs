@@ -41,7 +41,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.network.Network;
 
 import processing.core.PConstants;
 
@@ -81,7 +81,7 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, PersonDep
 		LinkInfo info = new LinkInfo();
 		
 		info.id = l.getId();
-		info.cap = (l.getLength()/((NetworkImpl)sc.getNetwork()).getEffectiveCellSize())*l.getNumberOfLanes();
+		info.cap = (l.getLength()/((Network)sc.getNetwork()).getEffectiveCellSize())*l.getNumberOfLanes();
 
 		double x0 = l.getFromNode().getCoord().getX();
 		double y0 = l.getFromNode().getCoord().getY();

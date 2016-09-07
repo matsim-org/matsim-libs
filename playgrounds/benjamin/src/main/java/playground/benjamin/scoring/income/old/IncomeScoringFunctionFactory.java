@@ -19,21 +19,6 @@
 
 package playground.benjamin.scoring.income.old;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.households.Income;
-import org.matsim.households.Income.IncomePeriod;
-import org.matsim.households.PersonHouseholdMapping;
-
 /**
  * @author dgrether
  *

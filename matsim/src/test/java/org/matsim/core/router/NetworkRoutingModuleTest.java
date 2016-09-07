@@ -36,13 +36,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -55,22 +52,20 @@ public class NetworkRoutingModuleTest {
 	@Test
 	public void testRouteLeg() {
 		Fixture f = new Fixture();
-		RouteFactoryImpl routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getRouteFactory();
 		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
 		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
 
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
-		Activity fromAct = new ActivityImpl("h", new Coord((double) 0, (double) 0));
-		((ActivityImpl) fromAct).setLinkId(Id.create("1", Link.class));
-		Activity toAct = new ActivityImpl("h", new Coord((double) 0, (double) 3000));
-		((ActivityImpl) toAct).setLinkId(Id.create("3", Link.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 0));
+		fromAct.setLinkId(Id.create("1", Link.class));
+		Activity toAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 3000));
+		toAct.setLinkId(Id.create("3", Link.class));
 
 		final NetworkRoutingModule routingModule = new NetworkRoutingModule(
 		            TransportMode.car,
 		            f.s.getPopulation().getFactory(),
 		            f.s.getNetwork(),
-		            routeAlgo,
-		            routeFactory);
+		            routeAlgo);
 		Facility fromFacility = new ActivityWrapperFacility( fromAct ) ;
 		Facility toFacility = new ActivityWrapperFacility( toAct ) ;
 		List<? extends PlanElement> result = routingModule.calcRoute(fromFacility, toFacility, 7.0*3600, person) ;
@@ -84,18 +79,16 @@ public class NetworkRoutingModuleTest {
 	public void testRouteLegWithDistance() {
 		Fixture f = new Fixture();
 
-		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
-		Activity fromAct = new ActivityImpl("h", new Coord((double) 0, (double) 0));
-		((ActivityImpl) fromAct).setLinkId(Id.create("1", Link.class));
-		Activity toAct = new ActivityImpl("h", new Coord((double) 0, (double) 3000));
-		((ActivityImpl) toAct).setLinkId(Id.create("3", Link.class));
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
+		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 0));
+		fromAct.setLinkId(Id.create("1", Link.class));
+		Activity toAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 3000));
+		toAct.setLinkId(Id.create("3", Link.class));
 		
-		RouteFactoryImpl routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getRouteFactory();
-
 		TravelTime timeObject = TravelTimeCalculator.create(f.s.getNetwork(), f.s.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
 
 		{
-			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, f.s.getConfig().planCalcScore() ).createTravelDisutility(timeObject);
+			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig().planCalcScore() ).createTravelDisutility(timeObject);
 
 			LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), costObject, timeObject );
 
@@ -104,8 +97,7 @@ public class NetworkRoutingModuleTest {
 							TransportMode.car,
 							f.s.getPopulation().getFactory(),
 							f.s.getNetwork(),
-							routeAlgo,
-							routeFactory) ;
+							routeAlgo);
 
 			List<? extends PlanElement> results = router.calcRoute(new ActivityWrapperFacility(fromAct), new ActivityWrapperFacility(toAct), 8.*3600, person) ;
 			Assert.assertEquals( 1, results.size() );
@@ -123,7 +115,7 @@ public class NetworkRoutingModuleTest {
 			double monetaryDistanceRateCar = -1.;
 			f.s.getConfig().planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
 
-			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, f.s.getConfig().planCalcScore() ).createTravelDisutility(timeObject);
+			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig().planCalcScore() ).createTravelDisutility(timeObject);
 
 			LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), costObject, timeObject );
 
@@ -132,8 +124,7 @@ public class NetworkRoutingModuleTest {
 							TransportMode.car,
 							f.s.getPopulation().getFactory(),
 							f.s.getNetwork(),
-							routeAlgo,
-							routeFactory) ;
+							routeAlgo);
 
 			List<? extends PlanElement> result = router.calcRoute(new ActivityWrapperFacility(fromAct), new ActivityWrapperFacility(toAct), 7.*3600, person ) ;
 			
@@ -154,10 +145,10 @@ public class NetworkRoutingModuleTest {
 		public Fixture() {
 			Network net = this.s.getNetwork();
 			NetworkFactory nf = net.getFactory();
-			Node n1 = nf.createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-			Node n2 = nf.createNode(Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
-			Node n3 = nf.createNode(Id.create("3", Node.class), new Coord((double) 0, (double) 2000));
-			Node n4 = nf.createNode(Id.create("4", Node.class), new Coord((double) 0, (double) 3000));
+			Node n1 = nf.createNode(Id.create("1", Node.class), new Coord(0, 0));
+			Node n2 = nf.createNode(Id.create("2", Node.class), new Coord(0, 1000));
+			Node n3 = nf.createNode(Id.create("3", Node.class), new Coord(0, 2000));
+			Node n4 = nf.createNode(Id.create("4", Node.class), new Coord(0, 3000));
 			net.addNode(n1);
 			net.addNode(n2);
 			net.addNode(n3);

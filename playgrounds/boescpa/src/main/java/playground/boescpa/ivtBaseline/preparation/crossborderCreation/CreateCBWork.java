@@ -23,10 +23,9 @@ package playground.boescpa.ivtBaseline.preparation.crossborderCreation;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -168,27 +167,26 @@ public class CreateCBWork extends CreateSingleTripPopulation {
 
 	@Override
 	final Plan createSingleTripPlan(ActivityFacility origFacility, ActivityFacility destFacility) {
-		Plan plan = new PlanImpl();
+		Plan plan = PopulationUtils.createPlan();
 
 		double departureTime = getDepartureTime();
-		double actDuration = (8 + random.nextInt(12) + random.nextDouble())
-			* PrefsCreator.actCharacteristics.valueOf(WORK.toUpperCase()).getMinDur();
+		double actDuration = getWorkDuration();
 		double returnTime = departureTime + actDuration;
-		if (returnTime > 24.0 * 3600.0) {
+		/*if (returnTime > 24.0 * 3600.0) {
 			returnTime = 24.0 * 3600.0;
 			departureTime = returnTime - actDuration;
-		}
+		}*/
 
-		ActivityImpl actStart = new ActivityImpl(this.configGroup.getTag() + "Home", origFacility.getCoord(), origFacility.getLinkId());
+		Activity actStart = PopulationUtils.createActivityFromCoordAndLinkId(this.configGroup.getTag() + "Home", origFacility.getCoord(), origFacility.getLinkId());
 		actStart.setFacilityId(origFacility.getId());
 		actStart.setStartTime(0.0);
 		actStart.setMaximumDuration(departureTime);
 		actStart.setEndTime(departureTime);
 		plan.addActivity(actStart);
 
-		plan.addLeg(new LegImpl(mode));
+		plan.addLeg(PopulationUtils.createLeg(mode));
 
-		ActivityImpl actSA = new ActivityImpl(this.actTag, destFacility.getCoord());
+		Activity actSA = PopulationUtils.createActivityFromCoord(this.actTag, destFacility.getCoord());
 		//destFacility.getActivityOptions().get(this.actTag).setCapacity(
 		//		destFacility.getActivityOptions().get(this.actTag).getCapacity() + 1);
 		actSA.setFacilityId(destFacility.getId());
@@ -197,13 +195,26 @@ public class CreateCBWork extends CreateSingleTripPopulation {
 		actSA.setEndTime(returnTime);
 		plan.addActivity(actSA);
 
-		plan.addLeg(new LegImpl(mode));
+		plan.addLeg(PopulationUtils.createLeg(mode));
 
-		ActivityImpl actEnd = new ActivityImpl(this.configGroup.getTag() + "Home", origFacility.getCoord(), origFacility.getLinkId());
+		Activity actEnd = PopulationUtils.createActivityFromCoordAndLinkId(this.configGroup.getTag() + "Home", origFacility.getCoord(), origFacility.getLinkId());
 		actEnd.setFacilityId(origFacility.getId());
 		actEnd.setStartTime(returnTime);
 		//actEnd.setMaximumDuration(24.0 * 3600.0 - returnTime);
 		plan.addActivity(actEnd);
 		return plan;
+	}
+
+	private double getWorkDuration() {
+		double randDur = random.nextDouble();
+		// identify selected hour of day
+		int durInterval = 0;
+		while (durInterval < 48 && cummulativeDurationProbability[durInterval + 1] < randDur) {
+			durInterval++;
+		}
+		double duration = durInterval*60*30;
+		// random assignment within that hour of the day
+		duration += random.nextInt(1800);
+		return duration;
 	}
 }

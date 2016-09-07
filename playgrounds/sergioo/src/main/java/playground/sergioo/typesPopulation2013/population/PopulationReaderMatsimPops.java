@@ -27,15 +27,15 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -50,7 +50,7 @@ import org.xml.sax.Attributes;
  * @author mrieser
  * @author balmermi
  */
-public class PopulationReaderMatsimPops extends MatsimXmlParser implements PopulationReader {
+public class PopulationReaderMatsimPops extends MatsimXmlParser implements MatsimReader {
 
 	private final static String POPULATION = "population";
 	private final static String PERSON = "person";
@@ -91,13 +91,13 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 	private final Population plans;
 
 	private PersonImplPops currperson = null;
-	private PlanImpl currplan = null;
-	private ActivityImpl curract = null;
-	private LegImpl currleg = null;
+	private Plan currplan = null;
+	private Activity curract = null;
+	private Leg currleg = null;
 	private Route currRoute = null;
 	private String routeDescription = null;
 
-	private ActivityImpl prevAct = null;
+	private Activity prevAct = null;
 
 	public PopulationReaderMatsimPops(final Scenario scenario) {
 		this.scenario = scenario;
@@ -133,7 +133,7 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (PERSON.equals(name)) {
-			if (this.plans instanceof PopulationImpl) {
+			if (this.plans instanceof Population) {
 				this.plans.addPerson(this.currperson);
 			} else {
 				this.plans.addPerson(this.currperson);
@@ -150,16 +150,6 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 		} else if (ROUTE.equals(name)) {
 			this.routeDescription = content;
 		}
-	}
-
-	/**
-	 * Parses the specified plans file. This method calls {@link #parse(String)}.
-	 *
-	 * @param filename The name of the file to parse.
-	 */
-	@Override
-	public void readFile(final String filename) throws UncheckedIOException {
-		parse(filename);
 	}
 
 	private void startPopulation(final Attributes atts) {
@@ -217,14 +207,16 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 		Coord coord = null;
 		if (atts.getValue(ATTR_ACT_LINK) != null) {
 			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
-			this.curract = this.currplan.createAndAddActivity(atts.getValue(ATTR_ACT_TYPE), linkId);
+			final Id<Link> linkId1 = linkId;
+			this.curract = PopulationUtils.createAndAddActivityFromLinkId(this.currplan, (String) atts.getValue(ATTR_ACT_TYPE), linkId1);
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
 				coord = new Coord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
 				this.curract.setCoord(coord);
 			}
 		} else if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
 			coord = new Coord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
-			this.curract = this.currplan.createAndAddActivity(atts.getValue(ATTR_ACT_TYPE), coord);
+			final Coord coord1 = coord;
+			this.curract = PopulationUtils.createAndAddActivityFromCoord(this.currplan, (String) atts.getValue(ATTR_ACT_TYPE), coord1);
 		} else {
 			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");
 		}
@@ -270,10 +262,11 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 		if (VALUE_UNDEF.equals(mode)) {
 			mode = "undefined";
 		}
-		this.currleg = this.currplan.createAndAddLeg(mode.intern());
+		this.currleg = PopulationUtils.createAndAddLeg( this.currplan, (String) mode.intern() );
 		this.currleg.setDepartureTime(Time.parseTime(atts.getValue(ATTR_LEG_DEPTIME)));
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue(ATTR_LEG_TRAVTIME)));
-		this.currleg.setArrivalTime(Time.parseTime(atts.getValue(ATTR_LEG_ARRTIME)));
+		Leg r = this.currleg;
+		r.setTravelTime( Time.parseTime(atts.getValue(ATTR_LEG_ARRTIME)) - r.getDepartureTime() );
 	}
 
 	private void startRoute(final Attributes atts) {

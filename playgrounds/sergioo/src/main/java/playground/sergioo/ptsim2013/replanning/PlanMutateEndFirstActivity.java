@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * Mutates the duration of activities randomly within a specified range.

@@ -8,12 +8,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class PlansFileParser {
@@ -28,7 +29,7 @@ public class PlansFileParser {
 		final MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario.getNetwork());
 		matsimNetworkReader.readFile(args[0]);
 		final Population plans = scenario.getPopulation();
-		final PopulationReader matsimPlansReader = new MatsimPopulationReader(scenario);
+		final MatsimReader matsimPlansReader = new PopulationReader(scenario);
 		matsimPlansReader.readFile(args[1]);
 		
 		double totalTime = Double.parseDouble(args[2]);
@@ -37,13 +38,15 @@ public class PlansFileParser {
 		for(double time = 0; time < totalTime; time+=binTime)
 			travelTimeBins[(int)Math.floor(time/binTime)][0] = time;
 		for(Person person:plans.getPersons().values()) {
-			PlanImpl plan = (PlanImpl)person.getSelectedPlan();
-			for(Activity activity = plan.getFirstActivity();!activity.equals(plan.getLastActivity());) {
-				Leg leg = plan.getNextLeg(activity);
+			Plan plan = (Plan)person.getSelectedPlan();
+			for(Activity activity = PopulationUtils.getFirstActivity( plan );!activity.equals(PopulationUtils.getLastActivity(plan));) {
+				final Activity act = activity;
+				Leg leg = PopulationUtils.getNextLeg(plan, act);
 				int numBin = (int) Math.floor(leg.getDepartureTime()/binTime);
 				travelTimeBins[numBin][1]=travelTimeBins[numBin][1]+leg.getTravelTime();
 				travelTimeBins[numBin][2]++;
-				activity = plan.getNextActivity(leg);
+				final Leg leg1 = leg;
+				activity = PopulationUtils.getNextActivity(plan, leg1);
 			}
 		}
 		PrintWriter writer = new PrintWriter(new File(args[4]));

@@ -6,9 +6,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
@@ -220,8 +219,8 @@ class CreateDemand {
 	}
 	
 	private Plan adaptAndCopyPlan(Person person, Plan plan, boolean worker) {		
-		PlanImpl newPlan = new PlanImpl();
-		newPlan.copyFrom(plan);
+		Plan newPlan = PopulationUtils.createPlan();
+		PopulationUtils.copyFromTo(plan, newPlan);
 		/*
 		 * Go through plan and adapt locations and times
 		 */
@@ -231,7 +230,7 @@ class CreateDemand {
 		String firstType = "";
 		for (PlanElement pe : newPlan.getPlanElements()) {
 			if (pe instanceof Activity) {
-				ActivityImpl activity = (ActivityImpl)pe;
+				Activity activity = (Activity)pe;
 				ActivityFacility facility;
 				
 				if (activity.getType().startsWith("h")) {

@@ -25,6 +25,7 @@ package org.matsim.core.controler;
 import org.matsim.analysis.*;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.mobsim.DefaultMobsimModule;
+import org.matsim.core.population.VspPlansCleanerModule;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
@@ -32,7 +33,6 @@ import org.matsim.core.scoring.ExperiencedPlansModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.counts.CountsModule;
-import org.matsim.population.VspPlansCleanerModule;
 import org.matsim.pt.counts.PtCountsModule;
 import org.matsim.vis.snapshotwriters.SnapshotWritersModule;
 

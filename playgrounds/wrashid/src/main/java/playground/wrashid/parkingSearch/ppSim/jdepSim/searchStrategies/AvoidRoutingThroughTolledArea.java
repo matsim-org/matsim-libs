@@ -29,12 +29,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
@@ -79,7 +79,7 @@ public class AvoidRoutingThroughTolledArea extends RandomParkingSearch {
 
 			int i = 0;
 			while (i < planElements.size()) {
-				if (planElements.get(i) instanceof LegImpl && i >= 3) {
+				if (planElements.get(i) instanceof Leg && i >= 3) {
 					Activity prevAct = (Activity) planElements.get(i - 3);
 					Leg leg = (Leg) planElements.get(i);
 					if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
@@ -132,7 +132,7 @@ public class AvoidRoutingThroughTolledArea extends RandomParkingSearch {
 			Id personId = aem.getPerson().getId();
 			if (!changedRoute.contains(personId)) {
 				changedRoute.add(personId);
-				Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+				Leg leg = (Leg) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
 				LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) leg.getRoute();
 
 				if (startAndEndLinkNotInTolledArea(route)) {

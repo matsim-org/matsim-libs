@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -38,7 +39,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -194,10 +194,10 @@ public class SingleLineScenario
 		Population pop = scen.getPopulation();
 		PopulationFactory popFac = pop.getFactory();
 		
-		ActivityImpl homeBegin = (ActivityImpl) popFac.createActivityFromLinkId("home", ua.getId());
+		Activity homeBegin = (Activity) popFac.createActivityFromLinkId("home", ua.getId());
 		homeBegin.setCoord(ua.getCoord());
 		homeBegin.setEndTime(7 * 3600);
-		ActivityImpl homeEnd = (ActivityImpl) popFac.createActivityFromLinkId("home", bv.getId());
+		Activity homeEnd = (Activity) popFac.createActivityFromLinkId("home", bv.getId());
 		homeEnd.setCoord(bv.getCoord());
 		
 		

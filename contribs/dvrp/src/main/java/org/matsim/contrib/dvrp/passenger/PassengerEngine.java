@@ -24,7 +24,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.*;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -39,7 +38,7 @@ public class PassengerEngine
 {
     private final String mode;
 
-    private EventsManager eventsManager;
+    protected EventsManager eventsManager;
     private InternalInterface internalInterface;
     private final PassengerRequestCreator requestCreator;
     private final VrpOptimizer optimizer;
@@ -153,7 +152,7 @@ public class PassengerEngine
 
     //================ REQUESTS CREATION
 
-    private int nextId = 0;
+    private long nextId = 0;
 
 
     private PassengerRequest createRequest(MobsimPassengerAgent passenger, Id<Link> fromLinkId,

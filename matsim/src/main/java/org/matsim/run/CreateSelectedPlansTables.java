@@ -32,12 +32,15 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.*;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -121,7 +124,7 @@ public class CreateSelectedPlansTables {
 
 	private void readPlansFile(final String plansfilePath, final Population plans) {
 		System.out.println("  reading file "+plansfilePath);
-		final PopulationReader plansReader = new MatsimPopulationReader(new PseudoScenario(this.scenario, plans));
+		final MatsimReader plansReader = new PopulationReader(new PseudoScenario(this.scenario, plans));
 		plansReader.readFile(plansfilePath);
 	}
 
@@ -190,8 +193,8 @@ public class CreateSelectedPlansTables {
 				out.write("\t");
 
 				Plan selectedPlan = person.getSelectedPlan();
-				PlanImpl selectedPlanImpl = (PlanImpl) selectedPlan;
-				Activity firstActivity = selectedPlanImpl.getFirstActivity();
+				Plan selectedPlanImpl = (Plan) selectedPlan;
+				Activity firstActivity = PopulationUtils.getFirstActivity( selectedPlanImpl );
 				Coord c = null;
 				String link_id = "-";
 				

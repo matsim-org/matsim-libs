@@ -16,8 +16,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
@@ -30,7 +30,7 @@ import org.matsim.facilities.FacilitiesWriter;
  * @author dziemke
  */
 public class AccessibilityRunUtils {
-	public static final Logger log = Logger.getLogger(AccessibilityRunUtils.class);
+	public static final Logger LOG = Logger.getLogger(AccessibilityRunUtils.class);
 	
 	/**
 	 * Collects all facilities of a given type that have been loaded to the sceanrio.
@@ -68,6 +68,7 @@ public class AccessibilityRunUtils {
 				}
 			}
 		}
+		LOG.warn("The following activity option types where found within the activity facilities: " + activityOptionTypes);
 		return activityOptionTypes;
 	}
 
@@ -92,7 +93,10 @@ public class AccessibilityRunUtils {
 		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values() ) {
 			Coord coord = measuringPoint.getCoord();
 			Link link = NetworkUtils.getNearestLink(network, coord);
-			double distance = ((LinkImpl) link).calcDistance(coord);
+			final Coord coord1 = coord;
+			Link r = ((Link) link);
+			// TODO check if this is good or if orthogonal projection etc. is more suitable
+			double distance = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1);
 			if (distance <= maximumAllowedDistance) {
 				ActivityFacility facility = aff.createActivityFacility(measuringPoint.getId(), coord);
 				networkDensityFacilities.addActivityFacility(facility);

@@ -31,7 +31,7 @@ import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.WarmEmissionAnalysisModule;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -134,7 +134,7 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 		WarmEmissionAnalysisModule warmEmissionAnalysisModule = this.emissionModule.getWarmEmissionHandler().getWarmEmissionAnalysisModule();
 		Map<WarmPollutant, Double> expectedWarmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
 				vehicle,
-				Integer.parseInt(((LinkImpl) link).getType()),
+				Integer.parseInt(NetworkUtils.getType(((Link) link))),
 				link.getFreespeed(),
 				distance,
 				linkTravelTime

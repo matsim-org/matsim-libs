@@ -19,13 +19,11 @@
 package playground.polettif.publicTransitMapping.plausibility.log;
 
 
-import com.vividsolutions.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import playground.polettif.publicTransitMapping.plausibility.PlausibilityCheck;
@@ -34,10 +32,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-
+/**
+ * Abstract class for plausibility warnings
+ *
+ * @author polettif
+ */
 public abstract class AbstractPlausibilityWarning implements PlausibilityWarning {
 
-	private static String sep = PlausibilityCheck.CsvSeparator;
+	private static final String sep = PlausibilityCheck.CsvSeparator;
 
 	public static final String CSV_HEADER =	"id" + sep +
 											"WarningType" + sep +

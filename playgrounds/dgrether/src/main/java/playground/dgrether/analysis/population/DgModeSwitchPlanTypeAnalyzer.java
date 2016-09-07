@@ -22,7 +22,7 @@ package playground.dgrether.analysis.population;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.core.population.PlanImpl;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.utils.collections.Tuple;
 
 
@@ -47,8 +47,8 @@ public class DgModeSwitchPlanTypeAnalyzer {
 			DgPlanData planDataRun1 = d.getPlanData().get(runId1);
 			DgPlanData planDataRun2 = d.getPlanData().get(runId2);
 
-			Tuple<String, String> modeSwitchTuple = new Tuple<String, String>(((PlanImpl) planDataRun1.getPlan()).getType(), 
-					((PlanImpl) planDataRun2.getPlan()).getType());
+			Tuple<String, String> modeSwitchTuple = new Tuple<String, String>(((Plan) planDataRun1.getPlan()).getType(), 
+					((Plan) planDataRun2.getPlan()).getType());
 
 			DgAnalysisPopulation p = this.classifiedPops.get(modeSwitchTuple);
 			if (p == null){

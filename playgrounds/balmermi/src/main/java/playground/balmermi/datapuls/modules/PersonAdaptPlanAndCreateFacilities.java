@@ -25,11 +25,12 @@ import java.util.Random;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
@@ -39,7 +40,6 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.facilities.OpeningTimeImpl;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm {
 
@@ -77,7 +77,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 		double time = 0.0;
 		for (PlanElement e : plan.getPlanElements()) {
 			if (e instanceof Activity) {
-				ActivityImpl a = (ActivityImpl)e;
+				Activity a = (Activity)e;
 				
 				// set times
 				a.setStartTime(time);
@@ -115,7 +115,8 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 				if ( true ) throw new RuntimeException( "desires are gone and the behavior here can be reproduced with the classic config PlanCalcScore" );
 				
 				// reset coordinates
-				a.getCoord().setXY((int)a.getCoord().getX(),(int)a.getCoord().getY());
+//				a.getCoord().setXY((int)a.getCoord().getX(),(int)a.getCoord().getY());
+				a.setCoord( new Coord((int)a.getCoord().getX(),(int)a.getCoord().getY()));
 				
 				// create CB facilities (located outside of Switzerland)
 				if (a.getType().equals("tta") || a.getType().equals("home")) {

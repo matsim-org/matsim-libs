@@ -41,6 +41,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
@@ -48,7 +49,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.GfipMultimodalQSimFactory.QueueType;
 import org.matsim.core.mobsim.qsim.qnetsimengine.GfipQueuePassingControler.GfipMode;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
@@ -89,7 +89,7 @@ public class GfipLinkSpeedCalculator implements LinkSpeedCalculator {
 		
 		/* Get link's actual capacity (in pcu equivalents) */
 		double pcuCapacity = 1.1*(link.getLength()*link.getNumberOfLanes()/
-				((NetworkImpl)this.qsim.getNetsimNetwork().getNetwork()).getEffectiveCellSize());
+				((Network)this.qsim.getNetsimNetwork().getNetwork()).getEffectiveCellSize());
 		
 		double dumbDensity = pcuEquivalents / pcuCapacity;
 		

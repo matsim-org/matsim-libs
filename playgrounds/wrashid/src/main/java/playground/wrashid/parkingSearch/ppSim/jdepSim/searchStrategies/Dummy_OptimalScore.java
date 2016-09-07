@@ -25,10 +25,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.SortableMapObject;
-import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
@@ -62,7 +62,7 @@ public class Dummy_OptimalScore extends Dummy_TakeClosestParking {
 			if (!parkingFound.contains(personId)) {
 				parkingFound.add(personId);
 
-				ActivityImpl nextAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+				Activity nextAct = (Activity) aem.getPerson().getSelectedPlan().getPlanElements()
 						.get(aem.getPlanElementIndex() + 3);
 
 				Id parkingId = AgentWithParking.parkingManager.getFreePrivateParking(nextAct.getFacilityId(), nextAct.getType());
@@ -109,7 +109,7 @@ public class Dummy_OptimalScore extends Dummy_TakeClosestParking {
 	}
 
 	private double getWalkDuration(AgentWithParking aem, Coord coord) {
-		ActivityImpl nextAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+		Activity nextAct = (Activity) aem.getPerson().getSelectedPlan().getPlanElements()
 				.get(aem.getPlanElementIndex() + 3);
 
 		double walkDistance = GeneralLib.getDistance(coord, nextAct.getCoord());
@@ -130,7 +130,7 @@ public class Dummy_OptimalScore extends Dummy_TakeClosestParking {
 		} else {
 			int indexOfNextCarLeg = aem.duringCarLeg_getPlanElementIndexOfNextCarLeg();
 
-			ActivityImpl lastActBeforeNextCarLeg = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+			Activity lastActBeforeNextCarLeg = (Activity) aem.getPerson().getSelectedPlan().getPlanElements()
 					.get(indexOfNextCarLeg - 3);
 
 			double parkingDuration = GeneralLib.getIntervalDuration(aem.getMessageArrivalTime(),

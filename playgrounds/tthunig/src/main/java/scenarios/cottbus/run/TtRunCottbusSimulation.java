@@ -27,10 +27,11 @@ import java.util.Calendar;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsWriter20;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsWriter20;
@@ -45,15 +46,12 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import analysis.TtAnalyzedGeneralResultsWriter;
 import analysis.TtGeneralAnalysis;
@@ -152,7 +150,6 @@ public class TtRunCottbusSimulation {
 			// the signal system file depends on the network
 			if (SCENARIO_TYPE.equals(ScenarioType.BaseCase)){
 //				signalConfigGroup.setSignalSystemFile(INPUT_BASE_DIR + "signal_systems_no_13.xml");
-//				signalConfigGroup.setSignalSystemFile(INPUT_BASE_DIR + "signal_systems_no_13_new2222.xml");
 				signalConfigGroup.setSignalSystemFile(INPUT_BASE_DIR + "signal_systems_no_13_v2.1.xml");
 			} else { // BaseCaseContinued, i.e. smaller network
 				signalConfigGroup.setSignalSystemFile(BTU_BASE_DIR + "output_signal_systems_v2.0.xml.gz");
@@ -202,7 +199,7 @@ public class TtRunCottbusSimulation {
 			if (SCENARIO_TYPE.equals(ScenarioType.BaseCaseContinued_BtuRoutes))
 				strat.setWeight(0.0); // no ReRoute, fix route choice set
 			else // MatsimRoutes or BaseCase
-				strat.setWeight(0.05);
+				strat.setWeight(0.1);
 			strat.setDisableAfter(config.controler().getLastIteration() - 50);
 			config.strategy().addStrategySettings(strat);
 		}
@@ -217,7 +214,7 @@ public class TtRunCottbusSimulation {
 		{
 			StrategySettings strat = new StrategySettings();
 			strat.setStrategyName(DefaultSelector.ChangeExpBeta.toString());
-			strat.setWeight(0.95);
+			strat.setWeight(0.9);
 			strat.setDisableAfter(config.controler().getLastIteration());
 			config.strategy().addStrategySettings(strat);
 		}
@@ -302,14 +299,14 @@ public class TtRunCottbusSimulation {
 				throw new UnsupportedOperationException("In this scenario, counts can only be used together with ScenarioType.BaseCase"
 						+ " because they are not available for the simplified network of other scenario types.");
 			}
-			config.counts().setCountsFileName(INPUT_BASE_DIR + "CottbusCounts/counts_matsim/counts_final_shifted_addedLinks.xml");
-//			config.counts().setCountsFileName(INPUT_BASE_DIR + "CottbusCounts/counts_matsim/counts_test.xml");
+//			config.counts().setCountsFileName(INPUT_BASE_DIR + "CottbusCounts/counts_matsim/counts_final_shifted.xml");
+			config.counts().setInputFile(INPUT_BASE_DIR + "CottbusCounts/counts_matsim/counts_final_shifted_v2.xml");
 			config.counts().setCountsScaleFactor(1.0 / SCALING_FACTOR); // sample size
 			config.counts().setWriteCountsInterval(config.controler().getLastIteration());
 //			config.counts().setWriteCountsInterval(1);
 			config.counts().setOutputFormat("all");
 //			config.counts().setInputCRS(inputCRS);
-			config.counts().setAverageCountsOverIterations(1);
+			config.counts().setAverageCountsOverIterations(10);
 		}
 		
 		return config;
@@ -324,7 +321,7 @@ public class TtRunCottbusSimulation {
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		if (signalsConfigGroup.isUseSignalSystems()) {
 			scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-					new SignalsScenarioLoader(signalsConfigGroup).loadSignalsData());
+					new SignalsDataLoader(signalsConfigGroup).loadSignalsData());
 		}
 		
 		if (WRITE_INITIAL_FILES) 
@@ -361,7 +358,7 @@ public class TtRunCottbusSimulation {
 					if (strategies[i].getWeight() > 0.0){ // ReRoute is used
 						final CongestionTollTimeDistanceTravelDisutilityFactory factory =
 								new CongestionTollTimeDistanceTravelDisutilityFactory(
-										new Builder( TransportMode.car, config.planCalcScore() ),
+										new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ),
 								tollHandler, config.planCalcScore()
 							) ;
 						factory.setSigma(SIGMA);
@@ -417,8 +414,8 @@ public class TtRunCottbusSimulation {
 		} else { // no pricing
 			
 			// adapt sigma for randomized routing
-			final RandomizingTimeDistanceTravelDisutility.Builder builder = 
-					new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, config.planCalcScore() );
+			final RandomizingTimeDistanceTravelDisutilityFactory builder =
+					new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
 			builder.setSigma(SIGMA);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
@@ -544,6 +541,9 @@ public class TtRunCottbusSimulation {
 		if (USE_COUNTS){
 			runName += "_counts";
 		}
+		
+		// TODO
+		runName += "_newInput";
 		
 		String outputDir = OUTPUT_BASE_DIR + runName + "/"; 
 		// create directory

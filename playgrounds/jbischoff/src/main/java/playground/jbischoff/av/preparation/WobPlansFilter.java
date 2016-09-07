@@ -19,13 +19,20 @@
 
 package playground.jbischoff.av.preparation;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.*;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -37,7 +44,7 @@ public class WobPlansFilter {
 
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/vw078.taxiplans_alltrips.xml.gz");
+		new PopulationReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/vw078.taxiplans_alltrips.xml.gz");
 		Population pop2 = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		for (Person p : scenario.getPopulation().getPersons().values()){
 			boolean copyPerson = false;

@@ -29,8 +29,8 @@ import org.matsim.contrib.common.collections.CollectionUtils;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.*;
 
@@ -164,7 +164,8 @@ public class MergeFacilitiesToLink {
 		public void run() {
 			for (ActivityFacility facility : facilities) {
 				Coord c = facility.getCoord();
-				Link link = ((NetworkImpl) network).getNearestLinkExactly(c);
+				final Coord coord = c;
+				Link link = NetworkUtils.getNearestLinkExactly(((Network) network),coord);
 				putEntry(fac2link, link, facility);
 				ProgressLogger.step();
 			}

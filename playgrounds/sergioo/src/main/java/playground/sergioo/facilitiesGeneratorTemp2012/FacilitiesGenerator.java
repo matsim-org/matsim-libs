@@ -11,10 +11,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -130,7 +130,7 @@ public class FacilitiesGenerator {
 		log.info(numFacRepPosCode+" facilities with same postal code");
 		log.info(numFacNoActivities+" facilities without activities");
 		resultFacilities.close();
-		new WorldConnectLocations(scenario.getConfig()).connectFacilitiesWithLinks(facilities, (NetworkImpl) scenario.getNetwork());
+		new WorldConnectLocations(scenario.getConfig()).connectFacilitiesWithLinks(facilities, (Network) scenario.getNetwork());
 		new FacilitiesWriter(facilities).write(args[3]);
 	}
 	

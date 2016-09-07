@@ -55,18 +55,22 @@ final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 	@Inject private Population population;
 	@Inject private IterationStopWatch stopwatch;
 	@Inject private OutputDirectoryHierarchy controlerIO;
-	private int writePlansInterval, firstIteration;
+	private int writePlansInterval ;
+
+	private int writeMoreUntilIteration;
 
 	@Inject
 	PlansDumpingImpl(ControlerConfigGroup config) {
-		this.firstIteration = config.getFirstIteration();
 		this.writePlansInterval = config.getWritePlansInterval();
+		this.writeMoreUntilIteration = config.getWritePlansUntilIteration() ;
 	}
 
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
-		if ((writePlansInterval > 0) && ((event.getIteration() % writePlansInterval== 0)
-				|| (event.getIteration() == (firstIteration + 1)))) {
+		final boolean writingPlansAtAll = writePlansInterval > 0;
+		final boolean regularWritePlans = writingPlansAtAll && (event.getIteration()>0 && event.getIteration() % writePlansInterval== 0);
+		final boolean earlyIteration = event.getIteration() <= writeMoreUntilIteration ;
+		if ( writingPlansAtAll && (regularWritePlans || earlyIteration) ) {
 			stopwatch.beginOperation("dump all plans");
 			log.info("dumping plans...");
 			final String inputCRS = config.plans().getInputCRS();

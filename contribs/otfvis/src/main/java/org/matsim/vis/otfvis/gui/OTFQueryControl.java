@@ -20,6 +20,7 @@
 
 package org.matsim.vis.otfvis.gui;
 
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Double;
@@ -33,11 +34,11 @@ import java.util.Vector;
 import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQuery.Type;
-import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
@@ -60,50 +61,43 @@ import org.matsim.vis.otfvis.opengl.queries.QuerySpinne;
  * @author dstrippgen
  * 
  */
-public class OTFQueryControl implements OTFQueryHandler {
+public class OTFQueryControl {
 
 	private static final Logger log = Logger.getLogger(OTFQueryControl.class);
 
 	private JTextField textField;
 
-	private IdResolver agentIdResolver = new MyIdResolver();;
-
-	private final OTFHostControlBar hostControlBar;
-
 	private final OTFServer server;
 
-	private final Map<OTFQueryRemote, OTFQueryResult> queryEntries = new HashMap<OTFQueryRemote, OTFQueryResult>();
+	private final Map<OTFQueryRemote, OTFQueryResult> queryEntries = new HashMap<>();
 
-	private final Vector<QueryEntry> queries = new Vector<QueryEntry>(Arrays
+	private final Vector<QueryEntry> queries = new Vector<>(Arrays
 			.asList(new QueryEntry("agentPlan",
-					"show the actual plan of an agent", QueryAgentPlan.class),
+							"show the actual plan of an agent", QueryAgentPlan.class),
 					new QueryEntry("agentEvents",
 							"show the actual events of an agent",
 							QueryAgentEvents.class), new QueryEntry(
-									"agentPTBus",
-									"highlight all buses of a given line",
-									QueryAgentPTBus.class), new QueryEntry(
-											"linkSpinneALL", "show Spinne of ALL traffic",
-											QuerySpinne.class), 
-													new QueryEntry("linkById", "show link(s) by comma separated link id", QueryLinkById.class),
-													new QueryEntry("nodeById", "show node(s) by comma separated node id", QueryNodeById.class)));
+							"agentPTBus",
+							"highlight all buses of a given line",
+							QueryAgentPTBus.class), new QueryEntry(
+							"linkSpinneALL", "show Spinne of ALL traffic",
+							QuerySpinne.class),
+					new QueryEntry("linkById", "show link(s) by comma separated link id", QueryLinkById.class),
+					new QueryEntry("nodeById", "show node(s) by comma separated node id", QueryNodeById.class)));
 
 	private final OTFVisConfigGroup config;
 
-	public OTFQueryControl(OTFServer server, OTFHostControlBar handler, final OTFVisConfigGroup config) {
+	public OTFQueryControl(OTFServer server, final OTFVisConfigGroup config) {
 		this.config = config;
-		this.hostControlBar = handler;
 		this.server = server;
 	}
 
-	@Override
-	synchronized public void handleIdQuery(String id, String queryName) {
+	synchronized void handleIdQuery(String id, String queryName) {
 		AbstractQuery query = createQuery(queryName);
 		query.setId(id);
 		createQuery(query);
 	}
 
-	@Override
 	public void handleClick(Point2D.Double point, int mouseButton) {
 		Rectangle2D.Double origRect = new Rectangle2D.Double(point.x, point.y,
 				0, 0);
@@ -112,8 +106,7 @@ public class OTFQueryControl implements OTFQueryHandler {
 			handleClick(origRect, mouseButton);
 	}
 
-	@Override
-	synchronized public void removeQueries() {
+	synchronized void removeQueries() {
 		if(server.isLive()) {
 			((OTFLiveServer) server).removeQueries();
 		}
@@ -122,26 +115,24 @@ public class OTFQueryControl implements OTFQueryHandler {
 		}
 		this.queryEntries.clear();
 		textField.setText("");
-		hostControlBar.redrawDrawers();
+		((Component) OTFClientControl.getInstance().getMainOTFDrawer().getCanvas()).repaint();
 	}
 
-	@Override
 	synchronized public void drawQueries(OTFOGLDrawer drawer) {
 		for (OTFQueryResult queryResult : this.queryEntries.values()) {
 			queryResult.draw(drawer);
 		}
 	}
 
-	@Override
 	public void handleClick(Rectangle2D.Double origRect, int mouseButton) {
 		if (mouseButton == 3) {
 			removeQueries();
-			hostControlBar.redrawDrawers();
+			((Component) OTFClientControl.getInstance().getMainOTFDrawer().getCanvas()).repaint();
 		} else {
 			String queryName = this.config.getQueryType();
 			Type typeOfQuery = getTypeOfQuery(queryName);
 			if (typeOfQuery == OTFQuery.Type.AGENT) {
-				List<String> agentIds = agentIdResolver.resolveId(origRect);
+				List<String> agentIds = resolveId(origRect);
 				if ((agentIds != null) && (agentIds.size() != 0)) {
 					log.debug("AgentId = " + agentIds);
 					handleIdQuery(agentIds, queryName);
@@ -160,7 +151,6 @@ public class OTFQueryControl implements OTFQueryHandler {
 		}
 	}
 
-	@Override
 	synchronized public void updateQueries() {
 		for (Map.Entry<OTFQueryRemote, OTFQueryResult> queryItem : queryEntries.entrySet()) {
 			OTFQueryResult queryResult = queryItem.getValue();
@@ -173,16 +163,14 @@ public class OTFQueryControl implements OTFQueryHandler {
 		}
 	}
 
-	public OTFQueryResult createQuery(AbstractQuery query) {
+	private OTFQueryResult createQuery(AbstractQuery query) {
 		OTFQueryRemote remoteQuery = doQuery(query);
-		OTFQueryResult queryResult;
-		queryResult = remoteQuery.query();
+		OTFQueryResult queryResult = remoteQuery.query();
 		queryEntries.put(remoteQuery, queryResult);
 		return queryResult;
 	}
 
-	@Override
-	public OTFQueryRemote doQuery(final AbstractQuery query) {
+	private OTFQueryRemote doQuery(final AbstractQuery query) {
 		return ((OTFLiveServer) server).answerQuery(query);
 	}
 
@@ -199,47 +187,31 @@ public class OTFQueryControl implements OTFQueryHandler {
 			handleIdQuery(id, queryName);
 		}
 		textField.setText(infoText.toString());
-		hostControlBar.redrawDrawers();
+		((Component) OTFClientControl.getInstance().getMainOTFDrawer().getCanvas()).repaint();
 	}
 
 	@SuppressWarnings("unchecked")
-	protected AbstractQuery createQuery(String className) {
+	AbstractQuery createQuery(String className) {
 		try {
 			Class<? extends AbstractQuery> classDefinition = (Class<? extends AbstractQuery>) Class
 			.forName(className);
 			return classDefinition.newInstance();
-		} catch (InstantiationException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (ClassNotFoundException e) {
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	private Type getTypeOfQuery(String queryName) {
 		OTFQuery query = createQuery(queryName);
-		Type typeOfQuery = query.getType();
-		return typeOfQuery;
+		return query.getType();
 	}
 
-	public void setAgentIdResolver(IdResolver agentIdResolver) {
-		this.agentIdResolver = agentIdResolver;
-	}
-
-	public interface IdResolver {
-		List<String> resolveId(Double origRect);
-	}
-
-	public class MyIdResolver implements IdResolver {
-		@Override
-		public List<String> resolveId(Double origRect) {
-			QueryAgentId.Result agentIdQuery = (QueryAgentId.Result) createQuery(new QueryAgentId(origRect));
-			if ((agentIdQuery != null) && (agentIdQuery.agentIds.size() != 0)) {
-				return agentIdQuery.agentIds;
-			}
-			return null;
+	private List<String> resolveId(Double origRect) {
+		QueryAgentId.Result agentIdQuery = (QueryAgentId.Result) createQuery(new QueryAgentId(origRect));
+		if ((agentIdQuery != null) && (agentIdQuery.agentIds.size() != 0)) {
+			return agentIdQuery.agentIds;
 		}
+		return null;
 	}
 
 	public Vector<QueryEntry> getQueries() {

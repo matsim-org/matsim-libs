@@ -32,10 +32,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.TimeVariantLinkImpl;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.testcases.MatsimTestUtils;
@@ -98,8 +98,8 @@ public class Incident2NetworkChangeEventsTest {
 		
 		new NetworkWriter(scenario.getNetwork()).write(testUtils.getOutputDirectory() + "output-network.xml");
 				
-//		LinkImpl link = (LinkImpl) scenario.getNetwork().getLinks().get(Id.createLinkId("36087"));
-		TimeVariantLinkImpl link = (TimeVariantLinkImpl) scenario.getNetwork().getLinks().get(Id.createLinkId("36087"));
+		Link link = (Link) scenario.getNetwork().getLinks().get(Id.createLinkId("36087"));
+//		TimeVariantLinkImpl link = (TimeVariantLinkImpl) scenario.getNetwork().getLinks().get(Id.createLinkId("36087"));
 		
 		Assert.assertEquals("Wrong capacity.", 4700., link.getCapacity(), MatsimTestUtils.EPSILON);
 		
@@ -120,8 +120,8 @@ public class Incident2NetworkChangeEventsTest {
 		config.network().setChangeEventsInputFile(testUtils.getPackageInputDirectory() + "networkChangeEvents_2016-03-15.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 				
-//		LinkImpl link = (LinkImpl) scenario.getNetwork().getLinks().get(Id.createLinkId("36087"));
-		TimeVariantLinkImpl link = (TimeVariantLinkImpl) scenario.getNetwork().getLinks().get(Id.createLinkId("36087"));
+		Link link = (Link) scenario.getNetwork().getLinks().get(Id.createLinkId("36087"));
+//		TimeVariantLinkImpl link = (TimeVariantLinkImpl) scenario.getNetwork().getLinks().get(Id.createLinkId("36087"));
 		
 		Assert.assertEquals("Wrong capacity. Check if the flow capacity is given in 'vehicles per hour' 'vehicles per second'.", 4700. / 3600., link.getFlowCapacityPerSec(3 * 3600.), MatsimTestUtils.EPSILON);
 		

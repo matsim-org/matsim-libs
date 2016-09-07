@@ -26,14 +26,13 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -50,7 +49,7 @@ public class RouteSetGenerator {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final NetworkImpl network;
+	private final Network network;
 	private final TravelTime timeFunction;
 	private final PreProcessLandmarks preProcessData;
 	private final AStarLandmarks router;
@@ -59,7 +58,7 @@ public class RouteSetGenerator {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public RouteSetGenerator(NetworkImpl network, Config config) {
+	public RouteSetGenerator(Network network, Config config) {
 		this.network = network;
 		this.timeFunction = new TravelTimeCalculator(network, config.travelTimeCalculator()).getLinkTravelTimes();
 		this.preProcessData = new PreProcessLandmarks(new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
@@ -73,14 +72,17 @@ public class RouteSetGenerator {
 
 	private void addLinkToNetwork(Id linkId) {
 		Link link = this.network.getLinks().get(linkId);
-		((NodeImpl) link.getFromNode()).addOutLink(link);
-		((NodeImpl) link.getToNode()).addInLink(link);
+		((Node) link.getFromNode()).addOutLink(link);
+		((Node) link.getToNode()).addInLink(link);
 	}
 
 	private void removeLinkFromNetwork(Id linkId) {
 		Link link = this.network.getLinks().get(linkId);
-		((NodeImpl) link.getFromNode()).removeOutLink(link);
-		((NodeImpl) link.getToNode()).removeInLink(link);
+		final Link outlink = link;
+		final Id<Link> outLinkId = outlink.getId();
+		((Node) link.getFromNode()).removeOutLink(outLinkId);
+		final Link inlink = link;
+		((Node) link.getToNode()).removeInLink(inlink.getId());
 	}
 
 	private boolean containsRoute(NetworkRoute route, LinkedList<NetworkRoute> routes) {
@@ -102,8 +104,8 @@ public class RouteSetGenerator {
 	private boolean isLocalRoute(NetworkRoute route) {
 		boolean isLocal = true;
 		for (Id routeLink2Id : route.getLinkIds()) {
-			LinkImpl routeLink = (LinkImpl) this.network.getLinks().get(routeLink2Id);
-			if (!routeLink.getType().equals("39") && !routeLink.getType().equals("83") && !routeLink.getType().equals("90")) {
+			Link routeLink = (Link) this.network.getLinks().get(routeLink2Id);
+			if (!NetworkUtils.getType(routeLink).equals("39") && !NetworkUtils.getType(routeLink).equals("83") && !NetworkUtils.getType(routeLink).equals("90")) {
 				isLocal = false;
 				break;
 			}
@@ -181,7 +183,7 @@ public class RouteSetGenerator {
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final LinkedList<NetworkRoute> calcRouteSet(final NodeImpl o, final NodeImpl d, final int k, final int time, final int var_factor, final float localRoute_factor) {
+	public final LinkedList<NetworkRoute> calcRouteSet(final Node o, final Node d, final int k, final int time, final int var_factor, final float localRoute_factor) {
 		if (o.getId().equals(d.getId())) { throw new RuntimeException("O == D not alloed!"); }
 		if (k < 1) { throw new RuntimeException("k < 1 not allowed!"); }
 

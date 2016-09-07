@@ -170,11 +170,11 @@ class EstimateBindingFunction {
 			timeMatrices = new Matrices();
 			MatricesReaderMatsimV1<?> reader = new MatricesReaderMatsimV1<>(
 					timeMatrices);
-			reader.parse(traveltimesFileName);
+			reader.readFile(traveltimesFileName);
 
 			distanceMatrices = new Matrices();
 			reader = new MatricesReaderMatsimV1<>(distanceMatrices);
-			reader.parse(distancesFileName);
+			reader.readFile(distancesFileName);
 
 		}
 

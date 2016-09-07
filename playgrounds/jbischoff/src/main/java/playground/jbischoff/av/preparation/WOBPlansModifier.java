@@ -19,17 +19,29 @@
 
 package playground.jbischoff.av.preparation;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.*;
-import org.matsim.core.population.*;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -45,10 +57,10 @@ import com.vividsolutions.jts.geom.Geometry;
 public class WOBPlansModifier {
 public static void main(String[] args) throws IOException {
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	new MatsimPopulationReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/vw079.output_plansNoPTRoutes.xml.gz");
+	new PopulationReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/vw079.output_plansNoPTRoutes.xml.gz");
 	Geometry geometry = ScenarioPreparator.readShapeFileAndExtractGeometry("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/onezone.shp");
 	new MatsimNetworkReader(scenario.getNetwork()).readFile("../../../shared-svn/projects/vw_rufbus/av_simulation/scenario/networkpt-feb.xml.gz");
-	NetworkImpl net = (NetworkImpl) scenario.getNetwork();
+	Network net = (Network) scenario.getNetwork();
 	Population pop2 = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 	List<String> starts = new ArrayList<>();
 	List<String> ends = new ArrayList<>();
@@ -90,8 +102,10 @@ public static void main(String[] args) throws IOException {
 						end = leg.getRoute().getEndLinkId();
 						}
 						else {
-							start = net.getNearestLinkExactly(previousCoord).getId();
-							end = net.getNearestLinkExactly(currentCoord).getId();
+							final Coord coord = previousCoord;
+							start = NetworkUtils.getNearestLinkExactly(net,coord).getId();
+							final Coord coord1 = currentCoord;
+							end = NetworkUtils.getNearestLinkExactly(net,coord1).getId();
 						}
 						
 						starts.add(previousCoord.getX()+";"+previousCoord.getY()+";"+Time.writeTime(leg.getDepartureTime()));

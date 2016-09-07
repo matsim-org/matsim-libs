@@ -48,6 +48,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
+import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -166,9 +167,9 @@ public class QNetsimEngine implements MobsimEngine {
 		dpHandler = new VehicularDepartureHandler(this, vehicleBehavior, qSimConfigGroup);
 		
 		if(qSimConfigGroup.getLinkDynamics().equals(LinkDynamics.SeepageQ)) {
-			log.info("Seepage is allowed. Seep mode is " + qSimConfigGroup.getSeepMode() + ".");
+			log.info("Seepage is allowed. Seep mode(s) is(are) " + qSimConfigGroup.getSeepModes() + ".");
 			if(qSimConfigGroup.isSeepModeStorageFree()) {
-				log.warn("Seep mode " + qSimConfigGroup.getSeepMode() + " does not take storage space thus only considered for flow capacities.");
+				log.warn("Seep mode(s) " + qSimConfigGroup.getSeepModes() + " does not take storage space thus only considered for flow capacities.");
 			}
 		}
 		
@@ -492,7 +493,8 @@ public class QNetsimEngine implements MobsimEngine {
 				 * If the QLink contains agents that end their activity in the first time
 				 * step, the link should be activated.
 				 */
-				if (linksToActivateInitially.remove(qLink)) {
+				if (linksToActivateInitially.remove(qLink) 
+						|| qsim.getScenario().getConfig().qsim().getSimStarttimeInterpretation()==StarttimeInterpretation.onlyUseStarttime) {
 					this.engines.get(i).registerLinkAsActive(qLink);
 				}
 

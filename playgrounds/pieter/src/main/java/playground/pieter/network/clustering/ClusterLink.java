@@ -7,10 +7,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 class ClusterLink implements Link {
-	private final LinkImpl link;
+	private final Link link;
 	private NodeCluster rootCluster;
 	// set this to true if the link is an interlink
 	private boolean isInterLink = false;
@@ -31,7 +32,7 @@ class ClusterLink implements Link {
 		return isInterLink;
 	}
 
-	public ClusterLink(LinkImpl link) {
+	public ClusterLink(Link link) {
 		this.link = link;
 		this.isInterLink = false;
 
@@ -46,7 +47,8 @@ class ClusterLink implements Link {
 	}
 
 	public final double calcDistance(Coord coord) {
-		return link.calcDistance(coord);
+		final Coord coord1 = coord;
+		return CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord1);
 	}
 
 	public Node getFromNode() {
@@ -66,11 +68,12 @@ class ClusterLink implements Link {
 	}
 
 	public double getFreespeedTravelTime() {
-		return link.getFreespeedTravelTime();
+		return NetworkUtils.getFreespeedTravelTime(link) ;
 	}
 
 	public double getFreespeedTravelTime(double time) {
-		return link.getFreespeedTravelTime(time);
+		final double time1 = time;
+		return NetworkUtils.getFreespeedTravelTime(link, time1) ;
 	}
 
 	public double getFlowCapacity() {
@@ -82,15 +85,15 @@ class ClusterLink implements Link {
 	}
 
 	public final String getOrigId() {
-		return link.getOrigId();
+		return NetworkUtils.getOrigId( link ) ;
 	}
 
 	public final String getType() {
-		return link.getType();
+		return NetworkUtils.getType(link);
 	}
 
 	public final double getEuklideanDistance() {
-		return link.getEuklideanLength();
+		return CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
 	}
 
 	public double getCapacity() {
@@ -158,11 +161,13 @@ class ClusterLink implements Link {
 	}
 
 	public final void setOrigId(String id) {
-		link.setOrigId(id);
+		final String id1 = id;
+		NetworkUtils.setOrigId( link, id1 ) ;
 	}
 
 	public void setType(String type) {
-		link.setType(type);
+		final String type1 = type;
+		NetworkUtils.setType( link, type1);
 	}
 
 
@@ -216,5 +221,13 @@ class ClusterLink implements Link {
 
 	public void setFromCluster(NodeCluster fromCluster) {
 		this.fromCluster = fromCluster;
+	}
+
+	public double getFlowCapacityPerSec() {
+		return this.link.getFlowCapacityPerSec();
+	}
+
+	public double getFlowCapacityPerSec(double time) {
+		return this.link.getFlowCapacityPerSec(time);
 	}
 }

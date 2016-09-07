@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypes;
@@ -114,7 +114,7 @@ public class CountTripsPerTypeOfOriginAndDestination {
 
 	private static Population readPopulation(final String inPlansFile) {
 		final Scenario s = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimPopulationReader( s ).parse( inPlansFile );
+		new PopulationReader( s ).readFile( inPlansFile );
 		return s.getPopulation();
 	}
 

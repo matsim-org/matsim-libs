@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -135,7 +135,7 @@ public class LinkSHPWriter {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario.getNetwork());
-		reader.parse("/home/johannes/gsv/osm/network/germany-20140909.5.xml");
+		reader.readFile("/home/johannes/gsv/osm/network/germany-20140909.5.xml");
 		
 		Network network = scenario.getNetwork();
 		LinkOccupancyCalculator calc = new LinkOccupancyCalculator(null);

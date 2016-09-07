@@ -36,13 +36,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
@@ -95,7 +96,7 @@ public class MyZoneToZoneRouter {
 	public void prepareTravelTimeData(final String eventsFilename){
 		log.info("Processing the events file for zone-to-zone travel time calculation");
 		TravelTimeCalculator travelTimeCalculator = TravelTimeCalculator.create(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
-		TravelDisutilityFactory tccf = new Builder( TransportMode.car, scenario.getConfig().planCalcScore() );
+		TravelDisutilityFactory tccf = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, scenario.getConfig().planCalcScore() );
 		TravelDisutility travelCost = tccf.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes());
 		
 		EventsManager em = EventsUtils.createEventsManager();
@@ -120,7 +121,7 @@ public class MyZoneToZoneRouter {
 		log.info("Processing zone-to-zone travel times.");
 		this.odMatrix = matrix;
 		GeometryFactory gf = new GeometryFactory();
-		NetworkImpl ni = (NetworkImpl) scenario.getNetwork();
+		Network ni = (Network) scenario.getNetwork();
 		int total = odMatrix.rows()*odMatrix.columns();
 		int counter = 0;
 		int multiplier = 1;
@@ -173,11 +174,13 @@ public class MyZoneToZoneRouter {
 						
 						Point fp = zones.get(row).getCentroid();
 						Coord fc = new Coord(fp.getX(), fp.getY());
-						Node fn = ni.getNearestNode(fc);
+						final Coord coord = fc;
+						Node fn = NetworkUtils.getNearestNode(ni,coord);
 						
 						Point tp = zones.get(col).getCentroid();
 						Coord tc = new Coord(tp.getX(), tp.getY());
-						Node tn = ni.getNearestNode(tc); 
+						final Coord coord1 = tc;
+						Node tn = NetworkUtils.getNearestNode(ni,coord1); 
 						
 						Path p = router.calcLeastCostPath(fn, tn, 25200, null, null); /* Use 07:00:00 */
 						if(p != null){

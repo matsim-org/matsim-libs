@@ -59,7 +59,7 @@ public class SanralRoadPricing implements StartupListener, AfterMobsimListener, 
 		this.scheme = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(this.scheme);
 		try {
-            rpReader.parse(ConfigUtils.addOrGetModule(controler.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).getTollLinksFile());
+            rpReader.readFile(ConfigUtils.addOrGetModule(controler.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).getTollLinksFile());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
