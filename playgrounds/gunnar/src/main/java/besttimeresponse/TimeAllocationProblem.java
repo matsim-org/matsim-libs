@@ -76,8 +76,8 @@ class TimeAllocationProblem {
 			if (act.isEarlyDeparture()) {
 				result += this.betaEarlyDpt_1_s * (act.plannedActivity.earliestDptTime_s - act.realizedDptTime_s);
 			}
-			result += this.betaTravel_1_s
-					* (this.realizedActivities.get(q + 1 < _N ? q + 1 : 0).realizedArrTime_s - act.realizedDptTime_s);
+			result += this.betaTravel_1_s * (this.realizedActivities.get((q + 1) < _N ? (q + 1) : 0).realizedArrTime_s
+					- act.realizedDptTime_s);
 		}
 		return result;
 	}
@@ -95,7 +95,7 @@ class TimeAllocationProblem {
 		for (int q = 0; q < _N; q++) {
 
 			final RealizedActivity<?, ?> act = this.realizedActivities.get(q);
-			final RealizedActivity<?, ?> nextAct = this.realizedActivities.get((q + 1 < _N) ? (q + 1) : 0);
+			final RealizedActivity<?, ?> nextAct = this.realizedActivities.get(((q + 1) < _N) ? (q + 1) : 0);
 			final double a = act.nextTripTravelTime.dTT_dDptTime;
 
 			// travel time

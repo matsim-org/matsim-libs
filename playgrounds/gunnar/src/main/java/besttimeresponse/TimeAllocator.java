@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
-import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
 import org.apache.commons.math3.optim.linear.SimplexSolver;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.matsim.core.gbl.MatsimRandom;
@@ -92,23 +91,22 @@ public class TimeAllocator<L, M> {
 			final double[] initialDptTimes_s) {
 
 		TimeAllocationProblem problem = this.newTimeAllocationProblem(plannedActivities, initialDptTimes_s);
-
 		double[] currentDptTimes_s = problem.getInitialSolution();
-		LinearObjectiveFunction objFct = problem.getObjectiveFunction();
-		double currentScore = objFct.value(currentDptTimes_s);
-		RealVector currentGradient = objFct.getCoefficients();
+		double currentScore = problem.getTimeScoreAtInitialSolution();
+		RealVector currentGradient = problem.get__dScore_dDptTimes__1_s();
 
 		while (true) {
 
 			System.out.println(
 					"current dpt. times: " + new ArrayRealVector(currentDptTimes_s) + ", score = " + currentScore);
 
-			final double[] newDptTimes_s = (new SimplexSolver())
+			double[] newDptTimes_s = (new SimplexSolver())
 					.optimize(problem.getObjectiveFunction(), problem.getConstraints(), GoalType.MAXIMIZE).getPoint();
+			// System.out.println("	BEFORE: " + Arrays.toString(newDptTimes_s));
 			problem = this.newTimeAllocationProblem(plannedActivities, newDptTimes_s);
-			objFct = problem.getObjectiveFunction();
-			final double newScore = objFct.value(newDptTimes_s);
-			final RealVector newGradient = objFct.getCoefficients();
+			// System.out.println("	AFTER: " + Arrays.toString(problem.getInitialSolution()));
+			final double newScore = problem.getTimeScoreAtInitialSolution();
+			final RealVector newGradient = problem.get__dScore_dDptTimes__1_s();
 
 			if (newScore <= currentScore) {
 

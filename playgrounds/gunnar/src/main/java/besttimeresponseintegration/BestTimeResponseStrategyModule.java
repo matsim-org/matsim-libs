@@ -107,7 +107,11 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 				this.scoringParams.getScoringParameters(plan.getPerson()).marginalUtilityOfEarlyDeparture_s,
 				repairTimeStructure, interpolateTravelTimes, randomSmoothing);
 
-		final double[] result = timeAlloc.optimizeDepartureTimes(plannedActivities, null);
+		final double[] initialDptTimesArray_s = new double[initialDptTimes_s.size()];
+		for (int q = 0; q < initialDptTimes_s.size(); q++) {
+			initialDptTimesArray_s[q] = initialDptTimes_s.get(q);
+		}		
+		final double[] result = timeAlloc.optimizeDepartureTimes(plannedActivities, initialDptTimesArray_s);
 		System.out.println("FINAL DPT TIMES: " + new ArrayRealVector(result));
 
 		/*
