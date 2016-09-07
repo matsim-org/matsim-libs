@@ -177,8 +177,8 @@ public final class NetworkUtil {
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 1000, (double) 2000));
 //		Node node4 = network.createAndAddNode(Id.create("4", Node.cla)s, new CoordImpl(2000, 2000));
 //		Node node5 = network.createAndAddNode(Id.create("5", Node.cla)s, new CoordImpl(1000, 0));
-		Link link1 = (Link) NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), node1, node2, (double) 1000, (double) 1, (double) 3600, (double) 1 );
-		Link link2 = (Link) NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), node2, node3, (double) 1500, (double) 1, (double) 3600, (double) 1 );
+		Link link1 = (Link) NetworkUtils.createAndAddLink(network, Id.create("1", Link.class), node1, node2, (double) 1000, (double) 1, (double) 3600, (double) 1 );
+		Link link2 = (Link) NetworkUtils.createAndAddLink(network, Id.create("2", Link.class), node2, node3, (double) 1500, (double) 1, (double) 3600, (double) 1 );
 //		LinkImpl link3 = (LinkImpl) network.createAndAddLink(Id.create("3", Link.class), node3, node4, 1000, 1, 3600, 1);
 //		LinkImpl link4 = (LinkImpl) network.createAndAddLink(Id.create("4", Link.class), node4, node5, 2800, 1, 3600, 1);
 
