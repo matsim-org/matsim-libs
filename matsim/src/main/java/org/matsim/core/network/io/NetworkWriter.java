@@ -63,6 +63,21 @@ public class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 		String dtd = "http://www.matsim.org/files/dtd/network_v1.dtd";
 		NetworkWriterHandler handler = new NetworkWriterHandlerImplV1(transformation);
 
+		writeFile( dtd , handler , filename );
+	}
+
+	public void writeFileV2(final String filename) {
+		String dtd = "http://www.matsim.org/files/dtd/network_v2.dtd";
+		NetworkWriterHandler handler = new NetworkWriterHandlerImplV2(transformation);
+
+		writeFile( dtd , handler , filename );
+	}
+
+	private void writeFile(
+			final String dtd,
+			final NetworkWriterHandler handler,
+			final String filename) {
+
 		try {
 			openFile(filename);
 			writeXmlHead();
@@ -91,5 +106,4 @@ public class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 			throw new UncheckedIOException(e);
 		}
 	}
-	
 }
