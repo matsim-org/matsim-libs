@@ -22,7 +22,6 @@ package org.matsim.api.core.v01;
 
 import static org.junit.Assert.*;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -47,6 +46,16 @@ public class CoordTest {
 			c = new Coord(0.0, 1.0, 2.0);
 		} catch (Exception e){
 			fail("Should create coordinate");
+		}
+		
+		/* Should not accept Double.NEGATIVE_INFINITY as elevation. */
+		@SuppressWarnings("unused")
+		Coord c2d;
+		try{
+			c2d = new Coord(0.0, 1.0, Double.NEGATIVE_INFINITY);
+			fail("Should not accept special-value elevation.");
+		} catch ( IllegalArgumentException e){
+			/* Pass */
 		}
 	}
 
