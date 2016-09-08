@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import io.grpc.internal.ManagedChannelImpl;
 import io.grpc.netty.NegotiationType;
 import io.grpc.netty.NettyChannelBuilder;
+import org.matsim.contrib.hybridsim.proto.HybridSimulationGrpc;
 
 public class GRPCExternalClient {
 
