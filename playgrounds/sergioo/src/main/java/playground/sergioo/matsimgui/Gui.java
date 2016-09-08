@@ -2,7 +2,10 @@ package playground.sergioo.matsimgui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -43,11 +47,15 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import com.google.inject.binder.LinkedBindingBuilder;
 
-public class Gui implements ActionListener {
+public class Gui implements ActionListener, IterationStartsListener {
 	
 	private enum Type {
 		ADD, BIND, NO;
@@ -83,41 +91,6 @@ public class Gui implements ActionListener {
 		}
 	}
 	
-	private static class ConsoleDialog extends OutputStream {
-
-		JDialog dialog;
-		JTextArea textArea = new JTextArea(1000,1000);
-		public ConsoleDialog() {
-			dialog = new JDialog(frame, "Console", false);
-			dialog.setSize(1000, 700);
-			dialog.setLayout(new BorderLayout());
-			JScrollPane scroll = new JScrollPane();
-			scroll.add(textArea);
-			dialog.add(scroll, BorderLayout.CENTER);
-		}
-		
-		@Override
-		public synchronized void flush() {
-	    }
-		
-		@Override
-		public void write(byte[] ba,int str,int len) throws UnsupportedEncodingException {
-			textArea.append(new String(ba,str,len,"UTF-8"));
-		}
-
-		@Override
-		public void write(int val) throws IOException {
-			byte[] oneByte=new byte[]{(byte)val};
-		    write(oneByte,0,1);
-		}
-		
-		@Override
-		public synchronized void write(byte[] ba) throws UnsupportedEncodingException {
-		    write(ba,0,ba.length);
-		}
-
-	}
-	
 	static Map<Type, Set<BindMethod>> methods = new HashMap<>();
 	static Set<String> worked = new HashSet<>();
 	private static JTextField classTextField = new JTextField();
@@ -128,7 +101,8 @@ public class Gui implements ActionListener {
 	private static File configFile;
 	private static JLabel configL = new JLabel();
 	private static JButton buttonR;
-	
+	private static JLabel itLabel;
+
 	public static void run() {
         Gui gui = new Gui();
 		frame.setLayout(new BorderLayout());
@@ -288,6 +262,7 @@ public class Gui implements ActionListener {
 			Scenario scenario = ScenarioUtils.createScenario(config);
 			//Modify scenario
 			Controler controler = new Controler(config);
+			controler.addControlerListener(this);
 			//Modify controler
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
@@ -365,10 +340,24 @@ public class Gui implements ActionListener {
 					if(!Gui.worked.isEmpty())
 						frame.setVisible(false);
 				}
-			});try {
-				ConsoleDialog cd = new ConsoleDialog();
-		        cd.dialog.setVisible(true);
-		        controler.run();
+			});
+			try {
+				JDialog itFrame = new JDialog(frame, "Iteration", true);
+		        itFrame.setLayout(new BorderLayout());
+				itLabel = new JLabel("-");
+				itLabel.setHorizontalAlignment(SwingConstants.CENTER);
+				itLabel.setFont(new Font(itLabel.getFont().getName(), Font.BOLD, 200));
+				itFrame.add(itLabel, BorderLayout.CENTER);
+				itFrame.pack();
+				itFrame.setSize(itFrame.getWidth()*3,itFrame.getHeight());
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						controler.run();
+						itFrame.setVisible(false);
+					}
+				}).start();
+				itFrame.setVisible(true);
 			} catch (Exception e2) {
 				if(!Gui.worked.contains(e2.getMessage())) {
 					JOptionPane.showMessageDialog(frame, e2.getClass().getSimpleName()+": "+e2.getMessage());
@@ -401,6 +390,11 @@ public class Gui implements ActionListener {
 		else if(e.getActionCommand().startsWith("text,")) {
 			
 		}
+	}
+
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		itLabel.setText(event.getIteration()+"");
 	}
 	
 }
