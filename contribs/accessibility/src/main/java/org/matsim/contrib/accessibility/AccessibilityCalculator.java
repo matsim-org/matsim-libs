@@ -71,64 +71,90 @@ public final class AccessibilityCalculator {
 
 	private final Map<Modes4Accessibility, AccessibilityContributionCalculator> calculators = new HashMap<>();
 
-//	private PtMatrix ptMatrix;
-
 	private final ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 
-	private boolean useRawSum	; //= false;
+	private boolean useRawSum; //= false;
 	private double logitScaleParameter;
 	private double inverseOfLogitScaleParameter;
+	
+	// new
+	private double betaWalkTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
+	private double betaWalkTD;	// in MATSim this is 0 !!! since getMonetaryDistanceCostRateWalk doesn't exist: 
+	private double betaWalkTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
+	// ===
+//	private Coord2CoordTimeDistanceTravelDisutility walkTravelDisutility;
+	// end new
 	
 	private double walkSpeedMeterPerHour = -1;
 
 	// counter for warning that capacities are not used so far ... in order not to give the same warning multiple times; dz, apr'14
-	private static int cnt = 0 ;
-	private Map<String, TravelTime> travelTimes;
-	private Map<String, TravelDisutilityFactory> travelDisutilityFactories;
-
-	private final Scenario scenario;
-	private final AccessibilityConfigGroup acg;
-
-	private Coord2CoordTimeDistanceTravelDisutility walkTravelDisutility;
-
+	private static int cnt = 0;
+	
+	private Scenario scenario;
+	private AccessibilityConfigGroup acg;
 	
 	@Inject
-	public
-	AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
-//	AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario, AccessibilityConfigGroup config) {
+	public AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
+		this.scenario = scenario;
 		this.acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 
+		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
 		
-		this.travelTimes = travelTimes;
-		this.travelDisutilityFactories = travelDisutilityFactories;
-		this.scenario = scenario;
-	}
+		useRawSum = acg.isUsingRawSumsWithoutLn();
+		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
+		inverseOfLogitScaleParameter = 1 / (logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
+		
+		// new
+		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0.) {
+			log.error("marginal utility of distance for car different from zero but not used in accessibility computations");
+		}
+		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.pt).getMarginalUtilityOfDistance() != 0.) {
+			log.error("marginal utility of distance for pt different from zero but not used in accessibility computations");
+		}
+		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.bike).getMonetaryDistanceRate() != 0.) {
+			log.error("monetary distance cost rate for bike different from zero but not used in accessibility computations");
+		}
+		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.walk).getMonetaryDistanceRate() != 0.) {
+			log.error("monetary distance cost rate for walk different from zero but not used in accessibility computations");
+		}
+		
+		walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
 
-	
-	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface l){
-		this.zoneDataExchangeListeners.add(l);
+		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		betaWalkTD = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
+		betaWalkTMC = -planCalcScoreConfigGroup.getMarginalUtilityOfMoney();
+		// ===
+//		this.walkTravelDisutility = (Coord2CoordTimeDistanceTravelDisutility) travelDisutilityFactories.get(TransportMode.walk).createTravelDisutility(
+//				travelTimes.get(TransportMode.walk));
+		// end new
+		
+		initDefaultContributionCalculators(travelTimes, travelDisutilityFactories, scenario);
 	}
 	
-
 	
-	final void initDefaultContributionCalculators() {
+	private void initDefaultContributionCalculators(Map<String, TravelTime> travelTimes,
+			Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
 		calculators.put(
 				Modes4Accessibility.car,
 				new NetworkModeAccessibilityContributionCalculator(
 						travelTimes.get(TransportMode.car),
 						travelDisutilityFactories.get(TransportMode.car),
-						//
-						walkTravelDisutility,
-						//
+						// new
+//						walkTravelDisutility,
+						// ===
+						null,
+						// new
 						scenario));
 		calculators.put(
 				Modes4Accessibility.freeSpeed,
 				new NetworkModeAccessibilityContributionCalculator(
 						new FreeSpeedTravelTime(),
 						travelDisutilityFactories.get(TransportMode.car),
-						//
-						walkTravelDisutility,
-						//
+						// new
+//						walkTravelDisutility,
+						// ===
+						null,
+						// new
 						scenario));
 		calculators.put(
 				Modes4Accessibility.walk,
@@ -141,26 +167,12 @@ public final class AccessibilityCalculator {
 						TransportMode.bike,
 						scenario));
 	}
+
 	
-	
-	/**
-	 * setting parameter for accessibility calculation
-	 * @param config TODO
-	 */
-	final void initAccessibilityParameters(Config config) {
-
-		AccessibilityConfigGroup moduleAPCM = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-
-		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore();
-
-		useRawSum = moduleAPCM.isUsingRawSumsWithoutLn();
-		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
-		inverseOfLogitScaleParameter = 1 / (logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
-		
-		this.walkTravelDisutility = (Coord2CoordTimeDistanceTravelDisutility) travelDisutilityFactories.get(TransportMode.walk).createTravelDisutility(
-				travelTimes.get(TransportMode.walk));
+	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface l){
+		this.zoneDataExchangeListeners.add(l);
 	}
-
+	
 	
 	/**
 	 * This aggregates the disutilities Vjk to get from node j to all k that are attached to j.
@@ -176,7 +188,7 @@ public final class AccessibilityCalculator {
 	 * @param opportunities such as workplaces, either given at a parcel- or zone-level
 	 * @param network giving the road network
 	 */
-	final void aggregateOpportunities(final ActivityFacilities opportunities, Network network){
+	private final void aggregateOpportunities(final ActivityFacilities opportunities, Network network){
 		// yyyy this method ignores the "capacities" of the facilities. kai, mar'14
 		// for now, we decided not to add "capacities" as it is not needed for current projects. dz, feb'16
 
@@ -189,17 +201,17 @@ public final class AccessibilityCalculator {
 
 			Node nearestNode = NetworkUtils.getNearestNode(((Network)network),opportunity.getCoord());
 			
-			double walkUtility = -this.walkTravelDisutility.getCoord2CoordTravelDisutility(opportunity.getCoord(), nearestNode.getCoord());
-			double expVjk = Math.exp(this.logitScaleParameter * walkUtility);
-			
-//			// get Euclidian distance to nearest node
-//			double distance_meter 	= NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
-//			double VjkWalkTravelTime	= this.betaWalkTT * (distance_meter / this.walkSpeedMeterPerHour);
-//			double VjkWalkDistance 		= this.betaWalkTD * distance_meter;
-//
-//			double expVjk					= Math.exp(this.logitScaleParameter * (VjkWalkTravelTime + VjkWalkDistance ) );
+			// new
+//			double walkUtility = -this.walkTravelDisutility.getCoord2CoordTravelDisutility(opportunity.getCoord(), nearestNode.getCoord());
+//			double expVjk = Math.exp(this.logitScaleParameter * walkUtility);
+			// ===
+			// get Euclidian distance to nearest node
+			double distance_meter 	= NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
+			double VjkWalkTravelTime	= this.betaWalkTT * (distance_meter / this.walkSpeedMeterPerHour);
+			double VjkWalkDistance 		= this.betaWalkTD * distance_meter;
 
-			
+			double expVjk				= Math.exp(this.logitScaleParameter * (VjkWalkTravelTime + VjkWalkDistance ) );
+			// end new
 			
 			// add Vjk to sum
 			AggregationObject jco = opportunityClusterMap.get( nearestNode.getId() ) ;
@@ -212,7 +224,7 @@ public final class AccessibilityCalculator {
 				log.warn("ignoring the capacities of the facilities");
 				log.warn(Gbl.ONLYONCE);
 			}
-			jco.addObject( opportunity.getId(), expVjk ) ;
+			jco.addObject(opportunity.getId(), expVjk);
 		}
 		log.info("Aggregated " + opportunities.getFacilities().size() + " number of opportunities to " + opportunityClusterMap.size() + " nodes.");
 		this.aggregatedOpportunities = opportunityClusterMap.values().toArray(new AggregationObject[opportunityClusterMap.size()]);
@@ -220,7 +232,7 @@ public final class AccessibilityCalculator {
 
 	
 	public final void computeAccessibilities( Double departureTime, ActivityFacilities opportunities) {
-//	final void computeAccessibilities(Scenario scenario, Double departureTime) {
+		aggregateOpportunities(opportunities, scenario.getNetwork());
 		SumOfExpUtils[] gcs = new SumOfExpUtils[Modes4Accessibility.values().length] ;
 		// this could just be a double array, or a Map.  Not using a Map for computational speed reasons (untested);
 		// not using a simple double array for type safety in long argument lists. kai, feb'14
@@ -229,7 +241,8 @@ public final class AccessibilityCalculator {
 		}
 
 		// Condense measuring points (origins) that have the same nearest node on the network
-		Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins = aggregateMeasurePointsWithSameNearestNode(scenario);
+		Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins = aggregateMeasurePointsWithSameNearestNode();
+		
 		log.info("Now going through all origins:");
 		ProgressBar bar = new ProgressBar(aggregatedOrigins.size());
 		
@@ -282,22 +295,17 @@ public final class AccessibilityCalculator {
 					//log.info("here");
 					zoneDataExchangeInterface.setFacilityAccessibilities(origin, departureTime, accessibilities);
 				}
-
 			}
-
 		}
 		for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
 			zoneDataExchangeInterface.finish();
 		}
 	}
 
-	
 	/**
 	 * This method condenses measuring points (origins) that have the same nearest node on the network
-	 * @param scenario
-	 * @return
 	 */
-	private Map<Id<Node>, ArrayList<ActivityFacility>> aggregateMeasurePointsWithSameNearestNode(Scenario scenario) {
+	private Map<Id<Node>, ArrayList<ActivityFacility>> aggregateMeasurePointsWithSameNearestNode() {
 		Map<Id<Node>,ArrayList<ActivityFacility>> aggregatedOrigins = new ConcurrentHashMap<>();
 		
 		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values()) {
@@ -305,8 +313,6 @@ public final class AccessibilityCalculator {
 			// determine nearest network node (from- or toNode) based on the link
 			Node fromNode = NetworkUtils.getCloserNodeOnLink(measuringPoint.getCoord(),
 					NetworkUtils.getNearestLinkExactly(((Network)scenario.getNetwork()), measuringPoint.getCoord()));
-//			Node fromNode = NetworkUtils.getCloserNodeOnLink(measuringPoint.getCoord(),
-//					((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(measuringPoint.getCoord()));
 
 			// this is used as a key for hash map lookups
 			Id<Node> nodeId = fromNode.getId();
@@ -335,17 +341,14 @@ public final class AccessibilityCalculator {
 		}
 	}
 
-	
 	public void setComputingAccessibilityForMode( Modes4Accessibility mode, boolean val ) {
 		this.acg.setComputingAccessibilityForMode(mode, val);
 	}
-
 	
 	public Set<Modes4Accessibility> getIsComputingMode() {
 		return this.acg.getIsComputingMode();
 	}
 
-	
 	/**
 	 * stores travel disutilities for different modes
 	 */
@@ -368,11 +371,6 @@ public final class AccessibilityCalculator {
 		}
 	}
 
-	
-//	public final void setPtMatrix(PtMatrix ptMatrix) {
-//		this.ptMatrix = ptMatrix;
-//	}
-	
 	public final void setPtMatrix(PtMatrix ptMatrix) {
 		calculators.put(
 				Modes4Accessibility.pt,
@@ -381,12 +379,6 @@ public final class AccessibilityCalculator {
 						scenario.getConfig()));
 	}
 
-	
-//	ActivityFacilitiesImpl getMeasuringPoints() {
-//		return measuringPoints;
-//	}
-
-	
 	public void setMeasuringPoints(ActivityFacilitiesImpl measuringPoints) {
 		this.measuringPoints = measuringPoints;
 	}

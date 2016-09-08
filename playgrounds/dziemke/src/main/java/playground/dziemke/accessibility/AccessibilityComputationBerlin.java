@@ -56,7 +56,7 @@ public class AccessibilityComputationBerlin {
 		// now using work facilities
 		String facilitiesFile = "../../../../SVN/shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/facilities.xml";
 		
-		String outputDirectory = "../../../../SVN/shared-svn/projects/accessibility_berlin/output/08/";
+		String outputDirectory = "../../../../SVN/shared-svn/projects/accessibility_berlin/output/08_test/";
 //		String travelTimeMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelDistanceMatrix.csv.gz";
 //		String ptStops = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/stops.csv.gz";
