@@ -55,6 +55,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 /**
  * Example for how to create signal input files from code.
  * 
+ * See also the picture of the scenario in the same package as the input files
+ * (examples/tutorial/example90TrafficLights/).
+ * 
  * @link VisualizeSignalScenario for how to visualize this scenario.
  * 
  * @author dgrether
