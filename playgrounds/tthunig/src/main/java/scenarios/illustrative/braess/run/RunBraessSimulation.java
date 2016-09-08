@@ -278,7 +278,7 @@ public final class RunBraessSimulation {
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		if (signalsConfigGroup.isUseSignalSystems()) {
 			scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-					new SignalsDataLoader(signalsConfigGroup).loadSignalsData());
+					new SignalsDataLoader(config).loadSignalsData());
 			createSignals(scenario);
 		}
 		

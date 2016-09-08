@@ -154,7 +154,7 @@ public class RunResultsLoader {
 		ConfigUtils.addOrGetModule(c, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(systemspath);
 		ConfigUtils.addOrGetModule(c, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(groupspath);
 		ConfigUtils.addOrGetModule(c, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(controlpath);
-		SignalsDataLoader loader = new SignalsDataLoader(ConfigUtils.addOrGetModule(c, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
+		SignalsDataLoader loader = new SignalsDataLoader(c);
 		return loader.loadSignalsData();
 	}
 

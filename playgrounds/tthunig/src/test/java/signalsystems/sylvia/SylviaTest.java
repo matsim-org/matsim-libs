@@ -166,7 +166,7 @@ public class SylviaTest {
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-				new SignalsDataLoader(signalsConfigGroup).loadSignalsData());
+				new SignalsDataLoader(config).loadSignalsData());
 		
 		createScenarioElements(scenario, noPersons);
 		

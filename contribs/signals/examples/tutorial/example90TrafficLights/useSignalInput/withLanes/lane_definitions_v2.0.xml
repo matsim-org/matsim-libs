@@ -29,16 +29,6 @@
             <startsAt meterFromLinkEnd="150.0"/>
             <alignment>-1</alignment>
         </lane>
-        <lane id="65.ol">
-            <leadsTo>
-                <toLane refId="65.l"/>
-                <toLane refId="65.r"/>
-            </leadsTo>
-            <representedLanes number="1.0"/>
-            <capacity vehiclesPerHour="1800.0"/>
-            <startsAt meterFromLinkEnd="300.0"/>
-            <alignment>0</alignment>
-        </lane>
     </lanesToLinkAssignment>
     <lanesToLinkAssignment linkIdRef="65">
         <lane id="65.l">
@@ -49,6 +39,16 @@
             <capacity vehiclesPerHour="1800.0"/>
             <startsAt meterFromLinkEnd="150.0"/>
             <alignment>1</alignment>
+        </lane>
+        <lane id="65.ol">
+            <leadsTo>
+                <toLane refId="65.l"/>
+                <toLane refId="65.r"/>
+            </leadsTo>
+            <representedLanes number="1.0"/>
+            <capacity vehiclesPerHour="1800.0"/>
+            <startsAt meterFromLinkEnd="300.0"/>
+            <alignment>0</alignment>
         </lane>
         <lane id="65.r">
             <leadsTo>

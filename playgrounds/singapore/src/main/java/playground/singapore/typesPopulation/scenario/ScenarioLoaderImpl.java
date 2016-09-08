@@ -296,7 +296,7 @@ public class ScenarioLoaderImpl {
 	}
 
 	private void loadSignalSystems() {
-		this.scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(ConfigUtils.addOrGetModule(this.config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
+		this.scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 	}
 
 }

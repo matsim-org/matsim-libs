@@ -85,7 +85,7 @@ public class Fixture {
 
 		this.setSignalSystemConfigValues(signalsConfig, testUtils);
 		Scenario scenario = ScenarioUtils.loadScenario(conf);
-		SignalsDataLoader signalsLoader = new SignalsDataLoader(signalsConfig);
+		SignalsDataLoader signalsLoader = new SignalsDataLoader(conf);
 		SignalsData signalsData = signalsLoader.loadSignalsData();
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, signalsData);
 		

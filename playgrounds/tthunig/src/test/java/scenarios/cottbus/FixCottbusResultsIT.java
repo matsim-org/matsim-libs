@@ -84,7 +84,7 @@ public class FixCottbusResultsIT {
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-				new SignalsDataLoader(signalsConfigGroup).loadSignalsData());
+				new SignalsDataLoader(config).loadSignalsData());
 		
 		Controler controler = new Controler(scenario);
 		// add missing modules

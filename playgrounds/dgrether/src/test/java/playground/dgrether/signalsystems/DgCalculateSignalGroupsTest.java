@@ -245,11 +245,8 @@ public class DgCalculateSignalGroupsTest {
 
 		//load the network
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(conf);
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-				new SignalsDataLoader(ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class))
-						.loadSignalsData());
-		SignalsData signalsData = (SignalsData) scenario
-				.getScenarioElement(SignalsData.ELEMENT_NAME);
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(conf).loadSignalsData());
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		
 		//calculate the signal groups
 		DgCalculateSignalGroups calcSignalGroups = new DgCalculateSignalGroups(

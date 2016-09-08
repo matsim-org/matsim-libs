@@ -320,8 +320,7 @@ public class TtRunCottbusSimulation {
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		if (signalsConfigGroup.isUseSignalSystems()) {
-			scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-					new SignalsDataLoader(signalsConfigGroup).loadSignalsData());
+			scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 		}
 		
 		if (WRITE_INITIAL_FILES) 

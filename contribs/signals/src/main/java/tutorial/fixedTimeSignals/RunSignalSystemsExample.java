@@ -75,9 +75,9 @@ public class RunSignalSystemsExample {
 		signalConfig.setUseSignalSystems(true);
 
 		// set the paths to the signal systems definition files
-		signalConfig.setSignalSystemFile(INPUT_DIR + "signalSystems_v2.0.xml");
-		signalConfig.setSignalGroupsFile(INPUT_DIR + "signalGroups_v2.0.xml");
-		signalConfig.setSignalControlFile(INPUT_DIR + "signalControl_v2.0.xml");
+		signalConfig.setSignalSystemFile("signalSystems_v2.0.xml");
+		signalConfig.setSignalGroupsFile("signalGroups_v2.0.xml");
+		signalConfig.setSignalControlFile("signalControl_v2.0.xml");
 		
 //		// here is how to also use intergreen and amber times:
 //		signalConfig.setUseIntergreenTimes(true);
@@ -105,7 +105,7 @@ public class RunSignalSystemsExample {
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		/* load the information about signals data (i.e. fill the SignalsData object)
 		 * and add it to the scenario as scenario element */
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(signalConfig).loadSignalsData());
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 		
 		// --- create the controler
 		Controler c = new Controler( scenario );

@@ -133,7 +133,7 @@ public class Link2LinkTestRunner {
 
 		if ((boolean) signalConfigGroup.isUseSignalSystems()) {
 			// add the signals module if signal systems are use
-			scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(signalConfigGroup).loadSignalsData());
+			scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 			controler.addOverridingModule(new SignalsModule());
 		}
 

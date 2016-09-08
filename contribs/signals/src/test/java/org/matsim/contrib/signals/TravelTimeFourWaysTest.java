@@ -78,7 +78,7 @@ public class TravelTimeFourWaysTest {
 	
 	private SignalEngine initSignalEngine(Scenario scenario, EventsManager events) {
 		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-		SignalsDataLoader signalsLoader = new SignalsDataLoader(signalsConfig);
+		SignalsDataLoader signalsLoader = new SignalsDataLoader(scenario.getConfig());
 		SignalsData signalsData = signalsLoader.loadSignalsData();
 		scenario.addScenarioElement( SignalsData.ELEMENT_NAME , signalsData);
 		

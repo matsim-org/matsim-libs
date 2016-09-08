@@ -221,9 +221,9 @@ public class CreateSignalInputExample {
 		Files.createDirectories(Paths.get(outputDir));
 		
 		// set output filenames
-		signalSystemsConfigGroup.setSignalSystemFile(outputDir  + "signal_systems.xml");
-		signalSystemsConfigGroup.setSignalGroupsFile(outputDir  + "signal_groups.xml");
-		signalSystemsConfigGroup.setSignalControlFile(outputDir  + "signal_control.xml");
+		signalSystemsConfigGroup.setSignalSystemFile(outputDir + "signal_systems.xml");
+		signalSystemsConfigGroup.setSignalGroupsFile(outputDir + "signal_groups.xml");
+		signalSystemsConfigGroup.setSignalControlFile(outputDir + "signal_control.xml");
 		
 		//write config to file
 		String configFile = outputDir  + "config.xml";
