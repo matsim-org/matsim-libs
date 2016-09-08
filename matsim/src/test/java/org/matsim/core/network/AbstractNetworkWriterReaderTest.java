@@ -101,6 +101,20 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 		nodes.add(n2);
 		doTestNodes(nodes, getOutputDirectory() + "network.xml");
 	}
+	
+	public void testNodes_withAndWithoutElevation(){
+		List<Node> nodes = new ArrayList<>(2);
+		Node n1 = NetworkUtils.createNode(
+				Id.create("1", Node.class), 
+				new Coord((double) 0, (double) 0));
+		Node n2 = NetworkUtils.createNode(
+				Id.create("2", Node.class), 
+				new Coord((double) 1000, (double) 0, (double) 0));
+		nodes.add(n1);
+		nodes.add(n2);
+		doTestNodes(nodes, getOutputDirectory() + "network.xml");
+	}
+	
 
 	private void doTestAllowedModes(final Set<String> modes, final String filename) {
 		Network network1 = NetworkUtils.createNetwork();
