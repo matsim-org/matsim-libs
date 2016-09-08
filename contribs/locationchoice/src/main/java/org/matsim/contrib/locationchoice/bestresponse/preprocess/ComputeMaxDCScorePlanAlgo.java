@@ -32,6 +32,7 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 	
@@ -155,6 +156,11 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 		public void setCoord(Coord coord) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
-		}	
+		}
+
+		@Override
+		public Attributes getAttributes() {
+			throw new RuntimeException("not implemented") ;
+		}
 	}
 }
