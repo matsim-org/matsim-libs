@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dynagent.DriverDynLeg;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.vehicles.Vehicle;
 
 
 public class RandomDynLeg
@@ -105,6 +106,13 @@ public class RandomDynLeg
     public void arrivedOnLinkByNonNetworkMode(Id<Link> linkId)
     {
         currentLinkId = linkId;
+    }
+
+
+    @Override
+    public Id<Vehicle> getPlannedVehicleId()
+    {
+        return null;
     }
 
 
