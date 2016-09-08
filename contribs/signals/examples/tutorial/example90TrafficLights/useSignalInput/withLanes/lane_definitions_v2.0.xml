@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <laneDefinitions xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd" xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <lanesToLinkAssignment linkIdRef="12">
-        <lane id="1">
+        <lane id="12.l">
             <leadsTo>
                 <toLink refId="23"/>
-                <toLink refId="21"/>
             </leadsTo>
             <representedLanes number="1.0"/>
             <capacity vehiclesPerHour="1800.0"/>
@@ -13,15 +12,15 @@
         </lane>
         <lane id="12.ol">
             <leadsTo>
-                <toLane refId="2"/>
-                <toLane refId="1"/>
+                <toLane refId="12.l"/>
+                <toLane refId="12.r"/>
             </leadsTo>
             <representedLanes number="1.0"/>
             <capacity vehiclesPerHour="1800.0"/>
             <startsAt meterFromLinkEnd="300.0"/>
             <alignment>0</alignment>
         </lane>
-        <lane id="2">
+        <lane id="12.r">
             <leadsTo>
                 <toLink refId="27"/>
             </leadsTo>
@@ -30,37 +29,35 @@
             <startsAt meterFromLinkEnd="150.0"/>
             <alignment>-1</alignment>
         </lane>
-    </lanesToLinkAssignment>
-    <lanesToLinkAssignment linkIdRef="65">
-        <lane id="1">
+        <lane id="65.ol">
             <leadsTo>
-                <toLink refId="54"/>
-                <toLink refId="56"/>
+                <toLane refId="65.l"/>
+                <toLane refId="65.r"/>
             </leadsTo>
             <representedLanes number="1.0"/>
             <capacity vehiclesPerHour="1800.0"/>
-            <startsAt meterFromLinkEnd="150.0"/>
-            <alignment>-1</alignment>
+            <startsAt meterFromLinkEnd="300.0"/>
+            <alignment>0</alignment>
         </lane>
-        <lane id="2">
+    </lanesToLinkAssignment>
+    <lanesToLinkAssignment linkIdRef="65">
+        <lane id="65.l">
             <leadsTo>
                 <toLink refId="58"/>
-                <toLink refId="56"/>
             </leadsTo>
             <representedLanes number="1.0"/>
             <capacity vehiclesPerHour="1800.0"/>
             <startsAt meterFromLinkEnd="150.0"/>
             <alignment>1</alignment>
         </lane>
-        <lane id="65.ol">
+        <lane id="65.r">
             <leadsTo>
-                <toLane refId="2"/>
-                <toLane refId="1"/>
+                <toLink refId="54"/>
             </leadsTo>
             <representedLanes number="1.0"/>
             <capacity vehiclesPerHour="1800.0"/>
-            <startsAt meterFromLinkEnd="300.0"/>
-            <alignment>0</alignment>
+            <startsAt meterFromLinkEnd="150.0"/>
+            <alignment>-1</alignment>
         </lane>
     </lanesToLinkAssignment>
 </laneDefinitions>

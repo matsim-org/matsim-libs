@@ -86,9 +86,9 @@ public class CreateSignalInputWithLanesExample {
 		SignalSystemsDataFactory factory = systems.getFactory();
 		
 		SignalUtils.createAndAddSignal(sys, factory, Id.create("1", Signal.class), Id.createLinkId("12"),
-				Arrays.asList(Id.create("1", Lane.class)));
+				Arrays.asList(Id.create("12.l", Lane.class)));
 		SignalUtils.createAndAddSignal(sys, factory, Id.create("2", Signal.class), Id.createLinkId("12"),
-				Arrays.asList(Id.create("2", Lane.class)));
+				Arrays.asList(Id.create("12.r", Lane.class)));
 		SignalUtils.createAndAddSignal(sys, factory, Id.create("3", Signal.class), Id.createLinkId("32"), null);
 		SignalUtils.createAndAddSignal(sys, factory, Id.create("4", Signal.class), Id.createLinkId("72"), null);
 		
@@ -102,9 +102,9 @@ public class CreateSignalInputWithLanesExample {
 		SignalSystemsDataFactory factory = systems.getFactory();
 
 		SignalUtils.createAndAddSignal(sys, factory, Id.create("1", Signal.class), Id.createLinkId("65"),
-				Arrays.asList(Id.create("1", Lane.class)));
+				Arrays.asList(Id.create("65.r", Lane.class)));
 		SignalUtils.createAndAddSignal(sys, factory, Id.create("2", Signal.class), Id.createLinkId("65"),
-				Arrays.asList(Id.create("2", Lane.class)));
+				Arrays.asList(Id.create("65.l", Lane.class)));
 		SignalUtils.createAndAddSignal(sys, factory, Id.create("3", Signal.class), Id.createLinkId("45"), null);
 		SignalUtils.createAndAddSignal(sys, factory, Id.create("4", Signal.class), Id.createLinkId("85"), null);
 
@@ -148,34 +148,36 @@ public class CreateSignalInputWithLanesExample {
 		// original lane, i.e. lane that starts at the link from node and leads to all other lanes of the link
 		LanesUtils.createAndAddLane20(lanesForLink12, factory, 
 				Id.create("12.ol", Lane.class), LANE_CAPACITY, LINK_LENGTH, 0, NO_LANES, 
-				null, Arrays.asList(Id.create("1", Lane.class), Id.create("2", Lane.class)));
+				null, Arrays.asList(Id.create("12.l", Lane.class), Id.create("12.r", Lane.class)));
 		
 		// left turning lane (alignment 1)
 		LanesUtils.createAndAddLane20(lanesForLink12, factory,
-				Id.create("1", Lane.class), LANE_CAPACITY, LANE_LENGTH, 1, NO_LANES,
+				Id.create("12.l", Lane.class), LANE_CAPACITY, LANE_LENGTH, 1, NO_LANES,
 				Collections.singletonList(Id.create("23", Link.class)), null);
 
 		// right turning lane (alignment -1)
 		LanesUtils.createAndAddLane20(lanesForLink12, factory,
-				Id.create("2", Lane.class), LANE_CAPACITY, LANE_LENGTH, -1, NO_LANES,
+				Id.create("12.r", Lane.class), LANE_CAPACITY, LANE_LENGTH, -1, NO_LANES,
 				Collections.singletonList(Id.create("27", Link.class)), null);
 
-		// lanes for link 65
+		// create lanes for link 65
 		LanesToLinkAssignment20 lanesForLink65 = factory
 				.createLanesToLinkAssignment(Id.create("65", Link.class));
 		lanes.addLanesToLinkAssignment(lanesForLink65);
 
 		// original lane, i.e. lane that starts at the link from node and leads to all other lanes of the link
-		LanesUtils.createAndAddLane20(lanesForLink12, factory, Id.create("65.ol", Lane.class), LANE_CAPACITY, LINK_LENGTH, 0, NO_LANES, null,
-				Arrays.asList(Id.create("1", Lane.class), Id.create("2", Lane.class)));		
+		LanesUtils.createAndAddLane20(lanesForLink12, factory, 
+				Id.create("65.ol", Lane.class), LANE_CAPACITY, LINK_LENGTH, 0, NO_LANES, null,
+				Arrays.asList(Id.create("65.l", Lane.class), Id.create("65.r", Lane.class)));		
 		
 		// right turning lane (alignment -1)
 		LanesUtils.createAndAddLane20(lanesForLink65, factory,
-				Id.create("1", Lane.class), LANE_CAPACITY, LANE_LENGTH, -1, NO_LANES,
+				Id.create("65.r", Lane.class), LANE_CAPACITY, LANE_LENGTH, -1, NO_LANES,
 				Collections.singletonList(Id.create("54", Link.class)), null);
 
+		// left turning lane (alignment 1)
 		LanesUtils.createAndAddLane20(lanesForLink65, factory,
-				Id.create("2", Lane.class), LANE_CAPACITY, LANE_LENGTH, 1, NO_LANES,
+				Id.create("65.l", Lane.class), LANE_CAPACITY, LANE_LENGTH, 1, NO_LANES,
 				Collections.singletonList(Id.create("58", Link.class)), null);
 	}
 
