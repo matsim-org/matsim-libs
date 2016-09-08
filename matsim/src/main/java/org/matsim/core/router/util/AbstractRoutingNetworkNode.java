@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.PreProcessDijkstra.DeadEndData;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public abstract class AbstractRoutingNetworkNode implements RoutingNetworkNode {
 
@@ -100,5 +101,9 @@ public abstract class AbstractRoutingNetworkNode implements RoutingNetworkNode {
 	public Map<Id<Link>, ? extends Link> getOutLinks() {
 		throw new RuntimeException("Not supported operation!");
 	}
-	
+
+	@Override
+	public Attributes getAttributes() {
+		return node.getAttributes();
+	}
 }
