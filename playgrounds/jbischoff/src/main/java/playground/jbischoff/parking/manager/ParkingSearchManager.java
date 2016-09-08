@@ -29,7 +29,7 @@ import org.matsim.vehicles.Vehicle;
  * @author  jbischoff
  *
  */
-public interface ParkingManager {
+public interface ParkingSearchManager {
 
 	boolean reserveSpaceIfVehicleCanParkHere(Id<Vehicle> vehicleId, Id<Link> linkId);
 	Id<Link> getVehicleParkingLocation(Id<Vehicle> vehicleId);

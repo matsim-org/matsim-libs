@@ -28,7 +28,7 @@ import org.matsim.core.controler.Controler;
 import playground.jbischoff.parking.evaluation.ParkingListener;
 import playground.jbischoff.parking.manager.FacilityBasedParkingManager;
 import playground.jbischoff.parking.manager.LinkLengthBasedParkingManagerWithRandomInitialUtilisation;
-import playground.jbischoff.parking.manager.ParkingManager;
+import playground.jbischoff.parking.manager.ParkingSearchManager;
 import playground.jbischoff.parking.manager.WalkLegFactory;
 import playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
 import playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationToNearbyParking;
@@ -51,7 +51,7 @@ public class SetupParking {
 			
 			@Override
 			public void install() {
-			bind(ParkingManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();;
+			bind(ParkingSearchManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();;
 			bind(WalkLegFactory.class).asEagerSingleton();
 			
 			this.install(new ParkingSearchQSimModule());

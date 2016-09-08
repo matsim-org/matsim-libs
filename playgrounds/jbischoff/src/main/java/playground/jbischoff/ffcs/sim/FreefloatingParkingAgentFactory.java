@@ -45,7 +45,7 @@ import playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager;
 import playground.jbischoff.parking.DynAgent.agentLogic.ParkingAgentLogic;
 import playground.jbischoff.parking.choice.ParkingChoiceLogic;
 import playground.jbischoff.parking.choice.RandomParkingChoiceLogic;
-import playground.jbischoff.parking.manager.ParkingManager;
+import playground.jbischoff.parking.manager.ParkingSearchManager;
 import playground.jbischoff.parking.manager.WalkLegFactory;
 import playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
 import playground.jbischoff.parking.routing.ParkingRouter;
@@ -63,7 +63,7 @@ public class FreefloatingParkingAgentFactory implements AgentFactory {
 	@Inject
 	WalkLegFactory walkLegFactory;
 	@Inject
-	ParkingManager parkingManager;
+	ParkingSearchManager parkingManager;
 
 	@Inject
 	EventsManager events;

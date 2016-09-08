@@ -45,7 +45,7 @@ import org.matsim.vehicles.Vehicle;
 import playground.jbischoff.parking.ParkingUtils;
 import playground.jbischoff.parking.DynAgent.ParkingDynLeg;
 import playground.jbischoff.parking.choice.ParkingChoiceLogic;
-import playground.jbischoff.parking.manager.ParkingManager;
+import playground.jbischoff.parking.manager.ParkingSearchManager;
 import playground.jbischoff.parking.manager.WalkLegFactory;
 import playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
 import playground.jbischoff.parking.routing.ParkingRouter;
@@ -71,7 +71,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 	protected DynAgent agent;
 	protected Iterator<PlanElement> planElemIter;
 	protected PlanElement currentPlanElement;
-	protected ParkingManager parkingManager;
+	protected ParkingSearchManager parkingManager;
 	protected WalkLegFactory walkLegFactory;
 	protected ParkingRouter parkingRouter;
 	protected MobsimTimer timer;
@@ -85,7 +85,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 	 * @param plan
 	 *            (always starts with Activity)
 	 */
-	public ParkingAgentLogic(Plan plan, ParkingManager parkingManager, WalkLegFactory walkLegFactory, ParkingRouter parkingRouter, EventsManager events, ParkingChoiceLogic parkingLogic, MobsimTimer timer, VehicleTeleportationLogic teleportationLogic) {
+	public ParkingAgentLogic(Plan plan, ParkingSearchManager parkingManager, WalkLegFactory walkLegFactory, ParkingRouter parkingRouter, EventsManager events, ParkingChoiceLogic parkingLogic, MobsimTimer timer, VehicleTeleportationLogic teleportationLogic) {
 		planElemIter = plan.getPlanElements().iterator();
 		this.parkingManager = parkingManager;
 		this.walkLegFactory = walkLegFactory;

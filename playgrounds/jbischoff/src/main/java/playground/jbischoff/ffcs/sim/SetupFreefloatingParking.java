@@ -36,7 +36,7 @@ import playground.jbischoff.ffcs.manager.SimpleFreeFloatingCarsharingManagerImpl
 import playground.jbischoff.parking.evaluation.ParkingListener;
 import playground.jbischoff.parking.manager.FacilityBasedParkingManager;
 import playground.jbischoff.parking.manager.LinkLengthBasedParkingManagerWithRandomInitialUtilisation;
-import playground.jbischoff.parking.manager.ParkingManager;
+import playground.jbischoff.parking.manager.ParkingSearchManager;
 import playground.jbischoff.parking.manager.WalkLegFactory;
 import playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
 import playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationToNearbyParking;
@@ -64,7 +64,7 @@ public class SetupFreefloatingParking {
 	        addRoutingModuleBinding(FFCSUtils.FREEFLOATINGMODE).toInstance(new DynRoutingModule(FFCSUtils.FREEFLOATINGMODE));
 	        bind(CarsharingData.class).toInstance(data);
 			bind(FreefloatingCarsharingManager.class).to(SimpleFreeFloatingCarsharingManagerImpl.class).asEagerSingleton();	
-			bind(ParkingManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();;
+			bind(ParkingSearchManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();;
 			bind(WalkLegFactory.class).asEagerSingleton();
 			
 			this.install(new FreefloatingParkingSearchQSimModule());

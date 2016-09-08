@@ -29,7 +29,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import com.google.inject.Inject;
 
 import playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager;
-import playground.jbischoff.parking.manager.ParkingManager;
+import playground.jbischoff.parking.manager.ParkingSearchManager;
 
 /**
  * @author  jbischoff

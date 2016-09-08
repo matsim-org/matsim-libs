@@ -50,7 +50,7 @@ import playground.jbischoff.parking.ParkingUtils;
 /**
  *
  */
-public class FacilityBasedParkingManager implements ParkingManager {
+public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 	Map<Id<Link>,Integer> capacity = new HashMap<>();
 	Map<Id<ActivityFacility>,MutableInt> occupation = new HashMap<>();

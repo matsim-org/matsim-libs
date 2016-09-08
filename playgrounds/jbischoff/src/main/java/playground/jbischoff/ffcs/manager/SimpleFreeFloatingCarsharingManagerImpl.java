@@ -42,7 +42,7 @@ import com.google.inject.Inject;
 
 import playground.jbischoff.ffcs.FFCSConfigGroup;
 import playground.jbischoff.ffcs.data.CarsharingData;
-import playground.jbischoff.parking.manager.ParkingManager;
+import playground.jbischoff.parking.manager.ParkingSearchManager;
 
 /**
  * @author  jbischoff
@@ -62,7 +62,7 @@ public class SimpleFreeFloatingCarsharingManagerImpl implements FreefloatingCars
 	 * 
 	 */
 	@Inject
-	public SimpleFreeFloatingCarsharingManagerImpl(Network network, ParkingManager parkingManager, CarsharingData data, Config config) {
+	public SimpleFreeFloatingCarsharingManagerImpl(Network network, ParkingSearchManager parkingManager, CarsharingData data, Config config) {
 		this.idleVehicleLocations=data.getVehiclesStartLocations();
 		this.network = network;
 		this.ffcsConfigGroup = (FFCSConfigGroup) config.getModule("freefloating");
