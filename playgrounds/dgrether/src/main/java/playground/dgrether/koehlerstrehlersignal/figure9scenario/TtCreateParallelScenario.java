@@ -49,14 +49,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.LanesWriter;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
 import playground.dgrether.DgPaths;
 
@@ -125,7 +125,7 @@ public class TtCreateParallelScenario {
 		log.info("network written to " + networkOutfile);
 		// lanes
 		createLanes((MutableScenario) scenario);
-		LaneDefinitionsWriter20 laneWriter = new LaneDefinitionsWriter20(scenario.getLanes());
+		LanesWriter laneWriter = new LanesWriter(scenario.getLanes());
 		laneWriter.write(lanesOutfile);
 		log.info("lanes written to " + lanesOutfile);
 		// signals

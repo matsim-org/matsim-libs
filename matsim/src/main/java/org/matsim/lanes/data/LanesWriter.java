@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.data.v20;
+package org.matsim.lanes.data;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -45,10 +45,10 @@ import org.matsim.jaxb.lanedefinitions20.XMLLanesToLinkAssignmentType;
  * @author dgrether
  *
  */
-public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements MatsimSomeWriter {
+public class LanesWriter extends MatsimJaxbXmlWriter implements MatsimSomeWriter {
 
 	private static final Logger log = Logger
-			.getLogger(LaneDefinitionsWriter20.class);
+			.getLogger(LanesWriter.class);
 
 	private Lanes laneDefinitions;
 
@@ -58,7 +58,7 @@ public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements Mats
 	 * @param lanedefs
 	 *
 	 */
-	public LaneDefinitionsWriter20(Lanes lanedefs) {
+	public LanesWriter(Lanes lanedefs) {
 		log.info("Using LaneDefinitionWriter20...");
 		this.laneDefinitions = lanedefs;
 	}
@@ -74,7 +74,7 @@ public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements Mats
 			XMLLaneDefinitions xmlLaneDefinitions = convertDataToXml();
 			jc = JAXBContext.newInstance(org.matsim.jaxb.lanedefinitions20.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller();
-			super.setMarshallerProperties(LaneDefinitionsReader.SCHEMALOCATIONV20, m);
+			super.setMarshallerProperties(LanesReader.SCHEMALOCATIONV20, m);
 			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
 			m.marshal(xmlLaneDefinitions, bufout);
 			bufout.close();
@@ -87,7 +87,7 @@ public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements Mats
 		ObjectFactory fac = new ObjectFactory();
 		XMLLaneDefinitions xmllaneDefs = fac.createXMLLaneDefinitions();
 
-		for (LanesToLinkAssignment20 ltla : this.laneDefinitions.getLanesToLinkAssignments().values()) {
+		for (LanesToLinkAssignment ltla : this.laneDefinitions.getLanesToLinkAssignments().values()) {
 			XMLLanesToLinkAssignmentType xmlltla = fac.createXMLLanesToLinkAssignmentType();
 			xmlltla.setLinkIdRef(ltla.getLinkId().toString());
 

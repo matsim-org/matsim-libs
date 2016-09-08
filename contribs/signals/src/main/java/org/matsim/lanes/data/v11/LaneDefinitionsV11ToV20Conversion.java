@@ -25,10 +25,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.lanes.LanesUtils;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.Lanes;
-import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
-import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesFactory;
+import org.matsim.lanes.data.LanesImpl;
 
 import java.io.Serializable;
 import java.util.*;
@@ -56,6 +56,7 @@ import java.util.*;
  * @author dgrether
  * @author aneumann
  */
+@Deprecated
 public abstract class LaneDefinitionsV11ToV20Conversion {
 	
 //	private static final Logger log = Logger.getLogger(LaneDefinitionsV11ToV20Conversion.class);
@@ -78,8 +79,8 @@ public abstract class LaneDefinitionsV11ToV20Conversion {
 	}	
 	
 	public static void convertTo20(LaneDefinitions11 in, Lanes out, Network network, UTurnCreation uturn) {
-		LaneDefinitionsFactory20 lanedefs20fac = out.getFactory();
-		org.matsim.lanes.data.v20.LanesToLinkAssignment20 l2lnew;
+		LanesFactory lanedefs20fac = out.getFactory();
+		org.matsim.lanes.data.LanesToLinkAssignment l2lnew;
 		Lane lanev20;
 		Link link;
 		for (LanesToLinkAssignment11 l2lv11 : in.getLanesToLinkAssignments().values()){
@@ -192,7 +193,7 @@ public abstract class LaneDefinitionsV11ToV20Conversion {
 	}
 	
 	public static Lanes convertTo20(LaneDefinitions11 lanedefs11, Network network, UTurnCreation uturns) {
-		Lanes lanedefs20 = new LaneDefinitions20Impl();
+		Lanes lanedefs20 = new LanesImpl();
 		convertTo20(lanedefs11, lanedefs20, network, uturns);
 		return lanedefs20;
 	}

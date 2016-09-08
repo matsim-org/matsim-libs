@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.data.v20;
+package org.matsim.lanes.data;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -26,21 +26,26 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesReader;
+import org.matsim.lanes.data.LanesToLinkAssignment;
+import org.matsim.lanes.data.LanesWriter;
 import org.matsim.testcases.MatsimTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Tests the reader and writer for the different lane formats
+ * Tests the reader and writer for lanes
  * @author dgrether
  *
  */
-public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
+public class LanesReaderWriterTest extends MatsimTestCase {
 
-	private static final Logger log = Logger.getLogger(LaneDefinitionsReaderWriterTest.class);
+	private static final Logger log = Logger.getLogger(LanesReaderWriterTest.class);
 
-	private static final String TESTXMLV20 = "testLaneDefinitions_v2.0.xml";
+	private static final String FILENAME = "testLanes.xml";
 
 	private Id<Lane> laneId1 = Id.create("1", Lane.class);
 	private Id<Link> linkId1 = Id.create("1", Link.class);
@@ -66,8 +71,8 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 
 	public void testReader20() {
 		Fixture f = new Fixture();
-		LaneDefinitionsReader reader = new LaneDefinitionsReader(f.scenario);
-		reader.readFile(this.getClassInputDirectory() + TESTXMLV20);
+		LanesReader reader = new LanesReader(f.scenario);
+		reader.readFile(this.getClassInputDirectory() + FILENAME);
 		checkContent(f.scenario.getLanes());
 	}
 	
@@ -76,18 +81,18 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 		String testoutput = this.getOutputDirectory() + "testLaneDefinitions2.0out.xml.gz";
 		log.debug("reading file...");
 		// read the test file
-		LaneDefinitionsReader reader = new LaneDefinitionsReader(
+		LanesReader reader = new LanesReader(
 				f.scenario);
-		reader.readFile(this.getClassInputDirectory() + TESTXMLV20);
+		reader.readFile(this.getClassInputDirectory() + FILENAME);
 
 		// write the test file
 		log.debug("write the test file...");
-		LaneDefinitionsWriter20 writerDelegate = new LaneDefinitionsWriter20(f.scenario.getLanes());
+		LanesWriter writerDelegate = new LanesWriter(f.scenario.getLanes());
 		writerDelegate.write(testoutput);
 
 		f = new Fixture();
 		log.debug("and read it again");
-		reader = new LaneDefinitionsReader(
+		reader = new LanesReader(
 				f.scenario);
 		reader.readFile(testoutput);
 		checkContent(f.scenario.getLanes());
@@ -95,8 +100,8 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 
 	private void checkContent(Lanes lanedefs) {
 		assertEquals(2, lanedefs.getLanesToLinkAssignments().size());
-		LanesToLinkAssignment20 l2la;
-		List<LanesToLinkAssignment20> assignments = new ArrayList<>();
+		LanesToLinkAssignment l2la;
+		List<LanesToLinkAssignment> assignments = new ArrayList<>();
 		assignments.addAll(lanedefs.getLanesToLinkAssignments().values());
 		l2la = assignments.get(0);
 		assertNotNull(l2la);

@@ -57,7 +57,7 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.Default
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
+import org.matsim.lanes.data.LanesWriter;
 
 //import matsimConnector.congestionpricing.MSACongestionHandler;
 //import matsimConnector.congestionpricing.MSAMarginalCongestionPricingContolerListener;
@@ -690,7 +690,7 @@ public final class RunBraessSimulation {
 		// write network and lanes
 		new NetworkWriter(scenario.getNetwork()).write(outputDir + "network.xml");
 		if (!LANE_TYPE.equals(LaneType.NONE)) 
-			new LaneDefinitionsWriter20(scenario.getLanes()).write(outputDir + "lanes.xml");
+			new LanesWriter(scenario.getLanes()).write(outputDir + "lanes.xml");
 		
 		// write population
 		new PopulationWriter(scenario.getPopulation()).write(outputDir + "plans.xml");

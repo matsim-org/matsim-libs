@@ -51,11 +51,11 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.LanesUtils;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
-import org.matsim.lanes.data.v20.Lanes;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesFactory;
+import org.matsim.lanes.data.LanesToLinkAssignment;
+import org.matsim.lanes.data.LanesWriter;
 
 /**
  * Example for how to create signal input files for a scenario with lanes from code.
@@ -138,45 +138,45 @@ public class CreateSignalInputWithLanesExample {
 	}
 
 	private void createLanes(Lanes lanes) {
-		LaneDefinitionsFactory20 factory = lanes.getFactory();
+		LanesFactory factory = lanes.getFactory();
 		
 		// create lanes for link 12
-		LanesToLinkAssignment20 lanesForLink12 = factory
+		LanesToLinkAssignment lanesForLink12 = factory
 				.createLanesToLinkAssignment(Id.createLinkId("12"));
 		lanes.addLanesToLinkAssignment(lanesForLink12);
 		
 		// original lane, i.e. lane that starts at the link from node and leads to all other lanes of the link
-		LanesUtils.createAndAddLane20(lanesForLink12, factory, 
+		LanesUtils.createAndAddLane(lanesForLink12, factory, 
 				Id.create("12.ol", Lane.class), LANE_CAPACITY, LINK_LENGTH, 0, NO_LANES, 
 				null, Arrays.asList(Id.create("12.l", Lane.class), Id.create("12.r", Lane.class)));
 		
 		// left turning lane (alignment 1)
-		LanesUtils.createAndAddLane20(lanesForLink12, factory,
+		LanesUtils.createAndAddLane(lanesForLink12, factory,
 				Id.create("12.l", Lane.class), LANE_CAPACITY, LANE_LENGTH, 1, NO_LANES,
 				Collections.singletonList(Id.create("23", Link.class)), null);
 
 		// right turning lane (alignment -1)
-		LanesUtils.createAndAddLane20(lanesForLink12, factory,
+		LanesUtils.createAndAddLane(lanesForLink12, factory,
 				Id.create("12.r", Lane.class), LANE_CAPACITY, LANE_LENGTH, -1, NO_LANES,
 				Collections.singletonList(Id.create("27", Link.class)), null);
 
 		// create lanes for link 65
-		LanesToLinkAssignment20 lanesForLink65 = factory
+		LanesToLinkAssignment lanesForLink65 = factory
 				.createLanesToLinkAssignment(Id.create("65", Link.class));
 		lanes.addLanesToLinkAssignment(lanesForLink65);
 
 		// original lane, i.e. lane that starts at the link from node and leads to all other lanes of the link
-		LanesUtils.createAndAddLane20(lanesForLink12, factory, 
+		LanesUtils.createAndAddLane(lanesForLink12, factory, 
 				Id.create("65.ol", Lane.class), LANE_CAPACITY, LINK_LENGTH, 0, NO_LANES, null,
 				Arrays.asList(Id.create("65.l", Lane.class), Id.create("65.r", Lane.class)));		
 		
 		// right turning lane (alignment -1)
-		LanesUtils.createAndAddLane20(lanesForLink65, factory,
+		LanesUtils.createAndAddLane(lanesForLink65, factory,
 				Id.create("65.r", Lane.class), LANE_CAPACITY, LANE_LENGTH, -1, NO_LANES,
 				Collections.singletonList(Id.create("54", Link.class)), null);
 
 		// left turning lane (alignment 1)
-		LanesUtils.createAndAddLane20(lanesForLink65, factory,
+		LanesUtils.createAndAddLane(lanesForLink65, factory,
 				Id.create("65.l", Lane.class), LANE_CAPACITY, LANE_LENGTH, 1, NO_LANES,
 				Collections.singletonList(Id.create("58", Link.class)), null);
 	}
@@ -240,7 +240,7 @@ public class CreateSignalInputWithLanesExample {
 		configWriter.write(configFile);
 		
 		// write lanes to file
-		LaneDefinitionsWriter20 writerDelegate = new LaneDefinitionsWriter20(scenario.getLanes());
+		LanesWriter writerDelegate = new LanesWriter(scenario.getLanes());
 		writerDelegate.write(config.network().getLaneDefinitionsFile());
 
 		// write signal information to file

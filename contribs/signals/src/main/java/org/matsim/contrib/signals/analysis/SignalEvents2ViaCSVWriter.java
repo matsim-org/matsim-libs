@@ -40,16 +40,13 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
 import org.matsim.contrib.signals.model.Signal;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.events.EventsHandlerHierarchyTest;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.Lanes;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
 
 /**
  * Write a csv file for visualizing signals in via based on the events.
@@ -104,12 +101,12 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 			init();
 		}
 		
-		String signalCSVFilname = scenario.getConfig().controler().getOutputDirectory() + "ITERS/it." 
+		String signalCSVFilename = scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." 
 				+ event.getIteration() + "/signalEvents2Via.csv";
 		
 //		log.info("Initializing SignalsCSVWriter ...");
-		signalsCSVWriter = IOUtils.getBufferedWriter( signalCSVFilname );
-		log.info("Writing signal events of iteration " + event.getIteration() + " as csv file for via to " + signalCSVFilname + " ...");
+		signalsCSVWriter = IOUtils.getBufferedWriter( signalCSVFilename );
+		log.info("Writing signal events of iteration " + event.getIteration() + " as csv file for via to " + signalCSVFilename + " ...");
 		
 		// create header
 		try {

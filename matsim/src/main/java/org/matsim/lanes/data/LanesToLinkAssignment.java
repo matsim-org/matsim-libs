@@ -1,10 +1,10 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- * DgLaneSensor
- *                                                                         *
+/* **********************************import java.util.List;
+
+import org.matsim.interfaces.basic.v01.Id;
+                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,41 +17,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems;
 
+package org.matsim.lanes.data;
+
+import java.util.SortedMap;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.LaneEnterEvent;
-import org.matsim.core.api.experimental.events.LaneLeaveEvent;
-import org.matsim.lanes.data.Lane;
-
-
 /**
+ *
  * @author dgrether
  *
  */
-public class DgLaneSensor {
+public interface LanesToLinkAssignment {
 
-	private Link link;
-	private Lane lane;
-	private int agentsOnLink = 0;
+	SortedMap<Id<Lane>, Lane> getLanes();
 
-	public DgLaneSensor(Link link, Lane lane) {
-		this.link = link;
-		this.lane = lane;
-	}
+	void addLane(Lane lane);
 
-	public void handleEvent(LaneLeaveEvent event) {
-		this.agentsOnLink--;
-	}
-
-	public void handleEvent(LaneEnterEvent event) {
-		this.agentsOnLink++;
-	}
-
-	public int getNumberOfCarsOnLink() {
-		return this.agentsOnLink;
-	}
-	
-	
+	Id<Link> getLinkId();
 
 }

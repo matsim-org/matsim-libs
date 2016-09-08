@@ -33,7 +33,7 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.v20.*;
+import org.matsim.lanes.data.*;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -65,9 +65,9 @@ public class QLinkLanesTest extends MatsimTestCase {
 	private Lanes createOneLane(Scenario scenario, int numberOfRepresentedLanes) {
 		scenario.getConfig().qsim().setUseLanes(true);
 		Lanes lanes = scenario.getLanes();
-		LaneDefinitionsFactory20 builder = lanes.getFactory();
+		LanesFactory builder = lanes.getFactory();
 		//lanes for link 1
-		LanesToLinkAssignment20 lanesForLink1 = builder.createLanesToLinkAssignment(Id.create(1, Link.class));
+		LanesToLinkAssignment lanesForLink1 = builder.createLanesToLinkAssignment(Id.create(1, Link.class));
 		Lane link1FirstLane = builder.createLane(Id.create("1.ol", Lane.class));
 		link1FirstLane.addToLaneId(Id.create(1, Lane.class));
 		link1FirstLane.setNumberOfRepresentedLanes(2.0);
@@ -88,9 +88,9 @@ public class QLinkLanesTest extends MatsimTestCase {
 	private Lanes createLanes(Scenario scenario) {
 		scenario.getConfig().qsim().setUseLanes(true);
 		Lanes lanes = scenario.getLanes();
-		LaneDefinitionsFactory20 builder = lanes.getFactory();
+		LanesFactory builder = lanes.getFactory();
 		//lanes for link 1
-		LanesToLinkAssignment20 lanesForLink1 = builder.createLanesToLinkAssignment(Id.create("1", Link.class));
+		LanesToLinkAssignment lanesForLink1 = builder.createLanesToLinkAssignment(Id.create("1", Link.class));
 		
 		Lane link1FirstLane = builder.createLane(Id.create("1.ol", Lane.class));
 		link1FirstLane.addToLaneId(Id.create("1", Lane.class));

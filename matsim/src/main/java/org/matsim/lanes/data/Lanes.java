@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,40 +17,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.lanes.data.v20;
+package org.matsim.lanes.data;
 
 import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 
 /**
+ * Top level container for lanes within MATSim. See package-info for documentation.
  * @author dgrether
+ *
  */
-class LanesToLinkAssignment20Impl implements LanesToLinkAssignment20 {
+public interface Lanes extends MatsimToplevelContainer {
+	String ELEMENT_NAME = "laneDefinition20";
 
-	private final Id<Link> linkId;
+	/**
+	 *
+	 * @return Map with Link Ids as keys and assignments as values
+	 */
+	SortedMap<Id<Link>, LanesToLinkAssignment> getLanesToLinkAssignments();
 
-	private final SortedMap<Id<Lane>, Lane> lanes = new TreeMap<>();
-
-	public LanesToLinkAssignment20Impl(Id<Link> linkId) {
-		this.linkId = linkId;
-	}
-
+	/**
+	 * Adds a LanesToLinkAssignment to the container.
+	 * @param assignment
+	 */
+	void addLanesToLinkAssignment(LanesToLinkAssignment assignment);
+	/**
+	 * Get the factory to create container content.
+	 */
 	@Override
-	public void addLane(Lane lane) {
-		this.lanes.put(lane.getId(), lane);
-	}
-
-	@Override
-	public Id<Link> getLinkId() {
-		return linkId;
-	}
-
-	@Override
-	public SortedMap<Id<Lane>, Lane> getLanes() {
-		return this.lanes;
-	}
+	LanesFactory getFactory();
 
 }

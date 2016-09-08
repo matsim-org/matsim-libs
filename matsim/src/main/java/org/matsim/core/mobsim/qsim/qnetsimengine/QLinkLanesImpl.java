@@ -47,7 +47,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.lanes.ModelLane;
-import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.Lane;
 import org.matsim.lanes.vis.VisLane;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
 import org.matsim.lanes.vis.VisLinkWLanes;

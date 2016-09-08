@@ -17,20 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.lanes.data.v11;
+package org.matsim.lanes.data;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.lanes.data.Lane;
 
 /**
  * @author dgrether
  */
-@Deprecated
-public class LaneData11Impl implements LaneData11 {
+class LaneImpl implements Lane {
 
 	private Id<Lane> id;
 	/**
@@ -41,10 +39,15 @@ public class LaneData11Impl implements LaneData11 {
 	 * the default according to the xml schema, never change the value if schema is not changed
 	 */
 	private double startsAtMeterFromLinkEnd = 45.0;
-	
-	private List<Id<Link>> toLinkIds = null;
+	private List<Id<Link>> toLinkIds;
+  private List<Id<Lane>> toLaneIds;
+  private int alignment = 0;
+	/**
+	 * the default according to the xml schema, never change the value if schema is not changed
+	 */
+	private double capacity = 3600.0;
 
-	public LaneData11Impl(Id<Lane> id) {
+	public LaneImpl(Id<Lane> id) {
 		this.id = id;
 	}
 
@@ -87,4 +90,38 @@ public class LaneData11Impl implements LaneData11 {
 	public List<Id<Link>> getToLinkIds() {
 		return this.toLinkIds;
 	}
+	
+	@Override
+	public void addToLaneId(Id<Lane> id) {
+		if (this.toLaneIds == null) {
+			this.toLaneIds = new ArrayList<>();
+		}
+		this.toLaneIds.add(id);
+	}
+	
+	@Override
+	public List<Id<Lane>> getToLaneIds() {
+		return this.toLaneIds;
+	}
+	
+	@Override
+	public int getAlignment() {
+		return alignment;
+	}
+	
+	@Override
+	public void setAlignment(int alignment) {
+		this.alignment = alignment;
+	}
+
+	@Override
+	public double getCapacityVehiclesPerHour() {
+		return this.capacity ;
+	}
+
+	@Override
+	public void setCapacityVehiclesPerHour(double capacity) {
+		this.capacity = capacity;
+	}
+	
 }

@@ -42,13 +42,13 @@ import org.matsim.jaxb.signalsystems20.XMLSignalSystemType;
 import org.matsim.jaxb.signalsystems20.XMLSignalSystemType.XMLSignals;
 import org.matsim.jaxb.signalsystems20.XMLSignalType;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLLane;
-import org.matsim.lanes.data.v20.LaneDefinitionsReader;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.LanesReader;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitionsReader11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
-import org.matsim.lanes.data.v20.Lane;
 import org.matsim.contrib.signals.SignalSystemsReader11;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsWriter20;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsWriter20;
@@ -76,7 +76,7 @@ public class SignalSystems11To20Converter {
 	
 	private LaneDefinitions11 readLaneDefinitions11(String laneDefinitions11) {
 		LaneDefinitions11 laneDefs = new LaneDefinitions11Impl();
-		LaneDefinitionsReader11 reader = new LaneDefinitionsReader11(laneDefs, LaneDefinitionsReader.SCHEMALOCATIONV11);
+		LaneDefinitionsReader11 reader = new LaneDefinitionsReader11(laneDefs, LanesReader.SCHEMALOCATIONV11);
 		reader.readFile(laneDefinitions11);
 		return laneDefs;
 	}

@@ -40,7 +40,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
  * Configures and runs MATSim with traffic signals from input files
  * and visualizes it with OTFVis. 
  * 
- * @author dgrether
+ * @author dgrether, tthunig
  */
 public class RunSignalSystemsExample {
 

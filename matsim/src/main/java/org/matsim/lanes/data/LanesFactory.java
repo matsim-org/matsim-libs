@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LaneEnterEvent
+ * BasicLaneDefinitionBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,63 +17,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.api.experimental.events;
-
-import java.util.Map;
+package org.matsim.lanes.data;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.lanes.data.Lane;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.core.api.internal.MatsimFactory;
 
 
 /**
- *
+ * Builder for the content of BasicLaneDefinitions
  * @author dgrether
- *
  */
-public final class LaneEnterEvent extends Event  {
-	
-	public static final String EVENT_TYPE = "entered lane";
-	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_LANE = "lane";
-	
-	private final Id<Vehicle> vehicleId;
-	private final Id<Link> linkId;
-	private final Id<Lane> laneId;
-	
-	public LaneEnterEvent(double time, Id<Vehicle> vehicleId, Id<Link> linkId, Id<Lane> laneId) {
-		super(time);
-		this.laneId = laneId;
-		this.vehicleId = vehicleId;
-		this.linkId = linkId;
-	}
+public interface LanesFactory extends MatsimFactory {
 
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-
-	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
-		attr.put(ATTRIBUTE_LANE, this.laneId.toString());
-		return attr;
-	}
-
-	public Id<Vehicle> getVehicleId() {
-		return vehicleId;
-	}
-
-	public Id<Link> getLinkId() {
-		return this.linkId;
-	}
-
-	public Id<Lane> getLaneId() {
-		return this.laneId;
-	}
+	/**
+	 * 
+	 * @param linkIdReference id of the links the lanes of the created object belong to
+	 * @return An empty instance of LanesToLinkAssignment for the Link with the Id given as parameter
+	 */
+	LanesToLinkAssignment createLanesToLinkAssignment(Id<Link> linkIdReference);
+	/**
+	 * Creates an instance of BasicLane with the id given as parameter.
+	 * @param laneId
+	 * @return
+	 */
+	Lane createLane(Id<Lane> laneId);
 }

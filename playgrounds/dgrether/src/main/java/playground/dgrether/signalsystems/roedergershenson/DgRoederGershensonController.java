@@ -28,9 +28,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.Lanes;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.model.Signal;
@@ -39,6 +36,9 @@ import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesToLinkAssignment;
 
 import playground.dgrether.signalsystems.DgSensorManager;
 
@@ -138,7 +138,7 @@ public class DgRoederGershensonController implements SignalController {
 						this.addOutLinksWithoutBackLinkToMetadata(inLink, metadata);
 					}
 					else { // there are lanes
-						LanesToLinkAssignment20 lanes4link = lanedefs.getLanesToLinkAssignments().get(signalData.getLinkId());
+						LanesToLinkAssignment lanes4link = lanedefs.getLanesToLinkAssignments().get(signalData.getLinkId());
 						for (Id  laneId : signalData.getLaneIds()){
 							Lane lane = lanes4link.getLanes().get(laneId);
 							if (lane.getToLinkIds() == null || lane.getToLinkIds().isEmpty()){

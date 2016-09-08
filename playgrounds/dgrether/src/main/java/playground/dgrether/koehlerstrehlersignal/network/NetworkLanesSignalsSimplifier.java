@@ -36,9 +36,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.Lanes;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesToLinkAssignment;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
@@ -152,8 +152,8 @@ public class NetworkLanesSignalsSimplifier {
 									
 									//take lanes of outLink and adapt length of first lane
 									if (lanes.getLanesToLinkAssignments().containsKey(outLink.getId())){
-										LanesToLinkAssignment20 l2l = lanes.getLanesToLinkAssignments().remove(outLink.getId());
-										LanesToLinkAssignment20 newL2l = lanes.getFactory().createLanesToLinkAssignment(newLink.getId());
+										LanesToLinkAssignment l2l = lanes.getLanesToLinkAssignments().remove(outLink.getId());
+										LanesToLinkAssignment newL2l = lanes.getFactory().createLanesToLinkAssignment(newLink.getId());
 										newL2l.getLanes().putAll(l2l.getLanes());
 										//correct first lane of newLink which starts at the beginning of inLink
 										for (Lane lane : newL2l.getLanes().values()){
@@ -165,7 +165,7 @@ public class NetworkLanesSignalsSimplifier {
 									}
 									
 									//correct lanes with toLink = inLink
-									for (LanesToLinkAssignment20  l2l : lanes.getLanesToLinkAssignments().values()){
+									for (LanesToLinkAssignment  l2l : lanes.getLanesToLinkAssignments().values()){
 										for (Lane lane : l2l.getLanes().values()){
 											if (lane.getToLinkIds() != null && lane.getToLinkIds().contains(inLink.getId())) {
 												lane.getToLinkIds().remove(inLink.getId());

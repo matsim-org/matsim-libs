@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LaneEnterEvent
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,63 +16,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.api.experimental.events;
 
-import java.util.Map;
+package org.matsim.lanes.data;
+
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.lanes.data.Lane;
-import org.matsim.vehicles.Vehicle;
-
 
 /**
- *
  * @author dgrether
- *
  */
-public final class LaneEnterEvent extends Event  {
-	
-	public static final String EVENT_TYPE = "entered lane";
-	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_LANE = "lane";
-	
-	private final Id<Vehicle> vehicleId;
+class LanesToLinkAssignmentImpl implements LanesToLinkAssignment {
+
 	private final Id<Link> linkId;
-	private final Id<Lane> laneId;
-	
-	public LaneEnterEvent(double time, Id<Vehicle> vehicleId, Id<Link> linkId, Id<Lane> laneId) {
-		super(time);
-		this.laneId = laneId;
-		this.vehicleId = vehicleId;
+
+	private final SortedMap<Id<Lane>, Lane> lanes = new TreeMap<>();
+
+	public LanesToLinkAssignmentImpl(Id<Link> linkId) {
 		this.linkId = linkId;
 	}
 
 	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
+	public void addLane(Lane lane) {
+		this.lanes.put(lane.getId(), lane);
 	}
 
 	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
-		attr.put(ATTRIBUTE_LANE, this.laneId.toString());
-		return attr;
-	}
-
-	public Id<Vehicle> getVehicleId() {
-		return vehicleId;
-	}
-
 	public Id<Link> getLinkId() {
-		return this.linkId;
+		return linkId;
 	}
 
-	public Id<Lane> getLaneId() {
-		return this.laneId;
+	@Override
+	public SortedMap<Id<Lane>, Lane> getLanes() {
+		return this.lanes;
 	}
+
 }

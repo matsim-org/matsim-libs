@@ -32,8 +32,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.lanes.data.Lane;
 import org.matsim.lanes.data.v11.*;
-import org.matsim.lanes.data.v20.Lane;
 
 import java.util.ArrayList;
 import java.util.List;

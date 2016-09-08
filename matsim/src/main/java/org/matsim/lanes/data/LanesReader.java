@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MatsimLaneReader
+ * MatsimLaneDefinitionReader
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,59 +17,72 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.data.v20;
+package org.matsim.lanes.data;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.jaxb.lanedefinitions20.*;
-import org.xml.sax.SAXException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.SchemaFactory;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.internal.MatsimReader;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.jaxb.lanedefinitions20.ObjectFactory;
+import org.matsim.jaxb.lanedefinitions20.XMLIdRefType;
+import org.matsim.jaxb.lanedefinitions20.XMLLaneDefinitions;
+import org.matsim.jaxb.lanedefinitions20.XMLLaneType;
+import org.matsim.jaxb.lanedefinitions20.XMLLanesToLinkAssignmentType;
+import org.xml.sax.SAXException;
 
 /**
- * Reader for the http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd
- * file format.
  * @author dgrether
- *
  */
-class LaneDefinitionsReader20  {
+public class LanesReader implements MatsimReader {
+	
+	private static final Logger log = Logger.getLogger(LanesReader.class);
+	
+	@Deprecated
+	public static final String SCHEMALOCATIONV11 = "http://www.matsim.org/files/dtd/laneDefinitions_v1.1.xsd";
 
-	private static final Logger log = Logger
-			.getLogger(LaneDefinitionsReader20.class);
+	public static final String SCHEMALOCATIONV20 = "http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd";
+	
+	private Lanes lanes;
+	private LanesFactory factory;
 
-	private Lanes laneDefinitions;
-
-	private LaneDefinitionsFactory20 builder;
-
-	LaneDefinitionsReader20(Lanes laneDefs) {
-		this.laneDefinitions = laneDefs;
-		builder = this.laneDefinitions.getFactory();
+	public LanesReader(Scenario scenario) {
+		this.lanes = scenario.getLanes();
+		this.factory = lanes.getFactory();
 	}
 
-
-	public void readFile(String filename) throws JAXBException, SAXException,
-			ParserConfigurationException, IOException {
-		InputStream stream = IOUtils.getInputStream(filename);
-		parse(stream);
+	@Override
+	public void readFile(final String filename) {
+		try {
+			log.info("reading file " + filename);
+			InputStream inputStream = IOUtils.getInputStream(filename);
+			parse(inputStream);
+		} catch (JAXBException | SAXException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	void readURL(URL url) throws JAXBException, SAXException,
-			ParserConfigurationException, IOException {
-		InputStream inputStream = IOUtils.getInputStream(url);
-		parse(inputStream);
+	public void readURL(final URL url) {
+		try {
+			log.info("reading file " + url.toString());
+			InputStream inputStream = IOUtils.getInputStream(url);
+			parse(inputStream);
+		} catch (JAXBException | SAXException e) {
+			throw new RuntimeException(e);
+		}
 	}
-
+	
 	private void parse(InputStream stream) throws JAXBException, SAXException {
 		ObjectFactory fac = new ObjectFactory();
 		JAXBContext jc = JAXBContext.newInstance(org.matsim.jaxb.lanedefinitions20.ObjectFactory.class);
@@ -91,10 +104,10 @@ class LaneDefinitionsReader20  {
 		//convert the parsed xml-instances to basic instances
 		for (XMLLanesToLinkAssignmentType lldef : xmlLaneDefinitions
 				.getLanesToLinkAssignment()) {
-			LanesToLinkAssignment20 l2lAssignment = builder.createLanesToLinkAssignment(Id.create(lldef
+			LanesToLinkAssignment l2lAssignment = factory.createLanesToLinkAssignment(Id.create(lldef
 					.getLinkIdRef(), Link.class));
 			for (XMLLaneType laneType : lldef.getLane()) {
-				Lane lane = builder.createLane(Id.create(laneType.getId(), Lane.class));
+				Lane lane = factory.createLane(Id.create(laneType.getId(), Lane.class));
 
 				if (!laneType.getLeadsTo().getToLane().isEmpty()) {
 					for (XMLIdRefType toLaneId : laneType.getLeadsTo().getToLane()){
@@ -129,8 +142,7 @@ class LaneDefinitionsReader20  {
 
 				l2lAssignment.addLane(lane);
 			}
-			this.laneDefinitions.addLanesToLinkAssignment(l2lAssignment);
+			this.lanes.addLanesToLinkAssignment(l2lAssignment);
 		}
 	}
-
 }

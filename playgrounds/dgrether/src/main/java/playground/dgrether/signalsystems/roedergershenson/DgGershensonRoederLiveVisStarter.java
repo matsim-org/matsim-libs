@@ -35,7 +35,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.v20.Lanes;
+import org.matsim.lanes.data.Lanes;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;

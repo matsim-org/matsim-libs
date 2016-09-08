@@ -38,7 +38,7 @@ import org.matsim.jaxb.lanedefinitions11.XMLIdRefType;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneDefinitions;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneType;
 import org.matsim.jaxb.lanedefinitions11.XMLLanesToLinkAssignmentType;
-import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.Lane;
 import org.xml.sax.SAXException;
 
 
@@ -48,6 +48,7 @@ import org.xml.sax.SAXException;
  * @author dgrether
  *
  */
+@Deprecated
 public class LaneDefinitionsReader11 implements MatsimReader {
 
 	private static final Logger log = Logger

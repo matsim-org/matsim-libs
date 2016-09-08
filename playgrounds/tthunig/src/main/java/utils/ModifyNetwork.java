@@ -36,8 +36,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.LanesWriter;
 
 /**
  * double flow capacities of all signalized links and lanes
@@ -83,7 +83,7 @@ public class ModifyNetwork {
 		}
 		
 		new NetworkWriter(scenario.getNetwork()).write(INPUT_BASE_DIR + "network_wgs84_utm33n_v3.xml");
-		new LaneDefinitionsWriter20(scenario.getLanes()).write(INPUT_BASE_DIR + "lanes_v3.xml");
+		new LanesWriter(scenario.getLanes()).write(INPUT_BASE_DIR + "lanes_v3.xml");
 	}
 
 }

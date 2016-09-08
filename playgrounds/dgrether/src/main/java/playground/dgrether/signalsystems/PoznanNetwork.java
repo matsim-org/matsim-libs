@@ -38,9 +38,10 @@ import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesWriter;
 import org.matsim.lanes.data.v11.*;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
@@ -50,7 +51,6 @@ import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.dgrether.DgOTFVis;
@@ -625,7 +625,7 @@ public class PoznanNetwork
 
         String lanes20OutputFile = baseDir + "lanes20.xml";
         // String lanes20OutputFile = "d:\\PP-dyplomy\\2010_11-inz\\MATSim\\lanes20.xml";
-        LaneDefinitionsWriter20 writerDelegate = new LaneDefinitionsWriter20(lanes20);
+        LanesWriter writerDelegate = new LanesWriter(lanes20);
         writerDelegate.write(lanes20OutputFile);
         config.network().setLaneDefinitionsFile(lanes20OutputFile);
 

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicLaneDefinitionsBuilderImpl
+ * BasicLaneDefinitions
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,30 +17,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.data.v20;
+package org.matsim.lanes.data;
+
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 
 /**
- * 
  * @author dgrether
- * @see org.matsim.lanes.data.v20.LaneDefinitionsFactory20
  */
-class LaneDefinitionsFactory20Impl implements LaneDefinitionsFactory20 {
-	/**
-	 * @see org.matsim.lanes.data.v20.LaneDefinitionsFactory20#createLanesToLinkAssignment(org.matsim.api.core.v01.Id)
-	 */
+public class LanesImpl implements Lanes {
+
+	private SortedMap<Id<Link>, LanesToLinkAssignment> lanesToLinkAssignments =  new TreeMap<>();
+
+	private LanesFactory builder = new LanesFactoryImpl();
+
 	@Override
-	public LanesToLinkAssignment20 createLanesToLinkAssignment(Id<Link> linkIdReference) {
-		return new LanesToLinkAssignment20Impl(linkIdReference);
+	public SortedMap<Id<Link>, LanesToLinkAssignment> getLanesToLinkAssignments() {
+		return this.lanesToLinkAssignments;
 	}
-	/**
-	 * @see org.matsim.lanes.data.v20.LaneDefinitionsFactory20#createLane(org.matsim.api.core.v01.Id)
-	 */
+
 	@Override
-	public Lane createLane(Id<Lane> id) {
-		return new LaneData20Impl(id);
+	public void addLanesToLinkAssignment(LanesToLinkAssignment assignment) {
+		this.lanesToLinkAssignments.put(assignment.getLinkId(), assignment);
 	}
+
+	@Override
+	public LanesFactory getFactory(){
+		return this.builder;
+	}
+
 }

@@ -24,8 +24,10 @@ package org.matsim.lanes.data.v11;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.Lane;
 
+
+@Deprecated
 public class LanesUtils11 {
 	/**
 	 * Convenience method to create a format 11 lane with the given Id, the

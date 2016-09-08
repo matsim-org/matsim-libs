@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.v20.*;
+import org.matsim.lanes.data.*;
 
 import java.util.*;
 
@@ -38,7 +38,7 @@ import java.util.*;
 public final class LanesUtils {
 
 	/**
-	 * Convenience method to create a format 20 lane with the given Id, the given length,
+	 * Convenience method to create a lane with the given Id, the given length,
 	 * the given capacity, the given number of represented lanes, the given
 	 * alignment and the given Ids of the downstream links or lanes, respectively,
 	 * the lane leads to. The lane is added to the LanesToLinkAssignment given
@@ -47,7 +47,7 @@ public final class LanesUtils {
 	 * @param l2l
 	 *            the LanesToLinkAssignment to that the created lane is added
 	 * @param factory
-	 *            a LaneDefinitionsFactory20 to create the lane
+	 *            a LaneDefinitionsFactory to create the lane
 	 * @param laneId
 	 * @param capacity
 	 * @param startsAtMeterFromLinkEnd
@@ -56,8 +56,8 @@ public final class LanesUtils {
 	 * @param toLinkIds
 	 * @param toLaneIds
 	 */
-	public static void createAndAddLane20(LanesToLinkAssignment20 l2l,
-			LaneDefinitionsFactory20 factory, Id<Lane> laneId, double capacity,
+	public static void createAndAddLane(LanesToLinkAssignment l2l,
+			LanesFactory factory, Id<Lane> laneId, double capacity,
 			double startsAtMeterFromLinkEnd, int alignment,
 			int numberOfRepresentedLanes, List<Id<Link>> toLinkIds, List<Id<Lane>> toLaneIds) {
 		
@@ -85,7 +85,7 @@ public final class LanesUtils {
 	 * @param lanesToLinkAssignment
 	 * @return sorted list with the most upstream lane at the first position. 
 	 */
-	public static List<ModelLane> createLanes(Link link, LanesToLinkAssignment20 lanesToLinkAssignment) {
+	public static List<ModelLane> createLanes(Link link, LanesToLinkAssignment lanesToLinkAssignment) {
 		List<ModelLane> queueLanes = new ArrayList<ModelLane>();
 		List<Lane> sortedLanes =  new ArrayList<Lane>(lanesToLinkAssignment.getLanes().values());
 		Collections.sort(sortedLanes, new Comparator<Lane>() {
@@ -203,7 +203,7 @@ public final class LanesUtils {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Network network = scenario.getNetwork();
 		Lanes lanes = scenario.getLanes();
-		for (LanesToLinkAssignment20 l2l : lanes.getLanesToLinkAssignments().values()){
+		for (LanesToLinkAssignment l2l : lanes.getLanesToLinkAssignments().values()){
 			Link link = network.getLinks().get(l2l.getLinkId());
 			for (Lane lane : l2l.getLanes().values()){
 				if (lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty()){
@@ -214,7 +214,7 @@ public final class LanesUtils {
 				}
 			}
 		}
-		LaneDefinitionsWriter20 writerDelegate = new LaneDefinitionsWriter20(lanes);
+		LanesWriter writerDelegate = new LanesWriter(lanes);
 		writerDelegate.write(lanes20OutputFilename);
 	}
 }
