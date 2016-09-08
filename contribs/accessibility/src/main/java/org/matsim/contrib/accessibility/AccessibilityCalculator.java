@@ -33,33 +33,7 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 
 /**
- * improvements aug'12<ul>
- * <li> accessibility calculation of unified for cell- and zone-base approach
- * <li> large computing savings due reduction of "least cost path tree" execution:
- *   In a pre-processing step all nearest nodes of measuring points (origins) are determined. 
- *   The "least cost path tree" for measuring points with the same nearest node are now only executed once. 
- *   Only the cost calculations from the measuring point to the network is done individually.
- * </ul><p/>  
- * improvements nov'12<ul>
- * <li> bug fixed aggregatedOpportunities method for compound cost factors like time and distance    
- * </ul><p/>
- * improvements jan'13<ul>
- * <li> added pt for accessibility calculation
- * </ul><p/>
- * 
- * improvements june'13<ul>
- * <li> take "main" (reference to matsim4urbansim) out
- * <li> aggregation of opportunities adjusted to handle facilities
- * <li> zones are taken out
- * <li> replaced [[??]]
- * </ul> 
- * <p/> 
- * Design comments:<ul>
- * <li> yyyy This class is quite brittle, since it does not use a central disutility object, but produces its own.  Should be changed.
- * </ul>
- *     
- * @author thomas, knagel
- *
+ * @author thomas, knagel, dziemke
  */
 public final class AccessibilityCalculator {
 
@@ -93,6 +67,7 @@ public final class AccessibilityCalculator {
 	
 	private Scenario scenario;
 	private AccessibilityConfigGroup acg;
+	
 	
 	@Inject
 	public AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
@@ -305,6 +280,7 @@ public final class AccessibilityCalculator {
 		}
 	}
 
+	
 	/**
 	 * This method condenses measuring points (origins) that have the same nearest node on the network
 	 */
@@ -344,14 +320,17 @@ public final class AccessibilityCalculator {
 		}
 	}
 
+	
 	public void setComputingAccessibilityForMode( Modes4Accessibility mode, boolean val ) {
 		this.acg.setComputingAccessibilityForMode(mode, val);
 	}
+	
 	
 	public Set<Modes4Accessibility> getIsComputingMode() {
 		return this.acg.getIsComputingMode();
 	}
 
+	
 	/**
 	 * stores travel disutilities for different modes
 	 */
@@ -374,6 +353,7 @@ public final class AccessibilityCalculator {
 		}
 	}
 
+	
 	public final void setPtMatrix(PtMatrix ptMatrix) {
 		calculators.put(
 				Modes4Accessibility.pt,
@@ -382,6 +362,7 @@ public final class AccessibilityCalculator {
 						scenario.getConfig()));
 	}
 
+	
 	public void setMeasuringPoints(ActivityFacilitiesImpl measuringPoints) {
 		this.measuringPoints = measuringPoints;
 	}
