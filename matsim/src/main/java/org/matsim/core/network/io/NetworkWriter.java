@@ -21,6 +21,8 @@
 package org.matsim.core.network.io;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -32,6 +34,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.utils.objectattributes.AttributeConverter;
 
 public class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 	
@@ -39,6 +42,7 @@ public class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 	
 	private final Network network;
 	private final CoordinateTransformation transformation;
+	private final Map<Class<?>,AttributeConverter<?>> converters = new HashMap<>();
 
 	public NetworkWriter(final Network network) {
 		this( new IdentityTransformation() , network );
@@ -49,6 +53,14 @@ public class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 			final Network network) {
 		this.transformation = transformation;
 		this.network = network;
+	}
+
+	public void putAttributeConverters(final Map<Class<?>, AttributeConverter<?>> converters) {
+		this.converters.putAll( converters );
+	}
+
+	public void putAttributeConverter(Class<?> clazz , AttributeConverter<?> converter) {
+		this.converters.put(  clazz , converter );
 	}
 
 	@Override
@@ -68,7 +80,9 @@ public class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 
 	public void writeFileV2(final String filename) {
 		String dtd = "http://www.matsim.org/files/dtd/network_v2.dtd";
-		NetworkWriterHandler handler = new NetworkWriterHandlerImplV2(transformation);
+		NetworkWriterHandlerImplV2 handler = new NetworkWriterHandlerImplV2(transformation);
+
+		handler.putAttributeConverters( converters );
 
 		writeFile( dtd , handler , filename );
 	}

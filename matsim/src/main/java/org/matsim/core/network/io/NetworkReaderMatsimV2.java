@@ -32,10 +32,12 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.xml.sax.Attributes;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
@@ -225,4 +227,7 @@ public final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 		currentAttributes = l.getAttributes();
 	}
 
+	public void putAttributeConverters(Map<Class<?>, AttributeConverter<?>> converters) {
+		this.attributesDelegate.putAttributeConverters( converters );
+	}
 }

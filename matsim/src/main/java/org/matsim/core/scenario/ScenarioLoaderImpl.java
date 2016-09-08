@@ -129,7 +129,9 @@ class ScenarioLoaderImpl {
 			URL networkUrl = this.config.network().getInputFileURL(this.config.getContext());
 			log.info("loading network from " + networkUrl);
 			if ( config.network().getInputCRS() == null ) {
-				new MatsimNetworkReader(this.scenario.getNetwork()).parse(networkUrl);
+				MatsimNetworkReader reader = new MatsimNetworkReader(this.scenario.getNetwork());
+				reader.putAttributeConverters( attributeConverters );
+				reader.parse(networkUrl);
 			}
 			else {
 				log.info( "re-projecting network from "+config.network().getInputCRS()+" to "+config.global().getCoordinateSystem()+" for import" );
@@ -137,7 +139,9 @@ class ScenarioLoaderImpl {
 						TransformationFactory.getCoordinateTransformation(
 								config.network().getInputCRS(),
 								config.global().getCoordinateSystem() );
-				new MatsimNetworkReader( transformation , this.scenario.getNetwork() ).parse(networkUrl);
+				MatsimNetworkReader reader = new MatsimNetworkReader( transformation , this.scenario.getNetwork());
+				reader.putAttributeConverters( attributeConverters );
+				reader.parse(networkUrl);
 			}
 
 			if ((this.config.network().getChangeEventsInputFile()!= null) && this.config.network().isTimeVariantNetwork()) {

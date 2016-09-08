@@ -20,7 +20,10 @@
 
 package org.matsim.core.network.io;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
@@ -28,6 +31,7 @@ import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.utils.objectattributes.AttributeConverter;
 import org.xml.sax.Attributes;
 
 /**
@@ -46,6 +50,7 @@ public final class MatsimNetworkReader extends MatsimXmlParser {
 	private CoordinateTransformation transformation;
 
 	private final Network network;
+	private Map<Class<?>, AttributeConverter<?>> converters = new HashMap<>();
 
 	/**
 	 * Creates a new reader for MATSim network files.
@@ -88,6 +93,7 @@ public final class MatsimNetworkReader extends MatsimXmlParser {
 				break;
 			case NETWORK_V2:
 				this.delegate = new NetworkReaderMatsimV2(transformation , this.network);
+				((NetworkReaderMatsimV2) delegate).putAttributeConverters( converters );
 				log.info("using network_v2-reader.");
 				break;
 			default:
@@ -95,4 +101,11 @@ public final class MatsimNetworkReader extends MatsimXmlParser {
 		}
 	}
 
+	public void putAttributeConverter(Class<?> clazz, AttributeConverter<?> converter) {
+		this.converters.put( clazz, converter );
+	}
+
+	public void putAttributeConverters(Map<Class<?>, AttributeConverter<?>> attributeConverters) {
+		this.converters.putAll( attributeConverters );
+	}
 }
