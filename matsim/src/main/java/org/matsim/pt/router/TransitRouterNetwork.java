@@ -65,6 +65,7 @@ public final class TransitRouterNetwork implements Network {
 	private long nextNodeId = 0;
 	private long nextLinkId = 0;
 
+
 	public static final class TransitRouterNetworkNode implements Node {
 
 		public final TransitRouteStop stop;
@@ -493,5 +494,10 @@ public final class TransitRouterNetwork implements Network {
 	public double getEffectiveCellSize() {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
 	}
 }
