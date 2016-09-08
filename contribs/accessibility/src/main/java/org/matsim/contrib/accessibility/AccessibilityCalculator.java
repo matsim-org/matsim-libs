@@ -25,6 +25,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
@@ -124,8 +125,10 @@ public final class AccessibilityCalculator {
 		betaWalkTD = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
 		betaWalkTMC = -planCalcScoreConfigGroup.getMarginalUtilityOfMoney();
 		// ===
+//		TravelTime walkTravelTime = travelTimes.get(TransportMode.walk);
 //		this.walkTravelDisutility = (Coord2CoordTimeDistanceTravelDisutility) travelDisutilityFactories.get(TransportMode.walk).createTravelDisutility(
-//				travelTimes.get(TransportMode.walk));
+////				travelTimes.get(TransportMode.walk));
+//				walkTravelTime);
 		// end new
 		
 		initDefaultContributionCalculators(travelTimes, travelDisutilityFactories, scenario);

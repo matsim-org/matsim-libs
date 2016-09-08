@@ -34,7 +34,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 	private final double logitScaleParameter;
 	private final double betaCarTT;		// in MATSim this is [utils/h]: cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
 	private final double betaCarTD;		// in MATSim this is [utils/money * money/meter] = [utils/meter]: cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar()
-	private final double betaCarTMC;		// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
+	private final double betaCarTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
 
 	private final double constCar;
 
@@ -97,32 +97,23 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		this.lcpt.calculateExtended(scenario.getNetwork(), fromNode, departureTime);
 	}
 
-	@Override
-	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
-		// get the nearest link:
-//<<<<<<< HEAD
-//		Link nearestLink = ((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(origin.getCoord());
+	
+//	@Override
+//	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
+//		// get the nearest link:
+//		Link nearestLink = NetworkUtils.getNearestLinkExactly(((Network)scenario.getNetwork()),origin.getCoord());
 ////		Link nearestLink = NetworkUtils.getNearestLink(scenario.getNetwork(), origin.getCoord()); // TODO this would actually be more correct, dz, feb'16
-//=======
-		Link nearestLink = NetworkUtils.getNearestLinkExactly(((Network)scenario.getNetwork()),origin.getCoord());
-//>>>>>>> refs/heads/master
-
-		// === (1) ORIGIN to LINK to NODE:
-		// captures the distance (as walk time) between the origin via the link to the node:
-		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
-
-//<<<<<<< HEAD
+//
+//		// captures the distance (as walk time) between the origin via the link to the node:
+//		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
+//
 //		
 //		// === WALK TO NETWORK: ===
 //		// TODO: extract this walk part?
 //		// In the state found before modularization (june 15), this was anyway not consistent accross modes
 //		// (different for PtMatrix), pointing to the fact that making this mode-specific might make sense.
 //		// distance to road, and then to node.  (comment by thibaut?)
-//=======
-		// (a) ORIGIN FACILITY to LINK:
-//>>>>>>> refs/heads/master
-		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
-//<<<<<<< HEAD
+//		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
 //		//
 //		System.err.println("origin.getCoord() = " + origin.getCoord() + " -- destination.getNearestNode() = " + destination.getNearestNode());
 //		System.err.println("destination.getNumberOfObjects() = " + destination.getNumberOfObjects());
@@ -132,10 +123,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 //		//
 //
 //		// disutilities to get on or off the network
-//=======
-//>>>>>>> refs/heads/master
-		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distance.getDistancePoint2Road() * betaWalkTD);
-//<<<<<<< HEAD
+//		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distance.getDistancePoint2Road() * betaWalkTD);
 //		//
 //		System.err.println("walkDisutilityMeasuringPoint2Road = " + walkDisutilityMeasuringPoint2Road);
 //		//
@@ -157,30 +145,10 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 //		// end new
 //		
 //		// === NETWORK ENTRY TO FIRST NODE: ===
-//
-//		// this contains the current toll based on the toll scheme
-//		double road2NodeToll_money = getToll(nearestLink, scheme, departureTime); // tnicolai: add this to car disutility ??? depends on the road pricing scheme ...
-//		double toll_money 							= 0.;
-//		if ( scheme != null ) {
-//			if(RoadPricingScheme.TOLL_TYPE_CORDON.equals(scheme.getType()))
-//				toll_money = road2NodeToll_money;
-//			else if( RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType()))
-//				toll_money = road2NodeToll_money * distance.getDistanceRoad2Node();
-//			else
-//				throw new RuntimeException("accessibility not impelemented for requested toll scheme") ;
-//		}
-//
+//		double toll_money = getTollMoney(departureTime, nearestLink, distance);
 //		// travel time in hours to get from link enter point (position on a link given by orthogonal projection from measuring point) to the corresponding node
 //		double carSpeedOnNearestLink_meterpersec= nearestLink.getLength() / travelTime.getLinkTravelTime(nearestLink, departureTime, null, null);
-//=======
-		double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
-		
-		// (b) TRAVEL ON NETWORK to FIRST NODE:
-		double toll_money = getTollMoney(departureTime, nearestLink, distance);
-		double carSpeedOnNearestLink_meterpersec= nearestLink.getLength() / travelTime.getLinkTravelTime(nearestLink, departureTime, null, null);
-//>>>>>>> refs/heads/master
-		double road2NodeCongestedCarTime_h 			= distance.getDistanceRoad2Node() / (carSpeedOnNearestLink_meterpersec * 3600.);
-//<<<<<<< HEAD
+//		double road2NodeCongestedCarTime_h 			= distance.getDistanceRoad2Node() / (carSpeedOnNearestLink_meterpersec * 3600.);
 //		double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) + (distance.getDistanceRoad2Node() * betaCarTD) + (toll_money * betaCarTMC);
 //		
 //		// dzdzdz: replace the above by link disutility multiplied by fraction of link that is used according to the entry point.  (toll should be in there automatically??)
@@ -195,8 +163,30 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 //
 //		final double sumExpVjkWalk = destination.getSum();
 //		return Math.exp(logitScaleParameter * (walkDisutilityMeasuringPoint2Road + congestedCarDisutilityRoad2Node + constCar + congestedCarDisutility) ) * sumExpVjkWalk;
-//		
-//=======
+//	}
+	
+	
+	@Override
+	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
+		// get the nearest link:
+
+		Link nearestLink = NetworkUtils.getNearestLinkExactly(((Network)scenario.getNetwork()),origin.getCoord());
+
+		// === (1) ORIGIN to LINK to NODE:
+		// captures the distance (as walk time) between the origin via the link to the node:
+		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
+
+
+		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
+		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distance.getDistancePoint2Road() * betaWalkTD);
+		
+		double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
+		
+		// (b) TRAVEL ON NETWORK to FIRST NODE:
+		double toll_money = getTollMoney(departureTime, nearestLink, distance);
+		double carSpeedOnNearestLink_meterpersec= nearestLink.getLength() / travelTime.getLinkTravelTime(nearestLink, departureTime, null, null);
+		double road2NodeCongestedCarTime_h 			= distance.getDistanceRoad2Node() / (carSpeedOnNearestLink_meterpersec * 3600.);
+		
 		double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) 
 				+ (distance.getDistanceRoad2Node() * betaCarTD) + (toll_money * betaCarTMC);
 
@@ -212,7 +202,6 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		// note that exp(a+b+c) = exp(a) * exp(b) * exp(c), so for b and c the exponentiation has already been done.
 		return Math.exp(logitScaleParameter * (constCar + congestedCarDisutilityRoad2Node + congestedCarDisutility) ) *
 				expVhiWalk * sumExpVjkWalk;
-//>>>>>>> refs/heads/master
 	}
 
 
