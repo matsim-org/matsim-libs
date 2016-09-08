@@ -48,8 +48,6 @@ public class OneToManyBackwardPathSearch
             return new PathData(to.getFromNode(), 0.);
         }
         else {
-            //simplified, but works for taxis, since empty drives are short (about 5 mins)
-            //TODO delay can be computed after path search...
             double delay = VrpPaths.FIRST_LINK_TT + VrpPaths.getLastLinkTT(from, time);
             return new PathData(to.getToNode(), delay);
         }
