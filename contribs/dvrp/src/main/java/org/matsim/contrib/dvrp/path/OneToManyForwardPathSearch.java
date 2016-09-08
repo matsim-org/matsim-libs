@@ -17,39 +17,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.optimizer;
+package org.matsim.contrib.dvrp.path;
 
 import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.core.router.FastMultiNodeDijkstra;
 
 
-public class OneToManyBackwardPathSearch
+public class OneToManyForwardPathSearch
     extends AbstractOneToManyPathSearch
 {
-    public OneToManyBackwardPathSearch(FastMultiNodeDijkstra backwardMultiNodeDijkstra)
+    public OneToManyForwardPathSearch(FastMultiNodeDijkstra forwardMultiNodeDijkstra)
     {
-        super(backwardMultiNodeDijkstra);
+        super(forwardMultiNodeDijkstra);
     }
 
 
     /**
-     * This is backward search, so the meaning of variables is inverted.</br>
-     * 
-     * @param fromLink destination
-     * @param toLink origin
-     * @param startTime arrivalTime
+     * @param from origin link
+     * @param to destination link
+     * @param time departure time
      */
     @Override
     protected PathData createPathData(Link from, Link to, double time)
     {
         if (to == from) {
-            //we are already there, so let's use fromNode instead of toNode
-            return new PathData(to.getFromNode(), 0.);
+            //we are already there, so let's use toNode instead of fromNode
+            return new PathData(to.getToNode(), 0);
         }
         else {
-            double delay = VrpPaths.FIRST_LINK_TT + VrpPaths.getLastLinkTT(from, time);
-            return new PathData(to.getToNode(), delay);
+            //simplified, but works for taxis, since empty drives are short (about 5 mins)
+            //TODO delay can be computed more accurately after path search...
+            double delay = VrpPaths.FIRST_LINK_TT + VrpPaths.getLastLinkTT(to, time);
+            return new PathData(to.getFromNode(), delay);
         }
     }
 
@@ -57,6 +56,6 @@ public class OneToManyBackwardPathSearch
     @Override
     protected Node getFromNode(Link fromLink)
     {
-        return fromLink.getFromNode();
+        return fromLink.getToNode();
     }
 }

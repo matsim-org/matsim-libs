@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.optimizer;
+package org.matsim.contrib.dvrp.path;
 
 import java.util.*;
 

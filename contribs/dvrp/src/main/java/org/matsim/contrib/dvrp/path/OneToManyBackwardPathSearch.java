@@ -17,39 +17,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.optimizer;
+package org.matsim.contrib.dvrp.path;
 
 import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.core.router.FastMultiNodeDijkstra;
 
 
-public class OneToManyForwardPathSearch
+public class OneToManyBackwardPathSearch
     extends AbstractOneToManyPathSearch
 {
-    public OneToManyForwardPathSearch(FastMultiNodeDijkstra forwardMultiNodeDijkstra)
+    public OneToManyBackwardPathSearch(FastMultiNodeDijkstra backwardMultiNodeDijkstra)
     {
-        super(forwardMultiNodeDijkstra);
+        super(backwardMultiNodeDijkstra);
     }
 
 
     /**
-     * @param from origin link
-     * @param to destination link
-     * @param time departure time
+     * This is backward search, so the meaning of variables is inverted.</br>
+     * 
+     * @param fromLink destination
+     * @param toLink origin
+     * @param startTime arrivalTime
      */
     @Override
     protected PathData createPathData(Link from, Link to, double time)
     {
         if (to == from) {
-            //we are already there, so let's use toNode instead of fromNode
-            return new PathData(to.getToNode(), 0);
+            //we are already there, so let's use fromNode instead of toNode
+            return new PathData(to.getFromNode(), 0.);
         }
         else {
-            //simplified, but works for taxis, since empty drives are short (about 5 mins)
-            //TODO delay can be computed more accurately after path search...
-            double delay = VrpPaths.FIRST_LINK_TT + VrpPaths.getLastLinkTT(to, time);
-            return new PathData(to.getFromNode(), delay);
+            double delay = VrpPaths.FIRST_LINK_TT + VrpPaths.getLastLinkTT(from, time);
+            return new PathData(to.getToNode(), delay);
         }
     }
 
@@ -57,6 +56,6 @@ public class OneToManyForwardPathSearch
     @Override
     protected Node getFromNode(Link fromLink)
     {
-        return fromLink.getToNode();
+        return fromLink.getFromNode();
     }
 }

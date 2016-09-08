@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.optimizer.assignment;
 
-import org.matsim.contrib.taxi.optimizer.AbstractOneToManyPathSearch.PathData;
+import org.matsim.contrib.dvrp.path.AbstractOneToManyPathSearch.PathData;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
 import org.matsim.contrib.taxi.optimizer.VehicleData.Entry;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
