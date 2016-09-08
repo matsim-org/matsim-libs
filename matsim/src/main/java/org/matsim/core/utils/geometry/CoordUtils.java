@@ -294,13 +294,18 @@ public abstract class CoordUtils {
 	 * the extension of the line segment, i.e. the infinite line), the end point of
 	 * the line segment which is closest to the given point is returned.
 	 *
+	 * <br><br>
+	 * The 3D version was adapted from the documentation of 
+	 * <a href="http://www.geometrictools.com/Documentation/DistancePointLine.pdf">
+	 * David Eberly/a>. 
+	 *
 	 * @param lineFrom The start point of the line segment
 	 * @param lineTo The end point of the line segment
 	 * @param point The point whose distance to the line segment should be calculated
 	 * @return the <code>coordinate</code> of the intersection point of the orthogonal
 	 * projection of a given point on a line segment with that line segment
 	 *
-	 * @author dziemke
+	 * @author dziemke, jwjoubert
 	 */
 	public static Coord orthogonalProjectionOnLineSegment(final Coord lineFrom, final Coord lineTo, final Coord point) {
 		if(is2D(lineFrom) && is2D(lineTo) &&is2D(point)){
@@ -331,7 +336,11 @@ public abstract class CoordUtils {
 			return new Coord(lineFrom.getX() + u * lineDX, lineFrom.getY() + u * lineDY);
 		} else if(!is2D(lineFrom) && !is2D(lineTo) && !is2D(point)){
 			/* All coordinates are 3D. */
-			throw new RuntimeException("Not implemented.");
+			Coord direction = minus(lineTo, lineFrom);
+			
+			double t0 = dotProduct(direction, minus(point, lineFrom)) / dotProduct(direction, direction);
+			Coord q = plus(lineFrom, scalarMult(t0, direction));
+			return q;
 		} else{
 			throw new RuntimeException("All given coordinates must either be 2D, or 3D. A mix is not allowed.");
 		}

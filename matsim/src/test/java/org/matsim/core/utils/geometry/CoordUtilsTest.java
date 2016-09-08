@@ -231,5 +231,27 @@ public class CoordUtilsTest {
 		assertEquals(CoordUtils.calcEuclideanDistance(c3, c1), dist, MatsimTestUtils.EPSILON);
 	}
 	
+	@Test
+	public void testOrthogonalProjectionOnLineSegment(){
+		/* First: 2D */
+		Coord point = CoordUtils.createCoord(2.0, 0.0);
+		Coord lineFrom = CoordUtils.createCoord(0.0, 0.0);
+		Coord lineTo = CoordUtils.createCoord(2.0, 2.0);
+		
+		Coord projection = CoordUtils.createCoord(1.0, 1.0);
+		assertEquals(projection, CoordUtils.orthogonalProjectionOnLineSegment(lineFrom, lineTo, point));
+		
+		/* Second: 3D */
+		lineFrom = CoordUtils.createCoord(0.0, 0.0, 0.0);
+		lineTo = CoordUtils.createCoord(2.0, 2.0, 2.0);
+		point = CoordUtils.createCoord(2.0, 0.0, 1.0);
+		
+		projection = CoordUtils.createCoord(1.0, 1.0, 1.0);
+		assertEquals(projection, CoordUtils.orthogonalProjectionOnLineSegment(lineFrom, lineTo, point));
+		
+		point = CoordUtils.createCoord(3.0, 3.0, 3.0);
+		assertEquals(point, CoordUtils.orthogonalProjectionOnLineSegment(lineFrom, lineTo, point));
+	}
+	
 
 }
