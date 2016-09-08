@@ -22,6 +22,8 @@
  */
 package playground.jbischoff.ffcs.manager;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
@@ -42,4 +44,7 @@ public interface FreefloatingCarsharingManager {
 	 */
 	Tuple<Id<Link>,Id<Vehicle>> findAndReserveFreefloatingVehicleForLeg(Leg leg, Id<Person> personId, double time);
 	boolean endRental(Id<Link> linkId, Id<Person> personId, Id<Vehicle> vehicleId, double time);
+	void reset(int iteration);
+	public Map<Id<Vehicle>, Id<Link>> getIdleVehicleLocations();
+
 }

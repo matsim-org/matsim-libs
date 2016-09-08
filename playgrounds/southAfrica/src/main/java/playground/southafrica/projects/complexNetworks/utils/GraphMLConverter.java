@@ -74,7 +74,8 @@ public class GraphMLConverter {
 	
 	/**
 	 * Parses a MATSim-format {@link Network}, and translates it into a GraphML 
-	 * format using the {@link com.tinkerpop.blueprints.util.io.graphml.GraphMLWriter}. Then writes the resulting GraphML format to disk.
+	 * format using the {@link com.tinkerpop.blueprints.util.io.graphml.GraphMLWriter}. 
+	 * Then writes the resulting GraphML format to disk.
 	 * @param networkFile
 	 * @param gephiFile
 	 */

@@ -185,7 +185,6 @@ import org.matsim.core.utils.collections.IdentifiableArrayMap;
 	@Override
 	public void setLocked() {
 		this.locked = true ;
-		this.coord.setLocked();
 	}
 	private void testForLocked() {
 		if ( locked ) {

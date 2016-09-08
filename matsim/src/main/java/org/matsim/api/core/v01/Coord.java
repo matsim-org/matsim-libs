@@ -22,8 +22,6 @@ package org.matsim.api.core.v01;
 
 import java.io.Serializable;
 
-import org.matsim.core.scenario.Lockable;
-
 /**
  * In MATSim, generally Cartesian Coordinates are used, with x increasing
  * to the right, and y increasing to the top:
@@ -34,42 +32,47 @@ import org.matsim.core.scenario.Lockable;
  *   (0/0) ---->
  * </pre>
  */
-public final class Coord implements Serializable, Lockable {
+public final class Coord implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	private double x;
 	private double y;
-
-	private boolean locked = false ;
+	private double z;
 
 	public Coord(final double x, final double y) {
 		this.x = x;
 		this.y = y;
+		this.z = Double.NEGATIVE_INFINITY;
 	}
+	
+	
+	public Coord(final double x, final double y, final double z){
+		if(z == Double.NEGATIVE_INFINITY){
+			throw new IllegalArgumentException("Double.NEGATIVE_INFINITY is an invalid elevation. " + 
+					"If you want to ignore elevation, use Coord(x, y) constructor instead.");
+		}
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+	
 
 	public double getX() {
 		return this.x;
 	}
+	
 	public double getY() {
 		return this.y;
 	}
+	
+	public double getZ() {
+		if (this.z == Double.NEGATIVE_INFINITY){
+			throw new RuntimeException("Requesting elevation (z) without having first set it."); 
+		}
+		return this.z;
+	}
 
-//	public void setX(final double x) {
-//		testForLocked() ;
-//		this.x = x;
-//	}
-
-//	public void setY(final double y) {
-//		testForLocked() ;
-//		this.y = y;
-//	}
-
-//	public void setXY(final double x, final double y) {
-//		testForLocked() ;
-//		this.x = x;
-//		this.y = y;
-//	}
 
 	@Override
 	public boolean equals(final Object other) {
@@ -77,9 +80,39 @@ public final class Coord implements Serializable, Lockable {
 			return false;
 		}
 		Coord o = (Coord)other;
-		return ((this.x == o.getX()) && (this.y == o.getY()));
+		
+		if(this.z == Double.NEGATIVE_INFINITY){
+			/* this object is a 2D coordinate. */
+			@SuppressWarnings("unused")
+			double oZ;
+			try{
+				oZ = o.getZ();
+				/* other object is 3D coordinate. */
+				return false;
+			} catch (Exception e){
+				/* both are 2D coordinates. */
+				return ((this.x == o.getX()) && (this.y == o.getY()));
+			}
+		} else{
+			/* this object is 3D coordinate. */
+			@SuppressWarnings("unused")
+			double oZ;
+			try{
+				oZ = o.getZ();
+				/* both objects are 3D coordinates. */
+				return (
+						(this.x == o.getX()) && 
+						(this.y == o.getY()) &&
+						(this.z == o.getZ())
+				);
+			} catch (Exception e){
+				/* other object is 2D coordinate. */
+				return false;
+			}
+		}
 	}
 
+	
 	@Override
 	public int hashCode() {
 		// Implementation based on chapter 3 of Joshua Bloch's "Effective Java"
@@ -90,22 +123,13 @@ public final class Coord implements Serializable, Lockable {
 		return result;
 	}
 
+	
 	@Override
 	public final String toString() {
-		return "[x=" + this.x + "][y=" + this.y + "]";
-	}
-
-
-	@Override
-	public void setLocked() {
-		this.locked = true ;
-	}
-	private void testForLocked() {
-		if ( locked ) {
-			throw new RuntimeException( "Coord is locked; too late to do this.  See comments in code.") ;
+		if(this.z == Double.NEGATIVE_INFINITY){
+			return "[x=" + this.x + "][y=" + this.y + "]";
+		} else{
+			return "[x=" + this.x + "][y=" + this.y + "][z=" + this.z + "]";
 		}
 	}
-
-
-
 }

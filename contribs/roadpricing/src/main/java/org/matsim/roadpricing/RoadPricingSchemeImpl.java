@@ -39,7 +39,7 @@ import org.matsim.vehicles.Vehicle;
  *
  * @author mrieser
  */
-public class RoadPricingSchemeImpl implements RoadPricingScheme {
+public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 	// currently needs to be public. kai, sep'14
 	
 	private static Logger log = Logger.getLogger( RoadPricingSchemeImpl.class ) ;
@@ -95,7 +95,7 @@ public class RoadPricingSchemeImpl implements RoadPricingScheme {
 	/**
 	 * This is (if I am right) adding a possible toll for <i>all</i> links.  kai, oct'14
 	 */
-	public Cost addCost(final double startTime, final double endTime, final double amount) {
+	public Cost createAndAddCost(final double startTime, final double endTime, final double amount) {
 		if ( startTime==0. && endTime == 24.*3600. ) {
 			if (wrnCnt < 1) {
 				wrnCnt++ ;

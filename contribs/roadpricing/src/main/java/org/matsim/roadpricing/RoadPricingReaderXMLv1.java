@@ -33,7 +33,7 @@ import org.xml.sax.Attributes;
  *
  * @author mrieser
  */
-public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
+public final class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 	// currently needs to be public. kai, sep'14
 
 	private final static String TAG_ROADPRICING = "roadpricing";
@@ -50,7 +50,7 @@ public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 
 	private RoadPricingSchemeImpl scheme = null;
 
-	private Id currentLinkId = null;
+	private Id<Link> currentLinkId = null;
 
 	private boolean hasLinkCosts = false;
 
@@ -74,7 +74,7 @@ public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 				// (interpretation: an undefined toll end time very presumably means that it should last until +infty. kai, jan'14)
 			}
 			if (TAG_COST.equals(name) && this.currentLinkId == null) {
-				this.scheme.addCost(Time.parseTime(atts.getValue(ATTR_START_TIME)),
+				this.scheme.createAndAddCost(Time.parseTime(atts.getValue(ATTR_START_TIME)),
 						endTime, Double.parseDouble(atts.getValue(ATTR_AMOUNT)));
 			} else if (TAG_COST.equals(name) && this.currentLinkId != null){
 				this.scheme.addLinkCost(this.currentLinkId, Time.parseTime(atts.getValue(ATTR_START_TIME)),

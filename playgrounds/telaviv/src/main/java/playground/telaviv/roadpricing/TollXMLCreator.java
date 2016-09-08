@@ -181,7 +181,7 @@ public class TollXMLCreator {
 	    	 * Toll is  0.44 min/km = 0.44 * 0.1 = 0.044 monetary units / km = 0.000044 monetary units / m. 
 	    	 */
 //	    	toll = 0.000044;
-	    	scheme.addCost(0.0, 86400, toll);
+	    	scheme.createAndAddCost(0.0, 86400, toll);
 
 	    	new RoadPricingWriterXMLv1(scheme).writeFile(basePath + tollFile);	
 		} catch (Exception e) {

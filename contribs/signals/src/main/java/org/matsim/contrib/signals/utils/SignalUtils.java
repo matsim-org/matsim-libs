@@ -46,7 +46,7 @@ import org.matsim.lanes.data.v20.Lane;
 public class SignalUtils {
 
 	/**
-	 * create an empty SignalsData object
+	 * Create an empty SignalsData object
 	 * 
 	 * @param signalSystemsConfigGroup
 	 */
@@ -55,24 +55,19 @@ public class SignalUtils {
 	}
 
 	/**
-	 * Creates a SignalGroupData instance for each SignalData instance of the
-	 * SignalSystemData instance given as parameter and adds it to the
-	 * SignalGroupsData container given as parameter. The SignalGroupData
-	 * instance has the same Id as the SignalData instance.
+	 * Creates a signal group for each single signal of the
+	 * system and adds it to the given SignalGroupsData container. 
+	 * Each created signal group will get the same ID as the signal itself.
 	 * 
 	 * @param groups
-	 *            The container to that the SignalGroupData instances are added.
+	 *            container to that the signal groups are added
 	 * @param system
-	 *            The SignalSystemData instance whose SignalData Ids serve as
-	 *            template for the SignalGroupData
+	 *            contains the signals for which signal groups are created
 	 */
-	public static void createAndAddSignalGroups4Signals(
-			SignalGroupsData groups, SignalSystemData system) {
-		
+	public static void createAndAddSignalGroups4Signals(SignalGroupsData groups, SignalSystemData system) {
 		for (SignalData signal : system.getSignalData().values()) {
-			SignalGroupData group4signal = groups.getFactory()
-					.createSignalGroupData(system.getId(),
-							Id.create(signal.getId(), SignalGroup.class));
+			SignalGroupData group4signal = groups.getFactory().createSignalGroupData(system.getId(), 
+					Id.create(signal.getId(), SignalGroup.class));
 			group4signal.addSignalId(signal.getId());
 			groups.addSignalGroupData(group4signal);
 		}

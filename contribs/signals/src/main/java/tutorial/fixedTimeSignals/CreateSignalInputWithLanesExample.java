@@ -19,7 +19,9 @@
  * *********************************************************************** */
 package tutorial.fixedTimeSignals;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.apache.log4j.Logger;
@@ -58,8 +60,9 @@ import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
 /**
- * This class contains some examples how to set up a scenario with lanes and
- * signalized intersections.
+ * Example for how to create signal input files for a scenario with lanes from code.
+ * 
+ * @link VisualizeSignalScenarioWithLanes for how to visualize this scenario.
  * 
  * @author dgrether
  * @author tthunig
@@ -68,7 +71,6 @@ public class CreateSignalInputWithLanesExample {
 
 	private static final Logger log = Logger.getLogger(CreateSignalInputWithLanesExample.class);
 	private static final String INPUT_DIR = "./examples/tutorial/example90TrafficLights/createSignalInput/";
-	private static final String OUTPUT_DIR = "output/example90TrafficLights/";
 
 	private int onset1 = 0;
 	private int dropping1 = 55;
@@ -219,7 +221,7 @@ public class CreateSignalInputWithLanesExample {
 				scenario.getLanes(), scenario.getNetwork());
 	}
 
-	public String run() {		
+	public void run(String outputDir) throws IOException {		
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(INPUT_DIR + "network.xml.gz");
 		config.plans().setInputFile(INPUT_DIR + "population.xml.gz");
@@ -241,19 +243,16 @@ public class CreateSignalInputWithLanesExample {
 		this.createSystem2Control(scenario, signalsData.getSignalControlData());
 		this.createSystem5Control(scenario, signalsData.getSignalControlData());
 
-		File outputDirectory = new File(OUTPUT_DIR);
-		if (!outputDirectory.exists()) {
-			outputDirectory.mkdir();
-		}
-
-		// TODO delete "OUTPUT_DIR +" here. But what is with network and population above?
-		config.network().setLaneDefinitionsFile(OUTPUT_DIR + "lane_definitions_v2.0.xml");
-		signalSystemsConfigGroup.setSignalSystemFile(OUTPUT_DIR + "signal_systems.xml");
-		signalSystemsConfigGroup.setSignalGroupsFile(OUTPUT_DIR + "signal_groups.xml");
-		signalSystemsConfigGroup.setSignalControlFile(OUTPUT_DIR + "signal_control.xml");
+		// create the path to the output directory if it does not exist yet
+		Files.createDirectories(Paths.get(outputDir));
+				
+		config.network().setLaneDefinitionsFile(outputDir + "lane_definitions_v2.0.xml");
+		signalSystemsConfigGroup.setSignalSystemFile(outputDir + "signal_systems.xml");
+		signalSystemsConfigGroup.setSignalGroupsFile(outputDir + "signal_groups.xml");
+		signalSystemsConfigGroup.setSignalControlFile(outputDir + "signal_control.xml");
 
 		// write to file
-		String configFile = OUTPUT_DIR + "config.xml";
+		String configFile = outputDir + "config.xml";
 		ConfigWriter configWriter = new ConfigWriter(config);
 		configWriter.write(configFile);
 		
@@ -268,10 +267,9 @@ public class CreateSignalInputWithLanesExample {
 
 		log.info("Config of traffic light scenario with lanes is written to " + configFile);
 		log.info("Visualize scenario by calling VisTrafficSignalScenarioWithLanes in the same package.");
-		return configFile;
 	}
 
-	public static void main(String[] args) {
-		new CreateSignalInputWithLanesExample().run();
+	public static void main(String[] args) throws IOException {
+		new CreateSignalInputWithLanesExample().run("output/example90TrafficLights/");
 	}
 }

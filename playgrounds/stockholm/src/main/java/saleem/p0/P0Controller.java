@@ -35,8 +35,7 @@ public class P0Controller {
 
 	public static void main(String[] args) {
 		
-		Config config = ConfigUtils.loadConfig("H:\\Mike Work\\input\\config.xml");
-//		Config config = ConfigUtils.loadConfig("/home/saleem/P0/input/config.xml");
+		Config config = ConfigUtils.loadConfig("/home/saleem/P0/input/config.xml");
 		config.network().setTimeVariantNetwork(true);
         Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
