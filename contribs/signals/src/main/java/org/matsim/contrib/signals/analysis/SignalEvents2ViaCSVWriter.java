@@ -40,10 +40,13 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
 import org.matsim.contrib.signals.model.Signal;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.events.EventsHandlerHierarchyTest;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.Lanes;
@@ -78,6 +81,14 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 	private BufferedWriter signalsCSVWriter;
 	private SignalsData signalsData;
 	@Inject Scenario scenario;
+	
+	/* this does not work here: one can bind the class via guice 
+	 * but it will never be instantiated because it is not used somewhere else */
+//	@Inject public SignalEvents2ViaCSVWriter(Scenario scenario, ControlerListenerManager clm, EventsManager em) {
+//		this.scenario = scenario;
+//		clm.addControlerListener(this);
+//		em.addHandler(this);
+//	}
 	
 	private Map<Id<Signal>, Coord> signal2Coord = new HashMap<>();
 

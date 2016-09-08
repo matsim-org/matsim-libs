@@ -134,7 +134,7 @@ public final class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/sylvia/";
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/test/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -161,7 +161,7 @@ public final class RunBraessSimulation {
 		Config config = ConfigUtils.createConfig();
 
 		// set number of iterations
-		config.controler().setLastIteration(20);
+		config.controler().setLastIteration(1);
 
 		// able or enable signals and lanes
 		config.qsim().setUseLanes(LANE_TYPE.equals(LaneType.NONE) ? false : true);
@@ -299,6 +299,7 @@ public final class RunBraessSimulation {
 		controler.addOverridingModule(sylviaSignalsModule);
 		
 		// add responsive signal controler if enabled
+		// TODO does this work together with the SylviaSignalsModule?!
 		if (SIGNAL_TYPE.equals(SignalControlType.SIGNAL4_RESPONSIVE)){
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
