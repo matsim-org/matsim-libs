@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -48,16 +49,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.v11.LaneDefinitions11;
-import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
-import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
-import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
-import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
-import org.matsim.lanes.data.v11.LanesUtils11;
+import org.matsim.lanes.LanesUtils;
 import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
+import org.matsim.lanes.data.v20.Lanes;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
 /**
  * Example for how to create signal input files for a scenario with lanes from code.
@@ -71,13 +69,16 @@ public class CreateSignalInputWithLanesExample {
 
 	private static final Logger log = Logger.getLogger(CreateSignalInputWithLanesExample.class);
 	private static final String INPUT_DIR = "./examples/tutorial/example90TrafficLights/createSignalInput/";
-
-	private final int ONSET1 = 0;
-	private final int DROPPING1 = 55;
-	private final int ONSET2 = 60;
-	private final int DROPPING2 = 115;
-	private final int CYCLE = 120;
-	private final double LANE_LENGTH = 150.0;
+	
+	private static final int ONSET1 = 0;
+	private static final int DROPPING1 = 55;
+	private static final int ONSET2 = 60;
+	private static final int DROPPING2 = 115;
+	private static final int CYCLE = 120;
+	private static final double LANE_LENGTH = 150.0;
+	private static final int LANE_CAPACITY = 1800;
+	private static final int NO_LANES = 1; // number of represented lanes per lane
+	private static final double LINK_LENGTH = 300;
 
 	private void createGroupsAndSystem2(Scenario scenario, SignalSystemsData systems, SignalGroupsData groups) {
 		SignalSystemData sys = systems.getFactory().createSignalSystemData(Id.create("2", SignalSystem.class));
@@ -122,7 +123,7 @@ public class CreateSignalInputWithLanesExample {
 		controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
 		
 		// create and add signal plan with defined cycle time and offset 0		
-		SignalPlanData plan = SignalUtils.createSignalPlan(fac, this.CYCLE, 0);
+		SignalPlanData plan = SignalUtils.createSignalPlan(fac, CYCLE, 0);
 		controller.addSignalPlanData(plan);
 		
 		// create and add control settings for signal groups
@@ -136,36 +137,46 @@ public class CreateSignalInputWithLanesExample {
 				Id.create("4", SignalGroup.class), onset2, dropping2));
 	}
 
-	private void createLanes(Scenario scenario) {
-		LaneDefinitions11 lanes = new LaneDefinitions11Impl();
-		LaneDefinitionsFactory11 factory = lanes.getFactory();
-		//lanes for link 12
-		LanesToLinkAssignment11 lanesForLink12 = factory
-				.createLanesToLinkAssignment(Id.create("12", Link.class));
+	private void createLanes(Lanes lanes) {
+		LaneDefinitionsFactory20 factory = lanes.getFactory();
+		
+		// create lanes for link 12
+		LanesToLinkAssignment20 lanesForLink12 = factory
+				.createLanesToLinkAssignment(Id.createLinkId("12"));
 		lanes.addLanesToLinkAssignment(lanesForLink12);
-		LanesUtils11.createAndAddLane11(lanesForLink12, factory,
-				Id.create("1", Lane.class), LANE_LENGTH, 1,
-				Id.create("23", Link.class));
+		
+		// original lane, i.e. lane that starts at the link from node and leads to all other lanes of the link
+		LanesUtils.createAndAddLane20(lanesForLink12, factory, 
+				Id.create("12.ol", Lane.class), LANE_CAPACITY, LINK_LENGTH, 0, NO_LANES, 
+				null, Arrays.asList(Id.create("1", Lane.class), Id.create("2", Lane.class)));
+		
+		// left turning lane (alignment 1)
+		LanesUtils.createAndAddLane20(lanesForLink12, factory,
+				Id.create("1", Lane.class), LANE_CAPACITY, LANE_LENGTH, 1, NO_LANES,
+				Collections.singletonList(Id.create("23", Link.class)), null);
 
-		LanesUtils11.createAndAddLane11(lanesForLink12, factory,
-				Id.create("2", Lane.class), LANE_LENGTH, 1,
-				Id.create("27", Link.class));
+		// right turning lane (alignment -1)
+		LanesUtils.createAndAddLane20(lanesForLink12, factory,
+				Id.create("2", Lane.class), LANE_CAPACITY, LANE_LENGTH, -1, NO_LANES,
+				Collections.singletonList(Id.create("27", Link.class)), null);
 
 		// lanes for link 65
-		LanesToLinkAssignment11 lanesForLink65 = factory
+		LanesToLinkAssignment20 lanesForLink65 = factory
 				.createLanesToLinkAssignment(Id.create("65", Link.class));
 		lanes.addLanesToLinkAssignment(lanesForLink65);
 
-		LanesUtils11.createAndAddLane11(lanesForLink65, factory,
-				Id.create("1", Lane.class), LANE_LENGTH, 1,
-				Id.create("54", Link.class));
+		// original lane, i.e. lane that starts at the link from node and leads to all other lanes of the link
+		LanesUtils.createAndAddLane20(lanesForLink12, factory, Id.create("65.ol", Lane.class), LANE_CAPACITY, LINK_LENGTH, 0, NO_LANES, null,
+				Arrays.asList(Id.create("1", Lane.class), Id.create("2", Lane.class)));		
+		
+		// right turning lane (alignment -1)
+		LanesUtils.createAndAddLane20(lanesForLink65, factory,
+				Id.create("1", Lane.class), LANE_CAPACITY, LANE_LENGTH, -1, NO_LANES,
+				Collections.singletonList(Id.create("54", Link.class)), null);
 
-		LanesUtils11.createAndAddLane11(lanesForLink65, factory,
-				Id.create("2", Lane.class), LANE_LENGTH, 1,
-				Id.create("58", Link.class));
-
-		LaneDefinitionsV11ToV20Conversion.convertTo20(lanes,
-				scenario.getLanes(), scenario.getNetwork());
+		LanesUtils.createAndAddLane20(lanesForLink65, factory,
+				Id.create("2", Lane.class), LANE_CAPACITY, LANE_LENGTH, 1, NO_LANES,
+				Collections.singletonList(Id.create("58", Link.class)), null);
 	}
 
 	public void run(String outputDir) throws IOException {		
@@ -199,7 +210,7 @@ public class CreateSignalInputWithLanesExample {
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, signalsData);
 		
 		// create lanes for the scenario
-		this.createLanes(scenario);
+		this.createLanes(scenario.getLanes());
 
 		/* fill the SignalsData object with information:
 		 * signal systems - specify signalized intersections
