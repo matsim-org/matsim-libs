@@ -24,6 +24,7 @@ package org.matsim.contrib.accessibility.run;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -48,6 +49,7 @@ public class NetworkUtilTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
 	
+	@Ignore
 	@Test
 	public void testNetworkUtil() {
 		/* create a sample network:
