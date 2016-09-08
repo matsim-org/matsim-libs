@@ -20,13 +20,13 @@
 package org.matsim.contrib.dvrp.path;
 
 import org.matsim.api.core.v01.network.*;
-import org.matsim.core.router.FastMultiNodeDijkstra;
+import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 
 
 public class OneToManyBackwardPathSearch
     extends AbstractOneToManyPathSearch
 {
-    public OneToManyBackwardPathSearch(FastMultiNodeDijkstra backwardMultiNodeDijkstra)
+    public OneToManyBackwardPathSearch(BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra)
     {
         super(backwardMultiNodeDijkstra);
     }
