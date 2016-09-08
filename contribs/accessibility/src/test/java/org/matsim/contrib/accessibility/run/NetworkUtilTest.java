@@ -49,7 +49,7 @@ public class NetworkUtilTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
 	
-	@Ignore
+//	@Ignore
 	@Test
 	public void testNetworkUtil() {
 		/* create a sample network:
@@ -146,9 +146,18 @@ public class NetworkUtilTest {
 		Assert.assertEquals("projectionC22.getY()", 1050., projectionC22.getY(), MatsimTestUtils.EPSILON);
 		
 		
+		Distances distanceC23 = NetworkUtil.getDistances2NodeViaGivenLink(c, link2, node3);
+		Assert.assertEquals("distanceC23.getDistancePoint2Road()", Math.sqrt(2.) / 2. * 100., distanceC23.getDistancePoint2Road(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("distanceC23.getDistanceRoad2Node()", Math.sqrt(2) * 1000. - Math.sqrt(2.) / 2. * 100., distanceC23.getDistanceRoad2Node(), MatsimTestUtils.EPSILON);
+		
+		Coord projectionC23 = NetworkUtil.getInteresectionOfProjection(c, link2, node3);
+		Assert.assertEquals("projectionC23.getX()", 50., projectionC23.getX(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("projectionC23.getY()", 1050., projectionC23.getY(), MatsimTestUtils.EPSILON);
+		
+		
 		Distances distanceD22 = NetworkUtil.getDistances2NodeViaGivenLink(d, link2, node2);
 		Assert.assertEquals("distanceD22.getDistancePoint2Road()", Math.sqrt(2.) / 2. * 100.0, distanceD22.getDistancePoint2Road(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("distanceD22.getDistanceRoad2Node()", Math.sqrt(2.) / 2. * 100.0 + Math.sqrt(200*200 + 200*200), distanceD22.getDistanceRoad2Node(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("distanceD22.getDistanceRoad2Node()", Math.sqrt(2.) / 2. * 100.0 + Math.sqrt(2) * 200., distanceD22.getDistanceRoad2Node(), MatsimTestUtils.EPSILON);
 		
 		Coord projectionD22 = NetworkUtil.getInteresectionOfProjection(d, link2, node2);
 		Assert.assertEquals("projectionD22.getX()", 250., projectionD22.getX(), MatsimTestUtils.EPSILON);
@@ -157,13 +166,14 @@ public class NetworkUtilTest {
 		
 		Distances distanceD23 = NetworkUtil.getDistances2NodeViaGivenLink(d, link2, node3);
 		Assert.assertEquals("distanceD23.getDistancePoint2Road()", Math.sqrt(2.)/2.*100.0, distanceD23.getDistancePoint2Road(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("distanceD23.getDistanceRoad2Node()", Math.sqrt(2.)/2.*100.0 + Math.sqrt(700*700+700*700), distanceD23.getDistanceRoad2Node(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("distanceD23.getDistanceRoad2Node()", Math.sqrt(2.)/2.*100.0 + Math.sqrt(2) * 700., distanceD23.getDistanceRoad2Node(), MatsimTestUtils.EPSILON);
 
 		Coord projectionD23 = NetworkUtil.getInteresectionOfProjection(d, link2, node3);
 		Assert.assertEquals("projectionD23.getX()", 250., projectionD23.getX(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("projectionD23.getY()", 1250., projectionD23.getY(), MatsimTestUtils.EPSILON);
 		
 		
+		// method yields wrong result; goes directly to point, leaving projection aside -> 316.x
 //		Distances distanceE33 = NetworkUtil.getDistances2NodeViaGivenLink(e, link3, node3);
 //		Assert.assertEquals("distanceE33.getDistancePoint2Road()", 100.0, distanceE33.getDistancePoint2Road(), MatsimTestUtils.EPSILON);
 //		Assert.assertEquals("distanceE33.getDistanceRoad2Node()", 300.0, distanceE33.getDistanceRoad2Node(), MatsimTestUtils.EPSILON);
@@ -172,7 +182,8 @@ public class NetworkUtilTest {
 		Assert.assertEquals("projectionE33.getX()", 1300., projectionE33.getX(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("projectionE33.getY()", 2000., projectionE33.getY(), MatsimTestUtils.EPSILON);
 		
-//		
+		
+		// method yields wrong result; goes directly to point, leaving projection aside -> 707.x
 //		Distances distanceE34 = NetworkUtil.getDistances2NodeViaGivenLink(e, link3, node4);
 //		Assert.assertEquals("distanceE34.getDistancePoint2Road()", 100.0, distanceE34.getDistancePoint2Road(), MatsimTestUtils.EPSILON);
 //		Assert.assertEquals("distanceE34.getDistanceRoad2Node()", 700.0, distanceE34.getDistanceRoad2Node(), MatsimTestUtils.EPSILON);
@@ -184,7 +195,7 @@ public class NetworkUtilTest {
 		
 		// from Coord F on only checking for correct projections as I will remove the distance calculation eventually anyways
 		Coord projectionF33 = NetworkUtil.getInteresectionOfProjection(f, link3, node3);
-		Assert.assertEquals("projectionF33.getX()", 2000., projectionF33.getX(), MatsimTestUtils.EPSILON); // TODO
+		Assert.assertEquals("projectionF33.getX()", 2300., projectionF33.getX(), MatsimTestUtils.EPSILON); // TODO
 		Assert.assertEquals("projectionF33.getY()", 2000., projectionF33.getY(), MatsimTestUtils.EPSILON);
 		
 		Coord projectionF33_2 = CoordUtils.orthogonalProjectionOnLineSegment(link3.getFromNode().getCoord(), link3.getToNode().getCoord(), f);
