@@ -63,10 +63,10 @@ public class TravelTimeFourWaysTest {
 		Scenario scenario = ScenarioUtils.createScenario(conf);
 
 		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-		String signalSystemsFile = testUtils.getClassInputDirectory() + "testSignalSystems_v2.0.xml";
-		String signalGroupsFile = testUtils.getClassInputDirectory() + "testSignalGroups_v2.0.xml";
-		String signalControlFile = testUtils.getClassInputDirectory() + "testSignalControl_v2.0.xml";
-		String amberTimesFile = testUtils.getClassInputDirectory() + "testAmberTimes_v1.0.xml";
+		String signalSystemsFile = "testSignalSystems_v2.0.xml";
+		String signalGroupsFile = "testSignalGroups_v2.0.xml";
+		String signalControlFile = "testSignalControl_v2.0.xml";
+		String amberTimesFile = "testAmberTimes_v1.0.xml";
 		signalsConfig.setSignalSystemFile(signalSystemsFile);
 		signalsConfig.setSignalGroupsFile(signalGroupsFile);
 		signalsConfig.setSignalControlFile(signalControlFile);

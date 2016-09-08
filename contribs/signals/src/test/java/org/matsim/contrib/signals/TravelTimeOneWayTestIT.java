@@ -78,10 +78,10 @@ public class TravelTimeOneWayTestIT {
 		if (useLanes){
 			conf.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 				conf.qsim().setUseLanes(true);
-				signalSystemsFile = testUtils.getClassInputDirectory() + "testSignalSystems_v2.0.xml";
+				signalSystemsFile = "testSignalSystems_v2.0.xml";
 		}
 		else {
-			signalSystemsFile = testUtils.getClassInputDirectory() + "testSignalSystemsNoLanes_v2.0.xml";
+			signalSystemsFile = "testSignalSystemsNoLanes_v2.0.xml";
 		}
 		conf.qsim().setStuckTime(1000);
 		conf.qsim().setRemoveStuckVehicles(false);
@@ -89,9 +89,9 @@ public class TravelTimeOneWayTestIT {
 
 		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		signalsConfig.setSignalSystemFile(signalSystemsFile);
-		String signalGroupsFile = testUtils.getClassInputDirectory() + "testSignalGroups_v2.0.xml";
-		String signalControlFile = testUtils.getClassInputDirectory() + "testSignalControl_v2.0.xml";
-		String amberTimesFile = testUtils.getClassInputDirectory() + "testAmberTimes_v1.0.xml";
+		String signalGroupsFile = "testSignalGroups_v2.0.xml";
+		String signalControlFile = "testSignalControl_v2.0.xml";
+		String amberTimesFile = "testAmberTimes_v1.0.xml";
 		signalsConfig.setSignalGroupsFile(signalGroupsFile);
 		signalsConfig.setSignalControlFile(signalControlFile);
 		signalsConfig.setAmberTimesFile(amberTimesFile);
