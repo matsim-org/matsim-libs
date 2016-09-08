@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class ComposedLink implements Link {
 	private Link delegate ;
@@ -92,6 +93,10 @@ public class ComposedLink implements Link {
 		return this.delegate.getFlowCapacityPerSec(time);
 	}
 
+	@Override
+	public Attributes getAttributes() {
+		return delegate.getAttributes();
+	}
 }
 
 	

@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 class ClusterLink implements Link {
 	private final Link link;
@@ -229,5 +230,10 @@ class ClusterLink implements Link {
 
 	public double getFlowCapacityPerSec(double time) {
 		return this.link.getFlowCapacityPerSec(time);
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return link.getAttributes();
 	}
 }
