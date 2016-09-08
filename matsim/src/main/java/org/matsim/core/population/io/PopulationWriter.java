@@ -106,6 +106,7 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 		this.population = population;
 		this.network = network;
 		this.write_person_fraction = fraction;
+		this.handler = new PopulationWriterHandlerImplV6( coordinateTransformation );
 	}
 
 	/**
