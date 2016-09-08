@@ -28,11 +28,11 @@ import org.matsim.core.network.io.NetworkWriter;
 /**
  * @author mrieser
  */
-public class NetworkWriterReaderV1Test extends AbstractNetworkWriterReaderTest {
+public class NetworkWriterReaderV2Test extends AbstractNetworkWriterReaderTest {
 
 	@Override
 	protected void writeNetwork(final Network network, final String filename) {
-		new NetworkWriter(network).writeFileV1(filename);
+		new NetworkWriter(network).writeFileV2(filename);
 	}
 	
 	@Override
