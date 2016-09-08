@@ -39,7 +39,7 @@ public class NetworkWriter implements MatsimWriter {
 	 */
 	@Override
 	public void write(final String filename) {
-		writeV1(filename);
+		writeV2(filename);
 	}
 		
 	/**
@@ -50,5 +50,9 @@ public class NetworkWriter implements MatsimWriter {
 	public void writeV1(final String filename) {
 		new org.matsim.core.network.io.NetworkWriter(network).writeFileV1(filename);
 	}
-	
+
+	public void writeV2(final String filename) {
+		new org.matsim.core.network.io.NetworkWriter(network).writeFileV2(filename);
+	}
+
 }
