@@ -14,7 +14,7 @@ public class AttributesUtils {
 	 */
 	public static void copyTo( Attributes from , Attributes to ) {
 		for ( int i=0; i < from.keys.length; i++ ) {
-			to.putAttribute( from.keys[ i ] , to.keys[ i ] );
+			to.putAttribute( from.keys[ i ] , from.values[ i ] );
 		}
 	}
 
