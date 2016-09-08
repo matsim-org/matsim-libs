@@ -56,7 +56,6 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 			final TravelTime travelTime,
 			final TravelDisutilityFactory travelDisutilityFactory,
 			final Coord2CoordTimeDistanceTravelDisutility walkTravelDisutility,
-			//
 			final Scenario scenario){
 		this.scenario = scenario;
 
@@ -170,7 +169,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
 		// get the nearest link:
 
-		Link nearestLink = NetworkUtils.getNearestLinkExactly(((Network)scenario.getNetwork()),origin.getCoord());
+		Link nearestLink = NetworkUtils.getNearestLinkExactly(((Network)scenario.getNetwork()), origin.getCoord());
 
 		// === (1) ORIGIN to LINK to NODE:
 		// captures the distance (as walk time) between the origin via the link to the node:

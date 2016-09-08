@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
-import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
+import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -22,6 +22,8 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacilities;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * improvements sep'11:
@@ -346,8 +348,8 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 				}
 			}
 
-			double accessibilityValueSum = AccessibilityRunUtils.calculateSum(valueList);
-			double giniCoefficient = AccessibilityRunUtils.calculateGiniCoefficient(valueList);
+			double accessibilityValueSum = AccessibilityUtils.calculateSum(valueList);
+			double giniCoefficient = AccessibilityUtils.calculateGiniCoefficient(valueList);
 
 			log.warn("mode = " + mode  + " -- accessibilityValueSum = " + accessibilityValueSum);
 			accessibilitySums.put(mode, accessibilityValueSum);

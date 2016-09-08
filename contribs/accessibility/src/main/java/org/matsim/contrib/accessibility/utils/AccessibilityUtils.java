@@ -29,8 +29,8 @@ import org.matsim.facilities.FacilitiesWriter;
 /**
  * @author dziemke
  */
-public class AccessibilityRunUtils {
-	public static final Logger LOG = Logger.getLogger(AccessibilityRunUtils.class);
+public class AccessibilityUtils {
+	public static final Logger LOG = Logger.getLogger(AccessibilityUtils.class);
 	
 	/**
 	 * Collects all facilities of a given type that have been loaded to the sceanrio.
@@ -113,7 +113,7 @@ public class AccessibilityRunUtils {
 	 * @param cellSize
 	 * @return
 	 */
-	public static ActivityFacilities createMeasuringPointsFromNetwork(Network network, double cellSize) {
+	public static ActivityFacilities createMeasuringPointsFromNetworkBounds(Network network, double cellSize) {
 		BoundingBox boundingBox = BoundingBox.createBoundingBox(network);
 		double xMin = boundingBox.getXMin();
 		double xMax = boundingBox.getXMax();

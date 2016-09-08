@@ -11,6 +11,7 @@ import org.matsim.contrib.accessibility.CSVWriter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.FacilitiesUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -121,7 +122,8 @@ public final class GridUtils {
 		int skippedPoints = 0;
 		int setPoints = 0;
 
-		ActivityFacilitiesImpl measuringPoints = new ActivityFacilitiesImpl("accessibility measuring points");
+//		ActivityFacilitiesImpl measuringPoints = new ActivityFacilitiesImpl("accessibility measuring points");
+		ActivityFacilitiesImpl measuringPoints = (ActivityFacilitiesImpl) FacilitiesUtils.createActivityFacilities("accessibility measuring points");
 		
 		// goes step by step from the min x and y coordinate to max x and y coordinate
 		for(double x = minX; x <maxX; x += gridSize) {
