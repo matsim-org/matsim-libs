@@ -138,13 +138,22 @@ public final class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startNode(final Attributes atts) {
+		boolean hasZ = atts.getValue("z") == null ? false : true;
+		Coord c;
+		if(hasZ){
+			c = transformation.transform(new Coord(
+					Double.parseDouble(atts.getValue("x")),
+					Double.parseDouble(atts.getValue("y")),
+					Double.parseDouble(atts.getValue("z"))));
+		} else{
+			c = transformation.transform(new Coord(
+					Double.parseDouble(atts.getValue("x")),
+					Double.parseDouble(atts.getValue("y"))));
+		}
+		
 		final Node node =
 				this.network.getFactory().createNode(
-						Id.create(atts.getValue("id"), Node.class),
-						transformation.transform(
-								new Coord(
-										Double.parseDouble(atts.getValue("x")),
-										Double.parseDouble(atts.getValue("y")))) );
+						Id.create(atts.getValue("id"), Node.class), c);
 		this.network.addNode(node);
 
 		NetworkUtils.setType(node,atts.getValue("type"));

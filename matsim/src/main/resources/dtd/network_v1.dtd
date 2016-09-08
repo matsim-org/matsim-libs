@@ -28,6 +28,7 @@
 <!ATTLIST node id          CDATA #REQUIRED
                x           CDATA #REQUIRED
                y           CDATA #REQUIRED
+               z           CDATA #IMPLIED
                type        CDATA #IMPLIED
                origid      CDATA #IMPLIED>
 
