@@ -122,7 +122,9 @@ public class PopulationModifier {
 		
 		while(sortedpersonsiter.hasNext()){
 			Person person = sortedpersonsiter.next();
-			population.getPersons().remove(person.getId(), person);
+//			population.getPersons().remove(person.getId(), person);
+			population.getPersons().remove(person.getId() );
+			// I changed this to make the code compile.  kai, 9/sep/16
 		}
 	}
 	public ArrayList<Person> sortPersonsPerDistance(Scenario scenario, Coord cords, int numofppl){
