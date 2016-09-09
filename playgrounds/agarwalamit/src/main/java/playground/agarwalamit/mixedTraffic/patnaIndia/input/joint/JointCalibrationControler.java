@@ -140,7 +140,7 @@ public class JointCalibrationControler {
 			}
 		});
 
-		controler.addOverridingModule(new AbstractModule() { // ploting modal share over iterations
+		controler.addOverridingModule(new AbstractModule() { // plotting modal share over iterations
 			@Override
 			public void install() {
 				this.bind(ModalShareEventHandler.class);

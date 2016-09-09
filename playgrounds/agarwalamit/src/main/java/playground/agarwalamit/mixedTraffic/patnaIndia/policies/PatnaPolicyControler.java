@@ -94,27 +94,29 @@ public class PatnaPolicyControler {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 
+		String outputDir ;
+
 		if(args.length>0){
 			dir = args[0];
 			applyTrafficRestrain = Boolean.valueOf(args[1]);
 			addBikeTrack = Boolean.valueOf(args[2]);
 			isAllwoingMotorbikeOnBikeTrack = Boolean.valueOf(args[3]);
-		} 
+			outputDir = dir+args[4];
+		}  else {
+			if(applyTrafficRestrain ) {
+				if (isAllwoingMotorbikeOnBikeTrack) throw new RuntimeException("Two situations -- traffic restrain and motorbike on bike track -- are not considered.");
+				if (addBikeTrack) outputDir = dir+"/both/";
+				else outputDir = dir+"/trafficRestrain/";
+			} else if(addBikeTrack) outputDir = dir+"/bikeTrack/";
+			else if(isAllwoingMotorbikeOnBikeTrack) outputDir = dir+"/BT-mb/";
+			else outputDir = dir+"/baseCaseCtd/";			
+		}
 
 		String inputDir = dir+"/input/";
 		String configFile = inputDir + "configBaseCaseCtd.xml";
-		String outputDir ;
 
 		ConfigUtils.loadConfig(config, configFile);
 
-		if(applyTrafficRestrain ) {
-			if (isAllwoingMotorbikeOnBikeTrack) throw new RuntimeException("Two situations -- traffic restrain and motorbike on bike track -- are not considered.");
-			if (addBikeTrack) outputDir = dir+"/both/";
-			else outputDir = dir+"/trafficRestrain/";
-		} else if(addBikeTrack) outputDir = dir+"/bikeTrack/";
-		else if(isAllwoingMotorbikeOnBikeTrack) outputDir = dir+"/BT-mb/";
-		else outputDir = dir+"/baseCaseCtd/";
-		
 		config.controler().setOutputDirectory(outputDir);
 
 		//==
@@ -131,7 +133,7 @@ public class PatnaPolicyControler {
 		// take only selected plans so that time for urban and location for external traffic is fixed.
 		String inPlans = "baseCaseOutput_plans.xml.gz";
 		String outPlans = "selectedPlansOnly.xml.gz";
-		
+
 		if (! new File(inputDir+outPlans).exists() ) {
 			SelectedPlansFilter plansFilter = new SelectedPlansFilter();
 			plansFilter.run(inputDir + inPlans);
@@ -156,7 +158,7 @@ public class PatnaPolicyControler {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		final Controler controler = new Controler(scenario);
-		
+
 		// removal of some links may lead to exception if routes are not removed from leg.
 		// do this before setting a new network so that cord from removed links can be extracted.
 		if(applyTrafficRestrain ) removeRoutes(scenario, inputDir+"/network.xml.gz"); 
@@ -182,7 +184,7 @@ public class PatnaPolicyControler {
 			}
 		});
 
-		controler.addOverridingModule(new AbstractModule() { // ploting modal share over iterations
+		controler.addOverridingModule(new AbstractModule() { // plotting modal share over iterations
 			@Override
 			public void install() {
 				this.bind(ModalShareEventHandler.class);
@@ -278,7 +280,7 @@ public class PatnaPolicyControler {
 	private static void removeRoutes(final Scenario scenario, final String baseCaseNetwork){
 		// this is required because routes are generated from initial base case network; and new network does not have certain links.
 		Scenario scNetwork = LoadMyScenarios.loadScenarioFromNetwork(baseCaseNetwork); 
-		
+
 		//since some links are now removed, route in the plans will throw exception, remove them.
 		for (Person p : scenario.getPopulation().getPersons().values()){
 			List<PlanElement> pes = p.getSelectedPlan().getPlanElements();
