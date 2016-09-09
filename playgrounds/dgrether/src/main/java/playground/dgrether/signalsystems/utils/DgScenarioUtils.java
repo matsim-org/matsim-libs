@@ -56,8 +56,7 @@ public class DgScenarioUtils {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(c2);
 		
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-				new SignalsDataLoader(signalsConfigGroup).loadSignalsData());
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(c2).loadSignalsData());
 		
 		return scenario;
 	}

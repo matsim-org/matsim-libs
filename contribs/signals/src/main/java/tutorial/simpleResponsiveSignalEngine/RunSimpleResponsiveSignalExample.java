@@ -108,7 +108,7 @@ public class RunSimpleResponsiveSignalExample {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		// add missing scenario elements
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(signalsConfigGroup).loadSignalsData());
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 
 		createNetwork(scenario);
 		createPopulation(scenario);

@@ -29,7 +29,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.matsim.lanes.data.v20.LaneDefinitionsReader;
+import org.matsim.lanes.data.LanesReader;
 
 /**
  * @author mrieser
@@ -104,12 +104,12 @@ public class MatsimFileTypeGuesserTest {
 	}
 
 	@Test
-	public void testLaneDefinitionsV11XML() throws IOException {
-		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/lanes/data/v20/LaneDefinitionsReaderWriterTest/testLaneDefinitions_v1.1.xml");
+	public void testLanesV20XML() throws IOException {
+		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/lanes/data/LanesReaderWriterTest/testLanes.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.LaneDefinitions, g.getGuessedFileType());
 		assertNull(g.getPublicId());
 		assertNotNull(g.getSystemId());
-		assertEquals(LaneDefinitionsReader.SCHEMALOCATIONV11, g.getSystemId());
+		assertEquals(LanesReader.SCHEMALOCATIONV20, g.getSystemId());
 	}
 
 	@Test

@@ -40,9 +40,9 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.households.HouseholdsReaderV10;
-import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
-import org.matsim.lanes.data.v20.LaneDefinitionsReader;
-import org.matsim.lanes.data.v20.Lanes;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesImpl;
+import org.matsim.lanes.data.LanesReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
@@ -297,22 +297,22 @@ public class ScenarioLoaderImpl {
 	}
 
 	private void loadLanes() {
-		Lanes laneDefinitions = new LaneDefinitions20Impl();
+		Lanes laneDefinitions = new LanesImpl();
 		this.scenario.addScenarioElement(Lanes.ELEMENT_NAME, laneDefinitions);
 		String filename = this.config.network().getLaneDefinitionsFile();
 		if (filename != null) {
 			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(filename);
-			if (!LaneDefinitionsReader.SCHEMALOCATIONV20.equalsIgnoreCase(fileTypeGuesser.getSystemId())) {
+			if (!LanesReader.SCHEMALOCATIONV20.equalsIgnoreCase(fileTypeGuesser.getSystemId())) {
 				log.error(
 						"Lanes: Wrong file format. With the 0.5 version of matsim the scenario only accepts lane definitions in the "
-								+ "file format version 2.0, i.e. " + LaneDefinitionsReader.SCHEMALOCATIONV20
+								+ "file format version 2.0, i.e. " + LanesReader.SCHEMALOCATIONV20
 								+ ". An automatic conversion of the 1.1 file format is no longer provided, please call the "
 								+ "LaneDefinitonsV11ToV20Converter manually in the preprocessing phase.");
 				throw new UncheckedIOException("Wrong lane file format: " + fileTypeGuesser.getSystemId());
 			}
 		}
 		if ((laneDefinitions != null) && (filename != null)) {
-			LaneDefinitionsReader reader = new LaneDefinitionsReader(this.scenario);
+			LanesReader reader = new LanesReader(this.scenario);
 			reader.readFile(filename);
 		} else {
 			log.info("no lane definition file set in config or feature disabled, not able to load anything");

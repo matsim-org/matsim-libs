@@ -105,7 +105,13 @@ public class GK4toWGS84 implements CoordinateTransformation {
 		latitude = latitude * 180.0 / Math.PI;
 		longitude = longitude * 180.0 / Math.PI;
 
-		return new Coord(longitude, latitude);
+		double elevation;
+		try{
+			elevation = coord.getZ();
+			return new Coord(longitude, latitude, elevation);
+		} catch (Exception e){
+			return new Coord(longitude, latitude);
+		}
 	}
 
 }

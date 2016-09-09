@@ -20,6 +20,7 @@ import others.sergioo.addressLocator2011.BadAddressException;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlListItem;
 import com.gargoylesoftware.htmlunit.html.HtmlOrderedList;
@@ -131,14 +132,12 @@ public class RouteGeneratorHTML {
 	 */
 	public void locate() throws ElementNotFoundException, URISyntaxException, IOException, ParserConfigurationException, IllegalStateException, BadAddressException {
 		final WebClient webClient = new WebClient();
-		webClient.setCssEnabled(false);
-		webClient.setJavaScriptEnabled(true);
 		HtmlPage page = webClient.getPage(getUrlRequest());
 		HtmlOrderedList alternatives = page.getHtmlElementById("dir_altroutes_body");
 		for(HtmlElement element:alternatives.getElementsByTagName("li")) {
 			//TODO
 			HtmlListItem alternative = (HtmlListItem) element;
-			Iterator<HtmlElement> i = alternative.getChildElements().iterator();
+			Iterator<DomElement> i = alternative.getChildElements().iterator();
 			while(i.hasNext())
 				System.out.println(i.next());
 		}

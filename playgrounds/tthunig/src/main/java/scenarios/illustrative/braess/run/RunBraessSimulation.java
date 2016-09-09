@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
@@ -56,7 +57,7 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.Default
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
+import org.matsim.lanes.data.LanesWriter;
 
 //import matsimConnector.congestionpricing.MSACongestionHandler;
 //import matsimConnector.congestionpricing.MSAMarginalCongestionPricingContolerListener;
@@ -133,7 +134,7 @@ public final class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/sylvia/";
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/test/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -160,7 +161,7 @@ public final class RunBraessSimulation {
 		Config config = ConfigUtils.createConfig();
 
 		// set number of iterations
-		config.controler().setLastIteration(20);
+		config.controler().setLastIteration(1);
 
 		// able or enable signals and lanes
 		config.qsim().setUseLanes(LANE_TYPE.equals(LaneType.NONE) ? false : true);
@@ -277,7 +278,7 @@ public final class RunBraessSimulation {
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		if (signalsConfigGroup.isUseSignalSystems()) {
 			scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-					new SignalsDataLoader(signalsConfigGroup).loadSignalsData());
+					new SignalsDataLoader(config).loadSignalsData());
 			createSignals(scenario);
 		}
 		
@@ -298,12 +299,17 @@ public final class RunBraessSimulation {
 		controler.addOverridingModule(sylviaSignalsModule);
 		
 		// add responsive signal controler if enabled
+		// TODO does this work together with the SylviaSignalsModule?!
 		if (SIGNAL_TYPE.equals(SignalControlType.SIGNAL4_RESPONSIVE)){
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
 					bind(ResponsiveLocalDelayMinimizingSignal.class).asEagerSingleton();
 					addControlerListenerBinding().to(ResponsiveLocalDelayMinimizingSignal.class);
+		            // bind tool to write information about signal states for via
+					bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
+		            addEventHandlerBinding().to(SignalEvents2ViaCSVWriter.class);
+		            addControlerListenerBinding().to(SignalEvents2ViaCSVWriter.class);
 				}
 			});
 		}
@@ -684,7 +690,7 @@ public final class RunBraessSimulation {
 		// write network and lanes
 		new NetworkWriter(scenario.getNetwork()).write(outputDir + "network.xml");
 		if (!LANE_TYPE.equals(LaneType.NONE)) 
-			new LaneDefinitionsWriter20(scenario.getLanes()).write(outputDir + "lanes.xml");
+			new LanesWriter(scenario.getLanes()).write(outputDir + "lanes.xml");
 		
 		// write population
 		new PopulationWriter(scenario.getPopulation()).write(outputDir + "plans.xml");

@@ -32,7 +32,7 @@ import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityStartupListener;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
+import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
@@ -144,9 +144,9 @@ public class AccessibilityComputationCapeTownTest {
 		activityTypes.add(FacilityTypes.SHOPPING);
 		
 		// Network density points
-		ActivityFacilities measuringPoints = AccessibilityRunUtils.createMeasuringPointsFromNetwork(scenario.getNetwork(), cellSize);
+		ActivityFacilities measuringPoints = AccessibilityUtils.createMeasuringPointsFromNetworkBounds(scenario.getNetwork(), cellSize);
 		double maximumAllowedDistance = 0.5 * cellSize;
-		final ActivityFacilities densityFacilities = AccessibilityRunUtils.createNetworkDensityFacilities(
+		final ActivityFacilities densityFacilities = AccessibilityUtils.createNetworkDensityFacilities(
 				scenario.getNetwork(), measuringPoints, maximumAllowedDistance);
 
 		// Controller

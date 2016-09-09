@@ -38,8 +38,8 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.Lanes;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
 
 /**
  * Class to write the (x,y,t) signals csv file for via. 
@@ -47,6 +47,7 @@ import org.matsim.lanes.data.v20.Lanes;
  * @author tthunig
  *
  */
+@Deprecated
 public class SignalsViaCSVWriter {
 
 	private static final Logger log = Logger.getLogger(SignalsViaCSVWriter.class);

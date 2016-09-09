@@ -115,7 +115,7 @@ public class SignalsMorningEveningMergeTool {
 		}
 		Config config = ConfigUtils.createConfig();
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(infile.getAbsolutePath());
-		SignalsDataLoader signalsLoader = new SignalsDataLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
+		SignalsDataLoader signalsLoader = new SignalsDataLoader(config);
 		SignalsData signals = signalsLoader.loadSignalsData();
 		return signals.getSignalControlData();
 	}

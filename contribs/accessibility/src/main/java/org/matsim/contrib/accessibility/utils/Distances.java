@@ -46,7 +46,7 @@ public final class Distances{
 	 * point and the nearest node
 	 * @param value
 	 */
-	public void setDisatancePoint2Road(double value){
+	public void setDistanceCoord2Intersection(double value){
 		this.distancePoint2Road = value;
 	}
 	
@@ -56,7 +56,7 @@ public final class Distances{
 	 * node. 
 	 * @param value
 	 */
-	public void setDistanceRoad2Node(double value){
+	public void setDistanceIntersetion2Node(double value){
 		this.distanceRoad2Node = value;
 	}
 	

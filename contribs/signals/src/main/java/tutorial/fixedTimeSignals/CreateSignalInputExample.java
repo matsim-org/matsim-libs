@@ -55,6 +55,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 /**
  * Example for how to create signal input files from code.
  * 
+ * See also the picture of the scenario in the same package as the input files
+ * (examples/tutorial/example90TrafficLights/).
+ * 
  * @link VisualizeSignalScenario for how to visualize this scenario.
  * 
  * @author dgrether
@@ -218,9 +221,9 @@ public class CreateSignalInputExample {
 		Files.createDirectories(Paths.get(outputDir));
 		
 		// set output filenames
-		signalSystemsConfigGroup.setSignalSystemFile(outputDir  + "signal_systems.xml");
-		signalSystemsConfigGroup.setSignalGroupsFile(outputDir  + "signal_groups.xml");
-		signalSystemsConfigGroup.setSignalControlFile(outputDir  + "signal_control.xml");
+		signalSystemsConfigGroup.setSignalSystemFile(outputDir + "signal_systems.xml");
+		signalSystemsConfigGroup.setSignalGroupsFile(outputDir + "signal_groups.xml");
+		signalSystemsConfigGroup.setSignalControlFile(outputDir + "signal_control.xml");
 		
 		//write config to file
 		String configFile = outputDir  + "config.xml";

@@ -27,14 +27,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.Lanes;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesToLinkAssignment;
 
 
 /**
@@ -158,7 +158,7 @@ public class SignalSystemsGenerator {
 						for (Integer spurIdInteger : spuren) {
 							//lanes 
 							Id<Lane> spurId = Id.create(spurIdInteger, Lane.class);
-							LanesToLinkAssignment20 l2lAssignment = this.laneDefinitions.getLanesToLinkAssignments().get(linkId);
+							LanesToLinkAssignment l2lAssignment = this.laneDefinitions.getLanesToLinkAssignments().get(linkId);
 							if ((l2lAssignment != null) 
 									&& l2lAssignment.getLanes().containsKey(spurId)){
 								signal.addLaneId(spurId);

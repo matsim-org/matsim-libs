@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityStartupListener;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
+import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.core.config.Config;
@@ -106,14 +106,9 @@ public class AccessibilityComputationNairobiTest {
 		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 
-		// Matrix-based pt
-//		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
-//		mbpcg.setPtStopsInputFile(ptStops);
-//		mbpcg.setUsingTravelTimesAndDistances(true);
-//		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrix);
-//		mbpcg.setPtTravelTimesInputFile(travelTimeMatrix);
-		
-		// Some (otherwise irrelevant) settings to make the vsp check happy
+		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.abort);
+
+		// Some (otherwise irrelevant) settings to make the vsp check happy:
 		config.timeAllocationMutator().setMutationRange(7200.);
 		config.timeAllocationMutator().setAffectingDuration(false);
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
@@ -141,16 +136,16 @@ public class AccessibilityComputationNairobiTest {
 //		activityTypes.add("Recreational"); // land-use file version
 		
 		// Network density points
-		ActivityFacilities measuringPoints = AccessibilityRunUtils.createMeasuringPointsFromNetwork(scenario.getNetwork(), cellSize);
+		ActivityFacilities measuringPoints = AccessibilityUtils.createMeasuringPointsFromNetworkBounds(scenario.getNetwork(), cellSize);
 		double maximumAllowedDistance = 0.5 * cellSize;
-		final ActivityFacilities densityFacilities = AccessibilityRunUtils.createNetworkDensityFacilities(
+		final ActivityFacilities densityFacilities = AccessibilityUtils.createNetworkDensityFacilities(
 				scenario.getNetwork(), measuringPoints, maximumAllowedDistance);
 
 		// Controller
 		final Controler controler = new Controler(scenario);
 		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, name, envelope, cellSize));
 		controler.run();
-		
+
 		// QGis
 		if (createQGisOutput == true) {
 			String osName = System.getProperty("os.name");

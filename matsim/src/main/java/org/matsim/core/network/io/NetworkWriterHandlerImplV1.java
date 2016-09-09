@@ -117,6 +117,15 @@ import org.matsim.core.utils.misc.Time;
 		final Coord coord = transformation.transform( node.getCoord() );
 		out.write(" x=\"" + coord.getX() + "\"");
 		out.write(" y=\"" + coord.getY() + "\"");
+
+		/* May have elevation. */
+		try{
+			double z = coord.getZ();
+			out.write(" z=\"" + z + "\"");
+		} catch(Exception e){
+			/* Ignore the elevation. */
+		}
+		
 		if (NetworkUtils.getType( node ) != null) {
 			out.write(" type=\"" + NetworkUtils.getType( node ) + "\"");
 		}

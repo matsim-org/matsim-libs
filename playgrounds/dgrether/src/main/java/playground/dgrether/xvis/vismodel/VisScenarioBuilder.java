@@ -31,9 +31,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.lanes.ModelLane;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.Lanes;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesToLinkAssignment;
 import org.matsim.lanes.LanesUtils;
 import org.matsim.lanes.vis.VisLane;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
@@ -112,7 +112,7 @@ public class VisScenarioBuilder {
 		VisLaneModelBuilder visLaneModelBuilder = new VisLaneModelBuilder();
 		Lanes lanes = (Lanes) scenario.getLanes();
 		for (Link l : scenario.getNetwork().getLinks().values()){
-			LanesToLinkAssignment20 l2l = null;
+			LanesToLinkAssignment l2l = null;
 			if (lanes != null) {
 				l2l = lanes.getLanesToLinkAssignments().get(l.getId());
 			}

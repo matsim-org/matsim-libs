@@ -60,7 +60,7 @@ private SpatialGrid freeSpeedGrid;
 			final Coord coord2 = coord;
 			Node nearestNode = NetworkUtils.getNearestNode(network,coord2);
 			
-			Distances distance = NetworkUtil.getDistances2Node(coord, nearestLink, nearestNode);
+			Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(coord, nearestLink, nearestNode);
 			double distanceMeasuringPoint2Road_meter 	= distance.getDistancePoint2Road();
 			
 			double walkTravelTime_h 	= distanceMeasuringPoint2Road_meter / this.walkSpeedMeterPerHour; //travel time from coord to network (node or link)

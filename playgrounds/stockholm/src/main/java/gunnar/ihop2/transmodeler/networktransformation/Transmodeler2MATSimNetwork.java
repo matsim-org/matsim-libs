@@ -21,6 +21,9 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesWriter;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneData11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
@@ -31,9 +34,6 @@ import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion.UTurnCreation
 import org.matsim.lanes.data.v11.LaneDefinitionsWriter11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11Impl;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
-import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
@@ -431,7 +431,7 @@ public class Transmodeler2MATSimNetwork {
 			reader11.readFile(this.matsimLanesFile11);
 			final Lanes lanedefs20 = LaneDefinitionsV11ToV20Conversion
 					.convertTo20(lanedefs11, net, UTurnCreation.OFF);
-			final LaneDefinitionsWriter20 writer20 = new LaneDefinitionsWriter20(
+			final LanesWriter writer20 = new LanesWriter(
 					lanedefs20);
 			writer20.write(this.matsimLanesFile20);
 		}

@@ -33,10 +33,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.v20.LaneDefinitionsReader;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.Lanes;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesReader;
+import org.matsim.lanes.data.LanesToLinkAssignment;
 
 /**
  * @author dgrether copied from playground of dgrether
@@ -58,7 +58,7 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 	public void checkConsistency() {
 		log.info("checking consistency...");
 		List<Id> malformedLinkIds = new ArrayList<Id>();
-		for (LanesToLinkAssignment20 l2l : this.lanes.getLanesToLinkAssignments().values()){
+		for (LanesToLinkAssignment l2l : this.lanes.getLanesToLinkAssignments().values()){
 			//check if link exists for each assignment of one or more lanes to a link
 			if (this.network.getLinks().get(l2l.getLinkId()) == null) {
 				log.error("No link found for lanesToLinkAssignment on link Id(linkIdRef): "  + l2l.getLinkId());
@@ -164,7 +164,7 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFile);
 	  log.info("read network");
 	  
-		LaneDefinitionsReader laneReader = new LaneDefinitionsReader(scenario);
+		LanesReader laneReader = new LanesReader(scenario);
 	  laneReader.readFile(lanesFile);
 	  
 	  LanesConsistencyChecker lcc = new LanesConsistencyChecker(net, scenario.getLanes());
