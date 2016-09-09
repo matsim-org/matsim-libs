@@ -16,7 +16,7 @@ import opdytsintegration.MATSimStateFactory;
  * @author Kai Nagel based on Gunnar Flötteröd
  *
  */
-public class ModeChoiceStateFactory implements MATSimStateFactory<ModeChoiceDecisionVariable> {
+class ModeChoiceStateFactory implements MATSimStateFactory<ModeChoiceDecisionVariable> {
 	
 	private Controler controler = null;
 	
@@ -36,6 +36,7 @@ public class ModeChoiceStateFactory implements MATSimStateFactory<ModeChoiceDeci
 		 * ModeChoiceState is a snapshot of a past state). Bullet-proof solution is to compute the 
 		 * objective function value here and to pass it as a number to the ModeChoiceState. Gunnar
 		 */		
+		// yyyy might simply be able to use @Inject in ModeChoiceObjectiveFunction !!
 		return new ModeChoiceState(population, stateVector, epService, stageActivities, mmIdent);
 	}
 

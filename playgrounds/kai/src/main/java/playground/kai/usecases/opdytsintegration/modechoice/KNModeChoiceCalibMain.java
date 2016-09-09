@@ -2,7 +2,6 @@ package playground.kai.usecases.opdytsintegration.modechoice;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -14,8 +13,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
-import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
@@ -88,6 +87,14 @@ class KNModeChoiceCalibMain {
 					{
 						ModeParams oldModeParams = oldScoringConfig.getModes().get( TransportMode.car ) ;
 						ModeParams newModeParams = new ModeParams(TransportMode.car) ;
+						newModeParams.setConstant( oldModeParams.getConstant() + 0.1 * MatsimRandom.getRandom().nextGaussian() );
+						newModeParams.setMarginalUtilityOfDistance( oldModeParams.getMarginalUtilityOfDistance() + 0.1 * MatsimRandom.getRandom().nextGaussian() );
+						newModeParams.setMarginalUtilityOfTraveling( oldModeParams.getMarginalUtilityOfTraveling() + 0.1 * MatsimRandom.getRandom().nextGaussian() );
+						newScoringConfig.addModeParams(newModeParams);
+					}
+					{
+						ModeParams oldModeParams = oldScoringConfig.getModes().get( TransportMode.pt ) ;
+						ModeParams newModeParams = new ModeParams(TransportMode.pt) ;
 						newModeParams.setConstant( oldModeParams.getConstant() + 0.1 * MatsimRandom.getRandom().nextGaussian() );
 						newModeParams.setMarginalUtilityOfDistance( oldModeParams.getMarginalUtilityOfDistance() + 0.1 * MatsimRandom.getRandom().nextGaussian() );
 						newModeParams.setMarginalUtilityOfTraveling( oldModeParams.getMarginalUtilityOfTraveling() + 0.1 * MatsimRandom.getRandom().nextGaussian() );
