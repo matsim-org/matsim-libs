@@ -28,6 +28,7 @@ import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import floetteroed.opdyts.searchalgorithms.Simulator;
 import opdytsintegration.MATSimSimulator;
 import opdytsintegration.MATSimStateFactory;
+import opdytsintegration.MATSimStateFactoryImpl;
 import opdytsintegration.utils.TimeDiscretization;
 
 /**
@@ -114,7 +115,7 @@ class KNModeChoiceCalibMain {
 		final ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable( scenario.getConfig().planCalcScore(), scenario ) ;
 		
 		@SuppressWarnings("unchecked")
-		final MATSimStateFactory<ModeChoiceDecisionVariable> stateFactory = new ModeChoiceStateFactory();
+		final MATSimStateFactory<ModeChoiceDecisionVariable> stateFactory = new MATSimStateFactoryImpl<>();
 		
 		Simulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>( stateFactory, scenario, new TimeDiscretization(5 * 3600, 10 * 60, 18)); 
 

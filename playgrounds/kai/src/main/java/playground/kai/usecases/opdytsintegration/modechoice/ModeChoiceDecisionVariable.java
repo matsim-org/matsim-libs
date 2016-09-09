@@ -45,7 +45,8 @@ final class ModeChoiceDecisionVariable implements DecisionVariable {
 //				outputModeParams.setConstant( modeParams.getConstant() );
 				outputModeParams.setMarginalUtilityOfTraveling( modeParams.getMarginalUtilityOfTraveling() );
 //				outputModeParams.setMarginalUtilityOfDistance( modeParams.getMarginalUtilityOfDistance() );
-				// yyyy this is a bit dangerous since it implies that one knows which of these are relevant and which not.
+				// yyyy this is dangerous since it does not copy the whole list of betas but just a subset.
+				// Implies that one knows which of these are relevant and which not.
 				// Caused by passing the full dummyConfig into here rather than something specifically designed. 
 				// But this is what would keep it flexible for general scoring params calibration, so need to hedge against it.  kai, sep'16
 				
