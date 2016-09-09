@@ -784,6 +784,15 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		private double distance = 0.0;
 		private double monetaryDistanceRate = 0.0;
 		private double constant = 0.0;
+		
+//		@Override public String toString() {
+//			String str = super.toString();
+//			str += "[mode=" + mode + "]" ;
+//			str += "[const=" + constant + "]" ;
+//			str += "[beta_trav=" + traveling + "]" ;
+//			str += "[beta_dist=" + distance + "]" ;
+//			return str ;
+//		}
 
 		public ModeParams(final String mode) {
 			super( SET_TYPE );
