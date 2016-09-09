@@ -118,8 +118,7 @@ public class XVis {
 			SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
 					SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 			if (signalsConfigGroup.isUseSignalSystems()) {
-				scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-						new SignalsDataLoader(signalsConfigGroup).loadSignalsData());
+				scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 			}
 		}
 		else 	if (MatsimFileTypeGuesser.FileType.Network.equals(guesser.getGuessedFileType())){

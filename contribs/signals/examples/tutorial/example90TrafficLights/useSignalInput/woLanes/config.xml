@@ -594,9 +594,9 @@
 		<param name="actionOnIntergreenViolation" value="WARN" />
 		<param name="ambertimes" value="null" />
 		<param name="intergreentimes" value="null" />
-		<param name="signalcontrol" value="examples/tutorial/example90TrafficLights/useSignalInput/woLanes/signal_control.xml" />
-		<param name="signalgroups" value="examples/tutorial/example90TrafficLights/useSignalInput/woLanes/signal_groups.xml" />
-		<param name="signalsystems" value="examples/tutorial/example90TrafficLights/useSignalInput/woLanes/signal_systems.xml" />
+		<param name="signalcontrol" value="signal_control.xml" />
+		<param name="signalgroups" value="signal_groups.xml" />
+		<param name="signalsystems" value="signal_systems.xml" />
 		<param name="useAmbertimes" value="false" />
 		<param name="useIntergreentimes" value="false" />
 		<param name="useSignalsystems" value="true" />

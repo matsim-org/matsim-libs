@@ -77,8 +77,7 @@ public class ConvertBraessSolution2Matsim {
 				directory + "output_signal_groups_v2.0.xml.gz");
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(
 				directory + "output_signal_control_v2.0.xml.gz");
-		SignalsDataLoader signalsLoader = new SignalsDataLoader(
-				ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
+		SignalsDataLoader signalsLoader = new SignalsDataLoader(config);
 		SignalsData signals = signalsLoader.loadSignalsData();
 		return signals;
 	}

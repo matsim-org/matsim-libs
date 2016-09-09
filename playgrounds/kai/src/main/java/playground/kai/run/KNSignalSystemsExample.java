@@ -71,8 +71,7 @@ public class KNSignalSystemsExample {
 //		config.controler().setLinkToLinkRoutingEnabled(true);
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-				new SignalsDataLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 		// ---
 
 		// add the signals module to the simulation:

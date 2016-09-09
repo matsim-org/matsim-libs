@@ -166,7 +166,7 @@ public class CreateSignalInputWithLanesExample {
 		lanes.addLanesToLinkAssignment(lanesForLink65);
 
 		// original lane, i.e. lane that starts at the link from node and leads to all other lanes of the link
-		LanesUtils.createAndAddLane(lanesForLink12, factory, 
+		LanesUtils.createAndAddLane(lanesForLink65, factory, 
 				Id.create("65.ol", Lane.class), LANE_CAPACITY, LINK_LENGTH, 0, NO_LANES, null,
 				Arrays.asList(Id.create("65.l", Lane.class), Id.create("65.r", Lane.class)));		
 		

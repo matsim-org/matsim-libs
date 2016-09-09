@@ -114,8 +114,7 @@ public final class RunParallelSimulation {
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		if (signalsConfigGroup.isUseSignalSystems()) {
-			scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-					new SignalsDataLoader(signalsConfigGroup).loadSignalsData());
+			scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 			createSignals(scenario);
 		}
 		

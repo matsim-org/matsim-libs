@@ -100,7 +100,7 @@ public class DgFigure9ScenarioGenerator {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(config);
 		ScenarioUtils.loadScenario(sc);
 		
-		SignalsDataLoader signalsLoader = new SignalsDataLoader(ConfigUtils.addOrGetModule(sc.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
+		SignalsDataLoader signalsLoader = new SignalsDataLoader(config);
 		SignalsData signals = signalsLoader.loadSignalsData();
 		sc.addScenarioElement(SignalsData.ELEMENT_NAME, signals);
 		return sc;
