@@ -20,6 +20,7 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.simTime;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -48,7 +49,7 @@ import playground.agarwalamit.utils.ListUtils;
 
 public class TravelDistanceComperator {
 	
-	private String respectiveFileDirectory = "../../../../repos/runs-svn/patnaIndia/run106/10pct/";
+	private String respectiveFileDirectory = "../../../../repos/runs-svn/patnaIndia/run110/100pct/";
 	private String netFile = "../../../../repos/runs-svn/patnaIndia/inputs/network.xml";
 	private BufferedWriter writer;
 	private static final String LAST_IT = "200";
@@ -91,6 +92,7 @@ public class TravelDistanceComperator {
 				String queueModel = ld+"_"+td;
 				for(int i=2;i<12;i++){
 					String eventsFile = respectiveFileDirectory + "/output_"+queueModel+"_"+i+"/ITERS/it."+LAST_IT+"/"+LAST_IT+".events.xml.gz";
+					if (! new File(eventsFile).exists() ) continue;
 					SortedMap<String,Double> mode2avgDist = getMode2Dist(eventsFile);
 					
 					for (String mode : mode2avgDist.keySet()) {

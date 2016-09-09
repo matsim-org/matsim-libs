@@ -98,7 +98,7 @@ public class OuterCountVolumeAnalyzer {
 		allCountStationLinks.addAll(OuterCordonUtils.getExternalToInternalCountStationLinkIds( PatnaUtils.PATNA_NETWORK_TYPE  ));
 		allCountStationLinks.addAll(OuterCordonUtils.getInternalToExternalCountStationLinkIds( PatnaUtils.PATNA_NETWORK_TYPE  ));
 		
-		Map<Id<Link>, Map<Integer, Double>> link2time2volume = handler.getLinkId2TimeSlot2LinkVolume();
+		Map<Id<Link>, Map<Integer, Double>> link2time2volume = handler.getLinkId2TimeSlot2LinkCount();
 		try {
 			writer.write("timebin \t");
 			for(Id<Link> linkId : allCountStationLinks){

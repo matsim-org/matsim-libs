@@ -20,6 +20,7 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.simTime;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
@@ -34,7 +35,7 @@ import org.matsim.core.utils.misc.Time;
 
 public class MobsimTimeComparator {
 
-	private String respectiveFileDirectory = "../../../../repos/runs-svn/patnaIndia/run106/10pct/";
+	private String respectiveFileDirectory = "../../../../repos/runs-svn/patnaIndia/run110/100pct/";
 	private BufferedWriter writer;
 	private static final String FIRST_IT = "0";
 	private static final String LAST_IT = "200";
@@ -78,6 +79,7 @@ public class MobsimTimeComparator {
 				writeString(queueModel+"\t");
 				for(int i=2;i<12;i++){
 					String stopwatchFile = respectiveFileDirectory + "/output_"+queueModel+"_"+i+"/stopwatch.txt";
+					if (! new File(stopwatchFile).exists() ) continue;
 					double mobsimTime = readAndReturnMobsimTime(stopwatchFile);
 					writeString(mobsimTime+"\t");
 				}
