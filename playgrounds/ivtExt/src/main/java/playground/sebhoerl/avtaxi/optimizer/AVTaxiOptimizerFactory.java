@@ -19,6 +19,6 @@ public class AVTaxiOptimizerFactory implements TaxiOptimizerFactory {
 	
 	@Override
 	public TaxiOptimizer createTaxiOptimizer(TaxiOptimizerContext optimContext, ConfigGroup optimizerConfigGroup) {
-		return new AVTaxiOptimizer(optimContext, params);
+		return new AVSharedTaxiOptimizer(optimContext, params);
 	}
 }

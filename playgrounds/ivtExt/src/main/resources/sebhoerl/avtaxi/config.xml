@@ -6,6 +6,8 @@
         <param name="taxisFile" value="taxis.xml" />
 		<param name="pickupDuration" value="120" />
 		<param name="dropoffDuration" value="60" />
+		<param name="timeProfiles" value="false" />
+		<param name="detailedStats" value="false" />
         <parameterset type="optimizer" />
     </module>
 

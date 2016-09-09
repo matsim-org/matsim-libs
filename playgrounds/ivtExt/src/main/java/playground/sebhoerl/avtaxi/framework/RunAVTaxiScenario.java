@@ -29,7 +29,7 @@ public class RunAVTaxiScenario {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new TaxiModule(taxiData));
 		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
-		controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
+		controler.addOverridingModule(new DynQSimModule<>(AVTaxiQSimProvider.class));
 		controler.addOverridingModule(new AVTaxiModule());
 		
 		controler.run();

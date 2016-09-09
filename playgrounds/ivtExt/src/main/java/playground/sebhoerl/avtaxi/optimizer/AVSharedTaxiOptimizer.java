@@ -28,14 +28,16 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
-public class AVTaxiOptimizer implements TaxiOptimizer {
+import playground.sebhoerl.avtaxi.schedule.AVTaxiMultiPickupTask;
+
+public class AVSharedTaxiOptimizer implements TaxiOptimizer {
 	final private TaxiOptimizerContext context;
 	final private LeastCostPathCalculator router;
 	final private TaxiSchedulerParams params;
 	
 	final private Vehicle vehicle;
 	
-	public AVTaxiOptimizer(TaxiOptimizerContext context, TaxiSchedulerParams params) {
+	public AVSharedTaxiOptimizer(TaxiOptimizerContext context, TaxiSchedulerParams params) {
 		this.context = context;
 		this.params = params;
 		
@@ -66,7 +68,11 @@ public class AVTaxiOptimizer implements TaxiOptimizer {
 		VrpPathWithTravelData dropoffPath = VrpPaths.calcAndCreatePath(req.getFromLink(), req.getToLink(), pickupPath.getArrivalTime() + params.pickupDuration, router, context.travelTime);
 		
 		TaxiEmptyDriveTask emptyDriveTask = new TaxiEmptyDriveTask(pickupPath);
-		TaxiPickupTask pickupTask = new TaxiPickupTask(pickupPath.getArrivalTime(), pickupPath.getArrivalTime() + params.pickupDuration, req);
+		//TaxiPickupTask pickupTask = new TaxiPickupTask(pickupPath.getArrivalTime(), pickupPath.getArrivalTime() + params.pickupDuration, req);
+		
+		AVTaxiMultiPickupTask pickupTask = new AVTaxiMultiPickupTask(pickupPath.getArrivalTime(), pickupPath.getArrivalTime() + params.pickupDuration);
+		pickupTask.addRequest(req);
+		
 		TaxiOccupiedDriveTask occupiedDriveTask = new TaxiOccupiedDriveTask(dropoffPath, req);
 		TaxiDropoffTask dropoffTask = new TaxiDropoffTask(dropoffPath.getArrivalTime(), dropoffPath.getArrivalTime() + params.dropoffDuration, req);
 		
