@@ -341,8 +341,7 @@ public class Gui implements ActionListener, IterationStartsListener {
 						frame.setVisible(false);
 				}
 			});
-			try {
-				JDialog itFrame = new JDialog(frame, "Iteration", true);
+			JDialog itFrame = new JDialog(frame, "Iteration", true);
 		        itFrame.setLayout(new BorderLayout());
 				itLabel = new JLabel("-");
 				itLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -353,20 +352,18 @@ public class Gui implements ActionListener, IterationStartsListener {
 				new Thread(new Runnable() {
 					@Override
 					public void run() {
-						controler.run();
+						try {
+							controler.run();
+						} catch (Exception e2) {
+							if(!Gui.worked.contains(e2.getMessage())) {
+								JOptionPane.showMessageDialog(frame, e2.getClass().getSimpleName()+": "+e2.getMessage());
+								Gui.worked.add(e2.getMessage());
+							}
+						}
 						itFrame.setVisible(false);
 					}
 				}).start();
 				itFrame.setVisible(true);
-			} catch (Exception e2) {
-				if(!Gui.worked.contains(e2.getMessage())) {
-					JOptionPane.showMessageDialog(frame, e2.getClass().getSimpleName()+": "+e2.getMessage());
-					Gui.worked.add(e2.getMessage());
-				}
-				frame.setVisible(false);
-				System.exit(0);
-			}
-			
 		}
 		else if(e.getActionCommand().equals("add")) {
 			list.addItem(classTextField.getText()+(singBox.isSelected()?", Singleton":""));
