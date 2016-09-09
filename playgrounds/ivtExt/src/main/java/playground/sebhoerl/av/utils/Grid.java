@@ -35,11 +35,11 @@ public class Grid<BaseType> {
         double distanceX = maxX - minX;
         double distanceY = maxY - minY;
         
-        assert(distanceX > 0);
-        assert(distanceY > 0);
+        //assert(distanceX > 0.0);
+        //assert(distanceY > 0.0);
         
-        cellCountX = Math.max(1, (int)(distanceX / resolutionX));
-        cellCountY = Math.max(1, (int)(distanceY / resolutionY));
+        cellCountX = Math.max(1, (int)Math.ceil(distanceX / resolutionX));
+        cellCountY = Math.max(1, (int)Math.ceil(distanceY / resolutionY));
         
         grid = new ArrayList<>(cellCountX * cellCountY);
         map = new HashMap<>();
@@ -72,7 +72,7 @@ public class Grid<BaseType> {
             int minY = baseY - iteration;
             int maxY = baseY + iteration;
             
-            if (minX <= 0 && minY <= 0 && maxX >= cellCountX && maxY >= cellCountY) {
+            if (minX < 0 && minY < 0 && maxX >= cellCountX && maxY >= cellCountY) {
                 break;
             }
             
