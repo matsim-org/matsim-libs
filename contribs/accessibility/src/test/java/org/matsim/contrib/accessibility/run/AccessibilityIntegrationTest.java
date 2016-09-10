@@ -333,18 +333,30 @@ public class AccessibilityIntegrationTest {
 						
 					} else if(x == 50 && y == 150){
 						
-						expected.accessibilityFreespeed = 2.1555292541877;
-						expected.accessibilityCar = 2.1555292541877;
-						expected.accessibilityBike = 2.20170415738971;
-						expected.accessibilityWalk = 1.88907197432798;
+						// corrected with change in orthogonal projection computation
+//						expected.accessibilityFreespeed = 2.1555292541877;
+//						expected.accessibilityCar = 2.1555292541877;
+//						expected.accessibilityBike = 2.20170415738971;
+//						expected.accessibilityWalk = 1.88907197432798;
+//						expected.accessibilityPt = 0.461863556339195;
+						expected.accessibilityFreespeed = 2.1766435716006005;
+						expected.accessibilityCar = 2.1766435716006005;
+						expected.accessibilityBike = 2.2445468698643367;
+						expected.accessibilityWalk = 1.7719146868026079;
 						expected.accessibilityPt = 0.461863556339195;
 						
 					} else if(x == 150 && y == 150){
 						
-						expected.accessibilityFreespeed = 2.18445595855523;
-						expected.accessibilityCar = 2.18445595855523;
-						expected.accessibilityBike = 2.22089493905874;
-						expected.accessibilityWalk = 1.9683225787191;
+						// corrected with change in orthogonal projection computation
+//						expected.accessibilityFreespeed = 2.18445595855523;
+//						expected.accessibilityCar = 2.18445595855523;
+//						expected.accessibilityBike = 2.22089493905874;
+//						expected.accessibilityWalk = 1.9683225787191;
+//						expected.accessibilityPt = 0.624928280738513;
+						expected.accessibilityFreespeed = 2.2055702759681273;
+						expected.accessibilityCar = 2.2055702759681273;
+						expected.accessibilityBike = 2.2637376515333636;
+						expected.accessibilityWalk = 1.851165291193725;
 						expected.accessibilityPt = 0.624928280738513;
 						
 					}
