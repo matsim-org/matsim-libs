@@ -15,17 +15,17 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
-public class PopGenerationEquil implements Runnable {
+public class PopGenerationBoddin implements Runnable {
 	
 
-	String outputPop = "../../../shared-svn/studies/countries/de/berlin-bike/input/demand/equil_bike_20.xml";
+	String outputPop = "../../../shared-svn/studies/countries/de/berlin-bike/input/szenarios/boddin/demand/boddin_bike_50.xml";
 	
 	private Scenario scenario;
 
 	private Population population;
 
 	public static void main(String[] args) {
-		PopGenerationEquil Pop = new PopGenerationEquil();
+		PopGenerationBoddin Pop = new PopGenerationBoddin();
 		Pop.run();
 	}
 
@@ -42,7 +42,7 @@ public class PopGenerationEquil implements Runnable {
 	
 
 	private void generatePopulation() {
-		generateHomeWorkHomeTrips("home1", "work1", 20); // create 1000 trips from zone 'home1' to 'work1'
+		generateHomeWorkHomeTrips("home1", "work1", 50); // create 1000 trips from zone 'home1' to 'work1'
 		//... generate more trips here
 	}
 
@@ -51,8 +51,8 @@ public class PopGenerationEquil implements Runnable {
 		for (int i=0; i<quantity; ++i) {
 			Person person = population.getFactory().createPerson(createId(from, to, i, TransportMode.bike));
 			Plan plan = population.getFactory().createPlan();
-			Coord homeLocation = new Coord(4594056.246772228, 5815823.958524446);
-			Coord workLocation = new Coord(4597061.15798372, 5815895.2771292785);
+			Coord homeLocation = new Coord(4596667.909172385, 5817222.118015156);
+			Coord workLocation = new Coord(4589790.720652158, 5821449.8582265675);
 			plan.addActivity(createHome(homeLocation));
 					plan.addLeg(createDriveLeg());
 			plan.addActivity(createWork(workLocation));
@@ -88,7 +88,7 @@ public class PopGenerationEquil implements Runnable {
 	}
 
 	private Id<Person> createId(String source, String sink, int i, String transportMode) {
-		return Id.create(transportMode + "_" + source + "_" + sink + "_" + i, Person.class);
+		return Id.create(transportMode + "_" + i, Person.class);
 	}
 
 }

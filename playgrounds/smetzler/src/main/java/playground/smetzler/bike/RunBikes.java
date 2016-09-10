@@ -13,16 +13,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class RunBikes {
 	
 	public static void main(String[] args) {
-		//old way with using the MultiModal approach
-//		Config config = ConfigUtils.loadConfig("../../../shared-svn/studies/countries/de/berlin-bike/input/config_bike_equilCarnBike.xml", new BikeConfigGroup(), new MultiModalConfigGroup());
-//		Config config = ConfigUtils.loadConfig("../../../shared-svn/studies/countries/de/berlin-bike/input/config_bike_innenringWCar.xml", new BikeConfigGroup(), new MultiModalConfigGroup());
-		
-//		//new
-//		Config config = ConfigUtils.loadConfig("../../../shared-svn/studies/countries/de/berlin-bike/input/config_bike_innenringWrealDemand.xml", new BikeConfigGroup());
-		
-		//equil
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/studies/countries/de/berlin-bike/input/config_bike_equil.xml", new BikeConfigGroup());
 
+//		//boddin
+//		Config config = ConfigUtils.loadConfig("../../../shared-svn/studies/countries/de/berlin-bike/input/szenarios/boddin/config_bike_boddin.xml", new BikeConfigGroup());
+		//berlin
+		Config config = ConfigUtils.loadConfig("../../../shared-svn/studies/countries/de/berlin-bike/input/szenarios/berlin/config_bike_berlin.xml", new BikeConfigGroup());
 
 //		config.controler().setOutputDirectory("../../../runs-svn/berlin-bike/BerlinBike_0804_BVG_15000");
 //		
@@ -31,7 +26,7 @@ public class RunBikes {
 //		config.network().setInputFile("network/BerlinBikeNet_MATsim.xml");
 		
 
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+//		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
 		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 		

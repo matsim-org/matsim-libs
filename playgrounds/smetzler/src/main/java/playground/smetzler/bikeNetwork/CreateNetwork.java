@@ -23,21 +23,26 @@ public class CreateNetwork {
 	public static void main(String[] args) {
 		
 		String WGS84 = "EPSG:4326";
-		String DHDN_GK4 = "EPSG:31468"; //String DHDN = "EPSG:3068";
+		String DHDN_GK4 = "EPSG:31468";
 		
 		
-		//String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/berlin/BerlinBikeNet_mod.osm";
 		
-		//keepPaths line 489 !!!!!!!!!!!!!!!!!!
-		//only create bike links
-		//ohne slope
-		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/equil/equil_OSM_PedestrianbikeNo.osm";
+//		String szenarioname= "BerlinBikeNet_mod";
+//		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/berlin/" + szenarioname + ".osm";
+//	//	String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/input/szenarios/unequil/network/"+ szenarioname + ".osm";
+//		
+////		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/network/equil_eigenbau_MATsim.xml";
+////		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/equil_eigenbau_bikeObjectAtt.xml";
+//		
+//		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/szenarios/berlin/network/" + szenarioname + "_MATsim.xml.gz";
+//		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/szenarios/berlin/network/" + szenarioname + "_bikeObjectAtt.xml.gz";
 		
-//		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/network/equil_eigenbau_MATsim.xml";
-//		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/equil_eigenbau_bikeObjectAtt.xml";
 		
-		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/network/equil/equil_PedestrianbikeNo_MATsim.xml";
-		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/equil/equil_PedestrianbikeNo_bikeObjectAtt.xml";
+		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/berlin/massnahmen/BerlinBikeNet_mod_falke.osm";
+		String szenarioname= "Berlin_falke";
+		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/szenarios/berlin/network/massnahmen/" + szenarioname + "_MATsim.xml.gz";
+		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/szenarios/berlin/network/massnahmen/" + szenarioname + "_bikeObjectAtt.xml.gz";
+
 		
 		
 		Config config = ConfigUtils.createConfig();
@@ -49,7 +54,6 @@ public class CreateNetwork {
 		CoordinateTransformation ct = 
 				TransformationFactory.getCoordinateTransformation(WGS84, DHDN_GK4); //TransformationFactory.WGS84
 
-		//wie kann ich die bike-Interfaces einbringen??
 		BikeCustomizedOsmNetworkReader bikeNetworkReader = new BikeCustomizedOsmNetworkReader(bikeNetwork,ct);
 		bikeNetworkReader.constructBikeNetwork(inputOSM); 
 		
@@ -64,32 +68,32 @@ public class CreateNetwork {
 		new NetworkCleaner().run(bikeNetwork);
 		new NetworkCleaner().run(carNetwork);
 		
-//		Network mergedNetwork = NetworkUtils.createNetwork();
-//		
-//		List<Link> bikeLinks = new ArrayList<Link>(bikeNetwork.getLinks().values());
-//		List<Link> carLinks = new ArrayList<Link>(carNetwork.getLinks().values());
-//		for (Node node : new ArrayList<Node>(bikeNetwork.getNodes().values())) {
-//			bikeNetwork.removeNode(node.getId());
-//			mergedNetwork.addNode(node);
-//		}
-//		for (Node node : new ArrayList<Node>(carNetwork.getNodes().values())) {
-//			carNetwork.removeNode(node.getId());
-//			if (!mergedNetwork.getNodes().containsKey(node.getId())) {
-//				mergedNetwork.addNode(node);
-//			}
-//		}
-//		
-//		for (Link link : bikeLinks) {
-//			mergedNetwork.addLink(link);
-//		}
-//		for (Link link : carLinks) {
-//			mergedNetwork.addLink(link);
-//		}
+		Network mergedNetwork = NetworkUtils.createNetwork();
+		
+		List<Link> bikeLinks = new ArrayList<Link>(bikeNetwork.getLinks().values());
+		List<Link> carLinks = new ArrayList<Link>(carNetwork.getLinks().values());
+		for (Node node : new ArrayList<Node>(bikeNetwork.getNodes().values())) {
+			bikeNetwork.removeNode(node.getId());
+			mergedNetwork.addNode(node);
+		}
+		for (Node node : new ArrayList<Node>(carNetwork.getNodes().values())) {
+			carNetwork.removeNode(node.getId());
+			if (!mergedNetwork.getNodes().containsKey(node.getId())) {
+				mergedNetwork.addNode(node);
+			}
+		}
+		
+		for (Link link : bikeLinks) {
+			mergedNetwork.addLink(link);
+		}
+		for (Link link : carLinks) {
+			mergedNetwork.addLink(link);
+		}
 		
 		
 		
-	//	new NetworkWriter(mergedNetwork).write(outputXML);
-		new NetworkWriter(bikeNetwork).write(outputXML);
+		new NetworkWriter(mergedNetwork).write(outputXML);
+//		new NetworkWriter(bikeNetwork).write(outputXML);
 	}
 
 
