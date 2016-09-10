@@ -29,26 +29,34 @@ import floetteroed.opdyts.SimulatorState;
  * 
  */
 class ModeChoiceObjectiveFunction implements ObjectiveFunction {
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger( ModeChoiceObjectiveFunction.class );
+	
+	private static ExperiencedPlansService prevExperiencedPlansService = null ;
 
 	private final Map< String, Double > shares = new HashMap<>() ;
-	private final Map<String,Double> cnt = new HashMap<>() ;
 	private MainModeIdentifier mainModeIdentifier = new MyMainModeIdentifier() ;
 
 	@Inject ExperiencedPlansService service ;
 	@Inject TripRouter tripRouter ;
+	// Documentation: "Guice injects ... fields of all values that are bound using toInstance(). These are injected at injector-creation time."
+	// https://github.com/google/guice/wiki/InjectionPoints
+	// I read that as "the fields are injected (every time again) when the instance is injected".
+	// This is the behavior that we want here.  kai, sep'16
 
 	ModeChoiceObjectiveFunction() {
 		shares.put( TransportMode.walk, 0.0 ) ;
 		shares.put( TransportMode.bike, 0.0 ) ;
 		shares.put( TransportMode.pt, 0.95 ) ;
 		shares.put( TransportMode.car, 0.05 ) ;
-		
-		
 	}
 
 	@Override public double value(SimulatorState state) {
+		log.warn( "prevExpPlnsService=" + prevExperiencedPlansService + "; currExpPlnsService=" + service ) ;
+		prevExperiencedPlansService = service ;
+		
 		double sum = 0 ;
+		Map<String,Double> cnt = new HashMap<>() ;
 
 		for ( Plan plan : service.getExperiencedPlans().values() ) {
 			List<Trip> trips = TripStructureUtils.getTrips(plan, tripRouter.getStageActivityTypes() ) ;

@@ -4,6 +4,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
@@ -35,22 +36,18 @@ final class ModeChoiceDecisionVariable implements DecisionVariable {
 		for ( Entry<String, ScoringParameterSet> entry : newScoreConfig.getScoringParametersPerSubpopulation().entrySet() ) {
 			String subPopName = entry.getKey() ;
 			log.warn( "treating sub-population with name=" + subPopName );
-			ScoringParameterSet pSet = entry.getValue() ;
-			for ( Entry<String, ModeParams> modeEntry : pSet.getModes().entrySet() ) {
-				String modeName = modeEntry.getKey() ;
-				log.warn( "treating mode with name=" + modeName ) ;
-				ModeParams outputModeParams = scenario.getConfig().planCalcScore().getScoringParameters( subPopName ).getModes().get(modeName) ;
-				ModeParams modeParams = modeEntry.getValue() ;
+			ScoringParameterSet newParameterSet = entry.getValue() ;
+			for ( Entry<String, ModeParams> newModeEntry : newParameterSet.getModes().entrySet() ) {
+				String mode = newModeEntry.getKey() ;
+				if ( !TransportMode.car.equals(mode) ) { // we leave car alone
+					log.warn( "treating mode with name=" + mode ) ;
+					ModeParams newModeParams = newModeEntry.getValue() ;
+					ModeParams scenarioModeParams = scenario.getConfig().planCalcScore().getScoringParameters( subPopName ).getModes().get(mode) ;
 
-//				outputModeParams.setConstant( modeParams.getConstant() );
-				outputModeParams.setMarginalUtilityOfTraveling( modeParams.getMarginalUtilityOfTraveling() );
-//				outputModeParams.setMarginalUtilityOfDistance( modeParams.getMarginalUtilityOfDistance() );
-				// yyyy this is dangerous since it does not copy the whole list of betas but just a subset.
-				// Implies that one knows which of these are relevant and which not.
-				// Caused by passing the full dummyConfig into here rather than something specifically designed. 
-				// But this is what would keep it flexible for general scoring params calibration, so need to hedge against it.  kai, sep'16
-				
-				log.warn("new mode params:" + outputModeParams );
+					scenarioModeParams.setMarginalUtilityOfTraveling( newModeParams.getMarginalUtilityOfTraveling() );
+
+					log.warn("new mode params:" + scenarioModeParams );
+				}
 			}
 		}
 	}
