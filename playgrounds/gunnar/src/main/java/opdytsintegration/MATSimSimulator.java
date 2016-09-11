@@ -1,5 +1,6 @@
 package opdytsintegration;
 
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -37,19 +38,22 @@ public class MATSimSimulator<U extends DecisionVariable> implements Simulator<U>
 
 	private final Set<Id<TransitStopFacility>> relevantStopIds;
 
-	private AbstractModule[] modules = null;
+	private AbstractModule[] replacingModules = null;
+	private AbstractModule overrides = AbstractModule.emptyModule();
 
 	private int nextControlerRun = 0;
 
 	private ScoringFunctionFactory scoringFunctionFactory = null;
 
+
 	// -------------------- CONSTRUCTOR --------------------
 
 	public MATSimSimulator(final MATSimStateFactory<U> stateFactory, final Scenario scenario,
-			final TimeDiscretization timeDiscretization,
-			// final Set<Id<Link>> relevantLinkIds,
+			final TimeDiscretization timeDiscretization
+			// ,final Set<Id<Link>> relevantLinkIds,
 			// final Set<Id<TransitStopFacility>> relevantStopIds,
-			final AbstractModule... modules) {
+			//final AbstractModule... modules
+			) {
 		this.stateFactory = stateFactory;
 		this.scenario = scenario;
 		this.timeDiscretization = timeDiscretization;
@@ -65,13 +69,21 @@ public class MATSimSimulator<U extends DecisionVariable> implements Simulator<U>
 		} else {
 			this.relevantStopIds = null;
 		}
-		this.modules = modules;
+//		this.replacingModules = modules;
 
 		final String outputDirectory = this.scenario.getConfig().controler().getOutputDirectory();
 		this.scenario.getConfig().controler().setOutputDirectory(outputDirectory + "_0");
 	}
+	
+	public final void setReplacingModules( final AbstractModule... replacingModules ) {
+		this.replacingModules = replacingModules ;
+	}
+	public final void addOverridingModule(AbstractModule abstractModule) {
+		this.overrides = AbstractModule.override(Arrays.asList(this.overrides), abstractModule);
+	}
 
 	// TODO NEW
+	// In principle this can also be done via a module.  So this additional syntax is not really necessary (and bloats the design).  kai, sep'16
 	public void setScoringFunctionFactory(final ScoringFunctionFactory factory) {
 		this.scoringFunctionFactory = factory;
 	}
@@ -115,12 +127,19 @@ public class MATSimSimulator<U extends DecisionVariable> implements Simulator<U>
 		 * TODO Is this done correctly?
 		 */
 		final Controler controler = new Controler(this.scenario);
-		if ((this.modules != null) && (this.modules.length > 0)) {
+		if ((this.replacingModules != null) && (this.replacingModules.length > 0)) {
 			// controler.setModules(new
 			// ControlerDefaultsWithRoadPricingModule());
-			controler.setModules(this.modules);
+			controler.setModules(this.replacingModules);
 			// this.modules = null; // ???
+			
+			// I would say that with this syntax it is quite prone to misunderstandings: If this.modules is != null, this syntax will
+			// _replace_ the complete controler infrastructure.  This is a possibility, but in matsim it seems more normal to
+			// add "overriding" modules, i.e. to replace default functionality by other functionality and/or add functionality.  kai, sep'16
+			// Fixed by differentiating between setReplacingModules and addOverridingModules. kai, sep'16
 		}
+		controler.addOverridingModule( this.overrides );
+		
 		controler.addControlerListener(matsimDecisionVariableEvaluator);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
