@@ -19,6 +19,9 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.evac;
 
 import java.io.BufferedWriter;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -37,7 +40,8 @@ public class EvacProgress {
 	private final int shortestPathRunIteration = 0;
 	private final int NERunIteration = 100;
 
-	private final String dir = "../../../../repos/runs-svn/patnaIndia/run109/evac_SeepageQ/";
+	private final String runCase = "PassingQ";
+	private final String dir = "../../../../repos/runs-svn/patnaIndia/run109/1pct/evac_"+runCase+"/";
 
 	public static void main(String[] args) {
 		new EvacProgress().runAndWrite();
@@ -57,12 +61,11 @@ public class EvacProgress {
 		SortedMap<String,SortedMap<Integer, Integer>>  evacProgressNE = arrivalAnalyzer.getTimeBinToNumberOfArrivals();
 
 		String outFile = dir+"/analysis/evacuationProgress.txt";
-		BufferedWriter writer = IOUtils.getBufferedWriter(outFile);
 		
 		SortedSet<Integer> timeBins = new TreeSet<>();
 		timeBins.addAll(evacProgressSP.get(TransportMode.car).keySet());
 
-		try {
+		try(BufferedWriter writer = IOUtils.getBufferedWriter(outFile)) {
 			writer.write("hourOfTheDay \t");//\t  \t  \n
 			for (Integer ii : timeBins){
 				writer.write(ii+"\t");
@@ -88,8 +91,46 @@ public class EvacProgress {
 
 			writer.close();
 		} catch (Exception e) {
-			throw new RuntimeException("Data is not written in file. Reason: "
-					+ e);
+			throw new RuntimeException("Data is not written in file. Reason: "+ e);
+		}
+		
+		outFile = dir+"/analysis/evacuationProgress_ggplot.txt";
+		Map<String,double[]> evacSP = getCummulative(evacProgressSP);
+		Map<String,double[]> evacNE = getCummulative(evacProgressNE);
+		
+		try(BufferedWriter writer = IOUtils.getBufferedWriter(outFile)){
+			writer.write("hourOfTheDay\tmode\tevacueeSP\tevacueeNE\trunCase\n");
+			for(Integer timebin : timeBins){
+				for(String mode : evacSP.keySet()){
+					writer.write(timebin+"\t"+mode+"\t"+evacSP.get(mode)[timebin-1]+"\t"+evacNE.get(mode)[timebin-1]+"\t"+runCase+"\n");
+				}
+			}
+			writer.close();
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written in file. Reason: "+ e);
 		}
 	}
+	
+	private static Map<String,double[]> getCummulative(SortedMap<String,SortedMap<Integer, Integer>> inMap){
+		Map<String,double[]> outMap = new HashMap<>();
+		double allModes [] = new double [inMap.get("car").size()];
+		Arrays.fill(allModes, 0.0);
+		
+		for (String mode : inMap.keySet()) {
+			double d [] = new double [inMap.get(mode).size()];
+			for(int index = 1; index <= d.length; index++){
+				if(index==1)  {
+					d[index-1] = inMap.get(mode).get(index);
+					allModes[index-1] = allModes[index-1] + d[index-1];
+				} else {
+					d[index-1] = d[index-2] + inMap.get(mode).get(index);
+					allModes[index-1] = allModes[index-1] + d[index-1];
+				}
+			}
+			outMap.put(mode, d);
+		}
+		outMap.put("all modes", allModes);
+		return outMap;
+	}
+	
 }
