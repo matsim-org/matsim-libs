@@ -89,6 +89,7 @@ public class CountsCompare2GeoJSON {
 
 				Map<String, Object> properties = new HashMap<>();
 
+				properties.put("id", count.getCsId());
 				properties.put("simulation", simVal);
 				properties.put("observation", obsVal);
 				properties.put("error", relErr);
