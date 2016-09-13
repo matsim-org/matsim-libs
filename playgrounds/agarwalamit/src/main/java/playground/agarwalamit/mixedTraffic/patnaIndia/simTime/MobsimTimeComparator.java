@@ -37,8 +37,6 @@ public class MobsimTimeComparator {
 
 	private String respectiveFileDirectory = "../../../../repos/runs-svn/patnaIndia/run110/100pct/";
 	private BufferedWriter writer;
-	private static final String FIRST_IT = "0";
-	private static final String LAST_IT = "200";
 
 	public static void main(String[] args) {
 		MobsimTimeComparator mtc = new MobsimTimeComparator();
@@ -89,25 +87,24 @@ public class MobsimTimeComparator {
 	}
 
 	private double readAndReturnMobsimTime(String stopwatchFile){
-
 		double mobsimTime = 0;
 
 		BufferedReader reader = IOUtils.getBufferedReader(stopwatchFile);
 		try {
 			String line = reader.readLine();
-			String mobsimStartTime = "0" ;
-			String mobsimEndTime = "0";
+			String mobsimStartTime = null ;
+			String mobsimEndTime = null;
 			while(line!=null) {
 				if(line.startsWith("Iteration")) {
 					line = reader.readLine();
 					continue;
 				}
 				String [] parts = line.split("\t");
-				if(parts[0].equals(FIRST_IT)) mobsimStartTime = parts[8];
-				if(parts[0].equals(LAST_IT)) mobsimEndTime = parts[9];
+				mobsimStartTime = parts[10];
+				mobsimEndTime = parts[11];
+				mobsimTime += getMobsimTime(mobsimStartTime, mobsimEndTime);
 				line = reader.readLine();
 			} ;
-			mobsimTime = getMobsimTime(mobsimStartTime, mobsimEndTime);
 		} catch (Exception e) {
 			throw new RuntimeException("File not found. Reason "+ e);
 		}
