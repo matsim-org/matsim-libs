@@ -38,14 +38,14 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.Default
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 
-class KNBerlinControler {
+public final class KNBerlinControler {
 	private static final Logger log = Logger.getLogger(KNBerlinControler.class);
 
 	public static double capFactorForEWS = Double.NaN ;
 
 	public static void main ( String[] args ) {
-		final boolean assignment = true ;
-		final boolean equil = false ;
+		final boolean assignment = false ;
+		final boolean equil = true ;
 
 		OutputDirectoryLogging.catchLogEntries();
 
@@ -76,7 +76,7 @@ class KNBerlinControler {
 
 	}
 
-	private static AbstractModule prepareOverrides(final boolean assignment) {
+	public static AbstractModule prepareOverrides(final boolean assignment) {
 		AbstractModule overrides = new AbstractModule() {
 			@Override public void install() {
 				this.addControlerListenerBinding().toInstance( new KaiAnalysisListener() ) ;
@@ -89,7 +89,7 @@ class KNBerlinControler {
 		return overrides;
 	}
 
-	private static Scenario prepareScenario(final boolean equil, Config config) {
+	public static Scenario prepareScenario(final boolean equil, Config config) {
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 
 		if ( !equil ) {
@@ -114,7 +114,7 @@ class KNBerlinControler {
 		return scenario;
 	}
 
-	private static Config prepareConfig(String[] args, final boolean assignment, final boolean equil) {
+	public static Config prepareConfig(String[] args, final boolean assignment, final boolean equil) {
 		double sampleFactor;
 		if ( equil ) {
 			sampleFactor = 1. ;
@@ -274,13 +274,17 @@ class KNBerlinControler {
 				//				config.travelTimeCalculator().setTraveltimeBinSize(10);
 			}
 		}
-		//		{
-		//			StrategySettings stratSets = new StrategySettings( ) ;
-		//			stratSets.setStrategyName( DefaultStrategy.ChangeSingleTripMode.name() );
-		//			stratSets.setWeight(0.1);
-		//			config.strategy().addStrategySettings(stratSets);
-		//			config.changeMode().setModes(new String[] {"walk","bike","car","pt","pt2"});
-		//		}
+				{
+					StrategySettings stratSets = new StrategySettings( ) ;
+					stratSets.setStrategyName( DefaultStrategy.ChangeSingleTripMode.name() );
+					stratSets.setWeight(0.1);
+					config.strategy().addStrategySettings(stratSets);
+					if ( equil ) {
+						config.changeMode().setModes(new String[] {"car","pt"});
+					} else {
+						config.changeMode().setModes(new String[] {"walk","bike","car","pt","pt2"});
+					}
+				}
 		{
 			//			StrategySettings stratSets = new StrategySettings( ) ;
 			//			stratSets.setStrategyName( DefaultStrategy.TimeAllocationMutator.name() );
