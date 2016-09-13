@@ -28,8 +28,9 @@ final class ModeChoiceRandomizer implements DecisionVariableRandomizer<ModeChoic
 					ModeParams oldModeParams = oldScoringConfig.getModes().get(mode) ;
 					ModeParams newModeParams = new ModeParams(mode) ;
 					newModeParams.setConstant( oldModeParams.getConstant() + 0.1 * MatsimRandom.getRandom().nextGaussian() );
+					// yyyyyy careful with using matsim-random since it is always the same sequence!!
 					newModeParams.setMarginalUtilityOfDistance( oldModeParams.getMarginalUtilityOfDistance() + 0.1 * MatsimRandom.getRandom().nextGaussian() );
-					newModeParams.setMarginalUtilityOfTraveling( oldModeParams.getMarginalUtilityOfTraveling() + 1 * MatsimRandom.getRandom().nextGaussian() );
+					newModeParams.setMarginalUtilityOfTraveling( oldModeParams.getMarginalUtilityOfTraveling() + 1. * MatsimRandom.getRandom().nextGaussian() );
 					newModeParams.setMarginalUtilityOfDistance(oldModeParams.getMarginalUtilityOfDistance());
 					newModeParams.setMonetaryDistanceRate(oldModeParams.getMonetaryDistanceRate());
 					newScoringConfig.addModeParams(newModeParams);

@@ -23,6 +23,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -37,9 +39,11 @@ import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
- * @author thibautd
+ * @author Kai Nagel based on thibautd
  */
-public class MySubpopulationCharyparNagelScoringParameters implements CharyparNagelScoringParametersForPerson {
+public class EveryIterationScoringParameters implements CharyparNagelScoringParametersForPerson {
+	private static final Logger log = Logger.getLogger( EveryIterationScoringParameters.class ) ;
+	
 	private final PlanCalcScoreConfigGroup config;
 	private final ScenarioConfigGroup scConfig;
 	private final TransitConfigGroup transitConfigGroup;
@@ -49,7 +53,7 @@ public class MySubpopulationCharyparNagelScoringParameters implements CharyparNa
 	private ReplanningContext context;
 	private int previousIteration = -1 ;
 
-	@Inject MySubpopulationCharyparNagelScoringParameters(PlansConfigGroup plansConfigGroup,
+	@Inject EveryIterationScoringParameters(PlansConfigGroup plansConfigGroup,
 			PlanCalcScoreConfigGroup planCalcScoreConfigGroup, ScenarioConfigGroup scenarioConfigGroup, 
 			Population population, TransitConfigGroup transitConfigGroup, ReplanningContext context ) 
 	{
@@ -63,9 +67,11 @@ public class MySubpopulationCharyparNagelScoringParameters implements CharyparNa
 
 	@Override
 	public CharyparNagelScoringParameters getScoringParameters(Person person) {
+		boolean flag = false ;
 		if ( context.getIteration() > previousIteration ) {
 			previousIteration = context.getIteration() ;
 			params.clear();
+			flag = true ;
 		}
 		
 		final String subpopulation = (String) personAttributes.getAttribute( person.getId().toString(), subpopulationAttributeName);
@@ -91,9 +97,12 @@ public class MySubpopulationCharyparNagelScoringParameters implements CharyparNa
 				builder.setActivityParameters(PtConstants.TRANSIT_ACTIVITY_TYPE, modeParamsBuilder);
 			}
 
-			this.params.put(
-					subpopulation,
-					builder.build());
+			this.params.put( subpopulation, builder.build());
+		}
+		
+		if ( flag ) {
+			flag = false ;
+			log.warn("new pt params=" + (this.params.get(subpopulation).modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s *3600.) ) ;
 		}
 
 		return this.params.get(subpopulation);

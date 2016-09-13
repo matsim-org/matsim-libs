@@ -119,10 +119,6 @@ class KNModeChoiceCalibMain {
 
 		// ===
 
-		final DecisionVariableRandomizer<ModeChoiceDecisionVariable> randomizer = new ModeChoiceRandomizer(scenario);
-
-		final ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable( scenario.getConfig().planCalcScore(), scenario ) ;
-
 		//		final TimeDiscretization timeDiscretization = new TimeDiscretization(5 * 3600, 10 * 60, 18);
 		final TimeDiscretization timeDiscretization = new TimeDiscretization(0, 96*3600, 1);
 		final MATSimSimulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>( new MATSimStateFactoryImpl<>(), 
@@ -130,21 +126,17 @@ class KNModeChoiceCalibMain {
 		simulator.addOverridingModule(new AbstractModule(){
 			@Override public void install() {
 				bindScoringFunctionFactory().to(CharyparNagelScoringFunctionFactory.class);
-				bind(CharyparNagelScoringParametersForPerson.class).to(MySubpopulationCharyparNagelScoringParameters.class);
+				bind(CharyparNagelScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
 			}
 		} ) ;
 
-		final ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction();
-
-		final FixedIterationNumberConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion( 100, 10);
-
 		final RandomSearch.Builder<ModeChoiceDecisionVariable> builder = new RandomSearch.Builder<ModeChoiceDecisionVariable>().
 				setSimulator(simulator).
-				setRandomizer(randomizer).
-				setInitialDecisionVariable(initialDecisionVariable).
-				setConvergenceCriterion(convergenceCriterion).
+				setRandomizer(new ModeChoiceRandomizer(scenario)).
+				setInitialDecisionVariable(new ModeChoiceDecisionVariable( scenario.getConfig().planCalcScore(), scenario )).
+				setConvergenceCriterion(new FixedIterationNumberConvergenceCriterion( 100, 10)).
 				setRnd(MatsimRandom.getRandom()).
-				setObjectiveFunction(objectiveFunction) ;
+				setObjectiveFunction(new ModeChoiceObjectiveFunction()) ;
 		final RandomSearch<ModeChoiceDecisionVariable> randomSearch = builder.build() ;
 		randomSearch.setLogPath("./");
 
