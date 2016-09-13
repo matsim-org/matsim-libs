@@ -130,14 +130,30 @@ class KNModeChoiceCalibMain {
 			}
 		} ) ;
 
-		final RandomSearch.Builder<ModeChoiceDecisionVariable> builder = new RandomSearch.Builder<ModeChoiceDecisionVariable>().
-				setSimulator(simulator).
-				setRandomizer(new ModeChoiceRandomizer(scenario)).
-				setInitialDecisionVariable(new ModeChoiceDecisionVariable( scenario.getConfig().planCalcScore(), scenario )).
-				setConvergenceCriterion(new FixedIterationNumberConvergenceCriterion( 100, 10)).
-				setRnd(MatsimRandom.getRandom()).
-				setObjectiveFunction(new ModeChoiceObjectiveFunction()) ;
-		final RandomSearch<ModeChoiceDecisionVariable> randomSearch = builder.build() ;
+//		final RandomSearch.Builder<ModeChoiceDecisionVariable> builder = new RandomSearch.Builder<ModeChoiceDecisionVariable>().
+//				setSimulator(simulator).
+//				setRandomizer(new ModeChoiceRandomizer(scenario)).
+//				setInitialDecisionVariable(new ModeChoiceDecisionVariable( scenario.getConfig().planCalcScore(), scenario )).
+//				setConvergenceCriterion(new FixedIterationNumberConvergenceCriterion( 100, 10)).
+//				setRnd(MatsimRandom.getRandom()).
+//				setObjectiveFunction(new ModeChoiceObjectiveFunction()) ;
+//		final RandomSearch<ModeChoiceDecisionVariable> randomSearch = builder.build() ;
+		
+		int maxIterations = 10 ;
+		int maxTransitions = Integer.MAX_VALUE ;
+		int populationSize = 10 ;
+		boolean interpolate = true ;
+		boolean includeCurrentBest = false ;
+		RandomSearch<ModeChoiceDecisionVariable> randomSearch = new RandomSearch<>( simulator,
+				new ModeChoiceRandomizer(scenario) ,
+				new ModeChoiceDecisionVariable( scenario.getConfig().planCalcScore(), scenario ) ,
+				new FixedIterationNumberConvergenceCriterion(100, 10 ) ,
+				maxIterations, maxTransitions, populationSize, 
+				MatsimRandom.getRandom(),
+				interpolate,
+				new ModeChoiceObjectiveFunction(),
+				includeCurrentBest ) ;
+		
 		randomSearch.setLogPath("./");
 
 		// ===
