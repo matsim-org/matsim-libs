@@ -21,6 +21,7 @@ package org.matsim.contrib.signals.data.signalsystems.v20;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -50,7 +51,7 @@ public class SignalDataImpl implements SignalData {
 	@Override
 	public void addLaneId(Id<Lane> laneId) {
 		if (this.laneIds == null){
-			this.laneIds = new HashSet<>();
+			this.laneIds = new TreeSet<>();
 		}
 		this.laneIds.add(laneId);
 	}
@@ -58,7 +59,7 @@ public class SignalDataImpl implements SignalData {
 	@Override
 	public void addTurningMoveRestriction(Id<Link> linkId) {
 		if (this.turningMoveRestrictions == null){
-			this.turningMoveRestrictions = new HashSet<>();
+			this.turningMoveRestrictions = new TreeSet<>();
 		}
 		this.turningMoveRestrictions.add(linkId);
 	}

@@ -6,16 +6,16 @@
             <signal linkIdRef="43" id="2"/>
         </signals>
     </signalSystem>
-    <signalSystem id="4">
-        <signals>
-            <signal linkIdRef="34" id="1"/>
-            <signal linkIdRef="54" id="2"/>
-        </signals>
-    </signalSystem>
     <signalSystem id="7">
         <signals>
             <signal linkIdRef="27" id="1"/>
             <signal linkIdRef="87" id="2"/>
+        </signals>
+    </signalSystem>
+    <signalSystem id="4">
+        <signals>
+            <signal linkIdRef="34" id="1"/>
+            <signal linkIdRef="54" id="2"/>
         </signals>
     </signalSystem>
     <signalSystem id="8">
