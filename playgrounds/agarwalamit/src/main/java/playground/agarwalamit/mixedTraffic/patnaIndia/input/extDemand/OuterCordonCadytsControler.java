@@ -58,6 +58,7 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Counts;
 import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.Vehicles;
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
@@ -111,9 +112,9 @@ public class OuterCordonCadytsControler {
 		final Config config = pcc.getConfig();
 
 		PatnaVehiclesGenerator pvg = new PatnaVehiclesGenerator(plansFile);
-		pvg.createVehicles(PatnaUtils.EXT_MAIN_MODES);
+		Vehicles vehs = pvg.createAndReturnVehicles(PatnaUtils.EXT_MAIN_MODES);
 
-		new VehicleWriterV1(pvg.getPatnaVehicles()).writeFile(patnaVehicles);
+		new VehicleWriterV1(vehs).writeFile(patnaVehicles);
 		config.vehicles().setVehiclesFile(patnaVehicles);
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);

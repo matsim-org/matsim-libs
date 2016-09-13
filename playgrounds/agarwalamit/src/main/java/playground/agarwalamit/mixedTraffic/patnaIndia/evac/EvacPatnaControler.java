@@ -37,6 +37,7 @@ import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControler
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.PatnaVehiclesGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
@@ -83,7 +84,7 @@ public class EvacPatnaControler {
 		Scenario sc = ScenarioUtils.loadScenario(config); 
 
 		sc.getConfig().qsim().setVehiclesSource(VehiclesSource.modeVehicleTypesFromVehiclesData);
-		PatnaUtils.createAndAddVehiclesToScenario(sc, PatnaUtils.URBAN_MAIN_MODES);
+		PatnaVehiclesGenerator.createAndAddVehiclesToScenario(sc, PatnaUtils.URBAN_MAIN_MODES);
 
 		final Controler controler = new Controler(sc);
 

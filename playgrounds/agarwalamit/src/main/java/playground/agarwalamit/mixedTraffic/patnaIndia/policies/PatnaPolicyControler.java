@@ -120,7 +120,7 @@ public class PatnaPolicyControler {
 		config.controler().setOutputDirectory(outputDir);
 
 		//==
-		// after calibration;  departure time is fixed for urban; remove time choice
+		// after calibration;  departure time is fixed for urban; check if time choice is not present
 		Collection<StrategySettings> strategySettings = config.strategy().getStrategySettings();
 		for(StrategySettings ss : strategySettings){ // departure time is fixed now.
 			if ( ss.getStrategyName().equals(DefaultStrategy.TimeAllocationMutator.toString()) ) {
