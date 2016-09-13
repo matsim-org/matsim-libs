@@ -103,7 +103,7 @@
 					<artifactId>floetteroed-utilities</artifactId>
 					<version>1.0.0</version>
 				</dependency>
-				<dependency>
+ 				<dependency>
 					<groupId>floetteroed.opdyts</groupId>
 					<artifactId>opdyts</artifactId>
 					<version>1.0.0</version>

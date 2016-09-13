@@ -255,6 +255,7 @@ public final class AccessibilityCalculator {
 				Map< Modes4Accessibility, Double> accessibilities  = new HashMap<>() ;
 
 				for ( Modes4Accessibility mode : acg.getIsComputingMode() ) {
+					// TODO introduce here a config parameter "computation mode" that can be set to "rawSum", "minimum" or "exponential/logsum/hansen", dz, sept'16
 					if(!useRawSum){ 	// get log sum
 //						System.err.println(" ------------------ gcs[mode.ordinal()].getSum() = " + gcs[mode.ordinal()].getSum());
 						// does not seem to ever be "-infinity"

@@ -19,7 +19,6 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.joint;
 
 import java.io.File;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -140,7 +139,7 @@ public class JointCalibrationControler {
 			}
 		});
 
-		controler.addOverridingModule(new AbstractModule() { // ploting modal share over iterations
+		controler.addOverridingModule(new AbstractModule() { // plotting modal share over iterations
 			@Override
 			public void install() {
 				this.bind(ModalShareEventHandler.class);
@@ -199,7 +198,7 @@ public class JointCalibrationControler {
 	private static void addScoringFunction(final Controler controler, final Config config){
 		
 		CountsInserter jcg = new CountsInserter();		
-		jcg.processInputFile( inputLocation+"/raw/counts/urbanDemandCountsFile/innerCordon_excl_rckw_incl_truck_shpNetwork.txt" );
+		jcg.processInputFile( inputLocation+"/raw/counts/urbanDemandCountsFile/innerCordon_excl_rckw_shpNetwork.txt" );
 		jcg.processInputFile( inputLocation+"/raw/counts/externalDemandCountsFile/outerCordonData_allCounts_shpNetwork.txt" );
 		jcg.run();
 

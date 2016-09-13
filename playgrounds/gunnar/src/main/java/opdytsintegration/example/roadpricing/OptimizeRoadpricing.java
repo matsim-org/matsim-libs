@@ -176,9 +176,11 @@ class OptimizeRoadpricing {
 		final double tollScale = 0.0;
 		final MATSimSimulator<TollLevels> matsimSimulator = new MATSimSimulator<>(
 				new RoadpricingStateFactory(timeDiscretization, occupancyScale,
-						tollScale), scenario, timeDiscretization,
+						tollScale), scenario, timeDiscretization //,
 				// relevantLinkIds, null, 
-				roadpricingModule);
+//				roadpricingModule
+				);
+		matsimSimulator.setReplacingModules(roadpricingModule);
 		matsimSimulator
 				.setScoringFunctionFactory(new RandomizedCharyparNagelScoringFunctionFactory(
 						scenario));

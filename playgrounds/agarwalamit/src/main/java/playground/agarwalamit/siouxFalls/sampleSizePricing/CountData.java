@@ -120,7 +120,7 @@ public class CountData extends AbstractAnalysisModule {
 
 	@Override
 	public void postProcessData() {
-		this.linkId2TimeSlot2Vol = this.lvh.getLinkId2TimeSlot2LinkVolume();
+		this.linkId2TimeSlot2Vol = this.lvh.getLinkId2TimeSlot2LinkCount();
 		getDesiredLinkVolumes();
 	}
 

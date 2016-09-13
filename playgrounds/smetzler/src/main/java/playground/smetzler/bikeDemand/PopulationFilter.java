@@ -66,7 +66,7 @@ public class PopulationFilter {
 
 
 		inputPlansFile =  "C:/users/Ettan/VSPworkspace/bvg.run189.10pct/bvg.run189.10pct.100.plans.selected.genericPt.xml.gz";
-		outputPlansFile = "C:/users/Ettan/VSPworkspace/bvg.run189.10pct/bvg.run189.10pct.100.plans.selected_bikeonly_1percent_clean.xml.gz";
+		outputPlansFile = "C:/users/Ettan/VSPworkspace/bvg.run189.10pct/bvg.run189.10pct.100.plans.selected_bikeonly_10percent_clean.xml.gz";
 
 
 		PopulationFilter filter = new PopulationFilter();
@@ -102,10 +102,10 @@ public class PopulationFilter {
 						if (leg.getMode().equals(TransportMode.bike)){
 							// leg has bike mode
 							// get 1/100 only, be care sample is already 10%
-							if (random.nextDouble() > 0.90) {
+//							if (random.nextDouble() > 0.90) {
 								planContainsBikeLeg = true;
 								//System.out.println("bike Leg");
-							}
+//							}
 						} else {
 							// no bike mode
 						}

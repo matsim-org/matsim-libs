@@ -91,7 +91,7 @@ public final class NetworkReaderMatsimV1 extends MatsimXmlParser {
 		/* FIXME Note: I would like this to rather crash here (jwjoubert, Sep'16) */
 		if(NODES.equals(name)){
 			if(hasElevation && hasNoElevation){
-				log.error("There is a mixture of nodes WITH and WITHOUT elevation! " + 
+				log.warn("There is a mixture of nodes WITH and WITHOUT elevation! " + 
 						  "You will likely run into problems when doing coordinate calculations.");
 			}
 		}
