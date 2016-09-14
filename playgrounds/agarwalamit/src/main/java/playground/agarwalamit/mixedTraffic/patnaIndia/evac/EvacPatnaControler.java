@@ -56,8 +56,8 @@ public class EvacPatnaControler {
 
 		if(args.length==0){
 			configFile = "../../../../repos/runs-svn/patnaIndia/run109/1pct/input/evac_config.xml.gz";
-			outDir = "../../../../repos/runs-svn/patnaIndia/run109/1pct2/";
-			linkDynamics = LinkDynamics.SeepageQ;
+			outDir = "../../../../repos/runs-svn/patnaIndia/run109/1pct/withoutHoles/";
+			linkDynamics = LinkDynamics.PassingQ;
 			isSeepModeStorageFree = false;
 		} else {
 			configFile = args[0];
@@ -71,10 +71,15 @@ public class EvacPatnaControler {
 
 		config.qsim().setLinkDynamics(linkDynamics.name());
 		config.qsim().setSeepModeStorageFree(isSeepModeStorageFree);
-		Collection<String> seepModes = Arrays.asList("bike","motorbike");
+		Collection<String> seepModes = Arrays.asList("bike");
 		config.qsim().setSeepModes(seepModes );
-		String outputDir = config.controler().getOutputDirectory()+"/evac_"+linkDynamics.name()+"_bikeMotorbike/";
-		if(isSeepModeStorageFree) outputDir = config.controler().getOutputDirectory()+"/evac_"+linkDynamics.name()+"_noStorageCap/";
+		
+		String outputDir ;
+		if(linkDynamics.equals(LinkDynamics.SeepageQ)) {
+			outputDir = config.controler().getOutputDirectory()+"/evac_"+linkDynamics.name()+"_"+seepModes.toString();
+			if(isSeepModeStorageFree) outputDir = outputDir.concat("_noStorageCap/");
+			else outputDir = outputDir.concat("/");
+		} else outputDir = config.controler().getOutputDirectory()+"/evac_"+linkDynamics.name()+"/";
 		
 		config.controler().setOutputDirectory(outputDir);
 		config.controler().setDumpDataAtEnd(true);
