@@ -33,13 +33,13 @@ import org.matsim.core.utils.misc.Time;
  * @author amit
  */
 
-public class MobsimTimeComparator {
+public class MobsimTimeWriter {
 
 	private String respectiveFileDirectory = "../../../../repos/runs-svn/patnaIndia/run110/100pct/";
 	private BufferedWriter writer;
 
 	public static void main(String[] args) {
-		MobsimTimeComparator mtc = new MobsimTimeComparator();
+		MobsimTimeWriter mtc = new MobsimTimeWriter();
 		mtc.openFile();
 		mtc.startProcessing();
 		mtc.closeFile();
