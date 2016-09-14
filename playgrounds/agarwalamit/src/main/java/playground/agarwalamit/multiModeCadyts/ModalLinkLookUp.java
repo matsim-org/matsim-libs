@@ -17,51 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.mixedTraffic.multiModeCadyts;
+package playground.agarwalamit.multiModeCadyts;
+
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.cadyts.general.LookUpItemFromId;
 
 /**
- * A class to create a object which contains modal and link information. 
- * 
  * @author amit
  */
 
-public class ModalLink implements Identifiable<ModalLink> {
+class ModalLinkLookUp implements LookUpItemFromId<ModalLink> {
 	
-	private final String mode;
-	private final Id<Link> linkId;
-	private final Id<ModalLink> id;
+	private Map<String, ModalLink> mappingOfModalLink ;
 	
-	private static final String seperator = "_&_";
+	ModalLinkLookUp (final Map<String, ModalLink> modalLinkContainer){
+		this.mappingOfModalLink = modalLinkContainer;
+	}
 	
-	public String getMode() {
-		return mode;
-	}
-
-	public Id<Link> getLinkId() {
-		return linkId;
-	}
-
-	ModalLink(final String mode, final Id<Link> linkId) {
-		this.mode = mode;
-		this.linkId = linkId;
-		this.id = Id.create(this.mode.concat(getModeLinkSplittor()).concat(this.linkId.toString()), ModalLink.class);
-	}
-
 	@Override
-	public String toString(){
-		return this.mode.concat(getModeLinkSplittor()).concat(this.linkId.toString());
-	}
-	
-	public static String getModeLinkSplittor(){
-		return seperator;
-	}
-
-	@Override
-	public Id<ModalLink> getId() {
-		return this.id;
+	public ModalLink getItem( Id<ModalLink> id ) {
+		return this.mappingOfModalLink.get(id.toString());
 	}
 }
