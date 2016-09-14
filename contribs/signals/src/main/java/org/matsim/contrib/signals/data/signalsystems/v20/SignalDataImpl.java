@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.signalsystems.v20;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
