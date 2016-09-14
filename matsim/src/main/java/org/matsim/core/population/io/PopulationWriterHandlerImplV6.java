@@ -196,6 +196,12 @@ import java.util.Map;
 			out.write("\" y=\"");
 			out.write(Double.toString( coord.getY() ));
 			out.write("\"");
+
+			if ( act.getCoord().hasZ() ) {
+				out.write(" z=\"");
+				out.write(Double.toString( coord.getZ() ));
+				out.write("\"");
+			}
 		}
 		if (act.getStartTime() != Time.UNDEFINED_TIME) {
 			out.write(" start_time=\"");

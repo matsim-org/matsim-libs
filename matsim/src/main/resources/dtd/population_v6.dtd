@@ -31,6 +31,7 @@
           type           CDATA #REQUIRED
           x              CDATA #IMPLIED
           y              CDATA #IMPLIED
+          z              CDATA #IMPLIED
           link           CDATA #IMPLIED
           facility       CDATA #IMPLIED
           start_time     CDATA #IMPLIED

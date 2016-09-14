@@ -20,6 +20,40 @@ public class PopulationV6IOTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
+	public void testCoord3dIO() {
+		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
+
+		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
+		population.addPerson( person );
+
+		final Plan plan = population.getFactory().createPlan();
+		person.addPlan( plan );
+		plan.addActivity(population.getFactory().createActivityFromCoord( "speech" , new Coord( 0 , 0 ) ));
+		plan.addActivity(population.getFactory().createActivityFromCoord( "tweet" , new Coord( 0 , 0 , -100 ) ));
+
+		final String file = utils.getOutputDirectory()+"/population.xml";
+		new PopulationWriter( population ).writeV6( file );
+
+		final Scenario readScenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		new PopulationReader( readScenario ).readFile( file );
+
+		final Person readPerson = readScenario.getPopulation().getPersons().get( Id.createPersonId( "Donald Trump" ) );
+		final Activity readSpeach = (Activity) readPerson.getSelectedPlan().getPlanElements().get( 0 );
+		final Activity readTweet = (Activity) readPerson.getSelectedPlan().getPlanElements().get( 1 );
+
+		Assert.assertFalse( "did not expect Z value in "+readSpeach.getCoord() ,
+				readSpeach.getCoord().hasZ() );
+
+		Assert.assertTrue( "did expect T value in "+readTweet.getCoord() ,
+				readTweet.getCoord().hasZ() );
+
+		Assert.assertEquals( "unexpected Z value in "+readTweet.getCoord(),
+				-100,
+				readTweet.getCoord().getZ(),
+				MatsimTestUtils.EPSILON );
+	}
+
+	@Test
 	public void testEmptyPersonAttributesIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 

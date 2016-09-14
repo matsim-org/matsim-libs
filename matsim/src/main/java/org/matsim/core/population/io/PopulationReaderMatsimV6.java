@@ -77,6 +77,7 @@ import java.util.Stack;
 	private final static String ATTR_ACT_TYPE = "type";
 	private final static String ATTR_ACT_X = "x";
 	private final static String ATTR_ACT_Y = "y";
+	private static final String ATTR_ACT_Z = "z";
 	private final static String ATTR_ACT_LINK = "link";
 	private final static String ATTR_ACT_FACILITY = "facility";
 	private final static String ATTR_ACT_STARTTIME = "start_time";
@@ -283,10 +284,19 @@ import java.util.Stack;
 	}
 
 	private Coord parseCoord(Attributes atts) {
-		return coordinateTransformation.transform(
-				new Coord(
-						Double.parseDouble(atts.getValue( ATTR_ACT_X )),
-						Double.parseDouble(atts.getValue( ATTR_ACT_Y )) ) );
+		if ( atts.getValue( ATTR_ACT_Z ) != null ) {
+			return coordinateTransformation.transform(
+					new Coord(
+							Double.parseDouble(atts.getValue(ATTR_ACT_X)),
+							Double.parseDouble(atts.getValue(ATTR_ACT_Y)),
+							Double.parseDouble(atts.getValue(ATTR_ACT_Z)) ) );
+		}
+		else {
+			return coordinateTransformation.transform(
+					new Coord(
+							Double.parseDouble(atts.getValue(ATTR_ACT_X)),
+							Double.parseDouble(atts.getValue(ATTR_ACT_Y))));
+		}
 	}
 
 	private void finishLastRoute() {
