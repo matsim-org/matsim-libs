@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -37,8 +36,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
-import playground.sebhoerl.av.logic.agent.AVAgent;
-import playground.sebhoerl.av.logic.service.Service;
 import playground.sebhoerl.av.utils.Grid;
 import playground.sebhoerl.avtaxi.schedule.AVTaxiMultiDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVTaxiMultiOccupiedDriveTask;
@@ -93,6 +90,8 @@ public class AVAggregateHeuristicOptimizer implements TaxiOptimizer {
 		
 		router = new Dijkstra(context.network, context.travelDisutility, context.travelTime);
 		
+		
+		
 		for (Vehicle vehicle : context.taxiData.getVehicles().values()) {
 			Coord coord = vehicle.getStartLink().getCoord();
 			availableVehicleGrid.update(vehicle, coord.getX(), coord.getY());
@@ -135,15 +134,17 @@ public class AVAggregateHeuristicOptimizer implements TaxiOptimizer {
 		TaxiRequest master = findCombinableMasterRequest(request);
 		
 		if (master == null) {
-			System.err.println(String.format("MASTER: %s -> %s @ %d (%s)", request.getFromLink().getId().toString(), request.getToLink().getId().toString(), (int)request.getT0(), request.getPassenger().getId().toString()));
+			//System.err.println(String.format("MASTER: %s -> %s @ %d (%s)", request.getFromLink().getId().toString(), request.getToLink().getId().toString(), (int)request.getT0(), request.getPassenger().getId().toString()));
 			
 			Coord coord = request.getFromLink().getCoord();
 			
 			unplannedMasterRequests.add(request);
 			unplannedMasterRequestGrid.update(request, coord.getX(), coord.getY());
 			
-			availableMasterRequestsByOrigin.get(request.getFromLink()).add(request);
-			availableMasterRequestsByDestination.get(request.getToLink()).add(request);
+			if (optimParams.maximumPassengers > 1) {
+				availableMasterRequestsByOrigin.get(request.getFromLink()).add(request);
+				availableMasterRequestsByDestination.get(request.getToLink()).add(request);
+			}
 			
 			reoptimize = true;
 		} else {
@@ -157,15 +158,15 @@ public class AVAggregateHeuristicOptimizer implements TaxiOptimizer {
 			slaves.add(request);
 			
 			if (!unplannedMasterRequests.contains(master)) { // AV is already on the way to the pickup location
-				System.err.println(String.format("SLAVE: %s -> %s @ %d (%s > %s) [enroute]", master.getFromLink().getId().toString(), master.getToLink().getId().toString(), (int)master.getT0(), master.getPassenger().getId().toString(), request.getPassenger().getId().toString()));
+				//System.err.println(String.format("SLAVE: %s -> %s @ %d (%s > %s) [enroute]", master.getFromLink().getId().toString(), master.getToLink().getId().toString(), (int)master.getT0(), master.getPassenger().getId().toString(), request.getPassenger().getId().toString()));
 				assignEnrouteRequest(master, request);
 			} else {
-				System.err.println(String.format("SLAVE: %s -> %s @ %d (%s > %s)", master.getFromLink().getId().toString(), master.getToLink().getId().toString(), (int)master.getT0(), master.getPassenger().getId().toString(), request.getPassenger().getId().toString()));
+				//System.err.println(String.format("SLAVE: %s -> %s @ %d (%s > %s)", master.getFromLink().getId().toString(), master.getToLink().getId().toString(), (int)master.getT0(), master.getPassenger().getId().toString(), request.getPassenger().getId().toString()));
 			}
 			
 			if (!seatsAreAvailable(master)) {
-				availableMasterRequestsByOrigin.remove(master);
-				availableMasterRequestsByDestination.remove(master);
+				availableMasterRequestsByOrigin.get(master.getFromLink()).remove(master);
+				availableMasterRequestsByDestination.get(master.getToLink()).remove(master);
 			}
 		}
 	}
@@ -208,10 +209,14 @@ public class AVAggregateHeuristicOptimizer implements TaxiOptimizer {
 			case OVERSUPPLY:
 				request = unplannedMasterRequests.poll();
 				vehicle = getClosestVehicle(request);
+				availableVehicleGrid.remove(vehicle);
+				availableVehicles.remove(vehicle);
 				break;
 			case UNDERSUPPLY:
 				vehicle = availableVehicles.poll();
 				request = getClosestMasterRequest(vehicle);
+				unplannedMasterRequestGrid.remove(request);
+				unplannedMasterRequests.remove(request);
 				break;
 			}
 			
@@ -273,7 +278,9 @@ public class AVAggregateHeuristicOptimizer implements TaxiOptimizer {
 		schedule.addTask(occupiedDriveTask);
 		schedule.addTask(dropoffTask);
 		
-		schedule.addTask(new TaxiStayTask(dropoffTask.getEndTime(), scheduleEndTime, dropoffTask.getLink()));
+		if (dropoffTask.getEndTime() < schedule.getEndTime()) {
+			schedule.addTask(new TaxiStayTask(dropoffTask.getEndTime(), scheduleEndTime, dropoffTask.getLink()));
+		}		
 		
 		enrouteMappings.put(master, new EnrouteMapping(pickupTask, dropoffTask));
 	}

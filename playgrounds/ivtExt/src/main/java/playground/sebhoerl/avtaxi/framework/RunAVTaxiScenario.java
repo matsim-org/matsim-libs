@@ -20,15 +20,21 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.sebhoerl.avtaxi.utils.VehicleGeneratorByDensity;
+
 public class RunAVTaxiScenario {
 	public static void main(String[] args) throws MalformedURLException {
-		String configFile = "src/main/resources/sebhoerl/avtaxi/config.xml";
+		//String configFile = "src/main/resources/sebhoerl/avtaxi/config.xml";
+		String configFile = args[0];
 		
-		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup());
+		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new AVTaxiConfigGroup());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
+		AVTaxiConfigGroup avconfig = (AVTaxiConfigGroup) config.getModule("avtaxi");
+		
 		TaxiData taxiData = new TaxiData();
-		new VehicleReader(scenario.getNetwork(), taxiData).readFile("src/main/resources/sebhoerl/avtaxi/taxis.xml");
+		//new VehicleReader(scenario.getNetwork(), taxiData).readFile("src/main/resources/sebhoerl/avtaxi/taxis.xml");
+		new VehicleGeneratorByDensity(taxiData, scenario.getNetwork(), scenario.getPopulation()).generate(avconfig.getNumberOfVehicles());
 		
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new TaxiModule(taxiData));

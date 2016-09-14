@@ -2,6 +2,9 @@
 <!DOCTYPE config SYSTEM "./dtd/config_v2.dtd">
 
 <config>
+	<module name="avtaxi">
+		<param name="numberOfVehicles" value="5" />
+	</module>
     <module name="taxi">
         <param name="taxisFile" value="taxis.xml" />
 		<param name="pickupDuration" value="120" />
