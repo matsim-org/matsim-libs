@@ -165,10 +165,7 @@ public final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 		final Node node =
 				this.network.getFactory().createNode(
 						Id.create(atts.getValue("id"), Node.class),
-						transformation.transform(
-								new Coord(
-										Double.parseDouble(atts.getValue("x")),
-										Double.parseDouble(atts.getValue("y")))) );
+						parseCoord(atts));
 		this.network.addNode(node);
 
 		NetworkUtils.setType(node,atts.getValue("type"));
@@ -179,6 +176,18 @@ public final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 		}
 
 		currentAttributes = node.getAttributes();
+	}
+
+	private Coord parseCoord(Attributes atts) {
+		final Coord c = atts.getValue( "z" ) == null ?
+				new Coord(
+						Double.parseDouble(atts.getValue("x")),
+						Double.parseDouble(atts.getValue("y"))) :
+				new Coord(
+						Double.parseDouble(atts.getValue("x")),
+						Double.parseDouble(atts.getValue("y")),
+						Double.parseDouble(atts.getValue("y")));
+		return transformation.transform( c );
 	}
 
 	private void startLink(final Attributes atts) {

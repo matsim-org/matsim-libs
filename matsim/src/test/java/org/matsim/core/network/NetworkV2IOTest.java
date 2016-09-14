@@ -15,7 +15,7 @@ import org.matsim.testcases.MatsimTestUtils;
 /**
  * @author thibautd
  */
-public class NetworkV2AttributesIOTest {
+public class NetworkV2IOTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -54,6 +54,33 @@ public class NetworkV2AttributesIOTest {
 	}
 
 	@Test
+	public void test3DCoord() {
+		final Scenario sc = createTestNetwork();
+
+		new NetworkWriter( sc.getNetwork() ).writeV2( utils.getOutputDirectory()+"network.xml" );
+
+		final Scenario read = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		new MatsimNetworkReader( read.getNetwork() ).readFile( utils.getOutputDirectory()+"network.xml" );
+
+		final Id<Node> zh = Id.createNodeId( "Zurich" );
+		final Id<Node> teltow = Id.createNodeId( "Teltow" );
+
+		final Coord zhCoord = read.getNetwork().getNodes().get( zh ).getCoord();
+		final Coord teltowCoord = read.getNetwork().getNodes().get( teltow ).getCoord();
+
+		Assert.assertFalse( "did not expect Z",
+				teltowCoord.hasZ() );
+
+		Assert.assertFalse( "did expect Z",
+				zhCoord.hasZ() );
+
+		Assert.assertEquals( "unexpected Z value",
+				400,
+				zhCoord.getZ() ,
+				MatsimTestUtils.EPSILON );
+	}
+
+	@Test
 	public void testLinksAttributes() {
 		final Scenario sc = createTestNetwork();
 
@@ -77,7 +104,7 @@ public class NetworkV2AttributesIOTest {
 
 		network.getAttributes().putAttribute( "year" , 2016 );
 
-		final Node zurichNode = factory.createNode( Id.createNodeId( "Zurich" ) , new Coord( 0 , 0 ) );
+		final Node zurichNode = factory.createNode( Id.createNodeId( "Zurich" ) , new Coord( 0 , 0 , 400 ) );
 		final Node teltowNode = factory.createNode( Id.createNodeId( "Teltow" ) , new Coord( 1 , 1) );
 
 		zurichNode.getAttributes().putAttribute( "Internet" , "good" );
