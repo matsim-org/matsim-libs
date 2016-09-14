@@ -1,5 +1,7 @@
 package playground.sebhoerl.avtaxi.optimizer;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.MapConfiguration;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizerFactory;
@@ -19,6 +21,7 @@ public class AVTaxiOptimizerFactory implements TaxiOptimizerFactory {
 	
 	@Override
 	public TaxiOptimizer createTaxiOptimizer(TaxiOptimizerContext optimContext, ConfigGroup optimizerConfigGroup) {
-		return new AVAggregateFIFOOptimizer(optimContext, params);
+		Configuration optimizerConfig = new MapConfiguration(optimizerConfigGroup.getParams());
+		return new AVAggregateHeuristicOptimizer(optimContext, params, new AVAggregateHeuristicOptimizerParams(optimizerConfig));
 	}
 }

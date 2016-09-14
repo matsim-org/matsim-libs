@@ -19,7 +19,7 @@ public class AVPrebooking implements MobsimInitializedListener {
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		QSim qsim = (QSim) e.getQueueSimulation();
 		
-        passengerEngine.prebookTrip(
+        /*passengerEngine.prebookTrip(
         		0.0, 
         		(MobsimPassengerAgent) qsim.getAgentMap().get(Id.createPersonId("PersonA")), 
         		Id.createLinkId("AB"), 
@@ -31,7 +31,7 @@ public class AVPrebooking implements MobsimInitializedListener {
         		(MobsimPassengerAgent) qsim.getAgentMap().get(Id.createPersonId("PersonB")), 
         		Id.createLinkId("AB"), 
         		Id.createLinkId("CD"), 
-        		8.0 * 3600.0 - 120.0);
+        		8.0 * 3600.0 - 115.0);
         
         passengerEngine.prebookTrip(
         		0.0, 
@@ -45,6 +45,6 @@ public class AVPrebooking implements MobsimInitializedListener {
         		(MobsimPassengerAgent) qsim.getAgentMap().get(Id.createPersonId("PersonB")), 
         		Id.createLinkId("CD"), 
         		Id.createLinkId("AB"), 
-        		16.5 * 3600.0 - 120.0);
+        		16.5 * 3600.0 - 115.0);*/
 	}
 }

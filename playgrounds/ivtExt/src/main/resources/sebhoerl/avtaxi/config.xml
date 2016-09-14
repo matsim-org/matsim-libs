@@ -8,7 +8,13 @@
 		<param name="dropoffDuration" value="60" />
 		<param name="timeProfiles" value="false" />
 		<param name="detailedStats" value="false" />
-        <parameterset type="optimizer" />
+		
+        <parameterset type="optimizer">
+        	<param name="gridX" value="20" />
+        	<param name="gridY" value="20" />
+        	<param name="maximumPassengers" value="4" />
+        	<param name="maximumAggregationDelay" value="60.0" />
+        </parameterset>
     </module>
 
 	<module name="network">
@@ -128,5 +134,9 @@
 		<param name="activityOpeningTime_2"     value="08:00:00" />
 		<param name="activityClosingTime_2" value="20:00:00" />
 
+		<param name="traveling_taxi" value="0.0" />
+		<param name="monetaryDistanceRate_taxi" value="-0.0004" />
+		<param name="constant_taxi" value="-0.562" />
+		<param name="waiting" value="-0.18" />
 	</module>
 </config>

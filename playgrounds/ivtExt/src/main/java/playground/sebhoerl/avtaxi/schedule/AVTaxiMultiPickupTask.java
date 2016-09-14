@@ -18,6 +18,7 @@ import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 public class AVTaxiMultiPickupTask extends StayTaskImpl implements AVTaxiTaskWithMultipleRequests, AVTaxiMultiTask {
 	private final List<TaxiRequest> requests = new LinkedList<>();
 	private Link link;
+	private TaxiRequest master;
 	
 	public AVTaxiMultiPickupTask(double beginTime, double endTime) {
 		super(beginTime, endTime, null);
@@ -46,6 +47,7 @@ public class AVTaxiMultiPickupTask extends StayTaskImpl implements AVTaxiTaskWit
     	
     	if (link == null) {
     		link = request.getFromLink();
+    		master = request;
     	} else if (link != request.getFromLink()) {
     		// Must be the same for the same pickup task!
     		throw new IllegalStateException();

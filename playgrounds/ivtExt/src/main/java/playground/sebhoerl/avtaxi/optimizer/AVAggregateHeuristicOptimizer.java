@@ -8,7 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.TreeSet;
 
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -17,6 +20,7 @@ import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.taxi.data.TaxiRequest;
@@ -29,28 +33,42 @@ import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.taxi.scheduler.TaxiSchedulerParams;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
+import playground.sebhoerl.av.logic.agent.AVAgent;
+import playground.sebhoerl.av.logic.service.Service;
+import playground.sebhoerl.av.utils.Grid;
 import playground.sebhoerl.avtaxi.schedule.AVTaxiMultiDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVTaxiMultiOccupiedDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVTaxiMultiPickupTask;
 
-public class AVAggregateFIFOOptimizer implements TaxiOptimizer {
+public class AVAggregateHeuristicOptimizer implements TaxiOptimizer {
+    enum Mode {
+        OVERSUPPLY, UNDERSUPPLY
+    }
+    
+    private Mode mode = Mode.OVERSUPPLY;
+	
 	final private TaxiOptimizerContext context;
 	final private LeastCostPathCalculator router;
 	final private TaxiSchedulerParams params;
+	final private AVAggregateHeuristicOptimizerParams optimParams;
 	
-	final private Queue<Vehicle> vehicles = new LinkedList<>();
-
 	private boolean reoptimize = true;
-		
-	final static double MAXIMUM_AGGREGATION_DELAY = 60;
-	final static long MAXIMUM_PASSENGERS = 4;
+	
+	final private Queue<Vehicle> availableVehicles = new LinkedList<>();
+	final private Grid<Vehicle> availableVehicleGrid;
 	
 	final private Queue<TaxiRequest> unplannedMasterRequests = new LinkedList<>();
-	final private Queue<TaxiRequest> enrouteMasterRequests = new LinkedList<>(); // on the way to the pickup location
+	final private Grid<TaxiRequest> unplannedMasterRequestGrid;
+	
 	final private Map<TaxiRequest, Set<TaxiRequest>> slaveRequests = new HashMap<>();
+    
+	// Only AVs with seats left are kept in those maps
+    final private Map<Link, Set<TaxiRequest>> availableMasterRequestsByOrigin = new HashMap<>();
+    final private Map<Link, Set<TaxiRequest>> availableMasterRequestsByDestination = new HashMap<>();
 	
 	class EnrouteMapping {
 		AVTaxiMultiPickupTask pickup;
@@ -64,52 +82,71 @@ public class AVAggregateFIFOOptimizer implements TaxiOptimizer {
 	
 	final private Map<TaxiRequest, EnrouteMapping> enrouteMappings = new HashMap<>();
 	
-	public AVAggregateFIFOOptimizer(TaxiOptimizerContext context, TaxiSchedulerParams params) {
+	public AVAggregateHeuristicOptimizer(TaxiOptimizerContext context, TaxiSchedulerParams params, AVAggregateHeuristicOptimizerParams optimParams) {
 		this.context = context;
 		this.params = params;
+		this.optimParams = optimParams;
+		
+		double bounds[] = NetworkUtils.getBoundingBox(context.network.getNodes().values());
+		availableVehicleGrid = new Grid<Vehicle>(bounds[0], bounds[1], bounds[2], bounds[3], optimParams.grid_x, optimParams.grid_y);
+		unplannedMasterRequestGrid = new Grid<TaxiRequest>(bounds[0], bounds[1], bounds[2], bounds[3], optimParams.grid_x, optimParams.grid_y);
 		
 		router = new Dijkstra(context.network, context.travelDisutility, context.travelTime);
-		vehicles.addAll(context.taxiData.getVehicles().values());
-	}
-	
-	boolean requestsAreCombinable(TaxiRequest master, TaxiRequest slave) {
-		if (!master.getFromLink().equals(slave.getFromLink())) return false;
-		if (!master.getToLink().equals(slave.getToLink())) return false;
-		return Math.abs(master.getT0() - slave.getT0()) < MAXIMUM_AGGREGATION_DELAY;
+		
+		for (Vehicle vehicle : context.taxiData.getVehicles().values()) {
+			Coord coord = vehicle.getStartLink().getCoord();
+			availableVehicleGrid.update(vehicle, coord.getX(), coord.getY());
+			availableVehicles.add(vehicle);
+		}
+		
+		for (Link link : context.network.getLinks().values()) {
+			availableMasterRequestsByOrigin.put(link, new HashSet<>());
+			availableMasterRequestsByDestination.put(link, new HashSet<>());
+		}
 	}
 	
 	boolean seatsAreAvailable(TaxiRequest master) {
 		Set<TaxiRequest> slaves = slaveRequests.get(master);
 		if (slaves == null) return true;
-		return slaves.size() < MAXIMUM_PASSENGERS - 1;
+		return slaves.size() < optimParams.maximumPassengers - 1;
+	}
+	
+	private TaxiRequest findCombinableMasterRequest(TaxiRequest request) {
+		Set<TaxiRequest> sameOrigin = availableMasterRequestsByOrigin.get(request.getFromLink());
+		Set<TaxiRequest> sameDestination = availableMasterRequestsByDestination.get(request.getToLink());
+		
+		if (sameOrigin.size() > 0 && sameDestination.size() > 0) {
+			Set<TaxiRequest> sameOD = new HashSet<>(sameOrigin);
+			sameOD.retainAll(sameDestination);
+			
+			for (TaxiRequest candidate : sameOD) {
+				if (Math.abs(candidate.getT0() - request.getT0()) < optimParams.maximumAggregationDelay) {
+					return candidate;
+				}
+			}
+		}
+		
+		return null;
 	}
 	
 	@Override
 	public void requestSubmitted(Request req) {
 		TaxiRequest request = (TaxiRequest) req;
-		TaxiRequest master = null;
-		
-		for (TaxiRequest m : enrouteMasterRequests) {
-			if (seatsAreAvailable(m) && requestsAreCombinable(m, request)) {
-				System.err.println(String.format("SLAVE: %s -> %s @ %d (%s > %s) [enroute]", m.getFromLink().getId().toString(), m.getToLink().getId().toString(), (int)m.getT0(), m.getPassenger().getId().toString(), request.getPassenger().getId().toString()));
-				assignEnrouteRequest(m, request);
-				return;
-			}
-		}
-		
-		for (TaxiRequest m : unplannedMasterRequests) {
-			if (seatsAreAvailable(m) && requestsAreCombinable(m, request)) {
-				master = m;
-				break;
-			}
-		}
+		TaxiRequest master = findCombinableMasterRequest(request);
 		
 		if (master == null) {
 			System.err.println(String.format("MASTER: %s -> %s @ %d (%s)", request.getFromLink().getId().toString(), request.getToLink().getId().toString(), (int)request.getT0(), request.getPassenger().getId().toString()));
-			unplannedMasterRequests.add(request);
-		} else {
-			System.err.println(String.format("SLAVE: %s -> %s @ %d (%s > %s)", master.getFromLink().getId().toString(), master.getToLink().getId().toString(), (int)master.getT0(), master.getPassenger().getId().toString(), request.getPassenger().getId().toString()));
 			
+			Coord coord = request.getFromLink().getCoord();
+			
+			unplannedMasterRequests.add(request);
+			unplannedMasterRequestGrid.update(request, coord.getX(), coord.getY());
+			
+			availableMasterRequestsByOrigin.get(request.getFromLink()).add(request);
+			availableMasterRequestsByDestination.get(request.getToLink()).add(request);
+			
+			reoptimize = true;
+		} else {
 			Set<TaxiRequest> slaves = slaveRequests.get(master);
 			
 			if (slaves == null) {
@@ -118,9 +155,19 @@ public class AVAggregateFIFOOptimizer implements TaxiOptimizer {
 			}
 			
 			slaves.add(request);
+			
+			if (!unplannedMasterRequests.contains(master)) { // AV is already on the way to the pickup location
+				System.err.println(String.format("SLAVE: %s -> %s @ %d (%s > %s) [enroute]", master.getFromLink().getId().toString(), master.getToLink().getId().toString(), (int)master.getT0(), master.getPassenger().getId().toString(), request.getPassenger().getId().toString()));
+				assignEnrouteRequest(master, request);
+			} else {
+				System.err.println(String.format("SLAVE: %s -> %s @ %d (%s > %s)", master.getFromLink().getId().toString(), master.getToLink().getId().toString(), (int)master.getT0(), master.getPassenger().getId().toString(), request.getPassenger().getId().toString()));
+			}
+			
+			if (!seatsAreAvailable(master)) {
+				availableMasterRequestsByOrigin.remove(master);
+				availableMasterRequestsByDestination.remove(master);
+			}
 		}
-		
-		reoptimize = true;
 	}
 	
 	private void assignEnrouteRequest(TaxiRequest master, TaxiRequest slave) {
@@ -129,23 +176,62 @@ public class AVAggregateFIFOOptimizer implements TaxiOptimizer {
 		mapping.dropoff.addRequest(slave);
 	}
 	
+	private TaxiRequest getClosestMasterRequest(Vehicle vehicle) {
+		if (unplannedMasterRequests.size() > 0) {
+			Coord coord = ((StayTask) vehicle.getSchedule().getCurrentTask()).getLink().getCoord();
+			return unplannedMasterRequestGrid.getClosest(coord.getX(), coord.getY(), 1).iterator().next();
+		} else {
+			return null;
+		}
+	}
+	
+	private Vehicle getClosestVehicle(TaxiRequest master) {
+		if (availableVehicles.size() > 0) {
+			Coord coord = master.getFromLink().getCoord();
+			return availableVehicleGrid.getClosest(coord.getX(), coord.getY(), 1).iterator().next();
+		} else {
+			return null;
+		}
+	}
+	
 	@Override
 	public void nextLinkEntered(DriveTask driveTask) {}
 	
 	private void optimize() {
 		reoptimize = false;
 		
-		while (!vehicles.isEmpty() && !unplannedMasterRequests.isEmpty()) {
-			TaxiRequest master = unplannedMasterRequests.poll();
-			Set<TaxiRequest> slaves = slaveRequests.remove(master);
-			Vehicle vehicle = vehicles.poll();
+		while (!availableVehicles.isEmpty() && !unplannedMasterRequests.isEmpty()) {
+			TaxiRequest request = null;
+			Vehicle vehicle = null;
+			 
+			switch (mode) {
+			case OVERSUPPLY:
+				request = unplannedMasterRequests.poll();
+				vehicle = getClosestVehicle(request);
+				break;
+			case UNDERSUPPLY:
+				vehicle = availableVehicles.poll();
+				request = getClosestMasterRequest(vehicle);
+				break;
+			}
 			
-			optimizeAssignment(vehicle, master, (slaves == null) ? Collections.emptySet() : slaves);
+			if (request != null && vehicle != null) {
+				optimizeAssignment(vehicle, request);
+			} else {
+				break;
+			}
 		}
+		
+		mode = availableVehicles.size() > 0 ? Mode.OVERSUPPLY : Mode.UNDERSUPPLY;
 	}
 	
-	private void optimizeAssignment(Vehicle vehicle, TaxiRequest master, Set<TaxiRequest> slaves) {
+	private void optimizeAssignment(Vehicle vehicle, TaxiRequest master) {
 		Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(vehicle.getSchedule());
+		Set<TaxiRequest> slaves = slaveRequests.get(master);
+		
+		if (slaves == null) {
+			slaves = Collections.emptySet();
+		}
 		
 		TaxiStayTask stayTask = (TaxiStayTask) Schedules.getLastTask(schedule);
 		
@@ -189,7 +275,6 @@ public class AVAggregateFIFOOptimizer implements TaxiOptimizer {
 		
 		schedule.addTask(new TaxiStayTask(dropoffTask.getEndTime(), scheduleEndTime, dropoffTask.getLink()));
 		
-		enrouteMasterRequests.add(master);
 		enrouteMappings.put(master, new EnrouteMapping(pickupTask, dropoffTask));
 	}
 	
@@ -235,12 +320,17 @@ public class AVAggregateFIFOOptimizer implements TaxiOptimizer {
 		
 		if (nextTask != null) {
 			if (nextTask.getTaxiTaskType() == TaxiTaskType.STAY) {
-				vehicles.add(schedule.getVehicle());
+				Coord coord = ((TaxiStayTask) nextTask).getLink().getCoord();
+				availableVehicles.add(schedule.getVehicle());
+				availableVehicleGrid.update(schedule.getVehicle(), coord.getX(), coord.getY());
 				reoptimize = true;
 			} else if (nextTask.getTaxiTaskType() == TaxiTaskType.PICKUP && nextTask instanceof AVTaxiMultiPickupTask) {
 				for (TaxiRequest r : ((AVTaxiMultiPickupTask)nextTask).getRequests()) {
-					enrouteMasterRequests.remove(r);
+					// TODO: Only necessary to remove MASTER request, but then a specific AVTaxiRequest needs to be defined
+					availableMasterRequestsByOrigin.get(r.getFromLink()).remove(r);
+					availableMasterRequestsByDestination.get(r.getToLink()).remove(r);
 					enrouteMappings.remove(r);
+					slaveRequests.remove(r);
 				}
 			}
 		}
