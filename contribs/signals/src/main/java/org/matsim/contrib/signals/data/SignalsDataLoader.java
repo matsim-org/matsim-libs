@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data;
 
+import java.net.URL;
+
 import org.apache.log4j.Logger;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesReader10;
@@ -26,6 +28,9 @@ import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesReader10;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlReader20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsReader20;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsReader20;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 
 
 /**
@@ -38,10 +43,13 @@ public class SignalsDataLoader {
 
 	private static final Logger log = Logger.getLogger(SignalsDataLoader.class);
 
+	private Config config;
 	private SignalSystemsConfigGroup signalConfig;
 
-	public SignalsDataLoader(SignalSystemsConfigGroup config){
-		this.signalConfig = config;
+	public SignalsDataLoader(Config config){
+		this.config = config;
+		this.signalConfig = ConfigUtils.addOrGetModule(config,
+				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 	}
 
 	public SignalsData loadSignalsData() {
@@ -62,7 +70,8 @@ public class SignalsDataLoader {
 	private void loadIntergreenTimes(SignalsData data){
 		if (this.signalConfig.getIntergreenTimesFile() != null) {
 			IntergreenTimesReader10 reader = new IntergreenTimesReader10(data.getIntergreenTimesData());
-			reader.readFile(this.signalConfig.getIntergreenTimesFile());
+			URL filename = ConfigGroup.getInputFileURL(config.getContext(), this.signalConfig.getIntergreenTimesFile());
+			reader.readFile(filename.getFile());
 		}
 	}
 
@@ -70,7 +79,8 @@ public class SignalsDataLoader {
 	private void loadAmberTimes(SignalsData data) {
 		if (this.signalConfig.getAmberTimesFile() != null){
 			AmberTimesReader10 reader = new AmberTimesReader10(data.getAmberTimesData());
-			reader.readFile(this.signalConfig.getAmberTimesFile());
+			URL filename = ConfigGroup.getInputFileURL(config.getContext(), this.signalConfig.getAmberTimesFile());
+			reader.readFile(filename.getFile());
 		}
 		else {
 			log.info("Signals: No amber times file set, can't load amber times!");
@@ -80,7 +90,8 @@ public class SignalsDataLoader {
 	private void loadControl(SignalsData data){
 		if (this.signalConfig.getSignalControlFile() != null){
 			SignalControlReader20 controlReader = new SignalControlReader20(data.getSignalControlData());
-			controlReader.readFile(this.signalConfig.getSignalControlFile());
+			URL filename = ConfigGroup.getInputFileURL(config.getContext(), this.signalConfig.getSignalControlFile());
+			controlReader.readFile(filename.getFile());
 		}
 		else {
 			log.info("Signals: No signal control file set, can't load signal control data!");
@@ -90,7 +101,8 @@ public class SignalsDataLoader {
 	private void loadGroups(SignalsData data) {
 		if (this.signalConfig.getSignalGroupsFile() != null){
 			SignalGroupsReader20 groupsReader = new SignalGroupsReader20(data.getSignalGroupsData());
-			groupsReader.readFile(this.signalConfig.getSignalGroupsFile());
+			URL filename = ConfigGroup.getInputFileURL(config.getContext(), this.signalConfig.getSignalGroupsFile());
+			groupsReader.readFile(filename.getFile());
 		}
 		else {
 			log.info("Signals: No signal groups file set, can't load signal groups!");
@@ -100,7 +112,8 @@ public class SignalsDataLoader {
 	private void loadSystems(SignalsData data){
 		if (this.signalConfig.getSignalSystemFile() != null){
 			SignalSystemsReader20 systemsReader = new SignalSystemsReader20(data.getSignalSystemsData());
-			systemsReader.readFile(this.signalConfig.getSignalSystemFile());
+			URL filename = ConfigGroup.getInputFileURL(config.getContext(), this.signalConfig.getSignalSystemFile());
+			systemsReader.readFile(filename.getFile());
 		}
 		else {
 			log.info("Signals: No signal systems file set, can't load signal systems information!");

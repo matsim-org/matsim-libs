@@ -36,10 +36,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.Lanes;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesToLinkAssignment;
+import org.matsim.lanes.data.LanesWriter;
 import org.openstreetmap.osmosis.core.domain.v0_6.Tag;
 import org.openstreetmap.osmosis.tagfilter.v0_6.TagFilter;
 import org.openstreetmap.osmosis.xml.common.CompressionMethod;
@@ -72,13 +72,13 @@ public class DgOsmJunctionsPostprocessing {
 		Lanes lanes = this.handleLanes((Lanes)scenario.getScenarioElement(Lanes.ELEMENT_NAME), removedLinkIdToLinkIdsMap);
 		
 		new NetworkWriter(network).write(networkOutFile);
-		LaneDefinitionsWriter20 writerDelegate = new LaneDefinitionsWriter20(lanes);
+		LanesWriter writerDelegate = new LanesWriter(lanes);
 		writerDelegate.write(lanesOutFile);
 		log.info("done!");
 	}
 	
 	private Lanes handleLanes(Lanes laneDefinitions20, Map<Id<Link>, Set<Id<Link>>> removedLinkIdToLinkIdsMap) {
-		for (LanesToLinkAssignment20 l2l : laneDefinitions20.getLanesToLinkAssignments().values()){
+		for (LanesToLinkAssignment l2l : laneDefinitions20.getLanesToLinkAssignments().values()){
 			if (removedLinkIdToLinkIdsMap.containsKey(l2l.getLinkId())){
 				throw new IllegalStateException("Link Id " + l2l.getLinkId() + " was removed but has lanes attached, can't handle this automatically!");
 			}

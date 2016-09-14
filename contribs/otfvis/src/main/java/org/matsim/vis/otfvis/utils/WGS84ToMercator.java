@@ -38,7 +38,14 @@ public class WGS84ToMercator {
 
 		@Override
 		public Coord transform(Coord coord) {
-			Coord otherResult = new Coord((double) MercatorUtils.longToX(coord.getX(), radius), (double) MercatorUtils.latToY(coord.getY(), radius));
+			Coord otherResult; 
+			double elevation;
+			try{
+				elevation = coord.getZ();
+				otherResult = new Coord((double) MercatorUtils.longToX(coord.getX(), radius), (double) MercatorUtils.latToY(coord.getY(), radius), elevation);
+			} catch (Exception e){
+				otherResult = new Coord((double) MercatorUtils.longToX(coord.getX(), radius), (double) MercatorUtils.latToY(coord.getY(), radius));
+			}
 			return otherResult;
 		}
 
@@ -63,9 +70,15 @@ public class WGS84ToMercator {
 
 		@Override
 		public Coord transform(Coord coord) {
-			Coord otherResult = new Coord(MercatorUtils.xToLong((int) coord.getX(), radius), MercatorUtils.yToLat((int) coord.getY(), radius));
+			Coord otherResult; 
+			double elevation;
+			try{
+				elevation = coord.getZ();
+				otherResult = new Coord(MercatorUtils.xToLong((int) coord.getX(), radius), MercatorUtils.yToLat((int) coord.getY(), radius), elevation);
+			} catch (Exception e){
+				otherResult = new Coord(MercatorUtils.xToLong((int) coord.getX(), radius), MercatorUtils.yToLat((int) coord.getY(), radius));
+			}
 			return otherResult;
-			
 		}
 
 		private int widthOfWorldInPixels(int zoom, int TILE_SIZE) {

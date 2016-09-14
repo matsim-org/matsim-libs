@@ -128,6 +128,9 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 		}
 		return 0.0;
 	}
+	public double getRemainingRangeInMiles() {
+		return getRemainingRangeInMeters()/1609.34;
+	}
 	public double getRemainingRangeInMeters() {
 		return this.socInJoules / this.electricDriveEnergyConsumptionModel.getEnergyConsumptionRateInJoulesPerMeter();
 	}

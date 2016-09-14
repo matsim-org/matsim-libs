@@ -15,7 +15,7 @@ import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3
 import org.matsim.contrib.accessibility.Labels;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.gis.GridUtils;
-import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
+import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
@@ -79,7 +79,7 @@ public class AccessibilityBasedLocationOptimizer {
 
 		// for optimization
 		ActivityFacilities analysisPoints =
-				AccessibilityRunUtils.createMeasuringPointsFromNetwork(scenario.getNetwork(), cellSize);
+				AccessibilityUtils.createMeasuringPointsFromNetworkBounds(scenario.getNetwork(), cellSize);
 
 		ActivityFacilitiesFactory activityFacilityFactory = new ActivityFacilitiesFactoryImpl();
 
@@ -93,7 +93,7 @@ public class AccessibilityBasedLocationOptimizer {
 
 			if ((i % searchInterval) == 0) { // if e.g. searchInterval = 7, only look at 7th measurePoint
 
-				final ActivityFacilities activityFacilites = AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType);
+				final ActivityFacilities activityFacilites = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType);
 
 				ActivityOption activityOption = activityFacilityFactory.createActivityOption(actType);
 

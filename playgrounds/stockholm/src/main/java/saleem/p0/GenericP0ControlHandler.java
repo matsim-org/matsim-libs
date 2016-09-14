@@ -79,7 +79,8 @@ public class GenericP0ControlHandler implements BasicEventHandler{
 			changeeventtimes.add(change.getStartTime());
 			change.addLink(link);
 			double cap = (link.getCapacity()/totalincap)*(link.getCapacity()/3600);//Initial green time share depending on the capacity of the link
-			// The statement 1/inLinks.size() to give equal percentage initially to all links
+			// The statement 1.0/inLinks.size() to give equal percentage initially to all links
+			// The statement link.getCapacity()/totalincap to give capacity based percentage initially to all links
 			change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS,cap));
 			events.add(change);
 		}
@@ -246,6 +247,7 @@ public class GenericP0ControlHandler implements BasicEventHandler{
 			Id<Link> linkid = iterator.next().getId();
 //			System.out.println("Average Delays: " + time + "..." + delayinthisbinoverlinks.get(linkid));
 			double abspres = delayinthisbinoverlinks.get(linkid)*satCapacities.get(linkid);
+//			double abspres = delayinthisbinoverlinks.get(linkid)*1500;//Just based on delay
 			abspressures.put(linkid, abspres);
 			avgpressure += abspres;
 		}

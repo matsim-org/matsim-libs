@@ -39,7 +39,7 @@ import org.matsim.vehicles.Vehicle;
  * @author  jbischoff
  *
  */
-public class LinkLengthBasedParkingManagerWithRandomInitialUtilisation implements ParkingManager {
+public class LinkLengthBasedParkingManagerWithRandomInitialUtilisation implements ParkingSearchManager {
 	
 	Map<Id<Link>,Integer> capacity = new HashMap<>();
 	Map<Id<Link>,MutableInt> occupation = new HashMap<>();

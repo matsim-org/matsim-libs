@@ -34,11 +34,11 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.Lanes;
-import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesFactory;
+import org.matsim.lanes.data.LanesToLinkAssignment;
+import org.matsim.lanes.data.LanesWriter;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -215,12 +215,12 @@ public class LinkLaneTTTest {
 			  [..200m..][......200m......][.200m.]	
 			 */
 			Lanes lanes = scenario.getLanes();
-			LaneDefinitionsFactory20 lfactory = lanes.getFactory();
+			LanesFactory lfactory = lanes.getFactory();
 			Id<Lane> olId = Id.create("2.1", Lane.class);
 			Id<Lane> secondLaneId = Id.create("2.2", Lane.class);
 			Id<Lane> thirdLaneId = Id.create("2.3", Lane.class);
 			Id<Lane> fourthLaneId = Id.create("2.4", Lane.class);
-			LanesToLinkAssignment20 l2l = lfactory.createLanesToLinkAssignment(LINK_ID2);
+			LanesToLinkAssignment l2l = lfactory.createLanesToLinkAssignment(LINK_ID2);
 			
 			//create 4 lanes following each other
 			Lane lane = lfactory.createLane(olId);
@@ -257,7 +257,7 @@ public class LinkLaneTTTest {
 			}
 			
 			if(WRITE_OUTPUT){
-				LaneDefinitionsWriter20 writer = new LaneDefinitionsWriter20(lanes);
+				LanesWriter writer = new LanesWriter(lanes);
 				writer.write(utils.getOutputDirectory() + "4lanes.xml");
 			}
 			
@@ -303,7 +303,7 @@ public class LinkLaneTTTest {
 			}
 			
 			if(WRITE_OUTPUT){
-				LaneDefinitionsWriter20 writer = new LaneDefinitionsWriter20(lanes);
+				LanesWriter writer = new LanesWriter(lanes);
 				writer.write(utils.getOutputDirectory() + "topBottomlanes.xml");
 			}
 			

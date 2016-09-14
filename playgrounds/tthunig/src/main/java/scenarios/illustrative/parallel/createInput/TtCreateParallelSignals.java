@@ -36,8 +36,8 @@ import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.utils.SignalUtils;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.LanesToLinkAssignment;
 
 import java.util.*;
 
@@ -210,7 +210,7 @@ public final class TtCreateParallelSignals {
                     signal.setLinkId(inLinkId);
                     signal.addTurningMoveRestriction(outLinkId);
 
-                    LanesToLinkAssignment20 linkLanes = this.scenario.getLanes().getLanesToLinkAssignments().get(inLinkId);
+                    LanesToLinkAssignment linkLanes = this.scenario.getLanes().getLanesToLinkAssignments().get(inLinkId);
                     if (linkLanes != null) {
                         for (Lane l : linkLanes.getLanes().values()) {
                             if (l.getToLinkIds() != null) {

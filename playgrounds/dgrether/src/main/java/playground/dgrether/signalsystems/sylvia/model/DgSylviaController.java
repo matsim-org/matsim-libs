@@ -36,7 +36,7 @@ import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.Lane;
 
 import playground.dgrether.signalsystems.DgSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;

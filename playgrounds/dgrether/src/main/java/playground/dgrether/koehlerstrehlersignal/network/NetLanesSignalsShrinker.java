@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
-import org.matsim.lanes.data.v20.Lanes;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesWriter;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -153,7 +153,7 @@ public class NetLanesSignalsShrinker {
 		DgNetworkUtils.writeNetwork(smallNetwork, simplifiedNetworkFile);
 		DgNetworkUtils.writeNetwork2Shape(smallNetwork, crs, shapeFileDirectory + "network_small_simplified");
 
-		LaneDefinitionsWriter20 lanesWriter = new LaneDefinitionsWriter20(this.fullScenario.getLanes());
+		LanesWriter lanesWriter = new LanesWriter(this.fullScenario.getLanes());
 		lanesWriter.write(outputDirectory + simplifiedLanesFilename);
 		
 		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter(outputDirectory);

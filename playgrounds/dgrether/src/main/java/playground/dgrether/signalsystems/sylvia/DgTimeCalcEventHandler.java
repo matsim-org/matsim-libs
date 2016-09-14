@@ -25,7 +25,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LaneEnterEventHandler;
-import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.Lane;
 import org.matsim.vehicles.Vehicle;
 
 public class DgTimeCalcEventHandler implements LaneEnterEventHandler {

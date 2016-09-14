@@ -20,11 +20,7 @@
 package org.matsim.pt.utils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -73,17 +69,17 @@ public abstract class TransitScheduleValidator {
 			for (TransitRoute route : line.getRoutes().values()) {
 				NetworkRoute netRoute = route.getRoute();
 				if (netRoute == null) {
-					result.addError("Transit line " + line.getId() + ", route " + route.getId() + " has no network route.");
+					result.addIssue(new ValidationResult.ValidationIssue(ValidationResult.Severity.ERROR, "Transit line " + line.getId() + ", route " + route.getId() + " has no network route.", ValidationResult.Type.OTHER, Collections.singleton(route.getId())));
 				} else {
 					Link prevLink = network.getLinks().get(netRoute.getStartLinkId());
 					for (Id<Link> linkId : netRoute.getLinkIds()) {
 						Link link = network.getLinks().get(linkId);
 						if (link == null) {
-							result.addError("Transit line " + line.getId() + ", route " + route.getId() +
-									" contains a link that is not part of the network: " + linkId);
+							result.addIssue(new ValidationResult.ValidationIssue(ValidationResult.Severity.ERROR, "Transit line " + line.getId() + ", route " + route.getId() +
+									" contains a link that is not part of the network: " + linkId, ValidationResult.Type.OTHER, Collections.singleton(route.getId())));
 						} else if (prevLink != null && !prevLink.getToNode().equals(link.getFromNode())) {
-							result.addError("Transit line " + line.getId() + ", route " + route.getId() +
-									" has inconsistent network route, e.g. between link " + prevLink.getId() + " and " + linkId);
+							result.addIssue(new ValidationResult.ValidationIssue(ValidationResult.Severity.ERROR, "Transit line " + line.getId() + ", route " + route.getId() +
+									" has inconsistent network route, e.g. between link " + prevLink.getId() + " and " + linkId, ValidationResult.Type.OTHER, Collections.singleton(route.getId())));
 						}
 						prevLink = link;
 					}
@@ -111,7 +107,7 @@ public abstract class TransitScheduleValidator {
 			for (TransitRoute route : line.getRoutes().values()) {
 				NetworkRoute netRoute = route.getRoute();
 				if (netRoute == null) {
-					result.addError("Transit line " + line.getId() + ", route " + route.getId() + " has no network route.");
+					result.addIssue(new ValidationResult.ValidationIssue(ValidationResult.Severity.ERROR, "Transit line " + line.getId() + ", route " + route.getId() + " has no network route.", ValidationResult.Type.OTHER, Collections.singleton(route.getId())));
 				} else {
 					List<Id<Link>> linkIds = new ArrayList<>();
 					linkIds.add(netRoute.getStartLinkId());
@@ -127,7 +123,7 @@ public abstract class TransitScheduleValidator {
 							if (linkIdIterator.hasNext()) {
 								nextLinkId = linkIdIterator.next();
 							} else {
-								result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": Stop " + stop.getStopFacility().getId() + " cannot be reached along network route.");
+								result.addIssue(new ValidationResult.ValidationIssue(ValidationResult.Severity.ERROR, "Transit line " + line.getId() + ", route " + route.getId() + ": Stop " + stop.getStopFacility().getId() + " cannot be reached along network route.", ValidationResult.Type.ROUTE_HAS_UNREACHABLE_STOP, Collections.singletonList(stop.getStopFacility().getId())));
 								error = true;
 								break;
 							}
@@ -150,7 +146,7 @@ public abstract class TransitScheduleValidator {
 				for (TransitRouteStop stop : route.getStops()) {
 					Id<Link> linkId = stop.getStopFacility().getLinkId();
 					if (linkId == null) {
-						result.addError("Transit Stop Facility " + stop.getStopFacility().getId() + " has no linkId, but is used by transit line " + line.getId() + ", route " + route.getId());
+						result.addIssue(new ValidationResult.ValidationIssue(ValidationResult.Severity.ERROR,"Transit Stop Facility " + stop.getStopFacility().getId() + " has no linkId, but is used by transit line " + line.getId() + ", route " + route.getId(), ValidationResult.Type.HAS_NO_LINK_REF, Collections.singleton(stop.getStopFacility().getId())));
 					}
 				}
 			}
@@ -164,9 +160,9 @@ public abstract class TransitScheduleValidator {
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (TransitRouteStop stop : route.getStops()) {
 					if (stop.getStopFacility() == null) {
-						result.addError("Transit line " + line.getId() + ", route " + route.getId() + " contains a stop (dep-offset=" + stop.getDepartureOffset() + ") without stop-facility. Most likely, a wrong id was specified in the file.");
+						result.addIssue(new ValidationResult.ValidationIssue(ValidationResult.Severity.ERROR, "Transit line " + line.getId() + ", route " + route.getId() + " contains a stop (dep-offset=" + stop.getDepartureOffset() + ") without stop-facility. Most likely, a wrong id was specified in the file.", ValidationResult.Type.HAS_MISSING_STOP_FACILITY, Collections.singletonList(route.getId())));
 					} else if (schedule.getFacilities().get(stop.getStopFacility().getId()) == null) {
-						result.addError("Transit line " + line.getId() + ", route " + route.getId() + " contains a stop (stop-facility " + stop.getStopFacility().getId() + ") that is not contained in the list of all stop facilities.");
+						result.addIssue(new ValidationResult.ValidationIssue(ValidationResult.Severity.ERROR, "Transit line " + line.getId() + ", route " + route.getId() + " contains a stop (stop-facility " + stop.getStopFacility().getId() + ") that is not contained in the list of all stop facilities.", ValidationResult.Type.HAS_MISSING_STOP_FACILITY, Collections.singletonList(route.getId())));
 					}
 				}
 			}
@@ -269,34 +265,92 @@ public abstract class TransitScheduleValidator {
 	}
 
 	public static class ValidationResult {
+
+		public enum Severity {
+			WARNING, ERROR;
+		}
+
+		public enum Type {
+			HAS_MISSING_STOP_FACILITY, HAS_NO_LINK_REF, ROUTE_HAS_UNREACHABLE_STOP, OTHER;
+		}
+
+		public static class ValidationIssue<T> {
+			private final Severity severity;
+			private final String message;
+			private final Type errorCode;
+			private final Collection<Id<T>> entities;
+
+			public ValidationIssue(Severity severity, String message, Type errorCode, Collection<Id<T>> entities) {
+				this.severity = severity;
+				this.message = message;
+				this.errorCode = errorCode;
+				this.entities = entities;
+			}
+
+			public Severity getSeverity() {
+				return severity;
+			}
+
+			public String getMessage() {
+				return message;
+			}
+
+			public Type getErrorCode() {
+				return errorCode;
+			}
+
+			public Collection<Id<T>> getEntities() {
+				return entities;
+			}
+
+		}
+
 		private boolean isValid = true;
-		private final List<String> warnings = new ArrayList<String>();
-		private final List<String> errors = new ArrayList<String>();
+		private final List<ValidationIssue> issues = new ArrayList<>();
 
 		public boolean isValid() {
 			return this.isValid;
 		}
 
 		public List<String> getWarnings() {
-			return Collections.unmodifiableList(this.warnings);
+			List<String> result = new ArrayList<>();
+			for (ValidationIssue issue : this.issues) {
+				if (issue.severity == Severity.WARNING) {
+					result.add(issue.getMessage());
+				}
+			}
+			return Collections.unmodifiableList(result);
 		}
 
 		public List<String> getErrors() {
-			return Collections.unmodifiableList(this.errors);
+			List<String> result = new ArrayList<>();
+			for (ValidationIssue issue : this.issues) {
+				if (issue.severity == Severity.ERROR) {
+					result.add(issue.getMessage());
+				}
+			}
+			return Collections.unmodifiableList(result);
+		}
+
+		public List<ValidationIssue> getIssues() {
+			return Collections.unmodifiableList(this.issues);
 		}
 
 		public void addWarning(final String warning) {
-			this.warnings.add(warning);
+			this.issues.add(new ValidationIssue(Severity.WARNING, warning, Type.OTHER, Collections.<Id<?>>emptyList()));
 		}
 
 		public void addError(final String error) {
-			this.errors.add(error);
+			this.issues.add(new ValidationIssue(Severity.ERROR, error, Type.OTHER, Collections.<Id<?>>emptyList()));
 			this.isValid = false;
 		}
 
+		public void addIssue(final ValidationIssue issue) {
+			this.issues.add(issue);
+		}
+
 		public void add(final ValidationResult otherResult) {
-			this.warnings.addAll(otherResult.warnings);
-			this.errors.addAll(otherResult.errors);
+			this.issues.addAll(otherResult.getIssues());
 			this.isValid = this.isValid && otherResult.isValid;
 		}
 	}

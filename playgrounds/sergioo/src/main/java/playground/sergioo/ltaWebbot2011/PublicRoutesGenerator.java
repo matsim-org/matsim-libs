@@ -43,6 +43,7 @@ import others.sergioo.util.dataBase.NoConnectionException;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
@@ -58,15 +59,13 @@ public class PublicRoutesGenerator {
 	public static void getBusRoutes() throws FailingHttpStatusCodeException, MalformedURLException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, IndexOutOfBoundsException, NoConnectionException {
 		DataBaseAdmin dba = new DataBaseAdmin(new File("./data/DataBase.properties"));
 		final WebClient webClient = new WebClient();
-		webClient.setCssEnabled(false);
-		webClient.setJavaScriptEnabled(true);
 		HtmlPage page = webClient.getPage("http://www.publictransport.sg/publish/ptp/en/getting_around/bus_service.html?");
 		HtmlElement selector = page.getElementByName("qs_busservice");
-		Iterable<HtmlElement> options = selector.getChildElements();
-		Iterator<HtmlElement> i = options.iterator();
+		Iterable<DomElement> options = selector.getChildElements();
+		Iterator<DomElement> i = options.iterator();
 		i.next();
 		while(i.hasNext()) {
-			HtmlElement option = i.next();
+			DomElement option = i.next();
 			page = option.click();
 			List<HtmlDivision> routeTableContainers = (List<HtmlDivision>) page.getByXPath("//div[@class='BusService']");
 			char directionChar='>';
@@ -93,21 +92,19 @@ public class PublicRoutesGenerator {
 			}
 			System.out.println("Ready route: "+option.asText());
 		}
-		webClient.closeAllWindows();
+		webClient.close();
 		dba.close();
 	}
 	public static void getMRTRoutes() throws FailingHttpStatusCodeException, MalformedURLException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, IndexOutOfBoundsException, NoConnectionException {
 		DataBaseAdmin dba = new DataBaseAdmin(new File("./data/DataBase.properties"));
 		final WebClient webClient = new WebClient();
-		webClient.setCssEnabled(false);
-		webClient.setJavaScriptEnabled(true);
 		HtmlPage page = webClient.getPage("http://www.publictransport.sg/publish/ptp/en.html");
 		HtmlElement selector = page.getElementByName("qs_mrtlrt");
-		Iterable<HtmlElement> options = selector.getChildElements();
-		Iterator<HtmlElement> i = options.iterator();
+		Iterable<DomElement> options = selector.getChildElements();
+		Iterator<DomElement> i = options.iterator();
 		i.next();
 		while(i.hasNext()) {
-			HtmlElement option = i.next();
+			DomElement option = i.next();
 			page = option.click();
 			HtmlTableRow rowInfo = ((HtmlTable)((List<HtmlDivision>) page.getByXPath("//div[@class='getard_article contentSub']")).get(0).getHtmlElementsByTagName("table").get(0)).getRow(0);
 			String[] infoParts = rowInfo.getCell(1).getTextContent().replaceAll("'", "''").split("\\(");
@@ -121,7 +118,7 @@ public class PublicRoutesGenerator {
 				dba.executeStatement("INSERT INTO LRTStops (RouteCode,Name,Address,Latitude,Longitude) VALUES ('"+infoParts2[0]+"','"+infoParts2[1].substring(0,infoParts2[1].length()-5)+"','"+infoParts[1].substring(0,infoParts[1].length()-1)+"',"+coords[0]+","+coords[1].trim()+")");
 			System.out.println("Ready route: "+option.asText());
 		}
-		webClient.closeAllWindows();
+		webClient.close();
 		dba.close();
 	}
 	public static void mergeBusStops() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException, ParserConfigurationException, SAXException, BadAddressException, InterruptedException, IllegalStateException, URISyntaxException {

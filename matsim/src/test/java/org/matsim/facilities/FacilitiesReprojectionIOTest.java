@@ -148,7 +148,13 @@ public class FacilitiesReprojectionIOTest {
 	private static class Transformation implements CoordinateTransformation {
 		@Override
 		public Coord transform(Coord coord) {
-			return new Coord( coord.getX() + 1000 , coord.getY() + 1000 );
+			double elevation;
+			try{
+				elevation = coord.getZ();
+				return new Coord( coord.getX() + 1000 , coord.getY() + 1000 , elevation);
+			} catch (Exception e){
+				return new Coord( coord.getX() + 1000 , coord.getY() + 1000 );
+			}
 		}
 	}
 }

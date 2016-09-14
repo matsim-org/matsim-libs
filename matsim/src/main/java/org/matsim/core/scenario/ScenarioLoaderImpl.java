@@ -44,7 +44,7 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.households.HouseholdsReaderV10;
-import org.matsim.lanes.data.v20.LaneDefinitionsReader;
+import org.matsim.lanes.data.LanesReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -325,7 +325,7 @@ class ScenarioLoaderImpl {
 	private void loadLanes() {
 		String filename = this.config.network().getLaneDefinitionsFile();
 		if (filename != null){
-			LaneDefinitionsReader reader = new LaneDefinitionsReader(this.scenario);
+			LanesReader reader = new LanesReader(this.scenario);
 			reader.readURL(ConfigGroup.getInputFileURL(this.config.getContext(), filename));
 		}
 		else {

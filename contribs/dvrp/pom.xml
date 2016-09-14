@@ -54,6 +54,13 @@
 			<version>0.9.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>locationchoice</artifactId>
+			<version>0.9.0-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>

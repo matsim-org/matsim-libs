@@ -32,13 +32,13 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.TransportPlanningMainModeIdentifier;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
@@ -46,8 +46,6 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
@@ -62,6 +60,11 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -94,8 +97,22 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private final TreeMap<Id<Person>, Double> agentDepartures = new TreeMap<>();
 	private final TreeMap<Id<Person>, Integer> agentLegs = new TreeMap<>();
 
+	private final StageActivityTypes stageActivities = new StageActivityTypes(){
+		@Override public boolean isStageActivity(String activityType) {
+			return activityType.contains("interaction") ;
+			// yyyy Hopefully nobody defines a standard activity type with name "people_interaction" or similar ...  kai, sep'16
+		}
+	} ;
+	
+//	private final MainModeIdentifier mainModeIdentifier = new TransportPlanningMainModeIdentifier() ;
+	private final MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl() ;
+	// using this one here since presumably a fair number of the transit_walk trips in the survey in fact were pt trips.  kai, sep'16
+
 	// statistics types:
-	enum StatType { durations, durationsOtherBins, beelineDistances, beelineDistancesOtherBins, legDistances, scores, payments } ;
+	enum StatType { 
+		legDurations, legDurationsOtherBins, legBeelineDistances, legBeelineDistancesOtherBins, legDistances, personScores, 
+		personPayments, tripBeelineDistances
+	} ;
 
 	// container that contains the statistics containers:
 	private final Map<StatType,Databins<String>> statsContainer = new TreeMap<>() ;
@@ -109,7 +126,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private  Set<Id<Link>> tolledLinkIds = new HashSet<>() ;
 	// (initializing with empty set, meaning output will say no vehicles at gantries).
-	
+
 	private Set<Id<Link>> otherTolledLinkIds = new HashSet<>() ;
 
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
@@ -117,7 +134,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	// general trip counter.  Would, in theory, not necessary to do this per StatType, but I find it too brittle 
 	// to avoid under- or over-counting with respect to loops.
 	//	private final Map<StatType,Integer> legCount = new TreeMap<StatType,Integer>() ;
-	
+
 	public static class Builder {
 		private final Scenario scenario ;
 		private String otherTollLinkFile = null ;
@@ -131,7 +148,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 			return new KNAnalysisEventsHandler( scenario, otherTollLinkFile ) ;
 		}
 	}
-	
+
 	private KNAnalysisEventsHandler( final Scenario scenario, final String otherTollLinkFile ) {
 		this( scenario ) ;
 		if ( otherTollLinkFile != null && !otherTollLinkFile.equals("") ) {
@@ -167,23 +184,28 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 			// define the bin boundaries:
 			switch ( type ) {
-			case beelineDistances: {
+			case legBeelineDistances: {
 				double[] dataBoundariesTmp = {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.} ;
 				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
 				this.statsContainer.put( type, databins) ;
 				break; }
-			case beelineDistancesOtherBins: {
+			case tripBeelineDistances: {
+				double[] dataBoundariesTmp = {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.} ;
+				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
+				this.statsContainer.put( type, databins) ;
+				break; }
+			case legBeelineDistancesOtherBins: {
 				double[] dataBoundariesTmp = {0., 2000., 4000., 6000., 8000., 10000.} ;
 				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
 				this.statsContainer.put( type, databins) ;
 				break; }
-			case durations: {
+			case legDurations: {
 				double[] dataBoundariesTmp = {0., 300., 600., 900., 1200., 1500., 1800., 2100., 2400., 2700., 3000., 3300., 3600., 
 						3900., 4200., 4500., 4800., 5100., 5400., 5700., 6000., 6300., 6600., 6900., 7200.} ;
 				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
 				this.statsContainer.put( type, databins) ;
 				break; }
-			case durationsOtherBins: {
+			case legDurationsOtherBins: {
 				double[] dataBoundariesTmp = {0., 300., 900., 1800., 2700., 3600.} ;
 				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
 				this.statsContainer.put( type, databins) ;
@@ -193,12 +215,12 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
 				this.statsContainer.put( type, databins) ;
 				break; }
-			case scores:{
+			case personScores:{
 				double[] dataBoundariesTmp = {Double.NEGATIVE_INFINITY} ; // yy ??
 				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
 				this.statsContainer.put( type, databins) ;
 				break; }
-			case payments:{
+			case personPayments:{
 				double[] dataBoundariesTmp = {Double.NEGATIVE_INFINITY } ; // yy ??
 				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
 				this.statsContainer.put( type, databins) ;
@@ -267,38 +289,16 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 			// go through all types of statistics that are generated ...
 			for ( StatType statType : StatType.values() ) {
 
+				Double item = null ;
 				// .. generate correct "item" for statType ...
-				double item = 0. ;
 				switch( statType) {
-				case durations:
-				case durationsOtherBins:
+				case legDurations:
+				case legDurationsOtherBins:
 					item = travTime ;
 					break;
-				case beelineDistances:
-					if ( fromAct.getCoord()!=null && toAct.getCoord()!=null ) {
-						item = CoordUtils.calcEuclideanDistance(fromAct.getCoord(), toAct.getCoord()) ;
-					} else {
-						if ( noCoordCnt < 1 ) {
-							noCoordCnt ++ ;
-							log.warn("either fromAct or to Act has no Coord; using link coordinates as substitutes.\n" + Gbl.ONLYONCE ) ;
-						}
-						Link fromLink = scenario.getNetwork().getLinks().get( fromAct.getLinkId() ) ;
-						Link   toLink = scenario.getNetwork().getLinks().get(   toAct.getLinkId() ) ;
-						item = CoordUtils.calcEuclideanDistance( fromLink.getCoord(), toLink.getCoord() ) ; 
-					}
-					break;
-				case beelineDistancesOtherBins:
-					if ( fromAct.getCoord()!=null && toAct.getCoord()!=null ) {
-						item = CoordUtils.calcEuclideanDistance(fromAct.getCoord(), toAct.getCoord()) ;
-					} else {
-						if ( noCoordCnt < 1 ) {
-							noCoordCnt ++ ;
-							log.warn("either fromAct or to Act has no Coord; using link coordinates as substitutes.\n" + Gbl.ONLYONCE ) ;
-						}
-						Link fromLink = scenario.getNetwork().getLinks().get( fromAct.getLinkId() ) ;
-						Link   toLink = scenario.getNetwork().getLinks().get(   toAct.getLinkId() ) ;
-						item = CoordUtils.calcEuclideanDistance( fromLink.getCoord(), toLink.getCoord() ) ; 
-					}
+				case legBeelineDistances:
+				case legBeelineDistancesOtherBins:
+					item = calcBeelineDistance(fromAct, toAct);
 					break;
 				case legDistances:
 					if ( leg.getRoute() instanceof NetworkRoute ) {
@@ -317,17 +317,35 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 						}
 					}
 					break;
-				case payments:
-				case scores:
+				case personPayments:
+				case personScores:
+				case tripBeelineDistances:
 					break ;
 				default:
 					throw new RuntimeException("`item' for statistics type not defined; statistics type: " + statType ) ;
 				}
-
-				addItemToAllRegisteredTypes(legTypes, statType, item);
+				if ( item != null ) {
+					addItemToAllRegisteredTypes(legTypes, statType, item);
+				}
 			}
 
 		}
+	}
+
+	private double calcBeelineDistance(final Activity fromAct, final Activity toAct) {
+		double item;
+		if ( fromAct.getCoord()!=null && toAct.getCoord()!=null ) {
+			item = CoordUtils.calcEuclideanDistance(fromAct.getCoord(), toAct.getCoord()) ;
+		} else {
+			if ( noCoordCnt < 1 ) {
+				noCoordCnt ++ ;
+				log.warn("either fromAct or to Act has no Coord; using link coordinates as substitutes.\n" + Gbl.ONLYONCE ) ;
+			}
+			Link fromLink = scenario.getNetwork().getLinks().get( fromAct.getLinkId() ) ;
+			Link   toLink = scenario.getNetwork().getLinks().get(   toAct.getLinkId() ) ;
+			item = CoordUtils.calcEuclideanDistance( fromLink.getCoord(), toLink.getCoord() ) ; 
+		}
+		return item;
 	}
 
 	private String getSubpopName(Person person) {
@@ -355,7 +373,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	@Override
 	public void reset(final int iteration) {
 		delegate.reset(iteration);
-		
+
 		this.agentDepartures.clear();
 		this.agentLegs.clear();
 
@@ -394,7 +412,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 		double item = - event.getAmount() ;
 
-		this.addItemToAllRegisteredTypes(legTypes, StatType.payments, item);
+		this.addItemToAllRegisteredTypes(legTypes, StatType.personPayments, item);
 		// (this is not additive by person, but it is additive by legType.  So if a person has multiple money events, they
 		// are added up in the legType category.  kai, feb'14)
 
@@ -417,20 +435,32 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 		// score statistics:
 		for ( Person person : pop.getPersons().values() ) {
-			// this defines to which categories this person should belong for the statistical averaging:
-			List<String> categories = new ArrayList<>() ;
+			{
+				// this defines to which categories this person should belong for the statistical averaging:
+				List<String> categories = new ArrayList<>() ;
+				categories.add( this.getSubpopName(person) ) ;
+				categories.add("zzzzzzz_all") ; 			// register for the overall average
 
-			categories.add( this.getSubpopName(person) ) ;
+				this.addItemToAllRegisteredTypes(categories, StatType.personScores, person.getSelectedPlan().getScore());
+			}
+			{
+				for ( Trip trip : TripStructureUtils.getTrips( person.getSelectedPlan(), stageActivities ) ) {
+					String mainMode = mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ;
+					Double item = calcBeelineDistance(trip.getOriginActivity(), trip.getDestinationActivity()) ;
 
-			// register the leg for the overall average:
-			categories.add("zzzzzzz_all") ;
+					// this defines to which categories this person should belong for the statistical averaging:
+					List<String> categories = new ArrayList<>() ;
+					categories.add( this.getSubpopName(person) ) ;
+					categories.add("zz_mode_" + mainMode) ;
+					categories.add("zzzzzzz_all") ;  // register for the overall average
 
-			Double item = person.getSelectedPlan().getScore() ;
-			this.addItemToAllRegisteredTypes(categories, StatType.scores, item);
+					this.addItemToAllRegisteredTypes(categories, StatType.tripBeelineDistances, item);
+				}
+			}
 		}
 
 		// write population attributes:
-		new ObjectAttributesXmlWriter(pop.getPersonAttributes()).writeFile("extendedPersonAttributes.xml.gz");
+		new ObjectAttributesXmlWriter(pop.getPersonAttributes()).writeFile(filenameTmp + "extendedPersonAttributes.xml.gz");
 
 		//write statistics:
 		for ( StatType type : StatType.values() ) {
@@ -499,10 +529,10 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 			linkAttribs.putAttribute(linkId.toString(), CNT, entry.getValue().toString() ) ;
 			linkAttribs.putAttribute(linkId.toString(), TTIME_SUM, this.linkTtimesSums.get(linkId).toString() ) ;
 		}
-		new ObjectAttributesXmlWriter( this.linkAttribs ).writeFile("networkAttributes.xml.gz");
+		new ObjectAttributesXmlWriter( this.linkAttribs ).writeFile(filenameTmp + "networkAttributes.xml.gz");
 
 		{
-			try ( BufferedWriter writer = IOUtils.getBufferedWriter("gantries.txt") ) {
+			try ( BufferedWriter writer = IOUtils.getBufferedWriter(filenameTmp + "gantries.txt") ) {
 				for (  Entry<Id<Vehicle>, Double> entry : this.vehicleGantryCounts.entrySet() ) {
 					writer.write( entry.getKey() + "\t" + entry.getValue() + "\t 1 ") ; // the "1" makes automatic processing a bit easier. kai, mar'14
 				}
@@ -555,13 +585,13 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 			}
 
 			switch( statType ) {
-			case durations:
-			case durationsOtherBins:
+			case legDurations:
+			case legDurationsOtherBins:
 				out.write("control statistics: average ttime = " + (controlStatisticsSum/controlStatisticsCnt) ) ;
 				out.write("\n");
 				out.write("\n");
 				break;
-			case beelineDistances:
+			case legBeelineDistances:
 				break;
 			default:
 				break;
@@ -594,11 +624,11 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 				this.vehicleGantryCounts.put( event.getVehicleId(), 1. + gantryCountSoFar ) ;
 			}
 		}
-		
+
 		if ( this.otherTolledLinkIds.contains( event.getLinkId() ) ) {
 			add( delegate.getDriverOfVehicle(event.getVehicleId()), 1., CERTAIN_LINKS_CNT );
 		}
-		
+
 	}
 
 	private Map<Id<Link>,Double> linkTtimesSums = new HashMap<>() ;

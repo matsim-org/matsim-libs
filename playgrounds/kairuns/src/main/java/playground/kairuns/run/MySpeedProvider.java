@@ -139,7 +139,8 @@ final class MySpeedProvider implements BeforeMobsimListener,AfterMobsimListener 
 
 					double freespeed = link.getFreespeed() ;
 
-					double cap_per_sec = link.getFlowCapacityPerSec() * KNBerlinControler.sampleFactor ;
+//					double cap_per_sec = link.getFlowCapacityPerSec() * KNBerlinControler.sampleFactor ;
+					double cap_per_sec = link.getFlowCapacityPerSec() * event.getServices().getConfig().qsim().getFlowCapFactor() ;
 
 					double flow_per_sec = info.getRawFlowPerSec(hour*3600+1) ; // yyyyyy 
 

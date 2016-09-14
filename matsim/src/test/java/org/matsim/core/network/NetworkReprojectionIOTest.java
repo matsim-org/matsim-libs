@@ -38,7 +38,13 @@ public class NetworkReprojectionIOTest {
 				new CoordinateTransformation() {
 					@Override
 					public Coord transform(Coord coord) {
-						return new Coord( 1000 , 1000 );
+						double elevation;
+						try{
+							elevation = coord.getZ();
+							return new Coord( 1000 , 1000 , elevation);
+						} catch (Exception e){
+							return new Coord( 1000 , 1000 );
+						}
 					}
 				},
 				readNetwork ).readFile( networkFile );
@@ -49,10 +55,16 @@ public class NetworkReprojectionIOTest {
 				readNetwork.getNodes().size() );
 
 		for ( Node n : readNetwork.getNodes().values() ) {
-			Assert.assertEquals(
-					"Unexpected coordinate",
-					new Coord( 1000 , 1000 ),
-					n.getCoord() );
+			double elevation;
+			Coord c;
+			try{
+				elevation = n.getCoord().getZ();
+				c = new Coord(1000, 1000, elevation);
+			} catch (Exception e){
+				c = new Coord(1000, 1000);
+			}
+
+			Assert.assertEquals( "Unexpected coordinate", c, n.getCoord() );
 		}
 	}
 
@@ -66,7 +78,13 @@ public class NetworkReprojectionIOTest {
 				new CoordinateTransformation() {
 					@Override
 					public Coord transform(Coord coord) {
-						return new Coord( 9999 , 9999 );
+						double elevation;
+						try{
+							elevation = coord.getZ();
+							return new Coord( 9999 , 9999 , elevation);
+						} catch (Exception e){
+							return new Coord( 9999 , 9999 );
+						}
 					}
 				},
 				initialNetwork ).write( networkFile );

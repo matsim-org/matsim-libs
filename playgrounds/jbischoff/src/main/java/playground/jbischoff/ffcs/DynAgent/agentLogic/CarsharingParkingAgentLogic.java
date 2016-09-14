@@ -45,7 +45,7 @@ import playground.jbischoff.parking.ParkingUtils;
 import playground.jbischoff.parking.DynAgent.agentLogic.ParkingAgentLogic;
 import playground.jbischoff.parking.DynAgent.agentLogic.ParkingAgentLogic.LastParkActionState;
 import playground.jbischoff.parking.choice.ParkingChoiceLogic;
-import playground.jbischoff.parking.manager.ParkingManager;
+import playground.jbischoff.parking.manager.ParkingSearchManager;
 import playground.jbischoff.parking.manager.WalkLegFactory;
 import playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
 import playground.jbischoff.parking.routing.ParkingRouter;
@@ -61,7 +61,6 @@ public class CarsharingParkingAgentLogic extends ParkingAgentLogic {
 
 	private FreefloatingCarsharingManager ffcmanager;
 	FFCSConfigGroup ffcsconfig;
-	private Id<Vehicle> currentlyAssignedVehicleId = null;
 	/**
 	 * @param plan
 	 * @param parkingManager
@@ -71,8 +70,10 @@ public class CarsharingParkingAgentLogic extends ParkingAgentLogic {
 	 * @param parkingLogic
 	 * @param timer
 	 * @param teleportationLogic
+	 * @param FreefloatingCarsharingManager
+	 * @param FFCSConfigGroup
 	 */
-	public CarsharingParkingAgentLogic(Plan plan, ParkingManager parkingManager, WalkLegFactory walkLegFactory,
+	public CarsharingParkingAgentLogic(Plan plan, ParkingSearchManager parkingManager, WalkLegFactory walkLegFactory,
 			ParkingRouter parkingRouter, EventsManager events, ParkingChoiceLogic parkingLogic, MobsimTimer timer,
 			VehicleTeleportationLogic teleportationLogic, FreefloatingCarsharingManager ffcmanager, FFCSConfigGroup ffcsconfig) {
 		super(plan, parkingManager, walkLegFactory, parkingRouter, events, parkingLogic, timer, teleportationLogic);

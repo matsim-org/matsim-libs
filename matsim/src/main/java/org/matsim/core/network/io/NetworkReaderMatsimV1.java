@@ -47,10 +47,14 @@ public final class NetworkReaderMatsimV1 extends MatsimXmlParser {
 
 	private final static String NETWORK = "network";
 	private final static String LINKS = "links";
+	private final static String NODES = "nodes";
 	private final static String NODE = "node";
 	private final static String LINK = "link";
 
 	private final Network network;
+	
+	private boolean hasElevation = false;
+	private boolean hasNoElevation = false;
 
 	// final or settable?
 	private final CoordinateTransformation transformation;
@@ -83,7 +87,14 @@ public final class NetworkReaderMatsimV1 extends MatsimXmlParser {
 
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
-		// currently, we do not have anything to do when a tag ends, maybe later sometimes...
+		/* Check if there is a mixture of nodes WITH and WITHOUT elevation. */
+		/* FIXME Note: I would like this to rather crash here (jwjoubert, Sep'16) */
+		if(NODES.equals(name)){
+			if(hasElevation && hasNoElevation){
+				log.warn("There is a mixture of nodes WITH and WITHOUT elevation! " + 
+						  "You will likely run into problems when doing coordinate calculations.");
+			}
+		}
 	}
 
 	private void startNetwork(final Attributes atts) {
@@ -138,13 +149,24 @@ public final class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startNode(final Attributes atts) {
+		boolean hasZ = atts.getValue("z") == null ? false : true;
+		Coord c;
+		if(hasZ){
+			c = transformation.transform(new Coord(
+					Double.parseDouble(atts.getValue("x")),
+					Double.parseDouble(atts.getValue("y")),
+					Double.parseDouble(atts.getValue("z"))));
+			hasElevation = true;
+		} else{
+			c = transformation.transform(new Coord(
+					Double.parseDouble(atts.getValue("x")),
+					Double.parseDouble(atts.getValue("y"))));
+			hasNoElevation = true;
+		}
+		
 		final Node node =
 				this.network.getFactory().createNode(
-						Id.create(atts.getValue("id"), Node.class),
-						transformation.transform(
-								new Coord(
-										Double.parseDouble(atts.getValue("x")),
-										Double.parseDouble(atts.getValue("y")))) );
+						Id.create(atts.getValue("id"), Node.class), c);
 		this.network.addNode(node);
 
 		NetworkUtils.setType(node,atts.getValue("type"));

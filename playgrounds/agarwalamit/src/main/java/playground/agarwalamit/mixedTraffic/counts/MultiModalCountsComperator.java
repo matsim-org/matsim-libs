@@ -40,10 +40,10 @@ public class MultiModalCountsComperator {
 
 	private final String inputCountsFile_urban = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/urbanDemandCountsFile/innerCordon_excl_rckw_incl_truck_"+PatnaUtils.PATNA_NETWORK_TYPE+".txt";
 	private final String inputCountsFile_external = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/externalDemandCountsFile/outerCordonData_allCounts_"+PatnaUtils.PATNA_NETWORK_TYPE+".txt";
-	private final int itNr = 200;
-	private final String afterITERSCountsFile = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/multiModalCadytsAndIncome/c3/ITERS/it."+itNr+"/"+itNr+".multiMode_hourlyCounts.txt";
+	private final int itNr = 1200;
+	private final String afterITERSCountsFile = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/"+PatnaUtils.PCU_2W.toString()+"pcu/afterCadyts/c203_12/ITERS/it."+itNr+"/"+itNr+".multiMode_hourlyCounts.txt";
 
-	private final String outputFile = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/multiModalCadytsAndIncome/c3/ITERS/it."+itNr+"/"+itNr+".multiMode_AWTVcountscompare.txt";
+	private final String outputFile = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/"+PatnaUtils.PCU_2W.toString()+"pcu/afterCadyts/c203_12/ITERS/it."+itNr+"/"+itNr+".multiMode_AWTVcountscompare.txt";
 
 	private final Map<String, Map<String,Map<Integer,Double>>> link2mode2time2count_input = new HashMap<>();
 

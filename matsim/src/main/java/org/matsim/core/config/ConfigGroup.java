@@ -21,13 +21,13 @@
 package org.matsim.core.config;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -48,14 +48,14 @@ public class ConfigGroup implements MatsimExtensionPoint {
 
 	private final String name;
 	private final TreeMap<String,String> params;
-	private final Map<String, Collection<ConfigGroup>> parameterSetsPerType = new HashMap<String, Collection<ConfigGroup>>();
+	private final Map<String, Collection<ConfigGroup>> parameterSetsPerType = new HashMap<>();
 	private boolean locked = false ;
 
 	private final static Logger log = Logger.getLogger(ConfigGroup.class);
 
 	public ConfigGroup(final String name) {
 		this.name = name;
-		this.params = new TreeMap<String,String>();
+		this.params = new TreeMap<>();
 	}
 
 	public void addParam(final String paramName, final String value) {
@@ -110,14 +110,19 @@ public class ConfigGroup implements MatsimExtensionPoint {
 	/**
 	 * @return a Map containing description to some or all parameters return in {@link #getParams()}.
 	 */
+	@SuppressWarnings("static-method")
 	public Map<String, String> getComments() {
-		return new HashMap<String, String>();
+		return new HashMap<>();
 	}
 
 	@Override
 	public final String toString() {
+		String str = "" ;
+		for ( Entry<String, String> entry : this.getParams().entrySet() ) {
+			str += "[" + entry.getKey() + "=" + entry.getValue() + "]" ;
+		}
 		return "[name=" + this.getName() + "]" +
-				"[nOfParams=" + this.getParams().size() + "]";
+				"[nOfParams=" + this.getParams().size() + "]" + str ;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -129,6 +134,7 @@ public class ConfigGroup implements MatsimExtensionPoint {
 	/**
 	 * Override if parameter sets of a certain type need a special implementation
 	 */
+	@SuppressWarnings("static-method")
 	public ConfigGroup createParameterSet(final String type) {
 		return new ConfigGroup( type );
 	}
@@ -150,7 +156,7 @@ public class ConfigGroup implements MatsimExtensionPoint {
 		Collection<ConfigGroup> parameterSets = parameterSetsPerType.get( set.getName() );
 
 		if ( parameterSets == null ) {
-			parameterSets = new ArrayList<ConfigGroup>();
+			parameterSets = new ArrayList<>();
 			parameterSetsPerType.put( set.getName() ,  parameterSets );
 		}
 
@@ -169,6 +175,7 @@ public class ConfigGroup implements MatsimExtensionPoint {
 	 * Can be extended if there are consistency checks to makes,
 	 * for instance if parameter sets of a given type should be
 	 * instances of a particular class.
+	 * @param set 
 	 */
 	protected void checkParameterSet(final ConfigGroup set) {
 		// empty for inheritance

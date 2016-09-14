@@ -27,7 +27,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationSco
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup.InflowConstraint;
-import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
@@ -39,20 +38,84 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.Default
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 
-class KNBerlinControler {
+public final class KNBerlinControler {
 	private static final Logger log = Logger.getLogger(KNBerlinControler.class);
 
-	static final boolean assignment = true ;
-	static final boolean equil = false ;
-	static double sampleFactor ;
-
-	static double capFactorForEWS = Double.NaN ;
+	public static double capFactorForEWS = Double.NaN ;
 
 	public static void main ( String[] args ) {
+		final boolean assignment = false ;
+		final boolean equil = true ;
+
 		OutputDirectoryLogging.catchLogEntries();
 
 		log.info("Starting KNBerlinControler ...") ;
 
+		Config config = prepareConfig(args, assignment, equil);
+
+		// ===
+
+		Scenario scenario = prepareScenario(equil, config);
+
+		// ===
+
+		AbstractModule overrides = prepareOverrides(assignment);
+		
+		// ===
+		
+		// run everything:
+		
+		Controler controler = new Controler( scenario ) ;
+		controler.addOverridingModule( overrides );
+		controler.run();
+
+		// ===
+		// post-processing:
+
+		//		computeNoise(sampleFactor, config, scenario);
+
+	}
+
+	public static AbstractModule prepareOverrides(final boolean assignment) {
+		AbstractModule overrides = new AbstractModule() {
+			@Override public void install() {
+				this.addControlerListenerBinding().toInstance( new KaiAnalysisListener() ) ;
+				//		controler.addOverridingModule( new OTFVisLiveModule() );
+				if ( assignment ) {
+					this.addControlerListenerBinding().to( MySpeedProvider.class ) ;
+				}
+			}
+		} ;
+		return overrides;
+	}
+
+	public static Scenario prepareScenario(final boolean equil, Config config) {
+		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+
+		if ( !equil ) {
+			for ( Link link : scenario.getNetwork().getLinks().values() ) {
+				if ( link.getLength()<100 ) {
+					link.setCapacity( 2. * link.getCapacity() ); // double capacity on short links, often roundabouts or short u-turns, etc., with the usual problem
+				}
+				if ( link.getFreespeed() < 77/3.6 ) {
+					link.setFreespeed( 0.5 * link.getFreespeed() );
+				}
+			}
+		}
+		if ( equil ) {
+			double time = 6*3600. ;
+			for ( Person person : scenario.getPopulation().getPersons().values() ) {
+				Plan plan = person.getSelectedPlan() ;
+				Activity activity = (Activity) plan.getPlanElements().get(0) ;
+				activity.setEndTime(time);
+				time++ ;
+			}
+		}
+		return scenario;
+	}
+
+	public static Config prepareConfig(String[] args, final boolean assignment, final boolean equil) {
+		double sampleFactor;
 		if ( equil ) {
 			sampleFactor = 1. ;
 		} else {
@@ -68,8 +131,8 @@ class KNBerlinControler {
 			config = ConfigUtils.createConfig( new NoiseConfigGroup() ) ;
 			config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-base_ext.xml.gz");
 			//		config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_ext.xml.gz") ;
-//			config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_17_ext.xml.gz") ;
-//			config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_17_storkower_ext.xml.gz") ;
+			//			config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_17_ext.xml.gz") ;
+			//			config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_17_storkower_ext.xml.gz") ;
 			config.plans().setInputFile("~/kairuns/a100/baseplan_900s_routed.xml.gz") ;
 		}
 
@@ -147,9 +210,9 @@ class KNBerlinControler {
 			if ( config.qsim().getTrafficDynamics()==TrafficDynamics.withHoles ) {
 				config.qsim().setInflowConstraint(InflowConstraint.maxflowFromFdiag);
 			}
-//			if ( config.qsim().getTrafficDynamics()==TrafficDynamics.assignmentEmulating ) {
-//				config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
-//			}
+			//			if ( config.qsim().getTrafficDynamics()==TrafficDynamics.assignmentEmulating ) {
+			//				config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
+			//			}
 		}
 
 		config.qsim().setNumberOfThreads(6);
@@ -173,8 +236,8 @@ class KNBerlinControler {
 
 		// strategy:
 
-		setStrategies(config);
-		
+		setStrategies(config, equil);
+
 		// other:
 
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
@@ -182,69 +245,17 @@ class KNBerlinControler {
 			config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn );
 		}
 
-//		ConfigUtils.loadConfig(config, System.getProperty("user.home") + "/kairuns/a100/additional-config.xml") ;
+		//		ConfigUtils.loadConfig(config, System.getProperty("user.home") + "/kairuns/a100/additional-config.xml") ;
 		if ( args.length >=1 && args[0]!=null ) {
 			ConfigUtils.loadConfig( config, args[0] ) ;
 		}
 
 		config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 		config.checkConsistency();
-
-		// ===
-
-		// prepare the scenario
-		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-
-		if ( !equil ) {
-			for ( Link link : scenario.getNetwork().getLinks().values() ) {
-				if ( link.getLength()<100 ) {
-					link.setCapacity( 2. * link.getCapacity() ); // double capacity on short links, often roundabouts or short u-turns, etc., with the usual problem
-				}
-				if ( link.getFreespeed() < 77/3.6 ) {
-					link.setFreespeed( 0.5 * link.getFreespeed() );
-				}
-			}
-		}
-		if ( equil ) {
-			double time = 6*3600. ;
-			for ( Person person : scenario.getPopulation().getPersons().values() ) {
-				Plan plan = person.getSelectedPlan() ;
-				Activity activity = (Activity) plan.getPlanElements().get(0) ;
-				activity.setEndTime(time);
-				time++ ;
-			}
-		}
-
-		// ===
-
-		// prepare the control(l)er:
-		Controler controler = new Controler( scenario ) ;
-
-		controler.addControlerListener(new KaiAnalysisListener()) ;
-
-//		controler.addOverridingModule( new OTFVisLiveModule() );
-
-		if ( assignment ) {
-			controler.addOverridingModule( new AbstractModule() {
-				@Override public void install() {
-					this.addControlerListenerBinding().to( MySpeedProvider.class ) ;
-				}
-			});
-		}
-
-		// ===
-
-		// run everything:
-		controler.run();
-
-		// ===
-		// post-processing:
-
-		//		computeNoise(sampleFactor, config, scenario);
-
+		return config;
 	}
 
-	private static void setStrategies(Config config) {
+	private static void setStrategies(Config config, boolean equil) {
 		{
 			StrategySettings stratSets = new StrategySettings( ) ;
 			stratSets.setStrategyName( DefaultSelector.ChangeExpBeta.name() ) ;
@@ -258,18 +269,22 @@ class KNBerlinControler {
 			config.strategy().addStrategySettings(stratSets);
 			if ( !equil ) {
 				config.plansCalcRoute().setInsertingAccessEgressWalk(true);
-//				config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
-//				config.travelTimeCalculator().setTravelTimeAggregatorType("experimental_LastMile");
-//				config.travelTimeCalculator().setTraveltimeBinSize(10);
+				//				config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
+				//				config.travelTimeCalculator().setTravelTimeAggregatorType("experimental_LastMile");
+				//				config.travelTimeCalculator().setTraveltimeBinSize(10);
 			}
 		}
-		//		{
-		//			StrategySettings stratSets = new StrategySettings( ) ;
-		//			stratSets.setStrategyName( DefaultStrategy.ChangeSingleTripMode.name() );
-		//			stratSets.setWeight(0.1);
-		//			config.strategy().addStrategySettings(stratSets);
-		//			config.changeMode().setModes(new String[] {"walk","bike","car","pt","pt2"});
-		//		}
+				{
+					StrategySettings stratSets = new StrategySettings( ) ;
+					stratSets.setStrategyName( DefaultStrategy.ChangeSingleTripMode.name() );
+					stratSets.setWeight(0.1);
+					config.strategy().addStrategySettings(stratSets);
+					if ( equil ) {
+						config.changeMode().setModes(new String[] {"car","pt"});
+					} else {
+						config.changeMode().setModes(new String[] {"walk","bike","car","pt","pt2"});
+					}
+				}
 		{
 			//			StrategySettings stratSets = new StrategySettings( ) ;
 			//			stratSets.setStrategyName( DefaultStrategy.TimeAllocationMutator.name() );

@@ -82,7 +82,7 @@ public class CreateIntergreensExample {
 		SignalSystemsConfigGroup signalSystemsConfigGroup = 
 				ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		signalSystemsConfigGroup.setUseIntergreenTimes(true);
-		SignalsDataLoader signalsDataLoader = new SignalsDataLoader(signalSystemsConfigGroup);
+		SignalsDataLoader signalsDataLoader = new SignalsDataLoader(config);
 		SignalsData signalsData = signalsDataLoader.loadSignalsData();
 		createIntergreens(signalsData);
 		// write the intergreens file

@@ -20,6 +20,7 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.simTime;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.util.SortedMap;
 
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
@@ -34,7 +35,7 @@ import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 
 public class TravelTimeComperator {
 	
-	private String respectiveFileDirectory = "../../../../repos/runs-svn/patnaIndia/run106/1pct/";
+	private String respectiveFileDirectory = "../../../../repos/runs-svn/patnaIndia/run110/100pct/";
 	private BufferedWriter writer;
 	private static final String LAST_IT = "200";
 
@@ -76,6 +77,7 @@ public class TravelTimeComperator {
 				String queueModel = ld+"_"+td;
 				for(int i=2;i<12;i++){
 					String eventsFile = respectiveFileDirectory + "/output_"+queueModel+"_"+i+"/ITERS/it."+LAST_IT+"/"+LAST_IT+".events.xml.gz";
+					if (! new File(eventsFile).exists() ) continue;
 					ModalTravelTimeAnalyzer timeAnalyzer  = new ModalTravelTimeAnalyzer(eventsFile);
 					timeAnalyzer.run();
 					SortedMap<String,Double> modalTravelTime = timeAnalyzer.getMode2AvgTripTime();

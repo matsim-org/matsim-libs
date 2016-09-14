@@ -118,20 +118,20 @@ public class SignalsScenarioWriter {
 		else{
 			log.info("No IntergreenTimesData object set to write!");
 		}
-		if (signalsData.getSignalSystemsData() != null && signalsData.getSignalGroupsData() != null && signalsData.getSignalControlData() != null){
-			writeSignalCSVData(scenario);
-		}
+//		if (signalsData.getSignalSystemsData() != null && signalsData.getSignalGroupsData() != null && signalsData.getSignalControlData() != null){
+//			writeSignalCSVData(scenario);
+//		}
 	}
 	
-	public void writeSignalCSVData(Scenario scenario) {
-		if (this.pathToSignalCSVOutputFilename != null) {
-			SignalsViaCSVWriter writer = new SignalsViaCSVWriter(scenario);
-			writer.writeSignalsCSV(this.pathToSignalCSVOutputFilename);
-		}
-		else {
-			log.warn("No path to signal csv output file set!");
-		}
-	}
+//	public void writeSignalCSVData(Scenario scenario) {
+//		if (this.pathToSignalCSVOutputFilename != null) {
+//			SignalsViaCSVWriter writer = new SignalsViaCSVWriter(scenario);
+//			writer.writeSignalsCSV(this.pathToSignalCSVOutputFilename);
+//		}
+//		else {
+//			log.warn("No path to signal csv output file set!");
+//		}
+//	}
 
 	public void writeSignalSystemsData(SignalSystemsData signalSystemsData){
 		if (this.pathToSignalSystemsOutputFilename != null) {

@@ -1,9 +1,5 @@
 <?xml version="1.0" ?>
-<!DOCTYPE config SYSTEM "./dtd/config_v1.dtd"
-	[
-		<!ENTITY INPUTBASE    "./test/input/org/matsim/contrib/signals/integration/SignalSystemsIT">
-	]
->
+<!DOCTYPE config SYSTEM "./dtd/config_v1.dtd">
 
 <config>
   <module name="global">
@@ -14,7 +10,7 @@
   
     <module name="network">
     <param name="inputNetworkFile" value="network.xml.gz" />
-    <param name="laneDefinitionsFile" value="./test/output/org/matsim/contrib/signals/integration/SignalSystemsIT/testSignalSystems/testLaneDefinitions_v2.0.xml" />
+    <param name="laneDefinitionsFile" value="testLaneDefinitions_v2.0.xml" />
   </module>
 
   <module name="plans">
@@ -24,11 +20,11 @@
   <module name="signalsystems">
     <!-- Set this parameter to true if signal systems should be used, false if not. -->
     <param name="useSignalsystems" value="true" />
-    <param name="signalsystems" value="&INPUTBASE;/testSignalSystems_v2.0.xml" />
-    <param name="signalcontrol" value="&INPUTBASE;/testSignalControl_v2.0.xml" />
-    <param name="signalgroups" value="&INPUTBASE;/testSignalGroups_v2.0.xml" />
+    <param name="signalsystems" value="testSignalSystems_v2.0.xml" />
+    <param name="signalcontrol" value="testSignalControl_v2.0.xml" />
+    <param name="signalgroups" value="testSignalGroups_v2.0.xml" />
     <param name="useAmbertimes" value="true" />
-    <param name="ambertimes" value="&INPUTBASE;/testAmberTimes_v1.0.xml" />
+    <param name="ambertimes" value="testAmberTimes_v1.0.xml" />
     <param name="useIntergreentimes" value="true" />
   </module>
   

@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
-import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
+import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -23,93 +23,10 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacilities;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 /**
- * improvements sep'11:
- * 
- * Code improvements since last version (deadline ersa paper): - Aggregated
- * Workplaces: Workplaces with same parcel_id are aggregated to a weighted job
- * (see JobClusterObject) This means much less iteration cycles - Less time
- * consuming look-ups: All workplaces are assigned to their nearest node in an
- * pre-proscess step (see addNearestNodeToJobClusterArray) instead to do nearest
- * node look-ups in each iteration cycle - Distance based accessibility added:
- * like the travel time accessibility computation now also distances are
- * computed with LeastCostPathTree (tnicolai feb'12 distances are replaced by
- * walking times which is also linear and corresponds to distances)
- * 
- * improvements jan'12:
- * 
- * - Better readability: Removed unused methods such as
- * "addNearestNodeToJobClusterArray" (this is done while gathering/processing
- * workplaces). Also all results are now dumped directly from this class.
- * Before, the SpatialGrid tables were transfered to another class to dump out
- * the results. This also improves readability - Workplace data dump: Dumping
- * out the used workplace data was simplified, since the simulation now already
- * uses aggregated data. Corresponding subroutines aggregating the data are not
- * needed any more (see dumpWorkplaceData()). But coordinates of the origin
- * workplaces could not dumped out, this is now done in
- * ReadFromUrbansimParcelModel during processing the UrbnAism job data
- * 
- * improvements feb'12 - distance between square centroid and nearest node on
- * road network is considered in the accessibility computation as walk time of
- * the euclidian distance between both (centroid and nearest node). This walk
- * time is added as an offset to each measured travel times - using walk travel
- * times instead of travel distances. This is because of the betas that are
- * utils/time unit. The walk time corresponds to distances since this is also
- * linear.
- * 
- * improvements march'12 - revised distance measure from centroid to network:
- * using orthogonal distance from centroid to nearest network link! - merged
- * CellBasedAccessibilityNetworkControlerListener and
- * CellBasedAccessibilityShapefileControlerListener
- * 
- * improvements april'12 - accessibility calculation uses configurable betas
- * (coming from UrbanSim) for car/walk travel times, -distances and -costs -
- * replaced "SpatialGrid<Double>" by "SpatialGrid" using double instead of
- * Double-objects
- * 
- * improvements may'12 - including interpolated (spatial grid) feedback for each
- * parcel
- * 
- * improvements / changes june'12 
- * - the walk distance (measuring point -> nearest node) for accessibilities by 
- * car has changed: Now only the orthoganal distance (measuring point -> nearest 
- * link) is measured.
- * - re-added free-speed car travel time calculation
- * - added accessibility calculation for bike
- * - using network.getNearestLinkExactly instead of network.getNearestLink. 
- *   the new entry does not use nearest nodes to determine the link it directly detects the nearest link. 
- *   This avoids some artifacts in accessibility computation (like selective fluctuation in accessibility )
- *   
- * improvements / changes july'12 
- * - fixed error: used pre-factor (1/beta scale) in deterrence function instead of beta scale (fixed now!) 
- * 
- * improvements aug'12
- * - the aggregated opportunities now contain the euclidian distance to the nereast node on the network. This
- *   is used to determine the total costs cij in the accessibility measure
- *   
- * changes sep'12
- * - renaming from CellBasedAccessibilityControlerListenerV3 into ParcelBasedAccessibilityControlerListenerV3
- * 
- * improvements jan'13
- * - added pt for accessibility calculation
- * 
- * improvements april'13
- * - congested car modes uses TravelDisutility from MATSim
- * - taking disutilites directly from MATSim (controler.createTravelCostCalculator()), this 
- * also activates road pricing ...
- * 
- * improvements may'13
- * - grid based accessibility data is written into matsim output folder
- * 
- * changes june'13
- * - changed class name from ParcelBasedAccessibilityControlerListenerV3 into GridBasedAccessibilityControlerListenerV3
- * - providing opportunity facilities (e.g. workplaces)
- * - reduced dependencies to MATSim4UrbanSim contrib: replaced ZoneLayer<Id> and Zone by standard MATSim ActivityFacilities
- * - relevant transport modes for which to calculate the accessibility are now configurable. with this accessibilities
- *   are not calculated for unselected transport modes to improve computing times
- * 
- * @author thomas
- * 
+ * @author thomas, dziemke
  */
 public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownListener {
 	private static final Logger log = Logger.getLogger(GridBasedAccessibilityShutdownListenerV3.class);
@@ -240,7 +157,6 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		}
 		//
 		
-		
 		// as for the other writer above: In case multiple AccessibilityControlerListeners are added to the controller, e.g. if 
 		// various calculations are done for different activity types or different modes (or both) subdirectories are required
 		// in order not to confuse the output
@@ -259,9 +175,9 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 				ee.printStackTrace(); 
 			}
 		}
-
 	}
 
+	
 	/**
 	 * This writes the accessibility grid data into the MATSim output directory
 	 */
@@ -270,18 +186,17 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		// in the following, the data used for gnuplot or QGis is written. dz, feb'15
 		// different separators have to be used to make this output useable by gnuplot or QGis, respectively
 		log.info("Writing plotting data for other analyis into " + adaptedOutputDirectory + " ...");
-		
 
 		final CSVWriter writer = new CSVWriter(adaptedOutputDirectory + "/" + CSVWriter.FILE_NAME ) ;
 		
 		// write header
 		writer.writeField(Labels.X_COORDINATE);
 		writer.writeField(Labels.Y_COORDINATE);
-//		writer.writeField(Labels.TIME);
+//		writer.writeField(Labels.TIME); // TODO
 		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
 			writer.writeField(mode.toString() + "_accessibility");
 		}
-		writer.writeField(Labels.POPULATION_DENSITIY);
+		writer.writeField(Labels.POPULATION_DENSITIY); // TODO I think this has to be made adjustable
 		writer.writeField(Labels.POPULATION_DENSITIY);
 		writer.writeNewLine();
 
@@ -293,7 +208,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 				writer.writeField( x + 0.5*spatialGrid.getResolution());
 				writer.writeField( y + 0.5*spatialGrid.getResolution());
 				
-//				writer.writeField(time);
+//				writer.writeField(time); // TODO
 				
 				for (Modes4Accessibility mode : Modes4Accessibility.values()) {
 					if ( accessibilityCalculator.getIsComputingMode().contains(mode) ) {
@@ -322,7 +237,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 	}
 	
 	
-	//
+	// new idea
 	/**
 	 * perform aggregate value calculations
 	 */
@@ -346,8 +261,8 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 				}
 			}
 
-			double accessibilityValueSum = AccessibilityRunUtils.calculateSum(valueList);
-			double giniCoefficient = AccessibilityRunUtils.calculateGiniCoefficient(valueList);
+			double accessibilityValueSum = AccessibilityUtils.calculateSum(valueList);
+			double giniCoefficient = AccessibilityUtils.calculateGiniCoefficient(valueList);
 
 			log.warn("mode = " + mode  + " -- accessibilityValueSum = " + accessibilityValueSum);
 			accessibilitySums.put(mode, accessibilityValueSum);

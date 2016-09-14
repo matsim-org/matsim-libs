@@ -43,7 +43,7 @@ import org.matsim.jaxb.signalsystems20.XMLSignalSystems;
 import org.matsim.jaxb.signalsystems20.XMLSignalType;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLLane;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLTurningMoveRestrictions;
-import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.Lane;
 import org.xml.sax.SAXException;
 
 
