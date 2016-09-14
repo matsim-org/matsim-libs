@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.signalgroups.v20;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.Signal;
@@ -32,7 +32,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
  */
 public class SignalGroupDataImpl implements SignalGroupData {
 
-	Set<Id<Signal>> signalIds = new HashSet<>();
+	Set<Id<Signal>> signalIds = new TreeSet<>();
 	Id<SignalGroup> signalGroupId;
 	Id<SignalSystem> signalSystemId;
 

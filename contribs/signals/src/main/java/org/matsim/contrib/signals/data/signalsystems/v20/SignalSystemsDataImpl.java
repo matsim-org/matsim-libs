@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.signalsystems.v20;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -35,7 +35,7 @@ public class SignalSystemsDataImpl implements SignalSystemsData {
 
 	private SignalSystemsDataFactory factory = new SignalSystemsDataFactoryImpl();
 	
-	private Map<Id<SignalSystem>, SignalSystemData> signalSystemData = new HashMap<Id<SignalSystem>, SignalSystemData>();
+	private Map<Id<SignalSystem>, SignalSystemData> signalSystemData = new TreeMap<Id<SignalSystem>, SignalSystemData>();
 	
 	@Override
 	public SignalSystemsDataFactory getFactory() {

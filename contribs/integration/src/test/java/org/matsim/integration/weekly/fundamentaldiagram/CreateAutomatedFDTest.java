@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.integration.daily.fundamentaldiagram;
+package org.matsim.integration.weekly.fundamentaldiagram;
 
 import java.io.File;
 import java.io.IOException;

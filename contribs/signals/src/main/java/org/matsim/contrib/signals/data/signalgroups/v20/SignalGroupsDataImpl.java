@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.signalgroups.v20;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.SignalGroup;
@@ -33,7 +33,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
  */
 public class SignalGroupsDataImpl implements SignalGroupsData {
 
-	private Map<Id<SignalSystem>, Map<Id<SignalGroup>, SignalGroupData>> signalGroupsDataBySystemId = new HashMap<>();
+	private Map<Id<SignalSystem>, Map<Id<SignalGroup>, SignalGroupData>> signalGroupsDataBySystemId = new TreeMap<>();
 	
 	private SignalGroupsDataFactory factory;
 	
@@ -46,7 +46,7 @@ public class SignalGroupsDataImpl implements SignalGroupsData {
 		Id<SignalSystem> signalSystemId = signalGroupData.getSignalSystemId();
 		Map<Id<SignalGroup>, SignalGroupData> map = this.signalGroupsDataBySystemId.get(signalSystemId);
 		if (map == null){
-			map = new HashMap<>();
+			map = new TreeMap<>();
 			this.signalGroupsDataBySystemId.put(signalSystemId, map);
 		}
 		map.put(signalGroupData.getId(), signalGroupData);

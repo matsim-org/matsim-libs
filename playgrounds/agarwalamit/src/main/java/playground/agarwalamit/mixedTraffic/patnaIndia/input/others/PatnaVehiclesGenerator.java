@@ -75,7 +75,7 @@ public class PatnaVehiclesGenerator {
 			VehicleType vehicle = VehicleUtils.getFactory().createVehicleType(Id.create(mode,VehicleType.class));
 			vehicle.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed(mode));
 			
-			if(pcu_2w==Double.NaN) vehicle.setPcuEquivalents( MixedTrafficVehiclesUtils.getPCU(mode) );
+			if( Double.isNaN(pcu_2w) ) vehicle.setPcuEquivalents( MixedTrafficVehiclesUtils.getPCU(mode) );
 			else vehicle.setPcuEquivalents( mode.equals("bike")||mode.equals("motorbike") ? pcu_2w : MixedTrafficVehiclesUtils.getPCU(mode) );
 			
 			modesType.put(mode, vehicle);

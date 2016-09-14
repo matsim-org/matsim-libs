@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.mixedTraffic.multiModeCadyts;
+package playground.agarwalamit.multiModeCadyts;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

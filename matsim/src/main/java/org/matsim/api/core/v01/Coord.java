@@ -67,10 +67,14 @@ public final class Coord implements Serializable {
 	}
 	
 	public double getZ() {
-		if (this.z == Double.NEGATIVE_INFINITY){
-			throw new RuntimeException("Requesting elevation (z) without having first set it."); 
+		if ( !hasZ() ){
+			throw new IllegalStateException("Requesting elevation (z) without having first set it.");
 		}
 		return this.z;
+	}
+
+	public boolean hasZ() {
+		return this.z != Double.NEGATIVE_INFINITY;
 	}
 
 
@@ -81,34 +85,24 @@ public final class Coord implements Serializable {
 		}
 		Coord o = (Coord)other;
 		
-		if(this.z == Double.NEGATIVE_INFINITY){
+		if( !hasZ() ){
 			/* this object is a 2D coordinate. */
-			@SuppressWarnings("unused")
-			double oZ;
-			try{
-				oZ = o.getZ();
-				/* other object is 3D coordinate. */
-				return false;
-			} catch (Exception e){
-				/* both are 2D coordinates. */
-				return ((this.x == o.getX()) && (this.y == o.getY()));
-			}
-		} else{
+
+			if ( o.hasZ() ) return false;
+
+			/* both are 2D coordinates. */
+			return (this.x == o.getX()) && (this.y == o.getY());
+		}
+		else {
 			/* this object is 3D coordinate. */
-			@SuppressWarnings("unused")
-			double oZ;
-			try{
-				oZ = o.getZ();
-				/* both objects are 3D coordinates. */
-				return (
-						(this.x == o.getX()) && 
-						(this.y == o.getY()) &&
-						(this.z == o.getZ())
-				);
-			} catch (Exception e){
-				/* other object is 2D coordinate. */
-				return false;
-			}
+
+			if ( !o.hasZ() ) return false;
+
+			/* both objects are 3D coordinates. */
+			return
+					(this.x == o.getX()) &&
+					(this.y == o.getY()) &&
+					(this.z == o.getZ());
 		}
 	}
 
@@ -118,15 +112,17 @@ public final class Coord implements Serializable {
 		// Implementation based on chapter 3 of Joshua Bloch's "Effective Java"
 		long xbits = Double.doubleToLongBits(this.x);
 		long ybits = Double.doubleToLongBits(this.y);
+		long zbits = Double.doubleToLongBits(this.z);
 		int result = (int) (xbits ^ (xbits >>> 32));
 		result = 31 * result + (int) (ybits ^ (ybits >>> 32));
+		result = 31 * result + (int) (zbits ^ (zbits >>> 32));
 		return result;
 	}
 
 	
 	@Override
 	public final String toString() {
-		if(this.z == Double.NEGATIVE_INFINITY){
+		if( !hasZ() ){
 			return "[x=" + this.x + "][y=" + this.y + "]";
 		} else{
 			return "[x=" + this.x + "][y=" + this.y + "][z=" + this.z + "]";

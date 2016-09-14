@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.signalcontrol.v20;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
@@ -46,7 +46,7 @@ public class SignalSystemControllerDataImpl implements SignalSystemControllerDat
 	@Override
 	public void addSignalPlanData(SignalPlanData plan) {
 		if (this.signalPlanData == null){
-			this.signalPlanData = new HashMap<>();
+			this.signalPlanData = new TreeMap<>();
 		}
 		this.signalPlanData.put(plan.getId(), plan);
 	}

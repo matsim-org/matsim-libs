@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,11 +17,51 @@
  *                                                                         *
  * *********************************************************************** */
 
+package playground.agarwalamit.multiModeCadyts;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.network.Link;
+
 /**
- * Cadyts infrastructure for multi (main) modes(s) calibration based on link traffic counts.
+ * A class to create a object which contains modal and link information. 
  * 
- * See {@link ModalCadytsTest}
  * @author amit
  */
 
-package playground.agarwalamit.mixedTraffic.multiModeCadyts;
+public class ModalLink implements Identifiable<ModalLink> {
+	
+	private final String mode;
+	private final Id<Link> linkId;
+	private final Id<ModalLink> id;
+	
+	private static final String seperator = "_&_";
+	
+	public String getMode() {
+		return mode;
+	}
+
+	public Id<Link> getLinkId() {
+		return linkId;
+	}
+
+	ModalLink(final String mode, final Id<Link> linkId) {
+		this.mode = mode;
+		this.linkId = linkId;
+		this.id = Id.create(this.mode.concat(getModeLinkSplittor()).concat(this.linkId.toString()), ModalLink.class);
+	}
+
+	@Override
+	public String toString(){
+		return this.mode.concat(getModeLinkSplittor()).concat(this.linkId.toString());
+	}
+	
+	public static String getModeLinkSplittor(){
+		return seperator;
+	}
+
+	@Override
+	public Id<ModalLink> getId() {
+		return this.id;
+	}
+}

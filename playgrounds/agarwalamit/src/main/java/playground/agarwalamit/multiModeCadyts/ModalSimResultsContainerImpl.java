@@ -1,4 +1,4 @@
-package playground.agarwalamit.mixedTraffic.multiModeCadyts;
+package playground.agarwalamit.multiModeCadyts;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
