@@ -26,8 +26,8 @@ public class TestTimeAllocation {
 				21.0 * 3600, null, null);
 
 		final double dptFromHome_s = Time.secFromStr("12:00:00");
-		final double dptFromWork_s = Time.secFromStr("13:00:00");
-		final double dptFromShop_s = Time.secFromStr("14:00:00");
+		final double dptFromWork_s = Time.secFromStr("12:00:00");
+		final double dptFromShop_s = Time.secFromStr("12:00:00");
 
 		final double betaDur_1_s = 1;
 		final double betaTravel_1_s = -1; // -1.0;
