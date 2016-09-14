@@ -24,6 +24,11 @@ public class AVMultiPassengerPickupActivity extends AbstractDynActivity implemen
 	public AVMultiPassengerPickupActivity(PassengerEngine passengerEngine, StayTask pickupTask, List<? extends PassengerRequest> requests, double pickupDuration, String activityType) {
         super(activityType);
         
+        if (requests.size() > pickupTask.getSchedule().getVehicle().getCapacity()) {
+        	// Number of requests exceeds number of seats
+        	throw new IllegalStateException();
+        }
+        
         this.passengerEngine = passengerEngine;
         this.pickupTask = pickupTask;
         this.pickupDuration = pickupDuration;
@@ -90,7 +95,7 @@ public class AVMultiPassengerPickupActivity extends AbstractDynActivity implemen
 		}
 		
 		DynAgent driver = pickupTask.getSchedule().getVehicle().getAgentLogic().getDynAgent();
-		if (passengerEngine.pickUpPassenger(this, driver, request, pickupTask.getBeginTime())) {
+		if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
 			passengersAboard++;
 		} else {
 			throw new IllegalStateException("The passenger is not on the link or not available for departure!");

@@ -17,7 +17,9 @@ import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
+import playground.sebhoerl.avtaxi.passenger.AVMultiPassengerDropoffActivity;
 import playground.sebhoerl.avtaxi.passenger.AVMultiPassengerPickupActivity;
+import playground.sebhoerl.avtaxi.schedule.AVTaxiMultiDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVTaxiMultiPickupTask;
 import playground.sebhoerl.avtaxi.schedule.AVTaxiMultiTask;
 
@@ -47,6 +49,12 @@ public class AVTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
     				AVTaxiMultiPickupTask mpt = (AVTaxiMultiPickupTask) task;
     	    		return new AVMultiPassengerPickupActivity(passengerEngine, mpt, mpt.getRequests(),
     	                    pickupDuration, MULTI_PICKUP_ACTIVITY_TYPE);
+    			case MULTI_DROPOFF:
+    				AVTaxiMultiDropoffTask mdt = (AVTaxiMultiDropoffTask) task;
+    				return new AVMultiPassengerDropoffActivity(passengerEngine, mdt, mdt.getRequests(),
+    						MULTI_DROPOFF_ACTIVITY_TYPE);
+    			case MULTI_OCCUPIED_DRIVE:
+    				return legCreator.createLeg((DriveTask)task);
     	    	default:
     	    		throw new IllegalStateException();
     		}
