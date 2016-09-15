@@ -51,24 +51,21 @@ import playground.jbischoff.parking.manager.ParkingSearchManager;
 /**
  *
  */
-public class SimpleFreeFloatingCarsharingManagerImpl implements FreefloatingCarsharingManager {
+public class ShapeBasedFreeFloatingCarsharingManager implements FreefloatingCarsharingManager {
 
 	private Map<Id<Vehicle>, Id<Link>> idleVehicleLocations;
 	private Map<Id<Vehicle>, Id<Link>> busyVehicleLastRentalLocations = new LinkedHashMap<>();
 	
 	private Network network;
-	private FFCSConfigGroup ffcsConfigGroup;
-	/**
-	 * 
-	 */
+	private final FFCSConfigGroup ffcsConfigGroup;
+
 	@Inject
-	public SimpleFreeFloatingCarsharingManagerImpl(Network network, ParkingSearchManager parkingManager, CarsharingData data, Config config) {
+	public ShapeBasedFreeFloatingCarsharingManager(Network network, ParkingSearchManager parkingManager, CarsharingData data, Config config) {
 		this.idleVehicleLocations=data.getVehiclesStartLocations();
 		this.network = network;
 		this.ffcsConfigGroup = (FFCSConfigGroup) config.getModule("freefloating");
 		
 	}
-	
 	
 	/* (non-Javadoc)
 	 * @see playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager#findAndReserveFreefloatingVehicleForLeg(org.matsim.api.core.v01.population.Leg, org.matsim.api.core.v01.Id, double)
@@ -144,7 +141,5 @@ public class SimpleFreeFloatingCarsharingManagerImpl implements FreefloatingCars
 		
 		return (this.idleVehicleLocations.containsKey(vehicleId)|this.busyVehicleLastRentalLocations.containsKey(busyVehicleLastRentalLocations));
 	}
-	
-	
 
 }

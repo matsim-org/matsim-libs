@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.jbischoff.parking.manager;
+package playground.jbischoff.ffcs.manager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.lang.mutable.MutableInt;
@@ -36,12 +37,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
 
+import playground.jbischoff.ffcs.FFCSUtils;
 import playground.jbischoff.parking.ParkingUtils;
+import playground.jbischoff.parking.manager.ParkingSearchManager;
 
 /**
  * @author  jbischoff
@@ -50,27 +54,36 @@ import playground.jbischoff.parking.ParkingUtils;
 /**
  *
  */
-public class FacilityBasedParkingManager implements ParkingSearchManager {
+public class FacilityBasedFreefloatingParkingManager implements ParkingSearchManager {
 
-	Map<Id<Link>, Integer> capacity = new HashMap<>();
-	Map<Id<ActivityFacility>, MutableInt> occupation = new HashMap<>();
-	Map<Id<ActivityFacility>, ActivityFacility> parkingFacilities;
-	Map<Id<Vehicle>, Id<ActivityFacility>> parkingLocations = new HashMap<>();
-	Map<Id<Vehicle>, Id<ActivityFacility>> parkingReservation = new HashMap<>();
-	Map<Id<Vehicle>, Id<Link>> parkingLocationsOutsideFacilities = new HashMap<>();
-	Map<Id<Link>, Set<Id<ActivityFacility>>> facilitiesPerLink = new HashMap<>();
-
+	private final Map<Id<Link>, Integer> capacity = new HashMap<>();
+	private final Map<Id<ActivityFacility>, MutableInt> occupancies = new HashMap<>();
+	private final Map<Id<ActivityFacility>, MutableInt> csoccupancy = new HashMap<>();
+	
+	private final Map<Id<ActivityFacility>, ActivityFacility> parkingFacilities= new HashMap<>();
+	
+	private final Map<Id<Vehicle>, Id<ActivityFacility>> parkingLocations = new HashMap<>();
+	private final Map<Id<Vehicle>, Id<ActivityFacility>> parkingReservation = new HashMap<>();
+	private final Map<Id<Vehicle>, Id<Link>> parkingLocationsOutsideFacilities = new HashMap<>();
+	private final Map<Id<Link>, Set<Id<ActivityFacility>>> facilitiesPerLink = new HashMap<>();
+	private final FreefloatingCarsharingManager ffcmanager;
+	private final Random random = MatsimRandom.getLocalInstance();
+	
 	Network network;
 
 	/**
 	 * 
 	 */
 	@Inject
-	public FacilityBasedParkingManager(Scenario scenario) {
+	public FacilityBasedFreefloatingParkingManager(Scenario scenario, FreefloatingCarsharingManager ffcmanager) {
+		this.ffcmanager = ffcmanager;
 		this.network = scenario.getNetwork();
-		parkingFacilities = scenario.getActivityFacilities()
-				.getFacilitiesForActivityType(ParkingUtils.PARKACTIVITYTYPE);
+		parkingFacilities.putAll(scenario.getActivityFacilities().getFacilitiesForActivityType(ParkingUtils.PARKACTIVITYTYPE));
+		parkingFacilities.putAll(scenario.getActivityFacilities().getFacilitiesForActivityType(FFCSUtils.FREEFLOATINGPARKACTIVITYTYPE));
+
 		Logger.getLogger(getClass()).info(parkingFacilities);
+		
+		
 
 		for (ActivityFacility fac : this.parkingFacilities.values()) {
 			Id<Link> linkId = fac.getLinkId();
@@ -80,9 +93,11 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 			}
 			parkingOnLink.add(fac.getId());
 			this.facilitiesPerLink.put(linkId, parkingOnLink);
-			this.occupation.put(fac.getId(), new MutableInt(0));
+			this.occupancies.put(fac.getId(), new MutableInt(0));
+			this.csoccupancy.put(fac.getId(), new MutableInt(0));
 
 		}
+		
 	}
 
 	/*
@@ -117,19 +132,53 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 			return true;
 		}
+		
 		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
+		boolean isFFCSVehicle = ffcmanager.isFFCSVehicle(vid);
 		for (Id<ActivityFacility> fac : parkingFacilitiesAtLink) {
-			double cap = this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE)
-					.getCapacity();
-			if (this.occupation.get(fac).doubleValue() < cap) {
+			double ordinaryCap = (this.parkingFacilities.get(fac).getActivityOptions().containsKey(ParkingUtils.PARKACTIVITYTYPE)?this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity():0);			
+			
+			double ordinaryOccupancy = this.occupancies.get(fac).doubleValue();
+			boolean hasOrdinaryCapacity = false;
+			
+			if (ordinaryOccupancy< ordinaryCap) {
 				// Logger.getLogger(getClass()).info("occ:
 				// "+this.occupation.get(fac).toString()+" cap: "+cap);
-				this.occupation.get(fac).increment();
-				this.parkingReservation.put(vid, fac);
+				if (!isFFCSVehicle){
+					this.occupancies.get(fac).increment();
+					this.parkingReservation.put(vid, fac);
+					return true;
+				} else {
+					hasOrdinaryCapacity = true;
+				}
 
-				return true;
 			}
+			if (isFFCSVehicle){
+				double ffcsCap = (this.parkingFacilities.get(fac).getActivityOptions().containsKey(FFCSUtils.FREEFLOATINGPARKACTIVITYTYPE)?this.parkingFacilities.get(fac).getActivityOptions().get(FFCSUtils.FREEFLOATINGPARKACTIVITYTYPE).getCapacity():0);			
+				double ffcsOccupancy = this.csoccupancy.get(fac).doubleValue();
+				boolean hasCSCapacity = false;
+				if (ffcsOccupancy<ffcsCap){
+					hasCSCapacity = true;
+				}
+				if (hasCSCapacity && hasOrdinaryCapacity){
+					if (random.nextBoolean()){
+						hasCSCapacity = false;
+						// we force to use ordinary parking
+					}
+				} else if (hasCSCapacity){
+					this.csoccupancy.get(fac).increment();
+					this.parkingReservation.put(vid, fac);
+					return true;
+				} else if (hasOrdinaryCapacity){
+					this.occupancies.get(fac).increment();
+					this.parkingReservation.put(vid, fac);
+					return true;
+				}
+
+			}
+			
 		}
+		
 		return false;
 	}
 
@@ -201,7 +250,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 			// we assume the person parks somewhere else
 		} else {
 			Id<ActivityFacility> fac = this.parkingLocations.remove(vehicleId);
-			this.occupation.get(fac).decrement();
+			this.occupancies.get(fac).decrement();
 			return true;
 		}
 	}
@@ -215,7 +264,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	@Override
 	public List<String> produceStatistics() {
 		List<String> stats = new ArrayList<>();
-		for (Entry<Id<ActivityFacility>, MutableInt> e : this.occupation.entrySet()) {
+		for (Entry<Id<ActivityFacility>, MutableInt> e : this.occupancies.entrySet()) {
 			Id<Link> linkId = this.parkingFacilities.get(e.getKey()).getLinkId();
 			double capacity = this.parkingFacilities.get(e.getKey()).getActivityOptions()
 					.get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();

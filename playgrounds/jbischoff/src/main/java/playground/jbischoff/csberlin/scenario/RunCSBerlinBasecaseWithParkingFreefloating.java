@@ -20,17 +20,19 @@
 /**
  * 
  */
-package playground.jbischoff.ffcs;
+package playground.jbischoff.csberlin.scenario;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.jbischoff.analysis.TripHistogram;
+import playground.jbischoff.analysis.TripHistogramListener;
+import playground.jbischoff.ffcs.FFCSConfigGroup;
 import playground.jbischoff.ffcs.sim.SetupFreefloatingParking;
+import playground.jbischoff.parking.sim.SetupParking;
 
 /**
  * @author  jbischoff
@@ -39,21 +41,28 @@ import playground.jbischoff.ffcs.sim.SetupFreefloatingParking;
 /**
  *
  */
-public class RunFreefloatingParkingExample {
-public static void main(String[] args) {
-	Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/bmw_carsharing/example/config _ffcs.xml", new FFCSConfigGroup());
-	config.plans().setInputFile("populationffcs100.xml");
-	config.facilities().setInputFile("parkingFacilities.xml");
-	config.controler().setOutputDirectory("../../../shared-svn/projects/bmw_carsharing/example/ffcs_output");
-	config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-	config.controler().setLastIteration(10);
-	config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
+public class RunCSBerlinBasecaseWithParkingFreefloating {
+	public static void main(String[] args) {
+		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/data/scenario/configBCParkingFreeFloat11.xml", new FFCSConfigGroup());
+		String runId = "bc11_2000ffc";
+		config.controler().setOutputDirectory("D:/runs-svn/bmw_carsharing/basecase/"+runId);
+		config.controler().setRunId(runId);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 	
-	Scenario scenario = ScenarioUtils.loadScenario(config);
-	Controler controler = new Controler(scenario);
-//    controler.addOverridingModule(new OTFVisLiveModule());
-	SetupFreefloatingParking.installFreefloatingParkingModules(controler, (FFCSConfigGroup) config.getModule("freefloating"));
-	controler.run();
-
-}
+		Controler controler = new Controler(config);
+		SetupFreefloatingParking.installFreefloatingParkingModules(controler, (FFCSConfigGroup) config.getModule("freefloating"));
+		
+		controler.addOverridingModule(new AbstractModule() {
+			
+			@Override
+			public void install() {
+				addControlerListenerBinding().to(TripHistogramListener.class).asEagerSingleton();
+				bind(TripHistogram.class).asEagerSingleton();
+			}
+		});
+		
+		controler.run();
+		
+		
+	}
 }

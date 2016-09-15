@@ -45,6 +45,13 @@ public interface FreefloatingCarsharingManager {
 	Tuple<Id<Link>,Id<Vehicle>> findAndReserveFreefloatingVehicleForLeg(Leg leg, Id<Person> personId, double time);
 	boolean endRental(Id<Link> linkId, Id<Person> personId, Id<Vehicle> vehicleId, double time);
 	void reset(int iteration);
+	
 	public Map<Id<Vehicle>, Id<Link>> getIdleVehicleLocations();
+	/**
+	 * 
+	 * @param vehicleId
+	 * @return whether the vehicle is a freefloating vehicle managed here.
+	 */
+	boolean isFFCSVehicle(Id<Vehicle> vehicleId);
 
 }

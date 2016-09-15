@@ -27,6 +27,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.zone.Zone;
+import org.matsim.contrib.zone.Zones;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -38,6 +40,7 @@ import org.matsim.vehicles.Vehicle;
  */
 public class CarsharingData {
     private final Map<Id<Vehicle>, Id<Link>> vehiclesStartLocations = new LinkedHashMap<>();
+	private Map<Id<Zone>,Zone> zones;
 
     /**
 	 * @return the vehiclesStartLocations
@@ -49,4 +52,19 @@ public class CarsharingData {
 	public void addVehicle(Id<Vehicle> vehicle, Id<Link> startLocationLinkId){
 		this.vehiclesStartLocations.put(vehicle, startLocationLinkId);
 	}
+	
+	/**
+	 * @param zones the zones to set
+	 */
+	public void setZones(Map<Id<Zone>, Zone> zones) {
+		this.zones = zones;
+	}
+	
+	/**
+	 * @return the zones
+	 */
+	public Map<Id<Zone>, Zone> getZones() {
+		return zones;
+	}
+	
 }

@@ -35,7 +35,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
  *
  * @author mrieser,jbischoff
  */
-final class TripHistogramListener implements IterationEndsListener {
+public final class TripHistogramListener implements IterationEndsListener {
 
 	@Inject private TripHistogram histogram;
 	@Inject private ControlerConfigGroup controlerConfigGroup;

@@ -17,38 +17,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.parking;
+/**
+ * 
+ */
+package playground.jbischoff.csberlin.scenario;
 
-import java.util.Random;
-
-import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.filter.NetworkFilterManager;
+import org.matsim.core.network.filter.NetworkLinkFilter;
+import org.matsim.core.network.io.MatsimNetworkReader;
 
 /**
  * @author  jbischoff
  *
  */
-public class ParkingUtils {
-	
-	static public final String PARKACTIVITYTYPE = "car interaction";
-	static public final double UNPARKDURATION = 60;
-	static public final double PARKDURATION = 60;
-	static public final int NO_OF_LINKS_TO_GET_ON_ROUTE = 5;
-	
-	
-	public ParkingUtils() {
-		// TODO Auto-generated constructor stub
-	}
-	
-	public static Coord getRandomPointAlongLink(Random rnd, Link link){
-		Coord fromNodeCoord = link.getFromNode().getCoord();
-		Coord toNodeCoord = link.getToNode().getCoord();
-		double r = rnd.nextDouble();
-		
-		double x = (fromNodeCoord.getX()*r)+(toNodeCoord.getX()*(1-r));
-		double y = (fromNodeCoord.getY()*r)+(toNodeCoord.getY()*(1-r));
-		
-		return new Coord(x,y);
+/**
+ *
+ */
+public class ExtractRoadNetwork {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Network network = NetworkUtils.createNetwork();
+		new MatsimNetworkReader(network).readFile("C:/Users/Joschka/Documents/shared-svn/projects/bmw_carsharing/data/scenario/network.xml.gz");
+		NetworkFilterManager m = new NetworkFilterManager(network);
+		m.addLinkFilter(new NetworkLinkFilter() {
+			
+			@Override
+			public boolean judgeLink(Link l) {
+				if (l.getAllowedModes().contains(TransportMode.car)) return true;
+				else return false;
+			}
+		});
+		Network network2 = m.applyFilters();
+		new NetworkWriter(network2).write("C:/Users/Joschka/Documents/shared-svn/projects/bmw_carsharing/data/scenario/network-car.xml.gz");
+
 	}
 
 }
