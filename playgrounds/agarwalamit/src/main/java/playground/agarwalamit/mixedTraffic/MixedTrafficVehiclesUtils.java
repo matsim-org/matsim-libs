@@ -41,6 +41,7 @@ public class MixedTrafficVehiclesUtils {
 		double pcu;
 		switch (travelMode) {
 		case CAR: pcu = 1.0; break;
+		case "bicycle":
 		case BIKE: pcu = 0.25; break;
 		case MOTORBIKE: pcu = 0.25;break;
 		case WALK: pcu = 0.10;break;
@@ -59,6 +60,7 @@ public class MixedTrafficVehiclesUtils {
 		double speed;
 		switch (travelMode) {
 		case CAR: speed = 16.67; break;
+		case "bicycle":
 		case BIKE: speed = 4.17; break;
 		case MOTORBIKE: speed = 16.67;break;
 		case WALK: speed = 1.2;break;
