@@ -186,7 +186,7 @@ public final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 				new Coord(
 						Double.parseDouble(atts.getValue("x")),
 						Double.parseDouble(atts.getValue("y")),
-						Double.parseDouble(atts.getValue("y")));
+						Double.parseDouble(atts.getValue("z")));
 		return transformation.transform( c );
 	}
 
