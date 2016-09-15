@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 
 public class ComposedNode implements Node {
@@ -20,6 +21,7 @@ public class ComposedNode implements Node {
 	//Constants
 
 	public static final String SEPARATOR = "-";
+
 
 
 	//Enums
@@ -322,4 +324,8 @@ public class ComposedNode implements Node {
 	}
 
 
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
+	}
 }

@@ -310,6 +310,11 @@ import org.xml.sax.helpers.AttributesImpl;
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
+
+		@Override
+		public org.matsim.utils.objectattributes.attributable.Attributes getAttributes() {
+			throw new RuntimeException("Calls to this method are not expected to happen...");
+		}
 	}
 	
 	public abstract static class Tag {

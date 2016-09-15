@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 //import playground.smetzler.bike.BikeLink;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class BikeLinkImpl 
 implements BikeLink 
@@ -163,5 +164,10 @@ implements BikeLink
 
 	public double getFlowCapacityPerSec(double time) {
 		return this.delegate.getFlowCapacityPerSec(time);
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return this.delegate.getAttributes();
 	}
 }

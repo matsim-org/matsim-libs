@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import playground.sergioo.passivePlanning2012.api.population.EmptyTime;
 
 public class EmptyTimeImpl implements Leg,EmptyTime {
@@ -52,5 +53,10 @@ public class EmptyTimeImpl implements Leg,EmptyTime {
 	@Override
 	public void setTravelTime(double seconds) {
 		this.delegate.setTravelTime(seconds);
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
 	}
 }

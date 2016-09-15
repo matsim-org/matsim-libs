@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import playground.balac.retailers.RetailersLocationListener;
 
 public class PersonRetailersImpl implements Person
@@ -82,4 +83,9 @@ public Id<Person> getId() {
 public Map<String, Object> getCustomAttributes() {
 		return delegate.getCustomAttributes();
 }
+
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
+	}
 }

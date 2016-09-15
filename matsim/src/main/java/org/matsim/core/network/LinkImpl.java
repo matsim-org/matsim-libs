@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /*deliberately package*/ class LinkImpl implements Link {
 
@@ -83,6 +84,8 @@ import org.matsim.core.utils.misc.Time;
 		set.add(TransportMode.car);
 		DEFAULT_ALLOWED_MODES = HashSetCache.get(set);
 	}
+
+	private final Attributes attributes = new Attributes();
 
 	/*deliberately package*/ LinkImpl(final Id<Link> id, final Node from, final Node to, final Network network, final double length, final double freespeed, final double capacity, final double lanes) {
 		this.id = id;
@@ -315,6 +318,11 @@ import org.matsim.core.utils.misc.Time;
 		Coord fromXY = getFromNode().getCoord();
 		Coord toXY = getToNode().getCoord();
 		return new Coord((fromXY.getX() + toXY.getX()) / 2.0, (fromXY.getY() + toXY.getY()) / 2.0);
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
 	}
 
 	/*package*/ abstract static class HashSetCache {

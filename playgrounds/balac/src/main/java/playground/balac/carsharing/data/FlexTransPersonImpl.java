@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class FlexTransPersonImpl implements Person
 {
@@ -131,4 +132,9 @@ public Id<Person> getId() {
 public Map<String, Object> getCustomAttributes() {
 		return delegate.getCustomAttributes();
 }
+
+  @Override
+  public Attributes getAttributes() {
+  	throw new UnsupportedOperationException();
+  }
 }

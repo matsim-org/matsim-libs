@@ -22,6 +22,7 @@ package org.matsim.contrib.locationchoice.population;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author cdobler
@@ -94,5 +95,10 @@ public class LCLeg implements Leg, LCPlanElement {
 	@Override
 	public final int getPlanElementIndex() {
 		return this.planElementIndex;
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
 	}
 }

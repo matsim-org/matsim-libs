@@ -2,6 +2,7 @@ package playground.sebhoerl.av.router;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class GenericLeg implements Leg {
 	private String mode;
@@ -53,4 +54,8 @@ public class GenericLeg implements Leg {
 		this.travelTime = travelTime;
 	}
 
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
+	}
 }
