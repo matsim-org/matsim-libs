@@ -278,7 +278,7 @@ public class AVAggregateHeuristicOptimizer implements TaxiOptimizer {
 		schedule.addTask(occupiedDriveTask);
 		schedule.addTask(dropoffTask);
 		
-		if (dropoffTask.getEndTime() < schedule.getEndTime()) {
+		if (dropoffTask.getEndTime() < scheduleEndTime) {
 			schedule.addTask(new TaxiStayTask(dropoffTask.getEndTime(), scheduleEndTime, dropoffTask.getLink()));
 		}		
 		
