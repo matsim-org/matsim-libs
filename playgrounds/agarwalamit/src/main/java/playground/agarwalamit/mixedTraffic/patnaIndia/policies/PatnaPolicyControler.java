@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
@@ -75,10 +76,9 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTime
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForTruck;
 import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
-import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.agarwalamit.utils.plans.SelectedPlansFilter;
 
 /**
  * @author amit
@@ -131,15 +131,9 @@ public class PatnaPolicyControler {
 
 		//==
 		// take only selected plans so that time for urban and location for external traffic is fixed.
+		// not anymore, there is now second calibration after cadyts and before baseCaseCtd; thus all plans in the choice set.
 		String inPlans = "baseCaseOutput_plans.xml.gz";
-		String outPlans = "selectedPlansOnly.xml.gz";
-
-		if (! new File(inputDir+outPlans).exists() ) {
-			SelectedPlansFilter plansFilter = new SelectedPlansFilter();
-			plansFilter.run(inputDir + inPlans);
-			plansFilter.writePlans(inputDir + outPlans);
-		}
-		config.plans().setInputFile(inputDir + outPlans);
+		config.plans().setInputFile(inputDir + inPlans);
 		//==
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -283,24 +277,26 @@ public class PatnaPolicyControler {
 
 		//since some links are now removed, route in the plans will throw exception, remove them.
 		for (Person p : scenario.getPopulation().getPersons().values()){
-			List<PlanElement> pes = p.getSelectedPlan().getPlanElements();
-			for (PlanElement pe :pes ){
-				if (pe instanceof Activity) { 
-					Activity act = ((Activity)pe);
-					Id<Link> linkId = act.getLinkId();
-					Coord cord = act.getCoord();
+			for(Plan plan : p.getPlans()){
+				List<PlanElement> pes = plan.getPlanElements();
+				for (PlanElement pe :pes ){
+					if (pe instanceof Activity) { 
+						Activity act = ((Activity)pe);
+						Id<Link> linkId = act.getLinkId();
+						Coord cord = act.getCoord();
 
-					if (cord == null && linkId == null) throw new RuntimeException("Activity "+act.toString()+" do not have either of link id or coord. Aborting...");
-					else if (linkId == null ) { /*nothing to do; cord is assigned*/ }
-					else if (cord==null && ! scNetwork.getNetwork().getLinks().containsKey(linkId)) throw new RuntimeException("Activity "+act.toString()+" do not have cord and link id is not present in network. Aborting...");
-					else {
-						cord = scNetwork.getNetwork().getLinks().get(linkId).getCoord();
-						act.setLinkId(null);
-						act.setCoord(cord);
+						if (cord == null && linkId == null) throw new RuntimeException("Activity "+act.toString()+" do not have either of link id or coord. Aborting...");
+						else if (linkId == null ) { /*nothing to do; cord is assigned*/ }
+						else if (cord==null && ! scNetwork.getNetwork().getLinks().containsKey(linkId)) throw new RuntimeException("Activity "+act.toString()+" do not have cord and link id is not present in network. Aborting...");
+						else {
+							cord = scNetwork.getNetwork().getLinks().get(linkId).getCoord();
+							act.setLinkId(null);
+							act.setCoord(cord);
+						}
+					} else if ( pe instanceof Leg){
+						Leg leg = (Leg) pe;
+						leg.setRoute(null);
 					}
-				} else if ( pe instanceof Leg){
-					Leg leg = (Leg) pe;
-					leg.setRoute(null);
 				}
 			}
 		}
