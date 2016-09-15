@@ -34,7 +34,10 @@ import org.matsim.contrib.taxi.scheduler.TaxiSchedulerParams;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import playground.sebhoerl.av.utils.Grid;
 import playground.sebhoerl.avtaxi.schedule.AVTaxiMultiDropoffTask;
@@ -88,9 +91,9 @@ public class AVAggregateHeuristicOptimizer implements TaxiOptimizer {
 		availableVehicleGrid = new Grid<Vehicle>(bounds[0], bounds[1], bounds[2], bounds[3], optimParams.grid_x, optimParams.grid_y);
 		unplannedMasterRequestGrid = new Grid<TaxiRequest>(bounds[0], bounds[1], bounds[2], bounds[3], optimParams.grid_x, optimParams.grid_y);
 		
-		router = new Dijkstra(context.network, context.travelDisutility, context.travelTime);
-		
-		
+		//router = new Dijkstra(context.network, context.travelDisutility, context.travelTime);
+		TravelTime tt = new FreeSpeedTravelTime();
+		router = new Dijkstra(context.network, new OnlyTimeDependentTravelDisutility(tt), tt);
 		
 		for (Vehicle vehicle : context.taxiData.getVehicles().values()) {
 			Coord coord = vehicle.getStartLink().getCoord();
@@ -201,6 +204,16 @@ public class AVAggregateHeuristicOptimizer implements TaxiOptimizer {
 	private void optimize() {
 		reoptimize = false;
 		
+		int completed = 0;
+		
+		for (Vehicle vehicle : context.taxiData.getVehicles().values()) {
+			if(vehicle.getSchedule().getStatus() == ScheduleStatus.COMPLETED) {
+				completed += 1;
+			}
+		}
+		
+		System.err.println(String.format("Status %d : %d : %d", completed, availableVehicles.size(), unplannedMasterRequests.size()));
+		
 		while (!availableVehicles.isEmpty() && !unplannedMasterRequests.isEmpty()) {
 			TaxiRequest request = null;
 			Vehicle vehicle = null;
@@ -208,22 +221,29 @@ public class AVAggregateHeuristicOptimizer implements TaxiOptimizer {
 			switch (mode) {
 			case OVERSUPPLY:
 				request = unplannedMasterRequests.poll();
+				unplannedMasterRequestGrid.remove(request);
+				
 				vehicle = getClosestVehicle(request);
 				availableVehicleGrid.remove(vehicle);
 				availableVehicles.remove(vehicle);
+				
 				break;
 			case UNDERSUPPLY:
 				vehicle = availableVehicles.poll();
+				availableVehicleGrid.remove(vehicle);
+				
 				request = getClosestMasterRequest(vehicle);
 				unplannedMasterRequestGrid.remove(request);
 				unplannedMasterRequests.remove(request);
+				
 				break;
 			}
 			
 			if (request != null && vehicle != null) {
 				optimizeAssignment(vehicle, request);
 			} else {
-				break;
+				throw new IllegalStateException();
+				//break;
 			}
 		}
 		
