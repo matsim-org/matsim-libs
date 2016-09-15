@@ -45,7 +45,8 @@ public abstract class CoordUtils {
 			double zz = coord1.getZ() + coord2.getZ();
 			return new Coord(xx, yy, zz);			
 		} else{
-			throw new RuntimeException("Cannot 'plus' coordinates if one has elevation (z) and the other not.");
+			throw new RuntimeException("Cannot 'plus' coordinates if one has elevation (z) and the other not; coord1.hasZ=" + coord1.hasZ()
+			+ "; coord2.hasZ=" + coord2.hasZ() );
 		}
 	}
 	
@@ -67,7 +68,7 @@ public abstract class CoordUtils {
 	}
 	
 	public static Coord scalarMult( double alpha, Coord coord ) {
-		if(coord.hasZ()){
+		if(!coord.hasZ()){
 			/* 2D coordinate. */
 			double xx = alpha * coord.getX();
 			double yy = alpha * coord.getY();
@@ -100,7 +101,7 @@ public abstract class CoordUtils {
 	}
 	
 	public static double length( Coord coord ) {
-		if(coord.hasZ()){
+		if(!coord.hasZ()){
 			return Math.sqrt( coord.getX()*coord.getX() + coord.getY()*coord.getY() ) ;
 		} else{
 			return Math.sqrt( 
@@ -117,7 +118,7 @@ public abstract class CoordUtils {
 	 * @return
 	 */
 	public static Coord rotateToRight( Coord coord ) {
-		if( coord.hasZ() ){
+		if( !coord.hasZ() ){
 			final double y = -coord.getX();
 			return new Coord(coord.getY(), y);
 		} else{
