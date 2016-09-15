@@ -204,16 +204,6 @@ public class AVAggregateHeuristicOptimizer implements TaxiOptimizer {
 	private void optimize() {
 		reoptimize = false;
 		
-		int completed = 0;
-		
-		for (Vehicle vehicle : context.taxiData.getVehicles().values()) {
-			if(vehicle.getSchedule().getStatus() == ScheduleStatus.COMPLETED) {
-				completed += 1;
-			}
-		}
-		
-		System.err.println(String.format("Status %d : %d : %d", completed, availableVehicles.size(), unplannedMasterRequests.size()));
-		
 		while (!availableVehicles.isEmpty() && !unplannedMasterRequests.isEmpty()) {
 			TaxiRequest request = null;
 			Vehicle vehicle = null;
