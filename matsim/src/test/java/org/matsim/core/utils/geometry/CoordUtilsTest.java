@@ -22,6 +22,7 @@ package org.matsim.core.utils.geometry;
 
 import static org.junit.Assert.*;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -148,9 +149,24 @@ public class CoordUtilsTest {
 	}
 
 	@Test
-	@Ignore
 	public void testRotateToRight() {
-		fail("Not yet implemented");
+		Coord coord1 = new Coord(3., 2.);
+
+		Coord result = CoordUtils.rotateToRight( coord1 ) ;
+		Assert.assertEquals(  2., result.getX(), MatsimTestUtils.EPSILON ) ;
+		Assert.assertEquals( -3., result.getY(), MatsimTestUtils.EPSILON ) ;
+
+		result = CoordUtils.rotateToRight( result ) ;
+		Assert.assertEquals( -3., result.getX(), MatsimTestUtils.EPSILON ) ;
+		Assert.assertEquals( -2., result.getY(), MatsimTestUtils.EPSILON ) ;
+
+		result = CoordUtils.rotateToRight( result ) ;
+		Assert.assertEquals( -2., result.getX(), MatsimTestUtils.EPSILON ) ;
+		 Assert.assertEquals( 3., result.getY(), MatsimTestUtils.EPSILON ) ;
+
+		result = CoordUtils.rotateToRight( result ) ;
+		Assert.assertEquals( coord1.getX(), result.getX(), MatsimTestUtils.EPSILON ) ;
+		Assert.assertEquals( coord1.getY(), result.getY(), MatsimTestUtils.EPSILON ) ;
 	}
 
 	@Test
@@ -180,7 +196,29 @@ public class CoordUtilsTest {
 		assertEquals(1.0, CoordUtils.calcEuclideanDistance(c3a, c3c), MatsimTestUtils.EPSILON);
 		assertEquals(1.0, CoordUtils.calcEuclideanDistance(c3a, c3d), MatsimTestUtils.EPSILON);
 		assertEquals(Math.sqrt(3.0), CoordUtils.calcEuclideanDistance(c3a, c3e), MatsimTestUtils.EPSILON);
+
+		// Mixed 2D and 3D
+		assertEquals(Math.sqrt(2.0), CoordUtils.calcEuclideanDistance(c2a, c3e), MatsimTestUtils.EPSILON);
 	}
+	
+	
+	@Test
+	public void testCalcProjectedDistance() {
+		// 2D
+		Coord c2a = CoordUtils.createCoord(0.0, 0.0);
+		Coord c2b = CoordUtils.createCoord(1.0, 1.0);
+		assertEquals(Math.sqrt(2.0), CoordUtils.calcProjectedEuclideanDistance(c2a, c2b), MatsimTestUtils.EPSILON);
+		
+		// 3D
+		Coord c3a = CoordUtils.createCoord(0.0, 0.0, 0.0);
+		Coord c3b = CoordUtils.createCoord(1.0, 1.0, 1.0);
+		assertEquals(Math.sqrt(2.0), CoordUtils.calcProjectedEuclideanDistance(c3a, c3b), MatsimTestUtils.EPSILON);
+		
+		// Mixed 2D and 3D
+		assertEquals(Math.sqrt(2.0), CoordUtils.calcProjectedEuclideanDistance(c2a, c3b), MatsimTestUtils.EPSILON);
+	}
+	
+	
 
 	@Test
 	public void testDistancePointLinesegment() {

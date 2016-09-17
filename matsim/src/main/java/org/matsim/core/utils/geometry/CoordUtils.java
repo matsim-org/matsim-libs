@@ -20,9 +20,11 @@
 
 package org.matsim.core.utils.geometry;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 
 public abstract class CoordUtils {
+	final private static Logger LOG = Logger.getLogger(CoordUtils.class);
 	
 	public static Coord createCoord( final double xx, final double yy ) {
 		return new Coord(xx, yy);
@@ -102,7 +104,9 @@ public abstract class CoordUtils {
 	
 	public static double length( Coord coord ) {
 		if(!coord.hasZ()){
-			return Math.sqrt( coord.getX()*coord.getX() + coord.getY()*coord.getY() ) ;
+			return Math.sqrt( 
+					coord.getX()*coord.getX() + 
+					coord.getY()*coord.getY() ) ;
 		} else{
 			return Math.sqrt( 
 					coord.getX()*coord.getX() + 
@@ -119,9 +123,11 @@ public abstract class CoordUtils {
 	 */
 	public static Coord rotateToRight( Coord coord ) {
 		if( !coord.hasZ() ){
+			/* 2D coordinate */
 			final double y = -coord.getX();
 			return new Coord(coord.getY(), y);
 		} else{
+			/* 3D coordinate */
 			final double y = -coord.getX();
 			return new Coord(coord.getY(), y, coord.getZ());			
 		}
@@ -165,10 +171,29 @@ public abstract class CoordUtils {
 			double zDiff = other.getZ()-coord.getZ();
 			return Math.sqrt((xDiff*xDiff) + (yDiff*yDiff) + (zDiff*zDiff));
 		} else{
-			throw new RuntimeException("Cannot get the center for coordinates if one has elevation (z) and the other not.");
+			LOG.warn("Mixed use of elevation in coordinates: " + coord.toString() + 
+					"; " + other.toString());
+			LOG.warn("Returning projected coordinate distance (using x and y components only)");
+			return calcProjectedEuclideanDistance(coord, other);
 		}
 	}
 
+
+	/**
+	 * Method to deal with distance calculation when only the x and y-components
+	 * of the coordinates are used. The elevation (z component) is ignored,
+	 * whether it is available or not. 
+	 * (xy-plane)
+	 * @param coord
+	 * @param other
+	 * @return
+	 */
+	public static double calcProjectedEuclideanDistance(Coord coord, Coord other) {
+		double xDiff = other.getX()-coord.getX();
+		double yDiff = other.getY()-coord.getY();
+		return Math.sqrt((xDiff*xDiff) + (yDiff*yDiff));
+	}
+	
 	
 	/**
 	 * Method should only be used in within this class, and only by 
