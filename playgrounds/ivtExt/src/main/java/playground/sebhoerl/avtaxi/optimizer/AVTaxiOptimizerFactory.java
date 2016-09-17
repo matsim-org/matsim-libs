@@ -22,6 +22,6 @@ public class AVTaxiOptimizerFactory implements TaxiOptimizerFactory {
 	@Override
 	public TaxiOptimizer createTaxiOptimizer(TaxiOptimizerContext optimContext, ConfigGroup optimizerConfigGroup) {
 		Configuration optimizerConfig = new MapConfiguration(optimizerConfigGroup.getParams());
-		return new AVAggregateHeuristicOptimizer(optimContext, params, new AVAggregateHeuristicOptimizerParams(optimizerConfig));
+		return new AVHeuristicOptimizer(optimContext, params, new AVAggregateHeuristicOptimizerParams(optimizerConfig));
 	}
 }
