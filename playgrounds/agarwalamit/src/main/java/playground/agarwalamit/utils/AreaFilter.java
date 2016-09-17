@@ -28,8 +28,6 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import playground.agarwalamit.munich.utils.MunichPersonFilter;
-
 /**
  * @author amit
  */
@@ -42,7 +40,7 @@ public class AreaFilter {
 	/**
 	 * @param shapeFile person will be soreted based on this shape file. In general this should be a polygon shape.
 	 */
-	public AreaFilter (String shapeFile){
+	public AreaFilter (final String shapeFile){
 		this.features = GeometryUtils.getSimplifiedGeometries( ShapeFileReader.getAllFeatures(shapeFile) );
 	}
 
@@ -51,14 +49,14 @@ public class AreaFilter {
 	 */
 	public AreaFilter (){
 		this.features = GeometryUtils.getSimplifiedGeometries( ShapeFileReader.getAllFeatures(MUNICH_SHAPE_FILE) );
-		Logger.getLogger(MunichPersonFilter.class).info("Reading Munich city area shape file...");
+		Logger.getLogger(AreaFilter.class).info("Reading Munich city area shape file...");
 	}
 
-	public boolean isCellInsideShape(Coord cellCentroid) {
+	public boolean isCellInsideShape(final Coord cellCentroid) {
 		return GeometryUtils.isCoordInsideShare(features, cellCentroid);
 	}
 	
-	public boolean isLinkInsideShape(Link link) {
+	public boolean isLinkInsideShape(final Link link) {
 		return GeometryUtils.isLinkInsideGeometries(features, link);
 	}
 
