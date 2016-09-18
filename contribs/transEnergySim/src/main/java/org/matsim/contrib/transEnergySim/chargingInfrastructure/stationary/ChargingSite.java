@@ -67,4 +67,6 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 
 	abstract void registerVehicleDeparture(VehicleAgent agent);
 
+	abstract int getNumAvailablePlugsOfType(ChargingPlugType plugType);
+
 }

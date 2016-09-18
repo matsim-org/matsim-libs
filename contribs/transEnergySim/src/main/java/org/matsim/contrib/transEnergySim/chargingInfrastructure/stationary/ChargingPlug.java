@@ -38,4 +38,6 @@ public interface ChargingPlug extends Identifiable<ChargingPlug> {
 	void handleBeginChargingSession(VehicleAgent agent);
 
 	void handleChargingSessionInterruption();
+
+	boolean isAvailable();
 }
