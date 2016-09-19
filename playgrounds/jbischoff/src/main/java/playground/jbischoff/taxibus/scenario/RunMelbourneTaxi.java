@@ -20,22 +20,14 @@
 package playground.jbischoff.taxibus.scenario;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
+import playground.jbischoff.taxibus.analysis.SharedTaxiConfigGroup;
 import playground.jbischoff.taxibus.analysis.SharedTaxiContolerListener;
 import playground.jbischoff.taxibus.analysis.SharedTaxiTripAnalyzer;
 import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
@@ -45,17 +37,24 @@ import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
  * @author jbischoff
  *
  */
-public class RunSharedTaxiExample {
+public class RunMelbourneTaxi {
 
 	public static void main(String[] args) {
 		
 		Config config = ConfigUtils.loadConfig(args[0], new TaxibusConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 	
-		Scenario scenario = ScenarioUtils.loadScenario(config);
 
+		SharedTaxiConfigGroup stt = new SharedTaxiConfigGroup();
+		stt.setDiscountForSharing(0.4);
+		stt.setHourlyTaxiFare(10.0);
+		stt.setScoreRides(true);
+		config.addModule(stt);
+		
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
+		
 		
 		//Analysis code:
 		controler.addOverridingModule(new AbstractModule() {
@@ -63,21 +62,6 @@ public class RunSharedTaxiExample {
 			public void install() {
 			bind(SharedTaxiTripAnalyzer.class).asEagerSingleton();
 			addControlerListenerBinding().to(SharedTaxiContolerListener.class);
-			bindScoringFunctionFactory().toInstance(new ScoringFunctionFactory() {
-				
-				@Override
-				public ScoringFunction createNewScoringFunction(Person person) {
-					SumScoringFunction sumScoringFunction = new SumScoringFunction();
-					final CharyparNagelScoringParameters params =
-							new CharyparNagelScoringParameters.Builder(scenario, person.getId()).build();
-					sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
-					sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
-					sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
-					sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-					
-					return sumScoringFunction;
-				}
-			});
 			}
 		});
 		controler.run();

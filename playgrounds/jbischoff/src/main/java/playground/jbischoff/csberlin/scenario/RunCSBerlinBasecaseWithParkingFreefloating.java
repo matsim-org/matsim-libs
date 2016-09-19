@@ -58,18 +58,20 @@ public class RunCSBerlinBasecaseWithParkingFreefloating {
 	public static void main(String[] args) {
 		String runId;
 		String configfile;
+		String outputdir;
 		if (args.length<2){
 		configfile = "../../../shared-svn/projects/bmw_carsharing/data/scenario/configBCParkingFreeFloat14.xml";
 		runId = "bc14_2000ffc_pA";
-		
+		outputdir = "D:/runs-svn/bmw_carsharing/basecase/"+runId;
 		}
 		else {
 			configfile = args[0];
 			runId = args[1];
+			outputdir = args[2];
 		}
 		Config config = ConfigUtils.loadConfig(configfile, new FFCSConfigGroup());
-		config.controler().setOutputDirectory("D:/runs-svn/bmw_carsharing/basecase/"+runId);
 		config.controler().setRunId(runId);
+		config.controler().setOutputDirectory(outputdir);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		Controler controler = new Controler(config);
