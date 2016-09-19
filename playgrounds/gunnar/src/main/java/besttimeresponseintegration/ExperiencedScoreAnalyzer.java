@@ -5,15 +5,20 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scoring.ExperiencedPlansService;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
+
+import matsimintegration.TimeDiscretizationInjection;
 
 /**
  * 
@@ -23,28 +28,28 @@ import com.google.inject.Singleton;
 @Singleton
 public class ExperiencedScoreAnalyzer implements IterationEndsListener {
 
-	private final Population population;
-
-	// private final BestTimeResponseStrategyProvider
-	// bestTimeResponseStrategyProvider;
-
-	private final Map<String, Provider<PlanStrategy>> name2planStratProvider;
-
 	private final Map<Id<Person>, Double> person2ExpectedScore = new LinkedHashMap<>();
 
 	@Inject
-	ExperiencedScoreAnalyzer(final Population population,
-			final Map<String, Provider<PlanStrategy>> name2planStratProvider) {
-		this.population = population;
-		this.name2planStratProvider = name2planStratProvider;
+	private Network network;
 
-		// >>> TODO TESTING >>>
-		for (Map.Entry<?, ?> entry : this.name2planStratProvider.entrySet()) {
-			System.out.println(entry);
-		}
-		System.exit(0);
-		// <<< TODO TESTING <<<
+	@Inject
+	private CharyparNagelScoringParametersForPerson scoringParams;
 
+	@Inject
+	private Map<String, TravelTime> mode2tt;
+
+	@Inject
+	private Population population;
+
+	@Inject
+	private TimeDiscretizationInjection timeDiscrInj;
+
+	@Inject
+	ExperiencedPlansService experiencedPlansService;
+
+	@Inject
+	ExperiencedScoreAnalyzer() {
 	}
 
 	public void setExpectedScore(final Id<Person> personId, final double score) {
@@ -54,6 +59,10 @@ public class ExperiencedScoreAnalyzer implements IterationEndsListener {
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 
+		// if (event.getIteration() == 0) {
+		// return;
+		// }
+
 		/*
 		 * There may be agents in the just ended iteration that have replanned
 		 * based on the BestTimeResponseStategyModule. These agents and the
@@ -62,18 +71,19 @@ public class ExperiencedScoreAnalyzer implements IterationEndsListener {
 		 * are subsequently of interest.
 		 */
 
+		// TODO crossing fingers that this provides the most recently
+		// experienced plans ...
+		final Map<Id<Person>, Plan> personId2experiencedPlan = this.experiencedPlansService.getExperiencedPlans();
+
 		final Map<Id<Person>, Double> person2ExperiencedScore = new LinkedHashMap<>();
 		for (Id<Person> personId : this.person2ExpectedScore.keySet()) {
-			final BestTimeResponseStrategyModule bestTimeResponse = null;
-
-			// (BestTimeResponseStrategyModule)
-			// this.bestTimeResponseStrategyProvider
-			// .get();
-
-			// person2ExperiencedScore.put(personId,
-			// this.population.getPersons().get(personId).getSelectedPlan().getScore());
-			person2ExperiencedScore.put(personId,
-					bestTimeResponse.evaluatePlan(this.population.getPersons().get(personId).getSelectedPlan()));
+			final boolean interpolate = true;
+			final Plan plan = personId2experiencedPlan.get(personId);
+			plan.setPerson(population.getPersons().get(personId)); // otherwise
+																	// null
+			final BestTimeResponseStrategyFunctionality planData = new BestTimeResponseStrategyFunctionality(plan,
+					network, scoringParams, this.timeDiscrInj.getInstance(), mode2tt, interpolate);
+			person2ExperiencedScore.put(personId, planData.evaluate());
 		}
 
 		/*

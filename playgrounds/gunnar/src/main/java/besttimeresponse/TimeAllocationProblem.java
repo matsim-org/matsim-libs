@@ -69,7 +69,7 @@ class TimeAllocationProblem {
 		for (int q = 0; q < _N; q++) {
 			final RealizedActivity<?, ?> act = this.realizedActivities.get(q);
 			result += this.betaDur_1_s * act.plannedActivity.desiredDur_s
-					* log(max(MINACTDUR_S, act.effectiveDuration_s()));
+					* log(max(MINACTDUR_S, act.effectiveDuration_s()) / max(MINACTDUR_S, act.plannedActivity.minDur_s));
 			if (act.isLateArrival()) {
 				result += this.betaLateArr_1_s * (act.realizedArrTime_s - act.plannedActivity.latestArrTime_s);
 			}

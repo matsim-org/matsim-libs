@@ -18,11 +18,11 @@ public class TestTimeAllocation {
 
 		final TimeDiscretization discr = new TimeDiscretization(0, 3600, 24);
 
-		final PlannedActivity<String, String> home = new PlannedActivity<>("home", "car", 8.0 * 3600, null, null, null,
+		final PlannedActivity<String, String> home = new PlannedActivity<>("home", "car", 8.0 * 3600, 1.0, null, null, null,
 				null);
-		final PlannedActivity<String, String> work = new PlannedActivity<>("office", "car", 8.0 * 3600, 6.0 * 3600,
+		final PlannedActivity<String, String> work = new PlannedActivity<>("office", "car", 8.0 * 3600, 1.0, 6.0 * 3600,
 				18.0 * 3600, null, null);
-		final PlannedActivity<String, String> shop = new PlannedActivity<>("store", "car", 1.0 * 3600, 8.0 * 3600,
+		final PlannedActivity<String, String> shop = new PlannedActivity<>("store", "car", 1.0 * 3600, 1.0,  8.0 * 3600,
 				21.0 * 3600, null, null);
 
 		final double dptFromHome_s = Time.secFromStr("12:00:00");
