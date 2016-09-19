@@ -144,7 +144,7 @@ public class PatnaPolicyControler {
 			config.network().setInputFile(inputDir + "/networkWithTrafficRestricationAndBikeTrack.xml.gz");
 		} else if (applyTrafficRestrain ) {
 			config.network().setInputFile(inputDir + "/networkWithTrafficRestrication.xml.gz");
-		} else if(addBikeTrack) {
+		} else if(addBikeTrack && !isAllwoingMotorbikeOnBikeTrack) {
 			config.network().setInputFile(inputDir + "/networkWithBikeTrack.xml.gz");
 		} else if (isAllwoingMotorbikeOnBikeTrack) {
 			config.network().setInputFile(inputDir + "/networkWithBikeMotorbikeTrack.xml.gz");
