@@ -1,4 +1,4 @@
-package playground.nmviljoen.gridExperiments;
+package gridExperiments;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -6,6 +6,12 @@ import java.util.LinkedList;
 import org.apache.log4j.Logger;
 
 import edu.uci.ics.jung.graph.DirectedGraph;
+import gridExperiments.JungCentrality;
+import gridExperiments.JungClusters;
+import gridExperiments.JungGraphDistance;
+import gridExperiments.NmvLink;
+import gridExperiments.NmvNode;
+import gridExperiments.ShortestPath;
 //import playground.southafrica.utilities.Header;
 public class MalikLabExperiments {
 	
@@ -44,14 +50,7 @@ public class MalikLabExperiments {
 		public void runThisSpecificExperiment(){
 			LinkedList<NmvLink> linkListGrid = new LinkedList<NmvLink>(myGraphGrid.getEdges());
 			ArrayList<NmvNode> nodeListGrid = new ArrayList<NmvNode>(myGraphGrid.getVertices());
-//			LinkedList<NmvLink> linkListGhost = new LinkedList<NmvLink>(myGraphGhost.getEdges());
-//			ArrayList<NmvNode> nodeListGhost = new ArrayList<NmvNode>(myGraphGhost.getVertices());
-			LinkedList<NmvLink> linkListMalik = new LinkedList<NmvLink>(myGraphMalik.getEdges());
-			ArrayList<NmvNode> nodeListMalik = new ArrayList<NmvNode>(myGraphMalik.getVertices());
-
-			String shortFile=path+"MalikShortPathStat.csv";
-			ShortestPath.collectShortest(myGraphGrid, myGraphMalik, linkListGrid, linkListMalik, nodeListGrid, nodeListMalik, assocList, shortFile);
-			
+	
 			//Grid graph metrics
 			String Gridpath=path+"GridGraph";
 			
@@ -70,24 +69,7 @@ public class MalikLabExperiments {
 			//Graph distance
 			JungGraphDistance.calculateAndWriteUnweightedDistances(myGraphGrid, path+"unweightedDist.csv");
 			
-			//Ghost graph metrics
-			String Ghostpath=path+"GhostGraph";
-			
-			//Centrality scores
-			
-//			JungCentrality.calculateAndWriteUnweightedBetweenness(myGraphGhost,Ghostpath+"unweightedNodeBetweenness.csv", Ghostpath+"unweightedEdgeBetweenness.csv",nodeListGhost, linkListGhost);
-//			JungCentrality.calculateAndWriteUnweightedCloseness(myGraphGhost, Ghostpath+"unweightedCloseness.csv", nodeListGhost);
-//			JungCentrality.calculateAndWriteUnweightedEigenvector(myGraphGhost, Ghostpath+"unweightedEigen.csv", nodeListGhost);
-//			JungCentrality.calculateAndWriteDegreeCentrality(myGraphGhost, Ghostpath+"Degree.csv", nodeListGhost, linkListGhost);
-//
-//			//Clustering
-//			JungClusters.calculateAndWriteClusteringCoefficient(myGraphGhost, Ghostpath+"clusterCoeff.csv");
-//			JungClusters.calculateAndWriteWeakComponents(myGraphGhost, Ghostpath+"weakComp.csv");
-//			JungClusters.calculateAndWriteTriadicCensus(myGraphGhost, Ghostpath+"triadCensus.csv");
-//
-//			//Graph distance
-//			JungGraphDistance.calculateAndWriteUnweightedDistances(myGraphGhost, Ghostpath+"unweightedDist.csv");
-//			
+
 		}
 		
 		public static void main(String[] args) throws FileNotFoundException{
