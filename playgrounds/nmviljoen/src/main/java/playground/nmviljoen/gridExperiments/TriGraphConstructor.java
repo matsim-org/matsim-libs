@@ -1,4 +1,4 @@
-package gridExperiments;
+package playground.nmviljoen.gridExperiments;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -19,12 +19,6 @@ import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
-import gridExperiments.NmvLink;
-import gridExperiments.NmvNode;
-import gridExperiments.GhostLinkList;
-import gridExperiments.GridLinkList;
-import gridExperiments.MalikLinkList;
-import gridExperiments.ResslerLinkList;
 
 public class TriGraphConstructor {
 	static DirectedGraph<NmvNode, NmvLink> myGraphGrid; 

@@ -1,4 +1,5 @@
-package gridExperiments;
+package playground.nmviljoen.gridExperiments;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -6,13 +7,7 @@ import java.util.LinkedList;
 import org.apache.log4j.Logger;
 
 import edu.uci.ics.jung.graph.DirectedGraph;
-import gridExperiments.JungCentrality;
-import gridExperiments.JungClusters;
-import gridExperiments.JungGraphDistance;
-import gridExperiments.NmvLink;
-import gridExperiments.NmvNode;
-import gridExperiments.ShortestPath;
-//import playground.southafrica.utilities.Header;
+
 public class MalikLabExperiments {
 	
 		private final static Logger LOG = Logger.getLogger(MalikLabExperiments.class);

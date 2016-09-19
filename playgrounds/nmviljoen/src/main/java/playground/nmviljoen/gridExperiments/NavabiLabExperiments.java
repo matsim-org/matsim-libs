@@ -1,4 +1,4 @@
-package gridExperiments;
+package playground.nmviljoen.gridExperiments;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
