@@ -63,7 +63,7 @@ public final class TripHistogramListener implements IterationEndsListener {
 		for (int nofDepartures : this.histogram.getDepartures()) {
 			nofLegs += nofDepartures;
 		}
-		log.info("number of legs:\t"  + nofLegs + "\t100%");
+		log.info("number of trips:\t"  + nofLegs + "\t100%");
 		for (String legMode : this.histogram.getLegModes()) {
 			int nofModeLegs = 0;
 			for (int nofDepartures : this.histogram.getDepartures(legMode)) {
