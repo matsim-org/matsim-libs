@@ -27,8 +27,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.algorithms.PermissibleModesCalculator;
 
@@ -51,14 +54,18 @@ public class BerlinCSPermissibleModesCalculator implements PermissibleModesCalcu
 	 */
 	@Override
 	public Collection<String> getPermissibleModes(Plan plan) {
-		List<String> modes = Arrays.asList(scenario.getConfig().subtourModeChoice().getModes());
-		int age = (int) scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().toString(), "age");
-		String carAv = (String) scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().toString(), "carAvail");
-		boolean member = (boolean) scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().toString(), "member");
-		
+		Id<Person> pId = plan.getPerson().getId();
+		List<String> modes = new ArrayList<>( Arrays.asList(scenario.getConfig().subtourModeChoice().getModes()));
+		Integer age = (Integer) scenario.getPopulation().getPersonAttributes().getAttribute(pId.toString(), "age");
+		String carAv = (String) scenario.getPopulation().getPersonAttributes().getAttribute(pId.toString(), "carAvail");
+		Boolean member = (Boolean) scenario.getPopulation().getPersonAttributes().getAttribute(pId.toString(), "member");
+		if (age!=null){
 		if (age<18) {
 			modes.remove(TransportMode.car);
 			modes.remove(FFCSUtils.FREEFLOATINGMODE);
+		}}
+		else {
+			Logger.getLogger(getClass()).info("no age for "+ pId.toString());
 		}
 		if (carAv.equals("never")){
 			modes.remove(TransportMode.car);

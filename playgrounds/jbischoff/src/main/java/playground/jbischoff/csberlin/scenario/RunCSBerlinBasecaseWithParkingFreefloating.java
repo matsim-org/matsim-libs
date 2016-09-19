@@ -46,7 +46,6 @@ import playground.jbischoff.analysis.TripHistogramListener;
 import playground.jbischoff.csberlin.replanning.BerlinCSPermissibleModesCalculator;
 import playground.jbischoff.ffcs.FFCSConfigGroup;
 import playground.jbischoff.ffcs.sim.SetupFreefloatingParking;
-import playground.jbischoff.parking.sim.SetupParking;
 
 /**
  * @author  jbischoff
@@ -57,8 +56,18 @@ import playground.jbischoff.parking.sim.SetupParking;
  */
 public class RunCSBerlinBasecaseWithParkingFreefloating {
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/data/scenario/configBCParkingFreeFloat13.xml", new FFCSConfigGroup());
-		String runId = "bc13_2000ffc";
+		String runId;
+		String configfile;
+		if (args.length<2){
+		configfile = "../../../shared-svn/projects/bmw_carsharing/data/scenario/configBCParkingFreeFloat14.xml";
+		runId = "bc14_2000ffc_pA";
+		
+		}
+		else {
+			configfile = args[0];
+			runId = args[1];
+		}
+		Config config = ConfigUtils.loadConfig(configfile, new FFCSConfigGroup());
 		config.controler().setOutputDirectory("D:/runs-svn/bmw_carsharing/basecase/"+runId);
 		config.controler().setRunId(runId);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);

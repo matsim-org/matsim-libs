@@ -51,7 +51,7 @@ public static void main(String[] args) {
 	
 	Scenario scenario = ScenarioUtils.loadScenario(config);
 	Controler controler = new Controler(scenario);
-//    controler.addOverridingModule(new OTFVisLiveModule());
+//    controler.addOverridingModule(new OTFVisLive	Module());
 	SetupFreefloatingParking.installFreefloatingParkingModules(controler, (FFCSConfigGroup) config.getModule("freefloating"));
 	controler.run();
 
