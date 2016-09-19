@@ -48,7 +48,7 @@ import java.util.List;
 
 public class MatsimOpdytsIntegrationTest {
 
-	private static final String EQUIL_DIR = new File("matsim/examples/equil-mixedTraffic/").getAbsolutePath();
+	private static final String EQUIL_DIR = "../../matsim/examples/equil-mixedTraffic/";
 
 	public static void main(String[] args) {
 		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
@@ -81,7 +81,7 @@ public class MatsimOpdytsIntegrationTest {
 		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(); // in this, the method argument (SimulatorStat) is not used.
 
 		//search algorithm
-		int maxIterations = 10; // idk, if this could be same as the matsim last iteration
+		int maxIterations = 20; // idk, if this could be same as the matsim last iteration
 		int maxTransitions = Integer.MAX_VALUE;
 		int populationSize = 10; // idk, if this could be same as the number of persons
 
@@ -95,8 +95,8 @@ public class MatsimOpdytsIntegrationTest {
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario);
 
 		// what would decide the convergence of the objective function
-		final int iterationsToConvergence = 100;
-		final int averagingIterations = 10;
+		final int iterationsToConvergence = 10; // a matsim simulation will run for iterationsToConvergence iterations.
+		final int averagingIterations = 2;
 		ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(iterationsToConvergence, averagingIterations);
 
 		RandomSearch<ModeChoiceDecisionVariable> randomSearch = new RandomSearch<>(
