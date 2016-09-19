@@ -232,10 +232,12 @@ public class Utils3D {
  	
  
 	/**
+	 * Use the function in the southAfrica playground instead.
 	 * 
 	 * @param c a coordinate assumed to be in WGS84 decimal degrees format.
 	 * @return
 	 */
+ 	@Deprecated
  	public static String getSrtmTile(Coord c){
 		int lon = (int)Math.floor(c.getX());
 		int lat = (int)Math.floor(c.getY());
@@ -244,6 +246,14 @@ public class Utils3D {
 		return String.format("%s%02d%s%03d", latPrefix, Math.abs(lat), lonPrefix, Math.abs(lon));
  	}
  	
+ 	/**
+ 	 * Use the function in the southAfrica playground instead.
+ 	 *  
+ 	 * @param pathToTiles
+ 	 * @param c
+ 	 * @return
+ 	 */
+ 	@Deprecated
  	public static double estimateSrtmElevation(String pathToTiles, Coord c){
  		pathToTiles += pathToTiles.endsWith("/") ? "" : "/";
  		String tileName = getSrtmTile(c);
