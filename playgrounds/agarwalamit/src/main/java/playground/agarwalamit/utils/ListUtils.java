@@ -18,10 +18,10 @@
  * *********************************************************************** */
 package playground.agarwalamit.utils;
 
+import org.apache.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.log4j.Logger;
 
 /**
  * @author amit
@@ -36,10 +36,9 @@ public final class ListUtils {
 		return intList.parallelStream().reduce(0,Integer::sum);
 	}
 	
-	public static int intMean(final List<Integer> intList){
-		if(intList.isEmpty()) return 0;
-		int sum =ListUtils.intSum(intList);
-		return sum/intList.size();
+	public static double intMean(final List<Integer> intList){
+		if(intList.isEmpty()) return 0.;
+		return intList.stream().mapToInt(i -> i).average().getAsDouble();
 	}
 
 	public static double doubleSum(final List<Double> doubleList){
@@ -49,8 +48,7 @@ public final class ListUtils {
 
 	public static double doubleMean(final List<Double> doubleList){
 		if(doubleList.isEmpty()) return 0.;
-		double sum = ListUtils.doubleSum(doubleList);
-		return sum/doubleList.size();
+		return doubleList.stream().mapToDouble(i -> i).average().getAsDouble();
 	}
 
 	public static List<Double> scalerProduct(final List<Double> doubleList, final double scalerFactor){
