@@ -22,14 +22,28 @@
  */
 package playground.jbischoff.csberlin.scenario;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl.Builder;
+import org.matsim.core.replanning.modules.ReRoute;
+import org.matsim.core.replanning.modules.SubtourModeChoice;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
+import org.matsim.core.router.TripRouter;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 import playground.jbischoff.analysis.TripHistogram;
 import playground.jbischoff.analysis.TripHistogramListener;
+import playground.jbischoff.csberlin.replanning.BerlinCSPermissibleModesCalculator;
 import playground.jbischoff.ffcs.FFCSConfigGroup;
 import playground.jbischoff.ffcs.sim.SetupFreefloatingParking;
 import playground.jbischoff.parking.sim.SetupParking;
@@ -43,12 +57,12 @@ import playground.jbischoff.parking.sim.SetupParking;
  */
 public class RunCSBerlinBasecaseWithParkingFreefloating {
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/data/scenario/configBCParkingFreeFloat11.xml", new FFCSConfigGroup());
-		String runId = "bc11_2000ffc";
+		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/data/scenario/configBCParkingFreeFloat13.xml", new FFCSConfigGroup());
+		String runId = "bc13_2000ffc";
 		config.controler().setOutputDirectory("D:/runs-svn/bmw_carsharing/basecase/"+runId);
 		config.controler().setRunId(runId);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-	
+		
 		Controler controler = new Controler(config);
 		SetupFreefloatingParking.installFreefloatingParkingModules(controler, (FFCSConfigGroup) config.getModule("freefloating"));
 		
@@ -58,8 +72,26 @@ public class RunCSBerlinBasecaseWithParkingFreefloating {
 			public void install() {
 				addControlerListenerBinding().to(TripHistogramListener.class).asEagerSingleton();
 				bind(TripHistogram.class).asEagerSingleton();
+				bind(BerlinCSPermissibleModesCalculator.class).asEagerSingleton();
+				addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.toString()).toProvider(new Provider<PlanStrategy>() {
+					@Inject Scenario scenario;
+					@Inject Provider<TripRouter> tripRouterProvider;
+					@Inject BerlinCSPermissibleModesCalculator berlinCSAvailableModeSelector;
+					@Override
+					public PlanStrategy get() {
+						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+						SubtourModeChoice subtourmodechoice = new SubtourModeChoice(scenario.getConfig().global().getNumberOfThreads(), scenario.getConfig().subtourModeChoice().getModes(), scenario.getConfig().subtourModeChoice().getChainBasedModes(), false, tripRouterProvider);
+						subtourmodechoice.setPermissibleModesCalculator(berlinCSAvailableModeSelector);
+						builder.addStrategyModule(subtourmodechoice);
+						builder.addStrategyModule(new ReRoute(scenario, tripRouterProvider));
+						return builder.build();
+
+
+					}
+				});
 			}
 		});
+		
 		
 		controler.run();
 		
