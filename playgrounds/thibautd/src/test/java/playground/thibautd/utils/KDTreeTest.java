@@ -27,6 +27,7 @@ import org.matsim.core.utils.collections.Tuple;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 
 import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.l;
 
@@ -35,25 +36,57 @@ import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.l;
  */
 public class KDTreeTest {
 	private static final Logger log = Logger.getLogger( KDTreeTest.class );
+
 	@Test
 	public void testClosestEuclidean() {
 		final KDTree<int[]> tree = createTree();
 
-		final int[] closest =
-				tree.getClosestEuclidean(
-						new double[]{ 50.1 , 40.6 , 30 } );
+		final Random random = new Random( 123 );
 
-		Assert.assertArrayEquals(
-				"unexpected closest point",
-				new int[]{ 50 , 41 , 30 },
-				closest );
+		for ( int i=0; i < 50; i++ ) {
+			final double[] c = new double[ 3 ];
+			for ( int j=0; j < c.length; j++ ) c[ j ] = random.nextDouble() * 100;
+
+			final int[] closest = tree.getClosestEuclidean( c );
+
+			final int[] expected = new int[ 3 ];
+			for ( int j=0; j < c.length; j++ ) expected[ j ] = (int) Math.round( c[ j ] );
+
+			Assert.assertArrayEquals(
+					"unexpected closest point",
+					expected,
+					closest );
+		}
+	}
+
+	@Test
+	public void testClosestOneDimension() {
+		final KDTree<int[]> tree = createTree();
+
+		final Random random = new Random( 123 );
+
+		for ( int i=0; i < 50; i++ ) {
+			final double[] c = new double[ 3 ];
+			for ( int j=0; j < c.length; j++ ) c[ j ] = random.nextDouble() * 100;
+
+			final int[] closest = tree.getClosest( c , (c1,c2) -> Math.abs( c1[1] - c2[1] ) );
+
+			final int expected = (int) Math.round( c[1] );
+
+			// only define distance based on one dimension, and check that query is well behaved (there are 100*100 points
+			// at the same distance. The query returns one, arbitrary.)
+			Assert.assertEquals(
+					"unexpected closest point",
+					expected,
+					closest[1] );
+		}
 	}
 
 	@Test
 	public void testBox() {
 		final KDTree<int[]> tree = createTree();
 
-		final Collection<int[]> box =
+		Collection<int[]> box =
 				tree.getBox(
 						new double[]{ 20 , 20 , 20 },
 						new double[]{ 40 , 40 , 40 } );
@@ -61,6 +94,24 @@ public class KDTreeTest {
 		Assert.assertEquals(
 				"unexpected number of elements in box",
 				21 * 21 * 21,
+				box.size() );
+
+		box = tree.getBox(
+						new double[]{ 20 , 40 , 20 },
+						new double[]{ 40 , 40 , 40 } );
+
+		Assert.assertEquals(
+				"unexpected number of elements in box",
+				21 * 1 * 21,
+				box.size() );
+
+		box = tree.getBox(
+						new double[]{ -10 , 20 , 20 },
+						new double[]{ 40 , 40 , 40 } );
+
+		Assert.assertEquals(
+				"unexpected number of elements in box",
+				41 * 21 * 21,
 				box.size() );
 	}
 
