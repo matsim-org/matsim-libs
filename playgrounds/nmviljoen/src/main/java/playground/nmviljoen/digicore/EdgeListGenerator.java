@@ -25,6 +25,7 @@ package playground.nmviljoen.digicore;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -113,6 +114,9 @@ public class EdgeListGenerator {
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "WGS84");
 		
+		int totalTripsConsidered = 0;
+		int ignoredTrips = 0;
+		
 		Counter counter = new Counter("   vehicles # ");
 		for(DigicoreVehicle vehicle : vehicles.getVehicles().values()){
 			for(DigicoreChain chain : vehicle.getChains()){
@@ -137,8 +141,11 @@ public class EdgeListGenerator {
 
 						if(oInArea || dInArea){
 							/* The pair should be considered. */
-							List<Id<Vehicle>> thisList = vehicleIds.get(
-									new Pair<Id<ActivityFacility>>(o.getFacilityId(), d.getFacilityId()));
+							Pair<Id<ActivityFacility>> pair = new Pair<Id<ActivityFacility>>(o.getFacilityId(), d.getFacilityId());
+							if(!vehicleIds.containsKey(pair)){
+								vehicleIds.put(pair, new ArrayList<Id<Vehicle>>());
+							}
+							List<Id<Vehicle>> thisList = vehicleIds.get(pair);
 							
 							/* ================================================
 							 * Check if the pair has already been serviced by the 
@@ -146,6 +153,7 @@ public class EdgeListGenerator {
 							if(thisList.contains(vehicle.getId())){
 								/* Ignore the pair. This vehicle has already been
 								 * accounted for. */
+								ignoredTrips++;
 							} else{
 								/* It is the first time this vehicle services this
 								 * activity pair. First add it to the list. */
@@ -158,6 +166,7 @@ public class EdgeListGenerator {
 							/* ================================================
 							 * Add the trip anyway to the 'All' network. */
 							dnAll.addArc(o, d);
+							totalTripsConsidered++;
 						}
 					}
 				}
@@ -166,6 +175,8 @@ public class EdgeListGenerator {
 		}
 		counter.printCounter();
 		LOG.info("Done building the networks.");
+		LOG.info("Total number of trips considered: " + totalTripsConsidered);
+		LOG.info("   Total number of trips ignored: " + ignoredTrips);
 		
 		/* Write the unique vehicle Id edge list to file. */
 		LOG.info("Writing the 'unique vehicle' network...");
@@ -215,10 +226,10 @@ public class EdgeListGenerator {
 			
 			for(Pair<Id<ActivityFacility>> edge : dnAll.getEdges()){
 				Id<ActivityFacility> oId = edge.getFirst();
-				Coord oCoord = dnUnique.getCoordinates().get(oId);
+				Coord oCoord = dnAll.getCoordinates().get(oId);
 				Id<ActivityFacility> dId = edge.getSecond();
-				Coord dCoord = dnUnique.getCoordinates().get(dId);
-				int weight = dnUnique.getEdgeWeight(oId, dId);
+				Coord dCoord = dnAll.getCoordinates().get(dId);
+				int weight = dnAll.getEdgeWeight(oId, dId);
 				
 				Coord oWgs = ct.transform(oCoord);
 				Coord dWgs = ct.transform(dCoord);
