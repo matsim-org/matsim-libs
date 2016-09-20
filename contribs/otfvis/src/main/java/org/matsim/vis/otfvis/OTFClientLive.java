@@ -123,7 +123,7 @@ public class OTFClientLive {
 		final int max=17;
 		TileFactoryInfo info = new TileFactoryInfo(0, 17, 17,
 				256, true, true,
-				"http://tile.openstreetmap.org",
+				"http://positron.basemaps.cartocdn.com/light_all",
 				"x","y","z") {
 			@Override
 			public String getTileUrl(int x, int y, int zoom) {
