@@ -41,26 +41,26 @@ import java.util.Set;
 
 public class EmissionModalTravelDisutilityCalculator {
 
-    EmissionTravelDisutilityCalculator delegate ;
-
-    public EmissionTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionCostModule emissionCostModule, Set<Id<Link>> hotspotLinks) {
-        this.timeCalculator = timeCalculator;
-        this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
-        this.distanceCostRateCar = cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate();
-        this.marginalUtlOfTravelTime = (-cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
-        this.emissionModule = emissionModule;
-        this.emissionCostModule = emissionCostModule;
-        this.hotspotLinks = hotspotLinks;
-    }
-
-    @Override
-    public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle v) {
-        return delegate.getLinkTravelDisutility(link, time, person, v);
-    }
-
-    @Override
-    public double getLinkMinimumTravelDisutility(Link link) {
-        return delegate.getLinkMinimumTravelDisutility(link);
-    }
+//    EmissionTravelDisutilityCalculator delegate ;
+//
+//    public EmissionTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionCostModule emissionCostModule, Set<Id<Link>> hotspotLinks) {
+//        this.timeCalculator = timeCalculator;
+//        this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
+//        this.distanceCostRateCar = cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate();
+//        this.marginalUtlOfTravelTime = (-cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
+//        this.emissionModule = emissionModule;
+//        this.emissionCostModule = emissionCostModule;
+//        this.hotspotLinks = hotspotLinks;
+//    }
+//
+//    @Override
+//    public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle v) {
+//        return delegate.getLinkTravelDisutility(link, time, person, v);
+//    }
+//
+//    @Override
+//    public double getLinkMinimumTravelDisutility(Link link) {
+//        return delegate.getLinkMinimumTravelDisutility(link);
+//    }
 
 }
