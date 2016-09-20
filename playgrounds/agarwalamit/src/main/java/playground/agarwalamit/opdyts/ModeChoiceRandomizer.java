@@ -48,7 +48,10 @@ final class ModeChoiceRandomizer implements DecisionVariableRandomizer<ModeChoic
                     // yyyyyy careful with using matsim-random since it is always the same sequence!!
                     newModeParams.setMarginalUtilityOfDistance( oldModeParams.getMarginalUtilityOfDistance() + 0.1 * MatsimRandom.getRandom().nextGaussian() );
                     newModeParams.setMarginalUtilityOfTraveling( oldModeParams.getMarginalUtilityOfTraveling() + 1. * MatsimRandom.getRandom().nextGaussian() );
+
+                    // Idk, why util_dist in new modeParams is set (again) same as oldParams. amit 20 Sep 2016
                     newModeParams.setMarginalUtilityOfDistance(oldModeParams.getMarginalUtilityOfDistance());
+
                     newModeParams.setMonetaryDistanceRate(oldModeParams.getMonetaryDistanceRate());
                     newScoringConfig.addModeParams(newModeParams);
                 }

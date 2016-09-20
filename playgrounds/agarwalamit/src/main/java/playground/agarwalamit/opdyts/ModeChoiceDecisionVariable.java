@@ -70,4 +70,17 @@ final class ModeChoiceDecisionVariable implements DecisionVariable {
         }
     }
 
+    @Override public String toString(){
+        Map<String, ModeParams> modeParams = newScoreConfig.getModes();
+        String str = "Util_func:";
+        for (String mode : modeParams.keySet()){
+            str = str + " U_"+mode+" = "
+                    + modeParams.get(mode).getConstant() + " + "
+                    + modeParams.get(mode).getMarginalUtilityOfTraveling() + " * time +"
+                    + "( " + modeParams.get(mode).getMarginalUtilityOfDistance() +" + "
+                    + modeParams.get(mode).getMonetaryDistanceRate() +" * " + newScoreConfig.getMarginalUtilityOfMoney()+ " ) * distance;";
+        }
+        return str;
+    }
+
 }

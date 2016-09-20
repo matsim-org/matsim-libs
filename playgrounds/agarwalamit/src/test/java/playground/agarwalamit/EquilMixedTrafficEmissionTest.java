@@ -20,6 +20,7 @@
 package playground.agarwalamit;
 
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -76,7 +77,7 @@ public class EquilMixedTrafficEmissionTest {
 		return Arrays.asList(considerCO2);
 	}
 
-	@Test
+	@Test @Ignore
 	public void emissionTollTest() {
 		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
 

@@ -94,8 +94,8 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                         final Databins<String> databins = new Databins<>( statType.name(), dataBoundariesTmp );
                         // leg mode for 5 plans is car and for rest 5, it is bicycle.
                         // trying to achieve 2 car and 8 bike plans. amit 19/09/2016
-                        databins.addValue( TransportMode.car, 2, 100.);
-                        databins.addValue( "bicycle", 8, 100.);
+                        databins.addValue( TransportMode.car, 9, 2.);
+                        databins.addValue( "bicycle", 9, 8.);
                         this.meaContainer.put( statType, databins) ;
                     }
                     break; }

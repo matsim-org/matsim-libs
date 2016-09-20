@@ -48,11 +48,13 @@ import java.util.List;
 
 public class MatsimOpdytsIntegrationTest {
 
-	private static final String EQUIL_DIR = "../../matsim/examples/equil-mixedTraffic/";
+	private static final String EQUIL_DIR = "./matsim/examples/equil-mixedTraffic/";
+	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil-mixedTraffic";
 
 	public static void main(String[] args) {
 		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
 		Config config = ConfigUtils.loadConfig(EQUIL_DIR+"/config.xml");
+		config.controler().setOutputDirectory(OUT_DIR);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -81,11 +83,11 @@ public class MatsimOpdytsIntegrationTest {
 		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(); // in this, the method argument (SimulatorStat) is not used.
 
 		//search algorithm
-		int maxIterations = 20; // idk, if this could be same as the matsim last iteration
+		int maxIterations = 10; // this many times simulator.run(...) and thus controler.run() will be called.
 		int maxTransitions = Integer.MAX_VALUE;
-		int populationSize = 10; // idk, if this could be same as the number of persons
+		int populationSize = 10; // the number of samples for decision variables, one of them will be drawn randomly for the simulation.
 
-		boolean interpolate = false;
+		boolean interpolate = true;
 		boolean includeCurrentBest = false;
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
@@ -95,8 +97,8 @@ public class MatsimOpdytsIntegrationTest {
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario);
 
 		// what would decide the convergence of the objective function
-		final int iterationsToConvergence = 10; // a matsim simulation will run for iterationsToConvergence iterations.
-		final int averagingIterations = 2;
+		final int iterationsToConvergence = 10; // 
+		final int averagingIterations = 5;
 		ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(iterationsToConvergence, averagingIterations);
 
 		RandomSearch<ModeChoiceDecisionVariable> randomSearch = new RandomSearch<>(
@@ -104,7 +106,7 @@ public class MatsimOpdytsIntegrationTest {
 				decisionVariableRandomizer,
 				initialDecisionVariable,
 				convergenceCriterion,
-				maxIterations,
+				maxIterations, // this many times simulator.run(...) and thus controler.run() will be called.
 				maxTransitions,
 				populationSize,
 				MatsimRandom.getRandom(),
@@ -115,6 +117,8 @@ public class MatsimOpdytsIntegrationTest {
 
 		// probably, an object which decide about the inertia
 		SelfTuner selfTuner = new SelfTuner(0.95);
+
+		randomSearch.setLogPath(OUT_DIR);
 
 		// run it, this will eventually call simulator.run() and thus controler.run
 		randomSearch.run(selfTuner );
