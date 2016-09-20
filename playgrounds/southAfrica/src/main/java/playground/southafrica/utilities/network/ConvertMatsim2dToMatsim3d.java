@@ -78,7 +78,7 @@ public class ConvertMatsim2dToMatsim3d {
 		counter.printCounter();
 		LOG.info("Done estimating elevation.");
 		
-		new NetworkWriter(sc.getNetwork()).write(networkOut);
+		new NetworkWriter(sc.getNetwork()).writeFileV1(networkOut);
 		
 		Header.printFooter();
 	}
