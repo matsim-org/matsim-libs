@@ -2,7 +2,6 @@ package besttimeresponseintegration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -43,7 +42,7 @@ public class BestTimeResponseStrategyFunctionality {
 
 	public BestTimeResponseStrategyFunctionality(final Plan plan, final Network network,
 			final CharyparNagelScoringParametersForPerson scoringParams, final TimeDiscretization timeDiscretization,
-			final Map<String, TravelTime> mode2tt, final boolean interpolate) {
+			final TravelTime carTravelTime, final boolean interpolate) {
 
 		/*
 		 * Building the initial plan data.
@@ -96,7 +95,7 @@ public class BestTimeResponseStrategyFunctionality {
 		final boolean interpolateTravelTimes = true;
 		final boolean randomSmoothing = true;
 
-		this.myTravelTimes = new BestTimeResponseTravelTimes(timeDiscretization, mode2tt, network, interpolate);
+		this.myTravelTimes = new BestTimeResponseTravelTimes(timeDiscretization, carTravelTime, network, interpolate);
 		this.timeAlloc = new TimeAllocator<>(timeDiscretization, this.myTravelTimes,
 				scoringParams.getScoringParameters(plan.getPerson()).marginalUtilityOfPerforming_s,
 				scoringParams.getScoringParameters(plan.getPerson()).modeParams.get("car").marginalUtilityOfTraveling_s,

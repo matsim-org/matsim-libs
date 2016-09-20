@@ -2,7 +2,6 @@ package besttimeresponseintegration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.matsim.api.core.v01.Id;
@@ -38,18 +37,18 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 
 	private final ExperiencedScoreAnalyzer experiencedScoreAnalyzer;
 
-	private final Map<String, TravelTime> mode2tt;
+	private final TravelTime carTravelTime;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	BestTimeResponseStrategyModule(final Scenario scenario, final CharyparNagelScoringParametersForPerson scoringParams,
 			final TimeDiscretization timeDiscretization, final ExperiencedScoreAnalyzer experiencedScoreAnalyzer,
-			final Map<String, TravelTime> mode2tt) {
+			final TravelTime carTravelTime) {
 		this.scenario = scenario;
 		this.scoringParams = scoringParams;
 		this.timeDiscretization = timeDiscretization;
 		this.experiencedScoreAnalyzer = experiencedScoreAnalyzer;
-		this.mode2tt = mode2tt;
+		this.carTravelTime = carTravelTime;
 	}
 
 	// --------------- IMPLEMENTATION OF PlanStrategyModule ---------------
@@ -64,7 +63,8 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 		final boolean interpolate = true;
 
 		final BestTimeResponseStrategyFunctionality initialPlanData = new BestTimeResponseStrategyFunctionality(plan,
-				this.scenario.getNetwork(), this.scoringParams, this.timeDiscretization, this.mode2tt, interpolate);
+				this.scenario.getNetwork(), this.scoringParams, this.timeDiscretization, this.carTravelTime,
+				interpolate);
 		final TimeAllocator<Link, String> timeAlloc = initialPlanData.getTimeAllocator();
 
 		final double[] initialDptTimesArray_s = new double[initialPlanData.initialDptTimes_s.size()];

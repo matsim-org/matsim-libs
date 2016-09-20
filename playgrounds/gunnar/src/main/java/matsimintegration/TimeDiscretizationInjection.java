@@ -5,7 +5,6 @@ import org.matsim.core.config.Config;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import floetteroed.utilities.Units;
 import opdytsintegration.utils.TimeDiscretization;
 
 /**
@@ -21,12 +20,9 @@ public class TimeDiscretizationInjection {
 
 	@Inject
 	TimeDiscretizationInjection(final Config config) {
-		final int startTime_s = 0;
-		final int binSize_s = config.travelTimeCalculator().getTraveltimeBinSize();
-		final int binCnt = (int) Math.ceil(Units.S_PER_D / binSize_s);
-		this.timeDiscr = new TimeDiscretization(startTime_s, binSize_s, binCnt);
+		this.timeDiscr = TimeDiscretizationFactory.newInstance(config);
 	}
-
+	
 	public TimeDiscretization getInstance() {
 		return this.timeDiscr;
 	}

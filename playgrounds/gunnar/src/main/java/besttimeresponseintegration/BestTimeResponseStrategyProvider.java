@@ -59,7 +59,7 @@ public class BestTimeResponseStrategyProvider implements Provider<PlanStrategy> 
 	public PlanStrategy get() {
 		final PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(this.randomPlanSelector);
 		final BestTimeResponseStrategyModule module = new BestTimeResponseStrategyModule(this.scenario,
-				this.scoringParams, this.timeDiscr, this.experiencedScoreAnalyzer, this.mode2tt);
+				this.scoringParams, this.timeDiscr, this.experiencedScoreAnalyzer, this.mode2tt.get("car"));
 		builder.addStrategyModule(module);
 		return builder.build();
 	}

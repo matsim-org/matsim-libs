@@ -1,7 +1,5 @@
 package besttimeresponseintegration;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -33,10 +31,10 @@ public class BestTimeResponseTravelTimes implements TripTravelTimes<Link, String
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public BestTimeResponseTravelTimes(final TimeDiscretization timeDiscr, final Map<String, TravelTime> mode2tt,
+	public BestTimeResponseTravelTimes(final TimeDiscretization timeDiscr, final TravelTime carTT,
 			final Network network, final boolean interpolate) {
 		this.timeDiscr = timeDiscr;
-		this.carTT = mode2tt.get("car");
+		this.carTT = carTT;
 		this.router = new Dijkstra(network, this, this);
 		this.interpolate = interpolate;
 	}
