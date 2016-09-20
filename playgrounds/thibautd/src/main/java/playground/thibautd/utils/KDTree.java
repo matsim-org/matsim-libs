@@ -18,19 +18,19 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
+import eu.eunoiaproject.examples.schedulebasedteleportation.Run;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.collections.Tuple;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Deque;
-import java.util.Map;
+import java.util.List;
 import java.util.Queue;
-import java.util.function.Predicate;
+import java.util.Random;
 import java.util.function.ToDoubleBiFunction;
-
-import static org.osgeo.proj4j.parser.Proj4Keyword.k;
-import static playground.ivt.router.TripSoftCache.LocationType.coord;
 
 /**
  * Basic implementation of a KD-Tree, to answer spatial queries in spaces of arbitrary dimensions.
@@ -39,18 +39,92 @@ import static playground.ivt.router.TripSoftCache.LocationType.coord;
  * @author thibautd
  */
 public class KDTree<T> {
+	// used only to balance the tree
+	private final Random random = MatsimRandom.getLocalInstance();
+	private static final int SUBLIST_SIZE_MEDIAN = 100;
+
+	private final int nDimensions;
 	private final Node<T> root = new Node<>( 0 );
 
-	public KDTree( final Map<T,double[]> points ) {
-		// TODO make it smarter to get a balanced tree
-		// for instance, always sample N random remaining points, and add the median of those points
-		for ( Map.Entry<T,double[]> e : points.entrySet() ) {
-			root.add( e.getKey() , e.getValue() );
+	public KDTree( final int nDimensions ) {
+		this.nDimensions = nDimensions;
+	}
+
+	/**
+	 * simple add: might break balance! Recommended to build the full tree at construction. No rebalancing.
+	 * @param coord
+	 * @param value
+	 */
+	public void add( final double[] coord , final T value ) {
+		root.add( value , coord );
+	}
+
+	public void add( Collection<Tuple<T,double[]>> points ) {
+
+		final Queue<AddFrame<T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
+
+		// copy parameter list as it is modified in place
+		stack.add( new AddFrame<>( root, new ArrayList<>( points ) ) );
+
+		while ( !stack.isEmpty() ) {
+			final AddFrame<T> currentFrame = stack.poll();
+
+			if ( currentFrame.toAdd.isEmpty() ) continue;
+
+			final Tuple<T,double[]> median = median( currentFrame.node.dimension , currentFrame.toAdd );
+			final double medianValue = median.getSecond()[ currentFrame.node.dimension ];
+
+			final int newDimension = (currentFrame.node.dimension + 1) % nDimensions;
+			final AddFrame<T> leftFrame =
+					new AddFrame<>(
+							new Node<T>( newDimension ),
+							new ArrayList<>( currentFrame.toAdd.size() / 2 + 1 ) );
+			final AddFrame<T> rightFrame =
+					new AddFrame<>(
+							new Node<T>( newDimension ),
+							new ArrayList<>( currentFrame.toAdd.size() / 2 + 1 ) );
+
+			currentFrame.node.left = leftFrame.node;
+			currentFrame.node.right = rightFrame.node;
+
+			for ( Tuple<T,double[]> v : currentFrame.toAdd ) {
+				if ( v == median && currentFrame.node.value == null ) {
+					currentFrame.node.value = v.getFirst();
+					currentFrame.node.coordinate = v.getSecond();
+
+					if ( currentFrame.node.coordinate.length != nDimensions ) throw new IllegalArgumentException( "wrong dimensionality" );
+				}
+				else if ( v.getSecond()[ currentFrame.node.dimension ] < medianValue ) {
+					leftFrame.toAdd.add( v );
+				}
+				else {
+					rightFrame.toAdd.add( v );
+				}
+			}
+
+			stack.add( leftFrame );
+			stack.add( rightFrame );
 		}
 	}
 
-	public void add( final double[] coord , final T value ) {
-		root.add( value , coord );
+	private <E> List<E> sublist( final List<E> l ) {
+		if ( l.size() < SUBLIST_SIZE_MEDIAN ) return l;
+
+		final List<E> sublist = new ArrayList<>();
+		final double prob = ((double) SUBLIST_SIZE_MEDIAN) / l.size();
+
+		for ( E e : l ) {
+			if ( random.nextDouble() < prob ) sublist.add( e );
+		}
+
+		return sublist;
+	}
+
+	private Tuple<T, double[]> median( final int dim , final List<Tuple<T,double[]>> l ) {
+		// very simple approximation: take median of a sublist, using standard sort algorithm
+		final List<Tuple<T, double[]>> sublist = sublist( l );
+		Collections.sort( sublist , (t1,t2) -> Double.compare( t1.getSecond()[ dim ] , t2.getSecond()[ dim ] ) );
+		return sublist.get( sublist.size() / 2 );
 	}
 
 	public Collection<T> getBox( final double[] lowers , final double[] uppers ) {
@@ -99,6 +173,20 @@ public class KDTree<T> {
 		}
 
 		return true;
+	}
+
+	public T getClosestEuclidean( final double[] coord ) {
+		return getClosest( coord , KDTree::euclidean );
+	}
+
+	private static double euclidean( double[] c1 , double[] c2 ) {
+		double d = 0;
+
+		for (int i=0; i < c1.length; i++ ) {
+			d += Math.pow( c1[ i ] - c2[ i ] , 2 );
+		}
+
+		return d;
 	}
 
 	public T getClosest( final double[] coord , final ToDoubleBiFunction<double[],double[]> distance ) {
@@ -164,6 +252,16 @@ public class KDTree<T> {
 		return coord[ dim ] < of[ dim ];
 	}
 
+	private static class AddFrame<T> {
+		Node<T> node;
+		List<Tuple<T,double[]>> toAdd;
+
+		public AddFrame( final Node<T> node, final List<Tuple<T, double[]>> toAdd ) {
+			this.node = node;
+			this.toAdd = toAdd;
+		}
+	}
+
 	// TODO all of the recursive methods here could be transformed in a loop easily
 	private static class Node<T> {
 		private Node<T> left, right;
@@ -193,22 +291,6 @@ public class KDTree<T> {
 			final boolean isLeft = newCoordinate[ dimension ] < coordinate[ dimension ];
 			if ( isLeft ) left.add( newValue , newCoordinate );
 			else right.add( newValue , newCoordinate );
-		}
-
-		/**
-		 * goes down the tree until the predicate is false. It assumes children of a "false" node are also "false"
-		 *
-		 * @param toFill
-		 * @param predicate
-		 */
-		public void fillUntilFalse( final Collection<T> toFill , final Predicate<double[]> predicate ) {
-			if ( value == null ) return;
-			if ( !predicate.test( coordinate ) ) return;
-
-			toFill.add( value );
-
-			left.fillUntilFalse( toFill , predicate );
-			right.fillUntilFalse( toFill , predicate );
 		}
 	}
 }
