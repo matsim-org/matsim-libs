@@ -19,28 +19,31 @@
 
 package playground.agarwalamit.opdyts;
 
-import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
-import floetteroed.opdyts.convergencecriteria.ConvergenceCriterionResult;
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
-import floetteroed.opdyts.trajectorysampling.Transition;
 import opdytsintegration.MATSimSimulator;
 import opdytsintegration.MATSimStateFactoryImpl;
 import opdytsintegration.utils.TimeDiscretization;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 
-import java.io.File;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Map;
+
 
 /**
  * @author amit
@@ -55,6 +58,37 @@ public class MatsimOpdytsIntegrationTest {
 		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
 		Config config = ConfigUtils.loadConfig(EQUIL_DIR+"/config.xml");
 		config.controler().setOutputDirectory(OUT_DIR);
+
+		//== default config has limited inputs
+		StrategyConfigGroup strategies = config.strategy();
+		strategies.clearStrategySettings();
+
+		config.changeMode().setModes(new String [] {"car","bicycle"});
+		StrategySettings modeChoice = new StrategySettings();
+		modeChoice.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ChangeTripMode.name());
+		modeChoice.setWeight(0.1);
+		config.strategy().addStrategySettings(modeChoice);
+
+		StrategySettings expChangeBeta = new StrategySettings();
+		expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
+		expChangeBeta.setWeight(0.75);
+		config.strategy().addStrategySettings(expChangeBeta);
+
+		StrategySettings reRoute = new StrategySettings();
+		reRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.name());
+		reRoute.setWeight(0.15);
+		config.strategy().addStrategySettings(reRoute);
+
+		strategies.setFractionOfIterationsToDisableInnovation(0.8);
+		//==
+
+		//== planCalcScore params (initialize will all defaults).
+		PlanCalcScoreConfigGroup.ModeParams mpCar = new PlanCalcScoreConfigGroup.ModeParams("car");
+		PlanCalcScoreConfigGroup.ModeParams mpBike = new PlanCalcScoreConfigGroup.ModeParams("bicycle");
+
+		config.planCalcScore().addModeParams(mpCar);
+		config.planCalcScore().addModeParams(mpBike);
+		//==
 
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -74,6 +108,9 @@ public class MatsimOpdytsIntegrationTest {
 				// add here whatever should be attached to matsim controler
 				addTravelTimeBinding("bicycle").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("bicycle").to(carTravelDisutilityFactoryKey());
+
+				// some stats
+				addControlerListenerBinding().to(ModalStatsControlerListner.class);
 			}
 		});
 
