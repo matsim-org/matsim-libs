@@ -19,7 +19,7 @@ import opdytsintegration.utils.TimeDiscretization;
  * @author Gunnar Flötteröd
  *
  */
-class BestTimeResponseTravelTimes implements TripTravelTimes<Link, String>, TravelTime, TravelDisutility {
+public class BestTimeResponseTravelTimes implements TripTravelTimes<Link, String>, TravelTime, TravelDisutility {
 
 	// -------------------- MEMBERS --------------------
 
@@ -33,7 +33,7 @@ class BestTimeResponseTravelTimes implements TripTravelTimes<Link, String>, Trav
 
 	// -------------------- CONSTRUCTION --------------------
 
-	BestTimeResponseTravelTimes(final TimeDiscretization timeDiscr, final Map<String, TravelTime> mode2tt,
+	public BestTimeResponseTravelTimes(final TimeDiscretization timeDiscr, final Map<String, TravelTime> mode2tt,
 			final Network network, final boolean interpolate) {
 		this.timeDiscr = timeDiscr;
 		this.carTT = mode2tt.get("car");
