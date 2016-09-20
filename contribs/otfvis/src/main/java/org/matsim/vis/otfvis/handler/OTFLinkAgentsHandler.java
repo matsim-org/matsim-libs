@@ -38,6 +38,7 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
+import org.matsim.vis.otfvis.opengl.layer.OGLSimpleLineDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
@@ -53,7 +54,7 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 
 	public static boolean showParked = false;
 
-	private OGLSimpleQuadDrawer quadReceiver = new OGLSimpleQuadDrawer();
+	private OGLSimpleLineDrawer quadReceiver = new OGLSimpleLineDrawer();
 
 	private final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 	private final AgentSnapshotInfoFactory snapshotFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
@@ -179,7 +180,7 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 	public void invalidate(SceneGraph graph) {
 	}
 
-	public OGLSimpleQuadDrawer getQuadReceiver() {
+	public OGLSimpleLineDrawer getQuadReceiver() {
 		return quadReceiver;
 	}
 
