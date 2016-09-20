@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
-import eu.eunoiaproject.examples.schedulebasedteleportation.Run;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -56,9 +55,16 @@ public class KDTree<T> {
 	 * @param value
 	 */
 	public void add( final double[] coord , final T value ) {
+		if ( coord.length != nDimensions ) throw new IllegalArgumentException( "wrong dimensionality" );
 		root.add( value , coord );
 	}
 
+	/**
+	 * Add a set of points to the tree. Although no rebalancing is performed, the newly created subtrees should be balanced.
+	 * For optimal results, the tree should be constructed by one single call to this method.
+	 *
+	 * @param points
+	 */
 	public void add( Collection<Tuple<T,double[]>> points ) {
 
 		final Queue<AddFrame<T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
