@@ -24,6 +24,9 @@ public class MATSimCountingStateAnalyzer<L extends Object> implements EventHandl
 
 	// -------------------- MEMBERS --------------------
 
+	// The object gets locked once a value is read out of it.
+	private boolean locked = false;
+
 	private final DynamicData<Id<L>> counts;
 
 	private final Map<Id<L>, RecursiveCountAverage> location2avgCnt = new LinkedHashMap<>();
@@ -37,7 +40,24 @@ public class MATSimCountingStateAnalyzer<L extends Object> implements EventHandl
 		this.reset(-1);
 	}
 
+	// -------------------- IMPLEMENTATION OF EventHandler --------------------
+
+	@Override
+	public void reset(final int iteration) {
+		this.locked = false;
+		this.counts.clear();
+		this.location2avgCnt.clear();
+		this.lastCompletedBin = -1;
+	}
+
 	// -------------------- INTERNALS --------------------
+
+	private void checkLocked() {
+		if (this.locked) {
+			throw new RuntimeException(this.getClass().getSimpleName()
+					+ " is locked, i.e. read has taken place, meaning that no more writes are allowed.");
+		}
+	}
 
 	private int lastCompletedBinEndTime() {
 		return this.counts.getStartTime_s() + (this.lastCompletedBin + 1) * this.counts.getBinSize_s();
@@ -69,17 +89,21 @@ public class MATSimCountingStateAnalyzer<L extends Object> implements EventHandl
 		return avg;
 	}
 
+	// -------------------- FOR SUBCLASSING --------------------
+
 	protected void registerIncrease(final Id<L> location, final int time_s) {
+		this.checkLocked();
 		this.advanceToTime(time_s);
 		this.avg(location).inc(time_s);
 	}
 
 	protected void registerDecrease(final Id<L> location, final int time_s) {
+		this.checkLocked();
 		this.advanceToTime(time_s);
 		this.avg(location).dec(time_s);
 	}
 
-	// TODO only used for testing
+	// Use this, otherwise the last bin gets lost!
 	public void advanceToEnd() {
 		this.completeBins(this.counts.getBinCnt() - 1);
 	}
@@ -92,15 +116,8 @@ public class MATSimCountingStateAnalyzer<L extends Object> implements EventHandl
 	// -------------------- CONTENT ACCESS --------------------
 
 	public double getCount(final Id<L> link, final int bin) {
+		this.advanceToEnd();
+		this.locked = true;
 		return this.counts.getBinValue(link, bin);
-	}
-
-	// -------------------- IMPLEMENTATION OF EventHandler --------------------
-
-	@Override
-	public void reset(final int iteration) {
-		this.counts.clear();
-		this.location2avgCnt.clear();
-		this.lastCompletedBin = -1;
 	}
 }
