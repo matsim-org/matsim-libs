@@ -90,7 +90,6 @@ public class AnalyseCliquesInSocialNetwork {
 
 		// start with the most minimal of cliques: individual alters
 		for ( Id<Person> alter : socialNetwork.getAlters( ego ) ) {
-			final Set<Id<Person>> clique = new HashSet<>();
 			cliques.add( new HashSet<>( Arrays.asList( ego, alter ) ) );
 		}
 
@@ -103,21 +102,24 @@ public class AnalyseCliquesInSocialNetwork {
 	private static void mergeCliques(
 			final SocialNetwork socialNetwork,
 			final Set<Set<Id<Person>>> cliques ) {
-		for ( List<Tuple<Set<Id<Person>>, Set<Id<Person>>>> toMerge = identifyMergeable( socialNetwork, cliques );
+		// we only try merge on results of previous merge. If a clique can be merged with a result from a previous iteration,
+		// its subcomponents can also, so it was already tried
+		final Set<Set<Id<Person>>> mergeCandidates = new HashSet<>( cliques );
+
+		for ( List<Tuple<Set<Id<Person>>, Set<Id<Person>>>> toMerge = identifyMergeable( socialNetwork, mergeCandidates );
 			  !toMerge.isEmpty();
-			  toMerge = identifyMergeable( socialNetwork, cliques ) ) {
+			  toMerge = identifyMergeable( socialNetwork, mergeCandidates ) ) {
+			mergeCandidates.clear();
 			for ( Tuple<Set<Id<Person>>, Set<Id<Person>>> tuple : toMerge ) {
-				// A clique might be part of several maximal cliques. But by the way we construct it, if it is,
-				// it will be merged twice (or more) in the same step, and can thus safely be remove.
-				// said another way, if it was to be merged with a clique later, it will be merged with sub-components
-				// of this clique in the current stage. So it is safe to remove it now.
 				cliques.remove( tuple.getFirst() );
 				cliques.remove( tuple.getSecond() );
 
 				final Set<Id<Person>> newClique = new HashSet<>();
 				newClique.addAll( tuple.getFirst() );
 				newClique.addAll( tuple.getSecond() );
+
 				cliques.add( newClique );
+				mergeCandidates.add( newClique );
 			}
 		}
 	}
