@@ -25,7 +25,6 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
@@ -104,39 +103,26 @@ public class AnalyseCliquesInSocialNetwork {
 			final Set<Set<Id<Person>>> cliques ) {
 		// we only try merge on results of previous merge. If a clique can be merged with a result from a previous iteration,
 		// its subcomponents can also, so it was already tried
-		final Set<Set<Id<Person>>> mergeCandidates = new HashSet<>( cliques );
 
-		for ( List<Tuple<Set<Id<Person>>, Set<Id<Person>>>> toMerge = identifyMergeable( socialNetwork, mergeCandidates );
-			  !toMerge.isEmpty();
-			  toMerge = identifyMergeable( socialNetwork, mergeCandidates ) ) {
-			mergeCandidates.clear();
-			for ( Tuple<Set<Id<Person>>, Set<Id<Person>>> tuple : toMerge ) {
-				cliques.remove( tuple.getFirst() );
-				cliques.remove( tuple.getSecond() );
-
-				final Set<Id<Person>> newClique = new HashSet<>();
-				newClique.addAll( tuple.getFirst() );
-				newClique.addAll( tuple.getSecond() );
-
-				cliques.add( newClique );
-				mergeCandidates.add( newClique );
-			}
-		}
+		for ( Set<Set<Id<Person>>> mergeCandidates = mergeIteration( socialNetwork , cliques , new HashSet<>( cliques ) );
+			  !mergeCandidates.isEmpty();
+			  mergeCandidates = mergeIteration( socialNetwork , mergeCandidates , cliques ) );
 	}
 
-	private static List<Tuple<Set<Id<Person>>, Set<Id<Person>>>> identifyMergeable(
+	private static Set<Set<Id<Person>>> mergeIteration(
 			final SocialNetwork socialNetwork,
+			final Set<Set<Id<Person>>> mergeCandidates,
 			final Set<Set<Id<Person>>> cliques ) {
-		final List<Tuple<Set<Id<Person>>,Set<Id<Person>>>> list = new ArrayList<>();
+		final Set<Set<Id<Person>>> newMergeCandidates = new HashSet<>();
 
 		// very naive way of doing it
-		for ( Set<Id<Person>> clique1 : cliques ) {
+		for ( Set<Id<Person>> clique1 : mergeCandidates ) {
 			// TODO: only iterate on cliques after clique 1 (just not sure what the most efficient way is.
 			// intuitively, first copying the set in an indexable structure would not help. And we need a set
 			// to check if the merge was already performed
 			boolean look = false;
 			Set<Id<Person>> candidate = new HashSet<>();
-			for ( Set<Id<Person>> clique2 : cliques ) {
+			for ( Set<Id<Person>> clique2 : mergeCandidates ) {
 				if ( clique2 == clique1 ) {
 					look = true;
 					continue;
@@ -149,16 +135,23 @@ public class AnalyseCliquesInSocialNetwork {
 				candidate.addAll( clique1 );
 				candidate.addAll( clique2 );
 
-				if ( cliques.contains( candidate ) ) continue;
+				if ( mergeCandidates.contains( candidate ) ) {
+					continue;
+				}
 
 				if ( isClique( clique1 , clique2 , socialNetwork ) ) {
-					list.add( new Tuple<>( clique1 , clique2 ) );
+					newMergeCandidates.add( candidate );
+
+					cliques.remove( clique1 );
+					cliques.remove( clique2 );
+					cliques.add( candidate );
+
 					candidate = null;
 				}
 			}
 		}
 
-		return list;
+		return newMergeCandidates;
 	}
 
 	private static boolean isClique(
