@@ -48,7 +48,7 @@ import java.util.Map;
  * @author amit
  */
 
-public class MatsimOpdytsIntegrationTest {
+public class MatsimOpdytsEquilIntegration {
 
 	private static final String EQUIL_DIR = "./matsim/examples/equil-mixedTraffic/";
 	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil-mixedTraffic";

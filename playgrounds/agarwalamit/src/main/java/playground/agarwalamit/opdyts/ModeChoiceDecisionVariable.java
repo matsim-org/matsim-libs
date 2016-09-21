@@ -72,17 +72,20 @@ final class ModeChoiceDecisionVariable implements DecisionVariable {
     @Override
     public String toString() {
         Map<String, ModeParams> modeParams = newScoreConfig.getModes();
-        String str = "Util_func:";
+        StringBuilder str = new StringBuilder();
+        str.append("Util_params :: asc, util_trav, util_dist, money_dist_rate; ");
+        ModeParams mpCar = modeParams.get("car");
+
         for (String mode : modeParams.keySet()) {
             if (mode.equals("car") || mode.equals("bicycle")) {
-                str = str + " U_" + mode + " = "
-                        + modeParams.get(mode).getConstant() + " + "
-                        + modeParams.get(mode).getMarginalUtilityOfTraveling() + " * time +"
-                        + "( " + modeParams.get(mode).getMarginalUtilityOfDistance() + " + "
-                        + modeParams.get(mode).getMonetaryDistanceRate() + " * " + newScoreConfig.getMarginalUtilityOfMoney() + " ) * distance;";
+                str.append(mode+" :: ");
+                str.append(modeParams.get(mode).getConstant()+", ");
+                str.append(modeParams.get(mode).getMarginalUtilityOfTraveling()+", ");
+                str.append(modeParams.get(mode).getMarginalUtilityOfDistance()+", ");
+                str.append(modeParams.get(mode).getMonetaryDistanceRate()+"; ");
             }
         }
-        return str;
+        return str.toString();
     }
 
 }
