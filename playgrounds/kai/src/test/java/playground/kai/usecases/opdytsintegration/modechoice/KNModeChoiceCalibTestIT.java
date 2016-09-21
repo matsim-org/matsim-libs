@@ -30,7 +30,7 @@ import playground.kairuns.run.KNBerlinControler;
  * @author nagel
  *
  */
-public class KNModeChoiceCalibTest {
+public class KNModeChoiceCalibTestIT {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 //	@Test public final void testZero() {
