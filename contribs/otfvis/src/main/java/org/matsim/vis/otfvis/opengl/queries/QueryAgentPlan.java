@@ -20,23 +20,9 @@
 
 package org.matsim.vis.otfvis.opengl.queries;
 
-import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.io.Serializable;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.GLUquadric;
@@ -45,16 +31,17 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
@@ -70,7 +57,17 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
-import com.jogamp.common.nio.Buffers;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.jogamp.opengl.GL2GL3.GL_QUADS;
 
@@ -93,9 +90,29 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	private SimulationViewForQueries simulationView;
 
+	private volatile double activityStartTime = Time.UNDEFINED_TIME;
+
 	@Override
-	public void installQuery(SimulationViewForQueries simulationView1) {
-		this.simulationView = simulationView1;
+	public void installQuery(SimulationViewForQueries simulationView) {
+		this.simulationView = simulationView;
+		this.simulationView.getEvents().addHandler(new ActivityStartEventHandler() {
+			@Override
+			public void handleEvent(ActivityStartEvent event) {
+				activityStartTime = event.getTime();
+			}
+
+			@Override
+			public void reset(int iteration) {}
+		});
+		this.simulationView.getEvents().addHandler(new ActivityEndEventHandler() {
+			@Override
+			public void handleEvent(ActivityEndEvent event) {
+
+			}
+
+			@Override
+			public void reset(int iteration) {}
+		});
 	}
 
 	@Override
@@ -140,7 +157,11 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 					}
 					Coord c2 = OTFServerQuadTree.getOTFTransformation().transform(coord);
 					ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), act.getType());
-					activityInfo.finished = 0.5;
+					if (simulationView.getTime() >= act.getEndTime()) {
+						activityInfo.finished = 1.0;
+					} else if (simulationView.getTime() > activityStartTime && simulationView.getTime() <= act.getEndTime()) {
+						activityInfo.finished = (simulationView.getTime() - activityStartTime) / (act.getEndTime() - activityStartTime);
+					}
 					result.acts.add(activityInfo);
 				}
 			}
