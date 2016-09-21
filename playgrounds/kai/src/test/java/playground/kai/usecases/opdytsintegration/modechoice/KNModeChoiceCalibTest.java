@@ -18,24 +18,61 @@
  * *********************************************************************** */
 package playground.kai.usecases.opdytsintegration.modechoice;
 
-import static org.junit.Assert.fail;
-
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.testcases.MatsimTestUtils;
+
+import playground.kairuns.run.KNBerlinControler;
 
 /**
  * @author nagel
  *
  */
 public class KNModeChoiceCalibTest {
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-	/**
-	 * Test method for {@link playground.kai.usecases.opdytsintegration.modechoice.KNModeChoiceCalibMain#solveFictitiousProblem()}.
-	 */
-	@Test
-	@Ignore
-	public final void testSolveFictitiousProblem() {
-		fail("Not yet implemented"); // TODO
+//	@Test public final void testZero() {
+//		boolean equil = true ;
+//		boolean calib = false ;
+//		boolean assignment = false ;
+//		
+//		Gbl.assertIf(equil); // test case not prepared for other setting
+//		Gbl.assertIf(!calib); // test case not prepared for other setting
+//		Gbl.assertIf(!assignment); // test case not prepared for other setting
+//
+//		final Config config = KNBerlinControler.prepareConfig(null, assignment, equil) ;
+//		
+//		String outputDirectory = utils.getOutputDirectory() ;
+//		config.controler().setOutputDirectory(outputDirectory);
+//
+//		config.plans().setInputFile("relaxed_plans.xml.gz");
+//
+//		KNModeChoiceCalibMain.run(config, null, equil, calib, assignment, outputDirectory) ;
+//
+//	}
+	@Test public final void testOne() {
+		boolean equil = true ;
+		boolean calib = true ;
+		boolean assignment = false ;
+		
+		Gbl.assertIf(equil); // test case not prepared for other setting
+		Gbl.assertIf(calib); // test case not prepared for other setting
+		Gbl.assertIf(!assignment); // test case not prepared for other setting
+		
+		String[] args = new String[]{ utils.getPackageInputDirectory() + "/config.xml"  } ;
+
+		final Config config = KNBerlinControler.prepareConfig(args, assignment, equil) ;
+		
+		config.plans().setInputFile("relaxed_plans.xml.gz");
+		config.network().setInputFile("network.xml.gz");
+		
+		String outputDirectory = utils.getOutputDirectory() ;
+		config.controler().setOutputDirectory(outputDirectory);
+
+		KNModeChoiceCalibMain.run(config, equil, calib, assignment, outputDirectory) ;
+
 	}
 
 }

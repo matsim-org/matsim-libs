@@ -49,7 +49,7 @@ final class ModeChoiceDecisionVariable implements DecisionVariable {
 	}
 
 	@Override public String toString() {
-		final Map<String, ModeParams> allModes = scenario.getConfig().planCalcScore().getScoringParameters(null).getModes();
+		final Map<String, ModeParams> allModes = newScoreConfig.getScoringParameters(null).getModes();
 
 		StringBuilder strb = new StringBuilder() ;
 		for ( ModeParams modeParams : allModes.values() ) {

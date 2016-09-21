@@ -27,16 +27,12 @@ import playground.kairuns.run.KNBerlinControler;
  * 
  */
 class KNModeChoiceCalibMain {
-	private static boolean equil = true ;
-	private static boolean calib = true ;
-
-	private static boolean assignment = false ;
-
 	public static void main(String[] args) {
+		boolean equil = true ;
+		boolean calib = true ;
 
-		OutputDirectoryLogging.catchLogEntries();
+		boolean assignment = false ;
 
-		System.out.println("STARTED ...");
 		final Config config = KNBerlinControler.prepareConfig(args, assignment, equil) ;
 		
 		String outputDirectory = "" ;
@@ -56,6 +52,15 @@ class KNModeChoiceCalibMain {
 			}
 		}
 		config.controler().setOutputDirectory(outputDirectory);
+
+		run(config, equil, calib, assignment, outputDirectory) ;
+	}
+	
+	public static void run( Config config, boolean equil, boolean calib, boolean assignment, String outputDirectory ) {
+
+		OutputDirectoryLogging.catchLogEntries();
+
+		System.out.println("STARTED ...");
 
 		
 		config.planCalcScore().setBrainExpBeta(1.);
@@ -101,7 +106,7 @@ class KNModeChoiceCalibMain {
 
 		if ( calib ) {
 
-			final TimeDiscretization timeDiscretization = new TimeDiscretization(0, 96*3600, 1);
+			final TimeDiscretization timeDiscretization = new TimeDiscretization(0, 3600, 24);
 			final MATSimSimulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>( new MATSimStateFactoryImpl<>(), 
 					scenario, timeDiscretization); 
 			simulator.addOverridingModule( overrides ) ;
@@ -115,7 +120,7 @@ class KNModeChoiceCalibMain {
 			RandomSearch<ModeChoiceDecisionVariable> randomSearch = new RandomSearch<>( simulator,
 					new ModeChoiceRandomizer(scenario) ,
 					initialDecisionVariable ,
-					new FixedIterationNumberConvergenceCriterion(200, 10 ) ,
+					new FixedIterationNumberConvergenceCriterion(100, 10 ) ,
 					maxIterations, maxTransitions, populationSize, 
 					MatsimRandom.getRandom(),
 					interpolate,

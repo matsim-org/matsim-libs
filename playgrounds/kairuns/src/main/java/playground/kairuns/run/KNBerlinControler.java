@@ -124,7 +124,9 @@ public final class KNBerlinControler {
 
 		// ### config, paths, and related:
 		Config config ;
-		if ( equil ) {
+		if ( args!=null && args.length>=1 ) {
+			config = ConfigUtils.loadConfig( args[0] ) ;
+		} else if ( equil ) {
 			config = ConfigUtils.loadConfig( "~/git/matsim/matsim/examples/equil/config.xml" ) ;
 			config.plans().setInputFile("plans2000.xml.gz");
 		} else {
