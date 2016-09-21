@@ -45,8 +45,10 @@ final class ModeChoiceRandomizer implements DecisionVariableRandomizer<ModeChoic
         for ( int ii=0 ; ii<2 ; ii++ ) {
             PlanCalcScoreConfigGroup newScoringConfig = new PlanCalcScoreConfigGroup() ;
             for ( String mode : oldScoringConfig.getModes().keySet() ) {
-                if ( ! TransportMode.car.equals(mode ) ) { // we leave car alone
-                    PlanCalcScoreConfigGroup.ModeParams oldModeParams = oldScoringConfig.getModes().get(mode) ;
+                PlanCalcScoreConfigGroup.ModeParams oldModeParams = oldScoringConfig.getModes().get(mode) ;
+                if ( TransportMode.car.equals(mode ) ) {
+                    newScoringConfig.addModeParams(oldModeParams);
+                }else { // we leave car alone
                     PlanCalcScoreConfigGroup.ModeParams newModeParams = new PlanCalcScoreConfigGroup.ModeParams(mode) ;
 
                     newModeParams.setConstant( oldModeParams.getConstant() + 1 * rnd.nextGaussian() );

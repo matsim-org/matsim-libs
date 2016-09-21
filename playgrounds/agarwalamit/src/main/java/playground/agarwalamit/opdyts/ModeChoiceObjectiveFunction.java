@@ -98,7 +98,7 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                         // trying to achieve 2 car and 8 bike plans. amit 19/09/2016
                         final double carVal = 1000. ;
                         databins.addValue( TransportMode.car, 8, carVal);
-                        databins.addValue( "bicycle", 8, 4000.-carVal);
+                        databins.addValue(TransportMode.pt, 8, 4000.-carVal);
                         this.meaContainer.put( statType, databins) ;
                     }
                     break; }
@@ -152,7 +152,7 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                 double[] reaVal = this.meaContainer.get( theStatType).getValues(mode) ;
                 for ( int ii=0 ; ii<value.length ; ii++ ) {
                     double diff = value[ii] - reaVal[ii] ;
-                    log.warn( "distanceBnd=" + databins.getDataBoundaries()[ii] + "; reaVal=" + reaVal[ii] + "; simVal=" + value[ii] ) ;
+                    log.warn( "distanceBnd=" + databins.getDataBoundaries()[ii] + "; objVal=" + reaVal[ii] + "; simVal=" + value[ii] ) ;
                     objective += diff * diff ;
                 }
             }

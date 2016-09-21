@@ -91,7 +91,7 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
             SortedMap<String, Double> moneyRates = new TreeMap<>();
 
             for (String mode : mode2Params.keySet()) {
-                if (mode.equals("car") || mode.equals("bicycle")) { //TODO: need to parametrize this.
+                if (mode.equals("car") || mode.equals("bicycle") || mode.equals("pt")) { //TODO: need to parametrize this.
                     ascs.put(mode, mode2Params.get(mode).getConstant());
                     travs.put(mode, mode2Params.get(mode).getMarginalUtilityOfTraveling());
                     dists.put(mode, mode2Params.get(mode).getMarginalUtilityOfDistance());

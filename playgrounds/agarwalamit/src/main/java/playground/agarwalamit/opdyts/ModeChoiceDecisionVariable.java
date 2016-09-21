@@ -32,8 +32,10 @@ import java.util.Map;
 /**
  * @author Kai Nagel based on Gunnar Flötteröd
  */
+
 final class ModeChoiceDecisionVariable implements DecisionVariable {
-    private static final Logger log = Logger.getLogger(ModeChoiceDecisionVariable.class);
+    @SuppressWarnings("unused")
+    private static final Logger log = Logger.getLogger( ModeChoiceDecisionVariable.class ) ;
 
     private final Scenario scenario;
 
@@ -45,15 +47,14 @@ final class ModeChoiceDecisionVariable implements DecisionVariable {
     }
 
     PlanCalcScoreConfigGroup getScoreConfig() {
-        return newScoreConfig;
+        return newScoreConfig ;
     }
 
-    @Override
-    public void implementInSimulation() {
-        for (Map.Entry<String, ScoringParameterSet> entry : newScoreConfig.getScoringParametersPerSubpopulation().entrySet()) {
-            String subPopName = entry.getKey();
-//            log.warn("treating sub-population with name=" + subPopName);
-            ScoringParameterSet newParameterSet = entry.getValue();
+    @Override public void implementInSimulation() {
+        for ( Map.Entry<String, ScoringParameterSet> entry : newScoreConfig.getScoringParametersPerSubpopulation().entrySet() ) {
+            String subPopName = entry.getKey() ;
+//			log.warn( "treating sub-population with name=" + subPopName );
+            ScoringParameterSet newParameterSet = entry.getValue() ;
             for ( ModeParams newModeParams : newParameterSet.getModes().values() ) {
 //				String mode = newModeParams.getMode() ;
 //				log.warn( "treating mode with name=" + mode ) ;
