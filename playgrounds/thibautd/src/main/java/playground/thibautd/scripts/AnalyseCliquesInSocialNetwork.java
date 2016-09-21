@@ -121,7 +121,6 @@ public class AnalyseCliquesInSocialNetwork {
 			// intuitively, first copying the set in an indexable structure would not help. And we need a set
 			// to check if the merge was already performed
 			boolean look = false;
-			Set<Id<Person>> candidate = new HashSet<>();
 			for ( Set<Id<Person>> clique2 : mergeCandidates ) {
 				if ( clique2 == clique1 ) {
 					look = true;
@@ -129,24 +128,15 @@ public class AnalyseCliquesInSocialNetwork {
 				}
 				if ( !look ) continue;
 
-				if ( candidate == null ) candidate = new HashSet<>();
-				else candidate.clear();
-
-				candidate.addAll( clique1 );
-				candidate.addAll( clique2 );
-
-				if ( mergeCandidates.contains( candidate ) ) {
-					continue;
-				}
-
 				if ( isClique( clique1 , clique2 , socialNetwork ) ) {
-					newMergeCandidates.add( candidate );
-
 					cliques.remove( clique1 );
 					cliques.remove( clique2 );
-					cliques.add( candidate );
 
-					candidate = null;
+					// avoid creating a new set
+					clique1.addAll( clique2 );
+					newMergeCandidates.add( clique1 );
+
+					cliques.add( clique1 );
 				}
 			}
 		}
