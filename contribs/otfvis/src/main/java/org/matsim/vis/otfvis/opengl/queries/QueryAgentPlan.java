@@ -285,7 +285,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 				this.cols.put((byte) color.getRed());
 				this.cols.put((byte) color.getGreen());
 				this.cols.put((byte) color.getBlue());
-				this.cols.put((byte) 128);
+				this.cols.put((byte) 255);
 			}
 			this.vert.position(0);
 			this.cols.position(0);
@@ -348,7 +348,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		private void drawActivityTexts() {
 			GLAutoDrawable drawable = OTFClientControl.getInstance().getMainOTFDrawer().getCanvas();
 			TextRenderer textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 32), true, false);
-			textRenderer.setColor(new Color(50, 50, 128, 128));
+			textRenderer.setColor(new Color(50, 50, 128, 255));
 			for (ActivityInfo activityEntry : this.acts ) {
 				drawTextBox(drawable, textRenderer, activityEntry);
 			}
@@ -377,8 +377,9 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			Rectangle2D textBounds = textRenderer.getBounds(activityEntry.name);
 			textRenderer.end3DRendering();
 
+			gl.glPushMatrix();
 			gl.glEnable(GL.GL_BLEND);
-			gl.glColor4f(0.9f, 0.9f, 0.9f, 0.5f);
+			gl.glColor4f(0.9f, 0.9f, 0.9f, 0.9f);
 			float halfh = (float)textBounds.getHeight()/2;
 			gl.glTranslatef(0f, halfh, 0f);
 
@@ -406,7 +407,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			// Origin (0,0,0) is now again the activity location.
 			// Draw the progress bar.
 			if (activityEntry.finished > 0f) {
-				gl.glColor4f(0.9f, 0.7f, 0.7f, 0.5f);
+				gl.glColor4f(0.9f, 0.7f, 0.7f, 0.9f);
 				gl.glBegin(GL_QUADS);
 				gl.glVertex3d(0, -halfh, 0);
 				gl.glVertex3d(0, -halfh -7, 0);
@@ -420,8 +421,13 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 				gl.glVertex3d(textBounds.getWidth()*activityEntry.finished, -halfh -7, 0);
 				gl.glVertex3d(textBounds.getWidth()*activityEntry.finished, -halfh, 0);
 				gl.glEnd();
-				gl.glColor4f(0.9f, 0.9f, 0.9f, 0.5f);
 			}
+			gl.glPopMatrix();
+
+			textRenderer.begin3DRendering();
+			textRenderer.draw3D(activityEntry.name, 0f, 0f, 0f, 1f);
+			textRenderer.end3DRendering();
+
 			gl.glPopMatrix();
 			gl.glDisable(GL.GL_BLEND);
 		}
