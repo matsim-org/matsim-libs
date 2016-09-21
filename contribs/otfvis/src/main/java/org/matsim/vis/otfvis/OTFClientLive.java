@@ -20,10 +20,10 @@
 
 package org.matsim.vis.otfvis;
 
-import org.jdesktop.swingx.mapviewer.DefaultTileFactory;
-import org.jdesktop.swingx.mapviewer.TileFactory;
-import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
-import org.jdesktop.swingx.mapviewer.wms.WMSService;
+import org.jxmapviewer.viewer.DefaultTileFactory;
+import org.jxmapviewer.viewer.TileFactory;
+import org.jxmapviewer.viewer.TileFactoryInfo;
+import org.jxmapviewer.viewer.wms.WMSService;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.vis.otfvis.gui.OTFHostControl;
@@ -139,7 +139,7 @@ public class OTFClientLive {
 	
 	private static class OTFVisWMSTileFactory extends DefaultTileFactory {
 		public OTFVisWMSTileFactory(final WMSService wms, final int maxZoom) {
-			super(new TileFactoryInfo(0, maxZoom, maxZoom, 
+			super(new TileFactoryInfo(0, maxZoom, maxZoom,
 					256, true, true, // tile size and x/y orientation is r2l & t2b
 					"","x","y","zoom") {
 				@Override
