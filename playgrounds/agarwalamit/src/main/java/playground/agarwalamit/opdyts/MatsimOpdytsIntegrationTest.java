@@ -44,7 +44,6 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import java.util.Arrays;
 import java.util.Map;
 
-
 /**
  * @author amit
  */
@@ -95,8 +94,8 @@ public class MatsimOpdytsIntegrationTest {
 
 		// this is something like time bin generator
 		int startTime= 0;
-		int binSize = 24*3600; // can this be scenario simulation end time.
-		int binCount = 1; // to me, binCount and binSize must be related
+		int binSize = 3600; // can this be scenario simulation end time.
+		int binCount = 24; // to me, binCount and binSize must be related
 		TimeDiscretization timeDiscretization = new TimeDiscretization(startTime, binSize, binCount);
 
 		// following is the  entry point to start a matsim controler together with opdyts
@@ -134,8 +133,8 @@ public class MatsimOpdytsIntegrationTest {
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario);
 
 		// what would decide the convergence of the objective function
-		final int iterationsToConvergence = 10; // 
-		final int averagingIterations = 5;
+		final int iterationsToConvergence = 100; //
+		final int averagingIterations = 10;
 		ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(iterationsToConvergence, averagingIterations);
 
 		RandomSearch<ModeChoiceDecisionVariable> randomSearch = new RandomSearch<>(

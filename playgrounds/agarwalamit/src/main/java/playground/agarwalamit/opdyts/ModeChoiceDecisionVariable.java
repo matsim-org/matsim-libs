@@ -30,12 +30,10 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSe
 import java.util.Map;
 
 /**
- *
  * @author Kai Nagel based on Gunnar Flötteröd
- *
  */
 final class ModeChoiceDecisionVariable implements DecisionVariable {
-    private static final Logger log = Logger.getLogger( ModeChoiceDecisionVariable.class ) ;
+    private static final Logger log = Logger.getLogger(ModeChoiceDecisionVariable.class);
 
     private final Scenario scenario;
 
@@ -47,38 +45,42 @@ final class ModeChoiceDecisionVariable implements DecisionVariable {
     }
 
     PlanCalcScoreConfigGroup getScoreConfig() {
-        return newScoreConfig ;
+        return newScoreConfig;
     }
 
-    @Override public void implementInSimulation() {
-        for ( Map.Entry<String, ScoringParameterSet> entry : newScoreConfig.getScoringParametersPerSubpopulation().entrySet() ) {
-            String subPopName = entry.getKey() ;
-            log.warn( "treating sub-population with name=" + subPopName );
-            ScoringParameterSet newParameterSet = entry.getValue() ;
-            for ( Map.Entry<String, ModeParams> newModeEntry : newParameterSet.getModes().entrySet() ) {
-                String mode = newModeEntry.getKey() ;
-                if ( !TransportMode.car.equals(mode) ) { // we leave car alone
-                    log.warn( "treating mode with name=" + mode ) ;
-                    ModeParams newModeParams = newModeEntry.getValue() ;
-                    ModeParams scenarioModeParams = scenario.getConfig().planCalcScore().getScoringParameters( subPopName ).getModes().get(mode) ;
+    @Override
+    public void implementInSimulation() {
+        for (Map.Entry<String, ScoringParameterSet> entry : newScoreConfig.getScoringParametersPerSubpopulation().entrySet()) {
+            String subPopName = entry.getKey();
+            log.warn("treating sub-population with name=" + subPopName);
+            ScoringParameterSet newParameterSet = entry.getValue();
+            for (Map.Entry<String, ModeParams> newModeEntry : newParameterSet.getModes().entrySet()) {
+                String mode = newModeEntry.getKey();
+                if (!TransportMode.car.equals(mode)) { // we leave car alone
+                    log.warn("treating mode with name=" + mode);
+                    ModeParams newModeParams = newModeEntry.getValue();
+                    ModeParams scenarioModeParams = scenario.getConfig().planCalcScore().getScoringParameters(subPopName).getModes().get(mode);
 
-                    scenarioModeParams.setMarginalUtilityOfTraveling( newModeParams.getMarginalUtilityOfTraveling() );
+                    scenarioModeParams.setMarginalUtilityOfTraveling(newModeParams.getMarginalUtilityOfTraveling());
 
-                    log.warn("new mode params:" + scenarioModeParams );
+                    log.warn("new mode params:" + scenarioModeParams);
                 }
             }
         }
     }
 
-    @Override public String toString(){
+    @Override
+    public String toString() {
         Map<String, ModeParams> modeParams = newScoreConfig.getModes();
         String str = "Util_func:";
-        for (String mode : modeParams.keySet()){
-            str = str + " U_"+mode+" = "
-                    + modeParams.get(mode).getConstant() + " + "
-                    + modeParams.get(mode).getMarginalUtilityOfTraveling() + " * time +"
-                    + "( " + modeParams.get(mode).getMarginalUtilityOfDistance() +" + "
-                    + modeParams.get(mode).getMonetaryDistanceRate() +" * " + newScoreConfig.getMarginalUtilityOfMoney()+ " ) * distance;";
+        for (String mode : modeParams.keySet()) {
+            if (mode.equals("car") || mode.equals("bicycle")) {
+                str = str + " U_" + mode + " = "
+                        + modeParams.get(mode).getConstant() + " + "
+                        + modeParams.get(mode).getMarginalUtilityOfTraveling() + " * time +"
+                        + "( " + modeParams.get(mode).getMarginalUtilityOfDistance() + " + "
+                        + modeParams.get(mode).getMonetaryDistanceRate() + " * " + newScoreConfig.getMarginalUtilityOfMoney() + " ) * distance;";
+            }
         }
         return str;
     }
