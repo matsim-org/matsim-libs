@@ -48,7 +48,6 @@ import org.matsim.vis.otfvis.opengl.gl.GLUtils;
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -61,8 +60,6 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -98,8 +95,6 @@ public class OTFOGLDrawer implements GLEventListener {
 	private int nRedrawn = 0;
 
     private final OTFClientQuadTree clientQ;
-
-	private int lastShot = -1;
 
 	private OTFQueryControl queryHandler = null;
 
@@ -140,6 +135,10 @@ public class OTFOGLDrawer implements GLEventListener {
 		((GLAutoDrawable) canvas).addGLEventListener(new OGLSimpleStaticNetLayer());
 		((GLAutoDrawable) canvas).addGLEventListener(this);
 		((GLAutoDrawable) canvas).addGLEventListener(new OTFScaleBarDrawer());
+		((GLAutoDrawable) canvas).addGLEventListener(new OTFGLOverlay("/res/matsim_logo_blue.png", -0.03f, 0.05f, 1.5f, false));
+		if (this.otfVisConfig.getRenderImages()) {
+			((GLAutoDrawable) canvas).addGLEventListener(new ScreenshotTaker(this.hostControlBar));
+		}
 		clientQ.getConstData();
 
 		MouseInputAdapter mouseMan = new MouseInputAdapter() {
@@ -313,7 +312,6 @@ public class OTFOGLDrawer implements GLEventListener {
 		canvas.addMouseListener(mouseMan);
 		canvas.addMouseMotionListener(mouseMan);
 		canvas.addMouseWheelListener(mouseMan);
-		((GLAutoDrawable) canvas).addGLEventListener(new OTFGLOverlay("/res/matsim_logo_blue.png", -0.03f, 0.05f, 1.5f, false));
 		Rectangle2D initialZoom = otfVisConfig.getZoomValue("*Initial*");
 		if (initialZoom != null) {
 			this.viewBounds = new Rect(initialZoom.getMinX(), initialZoom.getMinY(), initialZoom.getMaxX(), initialZoom.getMaxY());
@@ -385,19 +383,6 @@ public class OTFOGLDrawer implements GLEventListener {
 			this.alpha = 1.0f;
 		}
 
-		if (otfVisConfig.renderImages() && (this.lastShot < now)){
-			this.lastShot = now;
-			try {
-				int screenshotInterval = 1;
-				if (now % screenshotInterval == 0) {
-					AWTGLReadBufferUtil glReadBufferUtil = new AWTGLReadBufferUtil(gl.getGLProfile(), true);
-					BufferedImage bufferedImage = glReadBufferUtil.readPixelsToBufferedImage(gl, false);
-					ImageIO.write(bufferedImage, "png", new File("frame" + String.format("%07d", now) + ".png"));
-				}
-			} catch (GLException | IOException | IllegalArgumentException e) {
-				e.printStackTrace();
-			}
-		}
 		if (this.current == null) {
 			AWTGLReadBufferUtil glReadBufferUtil = new AWTGLReadBufferUtil(gl.getGLProfile(), true);
 			this.current = glReadBufferUtil.readPixelsToBufferedImage(gl, false);

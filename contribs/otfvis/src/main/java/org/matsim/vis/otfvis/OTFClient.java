@@ -331,11 +331,11 @@ public final class OTFClient extends JFrame {
 				panel.add(synchBox);
 
 				synchBox = new JCheckBox("save jpg frames");
-				synchBox.setSelected(visConfig.renderImages());
+				synchBox.setSelected(visConfig.getRenderImages());
 				synchBox.addItemListener(new ItemListener() {
 					@Override
 					public void itemStateChanged(ItemEvent e) {
-						visConfig.setRenderImages(!visConfig.renderImages());
+						visConfig.setRenderImages(!visConfig.getRenderImages());
 					}
 				});
 				synchBox.setBounds(10, 100, 200, 31);
