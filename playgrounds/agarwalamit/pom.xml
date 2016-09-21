@@ -31,11 +31,11 @@
 			<artifactId>gunnar</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
-		<!--<dependency>-->
-			<!--<groupId>playground</groupId>-->
-			<!--<artifactId>kai</artifactId>-->
-			<!--<version>0.9.0-SNAPSHOT</version>-->
-		<!--</dependency>-->
+		<dependency>
+			<groupId>playground</groupId>
+			<artifactId>kai</artifactId>
+			<version>0.9.0-SNAPSHOT</version>
+		</dependency>
 <!-- 		<dependency> -->
 <!-- 			<groupId>org.matsim.contrib</groupId> -->
 <!-- 			<artifactId>emissions</artifactId> -->

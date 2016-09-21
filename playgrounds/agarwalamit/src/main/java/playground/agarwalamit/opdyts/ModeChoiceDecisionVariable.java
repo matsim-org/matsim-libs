@@ -52,19 +52,13 @@ final class ModeChoiceDecisionVariable implements DecisionVariable {
     public void implementInSimulation() {
         for (Map.Entry<String, ScoringParameterSet> entry : newScoreConfig.getScoringParametersPerSubpopulation().entrySet()) {
             String subPopName = entry.getKey();
-            log.warn("treating sub-population with name=" + subPopName);
+//            log.warn("treating sub-population with name=" + subPopName);
             ScoringParameterSet newParameterSet = entry.getValue();
-            for (Map.Entry<String, ModeParams> newModeEntry : newParameterSet.getModes().entrySet()) {
-                String mode = newModeEntry.getKey();
-                if (!TransportMode.car.equals(mode)) { // we leave car alone
-                    log.warn("treating mode with name=" + mode);
-                    ModeParams newModeParams = newModeEntry.getValue();
-                    ModeParams scenarioModeParams = scenario.getConfig().planCalcScore().getScoringParameters(subPopName).getModes().get(mode);
-
-                    scenarioModeParams.setMarginalUtilityOfTraveling(newModeParams.getMarginalUtilityOfTraveling());
-
-                    log.warn("new mode params:" + scenarioModeParams);
-                }
+            for ( ModeParams newModeParams : newParameterSet.getModes().values() ) {
+//				String mode = newModeParams.getMode() ;
+//				log.warn( "treating mode with name=" + mode ) ;
+                scenario.getConfig().planCalcScore().getScoringParameters( subPopName ).addModeParams( newModeParams ) ;
+//				log.warn("new mode params:" + scenario.getConfig().planCalcScore().getScoringParameters( subPopName ).getModes().get(mode) );
             }
         }
     }
@@ -77,7 +71,7 @@ final class ModeChoiceDecisionVariable implements DecisionVariable {
         ModeParams mpCar = modeParams.get("car");
 
         for (String mode : modeParams.keySet()) {
-            if (mode.equals("car") || mode.equals("bicycle")) {
+            if (mode.equals("car") || mode.equals("bicycle") ||mode.equals("pt")) {
                 str.append(mode+" :: ");
                 str.append(modeParams.get(mode).getConstant()+", ");
                 str.append(modeParams.get(mode).getMarginalUtilityOfTraveling()+", ");

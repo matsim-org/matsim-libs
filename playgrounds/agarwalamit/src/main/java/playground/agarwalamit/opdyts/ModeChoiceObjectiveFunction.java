@@ -22,6 +22,7 @@ package playground.agarwalamit.opdyts;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 import org.apache.log4j.Logger;
+import org.matsim.analysis.TransportPlanningMainModeIdentifier;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -54,6 +55,7 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
     private static final Logger log = Logger.getLogger( ModeChoiceObjectiveFunction.class );
 
     private MainModeIdentifier mainModeIdentifier ;
+    private boolean patna = false;
 
     @Inject
     ExperiencedPlansService service ;
@@ -94,8 +96,9 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                         final Databins<String> databins = new Databins<>( statType.name(), dataBoundariesTmp );
                         // leg mode for 5 persons is car and for rest 5, it is bicycle (each person make two trips).
                         // trying to achieve 2 car and 8 bike plans. amit 19/09/2016
-                        databins.addValue( TransportMode.car, 9, 4.);
-                        databins.addValue( "bicycle", 9, 16.);
+                        final double carVal = 1000. ;
+                        databins.addValue( TransportMode.car, 8, carVal);
+                        databins.addValue( "bicycle", 8, 4000.-carVal);
                         this.meaContainer.put( statType, databins) ;
                     }
                     break; }
@@ -105,16 +108,19 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         }
 
         // for Patna, all legs have same trip mode.
-        mainModeIdentifier = new MainModeIdentifier() {
-            @Override
-            public String identifyMainMode(List<? extends PlanElement> tripElements) {
-                for(PlanElement pe : tripElements) {
-                    if (pe instanceof  Leg ) return ( (Leg) pe).getMode();
+        if(patna) {
+            mainModeIdentifier = new MainModeIdentifier() {
+                @Override
+                public String identifyMainMode(List<? extends PlanElement> tripElements) {
+                    for (PlanElement pe : tripElements) {
+                        if (pe instanceof Leg) return ((Leg) pe).getMode();
+                    }
+                    throw new RuntimeException("No instance of leg is found.");
                 }
-                throw new RuntimeException("No instance of leg is found.");
-            }
-        };
-
+            };
+        } else {
+            mainModeIdentifier = new TransportPlanningMainModeIdentifier();
+        }
     }
 
     @Override public double value(SimulatorState state) {

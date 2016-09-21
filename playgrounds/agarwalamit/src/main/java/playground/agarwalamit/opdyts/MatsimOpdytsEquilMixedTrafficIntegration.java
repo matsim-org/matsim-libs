@@ -29,7 +29,6 @@ import opdytsintegration.MATSimSimulator;
 import opdytsintegration.MATSimStateFactoryImpl;
 import opdytsintegration.utils.TimeDiscretization;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -40,47 +39,58 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
-import playground.kairuns.run.KNBerlinControler;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
+
+import java.util.Arrays;
+import java.util.Map;
 
 /**
  * @author amit
  */
 
-public class MatsimOpdytsEquilIntegration {
+public class MatsimOpdytsEquilMixedTrafficIntegration {
 
-	private static final String EQUIL_DIR = "./matsim/examples/equil/";
-	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil";
+	private static final String EQUIL_DIR = "./matsim/examples/equil-mixedTraffic/";
+	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil-mixedTraffic";
 
 	public static void main(String[] args) {
 		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
 		Config config = ConfigUtils.loadConfig(EQUIL_DIR+"/config.xml");
-
 		config.controler().setOutputDirectory(OUT_DIR);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-
-		config.plans().setInputFile("plans2000.xml.gz");
 
 		//== default config has limited inputs
 		StrategyConfigGroup strategies = config.strategy();
 		strategies.clearStrategySettings();
 
-		config.changeMode().setModes(new String [] {"car","pt"});
+		config.changeMode().setModes(new String [] {"car","bicycle"});
 		StrategySettings modeChoice = new StrategySettings();
-		modeChoice.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.name());
+		modeChoice.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ChangeTripMode.name());
 		modeChoice.setWeight(0.1);
 		config.strategy().addStrategySettings(modeChoice);
 
 		StrategySettings expChangeBeta = new StrategySettings();
 		expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
-		expChangeBeta.setWeight(0.9);
+		expChangeBeta.setWeight(0.75);
 		config.strategy().addStrategySettings(expChangeBeta);
+
+		StrategySettings reRoute = new StrategySettings();
+		reRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.name());
+		reRoute.setWeight(0.15);
+		config.strategy().addStrategySettings(reRoute);
 
 		strategies.setFractionOfIterationsToDisableInnovation(0.8);
 		//==
 
-		Scenario scenario = KNBerlinControler.prepareScenario(true, config);
+		//== planCalcScore params (initialize will all defaults).
+		PlanCalcScoreConfigGroup.ModeParams mpCar = new PlanCalcScoreConfigGroup.ModeParams("car");
+		PlanCalcScoreConfigGroup.ModeParams mpBike = new PlanCalcScoreConfigGroup.ModeParams("bicycle");
+
+		config.planCalcScore().addModeParams(mpCar);
+		config.planCalcScore().addModeParams(mpBike);
+		//==
+
+		Scenario scenario = ScenarioUtils.loadScenario(config) ;
+		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		// this is something like time bin generator
 		int startTime= 0;
@@ -100,12 +110,9 @@ public class MatsimOpdytsEquilIntegration {
 
 				// some stats
 				addControlerListenerBinding().to(ModalStatsControlerListner.class);
-
-				// from KN
-				addControlerListenerBinding().to(KaiAnalysisListener.class);
-				bind(CharyparNagelScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
 			}
 		});
+
 
 		// this is the objective Function which returns the value for given SimulatorState
 		// in my case, this will be the distance based modal split

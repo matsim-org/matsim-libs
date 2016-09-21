@@ -27,15 +27,19 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 final class ModeChoiceRandomizer implements DecisionVariableRandomizer<ModeChoiceDecisionVariable> {
     private final Scenario scenario;
+    private final Random rnd ;
 
     ModeChoiceRandomizer(Scenario scenario) {
         this.scenario = scenario;
+        this.rnd = new Random(4711) ;
+        // (careful with using matsim-random since it is always the same sequence)
     }
 
-    @Override public List<ModeChoiceDecisionVariable> newRandomVariations(ModeChoiceDecisionVariable decisionVariable ) {
+    @Override public List<ModeChoiceDecisionVariable> newRandomVariations( ModeChoiceDecisionVariable decisionVariable ) {
         final PlanCalcScoreConfigGroup oldScoringConfig = decisionVariable.getScoreConfig();
         List<ModeChoiceDecisionVariable> result = new ArrayList<>() ;
         for ( int ii=0 ; ii<2 ; ii++ ) {
@@ -44,15 +48,13 @@ final class ModeChoiceRandomizer implements DecisionVariableRandomizer<ModeChoic
                 if ( ! TransportMode.car.equals(mode ) ) { // we leave car alone
                     PlanCalcScoreConfigGroup.ModeParams oldModeParams = oldScoringConfig.getModes().get(mode) ;
                     PlanCalcScoreConfigGroup.ModeParams newModeParams = new PlanCalcScoreConfigGroup.ModeParams(mode) ;
-                    newModeParams.setConstant( oldModeParams.getConstant() + 0.1 * MatsimRandom.getRandom().nextGaussian() );
-                    // yyyyyy careful with using matsim-random since it is always the same sequence!!
-                    newModeParams.setMarginalUtilityOfDistance( oldModeParams.getMarginalUtilityOfDistance() + 0.1 * MatsimRandom.getRandom().nextGaussian() );
-                    newModeParams.setMarginalUtilityOfTraveling( oldModeParams.getMarginalUtilityOfTraveling() + 1. * MatsimRandom.getRandom().nextGaussian() );
 
-                    // Idk, why util_dist in new modeParams is set (again) same as oldParams. amit 20 Sep 2016
-                    newModeParams.setMarginalUtilityOfDistance(oldModeParams.getMarginalUtilityOfDistance());
+                    newModeParams.setConstant( oldModeParams.getConstant() + 1 * rnd.nextGaussian() );
 
+                    newModeParams.setMarginalUtilityOfDistance( oldModeParams.getMarginalUtilityOfDistance() + 0. * rnd.nextGaussian() );
+                    newModeParams.setMarginalUtilityOfTraveling( oldModeParams.getMarginalUtilityOfTraveling() + 0. * rnd.nextGaussian() );
                     newModeParams.setMonetaryDistanceRate(oldModeParams.getMonetaryDistanceRate());
+
                     newScoringConfig.addModeParams(newModeParams);
                 }
             }
