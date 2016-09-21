@@ -56,7 +56,7 @@ public class AnalyseCliquesInSocialNetwork {
 
 		final List<Id<Person>> remainingEgos = new ArrayList<>( socialNetwork.getEgos() );
 
-		final Random random = new Random();
+		final Random random = new Random( 123 );
 		final Counter counter = new Counter( "analyse ego # " , " / " + SAMPLE_SIZE );
 		try ( final BufferedWriter writer = IOUtils.getBufferedWriter( outputFile ) ) {
 			writer.write( "egoId\talterId\tcliqueId" );
@@ -151,7 +151,7 @@ public class AnalyseCliquesInSocialNetwork {
 
 				if ( cliques.contains( candidate ) ) continue;
 
-				if ( isClique( candidate , socialNetwork ) ) {
+				if ( isClique( clique1 , clique2 , socialNetwork ) ) {
 					list.add( new Tuple<>( clique1 , clique2 ) );
 					candidate = null;
 				}
@@ -162,16 +162,17 @@ public class AnalyseCliquesInSocialNetwork {
 	}
 
 	private static boolean isClique(
-			final Collection<Id<Person>> candidate,
+			final Collection<Id<Person>> merge1,
+			final Collection<Id<Person>> merge2,
 			final SocialNetwork socialNetwork ) {
-		final Collection<Id<Person>> necessaryAlters = new HashSet<>();
+		// only need to check links between the two cliques to merge (we know they are cliques)
+		for ( Id<Person> ego : merge1 ) {
+			final Set<Id<Person>> alters = socialNetwork.getAlters( ego );
 
-		for ( Id<Person> ego : candidate ) {
-			necessaryAlters.clear();
-			necessaryAlters.addAll( candidate );
-			necessaryAlters.remove( ego );
-
-			if ( !socialNetwork.getAlters( ego ).containsAll( necessaryAlters ) ) return false;
+			for ( Id<Person> cliqueMember : merge2 ) {
+				if ( ego == cliqueMember ) continue;
+				if ( !alters.contains( cliqueMember ) ) return false;
+			}
 		}
 
 		return true;
