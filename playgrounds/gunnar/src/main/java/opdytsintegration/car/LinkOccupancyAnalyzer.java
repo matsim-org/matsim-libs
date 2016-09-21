@@ -151,7 +151,7 @@ public class LinkOccupancyAnalyzer extends MATSimCountingStateAnalyzer<Link>
 
 		// time = 100, in = 8, out = 8
 
-		analyzer.advanceToEnd();
+		analyzer.finalizeAndLock();
 
 		for (int bin = 0; bin < binCnt; bin++) {
 			System.out.println("[" + (startTime_s + bin * binSize_s) + "," + (startTime_s + (bin + 1) * binSize_s)
@@ -169,7 +169,7 @@ public class LinkOccupancyAnalyzer extends MATSimCountingStateAnalyzer<Link>
 		final Id<Link> linkId = Id.createLinkId("1");
 
 		
-		final int vehCnt = 10 * 1000;
+		final int vehCnt = 100 * 1000;
 		double avg = 0.0;
 		final List<Event> events = new ArrayList<>();
 		for (int veh = 1; veh < vehCnt; veh++) {

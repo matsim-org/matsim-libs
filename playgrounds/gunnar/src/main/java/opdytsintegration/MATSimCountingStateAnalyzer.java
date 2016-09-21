@@ -24,7 +24,14 @@ public class MATSimCountingStateAnalyzer<L extends Object> implements EventHandl
 
 	// -------------------- MEMBERS --------------------
 
-	// The object gets locked once a value is read out of it.
+	/*
+	 * Initial state is "not locked". When locked, no writing with
+	 * registerIncrease(..), registerDecrease(..) is allowed.
+	 * 
+	 * Gets locked when data is accessed through getCount(..).
+	 * 
+	 * Gets again unlocked when reset(..) is called.
+	 */
 	private boolean locked = false;
 
 	private final DynamicData<Id<L>> counts;
@@ -35,6 +42,7 @@ public class MATSimCountingStateAnalyzer<L extends Object> implements EventHandl
 
 	// -------------------- CONSTRUCTION --------------------
 
+	// TODO use TimeDiscretization as argument, also in DynamicData
 	public MATSimCountingStateAnalyzer(final int startTime_s, final int binSize_s, final int binCnt) {
 		this.counts = new DynamicData<>(startTime_s, binSize_s, binCnt);
 		this.reset(-1);
@@ -54,8 +62,7 @@ public class MATSimCountingStateAnalyzer<L extends Object> implements EventHandl
 
 	private void checkLocked() {
 		if (this.locked) {
-			throw new RuntimeException(this.getClass().getSimpleName()
-					+ " is locked, i.e. read has taken place, meaning that no more writes are allowed.");
+			throw new RuntimeException(this.getClass().getSimpleName() + " is locked and cannot accept more data.");
 		}
 	}
 
@@ -75,7 +82,7 @@ public class MATSimCountingStateAnalyzer<L extends Object> implements EventHandl
 		}
 	}
 
-	private void advanceToTime(final int time_s) {
+	private void completeBinsUntilTime(final int time_s) {
 		final int lastBinToComplete = this.counts.bin(time_s) - 1;
 		this.completeBins(min(lastBinToComplete, this.counts.getBinCnt() - 1));
 	}
@@ -89,35 +96,33 @@ public class MATSimCountingStateAnalyzer<L extends Object> implements EventHandl
 		return avg;
 	}
 
-	// -------------------- FOR SUBCLASSING --------------------
+	// -------------------- SETTERS --------------------
 
 	protected void registerIncrease(final Id<L> location, final int time_s) {
 		this.checkLocked();
-		this.advanceToTime(time_s);
+		this.completeBinsUntilTime(time_s);
 		this.avg(location).inc(time_s);
 	}
 
 	protected void registerDecrease(final Id<L> location, final int time_s) {
 		this.checkLocked();
-		this.advanceToTime(time_s);
+		this.completeBinsUntilTime(time_s);
 		this.avg(location).dec(time_s);
 	}
 
-	// Use this, otherwise the last bin gets lost!
-	public void advanceToEnd() {
+	public void finalizeAndLock() {
+		this.locked = true;
 		this.completeBins(this.counts.getBinCnt() - 1);
 	}
 
-	// TODO only used for testing
+	// -------------------- GETTERS --------------------
+
 	public Set<Id<L>> observedLinkSetView() {
 		return Collections.unmodifiableSet(this.counts.keySet());
 	}
 
-	// -------------------- CONTENT ACCESS --------------------
-
 	public double getCount(final Id<L> link, final int bin) {
-		this.advanceToEnd();
-		this.locked = true;
+		this.finalizeAndLock();
 		return this.counts.getBinValue(link, bin);
 	}
 }
