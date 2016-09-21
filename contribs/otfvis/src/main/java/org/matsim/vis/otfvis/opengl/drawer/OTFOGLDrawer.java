@@ -48,6 +48,7 @@ import org.matsim.vis.otfvis.opengl.gl.GLUtils;
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -61,7 +62,9 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class OTFOGLDrawer implements GLEventListener {
@@ -384,18 +387,15 @@ public class OTFOGLDrawer implements GLEventListener {
 
 		if (otfVisConfig.renderImages() && (this.lastShot < now)){
 			this.lastShot = now;
-			String nr = String.format("%07d", now);
 			try {
 				int screenshotInterval = 1;
 				if (now % screenshotInterval == 0) {
 					AWTGLReadBufferUtil glReadBufferUtil = new AWTGLReadBufferUtil(gl.getGLProfile(), true);
-					glReadBufferUtil.readPixels(gl, false);
-					glReadBufferUtil.write(new File("movie" + this + " Frame" + nr + ".jpg"));
+					BufferedImage bufferedImage = glReadBufferUtil.readPixelsToBufferedImage(gl, false);
+					ImageIO.write(bufferedImage, "png", new File("frame" + String.format("%07d", now) + ".png"));
 				}
-			} catch (GLException e) {
+			} catch (GLException | IOException | IllegalArgumentException e) {
 				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				// could happen for folded displays on split screen... ignore
 			}
 		}
 		if (this.current == null) {

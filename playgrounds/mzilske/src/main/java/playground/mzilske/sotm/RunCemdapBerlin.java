@@ -14,6 +14,8 @@ public class RunCemdapBerlin {
 		Config config = ConfigUtils.loadConfig("/Users/michaelzilske/wurst/berlin-1pct/config_be_1pct.xml");
 		OTFVisConfigGroup otfVisConfigGroup = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
 		otfVisConfigGroup.setMapOverlayMode(true);
+		otfVisConfigGroup.setDelay_ms(0);
+		otfVisConfigGroup.setRenderImages(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		OTFVis.playScenario(scenario);
