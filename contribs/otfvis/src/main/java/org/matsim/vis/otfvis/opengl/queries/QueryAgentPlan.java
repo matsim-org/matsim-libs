@@ -31,17 +31,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
@@ -90,29 +87,9 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	private SimulationViewForQueries simulationView;
 
-	private volatile double activityStartTime = Time.UNDEFINED_TIME;
-
 	@Override
 	public void installQuery(SimulationViewForQueries simulationView) {
 		this.simulationView = simulationView;
-		this.simulationView.getEvents().addHandler(new ActivityStartEventHandler() {
-			@Override
-			public void handleEvent(ActivityStartEvent event) {
-				activityStartTime = event.getTime();
-			}
-
-			@Override
-			public void reset(int iteration) {}
-		});
-		this.simulationView.getEvents().addHandler(new ActivityEndEventHandler() {
-			@Override
-			public void handleEvent(ActivityEndEvent event) {
-
-			}
-
-			@Override
-			public void reset(int iteration) {}
-		});
 	}
 
 	@Override
@@ -139,7 +116,6 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	@Override
 	public OTFQueryResult query() {
-		Network net = simulationView.getNetwork();
 		Plan plan = simulationView.getPlans().get(this.agentId);
 		Result result = new Result();
 		result.agentId = this.agentId.toString();
@@ -150,31 +126,40 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 					if ( !includeRoutes && PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType()) ) {
 						continue ; // skip
 					}
-					Coord coord = act.getCoord();
-					if (coord == null) {
-						Link link = net.getLinks().get(act.getLinkId());
-						coord = link.getCoord();
-					}
-					Coord c2 = OTFServerQuadTree.getOTFTransformation().transform(coord);
+					Coord c2 = getCoord(act);
 					ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), act.getType());
-					if (simulationView.getTime() >= act.getEndTime()) {
-						activityInfo.finished = 1.0;
-					} else if (simulationView.getTime() > activityStartTime && simulationView.getTime() <= act.getEndTime()) {
-						activityInfo.finished = (simulationView.getTime() - activityStartTime) / (act.getEndTime() - activityStartTime);
-					}
 					result.acts.add(activityInfo);
 				}
 			}
 
 			if ( includeRoutes ) {
-				result.buildRoute(plan, agentId, net, Level.ROUTES );
+				result.buildRoute(plan, agentId, simulationView.getNetwork(), Level.ROUTES );
 			} else {
-				result.buildRoute(plan, agentId, net, Level.PLANELEMENTS);
+				result.buildRoute(plan, agentId, simulationView.getNetwork(), Level.PLANELEMENTS);
 			}
 		} else {
 			log.error("No plan found for id " + this.agentId);
 		}
+		MobsimAgent mobsimAgent = simulationView.getAgents().get(this.agentId);
+		if (mobsimAgent != null && mobsimAgent.getState() == MobsimAgent.State.ACTIVITY) {
+			Activity act = (Activity) ((PlanAgent) mobsimAgent).getCurrentPlanElement();
+			Coord c2 = getCoord(act);
+			if (simulationView.getTime() > act.getStartTime() && simulationView.getTime() <= act.getEndTime()) {
+				ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), act.getType());
+				activityInfo.finished = (simulationView.getTime() - act.getStartTime()) / (act.getEndTime() - act.getStartTime());
+				result.acts.add(activityInfo);
+			}
+		}
 		return result;
+	}
+
+	private Coord getCoord( Activity act) {
+		Coord coord = act.getCoord();
+		if (coord == null) {
+			Link link = simulationView.getNetwork().getLinks().get(act.getLinkId());
+			coord = link.getCoord();
+		}
+		return OTFServerQuadTree.getOTFTransformation().transform(coord);
 	}
 
 	@Override

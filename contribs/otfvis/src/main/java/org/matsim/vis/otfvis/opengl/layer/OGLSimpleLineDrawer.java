@@ -27,6 +27,7 @@ public class OGLSimpleLineDrawer extends OTFGLAbstractDrawableReceiver {
 
 	@Override
 	public void onDraw( GL2 gl) {
+		gl.glLineWidth(1);
 		gl.glBegin(GL2.GL_LINES);
 		gl.glVertex2f(quad[0].x, quad[0].y);
 		gl.glVertex2f(quad[1].x, quad[1].y);

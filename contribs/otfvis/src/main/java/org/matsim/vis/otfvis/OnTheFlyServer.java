@@ -90,6 +90,11 @@ public class OnTheFlyServer implements OTFLiveServer {
 		}
 
 		@Override
+		public Map<Id<Person>, MobsimAgent> getAgents() {
+			return ((QSim) visMobsim).getAgentMap();
+		}
+
+		@Override
 		public Network getNetwork() {
 			return scenario.getNetwork();
 		}
