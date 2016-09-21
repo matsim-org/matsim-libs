@@ -79,8 +79,7 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
         try {
             writer.write(event.getIteration() + "\t" +
                     mode2Legs.keySet().toString() + "\t" +
-                    mode2Legs.values().toString());
-            writer.newLine();
+                    mode2Legs.values().toString() + "\t");
 
             // write modalParams
             Map<String, PlanCalcScoreConfigGroup.ModeParams> mode2Params = event.getServices().getConfig().planCalcScore().getModes();
