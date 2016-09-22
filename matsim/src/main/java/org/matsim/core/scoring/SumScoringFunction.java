@@ -38,7 +38,9 @@ public final class SumScoringFunction implements ScoringFunction {
 	 * through this interface.  This excludes, in particular, LinkEnterEvent and LinkLeaveEvent.  This was done for performance reasons,
 	 * since passing those events to all handlers imposes a significant additional burden.  See comments in 
 	 * and implementation of the handleEvent 
-	 * method in {@link EventsToScore}.
+	 * method in {@link EventsToScore}. (yyyyyy Those comments, and possibly also the events filtering, have gone
+	 * from EventsToScore in commit e718809884cac6a86bdc35ea2a03c10195d37c69 .  I don't know if the performance consequences
+	 * were tested.) 
 	 * 
 	 * @author nagel
 	 */
