@@ -45,16 +45,16 @@ public class ExamplesByConfigfileTest {
 	
 	@Parameters(name = "{index}: configFilename == {0};")
 	public static Collection<Object[]> createTests() {
-		int nConfigFiles = 10 ;
+		int nConfigFiles = 5 ;
 		Object [][] files2run = new Object [nConfigFiles][1]; 
 		files2run[0] = new Object [] {"examples/equil/config.xml"};
 		files2run[1] = new Object [] {"examples/equil-extended/config.xml"};
-//		files2run[2] = new Object [] {"examples/equil-extended/config-with-roadpricing.xml"}; // yyyy throws exception; should be investigated and fixed.  kai, sep'16
+		files2run[2] = new Object [] {"examples/tutorial/config/example1-config.xml"} ;
+		files2run[3] = new Object [] {"examples/tutorial/config/example5-config.xml"} ;
+		files2run[4] = new Object [] {"examples/tutorial/config/example5trips-config.xml"} ;
+//		files2run[5] = new Object [] {"examples/equil-extended/config-with-roadpricing.xml"}; // yyyy throws exception; should be investigated and fixed.  (This can, actually not work from core matsim after roadpricing was moved into a contrib!) kai, sep'16
 //		files2run[3] = new Object [] {"examples/equil-mixedTraffic/config.xml"}; // yyyy throws exception; should be investigated and fixed.  kai, sep'16
-		files2run[4] = new Object [] {"examples/tutorial/config/example1-config.xml"} ;
 //		files2run[5] = new Object [] {"examples/tutorial/config/example2-config.xml"} ; // yyyy throws exception; should be investigated and fixed.  kai, sep'16
-		files2run[6] = new Object [] {"examples/tutorial/config/example5-config.xml"} ;
-		files2run[7] = new Object [] {"examples/tutorial/config/example5trips-config.xml"} ;
 //		files2run[8] = new Object [] {"examples/tutorial/config/externalReplanning.xml"} ; // yyyy throws exception; should be investigated and fixed.  kai, sep'16 
 //		files2run[2] = new Object [] {"examples/equil-extended/config-with-network-change-events.xml"}; // yyyy runs forever; should be investigated and fixed.  kai, sep'16
 //		files2run[1] = new Object [] {"examples/tutorial/config/externalMobsim.xml"} ; // yyyy throws exception; should be investigated and fixed.  kai, sep'16
