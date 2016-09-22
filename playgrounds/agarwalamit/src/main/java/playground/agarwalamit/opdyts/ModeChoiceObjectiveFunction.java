@@ -55,14 +55,11 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
     private static final Logger log = Logger.getLogger( ModeChoiceObjectiveFunction.class );
 
     private MainModeIdentifier mainModeIdentifier ;
-    private boolean patna = false;
+    private boolean isUsingPatna = false;
 
-    @Inject
-    ExperiencedPlansService service ;
-    @Inject
-    TripRouter tripRouter ;
-    @Inject
-    Network network ;
+    @Inject ExperiencedPlansService service ;
+    @Inject TripRouter tripRouter ;
+    @Inject Network network ;
     // Documentation: "Guice injects ... fields of all values that are bound using toInstance(). These are injected at injector-creation time."
     // https://github.com/google/guice/wiki/InjectionPoints
     // I read that as "the fields are injected (every time again) when the instance is injected".
@@ -85,13 +82,15 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                 case tripBeelineDistances: {
                     double[] dataBoundariesTmp = {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.} ;
                     {
-                        this.statsContainer.put( statType, new Databins<>( statType.name(), dataBoundariesTmp )) ;
+                        final Databins<String> databins = new Databins<>( statType.name(), dataBoundariesTmp );
+                        this.statsContainer.put( statType, databins) ;
                     }
                     {
-                        final Databins<String> databins = new Databins<>( statType.name(), dataBoundariesTmp );
+                        final Databins<String> databins = new Databins<>( statType.name(), dataBoundariesTmp ) ;
+//					final double carVal = 3753.; // relaxed
                         final double carVal = 1000. ;
                         databins.addValue( TransportMode.car, 8, carVal);
-                        databins.addValue(TransportMode.pt, 8, 4000.-carVal);
+                        databins.addValue( TransportMode.pt, 8, 4000.-carVal);
                         this.meaContainer.put( statType, databins) ;
                     }
                     break; }
@@ -101,7 +100,7 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         }
 
         // for Patna, all legs have same trip mode.
-        if(patna) {
+        if(isUsingPatna) {
             mainModeIdentifier = new MainModeIdentifier() {
                 @Override
                 public String identifyMainMode(List<? extends PlanElement> tripElements) {
