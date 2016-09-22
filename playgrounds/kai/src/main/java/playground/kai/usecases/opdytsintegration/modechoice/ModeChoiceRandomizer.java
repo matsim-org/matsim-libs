@@ -38,7 +38,7 @@ final class ModeChoiceRandomizer implements DecisionVariableRandomizer<ModeChoic
 					ModeParams newModeParams1 = new ModeParams(mode) ;
 					ModeParams newModeParams2 = new ModeParams(mode) ;
 
-					final double rnd1 = 1. * rnd.nextDouble() ;
+					final double rnd1 = 1. * rnd.nextGaussian() ;
 //					log.warn( "mode=" + mode + "; rnd1=" + rnd1 + "; oldConstant=" + oldModeParams.getConstant() ) ;
 					newModeParams1.setConstant( oldModeParams.getConstant() + rnd1 );
 					newModeParams2.setConstant( oldModeParams.getConstant() - rnd1 );
