@@ -73,13 +73,8 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         tripBeelineDistances
     } ;
 
-    // container that contains the statistics containers:
     private final Map<StatType,Databins<String>> statsContainer = new TreeMap<>() ;
-
-    // container that contains the sum (to write averages):
     private final Map<StatType,DataMap<String>> sumsContainer  = new TreeMap<>() ;
-    // yy for time being not fully symmetric with DatabinsMap! kai, oct'15
-
     private final Map<StatType,Databins<String>> meaContainer = new TreeMap<>() ;
 
 
@@ -94,8 +89,6 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                     }
                     {
                         final Databins<String> databins = new Databins<>( statType.name(), dataBoundariesTmp );
-                        // leg mode for 5 persons is car and for rest 5, it is bicycle (each person make two trips).
-                        // trying to achieve 2 car and 8 bike plans. amit 19/09/2016
                         final double carVal = 1000. ;
                         databins.addValue( TransportMode.car, 8, carVal);
                         databins.addValue(TransportMode.pt, 8, 4000.-carVal);
@@ -140,7 +133,8 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
             }
         }
 
-        double objective = 0 ;
+        double objective = 0. ;
+        double sum = 0.;
         for ( Map.Entry<StatType, Databins<String>> entry : statsContainer.entrySet() ) {
             StatType theStatType = entry.getKey() ;  // currently only one type ;
             log.warn( "statType=" + statType );
@@ -152,11 +146,15 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                 double[] reaVal = this.meaContainer.get( theStatType).getValues(mode) ;
                 for ( int ii=0 ; ii<value.length ; ii++ ) {
                     double diff = value[ii] - reaVal[ii] ;
-                    log.warn( "distanceBnd=" + databins.getDataBoundaries()[ii] + "; objVal=" + reaVal[ii] + "; simVal=" + value[ii] ) ;
+                    if ( reaVal[ii]>0.1 || value[ii]>0.1 ) {
+                        log.warn( "distanceBnd=" + databins.getDataBoundaries()[ii] + "; objVal=" + reaVal[ii] + "; simVal=" + value[ii] ) ;
+                    }
                     objective += diff * diff ;
+                    sum += reaVal[ii] ;
                 }
             }
         }
+        objective /= (sum*sum) ;
         log.warn( "objective=" + objective );
         return objective ;
 
@@ -193,7 +191,8 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         } else {
             if ( noCoordCnt < 1 ) {
                 noCoordCnt ++ ;
-                log.warn("either fromAct or to Act has no Coord; using link coordinates as substitutes.\n" + Gbl.ONLYONCE ) ;
+				log.warn("either fromAct or to Act has no Coord; using link coordinates as substitutes.") ;
+				log.warn(Gbl.ONLYONCE ) ;
             }
             Link fromLink = network.getLinks().get( fromAct.getLinkId() ) ;
             Link   toLink = network.getLinks().get(   toAct.getLinkId() ) ;
