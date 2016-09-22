@@ -20,6 +20,7 @@
 package playground.agarwalamit;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -28,16 +29,23 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,10 +58,8 @@ public class EquilMixedTrafficTest {
 	
 	private static final String EQUIL_DIR = "../../matsim/examples/equil-mixedTraffic/";
 	
-	@Test
-	public void run() {
-		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
-		
+	@Test@Ignore
+	public void runSameVehicleAllTrips() {
 		Config config = ConfigUtils.loadConfig(EQUIL_DIR+"/config.xml");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
@@ -99,6 +105,73 @@ public class EquilMixedTrafficTest {
 
 		Assert.assertEquals("Wrong travel time on link 22",2100.0,carTT, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong travel time on link 22",8394, bikeTT, MatsimTestUtils.EPSILON);
+	}
+
+	/*
+	 * Multiple main modes, a person make multiple trips with different modes. Mode choice is allowed.
+	 */
+	@Test@Ignore
+	public void runMultipleVehiclesTypeAllTrips() {
+        // TODO: fix and clean it.
+		Config config = ConfigUtils.loadConfig(EQUIL_DIR+"/config.xml");
+//		config.vehicles().setVehiclesFile(null);
+//
+//		Vehicles vehs = VehicleUtils.createVehiclesContainer();
+//
+//		new VehicleReaderV1(vehs).readFile(EQUIL_DIR+"/vehicles.xml");
+//		Map<Id<VehicleType>, VehicleType> vts = vehs.getVehicleTypes();
+
+		Scenario scenario = ScenarioUtils.loadScenario(config) ;
+
+//		for(VehicleType  vt : vts.values() ) { scenario.getVehicles().addVehicleType(vt); }
+
+		// get bicycle-car or car-bicycle in plan.
+		for (Person p : scenario.getPopulation().getPersons().values()){
+			List<PlanElement> pes = p.getSelectedPlan().getPlanElements();
+			String firstMode = null;
+			for (PlanElement  pe : pes ){
+				if (pe instanceof Leg){
+					Leg leg = (Leg)pe;
+					if ( firstMode == null ) firstMode = leg.getMode();
+					else {
+						String mode = firstMode.equals("car") ? "bicycle" : "car";
+						leg.setMode(mode);
+					}
+				}
+			}
+		}
+
+		//
+        StrategyConfigGroup scg = scenario.getConfig().strategy();
+        StrategyConfigGroup.StrategySettings ss = new StrategyConfigGroup.StrategySettings();
+        ss.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.name());
+        ss.setWeight(0.2);
+
+        scenario.getConfig().strategy().setFractionOfIterationsToDisableInnovation(0.8);
+
+		scenario.getConfig().controler().setDumpDataAtEnd(true);
+		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+
+        scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+        scenario.getConfig().qsim().setUsePersonIdForMissingVehicleId(false);
+
+		Controler controler = new Controler(scenario);
+
+		final PersonLinkTravelTimeEventHandler handler = new PersonLinkTravelTimeEventHandler();
+
+		controler.addOverridingModule(new AbstractModule() {
+
+			@Override
+			public void install() {
+				addTravelTimeBinding("bicycle").to(networkTravelTime());
+				addTravelDisutilityFactoryBinding("bicycle").to(carTravelDisutilityFactoryKey());
+
+				// add event handler to test...
+				addEventHandlerBinding().toInstance(handler);
+			}
+		});
+
+		controler.run();
 	}
 
 	private static class PersonLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
