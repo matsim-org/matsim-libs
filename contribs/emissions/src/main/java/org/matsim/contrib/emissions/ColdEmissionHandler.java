@@ -115,7 +115,7 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
     @Override
     public void handleEvent(VehicleEntersTrafficEvent event) {
         if (!event.getNetworkMode().equals("car")) { // no engine to start...
-            return;
+            throw new RuntimeException("non-car modes are not supported yet.");
         }
         Id<Link> linkId = event.getLinkId();
         Id<Vehicle> vehicleId = event.getVehicleId();

@@ -90,7 +90,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		if(!event.getNetworkMode().equals("car")){ // link travel time calculation not neccessary for other modes
-			return;
+			throw new RuntimeException("non-car modes are not supported yet.");
 		}
 		Tuple<Id<Link>, Double> linkId2Time = new Tuple<Id<Link>, Double>(event.getLinkId(), event.getTime());
 		this.vehicleLeavesTraffic.put(event.getVehicleId(), linkId2Time);
