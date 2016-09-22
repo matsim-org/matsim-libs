@@ -17,7 +17,7 @@ import floetteroed.opdyts.DecisionVariable;
  * @author Kai Nagel based on Gunnar Flötteröd
  *
  */
-final class ModeChoiceDecisionVariable implements DecisionVariable {
+public final class ModeChoiceDecisionVariable implements DecisionVariable {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger( ModeChoiceDecisionVariable.class ) ;
 
@@ -25,12 +25,12 @@ final class ModeChoiceDecisionVariable implements DecisionVariable {
 
 	private final PlanCalcScoreConfigGroup newScoreConfig;
 
-	ModeChoiceDecisionVariable(PlanCalcScoreConfigGroup newScoreConfig, Scenario scenario) {
+	public ModeChoiceDecisionVariable(PlanCalcScoreConfigGroup newScoreConfig, Scenario scenario) {
 		this.newScoreConfig = newScoreConfig;
 		this.scenario = scenario;
 	}
 
-	PlanCalcScoreConfigGroup getScoreConfig() {
+	public PlanCalcScoreConfigGroup getScoreConfig() {
 		return newScoreConfig ;
 	}
 

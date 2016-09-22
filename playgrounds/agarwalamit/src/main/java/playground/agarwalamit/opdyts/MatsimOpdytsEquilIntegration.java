@@ -32,16 +32,15 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
+import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable;
 import playground.kairuns.run.KNBerlinControler;
 
 /**
@@ -79,7 +78,7 @@ public class MatsimOpdytsEquilIntegration {
 		expChangeBeta.setWeight(0.9);
 		config.strategy().addStrategySettings(expChangeBeta);
 
-		strategies.setFractionOfIterationsToDisableInnovation(0.8);
+		strategies.setFractionOfIterationsToDisableInnovation(0.8); // does not matter, what you set, matsim simulator will set it to infinity.
 		//==
 
 		Scenario scenario = KNBerlinControler.prepareScenario(true, config);
