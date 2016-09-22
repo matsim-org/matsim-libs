@@ -109,6 +109,8 @@ public class EquilMixedTrafficTest {
 
 	/*
 	 * Multiple main modes, a person make multiple trips with different modes. Mode choice is allowed.
+	 * For e.g. In initial plans of Munich, person 555524.1#3699 uses bike in all trip modes,
+	 * however, a vehicle (passenger car) is still created for this person with vehicle id same as person id.
 	 */
 	@Test@Ignore
 	public void runMultipleVehiclesTypeAllTrips() {
