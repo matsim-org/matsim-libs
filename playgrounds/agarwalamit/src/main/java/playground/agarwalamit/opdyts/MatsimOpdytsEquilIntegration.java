@@ -53,6 +53,8 @@ public class MatsimOpdytsEquilIntegration {
 	private static final String EQUIL_DIR = "./matsim/examples/equil/";
 	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil";
 
+	private static final boolean isUsingBicycle = false;
+
 	public static void main(String[] args) {
 		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
 		Config config = ConfigUtils.loadConfig(EQUIL_DIR+"/config.xml");
@@ -95,9 +97,10 @@ public class MatsimOpdytsEquilIntegration {
 			@Override
 			public void install() {
 				// add here whatever should be attached to matsim controler
-				addTravelTimeBinding("bicycle").to(networkTravelTime());
-				addTravelDisutilityFactoryBinding("bicycle").to(carTravelDisutilityFactoryKey());
-
+				if(isUsingBicycle) {
+					addTravelTimeBinding("bicycle").to(networkTravelTime());
+					addTravelDisutilityFactoryBinding("bicycle").to(carTravelDisutilityFactoryKey());
+				}
 				// some stats
 				addControlerListenerBinding().to(ModalStatsControlerListner.class);
 
