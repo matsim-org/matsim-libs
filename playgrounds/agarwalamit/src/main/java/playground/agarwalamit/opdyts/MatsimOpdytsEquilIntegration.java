@@ -126,10 +126,6 @@ public class MatsimOpdytsEquilIntegration {
 			@Override
 			public void install() {
 				// add here whatever should be attached to matsim controler
-				if(isUsingBicycle) {
-					addTravelTimeBinding("bicycle").to(networkTravelTime());
-					addTravelDisutilityFactoryBinding("bicycle").to(carTravelDisutilityFactoryKey());
-				}
 				// some stats
 				addControlerListenerBinding().to(ModalStatsControlerListner.class);
 

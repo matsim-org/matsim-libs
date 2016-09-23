@@ -55,7 +55,7 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
     private static final Logger log = Logger.getLogger( ModeChoiceObjectiveFunction.class );
 
     private MainModeIdentifier mainModeIdentifier ;
-    private boolean isUsingPatna = false;
+    private boolean isUsingPatna = true;
 
     @Inject ExperiencedPlansService service ;
     @Inject TripRouter tripRouter ;
@@ -90,7 +90,8 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 //					final double carVal = 3753.; // relaxed
                         final double carVal = 1000. ;
                         databins.addValue( TransportMode.car, 8, carVal);
-                        databins.addValue( TransportMode.pt, 8, 4000.-carVal);
+//                        databins.addValue( TransportMode.pt, 8, 4000.-carVal);
+                        databins.addValue( "bicycle", 8, 4000.-carVal);
                         this.meaContainer.put( statType, databins) ;
                     }
                     break; }
