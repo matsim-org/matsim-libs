@@ -12,6 +12,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacilities;
 
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
 import playground.sergioo.passivePlanning2012.api.population.BasePlan;
 
@@ -103,4 +104,8 @@ public class BasePersonImpl implements BasePerson {
 			return delegate.getCustomAttributes();
 		}
 
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
+	}
 }

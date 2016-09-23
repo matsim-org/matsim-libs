@@ -87,29 +87,4 @@ public class CoordUtilsTest {
 		double result = CoordUtils.length( coord1 ) ;
 		Assert.assertEquals( Math.sqrt( 9. + 4. ), result, delta) ;
 	}
-
-	/**
-	 * Test method for {@link org.matsim.core.utils.geometry.CoordUtils#rotateToRight(org.matsim.api.core.v01.Coord)}.
-	 */
-	@Test
-	public void testRotateToRight() {
-		Coord coord1 = new Coord(3., 2.);
-
-		Coord result = CoordUtils.rotateToRight( coord1 ) ;
-		Assert.assertEquals(  2., result.getX(), delta ) ;
-		Assert.assertEquals( -3., result.getY(), delta ) ;
-
-		result = CoordUtils.rotateToRight( result ) ;
-		Assert.assertEquals( -3., result.getX(), delta ) ;
-		Assert.assertEquals( -2., result.getY(), delta ) ;
-
-		result = CoordUtils.rotateToRight( result ) ;
-		Assert.assertEquals( -2., result.getX(), delta ) ;
-		 Assert.assertEquals( 3., result.getY(), delta ) ;
-
-		result = CoordUtils.rotateToRight( result ) ;
-		Assert.assertEquals( coord1.getX(), result.getX(), delta ) ;
-		Assert.assertEquals( coord1.getY(), result.getY(), delta ) ;
-	}
-
 }

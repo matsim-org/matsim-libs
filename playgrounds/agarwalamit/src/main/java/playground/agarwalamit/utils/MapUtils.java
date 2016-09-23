@@ -35,23 +35,17 @@ import org.matsim.api.core.v01.Id;
 public final class MapUtils {
 
 	private MapUtils(){}
-
-	public static int intValueSum(final Map<?, Integer> intMap){
+	
+    public static int intValueSum(final Map<?, Integer> intMap){
 		if(intMap==null ) throw new NullPointerException("The map is null. Aborting ...");
-		int sum =0;
-		for(Integer i :intMap.values()){
-			sum+=i;	
-		}
-		return sum;
+
+		return intMap.values().parallelStream().reduce(0, Integer::sum);
 	}
 
 	public static double doubleValueSum(final Map<?, Double> doubleMap){
 		if(doubleMap==null ) throw new NullPointerException("The map is null. Aborting ...");
-		double sum =0;
-		for(Double i :doubleMap.values()){
-			sum+=i;	
-		}
-		return sum;
+
+		return doubleMap.values().parallelStream().reduce(0.0, Double::sum);
 	}
 	/**
 	 * @return m1-m2
@@ -89,7 +83,7 @@ public final class MapUtils {
 		double valueSum = (double) MapUtils.intValueSum(inMap);
 		for(Entry<T,Integer> e : inMap.entrySet()){
 			double legs = (double) e.getValue();
-			double pctShare = NumberUtils.round( legs*100. / valueSum, 3); 
+			double pctShare = NumberUtils.round( legs*100. / valueSum, 3);
 			outMap.put(e.getKey(), pctShare);
 		}
 		return outMap;
@@ -100,7 +94,7 @@ public final class MapUtils {
 		double valueSum = MapUtils.doubleValueSum(inMap);
 		for(Entry<T,Double> e : inMap.entrySet()){
 			double legs = (double) e.getValue();
-			double pctShare = NumberUtils.round( legs*100. / valueSum, 3); 
+			double pctShare = NumberUtils.round( legs*100. / valueSum, 3);
 			outMap.put(e.getKey(), pctShare);
 		}
 		return outMap;

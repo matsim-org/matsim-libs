@@ -20,9 +20,11 @@
 
 package org.matsim.core.utils.geometry;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 
 public abstract class CoordUtils {
+	final private static Logger LOG = Logger.getLogger(CoordUtils.class);
 	
 	public static Coord createCoord( final double xx, final double yy ) {
 		return new Coord(xx, yy);
@@ -33,29 +35,30 @@ public abstract class CoordUtils {
 	}
 	
 	public static Coord plus ( Coord coord1, Coord coord2 ) {
-		if(is2D(coord1) && is2D(coord2)){
+		if( !coord1.hasZ() && !coord2.hasZ() ){
 			/* Both are 2D coordinates. */
 			double xx = coord1.getX() + coord2.getX();
 			double yy = coord1.getY() + coord2.getY();
 			return new Coord(xx, yy);			
-		} else if(!is2D(coord1) && !is2D(coord2)){
+		} else if( coord1.hasZ() && coord2.hasZ() ){
 			/* Both are 3D coordinates. */
 			double xx = coord1.getX() + coord2.getX();
 			double yy = coord1.getY() + coord2.getY();
 			double zz = coord1.getZ() + coord2.getZ();
 			return new Coord(xx, yy, zz);			
 		} else{
-			throw new RuntimeException("Cannot 'plus' coordinates if one has elevation (z) and the other not.");
+			throw new RuntimeException("Cannot 'plus' coordinates if one has elevation (z) and the other not; coord1.hasZ=" + coord1.hasZ()
+			+ "; coord2.hasZ=" + coord2.hasZ() );
 		}
 	}
 	
 	public static Coord minus ( Coord coord1, Coord coord2 ) {
-		if(is2D(coord1) && is2D(coord2)){
+		if( !coord1.hasZ() && !coord2.hasZ() ){
 			/* Both are 2D coordinates. */
 			double xx = coord1.getX() - coord2.getX();
 			double yy = coord1.getY() - coord2.getY();
 			return new Coord(xx, yy);			
-		} else if(!is2D(coord1) && !is2D(coord2)){
+		} else if( coord1.hasZ() && coord2.hasZ() ){
 			/* Both are 3D coordinates. */
 			double xx = coord1.getX() - coord2.getX();
 			double yy = coord1.getY() - coord2.getY();
@@ -67,7 +70,7 @@ public abstract class CoordUtils {
 	}
 	
 	public static Coord scalarMult( double alpha, Coord coord ) {
-		if(is2D(coord)){
+		if(!coord.hasZ()){
 			/* 2D coordinate. */
 			double xx = alpha * coord.getX();
 			double yy = alpha * coord.getY();
@@ -83,12 +86,12 @@ public abstract class CoordUtils {
 	
 	
 	public static Coord getCenter( Coord coord1, Coord coord2 ) {
-		if(is2D(coord1) && is2D(coord2)){
+		if( !coord1.hasZ() && !coord2.hasZ() ){
 			/* Both are 2D coordinates. */
 			double xx = 0.5*( coord1.getX() + coord2.getX() ) ;
 			double yy = 0.5*( coord1.getY() + coord2.getY() ) ;
 			return new Coord(xx, yy);			
-		} else if(!is2D(coord1) && !is2D(coord2)){
+		} else if( coord1.hasZ() && coord2.hasZ() ){
 			/* Both are 3D coordinates. */
 			double xx = 0.5*( coord1.getX() + coord2.getX() ) ;
 			double yy = 0.5*( coord1.getY() + coord2.getY() ) ;
@@ -99,42 +102,46 @@ public abstract class CoordUtils {
 		}
 	}
 	
-	public static double length( Coord coord1 ) {
-		if(is2D(coord1)){
-			return Math.sqrt( coord1.getX()*coord1.getX() + coord1.getY()*coord1.getY() ) ;
+	public static double length( Coord coord ) {
+		if(!coord.hasZ()){
+			return Math.sqrt( 
+					coord.getX()*coord.getX() + 
+					coord.getY()*coord.getY() ) ;
 		} else{
 			return Math.sqrt( 
-					coord1.getX()*coord1.getX() + 
-					coord1.getY()*coord1.getY() +
-					coord1.getZ()*coord1.getZ()) ;
+					coord.getX()*coord.getX() + 
+					coord.getY()*coord.getY() +
+					coord.getZ()*coord.getZ()) ;
 		}
 	}
 	
 	/**
 	 * Note: If the given {@link Coord} has elevation, it's elevation will stay 
 	 * the same (jjoubert, Sep '16). 
-	 * @param coord1
+	 * @param coord
 	 * @return
 	 */
-	public static Coord rotateToRight( Coord coord1 ) {
-		if(is2D(coord1)){
-			final double y = -coord1.getX();
-			return new Coord(coord1.getY(), y);
+	public static Coord rotateToRight( Coord coord ) {
+		if( !coord.hasZ() ){
+			/* 2D coordinate */
+			final double y = -coord.getX();
+			return new Coord(coord.getY(), y);
 		} else{
-			final double y = -coord1.getX();
-			return new Coord(coord1.getY(), y, coord1.getZ());			
+			/* 3D coordinate */
+			final double y = -coord.getX();
+			return new Coord(coord.getY(), y, coord.getZ());			
 		}
 	}
 
 	
 	public static Coord getCenterWOffset( Coord coord1, Coord coord2 ) {
-		if(is2D(coord1) && is2D(coord2)){
+		if( !coord1.hasZ() && !coord2.hasZ() ){
 			/* Both are 2D coordinates. */
 			Coord fromTo = minus( coord2, coord1 ) ;
 			Coord offset = scalarMult( 0.1 , rotateToRight( fromTo ) ) ;
 			Coord centerWOffset = plus( getCenter( coord1, coord2 ) , offset ) ;
 			return centerWOffset ;
-		} else if(!is2D(coord1) && !is2D(coord2)){
+		} else if( coord1.hasZ() && coord2.hasZ() ){
 			/* TODO Both are 3D coordinates. */
 			throw new RuntimeException("3D version not implemented.");
 		} else{
@@ -152,22 +159,41 @@ public abstract class CoordUtils {
 		 * we should implement by our own and for what part we could use an 
 		 * existing GIS like geotools. We need to discuss this in terms of code 
 		 * robustness, performance and so on ... [gl] */
-		if(is2D(coord) && is2D(other)){
+		if( !coord.hasZ() && !other.hasZ() ){
 			/* Both are 2D coordinates. */
 			double xDiff = other.getX()-coord.getX();
 			double yDiff = other.getY()-coord.getY();
 			return Math.sqrt((xDiff*xDiff) + (yDiff*yDiff));
-		} else if(!is2D(coord) && !is2D(other)){
+		} else if( coord.hasZ() && other.hasZ() ){
 			/* Both are 3D coordinates. */
 			double xDiff = other.getX()-coord.getX();
 			double yDiff = other.getY()-coord.getY();
 			double zDiff = other.getZ()-coord.getZ();
 			return Math.sqrt((xDiff*xDiff) + (yDiff*yDiff) + (zDiff*zDiff));
 		} else{
-			throw new RuntimeException("Cannot get the center for coordinates if one has elevation (z) and the other not.");
+			LOG.warn("Mixed use of elevation in coordinates: " + coord.toString() + 
+					"; " + other.toString());
+			LOG.warn("Returning projected coordinate distance (using x and y components only)");
+			return calcProjectedEuclideanDistance(coord, other);
 		}
 	}
 
+
+	/**
+	 * Method to deal with distance calculation when only the x and y-components
+	 * of the coordinates are used. The elevation (z component) is ignored,
+	 * whether it is available or not. 
+	 * (xy-plane)
+	 * @param coord
+	 * @param other
+	 * @return
+	 */
+	public static double calcProjectedEuclideanDistance(Coord coord, Coord other) {
+		double xDiff = other.getX()-coord.getX();
+		double yDiff = other.getY()-coord.getY();
+		return Math.sqrt((xDiff*xDiff) + (yDiff*yDiff));
+	}
+	
 	
 	/**
 	 * Method should only be used in within this class, and only by 
@@ -177,11 +203,11 @@ public abstract class CoordUtils {
 	 * @return
 	 */
 	private static double dotProduct( Coord coord1, Coord coord2 ) {
-		if(is2D(coord1) && is2D(coord2)){
+		if( !coord1.hasZ() && !coord2.hasZ() ){
 			/* Both are 2D coordinates. */
 			return 	coord1.getX()*coord2.getX() + 
 					coord1.getY()*coord2.getY();
-		} else if(!is2D(coord1) && !is2D(coord2)){
+		} else if( coord1.hasZ() && coord2.hasZ() ){
 			/* Both are 3D coordinates. */
 			return 	coord1.getX()*coord2.getX() + 
 					coord1.getY()*coord2.getY() +
@@ -211,7 +237,7 @@ public abstract class CoordUtils {
 	 * @author mrieser, jwjoubert
 	 */
 	public static double distancePointLinesegment(final Coord lineFrom, final Coord lineTo, final Coord point) {
-		if(is2D(lineFrom) && is2D(lineTo) && is2D(point)){
+		if( !lineFrom.hasZ() && !lineTo.hasZ() && !point.hasZ() ){
 			/* All coordinates are 2D and in the XY plane. */
 
 			/* The shortest distance is where the tangent of the line goes 
@@ -251,7 +277,7 @@ public abstract class CoordUtils {
 			}
 			
 			return calcEuclideanDistance(new Coord(lineFrom.getX() + u * lineDX, lineFrom.getY() + u * lineDY), point);
-		} else if(!is2D(lineFrom) && !is2D(lineTo) && !is2D(point)){
+		} else if( lineFrom.hasZ() && lineTo.hasZ() && point.hasZ() ){
 			/* All coordinates are 3D. */
 			double lineDX = lineTo.getX() - lineFrom.getX();
 			double lineDY = lineTo.getY() - lineFrom.getY();
@@ -308,7 +334,7 @@ public abstract class CoordUtils {
 	 * @author dziemke, jwjoubert
 	 */
 	public static Coord orthogonalProjectionOnLineSegment(final Coord lineFrom, final Coord lineTo, final Coord point) {
-		if(is2D(lineFrom) && is2D(lineTo) &&is2D(point)){
+		if( !lineFrom.hasZ() && !lineTo.hasZ() && !point.hasZ() ){
 			/* All coordinates are 2D. */
 
 			/* Concerning explanation and usage of the dot product for these calculation, please
@@ -334,7 +360,7 @@ public abstract class CoordUtils {
 				return lineTo;
 			}
 			return new Coord(lineFrom.getX() + u * lineDX, lineFrom.getY() + u * lineDY);
-		} else if(!is2D(lineFrom) && !is2D(lineTo) && !is2D(point)){
+		} else if(lineFrom.hasZ() && lineTo.hasZ() && point.hasZ() ){
 			/* All coordinates are 3D. */
 			Coord direction = minus(lineTo, lineFrom);
 			
@@ -345,21 +371,4 @@ public abstract class CoordUtils {
 			throw new RuntimeException("All given coordinates must either be 2D, or 3D. A mix is not allowed.");
 		}
 	}
-
-	/**
-	 * Checks if a {@link Coord} is 2D. That is, does <i>not</i> have elevation (z).
-	 * @param c
-	 * @return
-	 */
-	private static boolean is2D(Coord c){
-		@SuppressWarnings("unused")
-		double z;
-		try{
-			z = c.getZ();
-			return false;
-		} catch(Exception e){
-			return true;
-		}
-	}
-	
 }

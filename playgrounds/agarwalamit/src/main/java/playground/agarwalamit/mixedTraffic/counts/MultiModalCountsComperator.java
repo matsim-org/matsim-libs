@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.core.utils.io.IOUtils;
 
@@ -38,12 +39,14 @@ import playground.agarwalamit.utils.MapUtils;
 
 public class MultiModalCountsComperator {
 
-	private final String inputCountsFile_urban = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/urbanDemandCountsFile/innerCordon_excl_rckw_incl_truck_"+PatnaUtils.PATNA_NETWORK_TYPE+".txt";
+	private final String inputCountsFile_urban = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/urbanDemandCountsFile/innerCordon_excl_rckw_"+PatnaUtils.PATNA_NETWORK_TYPE+".txt";
 	private final String inputCountsFile_external = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/externalDemandCountsFile/outerCordonData_allCounts_"+PatnaUtils.PATNA_NETWORK_TYPE+".txt";
-	private final int itNr = 200;
-	private final String afterITERSCountsFile = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/multiModalCadytsAndIncome/c3/ITERS/it."+itNr+"/"+itNr+".multiMode_hourlyCounts.txt";
+	private final int itNr = 1200;
+	private final String afterITERSCountsFile = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/"+PatnaUtils.PCU_2W.toString()+"pcu/afterCadyts/c203_14/ITERS/it."+itNr+"/"+itNr+".multiMode_hourlyCounts.txt";
 
-	private final String outputFile = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/multiModalCadytsAndIncome/c3/ITERS/it."+itNr+"/"+itNr+".multiMode_AWTVcountscompare.txt";
+	private final Map<String,Set<String>> linkId2CountedModes= new HashMap<>();
+	
+	private final String outputFile = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/"+PatnaUtils.PCU_2W.toString()+"pcu/afterCadyts/c203_14/ITERS/it."+itNr+"/"+itNr+".multiMode_AWTVcountscompare.txt";
 
 	private final Map<String, Map<String,Map<Integer,Double>>> link2mode2time2count_input = new HashMap<>();
 
@@ -75,7 +78,6 @@ public class MultiModalCountsComperator {
 				if ( mode2count == null ) mode2count = new HashMap<>();
 
 				String mode = parts[1];
-				mode = mode.split("_")[0];
 
 				double outCountSum = 0 ;
 				for (int i=2; i<parts.length;i++){
@@ -98,6 +100,7 @@ public class MultiModalCountsComperator {
 
 			for (String linkId : link2mode2count.keySet()) { 
 				for (String mode : link2mode2count.get(linkId).keySet() ) {
+					if(! linkId2CountedModes.get(linkId).contains(mode)) continue;
 					writer.write(linkId+"\t"+mode+"\t"+ link2mode2count.get(linkId).get(mode)+ "\t");
 					writer.write( MapUtils.doubleValueSum( link2mode2time2count_input.get(linkId).get(mode) ) + "\n");
 				}
@@ -130,10 +133,6 @@ public class MultiModalCountsComperator {
 
 				if ( mode2time2count == null) {
 					mode2time2count = new HashMap<>();
-					for (String mode : PatnaUtils.ALL_MAIN_MODES) {
-						mode = mode.split("_")[0];
-						mode2time2count.put(mode, new HashMap<>());
-					}
 					link2mode2time2count_input.put(linkId, mode2time2count);
 				} 
 
@@ -152,11 +151,15 @@ public class MultiModalCountsComperator {
 					}
 					
 					count = Math.round( outTripReductionFactor*count );
+					
+					if(! mode2time2count.containsKey(mode)) mode2time2count.put(mode, new HashMap<>());
+					
 					Map<Integer,Double> time2count = mode2time2count.get(mode);
 					if (time2count.containsKey(time)) {
 						time2count.put( time, time2count.get(time) + count );
 					}	else time2count.put(time, count);
 				}
+				linkId2CountedModes.put(linkId, mode2time2count.keySet());
 				line = reader.readLine();
 			}
 

@@ -23,6 +23,7 @@ package tutorial.fixedTimeSignals;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -35,11 +36,12 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  */
 public class CreateSignalInputExampleTest {
+	private static final Logger log = Logger.getLogger( CreateSignalInputExampleTest.class ) ;
 
 	private static final String DIR_TO_COMPARE_WITH = "./examples/tutorial/example90TrafficLights/useSignalInput/woLanes/";
 
 	@Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
-	
+
 	@Test
 	public void testCreateSignalInputExample(){
 		try {
@@ -49,9 +51,15 @@ public class CreateSignalInputExampleTest {
 			Assert.fail("something went wrong") ;
 		}
 		// compare signal output
-		Assert.assertEquals("different signal system files", 
-				CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "signal_systems.xml"), 
-				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "signal_systems.xml"));
+		{
+			final String outputFilename = testUtils.getOutputDirectory() + "signal_systems.xml";
+			final String referenceFilename = DIR_TO_COMPARE_WITH + "signal_systems.xml";
+			log.info( "outputFilename=" + outputFilename ) ;
+			log.info( "referenceFilename=" + referenceFilename ) ;
+			Assert.assertEquals("different signal system files", 
+					CRCChecksum.getCRCFromFile(outputFilename), 
+					CRCChecksum.getCRCFromFile(referenceFilename));
+		}
 		Assert.assertEquals("different signal group files", 
 				CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "signal_groups.xml"),
 				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "signal_groups.xml"));
@@ -59,5 +67,5 @@ public class CreateSignalInputExampleTest {
 				CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "signal_groups.xml"),
 				CRCChecksum.getCRCFromFile(DIR_TO_COMPARE_WITH + "signal_groups.xml"));
 	}
-	
+
 }

@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * Default implementation of {@link Person} interface.
@@ -95,4 +96,8 @@ public class PersonImplPops implements Person {
 			return delegate.getCustomAttributes();
 		}
 
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
+	}
 }

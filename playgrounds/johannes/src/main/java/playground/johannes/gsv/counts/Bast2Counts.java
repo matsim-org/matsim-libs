@@ -93,7 +93,8 @@ public class Bast2Counts {
 		int valDirect1SVIdx = colIdices.get("dtv_sv_mobisso_ri1");
 		int valDirect2SVIdx = colIdices.get("dtv_sv_mobisso_ri2");
 		int nameIdx = colIdices.get("dz_name");
-		
+		int indexId = colIdices.get("dz_nr");
+
 		int xDirect1 = colIdices.get("fernziel_ri1_long");
 		int yDirect1 = colIdices.get("fernziel_ri1_lat");
 		int xDirect2 = colIdices.get("fernziel_ri2_long");
@@ -105,17 +106,14 @@ public class Bast2Counts {
 			CountsData data = new CountsData();
 			
 
-//			data.yCoord  = format.parse(tokens[xIdx]).doubleValue();
-//			data.xCoord = format.parse(tokens[yIdx]).doubleValue();
 			data.xCoord  = format.parse(tokens[xIdx]).doubleValue();
 			data.yCoord = format.parse(tokens[yIdx]).doubleValue();
 			data.name = tokens[nameIdx];
-//			if(data.name.contains("Neufahrn")) {
-//				System.err.println();
-//			}
 			data.name = data.name.replace("<", "-");
 			data.name = data.name.replace(">", "-");
-			
+
+			data.id = tokens[indexId];
+
 			if(tokens[xDirect1].length() > 0)
 				data.xDirection1 = Double.parseDouble(tokens[xDirect1]);
 			
@@ -149,9 +147,10 @@ public class Bast2Counts {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(netFile);
-		Network network = (Network) scenario.getNetwork();
-		
-		
+
+		Network network = scenario.getNetwork();
+		removeForeignLinks(network);
+
 		logger.info("Linking bast counts...");
 		GeometryFactory factory = new GeometryFactory(); //.getGeometryFactory(null);
 		MathTransform transform = CRS.findMathTransform(CRSUtils.getCRS(4326), CRSUtils.getCRS(31467));
@@ -174,14 +173,18 @@ public class Bast2Counts {
 			double dist2 = CoordUtils.calcEuclideanDistance(toNode.getCoord(), MatsimCoordUtils.pointToCoord(direct2));
 			
 			double returnVal;
+			String returnDir;
+
 			if(dist1 < dist2) {
 				logger.info(String.format("Adding count %s to link %s with direction 1.", data.name, link1.getId().toString()));
-				createCount(theCounts, link1, countPos, data.name, data.valDirect1);
+				createCount(theCounts, link1, countPos, data.id + "_R1", data.valDirect1);
 				returnVal = data.valDirect2;
+				returnDir = "_R2";
 			} else {
 				logger.info(String.format("Adding count %s to link %s with direction 2.", data.name, link1.getId().toString()));
-				createCount(theCounts, link1, countPos, data.name, data.valDirect2);
+				createCount(theCounts, link1, countPos, data.id + "_R2", data.valDirect2);
 				returnVal = data.valDirect1;
+				returnDir = "_R1";
 			}
 			
 			Link link2 = NetworkUtils.getConnectingLink(link1.getToNode(), link1.getFromNode());
@@ -190,11 +193,8 @@ public class Bast2Counts {
 				link2 = getReturnLink(link1, network);
 			}
 			if(link2 != null) {
-//				if(link1.getId().toString().equals("new223251")) {
-//					System.err.println();
-//				}
 				logger.info(String.format("Link %s has return link %s.", link1.getId().toString(), link2.getId().toString()));
-				createCount(theCounts, link2, countPos, data.name, returnVal);
+				createCount(theCounts, link2, countPos, data.id + returnDir, returnVal);
 			} else {
 				noreturn++;
 				logger.warn(String.format("No return link found for station %s", data.name));
@@ -244,7 +244,7 @@ public class Bast2Counts {
 		double step = 10;
 		double minsize = 5;
 		final double distance = delta;
-		
+
 		Collection<Node> nodes = NetworkUtils.getNearestNodes(network,node.getCoord(), distance);
 		while(nodes.size() < minsize) {
 			delta += step;
@@ -267,7 +267,9 @@ public class Bast2Counts {
 		private double valDirect2;
 		
 		private String name;
-		
+
+		private String id;
+
 		private double xDirection1;
 		
 		private double yDirection1;
@@ -277,4 +279,21 @@ public class Bast2Counts {
 		private double yDirection2;
 	}
 
+	private static void removeForeignLinks(Network network) {
+		int before = network.getLinks().size();
+
+		Set<Link> remove = new HashSet<>();
+		for(Link link : network.getLinks().values()) {
+			if(link.getId().toString().contains(".l")) {
+				remove.add(link);
+			}
+		}
+
+		for(Link link : remove) {
+			network.removeLink(link.getId());
+		}
+
+		int after = network.getLinks().size();
+		logger.info(String.format("Removed %s foreign links.", before - after));
+	}
 }

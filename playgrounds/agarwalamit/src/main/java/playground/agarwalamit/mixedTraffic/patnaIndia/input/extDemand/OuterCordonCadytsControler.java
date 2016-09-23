@@ -58,6 +58,7 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Counts;
 import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.Vehicles;
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
@@ -69,15 +70,15 @@ import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
-import playground.agarwalamit.mixedTraffic.multiModeCadyts.CountsInserter;
-import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalCadytsContext;
-import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalLink;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.joint.JointCalibrationControler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.PatnaVehiclesGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForTruck;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
+import playground.agarwalamit.multiModeCadyts.CountsInserter;
+import playground.agarwalamit.multiModeCadyts.ModalCadytsContext;
+import playground.agarwalamit.multiModeCadyts.ModalLink;
 import playground.agarwalamit.utils.plans.SelectedPlansFilter;
 
 /**
@@ -111,9 +112,9 @@ public class OuterCordonCadytsControler {
 		final Config config = pcc.getConfig();
 
 		PatnaVehiclesGenerator pvg = new PatnaVehiclesGenerator(plansFile);
-		pvg.createVehicles(PatnaUtils.EXT_MAIN_MODES);
+		Vehicles vehs = pvg.createAndReturnVehicles(PatnaUtils.EXT_MAIN_MODES);
 
-		new VehicleWriterV1(pvg.getPatnaVehicles()).writeFile(patnaVehicles);
+		new VehicleWriterV1(vehs).writeFile(patnaVehicles);
 		config.vehicles().setVehiclesFile(patnaVehicles);
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);

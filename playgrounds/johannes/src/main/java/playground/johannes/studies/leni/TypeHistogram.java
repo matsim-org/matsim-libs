@@ -36,10 +36,14 @@ import java.util.Map;
 public class TypeHistogram {
 
     public static void main(String args[]) throws IOException {
-        Map<String, List<String>> routes = buildRoutes("/Users/johannes/gsv/anlagen-prognose/357.csv");
+        Map<String, List<String>> routes = new HashMap<>();
+        Map<String, Double> weights = new HashMap<>();
+        buildRoutes("/Users/johannes/gsv/anlagen-prognose/357.csv", routes, weights);
+
         TObjectDoubleMap<String> hist = new TObjectDoubleHashMap<>();
 
-        for(List<String> route : routes.values()) {
+        for(Map.Entry<String, List<String>> entry : routes.entrySet()) {
+            List<String> route = entry.getValue();
             StringBuilder builder = new StringBuilder();
             for(String type : route) {
                 if(type != null) {
@@ -53,7 +57,8 @@ public class TypeHistogram {
             } else {
                 sequence = builder.substring(0, builder.length() - 5);
             }
-            hist.adjustOrPutValue(sequence, 1, 1);
+            double w = weights.get(entry.getKey());
+            hist.adjustOrPutValue(sequence, w, w);
         }
 
 //        Histogram.normalize(hist);
@@ -87,8 +92,8 @@ public class TypeHistogram {
         else return "NA";
     }
 
-    private static Map<String, List<String>> buildRoutes(String file) throws IOException {
-        Map<String, List<String>> routes = new HashMap<>();
+    private static void buildRoutes(String file, Map<String, List<String>> routes, Map<String, Double> weights) throws IOException {
+//        Map<String, List<String>> routes = new HashMap<>();
 
         BufferedReader reader = new BufferedReader(new FileReader(file));
 
@@ -100,6 +105,9 @@ public class TypeHistogram {
             String commodity = tokens[0];
             String node = tokens[2];
             int idx = Integer.parseInt(tokens[3]);
+            double weight = Double.parseDouble(tokens[4]);
+
+            weights.put(commodity, weight);
 
             List<String> route = routes.get(commodity);
             if(route == null) {
@@ -113,6 +121,6 @@ public class TypeHistogram {
             route.set(idx, node);
         }
 
-        return routes;
+//        return routes;
     }
 }

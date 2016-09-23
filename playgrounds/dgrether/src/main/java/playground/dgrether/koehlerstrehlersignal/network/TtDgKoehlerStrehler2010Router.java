@@ -30,6 +30,7 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
@@ -104,6 +105,11 @@ public class TtDgKoehlerStrehler2010Router {
 	};
 
 	private Person fakePerson = new Person(){
+		@Override
+		public Attributes getAttributes() {
+			return null;
+		}
+
 		@Override
 		public Id getId() {
 			return null;

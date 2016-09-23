@@ -15,6 +15,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class DigicoreActivity implements Activity {
 		
@@ -170,5 +171,9 @@ public class DigicoreActivity implements Activity {
 		int second = endTime.get(Calendar.SECOND);
 		return hour*60*60 + minute*60 + second;
 	}
-	
+
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
+	}
 }

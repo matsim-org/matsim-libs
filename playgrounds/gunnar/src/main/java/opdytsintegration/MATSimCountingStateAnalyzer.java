@@ -24,6 +24,16 @@ public class MATSimCountingStateAnalyzer<L extends Object> implements EventHandl
 
 	// -------------------- MEMBERS --------------------
 
+	/*
+	 * Initial state is "not locked". When locked, no writing with
+	 * registerIncrease(..), registerDecrease(..) is allowed.
+	 * 
+	 * Gets locked when data is accessed through getCount(..).
+	 * 
+	 * Gets again unlocked when reset(..) is called.
+	 */
+	private boolean locked = false;
+
 	private final DynamicData<Id<L>> counts;
 
 	private final Map<Id<L>, RecursiveCountAverage> location2avgCnt = new LinkedHashMap<>();
@@ -32,12 +42,29 @@ public class MATSimCountingStateAnalyzer<L extends Object> implements EventHandl
 
 	// -------------------- CONSTRUCTION --------------------
 
+	// TODO use TimeDiscretization as argument, also in DynamicData
 	public MATSimCountingStateAnalyzer(final int startTime_s, final int binSize_s, final int binCnt) {
 		this.counts = new DynamicData<>(startTime_s, binSize_s, binCnt);
 		this.reset(-1);
 	}
 
+	// -------------------- IMPLEMENTATION OF EventHandler --------------------
+
+	@Override
+	public void reset(final int iteration) {
+		this.locked = false;
+		this.counts.clear();
+		this.location2avgCnt.clear();
+		this.lastCompletedBin = -1;
+	}
+
 	// -------------------- INTERNALS --------------------
+
+	private void checkLocked() {
+		if (this.locked) {
+			throw new RuntimeException(this.getClass().getSimpleName() + " is locked and cannot accept more data.");
+		}
+	}
 
 	private int lastCompletedBinEndTime() {
 		return this.counts.getStartTime_s() + (this.lastCompletedBin + 1) * this.counts.getBinSize_s();
@@ -55,7 +82,7 @@ public class MATSimCountingStateAnalyzer<L extends Object> implements EventHandl
 		}
 	}
 
-	private void advanceToTime(final int time_s) {
+	private void completeBinsUntilTime(final int time_s) {
 		final int lastBinToComplete = this.counts.bin(time_s) - 1;
 		this.completeBins(min(lastBinToComplete, this.counts.getBinCnt() - 1));
 	}
@@ -69,38 +96,33 @@ public class MATSimCountingStateAnalyzer<L extends Object> implements EventHandl
 		return avg;
 	}
 
+	// -------------------- SETTERS --------------------
+
 	protected void registerIncrease(final Id<L> location, final int time_s) {
-		this.advanceToTime(time_s);
+		this.checkLocked();
+		this.completeBinsUntilTime(time_s);
 		this.avg(location).inc(time_s);
 	}
 
 	protected void registerDecrease(final Id<L> location, final int time_s) {
-		this.advanceToTime(time_s);
+		this.checkLocked();
+		this.completeBinsUntilTime(time_s);
 		this.avg(location).dec(time_s);
 	}
 
-	// TODO only used for testing
-	public void advanceToEnd() {
+	public void finalizeAndLock() {
+		this.locked = true;
 		this.completeBins(this.counts.getBinCnt() - 1);
 	}
 
-	// TODO only used for testing
+	// -------------------- GETTERS --------------------
+
 	public Set<Id<L>> observedLinkSetView() {
 		return Collections.unmodifiableSet(this.counts.keySet());
 	}
 
-	// -------------------- CONTENT ACCESS --------------------
-
 	public double getCount(final Id<L> link, final int bin) {
+		this.finalizeAndLock();
 		return this.counts.getBinValue(link, bin);
-	}
-
-	// -------------------- IMPLEMENTATION OF EventHandler --------------------
-
-	@Override
-	public void reset(final int iteration) {
-		this.counts.clear();
-		this.location2avgCnt.clear();
-		this.lastCompletedBin = -1;
 	}
 }

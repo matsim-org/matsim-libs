@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * Used by the MultiNodeDijkstra for backwards compatibility with default Dijkstra. 
@@ -108,5 +109,10 @@ public class ImaginaryNode implements Node {
 	public void setCoord(Coord coord) {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
 	}
 }

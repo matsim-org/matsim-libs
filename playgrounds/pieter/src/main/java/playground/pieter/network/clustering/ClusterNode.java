@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class ClusterNode implements Node {
 	private final Node node;
@@ -135,4 +136,8 @@ public class ClusterNode implements Node {
 	}
 
 
+	@Override
+	public Attributes getAttributes() {
+		return node.getAttributes();
+	}
 }

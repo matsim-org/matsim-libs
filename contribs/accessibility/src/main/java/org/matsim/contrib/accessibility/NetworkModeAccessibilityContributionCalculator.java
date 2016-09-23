@@ -14,6 +14,7 @@ import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -96,6 +97,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		this.lcpt.calculateExtended(scenario.getNetwork(), fromNode, departureTime);
 	}
 	
+	private static int cnt = 0 ;
 	
 	@Override
 	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
@@ -116,25 +118,33 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		// distance to road, and then to node.  (comment by thibaut?)
 		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Intersection() / this.walkSpeedMeterPerHour;
 		
-		System.err.println("#############");
-		System.err.println("origin.getCoord() = " + origin.getCoord() + " -- destination.getNearestNode() = " + destination.getNearestNode());
-		System.err.println("destination.getNumberOfObjects() = " + destination.getNumberOfObjects());
-		System.err.println("distance.getDistancePoint2Road() = " + distance.getDistancePoint2Intersection());
 		// disutilities to get on or off the network
 		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distance.getDistancePoint2Intersection() * betaWalkTD);
 		System.err.println("walkDisutilityMeasuringPoint2Road = " + walkDisutilityMeasuringPoint2Road);
 
 		Coord projectionCoord = CoordUtils.orthogonalProjectionOnLineSegment(nearestLink.getFromNode().getCoord(), nearestLink.getToNode().getCoord(), origin.getCoord());
-		System.err.println("nearestLink.getFromNode().getCoord() = " + nearestLink.getFromNode().getCoord() + 
-				" -- nearestLink.getToNode().getCoord() = " + nearestLink.getToNode().getCoord());
-		System.err.println("NEW distance coord - from coord = " + CoordUtils.calcEuclideanDistance(origin.getCoord(), nearestLink.getFromNode().getCoord()) + 
-				" -- NEW distance coord - to coord = " + CoordUtils.calcEuclideanDistance(origin.getCoord(), nearestLink.getToNode().getCoord()));
-		System.err.println("projectionCoord = " + projectionCoord);
-//		double walkUtility = -this.walkTravelDisutility.getCoord2CoordTravelDisutility(origin.getCoord(), projectionCoord);
-		
-//		walkDisutilityMeasuringPoint2Road = walkUtility;
-//		System.err.println("NEW walkDisutility = " + walkUtility);
-		System.err.println("#############");
+		//		double walkUtility = -this.walkTravelDisutility.getCoord2CoordTravelDisutility(origin.getCoord(), projectionCoord);
+
+		//		walkDisutilityMeasuringPoint2Road = walkUtility;
+
+		if ( cnt < 10 ) {
+			cnt ++ ; 
+			log.warn("#############");
+			log.warn("origin.getCoord() = " + origin.getCoord() + " -- destination.getNearestNode() = " + destination.getNearestNode());
+			log.warn("destination.getNumberOfObjects() = " + destination.getNumberOfObjects());
+			log.warn("distance.getDistancePoint2Road() = " + distance.getDistancePoint2Intersection());
+			log.warn("nearestLink.getFromNode().getCoord() = " + nearestLink.getFromNode().getCoord() + 
+					" -- nearestLink.getToNode().getCoord() = " + nearestLink.getToNode().getCoord());
+			log.warn("NEW distance coord - from coord = " + CoordUtils.calcEuclideanDistance(origin.getCoord(), nearestLink.getFromNode().getCoord()) + 
+					" -- NEW distance coord - to coord = " + CoordUtils.calcEuclideanDistance(origin.getCoord(), nearestLink.getToNode().getCoord()));
+			log.warn("projectionCoord = " + projectionCoord);
+			//		System.err.println("NEW walkDisutility = " + walkUtility);
+			log.warn("#############");
+			
+			if ( cnt==10 ) {
+				log.warn( Gbl.FUTURE_SUPPRESSED);
+			}
+		}
 		
 		double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
 		

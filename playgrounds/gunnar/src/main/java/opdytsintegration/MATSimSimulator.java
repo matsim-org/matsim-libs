@@ -73,6 +73,12 @@ public class MATSimSimulator<U extends DecisionVariable> implements Simulator<U>
 
 		final String outputDirectory = this.scenario.getConfig().controler().getOutputDirectory();
 		this.scenario.getConfig().controler().setOutputDirectory(outputDirectory + "_0");
+		
+		// >>>>>>>>>> TODO NEW >>>>>>>>>>		
+		this.scenario.getConfig().strategy().setFractionOfIterationsToDisableInnovation(Double.POSITIVE_INFINITY);
+		this.scenario.getConfig().planCalcScore().setFractionOfIterationsToStartScoreMSA(Double.POSITIVE_INFINITY);
+		// <<<<<<<<<< TODO NEW <<<<<<<<<<
+
 	}
 	
 	public final void setReplacingModules( final AbstractModule... replacingModules ) {
@@ -175,7 +181,7 @@ public class MATSimSimulator<U extends DecisionVariable> implements Simulator<U>
 		// >>>>>>>>>> TODO NEW >>>>>>>>>>
 		this.stateFactory.registerControler(controler);
 		// <<<<<<<<<< TODO NEW <<<<<<<<<<
-
+		
 		controler.run();
 		this.nextControlerRun++;
 		return matsimDecisionVariableEvaluator.getFinalState();

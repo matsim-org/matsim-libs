@@ -33,7 +33,7 @@ import java.util.Map;
 public final class TeleportationArrivalEvent extends Event implements HasPersonId {
 
 	public static final String ATTRIBUTE_PERSON = "person";
-	public static final String ATTRIBUT_DISTANCE = "distance";
+	public static final String ATTRIBUTE_DISTANCE = "distance";
 
 	public static final String EVENT_TYPE = "travelled";
 
@@ -63,7 +63,7 @@ public final class TeleportationArrivalEvent extends Event implements HasPersonI
     public Map<String, String> getAttributes() {
         Map<String, String> attributes = super.getAttributes();
         attributes.put(ATTRIBUTE_PERSON, agentId.toString());
-        attributes.put(ATTRIBUT_DISTANCE, Double.toString(distance));
+        attributes.put(ATTRIBUTE_DISTANCE, Double.toString(distance));
         return attributes;
     }
 }

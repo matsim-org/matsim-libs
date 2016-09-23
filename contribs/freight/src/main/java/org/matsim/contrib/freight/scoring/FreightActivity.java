@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class FreightActivity implements Activity {
 
@@ -96,4 +97,8 @@ public class FreightActivity implements Activity {
 		throw new RuntimeException("not implemented") ;
 	}
 
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
+	}
 }

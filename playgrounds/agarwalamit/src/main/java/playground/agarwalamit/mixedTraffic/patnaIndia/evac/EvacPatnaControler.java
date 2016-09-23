@@ -18,6 +18,10 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia.evac;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -30,8 +34,11 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
+import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
+import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
-import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.PatnaVehiclesGenerator;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 /**
@@ -48,8 +55,8 @@ public class EvacPatnaControler {
 		boolean isSeepModeStorageFree ;
 
 		if(args.length==0){
-			configFile = "../../../../repos/runs-svn/patnaIndia/run109/input/patna_evac_config.xml.gz";
-			outDir = "../../../../repos/runs-svn/patnaIndia/run109/100pct/";
+			configFile = "../../../../repos/runs-svn/patnaIndia/run109/1pct/input/evac_config.xml.gz";
+			outDir = "../../../../repos/runs-svn/patnaIndia/run109/1pct/withoutHoles/";
 			linkDynamics = LinkDynamics.PassingQ;
 			isSeepModeStorageFree = false;
 		} else {
@@ -64,15 +71,25 @@ public class EvacPatnaControler {
 
 		config.qsim().setLinkDynamics(linkDynamics.name());
 		config.qsim().setSeepModeStorageFree(isSeepModeStorageFree);
-		config.controler().setOutputDirectory(config.controler().getOutputDirectory()+"/evac_"+linkDynamics.name()+"/");
+		Collection<String> seepModes = Arrays.asList("bike");
+		config.qsim().setSeepModes(seepModes );
+		
+		String outputDir ;
+		if(linkDynamics.equals(LinkDynamics.SeepageQ)) {
+			outputDir = config.controler().getOutputDirectory()+"/evac_"+linkDynamics.name()+"_"+seepModes.toString();
+			if(isSeepModeStorageFree) outputDir = outputDir.concat("_noStorageCap/");
+			else outputDir = outputDir.concat("/");
+		} else outputDir = config.controler().getOutputDirectory()+"/evac_"+linkDynamics.name()+"/";
+		
+		config.controler().setOutputDirectory(outputDir);
 		config.controler().setDumpDataAtEnd(true);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.vspExperimental().setWritingOutputEvents(true);
 
 		Scenario sc = ScenarioUtils.loadScenario(config); 
 
 		sc.getConfig().qsim().setVehiclesSource(VehiclesSource.modeVehicleTypesFromVehiclesData);
-		PatnaUtils.createAndAddVehiclesToScenario(sc, PatnaUtils.URBAN_MAIN_MODES);
+		PatnaVehiclesGenerator.createAndAddVehiclesToScenario(sc, PatnaUtils.URBAN_MAIN_MODES);
 
 		final Controler controler = new Controler(sc);
 
@@ -82,8 +99,8 @@ public class EvacPatnaControler {
 			@Override
 			public void install() {
 
-				addTravelTimeBinding("bike").to(FreeSpeedTravelTimeForBike.class);
-				addTravelDisutilityFactoryBinding("bike").toInstance(builder_bike);
+				addTravelTimeBinding("bike").to(networkTravelTime());
+				addTravelDisutilityFactoryBinding("bike").to(carTravelDisutilityFactoryKey());
 
 				addTravelTimeBinding("motorbike").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("motorbike").to(carTravelDisutilityFactoryKey());					
@@ -99,5 +116,19 @@ public class EvacPatnaControler {
 		});
 
 		controler.run();
+		
+		new File(outputDir+"/analysis/").mkdir();
+		String outputEventsFile = outputDir+"/output_events.xml.gz";
+		// write some default analysis
+		String userGroup = PatnaUserGroup.urban.toString();
+		ModalTravelTimeAnalyzer mtta = new ModalTravelTimeAnalyzer(outputEventsFile);
+		mtta.run();
+		mtta.writeResults(outputDir+"/analysis/modalTravelTime_"+userGroup+".txt");
+
+		ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile);
+		msc.run();
+		msc.writeResults(outputDir+"/analysis/modalShareFromEvents_"+userGroup+".txt");
+
+		
 	}
 }

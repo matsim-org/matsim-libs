@@ -23,6 +23,7 @@ package org.matsim.core.population;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /* deliberately package */  final class LegImpl  implements Leg {
 
@@ -31,6 +32,8 @@ import org.matsim.core.utils.misc.Time;
 	private double depTime = Time.UNDEFINED_TIME;
 	private double travTime = Time.UNDEFINED_TIME;
 	private String mode;
+
+	private final Attributes attributes = new Attributes();
 
 	/* deliberately package */  LegImpl(final String transportMode) {
 		this.mode = transportMode;
@@ -85,7 +88,12 @@ import org.matsim.core.utils.misc.Time;
 				"[route=" + this.route + "]";
 	}
 
-//	private boolean locked;
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
+
+	//	private boolean locked;
 //
 //	public void setLocked() {
 //		this.locked = true ;

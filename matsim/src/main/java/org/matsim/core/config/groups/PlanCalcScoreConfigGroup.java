@@ -1087,8 +1087,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 				}
 				map.put( pars.getMode() , pars );
 			}
-
-			return map;
+			if ( this.isLocked() ) {
+				return Collections.unmodifiableMap(map) ;
+			} else {
+				return map ;
+			}
 		}
 
 		public ModeParams getOrCreateModeParams(String modeName) {
@@ -1104,10 +1107,9 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			final ModeParams previous = this.getModes().get( params.getMode() );
 
 			if ( previous != null ) {
-				log.info("mode parameters for mode " + previous.getMode() + " were just overwritten.") ;
-
 				final boolean removed = removeParameterSet( previous );
 				if ( !removed ) throw new RuntimeException( "problem replacing mode params " );
+				log.info("mode parameters for mode " + previous.getMode() + " were just overwritten.") ;
 			}
 
 			super.addParameterSet( params );

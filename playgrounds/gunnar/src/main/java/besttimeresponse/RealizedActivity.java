@@ -57,16 +57,19 @@ class RealizedActivity<L, M> {
 	}
 
 	double effectiveDuration_s() {
+		final double result;
 		if (this.realizedArrTime_s > this.realizedDptTime_s) {
 			// An overnight activity, always open.
-			return this.realizedDptTime_s + (Units.S_PER_D - this.realizedArrTime_s);
+			result = this.realizedDptTime_s + (Units.S_PER_D - this.realizedArrTime_s);
 		} else {
-			// Probably a within-day activity, possibly closed.
-			return MathHelpers.overlap(this.realizedDptTime_s, this.realizedArrTime_s,
+			// A within-day activity, possibly closed.
+			result = MathHelpers.overlap(this.realizedArrTime_s, this.realizedDptTime_s,
 					(this.plannedActivity.openingTime_s != null) ? this.plannedActivity.openingTime_s
 							: NEGATIVE_INFINITY,
 					(this.plannedActivity.closingTime_s != null) ? this.plannedActivity.closingTime_s
 							: POSITIVE_INFINITY);
 		}
+		// System.out.println("Realized duration of " + this.plannedActivity.location + " is " + result + "s.");
+		return result;
 	}
 }

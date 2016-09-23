@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.DynLeg;
 import org.matsim.contrib.dynagent.StaticDynActivity;
 import org.matsim.contrib.dynagent.StaticPassengerDynLeg;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -86,7 +87,10 @@ public class CarsharingParkingAgentLogic extends ParkingAgentLogic {
 		
 		// car trip is complete, we have found a parking space (not part of the logic), block it and start to park
 		if (this.parkingManager.parkVehicleHere(this.currentlyAssignedVehicleId, agent.getCurrentLinkId(), now)){
-		this.ffcmanager.endRental(agent.getCurrentLinkId(), agent.getId(), this.currentlyAssignedVehicleId, now);
+		DynLeg oldLeg = (DynLeg) oldAction;
+		if (oldLeg.getMode().equals(FFCSUtils.FREEFLOATINGMODE)){
+			this.ffcmanager.endRental(agent.getCurrentLinkId(), agent.getId(), this.currentlyAssignedVehicleId, now);
+			}
 		this.lastParkActionState = LastParkActionState.PARKACTIVITY;
 		this.currentlyAssignedVehicleId = null;
 		return new StaticDynActivity(ParkingUtils.PARKACTIVITYTYPE,now + ParkingUtils.PARKDURATION);}
@@ -112,6 +116,7 @@ public class CarsharingParkingAgentLogic extends ParkingAgentLogic {
 			Leg walkleg = walkLegFactory.createWalkLeg(agent.getCurrentLinkId(), telePortedParkLink, now, TransportMode.access_walk);
 			this.lastParkActionState = LastParkActionState.WALKTOPARK;
 			this.currentlyAssignedVehicleId = vehicleId;
+			this.stageInteractionType = ParkingUtils.PARKACTIVITYTYPE;
 			return new StaticPassengerDynLeg(walkleg.getRoute(), walkleg.getMode());
 		}
 		else if (currentLeg.getMode().equals(FFCSUtils.FREEFLOATINGMODE)){
@@ -129,6 +134,7 @@ public class CarsharingParkingAgentLogic extends ParkingAgentLogic {
 			Leg walkleg = walkLegFactory.createWalkLeg(agent.getCurrentLinkId(), vehicleLocationLink.getFirst(), now, TransportMode.access_walk);
 			this.currentlyAssignedVehicleId = vehicleLocationLink.getSecond();
 			this.lastParkActionState = LastParkActionState.WALKTOPARK;
+			this.stageInteractionType = FFCSUtils.FREEFLOATINGPARKACTIVITYTYPE;
 			return new StaticPassengerDynLeg(walkleg.getRoute(), walkleg.getMode());
 		}
 		

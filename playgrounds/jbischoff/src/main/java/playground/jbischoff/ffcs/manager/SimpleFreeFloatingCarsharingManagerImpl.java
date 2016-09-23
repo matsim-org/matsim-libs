@@ -134,6 +134,16 @@ public class SimpleFreeFloatingCarsharingManagerImpl implements FreefloatingCars
 	public Map<Id<Vehicle>, Id<Link>> getIdleVehicleLocations() {
 		return idleVehicleLocations;
 	}
+
+
+	/* (non-Javadoc)
+	 * @see playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager#isFFCSVehicle(org.matsim.api.core.v01.Id)
+	 */
+	@Override
+	public boolean isFFCSVehicle(Id<Vehicle> vehicleId) {
+		
+		return (this.idleVehicleLocations.containsKey(vehicleId)|this.busyVehicleLastRentalLocations.containsKey(busyVehicleLastRentalLocations));
+	}
 	
 	
 

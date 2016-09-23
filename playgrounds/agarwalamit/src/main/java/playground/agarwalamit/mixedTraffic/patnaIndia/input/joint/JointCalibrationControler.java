@@ -19,7 +19,6 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.joint;
 
 import java.io.File;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -69,15 +68,15 @@ import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
-import playground.agarwalamit.mixedTraffic.multiModeCadyts.CountsInserter;
-import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalCadytsContext;
-import playground.agarwalamit.mixedTraffic.multiModeCadyts.ModalLink;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.BikeTimeDistanceTravelDisutilityFactory;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForTruck;
 import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
+import playground.agarwalamit.multiModeCadyts.CountsInserter;
+import playground.agarwalamit.multiModeCadyts.ModalCadytsContext;
+import playground.agarwalamit.multiModeCadyts.ModalLink;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 /**
@@ -199,7 +198,7 @@ public class JointCalibrationControler {
 	private static void addScoringFunction(final Controler controler, final Config config){
 		
 		CountsInserter jcg = new CountsInserter();		
-		jcg.processInputFile( inputLocation+"/raw/counts/urbanDemandCountsFile/innerCordon_excl_rckw_incl_truck_shpNetwork.txt" );
+		jcg.processInputFile( inputLocation+"/raw/counts/urbanDemandCountsFile/innerCordon_excl_rckw_shpNetwork.txt" );
 		jcg.processInputFile( inputLocation+"/raw/counts/externalDemandCountsFile/outerCordonData_allCounts_shpNetwork.txt" );
 		jcg.run();
 

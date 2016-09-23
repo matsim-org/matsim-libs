@@ -41,6 +41,7 @@ import org.matsim.core.utils.io.AbstractMatsimWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public final class StreamingPopulationWriter extends AbstractMatsimWriter implements MatsimWriter, PersonAlgorithm {
 
@@ -210,6 +211,7 @@ public final class StreamingPopulationWriter extends AbstractMatsimWriter implem
 
 	public final void writeStartPlans(final String filename) {
 		Population fakepop = new Population(){
+
 			@Override public PopulationFactory getFactory() {
 				throw new RuntimeException("not implemented") ;
 			}
@@ -231,6 +233,11 @@ public final class StreamingPopulationWriter extends AbstractMatsimWriter implem
 			@Override public ObjectAttributes getPersonAttributes() {
 				throw new RuntimeException("not implemented") ;
 			}
+			@Override
+			public Attributes getAttributes() {
+				throw new RuntimeException( "not implemented" );
+			}
+
 		} ;
 		try {
 			this.openFile(filename);

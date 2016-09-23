@@ -20,6 +20,8 @@
 
 package org.matsim.core.population.io;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -29,7 +31,7 @@ import org.matsim.core.population.io.StreamingPopulationReader.StreamingPopulati
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.utils.objectattributes.AttributeConverter;
 import org.xml.sax.Attributes;
 
 /**
@@ -45,11 +47,14 @@ public class PopulationReader extends MatsimXmlParser implements MatsimReader {
 	private final static String PLANS_V1 = "plans_v1.dtd";
 	private final static String PLANS_V4 = "plans_v4.dtd";
 	private final static String POPULATION_V5 = "population_v5.dtd";
+	private final static String POPULATION_V6 = "population_v6.dtd";
 
 	private final CoordinateTransformation coordinateTransformation;
 
 	private MatsimXmlParser delegate = null;
 	private final Scenario scenario;
+
+	private Map<Class<?>, AttributeConverter<?>> attributeConverters = new HashMap<>();
 
 	private static final Logger log = Logger.getLogger(PopulationReader.class);
 
@@ -74,6 +79,14 @@ public class PopulationReader extends MatsimXmlParser implements MatsimReader {
 		this.scenario = scenario;
 	}
 
+	public void putAttributeConverter( final Class<?> clazz , AttributeConverter<?> converter ) {
+		attributeConverters.put( clazz , converter );
+	}
+
+	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
+		attributeConverters.putAll( converters );
+	}
+
 	@Override
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 		this.delegate.startTag(name, atts, context);
@@ -87,34 +100,47 @@ public class PopulationReader extends MatsimXmlParser implements MatsimReader {
 	@Override
 	protected void setDoctype(final String doctype) {
 		super.setDoctype(doctype);
-		if (PLANS_V4.equals(doctype)) {
-			// Replaced non-parallel reader with parallel implementation. cdobler, mar'12.
-//			this.delegate = new PopulationReaderMatsimV4(this.scenario);
-			this.delegate =
-					new ParallelPopulationReaderMatsimV4(
-							coordinateTransformation,
-							this.scenario);
-			log.info("using plans_v4-reader.");
-		} else if (POPULATION_V5.equals(doctype)) {
-			this.delegate =
-					new PopulationReaderMatsimV5(
-							coordinateTransformation,
-							this.scenario);
-			log.info("using population_v5-reader.");
-		} else if (PLANS_V1.equals(doctype)) {
-			this.delegate =
-					new PopulationReaderMatsimV1(
-							coordinateTransformation,
-							this.scenario);
-			log.info("using plans_v1-reader.");
-		} else if (PLANS_V0.equals(doctype) || PLANS.equals(doctype)) {
-			this.delegate =
-					new PopulationReaderMatsimV0(
-							coordinateTransformation,
-							this.scenario);
-			log.info("using plans_v0-reader.");
-		} else {
-			throw new IllegalArgumentException("No population reader available for doctype \"" + doctype + "\".");
+		switch ( doctype ) {
+			case POPULATION_V6:
+				this.delegate =
+						new PopulationReaderMatsimV6(
+								coordinateTransformation,
+								this.scenario);
+				((PopulationReaderMatsimV6) delegate).putAttributeConverters( attributeConverters );
+				log.info("using population_v6-reader.");
+				break;
+			case POPULATION_V5:
+				this.delegate =
+						new PopulationReaderMatsimV5(
+								coordinateTransformation,
+								this.scenario);
+				log.info("using population_v5-reader.");
+				break;
+			case PLANS_V4:
+				// Replaced non-parallel reader with parallel implementation. cdobler, mar'12.
+				this.delegate =
+						new ParallelPopulationReaderMatsimV4(
+								coordinateTransformation,
+								this.scenario);
+				log.info("using plans_v4-reader.");
+				break;
+			case PLANS_V1:
+				this.delegate =
+						new PopulationReaderMatsimV1(
+								coordinateTransformation,
+								this.scenario);
+				log.info("using plans_v1-reader.");
+				break;
+			case PLANS_V0:
+			case PLANS:
+				this.delegate =
+						new PopulationReaderMatsimV0(
+								coordinateTransformation,
+								this.scenario);
+				log.info("using plans_v0-reader.");
+				break;
+			default:
+				throw new IllegalArgumentException("No population reader available for doctype \"" + doctype + "\".");
 		}
 	}
 

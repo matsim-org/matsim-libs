@@ -28,12 +28,16 @@ import java.security.Permission;
 import org.junit.Assert;
 import org.junit.rules.TestWatchman;
 import org.junit.runners.model.FrameworkMethod;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 /**
  * Some helper methods for writing JUnit 4 tests in MATSim.
@@ -295,6 +299,18 @@ public class MatsimTestUtils extends TestWatchman {
 
   public static void enableSystemExitCall() {
     System.setSecurityManager(null);
+  }
+  
+  public static int compareEventsFiles( String filename1, String filename2 ) {
+	  return EventsFileComparator.compare(filename1, filename2) ;
+  }
+  public static void compareFilesBasedOnCRC( String filename1, String filename2 ) {
+	  long checksum1 = CRCChecksum.getCRCFromFile(filename1) ;
+	  long checksum2 = CRCChecksum.getCRCFromFile(filename2) ;
+	  Assert.assertEquals( "different file checksums", checksum1, checksum2 ); 
+  }
+  public static boolean comparePopulations( Population pop1, Population pop2 ) {
+	  return PopulationUtils.equalPopulation(pop1, pop2) ;
   }
 
 }

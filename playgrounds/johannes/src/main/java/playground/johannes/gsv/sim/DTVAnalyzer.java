@@ -33,10 +33,7 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.gis.CRSUtils;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -93,23 +90,19 @@ public class DTVAnalyzer implements IterationEndsListener, IterationStartsListen
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(outdir + "/counts.txt"));
 
-			writer.write("obs\tsim");
+			writer.write("id\tobs\tsim");
 			writer.newLine();
 			
 			for (Count count : obsCounts.getCounts().values()) {
 				Id linkId = count.getLocId();
-//				int[] simVols = simCounts.getVolumesForLink(linkId);
-//				int simVol = 0;
-//				if(simVols != null) {
-//					for(int i = 0; i < simVols.length; i++)
-//						simVol += simVols[i];
-//				}
 				double simVol = simCounts.getOccupancy(linkId) * factor;
 				double obsVol = 0;
 				for(int i = 1; i < 25; i++) {
 					obsVol += count.getVolume(i).getValue();
 				}
 
+				writer.write(count.getCsId());
+				writer.write("\t");
 				writer.write(String.valueOf(obsVol));
 				writer.write("\t");
 				writer.write(String.valueOf(simVol));

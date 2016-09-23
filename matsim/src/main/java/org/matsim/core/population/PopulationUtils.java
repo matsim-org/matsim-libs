@@ -66,6 +66,9 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.AttributesUtils;
+import org.w3c.dom.Attr;
 
 /**
  * @author nagel, ikaddoura
@@ -190,6 +193,12 @@ public final class PopulationUtils {
 		public String toString() {
 			return this.delegate.toString() ;
 		}
+
+		@Override
+		public Attributes getAttributes() {
+			// attributes should be made unmodifiable
+			return delegate.getAttributes();
+		}
 	}
 	
 	public static Activity unmodifiableActivity( Activity act ) {
@@ -277,6 +286,11 @@ public final class PopulationUtils {
 			throw new RuntimeException("not implemented") ;
 		}
 
+		@Override
+		public Attributes getAttributes() {
+			// attributes should be made unmodifiable
+			return delegate.getAttributes();
+		}
 	}
 
 	/**
@@ -787,6 +801,7 @@ public final class PopulationUtils {
 		if (in.getRoute() != null) {
 			out.setRoute(in.getRoute().clone());
 		}
+		AttributesUtils.copyAttributesTo( in , out );
 	}
 	
 	public static void copyFromTo(Activity act, Activity newAct) {
@@ -799,6 +814,8 @@ public final class PopulationUtils {
 		newAct.setEndTime(act.getEndTime());
 		newAct.setMaximumDuration(act.getMaximumDuration());
 		newAct.setFacilityId(act.getFacilityId());
+
+		AttributesUtils.copyAttributesTo( act , newAct );
 	}
 	
 	// --- copy factories:

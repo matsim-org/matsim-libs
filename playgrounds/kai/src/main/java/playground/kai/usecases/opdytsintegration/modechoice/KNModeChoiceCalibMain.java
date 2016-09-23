@@ -1,41 +1,25 @@
 package playground.kai.usecases.opdytsintegration.modechoice;
 
+import java.util.Arrays;
+
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.ModeUtilityParameters;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 
-import floetteroed.opdyts.DecisionVariableRandomizer;
-import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
-import floetteroed.opdyts.searchalgorithms.Simulator;
-import floetteroed.utilities.math.Vector;
 import opdytsintegration.MATSimSimulator;
-import opdytsintegration.MATSimState;
-import opdytsintegration.MATSimStateFactory;
 import opdytsintegration.MATSimStateFactoryImpl;
 import opdytsintegration.utils.TimeDiscretization;
+import playground.kairuns.run.KNBerlinControler;
 
 /**
  * 
@@ -43,122 +27,124 @@ import opdytsintegration.utils.TimeDiscretization;
  * 
  */
 class KNModeChoiceCalibMain {
+	public static void main(String[] args) {
+		boolean equil = true ;
+		boolean calib = true ;
 
-	static void solveFictitiousProblem() {
+		boolean assignment = false ;
+
+		final Config config = KNBerlinControler.prepareConfig(args, assignment, equil) ;
+		
+		String outputDirectory = "" ;
+		if ( calib ) {
+			if ( equil ) {
+				config.plans().setInputFile("/Users/nagel/kairuns/equil/relaxed/output_plans.xml.gz");
+				outputDirectory = "/Users/nagel/kairuns/equil/opdyts/" ;
+			} else {
+				config.plans().setInputFile("/Users/nagel/kairuns/a100/relaxed/output_plans.xml.gz");
+				outputDirectory = "/Users/nagel/kairuns/a100/opdyts/" ;
+			}
+		} else {
+			if ( equil ) {
+				outputDirectory = "/Users/nagel/kairuns/equil/relaxed/" ;
+			} else {
+				outputDirectory = "/Users/nagel/kairuns/a100/relaxed/" ;
+			}
+		}
+		config.controler().setOutputDirectory(outputDirectory);
+
+		run(config, equil, calib, assignment, outputDirectory) ;
+	}
+	
+	public static void run( Config config, boolean equil, boolean calib, boolean assignment, String outputDirectory ) {
+
 		OutputDirectoryLogging.catchLogEntries();
 
 		System.out.println("STARTED ...");
 
-		final Config config = ConfigUtils.loadConfig("examples/equil-extended/config.xml");
+		
+		config.planCalcScore().setBrainExpBeta(1.);
 
-		config.controler() .setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(10);
-
-		config.global().setRandomSeed(4711);
-
-		config.plans().setRemovingUnneccessaryPlanAttributes(true);
-		//		{
-		//			ModeRoutingParams pars = new ModeRoutingParams(TransportMode.walk) ;
-		//			pars.setBeelineDistanceFactor(1.3);
-		//			pars.setTeleportedModeSpeed(4/3.6);
-		//			config.plansCalcRoute().addModeRoutingParams(pars);
-		//		}
-		//		{
-		//			ModeRoutingParams pars = new ModeRoutingParams(TransportMode.bike) ;
-		//			pars.setBeelineDistanceFactor(1.3);
-		//			pars.setTeleportedModeSpeed(8/3.6);
-		//			config.plansCalcRoute().addModeRoutingParams(pars);
-		//		}
-		//		{
-		//			ModeRoutingParams pars = new ModeRoutingParams(TransportMode.pt) ;
-		//			pars.setBeelineDistanceFactor(1.3);
-		//			pars.setTeleportedModeSpeed(8/3.6);
-		//			config.plansCalcRoute().addModeRoutingParams(pars);
-		//		}
-		//		{
-		//			ModeRoutingParams pars = new ModeRoutingParams("pt2") ;
-		//			pars.setBeelineDistanceFactor(1.3);
-		//			pars.setTeleportedModeSpeed(16./3.6);
-		//			config.plansCalcRoute().addModeRoutingParams(pars);
-		//		}
-		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
-			params.setTypicalDurationScoreComputation( TypicalDurationScoreComputation.relative );
-		}
-		//		config.planCalcScore().addModeParams(new ModeParams("pt2"));
-		for ( ModeParams modeParams : config.planCalcScore().getModes().values() ) {
-			modeParams.setConstant(0.);
-			modeParams.setMarginalUtilityOfTraveling(0.); // only marg utl of time as resource
-			modeParams.setMarginalUtilityOfDistance(0.); // possibly make this larger
-			modeParams.setMonetaryDistanceRate(0.);
-		}
-		config.planCalcScore().getModes().get( TransportMode.car ).setMonetaryDistanceRate(-0.3/1000); // per meter!
-		config.planCalcScore().getModes().get( TransportMode.pt ).setMonetaryDistanceRate(-0.2/1000); // per meter!
-		//		config.planCalcScore().getModes().get( "pt2" ).setMonetaryDistanceRate(-0.2/1000); // per meter!
+		config.strategy().clearStrategySettings();
 		{
 			StrategySettings stratSets = new StrategySettings() ;
 			stratSets.setStrategyName( DefaultSelector.ChangeExpBeta.name() );
 			stratSets.setWeight(0.9);
 			config.strategy().addStrategySettings(stratSets);
 		}
-		{
+		if ( !equil ) {
 			StrategySettings stratSets = new StrategySettings() ;
-			stratSets.setStrategyName( DefaultStrategy.ChangeTripMode.name() );
+			stratSets.setStrategyName( DefaultStrategy.ReRoute.name() );
 			stratSets.setWeight(0.1);
 			config.strategy().addStrategySettings(stratSets);
 		}
-
-		config.changeMode().setIgnoreCarAvailability(true);
-		config.changeMode().setModes( new String[] {TransportMode.car, TransportMode.pt} );
-		//		config.changeMode().setModes( new String[] {TransportMode.car, TransportMode.pt, "pt2"} );
-
-		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn);
+		{
+			StrategySettings stratSets = new StrategySettings() ;
+			stratSets.setStrategyName( DefaultStrategy.ChangeSingleTripMode.name() );
+			stratSets.setWeight(0.1);
+			config.strategy().addStrategySettings(stratSets);
+			// note that changeMode _always_ includes ReRoute!
+		}
+		if ( equil ) {
+			config.changeMode().setModes(new String[]{"car","pt"});
+		} 
 
 		// ===
 
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		final Scenario scenario = KNBerlinControler.prepareScenario(equil, config) ;
 
 		// ===
 
-		final DecisionVariableRandomizer<ModeChoiceDecisionVariable> randomizer = new ModeChoiceRandomizer(scenario);
-
-		final ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable( scenario.getConfig().planCalcScore(), scenario ) ;
-
-		//		final TimeDiscretization timeDiscretization = new TimeDiscretization(5 * 3600, 10 * 60, 18);
-		final TimeDiscretization timeDiscretization = new TimeDiscretization(0, 96*3600, 1);
-		final MATSimSimulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>( new MATSimStateFactoryImpl<>(), 
-				scenario, timeDiscretization); 
-		simulator.addOverridingModule(new AbstractModule(){
+		AbstractModule overrides = KNBerlinControler.prepareOverrides(assignment);
+		overrides = AbstractModule.override(Arrays.asList(overrides), new AbstractModule(){
 			@Override public void install() {
-				bindScoringFunctionFactory().to(CharyparNagelScoringFunctionFactory.class);
-				bind(CharyparNagelScoringParametersForPerson.class).to(MySubpopulationCharyparNagelScoringParameters.class);
+				bind( CharyparNagelScoringParametersForPerson.class ).to( EveryIterationScoringParameters.class ) ;
 			}
-		} ) ;
-
-		final ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction();
-
-		final FixedIterationNumberConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion( 100, 10);
-
-		final RandomSearch.Builder<ModeChoiceDecisionVariable> builder = new RandomSearch.Builder<ModeChoiceDecisionVariable>().
-				setSimulator(simulator).
-				setRandomizer(randomizer).
-				setInitialDecisionVariable(initialDecisionVariable).
-				setConvergenceCriterion(convergenceCriterion).
-				setRnd(MatsimRandom.getRandom()).
-				setObjectiveFunction(objectiveFunction) ;
-		final RandomSearch<ModeChoiceDecisionVariable> randomSearch = builder.build() ;
-		randomSearch.setLogPath("./");
+		}  ) ;
 
 		// ===
 
-		randomSearch.run(new SelfTuner(0.95));
+		if ( calib ) {
+
+			final TimeDiscretization timeDiscretization = new TimeDiscretization(0, 3600, 24);
+			final MATSimSimulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>( new MATSimStateFactoryImpl<>(), 
+					scenario, timeDiscretization); 
+			simulator.addOverridingModule( overrides ) ;
+
+			int maxIterations = 10 ;
+			int maxTransitions = Integer.MAX_VALUE ;
+			int populationSize = 10 ;
+			boolean interpolate = true ;
+			boolean includeCurrentBest = false ;
+			final ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable( scenario.getConfig().planCalcScore(), scenario );
+			RandomSearch<ModeChoiceDecisionVariable> randomSearch = new RandomSearch<>( simulator,
+					new ModeChoiceRandomizer(scenario) ,
+					initialDecisionVariable ,
+					new FixedIterationNumberConvergenceCriterion(100, 10 ) ,
+					maxIterations, maxTransitions, populationSize, 
+					MatsimRandom.getRandom(),
+					interpolate,
+					new ModeChoiceObjectiveFunction(),
+					includeCurrentBest ) ;
+
+			randomSearch.setLogPath( outputDirectory );
+
+			// ---
+
+			randomSearch.run(new SelfTuner(0.95));
+
+		} else {
+			config.controler().setLastIteration(1000);
+			config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
+			config.planCalcScore().setFractionOfIterationsToStartScoreMSA(0.8);
+
+			Controler controler = new Controler( scenario ) ;
+			controler.addOverridingModule( overrides );
+			controler.run();
+
+		}
 
 		System.out.println("... DONE.");
-
-	}
-
-	public static void main(String[] args) {
-
-		solveFictitiousProblem();
 
 	}
 

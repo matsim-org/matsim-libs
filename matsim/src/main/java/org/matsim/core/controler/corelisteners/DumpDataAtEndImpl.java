@@ -272,17 +272,21 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		final String internalCRS = config.global().getCoordinateSystem();
 
 		if ( inputCRS == null ) {
-			new PopulationWriter(population, network).write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
+			final PopulationWriter writer = new PopulationWriter(population, network);
+			writer.putAttributeConverters( attributeConverters );
+			writer.write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
 		}
 		else {
-				log.info( "re-projecting population from "+internalCRS+" back to "+inputCRS+" for export" );
+			log.info( "re-projecting population from "+internalCRS+" back to "+inputCRS+" for export" );
 
-				final CoordinateTransformation transformation =
-						TransformationFactory.getCoordinateTransformation(
-								internalCRS,
-								inputCRS );
+			final CoordinateTransformation transformation =
+					TransformationFactory.getCoordinateTransformation(
+							internalCRS,
+							inputCRS );
 
-			new PopulationWriter(transformation , population, network).write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
+			final PopulationWriter writer = new PopulationWriter(transformation , population, network);
+			writer.putAttributeConverters( attributeConverters );
+			writer.write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
 
 		}
 

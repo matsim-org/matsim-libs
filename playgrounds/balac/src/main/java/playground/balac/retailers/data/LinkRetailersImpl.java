@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class LinkRetailersImpl implements Link
 {
@@ -185,4 +186,9 @@ public double getFlowCapacityPerSec() {
 public double getFlowCapacityPerSec(double time) {
 	return this.delegate.getFlowCapacityPerSec(time);
 }
+
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
+	}
 }
