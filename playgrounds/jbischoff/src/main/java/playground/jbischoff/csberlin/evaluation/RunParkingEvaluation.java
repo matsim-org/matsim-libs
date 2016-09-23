@@ -65,8 +65,8 @@ public static void main(String[] args) {
 	events.addHandler(wlpFF);
 	events.addHandler(mierendorffEval);
 	events.addHandler(klausEval);
-	String dir = "D:/runs-svn/bmw_carsharing/basecase/run17/";
-	new ParkingSearchEventsReader(events).readFile(dir+"run17.output_events.xml.gz");
+	String dir = "D:/runs-svn/bmw_carsharing/basecase/bc17_test_nocars/";
+	new ParkingSearchEventsReader(events).readFile(dir+"bc17_test_nocars.output_events.xml.gz");
 	pwde.writeEgressWalkStatistics(dir);
 	mierendorffEval.writeStats(dir+"mierendorffParkAndEgressStats.csv");
 	mierendorffEval.writeCoordTimeStamps(dir+"/mierendorffParkStamps.csv");
