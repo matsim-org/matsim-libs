@@ -1,8 +1,14 @@
 package contrib.baseline.build;
 
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.utils.io.IOUtils;
 
 public class BuildConfig extends ReflectiveConfigGroup  {
+	static final public String GROUP_NAME = "build";
+	
 	private String outputDirectory;
 	private String workingDirectory;
 	private String svnDirectory;
@@ -32,7 +38,7 @@ public class BuildConfig extends ReflectiveConfigGroup  {
 	}
 	
 	public BuildConfig() {
-		super("build");
+		super(GROUP_NAME);
 	}
 	
     @StringSetter( "outputDirectory" )
@@ -113,5 +119,18 @@ public class BuildConfig extends ReflectiveConfigGroup  {
     @StringGetter( "hashScenario" )
     public boolean getHashScenario() {
         return hashScenario;
+    }
+    
+    static public BuildConfig loadConfig(String path) {
+    	Config config = new Config();
+    	config.addModule(new BuildConfig());
+    	new ConfigReader(config).parse(IOUtils.getUrlFromFileOrResource(path));
+    	return (BuildConfig) config.getModule(GROUP_NAME);
+    }
+    
+    static public void saveConfig(String path, BuildConfig buildConfig) {
+    	Config config = new Config();
+    	config.addModule(buildConfig);
+    	new ConfigWriter(config).write(path);
     }
 }

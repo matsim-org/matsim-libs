@@ -65,6 +65,13 @@ public class Builder {
 	public void run() throws IOException, InterruptedException {
 		// Validate or fetch scenario from SVN
 		
+		if (hasConfigChanged()) { // config has changed, so reset!
+			System.out.println("Resetting working copy");
+			FileUtils.cleanDirectory(new File(config.getWorkingDirectory()));
+		}
+		
+		copyConfig();
+		
 		if (!validateCheckoutFromSVN()) {
 			if (svnAvailable) {
 				exportFromSVN();
@@ -72,7 +79,7 @@ public class Builder {
 			} else {
 				throw new RuntimeException("No SVN checkout available, but cannot download because not SVN is installed");
 			}
-		}	
+		}
 		
 		if (!validateUnifyFacilties()) {
 			unifyFacilties();
@@ -695,13 +702,52 @@ public class Builder {
 		System.out.println("Export successful!");
 	}
 	
-	public static void main(String[] argv) throws IOException, InterruptedException {
-		BuildConfig config = new BuildConfig();
+	private void copyConfig() {
+		File outputConfig = new File(config.getOutputDirectory(), "build.xml");
+		BuildConfig.saveConfig(outputConfig.getAbsolutePath(), config);
+	}
+	
+	private boolean hasConfigChanged() {
+		System.out.println("Checking if configuration has changed ...");
 		
-		config.setOutputDirectory("/home/sebastian/build_switzerland");
-		config.setScaling(Scaling.SCALING_1);
-		config.setScenario(Scenario.ZURICH);
-		config.setHashScenario(true);
+		File outputConfigPath = new File(config.getOutputDirectory(), "build.xml");
+		
+		if (outputConfigPath.exists()) {
+			BuildConfig outputConfig = BuildConfig.loadConfig(outputConfigPath.getAbsolutePath());
+			
+			if (!hashConfig(config).equals(hashConfig(outputConfig))) {
+				System.out.println("Configuration has been changed!");
+				return true;
+			}
+		}
+		
+		System.out.println("No changes, OK!");
+		return false;
+	}
+	
+	private String hashConfig(BuildConfig config) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(config.getOutputDirectory());
+		builder.append(config.getWorkingDirectory());
+		builder.append(config.getSVNDirectory());
+		builder.append(config.getPopulation().toString());
+		builder.append(config.getScaling().toString());
+		builder.append(config.getScenario().toString());
+		return builder.toString();
+	}
+	
+	public static void main(String[] argv) throws IOException, InterruptedException {
+		if (argv.length < 1) {
+			System.out.println("First argument must be configuration file.");
+			System.exit(1);
+		}
+		
+		BuildConfig config = BuildConfig.loadConfig(argv[0]);
+		
+		//config.setOutputDirectory("/home/sebastian/build_switzerland");
+		//config.setScaling(Scaling.SCALING_1);
+		//config.setScenario(Scenario.ZURICH);
+		//config.setHashScenario(true);
 		
 		Builder builder = new Builder(config);
 		builder.run();
