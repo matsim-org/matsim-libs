@@ -31,4 +31,6 @@ package playground.jbischoff.ffcs;
 public class FFCSUtils {
 
 	public static final String FREEFLOATINGMODE = "freefloating";
+	static public final String FREEFLOATINGPARKACTIVITYTYPE = "freefloating interaction";
+
 }

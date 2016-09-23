@@ -20,6 +20,7 @@ package playground.kai.usecases.opdytsintegration.modechoice;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
@@ -34,6 +35,7 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ModeUtilityParameters;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -102,7 +104,12 @@ public class EveryIterationScoringParameters implements CharyparNagelScoringPara
 		
 		if ( flag ) {
 			flag = false ;
-			log.warn("new pt params=" + (this.params.get(subpopulation).modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s *3600.) ) ;
+			for (   Entry<String, ModeUtilityParameters> entry : this.params.get(subpopulation).modeParams.entrySet() ) {
+				final String mode = entry.getKey() ;
+				if ( TransportMode.car.equals(mode) || TransportMode.pt.equals(mode) ) {
+					log.warn( mode + ": " + entry.getValue().constant + " + " + (entry.getValue().marginalUtilityOfTraveling_s*3600.) + " * ttime ; " ) ;
+				}
+			}
 		}
 
 		return this.params.get(subpopulation);

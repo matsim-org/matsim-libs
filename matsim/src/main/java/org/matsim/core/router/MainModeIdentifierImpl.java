@@ -51,7 +51,7 @@ public final class MainModeIdentifierImpl implements MainModeIdentifier {
 			}
 		}
 
-		throw new RuntimeException( "could not identify main mode") ;
+		throw new RuntimeException( "could not identify main mode "+ tripElements) ;
 		
 	}
 }

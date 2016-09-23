@@ -23,6 +23,7 @@ package org.matsim.core.utils.geometry.transformations;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.FactoryException;
@@ -71,7 +72,11 @@ public class GeotoolsTransformation implements CoordinateTransformation {
 		} catch (TransformException e) {
 			throw new RuntimeException(e);
 		}
-		return MGC.point2Coord(p);
+		if(coord.hasZ()){
+			return CoordUtils.createCoord(p.getX(), p.getY(), coord.getZ());
+		} else{
+			return MGC.point2Coord(p);
+		}
 	}
 
 

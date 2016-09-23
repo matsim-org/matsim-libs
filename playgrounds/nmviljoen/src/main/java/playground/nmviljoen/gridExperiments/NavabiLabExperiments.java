@@ -44,13 +44,7 @@ private final static Logger LOG = Logger.getLogger(MalikLabExperiments.class);
 	public void runThisSpecificExperiment(){
 		LinkedList<NmvLink> linkListGrid = new LinkedList<NmvLink>(myGraphGrid.getEdges());
 		ArrayList<NmvNode> nodeListGrid = new ArrayList<NmvNode>(myGraphGrid.getVertices());
-//		LinkedList<NmvLink> linkListGhost = new LinkedList<NmvLink>(myGraphGhost.getEdges());
-//		ArrayList<NmvNode> nodeListGhost = new ArrayList<NmvNode>(myGraphGhost.getVertices());
-		LinkedList<NmvLink> linkListNavabi = new LinkedList<NmvLink>(myGraphNavabi.getEdges());
-		ArrayList<NmvNode> nodeListNavabi = new ArrayList<NmvNode>(myGraphNavabi.getVertices());
-		String shortFile=path+"NavabiShortPathStat.csv";
-		ShortestPath.collectShortest(myGraphGrid, myGraphNavabi, linkListGrid, linkListNavabi, nodeListGrid, nodeListNavabi, assocList, shortFile);
-		
+	
 		//Grid graph metrics
 		String Gridpath=path+"GridGraph";
 		
@@ -69,23 +63,7 @@ private final static Logger LOG = Logger.getLogger(MalikLabExperiments.class);
 		//Graph distance
 		JungGraphDistance.calculateAndWriteUnweightedDistances(myGraphGrid, path+"unweightedDist.csv");
 		
-		//Ghost graph metrics
-		String Ghostpath=path+"GhostGraph";
 		
-		//Centrality scores
-//		
-//		JungCentrality.calculateAndWriteUnweightedBetweenness(myGraphGhost,Ghostpath+"unweightedNodeBetweenness.csv", Ghostpath+"unweightedEdgeBetweenness.csv",nodeListGhost, linkListGhost);
-//		JungCentrality.calculateAndWriteUnweightedCloseness(myGraphGhost, Ghostpath+"unweightedCloseness.csv", nodeListGhost);
-//		JungCentrality.calculateAndWriteUnweightedEigenvector(myGraphGhost, Ghostpath+"unweightedEigen.csv", nodeListGhost);
-//		JungCentrality.calculateAndWriteDegreeCentrality(myGraphGhost, Ghostpath+"Degree.csv", nodeListGhost, linkListGhost);
-//
-//		//Clustering
-//		JungClusters.calculateAndWriteClusteringCoefficient(myGraphGhost, Ghostpath+"clusterCoeff.csv");
-//		JungClusters.calculateAndWriteWeakComponents(myGraphGhost, Ghostpath+"weakComp.csv");
-//		JungClusters.calculateAndWriteTriadicCensus(myGraphGhost, Ghostpath+"triadCensus.csv");
-//
-//		//Graph distance
-//		JungGraphDistance.calculateAndWriteUnweightedDistances(myGraphGhost, Ghostpath+"unweightedDist.csv");
 		
 	}
 	

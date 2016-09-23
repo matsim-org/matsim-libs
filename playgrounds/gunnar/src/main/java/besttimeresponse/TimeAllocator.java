@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
-import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
 import org.apache.commons.math3.optim.linear.SimplexSolver;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.matsim.core.gbl.MatsimRandom;
@@ -88,39 +87,60 @@ public class TimeAllocator<L, M> {
 
 	// -------------------- IMPLEMENTATION --------------------
 
+	private double[] currentDptTimes_s = null;
+	private Double currentScore = null;
+
+	public double[] getResultPoint() {
+		return this.currentDptTimes_s;
+	}
+
+	public Double getResultValue() {
+		return this.currentScore;
+	}
+
+	// TODO NEW, FOR CONSISTENCY CHECK
+	public double evaluate(final List<PlannedActivity<L, M>> plannedActivities,
+			final double[] initialDptTimes_s) {
+		if (initialDptTimes_s == null) {
+			throw new RuntimeException("Cannot evaluate a plan without time structure.");
+		}
+		TimeAllocationProblem problem = this.newTimeAllocationProblem(plannedActivities, initialDptTimes_s);
+		return problem.getTimeScoreAtInitialSolution();
+	}
+	
 	public double[] optimizeDepartureTimes(final List<PlannedActivity<L, M>> plannedActivities,
 			final double[] initialDptTimes_s) {
 
 		TimeAllocationProblem problem = this.newTimeAllocationProblem(plannedActivities, initialDptTimes_s);
-
-		double[] currentDptTimes_s = problem.getInitialSolution();
-		LinearObjectiveFunction objFct = problem.getObjectiveFunction();
-		double currentScore = objFct.value(currentDptTimes_s);
-		RealVector currentGradient = objFct.getCoefficients();
+		this.currentDptTimes_s = problem.getInitialSolution();
+		this.currentScore = problem.getTimeScoreAtInitialSolution();
+		RealVector currentGradient = problem.get__dScore_dDptTimes__1_s();
 
 		while (true) {
 
-			System.out.println(
-					"current dpt. times: " + new ArrayRealVector(currentDptTimes_s) + ", score = " + currentScore);
+			System.out.println("current dpt. times: " + new ArrayRealVector(this.currentDptTimes_s) + ", score = "
+					+ this.currentScore);
 
-			final double[] newDptTimes_s = (new SimplexSolver())
+			double[] newDptTimes_s = (new SimplexSolver())
 					.optimize(problem.getObjectiveFunction(), problem.getConstraints(), GoalType.MAXIMIZE).getPoint();
+			// System.out.println(" BEFORE: " + Arrays.toString(newDptTimes_s));
 			problem = this.newTimeAllocationProblem(plannedActivities, newDptTimes_s);
-			objFct = problem.getObjectiveFunction();
-			final double newScore = objFct.value(newDptTimes_s);
-			final RealVector newGradient = objFct.getCoefficients();
+			// System.out.println(" AFTER: " +
+			// Arrays.toString(problem.getInitialSolution()));
+			final double newScore = problem.getTimeScoreAtInitialSolution();
+			final RealVector newGradient = problem.get__dScore_dDptTimes__1_s();
 
-			if (newScore <= currentScore) {
+			if (newScore <= this.currentScore) {
 
 				final RealVector deltaDptTime_s = new ArrayRealVector(newDptTimes_s)
-						.subtract(new ArrayRealVector(currentDptTimes_s));
+						.subtract(new ArrayRealVector(this.currentDptTimes_s));
 				final double deltaDptTimeNorm_s = deltaDptTime_s.getNorm();
 
 				if (deltaDptTimeNorm_s >= 1e-8) {
 					final double g0 = deltaDptTime_s.dotProduct(currentGradient) / deltaDptTimeNorm_s;
 					final double g1 = deltaDptTime_s.dotProduct(newGradient) / deltaDptTimeNorm_s;
 					if ((g0 > 0) && (g1 < 0)) {
-						final double _Q0 = currentScore;
+						final double _Q0 = this.currentScore;
 						final double _Q1 = newScore;
 
 						final double eta = max(0, min(1.0, 0.5 - (_Q1 - _Q0) / (g1 - g0)));
@@ -160,29 +180,33 @@ public class TimeAllocator<L, M> {
 						 * then the line search returns its *exact* maximum.
 						 */
 
-						final ArrayRealVector interpolDptTime_s = new ArrayRealVector(currentDptTimes_s).combine(1.0,
-								eta, deltaDptTime_s);
+						final ArrayRealVector interpolDptTime_s = new ArrayRealVector(this.currentDptTimes_s)
+								.combine(1.0, eta, deltaDptTime_s);
 						for (int q = 0; q < interpolDptTime_s.getDimension(); q++) {
-							currentDptTimes_s[q] = interpolDptTime_s.getEntry(q);
+							this.currentDptTimes_s[q] = interpolDptTime_s.getEntry(q);
 						}
-						System.out.println("current dpt. times: " + new ArrayRealVector(currentDptTimes_s)
-								+ ", score = " + this.newTimeAllocationProblem(plannedActivities, currentDptTimes_s)
-										.getObjectiveFunction().value(currentDptTimes_s));
+						System.out
+								.println(
+										"current dpt. times: " + new ArrayRealVector(this.currentDptTimes_s)
+												+ ", score = "
+												+ this.newTimeAllocationProblem(plannedActivities,
+														this.currentDptTimes_s).getObjectiveFunction()
+														.value(this.currentDptTimes_s));
 					}
 				}
 
 				if (this.randomSmoothing) {
-					for (int q = 0; q < currentDptTimes_s.length; q++) {
-						currentDptTimes_s[q] += this.timeDiscretization.getBinSize_s()
+					for (int q = 0; q < this.currentDptTimes_s.length; q++) {
+						this.currentDptTimes_s[q] += this.timeDiscretization.getBinSize_s()
 								* (MatsimRandom.getRandom().nextDouble() - 0.5);
 					}
 				}
 
-				return currentDptTimes_s;
+				return this.currentDptTimes_s;
 			}
 
-			currentDptTimes_s = newDptTimes_s;
-			currentScore = newScore;
+			this.currentDptTimes_s = newDptTimes_s;
+			this.currentScore = newScore;
 			currentGradient = newGradient;
 		}
 	}

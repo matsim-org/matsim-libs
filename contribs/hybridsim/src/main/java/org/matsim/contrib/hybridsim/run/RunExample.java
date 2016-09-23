@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -60,13 +61,13 @@ import com.google.inject.Provider;
 /**
  * Created by laemmel on 09.03.16.
  */
-public class Example {
+public class RunExample {
 
 
 	public static String REMOTE_HOST = "localhost";
 	public static int REMOTE_PORT = 9000;
 
-	private static final Logger log = Logger.getLogger(Example.class);
+    private static final Logger log = Logger.getLogger(RunExample.class);
 
     private static final IdIntMapper idIntMapper = new IdIntMapper();
 
@@ -77,6 +78,8 @@ public class Example {
 			REMOTE_HOST = args[0];
 			REMOTE_PORT = Integer.parseInt(args[1]);
 		}
+
+        Logger.getRootLogger().setLevel(Level.INFO);//Make output less verbose as netty is so blathering
 
 
 		Config c = ConfigUtils.createConfig();

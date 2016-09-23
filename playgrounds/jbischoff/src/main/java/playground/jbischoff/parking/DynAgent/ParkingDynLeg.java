@@ -100,7 +100,7 @@ public class ParkingDynLeg implements DriverDynLeg {
 					}
 				}
 				// need to find the next link
-				Id<Link> nextLinkId = this.logic.getNextLink(currentLinkId);
+				Id<Link> nextLinkId = this.logic.getNextLink(currentLinkId, vehicleId);
 				currentAndNextParkLink = new Tuple<Id<Link>, Id<Link>>(currentLinkId, nextLinkId);
 				return nextLinkId;
 

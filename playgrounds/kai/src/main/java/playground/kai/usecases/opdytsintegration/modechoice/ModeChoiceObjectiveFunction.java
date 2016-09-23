@@ -1,8 +1,6 @@
 package playground.kai.usecases.opdytsintegration.modechoice;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -44,23 +42,17 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 	@Inject ExperiencedPlansService service ;
 	@Inject TripRouter tripRouter ;
 	@Inject Network network ;
-	// Documentation: "Guice injects ... fields of all values that are bound using toInstance(). These are injected at injector-creation time."
+	// Documentation: "Guice injects ... fields of all values (=classes) that are bound using toInstance(). These are injected at injector-creation time."
 	// https://github.com/google/guice/wiki/InjectionPoints
 	// I read that as "the fields are injected (every time again) when the instance is injected".
 	// This is the behavior that we want here.  kai, sep'16
 	
-	// statistics types:
 	enum StatType { 
 		tripBeelineDistances
 	} ;
 
-	// container that contains the statistics containers:
 	private final Map<StatType,Databins<String>> statsContainer = new TreeMap<>() ;
-
-	// container that contains the sum (to write averages):
 	private final Map<StatType,DataMap<String>> sumsContainer  = new TreeMap<>() ;
-	// yy for time being not fully symmetric with DatabinsMap! kai, oct'15
-	
 	private final Map<StatType,Databins<String>> meaContainer = new TreeMap<>() ;
 
 
@@ -71,12 +63,15 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 			case tripBeelineDistances: {
 				double[] dataBoundariesTmp = {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.} ;
 				{
-					this.statsContainer.put( statType, new Databins<>( statType.name(), dataBoundariesTmp )) ;
+					final Databins<String> databins = new Databins<>( statType.name(), dataBoundariesTmp );
+					this.statsContainer.put( statType, databins) ;
 				}
 				{
-					final Databins<String> databins = new Databins<>( statType.name(), dataBoundariesTmp );
-					databins.addValue( TransportMode.car, 8, 100.);
-					databins.addValue( TransportMode.pt, 8, 100.);
+					final Databins<String> databins = new Databins<>( statType.name(), dataBoundariesTmp ) ;
+//					final double carVal = 3753.; // relaxed
+					final double carVal = 1000. ;
+					databins.addValue( TransportMode.car, 8, carVal);
+					databins.addValue( TransportMode.pt, 8, 4000.-carVal);
 					this.meaContainer.put( statType, databins) ;
 				}
 				break; }
@@ -104,6 +99,7 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 		}
 
 		double objective = 0 ;
+		double sum = 0. ;
 		for ( Entry<StatType, Databins<String>> entry : statsContainer.entrySet() ) {
 			StatType theStatType = entry.getKey() ;  // currently only one type ;
 			log.warn( "statType=" + statType );
@@ -115,12 +111,16 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 				double[] reaVal = this.meaContainer.get( theStatType).getValues(mode) ;
 				for ( int ii=0 ; ii<value.length ; ii++ ) {
 					double diff = value[ii] - reaVal[ii] ;
-					log.warn( "distanceBnd=" + databins.getDataBoundaries()[ii] + "; reaVal=" + reaVal[ii] + "; simVal=" + value[ii] ) ;
+					if ( reaVal[ii]>0.1 || value[ii]>0.1 ) {
+						log.warn( "distanceBnd=" + databins.getDataBoundaries()[ii] + "; objVal=" + reaVal[ii] + "; simVal=" + value[ii] ) ;
+					}
 					objective += diff * diff ;
+					sum += reaVal[ii] ;
 				}
 			}
 		}
-		log.warn( "objective=" + objective );
+		objective /= (sum*sum) ;
+		log.warn( "objective=" + objective ) ;
 		return objective ;
 
 	}
@@ -156,7 +156,8 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 		} else {
 			if ( noCoordCnt < 1 ) {
 				noCoordCnt ++ ;
-				log.warn("either fromAct or to Act has no Coord; using link coordinates as substitutes.\n" + Gbl.ONLYONCE ) ;
+				log.warn("either fromAct or to Act has no Coord; using link coordinates as substitutes.") ;
+				log.warn(Gbl.ONLYONCE ) ;
 			}
 			Link fromLink = network.getLinks().get( fromAct.getLinkId() ) ;
 			Link   toLink = network.getLinks().get(   toAct.getLinkId() ) ;

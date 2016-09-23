@@ -21,6 +21,7 @@ package playground.jbischoff.parking.choice;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author  jbischoff
@@ -29,7 +30,12 @@ import org.matsim.api.core.v01.network.Link;
 public interface ParkingChoiceLogic {
 	/**
 	 * currentLinkId link last visited
+	 * @param vehicleId vehicleId
 	 */
-	Id<Link> getNextLink(Id<Link> currentLinkId);
+	Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId);
 	
+	/**
+	 * fixed route search strategies (i.e. find the next carsharing parking lot) might require a reset once search is completed
+	 */
+	void reset();
 }

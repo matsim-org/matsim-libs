@@ -1,9 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*
+ * MyControler1.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,34 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.config.example5iterations;
 
-import java.io.File;
+package tutorial.config;
 
-import org.junit.Test;
-import org.matsim.core.utils.io.IOUtils;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
+
 
 /**
+ * runs a mobsim and writes events output.  See the config file for configuration details.
+ * 
  * @author nagel
  *
  */
-public class MyControler5IntegrationTest {
+public class RunFromConfigfileExample {
 
-	/**
-	 * Test method for {@link tutorial.config.example5iterations.RunExample5#main(java.lang.String[])}.
-	 */
-	@SuppressWarnings("static-method")
-	@Test
-	public final void testMain() {
-		try {
-			IOUtils.deleteDirectory(new File("./output/example5"),false);
-		} catch ( IllegalArgumentException ee ) {
-			// (normally, the directory should NOT be there initially.  It might, however, be there if someone ran the main class in some other way,
-			// and did not remove the directory afterwards.)
+	public static void main(final String[] args) {
+		String configFile ;
+		if ( args!=null && args.length>=1 ) {
+			configFile = args[0] ;
+		} else {
+			configFile = "examples/tutorial/config/example1-config.xml" ;
+//			configFile = "examples/tutorial/config/example5-config.xml" ;
+//			configFile = "examples/tutorial/config/example5trips-config.xml" ;
 		}
-		RunExample5.main(null);
-		IOUtils.deleteDirectory(new File("./output/example5"),false);
-		// (here, the directory should be there)
+
+		Config config = ConfigUtils.loadConfig(configFile);
+		
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		
+		Controler controler = new Controler(scenario);
+		controler.run();
 	}
 
 }

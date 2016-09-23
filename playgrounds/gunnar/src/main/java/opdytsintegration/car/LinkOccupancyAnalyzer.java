@@ -1,8 +1,14 @@
 package opdytsintegration.car;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
@@ -16,6 +22,7 @@ import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
+import floetteroed.utilities.Units;
 import opdytsintegration.MATSimCountingStateAnalyzer;
 import opdytsintegration.utils.TimeDiscretization;
 
@@ -54,13 +61,6 @@ public class LinkOccupancyAnalyzer extends MATSimCountingStateAnalyzer<Link>
 	// ---------- IMPLEMENTATION OF *EventHandler INTERFACES ----------
 
 	@Override
-	public void handleEvent(final VehicleLeavesTrafficEvent event) {
-		if (this.relevant(event.getLinkId())) {
-			this.registerDecrease(event.getLinkId(), (int) event.getTime());
-		}
-	}
-
-	@Override
 	public void handleEvent(final VehicleEntersTrafficEvent event) {
 		if (this.relevant(event.getLinkId())) {
 			this.registerIncrease(event.getLinkId(), (int) event.getTime());
@@ -71,6 +71,13 @@ public class LinkOccupancyAnalyzer extends MATSimCountingStateAnalyzer<Link>
 	public void handleEvent(final LinkEnterEvent event) {
 		if (this.relevant(event.getLinkId())) {
 			this.registerIncrease(event.getLinkId(), (int) event.getTime());
+		}
+	}
+
+	@Override
+	public void handleEvent(final VehicleLeavesTrafficEvent event) {
+		if (this.relevant(event.getLinkId())) {
+			this.registerDecrease(event.getLinkId(), (int) event.getTime());
 		}
 	}
 
@@ -90,9 +97,7 @@ public class LinkOccupancyAnalyzer extends MATSimCountingStateAnalyzer<Link>
 
 	// -------------------- MAIN-FUNCTION, ONLY FOR TESTING --------------------
 
-	// TODO make this a unit test
-	public static void main(String[] args) {
-
+	private static void constructedTest() {
 		final int startTime_s = 0;
 		final int binSize_s = 10;
 		final int binCnt = 5;
@@ -146,11 +151,90 @@ public class LinkOccupancyAnalyzer extends MATSimCountingStateAnalyzer<Link>
 
 		// time = 100, in = 8, out = 8
 
-		analyzer.advanceToEnd();
+		analyzer.finalizeAndLock();
 
 		for (int bin = 0; bin < binCnt; bin++) {
 			System.out.println("[" + (startTime_s + bin * binSize_s) + "," + (startTime_s + (bin + 1) * binSize_s)
 					+ "): " + analyzer.getCount(id1, bin));
 		}
+	}
+
+	private static void randomTest() {
+		final int startTime_s = 0;
+		final int binSize_s = 1 * 3600;
+		final int binCnt = 24; // 24;
+
+		final Random rnd = new Random();
+		final LinkOccupancyAnalyzer analyzer = new LinkOccupancyAnalyzer(startTime_s, binSize_s, binCnt, null);
+		final Id<Link> linkId = Id.createLinkId("1");
+
+		
+		final int vehCnt = 100 * 1000;
+		double avg = 0.0;
+		final List<Event> events = new ArrayList<>();
+		for (int veh = 1; veh < vehCnt; veh++) {
+
+			final double timeIn_s;
+			final double timeOut_s;
+			{
+				final int time1_s = rnd.nextInt((int) Units.S_PER_D);
+				final int time2_s = rnd.nextInt((int) Units.S_PER_D);
+				timeIn_s = Math.min(time1_s, time2_s);
+				timeOut_s = Math.max(time1_s, time2_s);
+			}
+			
+			avg += (timeOut_s - timeIn_s) / Units.S_PER_D;
+						
+			final Id<Vehicle> vehId = Id.createVehicleId(veh);
+
+			if (rnd.nextBoolean()) {
+				events.add(new VehicleEntersTrafficEvent(timeIn_s, null, linkId, vehId, null, 0.0));
+			} else {
+				events.add(new LinkEnterEvent(timeIn_s, vehId, linkId));
+			}
+
+			if (rnd.nextDouble() < 1.0 / 3.0) {
+				events.add(new VehicleLeavesTrafficEvent(timeOut_s, null, linkId, vehId, "car", 0.0));
+			} else if (rnd.nextBoolean()) {
+				events.add(new LinkLeaveEvent(timeOut_s, vehId, linkId));
+			} else {
+				events.add(new VehicleAbortsEvent(timeOut_s, vehId, linkId));
+			}
+		}
+		
+		Collections.sort(events, new Comparator<Event>() {
+			@Override
+			public int compare(Event o1, Event o2) {
+				return Double.compare(o1.getTime(), o2.getTime());
+			}
+		});
+		for (Event event : events) {
+			if (event instanceof VehicleEntersTrafficEvent) {
+				analyzer.handleEvent((VehicleEntersTrafficEvent) event);
+			} else if (event instanceof LinkEnterEvent) {
+				analyzer.handleEvent((LinkEnterEvent) event);
+			} else if (event instanceof VehicleLeavesTrafficEvent) {
+				analyzer.handleEvent((VehicleLeavesTrafficEvent) event);
+			} else if (event instanceof LinkLeaveEvent) {
+				analyzer.handleEvent((LinkLeaveEvent) event);
+			} else if (event instanceof VehicleAbortsEvent) {
+				analyzer.handleEvent((VehicleAbortsEvent) event);
+			} else {
+				throw new RuntimeException();
+			}			
+		}
+		
+		System.out.println("grand average = " + avg);
+		for (int bin = 0; bin < binCnt; bin++) {
+			System.out.println("bin = " + bin + ", value = " + analyzer.getCount(linkId, bin));
+		}
+
+		
+	}
+
+	// TODO make this a unit test
+	public static void main(String[] args) {
+//		constructedTest();
+		randomTest();
 	}
 }

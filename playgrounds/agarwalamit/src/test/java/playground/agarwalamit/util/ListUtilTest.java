@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,26 +16,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.kai.usecases.opdytsintegration.modechoice;
 
-import static org.junit.Assert.fail;
+package playground.agarwalamit.util;
 
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
+import playground.agarwalamit.utils.ListUtils;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * @author nagel
- *
+ * Created by amit on 19/09/16.
  */
-public class KNModeChoiceCalibTest {
 
-	/**
-	 * Test method for {@link playground.kai.usecases.opdytsintegration.modechoice.KNModeChoiceCalibMain#solveFictitiousProblem()}.
-	 */
-	@Test
-	@Ignore
-	public final void testSolveFictitiousProblem() {
-		fail("Not yet implemented"); // TODO
-	}
+
+public class ListUtilTest {
+
+    @Test
+    public void test(){
+
+        List<Integer> ints = Arrays.asList(4,8,12,16);
+
+        Assert.assertEquals("Sum is wrong",40, ListUtils.intSum(ints), MatsimTestUtils.EPSILON);
+        Assert.assertEquals("Mean is wrong",40/4, ListUtils.intMean(ints), MatsimTestUtils.EPSILON);
+
+        List<Double> doubles = Arrays.asList(4.0,8.0,12.0,16.0);
+
+        Assert.assertEquals("Sum is wrong",40., ListUtils.doubleSum(doubles), MatsimTestUtils.EPSILON);
+        Assert.assertEquals("Mean is wrong",40./4, ListUtils.doubleMean(doubles), MatsimTestUtils.EPSILON);
+    }
+
 
 }

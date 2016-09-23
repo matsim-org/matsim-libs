@@ -27,6 +27,10 @@ public class PlannedActivity<L, M> {
 	// Must be at least MINACTDUR_S.
 	final double desiredDur_s;
 
+	// TODO NEW
+	// Must be at least MINACTDUR_S.
+	final double minDur_s;
+
 	// Must be in [00:00:00, 24:00:00].
 	final Double openingTime_s;
 	final Double closingTime_s;
@@ -37,13 +41,17 @@ public class PlannedActivity<L, M> {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public PlannedActivity(final L location, final M departureMode, final double desiredDur_s,
+	public PlannedActivity(final L location, final M departureMode, final double desiredDur_s, final double minDur_s,
 			final Double openingTime_s, final Double closingTime_s, final Double latestArrTime_s,
 			final Double earliestDptTime_s) {
 
 		if (desiredDur_s < MINACTDUR_S) {
 			throw new RuntimeException(
 					"Desired activity duration is " + desiredDur_s + "s but must be at least " + MINACTDUR_S + "s.");
+		}
+		if (minDur_s < MINACTDUR_S) {
+			throw new RuntimeException(
+					"Minimal activity duration is " + minDur_s + "s but must be at least " + MINACTDUR_S + "s.");
 		}
 		if ((openingTime_s != null) && (closingTime_s != null) && (openingTime_s > closingTime_s)) {
 			throw new RuntimeException("Opening time " + openingTime_s + "s is larger than closing time "
@@ -58,6 +66,7 @@ public class PlannedActivity<L, M> {
 		this.location = location;
 		this.departureMode = departureMode;
 		this.desiredDur_s = desiredDur_s;
+		this.minDur_s = minDur_s;
 		this.openingTime_s = openingTime_s;
 		this.closingTime_s = closingTime_s;
 		this.latestArrTime_s = latestArrTime_s;

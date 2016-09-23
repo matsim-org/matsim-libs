@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,34 +16,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.config.example1mobsim;
-
-import java.io.File;
-
-import org.junit.Test;
-import org.matsim.core.utils.io.IOUtils;
+package playground.thibautd.initialdemandgeneration.empiricalsocnet;
 
 /**
- * @author nagel
- *
+ * @author thibautd
  */
-public class MyControler1IntegrationTest {
-
-	/**
-	 * Test method for {@link tutorial.config.example1mobsim.RunExample1#main(java.lang.String[])}.
-	 */
-	@SuppressWarnings("static-method")
-	@Test
-	public final void testMain() {
-		try {
-			IOUtils.deleteDirectory(new File("./output/example1"),false);
-		} catch ( IllegalArgumentException ee ) {
-			// (normally, the directory should NOT be there initially.  It might, however, be there if someone ran the main class in some other way,
-			// and did not remove the directory afterwards.)
-		}
-		RunExample1.main(null);
-		IOUtils.deleteDirectory(new File("./output/example1"),false);
-		// (here, the directory should be there)
-	}
-
+public class CliquesDistribution {
 }

@@ -107,7 +107,7 @@ public class PatnaPolicyControler {
 				if (isAllwoingMotorbikeOnBikeTrack) throw new RuntimeException("Two situations -- traffic restrain and motorbike on bike track -- are not considered.");
 				if (addBikeTrack) outputDir = dir+"/both/";
 				else outputDir = dir+"/trafficRestrain/";
-			} else if(addBikeTrack) outputDir = dir+"/bikeTrack/";
+			} else if(addBikeTrack && !isAllwoingMotorbikeOnBikeTrack) outputDir = dir+"/bikeTrack/";
 			else if(isAllwoingMotorbikeOnBikeTrack) outputDir = dir+"/BT-mb/";
 			else outputDir = dir+"/baseCaseCtd/";			
 		}
@@ -144,7 +144,7 @@ public class PatnaPolicyControler {
 			config.network().setInputFile(inputDir + "/networkWithTrafficRestricationAndBikeTrack.xml.gz");
 		} else if (applyTrafficRestrain ) {
 			config.network().setInputFile(inputDir + "/networkWithTrafficRestrication.xml.gz");
-		} else if(addBikeTrack) {
+		} else if(addBikeTrack && !isAllwoingMotorbikeOnBikeTrack) {
 			config.network().setInputFile(inputDir + "/networkWithBikeTrack.xml.gz");
 		} else if (isAllwoingMotorbikeOnBikeTrack) {
 			config.network().setInputFile(inputDir + "/networkWithBikeMotorbikeTrack.xml.gz");

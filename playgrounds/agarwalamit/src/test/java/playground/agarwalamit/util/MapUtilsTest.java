@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,34 +16,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.config.example5iterations;
 
-import java.io.File;
+package playground.agarwalamit.util;
 
+import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.core.utils.io.IOUtils;
+import org.matsim.testcases.MatsimTestUtils;
+import playground.agarwalamit.utils.MapUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * @author nagel
- *
+ * Created by amit on 19/09/16.
  */
-public class MyControler5TripsIntegrationTest {
 
-	/**
-	 * Test method for {@link tutorial.config.example5iterations.RunExample5Trips#main(java.lang.String[])}.
-	 */
-	@SuppressWarnings("static-method")
-	@Test
-	public final void testMain() {
-		try {
-			IOUtils.deleteDirectory(new File("./output/example5trips"),false);
-		} catch ( IllegalArgumentException ee ) {
-			// (normally, the directory should NOT be there initially.  It might, however, be there if someone ran the main class in some other way,
-			// and did not remove the directory afterwards.)
-		}
-		RunExample5Trips.main(null);
-		IOUtils.deleteDirectory(new File("./output/example5trips"),false);
-		// (here, the directory should be there)
-	}
+
+public class MapUtilsTest {
+
+    private final MatsimTestUtils helper = new MatsimTestUtils();
+
+    @Test
+    public void test(){
+
+        Map<String, Integer> str2Int = new HashMap<>();
+        str2Int.put("A",4);
+        str2Int.put("B",8);
+        str2Int.put("C",12);
+        str2Int.put("D",16);
+
+        //value sum
+        int sumFromUtil = MapUtils.intValueSum(str2Int);
+        int sum = 40;
+        Assert.assertEquals("Sum is wrong",sum,sumFromUtil,MatsimTestUtils.EPSILON);
+
+        Map<String, Double> str2Double = new HashMap<>();
+        str2Double.put("A",4.);
+        str2Double.put("B",8.);
+        str2Double.put("C",12.);
+        str2Double.put("D",16.);
+
+        //value sum
+        Assert.assertEquals("Sum is wrong",40.0, MapUtils.doubleValueSum(str2Double),MatsimTestUtils.EPSILON);
+
+    }
 
 }

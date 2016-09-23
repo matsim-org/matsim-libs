@@ -198,7 +198,15 @@ public class ConfigGroup implements MatsimExtensionPoint {
 
 	public final Map<String, ? extends Collection<? extends ConfigGroup>> getParameterSets() {
 		// TODO: immutabilize (including lists)
-		return parameterSetsPerType;
+		// maybe done with what I did below?  kai, sep'16
+		
+		//		return parameterSetsPerType;
+		
+		Map<String, Collection<ConfigGroup>> parameterSetsPerType2 = new TreeMap<>() ;
+		for ( Entry<String, Collection<ConfigGroup>> entry : parameterSetsPerType.entrySet() ) {
+			parameterSetsPerType2.put( entry.getKey(), Collections.unmodifiableCollection(entry.getValue()) ) ;
+		}
+		return Collections.unmodifiableMap( parameterSetsPerType2 ) ;
 	}
 
 	public final boolean isLocked() {
@@ -206,8 +214,13 @@ public class ConfigGroup implements MatsimExtensionPoint {
 	}
 
 	public void setLocked() {
-		// need to have this non-final to be able to set delegates.  kai, jun'15
+		// need to have this non-final to be able to override in order to set delegates.  kai, jun'15
 		this.locked = true ;
+		for ( Collection<ConfigGroup> parameterSets : this.parameterSetsPerType.values() ) {
+			for ( ConfigGroup parameterSet : parameterSets ) {
+				parameterSet.setLocked(); 
+			}
+		}
 	}
 	
 	public final void testForLocked() {

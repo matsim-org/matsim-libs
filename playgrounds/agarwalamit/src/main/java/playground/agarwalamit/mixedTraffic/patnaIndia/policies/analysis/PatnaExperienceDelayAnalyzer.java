@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import jdk.nashorn.internal.scripts.JO;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -38,6 +39,7 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.congestion.FilteredExperienceDelayHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.NumberUtils;
 
@@ -48,7 +50,7 @@ import playground.agarwalamit.utils.NumberUtils;
 public class PatnaExperienceDelayAnalyzer {
 
 	public static void main(String[] args) {
-		String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/policies/";
+		String outputDir = "../../repos/runs-svn/patnaIndia/run108/jointDemand/policies/"+ PatnaUtils.PCU_2W+"pcu/";
 		String runCases [] = {"baseCaseCtd","bikeTrack","trafficRestrain","both","BT-mb"};
 		for (String runCase : runCases){
 			String eventsFile = outputDir+runCase+"/output_events.xml.gz";

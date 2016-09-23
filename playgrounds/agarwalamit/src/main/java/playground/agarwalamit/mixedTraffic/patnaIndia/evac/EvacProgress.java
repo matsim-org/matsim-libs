@@ -40,8 +40,9 @@ public class EvacProgress {
 	private final int shortestPathRunIteration = 0;
 	private final int NERunIteration = 100;
 
-	private final String runCase = "PassingQ";
-	private final String dir = "../../../../repos/runs-svn/patnaIndia/run109/1pct/evac_"+runCase+"/";
+	private final String runCase = "SeepageQ_[bike, motorbike]";
+	private final String dir = "/Users/amit/Documents/repos/runs-svn/patnaIndia/run109/1pct/withoutHoles/evac_"+runCase;
+	private final String inputDir = "/Users/amit/Documents/repos/runs-svn/patnaIndia/run109/1pct/input/";
 
 	public static void main(String[] args) {
 		new EvacProgress().runAndWrite();
@@ -52,15 +53,19 @@ public class EvacProgress {
 		String eventsFileSP = dir+"/ITERS/it."+shortestPathRunIteration+"/"+shortestPathRunIteration+".events.xml.gz";
 		String eventsFileNE = dir+"/ITERS/it."+NERunIteration+"/"+NERunIteration+".events.xml.gz";
 
-		PersonArrivalAnalyzer arrivalAnalyzer = new PersonArrivalAnalyzer(eventsFileSP, dir+"output_config.xml.gz"); 
-		arrivalAnalyzer.run();
+		String networkFile = dir+"/output_network.xml.gz";
+		String shapeFile = inputDir+"/patnaEvacAnalysisArea.shp";
+		String outputFilePrefix = "_analysisArea";
+		
+		PersonArrivalAnalyzer arrivalAnalyzer = new PersonArrivalAnalyzer(eventsFileSP, dir+"/output_config.xml.gz"); 
+		arrivalAnalyzer.run(shapeFile,networkFile);
 		SortedMap<String,SortedMap<Integer, Integer>> evacProgressSP = arrivalAnalyzer.getTimeBinToNumberOfArrivals();
 
-		arrivalAnalyzer = new PersonArrivalAnalyzer(eventsFileNE, dir+"output_config.xml.gz"); 
-		arrivalAnalyzer.run();
+		arrivalAnalyzer = new PersonArrivalAnalyzer(eventsFileNE, dir+"/output_config.xml.gz"); 
+		arrivalAnalyzer.run(shapeFile,networkFile);
 		SortedMap<String,SortedMap<Integer, Integer>>  evacProgressNE = arrivalAnalyzer.getTimeBinToNumberOfArrivals();
 
-		String outFile = dir+"/analysis/evacuationProgress.txt";
+		String outFile = dir+"/analysis/evacuationProgress"+outputFilePrefix+".txt";
 		
 		SortedSet<Integer> timeBins = new TreeSet<>();
 		timeBins.addAll(evacProgressSP.get(TransportMode.car).keySet());
@@ -94,7 +99,7 @@ public class EvacProgress {
 			throw new RuntimeException("Data is not written in file. Reason: "+ e);
 		}
 		
-		outFile = dir+"/analysis/evacuationProgress_ggplot.txt";
+		outFile = dir+"/analysis/evacuationProgress"+outputFilePrefix+"_ggplot.txt";
 		Map<String,double[]> evacSP = getCummulative(evacProgressSP);
 		Map<String,double[]> evacNE = getCummulative(evacProgressNE);
 		

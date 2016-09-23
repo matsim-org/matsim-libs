@@ -2,7 +2,7 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
 		<!ENTITY INPUTBASE    "./examples/equil">
-		<!ENTITY OUTPUTBASE   "./output/externalMobsim">
+		<!ENTITY OUTPUTBASE   "./output/example">
 	]
 >
 <config>

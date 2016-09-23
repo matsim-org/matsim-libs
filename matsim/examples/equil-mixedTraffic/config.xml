@@ -16,7 +16,7 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="./output/equil-mixedTraffic" />
+		<param name="outputDirectory" value="./output/example" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
 		<param name="mobsim" value="qsim" />
@@ -31,7 +31,7 @@
 	
 		<param name = "snapshotperiod"	value = "00:01:00"/> <!-- 00:00:00 means NO snapshot writing -->
 		
-		<param name="vehiclesSource" value="fromVehiclesData" />
+		<param name="vehiclesSource" value="modeVehicleTypesFromVehiclesData" />
 		<param name="mainMode" value="car,bicycle" />
 		<param name="linkDynamics" value="PassingQ" />
 		<param name="trafficDynamics" value="queue" />

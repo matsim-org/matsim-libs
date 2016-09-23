@@ -31,7 +31,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.jbischoff.ffcs.sim.SetupFreefloatingParking;
-import playground.jbischoff.parking.sim.SetupParking;
 
 /**
  * @author  jbischoff
@@ -52,8 +51,8 @@ public static void main(String[] args) {
 	
 	Scenario scenario = ScenarioUtils.loadScenario(config);
 	Controler controler = new Controler(scenario);
-//    controler.addOverridingModule(new OTFVisLiveModule());
-	SetupFreefloatingParking.installParkingModules(controler, (FFCSConfigGroup) config.getModule("freefloating"));
+//    controler.addOverridingModule(new OTFVisLive	Module());
+	SetupFreefloatingParking.installFreefloatingParkingModules(controler, (FFCSConfigGroup) config.getModule("freefloating"));
 	controler.run();
 
 }

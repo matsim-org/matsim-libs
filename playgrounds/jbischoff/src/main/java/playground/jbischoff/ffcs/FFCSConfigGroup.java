@@ -41,12 +41,18 @@ public class FFCSConfigGroup extends ReflectiveConfigGroup {
 	public static final String FFCS_VEHICLES_FILE = "vehiclesFile";
 	public static final String PUNISHMENTFORMODESWITCH = "punishmentForModeSwitch";
 	public static final String MAXIMUMWALKDISTANCE = "maximumWalkDistance_m";
+	public static final String ZONESSHP = "allowedZonesShapeFile";
+	public static final String ZONESXML = "allowedZonesXmlFile";
+	public static final String RESETVEHICLES = "resetVehicles";
 	
 	
 	
 	private String vehiclesFiles = null;
 	private double punishMentForModeSwitch = 0.0;
 	private double maximumWalkDistance = 1500;
+	private String zonesXMLFile = null;
+	private String zonesShapeFile = null;
+	private boolean resetVehicles;
 
 	public static FFCSConfigGroup get(Config config) {
 		return (FFCSConfigGroup) config.getModule(GROUP_NAME);
@@ -54,6 +60,54 @@ public class FFCSConfigGroup extends ReflectiveConfigGroup {
 
 	public FFCSConfigGroup() {
 		super(GROUP_NAME);
+	}
+	
+	
+	/**
+	 * @return the resetVehicles
+	 */
+	@StringGetter(RESETVEHICLES)
+	public boolean resetVehicles() {
+		return resetVehicles;
+	}
+	
+	
+	/**
+	 * @param resetVehicles the resetVehicles to set
+	/
+	 */
+	@StringSetter(RESETVEHICLES)
+	public void setResetVehicles(boolean resetVehicles) {
+		this.resetVehicles = resetVehicles;
+	}
+	
+	/**
+	 * @return the zonesShape
+	 */
+	@StringGetter(ZONESSHP)
+	public String getZonesShapeFile() {
+		return zonesShapeFile;
+	}
+	/**
+	 * @param zonesShape the zonesShape to set
+	 */
+	@StringSetter(ZONESSHP)
+	public void setZonesShape(String zonesShape) {
+		this.zonesShapeFile = zonesShape;
+	}
+	/**
+	 * @return the zonesXML
+	 */
+	@StringGetter(ZONESXML)
+	public String getZonesXMLFile() {
+		return zonesXMLFile;
+	}
+	/**
+	 * @param zonesXML the zonesXML to set
+	 */
+	@StringSetter(ZONESXML)
+	public void setZonesXML(String zonesXML) {
+		this.zonesXMLFile = zonesXML;
 	}
 
 	@StringGetter(FFCS_VEHICLES_FILE)
@@ -68,7 +122,14 @@ public class FFCSConfigGroup extends ReflectiveConfigGroup {
 		return ConfigGroup.getInputFileURL(context, this.vehiclesFiles);
 
 	}
+	public URL getZonesXMLFileUrl(URL context){
+		return ConfigGroup.getInputFileURL(context, this.zonesXMLFile);
 
+	}
+	public URL getZonesShapeFileUrl(URL context){
+		return ConfigGroup.getInputFileURL(context, this.zonesShapeFile);
+
+	}
 	@StringSetter(FFCS_VEHICLES_FILE)
 	/**
 	 * @param vehiclesFiles
