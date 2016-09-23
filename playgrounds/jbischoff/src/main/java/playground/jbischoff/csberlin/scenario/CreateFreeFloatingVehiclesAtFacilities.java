@@ -72,7 +72,7 @@ public class CreateFreeFloatingVehiclesAtFacilities {
 	
 	public static void main(String[] args) {
 		CreateFreeFloatingVehiclesAtFacilities tvc = new CreateFreeFloatingVehiclesAtFacilities();
-		tvc.run(20000);
+		tvc.run(5000);
 }
 
 	public CreateFreeFloatingVehiclesAtFacilities() {
@@ -85,7 +85,7 @@ public class CreateFreeFloatingVehiclesAtFacilities {
 		final MutableInt number = new MutableInt(0);
 		TabularFileParserConfig config = new TabularFileParserConfig();
 		config.setDelimiterTags(new String[] { "\t" });
-		config.setFileName("../../../shared-svn/projects/bmw_carsharing/data/parkplaetze250cs.txt");
+		config.setFileName("../../../shared-svn/projects/bmw_carsharing/data/parkplaetze50cs.txt");
 		config.setCommentTags(new String[] { "#" });
 		new TabularFileParser().parse(config, new TabularFileHandler() {
 
