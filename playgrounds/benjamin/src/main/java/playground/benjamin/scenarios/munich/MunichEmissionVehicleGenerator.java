@@ -103,7 +103,7 @@ public class MunichEmissionVehicleGenerator {
 									  vehicleAttributes.getHbefaSizeClass() + ";" + 
 									  vehicleAttributes.getHbefaEmConcept(), VehicleType.class);
 			VehicleType vehicleType = VehicleUtils.getFactory().createVehicleType(vehTypeId);
-			
+			vehicleType.setDescription(vehTypeId.toString());
 			if(!(outputVehicles.getVehicles().containsKey(vehTypeId))){
 				outputVehicles.addVehicleType(vehicleType);
 			} else {
