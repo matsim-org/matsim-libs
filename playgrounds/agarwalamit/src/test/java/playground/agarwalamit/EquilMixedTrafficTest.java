@@ -21,13 +21,16 @@ package playground.agarwalamit;
 
 import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -43,6 +46,7 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
+import playground.agarwalamit.utils.MapUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -57,10 +61,12 @@ import java.util.Map;
 public class EquilMixedTrafficTest {
 	
 	private static final String EQUIL_DIR = "../../matsim/examples/equil-mixedTraffic/";
+	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
 	
-	@Test@Ignore
+	@Test
 	public void runSameVehicleAllTrips() {
 		Config config = ConfigUtils.loadConfig(EQUIL_DIR+"/config.xml");
+		config.controler().setOutputDirectory(helper.getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 
@@ -116,16 +122,31 @@ public class EquilMixedTrafficTest {
 	public void runMultipleVehiclesTypeAllTrips() {
         // TODO: fix and clean it.
 		Config config = ConfigUtils.loadConfig(EQUIL_DIR+"/config.xml");
-//		config.vehicles().setVehiclesFile(null);
-//
-//		Vehicles vehs = VehicleUtils.createVehiclesContainer();
-//
-//		new VehicleReaderV1(vehs).readFile(EQUIL_DIR+"/vehicles.xml");
-//		Map<Id<VehicleType>, VehicleType> vts = vehs.getVehicleTypes();
+		String outDir = helper.getOutputDirectory();
+		config.controler().setOutputDirectory(outDir);
+
+		// is using VehiclesSource.modeVehicleTypesFromVehiclesData, only vehicleTypes are required.
+		config.vehicles().setVehiclesFile(null);
+
+		config.qsim().setUsePersonIdForMissingVehicleId(true);
+		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
+		Vehicles vehs = scenario.getVehicles();
 
-//		for(VehicleType  vt : vts.values() ) { scenario.getVehicles().addVehicleType(vt); }
+		VehicleType car = vehs.getFactory().createVehicleType(Id.create("car",VehicleType.class));
+		car.setMaximumVelocity(16.67);
+		car.setPcuEquivalents(1.0);
+		vehs.addVehicleType(car);
+
+		VehicleType bicycle = vehs.getFactory().createVehicleType(Id.create("bicycle",VehicleType.class));
+		bicycle.setMaximumVelocity(4.17);
+		bicycle.setPcuEquivalents(0.25);
+		vehs.addVehicleType(bicycle);
+
+		Map<String, Integer> mode2legs = new HashMap<>();
+		mode2legs.put("car",0);
+		mode2legs.put("bicycle",0);
 
 		// get bicycle-car or car-bicycle in plan.
 		for (Person p : scenario.getPopulation().getPersons().values()){
@@ -134,10 +155,14 @@ public class EquilMixedTrafficTest {
 			for (PlanElement  pe : pes ){
 				if (pe instanceof Leg){
 					Leg leg = (Leg)pe;
-					if ( firstMode == null ) firstMode = leg.getMode();
+					if ( firstMode == null ) {
+						firstMode = leg.getMode();
+						mode2legs.put(firstMode,mode2legs.get(firstMode) + 1 );
+					}
 					else {
 						String mode = firstMode.equals("car") ? "bicycle" : "car";
 						leg.setMode(mode);
+						mode2legs.put(firstMode,mode2legs.get(firstMode) + 1 );
 					}
 				}
 			}
@@ -145,6 +170,7 @@ public class EquilMixedTrafficTest {
 
 		//
         StrategyConfigGroup scg = scenario.getConfig().strategy();
+
         StrategyConfigGroup.StrategySettings ss = new StrategyConfigGroup.StrategySettings();
         ss.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.name());
         ss.setWeight(0.2);
@@ -154,26 +180,40 @@ public class EquilMixedTrafficTest {
 		scenario.getConfig().controler().setDumpDataAtEnd(true);
 		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-        scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
-        scenario.getConfig().qsim().setUsePersonIdForMissingVehicleId(false);
+		Map<String, Integer> mode2legsFromEvents = new HashMap<>();
+		mode2legsFromEvents.put("car",0);
+		mode2legsFromEvents.put("bicycle",0);
 
 		Controler controler = new Controler(scenario);
-
-		final PersonLinkTravelTimeEventHandler handler = new PersonLinkTravelTimeEventHandler();
-
 		controler.addOverridingModule(new AbstractModule() {
-
 			@Override
 			public void install() {
 				addTravelTimeBinding("bicycle").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("bicycle").to(carTravelDisutilityFactoryKey());
 
-				// add event handler to test...
-				addEventHandlerBinding().toInstance(handler);
+				addEventHandlerBinding().toInstance(new VehicleEntersTrafficEventHandler(){
+					@Override
+					public void reset(int iteration) {
+					}
+
+					@Override
+					public void handleEvent(VehicleEntersTrafficEvent event) {
+						mode2legsFromEvents.put( event.getNetworkMode(), mode2legsFromEvents.get(event.getNetworkMode()) + 1 );
+					}
+				});
 			}
 		});
-
 		controler.run();
+
+		// number of legs should be different
+		Assert.assertTrue("number of car legs in the last iteration should not be same as in the 0th iteration",
+				mode2legs.get("car")!=mode2legsFromEvents.get("car"));
+		Assert.assertTrue("number of bicycle legs in the last iteration should not be same as in the 0th iteration",
+				mode2legs.get("bicycle")!=mode2legsFromEvents.get("bicycle"));
+
+		Assert.assertEquals("Total legs should be same.", MapUtils.intValueSum(mode2legsFromEvents),
+				MapUtils.intValueSum(mode2legs), helper.EPSILON);
+
 	}
 
 	private static class PersonLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
