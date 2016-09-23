@@ -37,6 +37,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
+import playground.jbischoff.parking.evaluation.ParkedVechiclesVisualiser;
 import playground.jbischoff.parking.evaluation.ParkingSearchAndEgressTimeEvaluator;
 import playground.jbischoff.parking.evaluation.ParkingSearchEvaluator;
 
@@ -54,20 +55,27 @@ public static void main(String[] args) {
 	EventsManager events = EventsUtils.createEventsManager();
 	ParkingSearchAndEgressTimeEvaluator mierendorffEval = new ParkingSearchAndEgressTimeEvaluator(readLinks("../../../shared-svn/projects/bmw_carsharing/data/gis/mierendorfflinks.txt"),network);	
 	ParkingSearchAndEgressTimeEvaluator klausEval = new ParkingSearchAndEgressTimeEvaluator(readLinks("../../../shared-svn/projects/bmw_carsharing/data/gis/klausnerlinks.txt"),network);	
-	WalkLegPlotter wlp = new WalkLegPlotter(network);
+	WalkLegPlotterVIA wlp = new WalkLegPlotterVIA(network,"car");
+	WalkLegPlotterVIA wlpFF = new WalkLegPlotterVIA(network,"freefloating");
+	ParkedVechiclesVisualiser pvv = new ParkedVechiclesVisualiser(network);
 	ParkingSearchEvaluator pwde = new ParkingSearchEvaluator();
 	events.addHandler(pwde);
+	events.addHandler(pvv);
 	events.addHandler(wlp);
+	events.addHandler(wlpFF);
 	events.addHandler(mierendorffEval);
 	events.addHandler(klausEval);
-	String dir = "D:/runs-svn/bmw_carsharing/basecase/run15/";
-	new ParkingSearchEventsReader(events).readFile(dir+"run15.output_events.xml.gz");
+	String dir = "D:/runs-svn/bmw_carsharing/basecase/run17/";
+	new ParkingSearchEventsReader(events).readFile(dir+"run17.output_events.xml.gz");
 	pwde.writeEgressWalkStatistics(dir);
 	mierendorffEval.writeStats(dir+"mierendorffParkAndEgressStats.csv");
 	mierendorffEval.writeCoordTimeStamps(dir+"/mierendorffParkStamps.csv");
 	klausEval.writeStats(dir+"klausnerParkAndEgressStats.csv");
 	klausEval.writeCoordTimeStamps(dir+"klausParkStamps.csv");
-	wlp.plotWalkLegs(dir+"walkLegs.csv");
+	wlp.plotWalkLegs(dir+"walkLegs_car.csv");
+	wlpFF.plotWalkLegs(dir+"walkLegs_freefloating.csv");
+	pvv.finishDay();
+	pvv.plotCarPositions(dir+"carPositions.csv");
 }
 
 static Set<Id<Link>> readLinks(String filename){

@@ -58,6 +58,7 @@ public class SimpleFreeFloatingCarsharingManagerImpl implements FreefloatingCars
 	
 	private Network network;
 	private FFCSConfigGroup ffcsConfigGroup;
+	private CarsharingData data;
 	/**
 	 * 
 	 */
@@ -66,7 +67,7 @@ public class SimpleFreeFloatingCarsharingManagerImpl implements FreefloatingCars
 		this.idleVehicleLocations=data.getVehiclesStartLocations();
 		this.network = network;
 		this.ffcsConfigGroup = (FFCSConfigGroup) config.getModule("freefloating");
-		
+		this.data = data;
 	}
 	
 	
@@ -143,6 +144,19 @@ public class SimpleFreeFloatingCarsharingManagerImpl implements FreefloatingCars
 	public boolean isFFCSVehicle(Id<Vehicle> vehicleId) {
 		
 		return (this.idleVehicleLocations.containsKey(vehicleId)|this.busyVehicleLastRentalLocations.containsKey(busyVehicleLastRentalLocations));
+	}
+
+
+	/* (non-Javadoc)
+	 * @see playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager#reset()
+	 */
+	@Override
+	public void reset() {
+		if (ffcsConfigGroup.resetVehicles()){
+		this.idleVehicleLocations=data.getVehiclesStartLocations();
+		this.busyVehicleLastRentalLocations.clear();
+		}
+		
 	}
 	
 	

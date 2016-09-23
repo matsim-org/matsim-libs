@@ -42,6 +42,8 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import playground.jbischoff.ffcs.FFCSConfigGroup;
 import playground.jbischoff.ffcs.DynAgent.agentLogic.CarsharingParkingAgentLogic;
 import playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager;
+import playground.jbischoff.ffcs.parking.FFCSorRandomParkingChoiceLogic;
+import playground.jbischoff.ffcs.parking.FacilityBasedFreefloatingParkingManager;
 import playground.jbischoff.parking.DynAgent.agentLogic.ParkingAgentLogic;
 import playground.jbischoff.parking.choice.ParkingChoiceLogic;
 import playground.jbischoff.parking.choice.RandomParkingChoiceLogic;
@@ -89,7 +91,7 @@ public class FreefloatingParkingAgentFactory implements AgentFactory {
 
 	@Override
 	public MobsimAgent createMobsimAgentFromPerson(Person p) {
-		ParkingChoiceLogic parkingLogic  = new RandomParkingChoiceLogic(network);
+		ParkingChoiceLogic parkingLogic  = new FFCSorRandomParkingChoiceLogic(network,(FacilityBasedFreefloatingParkingManager) parkingManager,ffcsmanager,parkingRouter);
 		CarsharingParkingAgentLogic agentLogic = new CarsharingParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkLegFactory,
 				parkingRouter, events, parkingLogic,  ((QSim) qsim).getSimTimer(),teleportationLogic, ffcsmanager, ffcsconfig );
 		Id<Link> startLinkId = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getLinkId();

@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.jbischoff.ffcs.manager;
+package playground.jbischoff.ffcs.parking;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,17 +33,22 @@ import java.util.Set;
 
 import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.util.distance.DistanceUtils;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
 
+import playground.jbischoff.ffcs.FFCSConfigGroup;
 import playground.jbischoff.ffcs.FFCSUtils;
+import playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager;
 import playground.jbischoff.parking.ParkingUtils;
 import playground.jbischoff.parking.manager.ParkingSearchManager;
 
@@ -56,7 +61,6 @@ import playground.jbischoff.parking.manager.ParkingSearchManager;
  */
 public class FacilityBasedFreefloatingParkingManager implements ParkingSearchManager {
 
-	private final Map<Id<Link>, Integer> capacity = new HashMap<>();
 	private final Map<Id<ActivityFacility>, MutableInt> occupancies = new HashMap<>();
 	private final Map<Id<ActivityFacility>, MutableInt> csoccupancy = new HashMap<>();
 	
@@ -68,16 +72,17 @@ public class FacilityBasedFreefloatingParkingManager implements ParkingSearchMan
 	private final Map<Id<Link>, Set<Id<ActivityFacility>>> facilitiesPerLink = new HashMap<>();
 	private final FreefloatingCarsharingManager ffcmanager;
 	private final Random random = MatsimRandom.getLocalInstance();
-	
+	private final FFCSConfigGroup ffcs;
 	Network network;
 
 	/**
 	 * 
 	 */
 	@Inject
-	public FacilityBasedFreefloatingParkingManager(Scenario scenario, FreefloatingCarsharingManager ffcmanager) {
+	public FacilityBasedFreefloatingParkingManager(Scenario scenario, FreefloatingCarsharingManager ffcmanager, Config config) {
 		this.ffcmanager = ffcmanager;
 		this.network = scenario.getNetwork();
+		this.ffcs = (FFCSConfigGroup) config.getModule(FFCSConfigGroup.GROUP_NAME);
 		parkingFacilities.putAll(scenario.getActivityFacilities().getFacilitiesForActivityType(ParkingUtils.PARKACTIVITYTYPE));
 		parkingFacilities.putAll(scenario.getActivityFacilities().getFacilitiesForActivityType(FFCSUtils.FREEFLOATINGPARKACTIVITYTYPE));
 
@@ -283,6 +288,27 @@ public class FacilityBasedFreefloatingParkingManager implements ParkingSearchMan
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
 
+	}
+	
+	ActivityFacility findNearestFreeCarsharingParkingFacility(Id<Link> linkId){
+		double bestSquareDist = Double.MAX_VALUE;
+		ActivityFacility bestFac = null;
+		Coord linkCoord = network.getLinks().get(linkId).getCoord();
+		for (Entry<Id<ActivityFacility>, MutableInt> e : this.csoccupancy.entrySet()){
+			if (e.getValue().intValue()>0){
+				ActivityFacility fac = this.parkingFacilities.get(e.getKey()); 
+				Coord facCoord = fac.getCoord();
+				double dist = DistanceUtils.calculateSquaredDistance(facCoord, linkCoord);
+				if (dist<bestSquareDist){
+					bestSquareDist = dist;
+					bestFac = fac;
+				}
+			}
+		}
+		if (bestSquareDist <= Math.pow(ffcs.getMaximumWalkDistance(),2)){
+			return bestFac;
+		} else	return null;
+		
 	}
 
 }

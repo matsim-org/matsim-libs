@@ -54,4 +54,5 @@ public interface FreefloatingCarsharingManager {
 	 */
 	boolean isFFCSVehicle(Id<Vehicle> vehicleId);
 
+	void reset();
 }
