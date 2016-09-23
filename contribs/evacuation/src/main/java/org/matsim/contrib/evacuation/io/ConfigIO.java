@@ -45,7 +45,7 @@ import org.matsim.core.utils.misc.Time;
 public class ConfigIO
 {
 
-	public static synchronized boolean saveRoadClosures(Controller controller, HashMap<Id<Link>, String> roadClosures)
+	public static synchronized boolean saveRoadClosures(Controller controller, HashMap<Id<Link>, String> roadClosures, String changeEventsFile)
 	{
 		
 		Scenario scenario = controller.getScenario();
@@ -56,8 +56,7 @@ public class ConfigIO
 		{
 
 			scenario.getConfig().network().setTimeVariantNetwork(true);
-			String changeEventsFile = scenarioPath + "/networkChangeEvents.xml";
-			scenario.getConfig().network().setChangeEventsInputFile(changeEventsFile);
+			scenario.getConfig().network().setChangeEventsInputFile("changeEvents.xml");
 			new ConfigWriter(scenario.getConfig()).write(configFile);
 			
 			// create change event

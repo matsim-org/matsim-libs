@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Link;
  * @author dgrether
  *
  */
+@Deprecated
 public class LaneDefinitions11Impl implements LaneDefinitions11 {
 
 	private SortedMap<Id<Link>, LanesToLinkAssignment11> lanesToLinkAssignments  =  new TreeMap<>();

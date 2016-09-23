@@ -52,6 +52,7 @@ import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getTr
  *
  * @author polettif
  */
+@Deprecated
 public class NetworkTools {
 
 	protected static Logger log = Logger.getLogger(NetworkTools.class);
@@ -85,7 +86,7 @@ public class NetworkTools {
 
 	/**
 	 * Returns the nearest link for the given coordinate.
-	 * Looks for nodes within search radius of coord (using {@link Network#getNearestNodes},
+	 * Looks for nodes within search radius of coord (using,
 	 * fetches all in- and outlinks returns the link with the smallest distance
 	 * to the given coordinate. If there are two opposite links, the link with
 	 * the coordinate on its right side is returned.<p/>
@@ -143,7 +144,7 @@ public class NetworkTools {
 	}
 
 	/**
-	 * Looks for nodes within search radius of <tt>coord</tt> (using {@link Network#getNearestNodes},
+	 * Looks for nodes within search radius of <tt>coord</tt>,
 	 * fetches all in- and outlinks and sorts them ascending by their
 	 * distance to the coordiantes given.
 	 * <p/>

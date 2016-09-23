@@ -44,7 +44,7 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.households.HouseholdsReaderV10;
-import org.matsim.lanes.data.v20.LaneDefinitionsReader;
+import org.matsim.lanes.data.LanesReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -129,7 +129,9 @@ class ScenarioLoaderImpl {
 			URL networkUrl = this.config.network().getInputFileURL(this.config.getContext());
 			log.info("loading network from " + networkUrl);
 			if ( config.network().getInputCRS() == null ) {
-				new MatsimNetworkReader(this.scenario.getNetwork()).parse(networkUrl);
+				MatsimNetworkReader reader = new MatsimNetworkReader(this.scenario.getNetwork());
+				reader.putAttributeConverters( attributeConverters );
+				reader.parse(networkUrl);
 			}
 			else {
 				log.info( "re-projecting network from "+config.network().getInputCRS()+" to "+config.global().getCoordinateSystem()+" for import" );
@@ -137,15 +139,17 @@ class ScenarioLoaderImpl {
 						TransformationFactory.getCoordinateTransformation(
 								config.network().getInputCRS(),
 								config.global().getCoordinateSystem() );
-				new MatsimNetworkReader( transformation , this.scenario.getNetwork() ).parse(networkUrl);
+				MatsimNetworkReader reader = new MatsimNetworkReader( transformation , this.scenario.getNetwork());
+				reader.putAttributeConverters( attributeConverters );
+				reader.parse(networkUrl);
 			}
 
-			if ((this.config.network().getChangeEventsInputFile() != null) && this.config.network().isTimeVariantNetwork()) {
-				log.info("loading network change events from " + this.config.network().getChangeEventsInputFile());
+			if ((this.config.network().getChangeEventsInputFile()!= null) && this.config.network().isTimeVariantNetwork()) {
+				log.info("loading network change events from " + this.config.network().getChangeEventsInputFileUrl(this.config.getContext()).getFile());
 				Network network = this.scenario.getNetwork();
 				List<NetworkChangeEvent> changeEvents = new ArrayList<>() ;
 				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network,changeEvents);
-				parser.readFile(this.config.network().getChangeEventsInputFile());
+				parser.parse(this.config.network().getChangeEventsInputFileUrl(config.getContext()));
 				NetworkUtils.setNetworkChangeEvents(network,changeEvents);
 			}
 		}
@@ -195,7 +199,9 @@ class ScenarioLoaderImpl {
 			log.info("loading population from " + populationFileName);
 
 			if ( config.plans().getInputCRS() == null ) {
-				new PopulationReader(this.scenario).parse(populationFileName);
+				final PopulationReader reader = new PopulationReader(this.scenario);
+				reader.putAttributeConverters( attributeConverters );
+				reader.parse( populationFileName );
 			}
 			else {
 				final String inputCRS = config.plans().getInputCRS();
@@ -208,7 +214,9 @@ class ScenarioLoaderImpl {
 								inputCRS,
 								internalCRS );
 
-				new PopulationReader(transformation , this.scenario).parse(populationFileName);
+				final PopulationReader reader = new PopulationReader(transformation , this.scenario);
+				reader.putAttributeConverters( attributeConverters );
+				reader.parse( populationFileName );
 			}
 
 			PopulationUtils.printPlansCount(this.scenario.getPopulation()) ;
@@ -317,7 +325,7 @@ class ScenarioLoaderImpl {
 	private void loadLanes() {
 		String filename = this.config.network().getLaneDefinitionsFile();
 		if (filename != null){
-			LaneDefinitionsReader reader = new LaneDefinitionsReader(this.scenario);
+			LanesReader reader = new LanesReader(this.scenario);
 			reader.readURL(ConfigGroup.getInputFileURL(this.config.getContext(), filename));
 		}
 		else {

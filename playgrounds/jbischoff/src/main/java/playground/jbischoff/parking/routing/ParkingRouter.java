@@ -21,6 +21,7 @@ package playground.jbischoff.parking.routing;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.NetworkRoute;
 
 /**
@@ -28,7 +29,14 @@ import org.matsim.core.population.routes.NetworkRoute;
  *
  */
 public interface ParkingRouter {
+	/**
+	 * *
+	 * @param intendedRoute: may be a network route (car trips) or may be generic (carsharing etc.) 
+	 * @param departureTime
+	 * @param startLinkId
+	 * @return
+	 */
 
-	NetworkRoute getRouteFromParkingToDestination(NetworkRoute originalIntendedRoute, double departureTime, Id<Link> startLinkId);
+	NetworkRoute getRouteFromParkingToDestination(Route intendedRoute, double departureTime, Id<Link> startLinkId);
 	
 }

@@ -31,6 +31,7 @@ import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.HasLinkId;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -50,19 +51,28 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
+ * Example for a simple adaptive signal that reacts on agent behavior.
+ * 
+ * It does not need any signal input as basis.
+ * It creates the signals as a MobsimInitializedListener before the simulation is started.
+ * There are to conflicting streams, link 4 and link 5.
+ * During the simulation the adaptive signal switches link 5 to green whenever vehicles want to leave it.
+ * 
  * @author nagel
- *
+ * @author tthunig
  */
 class SimpleAdaptiveSignal implements MobsimBeforeSimStepListener, MobsimInitializedListener, BasicEventHandler {
 
+	@Inject Scenario scenario;
+	
 	private Queue<Double> vehicleExitTimesOnLink5 = new LinkedList<>() ;
 	private long cnt4 = 0 ;
 	private long cnt5 = 0 ;
 	private OutputDirectoryHierarchy controlerIO;
 	private Writer out ;
 	
-	private SignalizeableItem link4;
-	private SignalizeableItem link5;
+	private SignalizeableItem signalLink4;
+	private SignalizeableItem signalLink5;
 	
 	class Result {
 		int iteration ;
@@ -80,48 +90,77 @@ class SimpleAdaptiveSignal implements MobsimBeforeSimStepListener, MobsimInitial
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		Netsim mobsim = (Netsim) e.getQueueSimulation() ;
-		link4 = (SignalizeableItem) mobsim.getNetsimNetwork().getNetsimLink(Id.createLinkId("4")) ;
-		link5 = (SignalizeableItem) mobsim.getNetsimNetwork().getNetsimLink(Id.createLinkId("5")) ;
-		link4.setSignalized(true);
-		link5.setSignalized(true);
+		signalLink4 = (SignalizeableItem) mobsim.getNetsimNetwork().getNetsimLink(Id.createLinkId("4")) ;
+		signalLink5 = (SignalizeableItem) mobsim.getNetsimNetwork().getNetsimLink(Id.createLinkId("5")) ;
+		signalLink4.setSignalized(true);
+		signalLink5.setSignalized(true);
 	}
 
 	@Override
 	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		double now = e.getSimulationTime();
+		
+		// switch the signal on link 5 to green when vehicles want to leave link 5 now
 		final Double dpTime = this.vehicleExitTimesOnLink5.peek();
 		if ( dpTime !=null && dpTime < now ) {
-			link4.setSignalStateAllTurningMoves(SignalGroupState.RED) ;
-			link5.setSignalStateAllTurningMoves(SignalGroupState.GREEN) ;
+			signalLink4.setSignalStateAllTurningMoves(SignalGroupState.RED) ;
+			signalLink5.setSignalStateAllTurningMoves(SignalGroupState.GREEN) ;
 		} else {
-			link4.setSignalStateAllTurningMoves(SignalGroupState.GREEN) ;
-			link5.setSignalStateAllTurningMoves(SignalGroupState.RED) ;
+			signalLink4.setSignalStateAllTurningMoves(SignalGroupState.GREEN) ;
+			signalLink5.setSignalStateAllTurningMoves(SignalGroupState.RED) ;
 		}
 
+//		/* alternative approach: switch between the signals every other second
+//		 * independent of link counts and vehicle behavior */
 //		if ( now<20.*60 && (long)now%2==0 ) { 
 //			link4.setSignalStateAllTurningMoves(SignalGroupState.RED) ;
+//			link5.setSignalStateAllTurningMoves(SignalGroupState.GREEN);
 //		} else {
 //			link4.setSignalStateAllTurningMoves(SignalGroupState.GREEN) ;
+//			link5.setSignalStateAllTurningMoves(SignalGroupState.RED);
 //		}
 	}
 
 	@Override
 	public void handleEvent(Event event) {
-		if ( event instanceof LinkEnterEvent || event instanceof VehicleEntersTrafficEvent ) {
-			if ( ((HasLinkId) event).getLinkId().equals(Id.create("5", Link.class)) ) {
-				this.vehicleExitTimesOnLink5.add( event.getTime() + 100. ) ;
-				// yy replace "100" by freeSpeedTravelTime
-				
-				// every vehicle that enters the link increases the counter:
-				cnt5++ ;
-			} 
-			if ( ((HasLinkId) event).getLinkId().equals(Id.create("4", Link.class)) ) {
-				cnt4++ ;
-			}
-		} else if ( event instanceof LinkLeaveEvent || event instanceof VehicleLeavesTrafficEvent ) {
+		switch (event.getEventType()){
+		/* store the desired link exit time when a vehicle is entering a link
+		 * and count the vehicles */
+		case VehicleEntersTrafficEvent.EVENT_TYPE:
+			// for the first link every vehicle needs one second without delay
+			storeDesiredExitTimeAndCountVehiclesOnLink(((HasLinkId) event).getLinkId(), event.getTime() + 1.);
+			break;
+		case LinkEnterEvent.EVENT_TYPE:
+			// calculate earliest link exit time
+			Link link5 = scenario.getNetwork().getLinks().get(Id.createLinkId(5));
+			double freespeedTt = link5.getLength() / link5.getFreespeed();
+			// this is the earliest time where matsim sets the agent to the next link
+			double matsimFreespeedTT = Math.floor(freespeedTt + 1);	
+			storeDesiredExitTimeAndCountVehiclesOnLink(((HasLinkId) event).getLinkId(), event.getTime() + matsimFreespeedTT);
+			break;
+			
+		// remove the desired exit time from the collection when the vehicle leaves the link
+		case LinkLeaveEvent.EVENT_TYPE:
+		case VehicleLeavesTrafficEvent.EVENT_TYPE:
 			if ( ((HasLinkId) event).getLinkId().equals(Id.create("5", Link.class)) ) {
 				this.vehicleExitTimesOnLink5.remove() ;
 			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	private void storeDesiredExitTimeAndCountVehiclesOnLink(Id<Link> linkId, double desiredExitTime) {
+		if ( linkId.equals(Id.createLinkId("5")) ) {
+			// remember the desired exit time (1 second after entering traffic)
+			this.vehicleExitTimesOnLink5.add( desiredExitTime ) ;
+			// every vehicle that enters the link increases the counter:
+			cnt5++ ;
+		} else if ( linkId.equals(Id.createLinkId("4")) ) {
+			/* in this example we do not want to know the exit time of vehicles on link 4
+			 * but we still count the vehicles on it */
+			cnt4++ ;
 		}
 	}
 
@@ -142,21 +181,16 @@ class SimpleAdaptiveSignal implements MobsimBeforeSimStepListener, MobsimInitial
 		if ( out==null ) {
 			out = IOUtils.getBufferedWriter(controlerIO.getOutputFilename("split.txt")) ;
 		}
-
 		
 		try {
 			out.write( result.iteration + "\t" + result.shareUp + "\t" + result.shareDown + "\n" ) ;
 			out.flush() ;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-
-		
+		}		
 	}
 
 	static public void main( String[] args ) {
 		RunSimpleAdaptiveSignalExample.main( args ) ;
 	}
-
 }

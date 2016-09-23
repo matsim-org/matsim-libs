@@ -184,7 +184,8 @@ public class Matrix2Population {
 		double frac = Double.parseDouble(args[3]);
 		String outFile = args[4];
 
-		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zonesFile, "plz", null);
+//		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zonesFile, "plz", null);
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zonesFile, "NO", null);
 		
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -201,8 +202,8 @@ public class Matrix2Population {
 			String type = "misc";
 			
 			logger.info("Initializing facilities...");
-//			Matrix2Population m2p = new Matrix2Population(scenario.getActivityFacilities(), zones, type, "NO");
-			Matrix2Population m2p = new Matrix2Population(scenario.getActivityFacilities(), zones, type, "plz");
+			Matrix2Population m2p = new Matrix2Population(scenario.getActivityFacilities(), zones, type, "NO");
+//			Matrix2Population m2p = new Matrix2Population(scenario.getActivityFacilities(), zones, type, "plz");
 			
 			logger.info(String.format("Generating persons out of %s %s trips...", MatrixOperations.sum(m), type));
 //			m2p.generatePersons(m, scenario.getPopulation(), 1/11.8);

@@ -36,9 +36,9 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.router.util.NetworkTurnInfoBuilder;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.Lanes;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesToLinkAssignment;
 
 /**
  * @author nagel
@@ -50,7 +50,7 @@ class Utils {
 	static Map<Id<Link>, List<TurnInfo>> createTurnInfos(Lanes laneDefs) {
 		Map<Id<Link>, List<TurnInfo>> inLinkIdTurnInfoMap = new HashMap<>();
 		Set<Id<Link>> toLinkIds = new HashSet<>();
-		for (LanesToLinkAssignment20 l2l : laneDefs.getLanesToLinkAssignments().values()) {
+		for (LanesToLinkAssignment l2l : laneDefs.getLanesToLinkAssignments().values()) {
 			toLinkIds.clear();
 			for (Lane lane : l2l.getLanes().values()) {
 				if (lane.getToLinkIds() != null

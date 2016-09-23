@@ -30,7 +30,7 @@ public class OneWayCarsharingRoutingModule implements RoutingModule{
 		
 		final List<PlanElement> trip = new ArrayList<PlanElement>();		
 		
-		final Leg csLeg = PopulationUtils.createLeg("onewaycarsharing");
+		final Leg csLeg = PopulationUtils.createLeg("oneway");
 		LinkNetworkRouteImpl csRoute = new LinkNetworkRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
 		csLeg.setRoute(csRoute);
 		trip.add( csLeg );	

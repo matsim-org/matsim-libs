@@ -22,7 +22,7 @@ package playground.dgrether.signalsystems;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
-import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.Lane;
 
 
 /**

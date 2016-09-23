@@ -28,8 +28,8 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromPlans;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -65,7 +65,7 @@ public class ModalSplitUserGroup {
 
 	public void run( String eventsFile, String plansFile){
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(plansFile);
-		ExtendedPersonFilter pf = new ExtendedPersonFilter();
+		MunichPersonFilter pf = new MunichPersonFilter();
 		
 		for( MunichUserGroup ug : MunichUserGroup.values()) {
 			ModalShareFromEvents msc = new ModalShareFromEvents(eventsFile, ug.toString(), pf);

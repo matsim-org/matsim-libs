@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -38,21 +37,6 @@ public class PopulationReprojectionIOTest {
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
-
-	@Test
-	@Ignore("dtd does not exist anymore")
-	public void testInput_V0() {
-		final String testFile = utils.getOutputDirectory() + "/plans.xml.gz";
-
-		// create test file in V0 format
-		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig(utils.getTestScenarioURL("berlin")));
-		// necessary for v4...
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(NET_FILE);
-		new PopulationReader(scenario).readFile(BASE_FILE);
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV0(testFile);
-
-		testConversionAtInput(testFile);
-	}
 
 	@Test
 	public void testInput_V4() {

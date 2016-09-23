@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
@@ -44,6 +45,7 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
@@ -64,20 +66,25 @@ public class SharedTaxiTripAnalyzer
 	private List<String> ridesLog;
 	private List<String> ridesPerIteration = new ArrayList<>();
 	private Map<Id<Person>, Integer> paxPerRide;
-
+	private EventsManager events;
+	private SharedTaxiConfigGroup stt;
 
 	private double totalWaittime = 0;
 	private double totalRidetime = 0;
+	private double totalFares = 0;
 	private int totalRides = 0;
 
 	// trip duration, (distance), waiting time, indication whether it is shared
 	// or not, indicate whether it is first or second trip shared
 
 	@Inject
-	SharedTaxiTripAnalyzer(OutputDirectoryHierarchy controlerIO, EventsManager events) {
+	SharedTaxiTripAnalyzer(OutputDirectoryHierarchy controlerIO, EventsManager events, Config config) {
 		reset(0);
 		events.addHandler(this);
-
+		this.events = events;
+		stt = (SharedTaxiConfigGroup) config.getModule("sharedTaxi");
+		
+		
 	}
 
 	@Override
@@ -90,6 +97,7 @@ public class SharedTaxiTripAnalyzer
 		totalWaittime = 0;
 		totalRidetime = 0;
 		totalRides = 0;
+		totalFares = 0;
 	}
 
 	@Override
@@ -105,7 +113,16 @@ public class SharedTaxiTripAnalyzer
 				String row = (int) departureTime + ";" + event.getPersonId().toString() + ";" + (int) enterTime + ";"
 						+ (int) arrivalTime + ";" + (int) waitTime + ";" + (int) rideTime+";"+paxOnBoard;
 				this.ridesLog.add(row);
-
+				
+				if (stt.isScoreRides()){
+					double discountFactor = (paxOnBoard>1)?stt.getDiscountForSharing():0;
+					double fullfare = stt.getHourlyTaxiFare()*rideTime/3600;
+					double discountedFare = fullfare * discountFactor*fullfare;
+					events.processEvent(new PersonMoneyEvent(arrivalTime, event.getPersonId(), -discountedFare));
+					totalFares+=discountedFare;
+				}
+				
+				
 				this.totalRides++;
 				this.totalRidetime += rideTime;
 				this.totalWaittime += waitTime;
@@ -199,7 +216,7 @@ public class SharedTaxiTripAnalyzer
 	void writeAverageStats(String outputFile) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
 		try {
-			bw.write("Iteration;TotalRides;AverageWait;AverageRideTime");
+			bw.write("Iteration;TotalRides;AverageWait;AverageRideTime;TotalFares");
 			for (String row : this.ridesPerIteration) {
 				bw.newLine();
 				bw.write(row);
@@ -215,7 +232,7 @@ public class SharedTaxiTripAnalyzer
 
 	void aggregateRideTimes(int iteration) {
 		String row = iteration + ";" + this.totalRides + ";" + this.totalWaittime / this.totalRides + ";"
-				+ this.totalRidetime / this.totalRides;
+				+ this.totalRidetime / this.totalRides + ";"+ this.totalFares; 
 		this.ridesPerIteration.add(row);
 	}
 

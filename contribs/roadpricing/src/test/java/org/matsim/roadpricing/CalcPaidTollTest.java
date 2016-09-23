@@ -37,6 +37,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -203,8 +205,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 
 	private void runTollSimulation(final Scenario scenario, final RoadPricingScheme toll) {
 		EventsManager events = EventsUtils.createEventsManager();
-		CalcPaidToll paidToll = new CalcPaidToll(scenario.getNetwork(), toll);
-		events.addHandler(paidToll);
+		CalcPaidToll paidToll = new CalcPaidToll(scenario.getNetwork(), toll, events);
 		EventsToScore scoring = EventsToScore.createWithScoreUpdating(scenario, new CharyparNagelScoringFunctionFactory(scenario), events);
 		scoring.beginIteration(0);
 

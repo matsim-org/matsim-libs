@@ -49,8 +49,8 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.GeometryUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
@@ -62,7 +62,7 @@ import playground.agarwalamit.utils.MapUtils;
 public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private static final Logger LOGGER = Logger.getLogger(TravelDistanceHandler.class.getName());
 	private final Vehicle2DriverEventHandler veh2DriverDelegate = new Vehicle2DriverEventHandler();
-	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private final MunichPersonFilter pf = new MunichPersonFilter();
 
 	private final double timeBinSize ;
 	private final Network network;
@@ -115,7 +115,7 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 	}
 
 	public static void main(String[] args) {
-		ExtendedPersonFilter pf = new ExtendedPersonFilter();
+		MunichPersonFilter pf = new MunichPersonFilter();
 		String scenario = "ei";
 		String eventsFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/ITERS/it.1500/1500.events.xml.gz";
 		String configFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/output_config.xml.gz";

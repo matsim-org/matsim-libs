@@ -22,12 +22,12 @@ package org.matsim.integration.pt;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestUtils;
@@ -62,7 +62,7 @@ public class TransitIntegrationTest {
 		Controler controler = new Controler(config);
         controler.run();
 
-		MutableScenario s = (MutableScenario) controler.getScenario();
+		Scenario s = controler.getScenario();
 		Assert.assertNotNull(s.getTransitSchedule());
 		Assert.assertEquals(4, s.getTransitSchedule().getFacilities().size());
 		Assert.assertEquals(1, s.getTransitSchedule().getTransitLines().size());

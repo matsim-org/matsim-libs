@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -118,8 +118,7 @@ public class XVis {
 			SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
 					SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 			if (signalsConfigGroup.isUseSignalSystems()) {
-				scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-						new SignalsScenarioLoader(signalsConfigGroup).loadSignalsData());
+				scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 			}
 		}
 		else 	if (MatsimFileTypeGuesser.FileType.Network.equals(guesser.getGuessedFileType())){

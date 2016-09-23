@@ -186,7 +186,13 @@ EXTRACT_ALL            = YES
 # If the EXTRACT_PRIVATE tag is set to YES all private members of a class 
 # will be included in the documentation.
 
-EXTRACT_PRIVATE        = NO
+#EXTRACT_PRIVATE        = NO
+EXTRACT_PRIVATE        = YES 
+
+# When I just looked, package-protected classes/methods were not
+# visible.  Trying to make them visible with this (note that doxygen
+# is made for c++, and I am not sure if it has package protection at
+# all). kai, sep'16
 
 # If the EXTRACT_STATIC tag is set to YES all static members of a file 
 # will be included in the documentation.

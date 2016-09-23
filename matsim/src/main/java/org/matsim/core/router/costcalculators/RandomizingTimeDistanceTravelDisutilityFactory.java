@@ -48,19 +48,15 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 			final TravelTime travelTime) {
 		logWarningsIfNecessary( cnScoringGroup );
 
-		/* Usually, the travel-utility should be negative (it's a disutility) but the cost should be positive. Thus negate the utility.*/
 		final PlanCalcScoreConfigGroup.ModeParams params = cnScoringGroup.getModes().get( mode ) ;
 		if ( params == null ) {
 			throw new NullPointerException( mode+" is not part of the valid mode parameters "+cnScoringGroup.getModes().keySet() );
 		}
+
+		/* Usually, the travel-utility should be negative (it's a disutility) but the cost should be positive. Thus negate the utility.*/
 		final double marginalCostOfTime_s = (-params.getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
-
-		final double marginalCostOfDistance_m = -params.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney() ;
-
-		if ( params.getMarginalUtilityOfDistance() !=  0.0 ) {
-			throw new RuntimeException( "marginal utility of distance not honored for travel disutility; aborting ... (should be easy to implement)") ;
-		}
-
+		final double marginalCostOfDistance_m = - params.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney() 
+				- params.getMarginalUtilityOfDistance() ;
 
 		double normalization = 1;
 		if ( sigma != 0. ) {
@@ -84,7 +80,7 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 			wrnCnt++ ;
 			if ( cnScoringGroup.getModes().get( mode ).getMonetaryDistanceRate() > 0. ) {
 				log.warn("Monetary distance cost rate needs to be NEGATIVE to produce the normal " +
-						"behavior; just found positive.  Continuing anyway.  This behavior may be changed in the future.") ;
+						"behavior; just found positive.  Continuing anyway.") ;
 			}
 
 			final Set<String> monoSubpopKeyset = Collections.singleton( null );

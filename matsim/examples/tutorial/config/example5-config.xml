@@ -12,7 +12,7 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="./output/example5" />
+		<param name="outputDirectory" value="./output/example" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
 		<param name="eventsFileFormat" value="xml" />

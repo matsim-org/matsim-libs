@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityCalculator;
@@ -42,10 +45,6 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.swing.event.CellEditorListener;
 
 /**
  * @author nagel
@@ -100,12 +99,7 @@ final public class RunAccessibilityExample {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				for ( final String actType : activityTypes ) {
-
-//			if ( !actType.equals("w") ) {
-//				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-//				continue ;
-//			}
+				for (final String actType : activityTypes) {
 
 					final ActivityFacilities opportunities = FacilitiesUtils.createActivityFacilities() ;
 					for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
@@ -115,6 +109,15 @@ final public class RunAccessibilityExample {
 							}
 						}
 					}
+					
+//					double walkSpeed = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);			
+//					
+//					// car is already bound, all other modes not
+//					// the walk mode gets the coord2coord-based disutility
+//					addTravelDisutilityFactoryBinding(TransportMode.bike).toInstance(new RandomizingTimeDistanceTravelDisutility.Builder(TransportMode.bike));	
+//					addTravelDisutilityFactoryBinding(TransportMode.walk).toInstance(new Coord2CoordTimeDistanceTravelDisutility.Builder(TransportMode.walk).setWalkSpeed(walkSpeed));
+
+					
 					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
 
 						@Inject Map<String, TravelTime> travelTimes;
@@ -151,5 +154,4 @@ final public class RunAccessibilityExample {
 
 		controler.run();
 	}
-
 }

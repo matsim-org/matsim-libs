@@ -117,6 +117,7 @@ import org.matsim.core.utils.misc.Time;
 		final Coord coord = transformation.transform( node.getCoord() );
 		out.write(" x=\"" + coord.getX() + "\"");
 		out.write(" y=\"" + coord.getY() + "\"");
+		if( coord.hasZ() ) out.write(" z=\"" + coord.getZ() + "\"");
 		if (NetworkUtils.getType( node ) != null) {
 			out.write(" type=\"" + NetworkUtils.getType( node ) + "\"");
 		}

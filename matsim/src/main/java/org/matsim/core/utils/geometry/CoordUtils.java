@@ -20,72 +20,213 @@
 
 package org.matsim.core.utils.geometry;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 
 public abstract class CoordUtils {
+	final private static Logger LOG = Logger.getLogger(CoordUtils.class);
 	
 	public static Coord createCoord( final double xx, final double yy ) {
 		return new Coord(xx, yy);
 	}
 	
+	public static Coord createCoord( final double xx, final double yy, final double zz){
+		return new Coord(xx, yy, zz);
+	}
+	
 	public static Coord plus ( Coord coord1, Coord coord2 ) {
-		double xx = coord1.getX() + coord2.getX();
-		double yy = coord1.getY() + coord2.getY();
-		return new Coord(xx, yy);
+		if( !coord1.hasZ() && !coord2.hasZ() ){
+			/* Both are 2D coordinates. */
+			double xx = coord1.getX() + coord2.getX();
+			double yy = coord1.getY() + coord2.getY();
+			return new Coord(xx, yy);			
+		} else if( coord1.hasZ() && coord2.hasZ() ){
+			/* Both are 3D coordinates. */
+			double xx = coord1.getX() + coord2.getX();
+			double yy = coord1.getY() + coord2.getY();
+			double zz = coord1.getZ() + coord2.getZ();
+			return new Coord(xx, yy, zz);			
+		} else{
+			throw new RuntimeException("Cannot 'plus' coordinates if one has elevation (z) and the other not; coord1.hasZ=" + coord1.hasZ()
+			+ "; coord2.hasZ=" + coord2.hasZ() );
+		}
 	}
 	
 	public static Coord minus ( Coord coord1, Coord coord2 ) {
-		double xx = coord1.getX() - coord2.getX();
-		double yy = coord1.getY() - coord2.getY();
-		return new Coord(xx, yy);
+		if( !coord1.hasZ() && !coord2.hasZ() ){
+			/* Both are 2D coordinates. */
+			double xx = coord1.getX() - coord2.getX();
+			double yy = coord1.getY() - coord2.getY();
+			return new Coord(xx, yy);			
+		} else if( coord1.hasZ() && coord2.hasZ() ){
+			/* Both are 3D coordinates. */
+			double xx = coord1.getX() - coord2.getX();
+			double yy = coord1.getY() - coord2.getY();
+			double zz = coord1.getZ() - coord2.getZ();
+			return new Coord(xx, yy, zz);			
+		} else{
+			throw new RuntimeException("Cannot 'minus' coordinates if one has elevation (z) and the other not.");
+		}
 	}
 	
 	public static Coord scalarMult( double alpha, Coord coord ) {
-		double xx = alpha * coord.getX() ;
-		double yy = alpha * coord.getY() ;
-		return new Coord(xx, yy);
+		if(!coord.hasZ()){
+			/* 2D coordinate. */
+			double xx = alpha * coord.getX();
+			double yy = alpha * coord.getY();
+			return new Coord(xx, yy);			
+		} else {
+			/* 3D coordinate. */
+			double xx = alpha * coord.getX();
+			double yy = alpha * coord.getY();
+			double zz = alpha * coord.getZ();
+			return new Coord(xx, yy, zz);			
+		} 
 	}
+	
 	
 	public static Coord getCenter( Coord coord1, Coord coord2 ) {
-		double xx = 0.5*( coord1.getX() + coord2.getX() ) ;
-		double yy = 0.5*( coord1.getY() + coord2.getY() ) ;
-		return new Coord(xx, yy);
+		if( !coord1.hasZ() && !coord2.hasZ() ){
+			/* Both are 2D coordinates. */
+			double xx = 0.5*( coord1.getX() + coord2.getX() ) ;
+			double yy = 0.5*( coord1.getY() + coord2.getY() ) ;
+			return new Coord(xx, yy);			
+		} else if( coord1.hasZ() && coord2.hasZ() ){
+			/* Both are 3D coordinates. */
+			double xx = 0.5*( coord1.getX() + coord2.getX() ) ;
+			double yy = 0.5*( coord1.getY() + coord2.getY() ) ;
+			double zz = 0.5*( coord1.getZ() + coord2.getZ() ) ;
+			return new Coord(xx, yy, zz);			
+		} else{
+			throw new RuntimeException("Cannot get the center for coordinates if one has elevation (z) and the other not.");
+		}
 	}
 	
-	public static double length( Coord coord1 ) {
-		return Math.sqrt( coord1.getX()*coord1.getX() + coord1.getY()*coord1.getY() ) ;
+	public static double length( Coord coord ) {
+		if(!coord.hasZ()){
+			return Math.sqrt( 
+					coord.getX()*coord.getX() + 
+					coord.getY()*coord.getY() ) ;
+		} else{
+			return Math.sqrt( 
+					coord.getX()*coord.getX() + 
+					coord.getY()*coord.getY() +
+					coord.getZ()*coord.getZ()) ;
+		}
 	}
 	
-	public static Coord rotateToRight( Coord coord1 ) {
-		final double y = -coord1.getX();
-		return new Coord(coord1.getY(), y);
+	/**
+	 * Note: If the given {@link Coord} has elevation, it's elevation will stay 
+	 * the same (jjoubert, Sep '16). 
+	 * @param coord
+	 * @return
+	 */
+	public static Coord rotateToRight( Coord coord ) {
+		if( !coord.hasZ() ){
+			/* 2D coordinate */
+			final double y = -coord.getX();
+			return new Coord(coord.getY(), y);
+		} else{
+			/* 3D coordinate */
+			final double y = -coord.getX();
+			return new Coord(coord.getY(), y, coord.getZ());			
+		}
 	}
+
 	
 	public static Coord getCenterWOffset( Coord coord1, Coord coord2 ) {
-		Coord fromTo = minus( coord2, coord1 ) ;
-		Coord offset = scalarMult( 0.1 , rotateToRight( fromTo ) ) ;
-		Coord centerWOffset = plus( getCenter( coord1, coord2 ) , offset ) ;
-		return centerWOffset ;
+		if( !coord1.hasZ() && !coord2.hasZ() ){
+			/* Both are 2D coordinates. */
+			Coord fromTo = minus( coord2, coord1 ) ;
+			Coord offset = scalarMult( 0.1 , rotateToRight( fromTo ) ) ;
+			Coord centerWOffset = plus( getCenter( coord1, coord2 ) , offset ) ;
+			return centerWOffset ;
+		} else if( coord1.hasZ() && coord2.hasZ() ){
+			/* TODO Both are 3D coordinates. */
+			throw new RuntimeException("3D version not implemented.");
+		} else{
+			throw new RuntimeException("Cannot get the center for coordinates if one has elevation (z) and the other not.");
+		}
 	}
 
 	public static double calcEuclideanDistance(Coord coord, Coord other) {
-		//depending on the coordinate system that is used, determining the
-		//distance based on the euclidean distance will lead to wrong results.
-		//however, if the distance is not to large (<1km) this will be a usable distance estimation.
-		//Another comfortable way to calculate correct distances would be, to use the distance functions
-		//provided by geotools lib. May be we need to discuss what part of GIS functionality we should implement
-		//by our own and for what part we could use an existing GIS like geotools. We need to discuss this in terms
-		//of code robustness, performance and so on ... [gl]
+		/* Depending on the coordinate system that is used, determining the 
+		 * distance based on the euclidean distance will lead to wrong results. 
+		 * However, if the distance is not to large (<1km) this will be a usable 
+		 * distance estimation. Another comfortable way to calculate correct 
+		 * distances would be, to use the distance functions provided by 
+		 * geotools lib. May be we need to discuss what part of GIS functionality 
+		 * we should implement by our own and for what part we could use an 
+		 * existing GIS like geotools. We need to discuss this in terms of code 
+		 * robustness, performance and so on ... [gl] */
+		if( !coord.hasZ() && !other.hasZ() ){
+			/* Both are 2D coordinates. */
+			double xDiff = other.getX()-coord.getX();
+			double yDiff = other.getY()-coord.getY();
+			return Math.sqrt((xDiff*xDiff) + (yDiff*yDiff));
+		} else if( coord.hasZ() && other.hasZ() ){
+			/* Both are 3D coordinates. */
+			double xDiff = other.getX()-coord.getX();
+			double yDiff = other.getY()-coord.getY();
+			double zDiff = other.getZ()-coord.getZ();
+			return Math.sqrt((xDiff*xDiff) + (yDiff*yDiff) + (zDiff*zDiff));
+		} else{
+			LOG.warn("Mixed use of elevation in coordinates: " + coord.toString() + 
+					"; " + other.toString());
+			LOG.warn("Returning projected coordinate distance (using x and y components only)");
+			return calcProjectedEuclideanDistance(coord, other);
+		}
+	}
+
+
+	/**
+	 * Method to deal with distance calculation when only the x and y-components
+	 * of the coordinates are used. The elevation (z component) is ignored,
+	 * whether it is available or not. 
+	 * (xy-plane)
+	 * @param coord
+	 * @param other
+	 * @return
+	 */
+	public static double calcProjectedEuclideanDistance(Coord coord, Coord other) {
 		double xDiff = other.getX()-coord.getX();
 		double yDiff = other.getY()-coord.getY();
 		return Math.sqrt((xDiff*xDiff) + (yDiff*yDiff));
 	}
-
+	
+	
+	/**
+	 * Method should only be used in within this class, and only by 
+	 * {@link #distancePointLinesegment(Coord, Coord, Coord)}. 
+	 * @param coord1
+	 * @param coord2
+	 * @return
+	 */
+	private static double dotProduct( Coord coord1, Coord coord2 ) {
+		if( !coord1.hasZ() && !coord2.hasZ() ){
+			/* Both are 2D coordinates. */
+			return 	coord1.getX()*coord2.getX() + 
+					coord1.getY()*coord2.getY();
+		} else if( coord1.hasZ() && coord2.hasZ() ){
+			/* Both are 3D coordinates. */
+			return 	coord1.getX()*coord2.getX() + 
+					coord1.getY()*coord2.getY() +
+					coord1.getZ()*coord2.getZ();
+		} else{
+			throw new RuntimeException("Cannot get the dot-product of coordinates if one has elevation (z) and the other not.");
+		}
+	}
+	
+	
 	/**
 	 * Calculates the shortest distance of a point to a line segment. The line segment
 	 * is given by two points, <code>lineFrom</code> and <code>lineTo</code>. Note that
 	 * the line segment has finite length, and thus the shortest distance cannot
 	 * always be the distance on the tangent to the line through <code>point</code>.
+	 * 
+	 * <br><br>
+	 * The 3D version was adapted from the C++ implementation of 
+	 * <a href="http://geomalgorithms.com/a02-_lines.html">Dan Sunday</a>. 
 	 *
 	 * @param lineFrom The start point of the line segment
 	 * @param lineTo The end point of the line segment
@@ -93,46 +234,141 @@ public abstract class CoordUtils {
 	 * @return the distance of <code>point</code> to the line segment given by the two
 	 *    end points of the line segment, <code>lineFrom</code> and <code>lineTo</code>
 	 *
-	 * @author mrieser
+	 * @author mrieser, jwjoubert
 	 */
 	public static double distancePointLinesegment(final Coord lineFrom, final Coord lineTo, final Coord point) {
-		/* The shortest distance is where the tangent of the line goes through "point".
-		 * The dot product (point - P) dot (lineTo - lineFrom) must be 0, when P is a point
-		 * on the line. P can be substituted with lineFrom + u*(lineTo - lineFrom).
-		 * Thus it must be:
-		 *    (point - lineFrom - u*(lineTo - lineFrom)) dot (lineTo - lineFrom) == 0
-		 * From this follows:
-		 *        (point.x - lineFrom.x)(lineTo.x - lineFrom.x) + (point.y - lineFrom.y)(lineTo.y - lineFrom.y)
-		 *    u = ---------------------------------------------------------------------------------------------
-		 *       (lineTo.x - lineFrom.x)(lineTo.x - lineFrom.x) + (lineTo.y - lineFrom.y)(lineTo.y - lineFrom.y)
-		 *
-		 * Substituting this gives:
-		 *   x = lineFrom.x + u*(lineFrom.x - lineTo.x) , y = lineFrom.y + u*(lineFrom.y - lineTo.y)
-		 *
-		 * The shortest distance is now the distance between "point" and (x | y)
-		 *
-		 */
-	
-		double lineDX = lineTo.getX() - lineFrom.getX();
-		double lineDY = lineTo.getY() - lineFrom.getY();
-	
-		if ((lineDX == 0.0) && (lineDY == 0.0)) {
-			// the line segment is a point without dimension
-			return calcEuclideanDistance(lineFrom, point);
-		}
-	
-		double u = ((point.getX() - lineFrom.getX())*lineDX + (point.getY() - lineFrom.getY())*lineDY) /
-							(lineDX*lineDX + lineDY*lineDY);
-	
-		if (u <= 0) {
-			// (x | y) is not on the line segment, but before lineFrom
-			return calcEuclideanDistance(lineFrom, point);
-		}
-		if (u >= 1) {
-			// (x | y) is not on the line segment, but after lineTo
-			return calcEuclideanDistance(lineTo, point);
-		}
-		return calcEuclideanDistance(new Coord(lineFrom.getX() + u * lineDX, lineFrom.getY() + u * lineDY), point);
-	}
+		if( !lineFrom.hasZ() && !lineTo.hasZ() && !point.hasZ() ){
+			/* All coordinates are 2D and in the XY plane. */
 
+			/* The shortest distance is where the tangent of the line goes 
+			 * through "point". The dot product (point - P) dot (lineTo - lineFrom) 
+			 * must be 0, when P is a point on the line. P can be substituted 
+			 * with lineFrom + u*(lineTo - lineFrom). Thus it must be:
+			 *    (point - lineFrom - u*(lineTo - lineFrom)) dot (lineTo - lineFrom) == 0
+			 * From this follows:
+			 *        (point.x - lineFrom.x)(lineTo.x - lineFrom.x) + (point.y - lineFrom.y)(lineTo.y - lineFrom.y)
+			 *    u = ---------------------------------------------------------------------------------------------
+			 *       (lineTo.x - lineFrom.x)(lineTo.x - lineFrom.x) + (lineTo.y - lineFrom.y)(lineTo.y - lineFrom.y)
+			 *
+			 * Substituting this gives:
+			 *   x = lineFrom.x + u*(lineFrom.x - lineTo.x) , y = lineFrom.y + u*(lineFrom.y - lineTo.y)
+			 *
+			 * The shortest distance is now the distance between "point" and 
+			 * (x | y)
+			 */
+			double lineDX = lineTo.getX() - lineFrom.getX();
+			double lineDY = lineTo.getY() - lineFrom.getY();
+			
+			if ((lineDX == 0.0) && (lineDY == 0.0)) {
+				// the line segment is a point without dimension
+				return calcEuclideanDistance(lineFrom, point);
+			}
+			
+			double u = ((point.getX() - lineFrom.getX())*lineDX + (point.getY() - lineFrom.getY())*lineDY) /
+					(lineDX*lineDX + lineDY*lineDY);
+			
+			if (u <= 0) {
+				// (x | y) is not on the line segment, but before lineFrom
+				return calcEuclideanDistance(lineFrom, point);
+			}
+			if (u >= 1) {
+				// (x | y) is not on the line segment, but after lineTo
+				return calcEuclideanDistance(lineTo, point);
+			}
+			
+			return calcEuclideanDistance(new Coord(lineFrom.getX() + u * lineDX, lineFrom.getY() + u * lineDY), point);
+		} else if( lineFrom.hasZ() && lineTo.hasZ() && point.hasZ() ){
+			/* All coordinates are 3D. */
+			double lineDX = lineTo.getX() - lineFrom.getX();
+			double lineDY = lineTo.getY() - lineFrom.getY();
+			double lineDZ = lineTo.getZ() - lineFrom.getZ();
+			
+			if((lineDX == 0.0) && (lineDY == 0.0) && (lineDZ == 0.0)){
+				return calcEuclideanDistance(lineFrom, point);
+			}
+			
+			Coord v = minus(lineTo, lineFrom);
+			Coord w = minus(point, lineFrom);
+			
+			double c1 = dotProduct(w, v);
+			if(c1 <= 0.0){
+				Coord m = minus(point, lineFrom);
+				return Math.sqrt(dotProduct(m, m));
+			}
+			
+			double c2 = dotProduct(v, v);
+			if(c2 <= c1){
+				Coord m = minus(point, lineTo);
+				return Math.sqrt(dotProduct(m, m));
+			}
+			
+			double b = c1 / c2;
+			Coord p = plus(lineFrom, scalarMult(b, v));
+			Coord m = minus(point, p);
+			return Math.sqrt(dotProduct(m, m));
+		} else{
+			throw new RuntimeException("All given coordinates must either be 2D, or 3D. A mix is not allowed.");
+		}
+	}
+	
+	
+	/**
+	 * Calculates the coordinate of the intersection point of the orthogonal projection
+	 * of a given point on a line segment with that line segment. The line segment
+	 * is given by two points, <code>lineFrom</code> and <code>lineTo</code>. If the
+	 * projection point does not lie *on* the line segment (but only somewhere on
+	 * the extension of the line segment, i.e. the infinite line), the end point of
+	 * the line segment which is closest to the given point is returned.
+	 *
+	 * <br><br>
+	 * The 3D version was adapted from the documentation of 
+	 * <a href="http://www.geometrictools.com/Documentation/DistancePointLine.pdf">
+	 * David Eberly/a>. 
+	 *
+	 * @param lineFrom The start point of the line segment
+	 * @param lineTo The end point of the line segment
+	 * @param point The point whose distance to the line segment should be calculated
+	 * @return the <code>coordinate</code> of the intersection point of the orthogonal
+	 * projection of a given point on a line segment with that line segment
+	 *
+	 * @author dziemke, jwjoubert
+	 */
+	public static Coord orthogonalProjectionOnLineSegment(final Coord lineFrom, final Coord lineTo, final Coord point) {
+		if( !lineFrom.hasZ() && !lineTo.hasZ() && !point.hasZ() ){
+			/* All coordinates are 2D. */
+
+			/* Concerning explanation and usage of the dot product for these calculation, please
+			 * read comments of "distancePointLinesegment".
+			 */
+			double lineDX = lineTo.getX() - lineFrom.getX();
+			double lineDY = lineTo.getY() - lineFrom.getY();
+			
+			if ((lineDX == 0.0) && (lineDY == 0.0)) {
+				// the line segment is a point without dimension
+				return lineFrom;
+			}
+			
+			double u = ((point.getX() - lineFrom.getX())*lineDX + (point.getY() - lineFrom.getY())*lineDY) /
+					(lineDX*lineDX + lineDY*lineDY);
+			
+			if (u <= 0) {
+				// (x | y) is not on the line segment, but before lineFrom
+				return lineFrom;
+			}
+			if (u >= 1) {
+				// (x | y) is not on the line segment, but after lineTo
+				return lineTo;
+			}
+			return new Coord(lineFrom.getX() + u * lineDX, lineFrom.getY() + u * lineDY);
+		} else if(lineFrom.hasZ() && lineTo.hasZ() && point.hasZ() ){
+			/* All coordinates are 3D. */
+			Coord direction = minus(lineTo, lineFrom);
+			
+			double t0 = dotProduct(direction, minus(point, lineFrom)) / dotProduct(direction, direction);
+			Coord q = plus(lineFrom, scalarMult(t0, direction));
+			return q;
+		} else{
+			throw new RuntimeException("All given coordinates must either be 2D, or 3D. A mix is not allowed.");
+		}
+	}
 }

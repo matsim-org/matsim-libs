@@ -25,12 +25,15 @@ import org.matsim.api.core.v01.network.Link;
 /**
  * This class provides methods to check, if a vehicle is approximately in a certain distance from a link's end.
  * 
+ * Note: Each instance of this class is valid for only one specific distance.
+ * 
  * @author droeder
  * @author dgrether
  *
  */
 public class CarLocator {
 	
+	// time when the vehicle will be at the given distance in front of the links to node 
 	private double earliestTimeInDistance;
 	
 	private static final Logger log = Logger.getLogger(CarLocator.class);
@@ -48,6 +51,12 @@ public class CarLocator {
 		return this.earliestTimeInDistance;
 	}
 	
+	/**
+	 * Checks whether the car is in the specific distance (given in the controller) from a links end at the given time.
+	 * 
+	 * @param time
+	 * @return true, if the position of the car on the link at the given time is within the specific distance from its end. false, if it is further afar.
+	 */
 	public boolean isCarinDistance(double time){
 		if ((this.earliestTimeInDistance < time)){
 			return true;

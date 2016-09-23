@@ -41,20 +41,25 @@
  * </pre></blockquote>
  *
  * <h4>Cordon Toll</h4>
- * In the case of a cordon toll, agents have to pay a fixed amount each time they enter a tolled link from a
- * non-tolled link. The roadpricing type in the file has to be set to "cordon". The links listed in the
- * roadpricing file are the "tolled links". There are two possibilities to specify the tolled links:
+ * In the case of a cordon toll, agents have to pay a fixed amount each time 
+ * they enter a tolled link from a non-tolled link. The roadpricing type in the 
+ * file has to be set to "cordon". The links listed in the roadpricing file are 
+ * the "tolled links". There are two possibilities to specify the tolled links:
  * <ul>
- *   <li><strike><b>All the links in the area enclosed by the cordon are listed.</b> In this case, agents only pay
- *   the toll when entering the cordon from the outside, but not when driving from the inside to the outside.
- *   This has the advantage that the listed links are the same as for an area toll within the same area.  DOES NOT WORK CORRECTLY 
- *   (in the router).  kai, apr'13 </strike></li>
- *   <li><b>Only the links that build the cordon are listed.</b> In this case, agents have to pay each time
- *   they cross the cordon, no matter if from the outside or from the inside (assuming both links, incoming and
- *   outgoing, are listed).</li>
+ *   <li><strike><b>All the links in the area enclosed by the cordon are 
+ *   listed.</b> In this case, agents only pay the toll when entering the cordon 
+ *   from the outside, but not when driving from the inside to the outside. This 
+ *   has the advantage that the listed links are the same as for an area toll 
+ *   within the same area.  DOES NOT WORK CORRECTLY  (in the router).  kai, apr'13 </strike></li>
+ *   
+ *   <li><b>Only the links that build the cordon are listed.</b> In this case, 
+ *   agents have to pay each time they cross the cordon, no matter if from the 
+ *   outside or from the inside (assuming both links, incoming and outgoing, 
+ *   are listed).</li>
  * </ul>
- * Each time an agent enters a tolled link, while having been on an not-tolled link before, the agent has to pay the
- * specified amount. The time the agent enters a link is determining the costs.
+ * Each time an agent enters a tolled link, while having been on an not-tolled 
+ * link before, the agent has to pay the specified amount. The time the agent 
+ * enters a link is determining the costs.
  * <br>
  * Example Road-Pricing File for a cordon toll:
  * <blockquote><pre>
@@ -148,7 +153,7 @@
  *   &lt;param name="tollLinksFile" value="path/to/your/roadpricing-file.xml" /&gt;
  * &lt;/module&gt; </pre>
  * 
- *Start MATSim using the following lines of code (check {@link org.matsim.roadpricing.run.RunRoadPricingExample} in the roadpricing contrib for an up-to-date example):
+ *Start MATSim using the following lines of code (check {@link org.matsim.roadpricing.RunRoadPricingExample} in the roadpricing contrib for an up-to-date example):
  * <code>
  * <pre>
  * 	public static void main(String[] args) {

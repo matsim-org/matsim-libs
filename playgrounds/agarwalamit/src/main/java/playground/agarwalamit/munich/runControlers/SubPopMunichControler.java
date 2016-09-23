@@ -55,8 +55,8 @@ import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.joint.JointCalibrationControler;
 import playground.agarwalamit.munich.controlerListner.MyEmissionCongestionMoneyEventControlerListner;
 import playground.agarwalamit.munich.controlerListner.MyTollAveragerControlerListner;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
 import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
@@ -260,13 +260,13 @@ public class SubPopMunichControler {
 		
 		{
 			String userGroup = MunichUserGroup.Urban.toString();
-			ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new ExtendedPersonFilter());
+			ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new MunichPersonFilter());
 			msc.run();
 			msc.writeResults(OUTPUT_DIR+"/analysis/modalShareFromEvents_"+userGroup+".txt");	
 		}
 		{
 			String userGroup = MunichUserGroup.Rev_Commuter.toString();
-			ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new ExtendedPersonFilter());
+			ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new MunichPersonFilter());
 			msc.run();
 			msc.writeResults(OUTPUT_DIR+"/analysis/modalShareFromEvents_"+userGroup+".txt");
 		}

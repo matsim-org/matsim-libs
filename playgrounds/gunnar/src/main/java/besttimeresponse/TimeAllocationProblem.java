@@ -1,9 +1,8 @@
 package besttimeresponse;
 
-import static besttimeresponse.PlannedActivity.minActDur_s;
+import static besttimeresponse.PlannedActivity.MINACTDUR_S;
 import static java.lang.Math.log;
 import static java.lang.Math.max;
-import static java.util.Collections.unmodifiableList;
 import static org.apache.commons.math3.optim.linear.Relationship.GEQ;
 import static org.apache.commons.math3.optim.linear.Relationship.LEQ;
 
@@ -19,16 +18,16 @@ import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
 /**
  * 
  * @author Gunnar Flötteröd
- *
+ * 
  */
 class TimeAllocationProblem {
 
 	// -------------------- MEMBERS --------------------
 
 	// chronological list of realized activities
-	private final List<RealizedActivity> realizedActivities;
+	private final List<RealizedActivity<?, ?>> realizedActivities;
 
-	// coefficient for duration of an activity
+	// coefficient for activity duration
 	private final double betaDur_1_s;
 
 	// coefficient for travel duration
@@ -40,14 +39,14 @@ class TimeAllocationProblem {
 	// coefficient for late arrival
 	private final double betaLateArr_1_s;
 
-	// overlap between piecewise linear functions
+	// overlap between travel time bins
 	private final double slack_s = 1.0;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	TimeAllocationProblem(final List<RealizedActivity> realizedActivities, final double betaDur_1_s,
+	<L, M> TimeAllocationProblem(final List<RealizedActivity<L, M>> realizedActivities, final double betaDur_1_s,
 			final double betaTravel_1_s, final double betaLateArr_1_s, final double betaEarlyDpt_1_s) {
-		this.realizedActivities = unmodifiableList(realizedActivities);
+		this.realizedActivities = new ArrayList<RealizedActivity<?, ?>>(realizedActivities);
 		this.betaDur_1_s = betaDur_1_s;
 		this.betaTravel_1_s = betaTravel_1_s;
 		this.betaLateArr_1_s = betaLateArr_1_s;
@@ -56,26 +55,34 @@ class TimeAllocationProblem {
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	private double getScore() {
+	double[] getInitialSolution() {
+		double[] result = new double[this.realizedActivities.size()];
+		for (int q = 0; q < this.realizedActivities.size(); q++) {
+			result[q] = this.realizedActivities.get(q).realizedDptTime_s;
+		}
+		return result;
+	}
+
+	double getTimeScoreAtInitialSolution() {
 		final int _N = this.realizedActivities.size();
 		double result = 0.0;
 		for (int q = 0; q < _N; q++) {
-			final RealizedActivity act = this.realizedActivities.get(q);
+			final RealizedActivity<?, ?> act = this.realizedActivities.get(q);
 			result += this.betaDur_1_s * act.plannedActivity.desiredDur_s
-					* log(max(minActDur_s, act.effectiveDuration_s()));
+					* log(max(MINACTDUR_S, act.effectiveDuration_s()) / max(MINACTDUR_S, act.plannedActivity.minDur_s));
 			if (act.isLateArrival()) {
 				result += this.betaLateArr_1_s * (act.realizedArrTime_s - act.plannedActivity.latestArrTime_s);
 			}
 			if (act.isEarlyDeparture()) {
 				result += this.betaEarlyDpt_1_s * (act.plannedActivity.earliestDptTime_s - act.realizedDptTime_s);
 			}
-			result += this.betaTravel_1_s
-					* (this.realizedActivities.get(q < _N - 1 ? q + 1 : 0).realizedArrTime_s - act.realizedDptTime_s);
+			result += this.betaTravel_1_s * (this.realizedActivities.get((q + 1) < _N ? (q + 1) : 0).realizedArrTime_s
+					- act.realizedDptTime_s);
 		}
 		return result;
 	}
 
-	private RealVector get__dScore_dDptTimes__1_s() {
+	RealVector get__dScore_dDptTimes__1_s() {
 
 		// For consistency with formula write-up.
 
@@ -87,8 +94,8 @@ class TimeAllocationProblem {
 
 		for (int q = 0; q < _N; q++) {
 
-			final RealizedActivity act = this.realizedActivities.get(q);
-			final RealizedActivity nextAct = this.realizedActivities.get((q < _N - 1) ? (q + 1) : 0);
+			final RealizedActivity<?, ?> act = this.realizedActivities.get(q);
+			final RealizedActivity<?, ?> nextAct = this.realizedActivities.get(((q + 1) < _N) ? (q + 1) : 0);
 			final double a = act.nextTripTravelTime.dTT_dDptTime;
 
 			// travel time
@@ -97,13 +104,13 @@ class TimeAllocationProblem {
 			// current activity duration
 			if (!act.isClosedAtDeparture()) {
 				dScore_dDptTimes__1_s.addToEntry(q, this.betaDur_1_s * act.plannedActivity.desiredDur_s
-						/ max(minActDur_s, act.effectiveDuration_s()));
+						/ max(MINACTDUR_S, act.effectiveDuration_s()));
 			}
 
 			// next activity duration
 			if (!nextAct.isClosedAtArrival()) {
 				dScore_dDptTimes__1_s.addToEntry(q, (-1.0) * (1.0 + a) * this.betaDur_1_s
-						* nextAct.plannedActivity.desiredDur_s / max(minActDur_s, nextAct.effectiveDuration_s()));
+						* nextAct.plannedActivity.desiredDur_s / max(MINACTDUR_S, nextAct.effectiveDuration_s()));
 			}
 
 			// early departure from current activity
@@ -122,10 +129,8 @@ class TimeAllocationProblem {
 
 	LinearObjectiveFunction getObjectiveFunction() {
 		final RealVector coeffs = this.get__dScore_dDptTimes__1_s();
-		double offset = this.getScore();
-		for (int q = 0; q < this.realizedActivities.size(); q++) {
-			offset -= coeffs.getEntry(q) * this.realizedActivities.get(q).realizedDptTime_s;
-		}
+		final double offset = this.getTimeScoreAtInitialSolution()
+				- coeffs.dotProduct(new ArrayRealVector(this.getInitialSolution()));
 		return new LinearObjectiveFunction(coeffs, offset);
 	}
 
@@ -156,7 +161,7 @@ class TimeAllocationProblem {
 			final RealVector coeffs = new ArrayRealVector(_N);
 			coeffs.setEntry(q, -(1.0 + a[q]));
 			coeffs.setEntry(q + 1, 1.0);
-			constraints.add(new LinearConstraint(coeffs, GEQ, minActDur_s + b[q]));
+			constraints.add(new LinearConstraint(coeffs, GEQ, MINACTDUR_S + b[q]));
 		}
 
 		// The last arrival must occur before midnight.

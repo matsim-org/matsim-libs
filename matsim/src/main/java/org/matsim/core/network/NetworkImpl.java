@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * Design thoughts:<ul>
@@ -84,6 +85,7 @@ import org.matsim.core.utils.collections.QuadTree;
 	private int nextMsg2=1;
 
 	private boolean locked = false ;
+	private final Attributes attributes = new Attributes();
 
 	NetworkImpl() {
 		this.factory = new NetworkFactoryImpl(this);
@@ -462,5 +464,10 @@ import org.matsim.core.utils.collections.QuadTree;
 		if ( locked ) {
 			throw new RuntimeException( "Network is locked; too late to do this.  See comments in code.") ;
 		}
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
 	}
 }

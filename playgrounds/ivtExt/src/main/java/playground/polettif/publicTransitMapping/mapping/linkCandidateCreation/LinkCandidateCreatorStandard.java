@@ -38,6 +38,7 @@ import java.util.*;
 /**
  * @author polettif
  */
+@Deprecated
 public class LinkCandidateCreatorStandard implements LinkCandidateCreator {
 
 	protected static Logger log = Logger.getLogger(LinkCandidateCreatorStandard.class);

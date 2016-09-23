@@ -17,7 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 /**
- * @author nagel
- *
+ * Package to run the different road pricing examples. The current examples 
+ * are now supported/working:
+ * <ul>
+ * 		<li> TODO Need to get them all running.
+ * </ul>
+ * 
+ * @author nagel, jwjoubert
  */
 package org.matsim.roadpricing.run;

@@ -38,13 +38,14 @@ import org.matsim.jaxb.lanedefinitions11.XMLIdRefType;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneDefinitions;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneType;
 import org.matsim.jaxb.lanedefinitions11.XMLLanesToLinkAssignmentType;
-import org.matsim.lanes.data.v20.LaneDefinitionsReader;
+import org.matsim.lanes.data.LanesReader;
 /**
  * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v1.1.xsd
  * file format.
  * @author dgrether
  *
  */
+@Deprecated
 public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter implements MatsimSomeWriter {
 
 	private static final Logger log = Logger
@@ -76,7 +77,7 @@ public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter implements Mats
 		try {
 			jc = JAXBContext.newInstance(org.matsim.jaxb.lanedefinitions11.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller();
-			super.setMarshallerProperties(LaneDefinitionsReader.SCHEMALOCATIONV11, m);
+			super.setMarshallerProperties(LanesReader.SCHEMALOCATIONV11, m);
 			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
 			m.marshal(this.xmlLaneDefinitions, bufout);
 			bufout.close();

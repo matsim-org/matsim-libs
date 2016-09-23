@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
@@ -42,11 +43,13 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 
+import playground.jbischoff.parking.ParkingUtils;
 import playground.jbischoff.parking.events.StartParkingSearchEvent;
 import playground.jbischoff.parking.events.StartParkingSearchEventHandler;
 
@@ -66,6 +69,7 @@ public class ParkingSearchAndEgressTimeEvaluator implements PersonArrivalEventHa
 	private double[] parkingCounts = new double[24];
 	private double[] parkingTime = new double[24];
 	private Network network;
+	Random rnd = MatsimRandom.getLocalInstance();
 
 	/* (non-Javadoc)
 	 * @see org.matsim.core.events.handler.EventHandler#reset(int)
@@ -161,7 +165,7 @@ public class ParkingSearchAndEgressTimeEvaluator implements PersonArrivalEventHa
 				this.parkingCounts[hour]++;
 				this.parkingTime[hour]+=parkingTime;
 				CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.GK4, TransformationFactory.WGS84);
-				Coord coord = this.network.getLinks().get(event.getLinkId()).getCoord();
+				Coord coord = ParkingUtils.getRandomPointAlongLink(rnd, this.network.getLinks().get(event.getLinkId()));
 				Coord t = ct.transform(coord);
 				String stamp = event.getTime()+";"+coord.getX()+";"+coord.getY()+";"+t.getX()+";"+t.getY()+";"+parkingTime;
 				this.coordTimeStamps.add(stamp);

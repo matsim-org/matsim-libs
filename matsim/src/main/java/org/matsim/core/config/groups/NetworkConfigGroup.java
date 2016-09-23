@@ -83,9 +83,15 @@ public final class NetworkConfigGroup extends ReflectiveConfigGroup {
 	public void setChangeEventsInputFile(final String changeEventsInputFile) {
 		this.changeEventsInputFile = changeEventsInputFile;
 	}
+	
 	@StringGetter( CHANGE_EVENTS_INPUT_FILE )
 	public String getChangeEventsInputFile() {
-		return this.changeEventsInputFile;
+		return changeEventsInputFile;
+	}
+	
+	
+	public URL getChangeEventsInputFileUrl(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.changeEventsInputFile);
 	}
 
 	@StringSetter( TIME_VARIANT_NETWORK )

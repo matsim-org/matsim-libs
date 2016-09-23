@@ -2,23 +2,22 @@ package besttimeresponseintegration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import org.apache.commons.math3.linear.ArrayRealVector;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.utils.misc.Time;
 
-import besttimeresponse.PlannedActivity;
 import besttimeresponse.TimeAllocator;
-import besttimeresponse.TripTravelTimes;
 import opdytsintegration.utils.TimeDiscretization;
 
 /**
@@ -32,24 +31,24 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 
 	private final Scenario scenario;
 
-	private final Map<String, TravelTime> mode2tt;
-
 	private final CharyparNagelScoringParametersForPerson scoringParams;
 
 	private final TimeDiscretization timeDiscretization;
 
-	private final TripTravelTimes myTravelTime;
+	private final ExperiencedScoreAnalyzer experiencedScoreAnalyzer;
+
+	private final TravelTime carTravelTime;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	BestTimeResponseStrategyModule(final Scenario scenario, final Map<String, TravelTime> mode2tt,
-			final CharyparNagelScoringParametersForPerson scoringParams, final TimeDiscretization timeDiscretization,
-			final TripTravelTimes myTravelTime) {
+	BestTimeResponseStrategyModule(final Scenario scenario, final CharyparNagelScoringParametersForPerson scoringParams,
+			final TimeDiscretization timeDiscretization, final ExperiencedScoreAnalyzer experiencedScoreAnalyzer,
+			final TravelTime carTravelTime) {
 		this.scenario = scenario;
-		this.mode2tt = mode2tt;
 		this.scoringParams = scoringParams;
 		this.timeDiscretization = timeDiscretization;
-		this.myTravelTime = myTravelTime;
+		this.experiencedScoreAnalyzer = experiencedScoreAnalyzer;
+		this.carTravelTime = carTravelTime;
 	}
 
 	// --------------- IMPLEMENTATION OF PlanStrategyModule ---------------
@@ -57,92 +56,55 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 	@Override
 	public void handlePlan(final Plan plan) {
 
-		System.out.println(">>>>> HANDLING PLAN FOR PERSON " + plan.getPerson());
-		System.out.println("scenario = " + scenario);
-		System.out.println("mode2tt = " + mode2tt + ", keys = " + mode2tt.keySet());
-		System.out.println("scoringParams = " + scoringParams + ", for person = "
-				+ scoringParams.getScoringParameters(plan.getPerson()));
-
 		if (plan.getPlanElements().size() <= 1) {
 			return; // nothing to do when just staying at home
 		}
 
-//		for (int r = 1; r < plan.getPlanElements().size(); r += 2) {
-//			final Leg leg = (Leg) plan.getPlanElements().get(r);
-//			if (!"car".equals(leg.getMode())) {
-//				return;
-//			}
-//		}
+		final boolean interpolate = true;
 
-		/*
-		 * BUILD DATA STRUCTURES
-		 */
+		final BestTimeResponseStrategyFunctionality initialPlanData = new BestTimeResponseStrategyFunctionality(plan,
+				this.scenario.getNetwork(), this.scoringParams, this.timeDiscretization, this.carTravelTime,
+				interpolate);
+		final TimeAllocator<Link, String> timeAlloc = initialPlanData.getTimeAllocator();
 
-		final List<PlannedActivity> plannedActivities = new ArrayList<>();
-		final List<Double> dptTimes_s = new ArrayList<>();
-
-		// Every other element is an activity; skip the last home activity.
-		for (int q = 0; q < plan.getPlanElements().size() - 1; q += 2) {
-
-			final Activity matsimAct = (Activity) plan.getPlanElements().get(q);
-			final ActivityUtilityParameters matsimActParams = this.scoringParams
-					.getScoringParameters(plan.getPerson()).utilParams.get(matsimAct.getType());
-			final Leg matsimNextLeg = (Leg) plan.getPlanElements().get(q + 1);
-
-			final Double latestStartTime_s = (matsimActParams.getLatestStartTime() == Time.UNDEFINED_TIME ? null
-					: matsimActParams.getLatestStartTime());
-			final Double earliestEndTime_s = (matsimActParams.getEarliestEndTime() == Time.UNDEFINED_TIME ? null
-					: matsimActParams.getEarliestEndTime());
-			final PlannedActivity plannedAct;
-			if (q == 0) {
-				plannedAct = PlannedActivity.newOvernightActivity(
-						this.scenario.getNetwork().getLinks().get(matsimAct.getLinkId()).getToNode(),
-						matsimNextLeg.getMode(), matsimActParams.getTypicalDuration(), latestStartTime_s,
-						earliestEndTime_s);
-			} else {
-				final Double openingTime_s = (matsimActParams.getOpeningTime() == Time.UNDEFINED_TIME ? null
-						: matsimActParams.getOpeningTime());
-				final Double closingTime_s = (matsimActParams.getClosingTime() == Time.UNDEFINED_TIME ? null
-						: matsimActParams.getClosingTime());
-				plannedAct = PlannedActivity.newWithinDayActivity(
-						this.scenario.getNetwork().getLinks().get(matsimAct.getLinkId()).getToNode(),
-						matsimNextLeg.getMode(), matsimActParams.getTypicalDuration(), latestStartTime_s,
-						earliestEndTime_s, openingTime_s, closingTime_s);
-			}
-			plannedActivities.add(plannedAct);
-			dptTimes_s.add(matsimAct.getEndTime());
+		final double[] initialDptTimesArray_s = new double[initialPlanData.initialDptTimes_s.size()];
+		for (int q = 0; q < initialPlanData.initialDptTimes_s.size(); q++) {
+			initialDptTimesArray_s[q] = initialPlanData.initialDptTimes_s.get(q);
 		}
+		final double[] result = timeAlloc.optimizeDepartureTimes(initialPlanData.plannedActivities,
+				initialDptTimesArray_s);
+		System.out.println("FINAL DPT TIMES: " + new ArrayRealVector(result));
 
-		/*
-		 * RUN OPTIMIZATION
-		 */
+		// >>>>>>>>>> TODO NEW >>>>>>>>>>
+		this.experiencedScoreAnalyzer.setExpectedScore(plan.getPerson().getId(), timeAlloc.getResultValue());
+		// <<<<<<<<<< TODO NEW <<<<<<<<<<
 
-		final TimeAllocator timeAlloc = new TimeAllocator(this.timeDiscretization, this.myTravelTime,
-				this.scoringParams.getScoringParameters(plan.getPerson()).marginalUtilityOfPerforming_s,
-				this.scoringParams.getScoringParameters(plan.getPerson()).modeParams
-						.get("car").marginalUtilityOfTraveling_s,
-				this.scoringParams.getScoringParameters(plan.getPerson()).marginalUtilityOfLateArrival_s,
-				this.scoringParams.getScoringParameters(plan.getPerson()).marginalUtilityOfEarlyDeparture_s);
-
-		final List<Double> result = timeAlloc.optimizeDepartureTimes(plannedActivities, dptTimes_s);
-		System.out.println("INITIAL DPT TIMES: " + dptTimes_s);
-		System.out.println("FINAL DPT TIMES: " + result);
-		
 		/*
 		 * TAKE OVER DEPARTURE TIMES AND RECOMPUTE PATHS
+		 * 
+		 * TODO Recomputation is inefficient.
 		 */
 		int i = 0;
 		for (int q = 0; q < plan.getPlanElements().size() - 1; q += 2) {
-			final double dptTime_s = result.get(i++);
-			
+			final double dptTime_s = result[i++];
+
 			final Activity matsimAct = (Activity) plan.getPlanElements().get(q);
 			matsimAct.setEndTime(dptTime_s);
-			
+			final Link fromLink = this.scenario.getNetwork().getLinks().get(matsimAct.getLinkId());
+
 			final Leg leg = (Leg) plan.getPlanElements().get(q + 1);
 			if ("car".equals(leg.getMode())) {
 
-				// NOW SOMEHOW GET THE NEW ROUTE IN HERE
-				
+				final Activity nextMATSimAct = (Activity) plan.getPlanElements().get(q + 2);
+				final Link toLink = this.scenario.getNetwork().getLinks().get(nextMATSimAct.getLinkId());
+
+				final Path path = initialPlanData.getTravelTimes().getCarPath(fromLink, toLink, dptTime_s);
+
+				List<Id<Link>> linkIds = new ArrayList<>(path.links.size());
+				for (Link link : path.links) {
+					linkIds.add(link.getId());
+				}
+				((NetworkRoute) leg.getRoute()).setLinkIds(matsimAct.getLinkId(), linkIds, nextMATSimAct.getLinkId());
 			}
 		}
 	}

@@ -35,6 +35,7 @@ import java.util.TreeMap;
  *
  * @author polettif
  */
+@Deprecated
 public class CsvTools {
 
 	/**

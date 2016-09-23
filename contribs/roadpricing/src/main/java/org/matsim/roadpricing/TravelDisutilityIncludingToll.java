@@ -29,12 +29,14 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * Calculates the travel disutility for links, including tolls. Currently supports distance, cordon and area tolls.
+ * Calculates the travel disutility for links, including tolls. Currently 
+ * supports distance, cordon and area tolls.
  *
  * @author mrieser
  */
 class TravelDisutilityIncludingToll implements TravelDisutility {
 
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger( TravelDisutilityIncludingToll.class ) ;
 
 	private final RoadPricingScheme scheme;

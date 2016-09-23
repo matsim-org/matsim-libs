@@ -15,6 +15,7 @@ import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.*;
  *
  * @author polettif
  */
+@Deprecated
 public interface PseudoRouting extends Runnable {
 
 	/**

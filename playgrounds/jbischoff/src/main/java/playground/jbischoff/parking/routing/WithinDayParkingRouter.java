@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.core.network.NetworkUtils;
@@ -59,7 +60,7 @@ public class WithinDayParkingRouter implements ParkingRouter {
 	}
 
 	@Override
-	public NetworkRoute getRouteFromParkingToDestination(NetworkRoute originalIntendedRoute, double departureTime,
+	public NetworkRoute getRouteFromParkingToDestination(Route originalIntendedRoute, double departureTime,
 			Id<Link> startLinkId) {
 
 		

@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * A very simple fake implementation of {@link Node} to be used in tests.
@@ -90,4 +91,8 @@ public class FakeNode implements Node {
 		throw new RuntimeException("not implemented") ;
 	}
 
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
+	}
 }

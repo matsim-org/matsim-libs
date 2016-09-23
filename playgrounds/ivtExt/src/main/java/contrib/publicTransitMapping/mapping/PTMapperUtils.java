@@ -87,6 +87,7 @@ public class PTMapperUtils {
 	 * than its referenced link. If so, the child stop facility is replaced with the one closer
 	 * to the facility coordinates. Transit routes with loop route profiles (i.e. a stop is accessed
 	 * twice in a stop sequence) are ignored.
+	 *
 	 * @return the number of child stop facilities pulled
 	 */
 	public static int pullChildStopFacilitiesTogether(TransitSchedule schedule, Network network) {
@@ -94,7 +95,7 @@ public class PTMapperUtils {
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : line.getRoutes().values()) {
 				boolean hasStopLoop = ScheduleTools.routeHasStopSequenceLoop(transitRoute);
-				if(transitRoute.getRoute() != null) {
+				if(transitRoute.getRoute() != null && !hasStopLoop) {
 					TransitRouteStop currentStop;
 					List<TransitRouteStop> routeStops = transitRoute.getStops();
 
@@ -105,28 +106,21 @@ public class PTMapperUtils {
 
 					currentStop = stopsIterator.next();
 					// look for a closer link before the route's start
-					if(!hasStopLoop) {
-						Set<Link> inlinksWithSameMode = NetworkTools.filterLinkSetExactlyByModes(linkList.get(0).getFromNode().getInLinks().values(), linkList.get(0).getAllowedModes());
-						Id<Link> closerLinkBefore = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), inlinksWithSameMode);
-						if(closerLinkBefore != null) {
-							linkIdList.add(0, closerLinkBefore);
-							nPulled++;
-						}
+					Set<Link> inlinksWithSameMode = NetworkTools.filterLinkSetExactlyByModes(linkList.get(0).getFromNode().getInLinks().values(), linkList.get(0).getAllowedModes());
+					Id<Link> closerLinkBefore = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), inlinksWithSameMode);
+					if(closerLinkBefore != null) {
+						linkIdList.add(0, closerLinkBefore);
+						nPulled++;
 					}
-						currentStop = stopsIterator.next();
+					currentStop = stopsIterator.next();
 
 					// optimize referenced links between start and end
-					for(int i = 1; i < linkList.size()-1; i++) {
-
-						if(linkList.get(i).toString().equals("114813")) {
-							log.debug("");
-						}
-
+					for(int i = 1; i < linkList.size() - 1; i++) {
 						if(linkList.get(i).getId().equals(currentStop.getStopFacility().getLinkId())) {
 							Set<Link> testSet = new HashSet<>();
 							testSet.add(linkList.get(i));
-							testSet.add(linkList.get(i-1));
-							testSet.add(linkList.get(i+1));
+							testSet.add(linkList.get(i - 1));
+							testSet.add(linkList.get(i + 1));
 							Id<Link> check = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), testSet);
 
 							if(check != null) nPulled++;
@@ -138,14 +132,12 @@ public class PTMapperUtils {
 					}
 
 					// look for a closer link after the route's end
-					if(!hasStopLoop) {
-						currentStop = routeStops.get(routeStops.size() - 1);
-						Set<Link> outlinksWithSameMode = NetworkTools.filterLinkSetExactlyByModes(linkList.get(linkList.size() - 1).getToNode().getOutLinks().values(), linkList.get(linkList.size() - 1).getAllowedModes());
-						Id<Link> closerLinkAfter = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), outlinksWithSameMode);
-						if(closerLinkAfter != null) {
-							linkIdList.add(closerLinkAfter);
-							nPulled++;
-						}
+					currentStop = routeStops.get(routeStops.size() - 1);
+					Set<Link> outlinksWithSameMode = NetworkTools.filterLinkSetExactlyByModes(linkList.get(linkList.size() - 1).getToNode().getOutLinks().values(), linkList.get(linkList.size() - 1).getAllowedModes());
+					Id<Link> closerLinkAfter = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), outlinksWithSameMode);
+					if(closerLinkAfter != null) {
+						linkIdList.add(closerLinkAfter);
+						nPulled++;
 					}
 
 					// set the new link list
@@ -160,6 +152,7 @@ public class PTMapperUtils {
 	/**
 	 * If a link of <tt>comparingLinks</tt> is closer to the stop facility than
 	 * its currently referenced link, the closest link is used.
+	 *
 	 * @return The id of the new closest link or <tt>null</tt> if the existing ref link
 	 * was used.
 	 */

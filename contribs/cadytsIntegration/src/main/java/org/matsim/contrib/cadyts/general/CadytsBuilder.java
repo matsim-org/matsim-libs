@@ -142,7 +142,7 @@ public final class CadytsBuilder {
 		}
 		
 		
-		AnalyticalCalibrator<T> matsimCalibrator = new AnalyticalCalibrator<T>(
+		AnalyticalCalibrator<T> matsimCalibrator = new AnalyticalCalibrator<>(
 				config.controler().getOutputDirectory() + "/cadyts.log",
 				MatsimRandom.getLocalInstance().nextLong(),cadytsConfig.getTimeBinSize()
 				 ) ;

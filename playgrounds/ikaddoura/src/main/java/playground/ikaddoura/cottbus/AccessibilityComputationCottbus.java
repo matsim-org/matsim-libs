@@ -15,7 +15,7 @@ import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.gis.GridUtils;
-import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
+import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -84,7 +84,7 @@ public class AccessibilityComputationCottbus {
 
 		// collect homes
 		String activityFacilityType = "home";
-		final ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityFacilityType);
+		final ActivityFacilities homes = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityFacilityType);
 
 		final Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {
@@ -101,7 +101,7 @@ public class AccessibilityComputationCottbus {
 						public ControlerListener get() {
 							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, (Scenario) scenario);
 							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(447759., 5729049., 460617., 5740192., cellSize));
-							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, (ActivityFacilities) AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType), null, config, scenario, travelTimes, travelDisutilityFactories, 447759., 5729049., 460617., 5740192., cellSize);
+							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, (ActivityFacilities) AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType), null, config, scenario, travelTimes, travelDisutilityFactories, 447759., 5729049., 460617., 5740192., cellSize);
 							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.car, false);
 							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);

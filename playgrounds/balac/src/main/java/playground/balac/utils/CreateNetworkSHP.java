@@ -29,7 +29,7 @@ public class CreateNetworkSHP {
     	double centerX = 683217.0; 
     	double centerY = 247300.0;	    	
         Config config = ConfigUtils.createConfig();
-        config.network().setInputFile("C:/Users/balacm/Documents/Projects/AvignonVisit/NetworkUncleaned/mmNetwork.xml.gz");
+        config.network().setInputFile("file:///C:/Users/balacm/Downloads/infrastructure_only_data_for_Milos_3.xml");
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
              
@@ -46,9 +46,9 @@ public class CreateNetworkSHP {
                 addAttribute("fromID", String.class).
                 addAttribute("toID", String.class).
                 addAttribute("length", Double.class).
-                addAttribute("type", String.class).
-                addAttribute("capacity", Double.class).
-                addAttribute("freespeed", Double.class).
+               // addAttribute("type", String.class).
+              //  addAttribute("capacity", Double.class).
+              //  addAttribute("freespeed", Double.class).
                 create();
         CH1903LV03PlustoCH1903LV03 transformation = new CH1903LV03PlustoCH1903LV03();
 
@@ -63,13 +63,13 @@ public class CreateNetworkSHP {
 		            Coordinate toNodeCoordinate = new Coordinate(transformation.transform(link.getToNode().getCoord()).getX(), transformation.transform(link.getToNode().getCoord()).getY());
 		            Coordinate linkCoordinate = new Coordinate(coordLinkT.getX(), coordLinkT.getY());
 		            SimpleFeature ft = linkFactory.createPolyline(new Coordinate [] {fromNodeCoordinate, linkCoordinate, toNodeCoordinate},
-		                    new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), link.getLength(), NetworkUtils.getType(((Link)link)), link.getCapacity(), link.getFreespeed()}, null);
+		                    new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), link.getLength()}, null);
 		            features.add(ft);
 	            
 				}
         	}
         }   
-        ShapeFileWriter.writeGeometries(features, "C:/Users/balacm/Documents/Projects/AvignonVisit/NetworkUncleaned/network_links.shp");
+        ShapeFileWriter.writeGeometries(features, "C:/Users/balacm/Downloads/infrastructure_only_data_for_Milos_3.shp");
         
       /*  features = new ArrayList();
         PointFeatureFactory nodeFactory = new PointFeatureFactory.Builder().

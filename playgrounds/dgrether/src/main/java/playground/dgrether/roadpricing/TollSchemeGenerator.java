@@ -263,7 +263,7 @@ public class TollSchemeGenerator {
 		for (Link l : tollNetwork.getLinks().values()) {
 			scheme.addLink(l.getId());
 		}
-		scheme.addCost(this.usedStart, this.usedStop, this.usedAmount);
+		scheme.createAndAddCost(this.usedStart, this.usedStop, this.usedAmount);
 		return scheme;
 	}
 

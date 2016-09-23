@@ -24,15 +24,17 @@ import java.util.Map;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-public class RoadPricingConfigGroup extends ReflectiveConfigGroup {
+public final class RoadPricingConfigGroup extends ReflectiveConfigGroup {
 	// has to be public
 
-	/* Reason for removing "usingRoadPricing" switch: We found it hard to interpret.  
-	 * Should a script "set" this switch, or rather "interpret" it, or ignore it?  
-	 * For the Gauteng toll simulation, it had to be set "false" in order to make everything work correctly.  
-	 * It is now gone; if you want to simulate a non-toll base case, recommendation is to use an empty toll file.  
-	 * In that way, you can be confident that you do not get two different execution paths which may cause differences by themselves. 
-	 * kai, in consultation with michael z. and johan j, sep'14
+	/* Reason for removing "usingRoadPricing" switch: We found it hard to 
+	 * interpret. Should a script "set" this switch, or rather "interpret" 
+	 * it, or ignore it? For the Gauteng toll simulation, it had to be set 
+	 * "false" in order to make everything work correctly. It is now gone; 
+	 * if you want to simulate a non-toll base case, recommendation is to 
+	 * use an empty toll file. In that way, you can be confident that you 
+	 * do not get two different execution paths which may cause differences 
+	 * by themselves. kai, in consultation with michael z. and johan j, sep'14
 	 */
 
 	public static final String GROUP_NAME = "roadpricing";

@@ -122,7 +122,6 @@
 		<module>taxi</module>
 		<module>emissions</module>
 		<module>freight</module>
-		<module>gtfs2matsimtransitschedule</module>
 		<module>signals</module>
 		<module>locationchoice</module>
 		<module>matsim4urbansim</module>

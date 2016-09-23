@@ -44,13 +44,7 @@ public class ResslerLabExperiments {
 	public void runThisSpecificExperiment(){
 		LinkedList<NmvLink> linkListGrid = new LinkedList<NmvLink>(myGraphGrid.getEdges());
 		ArrayList<NmvNode> nodeListGrid = new ArrayList<NmvNode>(myGraphGrid.getVertices());
-//		LinkedList<NmvLink> linkListGhost = new LinkedList<NmvLink>(myGraphGhost.getEdges());
-//		ArrayList<NmvNode> nodeListGhost = new ArrayList<NmvNode>(myGraphGhost.getVertices());
-		LinkedList<NmvLink> linkListRessler = new LinkedList<NmvLink>(myGraphRessler.getEdges());
-		ArrayList<NmvNode> nodeListRessler = new ArrayList<NmvNode>(myGraphRessler.getVertices());
-		String shortFile=path+"ResslerShortPathStat.csv";
-		ShortestPath.collectShortest(myGraphGrid, myGraphRessler, linkListGrid, linkListRessler, nodeListGrid, nodeListRessler, assocList, shortFile);
-		
+
 		//Grid graph metrics
 		String Gridpath=path+"GridGraph";
 		
@@ -69,29 +63,10 @@ public class ResslerLabExperiments {
 		//Graph distance
 		JungGraphDistance.calculateAndWriteUnweightedDistances(myGraphGrid, path+"unweightedDist.csv");
 		
-		//Ghost graph metrics
-		String Ghostpath=path+"GhostGraph";
-		
-		//Centrality scores
-		
-//		JungCentrality.calculateAndWriteUnweightedBetweenness(myGraphGhost,Ghostpath+"unweightedNodeBetweenness.csv", Ghostpath+"unweightedEdgeBetweenness.csv",nodeListGhost, linkListGhost);
-//		JungCentrality.calculateAndWriteUnweightedCloseness(myGraphGhost, Ghostpath+"unweightedCloseness.csv", nodeListGhost);
-//		JungCentrality.calculateAndWriteUnweightedEigenvector(myGraphGhost, Ghostpath+"unweightedEigen.csv", nodeListGhost);
-//		JungCentrality.calculateAndWriteDegreeCentrality(myGraphGhost, Ghostpath+"Degree.csv", nodeListGhost, linkListGhost);
-//
-//		//Clustering
-//		JungClusters.calculateAndWriteClusteringCoefficient(myGraphGhost, Ghostpath+"clusterCoeff.csv");
-//		JungClusters.calculateAndWriteWeakComponents(myGraphGhost, Ghostpath+"weakComp.csv");
-//		JungClusters.calculateAndWriteTriadicCensus(myGraphGhost, Ghostpath+"triadCensus.csv");
-//
-//		//Graph distance
-//		JungGraphDistance.calculateAndWriteUnweightedDistances(myGraphGhost, Ghostpath+"unweightedDist.csv");
-		
 	}
 	
 	public static void main(String[] args) throws FileNotFoundException{
 //		Header.printHeader(ResslerLabExperimentsLocal.class.toString(), args);
-		
 		
 		int ModeSwitch = Integer.parseInt(args[2]); //if ModeSwitch = 0 then it's a base run; if =1 then it's a simulation
 		int runStart = Integer.parseInt(args[3]);

@@ -36,8 +36,8 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.Toll.TripTollHandler;
 import playground.agarwalamit.analysis.trip.TripDistanceHandler;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.ListUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
@@ -49,7 +49,7 @@ public class HourlyTripTollPerKmWriter {
 	
 	private final TripTollHandler tollHandler ;
 	private final TripDistanceHandler distHandler;
-	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private final MunichPersonFilter pf = new MunichPersonFilter();
 	
 	public HourlyTripTollPerKmWriter(final Network network, final double simulationEndTime, final int noOfTimeBins) {
 		this.tollHandler = new TripTollHandler( simulationEndTime, noOfTimeBins );

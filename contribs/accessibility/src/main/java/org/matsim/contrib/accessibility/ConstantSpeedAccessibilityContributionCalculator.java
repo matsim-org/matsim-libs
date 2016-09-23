@@ -88,7 +88,7 @@ public class ConstantSpeedAccessibilityContributionCalculator implements Accessi
 		Link nearestLink = NetworkUtils.getNearestLinkExactly(((Network)scenario.getNetwork()),origin.getCoord());
 
 		// captures the distance (as walk time) between the origin via the link to the node:
-		Distances distance = NetworkUtil.getDistances2Node(origin.getCoord(), nearestLink, fromNode);
+		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
 
 		// get stored network node (this is the nearest node next to an aggregated work place)
 		Node destinationNode = destination.getNearestNode();
@@ -97,17 +97,17 @@ public class ConstantSpeedAccessibilityContributionCalculator implements Accessi
 		// In the state found before modularization (june 15), this was anyway not consistent accross modes
 		// (different for PtMatrix), pointing to the fact that making this mode-specific might make sense.
 		// distance to road, and then to node:
-		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
+		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Intersection() / this.walkSpeedMeterPerHour;
 
 		// disutilities to get on or off the network
-		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distance.getDistancePoint2Road() * betaWalkTD);
+		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distance.getDistancePoint2Intersection() * betaWalkTD);
 		double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
 		double sumExpVjkWalk = destination.getSum();
 
 
-		double road2NodeBikeTime_h					= distance.getDistanceRoad2Node() / speedMeterPerHour;
+		double road2NodeBikeTime_h					= distance.getDistanceIntersection2Node() / speedMeterPerHour;
 		double travelDistance_meter = lcptTravelDistance.getTree().get(destinationNode.getId()).getCost(); 				// travel link distances on road network for bicycle and walk
-		double bikeDisutilityRoad2Node = (road2NodeBikeTime_h * betaTT) + (distance.getDistanceRoad2Node() * betaTD); // toll or money ???
+		double bikeDisutilityRoad2Node = (road2NodeBikeTime_h * betaTT) + (distance.getDistanceIntersection2Node() * betaTD); // toll or money ???
 		double bikeDisutility = ((travelDistance_meter/ speedMeterPerHour) * betaTT) + (travelDistance_meter * betaTD);// toll or money ???
 		// This is equivalent to the sum of the exponential of the utilities for all destinations (I had to write it on
 		// paper to check it is correct...)

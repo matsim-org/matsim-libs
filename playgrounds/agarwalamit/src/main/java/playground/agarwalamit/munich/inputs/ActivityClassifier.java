@@ -38,8 +38,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 
 /**
  * It classifies activities into sub-activities for Munich scenario by assuming stated activities as typical duration.
@@ -62,7 +62,7 @@ public class ActivityClassifier {
 	private int zeroDurCount =0;
 	private SortedMap<String, Double> actType2TypDur;
 	private Scenario scOut;
-	private ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private MunichPersonFilter pf = new MunichPersonFilter();
 	private int skippedPersons = 0;
 
 	/**

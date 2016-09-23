@@ -21,6 +21,7 @@ package playground.johannes.gsv.synPop.analysis;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
 
@@ -89,4 +90,8 @@ public class ProxyLegAdaptor implements Leg {
 		throw new UnsupportedOperationException("This is read only data container.");
 	}
 
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
+	}
 }

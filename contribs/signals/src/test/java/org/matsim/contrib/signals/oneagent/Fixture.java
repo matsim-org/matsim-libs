@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -78,14 +78,14 @@ public class Fixture {
 		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		
 		if (useIntergreens) {
-			signalsConfig.setIntergreenTimesFile(testUtils.getClassInputDirectory() + "testIntergreenTimes_v1.0.xml");
+			signalsConfig.setIntergreenTimesFile("testIntergreenTimes_v1.0.xml");
 			signalsConfig.setUseIntergreenTimes(true);
-			signalsConfig.setActionOnIntergreenViolation(SignalSystemsConfigGroup.EXCEPTION_ON_INTERGREEN_VIOLATION);
+			signalsConfig.setActionOnIntergreenViolation(SignalSystemsConfigGroup.ActionOnIntergreenViolation.EXCEPTION);
 		}			
 
 		this.setSignalSystemConfigValues(signalsConfig, testUtils);
 		Scenario scenario = ScenarioUtils.loadScenario(conf);
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
+		SignalsDataLoader signalsLoader = new SignalsDataLoader(conf);
 		SignalsData signalsData = signalsLoader.loadSignalsData();
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, signalsData);
 		
@@ -93,14 +93,10 @@ public class Fixture {
 	}
 
 	private void setSignalSystemConfigValues(SignalSystemsConfigGroup signalsConfig, MatsimTestUtils testUtils){
-		String signalSystemsFile = testUtils.getClassInputDirectory() + "testSignalSystems_v2.0.xml";
-		String signalGroupsFile = testUtils.getClassInputDirectory() + "testSignalGroups_v2.0.xml";
-		String signalControlFile = testUtils.getClassInputDirectory() + "testSignalControl_v2.0.xml";
-		String amberTimesFile = testUtils.getClassInputDirectory() + "testAmberTimes_v1.0.xml";
-		signalsConfig.setSignalSystemFile(signalSystemsFile);
-		signalsConfig.setSignalGroupsFile(signalGroupsFile);
-		signalsConfig.setSignalControlFile(signalControlFile);
-		signalsConfig.setAmberTimesFile(amberTimesFile);
+		signalsConfig.setSignalSystemFile("testSignalSystems_v2.0.xml");
+		signalsConfig.setSignalGroupsFile("testSignalGroups_v2.0.xml");
+		signalsConfig.setSignalControlFile("testSignalControl_v2.0.xml");
+		signalsConfig.setAmberTimesFile("testAmberTimes_v1.0.xml");
 	}
 
 	

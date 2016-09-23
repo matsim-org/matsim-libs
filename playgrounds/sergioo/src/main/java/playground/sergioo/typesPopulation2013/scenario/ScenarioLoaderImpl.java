@@ -40,8 +40,8 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.households.HouseholdsReaderV10;
-import org.matsim.lanes.data.v20.LaneDefinitionsReader;
-import org.matsim.lanes.data.v20.Lanes;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
@@ -172,14 +172,14 @@ public class ScenarioLoaderImpl {
 				network.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 			}
 			new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkFileName);
-			if ((config.network().getChangeEventsInputFile() != null) && config.network().isTimeVariantNetwork()) {
-				log.info("loading network change events from " + config.network().getChangeEventsInputFile());
+			if ((this.config.network().getChangeEventsInputFile() != null) && this.config.network().isTimeVariantNetwork()) {
+				log.info("loading network change events from " + this.config.network().getChangeEventsInputFileUrl(this.config.getContext()).getFile());
 				List<NetworkChangeEvent> changeEvents = new ArrayList<>() ;
-				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network, changeEvents );
-				parser.readFile(config.network().getChangeEventsInputFile());
-				NetworkUtils.setNetworkChangeEvents(network,changeEvents) ;
+				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network,changeEvents);
+				parser.parse(this.config.network().getChangeEventsInputFileUrl(config.getContext()));
+				NetworkUtils.setNetworkChangeEvents(network,changeEvents);
 			}
-		}
+			}
 	}
 
 	/**
@@ -270,18 +270,18 @@ public class ScenarioLoaderImpl {
 		String filename = this.config.network().getLaneDefinitionsFile();
 		if (filename != null){
 			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(filename);
-			if (!LaneDefinitionsReader.SCHEMALOCATIONV20.equalsIgnoreCase(fileTypeGuesser
+			if (!LanesReader.SCHEMALOCATIONV20.equalsIgnoreCase(fileTypeGuesser
 					.getSystemId())) {
 				log.error("Lanes: Wrong file format. With the 0.5 version of matsim the scenario only accepts lane definitions in the "
 						+ "file format version 2.0, i.e. "
-						+ LaneDefinitionsReader.SCHEMALOCATIONV20
+						+ LanesReader.SCHEMALOCATIONV20
 						+ ". An automatic conversion of the 1.1 file format is no longer provided, please call the "
 						+ "LaneDefinitonsV11ToV20Converter manually in the preprocessing phase.");
 				throw new UncheckedIOException("Wrong lane file format: " + fileTypeGuesser.getSystemId());
 			}
 		}
 		if ((laneDefinitions != null) && (filename != null)) {
-			LaneDefinitionsReader reader = new LaneDefinitionsReader(scenario);
+			LanesReader reader = new LanesReader(scenario);
 			reader.readFile(filename);
 		}
 		else {

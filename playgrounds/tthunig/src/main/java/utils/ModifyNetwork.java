@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
@@ -36,8 +36,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.LanesWriter;
 
 /**
  * double flow capacities of all signalized links and lanes
@@ -62,7 +62,7 @@ public class ModifyNetwork {
 		signalConfigGroup.setSignalGroupsFile(INPUT_BASE_DIR + "signal_groups_no_13_v2.xml");
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(signalConfigGroup).loadSignalsData());
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 		
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
@@ -83,7 +83,7 @@ public class ModifyNetwork {
 		}
 		
 		new NetworkWriter(scenario.getNetwork()).write(INPUT_BASE_DIR + "network_wgs84_utm33n_v3.xml");
-		new LaneDefinitionsWriter20(scenario.getLanes()).write(INPUT_BASE_DIR + "lanes_v3.xml");
+		new LanesWriter(scenario.getLanes()).write(INPUT_BASE_DIR + "lanes_v3.xml");
 	}
 
 }

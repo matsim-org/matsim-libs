@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.mobsim.SignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
@@ -63,10 +63,10 @@ public class TravelTimeFourWaysTest {
 		Scenario scenario = ScenarioUtils.createScenario(conf);
 
 		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-		String signalSystemsFile = testUtils.getClassInputDirectory() + "testSignalSystems_v2.0.xml";
-		String signalGroupsFile = testUtils.getClassInputDirectory() + "testSignalGroups_v2.0.xml";
-		String signalControlFile = testUtils.getClassInputDirectory() + "testSignalControl_v2.0.xml";
-		String amberTimesFile = testUtils.getClassInputDirectory() + "testAmberTimes_v1.0.xml";
+		String signalSystemsFile = "testSignalSystems_v2.0.xml";
+		String signalGroupsFile = "testSignalGroups_v2.0.xml";
+		String signalControlFile = "testSignalControl_v2.0.xml";
+		String amberTimesFile = "testAmberTimes_v1.0.xml";
 		signalsConfig.setSignalSystemFile(signalSystemsFile);
 		signalsConfig.setSignalGroupsFile(signalGroupsFile);
 		signalsConfig.setSignalControlFile(signalControlFile);
@@ -78,7 +78,7 @@ public class TravelTimeFourWaysTest {
 	
 	private SignalEngine initSignalEngine(Scenario scenario, EventsManager events) {
 		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
+		SignalsDataLoader signalsLoader = new SignalsDataLoader(scenario.getConfig());
 		SignalsData signalsData = signalsLoader.loadSignalsData();
 		scenario.addScenarioElement( SignalsData.ELEMENT_NAME , signalsData);
 		

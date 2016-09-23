@@ -79,7 +79,7 @@
                 <version>1.1.0</version>
                 <configuration>
                     <mainClass>org.matsim.contrib.evacuation.run.ScenarioManager</mainClass>
-                    <!--<jrePath>/Library/Java/JavaVirtualMachines/jdk1.8.0_74.jdk</jrePath>-->
+                    <jrePath>/Library/Java/JavaVirtualMachines/jdk1.8.0_74.jdk</jrePath>
                     <generateDiskImageFile>true</generateDiskImageFile>
                     <iconFile>${basedir}/src/main/resources/res/evacuation.icns</iconFile>
                 </configuration>

@@ -41,6 +41,7 @@ import java.util.*;
  *
  * @author polettif
  */
+@Deprecated
 public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "PublicTransitMapping";

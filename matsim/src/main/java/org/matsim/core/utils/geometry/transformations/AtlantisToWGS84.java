@@ -39,7 +39,14 @@ public class AtlantisToWGS84 implements CoordinateTransformation {
 	public Coord transform(Coord coord) {
 		double latitude = coord.getY() / 10000.0 + 10.0;
 		double longitude = coord.getX() / 10000.0 - 30.0;
-		return new Coord(longitude, latitude);
+
+		double elevation;
+		try{
+			elevation = coord.getZ();
+			return new Coord(longitude, latitude, elevation);
+		} catch (Exception e){
+			return new Coord(longitude, latitude);
+		}
 	}
 
 }

@@ -15,8 +15,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 
-import besttimeresponse.TripTravelTimes;
-import floetteroed.utilities.Units;
+import matsimintegration.TimeDiscretizationInjection;
 import opdytsintegration.utils.TimeDiscretization;
 
 /**
@@ -38,25 +37,20 @@ public class BestTimeResponseStrategyProvider implements Provider<PlanStrategy> 
 
 	private final CharyparNagelScoringParametersForPerson scoringParams;
 
-	private final TripTravelTimes myTravelTime;
-	
+	private final ExperiencedScoreAnalyzer experiencedScoreAnalyzer;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	@Inject
 	BestTimeResponseStrategyProvider(final Scenario scenario, final Map<String, TravelTime> mode2tt,
-			final CharyparNagelScoringParametersForPerson scoringParams) {
+			final CharyparNagelScoringParametersForPerson scoringParams,
+			final ExperiencedScoreAnalyzer experiencedScoreAnalyzer, TimeDiscretizationInjection timeDiscrInj) {
 		this.randomPlanSelector = new RandomPlanSelector<>();
-
-		final int startTime_s = 0;
-		final int binSize_s = Integer
-				.parseInt(scenario.getConfig().getModule("travelTimeCalculator").getValue("travelTimeBinSize"));
-		final int binCnt = (int) Math.ceil(Units.S_PER_D / binSize_s);
-		this.timeDiscr = new TimeDiscretization(startTime_s, binSize_s, binCnt);
-		this.myTravelTime = new BestTimeResponseTravelTimes(this.timeDiscr, mode2tt, scenario.getNetwork());
-		
+		this.timeDiscr = timeDiscrInj.getInstance();
 		this.scenario = scenario;
 		this.mode2tt = mode2tt;
 		this.scoringParams = scoringParams;
+		this.experiencedScoreAnalyzer = experiencedScoreAnalyzer;
 	}
 
 	// --------------- IMPLEMENTATION OF Provider<PlanStrategy> ---------------
@@ -64,8 +58,8 @@ public class BestTimeResponseStrategyProvider implements Provider<PlanStrategy> 
 	@Override
 	public PlanStrategy get() {
 		final PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(this.randomPlanSelector);
-		final BestTimeResponseStrategyModule module = new BestTimeResponseStrategyModule(this.scenario, this.mode2tt,
-				this.scoringParams, this.timeDiscr, this.myTravelTime);
+		final BestTimeResponseStrategyModule module = new BestTimeResponseStrategyModule(this.scenario,
+				this.scoringParams, this.timeDiscr, this.experiencedScoreAnalyzer, this.mode2tt.get("car"));
 		builder.addStrategyModule(module);
 		return builder.build();
 	}

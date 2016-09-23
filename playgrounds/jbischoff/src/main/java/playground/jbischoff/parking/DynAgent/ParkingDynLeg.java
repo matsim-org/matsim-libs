@@ -32,7 +32,7 @@ import org.matsim.vehicles.Vehicle;
 
 import playground.jbischoff.parking.choice.ParkingChoiceLogic;
 import playground.jbischoff.parking.events.StartParkingSearchEvent;
-import playground.jbischoff.parking.manager.ParkingManager;
+import playground.jbischoff.parking.manager.ParkingSearchManager;
 
 public class ParkingDynLeg implements DriverDynLeg {
 	private final NetworkRoute route;
@@ -41,14 +41,14 @@ public class ParkingDynLeg implements DriverDynLeg {
 	private Tuple<Id<Link>, Id<Link>> currentAndNextParkLink = null;
 	Id<Link> currentLinkId;
 	private boolean parkingMode = false;
-	ParkingManager parkingManager;
+	ParkingSearchManager parkingManager;
 	Id<Vehicle> vehicleId;
 	private ParkingChoiceLogic logic;
 	private MobsimTimer timer;
 	private EventsManager events;
 	private boolean hasFoundParking = false;
 
-	public ParkingDynLeg(String mode, NetworkRoute route, ParkingChoiceLogic logic, ParkingManager parkingManager,
+	public ParkingDynLeg(String mode, NetworkRoute route, ParkingChoiceLogic logic, ParkingSearchManager parkingManager,
 			Id<Vehicle> vehicleId, MobsimTimer timer, EventsManager events) {
 		this.mode = mode;
 		this.route = route;
@@ -123,6 +123,14 @@ public class ParkingDynLeg implements DriverDynLeg {
 		return mode;
 	}
 
+	
+	@Override
+	public Id<Vehicle> getPlannedVehicleId()
+	{
+	    return this.vehicleId;
+	}
+	
+	
 	@Override
 	public void arrivedOnLinkByNonNetworkMode(Id<Link> linkId) {
 		if (!getDestinationLinkId().equals(linkId)) {

@@ -61,12 +61,12 @@ public static void main(String[] args) {
 	events.addHandler(mierendorffEval);
 	events.addHandler(klausEval);
 	
-	new ParkingSearchEventsReader(events).readFile("D:/runs-svn/bmw_carsharing/basecase/bc09_park_poster/ITERS/it.50/bc09_park_poster.50.events.xml.gz");
-	pwde.writeEgressWalkStatistics("D:/runs-svn/bmw_carsharing/basecase/bc09_park_poster/ITERS/it.50/");
-	mierendorffEval.writeStats("D:/runs-svn/bmw_carsharing/basecase/bc09_park_poster/ITERS/it.50/mierendorffParkAndEgressStats.csv");
-	mierendorffEval.writeCoordTimeStamps("D:/runs-svn/bmw_carsharing/basecase/bc09_park_poster/ITERS/it.50/mierendorffParkStamps.csv");
-	klausEval.writeStats("D:/runs-svn/bmw_carsharing/basecase/bc09_park_poster/ITERS/it.50/klausnerParkAndEgressStats.csv");
-	klausEval.writeCoordTimeStamps("D:/runs-svn/bmw_carsharing/basecase/bc09_park_poster/ITERS/it.50/klausParkStamps.csv");
+	new ParkingSearchEventsReader(events).readFile("D:/runs-svn/bmw_carsharing/basecase/bc09_park/ITERS/it.50/bc09_park.50.events.xml.gz");
+	pwde.writeEgressWalkStatistics("D:/runs-svn/bmw_carsharing/basecase/bc09_park/ITERS/it.50/");
+	mierendorffEval.writeStats("D:/runs-svn/bmw_carsharing/basecase/bc09_park/ITERS/it.50/mierendorffParkAndEgressStats.csv");
+	mierendorffEval.writeCoordTimeStamps("D:/runs-svn/bmw_carsharing/basecase/bc09_park/ITERS/it.50/mierendorffParkStamps.csv");
+	klausEval.writeStats("D:/runs-svn/bmw_carsharing/basecase/bc09_park/ITERS/it.50/klausnerParkAndEgressStats.csv");
+	klausEval.writeCoordTimeStamps("D:/runs-svn/bmw_carsharing/basecase/bc09_park/ITERS/it.50/klausParkStamps.csv");
 	
 }
 

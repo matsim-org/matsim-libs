@@ -47,11 +47,11 @@ class PTScheduleRandomiser implements DecisionVariableRandomizer<PTSchedule> {
 //		result.add(new PTSchedule(scenario, helper.deepCopyTransitSchedule(schedule), helper.deepCopyVehicles(vehicles)));
 //		
 //		
-//		result.add(adapter.updateScheduleDeleteLines(scenario, helper.deepCopyTransitSchedule(schedule), helper.deepCopyVehicles(vehicles), 0.01));
+		result.add(adapter.updateScheduleDeleteLines(scenario, helper.deepCopyTransitSchedule(schedule), helper.deepCopyVehicles(vehicles), 0.01));
 //		result.add(adapter.updateScheduleDeleteLines(scenario, helper.deepCopyTransitSchedule(schedule), helper.deepCopyVehicles(vehicles), 0.01));
 //		result.add(adapter.updateScheduleDeleteLines(scenario, helper.deepCopyTransitSchedule(schedule), helper.deepCopyVehicles(vehicles), 0.01));
 //		
-//		result.add(adapter.updateScheduleAddLines(scenario, helper.deepCopyTransitSchedule(schedule), helper.deepCopyVehicles(vehicles), 0.01));
+		result.add(adapter.updateScheduleAddLines(scenario, helper.deepCopyTransitSchedule(schedule), helper.deepCopyVehicles(vehicles), 0.01));
 //		result.add(adapter.updateScheduleAddLines(scenario, helper.deepCopyTransitSchedule(schedule), helper.deepCopyVehicles(vehicles), 0.01));
 //		result.add(adapter.updateScheduleAddLines(scenario, helper.deepCopyTransitSchedule(schedule), helper.deepCopyVehicles(vehicles), 0.01));
 //		
@@ -68,12 +68,12 @@ class PTScheduleRandomiser implements DecisionVariableRandomizer<PTSchedule> {
 //		result.add(adapter.updateScheduleRemove(scenario, helper.deepCopyVehicles(vehicles), helper.deepCopyTransitSchedule(schedule)));
 //		result.add(adapter.updateScheduleRemove(scenario, helper.deepCopyVehicles(vehicles), helper.deepCopyTransitSchedule(schedule)));
 		
-		result.add(adapter.updateScheduleChangeCapacity(scenario, helper.deepCopyVehicles(vehicles), helper.deepCopyTransitSchedule(schedule), factorline, factorroute));//Randomly Delete routes
+//		result.add(adapter.updateScheduleChangeCapacity(scenario, helper.deepCopyVehicles(vehicles), helper.deepCopyTransitSchedule(schedule), factorline, factorroute));//Randomly Delete routes
 //		result.add(adapter.updateScheduleChangeCapacity(scenario, helper.deepCopyVehicles(vehicles), helper.deepCopyTransitSchedule(schedule), factorline, factorroute));//Randomly Delete routes
 //		result.add(adapter.updateScheduleChangeCapacity(scenario, helper.deepCopyVehicles(vehicles), helper.deepCopyTransitSchedule(schedule), factorline, factorroute));//Randomly Delete routes
 //		result.add(adapter.updateScheduleChangeCapacity(scenario, helper.deepCopyVehicles(vehicles), helper.deepCopyTransitSchedule(schedule), factorline, factorroute));//Randomly Delete routes
 //		
-		result.add(new PTSchedule(scenario, helper.deepCopyTransitSchedule(schedule), helper.deepCopyVehicles(vehicles)));
+//		result.add(new PTSchedule(scenario, helper.deepCopyTransitSchedule(schedule), helper.deepCopyVehicles(vehicles)));
 //		result.add(new PTSchedule(scenario, helper.deepCopyTransitSchedule(schedule), helper.deepCopyVehicles(vehicles)));
 //		result.add(new PTSchedule(scenario, helper.deepCopyTransitSchedule(schedule), helper.deepCopyVehicles(vehicles)));
 //		result.add(new PTSchedule(scenario, helper.deepCopyTransitSchedule(schedule), helper.deepCopyVehicles(vehicles)));

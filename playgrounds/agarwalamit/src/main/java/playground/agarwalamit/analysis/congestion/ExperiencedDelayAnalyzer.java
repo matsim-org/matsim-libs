@@ -35,7 +35,9 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.utils.AreaFilter;
 import playground.agarwalamit.utils.MapUtils;
+import playground.agarwalamit.utils.PersonFilter;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 
 /**
@@ -48,17 +50,32 @@ public class ExperiencedDelayAnalyzer {
 	
 	private final static Logger LOGGER = Logger.getLogger(ExperiencedDelayAnalyzer.class);
 	private final String eventsFile;
-	private final ExperiencedDelayHandler congestionHandler;
+	private final FilteredExperienceDelayHandler congestionHandler;
 	private final Scenario scenario;
 
-	public ExperiencedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins, final double simulationEndTime) {
-		this(eventFile, scenario, noOfTimeBins, simulationEndTime, false);
-	}
-	
-	public ExperiencedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins, final double simulationEndTime, final boolean isSortingForInsideMunich) {
+	public ExperiencedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins, 
+			final String userGroup, final PersonFilter personFilter, final AreaFilter areaFilter) {
 		this.eventsFile = eventFile;
 		this.scenario = scenario;
-		this.congestionHandler = new ExperiencedDelayHandler(this.scenario, noOfTimeBins, simulationEndTime, isSortingForInsideMunich);
+		this.congestionHandler = new FilteredExperienceDelayHandler(this.scenario, noOfTimeBins, userGroup, personFilter, areaFilter);
+		LOGGER.info("Area and user group filtering is used, links fall inside the given shape and belongs to the given user group will be considered.");
+	}
+	
+	public ExperiencedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins, 
+			final String userGroup, final PersonFilter personFilter) {
+		this(eventFile, scenario, noOfTimeBins, userGroup, personFilter, null);
+		LOGGER.info("Usergroup filtering is used, result will include all links but persons from given user group only.");
+	}
+	
+	public ExperiencedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins, 
+			final AreaFilter areaFilter) {
+		this(eventFile, scenario, noOfTimeBins, null, null, areaFilter);
+		LOGGER.info("Area filtering is used, result will include links falls inside the given shape and persons from all user groups.");
+	}
+	
+	public ExperiencedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins) {
+		this(eventFile, scenario, noOfTimeBins, null, null, null);
+		LOGGER.info("No filtering is used, result will include all links, persons from all user groups.");
 	}
 	
 	public void run(){
@@ -66,8 +83,6 @@ public class ExperiencedDelayAnalyzer {
 		MatsimEventsReader eventsReader = new MatsimEventsReader(eventsManager);
 		eventsManager.addHandler(this.congestionHandler);
 		eventsReader.readFile(this.eventsFile);
-
-//		checkTotalDelayUsingAlternativeMethod();
 	}
 	
 	public void writeResults(String outputFile) {
@@ -109,6 +124,10 @@ public class ExperiencedDelayAnalyzer {
 		return outData;
 	}
 	
+	/**
+	 * This method will return total delay without any filtering for area or user group thus not necessarily matches the outcome above.
+	 */
+	@Deprecated 
 	public void checkTotalDelayUsingAlternativeMethod(){
 		EventsManager em = EventsUtils.createEventsManager();
 		CongestionHandlerImplV3 implV3 = new CongestionHandlerImplV3(em, (MutableScenario) this.scenario);

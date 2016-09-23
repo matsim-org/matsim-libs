@@ -43,7 +43,15 @@ class OTFTransformation implements CoordinateTransformation {
 	@Override
 	public Coord transform(Coord coord) {
 		Coord c = this.delegate.transform(coord);
-		Coord c2 = new Coord(c.getX() - this.offsetEast, c.getY() - this.offsetNorth);
+		Coord c2;
+		double elevation;
+		try{
+			elevation = coord.getZ();
+			c2 = new Coord(c.getX() - this.offsetEast, c.getY() - this.offsetNorth, elevation);
+		} catch (Exception e){
+			c2 = new Coord(c.getX() - this.offsetEast, c.getY() - this.offsetNorth);
+		}
+
 		return c2;
 	}
 }

@@ -19,7 +19,9 @@
 
 package playground.agarwalamit.mixedTraffic.patnaIndia.policies;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -39,21 +41,39 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public final class PatnaBikeTrackCreator {
 
+	private static final List<Id<Link>> bikeLinks = new ArrayList<>();
+	private static final boolean isMotorbikeAllowed = true;
+
 	public static void main (String [] args){
 
 		String networkFile = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/network.xml.gz";
 		Scenario scenario = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
-
-		PatnaBikeTrackCreator pbtc = new PatnaBikeTrackCreator();
 		Network network = scenario.getNetwork();
-		pbtc.addBikeTrackOnly(network);
-		new NetworkWriter(network).write(PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/networkWithBikeTrack.xml.gz");
-		
-		// now apply traffic restrain to this network
-		PatnaTrafficRestrainer.run(network);
-		new NetworkWriter(network).write(PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/networkWithTrafficRestricationAndBikeTrack.xml.gz");
+		{
+			PatnaBikeTrackCreator pbtc = new PatnaBikeTrackCreator();
+			pbtc.addBikeTrackOnly(network);
+			new NetworkWriter(network).write(PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/networkWithBikeTrack.xml.gz");
+		}
+
+		if (isMotorbikeAllowed) {
+			Set<String> modes = new HashSet<>();
+			modes.add("bike");
+			modes.add("motorbike");
+
+			for (Id<Link> linkId : bikeLinks){
+				Link l = network.getLinks().get(linkId);
+				l.setAllowedModes(modes);
+			}
+			new NetworkWriter(network).write(PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/networkWithBikeMotorbikeTrack.xml.gz");
+		}
+
+		if (!isMotorbikeAllowed) {
+			// now apply traffic restrain to this network
+			PatnaTrafficRestrainer.run(network);
+			new NetworkWriter(network).write(PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/networkWithTrafficRestricationAndBikeTrack.xml.gz");
+		}
 	}
-	
+
 	private void addBikeTrackOnly(final Network network){
 		// is using with cluster, provide bike track network.
 		String bikeTrack = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/bikeTrack.xml.gz";
@@ -63,12 +83,14 @@ public final class PatnaBikeTrackCreator {
 		for (Node n : bikeNetwork.getNodes().values()){
 			// cant simply add the nodes because it also has information about in-/out- links from the node
 			// adding the same in- out- link again will throw exception (because while adding a link, in-/out-links are added to to-/from-nodes.)
+
 			Node nNew = network.getFactory().createNode(n.getId(), n.getCoord());
 			network.addNode(nNew);
 		}
 
 		for (Link l: bikeNetwork.getLinks().values() ) {
 			network.addLink(l);
+			bikeLinks.add(l.getId());
 		}
 
 		// now connect track with the network.
@@ -137,5 +159,6 @@ public final class PatnaBikeTrackCreator {
 		l.setFreespeed(25/3.6); // lets keep this also lower than a normal car link
 		l.setNumberOfLanes(1);
 		network.addLink(l);
+		bikeLinks.add(l.getId());
 	}
 }

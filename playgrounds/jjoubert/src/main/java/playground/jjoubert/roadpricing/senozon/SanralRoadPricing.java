@@ -36,6 +36,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.*;
+
 import playground.jjoubert.roadpricing.senozon.routing.SanralTravelDisutilityIncludingToll;
 import playground.jjoubert.roadpricing.senozon.scoring.SanralCalcPaidToll;
 
@@ -100,8 +101,7 @@ public class SanralRoadPricing implements StartupListener, AfterMobsimListener, 
 //			});
 		}
 
-        this.cattl = new CalcAverageTolledTripLength(controler.getScenario().getNetwork(), this.scheme);
-		controler.getEvents().addHandler(this.cattl);
+	        this.cattl = new CalcAverageTolledTripLength(controler.getScenario().getNetwork(), this.scheme, controler.getEvents() ) ;
 	}
 
 	@Override

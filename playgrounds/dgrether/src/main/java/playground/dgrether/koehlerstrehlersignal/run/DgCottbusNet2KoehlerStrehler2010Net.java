@@ -20,7 +20,7 @@
 package playground.dgrether.koehlerstrehlersignal.run;
 
 import org.matsim.core.scenario.MutableScenario;
-import org.matsim.lanes.data.v20.Lanes;
+import org.matsim.lanes.data.Lanes;
 import org.matsim.contrib.signals.data.SignalsData;
 
 import playground.dgrether.DgPaths;

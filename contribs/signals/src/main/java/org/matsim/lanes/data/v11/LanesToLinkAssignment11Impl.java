@@ -24,11 +24,12 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.Lane;
 
 /**
  * @author dgrether
  */
+@Deprecated
 public class LanesToLinkAssignment11Impl implements LanesToLinkAssignment11 {
 
 	private final Id<Link> linkId;

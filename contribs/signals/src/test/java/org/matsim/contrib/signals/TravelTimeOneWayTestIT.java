@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
@@ -53,7 +53,6 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.v11.LaneDefinitonsV11ToV20Converter;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -79,10 +78,10 @@ public class TravelTimeOneWayTestIT {
 		if (useLanes){
 			conf.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 				conf.qsim().setUseLanes(true);
-				signalSystemsFile = testUtils.getClassInputDirectory() + "testSignalSystems_v2.0.xml";
+				signalSystemsFile = "testSignalSystems_v2.0.xml";
 		}
 		else {
-			signalSystemsFile = testUtils.getClassInputDirectory() + "testSignalSystemsNoLanes_v2.0.xml";
+			signalSystemsFile = "testSignalSystemsNoLanes_v2.0.xml";
 		}
 		conf.qsim().setStuckTime(1000);
 		conf.qsim().setRemoveStuckVehicles(false);
@@ -90,15 +89,15 @@ public class TravelTimeOneWayTestIT {
 
 		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		signalsConfig.setSignalSystemFile(signalSystemsFile);
-		String signalGroupsFile = testUtils.getClassInputDirectory() + "testSignalGroups_v2.0.xml";
-		String signalControlFile = testUtils.getClassInputDirectory() + "testSignalControl_v2.0.xml";
-		String amberTimesFile = testUtils.getClassInputDirectory() + "testAmberTimes_v1.0.xml";
+		String signalGroupsFile = "testSignalGroups_v2.0.xml";
+		String signalControlFile = "testSignalControl_v2.0.xml";
+		String amberTimesFile = "testAmberTimes_v1.0.xml";
 		signalsConfig.setSignalGroupsFile(signalGroupsFile);
 		signalsConfig.setSignalControlFile(signalControlFile);
 		signalsConfig.setAmberTimesFile(amberTimesFile);
 		
 		MutableScenario data = (MutableScenario) ScenarioUtils.loadScenario(conf);
-		data.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(signalsConfig).loadSignalsData());
+		data.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(conf).loadSignalsData());
 		return data;
 	}
 

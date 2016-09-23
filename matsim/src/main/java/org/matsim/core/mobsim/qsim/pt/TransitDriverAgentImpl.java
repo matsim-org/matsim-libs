@@ -95,8 +95,8 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 			TransitStopAgentTracker thisAgentTracker, InternalInterface internalInterface) {
 		super(internalInterface, thisAgentTracker);
 		this.umlauf = umlauf;
-		this.eventsManager = ((QSim) internalInterface.getMobsim()).getEventsManager();
-		this.scenario = ((QSim) internalInterface.getMobsim()).getScenario() ;
+		this.eventsManager = internalInterface.getMobsim().getEventsManager();
+		this.scenario = internalInterface.getMobsim().getScenario() ;
 		// (yy AbstractTransitDriverAgent already keeps both of them. kai, dec'15)
 		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().iterator();
 		Person driverPerson = PopulationUtils.getFactory().createPerson(Id.create("pt_" + umlauf.getId(), Person.class)); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.

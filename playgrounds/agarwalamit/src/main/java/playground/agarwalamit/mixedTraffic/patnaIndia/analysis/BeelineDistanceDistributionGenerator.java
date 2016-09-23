@@ -48,8 +48,8 @@ import playground.agarwalamit.utils.NumberUtils;
 
 public class BeelineDistanceDistributionGenerator {
 
-	private final String dir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/shpNetwork/multiModalCadytsAndIncome/c7/";
-	private final int iterationNumber = 0;
+	private final String dir = "../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/"+PatnaUtils.PCU_2W+"pcu/afterCadyts/c203_14/";
+	private final int iterationNumber = 1200;
 	private final String plansFile = dir+"/ITERS/it."+iterationNumber+"/"+iterationNumber+".plans.xml.gz";
 	private final String personAttributeFile = dir+ "output_personAttributes.xml.gz";
 

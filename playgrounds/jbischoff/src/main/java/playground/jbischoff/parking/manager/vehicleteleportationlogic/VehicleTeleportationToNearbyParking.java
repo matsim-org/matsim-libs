@@ -34,7 +34,7 @@ import com.google.inject.Inject;
 
 import playground.jbischoff.parking.choice.ParkingChoiceLogic;
 import playground.jbischoff.parking.choice.RandomParkingChoiceLogic;
-import playground.jbischoff.parking.manager.ParkingManager;
+import playground.jbischoff.parking.manager.ParkingSearchManager;
 
 /**
  * teleports vehicle to  a location near the agent, if vehicle is more than  a certain threshold in metres away
@@ -48,7 +48,7 @@ public class VehicleTeleportationToNearbyParking implements VehicleTeleportation
 	
 	private double beelineDistanceFactor;
 	@Inject
-	ParkingManager manager;
+	ParkingSearchManager manager;
 	
 	ParkingChoiceLogic parkingLogic;  
 	Network network;

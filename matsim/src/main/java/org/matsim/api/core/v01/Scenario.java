@@ -23,10 +23,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
-import org.matsim.lanes.data.v20.Lanes;
+import org.matsim.lanes.data.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
@@ -86,6 +87,12 @@ public interface Scenario {
 	 * Adds the given object to the scenario, such it can be
 	 * retrieved with {@link #getScenarioElement(String)} using
 	 * the name given here as a key.
+	 * <br/><br/>
+	 * Design issues:<ul>
+	 * <li> This is currently set to deprecated, since the guice injection approach achieves something similar.  However, 
+	 * at this point injection is only possible after {@link Controler} was started, which stands in the way of <i>first</i> constructing
+	 * the scenario and only <i>then</i> starting {@link Controler}.  So maybe we should un-deprecate this method.  Kai/Theresa, sep'16
+	 * </ul>
 	 *
 	 * @param name the name to which the object should be associated
 	 * @param o the object. <code>null</code> is not allowed.
@@ -94,15 +101,16 @@ public interface Scenario {
 	 * @throws IllegalStateException if there is already an object
 	 * associated to this name.
 	 */
-	@Deprecated // move to guice injection approach
+	@Deprecated // see javadoc
 	void addScenarioElement(String name, Object o);
 
 	/**
+	 * See the "Design issues" under {@link Scenario#addScenarioElement(String, Object)}.
 	 *
 	 * @param name the name of the element to get
 	 * @return the object associated with that name, or null if none is associated
 	 */
-	@Deprecated // move to guice injection approach
+	@Deprecated // see javadoc
 	Object getScenarioElement(String name);
 
 	ActivityFacilities getActivityFacilities();

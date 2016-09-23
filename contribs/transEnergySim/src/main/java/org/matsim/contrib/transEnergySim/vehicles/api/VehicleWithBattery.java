@@ -43,6 +43,7 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 	 */
 	protected double usableBatteryCapacityInJoules;
 	private boolean ignoreOverCharging = false;
+	private static double overchargingErrorMargin=1;
 
 	/**
 	 * state of charge
@@ -61,7 +62,7 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 	public double getRequiredEnergyInJoules() {
 		double requiredEnergyInJoules = getUsableBatteryCapacityInJoules() - socInJoules;
 
-		if (!MathLib.equals(requiredEnergyInJoules, 0, GeneralLib.EPSILON * 100) && requiredEnergyInJoules < 0) {
+		if (!MathLib.equals(requiredEnergyInJoules, 0, overchargingErrorMargin * 100) && requiredEnergyInJoules < 0) {
 			DebugLib.stopSystemAndReportInconsistency("soc bigger than battery size");
 		}
 
@@ -86,7 +87,7 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 	public double addEnergyToVehicleBattery(double energyChargeInJoule) {
 		if (!ignoreOverCharging) {
 			socInJoules += energyChargeInJoule;
-			if (!MathLib.equals(socInJoules, getUsableBatteryCapacityInJoules(), GeneralLib.EPSILON * 100) && socInJoules > getUsableBatteryCapacityInJoules()) {
+			if (!MathLib.equals(socInJoules, getUsableBatteryCapacityInJoules(), overchargingErrorMargin * 100) && socInJoules > getUsableBatteryCapacityInJoules()) {
 				DebugLib.stopSystemAndReportInconsistency("the car has been overcharged soc(" + socInJoules + ") > battery capacity (" + getUsableBatteryCapacityInJoules() + ")");
 			}
 		}
@@ -126,6 +127,9 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 				return Math.min(getMaxLevel3ChargingPowerInKW(),plugType.getChargingPowerInKW());
 		}
 		return 0.0;
+	}
+	public double getRemainingRangeInMiles() {
+		return getRemainingRangeInMeters()/1609.34;
 	}
 	public double getRemainingRangeInMeters() {
 		return this.socInJoules / this.electricDriveEnergyConsumptionModel.getEnergyConsumptionRateInJoulesPerMeter();

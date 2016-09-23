@@ -27,7 +27,6 @@ import org.junit.Test;
  */
 public class RunSignalSystemsExampleTest {
 
-	@SuppressWarnings("static-method")
 	@Test
 	public final void test() {
 		boolean usingOTFVis = false ;

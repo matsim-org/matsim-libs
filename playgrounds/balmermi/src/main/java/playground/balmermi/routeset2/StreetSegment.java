@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class StreetSegment implements Link {
 	
@@ -148,5 +149,10 @@ public class StreetSegment implements Link {
 	@Override
 	public double getFlowCapacityPerSec(double time) {
 		return this.delegate.getFlowCapacityPerSec(time);
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return this.delegate.getAttributes();
 	}
 }

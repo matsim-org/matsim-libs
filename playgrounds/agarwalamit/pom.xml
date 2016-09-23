@@ -10,27 +10,37 @@
 	<artifactId>agarwalamit</artifactId>
 	<name>agarwalamit</name>
 	<dependencies>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>otfvis</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.matsim.contrib</groupId> -->
+<!-- 			<artifactId>otfvis</artifactId> -->
+<!-- 			<version>0.9.0-SNAPSHOT</version> -->
+<!-- 			<scope>compile</scope> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>playground</groupId>
 			<artifactId>benjamin</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>playground</groupId> -->
+<!-- 			<artifactId>vsp</artifactId> -->
+<!-- 			<version>0.9.0-SNAPSHOT</version> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>playground</groupId>
-			<artifactId>vsp</artifactId>
+			<artifactId>gunnar</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>emissions</artifactId>
+			<groupId>playground</groupId>
+			<artifactId>kai</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.matsim.contrib</groupId> -->
+<!-- 			<artifactId>emissions</artifactId> -->
+<!-- 			<version>0.9.0-SNAPSHOT</version> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>evacuation</artifactId>
@@ -41,20 +51,30 @@
 			<artifactId>jts</artifactId>
 			<version>1.13</version>
 		</dependency>
-	<dependency>
-		<groupId>org.matsim.contrib</groupId>
-		<artifactId>signals</artifactId>
-		<version>0.9.0-SNAPSHOT</version>
-	</dependency>
+<!-- 	<dependency> -->
+<!-- 		<groupId>org.matsim.contrib</groupId> -->
+<!-- 		<artifactId>signals</artifactId> -->
+<!-- 		<version>0.9.0-SNAPSHOT</version> -->
+<!-- 	</dependency> -->
 	<dependency>
 		<groupId>org.matsim.contrib</groupId>
 		<artifactId>cadytsIntegration</artifactId>
 		<version>0.9.0-SNAPSHOT</version>
 	</dependency>
+<!-- 	<dependency> -->
+<!-- 		<groupId>org.matsim.contrib</groupId> -->
+<!-- 		<artifactId>analysis</artifactId> -->
+<!-- 		<version>0.9.0-SNAPSHOT</version> -->
+<!-- 	</dependency> -->
 	<dependency>
-		<groupId>org.matsim.contrib</groupId>
-		<artifactId>analysis</artifactId>
-		<version>0.9.0-SNAPSHOT</version>
+		<groupId>floetteroed.opdyts</groupId>
+		<artifactId>opdyts</artifactId>
+		<version>1.0.0</version>
+	</dependency>
+	<dependency>
+		<groupId>floetteroed.utilities</groupId>
+		<artifactId>floetteroed-utilities</artifactId>
+		<version>1.0.0</version>
 	</dependency>
 	</dependencies>
 

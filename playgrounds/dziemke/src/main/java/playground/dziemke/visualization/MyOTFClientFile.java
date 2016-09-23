@@ -20,7 +20,8 @@
 
 package playground.dziemke.visualization;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
 
 import javax.swing.SwingUtilities;
 
@@ -31,14 +32,13 @@ import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.data.fileio.OTFFileReader;
 import org.matsim.vis.otfvis.data.fileio.SettingsSaver;
-import org.matsim.vis.otfvis.gui.OTFHostControl;
 import org.matsim.vis.otfvis.gui.OTFControlBar;
+import org.matsim.vis.otfvis.gui.OTFHostControl;
 import org.matsim.vis.otfvis.gui.OTFTimeLine;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
-import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
 /**
  * This file starts OTFVis using a .mvi file.
@@ -69,33 +69,35 @@ public class MyOTFClientFile implements Runnable {
 	private void createDrawer() {
 		Component canvas = OTFOGLDrawer.createGLCanvas(new OTFVisConfigGroup());
 		OTFFileReader otfServer = new OTFFileReader(url);
-		OTFHostControl otfHostControl = new OTFHostControl(otfServer, canvas);
-		// #########################################################################################
-		// #########################################################################################
+		final OTFHostControl hostControl = new OTFHostControl(otfServer, canvas);
 		OTFVisConfigGroup otfVisConfig = otfServer.getOTFVisConfig();
-		// #########################################################################################
+		// new
 		otfVisConfig.setRenderImages(true);
-		otfVisConfig.addParam("agentSize", "60.f");
-		// #########################################################################################
+		// end new
+//		otfVisConfig.setRenderImages(true);
+//		otfVisConfig.addParam("agentSize", "60.f");
 		OTFConnectionManager connect = new OTFConnectionManager();
 		connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connect.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
 		connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
 		OTFServerQuadTree servQ = otfServer.getQuad(connect);
 		OTFClientQuadTree clientQ = servQ.convertToClient(otfServer, connect);
-		clientQ.setMinEasting(110000);
-		clientQ.setMaxEasting(0);
-		clientQ.setMinNorthing(116000);
-		clientQ.setMaxNorthing(140000);
-		OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQ, otfVisConfig, canvas, otfHostControl);
+		// Change pane stat opens
+//		clientQ.setMinEasting(110000);
+//		clientQ.setMaxEasting(0);
+//		clientQ.setMinNorthing(116000);
+//		clientQ.setMaxNorthing(140000);
+		OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQ, otfVisConfig, canvas, hostControl);
 //		mainDrawer.setIncludeLogo(false);
 //		mainDrawer.setScreenshotInterval(3600);
 //		mainDrawer.setTimeOfLastScreenshot(86400);
-		OTFTimeLine timeLine = new OTFTimeLine("time", otfHostControl);
-		OTFClient otfClient = new OTFClient(canvas, otfServer, new OTFControlBar(otfServer, otfHostControl, mainDrawer), mainDrawer, new SettingsSaver(url));
+		OTFControlBar hostControlBar = new OTFControlBar(otfServer, hostControl, mainDrawer);
+		OTFClient otfClient = new OTFClient(canvas, otfServer, hostControlBar, mainDrawer, new SettingsSaver(url));
+		OTFTimeLine timeLine = new OTFTimeLine("time", hostControl);
 		otfClient.getContentPane().add(timeLine, BorderLayout.SOUTH);
-		otfClient.setSize(800, 800);
-		otfClient.show();
+//		otfClient.setSize(800, 800); // does not seem to take effect
+//		otfClient.show();
+		otfClient.pack();
+        otfClient.setVisible(true);
 	}
-
 }

@@ -22,13 +22,14 @@ package org.matsim.lanes.data.v11;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.Lane;
 
 
 /**
  * Builder for the content of BasicLaneDefinitions
  * @author dgrether
  */
+@Deprecated
 public interface LaneDefinitionsFactory11 extends MatsimFactory {
 
 	/**

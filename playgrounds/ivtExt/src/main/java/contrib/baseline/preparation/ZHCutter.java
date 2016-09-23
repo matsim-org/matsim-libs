@@ -33,24 +33,52 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.strategies.ReRoute;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.NetworkRoutingModule;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
+import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.PreProcessDijkstra;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.*;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.households.*;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.*;
+
+import com.google.inject.Key;
+import com.google.inject.name.Names;
+
 import contrib.baseline.lib.F2LCreator;
 
 import java.io.BufferedReader;
@@ -74,11 +102,13 @@ public class ZHCutter {
 	private int radius;
 	private String commuterTag;
 	private Scenario scenario;
+	
+	final String pathToInputScenarioFolder;
 
 	private ZHCutter(ZHCutterConfigGroup cutterConfig) {
 		this.coordCache = new HashMap<>();
 		this.filteredAgents = new HashMap<>();
-		final String pathToInputScenarioFolder = cutterConfig.getPathToInputScenarioFolder() + File.separator;
+		pathToInputScenarioFolder = cutterConfig.getPathToInputScenarioFolder() + File.separator;
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(pathToInputScenarioFolder + PreparationScript.CONFIG));
 		new PopulationReader(scenario).readFile(pathToInputScenarioFolder + POPULATION);
 		new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes()).readFile(pathToInputScenarioFolder + POPULATION_ATTRIBUTES);
@@ -92,8 +122,8 @@ public class ZHCutter {
 		this.center = new Coord(cutterConfig.getxCoordCenter(), cutterConfig.getyCoordCenter());
 		this.radius = cutterConfig.getRadius();
 	}
-
-	public static void main(final String[] args) {
+	
+	public static void main(final String[] args) {		
 		final Config config = ConfigUtils.loadConfig(args[0], new ZHCutterConfigGroup(ZHCutterConfigGroup.GROUP_NAME));
 		final ZHCutterConfigGroup cutterConfig = (ZHCutterConfigGroup) config.getModule(ZHCutterConfigGroup.GROUP_NAME);
 		// For 30km around Zurich Center (Bellevue): X - 2683518.0, Y - 1246836.0, radius - 30000
@@ -101,6 +131,7 @@ public class ZHCutter {
 		// load files
 		ZHCutter cutter = new ZHCutter(cutterConfig);
 		// cut to area
+		cutter.findInitialRoutes();
 		Population filteredPopulation = cutter.geographicallyFilterPopulation();
 		Households filteredHouseholds = cutter.filterHouseholdsWithPopulation();
 		ActivityFacilities filteredFacilities = cutter.filterFacilitiesWithPopulation();
@@ -333,6 +364,46 @@ public class ZHCutter {
 		new NetworkWriter(filteredNetwork).write(pathToTargetFolder + NETWORK);
 		new ConfigWriter(subscenarioConfig).write(pathToTargetFolder + PreparationScript.CONFIG);
 	}
+	
+	@SuppressWarnings("deprecation")
+	public void findInitialRoutes() {
+		Counter counter = new Counter(" initial routing # ");
+		
+		Config config = ConfigUtils.createConfig();
+		config.setParam("f2l", "inputF2LFile", pathToInputScenarioFolder + FACILITIES2LINKS);
+		
+        WorldConnectLocations wcl = new WorldConnectLocations(config);
+        wcl.connectFacilitiesWithLinks(scenario.getActivityFacilities(), scenario.getNetwork());
+		
+		TravelTime travelTime = new FreeSpeedTravelTime();
+		TravelDisutility travelDisutility = new OnlyTimeDependentTravelDisutility(travelTime);
+		
+		PreProcessDijkstra preprocessDijkstra = new PreProcessDijkstra();
+		preprocessDijkstra.run(scenario.getNetwork());
+		
+		LeastCostPathCalculator leastCostPathCalculator = new Dijkstra(scenario.getNetwork(), travelDisutility, travelTime, preprocessDijkstra);
+		RoutingModule routingModule = new NetworkRoutingModule("car", scenario.getPopulation().getFactory(), scenario.getNetwork(), leastCostPathCalculator);
+		
+		MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
+		
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			counter.incCounter();
+			List<Trip> trips = TripStructureUtils.getTrips(person.getSelectedPlan(), routingModule.getStageActivityTypes());
+			
+			for (Trip trip : trips) {
+				if (mainModeIdentifier.identifyMainMode(trip.getTripElements()).equals("car")) {
+					ActivityFacility origin = scenario.getActivityFacilities().getFacilities().get(trip.getOriginActivity().getFacilityId());
+					ActivityFacility destination = scenario.getActivityFacilities().getFacilities().get(trip.getOriginActivity().getFacilityId());
+				
+					List<Leg> legs = trip.getLegsOnly();
+					if (legs.size() > 1) throw new IllegalStateException();
+					
+					List<? extends PlanElement> result = routingModule.calcRoute(origin, destination, legs.get(0).getDepartureTime(), person);
+					legs.get(0).setRoute(((Leg)result.get(0)).getRoute());
+				}
+			}
+		}
+	}
 
 	private Population geographicallyFilterPopulation() {
 		ObjectAttributes personAttributes = scenario.getPopulation().getPersonAttributes();
@@ -381,6 +452,7 @@ public class ZHCutter {
 		for (PlanElement pe : selectedPlan.getPlanElements()) {
 			if (pe instanceof Leg && ((Leg) pe).getMode().equals("car")) {
 				NetworkRoute route = (NetworkRoute) ((Leg) pe).getRoute();
+				
 				for (Id<Link> linkId : route.getLinkIds()) {
 					if (inArea(scenario.getNetwork().getLinks().get(linkId).getCoord())) {
 						routeIntersection = true;
@@ -456,9 +528,9 @@ public class ZHCutter {
 		}
 	}
 
-	private static class ZHCutterConfigGroup extends ReflectiveConfigGroup {
+	public static class ZHCutterConfigGroup extends ReflectiveConfigGroup {
 
-		static final String GROUP_NAME = "ZHCutter";
+		public static final String GROUP_NAME = "ZHCutter";
 
 		private String commuterTag = "outAct";
 		private String pathToInputScnearioFolder;
@@ -468,21 +540,21 @@ public class ZHCutter {
 		private double yCoordCenter = 1246836.0;
 		private int radius = 30000;
 
-		ZHCutterConfigGroup(String name) {
+		public ZHCutterConfigGroup(String name) {
 			super(name);
 		}
 
-		@StringGetter("commuterTag") String getCommuterTag() { return commuterTag; }
-		@StringSetter("commuterTag") void setCommuterTag(String commuterTag) { this.commuterTag = commuterTag; }
-		@StringGetter("inputScenarioFolder") String getPathToInputScenarioFolder() { return pathToInputScnearioFolder; }
-		@StringSetter("inputScenarioFolder") void setPathToInputScenarioFolder(String pathToInputScenarioFolder) { this.pathToInputScnearioFolder = pathToInputScenarioFolder; }
-		@StringGetter("outputFolder") String getPathToTargetFolder() { return pathToTargetFolder; }
-		@StringSetter("outputFolder") void setPathToTargetFolder(String pathToTargetFolder) { this.pathToTargetFolder = pathToTargetFolder; }
-		@StringGetter("xCoordCenter") double getxCoordCenter() { return xCoordCenter; }
-		@StringSetter("xCoordCenter") void setxCoordCenter(double xCoordCenter) { this.xCoordCenter = xCoordCenter; }
-		@StringGetter("yCoordCenter") double getyCoordCenter() { return yCoordCenter; }
-		@StringSetter("yCoordCenter") void setyCoordCenter(double yCoordCenter) { this.yCoordCenter = yCoordCenter; }
-		@StringGetter("radius") int getRadius() { return radius; }
-		@StringSetter("radius") void setRadius(int radius) { this.radius = radius; }
+		@StringGetter("commuterTag") public String getCommuterTag() { return commuterTag; }
+		@StringSetter("commuterTag") public void setCommuterTag(String commuterTag) { this.commuterTag = commuterTag; }
+		@StringGetter("inputScenarioFolder") public String getPathToInputScenarioFolder() { return pathToInputScnearioFolder; }
+		@StringSetter("inputScenarioFolder") public void setPathToInputScenarioFolder(String pathToInputScenarioFolder) { this.pathToInputScnearioFolder = pathToInputScenarioFolder; }
+		@StringGetter("outputFolder") public String getPathToTargetFolder() { return pathToTargetFolder; }
+		@StringSetter("outputFolder") public void setPathToTargetFolder(String pathToTargetFolder) { this.pathToTargetFolder = pathToTargetFolder; }
+		@StringGetter("xCoordCenter") public double getxCoordCenter() { return xCoordCenter; }
+		@StringSetter("xCoordCenter") public void setxCoordCenter(double xCoordCenter) { this.xCoordCenter = xCoordCenter; }
+		@StringGetter("yCoordCenter") public double getyCoordCenter() { return yCoordCenter; }
+		@StringSetter("yCoordCenter") public void setyCoordCenter(double yCoordCenter) { this.yCoordCenter = yCoordCenter; }
+		@StringGetter("radius") public int getRadius() { return radius; }
+		@StringSetter("radius") public void setRadius(int radius) { this.radius = radius; }
 	}
 }

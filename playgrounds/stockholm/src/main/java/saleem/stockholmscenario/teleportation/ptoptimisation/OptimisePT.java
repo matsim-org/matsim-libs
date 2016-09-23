@@ -88,9 +88,11 @@ public class OptimisePT {
 		final MATSimSimulator<PTSchedule> matsimSimulator = new MATSimSimulator(
 				new PTMatsimStateFactoryImpl<>(scenario),
 //				new PTStateFactory(timeDiscretization, occupancyScale), 
-				scenario, timeDiscretization,
+				scenario, timeDiscretization //,
 				// null, relevantStopIds,  
-				module);
+//				module
+				);
+		matsimSimulator.setReplacingModules(module);
 		final RandomSearch<PTSchedule> randomSearch = new RandomSearch<>(
 				matsimSimulator, decisionVariableRandomizer, ptschedule,
 				convergenceCriterion, maxRandomSearchIterations,

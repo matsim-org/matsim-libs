@@ -2,6 +2,7 @@ package playground.sergioo.passivePlanning2012.core.population;
 
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import playground.sergioo.passivePlanning2012.api.population.FloatActivity;
 
 public class FloatActivityImpl implements FloatActivity {
@@ -39,4 +40,8 @@ public class FloatActivityImpl implements FloatActivity {
 		return activityParams;
 	}
 
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
+	}
 }

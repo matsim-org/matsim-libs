@@ -19,16 +19,11 @@
  * *********************************************************************** */
 package tutorial.fixedTimeSignals;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.otfvis.OTFVisWithSignalsLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -42,75 +37,91 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 
 /**
- * Configures and runs MATSim with traffic signals. 
+ * Configures and runs MATSim with traffic signals from input files
+ * and visualizes it with OTFVis. 
  * 
- * @author dgrether
- *
+ * @author dgrether, tthunig
  */
 public class RunSignalSystemsExample {
 
-	/**
-	 * @param args is ignored
-	 */
+	private static final String INPUT_DIR = "./../../matsim/examples/equil-extended/";
+	
 	public static void main(String[] args) {
 		run(true);
 	}
 
-	static void run(boolean usingOTFVis) {
-		String inputDir = "./../../matsim/examples/equil-extended/";
-		
-		File f = new File("t");
-		System.out.println(f.getAbsolutePath());
-		Config config = ConfigUtils.loadConfig(inputDir + "config.xml", new SignalSystemsConfigGroup(), new OTFVisConfigGroup() ) ;
-		
-		config.controler().setLastIteration(0); // use higher values if you want to iterate
+	static void run(boolean useOTFVis) {
+		// load a config (without signal information)
+		Config config = ConfigUtils.loadConfig(INPUT_DIR + "config.xml") ;
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists);
 		
-		config.network().setInputFile("network.xml");
+		// use higher values if you want to iterate
+		config.controler().setLastIteration(0); 
 		
+		config.network().setInputFile("network.xml");
 		config.plans().setInputFile("plans2000.xml.gz");
 		
+		// simulate traffic dynamics with holes (default would be without)
 		config.qsim().setTrafficDynamics(TrafficDynamics.withHoles);
 		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
-		
 		config.qsim().setNodeOffset(5.);
 		
-		SignalSystemsConfigGroup signalConfig = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class ) ;
+		// add the signal config group to the config file
+		SignalSystemsConfigGroup signalConfig = 
+				ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class ) ;
 		
-		// the following makes the contrib load  the signalSystems files, but not to do anything with them:
+		// the following makes the contrib load the signal input files, but not to do anything with them
 		// (this switch will eventually go away)
 		signalConfig.setUseSignalSystems(true);
 
-		// these are the paths to the signal systems definition files:
-		signalConfig.setSignalSystemFile(inputDir + "signalSystems_v2.0.xml");
-		signalConfig.setSignalGroupsFile(inputDir + "signalGroups_v2.0.xml");
-		signalConfig.setSignalControlFile(inputDir + "signalControl_v2.0.xml");
+		// set the paths to the signal systems definition files
+		signalConfig.setSignalSystemFile("signalSystems_v2.0.xml");
+		signalConfig.setSignalGroupsFile("signalGroups_v2.0.xml");
+		signalConfig.setSignalControlFile("signalControl_v2.0.xml");
 		
+//		// here is how to also use intergreen and amber times:
+//		signalConfig.setUseIntergreenTimes(true);
+//		signalConfig.setIntergreenTimesFile(intergreenTimesFile);
+//		// set a suitable action for the case that intergreens are violated
+//		signalConfig.setActionOnIntergreenViolation(SignalSystemsConfigGroup.ActionOnIntergreenViolation.WARN);
+//		signalConfig.setUseAmbertimes(true);
+//		signalConfig.setAmberTimesFile(amberTimesFile);
+		
+//		// here is how to switch on link to link travel times if lanes are used:
 //		config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
 //		config.controler().setLinkToLinkRoutingEnabled(true);
 		
-		OTFVisConfigGroup otfvisConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class ) ;
-		otfvisConfig.setScaleQuadTreeRect(true); // make links visible beyond screen edge
-		otfvisConfig.setColoringScheme(ColoringScheme.byId);
-		otfvisConfig.setAgentSize(240);
-		
-		// ---
+		if (useOTFVis) {
+			// add the OTFVis config group
+			OTFVisConfigGroup otfvisConfig = 
+					ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
+			// make links visible beyond screen edge
+			otfvisConfig.setScaleQuadTreeRect(true); 
+			otfvisConfig.setColoringScheme(ColoringScheme.byId);
+			otfvisConfig.setAgentSize(240);
+		}
 
+		// --- create the scenario
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(signalConfig).loadSignalsData());
+		/* load the information about signals data (i.e. fill the SignalsData object)
+		 * and add it to the scenario as scenario element */
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 		
-		// ---
-
-		// add the signals module to the simulation:
+		// --- create the controler
 		Controler c = new Controler( scenario );
 
+		/* add the signals module to the simulation
+		 * such that SignalsData is not only contained in the scenario 
+		 * but also used in the simulation */
 		c.addOverridingModule(new SignalsModule());
-		if ( usingOTFVis ) {
+		
+		/* add the visualization module to the simulation
+		 * such that it is used */
+		if ( useOTFVis ) {
 			c.addOverridingModule( new OTFVisWithSignalsLiveModule() );
 		}
 		
-		//do it, do it, do it, now
+		// run the simulation
 		c.run();
 	}
-
 }

@@ -41,8 +41,8 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.Toll.TripTollHandler;
 import playground.agarwalamit.analysis.trip.TripDistanceHandler;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.ListUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
@@ -57,7 +57,7 @@ public class PeakHourTripTollPerKmAnalyzer {
 	private final TripDistanceHandler distHandler;
 
 	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{8., 9., 10., 16., 17., 18.,})); // => 7-10 and 15-18
-	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private final MunichPersonFilter pf = new MunichPersonFilter();
 	private final Map<Id<Person>,List<Double>> person2TollsPerKmPkHr = new HashMap<>();
 	private final Map<Id<Person>,List<Double>> person2TollsPerKmOffPkHr = new HashMap<>();
 	private final Map<Id<Person>,Integer> person2TripCountsPkHr = new HashMap<>();

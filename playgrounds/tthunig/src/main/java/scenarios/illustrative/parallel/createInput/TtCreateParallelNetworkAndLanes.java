@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.lanes.LanesUtils;
-import org.matsim.lanes.data.v20.*;
+import org.matsim.lanes.data.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -339,22 +339,22 @@ public final class TtCreateParallelNetworkAndLanes {
 	private void createLanes() {
 		
 		Lanes laneDef20 = this.scenario.getLanes();
-		LaneDefinitionsFactory20 fac = laneDef20.getFactory();
+		LanesFactory fac = laneDef20.getFactory();
 
 		// create link assignment of link 1_2
-		LanesToLinkAssignment20 linkAssignment = fac.createLanesToLinkAssignment(links.get("1_2"));
+		LanesToLinkAssignment linkAssignment = fac.createLanesToLinkAssignment(links.get("1_2"));
 
-		LanesUtils.createAndAddLane20(linkAssignment, fac,
+		LanesUtils.createAndAddLane(linkAssignment, fac,
 				Id.create("1_2.ol", Lane.class), capacity,
 				LINK_LENGTH, 0, 1, null,
 				Arrays.asList(Id.create("1_2.l", Lane.class),
 				Id.create("1_2.r", Lane.class)));
 
-			LanesUtils.createAndAddLane20(linkAssignment, fac,
+			LanesUtils.createAndAddLane(linkAssignment, fac,
 					Id.create("1_2.l", Lane.class), capacity,
 					LINK_LENGTH / 2, -1, 1,
 					Collections.singletonList(links.get("2_3")), null);
-			LanesUtils.createAndAddLane20(linkAssignment, fac,
+			LanesUtils.createAndAddLane(linkAssignment, fac,
 					Id.create("1_2.r", Lane.class), capacity,
 					LINK_LENGTH / 2, 1, 1,
 					Collections.singletonList(links.get("2_7")), null);
@@ -364,17 +364,17 @@ public final class TtCreateParallelNetworkAndLanes {
 		// create link assignment of link 6_5
 		linkAssignment = fac.createLanesToLinkAssignment(links.get("6_5"));
 
-		LanesUtils.createAndAddLane20(linkAssignment, fac,
+		LanesUtils.createAndAddLane(linkAssignment, fac,
 				Id.create("6_5.ol", Lane.class), capacity,
 				LINK_LENGTH, 0, 1, null,
 				Arrays.asList(Id.create("6_5.l", Lane.class),
 						Id.create("6_5.r", Lane.class)));
 
-		LanesUtils.createAndAddLane20(linkAssignment, fac,
+		LanesUtils.createAndAddLane(linkAssignment, fac,
 				Id.create("6_5.l", Lane.class), capacity,
 				LINK_LENGTH / 2, -1, 1,
 				Collections.singletonList(links.get("5_8")), null);
-		LanesUtils.createAndAddLane20(linkAssignment, fac,
+		LanesUtils.createAndAddLane(linkAssignment, fac,
 				Id.create("6_5.r", Lane.class), capacity,
 				LINK_LENGTH / 2, 1, 1,
 				Collections.singletonList(links.get("5_4")), null);
@@ -385,17 +385,17 @@ public final class TtCreateParallelNetworkAndLanes {
 			// create link assignment of link 9_10
 			linkAssignment = fac.createLanesToLinkAssignment(links.get("9_10"));
 
-			LanesUtils.createAndAddLane20(linkAssignment, fac,
+			LanesUtils.createAndAddLane(linkAssignment, fac,
 					Id.create("9_10.ol", Lane.class), capacity,
 					LINK_LENGTH, 0, 1, null,
 					Arrays.asList(Id.create("9_10.l", Lane.class),
 							Id.create("9_10.r", Lane.class)));
 
-			LanesUtils.createAndAddLane20(linkAssignment, fac,
+			LanesUtils.createAndAddLane(linkAssignment, fac,
 					Id.create("9_10.l", Lane.class), capacity,
 					LINK_LENGTH / 2, -1, 1,
 					Collections.singletonList(links.get("10_4")), null);
-			LanesUtils.createAndAddLane20(linkAssignment, fac,
+			LanesUtils.createAndAddLane(linkAssignment, fac,
 					Id.create("9_10.r", Lane.class), capacity,
 					LINK_LENGTH / 2, 1, 1,
 					Collections.singletonList(links.get("10_3")), null);
@@ -405,17 +405,17 @@ public final class TtCreateParallelNetworkAndLanes {
 			// create link assignment of link 12_11
 			linkAssignment = fac.createLanesToLinkAssignment(links.get("12_11"));
 
-			LanesUtils.createAndAddLane20(linkAssignment, fac,
+			LanesUtils.createAndAddLane(linkAssignment, fac,
 					Id.create("12_11.ol", Lane.class), capacity,
 					LINK_LENGTH, 0, 1, null,
 					Arrays.asList(Id.create("12_11.l", Lane.class),
 							Id.create("12_11.r", Lane.class)));
 
-			LanesUtils.createAndAddLane20(linkAssignment, fac,
+			LanesUtils.createAndAddLane(linkAssignment, fac,
 					Id.create("12_11.l", Lane.class), capacity,
 					LINK_LENGTH / 2, -1, 1,
 					Collections.singletonList(links.get("11_7")), null);
-			LanesUtils.createAndAddLane20(linkAssignment, fac,
+			LanesUtils.createAndAddLane(linkAssignment, fac,
 					Id.create("12_11.r", Lane.class), capacity,
 					LINK_LENGTH / 2, 1, 1,
 					Collections.singletonList(links.get("11_8")), null);
@@ -426,7 +426,7 @@ public final class TtCreateParallelNetworkAndLanes {
 
 	public void writeNetworkAndLanes(String directory) {
 		new NetworkWriter(scenario.getNetwork()).write(directory + "network.xml");
-		new LaneDefinitionsWriter20(scenario.getLanes()).write(directory + "lanes.xml");
+		new LanesWriter(scenario.getLanes()).write(directory + "lanes.xml");
 	}
 
 	/**

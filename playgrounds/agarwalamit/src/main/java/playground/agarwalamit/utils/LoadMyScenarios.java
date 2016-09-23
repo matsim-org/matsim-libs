@@ -67,12 +67,12 @@ public final class LoadMyScenarios {
 		config.plans().setInputFile(plansFile);
 		config.network().setInputFile(networkFile);
 		
-		String personAttributeFile = outputDir+"output_personAttributes.xml.gz";
+		String personAttributeFile = outputDir+"/output_personAttributes.xml.gz";
 		if ( new File(personAttributeFile).exists() )  {
 			config.plans().setInputPersonAttributeFile(personAttributeFile);
 		}
 		
-		String vehicleFile = outputDir+"output_vehicles.xml.gz";
+		String vehicleFile = outputDir+"/output_vehicles.xml.gz";
 		if(new File(vehicleFile).exists()) {
 			config.vehicles().setVehiclesFile(vehicleFile);
 		}

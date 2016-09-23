@@ -32,8 +32,9 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.CausedDelayAnalyzer;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
+import playground.agarwalamit.utils.AreaFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
@@ -44,7 +45,7 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 public class TollCounterInfoWriter extends AbstractAnalysisModule {
 	private final CausedDelayAnalyzer cda;
-	private final ExtendedPersonFilter pf ;
+	private final MunichPersonFilter pf ;
 	private final String suffixForSoring = "_sorted";
 
 	private final SortedMap<Double, SortedMap<MunichUserGroup, Integer>> userGroup2TollPayers = new TreeMap<>();
@@ -53,8 +54,8 @@ public class TollCounterInfoWriter extends AbstractAnalysisModule {
 	
 	public TollCounterInfoWriter(final String eventsFile, final Scenario sc, final int noOfTimeBins, final boolean isSortingForMunich) {
 		super(TollCounterInfoWriter.class.getSimpleName());
-		pf = new ExtendedPersonFilter(isSortingForMunich);
-		this.cda = new CausedDelayAnalyzer(eventsFile, sc, noOfTimeBins, isSortingForMunich);
+		pf = new MunichPersonFilter();
+		this.cda = new CausedDelayAnalyzer(eventsFile, sc, noOfTimeBins, new AreaFilter());
 	}
 
 	public static void main(String[] args) {

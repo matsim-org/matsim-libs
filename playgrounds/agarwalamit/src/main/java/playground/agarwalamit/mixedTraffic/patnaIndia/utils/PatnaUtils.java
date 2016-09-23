@@ -20,21 +20,10 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.utils;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 
-import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils.PatnaNetworkType;
 
 /**
@@ -73,39 +62,10 @@ public final class PatnaUtils {
 	public static final Collection <String> ALL_MODES = Arrays.asList("car","motorbike","bike","truck", "pt", "walk"); //Arrays.asList("car_ext","motorbike_ext","truck_ext","bike_ext","pt","walk","car","motorbike","bike");
 
 	public static final Double INR_USD_RATE = 66.6; // 08 June 2016 
+	
+	public static final Double PCU_2W = 0.15;
 
 	private PatnaUtils(){} 
-
-	/**
-	 * @param scenario
-	 * It creates first vehicle types and add them to scenario and then create and add vehicles to the scenario.
-	 */
-	public static void createAndAddVehiclesToScenario(final Scenario scenario, final Collection <String> modes){
-		final Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
-
-		for (String mode : modes){
-			VehicleType vehicle = VehicleUtils.getFactory().createVehicleType(Id.create(mode,VehicleType.class));
-			vehicle.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed(mode));
-			vehicle.setPcuEquivalents( MixedTrafficVehiclesUtils.getPCU(mode) );
-			modesType.put(mode, vehicle);
-			scenario.getVehicles().addVehicleType(vehicle);
-		}
-
-		for(Person p:scenario.getPopulation().getPersons().values()){
-			for(PlanElement pe :p.getSelectedPlan().getPlanElements()){
-				if (pe instanceof Leg) {
-					String travelMode = ((Leg)pe).getMode();
-					VehicleType vt = modesType.get(travelMode);
-					if (vt!=null) {
-						Id<Vehicle> vehicleId = Id.create(p.getId(),Vehicle.class);
-						Vehicle veh = VehicleUtils.getFactory().createVehicle(vehicleId, vt);
-						scenario.getVehicles().addVehicle(veh);
-						break;// all trips have same mode and once a vehicle is added just break for the person.
-					}
-				}
-			}
-		}
-	}
 
 	public static int getAverageIncome(final String incomeCode){
 		switch (incomeCode) {

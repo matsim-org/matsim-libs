@@ -22,7 +22,9 @@
 package scenarios.illustrative.braess.run;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Calendar;
 
 import org.apache.log4j.Logger;
@@ -32,8 +34,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsWriter20;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsWriter20;
@@ -54,7 +57,7 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.Default
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
+import org.matsim.lanes.data.LanesWriter;
 
 //import matsimConnector.congestionpricing.MSACongestionHandler;
 //import matsimConnector.congestionpricing.MSAMarginalCongestionPricingContolerListener;
@@ -103,18 +106,18 @@ public final class RunBraessSimulation {
 
 	/* population parameter */
 	
-	private static final int NUMBER_OF_PERSONS = 3600; // per hour
+	private static final int NUMBER_OF_PERSONS = 1000; // per hour
 	private static final int SIMULATION_PERIOD = 1; // in hours
 	private static final double SIMULATION_START_TIME = 0.0; // seconds from midnight
 	
-	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.NONE;
+	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.ONLY_MIDDLE;
 	// initial score for all initial plans
 	private static final Double INIT_PLAN_SCORE = null;
 
 	// defines which kind of signals should be used
-	private static final SignalControlType SIGNAL_TYPE = SignalControlType.SIGNAL4_X_SECOND_Z;
+	private static final SignalControlType SIGNAL_TYPE = SignalControlType.SIGNAL4_SYLVIA_Z2V;
 	// if SignalControlType SIGNAL4_X_Seconds_Z or SIGNAL4_RESPONSIVE is used, SECONDS_Z_GREEN gives the green time for Z
-	private static final int SECONDS_Z_GREEN = 1;
+	private static final int SECONDS_Z_GREEN = 5;
 	
 	// defines which kind of lanes should be used
 	private static final LaneType LANE_TYPE = LaneType.NONE;
@@ -158,7 +161,7 @@ public final class RunBraessSimulation {
 		Config config = ConfigUtils.createConfig();
 
 		// set number of iterations
-		config.controler().setLastIteration(100);
+		config.controler().setLastIteration(1);
 
 		// able or enable signals and lanes
 		config.qsim().setUseLanes(LANE_TYPE.equals(LaneType.NONE) ? false : true);
@@ -191,7 +194,7 @@ public final class RunBraessSimulation {
 		{
 			StrategySettings strat = new StrategySettings();
 			strat.setStrategyName(DefaultStrategy.ReRoute.toString());
-			strat.setWeight(0.1);
+			strat.setWeight(0.0);
 			strat.setDisableAfter(config.controler().getLastIteration() - 50);
 			config.strategy().addStrategySettings(strat);
 		}
@@ -238,7 +241,7 @@ public final class RunBraessSimulation {
 		config.qsim().setStartTime(3600 * SIMULATION_START_TIME);
 		// set end time to shorten simulation run time: 2 hours after the last agent departs
 //		config.qsim().setEndTime(3600 * (SIMULATION_START_TIME + SIMULATION_PERIOD + 2));
-//		config.qsim().setEndTime(3600 * 24);
+		config.qsim().setEndTime(3600 * 24);
 		
 		// adapt monetary distance cost rate (should be negative)
 		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(-0.0);
@@ -275,7 +278,7 @@ public final class RunBraessSimulation {
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		if (signalsConfigGroup.isUseSignalSystems()) {
 			scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-					new SignalsScenarioLoader(signalsConfigGroup).loadSignalsData());
+					new SignalsDataLoader(config).loadSignalsData());
 			createSignals(scenario);
 		}
 		
@@ -296,12 +299,17 @@ public final class RunBraessSimulation {
 		controler.addOverridingModule(sylviaSignalsModule);
 		
 		// add responsive signal controler if enabled
+		// TODO does this work together with the SylviaSignalsModule?!
 		if (SIGNAL_TYPE.equals(SignalControlType.SIGNAL4_RESPONSIVE)){
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
 					bind(ResponsiveLocalDelayMinimizingSignal.class).asEagerSingleton();
 					addControlerListenerBinding().to(ResponsiveLocalDelayMinimizingSignal.class);
+		            // bind tool to write information about signal states for via
+					bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
+		            addEventHandlerBinding().to(SignalEvents2ViaCSVWriter.class);
+		            addControlerListenerBinding().to(SignalEvents2ViaCSVWriter.class);
 				}
 			});
 		}
@@ -485,7 +493,7 @@ public final class RunBraessSimulation {
 
 		Config config = scenario.getConfig();
 		
-		// get the current date in format "yyyy-mm-dd"
+		// get the current date in format "yyyy-mm-dd-hh-mm-ss"
 		Calendar cal = Calendar.getInstance ();
 		// this class counts months from 0, but days from 1
 		int month = cal.get(Calendar.MONTH) + 1;
@@ -493,15 +501,27 @@ public final class RunBraessSimulation {
 		if (month < 10)
 			monthStr = "0" + month;
 		String date = cal.get(Calendar.YEAR) + "-" 
-				+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);
+				+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH) 
+				+ "-" + cal.get(Calendar.HOUR_OF_DAY) + "-" + cal.get(Calendar.MINUTE) + "-" + cal.get(Calendar.SECOND);
 		
-		String runName = date;
+		String outputDir = OUTPUT_BASE_DIR + date + "/"; 
+		// create directory
+		new File(outputDir).mkdirs();
 
-		runName += "_" + NUMBER_OF_PERSONS + "p";
+		config.controler().setOutputDirectory(outputDir);
+		log.info("The output will be written to " + outputDir);
+		
+		writeRunDescription(outputDir, createRunName(scenario));
+	}
+	
+	private static String createRunName(Scenario scenario) {
+		Config config = scenario.getConfig();
+		
+		String runName = NUMBER_OF_PERSONS + "p";
 		if (SIMULATION_PERIOD != 1){
 			runName += "_" + SIMULATION_PERIOD + "h";
 		}
-//		runName += "_start" + (int)SIMULATION_START_TIME; 
+		runName += "_start" + (int)SIMULATION_START_TIME; 
 		
 		switch(INIT_ROUTES_TYPE){
 		case ALL:
@@ -645,13 +665,21 @@ public final class RunBraessSimulation {
 		runName += "_stuckT" + (int)config.qsim().getStuckTime();
 		if (config.qsim().getEndTime() != Time.UNDEFINED_TIME)
 			runName += "_simEndT" + (int)(config.qsim().getEndTime()/24) + "h";
+		
+		return runName;
+	}
 
-		String outputDir = OUTPUT_BASE_DIR + runName + "/"; 
-		// create directory
-		new File(outputDir).mkdirs();
-
-		config.controler().setOutputDirectory(outputDir);
-		log.info("The output will be written to " + outputDir);
+	private static void writeRunDescription(String outputDir, String runName){
+		PrintStream stream;
+		String filename = outputDir + "runDescription.txt";
+		try {
+			stream = new PrintStream(new File(filename));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		stream.println(runName);
+		stream.close();
 	}
 
 	private static void writeInitFiles(Scenario scenario) {
@@ -662,7 +690,7 @@ public final class RunBraessSimulation {
 		// write network and lanes
 		new NetworkWriter(scenario.getNetwork()).write(outputDir + "network.xml");
 		if (!LANE_TYPE.equals(LaneType.NONE)) 
-			new LaneDefinitionsWriter20(scenario.getLanes()).write(outputDir + "lanes.xml");
+			new LanesWriter(scenario.getLanes()).write(outputDir + "lanes.xml");
 		
 		// write population
 		new PopulationWriter(scenario.getPopulation()).write(outputDir + "plans.xml");

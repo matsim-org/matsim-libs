@@ -63,23 +63,23 @@ public class XYDataCollector<T extends Identifiable<T>>
 
 
     @Override
-    public void notifyMobsimInitialized(MobsimInitializedEvent e)
+    public void notifyMobsimInitialized(@SuppressWarnings("rawtypes") MobsimInitializedEvent e)
     {
         String file = matsimServices.getControlerIO()
                 .getIterationFilename(matsimServices.getIterationNumber(), outputFile);
-        writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".xy"));
-        writer.writeNext("id", "time", "x", "y", calculator.getHeader());
+        writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".xy.gz"));
+        writer.writeNext("time", "id", "x", "y", calculator.getHeader());
     }
 
 
     @Override
-    public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e)
+    public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
         if (e.getSimulationTime() % interval == 0) {
             String time = (int)e.getSimulationTime() + "";
             for (T o : monitoredObjects) {
                 Coord coord = calculator.getCoord(o);
-                writer.writeNext(o.getId() + "", time, coord.getX() + "", coord.getY() + "",
+                writer.writeNext(time, o.getId() + "", coord.getX() + "", coord.getY() + "",
                         calculator.calculate(o));
             }
         }
@@ -87,7 +87,7 @@ public class XYDataCollector<T extends Identifiable<T>>
 
 
     @Override
-    public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e)
+    public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e)
     {
         writer.close();
     }

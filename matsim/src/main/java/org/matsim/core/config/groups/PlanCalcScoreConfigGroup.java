@@ -784,6 +784,15 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		private double distance = 0.0;
 		private double monetaryDistanceRate = 0.0;
 		private double constant = 0.0;
+		
+//		@Override public String toString() {
+//			String str = super.toString();
+//			str += "[mode=" + mode + "]" ;
+//			str += "[const=" + constant + "]" ;
+//			str += "[beta_trav=" + traveling + "]" ;
+//			str += "[beta_dist=" + distance + "]" ;
+//			return str ;
+//		}
 
 		public ModeParams(final String mode) {
 			super( SET_TYPE );
@@ -1078,8 +1087,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 				}
 				map.put( pars.getMode() , pars );
 			}
-
-			return map;
+			if ( this.isLocked() ) {
+				return Collections.unmodifiableMap(map) ;
+			} else {
+				return map ;
+			}
 		}
 
 		public ModeParams getOrCreateModeParams(String modeName) {
@@ -1095,10 +1107,9 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			final ModeParams previous = this.getModes().get( params.getMode() );
 
 			if ( previous != null ) {
-				log.info("mode parameters for mode " + previous.getMode() + " were just overwritten.") ;
-
 				final boolean removed = removeParameterSet( previous );
 				if ( !removed ) throw new RuntimeException( "problem replacing mode params " );
+				log.info("mode parameters for mode " + previous.getMode() + " were just overwritten.") ;
 			}
 
 			super.addParameterSet( params );

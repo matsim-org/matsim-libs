@@ -33,7 +33,8 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.CausedDelayAnalyzer;
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.utils.AreaFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -65,10 +66,14 @@ public class CongestionPricingComperator {
 	private String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run12/policies/";
 	private Scenario scenario;
 	private String pricingScenario;
+	
 	private final boolean isSortingForInsideMunich = true;
+	private final AreaFilter areaFilter = new AreaFilter();
+	
 	private final String suffixForSoring = "_sorted";
 	private double vttsCar;
-	private final ExtendedPersonFilter pf = new ExtendedPersonFilter(isSortingForInsideMunich);
+	private final MunichPersonFilter pf = new MunichPersonFilter();
+	private final AreaFilter af = new AreaFilter();
 
 	public static void main(String[] args) {
 		CongestionPricingComperator analyzer = new CongestionPricingComperator("implV3");
@@ -130,7 +135,7 @@ public class CongestionPricingComperator {
 	 */
 	private void writeAverageLinkTolls () {
 
-		CausedDelayAnalyzer delayAnalyzer = new CausedDelayAnalyzer(eventsFile, scenario, noOfTimeBins,true); // only Munich city area
+		CausedDelayAnalyzer delayAnalyzer = new CausedDelayAnalyzer(eventsFile, scenario, noOfTimeBins, new AreaFilter()); // only Munich city area
 		delayAnalyzer.run();
 
 		SortedMap<Double, Map<Id<Link>, Double>> timeBin2LinkId2Delay = delayAnalyzer.getTimeBin2LinkId2Delay();//delays on each link for each time bin
@@ -165,13 +170,13 @@ public class CongestionPricingComperator {
 	}
 
 	private SortedMap<Double, Map<Id<Person>, Double>> getExperiencedPersonDelay(int noOfTimeBin){
-		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, scenario, noOfTimeBin, scenario.getConfig().qsim().getEndTime(), isSortingForInsideMunich);
+		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, scenario, noOfTimeBin, areaFilter);
 		personAnalyzer.run();
 		return personAnalyzer.getTimeBin2AffectedPersonId2Delay();
 	}
 
 	private SortedMap<Double, Map<Id<Person>, Double>> getCausingPersonDelay(int noOfTimeBin){
-		CausedDelayAnalyzer delayAnalyzer = new CausedDelayAnalyzer(eventsFile, scenario, noOfTimeBin,isSortingForInsideMunich);
+		CausedDelayAnalyzer delayAnalyzer = new CausedDelayAnalyzer(eventsFile, scenario, noOfTimeBin, new AreaFilter());
 		delayAnalyzer.run();
 		return delayAnalyzer.getTimeBin2CausingPersonId2Delay();
 	}

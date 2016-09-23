@@ -43,6 +43,7 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.PatnaVehiclesGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.UrbanDemandGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
@@ -58,7 +59,8 @@ public class PatnaSimulationTimeWriter {
 	private static String runDir =  "../../../../repos/runs-svn/patnaIndia/run110/";
 	private static String inputFilesDir = runDir+"/inputs/";
 	
-	private static String linkDynamics_CSV = "FIFO,PassingQ,SeepageQ"; 
+	private static String linkDynamics_CSV = "FIFO,PassingQ,SeepageQ";
+	private static String trafficDynamics_CSV = "queue,withHoles";
 	
 	private static int cloningFactor = 1;
 	private static PrintStream writer;
@@ -74,6 +76,7 @@ public class PatnaSimulationTimeWriter {
 			inputFilesDir = args[1];
 			cloningFactor = Integer.valueOf( args[2] );
 			linkDynamics_CSV = args[3]; // for 100% scenario, all cases (72) cant be simulated only in one job
+			trafficDynamics_CSV = args[4];
 		}
 
 		PatnaSimulationTimeWriter pstw = new PatnaSimulationTimeWriter();
@@ -89,11 +92,13 @@ public class PatnaSimulationTimeWriter {
 		writer.print("scenario \t simTimeInSec \n");
 
 		List<String> lds  = Arrays.asList( linkDynamics_CSV.split(",") );
+		List<String> tds = Arrays.asList(trafficDynamics_CSV.split(","));
 		
 		for (String ldString : lds ) {
 			LinkDynamics ld = LinkDynamics.valueOf(ldString);
-			for ( TrafficDynamics td : TrafficDynamics.values()){
-				writer.print(ld+"_"+td+"\t");
+			for ( String tdString : tds){
+				TrafficDynamics td = TrafficDynamics.valueOf(tdString);
+				writer.print(ld+"_"+tdString+"\t");
 				pstw.processAndWriteSimulationTime(ld, td);
 				writer.println();	
 			}
@@ -158,7 +163,7 @@ public class PatnaSimulationTimeWriter {
 //		PersonsCloner pc = new PersonsCloner(sc);
 //		pc.clonePersons(cloningFactor);
 		
-		PatnaUtils.createAndAddVehiclesToScenario(sc, PatnaUtils.URBAN_MAIN_MODES);
+		PatnaVehiclesGenerator.createAndAddVehiclesToScenario(sc, PatnaUtils.URBAN_MAIN_MODES);
 
 		final Controler controler = new Controler(sc);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);

@@ -38,6 +38,7 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public final class StreamingPopulationReader implements MatsimReader {
 	private static final Logger log = Logger.getLogger(StreamingPopulationReader.class);
@@ -161,6 +162,11 @@ public final class StreamingPopulationReader implements MatsimReader {
 		}
 		@Override public ObjectAttributes getPersonAttributes() {
 			return delegate.getPersonAttributes();
+		}
+
+		@Override
+		public Attributes getAttributes() {
+			return delegate.getAttributes();
 		}
 	}
 

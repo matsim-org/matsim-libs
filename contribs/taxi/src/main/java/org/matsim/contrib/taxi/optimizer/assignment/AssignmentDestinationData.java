@@ -22,24 +22,23 @@ package org.matsim.contrib.taxi.optimizer.assignment;
 import java.util.*;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 
 public abstract class AssignmentDestinationData<D>
 {
     public static class DestEntry<D>
+        extends LinkTimePair
     {
         public final int idx;
         public final D destination;
-        public final Link link;
-        public final double time;
 
 
         public DestEntry(int idx, D destination, Link link, double time)
         {
+            super(link, time);
             this.idx = idx;
             this.destination = destination;
-            this.link = link;
-            this.time = time;
         }
     }
 

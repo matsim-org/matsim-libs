@@ -29,13 +29,20 @@ import java.util.Map;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 public class EventWriterXML implements EventWriter, BasicEventHandler {
-	private BufferedWriter out = null;
+	private final BufferedWriter out;
 
-	public EventWriterXML(final String filename) {
-		init(filename);
+	public EventWriterXML(final String outfilename) {
+		this.out = IOUtils.getBufferedWriter(outfilename);
+		try {
+			this.out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<events version=\"1.0\">\n");
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
+
 	/**
 	 * Constructor so you can pass System.out or System.err to the writer to see the result on the console.
 	 * 
@@ -52,34 +59,25 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 
 	@Override
 	public void closeFile() {
-		if (this.out != null)
-			try {
-				this.out.write("</events>");
-				// I added a "\n" to make it look nicer on the console.  Can't say if this may have unintended side
-				// effects anywhere else.  kai, oct'12
-				// fails signalsystems test (and presumably other tests in contrib/playground) since they compare
-				// checksums of event files.  Removed that change again.  kai, oct'12
-				this.out.close();
-				this.out = null;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		try {
+			this.out.write("</events>");
+			// I added a "\n" to make it look nicer on the console.  Can't say if this may have unintended side
+			// effects anywhere else.  kai, oct'12
+			// fails signalsystems test (and presumably other tests in contrib/playground) since they compare
+			// checksums of event files.  Removed that change again.  kai, oct'12
+			this.out.close();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
+	@Deprecated
 	public void init(final String outfilename) {
-		closeFile();
-
-		try {
-			this.out = IOUtils.getBufferedWriter(outfilename);
-			this.out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<events version=\"1.0\">\n");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		throw new RuntimeException("Please create a new instance.");
 	}
 
 	@Override
 	public void reset(final int iter) {
-		closeFile();
 	}
 
 	@Override

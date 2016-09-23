@@ -32,8 +32,8 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.CausedDelayAnalyzer;
 import playground.agarwalamit.analysis.congestion.CrossMarginalCongestionEventsWriter;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter.MunichUserGroup;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -51,7 +51,7 @@ public class CausedDelayUserGroup {
 	private SortedMap<MunichUserGroup, Double> userGroupToDelays;
 	private Map<Id<Person>, Double> personId2CausingDelay;
 	private Scenario scenario;
-	private ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private MunichPersonFilter pf = new MunichPersonFilter();
 
 	public CausedDelayUserGroup(final String outputDir) {
 		this.outputDir = outputDir;

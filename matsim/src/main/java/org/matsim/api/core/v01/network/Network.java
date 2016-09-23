@@ -24,11 +24,12 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * A topological network representation.
  */
-public interface Network extends MatsimToplevelContainer {
+public interface Network extends MatsimToplevelContainer, Attributable {
 
 	/**
 	 * Returns the builder for network elements

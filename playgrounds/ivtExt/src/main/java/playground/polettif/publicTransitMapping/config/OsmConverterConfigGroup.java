@@ -40,6 +40,7 @@ import java.util.Set;
  *
  * @author polettif
  */
+@Deprecated
 public class OsmConverterConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "OsmConverter";

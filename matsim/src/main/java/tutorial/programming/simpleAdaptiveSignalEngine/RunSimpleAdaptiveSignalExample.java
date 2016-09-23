@@ -28,15 +28,31 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 
+/**
+ * Load the scenario from the daganzo example,
+ * add the adaptive signal example from the same package
+ * and run the simulation.
+ * 
+ * @author nagel
+ */
 public class RunSimpleAdaptiveSignalExample {
 
+	private static String outputDir = "output/simpleAdaptiveSignalEngineExample/";
+	
+	/**
+	 * @param args if not null it gives the output directory for the intergreens file
+	 */
 	public static void main(String[] args) {
-		
+		if (args != null){
+			// use the given output if args is not null
+			outputDir = args[0];
+		}
+		// load the daganzo example
 		final Config config = ConfigUtils.loadConfig("examples/daganzo/config.xml");
-		config.controler().setOutputDirectory("output/simpleAdaptiveSignalEngineExample/");
+		config.controler().setOutputDirectory(outputDir);
 		config.controler().setWriteEventsInterval(config.controler().getLastIteration());
 		config.vspExperimental().setWritingOutputEvents(true);
-		// remove unmaterialized module
+		// remove unmaterialized module from the config
 		config.removeModule("otfvis");
 		final Controler controler = new Controler(config);
 		
@@ -44,14 +60,16 @@ public class RunSimpleAdaptiveSignalExample {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				/* bind the adaptive signal as mobsim listener (to be able to create the signals before simulation)
+				 * and as events handler (to get information about agent behavior) 
+				 * but both times as the same instance (asEagerSingleton) */
 				bind(SimpleAdaptiveSignal.class).asEagerSingleton();
 				addMobsimListenerBinding().to(SimpleAdaptiveSignal.class);
 				addEventHandlerBinding().to(SimpleAdaptiveSignal.class);
 			}
 		});
 		
-		controler.run();
-	
+		controler.run();	
 	}
 
 }

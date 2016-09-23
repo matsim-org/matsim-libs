@@ -13,7 +13,8 @@ public interface ChargingPlug extends Identifiable<ChargingPlug> {
 	ChargingPlugType getChargingPlugType();
 	
 	void plugVehicle(VehicleWithBattery vehicle);
-	void unPlugVehicle(VehicleWithBattery vehicle);
+	void unplugVehicle(VehicleWithBattery vehicle);
+	void registerPlugAvailable();
 
 	VehicleWithBattery getVehicle();
 
@@ -37,4 +38,6 @@ public interface ChargingPlug extends Identifiable<ChargingPlug> {
 	void handleBeginChargingSession(VehicleAgent agent);
 
 	void handleChargingSessionInterruption();
+
+	boolean isAvailable();
 }

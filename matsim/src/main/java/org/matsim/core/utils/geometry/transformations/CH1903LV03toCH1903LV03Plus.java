@@ -42,7 +42,13 @@ public class CH1903LV03toCH1903LV03Plus implements CoordinateTransformation {
 		double yNorm = (coord.getX() + 2000000.0);
 		double xNorm = (coord.getY() + 1000000.0);
 
-		return new Coord((double) Math.round(yNorm), (double) Math.round(xNorm));
+		double elevation;
+		try{
+			elevation = coord.getZ();
+			return new Coord((double) Math.round(yNorm), (double) Math.round(xNorm), elevation);
+		} catch (Exception e){
+			return new Coord((double) Math.round(yNorm), (double) Math.round(xNorm));
+		}
 	}
 
 }

@@ -75,11 +75,11 @@ public class DgSensor {
 		return this.vehiclesOnLink;
 	}
 
-	public int getNumberOfCarsInDistance(Double distanceMeter, double timeSeconds) {
-		Map<Id<Vehicle>, CarLocator> carLocators = this.distanceMeterCarLocatorMap.get(distanceMeter);
+	public int getNumberOfCarsInDistance(Double distanceMeter, double currentTime) {
+		Map<Id<Vehicle>, CarLocator> distSpecificCarLocators = this.distanceMeterCarLocatorMap.get(distanceMeter);
 		int count = 0;
-		for (CarLocator cl : carLocators.values()){
-			if (cl.isCarinDistance(timeSeconds)){
+		for (CarLocator cl : distSpecificCarLocators.values()){
+			if (cl.isCarinDistance(currentTime)){
 				count++;
 			}
 		}

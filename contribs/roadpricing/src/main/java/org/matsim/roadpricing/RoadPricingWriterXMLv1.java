@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
@@ -34,7 +35,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
  *
  * @author mrieser
  */
-public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
+public final class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 	// needs to be public. kai, sep'14
 
 	private final RoadPricingScheme scheme;
@@ -60,7 +61,7 @@ public class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 	
 			// links
 			this.writer.write("\t<links>\n");
-			for (Id linkId : this.scheme.getTypicalCostsForLink().keySet()) {
+			for (Id<Link> linkId : this.scheme.getTypicalCostsForLink().keySet()) {
 			  List<Cost> cs = this.scheme.getTypicalCostsForLink().get(linkId);
 			  this.writer.write("\t\t<link id=\"" + linkId.toString() + "\"");
 			  if (cs == null) {

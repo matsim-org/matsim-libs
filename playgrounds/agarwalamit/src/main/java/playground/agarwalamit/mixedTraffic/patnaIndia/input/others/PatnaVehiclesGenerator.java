@@ -41,46 +41,60 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 public class PatnaVehiclesGenerator {
 
 	private Scenario scenario ;
-	private Vehicles vehicles;
+	private static double pcu_2w = Double.NaN;
 
 	/**
 	 * @param plansFile is required to get vehicles for each agent type in population.
+	 * @param pcu_2w pcu for 2-wheeler if not using default from mixed traffic vehicle utils.
+	 */
+	public PatnaVehiclesGenerator(final String plansFile, final double pcu_2w) {
+		this.scenario = LoadMyScenarios.loadScenarioFromPlans(plansFile);
+		PatnaVehiclesGenerator.pcu_2w = pcu_2w;
+	}
+	
+	/**
+	 * @param plansFile is required to get vehicles for each agent type in population. The pcu of 2w is taken from mixed traffic vehicle utils.
 	 */
 	public PatnaVehiclesGenerator(final String plansFile) {
-		this.scenario = LoadMyScenarios.loadScenarioFromPlans(plansFile);
+		this(plansFile, Double.NaN);
 	}
+	
+	public Vehicles createAndReturnVehicles(final Collection <String> modes){
+		PatnaVehiclesGenerator.createAndAddVehiclesToScenario(scenario, modes);
+		return scenario.getVehicles();
+	}
+	
+	/**
+	 * @param scenario
+	 * It creates first vehicle types and add them to scenario and then create and add vehicles to the scenario.
+	 */
+	public static void createAndAddVehiclesToScenario(final Scenario scenario, final Collection <String> modes){
+		final Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
 
-	public void createVehicles (final Collection <String> modes) {
-
-		vehicles = VehicleUtils.createVehiclesContainer();
-
-		Map<String, VehicleType> modeTypes = new HashMap<String, VehicleType>();
-
-		for (String vehicleType : modes) {
-			VehicleType veh = VehicleUtils.getFactory().createVehicleType(Id.create(vehicleType,VehicleType.class));
-			veh.setMaximumVelocity( MixedTrafficVehiclesUtils.getSpeed( vehicleType.split("_")[0] ) );// this should not harm other use cases.
-			veh.setPcuEquivalents( MixedTrafficVehiclesUtils.getPCU( vehicleType.split("_")[0] ) );
-
-			modeTypes.put(vehicleType, veh);
-			vehicles.addVehicleType(veh);
+		for (String mode : modes){
+			VehicleType vehicle = VehicleUtils.getFactory().createVehicleType(Id.create(mode,VehicleType.class));
+			vehicle.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed(mode));
+			
+			if( Double.isNaN(pcu_2w) ) vehicle.setPcuEquivalents( MixedTrafficVehiclesUtils.getPCU(mode) );
+			else vehicle.setPcuEquivalents( mode.equals("bike")||mode.equals("motorbike") ? pcu_2w : MixedTrafficVehiclesUtils.getPCU(mode) );
+			
+			modesType.put(mode, vehicle);
+			scenario.getVehicles().addVehicleType(vehicle);
 		}
 
-		for(Person p : scenario.getPopulation().getPersons().values()){
-			for(PlanElement pe:p.getSelectedPlan().getPlanElements()) {
-				if(pe instanceof Leg ){
-					String travelMode =  ((Leg) pe).getMode();
-					if( modeTypes.containsKey(travelMode) ){
-						VehicleType vType = modeTypes.get(travelMode);
-						Vehicle veh =  VehicleUtils.getFactory().createVehicle(Id.create(p.getId(), Vehicle.class), vType);
-						vehicles.addVehicle(veh);
-						break;
+		for(Person p:scenario.getPopulation().getPersons().values()){
+			for(PlanElement pe :p.getSelectedPlan().getPlanElements()){
+				if (pe instanceof Leg) {
+					String travelMode = ((Leg)pe).getMode();
+					VehicleType vt = modesType.get(travelMode);
+					if (vt!=null) {
+						Id<Vehicle> vehicleId = Id.create(p.getId(),Vehicle.class);
+						Vehicle veh = VehicleUtils.getFactory().createVehicle(vehicleId, vt);
+						scenario.getVehicles().addVehicle(veh);
+						break;// all trips have same mode and once a vehicle is added just break for the person.
 					}
 				}
 			}
 		}
-	}
-
-	public Vehicles getPatnaVehicles(){
-		return vehicles;
 	}
 }

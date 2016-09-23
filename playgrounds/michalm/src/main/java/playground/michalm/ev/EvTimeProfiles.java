@@ -33,7 +33,8 @@ public class EvTimeProfiles
 {
     public static ProfileCalculator createSocHistogramCalculator(final EvData evData)
     {
-        String[] header = { "0", "0.1+", "0.2+", "0.3+", "0.4+", "0.5+", "0.6+", "0.7+", "0.8+", "0.9+" };
+        String[] header = { "0", "0.1+", "0.2+", "0.3+", "0.4+", "0.5+", "0.6+", "0.7+", "0.8+",
+                "0.9+" };
         return new TimeProfiles.MultiValueProfileCalculator(header) {
             @Override
             public String[] calcValues()
@@ -63,7 +64,7 @@ public class EvTimeProfiles
                 for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
                     mean.increment(ev.getBattery().getSoc());
                 }
-                return (mean.getResult() / EvUnitConversions.J_PER_kWh) + "";//print out in [kWh]
+                return String.format("%.3f", mean.getResult() / EvUnitConversions.J_PER_kWh);//print out in [kWh]
             }
         };
     }
@@ -91,7 +92,8 @@ public class EvTimeProfiles
                 String[] vals = new String[columns];
                 int col = 0;
                 for (ElectricVehicle ev : selectedEvs) {
-                    vals[col++] = (ev.getBattery().getSoc() / EvUnitConversions.J_PER_kWh) + "";//print out in [kWh]
+                    vals[col++] = String.format("%.3f",
+                            ev.getBattery().getSoc() / EvUnitConversions.J_PER_kWh);//print out in [kWh]
                 }
                 return vals;
             }

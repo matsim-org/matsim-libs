@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -136,6 +137,13 @@ public class VrpLeg
     public String getMode()
     {
         return mode;
+    }
+
+
+    @Override
+    public Id<Vehicle> getPlannedVehicleId()
+    {
+        return null;
     }
 
 
