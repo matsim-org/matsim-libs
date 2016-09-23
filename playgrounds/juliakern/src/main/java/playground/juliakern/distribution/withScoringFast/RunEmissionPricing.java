@@ -147,7 +147,7 @@ public class RunEmissionPricing {
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
 		controler.getConfig().addModule(ecg);
 		ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
-		ecg.setEmissionVehicleFile(emissionVehicleFile);
+		config.vehicles().setVehiclesFile(emissionVehicleFile);
 		
 		ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 		ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);

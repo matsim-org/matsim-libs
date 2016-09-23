@@ -148,7 +148,7 @@ public class SubPopMunichExposureControler {
 		else emissionRelatedInputFilesDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/input/";
 		
 		ecg.setEmissionRoadTypeMappingFile(emissionRelatedInputFilesDir + "/roadTypeMapping.txt");
-		ecg.setEmissionVehicleFile(emissionRelatedInputFilesDir + "/emissionVehicles_1pct.xml.gz");
+		controler.getConfig().vehicles().setVehiclesFile(emissionRelatedInputFilesDir + "/emissionVehicles_1pct.xml.gz");
 		
 		EmissionModule emissionModule = new EmissionModule(scenario);
 		emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));

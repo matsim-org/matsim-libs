@@ -75,7 +75,7 @@ public class ManteuffelEmissionToolOffline{
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
 		config.addModule(ecg);
 		ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
-		ecg.setEmissionVehicleFile(emissionVehicleFile);
+		config.vehicles().setVehiclesFile(emissionVehicleFile);
 		ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 		ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);

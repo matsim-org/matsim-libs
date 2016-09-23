@@ -66,8 +66,8 @@ public class MatsimOpdytsEquilIntegration {
 		config.controler().setOutputDirectory(OUT_DIR);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		config.plans().setInputFile("relaxed_plans.xml.gz");
-//		config.plans().setInputFile("plans2000.xml.gz");
+//		config.plans().setInputFile("relaxed_plans.xml.gz");
+		config.plans().setInputFile("plans2000.xml.gz");
 
 		//== default config has limited inputs
 		StrategyConfigGroup strategies = config.strategy();
@@ -89,12 +89,13 @@ public class MatsimOpdytsEquilIntegration {
 		}
 
 		strategies.setFractionOfIterationsToDisableInnovation(0.8); // does not matter, what you set, matsim simulator will set it to infinity.
+		config.qsim().setStorageCapFactor(0.03);
 
-		config.qsim().setTrafficDynamics( QSimConfigGroup.TrafficDynamics.withHoles );
-
-		if ( config.qsim().getTrafficDynamics()== QSimConfigGroup.TrafficDynamics.withHoles ) {
-			config.qsim().setInflowConstraint(QSimConfigGroup.InflowConstraint.maxflowFromFdiag);
-		}
+//		config.qsim().setTrafficDynamics( QSimConfigGroup.TrafficDynamics.withHoles );
+//
+//		if ( config.qsim().getTrafficDynamics()== QSimConfigGroup.TrafficDynamics.withHoles ) {
+//			config.qsim().setInflowConstraint(QSimConfigGroup.InflowConstraint.maxflowFromFdiag);
+//		}
 
 		config.qsim().setUsingFastCapacityUpdate(true);
 
