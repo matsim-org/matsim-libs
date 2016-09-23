@@ -55,8 +55,7 @@ public class EmissionModule {
 
 	//===
 	private static String roadTypeMappingFile;
-	private static String emissionVehicleFile;
-	
+
 	private static String averageFleetColdEmissionFactorsFile;
 	private static String averageFleetWarmEmissionFactorsFile;
 
@@ -397,6 +396,7 @@ public class EmissionModule {
 		return emissionEventsManager;
 	}
 
+	@Deprecated // use scenario.getVehicles() instead.
 	public Vehicles getEmissionVehicles() {
 		return emissionVehicles;
 	}

@@ -145,8 +145,8 @@ public class TestColdEmissionAnalysisModule {
 			HandlerToTestEmissionAnalysisModules.reset();
 			Id<Link> linkId = Id.create("linkId"+testCases.indexOf(tc), Link.class);
 			Id<Vehicle> vehicleId = Id.create("vehicleId"+testCases.indexOf(tc), Vehicle.class);
-			Id<VehicleType> vehicleTypeId = Id.create(tc.get(0) +";"+ tc.get(1) +";"+ tc.get(2) +";"+ tc.get(3), VehicleType.class);
-			ceam.calculateColdEmissionsAndThrowEvent(linkId, vehicleId, startTime, parkingDuration, tableAccDistance, vehicleTypeId);
+			String vehicleDescription = tc.get(0) +";"+ tc.get(1) +";"+ tc.get(2) +";"+ tc.get(3);
+			ceam.calculateColdEmissionsAndThrowEvent(linkId, vehicleId, startTime, parkingDuration, tableAccDistance, vehicleDescription);
 			String message = "The expected emissions for " + tc.toString() + " are " + 
 						numberOfColdEmissions*(Double)tc.get(4) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
 			Assert.assertEquals(message, numberOfColdEmissions*(Double)tc.get(4), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
@@ -154,42 +154,42 @@ public class TestColdEmissionAnalysisModule {
 		
 	}
 
-	@Test 
+	@Test
 	public void calculateColdEmissionsAndThrowEventTest_Exceptions() {
 		
 		/*
 		 * four test cases 
 		 * all of them should throw exceptions
 		 */
-		
+
 		setUp();
-		List<Id<VehicleType>> testCasesExceptions = new ArrayList<>();
-		excep  = false;
-		
+		List<String> testCasesExceptions = new ArrayList<>();
+		excep = false;
+
 		// seventh case: no corresponding entry either in the detailed nor the average table
-        Id<VehicleType> vehicleInfoForNoCase = Id.create("PASSENGER_CAR;PC diesel;;>=2L", VehicleType.class);
-        testCasesExceptions.add(vehicleInfoForNoCase);
+		String vehicleInfoForNoCase = "PASSENGER_CAR;PC diesel;;>=2L";
+		testCasesExceptions.add(vehicleInfoForNoCase);
 		// eighth case: vehicle category not specified
-		testCasesExceptions.add(Id.create(";;;", VehicleType.class));
+		testCasesExceptions.add(";;;");
 		// ninth case: empty string as id
-		testCasesExceptions.add(Id.create("", VehicleType.class));
+		testCasesExceptions.add("");
 		// tenth case: null id
 		testCasesExceptions.add(null);
-		
-		for(Id<VehicleType> vehicleTypeId : testCasesExceptions){
-			String message ="'"+vehicleTypeId+"'"+ " was used to calculate cold emissions and throw an event." 
+
+		for (String vehicleDescription : testCasesExceptions) {
+			String message = "'" + vehicleDescription + "'" + " was used to calculate cold emissions and throw an event."
 					+ "It should throw an exception because it is not valid vehicle information string.";
-			try{
-				Id<Link> linkId = Id.create("linkId"+testCasesExceptions.indexOf(vehicleTypeId), Link.class);
-				Id<Vehicle> vehicleId = Id.create("vehicleId"+testCasesExceptions.indexOf(vehicleTypeId), Vehicle.class);
-				ceam.calculateColdEmissionsAndThrowEvent(linkId, vehicleId, startTime, parkingDuration, tableAccDistance, vehicleTypeId);
-			}catch(Exception e){
-				excep=true;
+			try {
+				Id<Link> linkId = Id.create("linkId" + testCasesExceptions.indexOf(vehicleDescription), Link.class);
+				Id<Vehicle> vehicleId = Id.create("vehicleId" + testCasesExceptions.indexOf(vehicleDescription), Vehicle.class);
+				ceam.calculateColdEmissionsAndThrowEvent(linkId, vehicleId, startTime, parkingDuration, tableAccDistance, vehicleDescription);
+			} catch (Exception e) {
+				excep = true;
 			}
 			Assert.assertTrue(message, excep);
-			excep=false;
+			excep = false;
 		}
-		
+
 	}
 	
 	@Test 
@@ -200,13 +200,13 @@ public class TestColdEmissionAnalysisModule {
 				
 		// eleventh case: no specifications for technology, size, class, em concept
 		// string has no semicolons as seperators - use average values
-		Id<VehicleType> vehInfo11 = Id.create(passengercar, VehicleType.class); 
+		String vehicleDescription = passengercar;
 		Id<Link> linkId11 = Id.create("link id 11", Link.class);
 		Id<Vehicle> vehicleId7 = Id.create("vehicle 11", Vehicle.class);
 		
 		HandlerToTestEmissionAnalysisModules.reset();
-		ceam.calculateColdEmissionsAndThrowEvent(linkId11, vehicleId7, startTime, parkingDuration, tableAccDistance, vehInfo11);
-		String message = "The expected emissions for an event with vehicle information string '" + vehInfo11+ "' are " + 
+		ceam.calculateColdEmissionsAndThrowEvent(linkId11, vehicleId7, startTime, parkingDuration, tableAccDistance, vehicleDescription);
+		String message = "The expected emissions for an event with vehicle information string '" + vehicleDescription+ "' are " +
 				numberOfColdEmissions*averageAverageFactor + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
 		Assert.assertEquals(message, numberOfColdEmissions*averageAverageFactor, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
 
@@ -228,7 +228,7 @@ public class TestColdEmissionAnalysisModule {
 		
 		Id<Link> idForAvgTable = Id.create("link id avg", Link.class);
 		Id<Vehicle> vehicleIdForAvgTable = Id.create("vehicle avg", Vehicle.class);
-        Id<VehicleType> vehicleInfoForAvgCase = Id.create("PASSENGER_CAR;PC petrol;petrol;none", VehicleType.class);
+        String vehicleInfoForAvgCase = "PASSENGER_CAR;PC petrol;petrol;none";
         ceam.calculateColdEmissionsAndThrowEvent(idForAvgTable, vehicleIdForAvgTable, startTime, parkingDuration, tableAccDistance, vehicleInfoForAvgCase);
 		String message = "The expected rescaled emissions for this event are (calculated emissions * rescalefactor) = " 
 				+ (numberOfColdEmissions*petrolFactor) + " * " + rescaleFactor + " = " +

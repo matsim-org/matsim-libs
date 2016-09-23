@@ -39,7 +39,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
 
 
 /**
@@ -115,16 +114,16 @@ public class ColdEmissionAnalysisModule {
 			Id<Vehicle> vehicleId,
 			double eventTime,
 			double parkingDuration,
-            int distance_km,
-			Id<VehicleType> vehicleTypeId) {
+			int distance_km,
+			String vehicleDescription) {
 
 		Map<ColdPollutant, Double> coldEmissions;
-		if(vehicleTypeId == null){
+		if(vehicleDescription == null){
 			throw new RuntimeException("Vehicle type description for vehicle " + vehicleId + "is missing. " +
 					"Please make sure that requirements for emission vehicles in "
 					+ EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleTypeId2VehicleInformationTuple(vehicleTypeId);
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleDescription2VehicleInformationTuple(vehicleDescription);
 		if (vehicleInformationTuple.getFirst() == null){
 			throw new RuntimeException("Vehicle category for vehicle " + vehicleId + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
@@ -219,12 +218,12 @@ public class ColdEmissionAnalysisModule {
         return generatedEmissions;
     }
 
-    private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleTypeId2VehicleInformationTuple(Id<VehicleType> vehicleTypeId) {
+    private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple(String vehicleDescription) {
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
 		HbefaVehicleCategory hbefaVehicleCategory = null;
 		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 
-		String[] vehicleInformationArray = vehicleTypeId.toString().split(";");
+		String[] vehicleInformationArray = vehicleDescription.split(";");
 
 		for(HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()){
 			if(vehCat.toString().equals(vehicleInformationArray[0])){

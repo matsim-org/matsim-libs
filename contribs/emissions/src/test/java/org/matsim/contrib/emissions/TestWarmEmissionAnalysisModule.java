@@ -178,7 +178,10 @@ public class TestWarmEmissionAnalysisModule {
 		double linkLength = 200.; 
 		Id<VehicleType> vehicleTypeId = Id.create(passengercar+ ";"+petrolTechnology+";"+petrolSizeClass+";"+petrolConcept, VehicleType.class);
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
-		Vehicle vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(vehicleTypeId));
+		VehicleType vt = vehFac.createVehicleType(vehicleTypeId);
+		vt.setDescription(vehicleTypeId.toString());
+		Vehicle vehicle = vehFac.createVehicle(vehicleId, vt);
+
 		
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, roadType, petrolSpeedFf/3.6, linkLength, linkLength/petrolSpeedFf*3.6);
 		Assert.assertEquals(detailedPetrolFactorFf*linkLength/1000., warmEmissions.get(WarmPollutant.CO2_TOTAL), MatsimTestUtils.EPSILON);

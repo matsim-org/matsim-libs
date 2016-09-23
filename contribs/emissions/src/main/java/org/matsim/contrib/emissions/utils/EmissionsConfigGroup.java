@@ -56,6 +56,7 @@ public class EmissionsConfigGroup
 
         map.put(EMISSION_ROADTYPE_MAPPING_FILE, "REQUIRED: mapping from input road types to HBEFA 3.1 road type strings");
 
+        //TODO remove or update following. Amit sep 16
         map.put(EMISSION_VEHICLE_FILE, "definition of a vehicle for every person (who is allowed to choose a vehicle in the simulation):" + "\n\t\t" +
                 " - REQUIRED: vehicle type Id must start with the respective HbefaVehicleCategory followed by `;'" + "\n\t\t" +
                 " - OPTIONAL: if detailed emission calculation is switched on, vehicle type Id should aditionally contain" +

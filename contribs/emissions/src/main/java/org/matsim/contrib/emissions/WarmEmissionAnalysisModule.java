@@ -40,7 +40,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
 
 
 /**
@@ -148,13 +147,21 @@ public class WarmEmissionAnalysisModule {
 			double travelTime) {
 
 		Map<WarmPollutant, Double> warmEmissions;
-		if(vehicle == null || vehicle.getType() == null || vehicle.getType().getId() == null){
+		if(vehicle == null ||
+				(vehicle.getType() == null && vehicle.getType().getDescription() == null) // if both are null together; no vehicle information.
+				) { //TODO change the message for the exception. Amit sep 16
 			throw new RuntimeException("Vehicle type description for vehicle " + vehicle + "is missing. " +
 					"Please make sure that requirements for emission vehicles in "
 					+ EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
+
+		String vehicleDescription = vehicle.getType().getDescription();
+		//TODO this should be a temporary fix for tests or backward compatibility. amit sep 16
+		if(vehicleDescription==null) {
+			vehicleDescription = vehicle.getType().getId().toString();
+		}
 		
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleTypeId2VehicleInformationTuple(vehicle.getType().getId());
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleTypeId2VehicleInformationTuple(vehicleDescription);
 		if (vehicleInformationTuple.getFirst() == null){
 			throw new RuntimeException("Vehicle category for vehicle " + vehicle + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
@@ -301,12 +308,12 @@ public class WarmEmissionAnalysisModule {
 		return warmEmissionsOfEvent;
 	}
 
-	private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleTypeId2VehicleInformationTuple(Id<VehicleType> vehicleTypeId) {
+	private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleTypeId2VehicleInformationTuple(String vehicleDescription) {
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
 		HbefaVehicleCategory hbefaVehicleCategory = null;
 		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 
-		String[] vehicleInformationArray = vehicleTypeId.toString().split(";");
+		String[] vehicleInformationArray = vehicleDescription.split(";");
 
 		for(HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()){
 			if(vehCat.toString().equals(vehicleInformationArray[0])){

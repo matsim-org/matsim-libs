@@ -85,7 +85,13 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
             double distance = previousDistance + linkLength;
             double parkingDuration = this.vehicleId2parkingDuration.get(vehicleId);
             Id<Link> coldEmissionEventLinkId = this.vehicleId2coldEmissionEventLinkId.get(vehicleId);
-            Id<VehicleType> vehicleTypeId = emissionVehicles.getVehicles().get(vehicleId).getType().getId();
+
+            VehicleType vt = emissionVehicles.getVehicles().get(vehicleId).getType();
+
+            //for backward compatibility. amit sep 16
+            String vehicleDescription = vt.getDescription() ;
+            if(vehicleDescription ==null && vt.getId()!=null ) vehicleDescription = vt.getId().toString();
+
             if ((distance / 1000) > 1.0) {
                 this.coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent(
                         coldEmissionEventLinkId,
@@ -93,7 +99,7 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
                         event.getTime(),
                         parkingDuration,
                         2,
-                        vehicleTypeId);
+                        vehicleDescription);
                 this.vehicleId2accumulatedDistance.remove(vehicleId);
             } else {
                 this.vehicleId2accumulatedDistance.put(vehicleId, distance);
@@ -132,12 +138,19 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
         }
         this.vehicleId2parkingDuration.put(vehicleId, parkingDuration);
         this.vehicleId2accumulatedDistance.put(vehicleId, 0.0);
+
+        VehicleType vt = emissionVehicles.getVehicles().get(vehicleId).getType();
+
+        //for backward compatibility. amit sep 16
+        String vehicleDescription = vt.getDescription() ;
+        if(vehicleDescription ==null && vt.getId()!=null ) vehicleDescription = vt.getId().toString();
+
         this.coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent(
                 linkId,
                 vehicleId,
                 startEngineTime,
                 parkingDuration,
                 1,
-                emissionVehicles.getVehicles().get(vehicleId).getType().getId());
+                vehicleDescription);
     }
 }
