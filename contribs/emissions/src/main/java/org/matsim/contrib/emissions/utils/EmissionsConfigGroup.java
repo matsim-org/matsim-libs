@@ -59,7 +59,8 @@ public class EmissionsConfigGroup
         map.put(EMISSION_VEHICLE_FILE, "definition of a vehicle for every person (who is allowed to choose a vehicle in the simulation):" + "\n\t\t" +
                 " - REQUIRED: vehicle type Id must start with the respective HbefaVehicleCategory followed by `;'" + "\n\t\t" +
                 " - OPTIONAL: if detailed emission calculation is switched on, vehicle type Id should aditionally contain" +
-                " HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED);
+                " HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED+"" +
+                "This must be set in the vehicles container.");
 
         map.put(EMISSION_FACTORS_WARM_FILE_AVERAGE, "REQUIRED: file with HBEFA 3.1 fleet average warm emission factors");
 
@@ -84,14 +85,7 @@ public class EmissionsConfigGroup
     public String getEmissionRoadTypeMappingFile() {
         return this.emissionRoadTypeMappingFile;
     }
-    @StringSetter(EMISSION_VEHICLE_FILE)
-    public void setEmissionVehicleFile(String emissionVehicleFile) {
-        this.emissionVehicleFile = emissionVehicleFile;
-    }
-    @StringGetter(EMISSION_VEHICLE_FILE)
-    public String getEmissionVehicleFile() {
-        return this.emissionVehicleFile;
-    }
+
     @StringSetter(EMISSION_FACTORS_WARM_FILE_AVERAGE)
     public void setAverageWarmEmissionFactorsFile(String averageFleetWarmEmissionFactorsFile) {
         this.averageFleetWarmEmissionFactorsFile = averageFleetWarmEmissionFactorsFile;

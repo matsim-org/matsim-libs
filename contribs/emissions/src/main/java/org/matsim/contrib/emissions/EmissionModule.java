@@ -78,7 +78,7 @@ public class EmissionModule {
 		this.scenario = scenario;
 	}
 	
-	public EmissionModule(Scenario scenario, Vehicles emissionVehicles) {
+	public EmissionModule(Scenario scenario, Vehicles emissionVehicles) { // TODO : probably we dont need this. Amit sep 16
 		this.scenario = scenario;
 		this.emissionVehicles = emissionVehicles;
 	}
@@ -90,7 +90,7 @@ public class EmissionModule {
 		
 		roadTypeMapping = createRoadTypeMapping(roadTypeMappingFile);
 		if(this.emissionVehicles == null){
-			emissionVehicles = createEmissionVehicles(emissionVehicleFile);
+			emissionVehicles = scenario.getVehicles();
 		}
 
 		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
@@ -110,8 +110,7 @@ public class EmissionModule {
 	      EmissionsConfigGroup ecg = (EmissionsConfigGroup)scenario.getConfig().getModule("emissions");
 
 		roadTypeMappingFile = ecg.getEmissionRoadTypeMappingFile();
-		emissionVehicleFile = ecg.getEmissionVehicleFile();
-	
+
 		averageFleetWarmEmissionFactorsFile = ecg.getAverageWarmEmissionFactorsFile();
 		averageFleetColdEmissionFactorsFile = ecg.getAverageColdEmissionFactorsFile();
 		
@@ -159,14 +158,14 @@ public class EmissionModule {
 		return mapping;
 	}
 	
-	private Vehicles createEmissionVehicles(String emissionVehicleFilename) {
-		logger.info("entering createEmissionVehicles ...") ;
-		emissionVehicles = VehicleUtils.createVehiclesContainer();
-		VehicleReaderV1 vehicleReader = new VehicleReaderV1(emissionVehicles);
-		vehicleReader.readFile(emissionVehicleFilename);
-		logger.info("leaving createEmissionVehicles ...") ;
-		return emissionVehicles;
-	}
+//	private Vehicles createEmissionVehicles(String emissionVehicleFilename) {
+//		logger.info("entering createEmissionVehicles ...") ;
+//		emissionVehicles = VehicleUtils.createVehiclesContainer();
+//		VehicleReaderV1 vehicleReader = new VehicleReaderV1(emissionVehicles);
+//		vehicleReader.readFile(emissionVehicleFilename);
+//		logger.info("leaving createEmissionVehicles ...") ;
+//		return emissionVehicles;
+//	}
 
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createAvgHbefaWarmTable(String filename){
 		logger.info("entering createAvgHbefaWarmTable ...");

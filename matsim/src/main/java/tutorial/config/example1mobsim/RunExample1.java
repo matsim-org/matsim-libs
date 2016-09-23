@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * MyControler1.java
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +16,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package tutorial.config.example1mobsim;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioUtils;
-
+import tutorial.config.RunFromConfigfileExample;
 
 /**
- * runs a mobsim and writes events output.  See the config file for configuration details.
+ * Stub version to keep class that is referenced from documentation.  Rather see {@link RunFromConfigfileExample}.
  * 
  * @author nagel
- *
  */
 public class RunExample1 {
 
-	public static void main(final String[] args) {
-		String configFile = "examples/tutorial/config/example1-config.xml" ;
-
-		Config config = ConfigUtils.loadConfig(configFile);
-		
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		Controler controler = new Controler(scenario);
-		controler.run();
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		final String[] args2 = new String[]{"examples/tutorial/config/example1-config.xml"};
+		RunFromConfigfileExample.main( args2);
 	}
 
 }

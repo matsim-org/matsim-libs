@@ -77,7 +77,7 @@ public class TestingPricing4SamplePopulation {
 		ecg.setAverageColdEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_ColdStart_vehcat_2005average.txt");
 		ecg.setAverageWarmEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_HOT_vehcat_2005average.txt");
 		ecg.setEmissionRoadTypeMappingFile("../../siouxFalls/input/SiouxFalls_roadTypeMapping.txt");
-		ecg.setEmissionVehicleFile("../../siouxFalls/input/SiouxFalls_emissionVehicles.xml");
+		config.vehicles().setVehiclesFile("../../siouxFalls/input/SiouxFalls_emissionVehicles.xml");
 		ecg.setUsingDetailedEmissionCalculation(false);
 		config.addModule(ecg);
 

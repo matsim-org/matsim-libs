@@ -117,7 +117,7 @@ public class RunEmissionToolOffline {
 	       EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
         this.scenario.getConfig().addModule(ecg);
         ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
-        ecg.setEmissionVehicleFile(emissionVehicleFile);
+		this.scenario.getConfig().vehicles().setVehiclesFile(emissionVehicleFile);
         
         ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
         ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
