@@ -52,7 +52,7 @@ public class ExamplesByConfigfileTest {
 		files2run[2] = new Object [] {"examples/tutorial/config/example1-config.xml"} ;
 		files2run[3] = new Object [] {"examples/tutorial/config/example5-config.xml"} ;
 		files2run[4] = new Object [] {"examples/tutorial/config/example5trips-config.xml"} ;
-//		files2run[5] = new Object [] {"examples/equil-extended/config-with-roadpricing.xml"}; // yyyy throws exception; should be investigated and fixed.  (This can, actually not work from core matsim after roadpricing was moved into a contrib!) kai, sep'16
+//		files2run[5] = new Object [] {"examples/equil-extended/config-with-roadpricing.xml"}; // yyyy throws exception; should be investigated and fixed.  (This can not work from core matsim after roadpricing was moved into a contrib!) kai, sep'16
 //		files2run[3] = new Object [] {"examples/equil-mixedTraffic/config.xml"}; // yyyy throws exception; should be investigated and fixed.  kai, sep'16
 //		files2run[5] = new Object [] {"examples/tutorial/config/example2-config.xml"} ; // yyyy throws exception; should be investigated and fixed.  kai, sep'16
 //		files2run[8] = new Object [] {"examples/tutorial/config/externalReplanning.xml"} ; // yyyy throws exception; should be investigated and fixed.  kai, sep'16 
