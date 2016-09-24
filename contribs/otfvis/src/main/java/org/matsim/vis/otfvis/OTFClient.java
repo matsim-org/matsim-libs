@@ -188,7 +188,7 @@ public final class OTFClient extends JFrame {
 				double x = mainDrawer.getViewBoundsAsQuadTreeRect().centerX + mainDrawer.getQuad().offsetEast;
 				double y = mainDrawer.getViewBoundsAsQuadTreeRect().centerY + mainDrawer.getQuad().offsetNorth;
 				Coord center = coordinateTransformation.transform(new Coord(x, y));
-				double scale = mainDrawer.getScale();
+				double scale = mainDrawer.getScale()*2;
 				int zoom = (int) log2(scale);
 				jMapViewer.setCenterPosition(new GeoPosition(center.getY(), center.getX()));
 				jMapViewer.setZoom(zoom);
