@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.mixedTraffic.patnaIndia.policies;
+package playground.agarwalamit.mixedTraffic.patnaIndia.policies.bikeTrack;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import playground.agarwalamit.mixedTraffic.patnaIndia.policies.PatnaTrafficRestrainer;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 

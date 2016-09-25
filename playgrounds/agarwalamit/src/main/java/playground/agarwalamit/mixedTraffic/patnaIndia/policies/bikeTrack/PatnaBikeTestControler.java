@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.mixedTraffic.patnaIndia.policies;
+package playground.agarwalamit.mixedTraffic.patnaIndia.policies.bikeTrack;
 
 import java.util.Arrays;
 import java.util.HashSet;

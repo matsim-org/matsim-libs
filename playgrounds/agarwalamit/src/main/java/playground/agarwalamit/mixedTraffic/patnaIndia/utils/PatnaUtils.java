@@ -37,7 +37,7 @@ public final class PatnaUtils {
 	public static final String EPSG = "EPSG:24345";
 	public static final CoordinateTransformation COORDINATE_TRANSFORMATION = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, PatnaUtils.EPSG);
 
-	public static final String INPUT_FILES_DIR = "../../../../repos/shared-svn/projects/patnaIndia/inputs/";
+	public static final String INPUT_FILES_DIR = "../../repos/shared-svn/projects/patnaIndia/inputs/";
 	public static final String ZONE_FILE = PatnaUtils.INPUT_FILES_DIR+"/raw/others/wardFile/Wards.shp";
 
 	public static final String INCOME_ATTRIBUTE = "monthlyIncome";

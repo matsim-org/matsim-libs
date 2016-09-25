@@ -36,7 +36,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.LinkVolumeHandler;
+import playground.agarwalamit.analysis.linkVolume.LinkVolumeHandler;
 import playground.agarwalamit.utils.MapUtils;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
