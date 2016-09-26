@@ -48,6 +48,9 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable;
 import playground.kairuns.run.KNBerlinControler;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author amit
  */
@@ -114,6 +117,12 @@ public class MatsimOpdytsEquilIntegration {
 		int binCount = 24; // to me, binCount and binSize must be related
 		TimeDiscretization timeDiscretization = new TimeDiscretization(startTime, binSize, binCount);
 
+		Set<String> modes2consider = new HashSet<>();
+		modes2consider.add("car");
+		modes2consider.add("bike");
+
+		ModalStatsControlerListner stasControlerListner = new ModalStatsControlerListner(modes2consider);
+
 		// following is the  entry point to start a matsim controler together with opdyts
 		MATSimSimulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization);
 		simulator.addOverridingModule(new AbstractModule() {
@@ -122,7 +131,7 @@ public class MatsimOpdytsEquilIntegration {
 			public void install() {
 				// add here whatever should be attached to matsim controler
 				// some stats
-				addControlerListenerBinding().to(ModalStatsControlerListner.class);
+				addControlerListenerBinding().toInstance(stasControlerListner);
 
 				// from KN
 				addControlerListenerBinding().to(KaiAnalysisListener.class);

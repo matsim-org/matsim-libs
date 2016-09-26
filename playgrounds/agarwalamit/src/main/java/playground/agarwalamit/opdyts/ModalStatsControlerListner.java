@@ -19,6 +19,7 @@
 
 package playground.agarwalamit.opdyts;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -35,9 +36,7 @@ import playground.agarwalamit.analysis.modalShare.FilteredModalShareEventHandler
 import javax.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Created by amit on 20/09/16.
@@ -48,6 +47,17 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
 
     private FilteredModalShareEventHandler modalShareEventHandler = new FilteredModalShareEventHandler();
     private BufferedWriter writer;
+    private final Set<String> mode2consider;
+
+    ModalStatsControlerListner(final Set<String> mode2optimize) {
+        this.mode2consider = mode2optimize;
+    }
+
+    ModalStatsControlerListner() {
+        this.mode2consider = new HashSet<>();
+        this.mode2consider.add(TransportMode.car);
+        this.mode2consider.add(TransportMode.pt);
+    }
 
     @Inject
     private EventsManager events;
@@ -90,7 +100,7 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
             SortedMap<String, Double> moneyRates = new TreeMap<>();
 
             for (String mode : mode2Params.keySet()) {
-                if (mode.equals("car") || mode.equals("bicycle") || mode.equals("pt")) { //TODO: need to parametrize this.
+                if (mode2consider.contains(mode)) {
                     ascs.put(mode, mode2Params.get(mode).getConstant());
                     travs.put(mode, mode2Params.get(mode).getMarginalUtilityOfTraveling());
                     dists.put(mode, mode2Params.get(mode).getMarginalUtilityOfDistance());

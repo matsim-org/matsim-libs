@@ -29,6 +29,7 @@ import opdytsintegration.MATSimSimulator;
 import opdytsintegration.MATSimStateFactoryImpl;
 import opdytsintegration.utils.TimeDiscretization;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -49,7 +50,9 @@ import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVa
 import playground.kairuns.run.KNBerlinControler;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author amit
@@ -89,12 +92,17 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 			params.setTypicalDurationScoreComputation( PlanCalcScoreConfigGroup.TypicalDurationScoreComputation.relative );
 		}
 
+		// remove other mode params
+		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore();
+		for ( PlanCalcScoreConfigGroup.ModeParams params : planCalcScoreConfigGroup.getModes().values() ) {
+			planCalcScoreConfigGroup.removeParameterSet(params);
+		}
+
 		PlanCalcScoreConfigGroup.ModeParams mpCar = new PlanCalcScoreConfigGroup.ModeParams("car");
 		PlanCalcScoreConfigGroup.ModeParams mpBike = new PlanCalcScoreConfigGroup.ModeParams("bicycle");
 
-		config.planCalcScore().addModeParams(mpCar);
-		config.planCalcScore().addModeParams(mpBike);
-		// TODO remove the pt params if possible.
+		planCalcScoreConfigGroup.addModeParams(mpCar);
+		planCalcScoreConfigGroup.addModeParams(mpBike);
 		//==
 
 		//==
@@ -125,6 +133,12 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		int binCount = 24; // to me, binCount and binSize must be related
 		TimeDiscretization timeDiscretization = new TimeDiscretization(startTime, binSize, binCount);
 
+		Set<String> modes2consider = new HashSet<>();
+		modes2consider.add("car");
+		modes2consider.add("bike");
+
+		ModalStatsControlerListner stasControlerListner = new ModalStatsControlerListner(modes2consider);
+
 		// following is the  entry point to start a matsim controler together with opdyts
 		MATSimSimulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization);
 		simulator.addOverridingModule(new AbstractModule() {
@@ -137,7 +151,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 				// some stats
 				addControlerListenerBinding().to(KaiAnalysisListener.class);
-				addControlerListenerBinding().to(ModalStatsControlerListner.class);
+				addControlerListenerBinding().toInstance(stasControlerListner);
 			}
 		});
 
