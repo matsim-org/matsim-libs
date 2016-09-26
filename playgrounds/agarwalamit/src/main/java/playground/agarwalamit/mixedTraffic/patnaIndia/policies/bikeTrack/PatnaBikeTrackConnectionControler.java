@@ -17,26 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.mixedTraffic.patnaIndia.policies;
-
-import java.io.File;
-import java.util.Collection;
-import java.util.List;
-
-import javax.inject.Inject;
+package playground.agarwalamit.mixedTraffic.patnaIndia.policies.bikeTrack;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -53,15 +39,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.*;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.agarwalamit.analysis.StatsWriter;
 import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListner;
 import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
@@ -78,46 +57,45 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
-import playground.agarwalamit.utils.LoadMyScenarios;
+import playground.agarwalamit.utils.FileUtils;
+
+import javax.inject.Inject;
+import java.io.File;
+import java.util.Collection;
 
 /**
  * @author amit
  */
 
-public class PatnaPolicyControler {
+public class PatnaBikeTrackConnectionControler {
 
-	private static String dir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/policies/0.15pcu/";
-	private static boolean applyTrafficRestrain = false;
-	private static boolean addBikeTrack = false;
-	private static boolean isAllwoingMotorbikeOnBikeTrack = true;
+	private static String dir = FileUtils.RUNS_SVN+"/patnaIndia/run108/jointDemand/policies/0.15pcu/";
+	private static boolean isAllwoingMotorbikeOnBikeTrack = false;
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
-
 		String outputDir ;
 
 		if(args.length>0){
 			dir = args[0];
-			applyTrafficRestrain = Boolean.valueOf(args[1]);
-			addBikeTrack = Boolean.valueOf(args[2]);
-			isAllwoingMotorbikeOnBikeTrack = Boolean.valueOf(args[3]);
-			outputDir = dir+args[4];
+			isAllwoingMotorbikeOnBikeTrack = Boolean.valueOf(args[1]);
+			outputDir = dir+args[2];
 		}  else {
-			if(applyTrafficRestrain ) {
-				if (isAllwoingMotorbikeOnBikeTrack) throw new RuntimeException("Two situations -- traffic restrain and motorbike on bike track -- are not considered.");
-				if (addBikeTrack) outputDir = dir+"/both/";
-				else outputDir = dir+"/trafficRestrain/";
-			} else if(addBikeTrack && !isAllwoingMotorbikeOnBikeTrack) outputDir = dir+"/bikeTrack/";
-			else if(isAllwoingMotorbikeOnBikeTrack) outputDir = dir+"/BT-mb/";
-			else outputDir = dir+"/baseCaseCtd/";			
+			if(isAllwoingMotorbikeOnBikeTrack) outputDir = dir+"/bikeTrackConnectors-mb/";
+			else outputDir = dir+"/bikeTrackConnectors/";
 		}
 
 		String inputDir = dir+"/input/";
 		String configFile = inputDir + "configBaseCaseCtd.xml";
 
 		ConfigUtils.loadConfig(config, configFile);
-
 		config.controler().setOutputDirectory(outputDir);
+
+		config.network().setInputFile(inputDir+"network.xml.gz");
+		String inPlans = inputDir+"baseCaseOutput_plans.xml.gz";
+		config.plans().setInputFile( inPlans);
+		config.plans().setInputPersonAttributeFile(inputDir+"output_personAttributes.xml.gz");
+		config.vehicles().setVehiclesFile(inputDir+"output_vehicles.xml.gz");
 
 		//==
 		// after calibration;  departure time is fixed for urban; check if time choice is not present
@@ -129,36 +107,14 @@ public class PatnaPolicyControler {
 		}
 		//==
 
-		//==
-		// take only selected plans so that time for urban and location for external traffic is fixed.
-		// not anymore, there is now second calibration after cadyts and before baseCaseCtd; thus all plans in the choice set.
-		String inPlans = "baseCaseOutput_plans.xml.gz";
-		config.plans().setInputFile(inputDir + inPlans);
-		//==
-
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setWriteEventsInterval(50);
-
-		// policies if any
-		if (applyTrafficRestrain && addBikeTrack ) {
-			config.network().setInputFile(inputDir + "/networkWithTrafficRestricationAndBikeTrack.xml.gz");
-		} else if (applyTrafficRestrain ) {
-			config.network().setInputFile(inputDir + "/networkWithTrafficRestrication.xml.gz");
-		} else if(addBikeTrack && !isAllwoingMotorbikeOnBikeTrack) {
-			config.network().setInputFile(inputDir + "/networkWithBikeTrack.xml.gz");
-		} else if (isAllwoingMotorbikeOnBikeTrack) {
-			config.network().setInputFile(inputDir + "/networkWithBikeMotorbikeTrack.xml.gz");
-		}
+		config.controler().setWriteEventsInterval(10);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		final Controler controler = new Controler(scenario);
 
-		// removal of some links may lead to exception if routes are not removed from leg.
-		// do this before setting a new network so that cord from removed links can be extracted.
-		if(applyTrafficRestrain ) removeRoutes(scenario, inputDir+"/network.xml.gz"); 
-
 		controler.getConfig().controler().setDumpDataAtEnd(true);
-		controler.getConfig().strategy().setMaxAgentPlanMemorySize(10);
+//		controler.getConfig().strategy().setMaxAgentPlanMemorySize(10);
 
 		final BikeTimeDistanceTravelDisutilityFactory builder_bike =  new BikeTimeDistanceTravelDisutilityFactory("bike", config.planCalcScore());
 		final RandomizingTimeDistanceTravelDisutilityFactory builder_truck =  new RandomizingTimeDistanceTravelDisutilityFactory("truck", config.planCalcScore());
@@ -205,6 +161,18 @@ public class PatnaPolicyControler {
 
 		// add income dependent scoring function factory
 		addScoringFunction(controler);
+
+
+		// now add bike connection identifier
+		int numberOfConnectors = 15; // all one way links
+		int averageBikeVolumeAfterIts = 10;
+		BikeConnectorLinkControlerListner connector = new BikeConnectorLinkControlerListner(numberOfConnectors, averageBikeVolumeAfterIts);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addControlerListenerBinding().toInstance(connector);
+			}
+		});
 
 		controler.run();
 
@@ -269,36 +237,5 @@ public class PatnaPolicyControler {
 				return sumScoringFunction;
 			}
 		});
-	}
-
-	private static void removeRoutes(final Scenario scenario, final String baseCaseNetwork){
-		// this is required because routes are generated from initial base case network; and new network does not have certain links.
-		Scenario scNetwork = LoadMyScenarios.loadScenarioFromNetwork(baseCaseNetwork); 
-
-		//since some links are now removed, route in the plans will throw exception, remove them.
-		for (Person p : scenario.getPopulation().getPersons().values()){
-			for(Plan plan : p.getPlans()){
-				List<PlanElement> pes = plan.getPlanElements();
-				for (PlanElement pe :pes ){
-					if (pe instanceof Activity) { 
-						Activity act = ((Activity)pe);
-						Id<Link> linkId = act.getLinkId();
-						Coord cord = act.getCoord();
-
-						if (cord == null && linkId == null) throw new RuntimeException("Activity "+act.toString()+" do not have either of link id or coord. Aborting...");
-						else if (linkId == null ) { /*nothing to do; cord is assigned*/ }
-						else if (cord==null && ! scNetwork.getNetwork().getLinks().containsKey(linkId)) throw new RuntimeException("Activity "+act.toString()+" do not have cord and link id is not present in network. Aborting...");
-						else {
-							cord = scNetwork.getNetwork().getLinks().get(linkId).getCoord();
-							act.setLinkId(null);
-							act.setCoord(cord);
-						}
-					} else if ( pe instanceof Leg){
-						Leg leg = (Leg) pe;
-						leg.setRoute(null);
-					}
-				}
-			}
-		}
 	}
 }

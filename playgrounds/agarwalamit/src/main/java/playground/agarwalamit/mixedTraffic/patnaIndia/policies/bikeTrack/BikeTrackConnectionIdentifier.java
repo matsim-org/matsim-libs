@@ -19,7 +19,6 @@
 
 package playground.agarwalamit.mixedTraffic.patnaIndia.policies.bikeTrack;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -27,10 +26,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
-import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,28 +38,31 @@ import java.util.Map;
  */
 
 
-public class PatnaBikeConnectionIdentifier {
+public class BikeTrackConnectionIdentifier {
 
     private final String bikeNetwork ;
     private final Network net ;
     private final Map<Id<Link>,Link> connectedLinks = new HashMap<>();
+    private final List<Node> bikeTrackNodes = new ArrayList<>() ;
 
-    PatnaBikeConnectionIdentifier(final String initialNetwork, final String bikeTrack){
+    BikeTrackConnectionIdentifier(final String initialNetwork, final String bikeTrack){
         net = LoadMyScenarios.loadScenarioFromNetwork(initialNetwork).getNetwork();
         this.bikeNetwork = bikeTrack;
     }
 
     void run(){
         Network bikeTrack = LoadMyScenarios.loadScenarioFromNetwork(bikeNetwork).getNetwork();
+        bikeTrackNodes.addAll(bikeTrack.getNodes().values());
+
         for (Node bikeNode: bikeTrack.getNodes().values()){
             Coord cord = bikeNode.getCoord();
 
             Node n = NetworkUtils.getNearestNode(net, cord);
-            createAndAddLink(net,new Node [] { bikeNode, n } );
+            createAndAddLinkToList(net,new Node [] { bikeNode, n } );
         }
     }
 
-    private void createAndAddLink(final Network network, final Node [] nodes) {
+    private void createAndAddLinkToList(final Network network, final Node [] nodes) {
         double dist = CoordUtils.calcEuclideanDistance(nodes[0].getCoord(), nodes[1].getCoord());
         {
             String id = "connecter_link_"+ connectedLinks.size();
@@ -85,5 +88,9 @@ public class PatnaBikeConnectionIdentifier {
 
     public Map<Id<Link>,Link> getConnectedLinks() {
         return connectedLinks;
+    }
+
+    public List<Node> getBikeTrackNodes(){
+        return bikeTrackNodes;
     }
 }

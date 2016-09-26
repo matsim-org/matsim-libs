@@ -94,6 +94,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		config.planCalcScore().addModeParams(mpCar);
 		config.planCalcScore().addModeParams(mpBike);
+		// TODO remove the pt params if possible.
 		//==
 
 		//==

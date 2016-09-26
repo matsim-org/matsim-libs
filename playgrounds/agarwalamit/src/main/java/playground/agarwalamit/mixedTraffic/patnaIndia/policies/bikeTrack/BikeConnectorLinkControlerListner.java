@@ -20,10 +20,12 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.policies.bikeTrack;
 
 import com.google.inject.Inject;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -31,6 +33,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.network.NetworkUtils;
 import playground.agarwalamit.analysis.linkVolume.FilteredLinkVolumeHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
@@ -45,9 +48,10 @@ import java.util.*;
 
 public class BikeConnectorLinkControlerListner implements StartupListener, IterationStartsListener, IterationEndsListener {
 
+    private static final Logger LOG = Logger.getLogger(BikeConnectorLinkControlerListner.class);
     private final List<String> modes = Arrays.asList("bike");
     private final Set<String> allowedModes = new HashSet<>(modes);
-    private final double blendFactor = 0.05;
+    private final double blendFactor = 0.95;
 
     private final String initialNetwork = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/network.xml.gz";
     private final String bikeTrack = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/bikeTrack.xml.gz";
@@ -62,7 +66,10 @@ public class BikeConnectorLinkControlerListner implements StartupListener, Itera
 
     BikeConnectorLinkControlerListner (final int numberOfConnectorLinks, final int updateConnectorsAfterIteration ) {
         this.numberOfConnectors = numberOfConnectorLinks;
+        LOG.info(numberOfConnectorLinks + " connector links will be added to the network based on the maximum bike volume.");
         this.updateConnectorsAfterIteration = updateConnectorsAfterIteration;
+        LOG.info("The bike volume on the possible connector link is updated after every "+ updateConnectorsAfterIteration+" iterations.");
+        LOG.info("The blend factor for old counts is "+ blendFactor);
     }
 
     @Inject Scenario scenario;
@@ -80,9 +87,10 @@ public class BikeConnectorLinkControlerListner implements StartupListener, Itera
             for(Id<Link> linkId : linkIds.keySet()) {
                 double oldCount = linkId2Count.get(linkId);
                 double count = MapUtils.doubleValueSum( link2time2vol.get(linkId) );
-                linkId2Count.put(linkId,  oldCount * (1-blendFactor) +  blendFactor * count);
+                linkId2Count.put(linkId,  count * (1-blendFactor) +  blendFactor * oldCount);
             }
         }
+        event.getServices().getEvents().removeHandler(handler);
     }
 
     @Override
@@ -94,6 +102,7 @@ public class BikeConnectorLinkControlerListner implements StartupListener, Itera
                 l.setAllowedModes(allowedModes);
                 scenario.getNetwork().addLink(l);
             }
+            LOG.info("All possible connector links between bike track and network are added.");
         } else if (event.getIteration() % updateConnectorsAfterIteration == 0) {
             // remove if connector links exists
             for  (Id<Link> lId : linkIds.keySet()) {
@@ -110,6 +119,7 @@ public class BikeConnectorLinkControlerListner implements StartupListener, Itera
                 Link l = linkIds.get(iterator.next().getKey());
                 l.setAllowedModes(allowedModes);
                 scenario.getNetwork().addLink(l);
+                LOG.info("Connector "+ l.getId()+" is added to the network,");
             }
 
             // remove links in the routes from the plans of all persons
@@ -123,10 +133,18 @@ public class BikeConnectorLinkControlerListner implements StartupListener, Itera
     @Override
     public void notifyStartup(StartupEvent event) {
         // get connector links
-        PatnaBikeConnectionIdentifier bikeTrackConnector = new PatnaBikeConnectionIdentifier(this.initialNetwork, this.bikeTrack);
+        BikeTrackConnectionIdentifier bikeTrackConnector = new BikeTrackConnectionIdentifier(this.initialNetwork, this.bikeTrack);
         bikeTrackConnector.run();
         linkIds.clear();
         linkIds.putAll(bikeTrackConnector.getConnectedLinks());
+
+        // add nodes first, cant add net.addNode(bikeNode) directly due to information attached to the node.
+        List<Node> bikeTrackNodes = bikeTrackConnector.getBikeTrackNodes();
+
+        for(Node n : bikeTrackNodes) { // i think keeping some unused nodes is better than first finding which nodes to add and then add then again.
+            if(scenario.getNetwork().getNodes().containsKey(n.getId())) continue;
+            NetworkUtils.createAndAddNode(scenario.getNetwork(),n.getId(),n.getCoord());
+        }
     }
 
     private void removeRoutes(final Scenario scenario){
