@@ -51,6 +51,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.benjamin.internalization.EquilTestSetUp;
@@ -141,6 +142,7 @@ public class TestExposurePricing {
 		logger.info("Number of time bins are "+ this.noOfTimeBins);
 
 		Scenario sc = minimalControlerSetting();
+		ScenarioUtils.loadScenario(sc); // need to load vehicles. Amit Sep 2016
 
 		sc.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(true); 
 
@@ -202,6 +204,7 @@ public class TestExposurePricing {
 		logger.info("Number of time bins are "+ this.noOfTimeBins);
 
 		Scenario sc = minimalControlerSetting();
+		ScenarioUtils.loadScenario(sc); // need to load vehicles. Amit Sep 2016
 		
 		sc.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(false);
 		// yy otherwise, the scenario consumes walk time from activity to link, somewhat modifying the results. kai, jun'16

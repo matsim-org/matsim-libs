@@ -50,6 +50,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.benjamin.internalization.EmissionCostFactors;
@@ -96,6 +97,7 @@ public class EquilEmissionTest {
 		equilTestSetUp.createPassiveAgents(sc);
 
 		emissionSettings(sc);
+		ScenarioUtils.loadScenario(sc); // need to load vehicles. Amit Sep 2016
 
 		Controler controler = new Controler(sc);
 		String outputDirectory = helper.getOutputDirectory() + "/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/");
