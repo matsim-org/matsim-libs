@@ -24,6 +24,7 @@ package org.matsim.contrib.emissions;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
@@ -35,6 +36,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
@@ -45,9 +47,13 @@ import org.matsim.vehicles.Vehicles;
  */
 public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler {
 
+    private final Logger logger = Logger.getLogger(ColdEmissionHandler.class);
+
     private final Vehicles emissionVehicles;
     private final Network network;
     private final ColdEmissionAnalysisModule coldEmissionAnalysisModule;
+
+    private int nonCarWarn = 0;
 
     private final Map<Id<Vehicle>, Double> vehicleId2stopEngineTime = new HashMap<>();
     private final Map<Id<Vehicle>, Double> vehicleId2accumulatedDistance = new HashMap<>();
@@ -109,9 +115,9 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
 
     @Override
     public void handleEvent(VehicleLeavesTrafficEvent event) {
-        if (!event.getNetworkMode().equals("car")) { // no emissions to calculate...
-            return;
-        }
+//        if (!event.getNetworkMode().equals("car")) { // no emissions to calculate...
+//            return;
+//        }
         Id<Vehicle> vehicleId = event.getVehicleId();
         Double stopEngineTime = event.getTime();
         this.vehicleId2stopEngineTime.put(vehicleId, stopEngineTime);
@@ -121,7 +127,11 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
     @Override
     public void handleEvent(VehicleEntersTrafficEvent event) {
         if (!event.getNetworkMode().equals("car")) { // no engine to start...
-            throw new RuntimeException("non-car modes are not supported yet.");
+            if( nonCarWarn <=1) {
+                logger.warn("non-car modes are supported, however, it is not properly tested yet.");
+                logger.warn(Gbl.ONLYONCE);
+                nonCarWarn++;
+            }
         }
         Id<Link> linkId = event.getLinkId();
         Id<Vehicle> vehicleId = event.getVehicleId();

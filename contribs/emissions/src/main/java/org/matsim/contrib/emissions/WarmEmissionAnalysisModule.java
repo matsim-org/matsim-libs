@@ -146,7 +146,7 @@ public class WarmEmissionAnalysisModule {
 			double linkLength,
 			double travelTime) {
 
-		Map<WarmPollutant, Double> warmEmissions;
+		Map<WarmPollutant, Double> warmEmissions = new HashMap<>();
 		if(vehicle == null ||
 				(vehicle.getType() == null && vehicle.getType().getDescription() == null) // if both are null together; no vehicle information.
 				) { //TODO change the message for the exception. Amit sep 16
@@ -167,8 +167,14 @@ public class WarmEmissionAnalysisModule {
 					"Please make sure that requirements for emission vehicles in " + 
 					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
-		warmEmissions = calculateWarmEmissions(vehicle.getId(), travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple);
-		
+		if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.ZERO_EMISSION_VEHICLE)) {
+			for (WarmPollutant warmPollutant : WarmPollutant.values()) {
+				warmEmissions.put( warmPollutant, 0.0 );
+			}
+		} else {
+			warmEmissions = calculateWarmEmissions(vehicle.getId(), travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple);
+		}
+
 		// a basic apporach to introduce emission reduced cars:
 		if(emissionEfficiencyFactor != null){
 			warmEmissions = rescaleWarmEmissions(warmEmissions);

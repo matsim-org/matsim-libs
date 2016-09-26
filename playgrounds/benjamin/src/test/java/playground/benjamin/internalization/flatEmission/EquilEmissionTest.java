@@ -91,7 +91,7 @@ public class EquilEmissionTest {
 		
 		EquilTestSetUp equilTestSetUp = new EquilTestSetUp();
 
-		Scenario sc = equilTestSetUp.createConfig();
+		Scenario sc = equilTestSetUp.createConfigAndReturnScenario();
 		equilTestSetUp.createNetwork(sc);
 		equilTestSetUp.createActiveAgents(sc);
 		equilTestSetUp.createPassiveAgents(sc);

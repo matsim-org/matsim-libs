@@ -117,7 +117,7 @@ public class ColdEmissionAnalysisModule {
 			int distance_km,
 			String vehicleDescription) {
 
-		Map<ColdPollutant, Double> coldEmissions;
+		Map<ColdPollutant, Double> coldEmissions = new HashMap<>();
 		if(vehicleDescription == null){
 			throw new RuntimeException("Vehicle type description for vehicle " + vehicleId + "is missing. " +
 					"Please make sure that requirements for emission vehicles in "
@@ -129,7 +129,13 @@ public class ColdEmissionAnalysisModule {
 					"Please make sure that requirements for emission vehicles in " + 
 					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
-        coldEmissions = getColdPollutantDoubleMap(vehicleId, parkingDuration, vehicleInformationTuple, distance_km);
+        if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.ZERO_EMISSION_VEHICLE)) {
+			for (ColdPollutant cp : ColdPollutant.values()){
+				coldEmissions.put( cp, 0.0 );
+			}
+		} else {
+			coldEmissions = getColdPollutantDoubleMap(vehicleId, parkingDuration, vehicleInformationTuple, distance_km);
+		}
 
 		// a basic apporach to introduce emission reduced cars:
 		if(emissionEfficiencyFactor != null){

@@ -20,34 +20,41 @@
 package playground.agarwalamit.emisisons;
 
 import org.apache.log4j.Logger;
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.contrib.emissions.events.ColdEmissionEvent;
-import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
-import org.matsim.contrib.emissions.events.WarmEmissionEvent;
-import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
+import org.matsim.contrib.emissions.events.*;
+import org.matsim.contrib.emissions.types.ColdPollutant;
+import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
+import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.Vehicles;
 import playground.agarwalamit.emissions.EmissionModalTravelDisutilityCalculatorFactory;
+import playground.benjamin.internalization.EmissionCostFactors;
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.text.DecimalFormat;
+import java.util.*;
 
 /**
  * Just setting up the equil scenario to get emissions for a mixed traffic conditions.
@@ -62,7 +69,7 @@ public class EquilMixedTrafficEmissionTest {
 	public final MatsimTestUtils helper = new MatsimTestUtils();
 	private static final Logger logger = Logger.getLogger(EquilMixedTrafficEmissionTest.class);
 
-	private static final String EQUIL_DIR = "../../matsim/examples/equil-mixedTraffic/";
+	private DecimalFormat df = new DecimalFormat("#.###");
 
 	private boolean isConsideringCO2Costs ;
 
@@ -73,32 +80,73 @@ public class EquilMixedTrafficEmissionTest {
 
 	@Parameterized.Parameters(name = "{index}: considerCO2 == {0}")
 	public static List<Object> considerCO2 () {
-		Object[] considerCO2 = new Object [] { true, false };
+		Object[] considerCO2 = new Object [] { true ,false };
 		return Arrays.asList(considerCO2);
 	}
 
-	@Test @Ignore
+	@Test
 	public void emissionTollTest() {
 		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
+		List<String> mainModes = Arrays.asList("car","bicycle");
 
-		Config config = ConfigUtils.loadConfig(EQUIL_DIR + "/config.xml");
-		config.controler().setOutputDirectory(helper.getOutputDirectory());
+		EquilTestSetUp equilTestSetUp = new EquilTestSetUp();
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Scenario sc = equilTestSetUp.createConfigAndReturnScenario();
+		equilTestSetUp.createNetwork(sc);
 
-		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		// allow all modes on the links
+		for (Link l : sc.getNetwork().getLinks().values()){
+			l.setAllowedModes(new HashSet<>(mainModes));
+		}
 
-		emissionSettings(scenario);
+		String carPersonId = "567417.1#12424";
+		String bikePersonId = "567417.1#12425"; // no emissions
 
-		Controler controler = new Controler(scenario);
+		Vehicles vehs = sc.getVehicles();
 
-		EmissionModule emissionModule = new EmissionModule(scenario);
+		VehicleType car = vehs.getFactory().createVehicleType(Id.create(TransportMode.car,VehicleType.class));
+		car.setMaximumVelocity(60./3.6);
+		car.setPcuEquivalents(1.0);
+		car.setDescription(HbefaVehicleCategory.PASSENGER_CAR.toString().concat(";petrol (4S);&gt;=2L;PC-P-Euro-0"));
+		vehs.addVehicleType(car);
+
+		Vehicle carVeh = vehs.getFactory().createVehicle(Id.createVehicleId(carPersonId),car);
+		vehs.addVehicle(carVeh);
+
+		VehicleType bike = vehs.getFactory().createVehicleType(Id.create("bicycle",VehicleType.class));
+		bike.setMaximumVelocity(20./3.6);
+		bike.setPcuEquivalents(0.25);
+		bike.setDescription(HbefaVehicleCategory.ZERO_EMISSION_VEHICLE.toString().concat(";;;;"));
+		vehs.addVehicleType(bike);
+
+		Vehicle bikeVeh = vehs.getFactory().createVehicle(Id.createVehicleId(bikePersonId),bike);
+		vehs.addVehicle(bikeVeh);
+
+		sc.getConfig().qsim().setMainModes(mainModes);
+		sc.getConfig().qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ.name());
+		sc.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+		sc.getConfig().qsim().setUsePersonIdForMissingVehicleId(true);
+
+		sc.getConfig().plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.pt).setTeleportedModeFreespeedFactor(1.5);
+		sc.getConfig().plansCalcRoute().setNetworkModes(mainModes);
+		sc.getConfig().planCalcScore().getOrCreateModeParams("bicycle").setConstant(0.0);
+
+		equilTestSetUp.createActiveAgents(sc, carPersonId, TransportMode.car);
+		equilTestSetUp.createActiveAgents(sc, bikePersonId, "bicycle");
+
+		emissionSettings(sc);
+
+		Controler controler = new Controler(sc);
+		String outputDirectory = helper.getOutputDirectory() + "/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/");
+		sc.getConfig().controler().setOutputDirectory(outputDirectory);
+
+		EmissionModule emissionModule = new EmissionModule(sc);
 		emissionModule.setEmissionEfficiencyFactor( 1.0 );
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
 
 		EmissionCostModule emissionCostModule = new EmissionCostModule( 1.0, isConsideringCO2Costs );
-		final EmissionModalTravelDisutilityCalculatorFactory emissionTducf = new EmissionModalTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, scenario.getConfig().planCalcScore());
+		final EmissionModalTravelDisutilityCalculatorFactory emissionTducf = new EmissionModalTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, sc.getConfig().planCalcScore());
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -121,6 +169,91 @@ public class EquilMixedTrafficEmissionTest {
 		});
 
 		controler.run();
+
+		//TODO dont know how to catch emission event during simulation.
+		EventsManager events = EventsUtils.createEventsManager();
+		EmissionEventsReader reader = new EmissionEventsReader(events);
+		MyEmissionEventHandler emissEventHandler = new MyEmissionEventHandler();
+		events.addHandler(emissEventHandler);
+		int lastIt = sc.getConfig().controler().getLastIteration();
+		reader.readFile(outputDirectory + "/ITERS/it."+lastIt+"/"+lastIt+".emission.events.xml.gz");
+
+		// first check for cold emission, which are generated only on departure link.
+		for (ColdEmissionEvent e : emissEventHandler.coldEvents ) {
+			if( ! ( e.getLinkId().equals(Id.createLinkId(12)) || e.getLinkId().equals(Id.createLinkId(45)) ) ) {
+				throw new RuntimeException("Cold emission event can occur only on departure link.");
+			} else if (e.getVehicleId().toString().equals(bikePersonId)) {
+				for(double d : e.getColdEmissions().values()){
+					if (d!=0.) throw new RuntimeException("There should not be any cold emissions from bicycle mode.");
+				}
+			} else if (e.getVehicleId().toString().equals(carPersonId)) {
+				for(double d : e.getColdEmissions().values()){
+					if (d==0.) throw new RuntimeException("The cold emissions from car mode should be non-zero.");
+				}
+			}
+		}
+
+		for(WarmEmissionEvent e : emissEventHandler.warmEvents) {
+			if (e.getVehicleId().toString().equals(bikePersonId)) {
+				for(double d : e.getWarmEmissions().values()){
+					if (d!=0.) throw new RuntimeException("There should not be any cold emissions from bicycle mode.");
+				}
+			} else if (e.getVehicleId().toString().equals(carPersonId)) {
+				for(double d : e.getWarmEmissions().values()){
+					if (d==0.) throw new RuntimeException("The warm emissions from car mode should be non-zero.");
+				}
+			}
+		}
+
+//		// first coldEmission event is on departure link, thus compare money event and coldEmissionEvent
+//		double firstMoneyEventToll = personMoneyHandler.events.get(1).getAmount();
+//
+//		Map<ColdPollutant, Double> coldEmiss = emissEventHandler.coldEvents.get(1).getColdEmissions();
+//		double totalColdEmissAmount = 0.;
+//		/*
+//		 * departure time is 21600, so at this time. distance = 1.0km, parking duration = 12h, vehType="PASSENGER_CAR;petrol (4S);&gt;=2L;PC-P-Euro-0"
+//		 * Thus, coldEmission levels => FC 22.12, HC 5.41, CO 99.97, NO2 -0.00122764240950346, NOx -0-03, PM 0, NMHC 5.12
+//		 * Thus coldEmissionCost = 0 * 384500. / (1000. * 1000.) + 45.12 * 1700. / (1000. * 1000.) + -0.03 * 9600. / (1000. * 1000.) = 0.008416
+//		 */
+//
+//		for (ColdPollutant cp :coldEmiss.keySet() ){
+//			totalColdEmissAmount += EmissionCostFactors.getCostFactor(cp.toString()) * coldEmiss.get(cp);
+//		}
+//
+//		Assert.assertEquals("Cold emission toll from emission event and emission cost factors does not match from manual calculation.",totalColdEmissAmount, 0.008416, MatsimTestUtils.EPSILON);
+//		Assert.assertEquals("Cold emission toll from emission event and emission cost factors does not match from money event.",firstMoneyEventToll, - totalColdEmissAmount, MatsimTestUtils.EPSILON);
+//
+//		/*
+//		 * There are two routes --> 12-23-38-84-45 and 12-23-39-94-45. 12 is departure link --> no warmEmissionevent.
+//		 * Thus, in both routes, 2nd warmEmission event is on the link  (38 or 39) with length 5000m. On this link, only free flow warm emission is thrown.
+//		 * warmEmission --> linkLength = 5km, FC 77.12, HC 0.08, CO 1.0700000000000001, NO2 0.01, NOX 0.36, CO2(total) 241.78, PM 0.00503000011667609, NMHC 0.07, SO2 0.00123396399430931
+//		 * Thus if co2Costs is not considered --> warmEmissCost = 0.36 * 5 * 9600. / (1000. * 1000.) +  0.07 * 5 * 1700. / (1000. * 1000.) + 0.00123396399430931* 5 * 11000. / (1000. * 1000.)
+//		 *  +   0.00503000011667609 * 5 * 384500. / (1000. * 1000.) = 0.027613043
+//		 *  if co2costs are considerd, then warmEmissCost = 0.01787566 +  241.78 * 5 * 70. / (1000. * 1000.) = 0.112236043
+//		 */
+//		Map<WarmPollutant, Double> warmEmiss = emissEventHandler.warmEvents.get(2).getWarmEmissions();
+//		double warmEmissTime = emissEventHandler.warmEvents.get(2).getTime();
+//		double totalWarmEmissAmount = 0.;
+//		for ( WarmPollutant wp : warmEmiss.keySet() ) {
+//			if( wp.toString().equalsIgnoreCase(WarmPollutant.CO2_TOTAL.toString()) && !isConsideringCO2Costs ) {
+//				//nothing to do
+//			} else {
+//				totalWarmEmissAmount += EmissionCostFactors.getCostFactor(wp.toString()) * warmEmiss.get(wp);
+//			}
+//		}
+//		double tollFromMoneyEvent = 0.;
+//		for (PersonMoneyEvent e : personMoneyHandler.events) {
+//			// Money event at the time of 2nd warm emission event.
+//			if ( e.getTime() == warmEmissTime ) tollFromMoneyEvent = e.getAmount();
+//		}
+//
+//		if ( isConsideringCO2Costs ) {
+//			Assert.assertEquals( "Warm emission toll from emission event and emission cost factors does not match from manual calculation.", df.format( 0.112236043 ), df.format( totalWarmEmissAmount ) );
+//			Assert.assertEquals("Warm emission toll from emission event and emission cost factors does not match from money event.",tollFromMoneyEvent, - totalWarmEmissAmount, MatsimTestUtils.EPSILON);
+//		} else {
+//			Assert.assertEquals("Warm emission toll from emission event and emission cost factors does not match from manual calculation.", df.format( 0.027613043 ), df.format( totalWarmEmissAmount ) );
+//			Assert.assertEquals("Warm emission toll from emission event and emission cost factors does not match from money event.",tollFromMoneyEvent, - totalWarmEmissAmount, MatsimTestUtils.EPSILON);
+//		}
 	}
 	private void emissionSettings(Scenario scenario){
 		String inputFilesDir = "../benjamin/test/input/playground/benjamin/internalization/";
@@ -135,11 +268,11 @@ public class EquilMixedTrafficEmissionTest {
 		String detailedWarmEmissionFactorsFile = inputFilesDir + "/EFA_HOT_SubSegm_2005detailed.txt";
 		String detailedColdEmissionFactorsFile = inputFilesDir + "/EFA_ColdStart_SubSegm_2005detailed.txt";
 
-
 		Config config = scenario.getConfig();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
 		ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
-		config.vehicles().setVehiclesFile(emissionVehicleFile);
+
+		scenario.getConfig().vehicles().setVehiclesFile(emissionVehicleFile);
 
 		ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 		ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);

@@ -60,6 +60,8 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 	private int linkLeaveFirstActWarnCnt = 0;
 	private int linkLeaveSomeActWarnCnt = 0;
 
+	private int nonCarWarn = 0;
+
 	private final Map<Id<Vehicle>, Tuple<Id<Link>, Double>> linkenter = new HashMap<>();
 	private final Map<Id<Vehicle>, Tuple<Id<Link>, Double>> vehicleLeavesTraffic = new HashMap<>();
 	private final Map<Id<Vehicle>, Tuple<Id<Link>, Double>> vehicleEntersTraffic = new HashMap<>();
@@ -90,7 +92,11 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		if(!event.getNetworkMode().equals("car")){ // link travel time calculation not neccessary for other modes
-			throw new RuntimeException("non-car modes are not supported yet.");
+			if( nonCarWarn <=1) {
+				logger.warn("non-car modes are supported, however, it is not properly tested yet.");
+				logger.warn(Gbl.ONLYONCE);
+				nonCarWarn++;
+			}
 		}
 		Tuple<Id<Link>, Double> linkId2Time = new Tuple<Id<Link>, Double>(event.getLinkId(), event.getTime());
 		this.vehicleLeavesTraffic.put(event.getVehicleId(), linkId2Time);
@@ -103,9 +109,9 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
-		if(!event.getNetworkMode().equals("car")){ // link travel time calculation not neccessary for other modes
-			return;
-		}
+//		if(!event.getNetworkMode().equals("car")){ // link travel time calculation not neccessary for other modes
+//			return;
+//		}
 		Tuple<Id<Link>, Double> linkId2Time = new Tuple<Id<Link>, Double>(event.getLinkId(), event.getTime());
 		this.vehicleEntersTraffic.put(event.getVehicleId(), linkId2Time);
 	}
