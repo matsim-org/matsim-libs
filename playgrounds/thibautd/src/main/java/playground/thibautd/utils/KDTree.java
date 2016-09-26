@@ -47,6 +47,8 @@ public class KDTree<T> {
 	private final Node<T> root = new Node<>( 0 );
 	private final Coordinate<T> coordinate;
 
+	private int size = 0;
+
 	public interface Coordinate<T> {
 		double[] getCoord( T object );
 	}
@@ -68,9 +70,7 @@ public class KDTree<T> {
 	 * @param value
 	 */
 	public void add( final T value ) {
-		final double[] coord = coordinate.getCoord( value );
-		if ( coord.length != nDimensions ) throw new IllegalArgumentException( "wrong dimensionality" );
-		root.add( value , coord );
+		add( root , Collections.singleton( value ) );
 	}
 
 	public Collection<T> getAll() {
@@ -95,7 +95,41 @@ public class KDTree<T> {
 		return all;
 	}
 
+	/**
+	 * Here mainly to be able to get a random element.
+	 * @param i
+	 * @return
+	 */
+	public T get( int i ) {
+		final Queue<Node<T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
+		stack.add( root );
+
+		int count = 0;
+		while ( !stack.isEmpty() ) {
+			final Node<T> current = stack.poll();
+
+			if ( current.value == null ) continue;
+			if ( count++ == i ) return current.value;
+
+			if ( !isLeaf( current ) ) {
+				stack.add( current.left );
+				stack.add( current.right );
+			}
+		}
+
+		throw new IllegalArgumentException( "Index too high" );
+	}
+
+	public boolean isEmpty() {
+		return isLeaf( root ) && root.value == null;
+	}
+
+	public int size() {
+		return size;
+	}
+
 	public boolean remove( final T value ) {
+		size--;
 		Node<T> current = find( value );
 
 		if ( current == null ) return false;
@@ -186,6 +220,7 @@ public class KDTree<T> {
 	}
 
 	private void add( Node<T> addRoot , Collection<T> points ) {
+		size += points.size();
 		final Queue<AddFrame<T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
 
 		// copy parameter list as it is modified in place
@@ -396,26 +431,6 @@ public class KDTree<T> {
 		private Node(
 				final int dimension ) {
 			this.dimension = dimension;
-		}
-
-		// TODO make it a loop at the outer level
-		public void add( final T newValue , final double[] newCoordinate ) {
-			if ( value != null && newCoordinate.length != coordinate.length ) {
-				throw new IllegalArgumentException( "incompatible dimensionalities" );
-			}
-
-			if ( value == null ) {
-				this.value = newValue;
-				this.coordinate = newCoordinate;
-
-				this.left = new Node<>( (dimension + 1) % coordinate.length );
-				this.right = new Node<>( (dimension + 1) % coordinate.length );
-				return;
-			}
-
-			final boolean isLeft = newCoordinate[ dimension ] < coordinate[ dimension ];
-			if ( isLeft ) left.add( newValue , newCoordinate );
-			else right.add( newValue , newCoordinate );
 		}
 	}
 }
