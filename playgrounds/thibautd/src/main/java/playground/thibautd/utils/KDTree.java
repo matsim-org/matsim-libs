@@ -19,7 +19,6 @@
 package playground.thibautd.utils;
 
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.collections.Tuple;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -30,6 +29,8 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 import java.util.function.ToDoubleBiFunction;
+
+import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.s;
 
 /**
  * Basic implementation of a KD-Tree, to answer spatial queries in spaces of arbitrary dimensions.
@@ -44,19 +45,134 @@ public class KDTree<T> {
 
 	private final int nDimensions;
 	private final Node<T> root = new Node<>( 0 );
+	private final Coordinate<T> coordinate;
 
-	public KDTree( final int nDimensions ) {
+	public interface Coordinate<T> {
+		double[] getCoord( T object );
+	}
+
+	/**
+	 * Creates an empty kd-tree
+	 * @param nDimensions the number of dimensions of the space
+	 * @param coord designed to be a lambda, with a function that calls a getter on the T object itself to get the coordinate.
+	 *              The implementation should be relatively efficient. Inefficient implementations will impact the performance
+	 *              of adding elements, but should have no influence on the query performance.
+	 */
+	public KDTree( final int nDimensions , final Coordinate<T> coord ) {
 		this.nDimensions = nDimensions;
+		this.coordinate = coord;
 	}
 
 	/**
 	 * simple add: might break balance! Recommended to build the full tree at construction. No rebalancing.
-	 * @param coord
 	 * @param value
 	 */
-	public void add( final double[] coord , final T value ) {
+	public void add( final T value ) {
+		final double[] coord = coordinate.getCoord( value );
 		if ( coord.length != nDimensions ) throw new IllegalArgumentException( "wrong dimensionality" );
 		root.add( value , coord );
+	}
+
+	public Collection<T> getAll() {
+		final Collection<T> all = new ArrayList<>();
+
+		final Queue<Node<T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
+		stack.add( root );
+
+		while ( !stack.isEmpty() ) {
+			final Node<T> current = stack.poll();
+
+			if ( current.value == null ) continue;
+
+			all.add( current.value );
+
+			if ( !isLeaf( current ) ) {
+				stack.add( current.left );
+				stack.add( current.right );
+			}
+		}
+
+		return all;
+	}
+
+	public boolean remove( final T value ) {
+		Node<T> current = find( value );
+
+		if ( current == null ) return false;
+
+		while ( !isLeaf( current ) ) {
+			if ( current.right.value != null ) {
+				final Node<T> replacement = findMin( current.right , current.dimension );
+				current.value = replacement.value;
+				current.coordinate = replacement.coordinate;
+				current = replacement;
+			}
+			else {
+				// there is nothing on the right: find the best value in the left to make the left a right tree,
+				// and proceed as above
+				final Node<T> replacement = findMin( current.left , current.dimension );
+				current.value = replacement.value;
+				current.coordinate = replacement.coordinate;
+				current.right = current.left;
+				current.left = new Node<>( (current.dimension + 1) % 2 );
+				current = replacement;
+			}
+		}
+
+		current.value = null;
+		current.left = null;
+		current.right = null;
+
+		return true;
+	}
+
+	private Node<T> findMin( final Node<T> start, final int dimension ) {
+		final Queue<Node<T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
+
+		Node<T> min = start;
+		stack.add( start );
+
+		while ( !stack.isEmpty() )  {
+			final Node<T> current = stack.poll();
+
+			if ( current.coordinate == null ) continue;
+
+			if ( current.coordinate[ dimension ] < min.coordinate[ dimension ] ) {
+				min = current;
+			}
+
+			if ( isLeaf( current ) ) continue;
+			stack.add( current.left );
+			if ( current.dimension != dimension ) {
+				// cannot prune
+				stack.add( current.right );
+			}
+		}
+
+		return min;
+	}
+
+
+	private boolean isLeaf( final Node<T> currentRoot ) {
+		return currentRoot.left.value == null && currentRoot.right.value == null;
+	}
+
+	private Node<T> find( final T value ) {
+		Node<T> current = root;
+
+		final double[] searchedCoord = coordinate.getCoord( value );
+		while ( true ) {
+			if ( current.value == null ) return null;
+
+			if ( current.value.equals( value ) ) return current;
+
+			if ( isLeft( current.dimension , searchedCoord , current.coordinate ) ) {
+				current = current.left;
+			}
+			else {
+				current = current.right;
+			}
+		}
 	}
 
 	/**
@@ -65,20 +181,23 @@ public class KDTree<T> {
 	 *
 	 * @param points
 	 */
-	public void add( Collection<Tuple<T,double[]>> points ) {
+	public void add( Collection<T> points ) {
+		add( root , points );
+	}
 
+	private void add( Node<T> addRoot , Collection<T> points ) {
 		final Queue<AddFrame<T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
 
 		// copy parameter list as it is modified in place
-		stack.add( new AddFrame<>( root, new ArrayList<>( points ) ) );
+		stack.add( new AddFrame<>( addRoot , new ArrayList<>( points ) ) );
 
 		while ( !stack.isEmpty() ) {
 			final AddFrame<T> currentFrame = stack.poll();
 
 			if ( currentFrame.toAdd.isEmpty() ) continue;
 
-			final Tuple<T,double[]> median = median( currentFrame.node.dimension , currentFrame.toAdd );
-			final double medianValue = median.getSecond()[ currentFrame.node.dimension ];
+			final T median = median( currentFrame.node.dimension , currentFrame.toAdd );
+			final double medianValue = coordinate.getCoord( median )[ currentFrame.node.dimension ];
 
 			final int newDimension = (currentFrame.node.dimension + 1) % nDimensions;
 			final AddFrame<T> leftFrame =
@@ -93,14 +212,14 @@ public class KDTree<T> {
 			currentFrame.node.left = leftFrame.node;
 			currentFrame.node.right = rightFrame.node;
 
-			for ( Tuple<T,double[]> v : currentFrame.toAdd ) {
+			for ( T v : currentFrame.toAdd ) {
 				if ( v == median && currentFrame.node.value == null ) {
-					currentFrame.node.value = v.getFirst();
-					currentFrame.node.coordinate = v.getSecond();
+					currentFrame.node.value = v;
+					currentFrame.node.coordinate = coordinate.getCoord( v );
 
 					if ( currentFrame.node.coordinate.length != nDimensions ) throw new IllegalArgumentException( "wrong dimensionality" );
 				}
-				else if ( v.getSecond()[ currentFrame.node.dimension ] < medianValue ) {
+				else if ( coordinate.getCoord( v )[ currentFrame.node.dimension ] < medianValue ) {
 					leftFrame.toAdd.add( v );
 				}
 				else {
@@ -126,10 +245,10 @@ public class KDTree<T> {
 		return sublist;
 	}
 
-	private Tuple<T, double[]> median( final int dim , final List<Tuple<T,double[]>> l ) {
+	private T median( final int dim , final List<T> l ) {
 		// very simple approximation: take median of a sublist, using standard sort algorithm
-		final List<Tuple<T, double[]>> sublist = sublist( l );
-		Collections.sort( sublist , (t1,t2) -> Double.compare( t1.getSecond()[ dim ] , t2.getSecond()[ dim ] ) );
+		final List<T> sublist = sublist( l );
+		Collections.sort( sublist , (t1,t2) -> Double.compare( coordinate.getCoord( t1 )[ dim ] , coordinate.getCoord( t2 )[ dim ] ) );
 		return sublist.get( sublist.size() / 2 );
 	}
 
@@ -260,15 +379,14 @@ public class KDTree<T> {
 
 	private static class AddFrame<T> {
 		Node<T> node;
-		List<Tuple<T,double[]>> toAdd;
+		List<T> toAdd;
 
-		public AddFrame( final Node<T> node, final List<Tuple<T, double[]>> toAdd ) {
+		public AddFrame( final Node<T> node, final List<T> toAdd ) {
 			this.node = node;
 			this.toAdd = toAdd;
 		}
 	}
 
-	// TODO all of the recursive methods here could be transformed in a loop easily
 	private static class Node<T> {
 		private Node<T> left, right;
 		private double[] coordinate;
@@ -280,6 +398,7 @@ public class KDTree<T> {
 			this.dimension = dimension;
 		}
 
+		// TODO make it a loop at the outer level
 		public void add( final T newValue , final double[] newCoordinate ) {
 			if ( value != null && newCoordinate.length != coordinate.length ) {
 				throw new IllegalArgumentException( "incompatible dimensionalities" );
