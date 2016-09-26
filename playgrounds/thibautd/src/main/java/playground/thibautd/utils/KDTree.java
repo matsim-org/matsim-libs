@@ -28,9 +28,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.Random;
+import java.util.function.Predicate;
 import java.util.function.ToDoubleBiFunction;
-
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.s;
 
 /**
  * Basic implementation of a KD-Tree, to answer spatial queries in spaces of arbitrary dimensions.
@@ -287,7 +286,16 @@ public class KDTree<T> {
 		return sublist.get( sublist.size() / 2 );
 	}
 
-	public Collection<T> getBox( final double[] lowers , final double[] uppers ) {
+	public Collection<T> getBox(
+			final double[] lowers ,
+			final double[] uppers ) {
+		return getBox( lowers , uppers , (e) -> true );
+	}
+
+	public Collection<T> getBox(
+			final double[] lowers ,
+			final double[] uppers ,
+			final Predicate<T> predicate ) {
 		if ( !allLower( lowers , uppers ) ) {
 			throw new IllegalArgumentException( "invalid bounding box low="+Arrays.toString( lowers )+", high="+Arrays.toString( uppers ) );
 		}
@@ -302,7 +310,9 @@ public class KDTree<T> {
 
 			if ( allLower( lowers , current.coordinate ) && allLower( current.coordinate , uppers ) ) {
 				// in the box
-				result.add( current.value );
+				if ( predicate.test( current.value ) ) {
+					result.add( current.value );
+				}
 				stack.add( current.left );
 				stack.add( current.right );
 			}
@@ -339,6 +349,10 @@ public class KDTree<T> {
 		return getClosest( coord , KDTree::euclidean );
 	}
 
+	public T getClosestEuclidean( final double[] coord , final Predicate<T> predicate ) {
+		return getClosest( coord , KDTree::euclidean , predicate );
+	}
+
 	private static double euclidean( double[] c1 , double[] c2 ) {
 		double d = 0;
 
@@ -350,8 +364,15 @@ public class KDTree<T> {
 	}
 
 	public T getClosest( final double[] coord , final ToDoubleBiFunction<double[],double[]> distance ) {
-		T closest = root.value;
-		double bestDist = distance.applyAsDouble( coord , root.coordinate );
+		return getClosest( coord , distance , e -> true );
+	}
+
+	public T getClosest(
+			final double[] coord ,
+			final ToDoubleBiFunction<double[],double[]> distance,
+			final Predicate<T> predicate ) {
+		T closest = null;
+		double bestDist = Double.POSITIVE_INFINITY;
 
 		final Queue<Node<T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
 		stack.add( root );
@@ -363,7 +384,7 @@ public class KDTree<T> {
 			if ( current.value == null ) continue;
 			final double currentDist = distance.applyAsDouble( coord , current.coordinate );
 
-			if ( currentDist < bestDist ) {
+			if ( currentDist < bestDist && predicate.test( current.value ) ) {
 				closest = current.value;
 				bestDist = currentDist;
 			}
@@ -394,7 +415,7 @@ public class KDTree<T> {
 			}
 			else {
 				final double currentDist = distance.applyAsDouble( coord , current.coordinate );
-				if ( currentDist < bestDist ) {
+				if ( currentDist < bestDist && predicate.test( current.value ) ) {
 					closest = current.value;
 					bestDist = currentDist;
 				}

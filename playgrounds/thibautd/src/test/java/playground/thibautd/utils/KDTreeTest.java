@@ -80,6 +80,27 @@ public class KDTreeTest {
 	}
 
 	@Test
+	public void testClosestFilter() {
+		final KDTree<int[]> tree = createTree();
+
+		final Random random = new Random( 123 );
+
+		for ( int i=0; i < 50; i++ ) {
+			final double[] c = new double[ 3 ];
+			for ( int j=0; j < c.length; j++ ) c[ j ] = random.nextDouble() * 100;
+
+			final int[] closest =
+					tree.getClosestEuclidean(
+							c ,
+							a -> a[0] == a[1] );
+
+			Assert.assertTrue(
+					"closest point does not obey predicate",
+					closest[0] == closest[1] );
+		}
+	}
+
+	@Test
 	public void testRemove() {
 		final KDTree<int[]> tree = createTree();
 
@@ -151,6 +172,23 @@ public class KDTreeTest {
 				"unexpected number of elements in box",
 				41 * 21 * 21,
 				box.size() );
+	}
+
+	@Test
+	public void testBoxPredicate() {
+		final KDTree<int[]> tree = createTree();
+
+		Collection<int[]> box =
+				tree.getBox(
+						new double[]{ 20 , 20 , 20 },
+						new double[]{ 40 , 40 , 40 },
+						a -> a[0] == a[1]);
+
+		for ( int[] a : box ) {
+			Assert.assertTrue(
+					"value in box does not obey predicate",
+					a[0] == a[1] );
+		}
 	}
 
 	@Test
