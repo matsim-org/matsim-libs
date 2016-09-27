@@ -89,7 +89,7 @@ public class BikeConnectorLinkControlerListner implements StartupListener, Itera
         if(event.getIteration()==scenario.getConfig().controler().getFirstIteration()) {
             Map<Id<Link>, Map<Integer, Double>> link2time2vol = handler.getLinkId2TimeSlot2LinkCount();
             for(Id<Link> linkId : linkIds.keySet()) {
-                if(! linkId2Count.containsKey(linkId)) continue;
+                if(! link2time2vol.containsKey(linkId)) continue;
                 double count = MapUtils.doubleValueSum( link2time2vol.get(linkId) );
                 linkId2Count.put(linkId,count);
             }
