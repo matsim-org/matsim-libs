@@ -64,6 +64,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.UrbanDemandGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils.PatnaNetworkType;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
+import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -72,7 +73,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class EvacuationPatnaScenarioGenerator {
 
-	private final String dir = "../../../../repos/runs-svn/patnaIndia/run109/";
+	private final String dir = FileUtils.RUNS_SVN+"/patnaIndia/run109/";
 	
 	private final String networkFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/"+PatnaNetworkType.shpNetwork.toString()+"/network.xml.gz";
 	private final String outNetworkFile = "evac_network.xml.gz";
