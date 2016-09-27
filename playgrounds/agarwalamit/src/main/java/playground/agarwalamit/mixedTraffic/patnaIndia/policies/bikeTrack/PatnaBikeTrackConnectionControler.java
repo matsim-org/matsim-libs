@@ -19,10 +19,14 @@
 
 package playground.agarwalamit.mixedTraffic.patnaIndia.policies.bikeTrack;
 
+import java.io.File;
+import java.util.Collection;
+import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -58,10 +62,6 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.FileUtils;
-
-import javax.inject.Inject;
-import java.io.File;
-import java.util.Collection;
 
 /**
  * @author amit

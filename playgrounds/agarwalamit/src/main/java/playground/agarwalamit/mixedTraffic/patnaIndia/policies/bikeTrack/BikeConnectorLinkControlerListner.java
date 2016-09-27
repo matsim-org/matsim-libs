@@ -19,6 +19,7 @@
 
 package playground.agarwalamit.mixedTraffic.patnaIndia.policies.bikeTrack;
 
+import java.util.*;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -36,20 +37,19 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.*;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import playground.agarwalamit.analysis.linkVolume.FilteredLinkVolumeHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
+import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForTruck;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
-
-import java.util.*;
 
 /**
  * Created by amit on 25/09/16.
@@ -117,7 +117,7 @@ public class BikeConnectorLinkControlerListner implements StartupListener, Itera
             }
 
             // remove links in the routes from the plans of all persons
-            removeRoutes(event.getServices().getScenario());
+            reassignRoutes();
 
             // remove if connector links exists
             for  (Id<Link> lId : linkIds.keySet()) {
@@ -159,18 +159,53 @@ public class BikeConnectorLinkControlerListner implements StartupListener, Itera
         LOG.info("All possible connector links between bike track and network are added.");
     }
 
-    private void removeRoutes(final Scenario scenario) {
+    private void reassignRoutes() {
         LOG.info("Routes of all bike plans will be re-assinged.");
 
-        // this is required because routes are generated from initial base case network; and new network does not have certain links.
+        // following is required to get the routes (or links) from base network and not from the running scenario network.
         Scenario scNetwork = LoadMyScenarios.loadScenarioFromNetwork(this.initialNetwork);
+
+        // create routers for all modes, since this step is manual assignment of routes
+        Map<String, PersonPrepareForSim> mode2routers = new HashMap<>();
+        for(String mode : scenario.getConfig().qsim().getMainModes()){
+            TravelTime tt ;
+            if (mode.equals("bike")) tt = new FreeSpeedTravelTimeForBike();
+            else if(mode.equals("truck")) tt = new FreeSpeedTravelTimeForTruck();
+            else tt = new FreeSpeedTravelTime();
+
+            TripRouterFactoryBuilderWithDefaults routerFactory = new TripRouterFactoryBuilderWithDefaults();
+            routerFactory.setTravelTime(tt);
+            routerFactory.setTravelDisutility( new RandomizingTimeDistanceTravelDisutilityFactory(mode,scenario.getConfig().planCalcScore()).createTravelDisutility(tt) );
+
+            final TripRouter tripRouter = routerFactory.build(scNetwork).get();
+            PlanAlgorithm router = new PlanRouter( tripRouter );
+
+            PersonPrepareForSim pp4s = new PersonPrepareForSim(router, (MutableScenario) scNetwork);
+            mode2routers.put(mode,pp4s);
+        }
 
         // first remove routes from legs of bike mode
         for (Person p : scenario.getPopulation().getPersons().values()) {
             for (Plan plan : p.getPlans()) {
                 List<PlanElement> pes = plan.getPlanElements();
                 for (PlanElement pe : pes) {
-                    if (pe instanceof Leg) {
+                    if(pe instanceof  Activity) {
+                        Activity act = ((Activity)pe);
+                        Id<Link> linkId = act.getLinkId();
+                        Coord cord = act.getCoord();
+
+                        if(linkId==null) { // activity should have at least one of link id or coord
+                            if(cord==null) throw new RuntimeException("Activity "+act.toString()+" do not have either of link id or coord. Aborting...");
+                            else {/*nothing to do; cord is assigned*/ }
+                        } else if (cord==null) { // if cord is null, get it from
+                            if(scNetwork.getNetwork().getLinks().containsKey(linkId)) {
+                                cord = scNetwork.getNetwork().getLinks().get(linkId).getCoord();
+                                act.setLinkId(null);
+                                act.setCoord(cord);
+                            } else throw new RuntimeException("Activity "+act.toString()+" do not have cord and link id is not present in network. Aborting...");
+                        }
+                    }
+                    else if (pe instanceof Leg) {
                         Leg leg = (Leg) pe;
                         if (modes.contains(leg.getMode())) leg.setRoute(null);
                     }
@@ -178,89 +213,10 @@ public class BikeConnectorLinkControlerListner implements StartupListener, Itera
             }
         }
 
-        // now re-assign the routes. :
-        TravelTime ttBike = new FreeSpeedTravelTimeForBike();
-        TripRouterFactoryBuilderWithDefaults routerFactory = new TripRouterFactoryBuilderWithDefaults();
-        routerFactory.setTravelTime(ttBike );
-        routerFactory.setTravelDisutility( new RandomizingTimeDistanceTravelDisutilityFactory("bike",scenario.getConfig().planCalcScore()).createTravelDisutility(ttBike) );
-        final TripRouter tripRouter = routerFactory.build(scNetwork).get();
-
-        PlanAlgorithm router = new PlanRouter( routerFactory.build( scNetwork).get() );
-
-        PersonPrepareForSim pp4s = new PersonPrepareForSim(router, (MutableScenario) scNetwork);
         for (Person p : scenario.getPopulation().getPersons().values()){
-            pp4s.run(p);
-        }
-    }
-
-    private void removeRoutes2(final Scenario scenario){
-        LOG.info("Routes of all bike plans will be re-assinged.");
-
-        // this is required because routes are generated from initial base case network; and new network does not have certain links.
-        Scenario scNetwork = LoadMyScenarios.loadScenarioFromNetwork(this.initialNetwork);
-
-        //since some links are now removed, route in the plans will throw exception, remove them.
-        for (Person p : scenario.getPopulation().getPersons().values()){
-            for(Plan plan : p.getPlans()){
-                List<PlanElement> pes = plan.getPlanElements();
-                Activity actBeforeLeg = null; // needed for router.
-                for (PlanElement pe :pes ){
-                    if (pe instanceof Activity) { //the idea is to assign cords for all activities rather than a link.
-                        Activity act = ((Activity)pe);
-                        actBeforeLeg = act;
-                        // idk, if i should also remove links from the activities.
-
-//                        Id<Link> linkId = act.getLinkId();
-//                        Coord cord = act.getCoord();
-//
-//                        if(linkId==null) { // activity should have at least one of link id or coord
-//                            if(cord==null) throw new RuntimeException("Activity "+act.toString()+" do not have either of link id or coord. Aborting...");
-//                            else {/*nothing to do; cord is assigned*/ }
-//                        } else if (cord==null) { // if cord is null, get it from
-//                            if(scNetwork.getNetwork().getLinks().containsKey(linkId)) {
-//                                cord = scNetwork.getNetwork().getLinks().get(linkId).getCoord();
-//                                act.setLinkId(null);
-//                                act.setCoord(cord);
-//                            } else throw new RuntimeException("Activity "+act.toString()+" do not have cord and link id is not present in network. Aborting...");
-//                        }
-                    } else if ( pe instanceof Leg){
-                        Leg leg = (Leg) pe;
-                        if(! modes.contains(leg.getMode())) continue;
-
-//                        // if bike, remove routes and assign new routes (because old route may contain the links which are removed)
-                        Route oldRoute = leg.getRoute();
-                        Coord startRouteLinkCoord = scenario.getNetwork().getLinks().get(oldRoute.getStartLinkId()).getCoord();
-                        Id<Link> startLinkId = NetworkUtils.getNearestLink(scNetwork.getNetwork(), startRouteLinkCoord).getId();
-
-                        Coord endLinkCoord = scenario.getNetwork().getLinks().get(oldRoute.getEndLinkId()).getCoord();
-                        Id<Link> endLinkId = NetworkUtils.getNearestLink(scNetwork.getNetwork(), endLinkCoord).getId();
-
-                        TripRouter router = new TripRouter();
-                        router.setRoutingModule(
-                                leg.getMode(),
-                                DefaultRoutingModules.createPureNetworkRouter(
-                                        leg.getMode(),
-                                        scNetwork.getPopulation().getFactory(),
-                                        scNetwork.getNetwork(),
-                                        new Dijkstra( scNetwork.getNetwork(),
-                                                new OnlyTimeDependentTravelDisutility(new FreeSpeedTravelTimeForBike()),
-                                                new FreeSpeedTravelTimeForBike())
-                                )
-                        );
-                        List<? extends PlanElement> routeInfo = router.calcRoute(
-                                leg.getMode(),
-                                new ActivityWrapperFacility( actBeforeLeg ),
-                                new ActivityWrapperFacility( scNetwork.getPopulation().getFactory().createActivityFromLinkId("NA", endLinkId) ),
-                                actBeforeLeg.getEndTime(),
-                                p);
-
-                        Route route = ((Leg)routeInfo.get(0)).getRoute();
-                        route.setStartLinkId( startLinkId);
-                        route.setEndLinkId( endLinkId );
-                        leg.setRoute(route);
-                    }
-                }
-            }
+            // since all trips have same mode, following is safe.
+            String mode = ((Leg)p.getSelectedPlan().getPlanElements().get(1)).getMode();
+            mode2routers.get(mode).run(p);
         }
     }
 }
