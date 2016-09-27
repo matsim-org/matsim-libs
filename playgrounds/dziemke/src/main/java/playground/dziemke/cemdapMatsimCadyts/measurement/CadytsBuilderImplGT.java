@@ -21,7 +21,9 @@ package playground.dziemke.cemdapMatsimCadyts.measurement;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.measurements.SingleLinkMeasurement;
+import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.cadyts.general.CadytsBuilder;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
@@ -33,24 +35,20 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.util.Map;
 
 /**
  * @author nagel
  * @author mrieser
- *
- * Created by GabrielT on 27.09.2016.
  */
 public final class CadytsBuilderImplGT implements CadytsBuilder {
-	private static Logger log = Logger.getLogger( org.matsim.contrib.cadyts.general.CadytsBuilderImpl.class ) ;
-
-	public CadytsBuilderImplGT() {
-	}
+	private static Logger log = Logger.getLogger( CadytsBuilder.class ) ;
 
 	@Override
 	public <T> AnalyticalCalibrator<T> buildCalibratorAndAddMeasurements(final Config config, final Counts<T> occupCounts,
-																		 LookUpItemFromId<T> lookUp, Class<T> idType) {
+																		 LookUpItemFromId<T> lookUp, Class<T> idType ) {
 
 		if (occupCounts.getCounts().size() == 0) {
 			log.warn("Counts container is empty.");
@@ -79,16 +77,25 @@ public final class CadytsBuilderImplGT implements CadytsBuilder {
 		for (Map.Entry<Id<T>, Count<T>> entry : occupCounts.getCounts().entrySet()) {
 			// (loop over all counting "items" (usually locations/stations)
 
+			T item = (T)new FakeFacility((Id<TransitStopFacility>)Id.create(entry.getKey(), idType));
+			/*TODO
 			T item = lookUp.getItem(Id.create(entry.getKey(), idType)) ;
 			if ( item==null ) {
 				throw new RuntimeException("item is null; entry=" + entry + " idType=" + idType ) ;
 			}
+			*/
 			int timeBinIndex = 0 ; // starting with zero which is different from the counts file!!!
 			int startTimeOfBin_s = -1 ;
 			double count = -1 ;
 			for (Volume volume : entry.getValue().getVolumes().values()){
 				// (loop over the different time slots)
 
+				//TODO
+				numberOfAddedMeasurements++ ;
+				matsimCalibrator.addMeasurement(item, 0, 86400, volume.getValue(), SingleLinkMeasurement.TYPE.COUNT_VEH );
+				//TODO
+
+				/*TODO
 				if ( timeBinIndex%multiple == 0 ) {
 					// (i.e. first timeBinIndex belonging to given bin)
 
@@ -118,6 +125,7 @@ public final class CadytsBuilderImplGT implements CadytsBuilder {
 						// kai, feb'13
 					}
 				}
+				*/
 				timeBinIndex++ ;
 			}
 		}
@@ -146,14 +154,14 @@ public final class CadytsBuilderImplGT implements CadytsBuilder {
 		}
 
 
-		AnalyticalCalibrator<T> matsimCalibrator = new AnalyticalCalibrator<>(
+		AnalyticalCalibrator<T> matsimCalibrator = new AnalyticalCalibrator<T>(
 				config.controler().getOutputDirectory() + "/cadyts.log",
 				MatsimRandom.getLocalInstance().nextLong(),cadytsConfig.getTimeBinSize()
 		) ;
 
 		matsimCalibrator.setRegressionInertia(cadytsConfig.getRegressionInertia()) ;
-		matsimCalibrator.setMinStddev(cadytsConfig.getMinFlowStddev_vehPerHour(), SingleLinkMeasurement.TYPE.FLOW_VEH_H);
-		matsimCalibrator.setMinStddev(cadytsConfig.getMinFlowStddev_vehPerHour(), SingleLinkMeasurement.TYPE.COUNT_VEH);
+		matsimCalibrator.setMinStddev(cadytsConfig.getMinFlowStddev_vehPerHour(), TYPE.FLOW_VEH_H);
+		matsimCalibrator.setMinStddev(cadytsConfig.getMinFlowStddev_vehPerHour(), TYPE.COUNT_VEH);
 		matsimCalibrator.setFreezeIteration(cadytsConfig.getFreezeIteration());
 		matsimCalibrator.setPreparatoryIterations(cadytsConfig.getPreparatoryIterations());
 		matsimCalibrator.setVarianceScale(cadytsConfig.getVarianceScale());
@@ -170,4 +178,66 @@ public final class CadytsBuilderImplGT implements CadytsBuilder {
 		return matsimCalibrator;
 	}
 
+
+	private static class FakeFacility implements TransitStopFacility {
+		private final Id<TransitStopFacility> id;
+		public FakeFacility(final Id<TransitStopFacility> id) {
+			this.id = id;
+		}
+
+		@Override
+		public Id getLinkId() {
+			return id;
+		}
+
+		@Override
+		public Coord getCoord() {
+			return null;
+		}
+
+		@Override
+		public void setCoord(Coord coord) {
+
+		}
+
+		@Override
+		public Id getId() {
+			return id;
+		}
+
+		@Override
+		public Map<String, Object> getCustomAttributes() {
+			return null;
+		}
+
+		@Override
+		public boolean getIsBlockingLane() {
+			return false;
+		}
+
+		@Override
+		public void setLinkId(Id linkId) {
+
+		}
+
+		@Override
+		public void setName(String name) {
+
+		}
+
+		@Override
+		public String getName() {
+			return null;
+		}
+
+		@Override
+		public String getStopPostAreaId() {
+			return null;
+		}
+
+		@Override
+		public void setStopPostAreaId(String stopPostAreaId) {
+
+		}
+	}
 }
