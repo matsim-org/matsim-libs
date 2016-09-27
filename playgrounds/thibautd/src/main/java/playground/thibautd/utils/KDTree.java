@@ -153,6 +153,7 @@ public class KDTree<T> {
 		}
 
 		current.value = null;
+		current.coordinate = null;
 		current.left = null;
 		current.right = null;
 
@@ -168,6 +169,7 @@ public class KDTree<T> {
 		while ( !stack.isEmpty() )  {
 			final Node<T> current = stack.poll();
 
+			assert (current.coordinate == null) == (current.value == null) : current;
 			if ( current.coordinate == null ) continue;
 
 			if ( current.coordinate[ dimension ] < min.coordinate[ dimension ] ) {
@@ -452,6 +454,15 @@ public class KDTree<T> {
 		private Node(
 				final int dimension ) {
 			this.dimension = dimension;
+		}
+
+		@Override
+		public String toString() {
+			return "[Node coord="+Arrays.toString( coordinate )+
+					"; value="+value+
+					"; dimension="+dimension+
+					"; hasLeft="+(left != null)+
+					"; hasRight="+(right != null)+"]";
 		}
 	}
 }
