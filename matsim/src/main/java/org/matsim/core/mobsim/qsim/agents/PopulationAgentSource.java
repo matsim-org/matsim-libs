@@ -19,23 +19,13 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import java.util.*;
 import javax.inject.Inject;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -120,7 +110,23 @@ public final class PopulationAgentSource implements AgentSource {
 						}
 						if (vehicleId == null) {
 							if (qsim.getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
-								vehicleId = Id.create(p.getId(), Vehicle.class);
+
+								switch (qsim.getScenario().getConfig().qsim().getVehiclesSource()) {
+									case defaultVehicle:
+									case fromVehiclesData:
+										vehicleId = Id.createVehicleId(p.getId());
+										break;
+									case modeVehicleTypesFromVehiclesData:
+										if(!leg.getMode().equals(TransportMode.car)) {
+											String vehIdString = p.getId().toString() + "_" + leg.getMode() ;
+											vehicleId = Id.create(vehIdString, Vehicle.class);
+										} else {
+											vehicleId = Id.createVehicleId(p.getId());
+										}
+										break;
+									default:
+										throw new RuntimeException("not implemented") ;
+								}
 							} else {
 								throw new IllegalStateException("Found a network route without a vehicle id.");
 							}
