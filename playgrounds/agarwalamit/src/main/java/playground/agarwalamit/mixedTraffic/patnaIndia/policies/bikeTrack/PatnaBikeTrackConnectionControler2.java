@@ -23,13 +23,13 @@ import java.io.File;
 import java.util.*;
 import javax.inject.Inject;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -65,7 +65,6 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.FileUtils;
-import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
 
 /**
@@ -106,10 +105,6 @@ public class PatnaBikeTrackConnectionControler2 {
 		Map<Id<Link>, Link> linkIds = new HashMap<>(); // just to keep information about links
 		SortedMap<Id<Link>,Double> linkId2Count = new TreeMap<>(); // need to update the counts after every run.
 
-		// initialize
-		LOG.info("========================== Initializing scenario ... ");
-		Scenario scenario = getScenario();
-
 		// add all possible connectors to it
 		LOG.info("========================== Adding all possible connectors to bike track...");
 
@@ -119,27 +114,48 @@ public class PatnaBikeTrackConnectionControler2 {
 		List<Node> bikeTrackNodes = connectionIdentifier.getBikeTrackNodes();
 		linkIds = connectionIdentifier.getConnectedLinks();
 
-		for(Node n : bikeTrackNodes) {
-			if(scenario.getNetwork().getNodes().containsKey(n.getId())) continue;
-			NetworkUtils.createAndAddNode(scenario.getNetwork(),n.getId(),n.getCoord());
-		}
-
-		for (Id<Link> lId : linkIds.keySet()) {
-			Link l = linkIds.get(lId);
-			l.setAllowedModes(allowedModes);
-			scenario.getNetwork().addLink(l);
-		}
+		// sort based on the values (i.e. link volume)
+		Comparator<Map.Entry<Id<Link>, Double>> byValue = (entry1, entry2) -> entry1.getValue().compareTo(
+				entry2.getValue());
 
 		// start trials
 		for(int index = 1; index < maxItration/updateConnectorsAfterIteration; index++) {
-			removeRoutes(scenario);
+			LOG.info("========================== Initializing scenario ... ");
+			Scenario scenario = getScenario();
+
+			for(Node n : bikeTrackNodes) {
+				if(scenario.getNetwork().getNodes().containsKey(n.getId())) continue;
+				NetworkUtils.createAndAddNode(scenario.getNetwork(),n.getId(),n.getCoord());
+			}
+
+			if(index==1) {
+				for (Id<Link> lId : linkIds.keySet()) {
+					Link l = linkIds.get(lId);
+					l.setAllowedModes(allowedModes);
+					scenario.getNetwork().addLink(l);
+				}
+			}
+			else {
+				LOG.info("========================== Adding new connectors links based on the count...");
+				// take only pre-decided number of links.
+				Iterator<Map.Entry<Id<Link>, Double>> iterator = linkId2Count.entrySet().stream().sorted(byValue.reversed()).limit(numberOfConnectors).iterator();
+				while (iterator.hasNext()) {
+					Map.Entry<Id<Link>, Double> next = iterator.next();
+					Link l = linkIds.get(next.getKey());
+					l.setAllowedModes(allowedModes);
+					scenario.getNetwork().addLink(l);
+					LOG.info("========================== Connector "+ l.getId()+" is added to the network, volume on this link is "+ next.getValue());
+				}
+			}
+
+//			removeRoutes(scenario);
 
 			LOG.info("========================== Running trial "+index);
 			FilteredLinkVolumeHandler volHandler = new FilteredLinkVolumeHandler(modes);
 			volHandler.reset(0);
 
 			String outputDir = scenario.getConfig().controler().getOutputDirectory();
-			outputDir = outputDir+"_"+index;
+			outputDir = outputDir+"_"+index+"/";
 			int firstIt = scenario.getConfig().controler().getFirstIteration();
 			int lastIt = firstIt + index * updateConnectorsAfterIteration;
 
@@ -158,13 +174,8 @@ public class PatnaBikeTrackConnectionControler2 {
 
 			LOG.info("========================== Finished trial "+index);
 
-			LOG.info("========================== Removing the connector links if exists...");
-			for  (Id<Link> lId : linkIds.keySet()) {
-				scenario.getNetwork().removeLink(lId);
-			}
 
 			LOG.info("========================== Updating the bike counts on the connectors link...");
-
 			// update the link counts
 			if(index==1) { // nothing to update; just store info
 				Map<Id<Link>, Map<Integer, Double>> link2time2vol = volHandler.getLinkId2TimeSlot2LinkCount();
@@ -181,21 +192,6 @@ public class PatnaBikeTrackConnectionControler2 {
 					double count = link2time2vol.containsKey(linkId) ? MapUtils.doubleValueSum( link2time2vol.get(linkId) ) : 0.0;
 					linkId2Count.put(linkId,  count * (1-blendFactor) +  blendFactor * oldCount);
 				}
-			}
-
-			// sort based on the values (i.e. link volume)
-			Comparator<Map.Entry<Id<Link>, Double>> byValue = (entry1, entry2) -> entry1.getValue().compareTo(
-					entry2.getValue());
-
-			LOG.info("========================== Adding new connectors links based on the count...");
-			// take only pre-decided number of links.
-			Iterator<Map.Entry<Id<Link>, Double>> iterator = linkId2Count.entrySet().stream().sorted(byValue.reversed()).limit(numberOfConnectors).iterator();
-			while (iterator.hasNext()) {
-				Map.Entry<Id<Link>, Double> next = iterator.next();
-				Link l = linkIds.get(next.getKey());
-				l.setAllowedModes(allowedModes);
-				scenario.getNetwork().addLink(l);
-				LOG.info("========================== Connector "+ l.getId()+" is added to the network, volume on this link is "+ next.getValue());
 			}
 
 			// delete unnecessary iterations folder here.
@@ -340,41 +336,5 @@ public class PatnaBikeTrackConnectionControler2 {
 				return sumScoringFunction;
 			}
 		});
-	}
-
-	private static void removeRoutes(Scenario scenario) {
-		LOG.info("Routes of all bike plans will be re-moved.");
-
-		// following is required to get the routes (or links) from base network and not from the running scenario network.
-		Scenario scNetwork = LoadMyScenarios.loadScenarioFromNetwork(initialNetwork);
-
-		// remove routes from legs of bike mode
-		for (Person p : scenario.getPopulation().getPersons().values()) {
-			for (Plan plan : p.getPlans()) {
-				List<PlanElement> pes = plan.getPlanElements();
-				for (PlanElement pe : pes) {
-					if(pe instanceof Activity) {
-						Activity act = ((Activity)pe);
-						Id<Link> linkId = act.getLinkId();
-						Coord cord = act.getCoord();
-
-						if(linkId==null) { // activity should have at least one of link id or coord
-							if(cord==null) throw new RuntimeException("Activity "+act.toString()+" do not have either of link id or coord. Aborting...");
-							else {/*nothing to do; cord is assigned*/ }
-						} else if (cord==null) { // if cord is null, get it from
-							if(scNetwork.getNetwork().getLinks().containsKey(linkId)) {
-								cord = scNetwork.getNetwork().getLinks().get(linkId).getCoord();
-								act.setLinkId(null);
-								act.setCoord(cord);
-							} else throw new RuntimeException("Activity "+act.toString()+" do not have cord and link id is not present in network. Aborting...");
-						}
-					}
-					else if (pe instanceof Leg) {
-						Leg leg = (Leg) pe;
-						leg.setRoute(null);
-					}
-				}
-			}
-		}
 	}
 }
