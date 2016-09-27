@@ -49,7 +49,6 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.*;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.analysis.StatsWriter;
 import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListner;
 import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
 import playground.agarwalamit.analysis.linkVolume.FilteredLinkVolumeHandler;
@@ -213,7 +212,7 @@ public class PatnaBikeTrackConnectionControler2 {
 			msc.run();
 			msc.writeResults(outputDir+"/analysis/modalShareFromEvents_"+userGroup+".txt");
 
-			StatsWriter.run(outputDir);
+//			StatsWriter.run(outputDir);
 		}
 	}
 
