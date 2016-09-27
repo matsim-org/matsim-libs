@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 
 import java.io.BufferedReader;
@@ -58,6 +59,22 @@ public class CsvParser implements AutoCloseable {
 	public String getField( final String name ) {
 		// no check of validity. Assume users of this class know what they are doing, or are able to understand what goes wrong
 		return currentLine[ titleLine.getIndexOfField( name ) ];
+	}
+
+	public double getDoubleField( final String name ) {
+		return Double.parseDouble( getField( name ) );
+	}
+
+	public int getIntField( final String name ) {
+		return Integer.parseInt( getField( name ) );
+	}
+
+	public <E extends Enum<E>> E getEnumField( final String name , final Class<E> clazz ) {
+		return Enum.valueOf( clazz , getField( name ) );
+	}
+
+	public <T> Id<T> getIdField( final String name , final Class<T> clazz ) {
+		return Id.create( getField( name ) , clazz );
 	}
 
 	@Override

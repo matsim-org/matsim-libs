@@ -16,10 +16,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet;
+package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
+
+import playground.thibautd.utils.KDTree;
 
 /**
  * @author thibautd
  */
-public class CliquesDistribution {
+public interface EgoLocator extends KDTree.Coordinate<Ego> {
+	int getDimensionality();
 }

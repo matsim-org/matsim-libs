@@ -21,7 +21,6 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.evac;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -32,7 +31,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
@@ -40,6 +38,7 @@ import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.PatnaVehiclesGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
+import playground.agarwalamit.utils.FileUtils;
 
 /**
  * @author amit
@@ -55,8 +54,8 @@ public class EvacPatnaControler {
 		boolean isSeepModeStorageFree ;
 
 		if(args.length==0){
-			configFile = "../../../../repos/runs-svn/patnaIndia/run109/1pct/input/evac_config.xml.gz";
-			outDir = "../../../../repos/runs-svn/patnaIndia/run109/1pct/withoutHoles/";
+			configFile = FileUtils.RUNS_SVN+"/patnaIndia/run109/1pct/input/evac_config.xml.gz";
+			outDir = FileUtils.RUNS_SVN+"/patnaIndia/run109/1pct/withoutHoles/";
 			linkDynamics = LinkDynamics.PassingQ;
 			isSeepModeStorageFree = false;
 		} else {

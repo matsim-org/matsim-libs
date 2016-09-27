@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.analysis.PersonArrivalAnalyzer;
+import playground.agarwalamit.utils.FileUtils;
 
 /**
  * @author amit
@@ -40,9 +41,9 @@ public class EvacProgress {
 	private final int shortestPathRunIteration = 0;
 	private final int NERunIteration = 100;
 
-	private final String runCase = "SeepageQ_[bike, motorbike]";
-	private final String dir = "/Users/amit/Documents/repos/runs-svn/patnaIndia/run109/1pct/withoutHoles/evac_"+runCase;
-	private final String inputDir = "/Users/amit/Documents/repos/runs-svn/patnaIndia/run109/1pct/input/";
+	private final String runCase = "PassingQ";
+	private final String dir = FileUtils.RUNS_SVN+"/patnaIndia/run109/1pct/withoutHoles/evac_"+runCase;
+	private final String inputDir = FileUtils.RUNS_SVN+"/patnaIndia/run109/1pct/input/";
 
 	public static void main(String[] args) {
 		new EvacProgress().runAndWrite();
@@ -55,14 +56,17 @@ public class EvacProgress {
 
 		String networkFile = dir+"/output_network.xml.gz";
 		String shapeFile = inputDir+"/patnaEvacAnalysisArea.shp";
-		String outputFilePrefix = "_analysisArea";
-		
+//		String outputFilePrefix = "_analysisArea";
+		String outputFilePrefix = "";
+
 		PersonArrivalAnalyzer arrivalAnalyzer = new PersonArrivalAnalyzer(eventsFileSP, dir+"/output_config.xml.gz"); 
-		arrivalAnalyzer.run(shapeFile,networkFile);
+		arrivalAnalyzer.run();
+//		arrivalAnalyzer.run(shapeFile,networkFile);
 		SortedMap<String,SortedMap<Integer, Integer>> evacProgressSP = arrivalAnalyzer.getTimeBinToNumberOfArrivals();
 
 		arrivalAnalyzer = new PersonArrivalAnalyzer(eventsFileNE, dir+"/output_config.xml.gz"); 
-		arrivalAnalyzer.run(shapeFile,networkFile);
+//		arrivalAnalyzer.run(shapeFile,networkFile);
+		arrivalAnalyzer.run();
 		SortedMap<String,SortedMap<Integer, Integer>>  evacProgressNE = arrivalAnalyzer.getTimeBinToNumberOfArrivals();
 
 		String outFile = dir+"/analysis/evacuationProgress"+outputFilePrefix+".txt";
