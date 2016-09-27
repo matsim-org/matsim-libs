@@ -61,7 +61,7 @@ public class RunCSBerlinBasecaseWithParkingFreefloating {
 		String outputdir;
 		if (args.length<2){
 		configfile = "../../../shared-svn/projects/bmw_carsharing/data/scenario/configBCParkingFreeFloat14.xml";
-		runId = "bc14_2000ffc_pA";
+		runId = "bc17_test_pA";
 		outputdir = "D:/runs-svn/bmw_carsharing/basecase/"+runId;
 		}
 		else {

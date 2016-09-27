@@ -135,7 +135,7 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 		return this.socInJoules / this.electricDriveEnergyConsumptionModel.getEnergyConsumptionRateInJoulesPerMeter();
 	}
 	public boolean isBEV() {
-		return this.isBEV;
+		return this instanceof BatteryElectricVehicle;
 	}
 	public void setChargingFields(String vehicleTypeName, Double maxDischargingPowerInKW,
 			Double maxLevel2ChargingPowerInKW, Double maxLevel3ChargingPowerInKW, HashSet<ChargingPlugType> compatiblePlugTypes) {

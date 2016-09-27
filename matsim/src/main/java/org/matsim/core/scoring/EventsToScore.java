@@ -48,7 +48,7 @@ import javax.inject.Inject;
  *
  * @author mrieser, michaz
  */
-public class EventsToScore implements BasicEventHandler {
+public final class EventsToScore implements BasicEventHandler {
 
 	private final NewScoreAssigner newScoreAssigner;
 	private final ControlerListenerManagerImpl controlerListenerManager;
@@ -152,6 +152,8 @@ public class EventsToScore implements BasicEventHandler {
 		// I have to be a BasicEventHandler so that my reset method is
 		// called, EVEN THOUGH reset is actually on EventHandler
 		// and not on BasicEventHandler. :-)
+		
+		// yy the "handleEvent" that passes only the person-related events (via HasPersonId) is in ScoringFunctionsForPopulation.  kai, sep'16
 	}
 
 	private static class NoopNewScoreAssignerImpl implements NewScoreAssigner {

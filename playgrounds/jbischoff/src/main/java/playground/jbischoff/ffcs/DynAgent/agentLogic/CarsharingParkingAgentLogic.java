@@ -93,7 +93,8 @@ public class CarsharingParkingAgentLogic extends ParkingAgentLogic {
 			}
 		this.lastParkActionState = LastParkActionState.PARKACTIVITY;
 		this.currentlyAssignedVehicleId = null;
-		return new StaticDynActivity(ParkingUtils.PARKACTIVITYTYPE,now + ParkingUtils.PARKDURATION);}
+		this.parkingLogic.reset();
+		return new StaticDynActivity(FFCSUtils.FREEFLOATINGPARKACTIVITYTYPE,now + ParkingUtils.PARKDURATION);}
 		else throw new RuntimeException ("No parking possible");
 	}
 	

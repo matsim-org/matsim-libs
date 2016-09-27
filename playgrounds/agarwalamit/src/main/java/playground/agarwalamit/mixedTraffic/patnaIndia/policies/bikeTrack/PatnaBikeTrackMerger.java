@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.mixedTraffic.patnaIndia.policies;
+package playground.agarwalamit.mixedTraffic.patnaIndia.policies.bikeTrack;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,14 +32,17 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import playground.agarwalamit.mixedTraffic.patnaIndia.policies.PatnaTrafficRestrainer;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
+ * Simply merge bike track to actual network with some connectors.
+ *
  * @author amit
  */
 
-public final class PatnaBikeTrackCreator {
+public final class PatnaBikeTrackMerger {
 
 	private static final List<Id<Link>> bikeLinks = new ArrayList<>();
 	private static final boolean isMotorbikeAllowed = true;
@@ -50,7 +53,7 @@ public final class PatnaBikeTrackCreator {
 		Scenario scenario = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
 		Network network = scenario.getNetwork();
 		{
-			PatnaBikeTrackCreator pbtc = new PatnaBikeTrackCreator();
+			PatnaBikeTrackMerger pbtc = new PatnaBikeTrackMerger();
 			pbtc.addBikeTrackOnly(network);
 			new NetworkWriter(network).write(PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/networkWithBikeTrack.xml.gz");
 		}

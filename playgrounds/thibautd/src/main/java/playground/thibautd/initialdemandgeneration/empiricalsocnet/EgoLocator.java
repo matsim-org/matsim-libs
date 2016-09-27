@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,27 +16,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.thibautd.initialdemandgeneration.empiricalsocnet;
 
-package playground.jbischoff.parking.routing;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.NetworkRoute;
+import playground.thibautd.utils.KDTree;
 
 /**
- * @author  jbischoff
- *
+ * @author thibautd
  */
-public interface ParkingRouter {
-	/**
-	 * *
-	 * @param intendedRoute: may be a network route (car trips) or may be generic (carsharing etc.) 
-	 * @param departureTime
-	 * @param startLinkId
-	 * @return
-	 */
-
-	NetworkRoute getRouteFromParkingToDestination(Id<Link> destinationLinkId, double departureTime, Id<Link> startLinkId);
-	
+public interface EgoLocator extends KDTree.Coordinate<Ego> {
+	int getDimensionality();
 }

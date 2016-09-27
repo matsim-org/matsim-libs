@@ -48,6 +48,9 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable;
 import playground.kairuns.run.KNBerlinControler;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author amit
  */
@@ -55,9 +58,7 @@ import playground.kairuns.run.KNBerlinControler;
 public class MatsimOpdytsEquilIntegration {
 
 	private static final String EQUIL_DIR = "./matsim/examples/equil/";
-	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil/";
-
-	private static final boolean isUsingBicycle = false;
+	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil-initialPlans-holes-withoutInflowConstraint/";
 
 	public static void main(String[] args) {
 		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
@@ -66,8 +67,8 @@ public class MatsimOpdytsEquilIntegration {
 		config.controler().setOutputDirectory(OUT_DIR);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		config.plans().setInputFile("relaxed_plans.xml.gz");
-//		config.plans().setInputFile("plans2000.xml.gz");
+//		config.plans().setInputFile("relaxed_plans.xml.gz");
+		config.plans().setInputFile("plans2000.xml.gz");
 
 		//== default config has limited inputs
 		StrategyConfigGroup strategies = config.strategy();
@@ -88,16 +89,13 @@ public class MatsimOpdytsEquilIntegration {
 			params.setTypicalDurationScoreComputation( PlanCalcScoreConfigGroup.TypicalDurationScoreComputation.relative );
 		}
 
-		strategies.setFractionOfIterationsToDisableInnovation(0.8); // does not matter, what you set, matsim simulator will set it to infinity.
-
 		config.qsim().setTrafficDynamics( QSimConfigGroup.TrafficDynamics.withHoles );
 
-		if ( config.qsim().getTrafficDynamics()== QSimConfigGroup.TrafficDynamics.withHoles ) {
-			config.qsim().setInflowConstraint(QSimConfigGroup.InflowConstraint.maxflowFromFdiag);
-		}
+//		if ( config.qsim().getTrafficDynamics()== QSimConfigGroup.TrafficDynamics.withHoles ) {
+//			config.qsim().setInflowConstraint(QSimConfigGroup.InflowConstraint.maxflowFromFdiag);
+//		}
 
 		config.qsim().setUsingFastCapacityUpdate(true);
-
 
 		//==
 
@@ -119,6 +117,12 @@ public class MatsimOpdytsEquilIntegration {
 		int binCount = 24; // to me, binCount and binSize must be related
 		TimeDiscretization timeDiscretization = new TimeDiscretization(startTime, binSize, binCount);
 
+		Set<String> modes2consider = new HashSet<>();
+		modes2consider.add("car");
+		modes2consider.add("bike");
+
+		ModalStatsControlerListner stasControlerListner = new ModalStatsControlerListner(modes2consider);
+
 		// following is the  entry point to start a matsim controler together with opdyts
 		MATSimSimulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization);
 		simulator.addOverridingModule(new AbstractModule() {
@@ -126,12 +130,8 @@ public class MatsimOpdytsEquilIntegration {
 			@Override
 			public void install() {
 				// add here whatever should be attached to matsim controler
-				if(isUsingBicycle) {
-					addTravelTimeBinding("bicycle").to(networkTravelTime());
-					addTravelDisutilityFactoryBinding("bicycle").to(carTravelDisutilityFactoryKey());
-				}
 				// some stats
-				addControlerListenerBinding().to(ModalStatsControlerListner.class);
+				addControlerListenerBinding().toInstance(stasControlerListner);
 
 				// from KN
 				addControlerListenerBinding().to(KaiAnalysisListener.class);
@@ -141,7 +141,7 @@ public class MatsimOpdytsEquilIntegration {
 
 		// this is the objective Function which returns the value for given SimulatorState
 		// in my case, this will be the distance based modal split
-		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(); // in this, the method argument (SimulatorStat) is not used.
+		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(false); // in this, the method argument (SimulatorStat) is not used.
 
 		//search algorithm
 		int maxIterations = 10; // this many times simulator.run(...) and thus controler.run() will be called.

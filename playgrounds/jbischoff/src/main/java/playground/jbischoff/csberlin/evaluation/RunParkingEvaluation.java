@@ -37,6 +37,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
+import playground.jbischoff.parking.evaluation.ParkedVechiclesVisualiser;
 import playground.jbischoff.parking.evaluation.ParkingSearchAndEgressTimeEvaluator;
 import playground.jbischoff.parking.evaluation.ParkingSearchEvaluator;
 
@@ -54,20 +55,27 @@ public static void main(String[] args) {
 	EventsManager events = EventsUtils.createEventsManager();
 	ParkingSearchAndEgressTimeEvaluator mierendorffEval = new ParkingSearchAndEgressTimeEvaluator(readLinks("../../../shared-svn/projects/bmw_carsharing/data/gis/mierendorfflinks.txt"),network);	
 	ParkingSearchAndEgressTimeEvaluator klausEval = new ParkingSearchAndEgressTimeEvaluator(readLinks("../../../shared-svn/projects/bmw_carsharing/data/gis/klausnerlinks.txt"),network);	
-	
+	WalkLegPlotterVIA wlp = new WalkLegPlotterVIA(network,"car");
+	WalkLegPlotterVIA wlpFF = new WalkLegPlotterVIA(network,"freefloating");
+	ParkedVechiclesVisualiser pvv = new ParkedVechiclesVisualiser(network);
 	ParkingSearchEvaluator pwde = new ParkingSearchEvaluator();
 	events.addHandler(pwde);
-	
+	events.addHandler(pvv);
+	events.addHandler(wlp);
+	events.addHandler(wlpFF);
 	events.addHandler(mierendorffEval);
 	events.addHandler(klausEval);
-	
-	new ParkingSearchEventsReader(events).readFile("D:/runs-svn/bmw_carsharing/basecase/bc09_park/ITERS/it.50/bc09_park.50.events.xml.gz");
-	pwde.writeEgressWalkStatistics("D:/runs-svn/bmw_carsharing/basecase/bc09_park/ITERS/it.50/");
-	mierendorffEval.writeStats("D:/runs-svn/bmw_carsharing/basecase/bc09_park/ITERS/it.50/mierendorffParkAndEgressStats.csv");
-	mierendorffEval.writeCoordTimeStamps("D:/runs-svn/bmw_carsharing/basecase/bc09_park/ITERS/it.50/mierendorffParkStamps.csv");
-	klausEval.writeStats("D:/runs-svn/bmw_carsharing/basecase/bc09_park/ITERS/it.50/klausnerParkAndEgressStats.csv");
-	klausEval.writeCoordTimeStamps("D:/runs-svn/bmw_carsharing/basecase/bc09_park/ITERS/it.50/klausParkStamps.csv");
-	
+	String dir = "D:/runs-svn/bmw_carsharing/basecase/run17/";
+	new ParkingSearchEventsReader(events).readFile(dir+"run17.output_events.xml.gz");
+	pwde.writeEgressWalkStatistics(dir);
+	mierendorffEval.writeStats(dir+"mierendorffParkAndEgressStats.csv");
+	mierendorffEval.writeCoordTimeStamps(dir+"/mierendorffParkStamps.csv");
+	klausEval.writeStats(dir+"klausnerParkAndEgressStats.csv");
+	klausEval.writeCoordTimeStamps(dir+"klausParkStamps.csv");
+	wlp.plotWalkLegs(dir+"walkLegs_car.csv");
+	wlpFF.plotWalkLegs(dir+"walkLegs_freefloating.csv");
+	pvv.finishDay();
+	pvv.plotCarPositions(dir+"carPositions.csv");
 }
 
 static Set<Id<Link>> readLinks(String filename){

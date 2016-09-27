@@ -57,11 +57,10 @@ public class CreateFreefloatingParkingFacilities {
 		new MatsimNetworkReader(scenario.getNetwork())
 				.readFile("../../../shared-svn/projects/bmw_carsharing/data/scenario/network.xml.gz");
 		final ActivityFacilitiesFactory fac = scenario.getActivityFacilities().getFactory();
-		int lossPerLink = 0;
-		int csPerLink = 0;
+	
 		TabularFileParserConfig config = new TabularFileParserConfig();
 		config.setDelimiterTags(new String[] { "\t" });
-		config.setFileName("../../../shared-svn/projects/bmw_carsharing/data/parkplaetze.txt");
+		config.setFileName("../../../shared-svn/projects/bmw_carsharing/data/parkplaetze250cs.txt");
 		config.setCommentTags(new String[] { "#" });
 		new TabularFileParser().parse(config, new TabularFileHandler() {
 
@@ -69,7 +68,7 @@ public class CreateFreefloatingParkingFacilities {
 			public void startRow(String[] row) {
 				Id<Link> linkId = Id.createLinkId(row[0]);
 				Coord coord = scenario.getNetwork().getLinks().get(linkId).getCoord();
-				int capacity = Integer.parseInt(row[1]) - lossPerLink - csPerLink;
+				int capacity = Integer.parseInt(row[1]);
 				ActivityFacility parking = fac.createActivityFacility(
 						Id.create(linkId.toString() + "_curbside", ActivityFacility.class), coord, linkId);
 				ActivityOption parkingOption = fac.createActivityOption(ParkingUtils.PARKACTIVITYTYPE);
@@ -77,7 +76,7 @@ public class CreateFreefloatingParkingFacilities {
 				parking.addActivityOption(parkingOption);
 
 				ActivityOption ffcsParkingOption = fac.createActivityOption(FFCSUtils.FREEFLOATINGPARKACTIVITYTYPE);
-				ffcsParkingOption.setCapacity(csPerLink);
+				ffcsParkingOption.setCapacity(Integer.parseInt(row[2]));
 
 				parking.addActivityOption(ffcsParkingOption);
 
@@ -86,7 +85,7 @@ public class CreateFreefloatingParkingFacilities {
 
 		});
 		new FacilitiesWriter(scenario.getActivityFacilities())
-				.write("../../../shared-svn/projects/bmw_carsharing/data/scenario/parkingFacilities-nocs.xml");
+				.write("../../../shared-svn/projects/bmw_carsharing/data/scenario/parkingFacilities-250cs.xml");
 
 	}
 

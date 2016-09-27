@@ -17,26 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.parking.routing;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.NetworkRoute;
+package playground.agarwalamit.utils;
 
 /**
- * @author  jbischoff
+ * I think, after introduction of URL and for uniformity, pass absolute path.
+ * Because, relative paths are converted to new uri and then url using new File(" ").getAbsoluteFile() rather than
+ * new File(" ").getCanonicalFile(); which eventually contains (../..) in the file path. see toURL() of {@link java.io.File}.
  *
+ * Created by amit on 26/09/16.
  */
-public interface ParkingRouter {
-	/**
-	 * *
-	 * @param intendedRoute: may be a network route (car trips) or may be generic (carsharing etc.) 
-	 * @param departureTime
-	 * @param startLinkId
-	 * @return
-	 */
 
-	NetworkRoute getRouteFromParkingToDestination(Id<Link> destinationLinkId, double departureTime, Id<Link> startLinkId);
-	
+
+public final class FileUtils {
+
+    public static final String RUNS_SVN = "/Users/amit/Documents/repos/runs-svn/";
+
+    public static final String SHARED_SVN = "/Users/amit/Documents/repos/shared-svn/";
+
 }

@@ -22,14 +22,11 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.matsim.core.utils.collections.Tuple;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
-
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.l;
 
 /**
  * @author thibautd
@@ -83,6 +80,68 @@ public class KDTreeTest {
 	}
 
 	@Test
+	public void testClosestFilter() {
+		final KDTree<int[]> tree = createTree();
+
+		final Random random = new Random( 123 );
+
+		for ( int i=0; i < 50; i++ ) {
+			final double[] c = new double[ 3 ];
+			for ( int j=0; j < c.length; j++ ) c[ j ] = random.nextDouble() * 100;
+
+			final int[] closest =
+					tree.getClosestEuclidean(
+							c ,
+							a -> a[0] == a[1] );
+
+			Assert.assertTrue(
+					"closest point does not obey predicate",
+					closest[0] == closest[1] );
+		}
+	}
+
+	@Test
+	public void testRemove() {
+		final KDTree<int[]> tree = createTree();
+
+		final Random random = new Random( 123 );
+
+		int size = 100 * 100 * 100;
+		for ( int i=0; i < 50; i++ ) {
+			final double[] c = new double[ 3 ];
+			for ( int j=0; j < c.length; j++ ) c[ j ] = random.nextDouble() * 100;
+
+			final int[] closest = tree.getClosest( c , (c1,c2) -> Math.abs( c1[1] - c2[1] ) );
+
+			final boolean removed = tree.remove( closest );
+
+			Assert.assertEquals(
+					"unexpected number of elements after removal",
+					--size,
+					tree.getAll().size() );
+
+			Assert.assertTrue(
+					"remove returned false when removing",
+					removed );
+
+			final boolean reremoved = tree.remove( closest );
+
+			Assert.assertFalse(
+					"remove returned true when re-removing",
+					reremoved );
+
+			Assert.assertEquals(
+					"size changed when re-removing",
+					size,
+					tree.getAll().size() );
+
+			Assert.assertFalse(
+					"removed element is still there",
+					tree.getAll().contains( closest ) );
+		}
+	}
+
+	@Test
 	public void testBox() {
 		final KDTree<int[]> tree = createTree();
 
@@ -113,6 +172,23 @@ public class KDTreeTest {
 				"unexpected number of elements in box",
 				41 * 21 * 21,
 				box.size() );
+	}
+
+	@Test
+	public void testBoxPredicate() {
+		final KDTree<int[]> tree = createTree();
+
+		Collection<int[]> box =
+				tree.getBox(
+						new double[]{ 20 , 20 , 20 },
+						new double[]{ 40 , 40 , 40 },
+						a -> a[0] == a[1]);
+
+		for ( int[] a : box ) {
+			Assert.assertTrue(
+					"value in box does not obey predicate",
+					a[0] == a[1] );
+		}
 	}
 
 	@Test
@@ -159,16 +235,15 @@ public class KDTreeTest {
 	}
 
 	private KDTree<int[]> createTree( boolean balance ) {
-		final KDTree<int[]> tree = new KDTree<>( 3 );
+		final KDTree<int[]> tree = new KDTree<>( 3, a -> new double[]{ a[ 0 ] , a[ 1 ] , a[ 2 ] } );
 
-		List<Tuple<int[],double[]>> l = new ArrayList<>();
+		List<int[]> l = new ArrayList<>();
 
 		for ( int i=0; i < 100; i++ ) {
 			for ( int j=0; j < 100; j++ ) {
 				for ( int k=0; k < 100; k++ ) {
 					final int[] v = { i , j , k };
-					final double[] c = { i , j , k };
-					l.add( new Tuple<>( v, c ) );
+					l.add( v );
 				}
 			}
 		}
@@ -177,7 +252,7 @@ public class KDTreeTest {
 			tree.add( l );
 		}
 		else {
-			for ( Tuple<int[],double[]> t : l ) tree.add( t.getSecond() , t.getFirst() );
+			for ( int[] t : l ) tree.add( t );
 		}
 
 		return tree;

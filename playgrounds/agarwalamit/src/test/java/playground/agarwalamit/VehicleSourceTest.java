@@ -104,6 +104,13 @@ public class VehicleSourceTest {
 		createNetwork();
 		createPlans();
 
+		if(vehicleSource==VehiclesSource.modeVehicleTypesFromVehiclesData &&
+				!isUsingPersonIdForMissionVehicleId &&
+				scenario.getVehicles().getVehicles().size()==0) {
+			throw new RuntimeException("Use of person id for mission vehicle id is not allowed and vehicle source is "+vehicleSource+
+			". In such situation vehicles in the scenario must be present.");
+		}
+
 		Config config = scenario.getConfig();
 		config.qsim().setFlowCapFactor(1.0);
 		config.qsim().setStorageCapFactor(1.0);
@@ -122,8 +129,8 @@ public class VehicleSourceTest {
 
 		ActivityParams homeAct = new ActivityParams("h");
 		ActivityParams workAct = new ActivityParams("w");
-		homeAct.setTypicalDuration(1*3600);
-		workAct.setTypicalDuration(1*3600);
+		homeAct.setTypicalDuration(1. * 3600.);
+		workAct.setTypicalDuration(1. * 3600.);
 
 		config.planCalcScore().addActivityParams(homeAct);
 		config.planCalcScore().addActivityParams(workAct);
@@ -184,6 +191,8 @@ public class VehicleSourceTest {
 
 		VehicleType [] vehTypes = {bike, car};
 
+		System.out.println(vehicleSource);
+
 		for(int i=0;i<2;i++){
 			Id<Person> id = Id.create(i, Person.class);
 			Person p = population.getFactory().createPerson(id);
@@ -203,14 +212,19 @@ public class VehicleSourceTest {
 			plan.addActivity(a2);
 			population.addPerson(p);
 
-			//adding vehicle type and vehicle to scenario
-			Id<Vehicle> vId = Id.create(p.getId(),Vehicle.class);
-			Vehicle v = VehicleUtils.getFactory().createVehicle(vId, vehTypes[i]);
+			//adding vehicle type and vehicle to scenario if vehicleSource is not modeVehicleTypesFromVehiclesData
 
 			if(! scenario.getVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
 				scenario.getVehicles().addVehicleType(vehTypes[i]);
 			}
-			scenario.getVehicles().addVehicle(v);
+
+			if(vehicleSource == VehiclesSource.modeVehicleTypesFromVehiclesData) {
+				//vehicles ids are not necessary, however, if added, the simulation will work without any problem.
+			} else {
+				Id<Vehicle> vId = Id.create(p.getId(),Vehicle.class);
+				Vehicle v = VehicleUtils.getFactory().createVehicle(vId, vehTypes[i]);
+				scenario.getVehicles().addVehicle(v);
+			}
 		}
 	}
 

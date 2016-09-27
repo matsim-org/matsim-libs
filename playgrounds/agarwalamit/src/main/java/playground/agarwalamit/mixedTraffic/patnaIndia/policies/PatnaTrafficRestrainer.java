@@ -47,9 +47,8 @@ public final class PatnaTrafficRestrainer {
 
 	PatnaTrafficRestrainer() {}
 
-	static void run(Network network){
-
-		{ 
+	public static void run(Network network){
+		{
 			// major problem with the follwoing links
 			Id<Link> linkId = Id.createLinkId("1538010000");
 			Id<Link> reverseLinkId = Id.createLinkId("15380");

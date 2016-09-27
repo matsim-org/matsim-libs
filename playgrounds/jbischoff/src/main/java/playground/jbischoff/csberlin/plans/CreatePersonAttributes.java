@@ -46,14 +46,14 @@ public class CreatePersonAttributes {
 	public static void main(String[] args) {
 		Random r = MatsimRandom.getLocalInstance();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenario).readFile("C:/Users/Joschka/Documents/shared-svn/projects/bmw_carsharing/data/scenario/untersuchungsraum-dummyplans.xml");
+		new PopulationReader(scenario).readFile("C:/Users/Joschka/Documents/shared-svn/projects/bmw_carsharing/data/scenario/untersuchungsraum-plans.xml.gz");
 		for (Person p : scenario.getPopulation().getPersons().values()){
 			Integer age = (Integer) p.getCustomAttributes().get("age");
 			String car = (String) p.getCustomAttributes().get("carAvail");
 			Boolean license = ((String) p.getCustomAttributes().get("hasLicense")).equals("yes")?true:false;
 			Boolean member = false;
 			if (license){
-				if (r.nextDouble()<0.125){
+				if (r.nextDouble()<0.28){
 					member = true;
 				}
 			}
@@ -67,7 +67,7 @@ public class CreatePersonAttributes {
 			scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "member", member);
 			
 		}
-		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile("C:/Users/Joschka/Documents/shared-svn/projects/bmw_carsharing/data/scenario/untersuchungsraum-dummyplans_oA.xml");
+		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile("C:/Users/Joschka/Documents/shared-svn/projects/bmw_carsharing/data/scenario/untersuchungsraum-planscs50_oA.xml");
 		
 }
 	
