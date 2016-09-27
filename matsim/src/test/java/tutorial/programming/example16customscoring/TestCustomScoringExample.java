@@ -22,7 +22,7 @@ public class TestCustomScoringExample {
      */
     @Test
     public void testCustomScoring() {
-        final String pathname = "./output/example5";
+        final String pathname = "./output/example";
         try {
             IOUtils.deleteDirectory(new File(pathname),false);
         } catch ( IllegalArgumentException ee ) {
