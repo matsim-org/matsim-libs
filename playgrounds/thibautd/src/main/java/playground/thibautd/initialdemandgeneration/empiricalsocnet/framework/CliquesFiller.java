@@ -16,13 +16,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet;
+package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
 
 import playground.thibautd.utils.KDTree;
+
+import java.util.Set;
 
 /**
  * @author thibautd
  */
-public interface EgoLocator extends KDTree.Coordinate<Ego> {
-	int getDimensionality();
+public interface CliquesFiller {
+	/**
+	 * Sample a feasible clique, fills the alters lists of the egos, and returns the clique.
+	 * @param ego the "center" of the clique
+	 * @param egosWithFreeStubs
+	 * @return The set of egos pertaining to the clique, including the "center", already modified.
+	 */
+	Set<Ego> sampleClique( Ego ego, KDTree<Ego> egosWithFreeStubs );
 }
