@@ -31,6 +31,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.linkVolume.LinkVolumeHandler;
+import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.MapUtils;
 
 /**
@@ -39,7 +40,7 @@ import playground.agarwalamit.utils.MapUtils;
 
 public class LinkVolumeWriter {
 
-	private static final String dir = "../../../../repos/runs-svn/patnaIndia/run110/1pct/output_PassingQ_withHoles_7/";
+	private static final String dir = FileUtils.RUNS_SVN+"/patnaIndia/run110/1pct/output_PassingQ_withHoles_7/";
 	private static final String eventsFile = dir+"/output_events.xml.gz";
 	private Map<Id<Link>, Map<Integer, Double>> linkid2Count = new HashMap<>();
 

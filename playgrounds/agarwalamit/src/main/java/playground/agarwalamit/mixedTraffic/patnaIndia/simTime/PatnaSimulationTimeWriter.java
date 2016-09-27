@@ -47,6 +47,7 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.PatnaVehicles
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.UrbanDemandGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
+import playground.agarwalamit.utils.FileUtils;
 
 /**
  * @author amit
@@ -56,7 +57,7 @@ public class PatnaSimulationTimeWriter {
 
 	private static final Logger LOG = Logger.getLogger(PatnaSimulationTimeWriter.class);
 	private final int [] randomSeeds = {4711, 6835, 1847, 4144, 4628, 2632, 5982, 3218, 5736, 7573,4389, 1344} ;
-	private static String runDir =  "../../../../repos/runs-svn/patnaIndia/run110/";
+	private static String runDir = FileUtils.RUNS_SVN+"/patnaIndia/run110/";
 	private static String inputFilesDir = runDir+"/inputs/";
 	
 	private static String linkDynamics_CSV = "FIFO,PassingQ,SeepageQ";
