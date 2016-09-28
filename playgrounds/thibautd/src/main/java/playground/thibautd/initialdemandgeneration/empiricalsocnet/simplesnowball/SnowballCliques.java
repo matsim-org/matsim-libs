@@ -37,13 +37,24 @@ import java.util.Map;
  * @author thibautd
  */
 public class SnowballCliques {
-	public static Map<Id<Clique>, Clique> readCliques( final String file ) {
+	private final Map<Id<Clique>,Clique> cliques = new HashMap<>();
+	private final List<Member> egos = new ArrayList<>();
+
+	public Map<Id<Clique>, Clique> getCliques() {
+		return cliques;
+	}
+
+	public List<Member> getEgos() {
+		return egos;
+	}
+
+	public static SnowballCliques readCliques( final String file ) {
 		final CoordinateTransformation transformation =
 				TransformationFactory.getCoordinateTransformation(
 						TransformationFactory.WGS84,
 						TransformationFactory.CH1903_LV03_GT );
 
-		final Map<Id<Clique>,Clique> cliques = new HashMap<>();
+		final SnowballCliques cliques = new SnowballCliques();
 		try ( final CsvParser parser = new CsvParser( ',' , '\"' , file ) ) {
 			while ( parser.nextLine() ) {
 				final Id<Clique> cliqueId = parser.getIdField( "Clique_ID" , Clique.class );
@@ -62,10 +73,12 @@ public class SnowballCliques {
 				final Coord egoCoord = transformation.transform( new Coord( egoLongitude , egoLatitude ) );
 				final Coord alterCoord = transformation.transform( new Coord( alterLongitude , alterLatitude ) );
 
-				Clique clique = cliques.get( cliqueId );
+				Clique clique = cliques.cliques.get( cliqueId );
 				if ( clique == null ) {
-					clique = new Clique( cliqueId , new Member( egoSex , egoCoord , egoAge , egoDegree ) );
-					cliques.put( cliqueId , clique );
+					final Member ego = new Member( egoSex , egoCoord , egoAge , egoDegree );
+					clique = new Clique( cliqueId , ego );
+					cliques.cliques.put( cliqueId , clique );
+					cliques.egos.add( ego );
 				}
 				clique.alters.add( new Member( alterSex , alterCoord , alterAge , -1 ) );
 			}
@@ -104,10 +117,10 @@ public class SnowballCliques {
 	}
 
 	public static class Member {
-		final Sex sex;
-		final Coord coord;
-		final int age;
-		final int degree;
+		private final Sex sex;
+		private final Coord coord;
+		private final int age;
+		private final int degree;
 
 		public Member( final Sex sex, final Coord coord, final int age, final int degree ) {
 			this.sex = sex;

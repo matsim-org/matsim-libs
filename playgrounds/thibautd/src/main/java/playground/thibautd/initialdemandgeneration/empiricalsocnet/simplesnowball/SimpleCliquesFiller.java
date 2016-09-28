@@ -38,6 +38,8 @@ import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
+import static org.osgeo.proj4j.parser.Proj4Keyword.a;
+
 /**
  * @author thibautd
  */
@@ -55,11 +57,11 @@ public class SimpleCliquesFiller implements CliquesFiller {
 
 	@Inject
 	public SimpleCliquesFiller(
-			final Iterable<SnowballCliques.Clique> snowballCliques,
+			final SnowballCliques snowballCliques,
 			final Position position ) {
 		this.position = position;
 
-		for ( SnowballCliques.Clique snowballClique : snowballCliques ) {
+		for ( SnowballCliques.Clique snowballClique : snowballCliques.getCliques().values() ) {
 			final CliquePositions clique = new CliquePositions();
 
 			for ( SnowballCliques.Member alter : snowballClique.getAlters() ) {
@@ -193,6 +195,9 @@ public class SimpleCliquesFiller implements CliquesFiller {
 	 */
 	private static class CliquePosition {
 		private final double distance, bearing;
+		// one could also use actual age difference (not classified),
+		// but this would then require calibrating social distance more carefully
+		// (how much kilometers is one year difference worth?)
 		private final int ageClassDistance;
 		private final boolean sameSex;
 
