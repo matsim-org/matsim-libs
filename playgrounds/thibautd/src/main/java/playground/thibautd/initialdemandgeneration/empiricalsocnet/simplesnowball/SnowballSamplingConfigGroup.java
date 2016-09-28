@@ -26,21 +26,21 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 public class SnowballSamplingConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "snowballBasedSampling";
 
-	private String outputSocialNetwork = null;
+	private String outputDirectory = null;
 	private String inputCliquesCsv = null;
 
 	public SnowballSamplingConfigGroup( ) {
 		super( GROUP_NAME );
 	}
 
-	@StringGetter("outputSocialNetwork")
-	public String getOutputSocialNetwork() {
-		return outputSocialNetwork;
+	@StringGetter("outputDirectory")
+	public String getOutputDirectory() {
+		return outputDirectory;
 	}
 
-	@StringSetter("outputSocialNetwork")
-	public void setOutputSocialNetwork( final String outputSocialNetwork ) {
-		this.outputSocialNetwork = outputSocialNetwork;
+	@StringSetter("outputDirectory")
+	public void setOutputDirectory( final String outputDirectory ) {
+		this.outputDirectory = outputDirectory;
 	}
 
 	@StringGetter("inputCliquesCsv")

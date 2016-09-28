@@ -22,6 +22,7 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplerUtils;
 
 /**
@@ -32,14 +33,21 @@ public class RunSimpleCliquesSampling {
 		final SnowballSamplingConfigGroup configGroup = new SnowballSamplingConfigGroup();
 		final Config config = ConfigUtils.loadConfig( args[ 0 ] , configGroup );
 
-		final SocialNetwork socialNetwork =
-				SocialNetworkSamplerUtils.sampleSocialNetwork(
-						config,
-						new SimpleSnowballModule(
-								SnowballCliques.readCliques(
-										configGroup.getInputCliquesCsv() ) ) );
+		MoreIOUtils.initOut( configGroup.getOutputDirectory() , config );
 
-		new SocialNetworkWriter( socialNetwork ).write( configGroup.getOutputSocialNetwork() );
+		try {
+			final SocialNetwork socialNetwork =
+					SocialNetworkSamplerUtils.sampleSocialNetwork(
+							config,
+							new SimpleSnowballModule(
+									SnowballCliques.readCliques(
+											configGroup.getInputCliquesCsv() ) ) );
+
+			new SocialNetworkWriter( socialNetwork ).write( configGroup.getOutputDirectory() + "/output_socialNetwork.xml.gz" );
+		}
+		finally {
+			MoreIOUtils.closeOutputDirLogging();
+		}
 	}
 }
 
