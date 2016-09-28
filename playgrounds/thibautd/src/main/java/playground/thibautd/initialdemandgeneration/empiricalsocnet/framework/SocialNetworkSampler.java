@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.misc.Counter;
 import playground.thibautd.utils.KDTree;
 
 import java.util.HashMap;
@@ -64,7 +65,9 @@ public class SocialNetworkSampler {
 		final KDTree<Ego> egosWithFreeStubs = new KDTree<>( egoLocator.getDimensionality() , egoLocator );
 		egosWithFreeStubs.add( egos.values() );
 
+		final Counter counter = new Counter( "Sample clique # " );
 		while ( !egosWithFreeStubs.isEmpty() ) {
+			counter.incCounter();
 			final Ego ego = egosWithFreeStubs.get( random.nextInt( egosWithFreeStubs.size() ) );
 
 			final Set<Ego> clique = cliquesFiller.sampleClique( ego , egosWithFreeStubs );
@@ -75,6 +78,7 @@ public class SocialNetworkSampler {
 				}
 			}
 		}
+		counter.printCounter();
 
 		return new SocialNetwork() {
 			@Override
