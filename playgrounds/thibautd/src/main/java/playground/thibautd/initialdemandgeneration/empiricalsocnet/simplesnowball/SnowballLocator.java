@@ -24,6 +24,9 @@ import org.matsim.core.population.PersonUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoLocator;
 
+import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
+import static playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowball.SimpleCliquesFiller.getSex;
+
 /**
  * @author thibautd
  */
@@ -47,7 +50,7 @@ public class SnowballLocator implements EgoLocator, SimpleCliquesFiller.Position
 				firstActivity.getCoord().getX() ,
 				firstActivity.getCoord().getY() ,
 				SimpleCliquesFiller.calcAgeClass( PersonUtils.getAge( ego.getPerson() ) ) ,
-				SnowballCliques.Sex.valueOf( PersonUtils.getSex( ego.getPerson() ) ).ordinal() };
+				SimpleCliquesFiller.getSex( ego ).ordinal() };
 	}
 
 	@Override

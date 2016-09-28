@@ -128,6 +128,19 @@ public class SimpleCliquesFiller implements CliquesFiller {
 		return degree;
 	}
 
+
+	public static SnowballCliques.Sex getSex( final Ego ego ) {
+		final String sex = PersonUtils.getSex( ego.getPerson() );
+		switch ( sex ) {
+			case "f":
+				return SnowballCliques.Sex.female;
+			case "m":
+				return SnowballCliques.Sex.male;
+			default:
+				throw new IllegalArgumentException( sex );
+		}
+	}
+
 	private static class EgoClass {
 		private final int ageClass;
 		private final SnowballCliques.Sex sex;
@@ -144,7 +157,7 @@ public class SimpleCliquesFiller implements CliquesFiller {
 
 		private EgoClass( final Ego ego ) {
 			this( PersonUtils.getAge( ego.getPerson() ),
-					SnowballCliques.Sex.valueOf( PersonUtils.getSex( ego.getPerson() ) ),
+					getSex( ego ),
 					ego.getDegree() );
 		}
 
