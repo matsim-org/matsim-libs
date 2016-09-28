@@ -85,9 +85,9 @@ public class SeasonDiff {
 
         for(Count<Link> count : counts.getCounts().values()) {
 
-            Double relErr = rates.get(count.getCsId().toString());
+            Double relErr = rates.get(count.getCsLabel().toString());
             if(relErr != null) {
-                Double vol = volumes.get(count.getCsId().toString());
+                Double vol = volumes.get(count.getCsLabel().toString());
                 Coord obsPos = count.getCoord();
 
                 Point obsPoint = MatsimCoordUtils.coordToPoint(obsPos);
@@ -96,7 +96,7 @@ public class SeasonDiff {
 
                 Map<String, Object> properties = new HashMap<>();
 
-                properties.put("id", count.getCsId());
+                properties.put("id", count.getCsLabel());
                 properties.put("error", relErr);
                 properties.put("observation", vol);
 

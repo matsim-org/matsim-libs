@@ -57,8 +57,8 @@ import java.io.IOException;
 	@Override
 	public void startCount(final Count count, final BufferedWriter out) throws IOException {
 		out.write("\t<count");
-		out.write(" loc_id=\"" + count.getLocId() + "\"");
-		out.write(" cs_id=\"" + count.getCsId() + "\"");
+		out.write(" loc_id=\"" + count.getId() + "\"");
+		out.write(" cs_id=\"" + count.getCsLabel() + "\"");
 		if (count.getCoord() != null) {
 			final Coord coord = coordinateTransformation.transform( count.getCoord() );
 			out.write(" x=\"" + coord.getX() + "\"");

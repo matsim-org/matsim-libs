@@ -67,8 +67,8 @@ public class ODCountsAnalyzer implements AfterMobsimListener {
 			writer.newLine();
 
 			for (Count count : counts.getCounts().values()) {
-				if (count.getLocId().toString().startsWith(ODCalibrator.VIRTUAL_ID_PREFIX)) {
-					Link link = network.getLinks().get(count.getLocId());
+				if (count.getId().toString().startsWith(ODCalibrator.VIRTUAL_ID_PREFIX)) {
+					Link link = network.getLinks().get(count.getId());
 					double refVal = count.getMaxVolume().getValue() * 24;
 					double simVal = simResults.getSimValue(link, 0, 86400, TYPE.COUNT_VEH);
 

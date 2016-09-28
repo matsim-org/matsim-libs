@@ -202,7 +202,7 @@ public class CadytsPtIT {
 		new MatsimCountsReader(occupCounts).readFile(controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName());
 		Count count =  occupCounts.getCount(Id.create("stop1", Link.class)); // casting id from stop to link, not nice
 		Assert.assertEquals("Occupancy counts description is wrong", occupCounts.getDescription(), "counts values for equil net");
-		Assert.assertEquals("CsId is wrong.", count.getCsId() , "stop1");
+		Assert.assertEquals("CsId is wrong.", count.getCsLabel() , "stop1");
 		Assert.assertEquals("Volume of hour 4 is wrong", count.getVolume(7).getValue(), 4.0 , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Max count volume is wrong.", count.getMaxVolume().getValue(), 4.0 , MatsimTestUtils.EPSILON);
 
@@ -353,7 +353,7 @@ public class CadytsPtIT {
 		new MatsimCountsReader(occupCounts).readFile(controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName());
 		Count count =  occupCounts.getCount(Id.create("stop1", Link.class)); // casting the id from a stop to a link, not nice..
 		Assert.assertEquals("Occupancy counts description is wrong", occupCounts.getDescription(), "counts values for equil net");
-		Assert.assertEquals("CsId is wrong.", count.getCsId() , "stop1");
+		Assert.assertEquals("CsId is wrong.", count.getCsLabel() , "stop1");
 		Assert.assertEquals("Volume of hour 4 is wrong", count.getVolume(7).getValue(), 4.0 , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Max count volume is wrong.", count.getMaxVolume().getValue(), 4.0 , MatsimTestUtils.EPSILON);
 
@@ -510,7 +510,7 @@ public class CadytsPtIT {
 		new MatsimCountsReader(occupCounts).readFile(controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName());
 		Count count =  occupCounts.getCount(Id.create("stop1", Link.class));
 		Assert.assertEquals("Occupancy counts description is wrong", occupCounts.getDescription(), "counts values for equil net");
-		Assert.assertEquals("CsId is wrong.", count.getCsId() , "stop1");
+		Assert.assertEquals("CsId is wrong.", count.getCsLabel() , "stop1");
 
 		Assert.assertEquals("Volume of hour 4 is wrong", count.getVolume(7).getValue(), 4.0 , MatsimTestUtils.EPSILON);
 		// yy I don't know why it says "hour 4" but "getVolume(7)". kai, sep'14

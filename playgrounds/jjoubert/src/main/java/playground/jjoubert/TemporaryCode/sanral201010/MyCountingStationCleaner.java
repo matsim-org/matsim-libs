@@ -156,7 +156,7 @@ public class MyCountingStationCleaner {
 				if(linkMap.containsKey(id)){
 					// It is a station that must remain.
 					Count c = cs.getCount(id);
-					Count cNew = csNew.createAndAddCount(linkMap.get(id), c.getCsId());
+					Count cNew = csNew.createAndAddCount(linkMap.get(id), c.getCsLabel());
 											
 					// Get the coordinate. First remove the suffix from the Id.
 					cNew.setCoord(network.getLinks().get(linkMap.get(id)).getCoord());

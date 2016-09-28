@@ -53,8 +53,8 @@ public class CountsCleaner {
 					log.info("HW link:       " + link.getId().toString() + " capacity: " + capacity);
 					log.info("original link: " + originallink.getId().toString() + " capacity: " + originalcapacity);
 					HashMap<Integer,Volume> volumes = originalcount.getVolumes();
-					this.createHWCount(link.getId(), originalcount.getCsId(), volumes, counts, capacity / totalcapacity);
-					this.adaptOriginalCount(originallink.getId(), originalcount.getCsId(), volumes, counts, originalcapacity / totalcapacity);
+					this.createHWCount(link.getId(), originalcount.getCsLabel(), volumes, counts, capacity / totalcapacity);
+					this.adaptOriginalCount(originallink.getId(), originalcount.getCsLabel(), volumes, counts, originalcapacity / totalcapacity);
 				}
 				
 				

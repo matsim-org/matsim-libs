@@ -89,7 +89,7 @@ class CadytsPtCountsComparisonAlgorithm {
 	void calculateComparison() {
 		double countValue;
 		for (Count count : this.counts.getCounts().values()) {
-			Id stopId = count.getLocId();
+			Id stopId = count.getId();
 			if (!isInRange(count.getCoord())) {
 				continue;
 			}

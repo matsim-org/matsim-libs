@@ -247,7 +247,7 @@ class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 			for (int anOcuppancy : ocuppancy) {
 				writer.write((anOcuppancy) + TAB);
 			}
-			writer.write(count.getCoord().toString() + TAB + count.getCsId() + NL);
+			writer.write(count.getCoord().toString() + TAB + count.getCsLabel() + NL);
 		}
 		writer.write(this.occupancyRecord.toString());
 		writer.close();

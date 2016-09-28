@@ -97,10 +97,10 @@ public class CountsFileGenerator {
 				System.out.println(line);
 			Map<String,Count> aCounts = null;
 			for(Count count:allCounts.get(MODES[0]).getCounts().values())
-				if(count.getCsId().equals(code+SEPARATOR+movement)) {
+				if(count.getCsLabel().equals(code+SEPARATOR+movement)) {
 					aCounts = new HashMap<String, Count>();
 					for(String mode:MODES)
-						aCounts.put(mode,allCounts.get(mode).getCounts().get(count.getLocId()));
+						aCounts.put(mode,allCounts.get(mode).getCounts().get(count.getId()));
 				}
 			if(aCounts==null) {
 				Entry<String, Coord> entryLocation = null;
