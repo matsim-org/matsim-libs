@@ -31,6 +31,7 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego
 import playground.thibautd.utils.KDTree;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -88,7 +89,7 @@ public class SimpleCliquesFiller implements CliquesFiller {
 	}
 
 	private double calcBearing( final Coord coord1, final Coord coord2 ) {
-		final double normalizedXDiff = coord2.getX() - coord1.getX() / CoordUtils.calcProjectedEuclideanDistance( coord1 , coord2 );
+		final double normalizedXDiff = (coord2.getX() - coord1.getX()) / CoordUtils.calcProjectedEuclideanDistance( coord1 , coord2 );
 		final double sign = coord2.getY() > coord1.getY() ? 1 : -1;
 
 		return sign * Math.acos( normalizedXDiff );
@@ -120,6 +121,9 @@ public class SimpleCliquesFiller implements CliquesFiller {
 					egosWithFreeStubs.getClosestEuclidean(
 							point,
 							(e) -> e.getFreeStubs() >= clique.size() - 1 );
+			if ( member == null ) {
+				throw new RuntimeException( "no alter found at "+ Arrays.toString( point )+" for clique size "+clique.size() );
+			}
 			group( member , members );
 		}
 
