@@ -27,6 +27,7 @@ import playground.thibautd.utils.CsvParser;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,13 +80,26 @@ public class SnowballCliques {
 	public enum Sex { female, male }
 
 	public static class Clique {
-		final Id<Clique> cliqueId;
-		final Member ego;
-		final List<Member> alters = new ArrayList<>();
+		private final Id<Clique> cliqueId;
+		private final Member ego;
+		private final List<Member> alters = new ArrayList<>();
+		private final List<Member> unmodifiableAlters = Collections.unmodifiableList( alters );
 
 		public Clique( final Id<Clique> cliqueId, final Member ego ) {
 			this.cliqueId = cliqueId;
 			this.ego = ego;
+		}
+
+		public Id<Clique> getCliqueId() {
+			return cliqueId;
+		}
+
+		public Member getEgo() {
+			return ego;
+		}
+
+		public List<Member> getAlters() {
+			return unmodifiableAlters;
 		}
 	}
 

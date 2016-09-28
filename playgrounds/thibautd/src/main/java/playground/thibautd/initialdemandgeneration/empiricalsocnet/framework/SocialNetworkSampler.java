@@ -70,7 +70,7 @@ public class SocialNetworkSampler {
 			final Set<Ego> clique = cliquesFiller.sampleClique( ego , egosWithFreeStubs );
 
 			for ( Ego member : clique ) {
-				if ( member.degree <= member.alters.size() ) {
+				if ( member.getDegree() <= member.getAlters().size() ) {
 					egosWithFreeStubs.remove( member );
 				}
 			}
@@ -101,7 +101,7 @@ public class SocialNetworkSampler {
 
 			@Override
 			public Set<Id<Person>> getAlters( final Id<Person> ego ) {
-				return egos.get( ego ).alters
+				return egos.get( ego ).getAlters()
 						.stream()
 						.map( Ego::getId )
 						.collect( Collectors.toSet() );
@@ -117,7 +117,7 @@ public class SocialNetworkSampler {
 				return egos.values().stream()
 						.collect( Collectors.toMap(
 								Ego::getId,
-								e -> e.alters.stream()
+								e -> e.getAlters().stream()
 										.map( Ego::getId )
 										.collect( Collectors.toSet() ) ));
 			}
