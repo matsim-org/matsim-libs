@@ -76,6 +76,7 @@ public class ColdEmissionAnalysisModule {
 	
 	private final EventsManager eventsManager;
 	private final Double emissionEfficiencyFactor;
+	private final EmissionsConfigGroup ecg;
 	
 	private int vehInfoWarnHDVCnt = 0;
 	private int vehAttributesNotSpecifiedCnt = 0;
@@ -84,12 +85,14 @@ public class ColdEmissionAnalysisModule {
 	public static class ColdEmissionAnalysisModuleParameter {
 		public final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
 		public final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
+		private final EmissionsConfigGroup ecg;
 
 		public ColdEmissionAnalysisModuleParameter(
 				Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable,
-				Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable) {
+				Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, EmissionsConfigGroup emissionsConfigGroup) {
 			this.avgHbefaColdTable = avgHbefaColdTable;
 			this.detailedHbefaColdTable = detailedHbefaColdTable;
+			this.ecg = emissionsConfigGroup;
 		}
 	}
 
@@ -99,6 +102,7 @@ public class ColdEmissionAnalysisModule {
 
 		this.avgHbefaColdTable = parameterObject.avgHbefaColdTable;
 		this.detailedHbefaColdTable = parameterObject.detailedHbefaColdTable;
+		this.ecg = parameterObject.ecg;
 		this.eventsManager = emissionEventsManager;
 		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
 	}
@@ -111,21 +115,28 @@ public class ColdEmissionAnalysisModule {
 
 	public void calculateColdEmissionsAndThrowEvent(
 			Id<Link> coldEmissionEventLinkId,
-			Id<Vehicle> vehicleId,
+			Vehicle vehicle,
 			double eventTime,
 			double parkingDuration,
-			int distance_km,
-			String vehicleDescription) {
+			int distance_km) {
+
+		if(this.ecg.isUsingVehicleIdAsVehicleDescription() ) {
+			if(vehicle.getType().getDescription()==null) {
+				vehicle.getType().setDescription(vehicle.getType().getId().toString());
+			}
+		}
+
+		String vehicleDescription = vehicle.getType().getDescription();
 
 		Map<ColdPollutant, Double> coldEmissions = new HashMap<>();
-		if(vehicleDescription == null){
-			throw new RuntimeException("Vehicle type description for vehicle " + vehicleId + "is missing. " +
+		if(vehicle.getType().getDescription() == null){
+			throw new RuntimeException("Vehicle type description for vehicle " + vehicle + "is missing. " +
 					"Please make sure that requirements for emission vehicles in "
 					+ EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleDescription2VehicleInformationTuple(vehicleDescription);
 		if (vehicleInformationTuple.getFirst() == null){
-			throw new RuntimeException("Vehicle category for vehicle " + vehicleId + " is not valid. " +
+			throw new RuntimeException("Vehicle category for vehicle " + vehicle + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
 					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
@@ -134,14 +145,14 @@ public class ColdEmissionAnalysisModule {
 				coldEmissions.put( cp, 0.0 );
 			}
 		} else {
-			coldEmissions = getColdPollutantDoubleMap(vehicleId, parkingDuration, vehicleInformationTuple, distance_km);
+			coldEmissions = getColdPollutantDoubleMap(vehicle.getId(), parkingDuration, vehicleInformationTuple, distance_km);
 		}
 
 		// a basic apporach to introduce emission reduced cars:
 		if(emissionEfficiencyFactor != null){
 			coldEmissions = rescaleColdEmissions(coldEmissions);
 		}
-		Event coldEmissionEvent = new ColdEmissionEvent(eventTime, coldEmissionEventLinkId, vehicleId, coldEmissions);
+		Event coldEmissionEvent = new ColdEmissionEvent(eventTime, coldEmissionEventLinkId, vehicle.getId(), coldEmissions);
 		this.eventsManager.processEvent(coldEmissionEvent);
 	}
 

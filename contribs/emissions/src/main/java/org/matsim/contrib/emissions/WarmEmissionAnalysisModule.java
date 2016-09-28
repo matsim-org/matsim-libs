@@ -147,8 +147,6 @@ public class WarmEmissionAnalysisModule {
 			double linkLength,
 			double travelTime) {
 
-		// this can also go to WarmEmissionHandler (similar to ColdEmissionHandler);
-		// however, for routing, emission costs is calculated directly from here. Amit Sep 2016
 		if(this.ecg.isUsingVehicleIdAsVehicleDescription() ) {
 			if(vehicle.getType().getDescription()==null) {
 				vehicle.getType().setDescription(vehicle.getType().getId().toString());

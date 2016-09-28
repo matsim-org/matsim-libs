@@ -151,9 +151,12 @@ public class TestWarmEmissionAnalysisModule {
     @Test
 	public void testWarmEmissionAnalysisParameter(){
 		setUp();
-		WarmEmissionAnalysisModuleParameter weamp = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, null, new EmissionsConfigGroup());
+		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
+		ecg.setUsingVehicleIdAsVehicleDescription(true);
+
+		WarmEmissionAnalysisModuleParameter weamp = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, null, ecg);
 		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
-		weamp = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, null, detailedHbefaWarmTable, new EmissionsConfigGroup());
+		weamp = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, null, detailedHbefaWarmTable, ecg);
 		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
 	}
 	
@@ -178,8 +181,8 @@ public class TestWarmEmissionAnalysisModule {
 		Id<Vehicle> vehicleId = Id.create("veh 1", Vehicle.class);		
 		double linkLength = 200.; 
 		Id<VehicleType> vehicleTypeId = Id.create(passengercar+ ";"+petrolTechnology+";"+petrolSizeClass+";"+petrolConcept, VehicleType.class);
-
-		Vehicle vehicle = getVehicle(vehicleId,vehicleTypeId);
+		VehiclesFactory vehFac = VehicleUtils.getFactory();
+		Vehicle vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(vehicleTypeId));
 
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, roadType, petrolSpeedFf/3.6, linkLength, linkLength/petrolSpeedFf*3.6);
 		Assert.assertEquals(detailedPetrolFactorFf*linkLength/1000., warmEmissions.get(WarmPollutant.CO2_TOTAL), MatsimTestUtils.EPSILON);
@@ -200,8 +203,8 @@ public class TestWarmEmissionAnalysisModule {
 		Id<Vehicle> pcVehicleId = Id.create("veh 2", Vehicle.class);
 		double pclinkLength= 100.;
 		Id<VehicleType> pcVehicleTypeId = Id.create(passengercar + ";"+ pcTechnology + ";"+pcSizeClass+";"+pcConcept, VehicleType.class);
-
-		Vehicle pcVehicle = getVehicle(pcVehicleId, pcVehicleTypeId);
+		VehiclesFactory vehFac = VehicleUtils.getFactory();
+		Vehicle pcVehicle = vehFac.createVehicle(pcVehicleId, vehFac.createVehicleType(pcVehicleTypeId));
 		
 		// sub case avg speed = free flow speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(pcVehicle, roadType, pcfreeVelocity/3.6, pclinkLength, pclinkLength/pcfreeVelocity*3.6);
@@ -229,8 +232,8 @@ public class TestWarmEmissionAnalysisModule {
 		Id<Vehicle> dieselVehicleId = Id.create("veh 3", Vehicle.class);
 		double dieselLinkLength= 20.;
 		Id<VehicleType> dieselVehicleTypeId = Id.create(passengercar +";"+ dieselTechnology+ ";"+ dieselSizeClass+";"+dieselConcept, VehicleType.class);
-
-		Vehicle dieselVehicle = getVehicle(dieselVehicleId, dieselVehicleTypeId);
+		VehiclesFactory vehFac = VehicleUtils.getFactory();
+		Vehicle dieselVehicle = vehFac.createVehicle(dieselVehicleId, vehFac.createVehicleType(dieselVehicleTypeId));
 		
 		// sub case avg speed = free flow speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(dieselVehicle, roadType, dieselFreeVelocity/3.6, dieselLinkLength, dieselLinkLength/dieselFreeVelocity*3.6);
@@ -260,8 +263,8 @@ public class TestWarmEmissionAnalysisModule {
 		Id<Vehicle> lpgVehicleId = Id.create("veh 4", Vehicle.class);
 		double lpgLinkLength = 700.;
 		Id<VehicleType> lpgVehicleTypeId = Id.create(passengercar + ";"+ lpgTechnology+";"+lpgSizeClass+";"+lpgConcept, VehicleType.class);
-
-		Vehicle lpgVehicle = getVehicle(lpgVehicleId, lpgVehicleTypeId);
+		VehiclesFactory vehFac = VehicleUtils.getFactory();
+		Vehicle lpgVehicle = vehFac.createVehicle(lpgVehicleId, vehFac.createVehicleType(lpgVehicleTypeId));
 		
 		// sub case avg speed = free flow speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(lpgVehicle, roadType, lpgFreeVelocity/3.6, lpgLinkLength, lpgLinkLength/lpgFreeVelocity*3.6);
@@ -291,8 +294,8 @@ public class TestWarmEmissionAnalysisModule {
 		Id<Link> zeroLinkId = Id.create("link zero", Link.class);
 		double zeroLinklength = 3000.;
 		Id<VehicleType> zeroVehicleTypeId = Id.create(passengercar + ";"+ zeroTechnology + ";" + zeroSizeClass + ";" + zeroConcept, VehicleType.class);
-
-			Vehicle zeroVehicle = getVehicle(zeroVehicleId, zeroVehicleTypeId);
+		VehiclesFactory vehFac = VehicleUtils.getFactory();
+		Vehicle zeroVehicle = vehFac.createVehicle(zeroVehicleId, vehFac.createVehicleType(zeroVehicleTypeId));
 		
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(zeroVehicle, roadType, zeroFreeVelocity/3.6, zeroLinklength, 2*zeroLinklength/(zeroFreeVelocity+zeroSgVelocity)*3.6);
 		Assert.assertEquals(detailedZeroFactorFf*zeroLinklength/1000., warmEmissions.get(WarmPollutant.PM), MatsimTestUtils.EPSILON);
@@ -312,8 +315,8 @@ public class TestWarmEmissionAnalysisModule {
 		Id<Vehicle> sgffVehicleId = Id.create("vehicle sg equals ff", Vehicle.class);
 		double sgffLinklength = 4000.;
 		Id<VehicleType> sgffVehicleTypeId = Id.create(passengercar + ";" + sgffTechnology + ";"+ sgffSizeClass + ";"+sgffConcept, VehicleType.class);
-
-		Vehicle sgffVehicle = getVehicle(sgffVehicleId, sgffVehicleTypeId);
+		VehiclesFactory vehFac = VehicleUtils.getFactory();
+		Vehicle sgffVehicle = vehFac.createVehicle(sgffVehicleId, vehFac.createVehicleType(sgffVehicleTypeId));
 		
 		//avg>ff
 		boolean exceptionThrown = false;
@@ -345,8 +348,8 @@ public class TestWarmEmissionAnalysisModule {
         String noeConcept = "concept";
         String noeTechnology = "technology";
         Id<VehicleType> noeVehicleTypeId = Id.create(passengercar + ";"+ noeTechnology + ";" + noeSizeClass + ";" + noeConcept, VehicleType.class);
-
-		Vehicle noeVehicle = getVehicle(noeVehicleId, noeVehicleTypeId);
+        VehiclesFactory vehFac = VehicleUtils.getFactory();
+		Vehicle noeVehicle = vehFac.createVehicle(noeVehicleId, vehFac.createVehicleType(noeVehicleTypeId));
 		
 		excep= false;
 		try{
@@ -442,7 +445,8 @@ public class TestWarmEmissionAnalysisModule {
 		int roadType = 0;
 		double linkLength = 2*1000.; //in meter
 		Id<VehicleType> vehicleTypeId = Id.create(passengercar+ ";"+petrolTechnology+";"+petrolSizeClass+";"+petrolConcept, VehicleType.class);
-		Vehicle vehicle = getVehicle(vehicleId, vehicleTypeId);
+		VehiclesFactory vehFac = VehicleUtils.getFactory();
+		Vehicle vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(vehicleTypeId));
 		
 		// <stop&go speed
 		Double travelTime = linkLength/petrolSpeedSg*1.2; 
@@ -520,8 +524,8 @@ public class TestWarmEmissionAnalysisModule {
 		Id<Vehicle> vehicleId = Id.create("vehicle 4", Vehicle.class);
 		double lpgLinkLength = 2000.*1000;
 		Id<VehicleType> lpgVehicleTypeId = Id.create(passengercar + ";"+ lpgTechnology+";"+lpgSizeClass+";"+lpgConcept, VehicleType.class);
-
-		Vehicle vehicle = getVehicle(vehicleId,lpgVehicleTypeId);
+		VehiclesFactory vehFac = VehicleUtils.getFactory();
+		Vehicle vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(lpgVehicleTypeId));
 
 		// sub case: current speed equals free flow speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, roadType, lpgFreeVelocity/3.6, 
@@ -557,8 +561,8 @@ public class TestWarmEmissionAnalysisModule {
 		Id<Vehicle> pcVehicleId = Id.create("vehicle 2", Vehicle.class); 
 		double pclinkLength= 20.*1000;
 		Id<VehicleType> pcVehicleTypeId = Id.create(passengercar + ";"+ pcTechnology + ";"+pcSizeClass+";"+pcConcept, VehicleType.class);
-
-		Vehicle pcVehicle = getVehicle(pcVehicleId,pcVehicleTypeId);
+		VehiclesFactory vehFac = VehicleUtils.getFactory();
+		Vehicle pcVehicle = vehFac.createVehicle(pcVehicleId, vehFac.createVehicleType(pcVehicleTypeId));
 		
 		// sub case: current speed equals free flow speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(pcVehicle, roadType, pcfreeVelocity/3.6, pclinkLength, pclinkLength/pcfreeVelocity*3.6);
@@ -593,8 +597,8 @@ public class TestWarmEmissionAnalysisModule {
 	Id<Vehicle> dieselVehicleId = Id.create("vehicle 3", Vehicle.class);
 	double dieselLinkLength= 200.*1000;
 	Id<VehicleType> dieselVehicleTypeId = Id.create(passengercar +";"+ dieselTechnology+ ";"+ dieselSizeClass+";"+dieselConcept, VehicleType.class);
-
-		Vehicle dieselVehicle = getVehicle(dieselVehicleId,dieselVehicleTypeId);
+	VehiclesFactory vehFac = VehicleUtils.getFactory();
+	Vehicle dieselVehicle = vehFac.createVehicle(dieselVehicleId, vehFac.createVehicleType(dieselVehicleTypeId));
 	
 	// sub case: current speed equals free flow speed
 	warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(dieselVehicle, roadType, dieselFreeVelocity/3.6, dieselLinkLength, dieselLinkLength/dieselFreeVelocity*3.6);
@@ -630,8 +634,8 @@ public class TestWarmEmissionAnalysisModule {
 		double inconff = 30. * 1000;
 		double inconffavgSpeed = petrolSpeedFf*2.2;
 		Id<VehicleType> inconffVehicleTypeId = Id.create(passengercar + ";"+petrolTechnology+";"+petrolSizeClass+";"+petrolConcept, VehicleType.class);
-
-		Vehicle inconffVehicle = getVehicle(inconffVehicleId,inconffVehicleTypeId);
+		VehiclesFactory vehFac = VehicleUtils.getFactory();
+		Vehicle inconffVehicle = vehFac.createVehicle(inconffVehicleId, vehFac.createVehicleType(inconffVehicleTypeId));
 
 		// average speed equals free flow speed from table
 		warmEmissions =weam.checkVehicleInfoAndCalculateWarmEmissions(inconffVehicle, roadType, inconffavgSpeed/3.6, inconff, inconff/petrolSpeedFf*3.6);
@@ -662,8 +666,8 @@ public class TestWarmEmissionAnalysisModule {
 		Id<Vehicle> tableVehicleId = Id.create("vehicle 8", Vehicle.class);
 		double tableLinkLength= 30.*1000;
 		Id<VehicleType> tableVehicleTypeId = Id.create(passengercar + ";" + tableTechnology +";" + tableSizeClass+";"+tableConcept, VehicleType.class);
-
-		Vehicle tableVehicle = getVehicle(tableVehicleId,tableVehicleTypeId);
+		VehiclesFactory vehFac = VehicleUtils.getFactory();
+		Vehicle tableVehicle = vehFac.createVehicle(tableVehicleId, vehFac.createVehicleType(tableVehicleTypeId));
 
 		// ff < avg < ff+1 - handled like free flow
 		Double travelTime =  tableLinkLength/(tableffSpeed+0.5)*3.6;
@@ -703,8 +707,8 @@ public class TestWarmEmissionAnalysisModule {
 		double linkLength = 2*1000.; //in meter
 		Id<VehicleType> vehicleTypeId = Id.create(passengercar+ ";"+petrolTechnology+";"+petrolSizeClass+";"+petrolConcept, VehicleType.class);
 		double travelTime = linkLength/petrolSpeedSg*1.2;
-
-		Vehicle vehicle = getVehicle(vehicleId, vehicleTypeId);
+		VehiclesFactory vehFac = VehicleUtils.getFactory();
+		Vehicle vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(vehicleTypeId));
 
 		weam.reset();
 		Assert.assertEquals(0, weam.getFractionOccurences());
@@ -747,8 +751,11 @@ public class TestWarmEmissionAnalysisModule {
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 		
 		double rescaleF = 1.0003;
-		
-		WarmEmissionAnalysisModuleParameter weamParameter = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, new EmissionsConfigGroup());
+
+		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
+		ecg.setUsingVehicleIdAsVehicleDescription(true);
+
+		WarmEmissionAnalysisModuleParameter weamParameter = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, ecg);
 		WarmEmissionAnalysisModule weam = new WarmEmissionAnalysisModule(weamParameter , emissionEventManager, rescaleF);
 		HandlerToTestEmissionAnalysisModules.reset();
 		// ---- end of setup
@@ -757,7 +764,8 @@ public class TestWarmEmissionAnalysisModule {
 		Id<Link> idForAvgTable = Id.create("link id avg", Link.class);
 		Id<Vehicle> vehicleIdForAvgTable = Id.create("vehicle avg", Vehicle.class);
 		Id<VehicleType> dieselVehicleTypeId = Id.create(passengercar +";"+ dieselTechnology+ ";"+ dieselSizeClass+";"+dieselConcept, VehicleType.class);
-		Vehicle vehicleForAvgTable = getVehicle(vehicleIdForAvgTable, dieselVehicleTypeId);
+		VehiclesFactory vehFac = VehicleUtils.getFactory();
+		Vehicle vehicleForAvgTable = vehFac.createVehicle(vehicleIdForAvgTable, vehFac.createVehicleType(dieselVehicleTypeId));
 		
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicleForAvgTable, roadType, dieselFreeVelocity/3.6, 1000., 1000./dieselFreeVelocity*3.6);
 		weam.throwWarmEmissionEvent(10, idForAvgTable, vehicleIdForAvgTable, warmEmissions);
@@ -782,7 +790,10 @@ public class TestWarmEmissionAnalysisModule {
 		fillDetailedTable(detailedHbefaWarmTable);
 
         EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
-        WarmEmissionAnalysisModuleParameter warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, new EmissionsConfigGroup());
+        EmissionsConfigGroup ecg = new EmissionsConfigGroup();
+		ecg.setUsingVehicleIdAsVehicleDescription(true);
+
+		WarmEmissionAnalysisModuleParameter warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, ecg);
 		weam = new WarmEmissionAnalysisModule(warmEmissionParameterObject, emissionEventManager, null);
 	}
 	
@@ -1208,16 +1219,6 @@ public class TestWarmEmissionAnalysisModule {
 		
 	}
 
-	private Vehicle getVehicle(Id<Vehicle> vehicleId, Id<VehicleType> vehicleTypeId) {
-		VehiclesFactory vehFac = VehicleUtils.getFactory();
-
-		// switch to use vehicle type for vehicle description is in emission config group.
-		// this test is only for analysis module (and no emission config is used); must be set vehicle description
-		VehicleType vehicleType = vehFac.createVehicleType(vehicleTypeId);
-		vehicleType.setDescription(vehicleType.getId().toString());
-		return vehFac.createVehicle(vehicleId, vehicleType);
-	}
-	
 }
 	
 

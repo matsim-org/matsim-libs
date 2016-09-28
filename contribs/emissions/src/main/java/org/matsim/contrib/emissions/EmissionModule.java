@@ -125,10 +125,10 @@ public class EmissionModule {
 		Network network = scenario.getNetwork() ;
 
 		WarmEmissionAnalysisModuleParameter parameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, ecg );
-		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable);
+		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable, ecg);
 		
 		warmEmissionHandler = new WarmEmissionHandler(emissionVehicles,	network, parameterObject, emissionEventsManager, emissionEfficiencyFactor);
-		coldEmissionHandler = new ColdEmissionHandler(emissionVehicles, network, parameterObject2, emissionEventsManager, emissionEfficiencyFactor, ecg );
+		coldEmissionHandler = new ColdEmissionHandler(emissionVehicles, network, parameterObject2, emissionEventsManager, emissionEfficiencyFactor);
 		logger.info("leaving createEmissionHandler");
 	}
 
