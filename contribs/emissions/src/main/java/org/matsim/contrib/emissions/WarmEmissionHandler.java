@@ -193,7 +193,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 			// however, for consistency with ColdEmissionHandler; keeping it here. Amit Sep 2016
 			if(this.ecg.isUsingVehicleIdAsVehicleDescription() ) {
 				if(vehicle.getType().getDescription()==null) {
-					vehicle.getType().setDescription(vehicle.getType().toString());
+					vehicle.getType().setDescription(vehicle.getType().getId().toString());
 				}
 			}
 
