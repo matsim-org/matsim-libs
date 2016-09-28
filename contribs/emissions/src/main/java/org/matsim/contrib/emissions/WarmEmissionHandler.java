@@ -45,7 +45,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
 
-/**
+/**	
  * @author benjamin
  *
  */
@@ -55,6 +55,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 	private final Network network;
 	private final Vehicles emissionVehicles;
 	private final WarmEmissionAnalysisModule warmEmissionAnalysisModule;
+	private final EmissionsConfigGroup ecg;
 
 	private int linkLeaveCnt = 0;
 	private int linkLeaveFirstActWarnCnt = 0;
@@ -68,13 +69,14 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 
 	public WarmEmissionHandler(
 			Vehicles emissionVehicles,
-			final Network network, 
+			final Network network,
 			WarmEmissionAnalysisModuleParameter parameterObject,
-			EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
+			EventsManager emissionEventsManager, Double emissionEfficiencyFactor, EmissionsConfigGroup emissionsConfigGroup) {
 
 		this.emissionVehicles = emissionVehicles;
 		this.network = network;
-		this.warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(parameterObject, emissionEventsManager, emissionEfficiencyFactor);	
+		this.warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(parameterObject, emissionEventsManager, emissionEfficiencyFactor);
+		this.ecg = emissionsConfigGroup;
 	}
 
 	@Override
@@ -109,9 +111,6 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
-//		if(!event.getNetworkMode().equals("car")){ // link travel time calculation not neccessary for other modes
-//			return;
-//		}
 		Tuple<Id<Link>, Double> linkId2Time = new Tuple<Id<Link>, Double>(event.getLinkId(), event.getTime());
 		this.vehicleEntersTraffic.put(event.getVehicleId(), linkId2Time);
 	}
@@ -182,6 +181,14 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 						EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 			}
 			Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);
+
+			// this can also go to WarmEmissionAnalysisModule;
+			// however, for consistency with ColdEmissionHandler; keeping it here. Amit Sep 2016
+			if(this.ecg.isUsingVehicleIdAsVehicleDescription() ) {
+				if(vehicle.getType().getDescription()==null) {
+					vehicle.getType().setDescription(vehicle.getType().toString());
+				}
+			}
 
 			Map<WarmPollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
 					vehicle,

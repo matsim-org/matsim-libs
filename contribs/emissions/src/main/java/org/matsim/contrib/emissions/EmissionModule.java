@@ -19,6 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -27,17 +31,9 @@ import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnaly
 import org.matsim.contrib.emissions.types.*;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.vehicles.VehicleReaderV1;
-import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -51,7 +47,9 @@ public class EmissionModule {
 	private WarmEmissionHandler warmEmissionHandler;
 	private ColdEmissionHandler coldEmissionHandler;
 	public EventsManager emissionEventsManager;
-	private Double emissionEfficiencyFactor;
+	private Double emissionEfficiencyFactor; // i think, this can also go to EmissionsConfigGroup. Amit Sep 2016
+
+	private final EmissionsConfigGroup ecg;
 
 	//===
 	private static String roadTypeMappingFile;
@@ -75,11 +73,13 @@ public class EmissionModule {
 
 	public EmissionModule(Scenario scenario) {
 		this.scenario = scenario;
+		ecg = (EmissionsConfigGroup)scenario.getConfig().getModule("emissions");
 	}
 	
-	public EmissionModule(Scenario scenario, Vehicles emissionVehicles) { // TODO : probably we dont need this. Amit sep 16
+	public EmissionModule(Scenario scenario, Vehicles emissionVehicles) { // TODO : probably we dont need this anymore. Amit sep 16
 		this.scenario = scenario;
 		this.emissionVehicles = emissionVehicles;
+		ecg = (EmissionsConfigGroup)scenario.getConfig().getModule("emissions");
 	}
 
 	public void createLookupTables() {
@@ -94,13 +94,13 @@ public class EmissionModule {
 
 		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
 		avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
-		EmissionsConfigGroup ecg = (EmissionsConfigGroup)scenario.getConfig().getModule("emissions");
+
 		if(ecg.isUsingDetailedEmissionCalculation()){
 			detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
 			detailedHbefaColdTable = createDetailedHbefaColdTable(detailedColdEmissionFactorsFile);
 		}
 		else{
-			logger.warn("Detailed emission calculation is switched off in " + VspExperimentalConfigGroup.GROUP_NAME + " config group; Using fleet average values for all vehicles.");
+			logger.warn("Detailed emission calculation is switched off in " + EmissionsConfigGroup.GROUP_NAME + " config group; Using fleet average values for all vehicles.");
 		}
 		logger.info("leaving createLookupTables");
 	}
@@ -127,8 +127,8 @@ public class EmissionModule {
 		WarmEmissionAnalysisModuleParameter parameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable);
 		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable);
 		
-		warmEmissionHandler = new WarmEmissionHandler(emissionVehicles,	network, parameterObject, emissionEventsManager, emissionEfficiencyFactor);
-		coldEmissionHandler = new ColdEmissionHandler(emissionVehicles, network, parameterObject2, emissionEventsManager, emissionEfficiencyFactor);
+		warmEmissionHandler = new WarmEmissionHandler(emissionVehicles,	network, parameterObject, emissionEventsManager, emissionEfficiencyFactor, ecg );
+		coldEmissionHandler = new ColdEmissionHandler(emissionVehicles, network, parameterObject2, emissionEventsManager, emissionEfficiencyFactor, ecg );
 		logger.info("leaving createEmissionHandler");
 	}
 
@@ -157,15 +157,6 @@ public class EmissionModule {
 		return mapping;
 	}
 	
-//	private Vehicles createEmissionVehicles(String emissionVehicleFilename) {
-//		logger.info("entering createEmissionVehicles ...") ;
-//		emissionVehicles = VehicleUtils.createVehiclesContainer();
-//		VehicleReaderV1 vehicleReader = new VehicleReaderV1(emissionVehicles);
-//		vehicleReader.readFile(emissionVehicleFilename);
-//		logger.info("leaving createEmissionVehicles ...") ;
-//		return emissionVehicles;
-//	}
-
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createAvgHbefaWarmTable(String filename){
 		logger.info("entering createAvgHbefaWarmTable ...");
 		
@@ -364,6 +355,7 @@ public class EmissionModule {
 		HbefaVehicleCategory hbefaVehicleCategory;
 		if(string.contains("pass. car")) hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
 		else if(string.contains("HGV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
+		// TODO not sure, if some key is present in HBEFA database corresponding to ZEV; need to confirm. Amit sep 16
 		else{
 			logger.warn("Could not map String " + string + " to any HbefaVehicleCategory; please check syntax in file " + averageFleetWarmEmissionFactorsFile);
 			throw new RuntimeException();

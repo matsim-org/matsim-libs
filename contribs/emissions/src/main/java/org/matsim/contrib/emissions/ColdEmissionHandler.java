@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vehicles.Vehicle;
@@ -52,6 +53,7 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
     private final Vehicles emissionVehicles;
     private final Network network;
     private final ColdEmissionAnalysisModule coldEmissionAnalysisModule;
+    private final EmissionsConfigGroup ecg;
 
     private int nonCarWarn = 0;
 
@@ -64,11 +66,12 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
             Vehicles emissionVehicles,
             Network network,
             ColdEmissionAnalysisModuleParameter parameterObject2,
-            EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
+            EventsManager emissionEventsManager, Double emissionEfficiencyFactor, EmissionsConfigGroup emissionsConfigGroup) {
 
         this.emissionVehicles = emissionVehicles;
         this.network = network;
         this.coldEmissionAnalysisModule = new ColdEmissionAnalysisModule(parameterObject2, emissionEventsManager, emissionEfficiencyFactor);
+        this.ecg = emissionsConfigGroup;
     }
 
     @Override
@@ -94,9 +97,10 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
 
             VehicleType vt = emissionVehicles.getVehicles().get(vehicleId).getType();
 
-            //for backward compatibility. amit sep 16
-            String vehicleDescription = vt.getDescription() ;
-            if(vehicleDescription ==null && vt.getId()!=null ) vehicleDescription = vt.getId().toString();
+            String vehicleDescription;
+            if(this.ecg.isUsingVehicleIdAsVehicleDescription() ) {
+                vehicleDescription = vt.getId().toString();
+            } else vehicleDescription = vt.getDescription();
 
             if ((distance / 1000) > 1.0) {
                 this.coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent(
@@ -115,9 +119,6 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
 
     @Override
     public void handleEvent(VehicleLeavesTrafficEvent event) {
-//        if (!event.getNetworkMode().equals("car")) { // no emissions to calculate...
-//            return;
-//        }
         Id<Vehicle> vehicleId = event.getVehicleId();
         Double stopEngineTime = event.getTime();
         this.vehicleId2stopEngineTime.put(vehicleId, stopEngineTime);
@@ -151,9 +152,10 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
 
         VehicleType vt = emissionVehicles.getVehicles().get(vehicleId).getType();
 
-        //for backward compatibility. amit sep 16
-        String vehicleDescription = vt.getDescription() ;
-        if(vehicleDescription ==null && vt.getId()!=null ) vehicleDescription = vt.getId().toString();
+        String vehicleDescription;
+        if(this.ecg.isUsingVehicleIdAsVehicleDescription() ) {
+            vehicleDescription = vt.getId().toString();
+        } else vehicleDescription = vt.getDescription();
 
         this.coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent(
                 linkId,
