@@ -119,6 +119,13 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
 
     @Override
     public void handleEvent(VehicleLeavesTrafficEvent event) {
+        if (!event.getNetworkMode().equals("car")) {
+            if( nonCarWarn <=1) {
+                logger.warn("non-car modes are supported, however, not properly tested yet.");
+                logger.warn(Gbl.ONLYONCE);
+                nonCarWarn++;
+            }
+        }
         Id<Vehicle> vehicleId = event.getVehicleId();
         Double stopEngineTime = event.getTime();
         this.vehicleId2stopEngineTime.put(vehicleId, stopEngineTime);
@@ -127,9 +134,9 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
     // TODO actually, the engine starts before with the PersonEntersVehicleEvent
     @Override
     public void handleEvent(VehicleEntersTrafficEvent event) {
-        if (!event.getNetworkMode().equals("car")) { // no engine to start...
+        if (!event.getNetworkMode().equals("car")) {
             if( nonCarWarn <=1) {
-                logger.warn("non-car modes are supported, however, it is not properly tested yet.");
+                logger.warn("non-car modes are supported, however, not properly tested yet.");
                 logger.warn(Gbl.ONLYONCE);
                 nonCarWarn++;
             }

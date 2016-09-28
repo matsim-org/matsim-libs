@@ -45,7 +45,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
 
-/**	
+/**
  * @author benjamin
  *
  */
@@ -93,9 +93,9 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		if(!event.getNetworkMode().equals("car")){ // link travel time calculation not neccessary for other modes
+		if(!event.getNetworkMode().equals("car")){
 			if( nonCarWarn <=1) {
-				logger.warn("non-car modes are supported, however, it is not properly tested yet.");
+				logger.warn("non-car modes are supported, however, not properly tested yet.");
 				logger.warn(Gbl.ONLYONCE);
 				nonCarWarn++;
 			}
@@ -111,6 +111,13 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
+		if(!event.getNetworkMode().equals("car")){
+			if( nonCarWarn <=1) {
+				logger.warn("non-car modes are supported, however, not properly tested yet.");
+				logger.warn(Gbl.ONLYONCE);
+				nonCarWarn++;
+			}
+		}
 		Tuple<Id<Link>, Double> linkId2Time = new Tuple<Id<Link>, Double>(event.getLinkId(), event.getTime());
 		this.vehicleEntersTraffic.put(event.getVehicleId(), linkId2Time);
 	}

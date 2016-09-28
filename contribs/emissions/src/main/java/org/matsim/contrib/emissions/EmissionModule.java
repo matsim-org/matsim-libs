@@ -73,13 +73,13 @@ public class EmissionModule {
 
 	public EmissionModule(Scenario scenario) {
 		this.scenario = scenario;
-		ecg = (EmissionsConfigGroup)scenario.getConfig().getModule("emissions");
+		ecg = (EmissionsConfigGroup)scenario.getConfig().getModule(EmissionsConfigGroup.GROUP_NAME);
 	}
 	
 	public EmissionModule(Scenario scenario, Vehicles emissionVehicles) { // TODO : probably we dont need this anymore. Amit sep 16
 		this.scenario = scenario;
 		this.emissionVehicles = emissionVehicles;
-		ecg = (EmissionsConfigGroup)scenario.getConfig().getModule("emissions");
+		ecg = (EmissionsConfigGroup)scenario.getConfig().getModule(EmissionsConfigGroup.GROUP_NAME);
 	}
 
 	public void createLookupTables() {
