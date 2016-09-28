@@ -36,7 +36,7 @@ import floetteroed.opdyts.SimulatorState;
 class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger( ModeChoiceObjectiveFunction.class );
-	
+
 	private MainModeIdentifier mainModeIdentifier = new TransportPlanningMainModeIdentifier() ;
 
 	@Inject ExperiencedPlansService service ;
@@ -46,17 +46,17 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 	// https://github.com/google/guice/wiki/InjectionPoints
 	// I read that as "the fields are injected (every time again) when the instance is injected".
 	// This is the behavior that we want here.  kai, sep'16
-	
+
 	enum StatType { 
 		tripBeelineDistances
 	} ;
 
-	private final Map<StatType,Databins<String>> statsContainer = new TreeMap<>() ;
+	private final Map<StatType,Databins<String>> simStatsContainer = new TreeMap<>() ;
 	private final Map<StatType,DataMap<String>> sumsContainer  = new TreeMap<>() ;
-	private final Map<StatType,Databins<String>> meaContainer = new TreeMap<>() ;
+	private final Map<StatType,Databins<String>> refStatsContainer = new TreeMap<>() ;
 
 
-	ModeChoiceObjectiveFunction() {
+	ModeChoiceObjectiveFunction(boolean equil) {
 		for ( StatType statType : StatType.values() ) {
 			// define the bin boundaries:
 			switch ( statType ) {
@@ -64,15 +64,31 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 				double[] dataBoundariesTmp = {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.} ;
 				{
 					final Databins<String> databins = new Databins<>( statType.name(), dataBoundariesTmp );
-					this.statsContainer.put( statType, databins) ;
+					this.simStatsContainer.put( statType, databins) ;
 				}
 				{
 					final Databins<String> databins = new Databins<>( statType.name(), dataBoundariesTmp ) ;
-//					final double carVal = 3753.; // relaxed
-					final double carVal = 1000. ;
-					databins.addValue( TransportMode.car, 8, carVal);
-					databins.addValue( TransportMode.pt, 8, 4000.-carVal);
-					this.meaContainer.put( statType, databins) ;
+					if ( equil ) {
+						//					final double carVal = 3753.; // relaxed
+						final double carVal = 1000. ;
+						databins.addValue( TransportMode.car, 8, carVal);
+						databins.addValue( TransportMode.pt, 8, 4000.-carVal);
+					} else {
+						{
+							databins.addValue( TransportMode.car, 0, 5700. );
+							databins.addValue( TransportMode.car, 1, 220. );
+							databins.addValue( TransportMode.car, 2, 1126. );
+							databins.addValue( TransportMode.car, 3, 3261. );
+							databins.addValue( TransportMode.car, 4, 8867. );
+							databins.addValue( TransportMode.car, 5, 22999.);
+							databins.addValue( TransportMode.car, 6, 21648.);
+							databins.addValue( TransportMode.car, 7, 14859.);
+							databins.addValue( TransportMode.car, 8, 6034. );
+							databins.addValue( TransportMode.car, 9, 942. );
+							databins.addValue( TransportMode.car, 10, 110. );
+						}
+					}
+					this.refStatsContainer.put( statType, databins) ;
 				}
 				break; }
 			default:
@@ -82,9 +98,9 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 	}
 
 	@Override public double value(SimulatorState state) {
-		
+
 		resetContainers();
-		
+
 		StatType statType = StatType.tripBeelineDistances ;
 
 		for ( Plan plan : service.getExperiencedPlans().values() ) {
@@ -100,7 +116,7 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 
 		double objective = 0 ;
 		double sum = 0. ;
-		for ( Entry<StatType, Databins<String>> entry : statsContainer.entrySet() ) {
+		for ( Entry<StatType, Databins<String>> entry : simStatsContainer.entrySet() ) {
 			StatType theStatType = entry.getKey() ;  // currently only one type ;
 			log.warn( "statType=" + statType );
 			Databins<String> databins = entry.getValue() ;
@@ -108,7 +124,7 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 				String mode = theEntry.getKey() ;
 				log.warn("mode=" + mode);
 				double[] value = theEntry.getValue() ;
-				double[] reaVal = this.meaContainer.get( theStatType).getValues(mode) ;
+				double[] reaVal = this.refStatsContainer.get( theStatType).getValues(mode) ;
 				for ( int ii=0 ; ii<value.length ; ii++ ) {
 					double diff = value[ii] - reaVal[ii] ;
 					if ( reaVal[ii]>0.1 || value[ii]>0.1 ) {
@@ -127,21 +143,21 @@ class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 
 	private void resetContainers() {
 		for ( StatType statType : StatType.values() ) {
-			this.statsContainer.get(statType).clear() ;
+			this.simStatsContainer.get(statType).clear() ;
 			if ( this.sumsContainer.get(statType)==null ) {
 				this.sumsContainer.put( statType, new DataMap<String>() ) ;
 			}
 			this.sumsContainer.get(statType).clear() ;
 		}
 	}
-	
+
 	private void addItemToAllRegisteredTypes(List<String> filters, StatType statType, double item) {
 		// ... go through all filter to which the item belongs ...
 		for ( String filter : filters ) {
 
 			// ...  add the "item" to the correct bin in the container:
-			int idx = this.statsContainer.get(statType).getIndex(item) ;
-			this.statsContainer.get(statType).inc( filter, idx ) ;
+			int idx = this.simStatsContainer.get(statType).getIndex(item) ;
+			this.simStatsContainer.get(statType).inc( filter, idx ) ;
 
 			// also add it to the sums container:
 			this.sumsContainer.get(statType).addValue( filter, item ) ;
