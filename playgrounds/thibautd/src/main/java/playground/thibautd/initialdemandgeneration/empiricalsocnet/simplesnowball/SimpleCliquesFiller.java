@@ -89,10 +89,22 @@ public class SimpleCliquesFiller implements CliquesFiller {
 	}
 
 	private double calcBearing( final Coord coord1, final Coord coord2 ) {
-		final double normalizedXDiff = (coord2.getX() - coord1.getX()) / CoordUtils.calcProjectedEuclideanDistance( coord1 , coord2 );
+		final double normalizedXDiff = calcNormalizedXDifference( coord1, coord2 );
 		final double sign = coord2.getY() > coord1.getY() ? 1 : -1;
 
 		return sign * Math.acos( normalizedXDiff );
+	}
+
+	private double calcNormalizedXDifference( final Coord coord1, final Coord coord2 ) {
+		final double distance = CoordUtils.calcProjectedEuclideanDistance( coord1 , coord2 );
+		if ( distance <= 1E-7 ) return 0;
+
+		final double normalized = (coord2.getX() - coord1.getX()) / distance;
+
+		if ( normalized > 1 && normalized < 1 + 1E-7 ) return 1;
+		if ( normalized < -1 && normalized > -1 - 1E-7 ) return 1;
+		assert normalized >= -1 && normalized <= 1;
+		return normalized;
 	}
 
 	@Override
@@ -203,6 +215,13 @@ public class SimpleCliquesFiller implements CliquesFiller {
 			hashCode += 100 * (sex.ordinal() + 1);
 			hashCode += 1000 * (degreeClass + 1);
 			return hashCode;
+		}
+
+		@Override
+		public String toString() {
+			return "[EgoClass: ageClass="+ageClass+
+					"; sex="+sex+
+					"; degreeClass="+degreeClass+"]";
 		}
 	}
 
