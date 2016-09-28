@@ -20,9 +20,11 @@ package playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowba
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesFiller;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
@@ -44,10 +46,14 @@ import java.util.function.Consumer;
  */
 @Singleton
 public class SimpleCliquesFiller implements CliquesFiller {
+	private static final Logger log = Logger.getLogger( SimpleCliquesFiller.class );
 	private static final int[] AGE_CUTTING_POINTS = {24, 38, 51, 66, Integer.MAX_VALUE};
 
 	private final Random random = MatsimRandom.getLocalInstance();
 	private final Map<EgoClass, List<CliquePositions>> cliques = new HashMap<>(  );
+	private final List<CliquePositions> allCliques = new ArrayList<>();
+
+	private Set<EgoClass> knownEmptyClasses = new HashSet<>();
 
 	public interface Position {
 		double[] calcPosition( Ego center , CliquePosition position );
@@ -63,6 +69,9 @@ public class SimpleCliquesFiller implements CliquesFiller {
 
 		for ( SnowballCliques.Clique snowballClique : snowballCliques.getCliques().values() ) {
 			final CliquePositions clique = new CliquePositions();
+
+			MapUtils.getList( new EgoClass( snowballClique.getEgo() ) , cliques ).add( clique );
+			allCliques.add( clique );
 
 			for ( SnowballCliques.Member alter : snowballClique.getAlters() ) {
 				clique.positions.add( calcPosition( snowballClique.getEgo() , alter ) );
@@ -90,7 +99,15 @@ public class SimpleCliquesFiller implements CliquesFiller {
 			final Ego ego,
 			final KDTree<Ego> egosWithFreeStubs ) {
 		final EgoClass egoClass = new EgoClass( ego );
-		final List<CliquePositions> cliqueList = cliques.get( egoClass );
+		List<CliquePositions> cliqueList = cliques.get( egoClass );
+
+		if ( cliqueList == null ) {
+			if ( knownEmptyClasses.add( egoClass ) ) {
+				log.warn( "No cliques for egos of class "+egoClass );
+				log.warn( "Sampling unconditionned instead" );
+			}
+			cliqueList = allCliques;
+		}
 
 		final CliquePositions clique = cliqueList.get( random.nextInt( cliqueList.size() ) );
 
@@ -158,6 +175,12 @@ public class SimpleCliquesFiller implements CliquesFiller {
 		private EgoClass( final Ego ego ) {
 			this( PersonUtils.getAge( ego.getPerson() ),
 					getSex( ego ),
+					ego.getDegree() );
+		}
+
+		public EgoClass( final SnowballCliques.Member ego ) {
+			this( ego.getAge(),
+					ego.getSex(),
 					ego.getDegree() );
 		}
 
