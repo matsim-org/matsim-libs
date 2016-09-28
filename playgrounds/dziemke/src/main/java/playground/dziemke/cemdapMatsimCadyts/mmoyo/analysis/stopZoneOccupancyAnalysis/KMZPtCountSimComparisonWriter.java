@@ -23,15 +23,17 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
+import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.pt.counts.OccupancyAnalyzer;
-import org.matsim.pt.counts.PtCountSimComparisonKMLWriter;
+
 import playground.dziemke.cemdapMatsimCadyts.mmoyo.utils.KMZ_Extractor;
 
 
-public class KMZPtCountSimComparisonWriter {
+public final class KMZPtCountSimComparisonWriter {
 	private static final Logger log = Logger.getLogger(KMZPtCountSimComparisonWriter.class);
 	private Counts occupCounts = new Counts();
 	private final Controler controler;
@@ -45,7 +47,7 @@ public class KMZPtCountSimComparisonWriter {
 	final String strDONE = " done.";
 	final String S = "/";
 	final String STR_ERRPLOT = "errorGraphErrorBiasOccupancy.png";
-	final String STR_HOUROCCUPPLOT = "Occupancy-countsSimRealPerHour_1.png";
+	final String STR_HOUROCCUPPLOT = "ptCountsOccup1.png";
 
 	public KMZPtCountSimComparisonWriter (final Controler controler){
 		this.controler = controler;
@@ -54,23 +56,31 @@ public class KMZPtCountSimComparisonWriter {
 		net = controler.getScenario().getNetwork();
 		MatsimCountsReader reader = new MatsimCountsReader(occupCounts);
 		reader.readFile(controler.getConfig().ptCounts().getOccupancyCountsFileName());
-		scalefactor = controler.getConfig().ptCounts().getCountsScaleFactor();
+
+//		scalefactor = controler.getConfig().ptCounts().getCountsScaleFactor();
+		scalefactor = 1. ;
+		// yyyyyy otherwise it comes out way too large, but I don't know how it is put together. kai, sep'16
 
 		reader= null; //M
 	}
 
 
-	protected void write (final OccupancyAnalyzer ocupAnalizer,  final int itNum, final boolean stopZoneConversion){
+	 void write (final OccupancyAnalyzer ocupAnalizer,  final int itNum, final boolean stopZoneConversion){
 
 		PtCountComparisonAlgorithm4confTimeBinSize ccaOccupancy = new PtCountComparisonAlgorithm4confTimeBinSize (ocupAnalizer, occupCounts, net, scalefactor);
 		ccaOccupancy.calculateComparison();
 
 		//set and use kml writter
 		Config config = controler.getConfig();
-		PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(ccaOccupancy.getComparison(),
-				ccaOccupancy.getComparison(), ccaOccupancy.getComparison(), TransformationFactory.getCoordinateTransformation(config
-				.global().getCoordinateSystem(), TransformationFactory.WGS84), occupCounts, occupCounts,
-				occupCounts);
+		final CoordinateTransformation coordTransform = TransformationFactory.getCoordinateTransformation(config
+		.global().getCoordinateSystem(), TransformationFactory.WGS84);
+//		PtCountSimComparisonKMLWriter kmlWriterOrig = new PtCountSimComparisonKMLWriter(ccaOccupancy.getComparison(),
+//				ccaOccupancy.getComparison(), ccaOccupancy.getComparison(), coordTransform, occupCounts, occupCounts,
+//				occupCounts);
+		
+		CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(ccaOccupancy.getComparison(), this.occupCounts, coordTransform, "ptCountsOccup") ;
+
+		
 		kmlWriter.setIterationNumber(itNum);
 
 		//write counts comparison

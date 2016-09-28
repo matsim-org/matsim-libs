@@ -21,7 +21,7 @@
 /**
  * 
  */
-package org.matsim.pt.counts;
+package org.matsim.pt.counts.obsolete;
 
 import java.awt.Font;
 import java.util.List;
@@ -56,6 +56,7 @@ public final class PtBiasErrorGraph extends CountsGraph {
 	 * @param filename
 	 * @param chartTitle
 	 */
+	@Deprecated // use standard counts package
 	public PtBiasErrorGraph(List<CountSimComparison> ccl, int iteration,
 			String filename, String chartTitle) {
 		super(ccl, iteration, filename, chartTitle);
@@ -63,6 +64,7 @@ public final class PtBiasErrorGraph extends CountsGraph {
 	}
 
 	@Override
+	@Deprecated // use standard counts package
 	public JFreeChart createChart(final int nbr) {
 		DefaultCategoryDataset dataset0 = new DefaultCategoryDataset();
 		DefaultCategoryDataset dataset1 = new DefaultCategoryDataset();
@@ -121,6 +123,7 @@ public final class PtBiasErrorGraph extends CountsGraph {
 		return this.chart_;
 	}
 
+	@Deprecated // use standard counts package
 	public double[] getMeanRelError() {
 		if (this.errorStats == null) {
 			throw new RuntimeException(
@@ -129,6 +132,7 @@ public final class PtBiasErrorGraph extends CountsGraph {
 		return this.errorStats.getMeanRelError();
 	}
 
+	@Deprecated // use standard counts package
 	public double[] getMeanAbsBias() {
 		if (this.errorStats == null) {
 			throw new RuntimeException(

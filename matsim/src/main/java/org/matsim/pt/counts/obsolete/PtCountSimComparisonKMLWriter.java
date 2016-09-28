@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.pt.counts;
+package org.matsim.pt.counts.obsolete;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -55,12 +55,16 @@ import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.graphs.CountsGraph;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraph;
+import org.matsim.pt.counts.PtCountsLoadCurveGraphCreator;
+import org.matsim.pt.counts.obsolete.PtCountSimComparisonWriter.PtCountsType;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 import org.matsim.vis.kml.NetworkFeatureFactory;
 
 @Deprecated // we should try to rather make CountSimComparisonKMLWriter more general. kai, dec'13
-public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
+class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
+	// yyyyyy I think that this class is no longer used, and can thus be deleted.  kai, sep'16
+	
 	/**
 	 * constant for the name of the stops
 	 */
@@ -140,7 +144,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	 * @param coordTransform
 	 */
 	@Deprecated // we should try to rather make CountSimComparisonKMLWriter more general. kai, dec'13
-	public PtCountSimComparisonKMLWriter(
+	private PtCountSimComparisonKMLWriter(
 			final List<CountSimComparison> boardCountSimCompList,
 			final List<CountSimComparison> alightCountSimCompList,
 			final List<CountSimComparison> occupancyCountSimCompList,

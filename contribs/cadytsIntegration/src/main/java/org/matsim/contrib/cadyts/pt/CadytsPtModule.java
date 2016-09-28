@@ -11,5 +11,6 @@ public class CadytsPtModule extends AbstractModule {
 		bind(CadytsPtContext.class).asEagerSingleton();
 		addControlerListenerBinding().to(CadytsPtContext.class);
 		bind(CadytsBuilder.class).to(CadytsBuilderImpl.class);
+		bind(CadytsPtOccupancyAnalyzerI.class).to(CadytsPtOccupancyAnalyzer.class);
 	}
 }

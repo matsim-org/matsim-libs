@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.pt.counts;
+package org.matsim.pt.counts.obsolete;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -46,7 +46,7 @@ import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.algorithms.graphs.CountsGraph;
 import org.matsim.counts.algorithms.graphs.helper.Comp;
 import org.matsim.counts.algorithms.graphs.helper.MyComparator;
-import org.matsim.pt.counts.PtCountSimComparisonWriter.PtCountsType;
+import org.matsim.pt.counts.obsolete.PtCountSimComparisonWriter.PtCountsType;
 
 public final class PtCountsSimRealPerHourGraph extends CountsGraph {
 	/**
@@ -59,6 +59,7 @@ public final class PtCountsSimRealPerHourGraph extends CountsGraph {
 	 */
 	private PtCountsType countsType;
 
+	@Deprecated // use standard counts package
 	public PtCountsSimRealPerHourGraph(final List<CountSimComparison> ccl,
 			final int iteration, final String filename, PtCountsType countsType) {
 		super(ccl, iteration, filename, filename);
@@ -71,6 +72,7 @@ public final class PtCountsSimRealPerHourGraph extends CountsGraph {
 	 *            a.m. ...
 	 */
 	@Override
+	@Deprecated // use standard counts package
 	public JFreeChart createChart(final int hour) {
 		this.hour = hour;
 
@@ -225,6 +227,7 @@ public final class PtCountsSimRealPerHourGraph extends CountsGraph {
 	 * @return A value in 1..24, 1 for 0 a.m. to 1 a.m., 2 for 1 a.m. to 2 a.m.
 	 *         ...
 	 */
+	@Deprecated // use standard counts package
 	public int getHour() {
 		return this.hour;
 	}

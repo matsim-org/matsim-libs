@@ -6,8 +6,12 @@ import java.io.FileOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.apache.log4j.Logger;
+
 /**Extracts only station counts graphs and error graphs from a kmz file*/
 public class KMZ_Extractor {
+	private static final Logger log = Logger.getLogger( KMZ_Extractor.class ) ;
+	
 	String ERR_PREFIX = "error";
 	String POINT = ".";
     String kmzFile;
@@ -65,7 +69,7 @@ public class KMZ_Extractor {
                 
                 //only on parent directory
                 if (parentFile==null && zipEntryName.equals(strFile)){
-                	System.out.println("extracting: "+ outputDir + zipEntryName );
+                	log.info("extracting: "+ outputDir + zipEntryName );
                 	
                 	FileOutputStream fileoutputstream;
                 	fileoutputstream = new FileOutputStream(this.outputDir + zipEntryName);             

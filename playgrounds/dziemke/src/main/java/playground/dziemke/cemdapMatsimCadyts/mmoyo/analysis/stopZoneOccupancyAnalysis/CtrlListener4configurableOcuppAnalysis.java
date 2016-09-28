@@ -22,6 +22,7 @@ package playground.dziemke.cemdapMatsimCadyts.mmoyo.analysis.stopZoneOccupancyAn
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
+import org.matsim.contrib.cadyts.pt.CadytsPtOccupancyAnalyzerI;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -56,6 +57,10 @@ public class CtrlListener4configurableOcuppAnalysis implements IterationEndsList
 
 		kmzPtCountSimComparisonWritter = new KMZPtCountSimComparisonWriter(controler);
 	}
+	
+	public CadytsPtOccupancyAnalyzerI getAnalyzer() {
+		return this.configurableOccupAnalyzer ;
+	}
 
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
@@ -72,23 +77,17 @@ public class CtrlListener4configurableOcuppAnalysis implements IterationEndsList
 		}
 	}
 
-	private boolean isActiveInThisIteration(final int iter, final Controler controler) {
-		return (iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0);
+	private static boolean isActiveInThisIteration(final int iter, final Controler controler) {
+		final int ptCountsInterval = controler.getConfig().ptCounts().getPtCountsInterval();
+		if ( ptCountsInterval==0 ) {
+			return false ;
+		}
+		return (iter % ptCountsInterval == 0);
 	}
 
 	public void setStopZoneConversion(boolean stopZoneConversion){
 		this.stopZoneConversion = stopZoneConversion;
 	}
-
-//	private static Set<Id<TransitLine>> toTransitLineIdSet(Set<Id<Link>> list) {
-//		Set<Id<TransitLine>> converted = new LinkedHashSet<>();
-//
-//		for (Id<Link> id : list) {
-//			converted.add(Id.create(id, TransitLine.class));
-//		}
-//
-//		return converted;
-//	}
 
 	private static Set<Id<TransitLine>> toTransitLineIdSet(Set<String> list) {
 		Set<Id<TransitLine>> converted = new LinkedHashSet<>();

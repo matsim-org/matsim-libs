@@ -44,7 +44,7 @@ class CadytsPtCountsComparisonAlgorithm {
 	/**
 	 * The StopAttributes of the simulation
 	 */
-	private final CadytsPtOccupancyAnalyzer oa;
+	private final CadytsPtOccupancyAnalyzerI oa;
 	/**
 	 * The counts object
 	 */
@@ -68,7 +68,7 @@ class CadytsPtCountsComparisonAlgorithm {
 
 	StringBuffer content = new StringBuffer();
 
-	CadytsPtCountsComparisonAlgorithm(final CadytsPtOccupancyAnalyzer oa, final Counts<Link> counts, final Network network, final double countsScaleFactor) {
+	CadytsPtCountsComparisonAlgorithm(final CadytsPtOccupancyAnalyzerI oa, final Counts<Link> counts, final Network network, final double countsScaleFactor) {
 		this.oa = oa;
 		this.counts = counts;
 		this.countSimComp = new ArrayList<CountSimComparison>();

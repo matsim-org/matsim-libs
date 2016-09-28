@@ -180,6 +180,8 @@ public final class CadytsBuilderImplGT implements CadytsBuilder {
 
 
 	private static class FakeFacility implements TransitStopFacility {
+		// yyyyyy why do we need this?  kai, sep'16
+		
 		private final Id<TransitStopFacility> id;
 		public FakeFacility(final Id<TransitStopFacility> id) {
 			this.id = id;
