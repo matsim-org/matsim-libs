@@ -21,6 +21,7 @@ package playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowba
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkWriter;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplerUtils;
@@ -41,7 +42,9 @@ public class RunSimpleCliquesSampling {
 							config,
 							new SimpleSnowballModule(
 									SnowballCliques.readCliques(
-											configGroup.getInputCliquesCsv() ) ) );
+											ConfigGroup.getInputFileURL(
+													config.getContext(),
+													configGroup.getInputCliquesCsv() ).getPath() ) ) );
 
 			new SocialNetworkWriter( socialNetwork ).write( configGroup.getOutputDirectory() + "/output_socialNetwork.xml.gz" );
 		}
