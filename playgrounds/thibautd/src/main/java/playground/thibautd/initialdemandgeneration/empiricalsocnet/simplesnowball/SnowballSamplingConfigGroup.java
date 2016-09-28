@@ -29,6 +29,9 @@ public class SnowballSamplingConfigGroup extends ReflectiveConfigGroup {
 	private String outputDirectory = null;
 	private String inputCliquesCsv = null;
 
+	private boolean conditionCliqueSizeOnAge = false;
+	private boolean conditionCliqueSizeOnSex = false;
+
 	public SnowballSamplingConfigGroup( ) {
 		super( GROUP_NAME );
 	}
@@ -51,5 +54,25 @@ public class SnowballSamplingConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter("inputCliquesCsv")
 	public void setInputCliquesCsv( final String inputCliquesCsv ) {
 		this.inputCliquesCsv = inputCliquesCsv;
+	}
+
+	@StringGetter("conditionCliqueSizeOnAge")
+	public boolean isConditionCliqueSizeOnAge() {
+		return conditionCliqueSizeOnAge;
+	}
+
+	@StringSetter("conditionCliqueSizeOnAge")
+	public void setConditionCliqueSizeOnAge( final boolean conditionCliqueSizeOnAge ) {
+		this.conditionCliqueSizeOnAge = conditionCliqueSizeOnAge;
+	}
+
+	@StringGetter("conditionCliqueSizeOnSex")
+	public boolean isConditionCliqueSizeOnSex() {
+		return conditionCliqueSizeOnSex;
+	}
+
+	@StringSetter("conditionCliqueSizeOnSex")
+	public void setConditionCliqueSizeOnSex( final boolean conditionCliqueSizeOnSex ) {
+		this.conditionCliqueSizeOnSex = conditionCliqueSizeOnSex;
 	}
 }

@@ -54,6 +54,8 @@ public class SimpleCliquesFiller implements CliquesFiller {
 	private final Map<EgoClass, List<CliquePositions>> cliques = new HashMap<>(  );
 	private final List<CliquePositions> allCliques = new ArrayList<>();
 
+	private final SnowballSamplingConfigGroup configGroup;
+
 	private Set<EgoClass> knownEmptyClasses = new HashSet<>();
 
 	public interface Position {
@@ -65,13 +67,15 @@ public class SimpleCliquesFiller implements CliquesFiller {
 	@Inject
 	public SimpleCliquesFiller(
 			final SnowballCliques snowballCliques,
+			final SnowballSamplingConfigGroup configGroup,
 			final Position position ) {
+		this.configGroup = configGroup;
 		this.position = position;
 
 		for ( SnowballCliques.Clique snowballClique : snowballCliques.getCliques().values() ) {
 			final CliquePositions clique = new CliquePositions();
 
-			MapUtils.getList( new EgoClass( snowballClique.getEgo() ) , cliques ).add( clique );
+			MapUtils.getList( createEgoClass( snowballClique.getEgo() ) , cliques ).add( clique );
 			allCliques.add( clique );
 
 			for ( SnowballCliques.Member alter : snowballClique.getAlters() ) {
@@ -111,7 +115,7 @@ public class SimpleCliquesFiller implements CliquesFiller {
 	public Set<Ego> sampleClique(
 			final Ego ego,
 			final KDTree<Ego> egosWithFreeStubs ) {
-		final EgoClass egoClass = new EgoClass( ego );
+		final EgoClass egoClass = createEgoClass( ego );
 		List<CliquePositions> cliqueList = cliques.get( egoClass );
 
 		if ( cliqueList == null ) {
@@ -174,30 +178,40 @@ public class SimpleCliquesFiller implements CliquesFiller {
 		}
 	}
 
+	private EgoClass createEgoClass( final Ego ego ) {
+		return createEgoClass( PersonUtils.getAge( ego.getPerson() ),
+				getSex( ego ),
+				ego.getDegree() );
+	}
+
+	private EgoClass createEgoClass( final SnowballCliques.Member ego ) {
+		return createEgoClass( ego.getAge(),
+				ego.getSex(),
+				ego.getDegree() );
+	}
+
+	private EgoClass createEgoClass(
+			final int age,
+			final SnowballCliques.Sex sex,
+			final int degree ) {
+		final int ageClass = configGroup.isConditionCliqueSizeOnAge() ? calcAgeClass( age ) : -1;
+		final SnowballCliques.Sex theSex = configGroup.isConditionCliqueSizeOnSex() ? sex : null;
+
+		return new EgoClass( ageClass , theSex , degree );
+	}
+
 	private static class EgoClass {
 		private final int ageClass;
 		private final SnowballCliques.Sex sex;
 		private final int degreeClass;
 
 		private EgoClass(
-				final int age,
+				final int ageClass,
 				final SnowballCliques.Sex sex,
 				final int degree ) {
-			this.ageClass = calcAgeClass( age );
+			this.ageClass = ageClass;
 			this.sex = sex;
 			this.degreeClass = calcDegreeClass( degree );
-		}
-
-		private EgoClass( final Ego ego ) {
-			this( PersonUtils.getAge( ego.getPerson() ),
-					getSex( ego ),
-					ego.getDegree() );
-		}
-
-		public EgoClass( final SnowballCliques.Member ego ) {
-			this( ego.getAge(),
-					ego.getSex(),
-					ego.getDegree() );
 		}
 
 		@Override
@@ -212,7 +226,7 @@ public class SimpleCliquesFiller implements CliquesFiller {
 		public int hashCode() {
 			// unique if less than 99 age classes
 			int hashCode = ageClass;
-			hashCode += 100 * (sex.ordinal() + 1);
+			hashCode += 100 * (sex == null ? 0 : sex.ordinal() + 1);
 			hashCode += 1000 * (degreeClass + 1);
 			return hashCode;
 		}
