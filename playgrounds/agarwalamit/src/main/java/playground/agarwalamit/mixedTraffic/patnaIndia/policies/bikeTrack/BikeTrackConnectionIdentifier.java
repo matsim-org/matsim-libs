@@ -19,6 +19,10 @@
 
 package playground.agarwalamit.mixedTraffic.patnaIndia.policies.bikeTrack;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -28,11 +32,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Created by amit on 24/09/16.
  */
@@ -40,21 +39,26 @@ import java.util.Map;
 
 public class BikeTrackConnectionIdentifier {
 
-    private final String bikeNetwork ;
     private final Network net ;
     private final Map<Id<Link>,Link> connectedLinks = new HashMap<>();
-    private final List<Node> bikeTrackNodes = new ArrayList<>() ;
+    private final Network bikeTrackNetwork;
 
     BikeTrackConnectionIdentifier(final String initialNetwork, final String bikeTrack){
         net = LoadMyScenarios.loadScenarioFromNetwork(initialNetwork).getNetwork();
-        this.bikeNetwork = bikeTrack;
+
+        // remove unused nodes
+        List<Node> nodes2remove = new ArrayList<>();
+        for(Node n: net.getNodes().values()) {
+            if( n.getInLinks().size() == 0 && n.getOutLinks().size() == 0) nodes2remove.add(n);
+        }
+
+        for(Node n : nodes2remove) {net.removeNode(n.getId());}
+
+        bikeTrackNetwork = LoadMyScenarios.loadScenarioFromNetwork(bikeTrack).getNetwork();
     }
 
     void run(){
-        Network bikeTrack = LoadMyScenarios.loadScenarioFromNetwork(bikeNetwork).getNetwork();
-        bikeTrackNodes.addAll(bikeTrack.getNodes().values());
-
-        for (Node bikeNode: bikeTrack.getNodes().values()){
+        for (Node bikeNode: bikeTrackNetwork.getNodes().values()){
             Coord cord = bikeNode.getCoord();
 
             Node n = NetworkUtils.getNearestNode(net, cord);
@@ -90,7 +94,7 @@ public class BikeTrackConnectionIdentifier {
         return connectedLinks;
     }
 
-    public List<Node> getBikeTrackNodes(){
-        return bikeTrackNodes;
+    public Network getBikeTrackNetwork(){
+        return bikeTrackNetwork;
     }
 }
