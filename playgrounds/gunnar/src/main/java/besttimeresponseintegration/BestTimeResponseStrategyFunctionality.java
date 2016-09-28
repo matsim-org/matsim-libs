@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.utils.misc.Time;
 
@@ -44,6 +45,8 @@ public class BestTimeResponseStrategyFunctionality {
 			final CharyparNagelScoringParametersForPerson scoringParams, final TimeDiscretization timeDiscretization,
 			final TravelTime carTravelTime, final boolean interpolate) {
 
+		final CharyparNagelScoringParameters personScoringParams = scoringParams.getScoringParameters(plan.getPerson());
+
 		/*
 		 * Building the initial plan data.
 		 */
@@ -59,31 +62,47 @@ public class BestTimeResponseStrategyFunctionality {
 		for (int q = 0; q < plan.getPlanElements().size() - 1; q += 2) {
 
 			final Activity matsimAct = (Activity) plan.getPlanElements().get(q);
-
-			final ActivityUtilityParameters matsimActParams;
-			try {
-				matsimActParams = scoringParams.getScoringParameters(plan.getPerson()).utilParams
-						.get(matsimAct.getType());
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-
 			final Leg matsimNextLeg = (Leg) plan.getPlanElements().get(q + 1);
-
 			this.initialDptTimes_s.add(matsimAct.getEndTime());
 
-			final Double openingTime_s = ((matsimActParams.getOpeningTime() == Time.UNDEFINED_TIME) ? null
-					: matsimActParams.getOpeningTime());
-			final Double closingTime_s = ((matsimActParams.getClosingTime() == Time.UNDEFINED_TIME) ? null
-					: matsimActParams.getClosingTime());
-			final Double latestStartTime_s = ((matsimActParams.getLatestStartTime() == Time.UNDEFINED_TIME) ? null
-					: matsimActParams.getLatestStartTime());
-			final Double earliestEndTime_s = ((matsimActParams.getEarliestEndTime() == Time.UNDEFINED_TIME) ? null
-					: matsimActParams.getEarliestEndTime());
+			final ActivityUtilityParameters params = personScoringParams.utilParams.get(matsimAct.getType());
+
+			final Double openingTime_s = ((params.getOpeningTime() == Time.UNDEFINED_TIME) ? null
+					: params.getOpeningTime());
+			final Double closingTime_s = ((params.getClosingTime() == Time.UNDEFINED_TIME) ? null
+					: params.getClosingTime());
+			final Double latestStartTime_s = ((params.getLatestStartTime() == Time.UNDEFINED_TIME) ? null
+					: params.getLatestStartTime());
+			final Double earliestEndTime_s = ((params.getEarliestEndTime() == Time.UNDEFINED_TIME) ? null
+					: params.getEarliestEndTime());
+
 			final PlannedActivity<Link, String> plannedAct = new PlannedActivity<Link, String>(
-					network.getLinks().get(matsimAct.getLinkId()), matsimNextLeg.getMode(),
-					matsimActParams.getTypicalDuration(), Units.S_PER_H * matsimActParams.getZeroUtilityDuration_h(),
-					openingTime_s, closingTime_s, latestStartTime_s, earliestEndTime_s);
+					network.getLinks().get(matsimAct.getLinkId()), matsimNextLeg.getMode(), params.getTypicalDuration(),
+					Units.S_PER_H * params.getZeroUtilityDuration_h(), openingTime_s, closingTime_s, latestStartTime_s,
+					earliestEndTime_s);
+
+			// final Double openingTime_s = ((matsimActParams.getOpeningTime()
+			// == Time.UNDEFINED_TIME) ? null
+			// : matsimActParams.getOpeningTime());
+			// final Double closingTime_s = ((matsimActParams.getClosingTime()
+			// == Time.UNDEFINED_TIME) ? null
+			// : matsimActParams.getClosingTime());
+			// final Double latestStartTime_s =
+			// ((matsimActParams.getLatestStartTime() == Time.UNDEFINED_TIME) ?
+			// null
+			// : matsimActParams.getLatestStartTime());
+			// final Double earliestEndTime_s =
+			// ((matsimActParams.getEarliestEndTime() == Time.UNDEFINED_TIME) ?
+			// null
+			// : matsimActParams.getEarliestEndTime());
+			// final PlannedActivity<Link, String> plannedAct = new
+			// PlannedActivity<Link, String>(
+			// network.getLinks().get(matsimAct.getLinkId()),
+			// matsimNextLeg.getMode(),
+			// matsimActParams.getTypicalDuration(), Units.S_PER_H *
+			// matsimActParams.getZeroUtilityDuration_h(),
+			// openingTime_s, closingTime_s, latestStartTime_s,
+			// earliestEndTime_s);
 			this.plannedActivities.add(plannedAct);
 		}
 
@@ -96,12 +115,23 @@ public class BestTimeResponseStrategyFunctionality {
 		final boolean randomSmoothing = true;
 
 		this.myTravelTimes = new BestTimeResponseTravelTimes(timeDiscretization, carTravelTime, network, interpolate);
+		// this.timeAlloc = new TimeAllocator<>(timeDiscretization,
+		// this.myTravelTimes,
+		// scoreConfig.getScoringParameters(null).getPerforming_utils_hr() /
+		// 3600.0,
+		// scoreConfig.getModes().get("car").getMarginalUtilityOfTraveling() /
+		// 3600.0,
+		// scoreConfig.getScoringParameters(null).getLateArrival_utils_hr() /
+		// 3600.0,
+		// scoreConfig.getScoringParameters(null).getEarlyDeparture_utils_hr() /
+		// 3600.0, repairTimeStructure,
+		// interpolateTravelTimes, randomSmoothing);
 		this.timeAlloc = new TimeAllocator<>(timeDiscretization, this.myTravelTimes,
-				scoringParams.getScoringParameters(plan.getPerson()).marginalUtilityOfPerforming_s,
-				scoringParams.getScoringParameters(plan.getPerson()).modeParams.get("car").marginalUtilityOfTraveling_s,
-				scoringParams.getScoringParameters(plan.getPerson()).marginalUtilityOfLateArrival_s,
-				scoringParams.getScoringParameters(plan.getPerson()).marginalUtilityOfEarlyDeparture_s,
-				repairTimeStructure, interpolateTravelTimes, randomSmoothing);
+				personScoringParams.marginalUtilityOfPerforming_s,
+				personScoringParams.modeParams.get("car").marginalUtilityOfTraveling_s,
+				personScoringParams.marginalUtilityOfLateArrival_s,
+				personScoringParams.marginalUtilityOfEarlyDeparture_s, repairTimeStructure, interpolateTravelTimes,
+				randomSmoothing);
 	}
 
 	// -------------------- IMPLEMENTATION --------------------

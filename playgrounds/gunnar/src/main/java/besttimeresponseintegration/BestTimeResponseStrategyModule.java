@@ -39,6 +39,8 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 
 	private final TravelTime carTravelTime;
 
+	private final boolean verbose = false;
+	
 	// -------------------- CONSTRUCTION --------------------
 
 	BestTimeResponseStrategyModule(final Scenario scenario, final CharyparNagelScoringParametersForPerson scoringParams,
@@ -73,7 +75,10 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 		}
 		final double[] result = timeAlloc.optimizeDepartureTimes(initialPlanData.plannedActivities,
 				initialDptTimesArray_s);
-		System.out.println("FINAL DPT TIMES: " + new ArrayRealVector(result));
+
+		if (this.verbose) {
+			System.out.println("FINAL DPT TIMES: " + new ArrayRealVector(result));
+		}
 
 		// >>>>>>>>>> TODO NEW >>>>>>>>>>
 		this.experiencedScoreAnalyzer.setExpectedScore(plan.getPerson().getId(), timeAlloc.getResultValue());

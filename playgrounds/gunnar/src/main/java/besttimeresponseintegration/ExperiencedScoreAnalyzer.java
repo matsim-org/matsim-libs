@@ -82,7 +82,7 @@ public class ExperiencedScoreAnalyzer implements IterationEndsListener {
 			plan.setPerson(population.getPersons().get(personId)); // otherwise
 																	// null
 			final BestTimeResponseStrategyFunctionality planData = new BestTimeResponseStrategyFunctionality(plan,
-					network, scoringParams, this.timeDiscrInj.getInstance(), mode2tt.get("car"), interpolate);
+					this.network, this.scoringParams, this.timeDiscrInj.getInstance(), mode2tt.get("car"), interpolate);
 			person2ExperiencedScore.put(personId, planData.evaluate());
 		}
 
