@@ -53,17 +53,19 @@ import playground.jbischoff.parking.manager.ParkingSearchManager;
  */
 public class ShapeBasedFreeFloatingCarsharingManager implements FreefloatingCarsharingManager {
 
-	private Map<Id<Vehicle>, Id<Link>> idleVehicleLocations;
+	private Map<Id<Vehicle>, Id<Link>> idleVehicleLocations = new LinkedHashMap<>();
 	private Map<Id<Vehicle>, Id<Link>> busyVehicleLastRentalLocations = new LinkedHashMap<>();
 	private CarsharingData data;
 	private Network network;
 	private final FFCSConfigGroup ffcsConfigGroup;
+	private ParkingSearchManager parkingManager;
 
 	@Inject
 	public ShapeBasedFreeFloatingCarsharingManager(Network network, ParkingSearchManager parkingManager, CarsharingData data, Config config) {
 		this.data=data;
-		this.idleVehicleLocations=data.getVehiclesStartLocations();
+		this.idleVehicleLocations.putAll(data.getVehiclesStartLocations());;
 		this.network = network;
+		this.parkingManager = parkingManager;
 		this.ffcsConfigGroup = (FFCSConfigGroup) config.getModule("freefloating");
 		
 	}
@@ -118,6 +120,14 @@ public class ShapeBasedFreeFloatingCarsharingManager implements FreefloatingCars
 	 */
 	@Override
 	public void reset(int iteration) {
+		if (ffcsConfigGroup.resetVehicles()){
+			for (Entry<Id<Vehicle>, Id<Link>> vid : idleVehicleLocations.entrySet()){
+				this.parkingManager.unParkVehicleHere(vid.getKey(), vid.getValue(), 30*3600);
+			}
+			this.idleVehicleLocations.clear();
+			this.idleVehicleLocations.putAll(data.getVehiclesStartLocations());;
+}
+		else
 		if (!this.busyVehicleLastRentalLocations.isEmpty()){
 			Logger.getLogger(getClass()).info("Iteration "+iteration+": "+busyVehicleLastRentalLocations.size()+"  carsharing vehicles are reset to last know position:");
 			idleVehicleLocations.putAll(busyVehicleLastRentalLocations);
@@ -139,19 +149,10 @@ public class ShapeBasedFreeFloatingCarsharingManager implements FreefloatingCars
 	 */
 	@Override
 	public boolean isFFCSVehicle(Id<Vehicle> vehicleId) {
-		
-		return (this.idleVehicleLocations.containsKey(vehicleId)|this.busyVehicleLastRentalLocations.containsKey(busyVehicleLastRentalLocations));
+	
+		return (data.getVehiclesStartLocations().containsKey(vehicleId));
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager#reset()
-	 */
-	@Override
-	public void reset() {
-		if (ffcsConfigGroup.resetVehicles()){
-			this.idleVehicleLocations=data.getVehiclesStartLocations();
-			this.busyVehicleLastRentalLocations.clear();
-			}
-	}
+
 
 }

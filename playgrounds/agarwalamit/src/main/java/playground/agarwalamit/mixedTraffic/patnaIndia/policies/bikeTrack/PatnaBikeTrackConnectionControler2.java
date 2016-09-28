@@ -37,6 +37,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -77,13 +78,13 @@ public class PatnaBikeTrackConnectionControler2 {
 	private static String initialNetwork = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/network.xml.gz";
 	private static String bikeTrack = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/bikeTrack.xml.gz";
 
-	private static final Logger LOG = Logger.getLogger(BikeConnectorLinkControlerListner.class);
+	private static final Logger LOG = Logger.getLogger(PatnaBikeTrackConnectionControler2.class);
 
 	private static final List<String> modes = Arrays.asList("bike");
 	private static final Set<String> allowedModes = new HashSet<>(modes);
 	private static final double blendFactor = 0.95;
 	private static int numberOfConnectors = 15;
-	private static int updateConnectorsAfterIteration = 1;
+	private static int updateConnectorsAfterIteration = 10;
 	private static int maxItration = 100;
 
 	private static boolean isAllwoingMotorbikeOnBikeTrack = false;
@@ -110,7 +111,6 @@ public class PatnaBikeTrackConnectionControler2 {
 		BikeTrackConnectionIdentifier connectionIdentifier = new BikeTrackConnectionIdentifier(initialNetwork,bikeTrack);
 		connectionIdentifier.run();
 
-		List<Node> bikeTrackNodes = connectionIdentifier.getBikeTrackNodes();
 		linkIds = connectionIdentifier.getConnectedLinks();
 
 		// sort based on the values (i.e. link volume)
@@ -122,16 +122,25 @@ public class PatnaBikeTrackConnectionControler2 {
 			LOG.info("========================== Initializing scenario ... ");
 			Scenario scenario = getScenario();
 
-			for(Node n : bikeTrackNodes) {
+			// add bike network first
+			for(Node n : connectionIdentifier.getBikeTrackNetwork().getNodes().values()) {
 				if(scenario.getNetwork().getNodes().containsKey(n.getId())) continue;
 				NetworkUtils.createAndAddNode(scenario.getNetwork(),n.getId(),n.getCoord());
+			}
+
+			for(Link l : connectionIdentifier.getBikeTrackNetwork().getLinks().values()){
+				if (scenario.getNetwork().getLinks().containsKey(l.getId()) ) continue;
+				else{
+					// link must be re-created so that node objects are same.
+					addLinkToScenario(scenario, l);
+				}
 			}
 
 			if(index==1) {
 				for (Id<Link> lId : linkIds.keySet()) {
 					Link l = linkIds.get(lId);
-					l.setAllowedModes(allowedModes);
-					scenario.getNetwork().addLink(l);
+					// link must be re-created so that node objects are same.
+					addLinkToScenario(scenario, l);
 				}
 			}
 			else {
@@ -141,13 +150,10 @@ public class PatnaBikeTrackConnectionControler2 {
 				while (iterator.hasNext()) {
 					Map.Entry<Id<Link>, Double> next = iterator.next();
 					Link l = linkIds.get(next.getKey());
-					l.setAllowedModes(allowedModes);
-					scenario.getNetwork().addLink(l);
+					addLinkToScenario(scenario, l);
 					LOG.info("========================== Connector "+ l.getId()+" is added to the network, volume on this link is "+ next.getValue());
 				}
 			}
-
-//			removeRoutes(scenario);
 
 			LOG.info("========================== Running trial "+index);
 			FilteredLinkVolumeHandler volHandler = new FilteredLinkVolumeHandler(modes);
@@ -156,12 +162,12 @@ public class PatnaBikeTrackConnectionControler2 {
 			String outputDir = scenario.getConfig().controler().getOutputDirectory();
 			outputDir = outputDir+"_"+index+"/";
 			int firstIt = scenario.getConfig().controler().getFirstIteration();
-			int lastIt = firstIt + index * updateConnectorsAfterIteration;
+			int lastIt = firstIt + updateConnectorsAfterIteration;
 
 			scenario.getConfig().controler().setLastIteration( lastIt );
 			scenario.getConfig().controler().setOutputDirectory(outputDir);
 
- 			final Controler controler = new Controler(scenario);
+			final Controler controler = new Controler(scenario);
 			addOverrides(controler);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
@@ -177,13 +183,18 @@ public class PatnaBikeTrackConnectionControler2 {
 			LOG.info("========================== Updating the bike counts on the connectors link...");
 			// update the link counts
 			if(index==1) { // nothing to update; just store info
+				boolean isBikeTrackUsed = false;
 				Map<Id<Link>, Map<Integer, Double>> link2time2vol = volHandler.getLinkId2TimeSlot2LinkCount();
 				for(Id<Link> linkId : linkIds.keySet()) {
 					double count;
-					if ( link2time2vol.containsKey(linkId) ) count = MapUtils.doubleValueSum( link2time2vol.get(linkId) );
+					if ( link2time2vol.containsKey(linkId) ) {
+						count = MapUtils.doubleValueSum( link2time2vol.get(linkId) );
+						isBikeTrackUsed = true;
+					}
 					else count = 0.0;
 					linkId2Count.put(linkId, count);
 				}
+				if(! isBikeTrackUsed) throw new RuntimeException("bike track is not used at all.");
 			} else {
 				Map<Id<Link>, Map<Integer, Double>> link2time2vol = volHandler.getLinkId2TimeSlot2LinkCount();
 				for(Id<Link> linkId : linkId2Count.keySet()) {
@@ -216,6 +227,14 @@ public class PatnaBikeTrackConnectionControler2 {
 		}
 	}
 
+	private static void addLinkToScenario(Scenario scenario, Link l) {
+		Node fromNode = scenario.getNetwork().getNodes().get(l.getFromNode().getId());
+		Node toNode = scenario.getNetwork().getNodes().get(l.getToNode().getId());
+		Link lNew = NetworkUtils.createAndAddLink(scenario.getNetwork(), l.getId(), fromNode, toNode,
+                l.getLength(), l.getFreespeed(), l.getCapacity(), l.getNumberOfLanes());
+		lNew.setAllowedModes(new HashSet<>(modes));
+	}
+
 	public static Scenario getScenario() {
 		Config config = ConfigUtils.createConfig();
 		String outputDir ;
@@ -241,12 +260,18 @@ public class PatnaBikeTrackConnectionControler2 {
 		for(StrategySettings ss : strategySettings){ // departure time is fixed now.
 			if ( ss.getStrategyName().equals(DefaultStrategy.TimeAllocationMutator.toString()) ) {
 				throw new RuntimeException("Time mutation should not be used; fixed departure time must be used after cadyts calibration.");
+			} else if (  ss.getStrategyName().equals(DefaultStrategy.ReRoute.toString())  ) {
+				// increase chances of re-routing to 25%
+				ss.setWeight(0.25);
 			}
 		}
 		//==
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setWriteEventsInterval(10);
 		config.controler().setDumpDataAtEnd(true);
+
+		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
+		config.vspExperimental().setWritingOutputEvents(true);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		return scenario;

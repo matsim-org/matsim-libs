@@ -68,8 +68,9 @@ public class FFCSorRandomParkingChoiceLogic implements ParkingChoiceLogic {
 
 	@Override
 	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId) {
+	
 		if (!ffmanager.isFFCSVehicle(vehicleId)){
-			return getRandomLinkId(currentLinkId);
+				return getRandomLinkId(currentLinkId);
 		}
 		else {
 			if (!lookedForRoute){

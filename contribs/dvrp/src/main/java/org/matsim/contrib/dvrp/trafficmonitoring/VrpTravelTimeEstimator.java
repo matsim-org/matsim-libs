@@ -96,6 +96,9 @@ public class VrpTravelTimeEstimator
     	// Maybe the user should tag links appropriate for taxi usage with the tag "taxi". This can later be used to filter the
     	// network for the routing algos of the dvrp/taxi packages.
     	// AN Aug'16
+        
+        // would it be faster if we remove this hack to init()/updateTTs()???
+        // michalm Sep'16
 
     	if (link.getAllowedModes().contains(TransportMode.car)) {
     		//TODO TTC is more flexible (simple averaging vs linear interpolation, etc.)

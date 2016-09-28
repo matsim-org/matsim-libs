@@ -24,7 +24,7 @@ import java.util.*;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.*;
-import org.matsim.contrib.dvrp.path.AbstractOneToManyPathSearch.PathData;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
@@ -46,8 +46,8 @@ public class VehicleAssignmentProblem<D>
     private final TravelTime travelTime;
     private final FastAStarEuclidean euclideanRouter;
 
-    private final OneToManyForwardPathSearch forwardPathSearch;
-    private final OneToManyBackwardPathSearch backwardPathSearch;
+    private final OneToManyPathSearch forwardPathSearch;
+    private final OneToManyPathSearch backwardPathSearch;
 
     private final LinkProvider<DestEntry<D>> destLinkProvider = LinkProviders
             .createDestEntryToLink();
@@ -75,8 +75,8 @@ public class VehicleAssignmentProblem<D>
         this.travelTime = travelTime;
         this.euclideanRouter = euclideanRouter;
 
-        forwardPathSearch = new OneToManyForwardPathSearch(router);
-        backwardPathSearch = new OneToManyBackwardPathSearch(backwardRouter);
+        forwardPathSearch = OneToManyPathSearch.createForwardSearch(router);
+        backwardPathSearch = OneToManyPathSearch.createBackwardSearch(backwardRouter);
 
         //TODO this kNN is slow
         destinationFinder = StraightLineKnnFinders.createDestEntryFinder(nearestDestinationLimit);
@@ -159,7 +159,6 @@ public class VehicleAssignmentProblem<D>
                 int v = filteredVehs.get(i).idx;
                 pathDataMatrix[v][d] = paths[i];
             }
-
         }
     }
 
@@ -200,8 +199,8 @@ public class VehicleAssignmentProblem<D>
             VrpPathWithTravelData vrpPath = pathData == null ? //
                     VrpPaths.calcAndCreatePath(departure.link, dest.link, departure.time,
                             euclideanRouter, travelTime)
-                    : VrpPaths.createPath(departure.link, dest.link, departure.time,
-                            pathData.getPath(), travelTime);
+                    : VrpPaths.createPath(departure.link, dest.link, departure.time, pathData.path,
+                            travelTime);
 
             dispatches.add(new Dispatch<>(departure.vehicle, dest.destination, vrpPath));
         }

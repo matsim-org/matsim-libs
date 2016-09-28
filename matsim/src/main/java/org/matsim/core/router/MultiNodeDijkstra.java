@@ -72,7 +72,7 @@ public class MultiNodeDijkstra extends Dijkstra {
 	 * is in a not reachable part of the network, the algorithm will process the
 	 * entire reachable part of the network before terminating.
 	 */
-	private final boolean searchAllEndNodes;
+	private boolean searchAllEndNodes;
 	
 	public MultiNodeDijkstra(Network network, TravelDisutility costFunction, TravelTime timeFunction, boolean searchAllEndNodes) {
 		super(network, costFunction, timeFunction);
@@ -275,5 +275,12 @@ public class MultiNodeDijkstra extends Dijkstra {
 			return constructPath(fromNode, toNode, startTime, arrivalTime);			
 		}
 	}
-	
+
+    public boolean isSearchAllEndNodes() {
+        return searchAllEndNodes;
+    }
+
+    public void setSearchAllEndNodes(boolean searchAllEndNodes) {
+        this.searchAllEndNodes = searchAllEndNodes;
+    }
 }

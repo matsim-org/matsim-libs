@@ -73,6 +73,7 @@ public class FacilityBasedFreefloatingParkingManager implements ParkingSearchMan
 	private final FreefloatingCarsharingManager ffcmanager;
 	private final Random random = MatsimRandom.getLocalInstance();
 	private final FFCSConfigGroup ffcs;
+	private final Set<Id<Vehicle>> parkedInCsFacility = new HashSet<>();
 	Network network;
 
 	/**
@@ -172,6 +173,7 @@ public class FacilityBasedFreefloatingParkingManager implements ParkingSearchMan
 					}
 				} else if (hasCSCapacity){
 					this.csoccupancy.get(fac).increment();
+					this.parkedInCsFacility.add(vid);
 					this.parkingReservation.put(vid, fac);
 					return true;
 				} else if (hasOrdinaryCapacity){
@@ -255,7 +257,13 @@ public class FacilityBasedFreefloatingParkingManager implements ParkingSearchMan
 			// we assume the person parks somewhere else
 		} else {
 			Id<ActivityFacility> fac = this.parkingLocations.remove(vehicleId);
+			if (parkedInCsFacility.contains(vehicleId)){
+				parkedInCsFacility.remove(vehicleId);
+				this.csoccupancy.get(fac).decrement();
+			}
+			else{
 			this.occupancies.get(fac).decrement();
+			}
 			return true;
 		}
 	}
@@ -273,7 +281,11 @@ public class FacilityBasedFreefloatingParkingManager implements ParkingSearchMan
 			Id<Link> linkId = this.parkingFacilities.get(e.getKey()).getLinkId();
 			double capacity = this.parkingFacilities.get(e.getKey()).getActivityOptions()
 					.get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
-			String s = linkId.toString() + ";" + e.getKey().toString() + ";" + capacity + ";" + e.getValue().toString();
+			double ffcapacity = this.parkingFacilities.get(e.getKey()).getActivityOptions()
+					.get(FFCSUtils.FREEFLOATINGPARKACTIVITYTYPE).getCapacity();
+			int ffocupancy = this.csoccupancy.get(e.getKey()).intValue();
+			
+			String s = linkId.toString() + ";" + e.getKey().toString() + ";" + capacity + ";" + e.getValue().toString()+";"+ffcapacity+";"+ffocupancy;
 			stats.add(s);
 		}
 		return stats;

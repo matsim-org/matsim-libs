@@ -60,7 +60,7 @@ public class CreateFreefloatingParkingFacilities {
 	
 		TabularFileParserConfig config = new TabularFileParserConfig();
 		config.setDelimiterTags(new String[] { "\t" });
-		config.setFileName("../../../shared-svn/projects/bmw_carsharing/data/parkplaetze250cs.txt");
+		config.setFileName("../../../shared-svn/projects/bmw_carsharing/data/parkplaetze-nocars.txt");
 		config.setCommentTags(new String[] { "#" });
 		new TabularFileParser().parse(config, new TabularFileHandler() {
 
@@ -85,7 +85,7 @@ public class CreateFreefloatingParkingFacilities {
 
 		});
 		new FacilitiesWriter(scenario.getActivityFacilities())
-				.write("../../../shared-svn/projects/bmw_carsharing/data/scenario/parkingFacilities-250cs.xml");
+				.write("../../../shared-svn/projects/bmw_carsharing/data/scenario/parkingFacilities-nocars.xml");
 
 	}
 

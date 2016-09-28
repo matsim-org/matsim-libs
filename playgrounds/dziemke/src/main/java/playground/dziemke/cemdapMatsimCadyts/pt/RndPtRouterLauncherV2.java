@@ -5,7 +5,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.pt.CadytsPtContext;
-import org.matsim.contrib.cadyts.pt.CadytsPtModule;
 import org.matsim.contrib.common.randomizedtransitrouter.RandomizingTransitRouterTravelTimeAndDisutility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -21,6 +20,7 @@ import org.matsim.core.scoring.functions.*;
 import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import playground.dziemke.cemdapMatsimCadyts.measurement.CadytsPtModuleGT;
 import playground.dziemke.cemdapMatsimCadyts.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
 
 import javax.inject.Inject;
@@ -89,7 +89,7 @@ public class RndPtRouterLauncherV2 {
 
 //		controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
-		controler.addOverridingModule(new CadytsPtModule());
+		controler.addOverridingModule(new CadytsPtModuleGT());
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Inject private CadytsPtContext cadytsContext;

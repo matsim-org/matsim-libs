@@ -143,7 +143,7 @@ public class BikeConnectorLinkControlerListner implements StartupListener, Itera
         linkIds.putAll(bikeTrackConnector.getConnectedLinks());
 
         // add nodes first, cant add net.addNode(bikeNode) directly due to information attached to the node.
-        List<Node> bikeTrackNodes = bikeTrackConnector.getBikeTrackNodes();
+        List<Node> bikeTrackNodes = new ArrayList<>( bikeTrackConnector.getBikeTrackNetwork().getNodes().values() );
 
         for(Node n : bikeTrackNodes) { // i think keeping some unused nodes is better than first finding which nodes to add and then add then again.
             if(scenario.getNetwork().getNodes().containsKey(n.getId())) continue;
