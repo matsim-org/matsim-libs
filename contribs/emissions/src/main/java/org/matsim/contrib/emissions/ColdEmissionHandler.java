@@ -92,7 +92,6 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
             Id<Link> coldEmissionEventLinkId = this.vehicleId2coldEmissionEventLinkId.get(vehicleId);
 
             Vehicle vehicle = emissionVehicles.getVehicles().get(vehicleId);
-            VehicleType vt = vehicle.getType();
 
             if ((distance / 1000) > 1.0) {
                 this.coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent(
