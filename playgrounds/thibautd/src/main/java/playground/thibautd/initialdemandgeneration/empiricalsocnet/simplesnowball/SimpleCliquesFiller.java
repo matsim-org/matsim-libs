@@ -19,6 +19,7 @@
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowball;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonUtils;
@@ -38,11 +39,10 @@ import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
-import static org.osgeo.proj4j.parser.Proj4Keyword.a;
-
 /**
  * @author thibautd
  */
+@Singleton
 public class SimpleCliquesFiller implements CliquesFiller {
 	private static final int[] AGE_CUTTING_POINTS = {24, 38, 51, 66, Integer.MAX_VALUE};
 
@@ -117,7 +117,7 @@ public class SimpleCliquesFiller implements CliquesFiller {
 		members.add( ego );
 	}
 
-	private static int calcAgeClass( int age ) {
+	public static int calcAgeClass( int age ) {
 		for ( int i=0; i < AGE_CUTTING_POINTS.length; i++ ) {
 			if ( age < AGE_CUTTING_POINTS[ i ] ) return i;
 		}
@@ -193,7 +193,7 @@ public class SimpleCliquesFiller implements CliquesFiller {
 	/**
 	 * describes the "positions" of members of a clique in the "social space", relative the ego.
 	 */
-	private static class CliquePosition {
+	public static class CliquePosition {
 		private final double distance, bearing;
 		// one could also use actual age difference (not classified),
 		// but this would then require calibrating social distance more carefully
@@ -210,6 +210,22 @@ public class SimpleCliquesFiller implements CliquesFiller {
 			this.bearing = bearing;
 			this.ageClassDistance = ageClassDistance;
 			this.sameSex = sameSex;
+		}
+
+		public double getDistance() {
+			return distance;
+		}
+
+		public double getBearing() {
+			return bearing;
+		}
+
+		public int getAgeClassDistance() {
+			return ageClassDistance;
+		}
+
+		public boolean isSameSex() {
+			return sameSex;
 		}
 	}
 }

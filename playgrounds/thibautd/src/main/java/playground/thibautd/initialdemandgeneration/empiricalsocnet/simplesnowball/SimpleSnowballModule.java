@@ -18,33 +18,30 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowball;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.gbl.MatsimRandom;
+import com.google.inject.AbstractModule;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesFiller;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.DegreeDistribution;
-
-import java.util.Random;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoLocator;
 
 /**
- * Very simple implementation, that does not care about socio-demographics
- *
  * @author thibautd
  */
-@Singleton
-public class SimpleDegreeDistribution implements DegreeDistribution {
-	private final Random random = MatsimRandom.getLocalInstance();
-	// could be compressed a lot, by storing (cumulative) counts in another array and searching with binary search on count
-	private final int[] degrees;
+public class SimpleSnowballModule extends AbstractModule {
+	private final SnowballCliques snowballCliques;
 
-	@Inject
-	public SimpleDegreeDistribution( final SnowballCliques cliques ) {
-		degrees = new int[ cliques.getEgos().size() ];
-		for ( int i = 0; i < degrees.length; i++ ) degrees[ i ] = cliques.getEgos().get( i ).getDegree();
+	public SimpleSnowballModule( final SnowballCliques snowballCliques ) {
+		this.snowballCliques = snowballCliques;
 	}
 
 	@Override
-	public int sampleDegree( final Person person ) {
-		return degrees[ random.nextInt( degrees.length ) ];
+	protected void configure() {
+		bind( EgoLocator.class ).to( SnowballLocator.class );
+		bind( SimpleCliquesFiller.Position.class ).to( SnowballLocator.class );
+
+		bind( DegreeDistribution.class ).to( SimpleDegreeDistribution.class );
+
+		bind( CliquesFiller.class ).to( SimpleCliquesFiller.class );
+
+		bind( SnowballCliques.class ).toInstance( snowballCliques );
 	}
 }

@@ -140,7 +140,4 @@ public class SocialNetworkSampler {
 		};
 	}
 
-	public interface DegreeDistribution {
-		int sampleDegree( Person person );
-	}
 }
