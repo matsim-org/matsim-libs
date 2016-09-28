@@ -32,6 +32,9 @@ import static playground.thibautd.initialdemandgeneration.empiricalsocnet.simple
  */
 @Singleton
 public class SnowballLocator implements EgoLocator, SimpleCliquesFiller.Position {
+	// a difference in the categorical variables is equivalent to 10'000 km
+	private static double NON_SPATIAL_FACTOR = 10 * 1000 * 1000;
+
 	@Override
 	public int getDimensionality() {
 		return 4;
@@ -49,8 +52,8 @@ public class SnowballLocator implements EgoLocator, SimpleCliquesFiller.Position
 		return new double[]{
 				firstActivity.getCoord().getX() ,
 				firstActivity.getCoord().getY() ,
-				SimpleCliquesFiller.calcAgeClass( PersonUtils.getAge( ego.getPerson() ) ) ,
-				SimpleCliquesFiller.getSex( ego ).ordinal() };
+				NON_SPATIAL_FACTOR * SimpleCliquesFiller.calcAgeClass( PersonUtils.getAge( ego.getPerson() ) ) ,
+				NON_SPATIAL_FACTOR * SimpleCliquesFiller.getSex( ego ).ordinal() };
 	}
 
 	@Override
@@ -65,7 +68,7 @@ public class SnowballLocator implements EgoLocator, SimpleCliquesFiller.Position
 				egoCoord[ 1 ] + yTranslation ,
 				// can go out of bounds, in which case the closest is the first or last class.
 				// would be better to manage to get something "at a distance", whatever the direction...
-				egoCoord[ 2 ] + position.getAgeClassDistance() ,
-				position.isSameSex() ? egoCoord[ 3 ] : 1 - egoCoord[ 3 ] };
+				egoCoord[ 2 ] + NON_SPATIAL_FACTOR * position.getAgeClassDistance() ,
+				position.isSameSex() ? egoCoord[ 3 ] : NON_SPATIAL_FACTOR - egoCoord[ 3 ] };
 	}
 }
