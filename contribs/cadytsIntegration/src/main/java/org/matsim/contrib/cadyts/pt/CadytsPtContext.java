@@ -22,11 +22,6 @@ package org.matsim.contrib.cadyts.pt;
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.supply.SimResults;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Id;
@@ -37,7 +32,6 @@ import org.matsim.contrib.cadyts.general.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PtCountsConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -58,6 +52,10 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import javax.inject.Inject;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * @author nagel
@@ -85,13 +83,16 @@ CadytsContextI<TransitStopFacility> {
 	private Scenario scenario;
 	private OutputDirectoryHierarchy controlerIO;
 	private IterationStopWatch stopWatch;
+	private CadytsBuilder cadytsBuilder;
 
 	@Inject
-	CadytsPtContext(final Config config, EventsManager events, Scenario scenario, OutputDirectoryHierarchy controlerIO, IterationStopWatch stopWatch) {
+	CadytsPtContext(final Config config, EventsManager events, Scenario scenario, OutputDirectoryHierarchy controlerIO,
+					IterationStopWatch stopWatch, CadytsBuilder cadytsBuilder) {
 		this.events = events;
 		this.scenario = scenario;
 		this.controlerIO = controlerIO;
 		this.stopWatch = stopWatch;
+		this.cadytsBuilder = cadytsBuilder;
 		cadytsConfig = (CadytsConfigGroup) config.getModule(CadytsConfigGroup.GROUP_NAME);
 
 		// === prepare the structure which extracts the measurements from the simulation:
@@ -137,7 +138,7 @@ CadytsContextI<TransitStopFacility> {
 		new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
-		this.calibrator = CadytsBuilder.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.occupCounts, new TransitStopFacilityLookUp(scenario) , TransitStopFacility.class);
+		this.calibrator = cadytsBuilder.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.occupCounts, new TransitStopFacilityLookUp(scenario) , TransitStopFacility.class);
 
 		// === find out which plan is contributing what to each measurement:
 		this.ptStep = new PtPlanToPlanStepBasedOnEvents<>(scenario, toTransitLineIdSet(cadytsConfig.getCalibratedItems()));

@@ -43,7 +43,7 @@ public class Counts<T> {
 		if (this.counts.containsKey(linkId)) {
 			return null;
 		}
-		Count<T> c = new Count<T>(linkId, stationName);
+		Count<T> c = new Count<>(linkId, stationName);
 		this.counts.put(linkId, c);
 		return c;
 	}

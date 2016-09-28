@@ -34,10 +34,10 @@ import playground.jbischoff.ffcs.FFCSConfigGroup;
 import playground.jbischoff.ffcs.FFCSUtils;
 import playground.jbischoff.ffcs.data.CarsharingData;
 import playground.jbischoff.ffcs.data.CarsharingVehiclesReader;
-import playground.jbischoff.ffcs.manager.FacilityBasedFreefloatingParkingManager;
 import playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager;
 import playground.jbischoff.ffcs.manager.ShapeBasedFreeFloatingCarsharingManager;
 import playground.jbischoff.ffcs.manager.SimpleFreeFloatingCarsharingManagerImpl;
+import playground.jbischoff.ffcs.parking.FacilityBasedFreefloatingParkingManager;
 import playground.jbischoff.parking.ParkingUtils;
 import playground.jbischoff.parking.evaluation.ParkingListener;
 import playground.jbischoff.parking.manager.ParkingSearchManager;
@@ -105,8 +105,7 @@ public class SetupFreefloatingParking {
 				bind(ParkingSearchManager.class).to(FacilityBasedFreefloatingParkingManager.class).asEagerSingleton();
 				bind(WalkLegFactory.class).asEagerSingleton();
 				this.install(new FreefloatingParkingSearchQSimModule());
-				addControlerListenerBinding().to(ParkingListener.class);
-				addControlerListenerBinding().to(CarsharingListener.class);
+				addControlerListenerBinding().to(CarsharingParkingListener.class);
 				bind(ParkingRouter.class).to(WithinDayParkingRouter.class);
 				bind(VehicleTeleportationLogic.class).to(VehicleTeleportationToNearbyParking.class);
 			}

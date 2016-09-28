@@ -26,11 +26,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author jbischoff
@@ -44,18 +44,29 @@ public class RandomParkingChoiceLogic implements ParkingChoiceLogic {
 
 	/**
 	 * {@link Network} the network
+	 * 
+	 * @param parkingManager
 	 */
 	public RandomParkingChoiceLogic(Network network) {
-
 		this.network = network;
 	}
 
 	@Override
-	public Id<Link> getNextLink(Id<Link> currentLinkId) {
+	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId) {
 		Link currentLink = network.getLinks().get(currentLinkId);
 		List<Id<Link>> keys = new ArrayList<>(currentLink.getToNode().getOutLinks().keySet());
 		Id<Link> randomKey = keys.get(random.nextInt(keys.size()));
 		return randomKey;
 
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see playground.jbischoff.parking.choice.ParkingChoiceLogic#reset()
+	 */
+	@Override
+	public void reset() {
+	}
+
 }

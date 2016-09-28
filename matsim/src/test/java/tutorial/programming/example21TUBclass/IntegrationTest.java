@@ -19,8 +19,6 @@
 
 package tutorial.programming.example21TUBclass;
 
-import static org.junit.Assert.*;
-
 import java.io.File;
 
 import org.junit.Test;
@@ -36,7 +34,7 @@ public class IntegrationTest {
 
 	@Test
 	public void test() {
-		final String pathname = "./output/equil";
+		final String pathname = "./output/example";
 		try{
 		IOUtils.deleteDirectory(new File(pathname),false);
 		}

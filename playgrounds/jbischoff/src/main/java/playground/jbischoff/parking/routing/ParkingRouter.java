@@ -37,6 +37,6 @@ public interface ParkingRouter {
 	 * @return
 	 */
 
-	NetworkRoute getRouteFromParkingToDestination(Route intendedRoute, double departureTime, Id<Link> startLinkId);
+	NetworkRoute getRouteFromParkingToDestination(Id<Link> destinationLinkId, double departureTime, Id<Link> startLinkId);
 	
 }

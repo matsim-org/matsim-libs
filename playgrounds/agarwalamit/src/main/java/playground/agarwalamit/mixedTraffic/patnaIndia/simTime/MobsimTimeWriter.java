@@ -26,6 +26,7 @@ import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
+import playground.agarwalamit.utils.FileUtils;
 
 /**
  * Idea is to read mosbim time from the stopwatch.txt and then compare it with other traffic/link dynamics. 
@@ -35,7 +36,7 @@ import org.matsim.core.utils.misc.Time;
 
 public class MobsimTimeWriter {
 
-	private String respectiveFileDirectory = "../../../../repos/runs-svn/patnaIndia/run110/100pct/";
+	private String respectiveFileDirectory = FileUtils.RUNS_SVN+"/patnaIndia/run110/100pct/";
 	private BufferedWriter writer;
 
 	public static void main(String[] args) {

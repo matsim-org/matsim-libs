@@ -17,13 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.mixedTraffic.patnaIndia.policies;
+package playground.agarwalamit;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Ignore;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -48,6 +50,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.BikeTimeDistanceTravelDisutilityFactory;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
+import playground.agarwalamit.utils.FileUtils;
 
 /**
  * Trying to check if an agent is routed on multi-mode network.
@@ -60,10 +63,13 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 public class PatnaBikeTestControler {
 
-	public static void main(String[] args) {
+	// TODO : add some assert statements to it.
+
+	@Test@Ignore
+	public void run() {
 
 		String net = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/bikeTrack.xml.gz";
-		String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/policies/testBikeTrack/";
+		String outputDir = FileUtils.RUNS_SVN+"/patnaIndia/run108/jointDemand/policies/testBikeTrack/";
 
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(net);

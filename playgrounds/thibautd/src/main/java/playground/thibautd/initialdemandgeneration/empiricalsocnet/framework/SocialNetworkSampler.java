@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet;
+package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
@@ -24,19 +24,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.core.gbl.MatsimRandom;
+import playground.thibautd.utils.KDTree;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-
-import static org.osgeo.proj4j.parser.Proj4Keyword.a;
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
 
 /**
  * @author thibautd
@@ -47,30 +41,33 @@ public class SocialNetworkSampler {
 	private final Population population;
 	private final DegreeDistribution degreeDistribution;
 	private final CliquesFiller cliquesFiller;
+	private final EgoLocator egoLocator;
 
 	@Inject
 	public SocialNetworkSampler(
 			final Population population,
 			final DegreeDistribution degreeDistribution,
-			final CliquesFiller cliquesFiller ) {
+			final CliquesFiller cliquesFiller,
+			final EgoLocator egoLocator ) {
 		this.population = population;
 		this.degreeDistribution = degreeDistribution;
 		this.cliquesFiller = cliquesFiller;
+		this.egoLocator = egoLocator;
 	}
 
 	public SocialNetwork sampleSocialNetwork() {
 		final Map<Id<Person>,Ego> egos = new HashMap<>();
-		final List<Ego> egosWithFreeStubs = new ArrayList<>( population.getPersons().size() );
 		for ( Person p : population.getPersons().values() ) {
-			final Ego ego = new Ego( p , degreeDistribution.sampledDegree( p ) );
+			final Ego ego = new Ego( p , degreeDistribution.sampleDegree( p ) );
 			egos.put( p.getId() , ego );
-			egosWithFreeStubs.add( ego );
 		}
+		final KDTree<Ego> egosWithFreeStubs = new KDTree<>( egoLocator.getDimensionality() , egoLocator );
+		egosWithFreeStubs.add( egos.values() );
 
 		while ( !egosWithFreeStubs.isEmpty() ) {
 			final Ego ego = egosWithFreeStubs.get( random.nextInt( egosWithFreeStubs.size() ) );
 
-			final Set<Ego> clique = cliquesFiller.sampleClique( ego );
+			final Set<Ego> clique = cliquesFiller.sampleClique( ego , egosWithFreeStubs );
 
 			for ( Ego member : clique ) {
 				if ( member.degree <= member.alters.size() ) {
@@ -144,6 +141,6 @@ public class SocialNetworkSampler {
 	}
 
 	public interface DegreeDistribution {
-		int sampledDegree( Person person );
+		int sampleDegree( Person person );
 	}
 }

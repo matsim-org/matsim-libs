@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.taxi.optimizer.assignment;
 
-import org.matsim.contrib.dvrp.path.AbstractOneToManyPathSearch.PathData;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
 import org.matsim.contrib.taxi.optimizer.VehicleData.Entry;
@@ -101,7 +101,7 @@ public class TaxiToRequestAssignmentCostProvider
     {
         double travelTime = pathData == null ? //
                 params.nullPathCost : // no path (too far away)
-                pathData.delay + pathData.getPath().travelTime;
+                pathData.firstAndLastLinkTT + pathData.path.travelTime;
         return Math.max(reqEntry.destination.getT0(), departure.time + travelTime);
     }
 }

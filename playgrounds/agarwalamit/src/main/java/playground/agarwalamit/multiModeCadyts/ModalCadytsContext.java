@@ -20,21 +20,13 @@
 
 package playground.agarwalamit.multiModeCadyts;
 
-import java.io.IOException;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import cadyts.supply.SimResults;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.cadyts.general.CadytsBuilder;
-import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
-import org.matsim.contrib.cadyts.general.CadytsContextI;
-import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
-import org.matsim.contrib.cadyts.general.PlansTranslator;
+import org.matsim.contrib.cadyts.general.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -48,8 +40,10 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.counts.Counts;
 
-import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import cadyts.supply.SimResults;
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
@@ -110,7 +104,7 @@ public class ModalCadytsContext implements CadytsContextI<ModalLink>, StartupLis
 		this.plansTranslator = new ModalPlansTranslatorBasedOnEvents(scenario, modalLinkContainer);
 		this.eventsManager.addHandler(plansTranslator);
 
-		this.calibrator =  CadytsBuilder.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.calibrationCounts , new ModalLinkLookUp(modalLinkContainer) /*, cadytsConfig.getTimeBinSize()*/, ModalLink.class);
+		this.calibrator =  new CadytsBuilderImpl().buildCalibratorAndAddMeasurements(scenario.getConfig(), this.calibrationCounts , new ModalLinkLookUp(modalLinkContainer) /*, cadytsConfig.getTimeBinSize()*/, ModalLink.class);
 	}
 
 	@Override

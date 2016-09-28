@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,46 +16,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
 
-package org.matsim.contrib.dvrp.path;
+import playground.thibautd.utils.KDTree;
 
-import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
-
-
-public class OneToManyBackwardPathSearch
-    extends AbstractOneToManyPathSearch
-{
-    public OneToManyBackwardPathSearch(BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra)
-    {
-        super(backwardMultiNodeDijkstra);
-    }
-
-
-    /**
-     * This is backward search, so the meaning of variables is inverted.</br>
-     * 
-     * @param fromLink destination
-     * @param toLink origin
-     * @param startTime arrivalTime
-     */
-    @Override
-    protected PathData createPathData(Link from, Link to, double time)
-    {
-        if (to == from) {
-            //we are already there, so let's use fromNode instead of toNode
-            return new PathData(to.getFromNode(), 0.);
-        }
-        else {
-            double delay = VrpPaths.FIRST_LINK_TT + VrpPaths.getLastLinkTT(from, time);
-            return new PathData(to.getToNode(), delay);
-        }
-    }
-
-
-    @Override
-    protected Node getFromNode(Link fromLink)
-    {
-        return fromLink.getFromNode();
-    }
+/**
+ * @author thibautd
+ */
+public interface EgoLocator extends KDTree.Coordinate<Ego> {
+	int getDimensionality();
 }

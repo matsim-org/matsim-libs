@@ -282,7 +282,7 @@ public class DemandGeneration {
 		//The capacity factor is equal to the percentage used in the clonePersons method.
 		qsim.setFlowCapFactor(percentage);
 		//storageCapFactor obtained by expression proposed by Nicolai and Nagel, 2013.
-		double storageCapFactor = Math.ceil(((0.1 / (Math.pow(percentage, 0.25))))*100)/100;
+		double storageCapFactor = Math.ceil(((percentage / (Math.pow(percentage, 0.25))))*100)/100;
 		qsim.setStorageCapFactor(storageCapFactor);
 		////////////////////////////////////////////////////////////////////////
 		

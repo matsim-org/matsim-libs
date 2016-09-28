@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.optimizer.assignment;
 
-import org.matsim.contrib.dvrp.path.AbstractOneToManyPathSearch.PathData;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
 import org.matsim.contrib.taxi.optimizer.VehicleData.Entry;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
@@ -89,7 +89,7 @@ public class ETaxiToPlugAssignmentCostProvider
     {
         double travelTime = pathData == null ? //
                 params.nullPathCost : // no path (too far away)
-                pathData.delay + pathData.getPath().travelTime;
+                pathData.firstAndLastLinkTT + pathData.path.travelTime;
         return departure.time + travelTime;
     }
 }

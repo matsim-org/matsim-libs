@@ -38,8 +38,20 @@ public final class Coord implements Serializable {
 
 	private double x;
 	private double y;
-	private double z;
+	private double z = Double.NEGATIVE_INFINITY;
 
+	/**
+	 * Added this constructor so that Gson can again parse 2D coordinates from json files, e.g. via
+	 * <p>
+	 * Coord coord = new Gson().fromJson("{\"x\":123.0,\"y\":456.0}", Coord.class);
+	 * </p>
+	 * Without the constructor, the default values are ignored and the non-existing z-coordinate is initialized with the JAVA default of 0.0.
+	 * {@linkplain Double}s would be initialized with {@code null}. This could also better indicate that there is indeed no information on the z-coordinate. However, memory consumption goes up.
+	 * AN, 09/2016 
+	 */
+	public Coord() {
+	}
+	
 	public Coord(final double x, final double y) {
 		this.x = x;
 		this.y = y;

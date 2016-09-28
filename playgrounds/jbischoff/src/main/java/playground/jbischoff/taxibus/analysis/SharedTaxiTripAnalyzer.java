@@ -117,7 +117,7 @@ public class SharedTaxiTripAnalyzer
 				if (stt.isScoreRides()){
 					double discountFactor = (paxOnBoard>1)?stt.getDiscountForSharing():0;
 					double fullfare = stt.getHourlyTaxiFare()*rideTime/3600;
-					double discountedFare = fullfare * discountFactor*fullfare;
+					double discountedFare = fullfare - discountFactor*fullfare;
 					events.processEvent(new PersonMoneyEvent(arrivalTime, event.getPersonId(), -discountedFare));
 					totalFares+=discountedFare;
 				}

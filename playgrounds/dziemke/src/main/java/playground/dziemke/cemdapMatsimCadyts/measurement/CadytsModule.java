@@ -19,17 +19,16 @@
 
 package playground.dziemke.cemdapMatsimCadyts.measurement;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import com.google.inject.Binder;
+import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.Multibinder;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.cadyts.car.PlansTranslatorBasedOnEvents;
-import org.matsim.contrib.cadyts.general.CadytsBuilder;
+import org.matsim.contrib.cadyts.general.CadytsBuilderImpl;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.LookUpItemFromId;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
@@ -37,12 +36,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.counts.Counts;
 
-import com.google.inject.Binder;
-import com.google.inject.Singleton;
-import com.google.inject.TypeLiteral;
-import com.google.inject.multibindings.Multibinder;
-
-import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class CadytsModule extends AbstractModule {
 
@@ -72,7 +69,7 @@ public class CadytsModule extends AbstractModule {
             };
             Counts<Link> calibrationCounts = (Counts<Link>) scenario.getScenarioElement("calibrationCounts");
             cadytsConfig.setCalibratedItems(calibrationCounts.getCounts().keySet().stream().map(Id::toString).collect(Collectors.toSet()));
-            AnalyticalCalibrator<Link> linkAnalyticalCalibrator = CadytsBuilder.buildCalibratorAndAddMeasurements(scenario.getConfig(), calibrationCounts, linkLookUp, Link.class);
+            AnalyticalCalibrator<Link> linkAnalyticalCalibrator = new CadytsBuilderImpl().buildCalibratorAndAddMeasurements(scenario.getConfig(), calibrationCounts, linkLookUp, Link.class);
             for (MeasurementLoader<Link> measurementLoader : measurementLoaders) {
                 measurementLoader.load(linkAnalyticalCalibrator);
             }

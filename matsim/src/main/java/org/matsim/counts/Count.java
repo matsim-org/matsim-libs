@@ -30,7 +30,7 @@ public class Count<T> {
 	private final Id<T> linkId;
 	private String stationName;
 
-	private final HashMap<Integer,Volume> volumes = new HashMap<Integer, Volume>();
+	private final HashMap<Integer,Volume> volumes = new HashMap<>();
 	private Coord coord;
 
 

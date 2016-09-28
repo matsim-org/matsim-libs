@@ -17,45 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.path;
+package playground.agarwalamit.utils;
 
-import org.matsim.api.core.v01.network.*;
-import org.matsim.core.router.FastMultiNodeDijkstra;
-
-
-public class OneToManyForwardPathSearch
-    extends AbstractOneToManyPathSearch
-{
-    public OneToManyForwardPathSearch(FastMultiNodeDijkstra forwardMultiNodeDijkstra)
-    {
-        super(forwardMultiNodeDijkstra);
-    }
+/**
+ * I think, after introduction of URL and for uniformity, pass absolute path.
+ * Because, relative paths are converted to new uri and then url using new File(" ").getAbsoluteFile() rather than
+ * new File(" ").getCanonicalFile(); which eventually contains (../..) in the file path. see toURL() of {@link java.io.File}.
+ *
+ * Created by amit on 26/09/16.
+ */
 
 
-    /**
-     * @param from origin link
-     * @param to destination link
-     * @param time departure time
-     */
-    @Override
-    protected PathData createPathData(Link from, Link to, double time)
-    {
-        if (to == from) {
-            //we are already there, so let's use toNode instead of fromNode
-            return new PathData(to.getToNode(), 0);
-        }
-        else {
-            //simplified, but works for taxis, since empty drives are short (about 5 mins)
-            //TODO delay can be computed more accurately after path search...
-            double delay = VrpPaths.FIRST_LINK_TT + VrpPaths.getLastLinkTT(to, time);
-            return new PathData(to.getFromNode(), delay);
-        }
-    }
+public final class FileUtils {
 
+    public static final String RUNS_SVN = "/Users/amit/Documents/repos/runs-svn/";
 
-    @Override
-    protected Node getFromNode(Link fromLink)
-    {
-        return fromLink.getToNode();
-    }
+    public static final String SHARED_SVN = "/Users/amit/Documents/repos/shared-svn/";
+
 }

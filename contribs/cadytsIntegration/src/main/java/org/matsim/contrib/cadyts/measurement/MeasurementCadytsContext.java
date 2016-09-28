@@ -20,19 +20,13 @@
 
 package org.matsim.contrib.cadyts.measurement;
 
-import java.io.IOException;
-import java.util.Set;
-import java.util.TreeSet;
-
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import cadyts.demand.Plan;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.cadyts.general.CadytsBuilder;
-import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
-import org.matsim.contrib.cadyts.general.CadytsContextI;
-import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
-import org.matsim.contrib.cadyts.general.PlansTranslator;
+import org.matsim.contrib.cadyts.general.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -44,8 +38,9 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.counts.Counts;
 
-import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import cadyts.demand.Plan;
+import java.io.IOException;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class MeasurementCadytsContext implements CadytsContextI<Measurement>, StartupListener, IterationEndsListener, BeforeMobsimListener {
 
@@ -94,8 +89,8 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 		Config config = scenario.getConfig();
 
 		// 1st major Cadyts method is "calibrator.addMesurement"
-		// in this implementation it is called by the "CadytsBuilder", dz 09/15
-		this.calibrator = CadytsBuilder.buildCalibratorAndAddMeasurements(config, this.counts, measurements, Measurement.class) ;
+		// in this implementation it is called by the "CadytsBuilderImpl", dz 09/15
+		this.calibrator = new CadytsBuilderImpl().buildCalibratorAndAddMeasurements(config, this.counts, measurements, Measurement.class) ;
 
 		this.measurementListener = new MeasurementListener(scenario, measurements );
 		event.getServices().getEvents().addHandler(measurementListener);

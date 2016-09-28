@@ -137,7 +137,7 @@ public class PatnaPolicyControler {
 		//==
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setWriteEventsInterval(1);
+		config.controler().setWriteEventsInterval(50);
 
 		// policies if any
 		if (applyTrafficRestrain && addBikeTrack ) {
