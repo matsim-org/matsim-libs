@@ -23,12 +23,16 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Injector;
 
+import java.util.Arrays;
+
 /**
  * @author thibautd
  */
 public class SocialNetworkSamplerUtils {
 	public static SocialNetwork sampleSocialNetwork( final Config config, final Module... modules ) {
-		final com.google.inject.Injector injector = Injector.createInjector( config , modules );
+		final Module[] allModules = Arrays.copyOf( modules , modules.length + 1 );
+		allModules[ allModules.length - 1 ] = new SocialNetworkSamplerModule();
+		final com.google.inject.Injector injector = Injector.createInjector( config , allModules );
 
 		return injector.getInstance( SocialNetworkSampler.class ).sampleSocialNetwork();
 	}
