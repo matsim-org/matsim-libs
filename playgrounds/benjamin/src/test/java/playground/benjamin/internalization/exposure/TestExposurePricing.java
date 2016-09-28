@@ -342,6 +342,7 @@ public class TestExposurePricing {
 		ecg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
 		ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
 		ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
+		ecg.setUsingVehicleIdAsVehicleDescription(true);
 
 		config.addModule(ecg);
 

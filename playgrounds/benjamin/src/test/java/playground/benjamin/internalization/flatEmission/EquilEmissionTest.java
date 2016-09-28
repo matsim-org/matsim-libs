@@ -219,6 +219,7 @@ public class EquilEmissionTest {
 		ecg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
 		ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
 		ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
+		ecg.setUsingVehicleIdAsVehicleDescription(true);
 
 		config.addModule(ecg);
 	}

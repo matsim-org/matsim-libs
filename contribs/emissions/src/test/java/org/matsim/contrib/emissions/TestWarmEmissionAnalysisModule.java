@@ -33,6 +33,7 @@ import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactor;
 import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactorKey;
 import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -150,9 +151,9 @@ public class TestWarmEmissionAnalysisModule {
     @Test
 	public void testWarmEmissionAnalysisParameter(){
 		setUp();
-		WarmEmissionAnalysisModuleParameter weamp = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, null);
+		WarmEmissionAnalysisModuleParameter weamp = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, null, new EmissionsConfigGroup());
 		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
-		weamp = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, null, detailedHbefaWarmTable);
+		weamp = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, null, detailedHbefaWarmTable, new EmissionsConfigGroup());
 		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
 	}
 	
@@ -747,7 +748,7 @@ public class TestWarmEmissionAnalysisModule {
 		
 		double rescaleF = 1.0003;
 		
-		WarmEmissionAnalysisModuleParameter weamParameter = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable);
+		WarmEmissionAnalysisModuleParameter weamParameter = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, new EmissionsConfigGroup());
 		WarmEmissionAnalysisModule weam = new WarmEmissionAnalysisModule(weamParameter , emissionEventManager, rescaleF);
 		HandlerToTestEmissionAnalysisModules.reset();
 		// ---- end of setup
@@ -781,7 +782,7 @@ public class TestWarmEmissionAnalysisModule {
 		fillDetailedTable(detailedHbefaWarmTable);
 
         EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
-        WarmEmissionAnalysisModuleParameter warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable);
+        WarmEmissionAnalysisModuleParameter warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, new EmissionsConfigGroup());
 		weam = new WarmEmissionAnalysisModule(warmEmissionParameterObject, emissionEventManager, null);
 	}
 	

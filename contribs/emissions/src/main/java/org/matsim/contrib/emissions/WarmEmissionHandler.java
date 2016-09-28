@@ -55,7 +55,6 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 	private final Network network;
 	private final Vehicles emissionVehicles;
 	private final WarmEmissionAnalysisModule warmEmissionAnalysisModule;
-	private final EmissionsConfigGroup ecg;
 
 	private int linkLeaveCnt = 0;
 	private int linkLeaveFirstActWarnCnt = 0;
@@ -71,12 +70,11 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 			Vehicles emissionVehicles,
 			final Network network,
 			WarmEmissionAnalysisModuleParameter parameterObject,
-			EventsManager emissionEventsManager, Double emissionEfficiencyFactor, EmissionsConfigGroup emissionsConfigGroup) {
+			EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
 
 		this.emissionVehicles = emissionVehicles;
 		this.network = network;
 		this.warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(parameterObject, emissionEventsManager, emissionEfficiencyFactor);
-		this.ecg = emissionsConfigGroup;
 	}
 
 	@Override
@@ -188,14 +186,6 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 						EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 			}
 			Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);
-
-			// this can also go to WarmEmissionAnalysisModule;
-			// however, for consistency with ColdEmissionHandler; keeping it here. Amit Sep 2016
-			if(this.ecg.isUsingVehicleIdAsVehicleDescription() ) {
-				if(vehicle.getType().getDescription()==null) {
-					vehicle.getType().setDescription(vehicle.getType().getId().toString());
-				}
-			}
 
 			Map<WarmPollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
 					vehicle,

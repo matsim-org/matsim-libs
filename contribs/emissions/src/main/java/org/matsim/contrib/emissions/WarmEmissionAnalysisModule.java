@@ -56,6 +56,7 @@ public class WarmEmissionAnalysisModule {
 
 	private final EventsManager eventsManager;
 	private final Double emissionEfficiencyFactor;
+	private final EmissionsConfigGroup ecg;
 
 	private int vehAttributesNotSpecifiedCnt = 0;
 
@@ -78,14 +79,16 @@ public class WarmEmissionAnalysisModule {
 		public final Map<Integer, String> roadTypeMapping;
 		public final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 		public final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
+		private final EmissionsConfigGroup ecg;
 
 		public WarmEmissionAnalysisModuleParameter(
 				Map<Integer, String> roadTypeMapping,
 				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
-				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable) {
+				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable, EmissionsConfigGroup emissionsConfigGroup) {
 			this.roadTypeMapping = roadTypeMapping;
 			this.avgHbefaWarmTable = avgHbefaWarmTable;
 			this.detailedHbefaWarmTable = detailedHbefaWarmTable;
+			this.ecg = emissionsConfigGroup;
 			// check if all needed tables are non-null
 			if(roadTypeMapping == null){
 				 logger.error("Road type mapping not set. Aborting...");
@@ -115,6 +118,7 @@ public class WarmEmissionAnalysisModule {
 		this.detailedHbefaWarmTable = parameterObject.detailedHbefaWarmTable;
 		this.eventsManager = emissionEventsManager;
 		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
+		this.ecg = parameterObject.ecg;
 	}
 
 	public void reset() {
@@ -142,6 +146,14 @@ public class WarmEmissionAnalysisModule {
 			double freeVelocity,
 			double linkLength,
 			double travelTime) {
+
+		// this can also go to WarmEmissionHandler (similar to ColdEmissionHandler);
+		// however, for routing, emission costs is calculated directly from here. Amit Sep 2016
+		if(this.ecg.isUsingVehicleIdAsVehicleDescription() ) {
+			if(vehicle.getType().getDescription()==null) {
+				vehicle.getType().setDescription(vehicle.getType().getId().toString());
+			}
+		}
 
 		Map<WarmPollutant, Double> warmEmissions = new HashMap<>();
 		if(vehicle == null ||
