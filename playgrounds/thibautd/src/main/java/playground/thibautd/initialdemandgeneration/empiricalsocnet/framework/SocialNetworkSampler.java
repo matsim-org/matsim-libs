@@ -72,8 +72,9 @@ public class SocialNetworkSampler {
 
 		log.info( "Start sampling with "+egosWithFreeStubs.size()+" egos with free stubs" );
 		final Counter counter = new Counter( "Sample clique # " );
-		while ( !egosWithFreeStubs.isEmpty() ) {
+		while ( egosWithFreeStubs.size() > 1 ) {
 			counter.incCounter();
+
 			final Ego ego = egosWithFreeStubs.get( random.nextInt( egosWithFreeStubs.size() ) );
 
 			final Set<Ego> clique = cliquesFiller.sampleClique( ego , egosWithFreeStubs );
