@@ -129,7 +129,7 @@ public final class PopulationAgentSource implements AgentSource {
 									default:
 										throw new RuntimeException("not implemented") ;
 								}
-								route.setVehicleId(vehicleId);
+								if(route!=null) route.setVehicleId(vehicleId);
 							} else {
 								throw new IllegalStateException("Found a network route without a vehicle id.");
 							}
@@ -171,8 +171,9 @@ public final class PopulationAgentSource implements AgentSource {
 						}
 						seenModes.put(leg.getMode(),vehicleId);
 					} else {
-						if (vehicleId==null ) {
-							route.setVehicleId( seenModes.get(leg.getMode() ) ) ;
+						if (vehicleId==null && route!=null) {
+							vehicleId = seenModes.get(leg.getMode());
+							route.setVehicleId( vehicleId );
 						}
 					}
 				}

@@ -19,6 +19,8 @@
 
 package playground.agarwalamit;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -36,9 +38,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Just setting up the equil scenario for mixed traffic conditions.
@@ -81,7 +80,7 @@ public class EquilMixedTrafficTest {
 		final Map<Id<Vehicle>,Map<Id<Link>,Double>> vehicle2link2enterTime = handler.getVehicleId2LinkEnterTime();
 		final Map<Id<Vehicle>,Map<Id<Link>,Double>> vehicle2link2leaveTime = handler.getVehicleId2LinkLeaveTime();
 
-		Id<Vehicle> bikeVeh = Id.createVehicleId(9);
+		Id<Vehicle> bikeVeh = Id.createVehicleId("9_bicycle");
 		Id<Vehicle> carVeh = Id.createVehicleId(2);
 
 		Id<Link> link2 = Id.createLinkId(2);
