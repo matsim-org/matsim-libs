@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
-		<!ENTITY INPUTBASE    "../../../examples/equil">
+		<!ENTITY INPUTBASE    "../../equil">
 		<!ENTITY OUTPUTBASE   "./output/example">
 	]
 >
@@ -64,7 +64,7 @@
 
 		<param name="ModuleProbability_2" value="0.1" />
 		<param name="Module_2" value="ExternalModule" />
-		<param name="ModuleExePath_2" value="java -jar ./examples/external/replanning.jar" />
+		<param name="ModuleExePath_2" value="java -jar ../../external/replanning.jar" />
 	</module>
 
 </config>
