@@ -111,7 +111,7 @@ public class EquilMixedTrafficEmissionTest {
 		car.setMaximumVelocity(100.0/3.6);
 		car.setPcuEquivalents(1.0);
 //		car.setDescription(HbefaVehicleCategory.PASSENGER_CAR.toString().concat(";petrol (4S);&gt;=2L;PC-P-Euro-0"));
-		car.setDescription(HbefaVehicleCategory.PASSENGER_CAR.toString().concat(";petrol (4S);>=2L;PC-P-Euro-0"));
+		car.setDescription("beginEmissions " + HbefaVehicleCategory.PASSENGER_CAR.toString().concat(";petrol (4S);>=2L;PC-P-Euro-0") + " endEmissions");
 		// TODO "&gt;" is an escape character for ">" in xml (http://stackoverflow.com/a/1091953/1359166); need to be very careful with them.
 		// thus, reading from vehicles file and directly passing to vehicles container is not the same.
 		vehs.addVehicleType(car);
