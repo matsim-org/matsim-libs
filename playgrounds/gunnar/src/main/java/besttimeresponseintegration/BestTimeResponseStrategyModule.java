@@ -37,10 +37,12 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 
 	private final ExperiencedScoreAnalyzer experiencedScoreAnalyzer;
 
-	private final TravelTime carTravelTime;
+	// private final TravelTime carTravelTime;
+
+	private final BestTimeResponseTravelTimes travelTimes;
 
 	private final boolean verbose = false;
-	
+
 	// -------------------- CONSTRUCTION --------------------
 
 	BestTimeResponseStrategyModule(final Scenario scenario, final CharyparNagelScoringParametersForPerson scoringParams,
@@ -50,7 +52,11 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 		this.scoringParams = scoringParams;
 		this.timeDiscretization = timeDiscretization;
 		this.experiencedScoreAnalyzer = experiencedScoreAnalyzer;
-		this.carTravelTime = carTravelTime;
+		// this.carTravelTime = carTravelTime;
+
+		this.travelTimes = new BestTimeResponseTravelTimes(timeDiscretization, carTravelTime, scenario.getNetwork(),
+				true);
+		this.travelTimes.setCaching(false);
 	}
 
 	// --------------- IMPLEMENTATION OF PlanStrategyModule ---------------
@@ -62,11 +68,10 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 			return; // nothing to do when just staying at home
 		}
 
-		final boolean interpolate = true;
-
 		final BestTimeResponseStrategyFunctionality initialPlanData = new BestTimeResponseStrategyFunctionality(plan,
-				this.scenario.getNetwork(), this.scoringParams, this.timeDiscretization, this.carTravelTime,
-				interpolate);
+				this.scenario.getNetwork(), this.scoringParams, this.timeDiscretization,
+				// this.carTravelTime, interpolate, false
+				this.travelTimes);
 		final TimeAllocator<Link, String> timeAlloc = initialPlanData.getTimeAllocator();
 
 		final double[] initialDptTimesArray_s = new double[initialPlanData.initialDptTimes_s.size()];

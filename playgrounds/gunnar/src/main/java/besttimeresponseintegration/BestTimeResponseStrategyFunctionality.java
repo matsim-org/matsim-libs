@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
@@ -43,7 +42,9 @@ public class BestTimeResponseStrategyFunctionality {
 
 	public BestTimeResponseStrategyFunctionality(final Plan plan, final Network network,
 			final CharyparNagelScoringParametersForPerson scoringParams, final TimeDiscretization timeDiscretization,
-			final TravelTime carTravelTime, final boolean interpolate) {
+			// final TravelTime carTravelTime, final boolean interpolate, final
+			// boolean cache
+			final BestTimeResponseTravelTimes myTravelTimes) {
 
 		final CharyparNagelScoringParameters personScoringParams = scoringParams.getScoringParameters(plan.getPerson());
 
@@ -114,7 +115,12 @@ public class BestTimeResponseStrategyFunctionality {
 		final boolean interpolateTravelTimes = true;
 		final boolean randomSmoothing = true;
 
-		this.myTravelTimes = new BestTimeResponseTravelTimes(timeDiscretization, carTravelTime, network, interpolate);
+		// this.myTravelTimes = new
+		// BestTimeResponseTravelTimes(timeDiscretization, carTravelTime,
+		// network, interpolate);
+		// this.myTravelTimes.setCaching(cache);
+		this.myTravelTimes = myTravelTimes;
+
 		// this.timeAlloc = new TimeAllocator<>(timeDiscretization,
 		// this.myTravelTimes,
 		// scoreConfig.getScoringParameters(null).getPerforming_utils_hr() /
