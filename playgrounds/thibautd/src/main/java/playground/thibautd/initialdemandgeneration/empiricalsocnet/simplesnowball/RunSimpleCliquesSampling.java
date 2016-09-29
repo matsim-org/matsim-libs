@@ -52,6 +52,7 @@ public class RunSimpleCliquesSampling {
 							closer,
 							binder -> binder.bind( CliquesCsvWriter.class ).asEagerSingleton(),
 							binder -> binder.bind( SnowballTiesCsvWriter.class ).asEagerSingleton(),
+							binder -> binder.bind( EgoCsvWriter.class ).asEagerSingleton(),
 							new SimpleSnowballModule(
 									SnowballCliques.readCliques(
 											ConfigGroup.getInputFileURL(
