@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
@@ -95,13 +96,22 @@ public class RndPtRouterLauncherV2 {
 			stratSets.setWeight(0.9);
 			config.strategy().addStrategySettings(stratSets);
 		}
-
 		{
-			StrategyConfigGroup.StrategySettings stratSets2 = new StrategyConfigGroup.StrategySettings();
-			stratSets2.setStrategyName(DefaultStrategy.ReRoute.name()); 
-			stratSets2.setWeight(0.1);
-			stratSets2.setDisableAfter(400) ;
-			config.strategy().addStrategySettings(stratSets2);
+			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
+			stratSets.setStrategyName(DefaultStrategy.ReRoute.name()); 
+			stratSets.setWeight(0.1);
+			stratSets.setDisableAfter(400) ;
+			config.strategy().addStrategySettings(stratSets);
+		}
+		{
+			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
+			stratSets.setStrategyName(DefaultStrategy.ChangeSingleTripMode.name()); 
+			stratSets.setWeight(0.1);
+			stratSets.setDisableAfter(400) ;
+			config.strategy().addStrategySettings(stratSets);
+			
+			config.changeMode().setIgnoreCarAvailability(true);
+			config.changeMode().setModes( new String[]{TransportMode.car, TransportMode.walk, TransportMode.pt });
 		}
 
 		CadytsConfigGroup ccc = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class ) ;

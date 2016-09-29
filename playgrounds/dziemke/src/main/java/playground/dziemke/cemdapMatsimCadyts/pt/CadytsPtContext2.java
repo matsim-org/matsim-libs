@@ -82,6 +82,8 @@ CadytsContextI<TransitStopFacility> {
 	 * -- write test around the transit zone/24h cadyts functionality.
 	 * -- clean up the original cadyts stuff.  In particular, it needs to be clear if we have Links or TransitStopFacilities or arbitrary types.
 	 * -- make the original cadyts stuff more package protected again.  Think about what could be public and what not.
+	 * -- Build back the changes that we had made to make the existing CadytsPtContext more flexible.  Maintaining flexibility for which 
+	 *     we do not have a use case just means that someone will break it later and then we have to support it.
 	 * -- combine everything that is needed for the transit zone/24h cadyts in one package.  Make as much of it as possible non-public.
 	 */
 
