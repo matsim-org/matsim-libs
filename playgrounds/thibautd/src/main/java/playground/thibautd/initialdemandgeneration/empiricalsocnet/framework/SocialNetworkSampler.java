@@ -32,10 +32,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.s;
 
 /**
  * @author thibautd
@@ -49,16 +47,20 @@ public class SocialNetworkSampler {
 	private final CliquesFiller cliquesFiller;
 	private final EgoLocator egoLocator;
 
+	private final Consumer<Set<Ego>> cliquesListenner;
+
 	@Inject
 	public SocialNetworkSampler(
 			final Population population,
 			final DegreeDistribution degreeDistribution,
 			final CliquesFiller cliquesFiller,
-			final EgoLocator egoLocator ) {
+			final EgoLocator egoLocator,
+			final Consumer<Set<Ego>> cliquesListenner ) {
 		this.population = population;
 		this.degreeDistribution = degreeDistribution;
 		this.cliquesFiller = cliquesFiller;
 		this.egoLocator = egoLocator;
+		this.cliquesListenner = cliquesListenner;
 	}
 
 	public SocialNetwork sampleSocialNetwork() {
@@ -78,6 +80,7 @@ public class SocialNetworkSampler {
 			final Ego ego = egosWithFreeStubs.get( random.nextInt( egosWithFreeStubs.size() ) );
 
 			final Set<Ego> clique = cliquesFiller.sampleClique( ego , egosWithFreeStubs );
+			cliquesListenner.accept( clique );
 
 			for ( Ego member : clique ) {
 				if ( member.getDegree() <= member.getAlters().size() ) {

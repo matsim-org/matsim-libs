@@ -16,49 +16,52 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowball;
+package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
 
-import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
-import org.matsim.contrib.socnetsim.framework.population.SocialNetworkWriter;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
-import playground.ivt.utils.MoreIOUtils;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CsvWritingModule;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplerUtils;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * @author thibautd
  */
-public class RunSimpleCliquesSampling {
-	public static void main( String[] args ) {
-		final SnowballSamplingConfigGroup configGroup = new SnowballSamplingConfigGroup();
-		final Config config = ConfigUtils.loadConfig( args[ 0 ] , configGroup );
+public class CliquesCsvWriter implements Consumer<Set<Ego>>, AutoCloseable {
+	private final BufferedWriter writer;
 
-		MoreIOUtils.initOut( configGroup.getOutputDirectory() , config );
+	private int cliqueId = 0;
 
-		try ( final CsvWritingModule writingModule = new CsvWritingModule( configGroup.getOutputDirectory() ) ){
-			final SocialNetwork socialNetwork =
-					SocialNetworkSamplerUtils.sampleSocialNetwork(
-							config,
-							writingModule,
-							new SimpleSnowballModule(
-									SnowballCliques.readCliques(
-											ConfigGroup.getInputFileURL(
-													config.getContext(),
-													configGroup.getInputCliquesCsv() ).getPath() ) ) );
-
-			new SocialNetworkWriter( socialNetwork ).write( configGroup.getOutputDirectory() + "/output_socialNetwork.xml.gz" );
+	public CliquesCsvWriter( final String file ) {
+		this.writer = IOUtils.getBufferedWriter( file );
+		try {
+			writer.write( "cliqueId\tegoId" );
 		}
 		catch ( IOException e ) {
 			throw new UncheckedIOException( e );
 		}
-		finally {
-			MoreIOUtils.closeOutputDirLogging();
+	}
+
+	@Override
+	public void accept( final Set<Ego> egos ) {
+		// How to detect "center" ego?
+		// no such concept here
+		for ( Ego ego : egos ) {
+			try {
+				writer.newLine();
+				writer.write( cliqueId +"\t"+ ego.getId() );
+			}
+			catch ( IOException e ) {
+				throw new UncheckedIOException( e );
+			}
 		}
+		cliqueId++;
+	}
+
+	@Override
+	public void close() throws IOException {
+		writer.close();
 	}
 }
-
