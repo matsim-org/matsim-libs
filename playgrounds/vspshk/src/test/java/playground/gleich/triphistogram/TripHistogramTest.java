@@ -57,7 +57,10 @@ public class TripHistogramTest {
 	 */
 	@Test
 	public void ensure_trip_counts_equal_number_of_planned_legs_in_input_population_file() {
-		Config config = this.utils.loadConfig("examples/pt-tutorial/0.config.xml");
+//		Config config = this.utils.loadConfig("examples/pt-tutorial/0.config.xml");
+		Config config = this.utils.loadConfig("../../matsim/examples/pt-tutorial/0.config.xml");
+		// (this is no longer in the resource path. ../../matsim fixes it for me locally; not sure what the build servers will do ...  kai, sep'16)
+		
 		config.vspExperimental().setAbleToOverwritePtInteractionParams(true);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(0);
