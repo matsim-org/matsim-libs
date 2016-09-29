@@ -34,6 +34,9 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
+import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.s;
+
 /**
  * @author thibautd
  */
@@ -82,6 +85,20 @@ public class SocialNetworkSampler {
 			}
 		}
 		counter.printCounter();
+
+		// to assess what kind of damage the resolution of "conflicts" did
+		final int sumPlannedDegrees =
+				egos.values().stream()
+					.mapToInt( Ego::getDegree )
+					.sum();
+		final int sumActualDegrees =
+				egos.values().stream()
+						.mapToInt( e -> e.getAlters().size() )
+						.sum();
+
+		log.info( "Average planned degree was "+((double) sumPlannedDegrees / egos.size()) );
+		log.info( "Average actual degree is "+((double) sumActualDegrees / egos.size()) );
+		log.info( "Number of excedentary ties: "+(sumActualDegrees - sumPlannedDegrees) );
 
 		return new SocialNetwork() {
 			@Override
