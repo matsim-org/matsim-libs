@@ -18,35 +18,47 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * @author thibautd
  */
-public class TiesCsvWriter extends AbstractCsvWriter {
-	public TiesCsvWriter( final String file ) {
-		super( file );
+public abstract class AbstractCsvWriter  implements Consumer<Set<Ego>>, AutoCloseable {
+	private final BufferedWriter writer;
+
+	protected abstract String titleLine();
+	protected abstract Iterable<String> cliqueLines( Set<Ego> clique);
+
+	public AbstractCsvWriter( final String file ) {
+		this.writer = IOUtils.getBufferedWriter( file );
+		try {
+			writer.write( titleLine() );
+		}
+		catch ( IOException e ) {
+			throw new UncheckedIOException( e );
+		}
 	}
 
 	@Override
-	protected String titleLine() {
-		return "egoId\tegoPlannedDegree\talterId\talterPlannedDegree";
-	}
-
-	@Override
-	protected Iterable<String> cliqueLines( final Set<Ego> clique ) {
-		final List<String> lines = new ArrayList<>();
-
-		for ( Ego ego : clique ) {
-			for ( Ego alter : clique ) {
-				// only write in one direction?
-				if ( alter == ego ) break;
-				lines.add( ego.getId() +"\t"+ ego.getDegree() +"\t"+ alter.getId() +"\t"+ alter.getDegree() );
+	public final void accept( final Set<Ego> egos ) {
+		for ( String l : cliqueLines( egos ) ) {
+			try {
+				writer.write( l );
+			}
+			catch ( IOException e ) {
+				throw new UncheckedIOException( e );
 			}
 		}
+	}
 
-		return lines;
+	@Override
+	public final void close() throws IOException {
+		writer.close();
 	}
 }

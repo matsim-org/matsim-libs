@@ -25,43 +25,28 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * @author thibautd
  */
-public class CliquesCsvWriter implements Consumer<Set<Ego>>, AutoCloseable {
-	private final BufferedWriter writer;
-
+public class CliquesCsvWriter extends AbstractCsvWriter {
 	private int cliqueId = 0;
 
 	public CliquesCsvWriter( final String file ) {
-		this.writer = IOUtils.getBufferedWriter( file );
-		try {
-			writer.write( "cliqueId\tegoId" );
-		}
-		catch ( IOException e ) {
-			throw new UncheckedIOException( e );
-		}
+		super( file );
 	}
 
 	@Override
-	public void accept( final Set<Ego> egos ) {
-		// How to detect "center" ego?
-		// no such concept here
-		for ( Ego ego : egos ) {
-			try {
-				writer.newLine();
-				writer.write( cliqueId +"\t"+ ego.getId() );
-			}
-			catch ( IOException e ) {
-				throw new UncheckedIOException( e );
-			}
-		}
-		cliqueId++;
+	protected String titleLine() {
+		return "cliqueId\tegoId";
 	}
 
 	@Override
-	public void close() throws IOException {
-		writer.close();
+	protected Iterable<String> cliqueLines( final Set<Ego> clique ) {
+		final int currentClique = cliqueId++;
+		return clique.stream()
+				.map( ego -> currentClique +"\t"+ ego.getId() )
+				.collect( Collectors.toList() );
 	}
 }
