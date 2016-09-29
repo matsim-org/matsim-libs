@@ -146,7 +146,7 @@ public class SimpleCliquesFiller implements CliquesFiller {
 		for ( CliquePosition cliqueMember : clique ) {
 			// TODO: rotate? -> only once per clique
 			final double[] point = position.calcPosition( ego , cliqueMember );
-			final Ego member = findEgo( egosWithFreeStubs, clique, point );
+			final Ego member = findEgo( egosWithFreeStubs, clique, point , members );
 
 			if ( member == null ) {
 				throw new RuntimeException( "no alter found at "+ Arrays.toString( point )+" for clique size "+clique.size() );
@@ -160,7 +160,8 @@ public class SimpleCliquesFiller implements CliquesFiller {
 
 	private Ego findEgo( final KDTree<Ego> egosWithFreeStubs,
 			final CliquePositions clique,
-			final double[] point ) {
+			final double[] point,
+			final Set<Ego> currentClique ) {
 		// Allow more ties than stubs in case no agent can be found.
 		// should remain OK, because:
 		// - clique size cannot exceed number of agents with free stubs
@@ -171,7 +172,7 @@ public class SimpleCliquesFiller implements CliquesFiller {
 			final Ego member =
 					egosWithFreeStubs.getClosestEuclidean(
 							point,
-							( e ) -> e.getFreeStubs() >= freeStubs );
+							( e ) -> e.getFreeStubs() >= freeStubs && !currentClique.contains( e ) );
 			if ( member != null ) return member;
 		}
 	}
