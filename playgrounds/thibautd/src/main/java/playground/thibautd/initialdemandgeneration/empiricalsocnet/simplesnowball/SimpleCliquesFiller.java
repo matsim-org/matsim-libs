@@ -29,6 +29,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesFiller;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 import playground.thibautd.utils.AggregateList;
+import playground.thibautd.utils.ArrayUtils;
 import playground.thibautd.utils.KDTree;
 
 import java.util.ArrayList;
@@ -289,32 +290,23 @@ public class SimpleCliquesFiller implements CliquesFiller {
 		private void updateMaxSize( final int maxSize ) {
 			if ( maxSize == currentMaxSize ) return;
 
+			// if greater than the known max size, restart from scratch.
+			// otherwise, start from known max
 			if ( maxSize > currentMaxSize ) {
 				currentMaxSize = cliques[ cliques.length - 1 ].size();
 				currentMaxIndex = cliques.length;
 			}
 
-			currentMaxIndex = binarySearch( maxSize );
+			currentMaxIndex = ArrayUtils.searchLowest(
+					cliques,
+					CliquePositions::size,
+					maxSize,
+					0 , currentMaxIndex );
 			currentMaxSize = maxSize;
 			assert cliques[ currentMaxIndex ].size() == currentMaxSize;
 		}
 
-		// cannot use library implementation because not in a nice comparable format
-		private int binarySearch( final int maxSize ) {
-			int min = 0;
-			int max = currentMaxIndex;
 
-			while ( min < max - 1 ) {
-				final int mid = (max + min) / 2;
-
-				// we want the rightmost element: "push" min even if in the right value,
-				// as long as possible
-				if ( cliques[ mid ].size() <= maxSize ) min = mid;
-				else max = mid;
-			}
-
-			return min;
-		}
 	}
 
 	private static class CliquePositions implements Iterable<CliquePosition> {
