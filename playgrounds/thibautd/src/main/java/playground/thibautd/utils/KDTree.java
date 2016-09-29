@@ -120,7 +120,7 @@ public class KDTree<T> {
 	}
 
 	public boolean isEmpty() {
-		return isLeaf( root ) && root.value == null;
+		return size == 0;
 	}
 
 	public int size() {
