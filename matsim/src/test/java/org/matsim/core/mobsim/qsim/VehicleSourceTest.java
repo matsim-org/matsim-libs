@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit;
+package org.matsim.core.mobsim.qsim;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -138,8 +138,8 @@ public class VehicleSourceTest {
 		final Controler cont = new Controler(scenario);
 		cont.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes = new HashMap<Id<Person>, Map<Id<Link>, Double>>();
-		PersonLinkTravelTimeEventHandler handler = new PersonLinkTravelTimeEventHandler(personLinkTravelTimes);
+		Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes = new HashMap<>();
+		final PersonLinkTravelTimeEventHandler handler = new PersonLinkTravelTimeEventHandler(vehicleLinkTravelTimes);
 		cont.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -148,8 +148,20 @@ public class VehicleSourceTest {
 		});
 		cont.run();
 
-		Map<Id<Link>, Double> travelTime1 = personLinkTravelTimes.get(Id.create("0", Person.class));
-		Map<Id<Link>, Double> travelTime2 = personLinkTravelTimes.get(Id.create("1", Person.class));
+		Map<Id<Link>, Double> travelTime1= null ;
+		switch( this.vehicleSource ) {
+		case defaultVehicle:
+		case fromVehiclesData:
+			travelTime1 = vehicleLinkTravelTimes.get(Id.create("0", Vehicle.class));
+			break;
+		case modeVehicleTypesFromVehiclesData:
+			travelTime1 = vehicleLinkTravelTimes.get(Id.create("0_bike", Vehicle.class));
+			break;
+		default:
+			break;
+		}
+		
+		Map<Id<Link>, Double> travelTime2 = vehicleLinkTravelTimes.get(Id.create("1", Vehicle.class));
 
 		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue(); 
 		int carTravelTime = travelTime2.get(Id.create("2", Link.class)).intValue();
@@ -158,7 +170,7 @@ public class VehicleSourceTest {
 	}
 
 	private void createNetwork(){
-		Network network = (Network) scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		double x = -100.0;
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(x, 0.0));
@@ -230,25 +242,25 @@ public class VehicleSourceTest {
 
 	private static class PersonLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
-		private final Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes;
+		private final Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleTravelTimes;
 
-		public PersonLinkTravelTimeEventHandler(Map<Id<Person>, Map<Id<Link>, Double>> agentTravelTimes) {
-			this.personLinkTravelTimes = agentTravelTimes;
+		public PersonLinkTravelTimeEventHandler(Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes) {
+			this.vehicleTravelTimes = agentTravelTimes;
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(Id.createPersonId(event.getVehicleId()));
+			Map<Id<Link>, Double> travelTimes = this.vehicleTravelTimes.get(event.getVehicleId());
 			if (travelTimes == null) {
-				travelTimes = new HashMap<Id<Link>, Double>();
-				this.personLinkTravelTimes.put(Id.createPersonId(event.getVehicleId()), travelTimes);
+				travelTimes = new HashMap<>();
+				this.vehicleTravelTimes.put(event.getVehicleId(), travelTimes);
 			}
 			travelTimes.put(event.getLinkId(), Double.valueOf(event.getTime()));
 		}
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(Id.createPersonId(event.getVehicleId()));
+			Map<Id<Link>, Double> travelTimes = this.vehicleTravelTimes.get( event.getVehicleId() );
 			if (travelTimes != null) {
 				Double d = travelTimes.get(event.getLinkId());
 				if (d != null) {
@@ -260,7 +272,7 @@ public class VehicleSourceTest {
 
 		@Override
 		public void reset(int iteration) {
-			personLinkTravelTimes.clear();
+			vehicleTravelTimes.clear();
 		}
 	}
 }
