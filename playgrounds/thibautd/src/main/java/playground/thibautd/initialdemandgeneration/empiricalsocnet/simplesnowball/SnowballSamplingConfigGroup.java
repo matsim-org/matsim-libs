@@ -26,7 +26,6 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 public class SnowballSamplingConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "snowballBasedSampling";
 
-	private String outputDirectory = null;
 	private String inputCliquesCsv = null;
 
 	private boolean conditionCliqueSizeOnAge = false;
@@ -34,16 +33,6 @@ public class SnowballSamplingConfigGroup extends ReflectiveConfigGroup {
 
 	public SnowballSamplingConfigGroup( ) {
 		super( GROUP_NAME );
-	}
-
-	@StringGetter("outputDirectory")
-	public String getOutputDirectory() {
-		return outputDirectory;
-	}
-
-	@StringSetter("outputDirectory")
-	public void setOutputDirectory( final String outputDirectory ) {
-		this.outputDirectory = outputDirectory;
 	}
 
 	@StringGetter("inputCliquesCsv")

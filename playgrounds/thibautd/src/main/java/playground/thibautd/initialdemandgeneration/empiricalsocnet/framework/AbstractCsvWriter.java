@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
@@ -29,6 +30,7 @@ import java.util.Set;
  * @author thibautd
  */
 public abstract class AbstractCsvWriter implements AutoCloseable {
+	private static final Logger log = Logger.getLogger( AbstractCsvWriter.class );
 	private final BufferedWriter writer;
 
 	protected abstract String titleLine();
@@ -38,6 +40,7 @@ public abstract class AbstractCsvWriter implements AutoCloseable {
 			final String file ,
 			final SocialNetworkSampler sampler,
 			final AutocloserModule.Closer closer ) {
+		log.info( "opening "+file );
 		this.writer = IOUtils.getBufferedWriter( file );
 		try {
 			writer.write( titleLine() );
@@ -53,6 +56,7 @@ public abstract class AbstractCsvWriter implements AutoCloseable {
 	public final void write( final Set<Ego> egos ) {
 		for ( String l : cliqueLines( egos ) ) {
 			try {
+				writer.newLine();
 				writer.write( l );
 			}
 			catch ( IOException e ) {

@@ -19,6 +19,7 @@
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowball;
 
 import com.google.inject.Singleton;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.PersonUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
@@ -40,18 +41,22 @@ public class SnowballLocator implements EgoLocator, SimpleCliquesFiller.Position
 		return 4;
 	}
 
+	public static Coord calcCoord( final Ego ego ) {
+		return ego.getPerson().getSelectedPlan().getPlanElements().stream()
+				.filter( pe -> pe instanceof Activity )
+				.map( pe -> (Activity) pe )
+				.findFirst()
+				.get()
+				.getCoord();
+	}
+
 	@Override
 	public double[] getCoord( final Ego ego ) {
-		final Activity firstActivity =
-				ego.getPerson().getSelectedPlan().getPlanElements().stream()
-						.filter( pe -> pe instanceof Activity )
-						.map( pe -> (Activity) pe )
-						.findFirst()
-						.get();
+		final Coord coord = calcCoord( ego );
 
 		return new double[]{
-				firstActivity.getCoord().getX() ,
-				firstActivity.getCoord().getY() ,
+				coord.getX() ,
+				coord.getY() ,
 				NON_SPATIAL_FACTOR * SimpleCliquesFiller.calcAgeClass( PersonUtils.getAge( ego.getPerson() ) ) ,
 				NON_SPATIAL_FACTOR * SimpleCliquesFiller.getSex( ego ).ordinal() };
 	}

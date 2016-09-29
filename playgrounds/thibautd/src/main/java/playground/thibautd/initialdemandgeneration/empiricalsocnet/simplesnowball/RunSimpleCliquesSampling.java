@@ -43,21 +43,22 @@ public class RunSimpleCliquesSampling {
 		final SnowballSamplingConfigGroup configGroup = new SnowballSamplingConfigGroup();
 		final Config config = ConfigUtils.loadConfig( args[ 0 ] , configGroup );
 
-		MoreIOUtils.initOut( configGroup.getOutputDirectory() , config );
+		MoreIOUtils.initOut( config.controler().getOutputDirectory() , config );
 
 		try ( final AutocloserModule closer = new AutocloserModule() ){
 			final SocialNetwork socialNetwork =
 					SocialNetworkSamplerUtils.sampleSocialNetwork(
 							config,
 							closer,
-							binder -> binder.bind( CliquesCsvWriter.class ),
+							binder -> binder.bind( CliquesCsvWriter.class ).asEagerSingleton(),
+							binder -> binder.bind( SnowballTiesCsvWriter.class ).asEagerSingleton(),
 							new SimpleSnowballModule(
 									SnowballCliques.readCliques(
 											ConfigGroup.getInputFileURL(
 													config.getContext(),
 													configGroup.getInputCliquesCsv() ).getPath() ) ) );
 
-			new SocialNetworkWriter( socialNetwork ).write( configGroup.getOutputDirectory() + "/output_socialNetwork.xml.gz" );
+			new SocialNetworkWriter( socialNetwork ).write( config.controler().getOutputDirectory() + "/output_socialNetwork.xml.gz" );
 		}
 		catch ( Exception e ) {
 			throw new RuntimeException( e );

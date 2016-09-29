@@ -38,7 +38,9 @@ public class AutocloserModule extends AbstractModule implements AutoCloseable {
 
 	@Override
 	public void close() throws Exception {
-		for ( AutoCloseable c : closeables ) c.close();
+		for ( AutoCloseable c : closeables ) {
+			c.close();
+		}
 	}
 
 	@Singleton
