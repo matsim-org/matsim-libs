@@ -44,6 +44,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.algorithms.CountSimComparisonLinkFilter;
 import org.matsim.counts.algorithms.graphs.helper.Comp;
@@ -72,19 +73,21 @@ public final class CountsSimReal24Graph extends CountsGraph{
 		CustomXYURLGenerator url_gen=new CustomXYURLGenerator();
 		CustomXYToolTipGenerator tt_gen=new CustomXYToolTipGenerator();
 
-		final ArrayList<String> urls = new ArrayList<String>();
-		final ArrayList<String> tooltips = new ArrayList<String>();
-		List<Comp> comps=new Vector<Comp>();
+		final ArrayList<String> urls = new ArrayList<>();
+		final ArrayList<String> tooltips = new ArrayList<>();
+		List<Comp> comps=new Vector<>();
 		
 		
 		//--------------------
 		CountSimComparisonLinkFilter linkFilter=new CountSimComparisonLinkFilter(this.ccl_);
 		
-		Iterator<Id<Link>> id_it = new CountSimComparisonLinkFilter(
-				this.ccl_).getLinkIds().iterator();
+		final Vector<Id<Link>> linkIds = new CountSimComparisonLinkFilter( this.ccl_).getLinkIds();
+		Iterator<Id<Link>> id_it = linkIds.iterator();
 		
-		double maxCountValue=0.0;
-		double maxSimValue=0.0;
+		double maxCountValue=0.1;
+		double maxSimValue=0.1;
+		// yyyy PtCountsKMLWriterTest.testPtAlightKMLCreation never touches these and then leads to an exception later
+		// when they are zero.  Don't know why. kai, sep'16
 		
 		while (id_it.hasNext()) {
 			Id<Link> id= id_it.next();				
@@ -160,6 +163,7 @@ public final class CountsSimReal24Graph extends CountsGraph{
 	
 		// error band
 		DefaultXYDataset dataset1=new DefaultXYDataset();
+		Gbl.assertIf( maxCountValue > 0. );
 		dataset1.addSeries("f1x", new double[][] {{100.0, maxCountValue},{100.0, maxCountValue}});
 		dataset1.addSeries("f2x", new double[][] {{100.0, maxCountValue},{200.0, 2*maxCountValue}});
 		dataset1.addSeries("f05x", new double[][] {{200.0, maxCountValue},{100.0, 0.5*maxCountValue}});

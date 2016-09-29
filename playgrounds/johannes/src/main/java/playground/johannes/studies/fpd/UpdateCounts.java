@@ -70,7 +70,7 @@ public class UpdateCounts {
 
         int notFound = 0;
         for(Count<Link> count : counts.getCounts().values()) {
-            Double val = pkwCounts.get(count.getCsId());
+            Double val = pkwCounts.get(count.getCsLabel());
             if(val != null && val > 0) {
                 for(int h = 1 ; h < 25; h++) {
                     count.getVolumes().get(h).setValue(val/24.0);

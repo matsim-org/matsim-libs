@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -40,15 +40,15 @@ import org.matsim.pt.counts.SimpleWriter;
  * This is a modified copy of CountsComparisonAlgorithm, in order to realize the same functionality
  * for pt counts.
  */
-class CadytsPtCountsComparisonAlgorithm {
+public final class CadytsPtCountsComparisonAlgorithm {
 	/**
 	 * The StopAttributes of the simulation
 	 */
-	private final CadytsPtOccupancyAnalyzer oa;
+	private final CadytsPtOccupancyAnalyzerI oa;
 	/**
 	 * The counts object
 	 */
-	Counts <Link>counts;
+	Counts <? extends Identifiable>counts;
 	// needed in CadytsErrorPlot
 
 	/**
@@ -68,7 +68,7 @@ class CadytsPtCountsComparisonAlgorithm {
 
 	StringBuffer content = new StringBuffer();
 
-	CadytsPtCountsComparisonAlgorithm(final CadytsPtOccupancyAnalyzer oa, final Counts<Link> counts, final Network network, final double countsScaleFactor) {
+	public CadytsPtCountsComparisonAlgorithm(final CadytsPtOccupancyAnalyzerI oa, final Counts<? extends Identifiable> counts, final Network network, final double countsScaleFactor) {
 		this.oa = oa;
 		this.counts = counts;
 		this.countSimComp = new ArrayList<CountSimComparison>();
@@ -86,10 +86,10 @@ class CadytsPtCountsComparisonAlgorithm {
 	final char CHR_HT = '\t';
 	final char CHR_NL = '\n';
 
-	void calculateComparison() {
+	public void calculateComparison() {
 		double countValue;
 		for (Count count : this.counts.getCounts().values()) {
-			Id stopId = count.getLocId();
+			Id stopId = count.getId();
 			if (!isInRange(count.getCoord())) {
 				continue;
 			}
@@ -160,7 +160,7 @@ class CadytsPtCountsComparisonAlgorithm {
 	 *
 	 * @return the result list
 	 */
-	List<CountSimComparison> getComparison() {
+	public List<CountSimComparison> getComparison() {
 		return this.countSimComp;
 	}
 
@@ -171,12 +171,12 @@ class CadytsPtCountsComparisonAlgorithm {
 	 * @param distance
 	 * @param nodeId
 	 */
-	void setDistanceFilter(final Double distance, final String nodeId) {
+	public void setDistanceFilter(final Double distance, final String nodeId) {
 		this.distanceFilter = distance;
 		this.distanceFilterNode = this.network.getNodes().get(Id.create(nodeId, Node.class));
 	}
 
-	void write(final String outputFilename) {
+	public void write(final String outputFilename) {
 		final SimpleWriter simpleWriter = new SimpleWriter(outputFilename);
 		simpleWriter.write(this.content.toString());
 		simpleWriter.close();

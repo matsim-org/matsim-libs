@@ -116,7 +116,7 @@ public class CountsWriter extends MatsimXmlWriter implements MatsimWriter {
 //			else return 0;
 			
 			
-			return c1.getCsId().compareTo(c2.getCsId());
+			return c1.getCsLabel().compareTo(c2.getCsLabel());
 		}
 	}
 }

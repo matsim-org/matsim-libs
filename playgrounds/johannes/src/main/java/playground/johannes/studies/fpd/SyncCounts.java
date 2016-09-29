@@ -48,12 +48,12 @@ public class SyncCounts {
 
         Set<String> refLinks = new HashSet<>();
         for(Count<Link> count : refCounts.getCounts().values()) {
-            refLinks.add(count.getLocId().toString());
+            refLinks.add(count.getId().toString());
         }
 
         Set<Count> remove = new HashSet<>();
         for(Count<Link> count : newCounts.getCounts().values()) {
-            String id = count.getLocId().toString();
+            String id = count.getId().toString();
             if(!refLinks.contains(id)) {
                 remove.add(count);
             }
@@ -63,7 +63,7 @@ public class SyncCounts {
 
         int before = newCounts.getCounts().size();
         for(Count<Link> count : remove) {
-            newCounts.getCounts().remove(count.getLocId());
+            newCounts.getCounts().remove(count.getId());
         }
         int after = newCounts.getCounts().size();
         logger.info(String.format("Removed %s counts.", before-after));

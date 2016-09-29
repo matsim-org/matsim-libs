@@ -124,9 +124,9 @@ public class CountsComparisonAlgorithm {
 			if (!distanceFilter.isInRange(count)) {
 				continue;
 			}
-			double[] volumes = this.volumesPerLinkPerHour.getVolumesForStop(Id.create(count.getLocId(), TransitStopFacility.class));
+			double[] volumes = this.volumesPerLinkPerHour.getVolumesForStop(Id.create(count.getId(), TransitStopFacility.class));
 			if (volumes == null || volumes.length == 0) {
-				log.warn("No volumes for count location: " + count.getLocId().toString());
+				log.warn("No volumes for count location: " + count.getId().toString());
 				continue;
 			}
 			for (int hour = 1; hour <= 24; hour++) {
@@ -135,7 +135,7 @@ public class CountsComparisonAlgorithm {
 					double countValue = volume.getValue();
 					double simValue=volumes[hour-1];
 					simValue *= this.countsScaleFactor;
-					this.result.add(new CountSimComparisonImpl(count.getLocId(), hour, countValue, simValue));
+					this.result.add(new CountSimComparisonImpl(count.getId(), hour, countValue, simValue));
 				}
 			}
 		}
@@ -165,9 +165,9 @@ public class CountsComparisonAlgorithm {
 
 			@Override
 			public boolean isInRange(Count count) {
-				Link l = network.getLinks().get(count.getLocId());
+				Link l = network.getLinks().get(count.getId());
 				if (l == null) {
-					log.warn("Cannot find requested link: " + count.getLocId().toString());
+					log.warn("Cannot find requested link: " + count.getId().toString());
 					return false;
 				}
 				double dist = CoordUtils.calcEuclideanDistance(l.getCoord(), centerCoord);

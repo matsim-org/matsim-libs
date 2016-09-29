@@ -54,7 +54,7 @@ public class CountsLocationCompare {
 
         Map<String, Coord> refCoords = new HashMap<>();
         for(Count<Link> count : refCounts.getCounts().values()) {
-            refCoords.put(count.getCsId(), count.getCoord());
+            refCoords.put(count.getCsLabel(), count.getCoord());
         }
 
         Counts<Link> targetCounts = new Counts<>();
@@ -64,7 +64,7 @@ public class CountsLocationCompare {
 
         Map<String, Coord> targetCoords = new HashMap<>();
         for(Count<Link> count : targetCounts.getCounts().values()) {
-            targetCoords.put(count.getCsId(), count.getCoord());
+            targetCoords.put(count.getCsLabel(), count.getCoord());
         }
         DistanceCalculator distanceCalculator = CartesianDistanceCalculator.getInstance();
 

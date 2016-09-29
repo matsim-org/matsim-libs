@@ -13,6 +13,8 @@ import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.matsim.core.gbl.MatsimRandom;
 
 import floetteroed.utilities.Units;
+import floetteroed.utilities.searchrepeater.SearchAlgorithm;
+import floetteroed.utilities.searchrepeater.SearchRepeater;
 import opdytsintegration.utils.TimeDiscretization;
 
 /**
@@ -46,6 +48,8 @@ public class TimeAllocator<L, M> {
 	private final double betaLateArr_1_s;
 
 	private final double betaEarlyDpt_1_s;
+
+	private final boolean verbose = false;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -87,7 +91,16 @@ public class TimeAllocator<L, M> {
 
 	// -------------------- IMPLEMENTATION --------------------
 
+	public double evaluate(final List<PlannedActivity<L, M>> plannedActivities, final double[] initialDptTimes_s) {
+		if (initialDptTimes_s == null) {
+			throw new RuntimeException("Cannot evaluate a plan without time structure.");
+		}
+		TimeAllocationProblem problem = this.newTimeAllocationProblem(plannedActivities, initialDptTimes_s);
+		return problem.getTimeScoreAtInitialSolution();
+	}
+
 	private double[] currentDptTimes_s = null;
+
 	private Double currentScore = null;
 
 	public double[] getResultPoint() {
@@ -98,16 +111,6 @@ public class TimeAllocator<L, M> {
 		return this.currentScore;
 	}
 
-	// TODO NEW, FOR CONSISTENCY CHECK
-	public double evaluate(final List<PlannedActivity<L, M>> plannedActivities,
-			final double[] initialDptTimes_s) {
-		if (initialDptTimes_s == null) {
-			throw new RuntimeException("Cannot evaluate a plan without time structure.");
-		}
-		TimeAllocationProblem problem = this.newTimeAllocationProblem(plannedActivities, initialDptTimes_s);
-		return problem.getTimeScoreAtInitialSolution();
-	}
-	
 	public double[] optimizeDepartureTimes(final List<PlannedActivity<L, M>> plannedActivities,
 			final double[] initialDptTimes_s) {
 
@@ -118,8 +121,10 @@ public class TimeAllocator<L, M> {
 
 		while (true) {
 
-			System.out.println("current dpt. times: " + new ArrayRealVector(this.currentDptTimes_s) + ", score = "
-					+ this.currentScore);
+			if (this.verbose) {
+				System.out.println("current dpt. times: " + new ArrayRealVector(this.currentDptTimes_s) + ", score = "
+						+ this.currentScore);
+			}
 
 			double[] newDptTimes_s = (new SimplexSolver())
 					.optimize(problem.getObjectiveFunction(), problem.getConstraints(), GoalType.MAXIMIZE).getPoint();
@@ -185,13 +190,15 @@ public class TimeAllocator<L, M> {
 						for (int q = 0; q < interpolDptTime_s.getDimension(); q++) {
 							this.currentDptTimes_s[q] = interpolDptTime_s.getEntry(q);
 						}
-						System.out
-								.println(
-										"current dpt. times: " + new ArrayRealVector(this.currentDptTimes_s)
-												+ ", score = "
-												+ this.newTimeAllocationProblem(plannedActivities,
-														this.currentDptTimes_s).getObjectiveFunction()
-														.value(this.currentDptTimes_s));
+						if (this.verbose) {
+							System.out
+									.println(
+											"current dpt. times: " + new ArrayRealVector(this.currentDptTimes_s)
+													+ ", score = "
+													+ this.newTimeAllocationProblem(plannedActivities,
+															this.currentDptTimes_s).getObjectiveFunction()
+															.value(this.currentDptTimes_s));
+						}
 					}
 				}
 
@@ -209,5 +216,37 @@ public class TimeAllocator<L, M> {
 			this.currentScore = newScore;
 			currentGradient = newGradient;
 		}
+	}
+
+	public void optimizeDepartureTimes(final List<PlannedActivity<L, M>> plannedActivities, final int maxTrials,
+			final int maxFailures) {
+
+		// for referencing in inner class
+		final TimeAllocator<L, M> enclosingTimeAllocator = this;
+
+		final SearchRepeater<double[]> repeater = new SearchRepeater<>(maxTrials, maxFailures);
+		repeater.run(new SearchAlgorithm<double[]>() {
+			private double[] departureTimes = null;
+			private Double timeScore = null;
+
+			@Override
+			public void run() {
+				this.departureTimes = enclosingTimeAllocator.optimizeDepartureTimes(plannedActivities, null);
+				this.timeScore = enclosingTimeAllocator.getResultValue();
+			}
+
+			@Override
+			public Double getObjectiveFunctionValue() {
+				return this.timeScore;
+			}
+
+			@Override
+			public double[] getDecisionVariable() {
+				return this.departureTimes;
+			}
+		});
+
+		this.currentDptTimes_s = repeater.getDecisionVariable();
+		this.currentScore = repeater.getObjectiveFunctionValue();
 	}
 }

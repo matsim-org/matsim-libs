@@ -28,9 +28,9 @@ import java.util.Set;
  * @author thibautd
  */
 public class Ego {
-	final Person person;
-	final int degree;
-	final Set<Ego> alters = new HashSet<>();
+	private final Person person;
+	private final int degree;
+	private final Set<Ego> alters = new HashSet<>();
 
 	public Ego( final Person person, final int degree ) {
 		this.person = person;
@@ -38,6 +38,22 @@ public class Ego {
 	}
 
 	public Id<Person> getId() {
-		return person.getId();
+		return getPerson().getId();
+	}
+
+	public Person getPerson() {
+		return person;
+	}
+
+	public int getDegree() {
+		return degree;
+	}
+
+	public int getFreeStubs() {
+		return degree - alters.size();
+	}
+
+	public Set<Ego> getAlters() {
+		return alters;
 	}
 }

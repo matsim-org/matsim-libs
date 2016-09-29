@@ -76,14 +76,14 @@ public class CountsCompareAnalyzer implements AfterMobsimListener {
 		TDoubleArrayList speeds = new TDoubleArrayList();
 
 		for (Count count : counts.getCounts().values()) {
-			if (!count.getLocId().toString().startsWith(ODCalibrator.VIRTUAL_ID_PREFIX)) {
+			if (!count.getId().toString().startsWith(ODCalibrator.VIRTUAL_ID_PREFIX)) {
 				double obsVal = 0;
 				for (int i = 1; i < 25; i++) {
 					obsVal += count.getVolume(i).getValue();
 				}
 
 				if (obsVal > 0) {
-					double simVal = calculator.getOccupancy(count.getLocId());
+					double simVal = calculator.getOccupancy(count.getId());
 					simVal *= factor;
 
 					double err = (simVal - obsVal) / obsVal;
@@ -92,7 +92,7 @@ public class CountsCompareAnalyzer implements AfterMobsimListener {
 					errorAbs.addValue(Math.abs(err));
 					errorWeighted.addValue(Math.abs(err), 1 / obsVal);
 
-					Link link = network.getLinks().get(count.getLocId());
+					Link link = network.getLinks().get(count.getId());
 					errorVals.add(Math.abs(err));
 					caps.add(link.getCapacity());
 					speeds.add(link.getFreespeed());
