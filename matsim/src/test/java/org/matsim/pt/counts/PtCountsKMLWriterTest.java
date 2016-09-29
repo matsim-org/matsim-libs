@@ -27,6 +27,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
+import org.matsim.pt.counts.obsolete.PtCountSimComparisonKMLWriter;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -53,16 +54,20 @@ public class PtCountsKMLWriterTest extends MatsimTestCase {
 
 		String filename = this.getOutputDirectory() + "ptCountsCompare.kmz";
 		final CoordinateTransformation coordTransform = TransformationFactory.getCoordinateTransformation(boardFixture.config.global().getCoordinateSystem(),	TransformationFactory.WGS84);
-//		PtCountSimComparisonKMLWriter kmlWriter2 = new PtCountSimComparisonKMLWriter(ccaBoard.getComparison(), 
-//				ccaAlight.getComparison(),ccaOccupancy.getComparison(), 
-//				coordTransform,
-//				boardFixture.counts, alightFixture.counts,	occupancyFixture.counts);
-		
-		CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(ccaOccupancy.getComparison(), 
-				occupancyFixture.counts, coordTransform, "ptCountsOccup") ;
-
-		kmlWriter.setIterationNumber(0);
-		kmlWriter.writeFile(filename);
+		{
+			PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(ccaBoard.getComparison(), 
+					ccaAlight.getComparison(),ccaOccupancy.getComparison(), 
+					coordTransform,
+					boardFixture.counts, alightFixture.counts,	occupancyFixture.counts);
+			kmlWriter.setIterationNumber(0);
+			kmlWriter.writeFile(filename);
+		}
+		{
+			CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(ccaOccupancy.getComparison(), 
+					occupancyFixture.counts, coordTransform, "ptCountsOccup") ;
+			kmlWriter.setIterationNumber(0);
+			kmlWriter.writeFile(filename);
+		}
 
 		assertTrue(new File(filename).length() > 0);
 	}

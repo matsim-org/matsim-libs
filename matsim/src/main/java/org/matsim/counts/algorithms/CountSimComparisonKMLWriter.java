@@ -272,20 +272,32 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(simRealFolder));
 
 		// error graphs and awtv graph
-		ScreenOverlayType errorGraph = createBiasErrorGraph(filename);
-		errorGraph.setVisibility(Boolean.TRUE);
-		this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(errorGraph));
-
-		errorGraph = createBoxPlotErrorGraph();
-		if (errorGraph != null) {
-			errorGraph.setVisibility(Boolean.FALSE);
+		{
+			ScreenOverlayType errorGraph = createBiasErrorGraph(filename);
+			errorGraph.setVisibility(Boolean.TRUE);
 			this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(errorGraph));
 		}
-
-		ScreenOverlayType awtv=this.createAWTVGraph();
-		if (awtv != null) {
-			awtv.setVisibility(Boolean.FALSE);
-			this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(awtv));
+		{
+			ScreenOverlayType errorGraph = createBoxPlotErrorGraph();
+			if (errorGraph != null) {
+				errorGraph.setVisibility(Boolean.FALSE);
+				this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(errorGraph));
+			}
+		}
+		{
+			ScreenOverlayType awtv = null ;
+			try {
+				awtv=this.createAWTVGraph();
+			} catch ( Exception ee ) {
+				log.warn("generating awtv (average weekday traffic volumes) graph failed; printing stacktrace but continuing anyways ...") ;
+				for ( int ii=0 ; ii<ee.getStackTrace().length ; ii++ ) {
+					log.info( ee.getStackTrace()[ii].toString() );
+				}
+			}
+			if (awtv != null) {
+				awtv.setVisibility(Boolean.FALSE);
+				this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(awtv));
+			}
 		}
 
 		// link graphs
@@ -678,7 +690,11 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	}
 
 	/**
-	 * Creates the CountsSimReal24Graph for all the data
+	 * Creates the CountsSimReal24Graph for all the data. AWTV = average weekday traffic volumes.
+	 * <br/><br/>
+	 * Notes:<ul>
+	 * <li> I think that "weekday" means "day-of-week", i.e. the method does not care when it is sunday. kai, sep'16
+	 * </ul>
 	 * @param visible true if initially visible
 	 * @return the ScreenOverlay Feature
 	 */
@@ -724,5 +740,6 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	private void finish() {
 		this.writer.writeMainKml(this.mainKml);
 		this.writer.close();
+		log.info("DONE with writing kml file.");
 	}
 }

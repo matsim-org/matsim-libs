@@ -62,7 +62,7 @@ import org.matsim.vis.kml.MatsimKMLLogo;
 import org.matsim.vis.kml.NetworkFeatureFactory;
 
 @Deprecated // we should try to rather make CountSimComparisonKMLWriter more general. kai, dec'13
-class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
+public final class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	// yyyyyy I think that this class is no longer used, and can thus be deleted.  kai, sep'16
 	
 	/**
@@ -144,7 +144,7 @@ class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	 * @param coordTransform
 	 */
 	@Deprecated // we should try to rather make CountSimComparisonKMLWriter more general. kai, dec'13
-	private PtCountSimComparisonKMLWriter(
+	public PtCountSimComparisonKMLWriter(
 			final List<CountSimComparison> boardCountSimCompList,
 			final List<CountSimComparison> alightCountSimCompList,
 			final List<CountSimComparison> occupancyCountSimCompList,
