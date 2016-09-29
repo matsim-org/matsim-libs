@@ -8,8 +8,9 @@ import javax.inject.Provider;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.cadyts.general.CadytsBuilder;
+import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
+import org.matsim.contrib.cadyts.general.CadytsContextI;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.pt.CadytsPtContext;
 import org.matsim.contrib.cadyts.pt.CadytsPtOccupancyAnalyzerI;
@@ -19,7 +20,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
@@ -41,7 +41,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.dziemke.cemdapMatsimCadyts.measurement.CadytsBuilderImplGT;
 import playground.dziemke.cemdapMatsimCadyts.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
 
 /**
@@ -138,15 +137,14 @@ public class RndPtRouterLauncherV2 {
 		
 		controler.addOverridingModule(new AbstractModule(){
 			@Override public void install() {
-				bind(CadytsPtContext.class).asEagerSingleton();
-				addControlerListenerBinding().to(CadytsPtContext.class);
-				bind(CadytsBuilder.class).to(CadytsBuilderImplGT.class);
+				bind(CadytsPtContext2.class).asEagerSingleton();
+				addControlerListenerBinding().to(CadytsPtContext2.class);
 				bind(CadytsPtOccupancyAnalyzerI.class).toInstance(ctrlListener4configurableOcuppAnalysis.getAnalyzer()) ;
 			}
 		});
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			@Inject private CadytsPtContext cadytsContext;
+			@Inject private CadytsPtContext2 cadytsContext;
 			@Inject CharyparNagelScoringParametersForPerson parameters;
 			@Override public ScoringFunction createNewScoringFunction(Person person) {
 				final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);

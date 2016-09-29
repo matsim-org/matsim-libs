@@ -17,25 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.cadyts.pt;
+package playground.dziemke.cemdapMatsimCadyts.pt;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.cadyts.general.CadytsBuilderImpl;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsContextI;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
+import org.matsim.contrib.cadyts.general.LookUpItemFromId;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
+import org.matsim.contrib.cadyts.pt.CadytsBuilderImplGT;
+import org.matsim.contrib.cadyts.pt.CadytsPtCountsComparisonAlgorithm;
+import org.matsim.contrib.cadyts.pt.CadytsPtOccupancyAnalyzer;
+import org.matsim.contrib.cadyts.pt.CadytsPtOccupancyAnalyzerI;
+import org.matsim.contrib.cadyts.pt.TransitStopFacilityLookUp;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PtCountsConfigGroup;
@@ -50,6 +58,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
@@ -66,10 +75,17 @@ import cadyts.supply.SimResults;
  * @author nagel
  *
  */
-public class CadytsPtContext implements StartupListener, IterationEndsListener, BeforeMobsimListener, AfterMobsimListener,
+public class CadytsPtContext2 implements StartupListener, IterationEndsListener, BeforeMobsimListener, AfterMobsimListener,
 CadytsContextI<TransitStopFacility> {
+	
+	/* yyyy TODO:
+	 * -- write test around the transit zone/24h cadyts functionality.
+	 * -- clean up the original cadyts stuff.  In particular, it needs to be clear if we have Links or TransitStopFacilities or arbitrary types.
+	 * -- make the original cadyts stuff more package protected again.  Think about what could be public and what not.
+	 * -- combine everything that is needed for the transit zone/24h cadyts in one package.  Make as much of it as possible non-public.
+	 */
 
-	private final static Logger log = Logger.getLogger(CadytsPtContext.class);
+	private final static Logger log = Logger.getLogger(CadytsPtContext2.class);
 
 	private final static String LINKOFFSET_FILENAME = "linkCostOffsets.xml";
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
@@ -77,11 +93,11 @@ CadytsContextI<TransitStopFacility> {
 
 	private AnalyticalCalibrator<TransitStopFacility> calibrator = null;
 	private final SimResults<TransitStopFacility> simResults;
-	private final Counts occupCounts = new Counts();
+	private final Counts<TransitStopFacility> occupCounts = new Counts<>();
 	//	private final Counts boardCounts = new Counts();
 	//	private final Counts alightCounts = new Counts();
 	private final CadytsPtOccupancyAnalyzerI cadytsPtOccupAnalyzer;
-	private PtPlanToPlanStepBasedOnEvents<TransitStopFacility> ptStep ;
+	private PtPlanToPlanStepBasedOnEvents2<TransitStopFacility> ptStep ;
 
 	private CadytsConfigGroup cadytsConfig;
 	private EventsManager events;
@@ -90,7 +106,7 @@ CadytsContextI<TransitStopFacility> {
 	private IterationStopWatch stopWatch;
 
 	@Inject
-	CadytsPtContext(final Config config, EventsManager events, Scenario scenario, OutputDirectoryHierarchy controlerIO,
+	CadytsPtContext2(final Config config, EventsManager events, Scenario scenario, OutputDirectoryHierarchy controlerIO,
 					IterationStopWatch stopWatch, final CadytsPtOccupancyAnalyzerI cadytsPtOccupancyAnalyzer ) {
 		this.events = events;
 		this.scenario = scenario;
@@ -123,9 +139,6 @@ CadytsContextI<TransitStopFacility> {
 				default:
 					throw new RuntimeException("not implemented ...") ;
 				}
-//				if ( retval != 0. ) {
-//					log.warn("retval=" + retval );
-//				}
 				return retval ;
 			}
 			@Override
@@ -140,15 +153,27 @@ CadytsContextI<TransitStopFacility> {
 	@Override
 	public void notifyStartup(StartupEvent event) {
 
-		// === prepare the calibrator by giving measurements to it:
+		// === read the measurements:
 		String occupancyCountsFilename = scenario.getConfig().ptCounts().getOccupancyCountsFileName();
 		new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
+		
+		// === assign the measurements to fake facilities since we need them to look them up later:
+		final Map<Id<TransitStopFacility>,TransitStopFacility> fakeFacilities = new HashMap<>() ;
+		for ( Count<TransitStopFacility> val : this.occupCounts.getCounts().values() ) {
+			FakeFacility fac = new FakeFacility(val.getId()) ;
+			fakeFacilities.put( fac.getId(), fac ) ;
+		}
+		LookUpItemFromId<TransitStopFacility> lookUp = new LookUpItemFromId<TransitStopFacility>() {
+			@Override public TransitStopFacility getItem(Id<TransitStopFacility> id) {
+				return fakeFacilities.get( id ) ;
+			}
+		};
 
-		// === build the calibrator:
-		this.calibrator = CadytsBuilderImpl.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.occupCounts, new TransitStopFacilityLookUp(scenario) , TransitStopFacility.class);
+		// === build the calibrator and add the measurements:
+		this.calibrator = CadytsBuilderImplGT.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.occupCounts, lookUp , TransitStopFacility.class);
 
 		// === find out which plan is contributing what to each measurement:
-		this.ptStep = new PtPlanToPlanStepBasedOnEvents<>(scenario, CadytsPtOccupancyAnalyzer.toTransitLineIdSet(cadytsConfig.getCalibratedItems()));
+		this.ptStep = new PtPlanToPlanStepBasedOnEvents2<>(scenario, CadytsPtOccupancyAnalyzer.toTransitLineIdSet(cadytsConfig.getCalibratedItems()), lookUp);
 		events.addHandler(ptStep);
 	}
 
@@ -176,7 +201,7 @@ CadytsContextI<TransitStopFacility> {
 			}
 		}
 		String outFile = controlerIO.getIterationFilename(it, OCCUPANCYANALYSIS_FILENAME);
-		this.cadytsPtOccupAnalyzer.writeResultsForSelectedStopIds(outFile, this.occupCounts, stopIds);
+//		this.cadytsPtOccupAnalyzer.writeResultsForSelectedStopIds(outFile, this.occupCounts, stopIds);
 	}
 
 	@Override
@@ -274,5 +299,68 @@ CadytsContextI<TransitStopFacility> {
 	public PlansTranslator<TransitStopFacility> getPlansTranslator() {
 		return ptStep;
 	}
+	static class FakeFacility implements TransitStopFacility {
+		
+		private final Id<TransitStopFacility> id;
+		FakeFacility(final Id<TransitStopFacility> id) {
+			this.id = id;
+		}
+	
+		@Override
+		public Id getLinkId() {
+			return id;
+		}
+	
+		@Override
+		public Coord getCoord() {
+			return null;
+		}
+	
+		@Override
+		public void setCoord(Coord coord) {
+	
+		}
+	
+		@Override
+		public Id<TransitStopFacility> getId() {
+			return id;
+		}
+	
+		@Override
+		public Map<String, Object> getCustomAttributes() {
+			return null;
+		}
+	
+		@Override
+		public boolean getIsBlockingLane() {
+			return false;
+		}
+	
+		@Override
+		public void setLinkId(Id linkId) {
+	
+		}
+	
+		@Override
+		public void setName(String name) {
+	
+		}
+	
+		@Override
+		public String getName() {
+			return null;
+		}
+	
+		@Override
+		public String getStopPostAreaId() {
+			return null;
+		}
+	
+		@Override
+		public void setStopPostAreaId(String stopPostAreaId) {
+	
+		}
+	}
+
 
 }

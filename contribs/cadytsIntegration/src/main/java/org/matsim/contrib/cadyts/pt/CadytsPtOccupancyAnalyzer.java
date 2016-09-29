@@ -54,7 +54,7 @@ import org.matsim.vehicles.Vehicle;
  * (obviously) depends on the fact that the counts are actually what it thinks, and so it makes sense to decouple this from the upstream
  * counting method and leave it here. kai, sep'13 
  */
-class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
+public class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 
 	private final int timeBinSize, maxSlotIndex;
 	private final double maxTime;

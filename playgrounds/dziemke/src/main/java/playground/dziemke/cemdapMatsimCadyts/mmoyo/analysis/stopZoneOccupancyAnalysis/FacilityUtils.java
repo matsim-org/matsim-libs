@@ -22,13 +22,15 @@ package playground.dziemke.cemdapMatsimCadyts.mmoyo.analysis.stopZoneOccupancyAn
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-abstract class FacilityUtils{
+public final class FacilityUtils{
 	final static char POINT = '.';
+	
+	private FacilityUtils(){} // do not instantiate
 
 	/**
 	 * Converts the id of a stop facility into a stop Zone. (it is the same id, just without the point and suffix)
 	 */
-	static Id<TransitStopFacility> convertFacilitytoZoneId(Id<TransitStopFacility> facId) {
+	public static Id<TransitStopFacility> convertFacilitytoZoneId(Id<TransitStopFacility> facId) {
 		String str = getStrUntilPoint(facId.toString());
 		return Id.create(str, TransitStopFacility.class);
 	}
