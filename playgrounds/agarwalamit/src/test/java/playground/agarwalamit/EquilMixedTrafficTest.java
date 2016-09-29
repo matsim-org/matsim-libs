@@ -19,6 +19,9 @@
 
 package playground.agarwalamit;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import com.google.inject.Inject;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -50,13 +53,10 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vehicles.*;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.Vehicles;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
-import playground.agarwalamit.utils.MapUtils;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Just setting up the equil scenario for mixed traffic conditions.
@@ -89,8 +89,8 @@ public class EquilMixedTrafficTest {
 
             @Override
             public void install() {
-                addTravelTimeBinding("bicycle").to(networkTravelTime());
-                addTravelDisutilityFactoryBinding("bicycle").to(carTravelDisutilityFactoryKey());
+//                addTravelTimeBinding("bicycle").to(networkTravelTime());
+//                addTravelDisutilityFactoryBinding("bicycle").to(carTravelDisutilityFactoryKey());
 
                 // add event handler to test...
                 addEventHandlerBinding().toInstance(handler);

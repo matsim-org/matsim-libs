@@ -29,7 +29,6 @@ public class TravelDisutilityModule extends AbstractModule {
 
     @Override
     public void install() {
-//        addTravelDisutilityFactoryBinding(TransportMode.car).toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig().planCalcScore()));
         PlansCalcRouteConfigGroup routeConfigGroup = getConfig().plansCalcRoute();
         for (String mode : routeConfigGroup.getNetworkModes()) {
             addTravelDisutilityFactoryBinding(mode).toInstance(
