@@ -30,7 +30,7 @@ public final class Measurements implements LookUpItemFromId<Measurement> {
 	} ) ;
 	
 	public void add( Count<Measurement> cnt, double lowerBound ) {
-		Measurement mea = new Measurement( cnt.getLocId(), lowerBound ) ;
+		Measurement mea = new Measurement( cnt.getId(), lowerBound ) ;
 		map.put( mea.getId(), mea ) ;
 		set.add( mea ) ;
 	}

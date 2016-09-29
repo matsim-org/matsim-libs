@@ -134,9 +134,9 @@ public class CountsCompareToCSV {
 	}
 	
 	private void writeRow(BufferedWriter writer, Count count) throws IOException {
-		writer.write(count.getLocId().toString());
+		writer.write(count.getId().toString());
 		writer.write(separator);
-		writer.write(count.getCsId());
+		writer.write(count.getCsLabel());
 		for (int i = 1; i < 25; i++) {
 			writer.write(separator);
 			Volume volume = count.getVolume(i);

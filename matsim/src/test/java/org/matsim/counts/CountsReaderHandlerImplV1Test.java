@@ -45,7 +45,7 @@ public class CountsReaderHandlerImplV1Test extends MatsimTestCase {
 		reader.startTag("counts", attributeFactory.createCountsAttributes(), null);
 		reader.startTag("count", attributeFactory.createCountAttributes(), null);
 
-		assertEquals("Count attribute setting failed", "testNr", counts.getCount(Id.create(1, Link.class)).getCsId());
+		assertEquals("Count attribute setting failed", "testNr", counts.getCount(Id.create(1, Link.class)).getCsLabel());
 	}
 
 	public void testSEVolume() {

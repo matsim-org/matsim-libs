@@ -72,11 +72,11 @@ public class OSM2MatsimCounts {
 		System.out.println(String.format("Number of original counts: %s", counts.getCounts().size()));
 		
 		for (Count<Link> count : counts.getCounts().values()) {
-			Link link = mapping.get(count.getLocId().toString());
+			Link link = mapping.get(count.getId().toString());
 			if (link == null) {
-				System.err.println(String.format("Cannot find link with id %s.", count.getLocId().toString()));
+				System.err.println(String.format("Cannot find link with id %s.", count.getId().toString()));
 			} else {
-				Count<Link> newCount = newCounts.createAndAddCount(link.getId(), count.getCsId());
+				Count<Link> newCount = newCounts.createAndAddCount(link.getId(), count.getCsLabel());
 				if (newCount == null) {
 					System.err.println(String.format("There is already a count station on link %s.", link.getId().toString()));
 				} else {

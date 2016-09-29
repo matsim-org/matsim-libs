@@ -116,7 +116,7 @@ public class CreateCountsFromEvents {
 						try {
 							final Coord c = count.getCoord() != null ?
 									count.getCoord() :
-									network.getLinks().get( count.getLocId() ).getCoord();
+									network.getLinks().get( count.getId() ).getCoord();
 							return CoordUtils.calcEuclideanDistance( c , center ) <= radius;
 						}
 						catch ( Exception e ) {

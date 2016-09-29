@@ -32,8 +32,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
+import org.matsim.core.replanning.modules.ChangeSingleLegMode;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
+import org.matsim.core.replanning.modules.TripsToLegsModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.TripRouter;
@@ -44,6 +46,7 @@ import com.google.inject.Provider;
 import playground.jbischoff.analysis.TripHistogram;
 import playground.jbischoff.analysis.TripHistogramListener;
 import playground.jbischoff.csberlin.replanning.BerlinCSPermissibleModesCalculator;
+import playground.jbischoff.csberlin.replanning.ChangeSingleLegModeWithPermissibleModes;
 import playground.jbischoff.ffcs.FFCSConfigGroup;
 import playground.jbischoff.ffcs.sim.SetupFreefloatingParking;
 
@@ -84,16 +87,32 @@ public class RunCSBerlinBasecaseWithParkingFreefloating {
 				addControlerListenerBinding().to(TripHistogramListener.class).asEagerSingleton();
 				bind(TripHistogram.class).asEagerSingleton();
 				bind(BerlinCSPermissibleModesCalculator.class).asEagerSingleton();
-				addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.toString()).toProvider(new Provider<PlanStrategy>() {
+//				addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.toString()).toProvider(new Provider<PlanStrategy>() {
+//					@Inject Scenario scenario;
+//					@Inject Provider<TripRouter> tripRouterProvider;
+//					@Inject BerlinCSPermissibleModesCalculator berlinCSAvailableModeSelector;
+//					@Override
+//					public PlanStrategy get() {
+//						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+//						SubtourModeChoice subtourmodechoice = new SubtourModeChoice(scenario.getConfig().global().getNumberOfThreads(), scenario.getConfig().subtourModeChoice().getModes(), scenario.getConfig().subtourModeChoice().getChainBasedModes(), false, tripRouterProvider);
+//						subtourmodechoice.setPermissibleModesCalculator(berlinCSAvailableModeSelector);
+//						builder.addStrategyModule(subtourmodechoice);
+//						builder.addStrategyModule(new ReRoute(scenario, tripRouterProvider));
+//						return builder.build();
+//
+//
+//					}
+//				});
+				
+				addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.toString()).toProvider(new Provider<PlanStrategy>() {
 					@Inject Scenario scenario;
 					@Inject Provider<TripRouter> tripRouterProvider;
 					@Inject BerlinCSPermissibleModesCalculator berlinCSAvailableModeSelector;
 					@Override
 					public PlanStrategy get() {
 						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-						SubtourModeChoice subtourmodechoice = new SubtourModeChoice(scenario.getConfig().global().getNumberOfThreads(), scenario.getConfig().subtourModeChoice().getModes(), scenario.getConfig().subtourModeChoice().getChainBasedModes(), false, tripRouterProvider);
-						subtourmodechoice.setPermissibleModesCalculator(berlinCSAvailableModeSelector);
-						builder.addStrategyModule(subtourmodechoice);
+						builder.addStrategyModule(new TripsToLegsModule(tripRouterProvider, scenario.getConfig().global()));
+						builder.addStrategyModule(new ChangeSingleLegModeWithPermissibleModes(scenario.getConfig().global().getNumberOfThreads(), berlinCSAvailableModeSelector));
 						builder.addStrategyModule(new ReRoute(scenario, tripRouterProvider));
 						return builder.build();
 

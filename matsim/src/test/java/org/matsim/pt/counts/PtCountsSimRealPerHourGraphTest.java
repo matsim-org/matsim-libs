@@ -21,7 +21,8 @@
 package org.matsim.pt.counts;
 
 import org.junit.Test;
-import org.matsim.pt.counts.PtCountSimComparisonWriter.PtCountsType;
+import org.matsim.pt.counts.obsolete.PtCountsSimRealPerHourGraph;
+import org.matsim.pt.counts.obsolete.PtCountSimComparisonWriter.PtCountsType;
 import org.matsim.testcases.MatsimTestCase;
 
 public class PtCountsSimRealPerHourGraphTest extends MatsimTestCase {

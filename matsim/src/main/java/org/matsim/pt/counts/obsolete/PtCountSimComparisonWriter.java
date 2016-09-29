@@ -21,7 +21,7 @@
 /**
  * 
  */
-package org.matsim.pt.counts;
+package org.matsim.pt.counts.obsolete;
 
 import java.util.List;
 

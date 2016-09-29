@@ -24,8 +24,9 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 
-public class Count<T> {
+public class Count<T> implements Identifiable<T> {
 
 	private final Id<T> linkId;
 	private String stationName;
@@ -63,11 +64,12 @@ public class Count<T> {
 		this.stationName = cs_id;
 	}
 
-	public final Id<T> getLocId() {
+	@Override
+	public final Id<T> getId() {
 		return this.linkId;
 	}
 
-	public final String getCsId() {
+	public final String getCsLabel() {
 		return this.stationName;
 	}
 

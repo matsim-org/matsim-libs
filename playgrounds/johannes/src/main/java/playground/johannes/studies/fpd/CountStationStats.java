@@ -84,12 +84,12 @@ public class CountStationStats {
         writer.newLine();
 
         for(Count<Link> count : counts.getCounts().values()) {
-            Id<Link> id = Id.createLinkId(count.getLocId());
+            Id<Link> id = Id.createLinkId(count.getId());
             double dSum = distances.get(id);
             int volume = volumes.get(id);
             double dAvr = dSum/(double)volume;
 
-            writer.write(count.getCsId());
+            writer.write(count.getCsLabel());
             writer.write("\t");
             writer.write(String.valueOf(dAvr));
             writer.newLine();

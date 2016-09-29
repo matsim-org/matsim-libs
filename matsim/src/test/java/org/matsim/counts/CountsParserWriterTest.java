@@ -62,7 +62,7 @@ public class CountsParserWriterTest {
 		Iterator<Count> c_it = fixture.counts.getCounts().values().iterator();
 		while (c_it.hasNext()) {
 			Count c = c_it.next();
-			Assert.assertNotNull(c.getLocId());
+			Assert.assertNotNull(c.getId());
 
 			Iterator<Volume> vol_it = c.getVolumes().values().iterator();
 			while (vol_it.hasNext()) {

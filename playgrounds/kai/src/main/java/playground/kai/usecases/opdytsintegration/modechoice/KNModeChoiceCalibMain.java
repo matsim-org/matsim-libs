@@ -87,7 +87,9 @@ class KNModeChoiceCalibMain {
 		}
 		if ( equil ) {
 			config.changeMode().setModes(new String[]{"car","pt"});
-		} 
+		} else {
+			config.changeMode().setModes(new String[]{"car","pt","bike","walk"});
+		}
 
 		// ===
 
@@ -124,7 +126,7 @@ class KNModeChoiceCalibMain {
 					maxIterations, maxTransitions, populationSize, 
 					MatsimRandom.getRandom(),
 					interpolate,
-					new ModeChoiceObjectiveFunction(),
+					new ModeChoiceObjectiveFunction(equil),
 					includeCurrentBest ) ;
 
 			randomSearch.setLogPath( outputDirectory );

@@ -126,7 +126,7 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalysisModule{
 			for(Volume v: c.getVolumes().values()){
 				total += v.getValue();
 			}
-			totals.put(c.getLocId(), total);
+			totals.put(c.getId(), total);
 		}
 		if(this.writeHeatMaps){
 			log.warn("Writing heatmaps seems to be broken for a long time. This function is deactivated for the time beeing.");

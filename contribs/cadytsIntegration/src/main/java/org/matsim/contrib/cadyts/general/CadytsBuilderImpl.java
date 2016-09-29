@@ -38,11 +38,10 @@ import java.util.Map;
  * @author nagel
  * @author mrieser
  */
-public final class CadytsBuilderImpl implements CadytsBuilder {
+public final class CadytsBuilderImpl {
 	private static Logger log = Logger.getLogger( CadytsBuilderImpl.class ) ;
 
-	@Override
-	public <T> AnalyticalCalibrator<T> buildCalibratorAndAddMeasurements(final Config config, final Counts<T> occupCounts,
+	public static <T> AnalyticalCalibrator<T> buildCalibratorAndAddMeasurements(final Config config, final Counts<T> occupCounts,
 																				LookUpItemFromId<T> lookUp, Class<T> idType) {
 		
 		if (occupCounts.getCounts().size() == 0) {
@@ -125,8 +124,7 @@ public final class CadytsBuilderImpl implements CadytsBuilder {
 		return matsimCalibrator;
 	}
 
-	@Override
-	public <T> AnalyticalCalibrator<T> buildCalibrator(final Config config) {
+	public static <T> AnalyticalCalibrator<T> buildCalibrator(final Config config) {
 		CadytsConfigGroup cadytsConfig = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class ) ;
 		
 		//get timeBinSize_s and validate it
