@@ -28,19 +28,24 @@ import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesFiller;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
+import playground.thibautd.utils.AggregateList;
 import playground.thibautd.utils.KDTree;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
+
+import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.l;
 
 /**
  * @author thibautd
@@ -51,12 +56,12 @@ public class SimpleCliquesFiller implements CliquesFiller {
 	private static final int[] AGE_CUTTING_POINTS = {24, 38, 51, 66, Integer.MAX_VALUE};
 
 	private final Random random = MatsimRandom.getLocalInstance();
-	private final Map<EgoClass, List<CliquePositions>> cliques = new HashMap<>(  );
-	private final List<CliquePositions> allCliques = new ArrayList<>();
+	private final Map<EgoClass, CliqueSampler> cliques = new LinkedHashMap<>(  );
+	private final CliqueSampler allCliques;
 
 	private final SnowballSamplingConfigGroup configGroup;
 
-	private Set<EgoClass> knownEmptyClasses = new HashSet<>();
+	private final Set<EgoClass> knownEmptyClasses = new HashSet<>();
 
 	public interface Position {
 		double[] calcPosition( Ego center , CliquePosition position );
@@ -72,16 +77,23 @@ public class SimpleCliquesFiller implements CliquesFiller {
 		this.configGroup = configGroup;
 		this.position = position;
 
+		final Map<EgoClass, List<CliquePositions>> cliquesMap = new LinkedHashMap<>();
+		final List<CliquePositions> allCliquesList = new ArrayList<>();
 		for ( SnowballCliques.Clique snowballClique : snowballCliques.getCliques().values() ) {
 			final CliquePositions clique = new CliquePositions();
 
-			MapUtils.getList( createEgoClass( snowballClique.getEgo() ) , cliques ).add( clique );
-			allCliques.add( clique );
+			MapUtils.getList( createEgoClass( snowballClique.getEgo() ) , cliquesMap ).add( clique );
+			allCliquesList.add( clique );
 
 			for ( SnowballCliques.Member alter : snowballClique.getAlters() ) {
 				clique.positions.add( calcPosition( snowballClique.getEgo() , alter ) );
 			}
 		}
+
+		for ( Map.Entry<EgoClass,List<CliquePositions>> e : cliquesMap.entrySet() ) {
+			cliques.put( e.getKey() , new CliqueSampler( e.getValue() ) );
+		}
+		allCliques = new CliqueSampler( allCliquesList );
 	}
 
 	private CliquePosition calcPosition( final SnowballCliques.Member ego, final SnowballCliques.Member alter ) {
@@ -116,34 +128,51 @@ public class SimpleCliquesFiller implements CliquesFiller {
 			final Ego ego,
 			final KDTree<Ego> egosWithFreeStubs ) {
 		final EgoClass egoClass = createEgoClass( ego );
-		List<CliquePositions> cliqueList = cliques.get( egoClass );
+		CliqueSampler cliqueSampler = cliques.get( egoClass );
 
-		if ( cliqueList == null ) {
+		if ( cliqueSampler == null ) {
 			if ( knownEmptyClasses.add( egoClass ) ) {
 				log.warn( "No cliques for egos of class "+egoClass );
 				log.warn( "Sampling unconditionned instead" );
 			}
-			cliqueList = allCliques;
+			cliqueSampler = allCliques;
 		}
 
-		final CliquePositions clique = cliqueList.get( random.nextInt( cliqueList.size() ) );
+		final CliquePositions clique = cliqueSampler.sampleClique( random , egosWithFreeStubs.size() );
 
 		final Set<Ego> members = new HashSet<>();
 		members.add( ego );
 		for ( CliquePosition cliqueMember : clique ) {
-			// TODO: rotate?
+			// TODO: rotate? -> only once per clique
 			final double[] point = position.calcPosition( ego , cliqueMember );
-			final Ego member =
-					egosWithFreeStubs.getClosestEuclidean(
-							point,
-							(e) -> e.getFreeStubs() >= clique.size() - 1 );
+			final Ego member = findEgo( egosWithFreeStubs, clique, point );
+
 			if ( member == null ) {
 				throw new RuntimeException( "no alter found at "+ Arrays.toString( point )+" for clique size "+clique.size() );
 			}
+
 			group( member , members );
 		}
 
 		return members;
+	}
+
+	private Ego findEgo( final KDTree<Ego> egosWithFreeStubs,
+			final CliquePositions clique,
+			final double[] point ) {
+		// Allow more ties than stubs in case no agent can be found.
+		// should remain OK, because:
+		// - clique size cannot exceed number of agents with free stubs
+		// - this can happen at most once per agent
+		// - we keep the increase minimal, by increasingly increasing tolerance.
+		for ( int i = 1; true; i++ ) {
+			final int freeStubs = clique.size() - i;
+			final Ego member =
+					egosWithFreeStubs.getClosestEuclidean(
+							point,
+							( e ) -> e.getFreeStubs() >= freeStubs );
+			if ( member != null ) return member;
+		}
 	}
 
 	private void group( final Ego ego, final Set<Ego> members ) {
@@ -236,6 +265,55 @@ public class SimpleCliquesFiller implements CliquesFiller {
 			return "[EgoClass: ageClass="+ageClass+
 					"; sex="+sex+
 					"; degreeClass="+degreeClass+"]";
+		}
+	}
+
+	private static class CliqueSampler {
+		private final CliquePositions[] cliques;
+
+		private int currentMaxSize = -1;
+		private int currentMaxIndex = -1;
+
+		private CliqueSampler( final Collection<CliquePositions> l ) {
+			this.cliques = l.toArray( new CliquePositions[ l.size() ] );
+			Arrays.sort( this.cliques , (c1, c2) -> Integer.compare( c1.size() , c2.size() ) );
+		}
+
+		public CliquePositions sampleClique(
+				final Random random,
+				final int maxSize ) {
+			updateMaxSize( maxSize );
+			return cliques[ random.nextInt( currentMaxIndex ) ];
+		}
+
+		private void updateMaxSize( final int maxSize ) {
+			if ( maxSize == currentMaxSize ) return;
+
+			if ( maxSize > currentMaxSize ) {
+				currentMaxSize = cliques[ cliques.length - 1 ].size();
+				currentMaxIndex = cliques.length;
+			}
+
+			currentMaxIndex = binarySearch( maxSize );
+			currentMaxSize = maxSize;
+			assert cliques[ currentMaxIndex ].size() == currentMaxSize;
+		}
+
+		// cannot use library implementation because not in a nice comparable format
+		private int binarySearch( final int maxSize ) {
+			int min = 0;
+			int max = currentMaxIndex;
+
+			while ( min < max - 1 ) {
+				final int mid = (max + min) / 2;
+
+				// we want the rightmost element: "push" min even if in the right value,
+				// as long as possible
+				if ( cliques[ mid ].size() <= maxSize ) min = mid;
+				else max = mid;
+			}
+
+			return min;
 		}
 	}
 
