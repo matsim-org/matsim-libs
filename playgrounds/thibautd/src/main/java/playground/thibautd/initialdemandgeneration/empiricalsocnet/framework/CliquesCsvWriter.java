@@ -18,23 +18,26 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
 
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
  * @author thibautd
  */
+@Singleton
 public class CliquesCsvWriter extends AbstractCsvWriter {
 	private int cliqueId = 0;
 
-	public CliquesCsvWriter( final String file ) {
-		super( file );
+	@Inject
+	public CliquesCsvWriter(
+			final ControlerConfigGroup config,
+			final SocialNetworkSampler sampler,
+			final AutocloserModule.Closer closer ) {
+		super( config.getOutputDirectory() +"/output_cliques.csv" , sampler , closer );
 	}
 
 	@Override

@@ -47,20 +47,22 @@ public class SocialNetworkSampler {
 	private final CliquesFiller cliquesFiller;
 	private final EgoLocator egoLocator;
 
-	private final Consumer<Set<Ego>> cliquesListenner;
+	private Consumer<Set<Ego>> cliquesListener = (e) -> {};
 
 	@Inject
 	public SocialNetworkSampler(
 			final Population population,
 			final DegreeDistribution degreeDistribution,
 			final CliquesFiller cliquesFiller,
-			final EgoLocator egoLocator,
-			final Consumer<Set<Ego>> cliquesListenner ) {
+			final EgoLocator egoLocator ) {
 		this.population = population;
 		this.degreeDistribution = degreeDistribution;
 		this.cliquesFiller = cliquesFiller;
 		this.egoLocator = egoLocator;
-		this.cliquesListenner = cliquesListenner;
+	}
+
+	public void addCliqueListener( final Consumer<Set<Ego>> l ) {
+		cliquesListener = cliquesListener.andThen( l );
 	}
 
 	public SocialNetwork sampleSocialNetwork() {
@@ -80,7 +82,7 @@ public class SocialNetworkSampler {
 			final Ego ego = egosWithFreeStubs.get( random.nextInt( egosWithFreeStubs.size() ) );
 
 			final Set<Ego> clique = cliquesFiller.sampleClique( ego , egosWithFreeStubs );
-			cliquesListenner.accept( clique );
+			cliquesListener.accept( clique );
 
 			for ( Ego member : clique ) {
 				if ( member.getDegree() <= member.getAlters().size() ) {
@@ -167,5 +169,4 @@ public class SocialNetworkSampler {
 			}
 		};
 	}
-
 }

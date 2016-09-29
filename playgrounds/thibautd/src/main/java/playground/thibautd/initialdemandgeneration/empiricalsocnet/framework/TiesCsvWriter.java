@@ -18,6 +18,10 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.matsim.core.config.groups.ControlerConfigGroup;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -25,9 +29,14 @@ import java.util.Set;
 /**
  * @author thibautd
  */
+@Singleton
 public class TiesCsvWriter extends AbstractCsvWriter {
-	public TiesCsvWriter( final String file ) {
-		super( file );
+	@Inject
+	public TiesCsvWriter(
+			final ControlerConfigGroup config,
+			final SocialNetworkSampler sampler,
+			final AutocloserModule.Closer closer ) {
+		super( config.getOutputDirectory() +"/output_ties.csv" , sampler , closer );
 	}
 
 	@Override
@@ -42,7 +51,7 @@ public class TiesCsvWriter extends AbstractCsvWriter {
 		for ( Ego ego : clique ) {
 			for ( Ego alter : clique ) {
 				// only write in one direction?
-				if ( alter == ego ) break;
+				if ( alter == ego ) continue;
 				lines.add( ego.getId() +"\t"+ ego.getDegree() +"\t"+ alter.getId() +"\t"+ alter.getDegree() );
 			}
 		}

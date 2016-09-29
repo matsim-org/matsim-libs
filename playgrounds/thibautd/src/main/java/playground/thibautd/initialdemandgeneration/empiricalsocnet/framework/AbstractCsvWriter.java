@@ -24,18 +24,20 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * @author thibautd
  */
-public abstract class AbstractCsvWriter  implements Consumer<Set<Ego>>, AutoCloseable {
+public abstract class AbstractCsvWriter implements AutoCloseable {
 	private final BufferedWriter writer;
 
 	protected abstract String titleLine();
 	protected abstract Iterable<String> cliqueLines( Set<Ego> clique);
 
-	public AbstractCsvWriter( final String file ) {
+	protected AbstractCsvWriter(
+			final String file ,
+			final SocialNetworkSampler sampler,
+			final AutocloserModule.Closer closer ) {
 		this.writer = IOUtils.getBufferedWriter( file );
 		try {
 			writer.write( titleLine() );
@@ -43,10 +45,12 @@ public abstract class AbstractCsvWriter  implements Consumer<Set<Ego>>, AutoClos
 		catch ( IOException e ) {
 			throw new UncheckedIOException( e );
 		}
+		// OK, as it is designed to be used by injection
+		sampler.addCliqueListener( this::write );
+		closer.add( this::close );
 	}
 
-	@Override
-	public final void accept( final Set<Ego> egos ) {
+	public final void write( final Set<Ego> egos ) {
 		for ( String l : cliqueLines( egos ) ) {
 			try {
 				writer.write( l );

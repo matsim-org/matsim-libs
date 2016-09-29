@@ -25,10 +25,15 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import playground.ivt.utils.MoreIOUtils;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CsvWritingModule;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesCsvWriter;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplerUtils;
 
 import java.io.IOException;
+
+import static jdk.nashorn.internal.objects.NativeFunction.bind;
+import static org.osgeo.proj4j.parser.Proj4Keyword.a;
+import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
 
 /**
  * @author thibautd
@@ -40,11 +45,12 @@ public class RunSimpleCliquesSampling {
 
 		MoreIOUtils.initOut( configGroup.getOutputDirectory() , config );
 
-		try ( final CsvWritingModule writingModule = new CsvWritingModule( configGroup.getOutputDirectory() ) ){
+		try ( final AutocloserModule closer = new AutocloserModule() ){
 			final SocialNetwork socialNetwork =
 					SocialNetworkSamplerUtils.sampleSocialNetwork(
 							config,
-							writingModule,
+							closer,
+							binder -> binder.bind( CliquesCsvWriter.class ),
 							new SimpleSnowballModule(
 									SnowballCliques.readCliques(
 											ConfigGroup.getInputFileURL(
@@ -53,8 +59,8 @@ public class RunSimpleCliquesSampling {
 
 			new SocialNetworkWriter( socialNetwork ).write( configGroup.getOutputDirectory() + "/output_socialNetwork.xml.gz" );
 		}
-		catch ( IOException e ) {
-			throw new UncheckedIOException( e );
+		catch ( Exception e ) {
+			throw new RuntimeException( e );
 		}
 		finally {
 			MoreIOUtils.closeOutputDirLogging();

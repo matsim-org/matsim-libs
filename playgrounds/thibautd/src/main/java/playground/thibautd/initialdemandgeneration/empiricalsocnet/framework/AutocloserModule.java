@@ -19,35 +19,38 @@
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.TypeLiteral;
+import com.google.inject.Singleton;
 
-import java.io.IOException;
-import java.util.Set;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Should be created as a resource in a try-with-resources block. Not sure how dirty purists would consider that, but
- * does the job with little code.
- *
+ * Not that nice, but best way I found to be able to pass csv writers as listenner without maintaining each one separately
  * @author thibautd
  */
-public class CsvWritingModule extends AbstractModule implements AutoCloseable{
-	private final CliquesCsvWriter cliquesCsvWriter;
-	private final TiesCsvWriter tiesCsvWriter;
-
-	public CsvWritingModule( final String outputDirectory ) {
-		this.cliquesCsvWriter = new CliquesCsvWriter( outputDirectory+"/output_cliques.csv" );
-		this.tiesCsvWriter = new TiesCsvWriter( outputDirectory+"/output_ties.csv" );
-	}
+public class AutocloserModule extends AbstractModule implements AutoCloseable {
+	private final List<AutoCloseable> closeables = new ArrayList<>();
 
 	@Override
 	protected void configure() {
-		bind( new TypeLiteral<Consumer<Set<Ego>>>(){} ).toInstance( cliquesCsvWriter.andThen( tiesCsvWriter ) );
+		bind( Closer.class ).toInstance( new Closer( closeables ) );
 	}
 
 	@Override
-	public void close() throws IOException {
-		cliquesCsvWriter.close();
-		tiesCsvWriter.close();
+	public void close() throws Exception {
+		for ( AutoCloseable c : closeables ) c.close();
+	}
+
+	@Singleton
+	public static class Closer {
+		private final List<AutoCloseable> closeables;
+
+		public Closer( final List<AutoCloseable> closeables ) {
+			this.closeables = closeables;
+		}
+
+		public void add( final AutoCloseable closeable ) {
+			closeables.add( closeable );
+		}
 	}
 }
