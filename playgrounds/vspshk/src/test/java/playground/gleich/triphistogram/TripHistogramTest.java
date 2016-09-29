@@ -38,6 +38,9 @@ import com.google.inject.Inject;
 import playground.jbischoff.analysis.TripHistogram;
 
 /**
+ * Tests TripHistogram.class whether its counts of the number of trips is right
+ * for the pt tutorial.
+ * 
  * @author gleich
  */
 public class TripHistogramTest {
