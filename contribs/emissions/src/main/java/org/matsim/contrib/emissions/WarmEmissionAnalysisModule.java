@@ -35,6 +35,7 @@ import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactor;
 import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactorKey;
 import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.utils.EmissionDescriptionMarker;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
@@ -149,7 +150,8 @@ public class WarmEmissionAnalysisModule {
 
 		if(this.ecg.isUsingVehicleIdAsVehicleDescription() ) {
 			if(vehicle.getType().getDescription()==null) {
-				vehicle.getType().setDescription(vehicle.getType().getId().toString());
+				vehicle.getType().setDescription(EmissionDescriptionMarker.BEGIN_EMISSIONS
+						+vehicle.getType().getId().toString()+EmissionDescriptionMarker.END_EMISSIONS);
 			}
 		}
 
@@ -322,7 +324,10 @@ public class WarmEmissionAnalysisModule {
 		HbefaVehicleCategory hbefaVehicleCategory = null;
 		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 
-		String[] vehicleInformationArray = vehicleDescription.split(";");
+		int startIndex = vehicleDescription.indexOf(EmissionDescriptionMarker.BEGIN_EMISSIONS.toString()) + EmissionDescriptionMarker.BEGIN_EMISSIONS.toString().length();
+		int endIndex = vehicleDescription.lastIndexOf(EmissionDescriptionMarker.END_EMISSIONS.toString());
+
+		String[] vehicleInformationArray = vehicleDescription.substring(startIndex, endIndex).split(";");
 
 		for(HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()){
 			if(vehCat.toString().equals(vehicleInformationArray[0])){

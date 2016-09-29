@@ -23,17 +23,13 @@ package org.matsim.contrib.emissions;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
-import org.matsim.contrib.emissions.types.ColdPollutant;
-import org.matsim.contrib.emissions.types.HbefaColdEmissionFactor;
-import org.matsim.contrib.emissions.types.HbefaColdEmissionFactorKey;
-import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
-import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
+import org.matsim.contrib.emissions.types.*;
+import org.matsim.contrib.emissions.utils.EmissionDescriptionMarker;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
@@ -122,7 +118,8 @@ public class ColdEmissionAnalysisModule {
 
 		if(this.ecg.isUsingVehicleIdAsVehicleDescription() ) {
 			if(vehicle.getType().getDescription()==null) {
-				vehicle.getType().setDescription(vehicle.getType().getId().toString());
+				vehicle.getType().setDescription(EmissionDescriptionMarker.BEGIN_EMISSIONS
+						+vehicle.getType().getId().toString()+EmissionDescriptionMarker.END_EMISSIONS);
 			}
 		}
 
@@ -240,7 +237,10 @@ public class ColdEmissionAnalysisModule {
 		HbefaVehicleCategory hbefaVehicleCategory = null;
 		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 
-		String[] vehicleInformationArray = vehicleDescription.split(";");
+		int startIndex = vehicleDescription.indexOf(EmissionDescriptionMarker.BEGIN_EMISSIONS.toString()) + EmissionDescriptionMarker.BEGIN_EMISSIONS.toString().length();
+		int endIndex = vehicleDescription.lastIndexOf(EmissionDescriptionMarker.END_EMISSIONS.toString());
+
+		String[] vehicleInformationArray = vehicleDescription.substring(startIndex, endIndex).split(";");
 
 		for(HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()){
 			if(vehCat.toString().equals(vehicleInformationArray[0])){
