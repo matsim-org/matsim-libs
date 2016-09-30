@@ -3,15 +3,16 @@ package besttimeresponseintegration;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.Facility;
 
 import besttimeresponse.PlannedActivity;
 import besttimeresponse.TimeAllocator;
@@ -30,11 +31,11 @@ public class BestTimeResponseStrategyFunctionality {
 
 	// -------------------- MEMBERS --------------------
 
-	public final List<PlannedActivity<Link, String>> plannedActivities;
+	public final List<PlannedActivity<Facility, String>> plannedActivities;
 
 	public final List<Double> initialDptTimes_s;
 
-	private final TimeAllocator<Link, String> timeAlloc;
+	private final TimeAllocator<Facility, String> timeAlloc;
 
 	private final BestTimeResponseTravelTimes myTravelTimes;
 
@@ -42,8 +43,6 @@ public class BestTimeResponseStrategyFunctionality {
 
 	public BestTimeResponseStrategyFunctionality(final Plan plan, final Network network,
 			final CharyparNagelScoringParametersForPerson scoringParams, final TimeDiscretization timeDiscretization,
-			// final TravelTime carTravelTime, final boolean interpolate, final
-			// boolean cache
 			final BestTimeResponseTravelTimes myTravelTimes) {
 
 		final CharyparNagelScoringParameters personScoringParams = scoringParams.getScoringParameters(plan.getPerson());
@@ -77,33 +76,11 @@ public class BestTimeResponseStrategyFunctionality {
 			final Double earliestEndTime_s = ((params.getEarliestEndTime() == Time.UNDEFINED_TIME) ? null
 					: params.getEarliestEndTime());
 
-			final PlannedActivity<Link, String> plannedAct = new PlannedActivity<Link, String>(
-					network.getLinks().get(matsimAct.getLinkId()), matsimNextLeg.getMode(), params.getTypicalDuration(),
-					Units.S_PER_H * params.getZeroUtilityDuration_h(), openingTime_s, closingTime_s, latestStartTime_s,
-					earliestEndTime_s);
+			final PlannedActivity<Facility, String> plannedAct = new PlannedActivity<>(
+					(Facility) new ActivityWrapperFacility(matsimAct), matsimNextLeg.getMode(),
+					params.getTypicalDuration(), Units.S_PER_H * params.getZeroUtilityDuration_h(), openingTime_s,
+					closingTime_s, latestStartTime_s, earliestEndTime_s);
 
-			// final Double openingTime_s = ((matsimActParams.getOpeningTime()
-			// == Time.UNDEFINED_TIME) ? null
-			// : matsimActParams.getOpeningTime());
-			// final Double closingTime_s = ((matsimActParams.getClosingTime()
-			// == Time.UNDEFINED_TIME) ? null
-			// : matsimActParams.getClosingTime());
-			// final Double latestStartTime_s =
-			// ((matsimActParams.getLatestStartTime() == Time.UNDEFINED_TIME) ?
-			// null
-			// : matsimActParams.getLatestStartTime());
-			// final Double earliestEndTime_s =
-			// ((matsimActParams.getEarliestEndTime() == Time.UNDEFINED_TIME) ?
-			// null
-			// : matsimActParams.getEarliestEndTime());
-			// final PlannedActivity<Link, String> plannedAct = new
-			// PlannedActivity<Link, String>(
-			// network.getLinks().get(matsimAct.getLinkId()),
-			// matsimNextLeg.getMode(),
-			// matsimActParams.getTypicalDuration(), Units.S_PER_H *
-			// matsimActParams.getZeroUtilityDuration_h(),
-			// openingTime_s, closingTime_s, latestStartTime_s,
-			// earliestEndTime_s);
 			this.plannedActivities.add(plannedAct);
 		}
 
@@ -112,37 +89,20 @@ public class BestTimeResponseStrategyFunctionality {
 		 */
 
 		final boolean repairTimeStructure = true;
-		final boolean interpolateTravelTimes = true;
 		final boolean randomSmoothing = true;
 
-		// this.myTravelTimes = new
-		// BestTimeResponseTravelTimes(timeDiscretization, carTravelTime,
-		// network, interpolate);
-		// this.myTravelTimes.setCaching(cache);
 		this.myTravelTimes = myTravelTimes;
 
-		// this.timeAlloc = new TimeAllocator<>(timeDiscretization,
-		// this.myTravelTimes,
-		// scoreConfig.getScoringParameters(null).getPerforming_utils_hr() /
-		// 3600.0,
-		// scoreConfig.getModes().get("car").getMarginalUtilityOfTraveling() /
-		// 3600.0,
-		// scoreConfig.getScoringParameters(null).getLateArrival_utils_hr() /
-		// 3600.0,
-		// scoreConfig.getScoringParameters(null).getEarlyDeparture_utils_hr() /
-		// 3600.0, repairTimeStructure,
-		// interpolateTravelTimes, randomSmoothing);
 		this.timeAlloc = new TimeAllocator<>(timeDiscretization, this.myTravelTimes,
 				personScoringParams.marginalUtilityOfPerforming_s,
 				personScoringParams.modeParams.get("car").marginalUtilityOfTraveling_s,
 				personScoringParams.marginalUtilityOfLateArrival_s,
-				personScoringParams.marginalUtilityOfEarlyDeparture_s, repairTimeStructure, interpolateTravelTimes,
-				randomSmoothing);
+				personScoringParams.marginalUtilityOfEarlyDeparture_s, repairTimeStructure, randomSmoothing);
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	public TimeAllocator<Link, String> getTimeAllocator() {
+	public TimeAllocator<Facility, String> getTimeAllocator() {
 		return this.timeAlloc;
 	}
 

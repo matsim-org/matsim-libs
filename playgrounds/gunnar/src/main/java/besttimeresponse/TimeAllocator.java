@@ -37,8 +37,6 @@ public class TimeAllocator<L, M> {
 
 	private final boolean repairTimeStructure;
 
-	private final boolean interpolateTravelTimes;
-
 	private final boolean randomSmoothing;
 
 	private final double betaDur_1_s;
@@ -55,8 +53,7 @@ public class TimeAllocator<L, M> {
 
 	public TimeAllocator(final TimeDiscretization timeDiscretization, final TripTravelTimes<L, M> travelTimes,
 			final double betaDur_1_s, final double betaTravel_1_s, final double betaLateArr_1_s,
-			final double betaEarlyDpt_1_s, final boolean repairTimeStructure, final boolean interpolateTravelTimes,
-			final boolean randomSmoothing) {
+			final double betaEarlyDpt_1_s, final boolean repairTimeStructure, final boolean randomSmoothing) {
 		this.timeDiscretization = timeDiscretization;
 		this.travelTimes = travelTimes;
 		this.betaDur_1_s = betaDur_1_s;
@@ -64,7 +61,6 @@ public class TimeAllocator<L, M> {
 		this.betaLateArr_1_s = betaLateArr_1_s;
 		this.betaEarlyDpt_1_s = betaEarlyDpt_1_s;
 		this.repairTimeStructure = repairTimeStructure;
-		this.interpolateTravelTimes = interpolateTravelTimes;
 		this.randomSmoothing = randomSmoothing;
 	}
 
@@ -80,7 +76,7 @@ public class TimeAllocator<L, M> {
 			Arrays.sort(initialDptTimes_s);
 		}
 		final RealizedActivitiesBuilder<L, M> builder = new RealizedActivitiesBuilder<L, M>(this.timeDiscretization,
-				this.travelTimes, this.repairTimeStructure, this.interpolateTravelTimes);
+				this.travelTimes, this.repairTimeStructure);
 		for (int q = 0; q < plannedActivities.size(); q++) {
 			builder.addActivity(plannedActivities.get(q), initialDptTimes_s[q]);
 		}

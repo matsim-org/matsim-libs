@@ -31,8 +31,6 @@ public class RealizedActivitiesBuilder<L, M> {
 
 	private final boolean repairTimeStructure;
 
-	private final boolean interpolateTravelTimes;
-
 	private final List<PlannedActivity<L, M>> plannedActs = new ArrayList<>();
 
 	private final List<Double> dptTimes_s = new ArrayList<>();
@@ -42,11 +40,10 @@ public class RealizedActivitiesBuilder<L, M> {
 	// -------------------- CONSTRUCTION --------------------
 
 	public RealizedActivitiesBuilder(final TimeDiscretization timeDiscr, final TripTravelTimes<L, M> travelTimes,
-			final boolean repairTimeStructure, final boolean interpolateTravelTimes) {
+			final boolean repairTimeStructure) {
 		this.timeDiscr = timeDiscr;
 		this.travelTimes = travelTimes;
 		this.repairTimeStructure = repairTimeStructure;
-		this.interpolateTravelTimes = interpolateTravelTimes;
 	}
 
 	// -------------------- BUILDING PROCESS --------------------
@@ -89,18 +86,14 @@ public class RealizedActivitiesBuilder<L, M> {
 
 			double dTT_dDptTime;
 			final double ttOffset_s;
-			if (this.interpolateTravelTimes) {
-				final double ttAtDptTimeBinEnd_s = this.travelTimes.getTravelTime_s(prevAct.location, nextAct.location,
-						this.timeDiscr.getBinEndTime_s(dptBin), prevAct.departureMode);
-				dTT_dDptTime = (ttAtDptTimeBinEnd_s - ttAtDptTimeBinStart_s) / this.timeDiscr.getBinSize_s();
-				if ((dTT_dDptTime <= -(1.0 - 1e-8)) && this.repairTimeStructure) {
-					dTT_dDptTime = -(1.0 - 2e-8);
-				}
-				ttOffset_s = ttAtDptTimeBinStart_s - dTT_dDptTime * this.timeDiscr.getBinStartTime_s(dptBin);
-			} else {
-				dTT_dDptTime = 0.0;
-				ttOffset_s = ttAtDptTimeBinStart_s;
+
+			final double ttAtDptTimeBinEnd_s = this.travelTimes.getTravelTime_s(prevAct.location, nextAct.location,
+					this.timeDiscr.getBinEndTime_s(dptBin), prevAct.departureMode);
+			dTT_dDptTime = (ttAtDptTimeBinEnd_s - ttAtDptTimeBinStart_s) / this.timeDiscr.getBinSize_s();
+			if ((dTT_dDptTime <= -(1.0 - 1e-8)) && this.repairTimeStructure) {
+				dTT_dDptTime = -(1.0 - 2e-8);
 			}
+			ttOffset_s = ttAtDptTimeBinStart_s - dTT_dDptTime * this.timeDiscr.getBinStartTime_s(dptBin);
 
 			lastArrTime_s = (1.0 + dTT_dDptTime) * this.dptTimes_s.get(q) + ttOffset_s;
 			final int arrBin = this.timeDiscr.getBin(lastArrTime_s);
