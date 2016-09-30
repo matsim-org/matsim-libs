@@ -51,6 +51,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.benjamin.internalization.EquilTestSetUp;
@@ -141,6 +142,7 @@ public class TestExposurePricing {
 		logger.info("Number of time bins are "+ this.noOfTimeBins);
 
 		Scenario sc = minimalControlerSetting();
+		ScenarioUtils.loadScenario(sc); // need to load vehicles. Amit Sep 2016
 
 		sc.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(true); 
 
@@ -202,6 +204,7 @@ public class TestExposurePricing {
 		logger.info("Number of time bins are "+ this.noOfTimeBins);
 
 		Scenario sc = minimalControlerSetting();
+		ScenarioUtils.loadScenario(sc); // need to load vehicles. Amit Sep 2016
 		
 		sc.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(false);
 		// yy otherwise, the scenario consumes walk time from activity to link, somewhat modifying the results. kai, jun'16
@@ -322,7 +325,7 @@ public class TestExposurePricing {
 		
 		
 		EquilTestSetUp equilTestSetUp = new EquilTestSetUp();
-		Scenario sc = equilTestSetUp.createConfig();
+		Scenario sc = equilTestSetUp.createConfigAndReturnScenario();
 		// TODO : I have used link speed as 100/3.6 m/s instead of 100 m/s thus check the difference in the result
 		equilTestSetUp.createNetwork(sc);
 		equilTestSetUp.createActiveAgents(sc);
@@ -331,7 +334,7 @@ public class TestExposurePricing {
 		Config config = sc.getConfig();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
 		ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
-		ecg.setEmissionVehicleFile(emissionVehicleFile);
+		config.vehicles().setVehiclesFile(emissionVehicleFile);
 
 		ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 		ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
@@ -339,6 +342,7 @@ public class TestExposurePricing {
 		ecg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
 		ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
 		ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
+		ecg.setUsingVehicleIdAsVehicleDescription(true);
 
 		config.addModule(ecg);
 

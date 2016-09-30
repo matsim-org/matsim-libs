@@ -55,7 +55,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class EquilTestSetUp {
 
-	public Scenario createConfig(){
+	public Scenario createConfigAndReturnScenario(){
 		Config config = ConfigUtils.createConfig();
 
 		config.strategy().setMaxAgentPlanMemorySize(2);

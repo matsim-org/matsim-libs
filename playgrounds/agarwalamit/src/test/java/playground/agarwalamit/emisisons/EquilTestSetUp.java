@@ -46,7 +46,7 @@ import java.util.Set;
 
 public class EquilTestSetUp {
 
-	public Scenario createConfig(){
+	public Scenario createConfigAndReturnScenario(){
 		Config config = ConfigUtils.createConfig();
 
 		config.strategy().setMaxAgentPlanMemorySize(2);
@@ -136,27 +136,27 @@ public class EquilTestSetUp {
 	/**
 	 * This agent is traveling and thus will be charged for exposure/emission toll.
 	 */
-	public void createActiveAgents(Scenario scenario) {
+	public void createActiveAgents(Scenario scenario, String personId, String mode, Double homeActEndTime) {
 		PopulationFactory pFactory = scenario.getPopulation().getFactory();
-		Person person = pFactory.createPerson(Id.create("567417.1#12424", Person.class));
+		Person person = pFactory.createPerson(Id.create(personId, Person.class));
 		Plan plan = pFactory.createPlan();
 
 		Coord homeCoords = new Coord(1.0, 10000.0);
 		Activity home = pFactory.createActivityFromCoord("home", homeCoords);
 		//Activity home = pFactory.createActivityFromLinkId("home", scenario.createId("12"));
-		home.setEndTime(6 * 3600);
+		home.setEndTime(homeActEndTime);
 		plan.addActivity(home);
 
-		Leg leg1 = pFactory.createLeg(TransportMode.car);
+		Leg leg1 = pFactory.createLeg(mode);
 		plan.addLeg(leg1);
 
 		Coord workCoords = new Coord(19999.0, 10000.0);
 		Activity work = pFactory.createActivityFromCoord("work" , workCoords);
 		//		Activity work = pFactory.createActivityFromLinkId("work", scenario.createId("45"));
-		work.setEndTime(home.getEndTime() + 600 + 8 * 3600);
+		work.setEndTime(homeActEndTime + 600 + 8 * 3600);
 		plan.addActivity(work);
 
-		Leg leg2 = pFactory.createLeg(TransportMode.car);
+		Leg leg2 = pFactory.createLeg(mode);
 		plan.addLeg(leg2);
 
 		home = pFactory.createActivityFromCoord("home", homeCoords);

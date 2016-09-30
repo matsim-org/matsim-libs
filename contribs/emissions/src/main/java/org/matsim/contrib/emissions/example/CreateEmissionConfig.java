@@ -102,7 +102,9 @@ public class CreateEmissionConfig {
 	        EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
 	        controler.getConfig().addModule(ecg);
 	        ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
-	        ecg.setEmissionVehicleFile(emissionVehicleFile);
+
+			// emission vehicles can be read directly from the default vehicle container
+			config.vehicles().setVehiclesFile(emissionVehicleFile);
 	        
 	        ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 	        ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);

@@ -46,7 +46,7 @@
 		<!-- definition of a vehicle for every person (who is allowed to choose a vehicle in the simulation):
 		 - REQUIRED: vehicle type Id must start with the respective HbefaVehicleCategory followed by `;'
 		 - OPTIONAL: if detailed emission calculation is switched on, vehicle type Id should aditionally contain HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in detailedWarmEmissionFactorsFile -->
-		<param name="emissionVehicleFile" value="./test/input/org/matsim/contrib/emissions/sample_emissionVehicles.xml" />
+		<!-- ><param name="emissionVehicleFile" value="./test/input/org/matsim/contrib/emissions/sample_emissionVehicles.xml" /> -->
 
 		<!-- if true then detailed emission factor files must be provided! -->
 		<param name="usingDetailedEmissionCalculation" value="true" />
@@ -440,7 +440,13 @@
 	</module>
 
 <!-- ====================================================================== -->
-
+	
+	<module name="vehicles" >
+		<param name="vehiclesFile" value="sample_emissionVehicles.xml" /> 
+	</module>
+	
+<!-- ====================================================================== -->
+	
 	<module name="scenario" >
 
 		<!-- Set this parameter to true if households should be used, false if not. -->

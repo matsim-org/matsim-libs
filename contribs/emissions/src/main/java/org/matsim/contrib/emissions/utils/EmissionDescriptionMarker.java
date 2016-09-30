@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * HbefaVehicleCategory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +16,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.emissions.types;
+
+
+package org.matsim.contrib.emissions.utils;
 
 /**
- * @author benjamin
- *
+ * Created by amit on 29/09/16.
  */
-public enum HbefaVehicleCategory {
+public enum EmissionDescriptionMarker {
 
-	PASSENGER_CAR, HEAVY_GOODS_VEHICLE, ZERO_EMISSION_VEHICLE;
-	
-	private HbefaVehicleCategory() {
-	}
+    BEGIN_EMISSIONS, END_EMISSIONS;
+
 }

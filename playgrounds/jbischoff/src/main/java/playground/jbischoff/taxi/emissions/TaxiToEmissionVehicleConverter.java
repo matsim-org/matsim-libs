@@ -67,6 +67,10 @@ public class TaxiToEmissionVehicleConverter {
 					vehicleAttributes.getHbefaSizeClass() + ";" + 
 					vehicleAttributes.getHbefaEmConcept(),VehicleType.class);
 			VehicleType vehicleType = VehicleUtils.getFactory().createVehicleType(vehTypeId);
+
+			// either set following or use switch in EmissionConfigGroup to use vehicle id for vehicle description. Amit sep 2016
+			vehicleType.setDescription(vehTypeId.toString());
+
 			if(!(outputVehicles.getVehicleTypes().containsKey(vehTypeId))){//getVehicles().containsKey(vehTypeId))){
 				outputVehicles.addVehicleType(vehicleType);
 			} else {
