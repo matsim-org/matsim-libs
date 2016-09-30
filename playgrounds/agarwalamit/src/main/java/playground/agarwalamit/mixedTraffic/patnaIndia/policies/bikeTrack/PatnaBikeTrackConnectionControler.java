@@ -49,7 +49,6 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.*;
-import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListner;
 import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
 import playground.agarwalamit.analysis.linkVolume.FilteredLinkVolumeHandler;
@@ -57,7 +56,6 @@ import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.joint.JointCalibrationControler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.BikeTimeDistanceTravelDisutilityFactory;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForTruck;
@@ -205,11 +203,7 @@ public class PatnaBikeTrackConnectionControler {
 			}
 
 			// delete unnecessary iterations folder here.
-			for (int inx = firstIt+1; inx <lastIt; inx ++){
-				String dirToDel = outputDir+"/ITERS/it."+inx;
-				Logger.getLogger(JointCalibrationControler.class).info("Deleting the directory "+dirToDel);
-				IOUtils.deleteDirectory(new File(dirToDel),false);
-			}
+			FileUtils.deleteIntermediateIterations(outputDir,firstIt,lastIt);
 
 			new File(outputDir+"/analysis/").mkdir();
 			String outputEventsFile = outputDir+"/output_events.xml.gz";

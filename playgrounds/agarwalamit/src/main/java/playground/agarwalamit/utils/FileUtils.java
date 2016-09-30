@@ -19,6 +19,11 @@
 
 package playground.agarwalamit.utils;
 
+import java.io.File;
+import org.apache.log4j.Logger;
+import org.matsim.core.utils.io.IOUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.joint.JointCalibrationControler;
+
 /**
  * I think, after introduction of URL and for uniformity, pass absolute path.
  * Because, relative paths are converted to new uri and then url using new File(" ").getAbsoluteFile() rather than
@@ -30,8 +35,20 @@ package playground.agarwalamit.utils;
 
 public final class FileUtils {
 
+    public static final Logger LOGGER = Logger.getLogger(FileUtils.class);
+
     public static final String RUNS_SVN = "/Users/amit/Documents/repos/runs-svn/";
 
     public static final String SHARED_SVN = "/Users/amit/Documents/repos/shared-svn/";
 
+    /*
+    * To delete all intermediate iteration except first and last.
+    */
+    public static void deleteIntermediateIterations(final String outputDir, final int firstIteration, final int lastIteration) {
+        for (int index =firstIteration+1; index <lastIteration; index ++){
+            String dirToDel = outputDir+"/ITERS/it."+index;
+            Logger.getLogger(JointCalibrationControler.class).info("Deleting the directory "+dirToDel);
+            IOUtils.deleteDirectory(new File(dirToDel),false);
+        }
+    }
 }
