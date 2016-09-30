@@ -113,7 +113,10 @@ public class CliquesDistributionCliquesFiller implements CliquesFiller {
 				SocialPositions.group( member, members );
 			}
 
-			if ( members.size() == clique.size() ) return members;
+			if ( members.size() == clique.size() ) {
+				for ( Ego member : members ) CliqueEgoDistribution.getCliqueStructure( member ).removeSize( members.size() );
+				return members;
+			}
 		}
 
 		return null;
