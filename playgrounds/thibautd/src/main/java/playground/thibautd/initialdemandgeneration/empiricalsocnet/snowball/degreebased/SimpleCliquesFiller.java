@@ -102,6 +102,10 @@ public class SimpleCliquesFiller implements CliquesFiller {
 		}
 
 		final SocialPositions.CliquePositions clique = cliqueSampler.sampleClique( random , egosWithFreeStubs.size() );
+		if ( clique == null ) {
+			egosWithFreeStubs.remove( ego );
+			return null;
+		}
 
 		final Set<Ego> members = new HashSet<>();
 		members.add( ego );
@@ -159,6 +163,7 @@ public class SimpleCliquesFiller implements CliquesFiller {
 				final Random random,
 				final int maxSize ) {
 			updateMaxSize( maxSize );
+			if ( currentMaxIndex == 0 ) return null;
 			return cliques[ random.nextInt( currentMaxIndex ) ];
 		}
 
@@ -178,7 +183,6 @@ public class SimpleCliquesFiller implements CliquesFiller {
 					maxSize,
 					0 , currentMaxIndex );
 			currentMaxSize = maxSize;
-			assert cliques[ currentMaxIndex ].size() == currentMaxSize;
 		}
 	}
 }
