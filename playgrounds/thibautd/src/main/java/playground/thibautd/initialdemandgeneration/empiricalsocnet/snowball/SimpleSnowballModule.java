@@ -16,32 +16,52 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowball;
+package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball;
 
 import com.google.inject.AbstractModule;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesFiller;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoCharacteristicsDistribution;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoLocator;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.degreebased.SimpleCliquesFiller;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.degreebased.SimpleEgoDistribution;
 
 /**
  * @author thibautd
  */
 public class SimpleSnowballModule extends AbstractModule {
 	private final SnowballCliques snowballCliques;
+	private final SnowballSamplingConfigGroup configGroup;
 
-	public SimpleSnowballModule( final SnowballCliques snowballCliques ) {
-		this.snowballCliques = snowballCliques;
+	// could use matsim module to avoid passing config, but better to read data in constructor (configure might be called
+	// several times)
+	public SimpleSnowballModule( final Config config ) {
+		this.configGroup = (SnowballSamplingConfigGroup) config.getModule( SnowballSamplingConfigGroup.GROUP_NAME );
+		this.snowballCliques = SnowballCliques.readCliques(
+											ConfigGroup.getInputFileURL(
+													config.getContext(),
+													configGroup.getInputCliquesCsv() ).getPath() );
 	}
 
 	@Override
 	protected void configure() {
+		// this should remain the same between methods
 		bind( EgoLocator.class ).to( SnowballLocator.class );
 		bind( SimpleCliquesFiller.Position.class ).to( SnowballLocator.class );
 
-		bind( EgoCharacteristicsDistribution.class ).to( SimpleEgoDistribution.class );
-
-		bind( CliquesFiller.class ).to( SimpleCliquesFiller.class );
-
 		bind( SnowballCliques.class ).toInstance( snowballCliques );
+
+		// this varies with method
+		switch ( configGroup.getSamplingMethod() ) {
+			case degreeBased:
+				bind( EgoCharacteristicsDistribution.class ).to( SimpleEgoDistribution.class );
+				bind( CliquesFiller.class ).to( SimpleCliquesFiller.class );
+				break;
+			case cliqueBased:
+				// TODO
+			default:
+				throw new RuntimeException( configGroup.getSamplingMethod()+" not implemented yet" );
+		}
 	}
 }

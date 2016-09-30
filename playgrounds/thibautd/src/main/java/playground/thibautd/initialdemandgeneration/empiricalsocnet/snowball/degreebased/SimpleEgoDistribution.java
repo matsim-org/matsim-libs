@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowball;
+package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.degreebased;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoCharacteristicsDistribution;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballCliques;
 
 import java.util.Random;
 

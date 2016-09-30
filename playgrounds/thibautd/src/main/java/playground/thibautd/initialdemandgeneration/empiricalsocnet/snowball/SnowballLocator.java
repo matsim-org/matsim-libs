@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowball;
+package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball;
 
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Coord;
@@ -24,9 +24,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.PersonUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoLocator;
-
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
-import static playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowball.SimpleCliquesFiller.getSex;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.degreebased.SimpleCliquesFiller;
 
 /**
  * @author thibautd

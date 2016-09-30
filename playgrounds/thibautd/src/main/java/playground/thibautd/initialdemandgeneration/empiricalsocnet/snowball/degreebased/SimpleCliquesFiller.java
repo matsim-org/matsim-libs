@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowball;
+package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.degreebased;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -28,14 +28,14 @@ import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesFiller;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
-import playground.thibautd.utils.AggregateList;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballCliques;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballSamplingConfigGroup;
 import playground.thibautd.utils.ArrayUtils;
 import playground.thibautd.utils.KDTree;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -45,8 +45,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
-
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.l;
 
 /**
  * @author thibautd

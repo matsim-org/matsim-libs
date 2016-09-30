@@ -16,25 +16,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowball;
+package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball;
 
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesCsvWriter;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplerUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.StopwatchCsvWriter;
-
-import java.io.IOException;
-
-import static jdk.nashorn.internal.objects.NativeFunction.bind;
-import static org.osgeo.proj4j.parser.Proj4Keyword.a;
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
 
 /**
  * @author thibautd
@@ -55,11 +48,7 @@ public class RunSimpleCliquesSampling {
 							binder -> binder.bind( SnowballTiesCsvWriter.class ).asEagerSingleton(),
 							binder -> binder.bind( EgoCsvWriter.class ).asEagerSingleton(),
 							binder -> binder.bind( StopwatchCsvWriter.class ).asEagerSingleton(),
-							new SimpleSnowballModule(
-									SnowballCliques.readCliques(
-											ConfigGroup.getInputFileURL(
-													config.getContext(),
-													configGroup.getInputCliquesCsv() ).getPath() ) ) );
+							new SimpleSnowballModule( config ) );
 
 			new SocialNetworkWriter( socialNetwork ).write( config.controler().getOutputDirectory() + "/output_socialNetwork.xml.gz" );
 		}
