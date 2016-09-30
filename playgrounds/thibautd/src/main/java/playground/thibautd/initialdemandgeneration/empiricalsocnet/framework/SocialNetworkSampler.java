@@ -83,10 +83,13 @@ public class SocialNetworkSampler {
 			final Ego ego = egosWithFreeStubs.get( random.nextInt( egosWithFreeStubs.size() ) );
 
 			final Set<Ego> clique = cliquesFiller.sampleClique( ego , egosWithFreeStubs );
+			// cliquesFiller is allowed to choke on a agent, but it is then expected to take care
+			// of updating egosWithFreeStubs itself. Not best design, try to solve that, might get messy!
+			if ( clique == null ) continue;
 			cliquesListener.accept( clique );
 
 			for ( Ego member : clique ) {
-				if ( member.getDegree() <= member.getAlters().size() ) {
+				if ( cliquesFiller.stopConsidering( member ) ) {
 					egosWithFreeStubs.remove( member );
 				}
 			}

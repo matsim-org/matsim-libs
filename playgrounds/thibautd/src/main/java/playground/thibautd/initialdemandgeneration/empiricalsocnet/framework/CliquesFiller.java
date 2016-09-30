@@ -33,4 +33,6 @@ public interface CliquesFiller {
 	 * @return The set of egos pertaining to the clique, including the "center", already modified.
 	 */
 	Set<Ego> sampleClique( Ego ego, KDTree<Ego> egosWithFreeStubs );
+
+	boolean stopConsidering( Ego ego );
 }
