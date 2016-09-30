@@ -61,6 +61,10 @@ public class CliqueEgoDistribution implements EgoCharacteristicsDistribution {
 		return new Ego( person , structure.degree , new EgosCliqueStructure( structure ) );
 	}
 
+	public static EgosCliqueStructure getCliqueStructure( final Ego ego ) {
+		return (EgosCliqueStructure) ego.getAdditionalInformation();
+	}
+
 	public static class EgosCliqueStructure {
 		//private int[] sizes;
 
@@ -75,6 +79,10 @@ public class CliqueEgoDistribution implements EgoCharacteristicsDistribution {
 		public boolean hasSize( final int size ) {
 			final int i = Arrays.binarySearch( remainingSizes , size );
 			return i >= 0;
+		}
+
+		public boolean hasUnassignedCliques() {
+			return remainingSizes.length > 0;
 		}
 
 		public int getRandomSize( final Random random ) {

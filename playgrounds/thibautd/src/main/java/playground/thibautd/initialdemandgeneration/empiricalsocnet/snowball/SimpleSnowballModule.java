@@ -24,6 +24,8 @@ import org.matsim.core.config.ConfigGroup;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesFiller;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoCharacteristicsDistribution;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoLocator;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.cliquedistributionsnowball.CliqueEgoDistribution;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.cliquedistributionsnowball.CliquesDistributionCliquesFiller;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.degreebased.SimpleCliquesFiller;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.degreebased.SimpleEgoDistribution;
 
@@ -59,6 +61,9 @@ public class SimpleSnowballModule extends AbstractModule {
 				bind( CliquesFiller.class ).to( SimpleCliquesFiller.class );
 				break;
 			case cliqueBased:
+				bind( EgoCharacteristicsDistribution.class ).to( CliqueEgoDistribution.class );
+				bind( CliquesFiller.class ).to( CliquesDistributionCliquesFiller.class );
+				break;
 				// TODO
 			default:
 				throw new RuntimeException( configGroup.getSamplingMethod()+" not implemented yet" );
