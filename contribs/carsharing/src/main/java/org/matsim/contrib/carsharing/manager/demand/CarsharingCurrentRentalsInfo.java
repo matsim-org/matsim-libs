@@ -76,9 +76,13 @@ public class CarsharingCurrentRentalsInfo {
 	
 	public boolean removeVehicle(Link link, CSVehicle vehicle, String type) {
 		QuadTree<CSVehicle> vehicleLocations = currentRentals.get(type);
-		Coord coord = link.getCoord();
 		
-		return vehicleLocations.remove(coord.getX(), coord.getY(), vehicle);
+		if (vehicleLocations != null) {
+			Coord coord = link.getCoord();
+		
+			return vehicleLocations.remove(coord.getX(), coord.getY(), vehicle);
+		}
+		return false;
 	}
 	
 	public Map<String, QuadTree<CSVehicle>> getCurrentRentals() {

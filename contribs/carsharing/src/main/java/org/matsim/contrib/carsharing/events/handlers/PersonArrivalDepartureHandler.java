@@ -33,7 +33,6 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 	PersonArrivalEventHandler, PersonEntersVehicleEventHandler {	
 
 	@Inject	private CarsharingManagerInterface carsharingManager;
-	//@Inject private CSPersonVehicle csPersonVehicles;
 	@Inject private CurrentTotalDemand currentDemand;
 	@Inject private CarsharingSupplyInterface carsharingSupply;
 	@Inject EventsManager eventsManager;
@@ -41,6 +40,8 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 	
 	Map<Id<Person>, String> personVehicleArrival = new HashMap<Id<Person>, String>();
 	Map<Id<Person>, Id<Link>> personArrivalMap = new HashMap<Id<Person>, Id<Link>>();
+	Map<Id<Person>, Id<Link>> personDepartureMap = new HashMap<Id<Person>, Id<Link>>();
+
 	Map<Id<Person>, Id<Vehicle>> personLeavesVehicleMap = new HashMap<Id<Person>, Id<Vehicle>>();
 
 	@Override
@@ -48,12 +49,14 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 		personLeavesVehicleMap = new HashMap<Id<Person>, Id<Vehicle>>();
 		personArrivalMap = new HashMap<Id<Person>, Id<Link>>();
 		personVehicleArrival = new HashMap<Id<Person>, String>();
+		personDepartureMap = new HashMap<Id<Person>, Id<Link>>();
 	}
 	
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		Network network = scenario.getNetwork();
 		String legMode = event.getLegMode();
+		
 		if (legMode.equals("egress_walk_ff")) {
 			String vehId = personLeavesVehicleMap.get(event.getPersonId()).toString();
 			Id<Link> linkId = personArrivalMap.get(event.getPersonId());
@@ -81,6 +84,12 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 			eventsManager.processEvent(new EndRentalEvent(event.getTime(), linkId, event.getPersonId(), vehId));
 
 		}
+		else if (legMode.equals("freefloating_vehicle")) {
+			
+			personDepartureMap.put(event.getPersonId(), event.getLinkId());
+		}
+			
+		
 	}
 
 	@Override
@@ -105,12 +114,7 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 			Link link = network.getLinks().get(linkId);
 
 			this.currentDemand.addVehicle(event.getPersonId(), link, vehicle, modeCut[0]);
-		//	if (this.csPersonVehicles.getVehicleLocationForType(event.getPersonId(), modeCut[0]) != null)
-		//		this.csPersonVehicles.getVehicleLocationForType(event.getPersonId(), modeCut[0]).put(linkId, vehicle);
-		//	else {				
-		//		this.csPersonVehicles.getVehicleLocationForType(event.getPersonId(), modeCut[0]).put(linkId, vehicle);
-
-		//	}			
+				
 		}		
 		personArrivalMap.put(event.getPersonId(), event.getLinkId());
 		
@@ -118,6 +122,7 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
+		Network network = scenario.getNetwork();
 
 		String vehId = event.getVehicleId().toString();
 		if (vehId.startsWith("OW")) {
@@ -125,7 +130,12 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 
 			this.carsharingManager.freeParkingSpot(vehId, linkId);
 		
-		}
-	}
-	
+		}		
+		else if (event.getVehicleId().toString().startsWith("FF")) {
+			Id<Link> linkId = this.personDepartureMap.get(event.getPersonId());
+			Link link = network.getLinks().get(linkId);
+
+			this.currentDemand.removeVehicle(event.getPersonId(), link, carsharingSupply.getAllVehicles().get(vehId), "freefloating");
+			}
+		}	
 }
