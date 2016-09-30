@@ -30,7 +30,7 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.degr
  * @author thibautd
  */
 @Singleton
-public class SnowballLocator implements EgoLocator, SimpleCliquesFiller.Position {
+public class SnowballLocator implements EgoLocator, Position {
 	// a difference in the categorical variables is equivalent to 10'000 km
 	private static double NON_SPATIAL_FACTOR = 10 * 1000 * 1000;
 

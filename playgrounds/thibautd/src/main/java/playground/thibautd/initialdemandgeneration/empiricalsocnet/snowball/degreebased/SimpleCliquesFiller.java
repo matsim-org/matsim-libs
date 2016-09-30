@@ -28,6 +28,7 @@ import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesFiller;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.Position;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballCliques;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballSamplingConfigGroup;
 import playground.thibautd.utils.ArrayUtils;
@@ -61,10 +62,6 @@ public class SimpleCliquesFiller implements CliquesFiller {
 	private final SnowballSamplingConfigGroup configGroup;
 
 	private final Set<EgoClass> knownEmptyClasses = new HashSet<>();
-
-	public interface Position {
-		double[] calcPosition( Ego center , CliquePosition position );
-	}
 
 	private final Position position;
 

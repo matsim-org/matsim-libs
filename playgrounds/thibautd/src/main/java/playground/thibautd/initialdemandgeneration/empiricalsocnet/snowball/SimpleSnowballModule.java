@@ -48,7 +48,7 @@ public class SimpleSnowballModule extends AbstractModule {
 	protected void configure() {
 		// this should remain the same between methods
 		bind( EgoLocator.class ).to( SnowballLocator.class );
-		bind( SimpleCliquesFiller.Position.class ).to( SnowballLocator.class );
+		bind( Position.class ).to( SnowballLocator.class );
 
 		bind( SnowballCliques.class ).toInstance( snowballCliques );
 
