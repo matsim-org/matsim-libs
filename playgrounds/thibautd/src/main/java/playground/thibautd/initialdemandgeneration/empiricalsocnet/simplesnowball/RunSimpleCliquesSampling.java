@@ -28,6 +28,7 @@ import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesCsvWriter;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplerUtils;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.StopwatchCsvWriter;
 
 import java.io.IOException;
 
@@ -53,6 +54,7 @@ public class RunSimpleCliquesSampling {
 							binder -> binder.bind( CliquesCsvWriter.class ).asEagerSingleton(),
 							binder -> binder.bind( SnowballTiesCsvWriter.class ).asEagerSingleton(),
 							binder -> binder.bind( EgoCsvWriter.class ).asEagerSingleton(),
+							binder -> binder.bind( StopwatchCsvWriter.class ).asEagerSingleton(),
 							new SimpleSnowballModule(
 									SnowballCliques.readCliques(
 											ConfigGroup.getInputFileURL(
