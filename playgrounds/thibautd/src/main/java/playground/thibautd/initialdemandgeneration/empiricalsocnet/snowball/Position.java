@@ -19,11 +19,10 @@
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball;
 
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.degreebased.SimpleCliquesFiller;
 
 /**
  * @author thibautd
  */
 public interface Position {
-	double[] calcPosition( Ego center, SimpleCliquesFiller.CliquePosition position );
+	double[] calcPosition( Ego center, SocialPositions.CliquePosition position );
 }

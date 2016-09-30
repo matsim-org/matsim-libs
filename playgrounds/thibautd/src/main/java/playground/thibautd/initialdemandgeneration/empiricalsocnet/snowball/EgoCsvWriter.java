@@ -29,7 +29,6 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSampler;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.degreebased.SimpleCliquesFiller;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -79,7 +78,7 @@ public class EgoCsvWriter implements AutoCloseable {
 			writer.write( record.ego.getId() +"\t"+ record.nCliques +"\t"+
 					record.ego.getAlters().size() +"\t"+ record.ego.getDegree() +"\t"+
 					PersonUtils.getAge( record.ego.getPerson() ) +"\t"+
-					SimpleCliquesFiller.getSex( record.ego ) );
+					SocialPositions.getSex( record.ego ) );
 		}
 		writer.close();
 	}

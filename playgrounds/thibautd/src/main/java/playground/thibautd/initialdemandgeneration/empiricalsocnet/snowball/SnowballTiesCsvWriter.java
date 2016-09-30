@@ -27,7 +27,6 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Abs
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSampler;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.degreebased.SimpleCliquesFiller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,10 +65,10 @@ public class SnowballTiesCsvWriter extends AbstractCsvWriter {
 
 				lines.add( ego.getId() +"\t"+ ego.getDegree() + "\t" +
 						PersonUtils.getAge( ego.getPerson() ) + "\t" +
-						SimpleCliquesFiller.getSex( ego ) + "\t" +
+						SocialPositions.getSex( ego ) + "\t" +
 						alter.getId() +"\t"+ alter.getDegree() + "\t" +
 						PersonUtils.getAge( alter.getPerson() ) + "\t" +
-						SimpleCliquesFiller.getSex( alter ) + "\t" +
+						SocialPositions.getSex( alter ) + "\t" +
 						CoordUtils.calcEuclideanDistance(
 								SnowballLocator.calcCoord( ego ),
 								SnowballLocator.calcCoord( alter ) ) );

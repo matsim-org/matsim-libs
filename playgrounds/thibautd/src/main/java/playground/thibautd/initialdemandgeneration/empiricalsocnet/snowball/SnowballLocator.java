@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.PersonUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoLocator;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.degreebased.SimpleCliquesFiller;
 
 /**
  * @author thibautd
@@ -55,12 +54,12 @@ public class SnowballLocator implements EgoLocator, Position {
 		return new double[]{
 				coord.getX() ,
 				coord.getY() ,
-				NON_SPATIAL_FACTOR * SimpleCliquesFiller.calcAgeClass( PersonUtils.getAge( ego.getPerson() ) ) ,
-				NON_SPATIAL_FACTOR * SimpleCliquesFiller.getSex( ego ).ordinal() };
+				NON_SPATIAL_FACTOR * SocialPositions.calcAgeClass( PersonUtils.getAge( ego.getPerson() ) ) ,
+				NON_SPATIAL_FACTOR * SocialPositions.getSex( ego ).ordinal() };
 	}
 
 	@Override
-	public double[] calcPosition( final Ego center, final SimpleCliquesFiller.CliquePosition position ) {
+	public double[] calcPosition( final Ego center, final SocialPositions.CliquePosition position ) {
 		final double[] egoCoord = getCoord( center );
 
 		final double xTranslation = Math.cos( position.getBearing() ) * position.getDistance();
