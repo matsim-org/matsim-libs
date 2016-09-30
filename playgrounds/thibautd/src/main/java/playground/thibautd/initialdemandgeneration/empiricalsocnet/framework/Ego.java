@@ -32,9 +32,17 @@ public class Ego {
 	private final int degree;
 	private final Set<Ego> alters = new HashSet<>();
 
+	// for special requirements
+	private final Object additionalInformation;
+
 	public Ego( final Person person, final int degree ) {
+		this( person , degree , null );
+	}
+
+	public Ego( final Person person, final int degree, final Object additionalInformation ) {
 		this.person = person;
 		this.degree = degree;
+		this.additionalInformation = additionalInformation;
 	}
 
 	public Id<Person> getId() {
@@ -55,5 +63,9 @@ public class Ego {
 
 	public Set<Ego> getAlters() {
 		return alters;
+	}
+
+	public Object getAdditionalInformation() {
+		return additionalInformation;
 	}
 }
