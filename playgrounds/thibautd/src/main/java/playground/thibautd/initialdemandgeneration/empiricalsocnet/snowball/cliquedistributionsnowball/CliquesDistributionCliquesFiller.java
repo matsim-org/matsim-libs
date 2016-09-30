@@ -103,18 +103,19 @@ public class CliquesDistributionCliquesFiller implements CliquesFiller {
 					abortCounter.incCounter();
 					// there does not seem to remain enough agents for the given clique size.
 					// for now just ignore them, and do something smarter only if it appears to bias a lot
+					// given how we failed, those should be the only egos with this clique size to allocate
 					for ( Ego e : members ) {
 						CliqueEgoDistribution.getCliqueStructure( e ).removeSize( clique.size() );
 						if ( stopConsidering( e ) ) egosWithFreeStubs.remove( e );
 					}
 					break;
 				}
-
-				SocialPositions.group( member, members );
+				members.add( member );
 			}
 
 			if ( members.size() == clique.size() ) {
 				for ( Ego member : members ) CliqueEgoDistribution.getCliqueStructure( member ).removeSize( members.size() );
+				SocialPositions.link( members );
 				return members;
 			}
 		}

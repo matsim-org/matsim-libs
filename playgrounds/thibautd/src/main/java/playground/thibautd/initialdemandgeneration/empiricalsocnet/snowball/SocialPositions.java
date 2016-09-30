@@ -102,6 +102,16 @@ public class SocialPositions {
 		members.add( ego );
 	}
 
+	public static void link( final Set<Ego> members ) {
+		for ( Ego ego : members ) {
+			for ( Ego alter : members ) {
+				if ( alter == ego ) break;
+				alter.getAlters().add( ego );
+				ego.getAlters().add( alter );
+			}
+		}
+	}
+
 	public static EgoClass createEgoClass(
 			final SnowballSamplingConfigGroup configGroup,
 			final Ego ego ) {
