@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,23 +16,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
-
-import playground.thibautd.utils.KDTree;
-
-import java.util.Set;
 
 /**
- * @author thibautd
+ * 
  */
-public interface CliquesFiller {
-	/**
-	 * Sample a feasible clique, fills the alters lists of the egos, and returns the clique.
-	 * @param ego the "center" of the clique
-	 * @param egosWithFreeStubs
-	 * @return The set of egos pertaining to the clique, including the "center", already modified.
-	 */
-	Set<Ego> sampleClique( Ego ego, KDTree<Ego> egosWithFreeStubs );
+package playground.jbischoff.pt;
 
-	boolean stopConsidering( Ego ego );
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+
+/**
+ * @author  jbischoff
+ *
+ */
+/**
+ *
+ */
+public interface VariableAccessEgressTravelDisutility {
+
+	Leg getAccessEgressModeAndTraveltime(Person person, Coord coord, Coord toCoord);
+	Leg getAccessEgressModeCost(String mode, Person person, Coord coord, Coord toCoord);
+	boolean isTeleportedAccessEgressMode(String mode);
+	
 }

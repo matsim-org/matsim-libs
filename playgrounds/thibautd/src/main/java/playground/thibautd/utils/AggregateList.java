@@ -18,16 +18,9 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowball.SimpleCliquesFiller;
-
 import java.util.AbstractList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.stream.Collectors;
-
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.l;
 
 /**
  * @author thibautd

@@ -69,6 +69,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
+import playground.agarwalamit.utils.FileUtils;
 
 /**
  * @author amit after ssix
@@ -123,14 +124,14 @@ public class GenerateFundamentalDiagramData {
 			
 			args = new String [8];
 			
-			String myDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run315/holes/1lane/";
-			String outFolder ="/carMotorbikeBikeSeepage_bikeSeep/";
+			String myDir = FileUtils.SHARED_SVN+"/projects/mixedTraffic/triangularNetwork/run315/holes/1lane/";
+			String outFolder ="/carBikePassing_fastCapacityUpdate/";
 			
 			args[0] = myDir + outFolder ;
-			args[1] = "car,motorbike,bike"; // travel (main) modes
-			args[2] = "1.0,1.0,1.0"; // modal split in pcu
+			args[1] = "car,bike"; // travel (main) modes
+			args[2] = "1.0,1.0"; // modal split in pcu
 			args[3] = TrafficDynamics.withHoles.toString(); // isUsingHoles
-			args[4] = LinkDynamics.SeepageQ.toString(); // isPassingAllowed
+			args[4] = LinkDynamics.PassingQ.toString(); // isPassingAllowed
 			args[5] = "1"; // reduce number of data points by this factor
 			args[6] = "false"; // is plotting modal split distribution
 		}

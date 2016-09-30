@@ -76,7 +76,9 @@ public class EmissionsConfigGroup
 
         map.put(IS_USING_VEHICLE_ID_AS_VEHICLE_DESCRIPTION, "OPTIONAL: vehicle id is used for the description. " +
                 "The vehicle information (or vehicles file) should be passed to the scenario."+
-                "The description of a vehicle for every person (who is allowed to choose a vehicle in the simulation):" + "\n\t\t" +
+                "The description of a vehicle for every person (who is allowed to choose a vehicle in the simulation) should be " +
+                "surrounded by emission descrption markers i.e. "+EmissionDescriptionMarker.BEGIN_EMISSIONS+" and +" +
+                EmissionDescriptionMarker.END_EMISSIONS+"." + "\n\t\t" +
                 " - REQUIRED: it must start with the respective HbefaVehicleCategory followed by `;'" + "\n\t\t" +
                 " - OPTIONAL: if detailed emission calculation is switched on, vehicle type Id should aditionally contain" +
                 " HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED+".");

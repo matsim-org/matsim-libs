@@ -16,32 +16,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowball;
+package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
 
-import com.google.inject.AbstractModule;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesFiller;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.DegreeDistribution;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoLocator;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.matsim.core.config.groups.ControlerConfigGroup;
+
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * @author thibautd
  */
-public class SimpleSnowballModule extends AbstractModule {
-	private final SnowballCliques snowballCliques;
+@Singleton
+public class StopwatchCsvWriter extends AbstractCsvWriter {
+	private final long startTime;
+	private int cliqueNr = 0;
 
-	public SimpleSnowballModule( final SnowballCliques snowballCliques ) {
-		this.snowballCliques = snowballCliques;
+	@Inject
+	protected StopwatchCsvWriter(
+			final ControlerConfigGroup config,
+			final SocialNetworkSampler sampler,
+			final AutocloserModule.Closer closer ) {
+		super( config.getOutputDirectory() +"/cliquesStopWatch.dat", sampler, closer );
+		this.startTime = System.currentTimeMillis();
 	}
 
 	@Override
-	protected void configure() {
-		bind( EgoLocator.class ).to( SnowballLocator.class );
-		bind( SimpleCliquesFiller.Position.class ).to( SnowballLocator.class );
+	protected String titleLine() {
+		return "cliqueNr\ttotalElapsedTime_ms";
+	}
 
-		bind( DegreeDistribution.class ).to( SimpleDegreeDistribution.class );
-
-		bind( CliquesFiller.class ).to( SimpleCliquesFiller.class );
-
-		bind( SnowballCliques.class ).toInstance( snowballCliques );
+	@Override
+	protected Iterable<String> cliqueLines( final Set<Ego> clique ) {
+		return Collections.singleton( (cliqueNr++ )+"\t"+(System.currentTimeMillis() - startTime) );
 	}
 }

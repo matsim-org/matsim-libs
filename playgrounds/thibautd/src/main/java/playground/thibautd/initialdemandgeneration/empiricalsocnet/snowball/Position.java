@@ -16,23 +16,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
+package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball;
 
-import playground.thibautd.utils.KDTree;
-
-import java.util.Set;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 
 /**
  * @author thibautd
  */
-public interface CliquesFiller {
-	/**
-	 * Sample a feasible clique, fills the alters lists of the egos, and returns the clique.
-	 * @param ego the "center" of the clique
-	 * @param egosWithFreeStubs
-	 * @return The set of egos pertaining to the clique, including the "center", already modified.
-	 */
-	Set<Ego> sampleClique( Ego ego, KDTree<Ego> egosWithFreeStubs );
-
-	boolean stopConsidering( Ego ego );
+public interface Position {
+	double[] calcPosition( Ego center, SocialPositions.CliquePosition position );
 }

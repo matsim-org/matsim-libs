@@ -31,6 +31,8 @@ import java.util.Random;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleBiFunction;
 
+import static playground.ivt.router.TripSoftCache.LocationType.coord;
+
 /**
  * Basic implementation of a KD-Tree, to answer spatial queries in spaces of arbitrary dimensions.
  * Balance is not enforced (yet).
@@ -373,6 +375,15 @@ public class KDTree<T> {
 			final double[] coord ,
 			final ToDoubleBiFunction<double[],double[]> distance,
 			final Predicate<T> predicate ) {
+		return getClosest( coord , distance , predicate , 0d );
+	}
+
+
+	public T getClosest(
+			final double[] coord ,
+			final ToDoubleBiFunction<double[],double[]> distance,
+			final Predicate<T> predicate,
+			final double precision) {
 		T closest = null;
 		double bestDist = Double.POSITIVE_INFINITY;
 
@@ -420,6 +431,8 @@ public class KDTree<T> {
 				if ( currentDist < bestDist && predicate.test( current.value ) ) {
 					closest = current.value;
 					bestDist = currentDist;
+					// early abort. Default precision means abort if distance exactly 0
+					if ( currentDist <= precision ) return closest;
 				}
 
 				// could take care of order to make pruning more probable

@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * @author thibautd
@@ -45,7 +44,7 @@ public class SocialNetworkSampler {
 	private final Random random = MatsimRandom.getLocalInstance();
 
 	private final Population population;
-	private final DegreeDistribution degreeDistribution;
+	private final EgoCharacteristicsDistribution egoDistribution;
 	private final CliquesFiller cliquesFiller;
 	private final EgoLocator egoLocator;
 
@@ -54,11 +53,11 @@ public class SocialNetworkSampler {
 	@Inject
 	public SocialNetworkSampler(
 			final Population population,
-			final DegreeDistribution degreeDistribution,
+			final EgoCharacteristicsDistribution degreeDistribution,
 			final CliquesFiller cliquesFiller,
 			final EgoLocator egoLocator ) {
 		this.population = population;
-		this.degreeDistribution = degreeDistribution;
+		this.egoDistribution = degreeDistribution;
 		this.cliquesFiller = cliquesFiller;
 		this.egoLocator = egoLocator;
 	}
@@ -70,7 +69,7 @@ public class SocialNetworkSampler {
 	public SocialNetwork sampleSocialNetwork() {
 		final Map<Id<Person>,Ego> egos = new HashMap<>();
 		for ( Person p : population.getPersons().values() ) {
-			final Ego ego = new Ego( p , degreeDistribution.sampleDegree( p ) );
+			final Ego ego = egoDistribution.sampleEgo( p );
 			egos.put( p.getId() , ego );
 		}
 		final KDTree<Ego> egosWithFreeStubs = new KDTree<>( egoLocator.getDimensionality() , egoLocator );
@@ -84,10 +83,13 @@ public class SocialNetworkSampler {
 			final Ego ego = egosWithFreeStubs.get( random.nextInt( egosWithFreeStubs.size() ) );
 
 			final Set<Ego> clique = cliquesFiller.sampleClique( ego , egosWithFreeStubs );
+			// cliquesFiller is allowed to choke on a agent, but it is then expected to take care
+			// of updating egosWithFreeStubs itself. Not best design, try to solve that, might get messy!
+			if ( clique == null ) continue;
 			cliquesListener.accept( clique );
 
 			for ( Ego member : clique ) {
-				if ( member.getDegree() <= member.getAlters().size() ) {
+				if ( cliquesFiller.stopConsidering( member ) ) {
 					egosWithFreeStubs.remove( member );
 				}
 			}
@@ -108,67 +110,7 @@ public class SocialNetworkSampler {
 		log.info( "Average actual degree is "+((double) sumActualDegrees / egos.size()) );
 		log.info( "Number of excedentary ties: "+(sumActualDegrees - sumPlannedDegrees) );
 
-		return new SocialNetwork() {
-			@Override
-			public void addEgo( final Id<Person> id ) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public void addEgos( final Iterable<? extends Id<Person>> ids ) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public void addBidirectionalTie( final Id<Person> id1, final Id<Person> id2 ) {
-				throw new UnsupportedOperationException();
-
-			}
-
-			@Override
-			public void addMonodirectionalTie( final Id<Person> ego, final Id<Person> alter ) {
-				throw new UnsupportedOperationException();
-
-			}
-
-			@Override
-			public Set<Id<Person>> getAlters( final Id<Person> ego ) {
-				return egos.get( ego ).getAlters()
-						.stream()
-						.map( Ego::getId )
-						.collect( Collectors.toSet() );
-			}
-
-			@Override
-			public Set<Id<Person>> getEgos() {
-				return egos.keySet();
-			}
-
-			@Override
-			public Map<Id<Person>, Set<Id<Person>>> getMapRepresentation() {
-				return egos.values().stream()
-						.collect( Collectors.toMap(
-								Ego::getId,
-								e -> e.getAlters().stream()
-										.map( Ego::getId )
-										.collect( Collectors.toSet() ) ));
-			}
-
-			@Override
-			public boolean isReflective() {
-				return true;
-			}
-
-			private final Map<String, String> metadata = new HashMap<>();
-			@Override
-			public Map<String, String> getMetadata() {
-				return metadata;
-			}
-
-			@Override
-			public void addMetadata( final String att, final String value ) {
-				metadata.put( att , value );
-			}
-		};
+		return new SampledSocialNetwork( egos );
 	}
+
 }
