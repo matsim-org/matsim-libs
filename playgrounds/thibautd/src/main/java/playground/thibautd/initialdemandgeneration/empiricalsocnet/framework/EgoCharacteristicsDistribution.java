@@ -23,6 +23,6 @@ import org.matsim.api.core.v01.population.Person;
 /**
  * @author thibautd
  */
-public interface DegreeDistribution {
-	int sampleDegree( Person person );
+public interface EgoCharacteristicsDistribution {
+	Ego sampleEgo( Person person );
 }

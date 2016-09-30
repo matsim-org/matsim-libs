@@ -44,7 +44,7 @@ public class SocialNetworkSampler {
 	private final Random random = MatsimRandom.getLocalInstance();
 
 	private final Population population;
-	private final DegreeDistribution degreeDistribution;
+	private final EgoCharacteristicsDistribution egoDistribution;
 	private final CliquesFiller cliquesFiller;
 	private final EgoLocator egoLocator;
 
@@ -53,11 +53,11 @@ public class SocialNetworkSampler {
 	@Inject
 	public SocialNetworkSampler(
 			final Population population,
-			final DegreeDistribution degreeDistribution,
+			final EgoCharacteristicsDistribution degreeDistribution,
 			final CliquesFiller cliquesFiller,
 			final EgoLocator egoLocator ) {
 		this.population = population;
-		this.degreeDistribution = degreeDistribution;
+		this.egoDistribution = degreeDistribution;
 		this.cliquesFiller = cliquesFiller;
 		this.egoLocator = egoLocator;
 	}
@@ -69,7 +69,7 @@ public class SocialNetworkSampler {
 	public SocialNetwork sampleSocialNetwork() {
 		final Map<Id<Person>,Ego> egos = new HashMap<>();
 		for ( Person p : population.getPersons().values() ) {
-			final Ego ego = new Ego( p , degreeDistribution.sampleDegree( p ) );
+			final Ego ego = egoDistribution.sampleEgo( p );
 			egos.put( p.getId() , ego );
 		}
 		final KDTree<Ego> egosWithFreeStubs = new KDTree<>( egoLocator.getDimensionality() , egoLocator );

@@ -20,7 +20,7 @@ package playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowba
 
 import com.google.inject.AbstractModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesFiller;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.DegreeDistribution;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoCharacteristicsDistribution;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoLocator;
 
 /**
@@ -38,7 +38,7 @@ public class SimpleSnowballModule extends AbstractModule {
 		bind( EgoLocator.class ).to( SnowballLocator.class );
 		bind( SimpleCliquesFiller.Position.class ).to( SnowballLocator.class );
 
-		bind( DegreeDistribution.class ).to( SimpleDegreeDistribution.class );
+		bind( EgoCharacteristicsDistribution.class ).to( SimpleEgoDistribution.class );
 
 		bind( CliquesFiller.class ).to( SimpleCliquesFiller.class );
 
