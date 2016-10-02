@@ -1,5 +1,7 @@
 package cba;
 
+import java.util.Arrays;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -12,7 +14,9 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ExperiencedPlansModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -40,7 +44,6 @@ public class Main {
 		if (outerIt == 1) {
 
 			final int popSize = 100;
-
 			DemandModel.initializePopulation(scenario, popSize);
 
 		} else {
@@ -54,10 +57,33 @@ public class Main {
 			reader.readFile("./testdata/cba/output/ITERS/it." + lastIt + "/" + lastIt + ".events.xml.gz");
 			final TravelTime carTravelTime = travelTimeCalculator.getLinkTravelTimes();
 
-			final Provider<TripRouter> tripRouterProvider = null; // TODO
+			// >>>>>>>>>> COPY & PASTE FROM TripRouterImplTest.java >>>>>>>>>>
 
-			DemandModel.replanPopulation(scenario, tripRouterProvider, replanProba);
+			/*
+			 * TODO Does this now behave like the TripRouter in the last
+			 * iteration of the last simulation run (from which the
+			 * carTravelTime comes)? Where do the PT travel times come from?
+			 */
 
+			final com.google.inject.Injector injector = org.matsim.core.controler.Injector
+					.createInjector(scenario.getConfig(), new AbstractModule() {
+						@Override
+						public void install() {
+							install(AbstractModule.override(Arrays.asList(new TripRouterModule()),
+									new AbstractModule() {
+										@Override
+										public void install() {
+											install(new ScenarioByInstanceModule(scenario));
+											addTravelTimeBinding("car").toInstance(carTravelTime);
+										}
+									}));
+						}
+					});
+			final Provider<TripRouter> factory = injector.getProvider(TripRouter.class);
+
+			// <<<<<<<<<< COPY & PASTE FROM TripRouterImplTest.java <<<<<<<<<<
+
+			DemandModel.replanPopulation(scenario, factory, replanProba);
 		}
 
 		final PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());

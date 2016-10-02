@@ -161,8 +161,12 @@ class UtilityFunction {
 		/*
 		 * 
 		 */
-		this.timeOpt = new TimeStructureOptimizer(this.scenario, tripRouterProvider);
 
+		if (tripRouterProvider != null) {
+			this.timeOpt = new TimeStructureOptimizer(this.scenario, tripRouterProvider);
+		} else {
+			this.timeOpt = null;
+		}
 	}
 
 	// -------------------- INTERNALS --------------------
@@ -210,7 +214,9 @@ class UtilityFunction {
 		double result = this.tourActSeq2asc.get(this.tourPurposes);
 
 		// Score of optimal time structure
-		result += this.timeOpt.computeScore(plan);
+		if (this.timeOpt != null) {
+			result += this.timeOpt.computeScore(plan);
+		}
 
 		for (int i = 0; i < this.tourPurposes.size(); i++) {
 			final Tour.Act act = this.tourPurposes.get(i);
