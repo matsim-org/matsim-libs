@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.opdyts;
+package playground.agarwalamit.opdyts.patna;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -31,96 +31,43 @@ import opdytsintegration.MATSimSimulator;
 import opdytsintegration.MATSimStateFactoryImpl;
 import opdytsintegration.utils.TimeDiscretization;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
+import org.matsim.core.scenario.ScenarioUtils;
+import playground.agarwalamit.opdyts.ModalStatsControlerListner;
+import playground.agarwalamit.opdyts.ModeChoiceObjectiveFunction;
+import playground.agarwalamit.opdyts.ModeChoiceRandomizer;
+import playground.agarwalamit.opdyts.OpdytsObjectiveFunctionCases;
+import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable;
-import playground.kairuns.run.KNBerlinControler;
 
 /**
  * @author amit
  */
 
-public class MatsimOpdytsEquilMixedTrafficIntegration {
+public class PatnaOpdytsCalibrator {
 
-	private static final String EQUIL_DIR = "./matsim/examples/equil-mixedTraffic/";
-	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil-mixedTraffic/";
+	private static final String OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/output/";
+	private static final String configDir = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/input/";
 
 	public static void main(String[] args) {
 		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
-		Config config = ConfigUtils.loadConfig(EQUIL_DIR+"/config.xml");
+		Config config = ConfigUtils.loadConfig(configDir+"/config_urban_1pct.xml");
+		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn); // must be warn, since opdyts override few things
 
 		config.controler().setOutputDirectory(OUT_DIR);
-		config.plans().setInputFile("plans2000.xml.gz");
+		config.qsim().setEndTime(50.*3600.);
 
-		//== default config has limited inputs
-		StrategyConfigGroup strategies = config.strategy();
-		strategies.clearStrategySettings();
-
-		config.changeMode().setModes(new String [] {"car","bicycle"});
-		StrategySettings modeChoice = new StrategySettings();
-		modeChoice.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.name()); // dont know, how it will work
-		modeChoice.setWeight(0.1);
-		config.strategy().addStrategySettings(modeChoice);
-
-		StrategySettings expChangeBeta = new StrategySettings();
-		expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
-		expChangeBeta.setWeight(0.9);
-		config.strategy().addStrategySettings(expChangeBeta);
-
-		//==
-
-		//== planCalcScore params (initialize will all defaults).
-		for ( PlanCalcScoreConfigGroup.ActivityParams params : config.planCalcScore().getActivityParams() ) {
-			params.setTypicalDurationScoreComputation( PlanCalcScoreConfigGroup.TypicalDurationScoreComputation.relative );
-		}
-
-		// remove other mode params
-		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore();
-		for ( PlanCalcScoreConfigGroup.ModeParams params : planCalcScoreConfigGroup.getModes().values() ) {
-			planCalcScoreConfigGroup.removeParameterSet(params);
-		}
-
-		PlanCalcScoreConfigGroup.ModeParams mpCar = new PlanCalcScoreConfigGroup.ModeParams("car");
-		PlanCalcScoreConfigGroup.ModeParams mpBike = new PlanCalcScoreConfigGroup.ModeParams("bicycle");
-
-		planCalcScoreConfigGroup.addModeParams(mpCar);
-		planCalcScoreConfigGroup.addModeParams(mpBike);
-		//==
-
-		//==
-		config.qsim().setTrafficDynamics( QSimConfigGroup.TrafficDynamics.withHoles );
-
-		if ( config.qsim().getTrafficDynamics()== QSimConfigGroup.TrafficDynamics.withHoles ) {
-			config.qsim().setInflowConstraint(QSimConfigGroup.InflowConstraint.maxflowFromFdiag);
-		}
-
-		config.qsim().setUsingFastCapacityUpdate(true);
-		//==
-
-		Scenario scenario = KNBerlinControler.prepareScenario(true, config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		double time = 6*3600. ;
-		for ( Person person : scenario.getPopulation().getPersons().values() ) {
-			Plan plan = person.getSelectedPlan() ;
-			Activity activity = (Activity) plan.getPlanElements().get(0) ;
-			activity.setEndTime(time);
-			time++ ;
-		}
 
-
+		// == opdyts settings
 		// this is something like time bin generator
 		int startTime= 0;
 		int binSize = 3600; // can this be scenario simulation end time.
@@ -130,6 +77,9 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		Set<String> modes2consider = new HashSet<>();
 		modes2consider.add("car");
 		modes2consider.add("bike");
+		modes2consider.add("motorbike");
+		modes2consider.add("pt");
+		modes2consider.add("walk");
 
 		ModalStatsControlerListner stasControlerListner = new ModalStatsControlerListner(modes2consider);
 
@@ -140,8 +90,9 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 			@Override
 			public void install() {
 				// add here whatever should be attached to matsim controler
-				addTravelTimeBinding("bicycle").to(networkTravelTime());
-				addTravelDisutilityFactoryBinding("bicycle").to(carTravelDisutilityFactoryKey());
+				addTravelTimeBinding("bike").to(networkTravelTime());
+				addTravelDisutilityFactoryBinding("bike").to(carTravelDisutilityFactoryKey());
+				// no need to input for motorbike, should be inserted auto-magically
 
 				// some stats
 				addControlerListenerBinding().to(KaiAnalysisListener.class);
@@ -151,7 +102,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		// this is the objective Function which returns the value for given SimulatorState
 		// in my case, this will be the distance based modal split
-		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(OpdytsObjectiveFunctionCases.EQUIL_MIXEDTRAFFIC); // in this, the method argument (SimulatorStat) is not used.
+		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(OpdytsObjectiveFunctionCases.PATNA); // in this, the method argument (SimulatorStat) is not used.
 
 		//search algorithm
 		int maxIterations = 10; // this many times simulator.run(...) and thus controler.run() will be called.

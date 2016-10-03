@@ -19,24 +19,21 @@
 
 package playground.agarwalamit.opdyts;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.*;
+import javax.inject.Inject;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.modalShare.FilteredModalShareEventHandler;
-
-import javax.inject.Inject;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.*;
 
 /**
  * Created by amit on 20/09/16.
@@ -49,11 +46,11 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
     private BufferedWriter writer;
     private final Set<String> mode2consider;
 
-    ModalStatsControlerListner(final Set<String> mode2optimize) {
+    public ModalStatsControlerListner(final Set<String> mode2optimize) {
         this.mode2consider = mode2optimize;
     }
 
-    ModalStatsControlerListner() {
+    public ModalStatsControlerListner() {
         this.mode2consider = new HashSet<>();
         this.mode2consider.add(TransportMode.car);
         this.mode2consider.add(TransportMode.pt);
