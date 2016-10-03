@@ -141,6 +141,15 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 					Coord c2 = OTFServerQuadTree.getOTFTransformation().transform(coord);
 					ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), act.getType());
 					activityInfo.finished = 0.5;
+
+					activityInfo.activityStartTime = act.getStartTime() ;
+					// yyyy using essentially deprecated attribute, not so good.  Should rather listen to the actual 
+					// activity start time.  kai, oct'16
+
+					activityInfo.activityEndTime = act.getEndTime() ;
+					// This, however, I do not find so bad: The diagram refers to the originally planned activity end time.
+					// kai, oct'16
+
 					result.acts.add(activityInfo);
 				}
 			}
@@ -282,13 +291,13 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			if (vert != null) {
 				drawPlanPolyLine(gl);
 			}
-			drawActivityTexts();
+			drawActivityTexts(drawer.getCurrentTime());
 			Point2D.Double agentCoords = drawer.getCurrentSceneGraph().getAgentPointLayer().getAgentCoords(this.agentId.toCharArray());
 			if (agentCoords != null) {
 				// We know where the agent is, so we draw stuff around them.
 				drawArrowFromAgentToTextLabel(agentCoords, gl);
 				drawCircleAroundAgent(agentCoords, gl);
-				drawLabelText(drawer, agentCoords);
+				drawLabelText(drawer, agentCoords, agentId);
 			}
 		}
 
@@ -324,16 +333,16 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			GLUtils.drawCircle(gl, (float) pos.x, (float) pos.y, size);
 		}
 
-		private void drawActivityTexts() {
+		private void drawActivityTexts(double now) {
 			GLAutoDrawable drawable = OTFClientControl.getInstance().getMainOTFDrawer().getCanvas();
 			TextRenderer textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 32), true, false);
 			textRenderer.setColor(new Color(50, 50, 128, 128));
 			for (ActivityInfo activityEntry : this.acts ) {
-				drawTextBox(drawable, textRenderer, activityEntry);
+				drawTextBox(drawable, textRenderer, activityEntry, now);
 			}
 		}
 
-		private void drawTextBox(GLAutoDrawable drawable, TextRenderer textRenderer, ActivityInfo activityEntry) {
+		private static void drawTextBox(GLAutoDrawable drawable, TextRenderer textRenderer, ActivityInfo activityEntry, double now) {
 			float scale = (float) OTFClientControl.getInstance().getMainOTFDrawer().getScale();
 
 			// The size of the whole text box, including the progress bar.
@@ -384,7 +393,9 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 			// Origin (0,0,0) is now again the activity location.
 			// Draw the progress bar.
-			if (activityEntry.finished > 0f) {
+//			if (activityEntry.finished > 0f) {
+			if ( activityEntry.activityStartTime < now && now < activityEntry.activityEndTime ) {
+				double fraction = ( now - activityEntry.activityStartTime ) / ( activityEntry.activityEndTime - activityEntry.activityStartTime ) ;
 				gl.glColor4f(0.9f, 0.7f, 0.7f, 0.5f);
 				gl.glBegin(GL_QUADS);
 				gl.glVertex3d(0, -halfh, 0);
@@ -396,8 +407,10 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 				gl.glBegin(GL_QUADS);
 				gl.glVertex3d(0, -halfh, 0);
 				gl.glVertex3d(0, -halfh -7, 0);
-				gl.glVertex3d(textBounds.getWidth()*activityEntry.finished, -halfh -7, 0);
-				gl.glVertex3d(textBounds.getWidth()*activityEntry.finished, -halfh, 0);
+//				gl.glVertex3d(textBounds.getWidth()*activityEntry.finished, -halfh -7, 0);
+//				gl.glVertex3d(textBounds.getWidth()*activityEntry.finished, -halfh, 0);
+				gl.glVertex3d(textBounds.getWidth()*fraction, -halfh -7, 0);
+				gl.glVertex3d(textBounds.getWidth()*fraction, -halfh, 0);
 				gl.glEnd();
 				gl.glColor4f(0.9f, 0.9f, 0.9f, 0.5f);
 			}
@@ -405,9 +418,9 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			gl.glDisable(GL.GL_BLEND);
 		}
 
-		private void drawLabelText(OTFOGLDrawer drawer, Point2D.Double pos) {
+		private static void drawLabelText(OTFOGLDrawer drawer, Point2D.Double pos, String agentId) {
 			TextRenderer textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 32), true, false);
-			InfoText agentText = new InfoText(this.agentId, (float) pos.x + 250, (float) pos.y + 250);
+			InfoText agentText = new InfoText(agentId, (float) pos.x + 250, (float) pos.y + 250);
 			agentText.setAlpha(0.7f);
 			agentText.draw(textRenderer, OTFClientControl.getInstance().getMainOTFDrawer().getCanvas(), drawer.getViewBoundsAsQuadTreeRect());
 		}
@@ -429,7 +442,9 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		private static final long serialVersionUID = 1L;
 		float east, north;
 		String name;
-		public double finished;
+		double finished;
+		double activityStartTime ;
+		double activityEndTime ;
 
 		ActivityInfo(float east, float north, String name) {
 			this.east = east;
