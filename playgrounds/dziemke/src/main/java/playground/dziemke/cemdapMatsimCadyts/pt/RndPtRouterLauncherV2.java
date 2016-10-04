@@ -62,7 +62,6 @@ public class RndPtRouterLauncherV2 {
 
 		Config config = ConfigUtils.loadConfig(configFile);
 
-		System.out.println(config.ptCounts().getPtCountsInterval());
 		config.ptCounts().setPtCountsInterval(5);
 
 //		config.vspExperimental().setAbleToOverwritePtInteractionParams(true);
