@@ -9,6 +9,12 @@
 	<groupId>playground</groupId>
 	<artifactId>agarwalamit</artifactId>
 	<name>agarwalamit</name>
+	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
 	<dependencies>
 <!-- 		<dependency> -->
 <!-- 			<groupId>org.matsim.contrib</groupId> -->
@@ -76,6 +82,15 @@
 		<!--<artifactId>floetteroed-utilities</artifactId>-->
 		<!--<version>1.0.0</version>-->
 	<!--</dependency>-->
+
+	<!--trying to add gunnar/opdyts directly from github-->
+		<dependency>
+			<groupId>com.github.gunnarfloetteroed</groupId>
+			<artifactId>java</artifactId>
+			<version>master-SNAPSHOT</version>
+			<!--<version>cdc96ff</version>-->
+		</dependency>
+
 	</dependencies>
 
 </project>
