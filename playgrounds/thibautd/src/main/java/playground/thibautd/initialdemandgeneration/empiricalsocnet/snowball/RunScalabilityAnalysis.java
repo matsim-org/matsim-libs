@@ -70,6 +70,8 @@ public class RunScalabilityAnalysis {
 					writer.newLine();
 					writer.write( (sample * scalabilityConfigGroup.getBasisSample())+"\t" );
 					writer.write( tryNr+"\t"+(end - start) );
+					// make results available directly
+					writer.flush();
 				}
 			}
 		}
