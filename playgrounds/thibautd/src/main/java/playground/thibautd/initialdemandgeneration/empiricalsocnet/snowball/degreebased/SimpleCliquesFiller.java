@@ -129,7 +129,7 @@ public class SimpleCliquesFiller implements CliquesFiller {
 		return ego.getDegree() <= ego.getAlters().size();
 	}
 
-	public static Ego findEgo( final KDTree<Ego> egosWithFreeStubs,
+	private static Ego findEgo( final KDTree<Ego> egosWithFreeStubs,
 			final SocialPositions.CliquePositions clique,
 			final double[] point,
 			final Set<Ego> currentClique ) {
