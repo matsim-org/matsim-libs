@@ -97,42 +97,54 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                                 databins.addValue( "bicycle", 8, 4000.- carVal);
                                 break;
                             case PATNA:
-                                double totalLegs = 13278.0;
+                                double totalLegs = 13278.0 * 2.0; // each person make two trips; here trips are counted not persons.
+                                double legsSumAllModes = 0;
                             {
                                 double [] carVals = {6.0, 17.0, 20.0, 19.0, 26.0, 12.0};
                                 double carLegs = 0.02 * totalLegs;
                                 for (int idx = 0; idx < dataBoundariesTmp.length; idx++) {
-                                    databins.addValue("car", idx, (double) Math.round( carLegs * carVals[idx] / 100.));
+                                    double legs = Math.round( carLegs * carVals[idx] / 100.);
+                                    databins.addValue("car", idx, legs);
+                                    legsSumAllModes += legs;
                                 }
                             }
                             {
                                 double [] motorbikeVals = {7.0, 35.0, 19.0, 23.0, 8.0, 8.0};
                                 double motorbikeLegs = 0.14 * totalLegs;
                                 for (int idx = 0; idx < dataBoundariesTmp.length; idx++) {
-                                    databins.addValue("car", idx, (double) Math.round( motorbikeLegs * motorbikeVals[idx] / 100.));
+                                    double legs = Math.round( motorbikeLegs * motorbikeVals[idx] / 100.);
+                                    databins.addValue("car", idx, legs);
+                                    legsSumAllModes += legs;
                                 }
                             }
                             {
                                 double [] bikeVals = {10.0, 51.0, 16.0, 15.0, 1.0, 7.0};
                                 double bikeLegs = 0.33 * totalLegs;
                                 for (int idx = 0; idx < dataBoundariesTmp.length; idx++) {
-                                    databins.addValue("car", idx, (double) Math.round(bikeLegs * bikeVals[idx] / 100.));
+                                    double legs = Math.round(bikeLegs * bikeVals[idx] / 100.);
+                                    databins.addValue("car", idx, legs);
+                                    legsSumAllModes += legs;
                                 }
                             }
                             {
                                 double [] ptVals = {6.4, 23.9, 34.5, 10.5, 12.7, 12.0};
                                 double ptLegs = 0.22 * totalLegs;
                                 for (int idx = 0; idx < dataBoundariesTmp.length; idx++) {
-                                    databins.addValue("car", idx, (double) Math.round(ptLegs * ptVals[idx] / 100.));
+                                    double legs = Math.round(ptLegs * ptVals[idx] / 100.);
+                                    databins.addValue("car", idx, legs);
+                                    legsSumAllModes += legs;
                                 }
                             }
                             {
                                 double [] walkVals = {70.0, 28.0, 1.0, 1., 0.0, 0.0};
                                 double walkLegs = 0.29 * totalLegs;
                                 for (int idx = 0; idx < dataBoundariesTmp.length; idx++) {
-                                    databins.addValue("car", idx, (double) Math.round(walkLegs * walkVals[idx] / 100.));
+                                    double legs = Math.round(walkLegs * walkVals[idx] / 100.);
+                                    databins.addValue("car", idx, legs);
+                                    legsSumAllModes += legs;
                                 }
                             }
+                            System.out.println("Total legs "+totalLegs+" ans sum of all legs "+legsSumAllModes);
                             break;
                             default: throw new RuntimeException("not implemented");
                         }
