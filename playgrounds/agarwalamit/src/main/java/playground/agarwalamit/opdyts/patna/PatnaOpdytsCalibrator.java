@@ -52,12 +52,27 @@ import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVa
 
 public class PatnaOpdytsCalibrator {
 
-	private static final String OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/output/";
+	private static String OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/output/";
 	private static final String configDir = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/input/";
 
 	public static void main(String[] args) {
-		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
-		Config config = ConfigUtils.loadConfig(configDir+"/config_urban_1pct.xml");
+
+		Config config;
+		int iterationsToConvergence = 100; //
+		int averagingIterations = 10;
+		boolean isRunningOnCluster = false;
+
+		if (args.length>0) isRunningOnCluster = true;
+
+		if ( isRunningOnCluster ) {
+			OUT_DIR = args[0];
+			config = ConfigUtils.loadConfig(args[1]);
+			averagingIterations = Integer.valueOf(args[2]);
+			iterationsToConvergence = Integer.valueOf(args[3]);
+		} else {
+			config = ConfigUtils.loadConfig(configDir+"/config_urban_1pct.xml");
+		}
+
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn); // must be warn, since opdyts override few things
 
 		config.controler().setOutputDirectory(OUT_DIR);
@@ -65,7 +80,6 @@ public class PatnaOpdytsCalibrator {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-
 
 		// == opdyts settings
 		// this is something like time bin generator
@@ -92,7 +106,7 @@ public class PatnaOpdytsCalibrator {
 				// add here whatever should be attached to matsim controler
 				addTravelTimeBinding("bike").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("bike").to(carTravelDisutilityFactoryKey());
-				// no need to input for motorbike, should be inserted auto-magically
+				// no need to add travel time and travel disutility for motorbike (same as car), should be inserted auto-magically, now
 
 				// some stats
 				addControlerListenerBinding().to(KaiAnalysisListener.class);
@@ -119,8 +133,6 @@ public class PatnaOpdytsCalibrator {
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario);
 
 		// what would decide the convergence of the objective function
-		final int iterationsToConvergence = 100; //
-		final int averagingIterations = 10;
 		ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(iterationsToConvergence, averagingIterations);
 
 		RandomSearch<ModeChoiceDecisionVariable> randomSearch = new RandomSearch<>(
