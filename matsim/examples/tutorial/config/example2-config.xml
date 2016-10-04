@@ -28,7 +28,7 @@
 	</module>
 
 
-	<module name="simulation">
+	<module name="qsim">
 
 		<param name="snapshotperiod" value="00:01:00" />
 

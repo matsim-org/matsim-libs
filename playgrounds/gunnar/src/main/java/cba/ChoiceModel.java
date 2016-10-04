@@ -92,6 +92,7 @@ class ChoiceModel {
 			final Plan plan = alternative.asPlan(this.scenario, homeLoc.getId(), person);
 			planAlternatives.add(plan);
 			final double utility = this.utilityFunction.getUtility(plan);
+			plan.setScore(utility);
 			utilities.add(utility);
 			maxUtility = Math.max(maxUtility, utility);
 		}

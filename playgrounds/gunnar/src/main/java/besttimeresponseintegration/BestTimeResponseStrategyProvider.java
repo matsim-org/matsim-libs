@@ -33,7 +33,7 @@ public class BestTimeResponseStrategyProvider implements Provider<PlanStrategy> 
 
 	private final CharyparNagelScoringParametersForPerson scoringParams;
 
-	private final ExperiencedScoreAnalyzer experiencedScoreAnalyzer;
+	// private final ExperiencedScoreAnalyzer experiencedScoreAnalyzer;
 
 	private final Provider<TripRouter> tripRouterProvider;
 
@@ -42,14 +42,15 @@ public class BestTimeResponseStrategyProvider implements Provider<PlanStrategy> 
 	@Inject
 	BestTimeResponseStrategyProvider(final Scenario scenario,
 			final CharyparNagelScoringParametersForPerson scoringParams,
-			final ExperiencedScoreAnalyzer experiencedScoreAnalyzer, TimeDiscretizationInjection timeDiscrInj,
+			// final ExperiencedScoreAnalyzer experiencedScoreAnalyzer, 
+			final TimeDiscretizationInjection timeDiscrInj,
 			final Provider<TripRouter> tripRouterProvider) {
 		
 		this.randomPlanSelector = new RandomPlanSelector<>();
 		this.timeDiscr = timeDiscrInj.getInstance();
 		this.scenario = scenario;
 		this.scoringParams = scoringParams;
-		this.experiencedScoreAnalyzer = experiencedScoreAnalyzer;
+//		this.experiencedScoreAnalyzer = experiencedScoreAnalyzer;
 		this.tripRouterProvider = tripRouterProvider;
 	}
 
@@ -59,7 +60,8 @@ public class BestTimeResponseStrategyProvider implements Provider<PlanStrategy> 
 	public PlanStrategy get() {
 		final PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(this.randomPlanSelector);
 		final BestTimeResponseStrategyModule module = new BestTimeResponseStrategyModule(this.scenario,
-				this.scoringParams, this.timeDiscr, this.experiencedScoreAnalyzer, this.tripRouterProvider.get());
+				this.scoringParams, this.timeDiscr, // this.experiencedScoreAnalyzer, 
+				this.tripRouterProvider.get());
 		builder.addStrategyModule(module);
 		return builder.build();
 	}
