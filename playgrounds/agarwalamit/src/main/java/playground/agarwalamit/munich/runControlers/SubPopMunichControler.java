@@ -147,7 +147,7 @@ public class SubPopMunichControler {
 		ecg.setDetailedColdEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_ColdStart_SubSegm_2005detailed.txt");
 		ecg.setDetailedWarmEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_HOT_SubSegm_2005detailed.txt");
 		ecg.setEmissionRoadTypeMappingFile("../../munich/input/roadTypeMapping.txt");
-		ecg.setEmissionVehicleFile("../../munich/input/emissionVehicles_1pct.xml.gz");
+		controler.getConfig().vehicles().setVehiclesFile("../../munich/input/emissionVehicles_1pct.xml.gz");
 
 		if(offline){
 			ecg.setAverageColdEmissionFactorsFile("../../../input/matsimHBEFAStandardsFiles/EFA_ColdStart_vehcat_2005average.txt");
@@ -155,7 +155,7 @@ public class SubPopMunichControler {
 			ecg.setDetailedColdEmissionFactorsFile("../../../input/matsimHBEFAStandardsFiles/EFA_ColdStart_SubSegm_2005detailed.txt");
 			ecg.setDetailedWarmEmissionFactorsFile("../../../input/matsimHBEFAStandardsFiles/EFA_HOT_SubSegm_2005detailed.txt");
 			ecg.setEmissionRoadTypeMappingFile("../../../input/munich/roadTypeMapping.txt");
-			ecg.setEmissionVehicleFile("../../../input/munich/emissionVehicles_1pct.xml.gz");
+			controler.getConfig().vehicles().setVehiclesFile("../../../input/munich/emissionVehicles_1pct.xml.gz");
 		}
 
 		ecg.setUsingDetailedEmissionCalculation(true);

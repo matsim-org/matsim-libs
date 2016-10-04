@@ -22,7 +22,7 @@
  *  <li> Go to "CaseDefinition" > "New"</li>
  *  <li> Select the desired parameters:</li>
  *   <ul>
- *    <li> VEHICLE CATEGORIES: Currently, PC (passenger car) and HGV (heavy goods vehicle) are supported (see {@link org.matsim.contrib.emissions.types.HbefaVehicleCategory HbefaVehicleCategory})</li>
+ *    <li> VEHICLE CATEGORIES: Currently, PC (passenger car) and HGV (heavy goods vehicle) are supported. A third type, ZEV (zero emission vehicle) is also added to the category (see {@link org.matsim.contrib.emissions.types.HbefaVehicleCategory HbefaVehicleCategory})</li>
  *    <li> COMPONENTS: Currently, all pollutants listed under {@link org.matsim.contrib.emissions.types.WarmPollutant WarmPollutant} are supported; please choose accordingly</li>
  *    <li> YEARS: Choose the year of your scenario (only when exporting the mandatory average emission factors files)</li>
  *    <li> FLEET COMPOSITION: Choose "EF weighted with fleet composition" for the mandatory average emission factors files, and "EF per subsegment (without weighting)" for the optional detailed emission factors files</li>
@@ -46,11 +46,11 @@
  * at the {@link org.matsim.contrib.emissions.EmissionModule EmissionModule} 
  * or see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup} for a detailed description.
  * 
- * <li>emissionVehicleFile: This data type is defined in the EmissionsConfigGroup, 
- * see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup} and described as "definition of a vehicle
+ * <li>emissionVehicleFile: This data type is defined in the EmissionsConfigGroup,
+ * see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup}. The following information is surrounded by {@link org.matsim.contrib.emissions.utils.EmissionDescriptionMarker EmissionDescriptionMarker}. It is described as "definition of a vehicle
  *  for every person (who is allowed to choose a vehicle in the simulation):
  *  <ul>
- *  <li> REQUIRED: Vehicle type Id must start with the respective HbefaVehicleCategory followed by ";"
+ *  <li> REQUIRED: Vehicle description must start with the respective HbefaVehicleCategory followed by ";"
  *  <li> OPTIONAL: If detailed emission calculation is switched on, the vehicle type Id should additionally contain
  *  HbefaVehicleAttributes ("Technology;SizeClasse;EmConcept"), corresponding to the strings in detailedWarmEmissionFactorsFile (see below) </li>
  * </ul>

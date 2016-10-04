@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.carsharing.manager.demand.membership.MembershipContainer;
+import org.matsim.contrib.carsharing.manager.demand.membership.PersonMembership;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.StageActivityTypes;
@@ -53,10 +54,14 @@ public final class ChooseRandomTripMode implements PlanAlgorithm {
 			if (l.getMode().equals( "car" ) || l.getMode().equals( "bike" ) || l.getMode().equals("twoway"))
 				return;
 		
-		if (this.memberships.getPerPersonMemberships().get(personId).getMembershipsPerCSType().containsKey("freefloating"))
-			ffcard = true;
-		if (this.memberships.getPerPersonMemberships().get(personId).getMembershipsPerCSType().containsKey("oneway"))
-			owcard = true;
+		PersonMembership personMemmbership = this.memberships.getPerPersonMemberships().get(personId);
+		
+		if (personMemmbership != null) {
+			if (personMemmbership.getMembershipsPerCSType().containsKey("freefloating"))
+				ffcard = true;
+			if (personMemmbership.getMembershipsPerCSType().containsKey("oneway"))
+				owcard = true;
+		}
 		
 			//don't change the trips between the same links
 			if (!t.get(rndIdx).getOriginActivity().getLinkId().toString().equals(t.get(rndIdx).getDestinationActivity().getLinkId().toString()))

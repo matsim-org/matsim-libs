@@ -55,6 +55,7 @@ public class ExamplesByConfigfileTest {
 		filesToRun.add(new Object [] {"examples/tutorial/config/example1-config.xml"});
 		filesToRun.add(new Object [] {"examples/tutorial/config/example5-config.xml"});
 		filesToRun.add(new Object [] {"examples/tutorial/config/example5trips-config.xml"});
+		filesToRun.add(new Object [] {"examples/equil-mixedTraffic/config.xml"});
 //		----------
 		
 //		----------
@@ -68,10 +69,6 @@ public class ExamplesByConfigfileTest {
 //		not working configs
 //		-----
 //		filesToRun.add(new Object [] {"examples/equil-extended/config-with-roadpricing.xml"}); // yyyy throws exception; should be investigated and fixed.  (This can not work from core matsim after roadpricing was moved into a contrib!) kai, sep'16
-
-//		-----
-//		filesToRun.add(new Object [] {"examples/equil-mixedTraffic/config.xml"}); // yyyy throws exception; should be investigated and fixed.  kai, sep'16
-		// Currently not working without adding a new OverridingModule to the controler in Java code, see https://matsim.atlassian.net/browse/MATSIM-585 and https://matsim.atlassian.net/wiki/display/MATPUB/Mixed+traffic
 //		-----
 //		filesToRun.add(new Object [] {"examples/tutorial/config/externalReplanning.xml"}); // yyyy throws exception; should be investigated and fixed.  kai, sep'16 		
 		// adjusted some file paths in externalReplanning.xml. However, there is no longer any replanning.jar as referenced in externalReplanning.xml (neither at the path indicated nor elsewhere in the matsim repository). vsp-gleich, sep'16

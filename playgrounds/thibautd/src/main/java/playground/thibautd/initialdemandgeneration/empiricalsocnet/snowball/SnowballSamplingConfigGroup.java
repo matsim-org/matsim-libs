@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowball;
+package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -28,8 +28,12 @@ public class SnowballSamplingConfigGroup extends ReflectiveConfigGroup {
 
 	private String inputCliquesCsv = null;
 
+	public enum SamplingMethod { degreeBased, cliqueBased }
+
 	private boolean conditionCliqueSizeOnAge = false;
 	private boolean conditionCliqueSizeOnSex = false;
+
+	private SamplingMethod samplingMethod = SamplingMethod.degreeBased;
 
 	public SnowballSamplingConfigGroup( ) {
 		super( GROUP_NAME );
@@ -63,5 +67,15 @@ public class SnowballSamplingConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter("conditionCliqueSizeOnSex")
 	public void setConditionCliqueSizeOnSex( final boolean conditionCliqueSizeOnSex ) {
 		this.conditionCliqueSizeOnSex = conditionCliqueSizeOnSex;
+	}
+
+	@StringGetter("samplingMethod")
+	public SamplingMethod getSamplingMethod() {
+		return samplingMethod;
+	}
+
+	@StringSetter("samplingMethod")
+	public void setSamplingMethod( final SamplingMethod samplingMethod ) {
+		this.samplingMethod = samplingMethod;
 	}
 }

@@ -62,6 +62,11 @@ public final class TripRouter implements MatsimExtensionPoint {
 	private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
 
 	public TripRouter() {}
+	// yyyyyy I guess this is meant as a way to create the trip router without injection, and to set its internals afterwards.  But
+	// is it so sensible to have this in this way?  The injection stuff states that the material is immutable after injection; here we introduce a
+	// way to get around that again, and even to change the injected material later.  
+	// I would expect a Builder instead. 
+	// kai, sep'16
 
 	@Inject
 	TripRouter(Map<String, Provider<RoutingModule>> routingModules, MainModeIdentifier mainModeIdentifier) {

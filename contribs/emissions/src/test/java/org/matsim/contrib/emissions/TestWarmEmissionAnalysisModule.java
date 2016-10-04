@@ -33,6 +33,7 @@ import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactor;
 import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactorKey;
 import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -150,9 +151,12 @@ public class TestWarmEmissionAnalysisModule {
     @Test
 	public void testWarmEmissionAnalysisParameter(){
 		setUp();
-		WarmEmissionAnalysisModuleParameter weamp = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, null);
+		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
+		ecg.setUsingVehicleIdAsVehicleDescription(true);
+
+		WarmEmissionAnalysisModuleParameter weamp = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, null, ecg);
 		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
-		weamp = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, null, detailedHbefaWarmTable);
+		weamp = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, null, detailedHbefaWarmTable, ecg);
 		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
 	}
 	
@@ -179,7 +183,7 @@ public class TestWarmEmissionAnalysisModule {
 		Id<VehicleType> vehicleTypeId = Id.create(passengercar+ ";"+petrolTechnology+";"+petrolSizeClass+";"+petrolConcept, VehicleType.class);
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(vehicleTypeId));
-		
+
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, roadType, petrolSpeedFf/3.6, linkLength, linkLength/petrolSpeedFf*3.6);
 		Assert.assertEquals(detailedPetrolFactorFf*linkLength/1000., warmEmissions.get(WarmPollutant.CO2_TOTAL), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset();
@@ -258,7 +262,7 @@ public class TestWarmEmissionAnalysisModule {
 		Id<Link> lpgLinkId = Id.create("link 4", Link.class);
 		Id<Vehicle> lpgVehicleId = Id.create("veh 4", Vehicle.class);
 		double lpgLinkLength = 700.;
-		Id<VehicleType> lpgVehicleTypeId = Id.create(passengercar + ";"+ lpgTechnology+";"+lpgSizeClass+";"+lpgConcept, VehicleType.class);		
+		Id<VehicleType> lpgVehicleTypeId = Id.create(passengercar + ";"+ lpgTechnology+";"+lpgSizeClass+";"+lpgConcept, VehicleType.class);
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle lpgVehicle = vehFac.createVehicle(lpgVehicleId, vehFac.createVehicleType(lpgVehicleTypeId));
 		
@@ -368,6 +372,7 @@ public class TestWarmEmissionAnalysisModule {
 		Id<Vehicle> noeVehicleId = Id.create("veh 6", Vehicle.class);
 		Id<VehicleType> noeVehicleTypeId = Id.create("", VehicleType.class);
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
+
 		Vehicle noeVehicle = vehFac.createVehicle(noeVehicleId, vehFac.createVehicleType(noeVehicleTypeId));
 		
 		excep= false;
@@ -509,7 +514,7 @@ public class TestWarmEmissionAnalysisModule {
 		
 		
 	}
-	
+
 	@Test
 	public void testCounters2(){
 		setUp();
@@ -521,7 +526,7 @@ public class TestWarmEmissionAnalysisModule {
 		Id<VehicleType> lpgVehicleTypeId = Id.create(passengercar + ";"+ lpgTechnology+";"+lpgSizeClass+";"+lpgConcept, VehicleType.class);
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(lpgVehicleTypeId));
-		
+
 		// sub case: current speed equals free flow speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, roadType, lpgFreeVelocity/3.6, 
 				lpgLinkLength, lpgLinkLength/lpgFreeVelocity*3.6);
@@ -631,7 +636,7 @@ public class TestWarmEmissionAnalysisModule {
 		Id<VehicleType> inconffVehicleTypeId = Id.create(passengercar + ";"+petrolTechnology+";"+petrolSizeClass+";"+petrolConcept, VehicleType.class);
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle inconffVehicle = vehFac.createVehicle(inconffVehicleId, vehFac.createVehicleType(inconffVehicleTypeId));
-		
+
 		// average speed equals free flow speed from table
 		warmEmissions =weam.checkVehicleInfoAndCalculateWarmEmissions(inconffVehicle, roadType, inconffavgSpeed/3.6, inconff, inconff/petrolSpeedFf*3.6);
 		Assert.assertEquals(1, weam.getFractionOccurences());
@@ -663,7 +668,7 @@ public class TestWarmEmissionAnalysisModule {
 		Id<VehicleType> tableVehicleTypeId = Id.create(passengercar + ";" + tableTechnology +";" + tableSizeClass+";"+tableConcept, VehicleType.class);
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle tableVehicle = vehFac.createVehicle(tableVehicleId, vehFac.createVehicleType(tableVehicleTypeId));
-		
+
 		// ff < avg < ff+1 - handled like free flow
 		Double travelTime =  tableLinkLength/(tableffSpeed+0.5)*3.6;
 		weam.checkVehicleInfoAndCalculateWarmEmissions(tableVehicle, roadType, tableffSpeed/3.6, tableLinkLength, travelTime);
@@ -701,10 +706,10 @@ public class TestWarmEmissionAnalysisModule {
 		int roadType = 0;
 		double linkLength = 2*1000.; //in meter
 		Id<VehicleType> vehicleTypeId = Id.create(passengercar+ ";"+petrolTechnology+";"+petrolSizeClass+";"+petrolConcept, VehicleType.class);
-		double travelTime = linkLength/petrolSpeedSg*1.2; 
+		double travelTime = linkLength/petrolSpeedSg*1.2;
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(vehicleTypeId));
-		
+
 		weam.reset();
 		Assert.assertEquals(0, weam.getFractionOccurences());
 		Assert.assertEquals(0., weam.getFreeFlowKmCounter());
@@ -746,8 +751,11 @@ public class TestWarmEmissionAnalysisModule {
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 		
 		double rescaleF = 1.0003;
-		
-		WarmEmissionAnalysisModuleParameter weamParameter = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable);
+
+		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
+		ecg.setUsingVehicleIdAsVehicleDescription(true);
+
+		WarmEmissionAnalysisModuleParameter weamParameter = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, ecg);
 		WarmEmissionAnalysisModule weam = new WarmEmissionAnalysisModule(weamParameter , emissionEventManager, rescaleF);
 		HandlerToTestEmissionAnalysisModules.reset();
 		// ---- end of setup
@@ -782,7 +790,10 @@ public class TestWarmEmissionAnalysisModule {
 		fillDetailedTable(detailedHbefaWarmTable);
 
         EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
-        WarmEmissionAnalysisModuleParameter warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable);
+        EmissionsConfigGroup ecg = new EmissionsConfigGroup();
+		ecg.setUsingVehicleIdAsVehicleDescription(true);
+
+		WarmEmissionAnalysisModuleParameter warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, ecg);
 		weam = new WarmEmissionAnalysisModule(warmEmissionParameterObject, emissionEventManager, null);
 	}
 	
@@ -1206,8 +1217,8 @@ public class TestWarmEmissionAnalysisModule {
 	private void fillRoadTypeMapping(Map<Integer, String> roadTypeMapping) {
 		roadTypeMapping.put(0, hbefaRoadCategory);
 		
-	}		
-	
+	}
+
 }
 	
 

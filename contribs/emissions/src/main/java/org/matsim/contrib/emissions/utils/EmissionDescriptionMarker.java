@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,32 +16,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowball;
 
-import com.google.inject.AbstractModule;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesFiller;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.DegreeDistribution;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoLocator;
+
+package org.matsim.contrib.emissions.utils;
 
 /**
- * @author thibautd
+ * Created by amit on 29/09/16.
  */
-public class SimpleSnowballModule extends AbstractModule {
-	private final SnowballCliques snowballCliques;
+public enum EmissionDescriptionMarker {
 
-	public SimpleSnowballModule( final SnowballCliques snowballCliques ) {
-		this.snowballCliques = snowballCliques;
-	}
+    BEGIN_EMISSIONS, END_EMISSIONS;
 
-	@Override
-	protected void configure() {
-		bind( EgoLocator.class ).to( SnowballLocator.class );
-		bind( SimpleCliquesFiller.Position.class ).to( SnowballLocator.class );
-
-		bind( DegreeDistribution.class ).to( SimpleDegreeDistribution.class );
-
-		bind( CliquesFiller.class ).to( SimpleCliquesFiller.class );
-
-		bind( SnowballCliques.class ).toInstance( snowballCliques );
-	}
 }

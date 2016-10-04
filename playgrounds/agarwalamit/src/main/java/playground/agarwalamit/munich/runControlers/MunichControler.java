@@ -93,14 +93,14 @@ public class MunichControler {
 		ecg.setDetailedColdEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_ColdStart_SubSegm_2005detailed.txt");
 		ecg.setDetailedWarmEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_HOT_SubSegm_2005detailed.txt");
 		ecg.setEmissionRoadTypeMappingFile("../../munich/input/roadTypeMapping.txt");
-		ecg.setEmissionVehicleFile("../../munich/input/emissionVehicles_1pct.xml.gz");
+		controler.getConfig().vehicles().setVehiclesFile("../../munich/input/emissionVehicles_1pct.xml.gz");
 
 		//	      	ecg.setAverageColdEmissionFactorsFile("/Users/amit/Documents/workspace/input/matsimHBEFAStandardsFiles/EFA_ColdStart_vehcat_2005average.txt");
 		//			ecg.setAverageWarmEmissionFactorsFile("/Users/amit/Documents/workspace/input/matsimHBEFAStandardsFiles/EFA_HOT_vehcat_2005average.txt");
 		//			ecg.setDetailedColdEmissionFactorsFile("/Users/amit/Documents/workspace/input/matsimHBEFAStandardsFiles/EFA_ColdStart_SubSegm_2005detailed.txt");
 		//			ecg.setDetailedWarmEmissionFactorsFile("/Users/amit/Documents/workspace/input/matsimHBEFAStandardsFiles/EFA_HOT_SubSegm_2005detailed.txt");
 		//			ecg.setEmissionRoadTypeMappingFile("/Users/amit/Documents/workspace/input/munich/roadTypeMapping.txt");
-		//			ecg.setEmissionVehicleFile("/Users/amit/Documents/workspace/input/munich/emissionVehicles_1pct.xml.gz");
+		//			controler.getConfig().vehicles().setVehiclesFile("/Users/amit/Documents/workspace/input/munich/emissionVehicles_1pct.xml.gz");
 
 		ecg.setUsingDetailedEmissionCalculation(true);
 		//===only emission events genertaion; used with all runs for comparisons

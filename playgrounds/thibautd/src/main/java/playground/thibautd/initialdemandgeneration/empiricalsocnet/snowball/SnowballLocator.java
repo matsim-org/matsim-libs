@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowball;
+package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball;
 
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Coord;
@@ -25,14 +25,11 @@ import org.matsim.core.population.PersonUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoLocator;
 
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
-import static playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowball.SimpleCliquesFiller.getSex;
-
 /**
  * @author thibautd
  */
 @Singleton
-public class SnowballLocator implements EgoLocator, SimpleCliquesFiller.Position {
+public class SnowballLocator implements EgoLocator, Position {
 	// a difference in the categorical variables is equivalent to 10'000 km
 	private static double NON_SPATIAL_FACTOR = 10 * 1000 * 1000;
 
@@ -57,12 +54,12 @@ public class SnowballLocator implements EgoLocator, SimpleCliquesFiller.Position
 		return new double[]{
 				coord.getX() ,
 				coord.getY() ,
-				NON_SPATIAL_FACTOR * SimpleCliquesFiller.calcAgeClass( PersonUtils.getAge( ego.getPerson() ) ) ,
-				NON_SPATIAL_FACTOR * SimpleCliquesFiller.getSex( ego ).ordinal() };
+				NON_SPATIAL_FACTOR * SocialPositions.calcAgeClass( PersonUtils.getAge( ego.getPerson() ) ) ,
+				NON_SPATIAL_FACTOR * SocialPositions.getSex( ego ).ordinal() };
 	}
 
 	@Override
-	public double[] calcPosition( final Ego center, final SimpleCliquesFiller.CliquePosition position ) {
+	public double[] calcPosition( final Ego center, final SocialPositions.CliquePosition position ) {
 		final double[] egoCoord = getCoord( center );
 
 		final double xTranslation = Math.cos( position.getBearing() ) * position.getDistance();

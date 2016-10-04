@@ -25,6 +25,11 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
 
 /**
  * @author thibautd
@@ -32,6 +37,11 @@ import java.util.Set;
 public abstract class AbstractCsvWriter implements AutoCloseable {
 	private static final Logger log = Logger.getLogger( AbstractCsvWriter.class );
 	private final BufferedWriter writer;
+
+	// execute writing in a parallel thread, not to slow down the algorithm
+	// it is static to avoid too many threads for simple tasks (intuitively,
+	// one big networks, building the clique should be slower than all the writers combined)
+	private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
 	protected abstract String titleLine();
 	protected abstract Iterable<String> cliqueLines( Set<Ego> clique);
@@ -54,19 +64,31 @@ public abstract class AbstractCsvWriter implements AutoCloseable {
 	}
 
 	public final void write( final Set<Ego> egos ) {
-		for ( String l : cliqueLines( egos ) ) {
-			try {
-				writer.newLine();
-				writer.write( l );
+		// execute outside of parallel thread, to make sure eg. stopwatch can be implemented
+		final Iterable<String> lines = cliqueLines( egos );
+		executor.submit( () -> {
+			for ( String l : lines ) {
+				try {
+					writer.newLine();
+					writer.write( l );
+				}
+				catch ( IOException e ) {
+					throw new UncheckedIOException( e );
+				}
 			}
-			catch ( IOException e ) {
-				throw new UncheckedIOException( e );
-			}
-		}
+		});
 	}
 
 	@Override
-	public final void close() throws IOException {
+	public synchronized final void close() throws IOException, InterruptedException {
+		// synchronisation is not strictly necessary (one can call executor.shutdown repeteadly),
+		// but it allows to log to look at how long it takes.
+		if ( !executor.isShutdown() ) {
+			log.info( "shutting down writing thread..." );
+			executor.shutdown();
+			executor.awaitTermination( Long.MAX_VALUE , TimeUnit.DAYS );
+			log.info( "shutting down writing thread... DONE" );
+		}
 		writer.close();
 	}
 }

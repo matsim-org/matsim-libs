@@ -16,82 +16,65 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet.simplesnowball;
+package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.utils.collections.MapUtils;
-import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AbstractCsvWriter;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSampler;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
-import static org.matsim.core.utils.collections.MapUtils.getArbitraryObject;
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.w;
-
 /**
+ * Writer that writes egos' attributes
+ *
  * @author thibautd
  */
 @Singleton
-public class EgoCsvWriter implements AutoCloseable {
-	private final BufferedWriter writer;
-
-	private final Map<Id<Person>,EgoRecord> records = new HashMap<>();
-
+public class SnowballTiesCsvWriter extends AbstractCsvWriter {
 	@Inject
-	public EgoCsvWriter(
-			final ControlerConfigGroup controlerConfigGroup,
+	public SnowballTiesCsvWriter(
+			final ControlerConfigGroup config,
 			final SocialNetworkSampler sampler,
 			final AutocloserModule.Closer closer ) {
-		this.writer = IOUtils.getBufferedWriter( controlerConfigGroup.getOutputDirectory() +"/output_egos.dat" );
-
-		sampler.addCliqueListener( this::updateRecords );
-		closer.add( this );
-	}
-
-	private void updateRecords( final Set<Ego> egos ) {
-		for ( Ego ego : egos ) {
-			final EgoRecord record =
-					MapUtils.getArbitraryObject(
-							ego.getId(),
-							records,
-							() -> new EgoRecord( ego ) );
-
-			record.nCliques++;
-			// cannot compute triangles, because the same alter can theoretically appear in several cliques
-		}
+		super( config.getOutputDirectory() +"/output_ties_attr.csv" , sampler , closer );
 	}
 
 	@Override
-	public void close() throws IOException {
-		writer.write( "egoId\tnCliques\tnAlters\tplannedDegree\tE_age\tE_sex" );
-
-		for ( EgoRecord record : records.values() ) {
-			writer.newLine();
-			writer.write( record.ego.getId() +"\t"+ record.nCliques +"\t"+
-					record.ego.getAlters().size() +"\t"+ record.ego.getDegree() +"\t"+
-					PersonUtils.getAge( record.ego.getPerson() ) +"\t"+
-					SimpleCliquesFiller.getSex( record.ego ) );
-		}
-		writer.close();
+	protected String titleLine() {
+		return "egoId\tegoPlannedDegree\tegoAge\tegoSex" +
+				"\talterId\talterPlannedDegree\talterAge\talterSex" +
+				"\tdistance_m";
 	}
 
-	private static class EgoRecord {
-		private final Ego ego;
-		int nCliques = 0;
+	@Override
+	protected Iterable<String> cliqueLines( final Set<Ego> clique ) {
+		final List<String> lines = new ArrayList<>();
 
-		private EgoRecord( final Ego ego ) {
-			this.ego = ego;
+		for ( Ego ego : clique ) {
+			for ( Ego alter : clique ) {
+				// only write in one direction?
+				if ( alter == ego ) continue;
+
+				lines.add( ego.getId() +"\t"+ ego.getDegree() + "\t" +
+						PersonUtils.getAge( ego.getPerson() ) + "\t" +
+						SocialPositions.getSex( ego ) + "\t" +
+						alter.getId() +"\t"+ alter.getDegree() + "\t" +
+						PersonUtils.getAge( alter.getPerson() ) + "\t" +
+						SocialPositions.getSex( alter ) + "\t" +
+						CoordUtils.calcEuclideanDistance(
+								SnowballLocator.calcCoord( ego ),
+								SnowballLocator.calcCoord( alter ) ) );
+			}
 		}
+
+		return lines;
 	}
 }

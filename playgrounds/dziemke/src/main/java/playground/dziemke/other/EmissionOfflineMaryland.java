@@ -54,7 +54,7 @@ public class EmissionOfflineMaryland {
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg = (EmissionsConfigGroup) config.getModule(ecg.getName());
         ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
-        ecg.setEmissionVehicleFile(emissionVehicleFile);
+		config.vehicles().setVehiclesFile(emissionVehicleFile);
         
         ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
         ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);

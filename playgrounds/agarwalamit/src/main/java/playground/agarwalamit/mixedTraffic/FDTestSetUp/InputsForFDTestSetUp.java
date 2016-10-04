@@ -98,6 +98,7 @@ public class InputsForFDTestSetUp {
 		config.qsim().setMainModes(Arrays.asList(this.travelModes));
 		config.qsim().setStuckTime(stuckTime);//allows to overcome maximal density regime
 		config.qsim().setEndTime(END_TIME);
+		config.qsim().setUsingFastCapacityUpdate(true);
 
 		config.qsim().setLinkDynamics(linkDynamics.toString());
 		GenerateFundamentalDiagramData.LOG.info("==========The chosen link dynamics is "+linkDynamics+". =========="); 

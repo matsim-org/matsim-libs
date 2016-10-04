@@ -18,11 +18,37 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
 
-import org.matsim.api.core.v01.population.Person;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.matsim.core.config.groups.ControlerConfigGroup;
+
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * @author thibautd
  */
-public interface DegreeDistribution {
-	int sampleDegree( Person person );
+@Singleton
+public class StopwatchCsvWriter extends AbstractCsvWriter {
+	private final long startTime;
+	private int cliqueNr = 0;
+
+	@Inject
+	protected StopwatchCsvWriter(
+			final ControlerConfigGroup config,
+			final SocialNetworkSampler sampler,
+			final AutocloserModule.Closer closer ) {
+		super( config.getOutputDirectory() +"/cliquesStopWatch.dat", sampler, closer );
+		this.startTime = System.currentTimeMillis();
+	}
+
+	@Override
+	protected String titleLine() {
+		return "cliqueNr\ttotalElapsedTime_ms";
+	}
+
+	@Override
+	protected Iterable<String> cliqueLines( final Set<Ego> clique ) {
+		return Collections.singleton( (cliqueNr++ )+"\t"+(System.currentTimeMillis() - startTime) );
+	}
 }

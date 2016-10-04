@@ -231,7 +231,7 @@ public class TransitRouterConfig implements MatsimParameters {
 		this.additionalTransferTime = additionalTransferTime;
 	}
 
-	final Double getBeelineDistanceFactor() {
+	public final Double getBeelineDistanceFactor() {
 		return this.beelineDistanceFactor;
 	}
 
