@@ -28,7 +28,7 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 
 	private final TimeDiscretization timeDiscretization;
 
-	private final ExperiencedScoreAnalyzer experiencedScoreAnalyzer;
+	// private final ExperiencedScoreAnalyzer experiencedScoreAnalyzer;
 
 	private final TripRouter tripRouter;
 
@@ -37,12 +37,12 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 	// -------------------- CONSTRUCTION --------------------
 
 	BestTimeResponseStrategyModule(final Scenario scenario, final CharyparNagelScoringParametersForPerson scoringParams,
-			final TimeDiscretization timeDiscretization, final ExperiencedScoreAnalyzer experiencedScoreAnalyzer,
+			final TimeDiscretization timeDiscretization, // final ExperiencedScoreAnalyzer experiencedScoreAnalyzer,
 			final TripRouter tripRouter) {
 		this.scenario = scenario;
 		this.scoringParams = scoringParams;
 		this.timeDiscretization = timeDiscretization;
-		this.experiencedScoreAnalyzer = experiencedScoreAnalyzer;
+		// this.experiencedScoreAnalyzer = experiencedScoreAnalyzer;
 		this.tripRouter = tripRouter;
 	}
 
@@ -74,7 +74,7 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 		}
 
 		// >>>>>>>>>> TODO NEW >>>>>>>>>>
-		this.experiencedScoreAnalyzer.setExpectedScore(plan.getPerson().getId(), timeAlloc.getResultValue());
+		// this.experiencedScoreAnalyzer.setExpectedScore(plan.getPerson().getId(), timeAlloc.getResultValue());
 		// <<<<<<<<<< TODO NEW <<<<<<<<<<
 
 		/*

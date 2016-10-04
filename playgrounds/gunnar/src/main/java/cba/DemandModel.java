@@ -1,5 +1,7 @@
 package cba;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,10 +101,17 @@ class DemandModel {
 	}
 
 	static void replanPopulation(final Scenario scenario, final Provider<TripRouter> tripRouterProvider,
-			final double replanProba) {
+			final double replanProba, final String expectationFileName) {
 
 		final UtilityFunction utilityFunction = new UtilityFunction(scenario, tripRouterProvider);
 		final ChoiceModel choiceModel = new ChoiceModel(scenario, utilityFunction);
+
+		final PrintWriter expectationWriter;
+		try {
+			expectationWriter = new PrintWriter(expectationFileName);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			if (Math.random() < replanProba) {
@@ -115,7 +124,11 @@ class DemandModel {
 				person.addPlan(plan);
 				plan.setPerson(person);
 				person.setSelectedPlan(plan);
+				expectationWriter.println(person.getId() + "\t" + plan.getScore());
 			}
 		}
+
+		expectationWriter.flush();
+		expectationWriter.close();
 	}
 }
