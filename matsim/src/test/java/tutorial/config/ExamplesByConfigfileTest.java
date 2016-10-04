@@ -71,13 +71,13 @@ public class ExamplesByConfigfileTest {
 //		filesToRun.add(new Object [] {"examples/equil-extended/config-with-roadpricing.xml"}); // yyyy throws exception; should be investigated and fixed.  (This can not work from core matsim after roadpricing was moved into a contrib!) kai, sep'16
 //		-----
 //		filesToRun.add(new Object [] {"examples/tutorial/config/externalReplanning.xml"}); // yyyy throws exception; should be investigated and fixed.  kai, sep'16 		
-		// adjusted some file paths in externalReplanning.xml. However, there is no longer any replanning.jar as referenced in externalReplanning.xml (neither at the path indicated nor elsewhere in the matsim repository). vsp-gleich, sep'16
+		// adjusted some file paths in externalReplanning.xml. However, there is no longer any replanning.jar as referenced in externalReplanning.xml (neither at the path indicated nor elsewhere in the matsim repository). Delete? vsp-gleich, oct'16
 //		-----
 //		filesToRun.add(new Object [] {"examples/equil-extended/config-with-network-change-events.xml"}); // yyyy runs forever; should be investigated and fixed.  kai, sep'16
-		// All agents drive by car from link 1 to link 20 and back to link 1. As the networkChangeEvents.xml sets the free speed of link 1 where all agents depart (and other links) to 0 m/s before the first agent departs, no agent will ever arrive during the first iteration. Keep link 1 open? vsp-gleich, sep'16
+		// All agents drive by car from link 1 to link 20 and back to link 1. As the networkChangeEvents.xml sets the free speed of link 1 where all agents depart (and other links) to 0 m/s before the first agent departs, no agent will ever arrive during the first iteration. Keep link 1 open? vsp-gleich, oct'16
 //		-----
 //		filesToRun.add(new Object [] {"examples/tutorial/config/externalMobsim.xml"}); // yyyy throws exception; should be investigated and fixed.  kai, sep'16
-		// adjusted file paths in externalMobsim.xml. However, there is no longer any Mobsim.jar as referenced in externalMobsim.xml (neither at the path indicated nor elsewhere in the matsim repository). Uses config group "simulation" which no longer exists. vsp-gleich, sep'16
+		// adjusted file paths in externalMobsim.xml. However, there is no longer any Mobsim.jar as referenced in externalMobsim.xml (neither at the path indicated nor elsewhere in the matsim repository). Uses config group "simulation" which no longer exists. Delete? vsp-gleich, oct'16
 //		-----
 		
 		return filesToRun;
