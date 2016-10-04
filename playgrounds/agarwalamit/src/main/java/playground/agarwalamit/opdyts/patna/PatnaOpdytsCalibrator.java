@@ -39,12 +39,8 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.agarwalamit.opdyts.ModalStatsControlerListner;
-import playground.agarwalamit.opdyts.ModeChoiceObjectiveFunction;
-import playground.agarwalamit.opdyts.ModeChoiceRandomizer;
-import playground.agarwalamit.opdyts.OpdytsObjectiveFunctionCases;
+import playground.agarwalamit.opdyts.*;
 import playground.agarwalamit.utils.FileUtils;
-import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable;
 
 /**
  * @author amit
@@ -52,14 +48,14 @@ import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVa
 
 public class PatnaOpdytsCalibrator {
 
-	private static String OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/output/";
+	private static String OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/output222/";
 	private static final String configDir = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/input/";
 
 	public static void main(String[] args) {
 
 		Config config;
 		int iterationsToConvergence = 100; //
-		int averagingIterations = 10;
+		int averagingIterations = 20;
 		boolean isRunningOnCluster = false;
 
 		if (args.length>0) isRunningOnCluster = true;

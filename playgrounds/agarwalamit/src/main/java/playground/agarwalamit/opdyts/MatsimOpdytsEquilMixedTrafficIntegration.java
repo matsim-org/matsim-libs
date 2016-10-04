@@ -45,8 +45,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
-import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable;
-import playground.kairuns.run.KNBerlinControler;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author amit
@@ -109,7 +108,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		config.qsim().setUsingFastCapacityUpdate(true);
 		//==
 
-		Scenario scenario = KNBerlinControler.prepareScenario(true, config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);//KNBerlinControler.prepareScenario(true, config);
 		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		double time = 6*3600. ;

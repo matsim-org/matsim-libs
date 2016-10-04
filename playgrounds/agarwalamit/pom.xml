@@ -31,11 +31,11 @@
 			<artifactId>gunnar</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
-		<dependency>
-			<groupId>playground</groupId>
-			<artifactId>kai</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
-		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>playground</groupId>-->
+			<!--<artifactId>kai</artifactId>-->
+			<!--<version>0.9.0-SNAPSHOT</version>-->
+		<!--</dependency>-->
 <!-- 		<dependency> -->
 <!-- 			<groupId>org.matsim.contrib</groupId> -->
 <!-- 			<artifactId>emissions</artifactId> -->
@@ -66,16 +66,16 @@
 <!-- 		<artifactId>analysis</artifactId> -->
 <!-- 		<version>0.9.0-SNAPSHOT</version> -->
 <!-- 	</dependency> -->
-	<dependency>
-		<groupId>floetteroed.opdyts</groupId>
-		<artifactId>opdyts</artifactId>
-		<version>1.0.0</version>
-	</dependency>
-	<dependency>
-		<groupId>floetteroed.utilities</groupId>
-		<artifactId>floetteroed-utilities</artifactId>
-		<version>1.0.0</version>
-	</dependency>
+	<!--<dependency>-->
+		<!--<groupId>floetteroed.opdyts</groupId>-->
+		<!--<artifactId>opdyts</artifactId>-->
+		<!--<version>1.0.0</version>-->
+	<!--</dependency>-->
+	<!--<dependency>-->
+		<!--<groupId>floetteroed.utilities</groupId>-->
+		<!--<artifactId>floetteroed-utilities</artifactId>-->
+		<!--<version>1.0.0</version>-->
+	<!--</dependency>-->
 	</dependencies>
 
 </project>

@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable;
 
 import java.util.ArrayList;
 import java.util.List;

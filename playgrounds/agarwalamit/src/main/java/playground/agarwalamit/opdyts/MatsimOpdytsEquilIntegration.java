@@ -44,10 +44,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
-import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable;
-import playground.kairuns.run.KNBerlinControler;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author amit
@@ -97,7 +94,7 @@ public class MatsimOpdytsEquilIntegration {
 
 		//==
 
-		Scenario scenario = KNBerlinControler.prepareScenario(true, config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);//KNBerlinControler.prepareScenario(true, config);
 
 		double time = 6*3600. ;
 		for ( Person person : scenario.getPopulation().getPersons().values() ) {
@@ -133,7 +130,7 @@ public class MatsimOpdytsEquilIntegration {
 
 				// from KN
 				addControlerListenerBinding().to(KaiAnalysisListener.class);
-				bind(CharyparNagelScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
+//				bind(CharyparNagelScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
 			}
 		});
 
