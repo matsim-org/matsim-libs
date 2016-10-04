@@ -28,6 +28,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 import java.io.BufferedWriter;
@@ -47,6 +48,11 @@ public class MoreIOUtils {
 
 	private MoreIOUtils() {
 		//no instanciation 
+	}
+
+	public static void deleteDirectoryIfExists( final String dir ) {
+		final File file = new File( dir );
+		if ( file.exists() ) IOUtils.deleteDirectory( file );
 	}
 
 	public static File checkFile(final String file) {
