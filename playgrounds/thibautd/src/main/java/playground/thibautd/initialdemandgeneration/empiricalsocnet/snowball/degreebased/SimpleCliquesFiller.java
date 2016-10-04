@@ -23,6 +23,7 @@ import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.core.utils.misc.IntegerCache;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesFiller;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.Position;
@@ -101,6 +102,64 @@ public class SimpleCliquesFiller implements CliquesFiller {
 			cliqueSampler = allCliques;
 		}
 
+		switch ( configGroup.getConflictResolutionMethod() ) {
+			case overload:
+				return sampleOverloadedClique( ego, egosWithFreeStubs, cliqueSampler );
+			case resample:
+				final Set<Ego> members = new HashSet<>();
+				for ( int maxSize = cliqueSampler.getMaxSize(); maxSize > 1; ) {
+					final SocialPositions.CliquePositions clique =
+							sampleMaxSizedClique(
+									ego,
+									egosWithFreeStubs,
+									cliqueSampler,
+									maxSize,
+									members );
+					if ( clique.size() == members.size() ) return members;
+					members.clear();
+					// only cliques smaller than the current cliques are feasible
+					maxSize = clique.size() - 1;
+				}
+				// no clique was found...
+				egosWithFreeStubs.remove( ego );
+				return null;
+			default:
+				throw new RuntimeException( "unknown "+configGroup.getConflictResolutionMethod() );
+		}
+	}
+
+	private SocialPositions.CliquePositions sampleMaxSizedClique(
+			final Ego ego,
+			final KDTree<Ego> egosWithFreeStubs,
+			final CliqueSampler cliqueSampler,
+			final int maxSize,
+			final Set<Ego> members ) {
+		final SocialPositions.CliquePositions clique = cliqueSampler.sampleClique( random , maxSize );
+		if ( clique == null ) {
+			// no possible clique at all
+			egosWithFreeStubs.remove( ego );
+			return clique;
+		}
+
+		members.add( ego );
+		for ( SocialPositions.CliquePosition cliqueMember : clique ) {
+			// TODO: rotate? -> only once per clique
+			final double[] point = position.calcPosition( ego , cliqueMember );
+			final Ego member = findEgo( egosWithFreeStubs, clique, point , members , 1 );
+
+			if ( member == null ) {
+				return clique;
+			}
+
+			SocialPositions.group( member , members );
+		}
+
+		return clique;
+	}
+
+	private Set<Ego> sampleOverloadedClique( final Ego ego,
+			final KDTree<Ego> egosWithFreeStubs,
+			final CliqueSampler cliqueSampler ) {
 		final SocialPositions.CliquePositions clique = cliqueSampler.sampleClique( random , egosWithFreeStubs.size() );
 		if ( clique == null ) {
 			egosWithFreeStubs.remove( ego );
@@ -112,7 +171,7 @@ public class SimpleCliquesFiller implements CliquesFiller {
 		for ( SocialPositions.CliquePosition cliqueMember : clique ) {
 			// TODO: rotate? -> only once per clique
 			final double[] point = position.calcPosition( ego , cliqueMember );
-			final Ego member = findEgo( egosWithFreeStubs, clique, point , members );
+			final Ego member = findEgo( egosWithFreeStubs, clique, point , members , Integer.MAX_VALUE );
 
 			if ( member == null ) {
 				throw new RuntimeException( "no alter found at "+ Arrays.toString( point )+" for clique size "+clique.size() );
@@ -132,13 +191,14 @@ public class SimpleCliquesFiller implements CliquesFiller {
 	private static Ego findEgo( final KDTree<Ego> egosWithFreeStubs,
 			final SocialPositions.CliquePositions clique,
 			final double[] point,
-			final Set<Ego> currentClique ) {
+			final Collection<Ego> currentClique,
+			final int maxIter ) {
 		// Allow more ties than stubs in case no agent can be found.
 		// should remain OK, because:
 		// - clique size cannot exceed number of agents with free stubs
 		// - this can happen at most once per agent
 		// - we keep the increase minimal, by increasingly increasing tolerance.
-		for ( int i = 1; true; i++ ) {
+		for ( int i = 1; i <= maxIter; i++ ) {
 			final int freeStubs = clique.size() - i;
 			final Ego member =
 					egosWithFreeStubs.getClosestEuclidean(
@@ -146,6 +206,7 @@ public class SimpleCliquesFiller implements CliquesFiller {
 							( e ) -> e.getFreeStubs() >= freeStubs && !currentClique.contains( e ) );
 			if ( member != null ) return member;
 		}
+		return null;
 	}
 
 	public static class CliqueSampler {
@@ -183,6 +244,10 @@ public class SimpleCliquesFiller implements CliquesFiller {
 					maxSize,
 					0 , currentMaxIndex );
 			currentMaxSize = maxSize;
+		}
+
+		public int getMaxSize() {
+			return cliques[ cliques.length - 1 ].size();
 		}
 	}
 }

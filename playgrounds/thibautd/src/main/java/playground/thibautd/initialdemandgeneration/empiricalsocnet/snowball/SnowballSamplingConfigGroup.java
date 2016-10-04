@@ -29,11 +29,13 @@ public class SnowballSamplingConfigGroup extends ReflectiveConfigGroup {
 	private String inputCliquesCsv = null;
 
 	public enum SamplingMethod { degreeBased, cliqueBased }
+	public enum ConflictResolutionMethod {overload,resample}
 
 	private boolean conditionCliqueSizeOnAge = false;
 	private boolean conditionCliqueSizeOnSex = false;
 
 	private SamplingMethod samplingMethod = SamplingMethod.degreeBased;
+	private ConflictResolutionMethod conflictResolutionMethod = ConflictResolutionMethod.overload;
 
 	public SnowballSamplingConfigGroup( ) {
 		super( GROUP_NAME );
@@ -77,5 +79,15 @@ public class SnowballSamplingConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter("samplingMethod")
 	public void setSamplingMethod( final SamplingMethod samplingMethod ) {
 		this.samplingMethod = samplingMethod;
+	}
+
+	@StringGetter("conflictResolutionMethod")
+	public ConflictResolutionMethod getConflictResolutionMethod() {
+		return conflictResolutionMethod;
+	}
+
+	@StringSetter("conflictResolutionMethod")
+	public void setConflictResolutionMethod( final ConflictResolutionMethod conflictResolutionMethod ) {
+		this.conflictResolutionMethod = conflictResolutionMethod;
 	}
 }
