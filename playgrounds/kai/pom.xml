@@ -39,7 +39,12 @@
 						<id>sarl-repository</id>
 						<url>http://maven.sarl.io/</url>
 					</repository>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
 	</repositories>
+
 	<pluginRepositories>
 		<pluginRepository>
 			<id>org.janusproject-maven</id>
@@ -98,20 +103,26 @@
 					<artifactId>tthunig</artifactId>
 					<version>0.9.0-SNAPSHOT</version>
 				</dependency>
-				<dependency>
-					<groupId>floetteroed.utilities</groupId>
-					<artifactId>floetteroed-utilities</artifactId>
-					<version>1.0.0</version>
-				</dependency>
- 				<dependency>
-					<groupId>floetteroed.opdyts</groupId>
-					<artifactId>opdyts</artifactId>
-					<version>1.0.0</version>
-				</dependency>
+				<!--<dependency>-->
+					<!--<groupId>floetteroed.utilities</groupId>-->
+					<!--<artifactId>floetteroed-utilities</artifactId>-->
+					<!--<version>1.0.0</version>-->
+				<!--</dependency>-->
+ 				<!--<dependency>-->
+					<!--<groupId>floetteroed.opdyts</groupId>-->
+					<!--<artifactId>opdyts</artifactId>-->
+					<!--<version>1.0.0</version>-->
+				<!--</dependency>-->
  				<dependency>
  					<groupId>playground</groupId>
  					<artifactId>kairuns</artifactId>
  					<version>0.9.0-SNAPSHOT</version>
  				</dependency>
+		<dependency>
+			<groupId>com.github.gunnarfloetteroed</groupId>
+			<artifactId>java</artifactId>
+			<version>master-SNAPSHOT</version>
+			<!--<version>cdc96ff</version>-->
+		</dependency>
 	</dependencies>
 </project>

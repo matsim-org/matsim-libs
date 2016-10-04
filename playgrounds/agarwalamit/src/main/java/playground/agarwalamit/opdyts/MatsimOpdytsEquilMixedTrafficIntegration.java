@@ -45,7 +45,10 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
+import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable;
+import playground.kairuns.run.KNBerlinControler;
 
 /**
  * @author amit
@@ -108,7 +111,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		config.qsim().setUsingFastCapacityUpdate(true);
 		//==
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);//KNBerlinControler.prepareScenario(true, config);
+		Scenario scenario = KNBerlinControler.prepareScenario(true, config);
 		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		double time = 6*3600. ;
@@ -145,6 +148,8 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 				// some stats
 				addControlerListenerBinding().to(KaiAnalysisListener.class);
 				addControlerListenerBinding().toInstance(stasControlerListner);
+
+				bind(CharyparNagelScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
 			}
 		});
 

@@ -39,8 +39,14 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.agarwalamit.opdyts.*;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import playground.agarwalamit.opdyts.ModalStatsControlerListner;
+import playground.agarwalamit.opdyts.ModeChoiceObjectiveFunction;
+import playground.agarwalamit.opdyts.ModeChoiceRandomizer;
+import playground.agarwalamit.opdyts.OpdytsObjectiveFunctionCases;
 import playground.agarwalamit.utils.FileUtils;
+import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
+import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable;
 
 /**
  * @author amit
@@ -107,6 +113,8 @@ public class PatnaOpdytsCalibrator {
 				// some stats
 				addControlerListenerBinding().to(KaiAnalysisListener.class);
 				addControlerListenerBinding().toInstance(stasControlerListner);
+
+				bind(CharyparNagelScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
 			}
 		});
 
