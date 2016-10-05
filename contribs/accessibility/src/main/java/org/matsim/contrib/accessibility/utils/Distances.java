@@ -28,20 +28,20 @@ package org.matsim.contrib.accessibility.utils;
 public final class Distances{
 	
 	/** This stores either the (i) orthogonal distance between a measure point
-	 * and the nearest link or (ii) the euclidian distance between the measuring
+	 * and the nearest link or (ii) the Euclidean distance between the measuring
 	 * point and the nearest node
 	 */
 	private double distanceCoord2Intersection = 0.;
 	
 	/** This stores the (i) distance between the link intersection (of a orthogonal
-	 * projection) and the "nearest" node. Otherwise (ii), in case of an euclidian
+	 * projection) and the "nearest" node. Otherwise (ii), in case of an Euclidean
 	 * distance measure, this is 0.
 	 */
 	private double distanceIntersection2Node = 0.;
 	
 	/**
 	 * Either an orthogonal distance between a measure point and the nearest link
-	 * or the euclidian distance between the measuring point and the nearest node.
+	 * or the Euclidean distance between the measuring point and the nearest node.
 	 * @param value
 	 */
 	public void setDistanceCoord2Intersection(double value){
@@ -59,7 +59,7 @@ public final class Distances{
 	
 	/**
 	 * Either an orthogonal distance between a measure point and the nearest link or 
-	 * the euclidian distance between the measuring point and the nearest node.
+	 * the Euclidean distance between the measuring point and the nearest node.
 	 * @return
 	 */
 	public double getDistancePoint2Intersection(){

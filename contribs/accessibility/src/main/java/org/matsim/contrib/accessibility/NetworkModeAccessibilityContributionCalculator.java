@@ -107,11 +107,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		// === (1) ORIGIN to LINK to NODE:
 		// captures the distance (as walk time) between the origin via the link to the node:
 		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
-		// TODO substitute this method by other way of computing this as there are circumstances when this leads to wrng results...
-		// newnew
-//		CoordUtils.distancePointLinesegment(lineFrom, lineTo, point)
-		// end newnew
-
+		
 		// TODO: extract this walk part?
 		// In the state found before modularization (june 15), this was anyway not consistent accross modes
 		// (different for PtMatrix), pointing to the fact that making this mode-specific might make sense.
