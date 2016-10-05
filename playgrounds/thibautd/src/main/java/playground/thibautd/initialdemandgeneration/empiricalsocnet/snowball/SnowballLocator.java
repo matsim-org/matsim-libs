@@ -59,11 +59,14 @@ public class SnowballLocator implements EgoLocator, Position {
 	}
 
 	@Override
-	public double[] calcPosition( final Ego center, final SocialPositions.CliquePosition position ) {
+	public double[] calcPosition( final Ego center,
+			final SocialPositions.CliquePosition position,
+			final double rotation ) {
 		final double[] egoCoord = getCoord( center );
 
-		final double xTranslation = Math.cos( position.getBearing() ) * position.getDistance();
-		final double yTranslation = Math.sin( position.getBearing() ) * position.getDistance();
+		final double bearing = position.getBearing() + rotation;
+		final double xTranslation = Math.cos( bearing ) * position.getDistance();
+		final double yTranslation = Math.sin( bearing ) * position.getDistance();
 
 		return new double[]{
 				egoCoord[ 0 ] + xTranslation ,

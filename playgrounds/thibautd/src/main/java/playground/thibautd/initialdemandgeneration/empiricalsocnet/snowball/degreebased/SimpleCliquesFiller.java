@@ -115,12 +115,16 @@ public class SimpleCliquesFiller implements CliquesFiller {
 									cliqueSampler,
 									maxSize,
 									members );
+					if ( clique == null ) break;
 					if ( clique.size() == members.size() ) return members;
 					members.clear();
 					// only cliques smaller than the current cliques are feasible
+					if ( log.isTraceEnabled() ) log.trace( "re sampling using max size "+(clique.size() - 1)+" instead of "+maxSize );
 					maxSize = clique.size() - 1;
 				}
 				// no clique was found...
+				log.debug( "No clique was found for ego "+ego );
+				log.debug( "Aborting search for ego "+ego );
 				egosWithFreeStubs.remove( ego );
 				return null;
 			default:
@@ -137,17 +141,17 @@ public class SimpleCliquesFiller implements CliquesFiller {
 		final SocialPositions.CliquePositions clique = cliqueSampler.sampleClique( random , maxSize );
 		if ( clique == null ) {
 			// no possible clique at all
-			egosWithFreeStubs.remove( ego );
-			return clique;
+			return null;
 		}
 
+		final double rotation = random.nextDouble() * 2 * Math.PI;
 		members.add( ego );
 		for ( SocialPositions.CliquePosition cliqueMember : clique ) {
-			// TODO: rotate? -> only once per clique
-			final double[] point = position.calcPosition( ego , cliqueMember );
+			final double[] point = position.calcPosition( ego , cliqueMember , rotation );
 			final Ego member = findEgo( egosWithFreeStubs, clique, point , members , 1 );
 
 			if ( member == null ) {
+				// return clique to allow restarting at lower clique size
 				return clique;
 			}
 
@@ -166,11 +170,11 @@ public class SimpleCliquesFiller implements CliquesFiller {
 			return null;
 		}
 
+		final double rotation = random.nextDouble() * 2 * Math.PI;
 		final Set<Ego> members = new HashSet<>();
 		members.add( ego );
 		for ( SocialPositions.CliquePosition cliqueMember : clique ) {
-			// TODO: rotate? -> only once per clique
-			final double[] point = position.calcPosition( ego , cliqueMember );
+			final double[] point = position.calcPosition( ego , cliqueMember , rotation );
 			final Ego member = findEgo( egosWithFreeStubs, clique, point , members , Integer.MAX_VALUE );
 
 			if ( member == null ) {

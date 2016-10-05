@@ -92,11 +92,11 @@ public class CliquesDistributionCliquesFiller implements CliquesFiller {
 							random,
 							CliqueEgoDistribution.getCliqueStructure( ego ).getRandomSize( random ) );
 
+			final double rotation = random.nextDouble() * 2 * Math.PI;
 			final Set<Ego> members = new HashSet<>();
 			members.add( ego );
 			for ( SocialPositions.CliquePosition cliqueMember : clique ) {
-				// TODO: rotate? -> only once per clique
-				final double[] point = position.calcPosition( ego, cliqueMember );
+				final double[] point = position.calcPosition( ego, cliqueMember , rotation );
 				final Ego member = findEgo( egosWithFreeStubs, clique, point, members );
 
 				if ( member == null ) {

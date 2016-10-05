@@ -24,5 +24,5 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego
  * @author thibautd
  */
 public interface Position {
-	double[] calcPosition( Ego center, SocialPositions.CliquePosition position );
+	double[] calcPosition( Ego center, SocialPositions.CliquePosition position , double rotation_rad );
 }
