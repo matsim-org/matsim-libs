@@ -22,6 +22,7 @@
 
 package playground.jbischoff.pt;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.pt.router.TransitRouter;
 
@@ -31,6 +32,7 @@ public class VariableAccessTransitRouterModule extends AbstractModule {
     @Override
     public void install() {
         if (getConfig().transit().isUseTransit()) {
+        	addRoutingModuleBinding(TransportMode.pt).toProvider(VariableAccessTransit.class);
             bind(TransitRouter.class).toProvider(VariableAccessTransitRouterImplFactory.class);
         }
     }

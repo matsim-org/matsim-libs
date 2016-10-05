@@ -42,21 +42,25 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
+import org.matsim.pt.router.PreparedTransitSchedule;
+import org.matsim.pt.router.TransitLeastCostPathTree;
 import org.matsim.pt.router.TransitLeastCostPathTree.InitialNode;
+import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
+import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.pt.router.*;
 
 /**
  * Not thread-safe because MultiNodeDijkstra is not. Does not expect the TransitSchedule to change once constructed! michaz '13
  *
- * @author mrieser
+ * @author jbischoff
  */
 public class VariableAccessTransitRouterImpl implements TransitRouter {
 
@@ -232,6 +236,8 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 								{
 									leg.getRoute().setEndLinkId(egressStop.getLinkId());
 									time += leg.getTravelTime();
+									legs.add(leg);
+
 
 								} else {
 									legs.add(leg); //access leg
@@ -243,17 +249,17 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 									walkRoute.setDistance(config.getBeelineDistanceFactor() * 
 											NetworkUtils.getEuclideanDistance(network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord(), egressStop.getCoord()) );
 								
-									leg = PopulationUtils.createLeg(TransportMode.transit_walk);
-									leg.setTravelTime(walkTime);
-									leg.setRoute(walkRoute);
+									Leg walkleg = PopulationUtils.createLeg(TransportMode.transit_walk);
+									walkleg.setTravelTime(walkTime);
+									walkleg.setRoute(walkRoute);
 									time += walkTime;
+									legs.add(walkleg);
 									
 								}
 								
 //								walkRoute.setDistance( currentDistance );
 								// (see MATSIM-556)
 
-								legs.add(leg);
 							}
 						}
 						currentDistance = 0;
@@ -288,12 +294,16 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 			if (accessStop == null) {
 				// no use of pt
 				leg = getAccessEgressLeg(person, fromCoord, toCoord);
+				legs.add(leg);
+
 			} else {
 				Leg eleg = getAccessEgressLeg(person, accessStop.getCoord(), toCoord);
 				
 				if (variableAccessEgressTravelDisutility.isTeleportedAccessEgressMode(eleg.getMode())){
 					leg = eleg;
 					leg.getRoute().setStartLinkId(accessStop.getLinkId());
+					legs.add(leg);
+
 				}
 				else {
 					leg = PopulationUtils.createLeg(TransportMode.transit_walk);
@@ -305,10 +315,8 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 					leg.setRoute(walkRoute);
 					legs.add(leg);
 					legs.add(eleg);
-					
 				}
 			}
-			legs.add(leg);
 		}
 		if (transitLegCnt == 0) {
 			// it seems, the agent only walked

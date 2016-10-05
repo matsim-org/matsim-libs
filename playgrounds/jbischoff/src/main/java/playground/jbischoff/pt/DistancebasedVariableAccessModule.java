@@ -29,7 +29,6 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -65,14 +64,9 @@ public class DistancebasedVariableAccessModule implements VariableAccessEgressTr
 	/**
 	 * 
 	 */
-	public DistancebasedVariableAccessModule(Network network, Config config) {
-		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-		Network net = NetworkUtils.createNetwork();
-		HashSet<String> modes = new HashSet<>();
-		modes.add(TransportMode.car);
-		filter.filter(net, modes);
+	public DistancebasedVariableAccessModule(Network carnetwork, Config config) {
 		this.config = config;
-		this.carnetwork = net;
+		this.carnetwork = carnetwork;
 	}
 	/**
 	 * 
