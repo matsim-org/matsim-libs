@@ -677,8 +677,4 @@ public class OTFOGLDrawer implements GLEventListener {
 		this.viewBounds = new Rect(viewBounds.minX, viewBounds.minY + (translateY - this.translateY), viewBounds.maxX, viewBounds.maxY + (translateY - this.translateY));
 		this.translateY = translateY;
 	}
-	
-	public final double getCurrentTime() {
-		return this.hostControlBar.getSimTime() ;
-	}
 }
