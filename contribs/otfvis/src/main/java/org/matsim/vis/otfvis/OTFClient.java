@@ -20,9 +20,9 @@
 package org.matsim.vis.otfvis;
 
 import org.apache.log4j.Logger;
-import org.jdesktop.swingx.JXMapViewer;
-import org.jdesktop.swingx.mapviewer.GeoPosition;
-import org.jdesktop.swingx.mapviewer.TileFactory;
+import org.jxmapviewer.JXMapViewer;
+import org.jxmapviewer.viewer.GeoPosition;
+import org.jxmapviewer.viewer.TileFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.vis.otfvis.data.fileio.SettingsSaver;
@@ -188,7 +188,7 @@ public final class OTFClient extends JFrame {
 				double x = mainDrawer.getViewBoundsAsQuadTreeRect().centerX + mainDrawer.getQuad().offsetEast;
 				double y = mainDrawer.getViewBoundsAsQuadTreeRect().centerY + mainDrawer.getQuad().offsetNorth;
 				Coord center = coordinateTransformation.transform(new Coord(x, y));
-				double scale = mainDrawer.getScale();
+				double scale = mainDrawer.getScale()*2;
 				int zoom = (int) log2(scale);
 				jMapViewer.setCenterPosition(new GeoPosition(center.getY(), center.getX()));
 				jMapViewer.setZoom(zoom);
@@ -331,11 +331,11 @@ public final class OTFClient extends JFrame {
 				panel.add(synchBox);
 
 				synchBox = new JCheckBox("save jpg frames");
-				synchBox.setSelected(visConfig.renderImages());
+				synchBox.setSelected(visConfig.getRenderImages());
 				synchBox.addItemListener(new ItemListener() {
 					@Override
 					public void itemStateChanged(ItemEvent e) {
-						visConfig.setRenderImages(!visConfig.renderImages());
+						visConfig.setRenderImages(!visConfig.getRenderImages());
 					}
 				});
 				synchBox.setBounds(10, 100, 200, 31);

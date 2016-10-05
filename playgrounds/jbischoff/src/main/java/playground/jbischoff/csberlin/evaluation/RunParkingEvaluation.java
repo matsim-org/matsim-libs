@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -65,8 +64,8 @@ public static void main(String[] args) {
 	events.addHandler(wlpFF);
 	events.addHandler(mierendorffEval);
 	events.addHandler(klausEval);
-	String dir = "D:/runs-svn/bmw_carsharing/run20/";
-	new ParkingSearchEventsReader(events).readFile(dir+"run20.output_events.xml.gz");
+	String dir = "D:/runs-svn/bmw_carsharing/run21/";
+	new ParkingSearchEventsReader(events).readFile(dir+"run21.output_events.xml.gz");
 	pwde.writeEgressWalkStatistics(dir);
 	mierendorffEval.writeStats(dir+"mierendorffParkAndEgressStats.csv");
 	mierendorffEval.writeCoordTimeStamps(dir+"/mierendorffParkStamps.csv");

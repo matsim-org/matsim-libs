@@ -25,7 +25,6 @@ package playground.jbischoff.pt;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.pt.router.TransitRouter;
 
-import javax.inject.Provider;
 
 public class VariableAccessTransitRouterModule extends AbstractModule {
 

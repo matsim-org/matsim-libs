@@ -35,8 +35,20 @@ import org.matsim.api.core.v01.population.Person;
  */
 public interface VariableAccessEgressTravelDisutility {
 
+	/**
+	 * 
+	 * @param person
+	 * @param coord
+	 * @param toCoord
+	 * @return
+	 */
 	Leg getAccessEgressModeAndTraveltime(Person person, Coord coord, Coord toCoord);
-	Leg getAccessEgressModeCost(String mode, Person person, Coord coord, Coord toCoord);
+	/**
+	 * 
+	 * @param mode
+	 * @return whether a mode is teleported. 
+	 * Non-teleported modes require an additional stage activity for the agent to get from street network to pt network
+	 */
 	boolean isTeleportedAccessEgressMode(String mode);
 	
 }
