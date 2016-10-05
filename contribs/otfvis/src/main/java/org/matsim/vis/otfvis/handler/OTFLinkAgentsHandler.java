@@ -25,7 +25,11 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLContext;
+import com.jogamp.opengl.util.texture.TextureCoords;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -38,8 +42,6 @@ import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
-import org.matsim.vis.otfvis.opengl.layer.OGLSimpleLineDrawer;
-import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
@@ -52,13 +54,28 @@ import org.matsim.vis.snapshotwriters.VisLink;
  */
 public class OTFLinkAgentsHandler extends OTFDataReader {
 
+	private final static boolean drawLinkAsLine = false;
 	public static boolean showParked = false;
 
-	private OGLSimpleLineDrawer quadReceiver = new OGLSimpleLineDrawer();
+	private final Point2D.Float[] quad = new Point2D.Float[4];
+	private float coloridx = 0;
+	private char[] id;
+	private int nrLanes;
 
 	private final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 	private final AgentSnapshotInfoFactory snapshotFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
-	
+
+	public static Point2D.Float calcOrtho(double startx, double starty, double endx, double endy, double len){
+		double dx = endy - starty;
+		double dy = endx -startx;
+		double sqr1 = Math.sqrt(dx*dx +dy*dy);
+
+		dx = dx*len/sqr1;
+		dy = -dy*len/sqr1;
+
+		return new Point2D.Float((float)dx,(float)dy);
+	}
+
 	static public class Writer extends OTFDataWriter<VisLink> implements OTFWriterFactory<VisLink> {
 
 		private static final long serialVersionUID = -7916541567386865404L;
@@ -162,13 +179,15 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
 		String id = ByteBufferUtils.getString(in);
-		this.quadReceiver.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat(), in.getInt());
-		this.quadReceiver.setId(id.toCharArray());
+		this.quad[0] = new Point2D.Float(in.getFloat(), in.getFloat());
+		this.quad[1] = new Point2D.Float(in.getFloat(), in.getFloat());
+		this.nrLanes = in.getInt();
+		this.id = id.toCharArray();
 	}
 
 	@Override
 	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
-		this.quadReceiver.setColor(in.getFloat());
+		this.coloridx = in.getFloat();
 
 		int count = in.getInt();
 		for (int i = 0; i < count; i++) {
@@ -180,8 +199,43 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 	public void invalidate(SceneGraph graph) {
 	}
 
-	public OGLSimpleLineDrawer getQuadReceiver() {
-		return quadReceiver;
+	public void drawLink() {
+		GL2 gl = GLContext.getCurrentGL().getGL2();
+		if (drawLinkAsLine) {
+			gl.glLineWidth(1);
+			gl.glBegin(GL2.GL_LINES);
+			gl.glVertex2f(quad[0].x, quad[0].y);
+			gl.glVertex2f(quad[1].x, quad[1].y);
+			gl.glEnd();
+		} else {
+			linkWidthCalculator.setLaneWidth(OTFClientControl.getInstance().getOTFVisConfig().getEffectiveLaneWidth());
+			linkWidthCalculator.setLinkWidthForVis(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
+			float width = (float) linkWidthCalculator.calculateLinkWidth(this.nrLanes);
+			final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, width);
+			// (yy this is where the width of the links for drawing is set)
+
+			this.quad[2] = new Point2D.Float(this.quad[0].x + ortho.x, this.quad[0].y + ortho.y);
+			this.quad[3] = new Point2D.Float(this.quad[1].x + ortho.x, this.quad[1].y + ortho.y);
+			//Draw quad
+			TextureCoords co = new TextureCoords(0,0,1,1);
+			gl.glBegin(GL2.GL_QUADS);
+			gl.glTexCoord2f(co.right(),co.bottom()); gl.glVertex3f(quad[0].x, quad[0].y, 0);
+			gl.glTexCoord2f(co.right(),co.top()); gl.glVertex3f(quad[1].x, quad[1].y, 0);
+			gl.glTexCoord2f(co.left(), co.top()); gl.glVertex3f(quad[3].x, quad[3].y, 0);
+			gl.glTexCoord2f(co.left(),co.bottom()); gl.glVertex3f(quad[2].x, quad[2].y, 0);
+			gl.glEnd();
+		}
+	}
+
+	public void prepareLinkId(Map<Coord, String> linkIds) {
+		double alpha = 0.4;
+		double middleX = alpha*this.quad[0].x + (1.0-alpha)*this.quad[3].x;
+		double middleY = alpha*this.quad[0].y + (1.0-alpha)*this.quad[3].y;
+		String idstr = "" ;
+		if ( id != null ) { // yyyy can't say if this is a meaningful fix but it works for the problem that I have right now.  kai, may'10
+			idstr = new String(id);
+		}
+		linkIds.put(new Coord(middleX, middleY), idstr);
 	}
 
 }
