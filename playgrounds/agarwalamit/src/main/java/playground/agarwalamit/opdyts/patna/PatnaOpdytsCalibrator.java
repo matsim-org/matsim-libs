@@ -40,10 +40,11 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import playground.agarwalamit.opdyts.ModalStatsControlerListner;
-import playground.agarwalamit.opdyts.ModeChoiceObjectiveFunction;
-import playground.agarwalamit.opdyts.ModeChoiceRandomizer;
-import playground.agarwalamit.opdyts.OpdytsObjectiveFunctionCases;
+import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListner;
+import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
+import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
+import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.opdyts.*;
 import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
 import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable;
@@ -60,8 +61,8 @@ public class PatnaOpdytsCalibrator {
 	public static void main(String[] args) {
 
 		Config config;
-		int iterationsToConvergence = 100; //
-		int averagingIterations = 20;
+		int iterationsToConvergence = 10; //
+		int averagingIterations = 10;
 		boolean isRunningOnCluster = false;
 
 		if (args.length>0) isRunningOnCluster = true;
@@ -114,6 +115,12 @@ public class PatnaOpdytsCalibrator {
 				addControlerListenerBinding().to(KaiAnalysisListener.class);
 				addControlerListenerBinding().toInstance(stasControlerListner);
 
+				this.bind(ModalShareEventHandler.class);
+				this.addControlerListenerBinding().to(ModalShareControlerListner.class);
+
+				this.bind(ModalTripTravelTimeHandler.class);
+				this.addControlerListenerBinding().to(ModalTravelTimeControlerListner.class);
+
 				bind(CharyparNagelScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
 			}
 		});
@@ -131,7 +138,7 @@ public class PatnaOpdytsCalibrator {
 		boolean includeCurrentBest = false;
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
-		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario);
+		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario, RandomizedUtilityParametersChoser.ONLY_ASC);
 
 		// what would be the decision variables to optimize the objective function.
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario);
