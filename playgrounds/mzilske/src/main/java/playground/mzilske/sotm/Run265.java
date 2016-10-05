@@ -24,7 +24,7 @@ public class Run265 {
 		OTFVisConfigGroup otfVisConfigGroup = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
 		otfVisConfigGroup.setMapOverlayMode(true);
 		otfVisConfigGroup.setDelay_ms(0);
-//		otfVisConfigGroup.setRenderImages(true);
+		otfVisConfigGroup.setRenderImages(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 
