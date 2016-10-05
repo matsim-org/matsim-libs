@@ -20,6 +20,7 @@
 
 package playground.jbischoff.pt;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
@@ -39,29 +40,29 @@ import javax.inject.Singleton;
 @Singleton
 public class VariableAccessTransitRouterImplFactory implements Provider<TransitRouter> {
 
-	private final TransitRouterConfig config;
+	private final TransitRouterConfig transitRouterconfig;
 	private final TransitRouterNetwork routerNetwork;
 	private final PreparedTransitSchedule preparedTransitSchedule;
+	private final Config config;
+	private final Network network;
 
 	@Inject
-	VariableAccessTransitRouterImplFactory(final TransitSchedule schedule, final Config config) {
-		this(schedule, new TransitRouterConfig(
-				config.planCalcScore(),
-				config.plansCalcRoute(),
-				config.transitRouter(),
-				config.vspExperimental()));
+	VariableAccessTransitRouterImplFactory(final TransitSchedule schedule, final Config config, final Network network) {
+		this.config = config;
+
+		this.transitRouterconfig = new TransitRouterConfig(config.planCalcScore(),config.plansCalcRoute(),config.transitRouter(),config.vspExperimental());
+		this.routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, this.transitRouterconfig.getBeelineWalkConnectionDistance());
+		this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
+		this.network = network;
 	}
 
-	public VariableAccessTransitRouterImplFactory(final TransitSchedule schedule, final TransitRouterConfig config) {
-		this.config = config;
-		this.routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, this.config.getBeelineWalkConnectionDistance());
-		this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
-	}
+	
 
 	@Override
 	public TransitRouter get() {
-		TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.config, this.preparedTransitSchedule);
-		return new TransitRouterImpl(this.config, this.preparedTransitSchedule, this.routerNetwork, ttCalculator, ttCalculator);
+		VariableAccessEgressTravelDisutility variableAccessEgressTravelDisutility = new DistancebasedVariableAccessModule(network,config);
+		TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.transitRouterconfig, this.preparedTransitSchedule);
+		return new VariableAccessTransitRouterImpl(this.transitRouterconfig, this.preparedTransitSchedule, this.routerNetwork, ttCalculator, ttCalculator, variableAccessEgressTravelDisutility, network);
 	}
 	
 }
