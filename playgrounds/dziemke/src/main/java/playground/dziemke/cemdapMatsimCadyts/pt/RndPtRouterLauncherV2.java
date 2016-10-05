@@ -51,14 +51,18 @@ public class RndPtRouterLauncherV2 {
 
 	public static void main(final String[] args) {
 
-		final double cadytsWeight = 30.0;
+		double cadytsWeight = 30.0;
 
 		String configFile;
 		if (args.length == 0) {
 			configFile = "../../../shared-svn/projects/ptManuel/calibration/moyo24hrs.xml";
+		} else if (args.length == 1){
+			configFile = args[0];
 		} else {
 			configFile = args[0];
+			cadytsWeight = Double.parseDouble(args[1]);
 		}
+		final double finalCadytsWeight = cadytsWeight;
 
 		Config config = ConfigUtils.loadConfig(configFile);
 
@@ -160,7 +164,7 @@ public class RndPtRouterLauncherV2 {
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
 				final CadytsScoring<TransitStopFacility> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cadytsContext);
-				final double cadytsScoringWeight = cadytsWeight * config.planCalcScore().getBrainExpBeta();
+				final double cadytsScoringWeight = finalCadytsWeight * config.planCalcScore().getBrainExpBeta();
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight);
 				sumScoringFunction.addScoringFunction(scoringFunction);
 
