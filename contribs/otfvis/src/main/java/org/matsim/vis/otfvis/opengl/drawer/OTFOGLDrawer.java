@@ -136,9 +136,7 @@ public class OTFOGLDrawer implements GLEventListener {
 		((GLAutoDrawable) canvas).addGLEventListener(this);
 		((GLAutoDrawable) canvas).addGLEventListener(new OTFScaleBarDrawer());
 		((GLAutoDrawable) canvas).addGLEventListener(new OTFGLOverlay("/res/matsim_logo_blue.png", -0.03f, 0.05f, 1.5f, false));
-		if (this.otfVisConfig.getRenderImages()) {
-			((GLAutoDrawable) canvas).addGLEventListener(new ScreenshotTaker(this.hostControlBar));
-		}
+		((GLAutoDrawable) canvas).addGLEventListener(new ScreenshotTaker(this.hostControlBar));
 		clientQ.getConstData();
 
 		MouseInputAdapter mouseMan = new MouseInputAdapter() {

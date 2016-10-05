@@ -5,6 +5,7 @@ import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.gui.OTFHostControl;
 
 import javax.imageio.ImageIO;
@@ -33,18 +34,20 @@ class ScreenshotTaker implements GLEventListener {
 
 	@Override
 	public void display(GLAutoDrawable glAutoDrawable) {
-		GL2 gl = glAutoDrawable.getGL().getGL2();
-		if (this.lastShot < hostControlBar.getSimTime()) {
-			this.lastShot = hostControlBar.getSimTime();
-			try {
-				int screenshotInterval = 1;
-				if (hostControlBar.getSimTime() % screenshotInterval == 0) {
-					AWTGLReadBufferUtil glReadBufferUtil = new AWTGLReadBufferUtil(gl.getGLProfile(), false);
-					BufferedImage bufferedImage = glReadBufferUtil.readPixelsToBufferedImage(gl, true);
-					ImageIO.write(bufferedImage, "png", new File("frame" + String.format("%07d", hostControlBar.getSimTime()) + ".png"));
+		if (OTFClientControl.getInstance().getOTFVisConfig().getRenderImages()) {
+			GL2 gl = glAutoDrawable.getGL().getGL2();
+			if (this.lastShot < hostControlBar.getSimTime()) {
+				this.lastShot = hostControlBar.getSimTime();
+				try {
+					int screenshotInterval = 1;
+					if (hostControlBar.getSimTime() % screenshotInterval == 0) {
+						AWTGLReadBufferUtil glReadBufferUtil = new AWTGLReadBufferUtil(gl.getGLProfile(), false);
+						BufferedImage bufferedImage = glReadBufferUtil.readPixelsToBufferedImage(gl, true);
+						ImageIO.write(bufferedImage, "png", new File("frame" + String.format("%07d", hostControlBar.getSimTime()) + ".png"));
+					}
+				} catch (GLException | IOException | IllegalArgumentException e) {
+					e.printStackTrace();
 				}
-			} catch (GLException | IOException | IllegalArgumentException e) {
-				e.printStackTrace();
 			}
 		}
 	}

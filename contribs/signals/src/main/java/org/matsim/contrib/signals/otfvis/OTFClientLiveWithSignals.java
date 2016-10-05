@@ -29,7 +29,7 @@ import org.jxmapviewer.viewer.wms.WMSService;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.vis.otfvis.OTFClient;
+import org.matsim.vis.otfvis.gui.OTFVisFrame;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
@@ -93,8 +93,8 @@ public class OTFClientLiveWithSignals {
 				OTFQueryControl queryControl = new OTFQueryControl(server, visconf);
 				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, visconf);
 				queryControl.setQueryTextField(queryControlBar.getTextField());
-				OTFClient otfClient = new OTFClient(canvas, server, hostControlBar, mainDrawer, saver);
-				otfClient.getContentPane().add(queryControlBar, BorderLayout.SOUTH);
+				OTFVisFrame otfVisFrame = new OTFVisFrame(canvas, server, hostControlBar, mainDrawer, saver);
+				otfVisFrame.getContentPane().add(queryControlBar, BorderLayout.SOUTH);
 				mainDrawer.setQueryHandler(queryControl);
 				if (otfVisConfigGroup.isMapOverlayMode()) {
 					TileFactory tf;
@@ -105,10 +105,10 @@ public class OTFClientLiveWithSignals {
 						WMSService wms = new WMSService(otfVisConfigGroup.getMapBaseURL(), otfVisConfigGroup.getMapLayer());
 						tf = new OTFVisWMSTileFactory(wms, otfVisConfigGroup.getMaximumZoom());
 					}
-					otfClient.addMapViewer(tf);
+					otfVisFrame.addMapViewer(tf);
 				}
-                otfClient.pack();
-				otfClient.setVisible(true);
+                otfVisFrame.pack();
+				otfVisFrame.setVisible(true);
 			}
 		});
 	}

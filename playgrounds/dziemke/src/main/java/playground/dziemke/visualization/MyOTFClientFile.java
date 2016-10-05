@@ -25,7 +25,7 @@ import java.awt.Component;
 
 import javax.swing.SwingUtilities;
 
-import org.matsim.vis.otfvis.OTFClient;
+import org.matsim.vis.otfvis.gui.OTFVisFrame;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
@@ -90,12 +90,12 @@ public class MyOTFClientFile implements Runnable {
 //		mainDrawer.setScreenshotInterval(3600);
 //		mainDrawer.setTimeOfLastScreenshot(86400);
 		OTFControlBar hostControlBar = new OTFControlBar(otfServer, hostControl, mainDrawer);
-		OTFClient otfClient = new OTFClient(canvas, otfServer, hostControlBar, mainDrawer, new SettingsSaver(url));
+		OTFVisFrame otfVisFrame = new OTFVisFrame(canvas, otfServer, hostControlBar, mainDrawer, new SettingsSaver(url));
 		OTFTimeLine timeLine = new OTFTimeLine("time", hostControl);
-		otfClient.getContentPane().add(timeLine, BorderLayout.SOUTH);
+		otfVisFrame.getContentPane().add(timeLine, BorderLayout.SOUTH);
 //		otfClient.setSize(800, 800); // does not seem to take effect
 //		otfClient.show();
-		otfClient.pack();
-        otfClient.setVisible(true);
+		otfVisFrame.pack();
+        otfVisFrame.setVisible(true);
 	}
 }

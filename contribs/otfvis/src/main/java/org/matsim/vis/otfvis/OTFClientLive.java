@@ -26,16 +26,13 @@ import org.jxmapviewer.viewer.TileFactoryInfo;
 import org.jxmapviewer.viewer.wms.WMSService;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.vis.otfvis.gui.OTFHostControl;
+import org.matsim.vis.otfvis.gui.*;
 import org.matsim.vis.otfvis.handler.FacilityDrawer;
 import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
 import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.data.fileio.SettingsSaver;
-import org.matsim.vis.otfvis.gui.OTFControlBar;
-import org.matsim.vis.otfvis.gui.OTFQueryControl;
-import org.matsim.vis.otfvis.gui.OTFQueryControlToolBar;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
@@ -86,12 +83,12 @@ public class OTFClientLive {
 
 				OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, visconf, canvas, hostControl);
 				OTFControlBar hostControlBar = new OTFControlBar(server, hostControl, mainDrawer);
-				OTFClient otfClient = new OTFClient(canvas, server, hostControlBar, mainDrawer, saver);
+				OTFVisFrame otfVisFrame = new OTFVisFrame(canvas, server, hostControlBar, mainDrawer, saver);
 
 				OTFQueryControl queryControl = new OTFQueryControl(server, visconf);
 				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, visconf);
 				queryControl.setQueryTextField(queryControlBar.getTextField());
-				otfClient.getContentPane().add(queryControlBar, BorderLayout.SOUTH);
+				otfVisFrame.getContentPane().add(queryControlBar, BorderLayout.SOUTH);
 				mainDrawer.setQueryHandler(queryControl);
 				if (visconf.isMapOverlayMode()) {
 					TileFactory tf;
@@ -102,10 +99,10 @@ public class OTFClientLive {
 						WMSService wms = new WMSService(visconf.getMapBaseURL(), visconf.getMapLayer());
 						tf = new OTFVisWMSTileFactory(wms, visconf.getMaximumZoom());
 					}
-					otfClient.addMapViewer(tf);
+					otfVisFrame.addMapViewer(tf);
 				}
-                otfClient.pack();
-				otfClient.setVisible(true);
+                otfVisFrame.pack();
+				otfVisFrame.setVisible(true);
 			}
 		});
 	}

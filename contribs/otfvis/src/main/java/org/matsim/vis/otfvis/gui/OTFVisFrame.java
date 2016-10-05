@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.vis.otfvis;
+package org.matsim.vis.otfvis.gui;
 
 import org.apache.log4j.Logger;
 import org.jxmapviewer.JXMapViewer;
@@ -25,8 +25,9 @@ import org.jxmapviewer.viewer.GeoPosition;
 import org.jxmapviewer.viewer.TileFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.vis.otfvis.OTFClientControl;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.data.fileio.SettingsSaver;
-import org.matsim.vis.otfvis.gui.OTFControlBar;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.utils.WGS84ToMercator;
@@ -42,14 +43,12 @@ import java.awt.event.*;
  * @author dgrether
  *
  */
-public final class OTFClient extends JFrame {
+public final class OTFVisFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger log = Logger.getLogger(OTFClient.class);
+	private static final Logger log = Logger.getLogger(OTFVisFrame.class);
 	private final Component canvas;
-
-	private final OTFControlBar hostControlBar;
 
 	private final OTFOGLDrawer mainDrawer;
 
@@ -84,7 +83,7 @@ public final class OTFClient extends JFrame {
 		return Math.log(scale) / Math.log(2);
 	}
 	
-	public OTFClient(Component canvas, OTFServer server, OTFControlBar hostControlBar, OTFOGLDrawer mainDrawer, SettingsSaver saver) {
+	public OTFVisFrame(Component canvas, OTFServer server, OTFControlBar controlBar, OTFOGLDrawer mainDrawer, SettingsSaver saver) {
 		super("MATSim OTFVis");
 
 		// Not considered very nice -- The QSim runs on the main thread, and we effectively kill it
@@ -109,10 +108,9 @@ public final class OTFClient extends JFrame {
 		compositePanel.setPreferredSize(new Dimension(screenSize.width/2,screenSize.height/2));
 		log.info("created MainFrame");
 		this.server = server;
-		this.hostControlBar = hostControlBar;
 		this.mainDrawer = mainDrawer;
 		log.info("got OTFVis config");
-		getContentPane().add(this.hostControlBar, BorderLayout.NORTH);
+		getContentPane().add(controlBar, BorderLayout.NORTH);
 		buildMenu(saver);
 		log.info("created HostControlBar");
 		log.info("created drawer");
@@ -167,7 +165,7 @@ public final class OTFClient extends JFrame {
 		Action exitAction = new AbstractAction("Quit") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				dispatchEvent(new WindowEvent(OTFClient.this, WindowEvent.WINDOW_CLOSING));			}
+				dispatchEvent(new WindowEvent(OTFVisFrame.this, WindowEvent.WINDOW_CLOSING));			}
 		};
 		fileMenu.add(exitAction);
 		setJMenuBar(menuBar);
@@ -203,7 +201,7 @@ public final class OTFClient extends JFrame {
 		private final OTFVisConfigGroup visConfig;
 
 		public PreferencesDialog(OTFVisConfigGroup config) {
-			super(OTFClient.this);
+			super(OTFVisFrame.this);
 			this.visConfig = config;
 			getContentPane().setLayout(null);
 			this.setResizable(false);

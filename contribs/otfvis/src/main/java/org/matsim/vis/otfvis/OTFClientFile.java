@@ -25,6 +25,7 @@ import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.data.fileio.OTFFileReader;
 import org.matsim.vis.otfvis.data.fileio.SettingsSaver;
+import org.matsim.vis.otfvis.gui.OTFVisFrame;
 import org.matsim.vis.otfvis.gui.OTFHostControl;
 import org.matsim.vis.otfvis.gui.OTFControlBar;
 import org.matsim.vis.otfvis.gui.OTFTimeLine;
@@ -73,11 +74,11 @@ public class OTFClientFile implements Runnable {
 		OTFClientQuadTree clientQ = servQ.convertToClient(otfServer, connect);
 		OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQ, otfVisConfig, canvas, hostControl);
 		OTFControlBar hostControlBar = new OTFControlBar(otfServer, hostControl, mainDrawer);
-		OTFClient otfClient = new OTFClient(canvas, otfServer, hostControlBar, mainDrawer, new SettingsSaver(url));
+		OTFVisFrame otfVisFrame = new OTFVisFrame(canvas, otfServer, hostControlBar, mainDrawer, new SettingsSaver(url));
 		OTFTimeLine timeLine = new OTFTimeLine("time", hostControl);
-		otfClient.getContentPane().add(timeLine, BorderLayout.SOUTH);
-		otfClient.pack();
-        otfClient.setVisible(true);
+		otfVisFrame.getContentPane().add(timeLine, BorderLayout.SOUTH);
+		otfVisFrame.pack();
+        otfVisFrame.setVisible(true);
 	}
 
 }
