@@ -79,7 +79,6 @@ public class PatnaOpdytsCalibrator {
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn); // must be warn, since opdyts override few things
 
 		config.controler().setOutputDirectory(OUT_DIR);
-		config.qsim().setEndTime(50.*3600.);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
