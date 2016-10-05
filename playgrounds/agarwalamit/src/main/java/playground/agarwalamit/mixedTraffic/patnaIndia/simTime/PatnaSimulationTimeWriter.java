@@ -98,7 +98,7 @@ public class PatnaSimulationTimeWriter {
 			int randomSeed = randomSeeds[i];
 //			MatsimRandom.reset(randomSeed);
 
-			String runSpecificOutputDir = runDir+"/100/"+cloningFactor+"pct" + "/output_"+ld+"_"+td+"_"+i+"/";
+			String runSpecificOutputDir = runDir+"/"+cloningFactor+"pct" + "/output_"+ld+"_"+td+"_"+i+"/";
 			Controler controler = getControler(ld, td, runSpecificOutputDir, isUsingFastCapacityUpdate);
 			controler.getConfig().global().setRandomSeed(randomSeed);
 
@@ -109,6 +109,13 @@ public class PatnaSimulationTimeWriter {
 			int lastIt = controler.getConfig().controler().getLastIteration();
 			FileUtils.deleteIntermediateIterations(runSpecificOutputDir,firstIt,lastIt);
 		}
+
+		// write travel time/distance
+		TravelTimeComperator time = new TravelTimeComperator(runDir+"/"+cloningFactor+"pct/");
+		time.run();
+
+		TravelDistanceComperator dist = new TravelDistanceComperator(runDir+"/"+cloningFactor+"pct/",inputFilesDir+"/network.xml.gz");
+		dist.run();
 	}
 
 	private Controler getControler(LinkDynamics ld, TrafficDynamics td, String runSpecificOutputDir, boolean isUsingFastCapacityUpdate) {

@@ -49,19 +49,28 @@ import playground.agarwalamit.utils.ListUtils;
 
 public class TravelDistanceComperator {
 	
-	private String respectiveFileDirectory = "../../../../repos/runs-svn/patnaIndia/run110/100pct/";
-	private String netFile = "../../../../repos/runs-svn/patnaIndia/inputs/network.xml";
+	private final String respectiveFileDirectory ;
+	private final String netFile ;
 	private BufferedWriter writer;
-	private static final String LAST_IT = "200";
 
-	public static void main(String[] args) {
-		TravelDistanceComperator tdc = new TravelDistanceComperator();
-		tdc.openFile();
-		tdc.startProcessing();
-		tdc.closeFile();
+	TravelDistanceComperator(final String dir, final String networkFile) {
+		this.respectiveFileDirectory = dir;
+		this.netFile = networkFile;
 	}
 
-	public void openFile(){
+	public static void main(String[] args) {
+		TravelDistanceComperator tdc = new TravelDistanceComperator("../../../../repos/runs-svn/patnaIndia/run110/100pct/",
+				"../../../../repos/runs-svn/patnaIndia/inputs/network.xml");
+		tdc.run();
+	}
+
+	void run (){
+		openFile();
+		startProcessing();
+		closeFile();
+	}
+
+	private void openFile(){
 		writer = IOUtils.getBufferedWriter(respectiveFileDirectory+"/travelDistance.txt");
 		try {
 			writeString("scenario\tmode\ttravelDistKm\n");
@@ -78,7 +87,7 @@ public class TravelDistanceComperator {
 		}
 	}
 
-	public void closeFile(){
+	private void closeFile(){
 		try{
 			writer.close();
 		} catch (Exception e) {
@@ -86,12 +95,12 @@ public class TravelDistanceComperator {
 		}
 	}
 
-	public void startProcessing(){
+	private void startProcessing(){
 		for (LinkDynamics ld : LinkDynamics.values() ) {
 			for ( TrafficDynamics td : TrafficDynamics.values()){
 				String queueModel = ld+"_"+td;
 				for(int i=2;i<12;i++){
-					String eventsFile = respectiveFileDirectory + "/output_"+queueModel+"_"+i+"/ITERS/it."+LAST_IT+"/"+LAST_IT+".events.xml.gz";
+					String eventsFile = respectiveFileDirectory + "/output_"+queueModel+"_"+i+"/output_events.xml.gz";
 					if (! new File(eventsFile).exists() ) continue;
 					SortedMap<String,Double> mode2avgDist = getMode2Dist(eventsFile);
 					
