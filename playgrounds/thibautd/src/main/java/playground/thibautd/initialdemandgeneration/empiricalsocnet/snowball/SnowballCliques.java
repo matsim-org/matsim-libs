@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -59,6 +60,7 @@ public class SnowballCliques {
 			while ( parser.nextLine() ) {
 				final Id<Clique> cliqueId = parser.getIdField( "Clique_ID" , Clique.class );
 
+				final Id<Member> egoId = parser.getIdField( "E_ID" , Member.class );
 				final Sex egoSex = parser.getEnumField( "E_sex" , Sex.class );
 				final double egoLatitude = parser.getDoubleField( "E_latitude" );
 				final double egoLongitude = parser.getDoubleField( "E_longitude" );
@@ -75,12 +77,12 @@ public class SnowballCliques {
 
 				Clique clique = cliques.cliques.get( cliqueId );
 				if ( clique == null ) {
-					final Member ego = new Member( egoSex , egoCoord , egoAge , egoDegree );
+					final Member ego = new Member( egoId , egoSex , egoCoord , egoAge , egoDegree );
 					clique = new Clique( cliqueId , ego );
 					cliques.cliques.put( cliqueId , clique );
 					cliques.egos.add( ego );
 				}
-				clique.alters.add( new Member( alterSex , alterCoord , alterAge , -1 ) );
+				clique.alters.add( new Member( egoId , alterSex , alterCoord , alterAge , -1 ) );
 			}
 		}
 		catch ( IOException e ) {
@@ -117,12 +119,19 @@ public class SnowballCliques {
 	}
 
 	public static class Member {
+		private final Id<Member> id;
 		private final Sex sex;
 		private final Coord coord;
 		private final int age;
 		private final int degree;
 
-		public Member( final Sex sex, final Coord coord, final int age, final int degree ) {
+		private Member(
+				final Id<Member> id,
+				final Sex sex,
+				final Coord coord,
+				final int age,
+				final int degree ) {
+			this.id = id;
 			this.sex = sex;
 			this.coord = coord;
 			this.age = age;
@@ -144,6 +153,24 @@ public class SnowballCliques {
 		public int getDegree() {
 			if ( degree < 0 ) throw new IllegalStateException( "no degree known" );
 			return degree;
+		}
+
+		public Id<Member> getId() {
+			return id;
+		}
+
+		@Override
+		public boolean equals( Object o ) {
+			if ( o == null ) return false;
+			if ( !( o instanceof  Member ) ) return false;
+			final Member m = (Member) o;
+			// if dataset is consistent this should be fine.
+			return id.equals( m.id );
+		}
+
+		@Override
+		public int hashCode() {
+			return id.hashCode();
 		}
 	}
 }

@@ -20,6 +20,7 @@ package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.cli
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.MapUtils;
@@ -74,6 +75,7 @@ public class CliqueEgoDistribution implements EgoCharacteristicsDistribution {
 			// TODO: copy? should not be modified anyway
 			//this.sizes = s.sizes;
 			this.remainingSizes = Arrays.copyOf( s.sizes , s.sizes.length );
+			Arrays.sort( remainingSizes );
 		}
 
 		public boolean hasSize( final int size ) {
@@ -86,7 +88,9 @@ public class CliqueEgoDistribution implements EgoCharacteristicsDistribution {
 		}
 
 		public int getRandomSize( final Random random ) {
-			return remainingSizes[ random.nextInt( remainingSizes.length ) ];
+			final int size = remainingSizes[ random.nextInt( remainingSizes.length ) ];
+			assert size >= 2 : Arrays.toString( remainingSizes );
+			return size;
 		}
 
 		public void removeSize( final int size ) {
@@ -97,7 +101,7 @@ public class CliqueEgoDistribution implements EgoCharacteristicsDistribution {
 			this.remainingSizes = new int[ old.length - 1 ];
 
 			for ( int i = 0; i < insertion; i++ ) remainingSizes[ i ] = old[ i ];
-			for ( int i = insertion + 1; i < remainingSizes.length; i++ ) remainingSizes[ i ] = old[ i + 1 ];
+			for ( int i = insertion; i < remainingSizes.length; i++ ) remainingSizes[ i ] = old[ i + 1 ];
 		}
 	}
 

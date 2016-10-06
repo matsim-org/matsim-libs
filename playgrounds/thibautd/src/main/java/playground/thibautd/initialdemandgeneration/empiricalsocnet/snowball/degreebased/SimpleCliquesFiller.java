@@ -107,7 +107,11 @@ public class SimpleCliquesFiller implements CliquesFiller {
 				return sampleOverloadedClique( ego, egosWithFreeStubs, cliqueSampler );
 			case resample:
 				final Set<Ego> members = new HashSet<>();
-				for ( int maxSize = cliqueSampler.getMaxSize(); maxSize > 1; ) {
+				// actually no strict need to check number of free stubs: overlap possible (even if improbable)
+				for ( int maxSize = Math.min(
+						cliqueSampler.getMaxSize(),
+					    ego.getFreeStubs() + 1 );
+					  maxSize > 1; ) {
 					final SocialPositions.CliquePositions clique =
 							sampleMaxSizedClique(
 									ego,
@@ -155,8 +159,10 @@ public class SimpleCliquesFiller implements CliquesFiller {
 				return clique;
 			}
 
-			SocialPositions.group( member , members );
+			members.add( member );
 		}
+
+		SocialPositions.link( members );
 
 		return clique;
 	}
