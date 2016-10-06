@@ -113,7 +113,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                                 double motorbikeLegs = 0.14 * totalLegs;
                                 for (int idx = 0; idx < dataBoundariesTmp.length; idx++) {
                                     double legs = Math.round( motorbikeLegs * motorbikeVals[idx] / 100.);
-                                    databins.addValue("car", idx, legs);
+                                    databins.addValue("motorbike", idx, legs);
                                     legsSumAllModes += legs;
                                 }
                             }
@@ -122,7 +122,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                                 double bikeLegs = 0.33 * totalLegs;
                                 for (int idx = 0; idx < dataBoundariesTmp.length; idx++) {
                                     double legs = Math.round(bikeLegs * bikeVals[idx] / 100.);
-                                    databins.addValue("car", idx, legs);
+                                    databins.addValue("bike", idx, legs);
                                     legsSumAllModes += legs;
                                 }
                             }
@@ -131,7 +131,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                                 double ptLegs = 0.22 * totalLegs;
                                 for (int idx = 0; idx < dataBoundariesTmp.length; idx++) {
                                     double legs = Math.round(ptLegs * ptVals[idx] / 100.);
-                                    databins.addValue("car", idx, legs);
+                                    databins.addValue("pt", idx, legs);
                                     legsSumAllModes += legs;
                                 }
                             }
@@ -140,7 +140,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                                 double walkLegs = 0.29 * totalLegs;
                                 for (int idx = 0; idx < dataBoundariesTmp.length; idx++) {
                                     double legs = Math.round(walkLegs * walkVals[idx] / 100.);
-                                    databins.addValue("car", idx, legs);
+                                    databins.addValue("walk", idx, legs);
                                     legsSumAllModes += legs;
                                 }
                             }
