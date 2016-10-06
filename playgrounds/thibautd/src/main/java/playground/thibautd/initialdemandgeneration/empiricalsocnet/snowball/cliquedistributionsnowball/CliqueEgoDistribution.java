@@ -20,7 +20,6 @@ package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.cli
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.MapUtils;
@@ -96,6 +95,7 @@ public class CliqueEgoDistribution implements EgoCharacteristicsDistribution {
 		public void removeSize( final int size ) {
 			final int insertion = Arrays.binarySearch( remainingSizes , size );
 			if ( insertion < 0 ) throw new IllegalArgumentException( "could not find "+size+" in "+Arrays.toString( remainingSizes ) );
+			assert remainingSizes[ insertion ] == size;
 
 			final int[] old = remainingSizes;
 			this.remainingSizes = new int[ old.length - 1 ];

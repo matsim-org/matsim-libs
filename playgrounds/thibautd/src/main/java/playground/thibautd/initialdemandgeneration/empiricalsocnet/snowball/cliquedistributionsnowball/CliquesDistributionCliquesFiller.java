@@ -87,10 +87,12 @@ public class CliquesDistributionCliquesFiller implements CliquesFiller {
 			final KDTree<Ego> egosWithFreeStubs ) {
 		// TODO condition sampling of clique on ego characteristic?
 		while ( !stopConsidering( ego ) ) {
+			final int size = CliqueEgoDistribution.getCliqueStructure( ego ).getRandomSize( random );
 			final SocialPositions.CliquePositions clique =
 					allCliques.sampleClique(
 							random,
-							CliqueEgoDistribution.getCliqueStructure( ego ).getRandomSize( random ) );
+							size );
+			assert clique.size() == size;
 
 			final double rotation = random.nextDouble() * 2 * Math.PI;
 			final Set<Ego> members = new HashSet<>();
