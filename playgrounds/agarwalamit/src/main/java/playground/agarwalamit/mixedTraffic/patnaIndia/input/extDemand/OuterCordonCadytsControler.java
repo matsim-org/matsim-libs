@@ -213,9 +213,9 @@ public class OuterCordonCadytsControler {
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
 			@Inject
-            final Network network;
+            Network network;
 			@Inject
-            final ModalCadytsContext cContext;
+            ModalCadytsContext cContext;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
