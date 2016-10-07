@@ -89,7 +89,7 @@ class DemandModel {
 		final ChoiceModel choiceModel = new ChoiceModel(scenario, utilityFunction);
 
 		for (int personNumber = 0; personNumber < homeLocs.size(); personNumber++) {
-			System.out.println("creating person " + personNumber);
+			// System.out.println("creating person " + personNumber);
 			final Person person = scenario.getPopulation().getFactory().createPerson(Id.createPersonId(personNumber));
 			scenario.getPopulation().addPerson(person);
 

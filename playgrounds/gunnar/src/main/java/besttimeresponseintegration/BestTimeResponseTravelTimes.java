@@ -75,7 +75,7 @@ public class BestTimeResponseTravelTimes implements TripTravelTimes<Facility, St
 		}
 		if (tt_s == null) {
 			final List<? extends PlanElement> tripSequence = this.tripRouter.calcRoute(mode, origin, destination,
-					this.timeDiscr.getBinStartTime_s(bin), person);
+					Math.max(this.timeDiscr.getBinStartTime_s(bin), 0), person);
 			final Leg lastLeg = (Leg) tripSequence.get(tripSequence.size() - 1);
 			tt_s = lastLeg.getDepartureTime() + lastLeg.getTravelTime();
 			if (this.cache != null) {

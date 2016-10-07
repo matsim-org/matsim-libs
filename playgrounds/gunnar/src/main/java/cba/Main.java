@@ -1,6 +1,5 @@
 package cba;
 
-import java.io.PrintWriter;
 import java.util.Arrays;
 
 import org.matsim.api.core.v01.Scenario;
@@ -16,6 +15,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterModule;
+import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -38,8 +38,8 @@ public class Main {
 	 * ============================================================
 	 */
 
-	static final int outerIts = 2;
-	static final int popSize = 100;
+	static final int outerIts = 1;
+	static final int popSize = 10 * 1000;
 	static final double replanProba = 1.0;
 	static final String expectationFilePrefix = "./testdata/cba/expectation";
 
@@ -68,12 +68,6 @@ public class Main {
 
 			// >>>>>>>>>> COPY & PASTE FROM TripRouterImplTest.java >>>>>>>>>>
 
-			/*
-			 * TODO Does this now behave like the TripRouter in the last
-			 * iteration of the last simulation run (from which the
-			 * carTravelTime comes)? Where do the PT travel times come from?
-			 */
-
 			final com.google.inject.Injector injector = org.matsim.core.controler.Injector
 					.createInjector(scenario.getConfig(), new AbstractModule() {
 						@Override
@@ -84,6 +78,7 @@ public class Main {
 										public void install() {
 											install(new ScenarioByInstanceModule(scenario));
 											addTravelTimeBinding("car").toInstance(carTravelTime);
+											install(new TravelDisutilityModule());
 										}
 									}));
 						}

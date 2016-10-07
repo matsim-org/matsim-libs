@@ -66,8 +66,8 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 		for (int q = 0; q < initialPlanData.initialDptTimes_s.size(); q++) {
 			initialDptTimesArray_s[q] = initialPlanData.initialDptTimes_s.get(q);
 		}
-		final double[] result = timeAlloc.optimizeDepartureTimes(initialPlanData.plannedActivities,
-				initialDptTimesArray_s);
+		final double[] result = timeAlloc.optimizeDepartureTimes(initialPlanData.plannedActivities, null);
+				// initialDptTimesArray_s);
 
 		if (this.verbose) {
 			System.out.println("FINAL DPT TIMES: " + new ArrayRealVector(result));
