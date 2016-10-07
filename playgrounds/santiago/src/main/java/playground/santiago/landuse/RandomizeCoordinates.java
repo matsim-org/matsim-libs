@@ -48,12 +48,15 @@ public class RandomizeCoordinates {
 	
 	final String configFolder = svnWorkingDir + "inputForMATSim/";
 	final String configFile = configFolder + "expanded_config_1.xml";
+	final String outputConfig = configFolder + "randomized_expanded_config.xml";
 	
 	
-	
+	final String outputFolder = plansFolder;
+	final String outputPlans = outputFolder + "randomized_expanded_plans.xml.gz";
 
 	
-
+	
+	
 	private void Run(){
 		
 		
@@ -78,8 +81,8 @@ public class RandomizeCoordinates {
 		rcwfi.Run();
 		
 	}
-	
-	private long getEODZone (Coord coord , Collection<SimpleFeature> features){
+
+	private long getEODZone (Coord coord){
 		
 		Point point = MGC.xy2Point(coord.getX(), coord.getY());		
 		Map<Long,Geometry>geometriesById = new HashMap<>();
@@ -102,158 +105,8 @@ public class RandomizeCoordinates {
 		
 		return zone;
 		
-	}
-	
-	private Multimap <Long,ActivityFacility> buildTheMap (String activityType, Collection<SimpleFeature> features){
-
-		/**************/
-		String IDAct = activityType.substring(0,2);
-		Config config = ConfigUtils.createConfig();
+	}	
 		
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		
-		/*Only necessary when the activity type has multiple activity options*/
-		Scenario scenarioAux1 = ScenarioUtils.createScenario(config);
-		Scenario scenarioAux2 = ScenarioUtils.createScenario(config);
-		Scenario scenarioAux3 = ScenarioUtils.createScenario(config);
-		/*************************************************************/
-		
-		MatsimFacilitiesReader fr = new MatsimFacilitiesReader(scenario);
-		
-		/*Only necessary when the activity type has multiple activity options*/
-		MatsimFacilitiesReader frAux1 = new MatsimFacilitiesReader(scenarioAux1);
-		MatsimFacilitiesReader frAux2 = new MatsimFacilitiesReader(scenarioAux2);
-		MatsimFacilitiesReader frAux3 = new MatsimFacilitiesReader(scenarioAux3);
-		/************************************************************/
-		
-		switch (IDAct){
-		
-		case ("ho"):
-			fr.readFile("../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/FacilitiesFile/hogByArea.xml");
-			break;
-			
-		case ("wo"):
-			fr.readFile("../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/FacilitiesFile/admByArea.xml");
-			frAux1.readFile("../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/FacilitiesFile/indByArea.xml");
-			frAux2.readFile("../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/FacilitiesFile/minByArea.xml");
-			frAux3.readFile("../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/FacilitiesFile/ofByArea.xml");
-			break;
-			
-		case ("bu"):
-			fr.readFile("../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/FacilitiesFile/admByArea.xml");
-			frAux1.readFile("../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/FacilitiesFile/indByArea.xml");
-			frAux2.readFile("../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/FacilitiesFile/minByArea.xml");
-			frAux3.readFile("../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/FacilitiesFile/ofByArea.xml");
-			break;
-			
-		case("ed"):
-			fr.readFile("../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/FacilitiesFile/edByArea.xml");
-			break;
-			
-		case("he"):
-			fr.readFile("../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/FacilitiesFile/salByArea.xml");
-			break;
-			
-		case("vi"):
-			fr.readFile("../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/FacilitiesFile/hogByArea.xml");
-			break;
-			
-		case("sh"):
-			fr.readFile("../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/FacilitiesFile/comByArea.xml");
-			break;
-			
-		case("le"):
-			fr.readFile("../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/FacilitiesFile/cultByArea.xml");
-			frAux1.readFile("../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/FacilitiesFile/depByArea.xml");
-			frAux2.readFile("../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/FacilitiesFile/hotByArea.xml");
-			break;
-			
-		case("ot"):
-			fr.readFile("../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/landUse/SII/FacilitiesFile/otrByArea.xml");
-			break;
-		}
-		/**************/
-		
-		
-		Multimap<Long, ActivityFacility > actFacilitiesByTAZ = HashMultimap.create();
-		
-		
-
-		/*Simple cases*/
-		if (IDAct.equals("ho")||IDAct.equals("ed")||IDAct.equals("he")||IDAct.equals("sh")||IDAct.equals("vi")||IDAct.equals("ot")){
-		
-		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
-			
-				Coord coord = facility.getCoord();
-				long TAZId = getEODZone (coord, features);				
-				actFacilitiesByTAZ.put(TAZId,facility);
-
-				
-			}
-		
-		/*work and busy*/
-		} else if (IDAct.equals("wo")||IDAct.equals("bu")){
-			
-				for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
-				
-					Coord coord = facility.getCoord();
-					long TAZId = getEODZone (coord, features);				
-					actFacilitiesByTAZ.put(TAZId,facility);
-				}
-			
-				for (ActivityFacility facility : scenarioAux1.getActivityFacilities().getFacilities().values()) {
-					
-					Coord coord = facility.getCoord();
-					long TAZId = getEODZone (coord, features);				
-					actFacilitiesByTAZ.put(TAZId,facility);
-				}
-				
-				for (ActivityFacility facility : scenarioAux2.getActivityFacilities().getFacilities().values()) {
-					
-					Coord coord = facility.getCoord();
-					long TAZId = getEODZone (coord, features);				
-					actFacilitiesByTAZ.put(TAZId,facility);
-				}
-				
-				for (ActivityFacility facility : scenarioAux3.getActivityFacilities().getFacilities().values()) {
-					
-					Coord coord = facility.getCoord();
-					long TAZId = getEODZone (coord, features);				
-					actFacilitiesByTAZ.put(TAZId,facility);
-				}
-				
-		/*leisure*/
-		} else {
-						
-			for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
-			
-				Coord coord = facility.getCoord();
-				long TAZId = getEODZone (coord, features);				
-				actFacilitiesByTAZ.put(TAZId,facility);
-			}
-		
-			for (ActivityFacility facility : scenarioAux1.getActivityFacilities().getFacilities().values()) {
-				
-				Coord coord = facility.getCoord();
-				long TAZId = getEODZone (coord, features);				
-				actFacilitiesByTAZ.put(TAZId,facility);
-			}
-			
-			for (ActivityFacility facility : scenarioAux2.getActivityFacilities().getFacilities().values()) {
-				
-				Coord coord = facility.getCoord();
-				long TAZId = getEODZone (coord, features);				
-				actFacilitiesByTAZ.put(TAZId,facility);
-			}
-			
-		}
-		
-	
-		return actFacilitiesByTAZ;
-		
-		
-	}
-	
 	private Coord selectRandomFacility (Multimap <Long,ActivityFacility> activityByTAZ, Long TAZId){
  
 	Collection<ActivityFacility> setToSearch = activityByTAZ.get(TAZId);
@@ -264,18 +117,19 @@ public class RandomizeCoordinates {
 
 	if (size!=0){
 		
-		int item = new Random().nextInt(size);	
-		int i = 0;
-
+		int facilityNumber = new Random().nextInt(size);		
+		int facilityIndex = 0;
+		
 		for(ActivityFacility facility : setToSearch){	
 
-			if (i == item){			
-//				coord.setXY(facility.getCoord().getX(), facility.getCoord().getY());
+			if (facilityIndex == facilityNumber){
 				coord = facility.getCoord();
-
-
+				break;
 			}
-			i = i + 1;
+				
+			++facilityIndex;	
+
+
 		}
 
 	}	
@@ -285,36 +139,23 @@ public class RandomizeCoordinates {
 
 	private Map <Id,Integer> getAgentCondition(Population originalPlans){
 		
-		ArrayList<String> repeatedPopulationIds=new ArrayList<>();
-		ArrayList<Id> populationIds = new ArrayList<Id>();
 		Map <Id,Integer> agentCondition = new HashMap<Id,Integer>();
 		
 		for (Person p : originalPlans.getPersons().values()) {
 			
 			String tempIds = p.getId().toString();
-			String [] partIds = tempIds.split("_");
-			repeatedPopulationIds.add(partIds[0]);
-			populationIds.add(p.getId());
 			
-		}
-		int i=0;
-		int j=1;
-		
-		//The first agent is an original agent.
-		agentCondition.put(populationIds.get(i), 0);
-		
-		while(j<populationIds.size()){
-			if (repeatedPopulationIds.get(i).equals(repeatedPopulationIds.get(j))){
-				agentCondition.put(populationIds.get(j), 1);
-
-				j=j+1;
-			}else{
-					agentCondition.put(populationIds.get(j),0);
-					i=j;
-					j=j+1;
+			int indicator = 0;
+			
+			if(tempIds.contains("_")){
+				indicator = 1;				
 				
-			}
-		}
+			}			
+			
+			agentCondition.put(p.getId(), indicator);
+			
+		}	
+
 		
 		return agentCondition;
 
@@ -322,31 +163,77 @@ public class RandomizeCoordinates {
 		
 	private Population createNewPlans(Map<Id, Integer> agentCondition, Population originalPlans, Collection<SimpleFeature> features){
 		
-		Multimap <Long,ActivityFacility> hogByTAZ = buildTheMap("home", features);
-		Multimap <Long,ActivityFacility> workByTAZ = buildTheMap("work", features);
-		Multimap <Long,ActivityFacility> busByTAZ = buildTheMap("busiest", features);
-		Multimap <Long,ActivityFacility> edByTAZ = buildTheMap("education", features);
-		Multimap <Long,ActivityFacility> healthByTAZ = buildTheMap("health", features);
-		Multimap <Long,ActivityFacility> visitByTAZ = buildTheMap("visit", features);
-		Multimap <Long,ActivityFacility> shopByTAZ = buildTheMap("shopping", features);
-		Multimap <Long,ActivityFacility> leisByTAZ = buildTheMap("leisure", features);
-		Multimap <Long,ActivityFacility> otherByTAZ = buildTheMap("other", features);
+		
+		FacilitiesByZone fbzHome = new FacilitiesByZone(features);
+		Multimap <Long,ActivityFacility> homeByTAZ = fbzHome.build("home");		
+		
+		FacilitiesByZone fbzWork = new FacilitiesByZone(features);
+		Multimap <Long,ActivityFacility> workByTAZ = fbzWork.build("work");
+		
+		FacilitiesByZone fbzBusiest = new FacilitiesByZone(features);
+		Multimap <Long,ActivityFacility> busiestByTAZ = fbzBusiest.build("busiest");
+		
+		FacilitiesByZone fbzEducation = new FacilitiesByZone(features);
+		Multimap <Long,ActivityFacility> educationByTAZ = fbzEducation.build("education");
+		
+		FacilitiesByZone fbzHealth = new FacilitiesByZone(features);
+		Multimap <Long,ActivityFacility> healthByTAZ = fbzHealth.build("health");
+		
+		FacilitiesByZone fbzVisit = new FacilitiesByZone(features);
+		Multimap <Long,ActivityFacility> visitByTAZ = fbzVisit.build("visit");
+		
+		FacilitiesByZone fbzShop = new FacilitiesByZone(features);
+		Multimap <Long,ActivityFacility> shopByTAZ = fbzShop.build("shopping");
+		
+		FacilitiesByZone fbzLeisure = new FacilitiesByZone(features);
+		Multimap <Long,ActivityFacility> leisureByTAZ = fbzLeisure.build("leisure");
+		
+		FacilitiesByZone fbzOther = new FacilitiesByZone(features);
+		Multimap <Long,ActivityFacility> otherByTAZ = fbzOther.build("other");
+	
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		Population newPlans = scenario.getPopulation();
 		Coord zeroCoord = new Coord (0,0);
-		 
+		
+
+		
+		
+		List<Coord> homeCoords = new ArrayList<>();
+		List<Coord> workCoords = new ArrayList<>();
+		List<Coord> busCoords = new ArrayList<>();		
+		List<Coord> educCoords = new ArrayList<>();
+		List<Coord> healthCoords = new ArrayList<>();	
+		List<Coord> visitCoords = new ArrayList<>();
+		List<Coord> shopCoords = new ArrayList<>();
+		List<Coord> leisCoords = new ArrayList<>();
+		List<Coord> otherCoords = new ArrayList<>();
+		
+		
 		for (Person p : originalPlans.getPersons().values()){
 
 			Id<Person> pInId = Id.createPersonId( p.getId() );
 			Person pIn = newPlans.getFactory().createPerson( pInId  );
 			newPlans.addPerson( pIn );
 			
-			if (agentCondition.get(p.getId()).equals(1)){
+
+			if(agentCondition.get(p.getId()).equals(0)){
+			
 				
+				homeCoords = new ArrayList<>();
+				workCoords = new ArrayList<>();
+				busCoords = new ArrayList<>();		
+				educCoords = new ArrayList<>();
+				healthCoords = new ArrayList<>();	
+				visitCoords = new ArrayList<>();
+				shopCoords = new ArrayList<>();
+				leisCoords = new ArrayList<>();
+				otherCoords = new ArrayList<>();
+				
+			
 				for (Plan plan : p.getPlans()){
-				
+					
 					Plan planIn = newPlans.getFactory().createPlan();
 					List<PlanElement> pes = plan.getPlanElements();
 					
@@ -359,52 +246,459 @@ public class RandomizeCoordinates {
 						planIn.addLeg(legIn);
 						
 					} else {
+						
+						Activity actIn = (Activity)pe;
+						String actType = actIn.getType();
+						
+
+						switch(actType.substring(0,2)){
+
+						case("ho"):
+						homeCoords.add(actIn.getCoord());
+						break;
+
+						case("wo"):
+						workCoords.add(actIn.getCoord());
+						break;
+
+						case("bu"):
+						busCoords.add(actIn.getCoord());
+						break;
+						
+						case("ed"):
+						educCoords.add(actIn.getCoord());							
+						break;
+						
+						case("he"):
+						healthCoords.add(actIn.getCoord());
+						break;
+						
+						case("vi"):
+						visitCoords.add(actIn.getCoord());
+						break;					
+	
+						case("sh"):
+						shopCoords.add(actIn.getCoord());
+						break;
+						
+						case("le"):
+						leisCoords.add(actIn.getCoord());						
+						
+						case("ot"):
+						otherCoords.add(actIn.getCoord());				
+
+						}
+						
+						
+						
+	
+
+					Activity actOut = newPlans.getFactory().createActivityFromCoord(actType, actIn.getCoord());
+						planIn.addActivity(actOut);				
+						actOut.setEndTime(actIn.getEndTime());
+						actOut.setStartTime(actIn.getStartTime());
+
+					}
+
+
+
+					}
+					
+					pIn.addPlan(planIn);
+				}
+			
+			
+		
+		} else if (agentCondition.get(p.getId()).equals(1)){
+			
+		
+			
+			ArrayList <Coord> homeShots = new ArrayList <> ();
+			ArrayList <Coord> workShots = new ArrayList <> ();
+			ArrayList <Coord> busShots = new ArrayList <> ();
+			ArrayList <Coord> educShots = new ArrayList <> ();
+			ArrayList <Coord> healthShots = new ArrayList <> ();
+			ArrayList <Coord> visitShots = new ArrayList <> ();
+			ArrayList <Coord> shopShots = new ArrayList <> ();
+			ArrayList <Coord> leisShots = new ArrayList <> ();
+			ArrayList <Coord> otherShots = new ArrayList <> ();
+			
+			
+			
+			
+			
+			int homeAppearences = 0;
+			int workAppearences = 0;
+			int busAppearences = 0;
+			int educAppearences = 0;
+			int healthAppearences = 0;
+			int visitAppearences = 0;
+			int shopAppearences = 0;
+			int leisAppearences = 0;
+			int otherAppearences = 0;
+			
+			
+			
+				for (Plan plan : p.getPlans()){
+				
+					Plan planIn = newPlans.getFactory().createPlan();
+					List<PlanElement> pes = plan.getPlanElements();
+					
+					
+					for ( PlanElement pe : pes){
+
+					if(pe instanceof Leg) {
+					
+						Leg leg = (Leg) pe;
+						Leg legIn = newPlans.getFactory().createLeg(leg.getMode());
+						planIn.addLeg(legIn);
+						
+					} else {
 											
 						Activity actTemp = (Activity) pe; 
 						String tempType = actTemp.getType();						
 						String IDAct = tempType.substring(0,2);
 						Coord tempCoord = actTemp.getCoord();			
-						long TAZId = getEODZone(tempCoord ,  features);
-						Coord newCoord = new Coord (0,0);
-
+						long TAZId = getEODZone(tempCoord);
+						Coord newCoord = new Coord (0,0);						
+						
+						int repeated = 0;
+						
 						switch (IDAct){
 						
-						case ("ho"):
-							newCoord = selectRandomFacility(hogByTAZ, TAZId);						
+						
+						case ("ho"): 						
+						++homeAppearences;
+						//IF FIRST APPEARENCE, SHOOT
+						if (homeAppearences == 1){
+							newCoord = selectRandomFacility(homeByTAZ, TAZId);
+							homeShots.add(newCoord);
+
+						//IF NOT...							
+						} else {
+
+							for (int homeCoordsIndex = 0; homeCoordsIndex<homeAppearences-1;++homeCoordsIndex){
+								//IF I'M ABLE TO FIND A REPEATED LOCATION
+								if(homeCoords.get(homeAppearences-1).equals(homeCoords.get(homeCoordsIndex))){
+
+									newCoord = homeShots.get(homeCoordsIndex);
+									homeShots.add(newCoord);
+									repeated=1;
+									break;
+
+								}
+								
+
+								
+							}
+							//IF I'M NOT ABLE TO FIND A REPEATED LOCATION, THEN SHOOT
+							if(repeated==0){
+								newCoord = selectRandomFacility(homeByTAZ, TAZId);
+								homeShots.add(newCoord);								
+								
+							}
+							
+							
+						}							
+						
+							break;
+
+
+						case ("wo"):							
+						++workAppearences;
+						//IF FIRST APPEARENCE, SHOOT
+						if (workAppearences == 1){
+							newCoord = selectRandomFacility(workByTAZ, TAZId);
+							workShots.add(newCoord);
+
+						//IF NOT...							
+						} else {
+
+							for (int workCoordsIndex = 0; workCoordsIndex<workAppearences-1;++workCoordsIndex){
+								//IF I'M ABLE TO FIND A REPEATED LOCATION
+								if(workCoords.get(workAppearences-1).equals(workCoords.get(workCoordsIndex))){
+									newCoord = workShots.get(workCoordsIndex);
+									workShots.add(newCoord);
+									repeated=1;
+									break;
+
+								}
+								
+
+								
+							}
+							//IF I'M NOT ABLE TO FIND A REPEATED LOCATION, THEN SHOOT
+							if(repeated==0){
+								newCoord = selectRandomFacility(workByTAZ, TAZId);
+								workShots.add(newCoord);								
+								
+							}
+							
+							
+						}	
+							
 							break;
 							
-						case ("wo"):
-							newCoord = selectRandomFacility(workByTAZ, TAZId);						
-							break;
+						case ("bu"):						
 							
-						case ("bu"):
-							newCoord = selectRandomFacility(busByTAZ, TAZId);						
+						++busAppearences;
+						//IF FIRST APPEARENCE, SHOOT
+						if (busAppearences == 1){
+							newCoord = selectRandomFacility(busiestByTAZ, TAZId);
+							busShots.add(newCoord);
+
+						//IF NOT...							
+						} else {
+
+							for (int busCoordsIndex = 0; busCoordsIndex<busAppearences-1;++busCoordsIndex){
+								//IF I'M ABLE TO FIND A REPEATED LOCATION
+								if(busCoords.get(busAppearences-1).equals(busCoords.get(busCoordsIndex))){
+
+									newCoord = busShots.get(busCoordsIndex);
+									busShots.add(newCoord);
+									repeated=1;
+									break;
+
+								}
+								
+
+								
+							}
+							//IF I'M NOT ABLE TO FIND A REPEATED LOCATION, THEN SHOOT
+							if(repeated==0){
+								newCoord = selectRandomFacility(busiestByTAZ, TAZId);
+								busShots.add(newCoord);								
+								
+							}
+							
+							
+						}
+							
+											
 							break;
+
 							
 						case("ed"):
-							newCoord = selectRandomFacility(edByTAZ, TAZId);						
+							
+						++educAppearences;
+						//IF FIRST APPEARENCE, SHOOT
+						if (educAppearences == 1){
+							newCoord = selectRandomFacility(educationByTAZ, TAZId);
+							educShots.add(newCoord);
+
+						//IF NOT...							
+						} else {
+
+							for (int educCoordsIndex = 0; educCoordsIndex<educAppearences-1;++educCoordsIndex){
+								//IF I'M ABLE TO FIND A REPEATED LOCATION
+								if(educCoords.get(educAppearences-1).equals(educCoords.get(educCoordsIndex))){
+									newCoord = educShots.get(educCoordsIndex);
+									educShots.add(newCoord);
+									repeated=1;
+									break;
+
+								}
+								
+
+								
+							}
+							//IF I'M NOT ABLE TO FIND A REPEATED LOCATION, THEN SHOOT
+							if(repeated==0){
+								newCoord = selectRandomFacility(educationByTAZ, TAZId);
+								educShots.add(newCoord);				
+								
+							}
+							
+							
+						}							
+								
 							break;
 							
 						case("he"):
-							newCoord = selectRandomFacility(healthByTAZ, TAZId);						
+							
+							++healthAppearences;
+							//IF FIRST APPEARENCE, SHOOT
+							if (healthAppearences == 1){
+								newCoord = selectRandomFacility(healthByTAZ, TAZId);
+								healthShots.add(newCoord);
+
+							//IF NOT...							
+							} else {
+
+								for (int healthCoordsIndex = 0; healthCoordsIndex<healthAppearences-1;++healthCoordsIndex){
+									//IF I'M ABLE TO FIND A REPEATED LOCATION
+									if(healthCoords.get(healthAppearences-1).equals(healthCoords.get(healthCoordsIndex))){
+										newCoord = healthShots.get(healthCoordsIndex);
+										healthShots.add(newCoord);
+										repeated=1;
+										break;
+
+									}
+									
+
+									
+								}
+								//IF I'M NOT ABLE TO FIND A REPEATED LOCATION, THEN SHOOT
+								if(repeated==0){
+									newCoord = selectRandomFacility(healthByTAZ, TAZId);
+									healthShots.add(newCoord);				
+									
+								}
+								
+								
+							}	
+							
+					
 							break;
 							
 						case("vi"):
-							newCoord = selectRandomFacility(visitByTAZ, TAZId);						
+							
+							++visitAppearences;
+							//IF FIRST APPEARENCE, SHOOT
+							if (visitAppearences == 1){
+								newCoord = selectRandomFacility(visitByTAZ, TAZId);
+								visitShots.add(newCoord);
+
+							//IF NOT...							
+							} else {
+
+								for (int visitCoordsIndex = 0; visitCoordsIndex<visitAppearences-1;++visitCoordsIndex){
+									//IF I'M ABLE TO FIND A REPEATED LOCATION
+									if(visitCoords.get(visitAppearences-1).equals(visitCoords.get(visitCoordsIndex))){
+										newCoord = visitShots.get(visitCoordsIndex);
+										visitShots.add(newCoord);
+										repeated=1;
+										break;
+
+									}
+									
+
+									
+								}
+								//IF I'M NOT ABLE TO FIND A REPEATED LOCATION, THEN SHOOT
+								if(repeated==0){
+									newCoord = selectRandomFacility(visitByTAZ, TAZId);
+									visitShots.add(newCoord);									
+								}								
+								
+							}	
+							
+					
 							break;
 							
 						case("sh"):
-							newCoord = selectRandomFacility(shopByTAZ, TAZId);						
+							
+							++shopAppearences;
+							//IF FIRST APPEARENCE, SHOOT
+							if (shopAppearences == 1){
+								newCoord = selectRandomFacility(shopByTAZ, TAZId);
+								shopShots.add(newCoord);
+
+							//IF NOT...							
+							} else {
+
+								for (int shopCoordsIndex = 0; shopCoordsIndex<shopAppearences-1;++shopCoordsIndex){
+									//IF I'M ABLE TO FIND A REPEATED LOCATION
+									if(shopCoords.get(shopAppearences-1).equals(shopCoords.get(shopCoordsIndex))){
+										newCoord = shopShots.get(shopCoordsIndex);
+										shopShots.add(newCoord);
+										repeated=1;
+										break;
+
+									}
+									
+
+									
+								}
+								//IF I'M NOT ABLE TO FIND A REPEATED LOCATION, THEN SHOOT
+								if(repeated==0){
+									newCoord = selectRandomFacility(shopByTAZ, TAZId);
+									shopShots.add(newCoord);									
+								}								
+								
+							}	
+							
+					
 							break;
 							
-						case("le"):							
-							newCoord = selectRandomFacility(leisByTAZ, TAZId);						
+						case("le"):	
+							
+						++leisAppearences;
+						//IF FIRST APPEARENCE, SHOOT
+						if (leisAppearences == 1){
+							newCoord = selectRandomFacility(leisureByTAZ, TAZId);
+							leisShots.add(newCoord);
+
+						//IF NOT...							
+						} else {
+
+							for (int leisCoordsIndex = 0; leisCoordsIndex<leisAppearences-1;++leisCoordsIndex){
+								//IF I'M ABLE TO FIND A REPEATED LOCATION
+								if(leisCoords.get(leisAppearences-1).equals(leisCoords.get(leisCoordsIndex))){
+									newCoord = leisShots.get(leisCoordsIndex);
+									leisShots.add(newCoord);
+									repeated=1;
+									break;
+
+								}
+								
+
+								
+							}
+							//IF I'M NOT ABLE TO FIND A REPEATED LOCATION, THEN SHOOT
+							if(repeated==0){
+								newCoord = selectRandomFacility(leisureByTAZ, TAZId);
+								leisShots.add(newCoord);									
+							}								
+							
+						}	
+											
 							break;
 							
 						case("ot"):
-							newCoord = selectRandomFacility(otherByTAZ, TAZId);						
+							
+							
+							++otherAppearences;
+							//IF FIRST APPEARENCE, SHOOT
+							if (otherAppearences == 1){
+								newCoord = selectRandomFacility(otherByTAZ, TAZId);
+								otherShots.add(newCoord);
+
+							//IF NOT...							
+							} else {
+
+								for (int otherCoordsIndex = 0; otherCoordsIndex<otherAppearences-1;++otherCoordsIndex){
+									//IF I'M ABLE TO FIND A REPEATED LOCATION
+									if(otherCoords.get(otherAppearences-1).equals(otherCoords.get(otherCoordsIndex))){
+										newCoord = otherShots.get(otherCoordsIndex);
+										otherShots.add(newCoord);
+										repeated=1;
+										break;
+
+									}
+									
+
+									
+								}
+								//IF I'M NOT ABLE TO FIND A REPEATED LOCATION, THEN SHOOT
+								if(repeated==0){
+									newCoord = selectRandomFacility(otherByTAZ, TAZId);
+									otherShots.add(newCoord);									
+								}								
+								
+							}	
+				
 							break;
 						}
+						
+						
+						
+						
+						
+						
+						
+						
+						//TODO
 						
 						if (!newCoord.equals(zeroCoord)){
 						
@@ -432,40 +726,7 @@ public class RandomizeCoordinates {
 					
 				}
 
-				
-				
-			} else if (agentCondition.get(p.getId()).equals(0)) {
-				
 
-				for (Plan plan : p.getPlans()){
-					
-					Plan planIn = newPlans.getFactory().createPlan();
-					List<PlanElement> pes = plan.getPlanElements();
-					
-					for ( PlanElement pe : pes){
-					
-					if(pe instanceof Leg) {
-					
-						Leg leg = (Leg) pe;
-						Leg legIn = newPlans.getFactory().createLeg(leg.getMode());
-						planIn.addLeg(legIn);
-						
-					} else {
-						
-						Activity actIn = (Activity)pe;
-						Activity actOut = newPlans.getFactory().createActivityFromCoord(actIn.getType(), actIn.getCoord());
-						planIn.addActivity(actOut);				
-						actOut.setEndTime(actIn.getEndTime());
-						actOut.setStartTime(actIn.getStartTime());
-
-					}
-
-
-
-					}
-					
-					pIn.addPlan(planIn);
-				}
 			}
 		}
 
@@ -473,19 +734,20 @@ public class RandomizeCoordinates {
 		return newPlans;
 		
 	}
-
+	
 	private void writeNewPopulation (Population population){
 		
 		PopulationWriter pw = new PopulationWriter(population);
-		pw.write(plansFolder + "randomized_expanded_plans.xml.gz");
+		pw.write(outputPlans);
 		
 	}
+	
 	
 	private void writeNewConfig (Config config){
 		
 		PlansConfigGroup plans = config.plans();
 		plans.setInputFile(runsWorkingDir + "randomized_expanded_plans.xml.gz");
-		new ConfigWriter(config).write(configFolder + "randomized_expanded_config.xml");
+		new ConfigWriter(config).write(outputConfig);
 		
 	}
 	
