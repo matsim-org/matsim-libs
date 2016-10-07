@@ -41,6 +41,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.legMode.distributions.LegModeRouteDistanceDistributionHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
+import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.ListUtils;
 
 /**
@@ -59,8 +60,8 @@ public class TravelDistanceComperator {
 	}
 
 	public static void main(String[] args) {
-		TravelDistanceComperator tdc = new TravelDistanceComperator("../../../../repos/runs-svn/patnaIndia/run110/100pct/",
-				"../../../../repos/runs-svn/patnaIndia/inputs/network.xml");
+		TravelDistanceComperator tdc = new TravelDistanceComperator(FileUtils.RUNS_SVN+"/patnaIndia/run110/randomNrFix/slowCapacityUpdate/1pct/",
+				FileUtils.RUNS_SVN+"/patnaIndia/inputs/network.xml");
 		tdc.run();
 	}
 
@@ -99,7 +100,7 @@ public class TravelDistanceComperator {
 		for (LinkDynamics ld : LinkDynamics.values() ) {
 			for ( TrafficDynamics td : TrafficDynamics.values()){
 				String queueModel = ld+"_"+td;
-				for(int i=2;i<12;i++){
+				for(int i=1;i<12;i++){
 					String eventsFile = respectiveFileDirectory + "/output_"+queueModel+"_"+i+"/output_events.xml.gz";
 					if (! new File(eventsFile).exists() ) continue;
 					SortedMap<String,Double> mode2avgDist = getMode2Dist(eventsFile);
