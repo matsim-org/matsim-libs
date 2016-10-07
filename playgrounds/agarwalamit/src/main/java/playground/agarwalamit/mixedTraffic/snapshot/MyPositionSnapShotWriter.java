@@ -52,11 +52,11 @@ public class MyPositionSnapShotWriter implements SnapshotWriter {
 
 	private BufferedWriter out = null;
 	private double currentTime = -1;
-	private Scenario scenario; 
-	private Map<Id<Person>, Id<Link>> person2link = new HashMap<>();
+	private final Scenario scenario;
+	private final Map<Id<Person>, Id<Link>> person2link = new HashMap<>();
 	private final static Logger LOG = Logger.getLogger(MyPositionSnapShotWriter.class);
 
-	public static enum Labels { TIME, VEHICLE, LINK_ID, DISTANCE_FROM_FROMNODE, SPEED } ;
+	public enum Labels { TIME, VEHICLE, LINK_ID, DISTANCE_FROM_FROMNODE, SPEED }
 
 	@Inject 
 	public MyPositionSnapShotWriter(Scenario scenario) {

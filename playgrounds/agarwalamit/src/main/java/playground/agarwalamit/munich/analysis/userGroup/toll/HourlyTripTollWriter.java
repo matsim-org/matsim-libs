@@ -48,7 +48,7 @@ public class HourlyTripTollWriter {
 		this.tollHandler = new TripTollHandler( simulationEndTime, noOfTimeBins );
 	}
 
-	private TripTollHandler tollHandler ;
+	private final TripTollHandler tollHandler ;
 	private final MunichPersonFilter pf = new MunichPersonFilter();
 
 	public static void main(String[] args) {
@@ -80,10 +80,10 @@ public class HourlyTripTollWriter {
 
 		//initialize
 		for(double d : timebin2persontoll.keySet()){
-			userGroup2timebin2tolls.put(d, new TreeMap<String, List<Double>>());
+			userGroup2timebin2tolls.put(d, new TreeMap<>());
 				SortedMap<String, List<Double>> time2totalToll = new TreeMap<>();
 				for(MunichUserGroup ug : MunichUserGroup.values()){
-				time2totalToll.put(ug.toString(), new ArrayList<Double>());
+				time2totalToll.put(ug.toString(), new ArrayList<>());
 			}
 			userGroup2timebin2tolls.put(d, time2totalToll);
 		}

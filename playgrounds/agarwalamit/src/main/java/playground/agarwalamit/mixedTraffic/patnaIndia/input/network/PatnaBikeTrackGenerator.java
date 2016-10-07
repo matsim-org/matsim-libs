@@ -52,9 +52,9 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 public class PatnaBikeTrackGenerator {
 
 	private final String railShapeFile = PatnaUtils.INPUT_FILES_DIR + "/raw/network/railPatna/railPatna_multiPart2SinglePart.shp"; // Bike is laid parallel to rail track.
-	private Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	private Network network = this.scenario.getNetwork();
-	private Map<Coord, String> coordId = new HashMap<Coord, String>();
+	private final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	private final Network network = this.scenario.getNetwork();
+	private final Map<Coord, String> coordId = new HashMap<>();
 	private final CoordinateTransformation ct= PatnaUtils.COORDINATE_TRANSFORMATION;
 	
 	public static void main(String[] args) {

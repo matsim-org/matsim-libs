@@ -97,7 +97,7 @@ public class SeepageSchematicPlotter {
 		sc.getConfig().qsim().setLinkWidthForVis((float)0);
 		((Network) sc.getNetwork()).setEffectiveLaneWidth(0.);	
 
-		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>();
+		Map<String, VehicleType> modesType = new HashMap<>();
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.car,VehicleType.class));
 		car.setMaximumVelocity(20);
 		car.setPcuEquivalents(1.0);
@@ -214,7 +214,7 @@ public class SeepageSchematicPlotter {
 			Node node3 = NetworkUtils.createAndAddNode(network, Id.createNodeId("3"), new Coord(0.0, 1100.0));
 			Node node4 = NetworkUtils.createAndAddNode(network, Id.createNodeId("4"), new Coord(0.0, 1200.0));
 
-			Set<String> allowedModes = new HashSet<String>(); allowedModes.addAll(Arrays.asList(TransportMode.car,TransportMode.bike,"motorbike"));
+			Set<String> allowedModes = new HashSet<>(); allowedModes.addAll(Arrays.asList(TransportMode.car,TransportMode.bike,"motorbike"));
 
 			link1 = NetworkUtils.createAndAddLink(network, Id.createLinkId("1"), node1, node2, 100, 25, 36000, 1, null, "22"); 
 			link2 = NetworkUtils.createAndAddLink(network, Id.createLinkId("2"), node2, node3, 1000, 25, 60, 1, null, "22");	//flow capacity is 1 PCU per min.

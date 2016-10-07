@@ -35,8 +35,8 @@ public class RoadTypeInfoAnalyzer {
 		Network network = LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork();
 		BufferedWriter writer = IOUtils.getBufferedWriter(outFile+"/roadTypeInfo_freight.txt");
 		
-		Map<String,Map<String,Integer>> runCase2RoadType2Count = new HashMap<String, Map<String,Integer>>();
-		Set<String> roadTypes = new HashSet<String>();
+		Map<String,Map<String,Integer>> runCase2RoadType2Count = new HashMap<>();
+		Set<String> roadTypes = new HashSet<>();
 		
 		for(String runCase:runCases){
 			RoadTypeInfoAnalyzer rti = new RoadTypeInfoAnalyzer(network, runDir+runCase+"/ITERS/it.1500/1500.events.xml.gz");
@@ -72,8 +72,8 @@ public class RoadTypeInfoAnalyzer {
 		this.eventsFile = eventsFile;
 	}
 
-	private RoadTypeHandler rth;
-	private String eventsFile;
+	private final RoadTypeHandler rth;
+	private final String eventsFile;
 	
 	public void run(){
 		EventsManager events = EventsUtils.createEventsManager();
@@ -96,14 +96,14 @@ public class RoadTypeInfoAnalyzer {
 			this.net = network;
 
 			for(UserGroup ug : UserGroup.values()){
-				this.userGrp2roadType2Count.put(ug, new HashMap<String, Integer>());
+				this.userGrp2roadType2Count.put(ug, new HashMap<>());
 			}
 		}
 
-		private Network net;
-		private MunichPersonFilter pf = new MunichPersonFilter();
+		private final Network net;
+		private final MunichPersonFilter pf = new MunichPersonFilter();
 
-		private Map<UserGroup,Map<String,Integer>> userGrp2roadType2Count = new HashMap<UserGroup, Map<String,Integer>>();
+		private final Map<UserGroup,Map<String,Integer>> userGrp2roadType2Count = new HashMap<>();
 
 		@Override
 		public void reset(int iteration) {

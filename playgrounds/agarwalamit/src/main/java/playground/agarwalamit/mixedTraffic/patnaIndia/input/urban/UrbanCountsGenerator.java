@@ -53,7 +53,7 @@ public class UrbanCountsGenerator {
 	
 	private void writeCountsDataToFile(final String outCountsFile){
 		
-		Counts<Link> counts = new Counts<Link>();
+		Counts<Link> counts = new Counts<>();
 		counts.setYear(2008);
 		counts.setName("Patna_counts");
 		counts.setDescription("OnlyUrbanCountsCarMotorbikeBikeTruck");

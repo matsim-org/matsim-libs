@@ -41,8 +41,8 @@ import org.matsim.core.events.MatsimEventsReader;
  */
 public class AverageLinkFlowHandler implements LinkEnterEventHandler, LinkLeaveEventHandler{
 
-	private Map<Id<Link>,List<Double>> enterTimes = new HashMap<Id<Link>, List<Double>>();
-	private Map<Id<Link>,List<Double>> leaveTimes = new HashMap<Id<Link>, List<Double>>();
+	private final Map<Id<Link>,List<Double>> enterTimes = new HashMap<>();
+	private final Map<Id<Link>,List<Double>> leaveTimes = new HashMap<>();
 	public static final Logger LOG = Logger.getLogger(AverageLinkFlowHandler.class);
 	
 	public static void main(String[] args) {
@@ -76,7 +76,7 @@ public class AverageLinkFlowHandler implements LinkEnterEventHandler, LinkLeaveE
 			List<Double> times = leaveTimes.get(event.getLinkId());
 			times.add(event.getTime());
 		} else {
-			List<Double> times = new ArrayList<Double>();
+			List<Double> times = new ArrayList<>();
 			times.add(event.getTime());
 			leaveTimes.put(event.getLinkId(), times);
 		}
@@ -88,14 +88,14 @@ public class AverageLinkFlowHandler implements LinkEnterEventHandler, LinkLeaveE
 			List<Double> times = enterTimes.get(event.getLinkId());
 			times.add(event.getTime());
 		} else {
-			List<Double> times = new ArrayList<Double>();
+			List<Double> times = new ArrayList<>();
 			times.add(event.getTime());
 			enterTimes.put(event.getLinkId(), times);
 		}
 	}
 
 	public Map<Id<Link>, Double> getInflow(){
-		Map<Id<Link>, Double> linkId2Inflow = new HashMap<Id<Link>, Double>();
+		Map<Id<Link>, Double> linkId2Inflow = new HashMap<>();
 		for(Id<Link> id : enterTimes.keySet()){
 			double inflow;
 			double firstVehEnterTime =Collections.min(enterTimes.get(id)); 
@@ -108,7 +108,7 @@ public class AverageLinkFlowHandler implements LinkEnterEventHandler, LinkLeaveE
 	}
 
 	public Map<Id<Link>, Double> getOutflow(){
-		Map<Id<Link>, Double> linkId2Outflow = new HashMap<Id<Link>, Double>();
+		Map<Id<Link>, Double> linkId2Outflow = new HashMap<>();
 		for(Id<Link> id : leaveTimes.keySet()){
 			double outflow;
 			double firstVehLeaveTime =Collections.min(leaveTimes.get(id)); 

@@ -53,13 +53,13 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private final Scenario scenario;
 
-	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	private final Map<Id<Person>,String> personId2Mode = new HashMap<>();
 	
 	private int iteration = -1;
 
 	// this is _only_ there for output:
-	Set<Plan> plansEverSeen = new HashSet<>();
+    final Set<Plan> plansEverSeen = new HashSet<>();
 
 	private static final String STR_PLANSTEPFACTORY = "planStepFactory";
 	private static final String STR_ITERATION = "iteration";
@@ -158,7 +158,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 			selectedPlan.getCustomAttributes().put(STR_ITERATION, this.iteration);
 
 			// construct a new PlanBulder and attach it to the plan:
-			planStepFactory = new PlanBuilder<ModalLink>();
+			planStepFactory = new PlanBuilder<>();
 			selectedPlan.getCustomAttributes().put(STR_PLANSTEPFACTORY, planStepFactory);
 
 			// memorize the plan as being seen:

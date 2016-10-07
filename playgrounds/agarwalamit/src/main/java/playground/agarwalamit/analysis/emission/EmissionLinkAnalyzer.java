@@ -145,7 +145,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 
 	@Override
 	public List<EventHandler> getEventHandler() {
-		return new LinkedList<EventHandler>();
+		return new LinkedList<>();
 	}
 
 	@Override

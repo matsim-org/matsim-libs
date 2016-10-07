@@ -62,7 +62,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private final SortedMap<Double, Map<Id<Person>,List<Double>>> timeBin2Person2TripsDistance = new TreeMap<>();
 	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
-	private Network network;
+	private final Network network;
 	private final double timeBinSize;
 	private int nonCarWarning= 0;
 	

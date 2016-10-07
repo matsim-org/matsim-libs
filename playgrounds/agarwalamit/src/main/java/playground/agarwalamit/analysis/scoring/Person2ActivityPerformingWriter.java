@@ -136,7 +136,7 @@ public class Person2ActivityPerformingWriter {
 
 	private void storeUtilOfPerforming(final Scenario sc, final Person p, final Activity activity) {
 		ScoringFunctionFactory sfFactory = new ScoringFunctionFactory() {
-			CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(sc, p.getId()).build();
+			final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(sc, p.getId()).build();
 
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
@@ -200,7 +200,7 @@ public class Person2ActivityPerformingWriter {
 	}
 
 	public class Person2ActivityScoringFunction implements ScoringFunction{
-		private CharyparNagelActivityScoring delegate;
+		private final CharyparNagelActivityScoring delegate;
 		public Person2ActivityScoringFunction(final CharyparNagelActivityScoring delegate) {
 			this.delegate = delegate;
 		}

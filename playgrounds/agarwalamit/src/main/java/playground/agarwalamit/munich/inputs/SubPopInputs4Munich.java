@@ -46,9 +46,9 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class SubPopInputs4Munich {
 
-	MunichPersonFilter pf = new MunichPersonFilter();
+	final MunichPersonFilter pf = new MunichPersonFilter();
 	private final String subPopAttributeName = "userGroup";
-	private String outPopAttributeFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/input/personsAttributes_1pct_usrGrp.xml.gz";
+	private final String outPopAttributeFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/input/personsAttributes_1pct_usrGrp.xml.gz";
 
 	public static void main(String[] args) {
 		SubPopInputs4Munich inputs = new SubPopInputs4Munich();

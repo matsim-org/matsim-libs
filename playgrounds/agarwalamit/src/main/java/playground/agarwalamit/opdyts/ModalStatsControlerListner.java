@@ -42,7 +42,7 @@ import playground.agarwalamit.analysis.modalShare.FilteredModalShareEventHandler
 
 public class ModalStatsControlerListner implements StartupListener, IterationEndsListener, ShutdownListener {
 
-    private FilteredModalShareEventHandler modalShareEventHandler = new FilteredModalShareEventHandler();
+    private final FilteredModalShareEventHandler modalShareEventHandler = new FilteredModalShareEventHandler();
     private BufferedWriter writer;
     private final Set<String> mode2consider;
 

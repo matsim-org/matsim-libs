@@ -42,8 +42,7 @@ public class BinaryAdditionModule {
 			}
 		} else {
 			GenerateFundamentalDiagramData.LOG.info("Already tried too many combinations!!!");
-			return;
-		}
+        }
 	}
 
 	public Integer[] getPoint() {

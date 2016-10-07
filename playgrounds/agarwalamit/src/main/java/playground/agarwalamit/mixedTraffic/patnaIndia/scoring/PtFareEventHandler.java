@@ -48,7 +48,7 @@ public class PtFareEventHandler implements PersonDepartureEventHandler, Teleport
 	private final Map<Id<Person>,String> person2mode = new HashMap<>();
 	
 	@Inject
-	private EventsManager events;
+	private final EventsManager events;
 	
 	@Override
 	public void reset(int iteration) {
@@ -67,7 +67,7 @@ public class PtFareEventHandler implements PersonDepartureEventHandler, Teleport
 		events.processEvent(moneyEvent);
 	}
 	
-	private final double getPTFareFromDistance(final double distance) {
+	private double getPTFareFromDistance(final double distance) {
 		double fareInRs = Double.NEGATIVE_INFINITY;
 		if(distance < 4000) fareInRs = 0.01 * 300;
 		else fareInRs = 0.01* ( 300 + (distance/1000 - 4)*31 );

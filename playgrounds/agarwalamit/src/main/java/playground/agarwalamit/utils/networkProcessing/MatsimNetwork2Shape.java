@@ -55,7 +55,7 @@ public class MatsimNetwork2Shape {
         Network network = scenario.getNetwork();
         
         CoordinateReferenceSystem crs = MGC.getCRS("EPSG:3459");//i have tried 2842 3659,2455  32035 and  32135
-        Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+        Collection<SimpleFeature> features = new ArrayList<>();
         PolylineFeatureFactory linkFactory = new PolylineFeatureFactory.Builder().setCrs(crs).
         		setName("link").
                 addAttribute("ID", String.class).
@@ -76,7 +76,7 @@ public class MatsimNetwork2Shape {
         }
        new File("./clusterOutput/networkShape/").mkdir();
         ShapeFileWriter.writeGeometries(features, OUT_SHAPE_LOCATION+"network_links.shp");
-        features = new ArrayList<SimpleFeature>();
+        features = new ArrayList<>();
 		PointFeatureFactory nodeFactory = new PointFeatureFactory.Builder().
 				setCrs(crs).
 				setName("nodes").

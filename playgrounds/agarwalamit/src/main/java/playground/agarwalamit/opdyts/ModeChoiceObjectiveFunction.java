@@ -66,7 +66,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
     // statistics types:
     enum StatType {
         tripBeelineDistances
-    } ;
+    }
 
     private final Map<StatType,Databins<String>> statsContainer = new TreeMap<>() ;
     private final Map<StatType,DataMap<String>> sumsContainer  = new TreeMap<>() ;
@@ -236,7 +236,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         for ( StatType statType : StatType.values() ) {
             this.statsContainer.get(statType).clear() ;
             if ( this.sumsContainer.get(statType)==null ) {
-                this.sumsContainer.put( statType, new DataMap<String>() ) ;
+                this.sumsContainer.put( statType, new DataMap<>() ) ;
             }
             this.sumsContainer.get(statType).clear() ;
         }

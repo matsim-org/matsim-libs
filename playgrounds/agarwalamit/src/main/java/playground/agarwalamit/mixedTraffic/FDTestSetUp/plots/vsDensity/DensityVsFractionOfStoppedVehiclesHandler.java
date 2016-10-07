@@ -41,22 +41,22 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 public class DensityVsFractionOfStoppedVehiclesHandler implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 
 	private final Id<Link> linkId ;
-	private Map<Double, Double> densityVsFractionOfStoppedVehicles;
+	private final Map<Double, Double> densityVsFractionOfStoppedVehicles;
 //	private final Map<String, Double> legMode2PCU;
-	private Map<Id<Person>, String> personId2LegMode;
+	private final Map<Id<Person>, String> personId2LegMode;
 	private double localDensity = 0.;
-	private Map<Id<Person>, Double> personId2LinkEnterTime;
-	private Map<String, Double> legMode2FreeSpeddTravelTime;
-	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	private final Map<Id<Person>, Double> personId2LinkEnterTime;
+	private final Map<String, Double> legMode2FreeSpeddTravelTime;
+	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	
 	public DensityVsFractionOfStoppedVehiclesHandler(Id<Link> linkId, double linkLength) {
 		this.linkId = linkId;
 
-		this.densityVsFractionOfStoppedVehicles = new HashMap<Double, Double>();
-		this.personId2LegMode = new HashMap<Id<Person>, String>();
-		this.personId2LinkEnterTime = new HashMap<Id<Person>, Double>();
+		this.densityVsFractionOfStoppedVehicles = new HashMap<>();
+		this.personId2LegMode = new HashMap<>();
+		this.personId2LinkEnterTime = new HashMap<>();
 //		this.legMode2PCU = new HashMap<String, Double>();
-		this.legMode2FreeSpeddTravelTime = new HashMap<String, Double>();
+		this.legMode2FreeSpeddTravelTime = new HashMap<>();
 
 //		this.legMode2PCU.put("cars", Double.valueOf(1));
 //		this.legMode2PCU.put("motorbikes", Double.valueOf(0.25));

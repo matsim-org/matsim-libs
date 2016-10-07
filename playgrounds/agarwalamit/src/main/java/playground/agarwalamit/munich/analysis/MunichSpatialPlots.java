@@ -61,15 +61,15 @@ import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
 public class MunichSpatialPlots {
 
-	private String runDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
-	private String bau = runDir+"/bau";
-	private String policyName = "ei";
-	private String policyCase = runDir+"/"+policyName;
+	private final String runDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
+	private final String bau = runDir+"/bau";
+	private final String policyName = "ei";
+	private final String policyCase = runDir+"/"+policyName;
 	private final double countScaleFactor = 100;
 	private static double gridSize ;
 	private static double smoothingRadius ;
-	private boolean isWritingGGPLOTData = true;
-	private int noOfBins = 1;
+	private final boolean isWritingGGPLOTData = true;
+	private final int noOfBins = 1;
 
 	private static double xMin=4452550.25;
 	private static double xMax=4479483.33;
@@ -80,7 +80,7 @@ public class MunichSpatialPlots {
 
 	private static final String SHAPE_FILE_CITY = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 	private static final String SHAPE_FILE_MMA = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
-	private static boolean isCityArea = false;
+	private static final boolean isCityArea = false;
 	private static String shapeFile;
 
 	public static void main(String[] args) {

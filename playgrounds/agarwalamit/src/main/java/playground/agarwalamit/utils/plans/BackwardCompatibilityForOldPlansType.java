@@ -52,9 +52,9 @@ public class BackwardCompatibilityForOldPlansType {
 		this.scOut = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	}
 
-	private String inputPlans;
-	private Scenario scOut;
-	private Collection<String> mainModes ;
+	private final String inputPlans;
+	private final Scenario scOut;
+	private final Collection<String> mainModes ;
 
 	public static void main(String[] args) {
 		Collection <String> mainModes = Arrays.asList("car","motorbike","bike");

@@ -27,6 +27,6 @@ public enum OpdytsObjectiveFunctionCases {
 
     EQUIL,
     EQUIL_MIXEDTRAFFIC,
-    PATNA;
+    PATNA
 
 }

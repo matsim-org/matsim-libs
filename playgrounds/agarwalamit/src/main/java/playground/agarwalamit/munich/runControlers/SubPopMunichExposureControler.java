@@ -43,7 +43,6 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.agarwalamit.munich.controlerListner.MyTollAveragerControlerListner;
@@ -59,14 +58,14 @@ import playground.benjamin.scenarios.munich.exposure.ResponsibilityGridTools;
 
 public class SubPopMunichExposureControler {
 
-	private static Integer noOfXCells = 160;
-	private static Integer noOfYCells = 120;
-	static double xMin = 4452550.25;
-	static double xMax = 4479483.33;
-	static double yMin = 5324955.00;
-	static double yMax = 5345696.81;
-	private static Double timeBinSize = 3600.;
-	private static int noOfTimeBins = 30;
+	private static final Integer noOfXCells = 160;
+	private static final Integer noOfYCells = 120;
+	static final double xMin = 4452550.25;
+	static final double xMax = 4479483.33;
+	static final double yMin = 5324955.00;
+	static final double yMax = 5345696.81;
+	private static final Double timeBinSize = 3600.;
+	private static final int noOfTimeBins = 30;
 
 	public static void main(String[] args) {
 
@@ -113,12 +112,12 @@ public class SubPopMunichExposureControler {
 				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 
 				addPlanStrategyBinding("SubtourModeChoice_".concat("COMMUTER_REV_COMMUTER")).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					String[] availableModes = {"car", "pt_COMMUTER_REV_COMMUTER"};
-					String[] chainBasedModes = {"car", "bike"};
+					final String[] availableModes = {"car", "pt_COMMUTER_REV_COMMUTER"};
+					final String[] chainBasedModes = {"car", "bike"};
 
 					@Override
 					public PlanStrategy get() {
-						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+						final Builder builder = new Builder(new RandomPlanSelector<>());
 						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
 						builder.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
 						return builder.build();

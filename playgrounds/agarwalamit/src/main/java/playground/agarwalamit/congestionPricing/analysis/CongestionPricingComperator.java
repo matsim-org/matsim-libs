@@ -60,18 +60,18 @@ public class CongestionPricingComperator {
 				/ (config.planCalcScore().getMarginalUtilityOfMoney());
 	}
 
-	private int noOfTimeBins = 1;
-	private String eventsFile ;
-	private double simulationEndTime;
-	private String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run12/policies/";
-	private Scenario scenario;
-	private String pricingScenario;
+	private final int noOfTimeBins = 1;
+	private final String eventsFile ;
+	private final double simulationEndTime;
+	private final String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run12/policies/";
+	private final Scenario scenario;
+	private final String pricingScenario;
 	
 	private final boolean isSortingForInsideMunich = true;
 	private final AreaFilter areaFilter = new AreaFilter();
 	
 	private final String suffixForSoring = "_sorted";
-	private double vttsCar;
+	private final double vttsCar;
 	private final MunichPersonFilter pf = new MunichPersonFilter();
 	private final AreaFilter af = new AreaFilter();
 

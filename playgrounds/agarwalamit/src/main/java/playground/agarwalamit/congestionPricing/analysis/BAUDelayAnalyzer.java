@@ -55,13 +55,13 @@ public class BAUDelayAnalyzer {
 		this.congestionImpl = congestionImpl;
 	}
 
-	private int noOfTimeBins = 30;
-	private String eventsFile ;
-	private double simulationEndTime;
-	private String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run11/policies/bau/";
-	private String congestionEventsFile;
-	private Scenario scenario;
-	private String congestionImpl;
+	private final int noOfTimeBins = 30;
+	private final String eventsFile ;
+	private final double simulationEndTime;
+	private final String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run11/policies/bau/";
+	private final String congestionEventsFile;
+	private final Scenario scenario;
+	private final String congestionImpl;
 	
 
 	private final MunichPersonFilter pf = new MunichPersonFilter();

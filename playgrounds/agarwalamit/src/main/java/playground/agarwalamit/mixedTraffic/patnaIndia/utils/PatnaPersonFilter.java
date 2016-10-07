@@ -32,8 +32,8 @@ import playground.agarwalamit.utils.PersonFilter;
 public class PatnaPersonFilter implements PersonFilter{
 	
 	public enum PatnaUserGroup {
-		urban, commuter, through;
-	}
+		urban, commuter, through
+    }
 	
 	public static boolean isPersonBelongsToUrban(Id<Person> personId){
 		if ( personId.toString().startsWith("slum") || personId.toString().startsWith("nonSlum") ) return true;

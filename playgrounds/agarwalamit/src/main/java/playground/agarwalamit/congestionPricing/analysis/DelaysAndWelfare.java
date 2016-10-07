@@ -36,8 +36,8 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 
 public class DelaysAndWelfare {
 
-	static String clusterPathDesktop = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run11/policies/";
-	static String [] runCases =  {"implV3","implV4","implV6"};
+	static final String clusterPathDesktop = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run11/policies/";
+	static final String [] runCases =  {"implV3","implV4","implV6"};
 
 	public static void main(String[] args) {
 		

@@ -50,7 +50,7 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
 public class TollAnalyzer extends AbstractAnalysisModule {
 	private static final Logger LOG = Logger.getLogger(TollAnalyzer.class);
 	private final String eventsFile;
-	private FilteredTollHandler handler;
+	private final FilteredTollHandler handler;
 
 	/**
 	 * No filtering will be used, result will include all links, persons from all user groups.

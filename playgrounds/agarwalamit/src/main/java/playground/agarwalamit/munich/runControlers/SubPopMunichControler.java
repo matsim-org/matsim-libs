@@ -124,13 +124,14 @@ public class SubPopMunichControler {
 				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 				String ug = MunichUserGroup.Rev_Commuter.toString();
 				addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name().concat("_").concat(ug)).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					String[] availableModes = {"car", "pt_".concat(ug)};
-					String[] chainBasedModes = {"car", "bike"};
-					@Inject Scenario sc;
+					final String[] availableModes = {"car", "pt_".concat(ug)};
+					final String[] chainBasedModes = {"car", "bike"};
+					@Inject
+                    final Scenario sc;
 
 					@Override
 					public PlanStrategy get() {
-						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+						final Builder builder = new Builder(new RandomPlanSelector<>());
 						builder.addStrategyModule(new SubtourModeChoice(sc.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
 						builder.addStrategyModule(new ReRoute(sc, tripRouterProvider));
 						return builder.build();

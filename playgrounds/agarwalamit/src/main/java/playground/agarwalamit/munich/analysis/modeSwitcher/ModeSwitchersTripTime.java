@@ -42,7 +42,7 @@ public class ModeSwitchersTripTime {
 
 	private static final Logger LOG = Logger.getLogger(ModeSwitchersTripTime.class);
 
-	private ModeSwitcherInfoCollector modeSwitchInfo = new ModeSwitcherInfoCollector();
+	private final ModeSwitcherInfoCollector modeSwitchInfo = new ModeSwitcherInfoCollector();
 
 	public static void main(String[] args) {
 
@@ -90,7 +90,7 @@ public class ModeSwitchersTripTime {
 
 					String switchTyp = firstMode.concat("2").concat(lastMode);
 					ModeSwitcherType modeSwitchType = ModeSwitcherType.valueOf(switchTyp);
-					this.modeSwitchInfo.storeTripTimeInfo(pId, modeSwitchType, new Tuple<Double, Double>(firstItMode.getSecond(), lastItMode.getSecond()));
+					this.modeSwitchInfo.storeTripTimeInfo(pId, modeSwitchType, new Tuple<>(firstItMode.getSecond(), lastItMode.getSecond()));
 				} 
 			} else if(!person2ModeTravelTimesLastIt.containsKey(pId)) {
 				LOG.warn("Person "+pId+ "is not present in the last iteration map. This person is thus not included in the results. Probably due to stuck and abort event.");
@@ -116,13 +116,13 @@ public class ModeSwitchersTripTime {
 		for(String mode : mode2Person2TripTimes.keySet()){
 			for (Id<Person> p : mode2Person2TripTimes.get(mode).keySet()){
 				for(Double d :mode2Person2TripTimes.get(mode).get(p)){
-					Tuple<String, Double> mode2TripTime = new Tuple<String, Double>(mode, d);
+					Tuple<String, Double> mode2TripTime = new Tuple<>(mode, d);
 
 					if (person2ModeTravelTimes.containsKey(p)){
 						List<Tuple<String, Double>> mode2TripTimeList  = person2ModeTravelTimes.get(p);
 						mode2TripTimeList.add(mode2TripTime);
 					} else {
-						List<Tuple<String, Double>> mode2TripTimeList = new ArrayList<Tuple<String,Double>>();
+						List<Tuple<String, Double>> mode2TripTimeList = new ArrayList<>();
 						mode2TripTimeList.add(mode2TripTime);
 						person2ModeTravelTimes.put(p, mode2TripTimeList);
 					}

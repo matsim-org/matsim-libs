@@ -90,7 +90,7 @@ public class HolesInOTFVisTest {
 
 		}
 
-		final List<PersonStuckEvent> stuckEvents = new ArrayList<PersonStuckEvent>();
+		final List<PersonStuckEvent> stuckEvents = new ArrayList<>();
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(new PersonStuckEventHandler() {
 			
@@ -139,7 +139,7 @@ public class HolesInOTFVisTest {
 			config.qsim().setStorageCapFactor(0.05);
 			
 			config.qsim().setStuckTime(24*3600); // in order to let agents wait instead of forced entry.
-			config.qsim().setEndTime(01*3600);
+			config.qsim().setEndTime(1 *3600);
 
 			config.qsim().setTrafficDynamics(TrafficDynamics.withHoles);
 			config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
@@ -151,7 +151,7 @@ public class HolesInOTFVisTest {
 			Node node3 = NetworkUtils.createAndAddNode(network, Id.createNodeId("3"), new Coord(1000.0, 0.0));
 			Node node4 = NetworkUtils.createAndAddNode(network, Id.createNodeId("4"), new Coord(1000.0, 100.0));
 
-			Set<String> allowedModes = new HashSet<String>(); allowedModes.addAll(Arrays.asList(TransportMode.car,TransportMode.walk));
+			Set<String> allowedModes = new HashSet<>(); allowedModes.addAll(Arrays.asList(TransportMode.car,TransportMode.walk));
 			final Node fromNode = node1;
 			final Node toNode = node2;
 

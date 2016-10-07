@@ -50,11 +50,11 @@ public class EmissionsPerPersonPerUserGroup {
 
 	public static final Logger LOG = Logger.getLogger(EmissionsPerPersonPerUserGroup.class);
 	private int lastIteration;
-	private String outputDir;
+	private final String outputDir;
 	private SortedMap<MunichUserGroup, SortedMap<String, Double>> userGroupToEmissions;
 	private Scenario scenario;
 	private Map<Id<Person>, SortedMap<String, Double>> emissionsPerPerson;
-	private MunichPersonFilter pf = new MunichPersonFilter();
+	private final MunichPersonFilter pf = new MunichPersonFilter();
 	
 	public EmissionsPerPersonPerUserGroup(String outputDir) {
 
@@ -74,11 +74,11 @@ public class EmissionsPerPersonPerUserGroup {
 		this.scenario = LoadMyScenarios.loadScenarioFromOutputDir(this.outputDir+runCase);
 		this.lastIteration = this.scenario.getConfig().controler().getLastIteration();
 		
-		this.userGroupToEmissions = new TreeMap<MunichUserGroup, SortedMap<String,Double>>();
+		this.userGroupToEmissions = new TreeMap<>();
 		this.emissionsPerPerson = new HashMap<>();
 		
 		for(MunichUserGroup ug:MunichUserGroup.values()){
-			SortedMap<String, Double> pollutantToValue = new TreeMap<String, Double>();
+			SortedMap<String, Double> pollutantToValue = new TreeMap<>();
 			for(WarmPollutant wm:WarmPollutant.values()){ //because ('warmPollutants' U 'coldPollutants') = 'warmPollutants'
 				pollutantToValue.put(wm.toString(), 0.0);
 			}
@@ -158,7 +158,7 @@ public class EmissionsPerPersonPerUserGroup {
 			Map<Id<Person>, SortedMap<String, Double>> emissionsPerPerson) {
 		for(Id<Person> personId: scenario.getPopulation().getPersons().keySet()){
 			MunichUserGroup ug = pf.getMunichUserGroupFromPersonId(personId);
-			SortedMap<String, Double> emissionsNewValue = new TreeMap<String, Double>();
+			SortedMap<String, Double> emissionsNewValue = new TreeMap<>();
 			for(String str: emissionsPerPerson.get(personId).keySet()){
 				double emissionSoFar = this.userGroupToEmissions.get(ug).get(str);
 				double emissionNewValue = emissionSoFar+emissionsPerPerson.get(personId).get(str);

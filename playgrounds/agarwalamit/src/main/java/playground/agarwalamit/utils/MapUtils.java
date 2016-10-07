@@ -55,7 +55,7 @@ public final class MapUtils {
 		if(m1==null || m2 ==null) throw new NullPointerException("Either of the maps is null. Aborting ...");
 		Set<Id<T>> keys = new HashSet<>(m1.keySet());
 		keys.addAll(m2.keySet());
-		Map<Id<T>, Double> outMap = new HashMap<Id<T>, Double>();
+		Map<Id<T>, Double> outMap = new HashMap<>();
 		for(Id<T> id : keys){
 			double v1 = m1.containsKey(id) ? m1.get(id) : 0;
 			double v2 = m2.containsKey(id) ? m2.get(id) : 0;

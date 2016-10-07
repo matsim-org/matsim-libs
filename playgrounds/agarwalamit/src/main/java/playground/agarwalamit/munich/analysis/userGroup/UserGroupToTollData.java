@@ -38,8 +38,8 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 public class UserGroupToTollData {
 
-	private Map<Id<Person>, Double> person2Toll = new HashMap<Id<Person>, Double>();
-	private Map<UserGroup, Double> userGrpToToll = new TreeMap<UserGroup, Double>();
+	private final Map<Id<Person>, Double> person2Toll = new HashMap<>();
+	private final Map<UserGroup, Double> userGrpToToll = new TreeMap<>();
 
 
 	public static void main(String[] args) {

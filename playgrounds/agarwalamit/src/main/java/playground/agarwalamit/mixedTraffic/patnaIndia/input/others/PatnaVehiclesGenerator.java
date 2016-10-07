@@ -40,7 +40,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  */
 public class PatnaVehiclesGenerator {
 
-	private Scenario scenario ;
+	private final Scenario scenario ;
 	private static double pcu_2w = Double.NaN;
 
 	/**
@@ -69,7 +69,7 @@ public class PatnaVehiclesGenerator {
 	 * It creates first vehicle types and add them to scenario and then create and add vehicles to the scenario.
 	 */
 	public static void createAndAddVehiclesToScenario(final Scenario scenario, final Collection <String> modes){
-		final Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
+		final Map<String, VehicleType> modesType = new HashMap<>();
 
 		for (String mode : modes){
 			VehicleType vehicle = VehicleUtils.getFactory().createVehicleType(Id.create(mode,VehicleType.class));

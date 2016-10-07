@@ -49,9 +49,9 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class ManualRouteAssignerExample {
 
-    private Scenario scenario;
-    private String initialNetwork;
-    private Set<String> modes;
+    private  Scenario scenario;
+    private  String initialNetwork;
+    private  Set<String> modes;
 
 
     private void reassignRoutes() {

@@ -39,8 +39,8 @@ public class ModalSplitUserGroup {
 	
 	private final static Logger LOG = Logger.getLogger(ModalSplitUserGroup.class);
 
-	private SortedMap<MunichUserGroup, SortedMap<String, Integer>> userGrp2Mode2Legs = new TreeMap<>();
-	private SortedMap<MunichUserGroup, SortedMap<String, Double>> userGrp2ModalSplit = new TreeMap<>();
+	private final SortedMap<MunichUserGroup, SortedMap<String, Integer>> userGrp2Mode2Legs = new TreeMap<>();
+	private final SortedMap<MunichUserGroup, SortedMap<String, Double>> userGrp2ModalSplit = new TreeMap<>();
 
 	private SortedMap<String, Double> wholePopPctModalShare ;
 	private SortedMap<String, Integer> wholePopMode2Legs;

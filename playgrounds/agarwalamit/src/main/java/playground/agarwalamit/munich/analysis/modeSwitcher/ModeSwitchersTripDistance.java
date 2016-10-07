@@ -49,7 +49,7 @@ public class ModeSwitchersTripDistance {
 
 	private static final Logger LOG = Logger.getLogger(ModeSwitchersTripDistance.class);
 
-	private ModeSwitcherInfoCollector modeSwitchInfo;
+	private final ModeSwitcherInfoCollector modeSwitchInfo;
 
 	public static void main(String[] args) {
 
@@ -98,7 +98,7 @@ public class ModeSwitchersTripDistance {
 
 					String switchTyp = firstMode.concat("2").concat(lastMode);
 					ModeSwitcherType modeSwitchType = ModeSwitcherType.valueOf(switchTyp);
-					this.modeSwitchInfo.storeTripDistanceInfo(pId, modeSwitchType, new Tuple<Double, Double>(firstItMode.getSecond(), lastItMode.getSecond()));
+					this.modeSwitchInfo.storeTripDistanceInfo(pId, modeSwitchType, new Tuple<>(firstItMode.getSecond(), lastItMode.getSecond()));
 				} 
 
 			} else if(!person2ModeTravelDistsTtLast.containsKey(pId)) {
@@ -132,13 +132,13 @@ public class ModeSwitchersTripDistance {
 		for(String mode : mode2Person2TripDists.keySet()){
 			for (Id<Person> p : mode2Person2TripDists.get(mode).keySet()){
 				for(Double d :mode2Person2TripDists.get(mode).get(p)){
-					Tuple<String, Double> mode2TripDist = new Tuple<String, Double>(mode, d);
+					Tuple<String, Double> mode2TripDist = new Tuple<>(mode, d);
 
 					if (person2ModeTravelDists.containsKey(p)){
 						List<Tuple<String, Double>> mode2TripDistList  = person2ModeTravelDists.get(p);
 						mode2TripDistList.add(mode2TripDist);
 					} else {
-						List<Tuple<String, Double>> mode2TripDistList = new ArrayList<Tuple<String,Double>>();
+						List<Tuple<String, Double>> mode2TripDistList = new ArrayList<>();
 						mode2TripDistList.add(mode2TripDist);
 						person2ModeTravelDists.put(p, mode2TripDistList);
 					}

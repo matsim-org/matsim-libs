@@ -49,15 +49,15 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  */
 
 public class PeakHourTripDistanceAnalyzer  {
-	private TripDistanceHandler tripDistHandler;
+	private final TripDistanceHandler tripDistHandler;
 	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{8., 9., 10., 16., 17., 18.,})); // => 7-10 and 15-18
 	private final MunichPersonFilter pf = new MunichPersonFilter();
-	private Map<Id<Person>,List<Double>> person2DistsPkHr = new HashMap<>();
-	private Map<Id<Person>,List<Double>> person2DistsOffPkHr = new HashMap<>();
-	private Map<Id<Person>,Integer> person2TripCountsPkHr = new HashMap<>();
-	private Map<Id<Person>,Integer> person2TripCountsOffPkHr = new HashMap<>();
-	private SortedMap<String, Tuple<Double,Double>> usrGrp2Dists = new TreeMap<>();
-	private SortedMap<String, Tuple<Integer,Integer>> usrGrp2TripCounts = new TreeMap<>();
+	private final Map<Id<Person>,List<Double>> person2DistsPkHr = new HashMap<>();
+	private final Map<Id<Person>,List<Double>> person2DistsOffPkHr = new HashMap<>();
+	private final Map<Id<Person>,Integer> person2TripCountsPkHr = new HashMap<>();
+	private final Map<Id<Person>,Integer> person2TripCountsOffPkHr = new HashMap<>();
+	private final SortedMap<String, Tuple<Double,Double>> usrGrp2Dists = new TreeMap<>();
+	private final SortedMap<String, Tuple<Integer,Integer>> usrGrp2TripCounts = new TreeMap<>();
 	private static final Logger LOG = Logger.getLogger(PeakHourTripDistanceAnalyzer.class);
 
 	public PeakHourTripDistanceAnalyzer(Network network, double simulationEndTime, int noOfTimeBins) {
@@ -106,16 +106,16 @@ public class PeakHourTripDistanceAnalyzer  {
 
 	private void storeUserGroupData(){
 		for(MunichUserGroup ug : MunichUserGroup.values()){
-			usrGrp2Dists.put(ug.toString(), new Tuple<Double, Double>(0., 0.));
-			usrGrp2TripCounts.put(ug.toString(), new Tuple<Integer, Integer>(0, 0));
+			usrGrp2Dists.put(ug.toString(), new Tuple<>(0., 0.));
+			usrGrp2TripCounts.put(ug.toString(), new Tuple<>(0, 0));
 		}
 		//first store peak hour data
 		for (Id<Person> personId : this.person2DistsPkHr.keySet()) {
 			String ug = pf.getUserGroupAsStringFromPersonId(personId);
 			double pkDist = usrGrp2Dists.get(ug).getFirst() + ListUtils.doubleSum(this.person2DistsPkHr.get(personId));
 			int pkTripCount = usrGrp2TripCounts.get(ug).getFirst() + this.person2TripCountsPkHr.get(personId);
-			usrGrp2Dists.put(ug, new Tuple<Double, Double>(pkDist, 0.));
-			usrGrp2TripCounts.put(ug, new Tuple<Integer,Integer>(pkTripCount,0) );
+			usrGrp2Dists.put(ug, new Tuple<>(pkDist, 0.));
+			usrGrp2TripCounts.put(ug, new Tuple<>(pkTripCount, 0) );
 		}
 
 		//now store off-peak hour data
@@ -123,8 +123,8 @@ public class PeakHourTripDistanceAnalyzer  {
 			String ug = pf.getUserGroupAsStringFromPersonId(personId);
 			double offpkDist = usrGrp2Dists.get(ug).getSecond() + ListUtils.doubleSum(this.person2DistsOffPkHr.get(personId));
 			int offpkTripCount = usrGrp2TripCounts.get(ug).getSecond() + this.person2TripCountsOffPkHr.get(personId);
-			usrGrp2Dists.put(ug, new Tuple<Double, Double>(usrGrp2Dists.get(ug).getFirst(), offpkDist));
-			usrGrp2TripCounts.put(ug, new Tuple<Integer,Integer>(usrGrp2TripCounts.get(ug).getFirst(),offpkTripCount) );
+			usrGrp2Dists.put(ug, new Tuple<>(usrGrp2Dists.get(ug).getFirst(), offpkDist));
+			usrGrp2TripCounts.put(ug, new Tuple<>(usrGrp2TripCounts.get(ug).getFirst(), offpkTripCount) );
 		}
 	}
 

@@ -40,7 +40,7 @@ public class EmissionVehicleGenerator {
 
 
 	private final String outputVehicleFile;
-	private Scenario scenario;
+	private final Scenario scenario;
 
 	public EmissionVehicleGenerator(Scenario scenario, String outputVehicleFile) {
 		this.outputVehicleFile = outputVehicleFile;

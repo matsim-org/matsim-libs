@@ -38,7 +38,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 public class PersonUserGroupHomeLocationInfo {
 
-	private PersonFilter pf = new PersonFilter();
+	private final PersonFilter pf = new PersonFilter();
 
 	public static void main(String[] args) {
 

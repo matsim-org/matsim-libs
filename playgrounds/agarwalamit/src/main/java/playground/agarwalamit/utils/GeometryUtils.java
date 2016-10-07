@@ -154,7 +154,7 @@ public final class GeometryUtils {
 			if (minX > f.getBounds().getMinX()) minX =  f.getBounds().getMinX();
 			if (maxX < f.getBounds().getMaxX()) maxX =  f.getBounds().getMaxX();
 		}
-		return new Tuple<Double, Double>(minX, maxX);
+		return new Tuple<>(minX, maxX);
 	}
 
 	public static Tuple<Double,Double> getMaxMinYFromFeatures (List<SimpleFeature> features){
@@ -165,7 +165,7 @@ public final class GeometryUtils {
 			if (minY > f.getBounds().getMinY()) minY =  f.getBounds().getMinY();
 			if (maxY < f.getBounds().getMaxY()) maxY =  f.getBounds().getMaxY();
 		}
-		return new Tuple<Double, Double>(minY, maxY);
+		return new Tuple<>(minY, maxY);
 	}
 
 	public static Geometry getGemetryFromListOfFeatures(List<SimpleFeature> featues) {

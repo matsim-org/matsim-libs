@@ -44,14 +44,14 @@ import java.util.Set;
  */
 public class EmissionModalTravelDisutilityCalculator implements TravelDisutility {
 
-    TravelTime timeCalculator;
-    double marginalUtlOfMoney;
+    final TravelTime timeCalculator;
+    final double marginalUtlOfMoney;
 //    double distanceCostRateCar;
 //    double marginalUtlOfTravelTime;
-    EmissionModule emissionModule;
-    EmissionCostModule emissionCostModule;
+final EmissionModule emissionModule;
+    final EmissionCostModule emissionCostModule;
     private final Set<Id<Link>> hotspotLinks;
-    private PlanCalcScoreConfigGroup cnScoringGroup;
+    private final PlanCalcScoreConfigGroup cnScoringGroup;
 
 
     public EmissionModalTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionCostModule emissionCostModule, Set<Id<Link>> hotspotLinks) {

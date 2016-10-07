@@ -44,7 +44,7 @@ import playground.agarwalamit.utils.PersonFilter;
 public class ModalShareFromPlans implements ModalShare{
 
 	private final Population pop ;
-	private SortedMap<String, Integer> mode2numberOflegs = new TreeMap<>();
+	private final SortedMap<String, Integer> mode2numberOflegs = new TreeMap<>();
 	private SortedMap<String, Double> mode2PctOflegs = new TreeMap<>();
 	private final PersonFilter pf;
 	private final String userGroup;

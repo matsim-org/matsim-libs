@@ -129,8 +129,8 @@ public class PeakHourTripTollPerKmAnalyzer {
 
 	private void storeUserGroupData(){
 		for(MunichUserGroup ug : MunichUserGroup.values()){
-			usrGrp2TollsPerKm.put(ug.toString(), new Tuple<Double, Double>(0., 0.));
-			usrGrp2TripCounts.put(ug.toString(), new Tuple<Integer, Integer>(0, 0));
+			usrGrp2TollsPerKm.put(ug.toString(), new Tuple<>(0., 0.));
+			usrGrp2TripCounts.put(ug.toString(), new Tuple<>(0, 0));
 		}
 		//first store peak hour data
 		for (Id<Person> personId : this.person2TollsPerKmPkHr.keySet()) {
@@ -138,8 +138,8 @@ public class PeakHourTripTollPerKmAnalyzer {
 			double tollInMeter = ListUtils.doubleSum(this.person2TollsPerKmPkHr.get(personId));
 			double pkTollInKm = usrGrp2TollsPerKm.get(ug).getFirst() + 1000*tollInMeter;
 			int pkTripCount = usrGrp2TripCounts.get(ug).getFirst() + this.person2TripCountsPkHr.get(personId);
-			usrGrp2TollsPerKm.put(ug, new Tuple<Double, Double>(pkTollInKm, 0.));
-			usrGrp2TripCounts.put(ug, new Tuple<Integer,Integer>(pkTripCount,0) );
+			usrGrp2TollsPerKm.put(ug, new Tuple<>(pkTollInKm, 0.));
+			usrGrp2TripCounts.put(ug, new Tuple<>(pkTripCount, 0) );
 		}
 
 		//now store off-peak hour data
@@ -148,8 +148,8 @@ public class PeakHourTripTollPerKmAnalyzer {
 			double tollInMeter = ListUtils.doubleSum(this.person2TollsPerKmOffPkHr.get(personId));
 			double offpkToll = usrGrp2TollsPerKm.get(ug).getSecond() + 1000*tollInMeter;
 			int offpkTripCount = usrGrp2TripCounts.get(ug).getSecond() + this.person2TripCountsOffPkHr.get(personId);
-			usrGrp2TollsPerKm.put(ug, new Tuple<Double, Double>(usrGrp2TollsPerKm.get(ug).getFirst(), offpkToll));
-			usrGrp2TripCounts.put(ug, new Tuple<Integer,Integer>(usrGrp2TripCounts.get(ug).getFirst(),offpkTripCount) );
+			usrGrp2TollsPerKm.put(ug, new Tuple<>(usrGrp2TollsPerKm.get(ug).getFirst(), offpkToll));
+			usrGrp2TripCounts.put(ug, new Tuple<>(usrGrp2TripCounts.get(ug).getFirst(), offpkTripCount) );
 		}
 	}
 

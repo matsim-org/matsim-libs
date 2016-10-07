@@ -44,7 +44,7 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 public class JointConfigWriter {
 	
-	private static String inputLocation = PatnaUtils.INPUT_FILES_DIR;
+	private static final String inputLocation = PatnaUtils.INPUT_FILES_DIR;
 
 	private static final String NET_FILE = inputLocation+"/simulationInputs/network/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/network.xml.gz"; //
 	private static final String JOINT_PLANS_10PCT = inputLocation+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_plans_10pct.xml.gz"; //
@@ -52,7 +52,7 @@ public class JointConfigWriter {
 	private static final String JOINT_COUNTS_10PCT = inputLocation+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_counts.xml.gz"; //
 	private static final String JOINT_VEHICLES_10PCT = inputLocation+"/simulationInputs/joint/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/joint_vehicles_10pct.xml.gz";
 
-	private Config config = ConfigUtils.createConfig();
+	private final Config config = ConfigUtils.createConfig();
 
 	public static void main(String[] args) {
 		String configFileName = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/calibration/"+PatnaUtils.PCU_2W.toString()+"pcu/input/config.xml.gz";

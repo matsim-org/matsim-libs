@@ -43,9 +43,9 @@ import org.matsim.core.utils.collections.Tuple;
  */
 public class ActivityType2DurationHandler implements ActivityEndEventHandler, ActivityStartEventHandler {
 	public static final Logger LOG = Logger.getLogger(ActivityType2DurationHandler.class);
-	private Map<Id<Person>, PersonActivityInfo> personId2ActInfo;
-	private double midNightTime;
-	private Set<String> actTyps;
+	private final Map<Id<Person>, PersonActivityInfo> personId2ActInfo;
+	private final double midNightTime;
+	private final Set<String> actTyps;
 	
 	public ActivityType2DurationHandler(final double midNightTime) {
 		this.personId2ActInfo = new HashMap<>();

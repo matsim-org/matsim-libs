@@ -46,23 +46,23 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
 public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalysisModule {
 
 	private final Logger logger = Logger.getLogger(LegModeDepartureArrivalTimeDistribution.class);
-	private LegModeDepartureArrivalTimeHandler lmdah;
+	private final LegModeDepartureArrivalTimeHandler lmdah;
 	private Map<String, Map<Id<Person>, List<Double> >> mode2PersonId2DepartureTime;
 	private Map<String, Map<Id<Person>, List<Double> >> mode2PersonId2ArrivalTime;
-	private List<Integer> timeStepClasses;
-	private List<String> travelModes;
+	private final List<Integer> timeStepClasses;
+	private final List<String> travelModes;
 	private SortedMap<String, Map<Integer, Integer>> mode2DepartureTimeClasses2LegCount;
 	private SortedMap<String, Map<Integer, Integer>> mode2ArrivalTimeClasses2LegCount;
-	private String eventsFile;
-	private String configFile;
+	private final String eventsFile;
+	private final String configFile;
 
 	public LegModeDepartureArrivalTimeDistribution(String eventsFile, String configFile) {
 		super(LegModeDepartureArrivalTimeDistribution.class.getSimpleName());
 
 		this.eventsFile = eventsFile;
 		this.configFile=configFile;
-		this.timeStepClasses=new ArrayList<Integer>();
-		this.travelModes = new ArrayList<String>();
+		this.timeStepClasses= new ArrayList<>();
+		this.travelModes = new ArrayList<>();
 		this.lmdah=new LegModeDepartureArrivalTimeHandler();
 		this.lmdah.reset(0);
 	}
@@ -110,9 +110,9 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalysisMod
 	}
 
 	private SortedMap<String, Map<Integer, Integer>> calculateMode2DepOrArrTimeClases2LegCount (Map<String, Map<Id<Person>, List<Double> >> mode2personId2DepOrArrTime) {
-		SortedMap<String, Map<Integer, Integer>> mode2DepOrArrTime2LegCount= new TreeMap<String, Map<Integer,Integer>>();
+		SortedMap<String, Map<Integer, Integer>> mode2DepOrArrTime2LegCount= new TreeMap<>();
 		for(String mode:this.travelModes){
-			SortedMap<Integer, Integer> travelTimeClasses2LegCount = new TreeMap<Integer, Integer>();
+			SortedMap<Integer, Integer> travelTimeClasses2LegCount = new TreeMap<>();
 			for(int i=0;i<this.timeStepClasses.size()-1;i++){
 				int legCount =0;
 				for(Id<Person> id:mode2personId2DepOrArrTime.get(mode).keySet()){

@@ -45,7 +45,7 @@ public class PatnaNonSlumDemandCleaner {
 	private BufferedWriter writer  ;
 	private final String outFile ;
 
-	private PatnaDemandImputer pdc = new PatnaDemandImputer();
+	private final PatnaDemandImputer pdc = new PatnaDemandImputer();
 
 	public PatnaNonSlumDemandCleaner(String outFile){
 		this.outFile = outFile;

@@ -36,7 +36,7 @@ import playground.agarwalamit.utils.FileUtils;
 
 public class MobsimTimeWriter {
 
-	private String respectiveFileDirectory = FileUtils.RUNS_SVN+"/patnaIndia/run110/randomNrFix/fastCapacityUpdate/1pct/";
+	private final String respectiveFileDirectory = FileUtils.RUNS_SVN+"/patnaIndia/run110/randomNrFix/fastCapacityUpdate/1pct/";
 	private BufferedWriter writer;
 
 	public static void main(String[] args) {
@@ -105,7 +105,7 @@ public class MobsimTimeWriter {
 				mobsimEndTime = parts[11];
 				mobsimTime += getMobsimTime(mobsimStartTime, mobsimEndTime);
 				line = reader.readLine();
-			} ;
+			}
 		} catch (Exception e) {
 			throw new RuntimeException("File not found. Reason "+ e);
 		}
