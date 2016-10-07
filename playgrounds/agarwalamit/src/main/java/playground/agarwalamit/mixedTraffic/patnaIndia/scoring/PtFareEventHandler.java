@@ -48,7 +48,7 @@ public class PtFareEventHandler implements PersonDepartureEventHandler, Teleport
 	private final Map<Id<Person>,String> person2mode = new HashMap<>();
 	
 	@Inject
-	private final EventsManager events;
+	private EventsManager events;
 	
 	@Override
 	public void reset(int iteration) {

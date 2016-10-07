@@ -44,10 +44,10 @@ public class ModalShareControlerListner implements StartupListener, IterationEnd
 	private final SortedMap<String, double []> mode2numberofLegs = new TreeMap<>();
 
 	@Inject
-	private final ModalShareEventHandler modalShareHandler;
+	private ModalShareEventHandler modalShareHandler;
 
 	@Inject
-	private final EventsManager events;
+	private EventsManager events;
 
 	@Override
 	public void notifyStartup(StartupEvent event) {

@@ -49,10 +49,10 @@ public class ModalTravelTimeControlerListner implements StartupListener, Iterati
 	private final SortedMap<String, double []> mode2AvgTripTimes = new TreeMap<>();
 
 	@Inject
-	private final ModalTripTravelTimeHandler travelTimeHandler;
+	private ModalTripTravelTimeHandler travelTimeHandler;
 
 	@Inject
-	private final EventsManager events;
+	private EventsManager events;
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
