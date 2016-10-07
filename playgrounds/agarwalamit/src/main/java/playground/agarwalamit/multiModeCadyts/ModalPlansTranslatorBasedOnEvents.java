@@ -24,9 +24,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import javax.inject.Inject;
-
+import cadyts.demand.PlanBuilder;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,15 +35,10 @@ import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
-
-import cadyts.demand.PlanBuilder;
 
 public class ModalPlansTranslatorBasedOnEvents implements PlansTranslator<ModalLink>, LinkLeaveEventHandler, 
 VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
@@ -64,15 +58,14 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private static final String STR_PLANSTEPFACTORY = "planStepFactory";
 	private static final String STR_ITERATION = "iteration";
 
-	private final Set<Id<Link>> calibratedLinks = new HashSet<>() ;
+	private final Set<String> calibratedLinks = new HashSet<>() ;
 	private final Map<String,ModalLink> modalLinkContainer;
 
 	@Inject
 	ModalPlansTranslatorBasedOnEvents(final Scenario scenario, Map<String,ModalLink> modalLinkContainer) {
 		this.scenario = scenario;
-		Set<String> abc = ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class).getCalibratedItems();
-		for ( String str : abc ) {
-			this.calibratedLinks.add( Id.createLinkId(str) ) ;
+		for ( String str : modalLinkContainer.keySet() ) {
+			this.calibratedLinks.add( str ) ;
 		}
 		this.modalLinkContainer = modalLinkContainer;
 	}
@@ -126,7 +119,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		
 		// if only a subset of links is calibrated but the link is not contained, ignore the event
 		Id<ModalLink> mlId = Id.create(new ModalLink(mode, event.getLinkId()).getId(),ModalLink.class);
-		if (!calibratedLinks.contains(event.getLinkId()))
+		if (!calibratedLinks.contains(mlId.toString()))
 			return;
 		
 		// get the "Person" behind the id:
