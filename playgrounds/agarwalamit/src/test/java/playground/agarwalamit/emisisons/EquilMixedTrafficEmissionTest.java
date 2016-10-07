@@ -73,9 +73,9 @@ public class EquilMixedTrafficEmissionTest {
 	public final MatsimTestUtils helper = new MatsimTestUtils();
 	private static final Logger logger = Logger.getLogger(EquilMixedTrafficEmissionTest.class);
 
-	private DecimalFormat df = new DecimalFormat("#.###");
+	private final DecimalFormat df = new DecimalFormat("#.###");
 
-	private boolean isConsideringCO2Costs ;
+	private final boolean isConsideringCO2Costs ;
 
 	public EquilMixedTrafficEmissionTest (boolean isConsideringCO2Costs) {
 		this.isConsideringCO2Costs = isConsideringCO2Costs;
@@ -316,7 +316,7 @@ public class EquilMixedTrafficEmissionTest {
 
 	private class MyPersonMoneyEventHandler implements PersonMoneyEventHandler {
 
-		List<PersonMoneyEvent> events = new ArrayList<PersonMoneyEvent>();
+		final List<PersonMoneyEvent> events = new ArrayList<>();
 
 		@Override
 		public void reset(int iteration) {
@@ -331,8 +331,8 @@ public class EquilMixedTrafficEmissionTest {
 
 	private class MyEmissionEventHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler {
 
-		List<WarmEmissionEvent> warmEvents = new ArrayList<WarmEmissionEvent>();
-		List<ColdEmissionEvent> coldEvents = new ArrayList<ColdEmissionEvent>();
+		final List<WarmEmissionEvent> warmEvents = new ArrayList<>();
+		final List<ColdEmissionEvent> coldEvents = new ArrayList<>();
 
 		@Override
 		public void reset(int iteration) {

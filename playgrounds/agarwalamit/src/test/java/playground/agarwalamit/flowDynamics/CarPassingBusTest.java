@@ -23,12 +23,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -37,13 +37,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -62,34 +56,23 @@ import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.vehicles.*;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 /**
- * @author amit after {@link AccessEgressDemoSimple.class}
+ * @author amit after {@link playground.andreas.demo.AccessEgressDemoSimple}
  */
 
 public class CarPassingBusTest {
 
 	@Rule public MatsimTestUtils helper = new MatsimTestUtils(); 
-	private final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	private boolean isUsingOTFVis = false;
+	private final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	private static final boolean isUsingOTFVis = false;
 	
 	@Test
 	public void runTest() {
@@ -140,7 +123,7 @@ public class CarPassingBusTest {
 
 	private void createNetwork() {
 		Network network = this.scenario.getNetwork();
-		((Network) network).setCapacityPeriod(3600.0);
+		network.setCapacityPeriod(3600.0);
 
 		Node n01, n10, n11, n12, n13, n14;
 		double x1 = -500;
@@ -164,7 +147,7 @@ public class CarPassingBusTest {
 		TransitSchedule schedule = this.scenario.getTransitSchedule();
 		TransitScheduleFactory builder = schedule.getFactory();
 
-		ArrayList<TransitRouteStop> stopListA = new ArrayList<TransitRouteStop>();
+		ArrayList<TransitRouteStop> stopListA = new ArrayList<>();
 
 		// create stops
 		TransitStopFacility stopFac;
@@ -178,9 +161,9 @@ public class CarPassingBusTest {
 		// transit line A		
 		Link startLinkA = this.scenario.getNetwork().getLinks().get(Id.create("0110", Link.class));
 		Link endLinkA = this.scenario.getNetwork().getLinks().get(Id.create("1314", Link.class));
-		NetworkRoute networkRouteA = ((PopulationFactory) this.scenario.getPopulation().getFactory()).getRouteFactories().createRoute(NetworkRoute.class, startLinkA.getId(), endLinkA.getId());
+		NetworkRoute networkRouteA = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, startLinkA.getId(), endLinkA.getId());
 
-		ArrayList<Id<Link>> linkListA = new ArrayList<Id<Link>>(); 
+		ArrayList<Id<Link>> linkListA = new ArrayList<>();
 		linkListA.add(Id.create("1011", Link.class)); 
 		linkListA.add(Id.create("1112", Link.class)); 
 		linkListA.add(Id.create("1213", Link.class));
@@ -227,18 +210,18 @@ public class CarPassingBusTest {
 		PopulationFactory pb = population.getFactory();
 
 		Person person = pb.createPerson(Id.create("carUser", Person.class));
-		Plan plan = (Plan) pb.createPlan();
+		Plan plan = pb.createPlan();
 
 		Link startLinkA = this.scenario.getNetwork().getLinks().get(Id.create("0110", Link.class));
 		Link endLinkA = this.scenario.getNetwork().getLinks().get(Id.create("1314", Link.class));
 
-		Activity act1 = (Activity) pb.createActivityFromLinkId("home", startLinkA.getId());
+		Activity act1 = pb.createActivityFromLinkId("home", startLinkA.getId());
 		act1.setEndTime(7*3600. + 49.);
-		Leg leg = (Leg) pb.createLeg(TransportMode.car);
+		Leg leg = pb.createLeg(TransportMode.car);
 
-		NetworkRoute networkRouteA = ((PopulationFactory) this.scenario.getPopulation().getFactory()).getRouteFactories().createRoute(NetworkRoute.class, startLinkA.getId(), endLinkA.getId());
+		NetworkRoute networkRouteA = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, startLinkA.getId(), endLinkA.getId());
 
-		ArrayList<Id<Link>> linkListA = new ArrayList<Id<Link>>(); 
+		ArrayList<Id<Link>> linkListA = new ArrayList<>();
 		linkListA.add(Id.create("1011", Link.class)); 
 		linkListA.add(Id.create("1112", Link.class)); 
 		linkListA.add(Id.create("1213", Link.class));
@@ -246,7 +229,7 @@ public class CarPassingBusTest {
 		networkRouteA.setLinkIds(startLinkA.getId(), linkListA, endLinkA.getId());
 		leg.setRoute(networkRouteA);
 
-		Activity act2 = (Activity) pb.createActivityFromLinkId("work", endLinkA.getId());
+		Activity act2 = pb.createActivityFromLinkId("work", endLinkA.getId());
 
 		population.addPerson(person);
 		person.addPlan(plan);
@@ -298,14 +281,14 @@ public class CarPassingBusTest {
 		public void handleEvent(LinkEnterEvent event) {
 			Map<Id<Link>, Tuple<Double, Double>> times = this.vehicleEnterLeaveTimes.get(event.getVehicleId());
 			if (times == null) {
-				times = new HashMap<Id<Link>, Tuple<Double, Double>>();
-				times.put(event.getLinkId(), new Tuple<Double,Double>(0., Double.NEGATIVE_INFINITY));
+				times = new HashMap<>();
+				times.put(event.getLinkId(), new Tuple<>(0., Double.NEGATIVE_INFINITY));
 				this.vehicleEnterLeaveTimes.put(event.getVehicleId(), times);
 			}
 			
 			Tuple<Double, Double> d = times.get(event.getLinkId());
 			if (d == null) {
-				d = new Tuple<Double, Double>(event.getTime(), Double.NEGATIVE_INFINITY);	
+				d = new Tuple<>(event.getTime(), Double.NEGATIVE_INFINITY);
 			}
 			
 			times.put(event.getLinkId(), d);
@@ -315,13 +298,13 @@ public class CarPassingBusTest {
 		public void handleEvent(LinkLeaveEvent event) {
 			Map<Id<Link>, Tuple<Double, Double>> times = this.vehicleEnterLeaveTimes.get(event.getVehicleId());
 			if (times == null) {
-				times = new HashMap<Id<Link>, Tuple<Double, Double>>();
-				times.put(event.getLinkId(), new Tuple<Double,Double>(Double.NEGATIVE_INFINITY, 0.));
+				times = new HashMap<>();
+				times.put(event.getLinkId(), new Tuple<>(Double.NEGATIVE_INFINITY, 0.));
 				this.vehicleEnterLeaveTimes.put(event.getVehicleId(), times);
 			}
 			
 			Tuple<Double, Double> d = times.get(event.getLinkId());
-			d = new Tuple<Double, Double>(d.getFirst(), event.getTime());
+			d = new Tuple<>(d.getFirst(), event.getTime());
 			times.put(event.getLinkId(), d);
 		}
 

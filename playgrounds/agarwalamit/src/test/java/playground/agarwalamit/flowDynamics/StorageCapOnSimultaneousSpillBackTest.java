@@ -95,7 +95,7 @@ public class StorageCapOnSimultaneousSpillBackTest {
 		 * 
 		 */
 
-		Tuple<Id<Link>, Id<Link>> startLinkIds = new Tuple<Id<Link>, Id<Link>>(Id.createLinkId(1), Id.createLinkId(4)); // agent 2,4 depart on link 1
+		Tuple<Id<Link>, Id<Link>> startLinkIds = new Tuple<>(Id.createLinkId(1), Id.createLinkId(4)); // agent 2,4 depart on link 1
 		Map<Id<Person>, Tuple<Double,Double>> person2EnterTime = getPerson2LinkEnterTime(startLinkIds);
 
 		if (this.isUsingFastCapacityUpdate ) {
@@ -119,7 +119,7 @@ public class StorageCapOnSimultaneousSpillBackTest {
 		}
 
 		//changing the links order such that agent 2,4 depart on link 4
-		startLinkIds = new Tuple<Id<Link>, Id<Link>>(Id.createLinkId(4), Id.createLinkId(1));
+		startLinkIds = new Tuple<>(Id.createLinkId(4), Id.createLinkId(1));
 		person2EnterTime = getPerson2LinkEnterTime(startLinkIds);
 
 		if(this.isUsingFastCapacityUpdate) { 
@@ -159,7 +159,7 @@ public class StorageCapOnSimultaneousSpillBackTest {
 
 	private class PersonLinkEnterLeaveTime implements LinkEnterEventHandler, LinkLeaveEventHandler{
 
-		Map<Id<Person>, Tuple<Double,Double>> person2linkleaveEnterTime ;
+		final Map<Id<Person>, Tuple<Double,Double>> person2linkleaveEnterTime ;
 
 		private PersonLinkEnterLeaveTime(Map<Id<Person>, Tuple<Double,Double>> person2LinkEnterTime){
 			this.person2linkleaveEnterTime = person2LinkEnterTime;
@@ -174,14 +174,14 @@ public class StorageCapOnSimultaneousSpillBackTest {
 		public void handleEvent(LinkLeaveEvent event) {
 			if(event.getLinkId().equals(Id.createLinkId(2))){
 				Tuple<Double, Double> linkEnterTime = person2linkleaveEnterTime.get(Id.createPersonId(event.getVehicleId()));
-				person2linkleaveEnterTime.put(Id.createPersonId(event.getVehicleId()), new Tuple<Double, Double>(linkEnterTime.getFirst(),event.getTime()));
+				person2linkleaveEnterTime.put(Id.createPersonId(event.getVehicleId()), new Tuple<>(linkEnterTime.getFirst(), event.getTime()));
 			}
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			if(event.getLinkId().equals(Id.createLinkId(2))){
-				person2linkleaveEnterTime.put(Id.createPersonId(event.getVehicleId()), new Tuple<Double, Double>(event.getTime(), 0.));
+				person2linkleaveEnterTime.put(Id.createPersonId(event.getVehicleId()), new Tuple<>(event.getTime(), 0.));
 			}
 		}
 	}
@@ -212,7 +212,7 @@ public class StorageCapOnSimultaneousSpillBackTest {
 			config.global().setRandomSeed(2546);
 			config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 			this.scenario = ScenarioUtils.loadScenario(config);
-			network =  (Network) this.scenario.getNetwork();
+			network = this.scenario.getNetwork();
 			population = this.scenario.getPopulation();
 		}
 
@@ -226,19 +226,11 @@ public class StorageCapOnSimultaneousSpillBackTest {
 			double x = -10;
 			double y = -200;
 			Node node5 = NetworkUtils.createAndAddNode(network, Id.createNodeId("5"), new Coord(x, y));
-			final Node fromNode = node1;
-			final Node toNode = node2;
 
-			link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("1")), fromNode, toNode, 1000.0, 20.0, 3600., (double) 1, null, (String) "7");
-			final Node fromNode1 = node2;
-			final Node toNode1 = node3;
-			link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("2")), fromNode1, toNode1, 5.0, 20.0, 360., (double) 1, null, (String) "7");
-			final Node fromNode2 = node3;
-			final Node toNode2 = node4;
-			link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("3")), fromNode2, toNode2, 1000.0, 20.0, 3600., (double) 1, null, (String) "7");
-			final Node fromNode3 = node5;
-			final Node toNode3 = node2;
-			link4 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("4")), fromNode3, toNode3, 1000.0, 20.0, 3600., (double) 1, null, (String) "7");
+            link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("1")), node1, node2, 1000.0, 20.0, 3600., (double) 1, null, "7");
+            link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("2")), node2, node3, 5.0, 20.0, 360., (double) 1, null, "7");
+            link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("3")), node3, node4, 1000.0, 20.0, 3600., (double) 1, null, "7");
+            link4 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("4")), node5, node2, 1000.0, 20.0, 3600., (double) 1, null, "7");
 		}
 
 		private void createPopulation(final Tuple<Id<Link>, Id<Link>> startLinkIds){
@@ -262,7 +254,7 @@ public class StorageCapOnSimultaneousSpillBackTest {
 				plan.addLeg(leg);
 				LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 				NetworkRoute route;
-				List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+				List<Id<Link>> linkIds = new ArrayList<>();
 				route= (NetworkRoute) factory.createRoute(startLinkId, link3.getId());
 				linkIds.add(link2.getId());
 				linkIds.add(link3.getId());
