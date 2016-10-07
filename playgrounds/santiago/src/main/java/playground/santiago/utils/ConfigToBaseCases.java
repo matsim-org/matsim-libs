@@ -2,12 +2,14 @@ package playground.santiago.utils;
 
 import java.io.File;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 
@@ -53,6 +55,14 @@ public class ConfigToBaseCases {
 		TransitConfigGroup transit = config.transit();
 		transit.setTransitScheduleFile(runsClusterDir + "input/transitschedule_simplified.xml" );
 		transit.setVehiclesFile(runsClusterDir + "input/transitvehicles.xml" );
+		
+		
+		PlanCalcScoreConfigGroup planCalc = config.planCalcScore();
+		planCalc.getModes().get(TransportMode.car).setConstant((double) 9.5511);
+		planCalc.getModes().get(TransportMode.pt).setConstant((double) -15.3975);
+		planCalc.getModes().get(TransportMode.walk).setConstant((double) 4.4591);
+		
+		
 		new ConfigWriter(config).write(localPersonalFolder + "config_" +  baseCase10pct + ".xml" );
 		
 	}
@@ -77,6 +87,12 @@ public class ConfigToBaseCases {
 		TransitConfigGroup transit = config.transit();
 		transit.setTransitScheduleFile(runsLocalDir + "input/transitschedule_simplified.xml" );
 		transit.setVehiclesFile(runsLocalDir + "input/transitvehicles.xml" );
+		
+		PlanCalcScoreConfigGroup planCalc = config.planCalcScore();
+		planCalc.getModes().get(TransportMode.car).setConstant((double) 9.5511);
+		planCalc.getModes().get(TransportMode.pt).setConstant((double) -15.3975);
+		planCalc.getModes().get(TransportMode.walk).setConstant((double) 4.4591);		
+		
 		new ConfigWriter(config).write(localPersonalFolder + "config_" + baseCase1pct + ".xml" );
 	}
 	
