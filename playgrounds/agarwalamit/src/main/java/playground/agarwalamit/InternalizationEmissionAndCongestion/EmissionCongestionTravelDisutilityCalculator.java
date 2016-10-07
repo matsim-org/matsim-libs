@@ -88,7 +88,7 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 				emissionVehicle = VehicleUtils.getFactory().createVehicle(Id.createVehicleId("defaultVehicle"), VehicleUtils.getDefaultVehicleType());
 			} else {
 				// a person is given -> use the vehicle for that person given in emissionModule
-				emissionVehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(person.getId());
+				emissionVehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(Id.createVehicleId(person.getId()));
 			}
 		}
 		

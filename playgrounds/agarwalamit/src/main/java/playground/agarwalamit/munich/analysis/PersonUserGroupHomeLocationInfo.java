@@ -67,6 +67,7 @@ public class PersonUserGroupHomeLocationInfo {
 							break;
 						} else homeCoord = new Coord(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 					}
+					assert homeCoord != null;
 					writer.write(p.getId()+"\t"+ug+"\t"+homeCoord.getX()+"\t"+homeCoord.getY()+"\n");
 				}
 			}

@@ -19,6 +19,8 @@
 
 package playground.agarwalamit.emissions;
 
+import java.util.Map;
+import java.util.Set;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -34,9 +36,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import playground.benjamin.internalization.EmissionCostModule;
-
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author benjamin
@@ -76,7 +75,7 @@ final EmissionModule emissionModule;
                 emissionVehicle = VehicleUtils.getFactory().createVehicle(Id.createVehicleId("defaultVehicle"), VehicleUtils.getDefaultVehicleType());
             } else {
                 // a person is given -> use the vehicle for that person given in emissionModule
-                emissionVehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(person.getId());
+                emissionVehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(Id.createVehicleId(person.getId()));
             }
         }
 

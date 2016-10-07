@@ -305,6 +305,7 @@ public class AgentPositionWriter {
 		if( Double.isNaN(distFromFromNode) ) { // this is possible, because of minor errors --
 
 			Link nearestLink = NetworkUtils.getNearestLink(sc.getNetwork(), eastinNorthing);
+			assert nearestLink != null;
 			linkId = Double.valueOf(nearestLink.getId().toString());
 			distFromFromNode = NetworkUtils.getEuclideanDistance(eastinNorthing, nearestLink.getFromNode().getCoord());
 

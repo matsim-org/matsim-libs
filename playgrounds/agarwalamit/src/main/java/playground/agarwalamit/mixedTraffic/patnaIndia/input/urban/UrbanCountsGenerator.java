@@ -60,7 +60,8 @@ public class UrbanCountsGenerator {
 		for (Tuple<Id<Link>,String> mcs : countStation2time2countInfo.keySet()){
 			Count<Link> c = counts.createAndAddCount(mcs.getFirst(), mcs.getSecond());
 			for(Integer i : countStation2time2countInfo.get(mcs).keySet()){
-				c.createVolume(i, countStation2time2countInfo.get(mcs).get(i));
+                assert c != null;
+                c.createVolume(i, countStation2time2countInfo.get(mcs).get(i));
 			}
 		}
 		new CountsWriter(counts).write(outCountsFile);

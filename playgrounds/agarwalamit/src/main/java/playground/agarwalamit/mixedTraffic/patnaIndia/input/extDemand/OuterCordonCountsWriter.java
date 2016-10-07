@@ -70,6 +70,7 @@ public class OuterCordonCountsWriter {
 			Count<Link> c = counts.createAndAddCount(mcs.getFirst(), mcs.getSecond());
 			for(Integer i : countStation2time2countInfo_in.get(mcs).keySet()){
 				double vol = countStation2time2countInfo_in.get(mcs).get(i) ;
+				assert c != null;
 				c.createVolume(i, vol );
 			}
 		}
@@ -78,6 +79,7 @@ public class OuterCordonCountsWriter {
 			for(Integer i : countStation2time2countInfo_out.get(mcs).keySet()){
 				double vol = Math.round(countStation2time2countInfo_out.get(mcs).get(i) 
 						* OuterCordonUtils.getModalOutTrafficAdjustmentFactor().get("total")); // this counts file is aggregated and therefore using aggregated factor
+				assert c != null;
 				c.createVolume(i, vol );
 			}
 		}

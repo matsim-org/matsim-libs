@@ -186,9 +186,7 @@ public class PeakHourTripTollPerKmAnalyzer {
 					if (person2TollsPerKmOffPkHr.containsKey(person) ) {
 						List<Double> existingTollsPerMeter = person2TollsPerKmOffPkHr.get(person);
 						List<Double> additionalTollsPerMeter = ListUtils.divide(timebin2person2tripTolls.get(d).get(person), timebin2person2tripDists.get(d).get(person));
-						if(additionalTollsPerMeter==null){
-							System.out.println("problem.");
-						}
+						assert additionalTollsPerMeter != null;
 						existingTollsPerMeter.addAll(additionalTollsPerMeter);
 						if(! (timebin2person2tripCounts.get(d).get(person)).equals(timebin2person2tripDistCounts.get(d).get(person)) ) {
 							throw new RuntimeException("Trip count should be equal in both lists. Aborting ...");

@@ -467,7 +467,10 @@ public class GenerateFundamentalDiagramData {
 			writer.print("\n");
 		}
 
-		if(isWritingEventsFileForEachIteration) eventWriter.closeFile();
+		if(isWritingEventsFileForEachIteration) {
+			assert eventWriter != null;
+			eventWriter.closeFile();
+		}
 	}
 	
 	private Netsim createModifiedQSim(Scenario sc, EventsManager events) {

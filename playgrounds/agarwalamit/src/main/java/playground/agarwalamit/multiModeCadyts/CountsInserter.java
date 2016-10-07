@@ -84,6 +84,7 @@ public class CountsInserter {
 				Count<ModalLink> c = counts.createAndAddCount(modalLinkId, mcs.getSecond());
 				for(Integer i : countStation2time2countInfo.get(mcs).get(mode).keySet()){
 					double vol = countStation2time2countInfo.get(mcs).get(mode).get(i) ;
+					assert c != null;
 					c.createVolume(i, vol );
 				}
 			}

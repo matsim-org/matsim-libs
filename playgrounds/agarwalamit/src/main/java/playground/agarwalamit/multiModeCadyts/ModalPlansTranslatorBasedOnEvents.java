@@ -126,7 +126,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		
 		// if only a subset of links is calibrated but the link is not contained, ignore the event
 		Id<ModalLink> mlId = Id.create(new ModalLink(mode, event.getLinkId()).getId(),ModalLink.class);
-		if (!calibratedLinks.contains(mlId)) 
+		if (!calibratedLinks.contains(event.getLinkId()))
 			return;
 		
 		// get the "Person" behind the id:

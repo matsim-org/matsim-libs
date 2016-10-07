@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
@@ -17,11 +16,9 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 public class RoadTypeInfoAnalyzer {
 	
@@ -41,7 +38,7 @@ public class RoadTypeInfoAnalyzer {
 		for(String runCase:runCases){
 			RoadTypeInfoAnalyzer rti = new RoadTypeInfoAnalyzer(network, runDir+runCase+"/ITERS/it.1500/1500.events.xml.gz");
 			rti.run();
-			Map<String, Integer> roadType2OccuranceCount = rti.getRoadType2OccuranceCount(UserGroup.FREIGHT);
+			Map<String, Integer> roadType2OccuranceCount = rti.getRoadType2OccuranceCount(MunichUserGroup.Freight);
 			runCase2RoadType2Count.put(runCase, roadType2OccuranceCount);
 			roadTypes.addAll(roadType2OccuranceCount.keySet());
 		}
@@ -82,11 +79,11 @@ public class RoadTypeInfoAnalyzer {
 		reader.readFile(eventsFile);
 	}
 	
-	public Map<UserGroup, Map<String, Integer>> getUserGroupToRoadType2OccuranceCount(){
+	public Map<MunichUserGroup, Map<String, Integer>> getUserGroupToRoadType2OccuranceCount(){
 		return rth.userGrp2roadType2Count;
 	}
 
-	public Map<String, Integer> getRoadType2OccuranceCount (UserGroup ug){
+	public Map<String, Integer> getRoadType2OccuranceCount (MunichUserGroup ug){
 		return rth.userGrp2roadType2Count.get(ug);
 	}
 	
@@ -95,7 +92,7 @@ public class RoadTypeInfoAnalyzer {
 		RoadTypeHandler(Network network) {
 			this.net = network;
 
-			for(UserGroup ug : UserGroup.values()){
+			for(MunichUserGroup ug : MunichUserGroup.values()){
 				this.userGrp2roadType2Count.put(ug, new HashMap<>());
 			}
 		}
@@ -103,7 +100,7 @@ public class RoadTypeInfoAnalyzer {
 		private final Network net;
 		private final MunichPersonFilter pf = new MunichPersonFilter();
 
-		private final Map<UserGroup,Map<String,Integer>> userGrp2roadType2Count = new HashMap<>();
+		private final Map<MunichUserGroup,Map<String,Integer>> userGrp2roadType2Count = new HashMap<>();
 
 		@Override
 		public void reset(int iteration) {
@@ -114,7 +111,7 @@ public class RoadTypeInfoAnalyzer {
 			Id<Link> linkId = event.getLinkId();
 			Id<Person> personId = Id.createPersonId(event.getVehicleId());
 			MunichUserGroup ug = pf.getMunichUserGroupFromPersonId(personId);
-			String roadType = NetworkUtils.getType(((Link)net.getLinks().get(linkId)));
+			String roadType = NetworkUtils.getType((net.getLinks().get(linkId)));
 
 			Map<String, Integer> road2count = userGrp2roadType2Count.get(ug);
 			if(road2count.containsKey(roadType)){
