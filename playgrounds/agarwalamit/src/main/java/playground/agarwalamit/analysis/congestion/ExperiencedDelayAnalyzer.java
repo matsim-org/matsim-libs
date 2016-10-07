@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -32,9 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.agarwalamit.utils.AreaFilter;
 import playground.agarwalamit.utils.MapUtils;
 import playground.agarwalamit.utils.PersonFilter;
@@ -130,7 +127,7 @@ public class ExperiencedDelayAnalyzer {
 	@Deprecated 
 	public void checkTotalDelayUsingAlternativeMethod(){
 		EventsManager em = EventsUtils.createEventsManager();
-		CongestionHandlerImplV3 implV3 = new CongestionHandlerImplV3(em, (MutableScenario) this.scenario);
+		CongestionHandlerImplV3 implV3 = new CongestionHandlerImplV3(em, this.scenario);
 		MatsimEventsReader eventsReader = new MatsimEventsReader(em);
 		em.addHandler(implV3);
 		eventsReader.readFile(this.eventsFile);

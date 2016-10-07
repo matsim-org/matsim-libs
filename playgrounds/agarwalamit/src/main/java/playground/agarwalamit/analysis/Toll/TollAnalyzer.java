@@ -193,7 +193,7 @@ public class TollAnalyzer extends AbstractAnalysisModule {
 			BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/boxPlot/toll_"+prefix+".txt");
 			try {
 				// sum all the values for different time bins
-				Map<Id<Person>,Double> personToll  = new HashMap<Id<Person>, Double>();
+				Map<Id<Person>,Double> personToll  = new HashMap<>();
 				for (double d : time2person2toll.keySet()){
 					for( Id<Person> person : time2person2toll.get(d).keySet() ) {
 						if(personToll.containsKey(person)) personToll.put(person, personToll.get(person) + time2person2toll.get(d).get(person) );

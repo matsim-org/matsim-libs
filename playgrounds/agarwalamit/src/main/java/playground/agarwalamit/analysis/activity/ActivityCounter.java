@@ -42,7 +42,7 @@ public class ActivityCounter {
 	private static final MunichPersonFilter PF = new MunichPersonFilter();
 	private final String inputPlansFile ;
 	private final UserGroup ug;
-	private final SortedMap<String, Integer> actTyp2Count = new TreeMap<String, Integer>();
+	private final SortedMap<String, Integer> actTyp2Count = new TreeMap<>();
 	private final boolean isSorting;
 
 	public ActivityCounter(final String inputPlansFile, final UserGroup ug){

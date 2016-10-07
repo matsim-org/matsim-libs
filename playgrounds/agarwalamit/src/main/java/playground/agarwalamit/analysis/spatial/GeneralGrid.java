@@ -60,7 +60,7 @@ public class GeneralGrid{
 
 	/* For caching purposes, create the grid cell geometry once, and return the 
 	 * cached geometry subsequently. */
-	private final Map<Point, Geometry> geometryCache = new HashMap<Point, Geometry>();
+	private final Map<Point, Geometry> geometryCache = new HashMap<>();
 
 
 	/**
@@ -90,11 +90,11 @@ public class GeneralGrid{
 
 //		grid = new Matrix("grid", null);
 		Polygon envelope = (Polygon)g.getEnvelope();
-		qt = new QuadTree<Point>(
-				envelope.getCoordinates()[0].x-width, 
-				envelope.getCoordinates()[0].y-width, 
-				envelope.getCoordinates()[2].x+width, 
-				envelope.getCoordinates()[2].y+width);				
+		qt = new QuadTree<>(
+				envelope.getCoordinates()[0].x - width,
+				envelope.getCoordinates()[0].y - width,
+				envelope.getCoordinates()[2].x + width,
+				envelope.getCoordinates()[2].y + width);
 
 		Counter counter = new Counter("   cells # ");
 
@@ -218,7 +218,7 @@ public class GeneralGrid{
 		try{
 			bw.write("Long,Lat,X,Y,Width");
 			bw.newLine();
-			Collection<Point> list = qt.getRectangle(qt.getMinEasting(), qt.getMinNorthing(), qt.getMaxEasting(), qt.getMaxNorthing(), new ArrayList<Point>());
+			Collection<Point> list = qt.getRectangle(qt.getMinEasting(), qt.getMinNorthing(), qt.getMaxEasting(), qt.getMaxNorthing(), new ArrayList<>());
 			for(Point p : list){
 				Coord original = new Coord(new Double(p.getX()), new Double(p.getY()));
 				Coord wgs84 = null;
@@ -303,8 +303,8 @@ public class GeneralGrid{
 	public static enum GridType{
 		SQUARE, 
 		HEX,
-		UNKNOWN;		
-	}
+		UNKNOWN
+    }
 
 
 

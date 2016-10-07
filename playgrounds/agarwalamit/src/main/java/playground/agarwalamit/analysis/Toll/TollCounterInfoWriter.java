@@ -46,11 +46,11 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
 public class TollCounterInfoWriter extends AbstractAnalysisModule {
 	private final CausedDelayAnalyzer cda;
 	private final MunichPersonFilter pf ;
-	private final String suffixForSoring = "_sorted";
+	private static final String suffixForSoring = "_sorted";
 
 	private final SortedMap<Double, SortedMap<MunichUserGroup, Integer>> userGroup2TollPayers = new TreeMap<>();
 	private final SortedMap<Double,SortedMap<MunichUserGroup, Integer>> userGroup2TolledTrips = new TreeMap<>();
-	private final SortedMap<Double,Integer> timeBin2TolledLinks = new TreeMap<Double,Integer>();
+	private final SortedMap<Double,Integer> timeBin2TolledLinks = new TreeMap<>();
 	
 	public TollCounterInfoWriter(final String eventsFile, final Scenario sc, final int noOfTimeBins, final boolean isSortingForMunich) {
 		super(TollCounterInfoWriter.class.getSimpleName());

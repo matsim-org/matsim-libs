@@ -36,8 +36,8 @@ public class PersonActivityInfo  {
 	
 	public PersonActivityInfo(final Id<Person> personId) {
 		this.personId = personId;
-		actType2EndTimes = new ArrayList<Tuple<String,Double>>();
-		actType2StartTimes = new ArrayList<Tuple<String,Double>>();
+		actType2EndTimes = new ArrayList<>();
+		actType2StartTimes = new ArrayList<>();
 	}
 
 	public Id<Person> getPersonId() {

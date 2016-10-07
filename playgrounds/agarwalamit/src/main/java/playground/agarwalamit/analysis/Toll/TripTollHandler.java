@@ -130,7 +130,8 @@ public class TripTollHandler implements PersonMoneyEventHandler, PersonDeparture
 		//departure and arrival without any money event.
 		int tollsStored = timeBin2Person2TripToll.get(time).get(personId).size();
 
-		if(totalTrips == tollsStored) return;
+		if(totalTrips == tollsStored) {
+        }
 		else throw new RuntimeException("Trip count and trip dist maps are initiated at departure events, thus, tripNr should be equal to "
 				+ "number of distances stored in trip dist map. Aborting ...");
 	}

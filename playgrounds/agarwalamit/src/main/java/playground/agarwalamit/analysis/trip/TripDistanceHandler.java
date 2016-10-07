@@ -107,7 +107,8 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		int totalTrips = timeBin2Person2TripsCount.get(time).get(personId);
 		int distancesStored = timeBin2Person2TripsDistance.get(time).get(personId).size();
 
-		if(totalTrips == distancesStored) return;
+		if(totalTrips == distancesStored) {
+        }
 		else throw new RuntimeException("Trip count and trip dist maps are initiated at departure events, thus, tripNr should be equal to "
 				+ "number of distances stored in trip dist map. Aborting ...");
 	}

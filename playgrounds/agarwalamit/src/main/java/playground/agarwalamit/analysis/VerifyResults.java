@@ -51,9 +51,7 @@ public class VerifyResults {
 	private static final String RUN_DIR = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
 	private static final String [] RUN_NR =  {"baseCaseCtd","ei","ci","eci"};
 
-	private  static Scenario scenario;
-
-	private static final boolean CONSIDER_CO2 = true;
+    private static final boolean CONSIDER_CO2 = true;
 	private static final double EMISSION_COST_FACTOR = 1.0;
 
 	public static void main(String[] args) {
@@ -65,12 +63,12 @@ public class VerifyResults {
 			int lastItenation = LoadMyScenarios.getLastIteration(inputConfigFile);
 			String emissionsEventsFile = RUN_DIR+RUN_NR[i]+"/ITERS/it."+lastItenation+"/"+lastItenation+".emission.events.xml.gz";
 			String plansFile = RUN_DIR+RUN_NR[i]+"/output_plans.xml.gz";
-			scenario = LoadMyScenarios.loadScenarioFromPlansAndNetwork(plansFile, networkFile);
+            Scenario scenario = LoadMyScenarios.loadScenarioFromPlansAndNetwork(plansFile, networkFile);
 			//			scenario = ScenarioUtils.loadScenario(config);
 			String eventsFile=RUN_DIR+RUN_NR[i]+"/ITERS/it."+lastItenation+"/"+lastItenation+".events.xml.gz";
 
 			calculateEmissionCosts(emissionsEventsFile, scenario,RUN_NR[i]);
-			calculateDelaysCosts(eventsFile,scenario,RUN_NR[i]);
+			calculateDelaysCosts(eventsFile, scenario,RUN_NR[i]);
 			calculateUserBenefits(scenario, RUN_NR[i]);
 		}
 		Logger.getLogger(VerifyResults.class).info("Writing files is finsished.");
@@ -106,7 +104,7 @@ public class VerifyResults {
 
 	public static void calculateDelaysCosts(final String eventsFile, final Scenario scenario, final String runNr){
 		EventsManager em = EventsUtils.createEventsManager();
-		CongestionHandlerImplV3 congestionHandler = new CongestionHandlerImplV3(em, (MutableScenario) scenario);
+		CongestionHandlerImplV3 congestionHandler = new CongestionHandlerImplV3(em, scenario);
 		MatsimEventsReader eventsReader = new MatsimEventsReader(em);
 		em.addHandler(congestionHandler);
 		eventsReader.readFile(eventsFile);

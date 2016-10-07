@@ -28,10 +28,10 @@ import java.util.SortedSet;
 
 public interface ModalShare {
 	
-	public SortedSet<String> getUsedModes();
-	public SortedMap<String, Integer> getModeToNumberOfLegs();
-	public SortedMap<String, Double> getModeToPercentOfLegs();
-	public void writeResults(String outputFile);
+	SortedSet<String> getUsedModes();
+	SortedMap<String, Integer> getModeToNumberOfLegs();
+	SortedMap<String, Double> getModeToPercentOfLegs();
+	void writeResults(String outputFile);
 }
 
 

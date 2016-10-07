@@ -44,8 +44,8 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  */
 public class LegModeTripTimeDistributionAnalyzer extends AbstractAnalysisModule {
 
-	private final List<Integer> timeClasses = new ArrayList<Integer>();
-	private SortedSet<String> usedModes = new TreeSet<String>();
+	private final List<Integer> timeClasses = new ArrayList<>();
+	private SortedSet<String> usedModes = new TreeSet<>();
 	private static final Logger LOG = Logger.getLogger(LegModeTripTimeDistributionAnalyzer.class);
 
 	private final SortedMap<String, SortedMap<Integer, Integer>> mode2timeClass2LegCount = new TreeMap<>();
@@ -77,11 +77,11 @@ public class LegModeTripTimeDistributionAnalyzer extends AbstractAnalysisModule 
 		
 		this.mode2PersonId2tripTimes = lmtth.getLegMode2PesonId2TripTimes();
 		initializeTimeClasses();
-		this.usedModes = new TreeSet<String>(this.mode2PersonId2tripTimes.keySet());
+		this.usedModes = new TreeSet<>(this.mode2PersonId2tripTimes.keySet());
 		LOG.info("The following transport modes are considered: " + this.usedModes);
 
 		for(String mode:this.usedModes){
-			SortedMap<Integer, Integer> distClass2Legs = new TreeMap<Integer, Integer>();
+			SortedMap<Integer, Integer> distClass2Legs = new TreeMap<>();
 			for(int i: this.timeClasses){
 				distClass2Legs.put(i, 0);
 			}
