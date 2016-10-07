@@ -69,7 +69,6 @@ class RealizedActivity<L, M> {
 					(this.plannedActivity.closingTime_s != null) ? this.plannedActivity.closingTime_s
 							: POSITIVE_INFINITY);
 		}
-		// System.out.println("Realized duration of " + this.plannedActivity.location + " is " + result + "s.");
 		return result;
 	}
 }

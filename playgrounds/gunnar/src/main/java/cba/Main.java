@@ -38,9 +38,9 @@ public class Main {
 	 * ============================================================
 	 */
 
-	static final int outerIts = 1;
-	static final int popSize = 10 * 1000;
-	static final double replanProba = 1.0;
+	static final int outerIts = 2;
+	static final int popSize = 1000;
+	static final double replanProba = 0.1;
 	static final String expectationFilePrefix = "./testdata/cba/expectation";
 
 	/*-
