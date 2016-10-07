@@ -99,7 +99,7 @@ public class SamplingAgentsFromPop {
 		net.setInputFile(runsSampledDir + "input/network_merged_cl.xml.gz" );
 		
 		PlansConfigGroup plans = config.plans();
-		plans.setInputPersonAttributeFile(runsSampledDir + "input/agentAttributes.xml" );
+
 		plans.setInputFile( runsSampledDir + "input/randomized_sampled_plans.xml.gz" );
 		plans.setInputPersonAttributeFile( runsSampledDir + "input/sampledAgentAttributes.xml");
 		
