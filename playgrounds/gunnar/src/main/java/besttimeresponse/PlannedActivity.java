@@ -115,4 +115,25 @@ public class PlannedActivity<L, M> {
 		final boolean closesBefore = (this.closingTime_s != null) && (time_s > this.closingTime_s);
 		return (opensLater || closesBefore);
 	}
+
+	// -------------------- OVERRIDING OF Object --------------------
+
+	@Override
+	public String toString() {
+		final StringBuffer result = new StringBuffer();
+		result.append(this.getClass().getSimpleName() + ": ");
+		result.append("location=" + this.location + ", ");
+		result.append("dpt.mode=" + this.departureMode + ", ");
+		result.append("des.dur=" + this.desiredDur_s * Units.H_PER_S + "h, ");
+		result.append("zero.utl.dur=" + this.zeroUtilityDur_s * Units.H_PER_S + "h, ");
+		result.append("openingTime=" + this.openingTime_s + "s, ");
+		result.append("closingTime=" + this.closingTime_s + "s, ");
+		result.append("latest.arr=" + this.latestArrTime_s + "s, ");
+		result.append("earliest.dpt=" + this.earliestDptTime_s + "s, ");
+		result.append("beta.dur=" + this.betaDur_1_s * 3600 + "/h, ");
+		result.append("beta.early=" + this.betaEarlyDpt_1_s * 3600 + "/h, ");
+		result.append("beta.late=" + this.betaLateArr_1_s* 3600 + "/h, ");
+		result.append("beta.travel=" + this.betaTravel_1_s * 3600 + "/h");
+		return result.toString();
+	}
 }

@@ -39,6 +39,8 @@ public class BestTimeResponseStrategyFunctionality {
 
 	private final BestTimeResponseTravelTimes myTravelTimes;
 
+	private final boolean verbose = false;
+	
 	// -------------------- CONSTRUCTION --------------------
 
 	public BestTimeResponseStrategyFunctionality(final Plan plan, final Network network,
@@ -89,6 +91,11 @@ public class BestTimeResponseStrategyFunctionality {
 					betaTravel_1_s);
 
 			this.plannedActivities.add(plannedAct);
+			
+			if (this.verbose) {
+				System.out.println(plannedAct);
+			}
+			
 		}
 
 		/*

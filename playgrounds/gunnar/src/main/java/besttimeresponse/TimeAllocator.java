@@ -204,6 +204,7 @@ public class TimeAllocator<L, M> {
 		final TimeAllocator<L, M> enclosingTimeAllocator = this;
 
 		final SearchRepeater<double[]> repeater = new SearchRepeater<>(maxTrials, maxFailures);
+		repeater.setMaximize();
 		repeater.run(new SearchAlgorithm<double[]>() {
 			private double[] departureTimes = null;
 			private Double timeScore = null;

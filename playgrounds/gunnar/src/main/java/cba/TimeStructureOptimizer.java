@@ -28,11 +28,7 @@ class TimeStructureOptimizer {
 
 	private final TimeDiscretization timeDiscretization;
 
-	// private final TravelTime carTravelTime;
-
 	private final SubpopulationCharyparNagelScoringParameters scoringParams;
-
-	// private final BestTimeResponseTravelTimes travelTimes;
 
 	final Provider<TripRouter> tripRouterProvider;
 
@@ -41,18 +37,7 @@ class TimeStructureOptimizer {
 	TimeStructureOptimizer(final Scenario scenario, final Provider<TripRouter> tripRouterProvider) {
 		this.scenario = scenario;
 		this.timeDiscretization = TimeDiscretizationFactory.newInstance(scenario.getConfig());
-		// this.carTravelTime = carTravelTime;
 		this.scoringParams = new SubpopulationCharyparNagelScoringParameters(scenario);
-
-		// if (carTravelTime == null) {
-		// this.travelTimes = null;
-		// } else {
-		// this.travelTimes = new
-		// BestTimeResponseTravelTimes(this.timeDiscretization, carTravelTime,
-		// scenario.getNetwork(), true);
-		// this.travelTimes.setCaching(true);
-		// }
-
 		this.tripRouterProvider = tripRouterProvider;
 	}
 
@@ -65,7 +50,6 @@ class TimeStructureOptimizer {
 
 		final BestTimeResponseStrategyFunctionality initialPlanData = new BestTimeResponseStrategyFunctionality(plan,
 				this.scenario.getNetwork(), this.scoringParams, this.timeDiscretization,
-				// carTravelTime, true, true
 				travelTimes);
 
 		final TimeAllocator<Facility, String> timeAlloc = initialPlanData.getTimeAllocator();

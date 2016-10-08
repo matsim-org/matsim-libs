@@ -3,6 +3,7 @@ package besttimeresponseintegration;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.ReplanningContext;
@@ -32,18 +33,26 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 
 	private final TripRouter tripRouter;
 
+	private final int maxTrials;
+
+	private final int maxFailures;
+
 	private final boolean verbose = false;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	BestTimeResponseStrategyModule(final Scenario scenario, final CharyparNagelScoringParametersForPerson scoringParams,
-			final TimeDiscretization timeDiscretization, // final ExperiencedScoreAnalyzer experiencedScoreAnalyzer,
-			final TripRouter tripRouter) {
+			final TimeDiscretization timeDiscretization, // final
+															// ExperiencedScoreAnalyzer
+															// experiencedScoreAnalyzer,
+			final TripRouter tripRouter, final int maxTrials, final int maxFailures) {
 		this.scenario = scenario;
 		this.scoringParams = scoringParams;
 		this.timeDiscretization = timeDiscretization;
 		// this.experiencedScoreAnalyzer = experiencedScoreAnalyzer;
 		this.tripRouter = tripRouter;
+		this.maxTrials = maxTrials;
+		this.maxFailures = maxFailures;
 	}
 
 	// --------------- IMPLEMENTATION OF PlanStrategyModule ---------------
@@ -62,19 +71,25 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 				this.scenario.getNetwork(), this.scoringParams, this.timeDiscretization, travelTimes);
 		final TimeAllocator<Facility, String> timeAlloc = initialPlanData.getTimeAllocator();
 
-		final double[] initialDptTimesArray_s = new double[initialPlanData.initialDptTimes_s.size()];
-		for (int q = 0; q < initialPlanData.initialDptTimes_s.size(); q++) {
-			initialDptTimesArray_s[q] = initialPlanData.initialDptTimes_s.get(q);
-		}
-		final double[] result = timeAlloc.optimizeDepartureTimes(initialPlanData.plannedActivities, null);
-				// initialDptTimesArray_s);
+		timeAlloc.optimizeDepartureTimes(initialPlanData.plannedActivities, this.maxTrials, this.maxFailures);
+		final double[] result = timeAlloc.getResultPoint();
+
+		// final double[] initialDptTimesArray_s = new
+		// double[initialPlanData.initialDptTimes_s.size()];
+		// for (int q = 0; q < initialPlanData.initialDptTimes_s.size(); q++) {
+		// initialDptTimesArray_s[q] = initialPlanData.initialDptTimes_s.get(q);
+		// }
+		// final double result[] =
+		// timeAlloc.optimizeDepartureTimes(initialPlanData.plannedActivities,
+		// initialDptTimesArray_s);
 
 		if (this.verbose) {
 			System.out.println("FINAL DPT TIMES: " + new ArrayRealVector(result));
 		}
 
 		// >>>>>>>>>> TODO NEW >>>>>>>>>>
-		// this.experiencedScoreAnalyzer.setExpectedScore(plan.getPerson().getId(), timeAlloc.getResultValue());
+		// this.experiencedScoreAnalyzer.setExpectedScore(plan.getPerson().getId(),
+		// timeAlloc.getResultValue());
 		// <<<<<<<<<< TODO NEW <<<<<<<<<<
 
 		/*
@@ -84,7 +99,9 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 		for (int q = 0; q < plan.getPlanElements().size() - 1; q += 2) {
 			final double dptTime_s = result[i++];
 			final Activity matsimAct = (Activity) plan.getPlanElements().get(q);
+			final Leg nextLeg = (Leg) plan.getPlanElements().get(q + 1);
 			matsimAct.setEndTime(dptTime_s);
+			nextLeg.setDepartureTime(dptTime_s);
 		}
 	}
 
