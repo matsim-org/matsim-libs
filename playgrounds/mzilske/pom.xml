@@ -19,6 +19,10 @@
 			</snapshots>
 		</repository>
 		<repository>
+			<id>matsim</id>
+			<url>http://dl.bintray.com/matsim/matsim</url>
+		</repository>
+		<repository>
 			<id>conveyal</id>
 			<name>Conveyal Maven Repository</name>
 			<url>http://maven.conveyal.com/</url>
