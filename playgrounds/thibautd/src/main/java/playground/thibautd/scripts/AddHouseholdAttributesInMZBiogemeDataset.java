@@ -26,7 +26,6 @@ import playground.thibautd.utils.CsvUtils;
 import playground.thibautd.utils.CsvWriter;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * @author thibautd

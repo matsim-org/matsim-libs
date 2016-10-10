@@ -19,13 +19,10 @@
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.estimatedsampling;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Provides;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.geometry.CoordUtils;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.arentzemodel.ArentzePopulation;
-import playground.thibautd.initialdemandgeneration.socnetgensimulated.arentzemodel.TRBModelConfigGroup;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility.DeterministicPart;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility.ErrorTerm;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility.GumbelErrorTerm;

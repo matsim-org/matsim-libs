@@ -22,15 +22,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
-import playground.thibautd.utils.ArrayUtils;
-import playground.thibautd.utils.KDTree;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
