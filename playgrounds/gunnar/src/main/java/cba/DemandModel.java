@@ -85,11 +85,10 @@ class DemandModel {
 
 		scenario.getPopulation().getPersons().clear();
 
-		final UtilityFunction utilityFunction = new UtilityFunction(scenario, null);
-		final ChoiceModel choiceModel = new ChoiceModel(scenario, utilityFunction);
+		final UtilityFunction dummyUtilityFunction = new UtilityFunction(scenario, null, 1, 1);
+		final ChoiceModel choiceModel = new ChoiceModel(scenario, dummyUtilityFunction);
 
 		for (int personNumber = 0; personNumber < homeLocs.size(); personNumber++) {
-			// System.out.println("creating person " + personNumber);
 			final Person person = scenario.getPopulation().getFactory().createPerson(Id.createPersonId(personNumber));
 			scenario.getPopulation().addPerson(person);
 
@@ -101,9 +100,9 @@ class DemandModel {
 	}
 
 	static void replanPopulation(final Scenario scenario, final Provider<TripRouter> tripRouterProvider,
-			final double replanProba, final String expectationFileName) {
+			final double replanProba, final String expectationFileName, final int maxTrials, final int maxFailures) {
 
-		final UtilityFunction utilityFunction = new UtilityFunction(scenario, tripRouterProvider);
+		final UtilityFunction utilityFunction = new UtilityFunction(scenario, tripRouterProvider, maxTrials, maxFailures);
 		final ChoiceModel choiceModel = new ChoiceModel(scenario, utilityFunction);
 
 		final PrintWriter expectationWriter;

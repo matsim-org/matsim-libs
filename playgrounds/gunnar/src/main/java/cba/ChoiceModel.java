@@ -84,7 +84,7 @@ class ChoiceModel {
 	Plan simulateChoice(final Link homeLoc, final Person person) {
 
 		final List<Plan> planAlternatives = new ArrayList<>(this.alternatives.size());
-
+		
 		// compute utilities
 		final List<Double> utilities = new ArrayList<>(this.alternatives.size());
 		double maxUtility = Double.NEGATIVE_INFINITY;

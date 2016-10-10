@@ -42,7 +42,8 @@ class UtilityFunction {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	UtilityFunction(final Scenario scenario, final Provider<TripRouter> tripRouterProvider) {
+	UtilityFunction(final Scenario scenario, final Provider<TripRouter> tripRouterProvider, final int maxTrials,
+			final int maxFailures) {
 
 		this.scenario = scenario;
 
@@ -163,7 +164,7 @@ class UtilityFunction {
 		 */
 
 		if (tripRouterProvider != null) {
-			this.timeOpt = new TimeStructureOptimizer(this.scenario, tripRouterProvider);
+			this.timeOpt = new TimeStructureOptimizer(this.scenario, tripRouterProvider, maxTrials, maxFailures);
 		} else {
 			this.timeOpt = null;
 		}
