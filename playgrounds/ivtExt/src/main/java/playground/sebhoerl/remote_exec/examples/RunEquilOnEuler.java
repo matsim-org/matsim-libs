@@ -16,6 +16,17 @@ import playground.sebhoerl.remote_exec.euler.EulerInterface;
 import java.io.*;
 
 public class RunEquilOnEuler {
+    /**
+     * This example shows how to setup a simple simulation environment on Euler, only by using the
+     * remote framework. All that is needed is an unpacked version of the standard MATSim distribution
+     * package.
+     *
+     * First, the configuration file is adjusted slightly to comply with the requirements of the remtoe
+     * execution framework. Then the framework sets up an environment on Euler consisting of the "equil" scenario
+     * for MATSim, as well as a standard controller. Finally, a number of simulations are started concurrently
+     * with different configuration parameters. The script will wait until all simulations are finished and
+     * read the events from the first one directly from Euler. At the end, the environment is cleaned up again.
+     */
     static public void main(String[] args) throws JSchException, IOException, InterruptedException {
         // Path to the unpacked standard MATSim package (zip)
         String localPath = "/home/sebastian/Downloads/matsim";
@@ -38,18 +49,30 @@ public class RunEquilOnEuler {
     }
 
     static public void prepareConfig(String localPath) throws IOException {
+        // Create config reader and writer
+        //    write the new config to examples/equil/updated_config.xml
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(localPath + "/examples/equil/config.xml")));
         OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(localPath + "/examples/equil/updated_config.xml"));
 
+        // It is possible to define custom placeholders in the config file. However, a couple of parameters
+        // are predefined:
+        //    %scenario - The path to the scenario on Euler, should be used to point to all the scenario assets (population etc.)
+        //    %output - The allocated output directory on euler.
+        //
+        // The configuration of a scenario should be prepared such that it makes use of those parameters, otherwise the
+        // simulation environment will not know how to handle the scenario.
+
         String line;
         while ((line = reader.readLine()) != null) {
-            line = line.replace("examples/equil/", "%scenario/");
-            line = line.replace("./output/equil", "%output");
-            line = line.replace("4711", "%randomSeed");
+            line = line.replace("examples/equil/", "%scenario/"); // Fix all assets paths
+            line = line.replace("./output/equil", "%output"); // Fix the output directory
+            line = line.replace("4711", "%randomSeed"); // Custom Parameter
 
             writer.write(line + "\n");
             writer.flush();
         }
+
+        // Instead of the fixed 4711 random seed, the placeholder %randomSeed has been added. It will be used later.
     }
 
     static public void runMatsim(String localPath, Session session) throws IOException, JSchException, InterruptedException {
@@ -74,7 +97,7 @@ public class RunEquilOnEuler {
         RemoteController controller = environment.createController("standard", localPath, "matsim-0.8.0.jar", "org.matsim.run.Controler");
 
         // Third, we can set up an arbitrary number of simulations
-        // Here, different car costs are used.
+        // Here, different random seeds are used.
         int[] seeds = { 4001, 4002, 4003, 4004, 4005 };
         String[] ids = { "RS4001", "RS4002", "RS4003", "RS4004", "RS4005" };
 
@@ -123,7 +146,8 @@ public class RunEquilOnEuler {
             System.out.println("");
         } while (finished < simulations.length); // Exit when all simulations are finished
 
-        // For convenience, events can be read directly from Euler:
+        // For convenience, events can be read directly from Euler. Event handlers for analysis can be added
+        // just as usual:
         EventsManager events = new EventsManagerImpl();
         simulations[0].getEvents(events);
 
