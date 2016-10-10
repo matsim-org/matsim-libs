@@ -60,7 +60,7 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
                     PlanCalcScoreConfigGroup.ModeParams newModeParams1 = new PlanCalcScoreConfigGroup.ModeParams(mode) ;
                     PlanCalcScoreConfigGroup.ModeParams newModeParams2 = new PlanCalcScoreConfigGroup.ModeParams(mode) ;
 
-                    double rnd1 = 1. * rnd.nextDouble();
+                    double rnd1 = 0.1 * rnd.nextDouble();
                     double rnd2 = 1. * rnd.nextDouble();
                     double rnd3 = 1. * rnd.nextDouble();
 
