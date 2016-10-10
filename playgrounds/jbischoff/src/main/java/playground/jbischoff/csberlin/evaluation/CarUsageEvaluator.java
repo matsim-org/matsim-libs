@@ -55,7 +55,7 @@ public static void main(String[] args) {
 	Set<Id<Person>> firstCarUsers = new HashSet<>();
 	Set<Id<Person>> secondCarUsers = new HashSet<>();
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	new PopulationReader(scenario).readFile("D:/runs-svn/bmw_carsharing/run19/ITERS/it.0/run19.0.plans.xml.gz");
+	new PopulationReader(scenario).readFile("D:/runs-svn/bmw_carsharing/run23/ITERS/it.0/run23.0.plans.xml.gz");
 	int persons = 0;
 	for (Person p : scenario.getPopulation().getPersons().values()){
 		
@@ -76,7 +76,7 @@ public static void main(String[] args) {
 	}
 	
 	Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	new PopulationReader(scenario2).readFile("D:/runs-svn/bmw_carsharing/run19/ITERS/it.150/run19.150.plans.xml.gz");
+	new PopulationReader(scenario2).readFile("D:/runs-svn/bmw_carsharing/run23/ITERS/it.150/run23.150.plans.xml.gz");
 	for (Person p : scenario2.getPopulation().getPersons().values()){
 		Plan plan = p.getSelectedPlan();
 		Activity hAct = (Activity) plan.getPlanElements().get(0);

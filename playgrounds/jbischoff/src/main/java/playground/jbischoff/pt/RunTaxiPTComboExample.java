@@ -38,6 +38,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.jbischoff.analysis.TripHistogramModule;
+
 /**
  * @author  jbischoff
  *
@@ -88,6 +90,7 @@ public static void main(String[] args) {
                VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
        controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
        controler.addOverridingModule(new VariableAccessTransitRouterModule());
+//       controler.addOverridingModule(new TripHistogramModule());
 //       controler.addOverridingModule(new OTFVisLiveModule());
 
        controler.run();
