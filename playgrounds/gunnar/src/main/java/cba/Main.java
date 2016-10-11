@@ -42,7 +42,7 @@ public class Main {
 	 */
 
 	static final int outerIts = 10;
-	static final int popSize = 100;
+	static final int popSize = 1000;
 	static final double replanProba = 0.1;
 	static final String expectationFilePrefix = "./testdata/cba/expectation-before-it";
 	static final String experienceFilePrefix = "./testdata/cba/experience-after-it";

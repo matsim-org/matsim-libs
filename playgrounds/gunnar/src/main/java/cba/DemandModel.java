@@ -3,7 +3,12 @@ package cba;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -85,14 +90,13 @@ class DemandModel {
 
 		scenario.getPopulation().getPersons().clear();
 
-		final UtilityFunction dummyUtilityFunction = new UtilityFunction(scenario, null, 1, 1);
-		final ChoiceModel choiceModel = new ChoiceModel(scenario, dummyUtilityFunction);
+		final List<TourSequence> tourSequenceAlternatives = ChoiceModel.newTourSeqAlternatives(scenario);
 
 		for (int personNumber = 0; personNumber < homeLocs.size(); personNumber++) {
 			final Person person = scenario.getPopulation().getFactory().createPerson(Id.createPersonId(personNumber));
 			scenario.getPopulation().addPerson(person);
 
-			final Plan plan = choiceModel.simulateChoice(homeLocs.get(personNumber), person);
+			final Plan plan = ChoiceModel.selectUniformly(homeLocs.get(personNumber), person, tourSequenceAlternatives, scenario);
 			person.addPlan(plan);
 			plan.setPerson(person);
 			person.setSelectedPlan(plan);
@@ -101,9 +105,32 @@ class DemandModel {
 
 	static void replanPopulation(final Scenario scenario, final Provider<TripRouter> tripRouterProvider,
 			final double replanProba, final String expectationFileName, final int maxTrials, final int maxFailures) {
+		
+		final ChoiceModel choiceModel = new ChoiceModel(scenario, tripRouterProvider, maxTrials, maxFailures);
 
-		final UtilityFunction utilityFunction = new UtilityFunction(scenario, tripRouterProvider, maxTrials, maxFailures);
-		final ChoiceModel choiceModel = new ChoiceModel(scenario, utilityFunction);
+		final Map<Person, ChoiceRunner> person2choiceRunner = new LinkedHashMap<>();
+
+		// Replan in parallel.
+
+		final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			if (Math.random() < replanProba) {
+				// System.out.println("replanning person " + person.getId());
+				final Link homeLoc = scenario.getNetwork().getLinks()
+						.get(((Activity) person.getSelectedPlan().getPlanElements().get(0)).getLinkId());
+				final ChoiceRunner choiceRunner = choiceModel.newChoiceRunner(homeLoc, person);
+				person2choiceRunner.put(person, choiceRunner);
+				threadPool.execute(choiceRunner);
+			}
+		}
+		threadPool.shutdown();
+		try {
+			threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+		} catch (InterruptedException e) {
+			throw new RuntimeException();
+		}
+
+		// Collect replanning results.
 
 		final PrintWriter expectationWriter;
 		try {
@@ -112,19 +139,15 @@ class DemandModel {
 			throw new RuntimeException(e);
 		}
 
-		for (Person person : scenario.getPopulation().getPersons().values()) {
-			if (Math.random() < replanProba) {
-				System.out.println("replanning person " + person.getId());
-				final Link homeLoc = scenario.getNetwork().getLinks()
-						.get(((Activity) person.getSelectedPlan().getPlanElements().get(0)).getLinkId());
-				person.getPlans().clear();
-				person.setSelectedPlan(null);
-				final Plan plan = choiceModel.simulateChoice(homeLoc, person);
-				person.addPlan(plan);
-				plan.setPerson(person);
-				person.setSelectedPlan(plan);
-				expectationWriter.println(person.getId() + "\t" + plan.getScore());
-			}
+		for (Map.Entry<Person, ChoiceRunner> entry : person2choiceRunner.entrySet()) {
+			final Person person = entry.getKey();
+			final Plan plan = entry.getValue().getChosenPlan();
+			person.getPlans().clear();
+			person.setSelectedPlan(null);
+			person.addPlan(plan);
+			plan.setPerson(person);
+			person.setSelectedPlan(plan);
+			expectationWriter.println(person.getId() + "\t" + plan.getScore());
 		}
 
 		expectationWriter.flush();
