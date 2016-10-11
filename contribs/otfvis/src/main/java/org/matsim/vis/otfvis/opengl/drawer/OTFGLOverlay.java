@@ -66,13 +66,15 @@ class OTFGLOverlay implements GLEventListener {
 			texture.bind(gl);
 			TextureCoords tc = texture.getImageTexCoords();
 			gl.glBegin(GL2.GL_QUADS);
-			gl.glTexCoord2f(tc.left(), tc.top());
-			gl.glVertex3f(startX, startY, z);
-			gl.glTexCoord2f(tc.right(), tc.top());
-			gl.glVertex3f(startX + width, startY, z);
-			gl.glTexCoord2f(tc.right(), tc.bottom());
-			gl.glVertex3f(startX + width, startY + height, z);
+			// In these lines, 'top' and 'bottom' must be flipped since the switch to jogl 2.3.2
+			// for no apparent reason.
 			gl.glTexCoord2f(tc.left(), tc.bottom());
+			gl.glVertex3f(startX, startY, z);
+			gl.glTexCoord2f(tc.right(), tc.bottom());
+			gl.glVertex3f(startX + width, startY, z);
+			gl.glTexCoord2f(tc.right(), tc.top());
+			gl.glVertex3f(startX + width, startY + height, z);
+			gl.glTexCoord2f(tc.left(), tc.top());
 			gl.glVertex3f(startX, startY + height, z);
 			gl.glEnd();
 			texture.disable(gl);
