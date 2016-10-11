@@ -38,23 +38,23 @@ public class FilteredTripDistanceHandler implements PersonDepartureEventHandler,
 
     private static final Logger LOG = Logger.getLogger(FilteredTripDistanceHandler.class);
     private final TripDistanceHandler delegate ;
-    private final Set<String> modes2Consider;
+    private final String mode2Consider;
     private final Map<Id<Person>,String> personId2mode = new HashMap<>(); // person id -- mode
     private final Vehicle2DriverEventHandler vehicle2DriverDelegate; // person id -- vehicle id
 
 
-    public FilteredTripDistanceHandler(final Network network, final double simulationEndTime, final int noOfTimeBins, final Set<String> modes2Consider){
+    public FilteredTripDistanceHandler(final Network network, final double simulationEndTime, final int noOfTimeBins, final String mode2Consider){
         this.delegate = new TripDistanceHandler(network, simulationEndTime, noOfTimeBins);
         this.vehicle2DriverDelegate = new Vehicle2DriverEventHandler();
-        this.modes2Consider = modes2Consider;
-        LOG.info("Only "+this.modes2Consider+" will be considerd to calculate trip distances");
+        this.mode2Consider = mode2Consider;
+        LOG.info("Only "+this.mode2Consider +" will be considerd to calculate trip distances");
     }
 
     /*
     * By default, this will analyze only car trips.
     */
     public FilteredTripDistanceHandler(final Network network, final double simulationEndTime, final int noOfTimeBins){
-        this(network,simulationEndTime,noOfTimeBins,new HashSet<String>(Arrays.asList("car")));
+        this(network,simulationEndTime,noOfTimeBins,"car");
     }
 
     @Override
@@ -65,15 +65,16 @@ public class FilteredTripDistanceHandler implements PersonDepartureEventHandler,
     @Override
     public void handleEvent(LinkLeaveEvent event) {
         Id<Person> personId = this.vehicle2DriverDelegate.getDriverOfVehicle(event.getVehicleId());
+        if(personId == null ) return;
         String mode = personId2mode.get(personId);
-        if(modes2Consider.contains(mode)) {
+        if(mode2Consider.contains(mode)) {
             delegate.handleEvent(event);
         }
     }
 
     @Override
     public void handleEvent(PersonArrivalEvent event) {
-        if(modes2Consider.contains(event.getLegMode())) {
+        if(mode2Consider.contains(event.getLegMode())) {
             delegate.handleEvent(event);
             personId2mode.remove(event.getPersonId());
         }
@@ -81,7 +82,7 @@ public class FilteredTripDistanceHandler implements PersonDepartureEventHandler,
 
     @Override
     public void handleEvent(PersonDepartureEvent event) {
-        if(modes2Consider.contains(event.getLegMode())) {
+        if(mode2Consider.contains(event.getLegMode())) {
             delegate.handleEvent(event);
             personId2mode.put(event.getPersonId(),event.getLegMode());
         }
@@ -92,7 +93,7 @@ public class FilteredTripDistanceHandler implements PersonDepartureEventHandler,
         String mode = event.getNetworkMode();
         if(mode==null) mode = personId2mode.get(event.getPersonId());
 
-        if(modes2Consider.contains(mode)) {
+        if(mode2Consider.contains(mode)) {
             delegate.handleEvent(event);
             vehicle2DriverDelegate.handleEvent(event);
         }
@@ -103,7 +104,7 @@ public class FilteredTripDistanceHandler implements PersonDepartureEventHandler,
         String mode = event.getNetworkMode();
         if(mode==null) mode = personId2mode.get(event.getPersonId());
 
-        if(modes2Consider.contains(mode)) {
+        if(mode2Consider.contains(mode)) {
             delegate.handleEvent(event);
             vehicle2DriverDelegate.handleEvent(event);
         }
