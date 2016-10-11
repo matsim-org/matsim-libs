@@ -132,6 +132,7 @@ public class SnowballCliques {
 		counter.printCounter();
 		log.info( "Finished cleaning up clique composition: ");
 		log.info( cliques.size()+" cliques remain." );
+		assert cliques.size() == cliquesPerEgo.values().stream().mapToInt( Set::size ).sum();
 	}
 
 	private static boolean isRedundant( final Clique clique , final Collection<Clique> in ) {
