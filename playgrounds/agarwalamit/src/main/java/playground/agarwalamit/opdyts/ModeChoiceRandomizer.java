@@ -35,12 +35,18 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
     private final Scenario scenario;
     private final Random rnd;
     private final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser;
+    private final double randomVariance;
 
-    public ModeChoiceRandomizer(final Scenario scenario, final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser) {
+    public ModeChoiceRandomizer(final Scenario scenario, final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser,final double randomVariance) {
         this.scenario = scenario;
         this.rnd = new Random(4711);
         // (careful with using matsim-random since it is always the same sequence in one run)
         this.randomizedUtilityParametersChoser = randomizedUtilityParametersChoser;
+        this.randomVariance = randomVariance;
+    }
+
+    public ModeChoiceRandomizer(final Scenario scenario, final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser) {
+        this(scenario,randomizedUtilityParametersChoser,0.1);
     }
 
     @Override
@@ -60,7 +66,7 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
                     PlanCalcScoreConfigGroup.ModeParams newModeParams1 = new PlanCalcScoreConfigGroup.ModeParams(mode) ;
                     PlanCalcScoreConfigGroup.ModeParams newModeParams2 = new PlanCalcScoreConfigGroup.ModeParams(mode) ;
 
-                    double rnd1 = 0.1 * rnd.nextDouble();
+                    double rnd1 = randomVariance * rnd.nextDouble();
                     double rnd2 = 1. * rnd.nextDouble();
                     double rnd3 = 1. * rnd.nextDouble();
 

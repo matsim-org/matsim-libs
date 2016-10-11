@@ -44,6 +44,8 @@ import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListn
 import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.mixedTraffic.patnaIndia.router.BikeTimeDistanceTravelDisutilityFactory;
+import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.opdyts.*;
 import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
@@ -60,21 +62,31 @@ public class PatnaOpdytsCalibrator {
 
 	public static void main(String[] args) {
 
-		Config config;
+		String configFile;
 		int iterationsToConvergence = 10; //
 		int averagingIterations = 10;
 		boolean isRunningOnCluster = false;
+		double randomVariance = 0.1;
 
 		if (args.length>0) isRunningOnCluster = true;
 
 		if ( isRunningOnCluster ) {
 			OUT_DIR = args[0];
-			config = ConfigUtils.loadConfig(args[1]);
+			configFile = args[1];
 			averagingIterations = Integer.valueOf(args[2]);
 			iterationsToConvergence = Integer.valueOf(args[3]);
+			randomVariance = Double.valueOf(args[4]);
 		} else {
-			config = ConfigUtils.loadConfig(configDir+"/config_urban_1pct.xml");
+			configFile = configDir+"/config_urban_1pct.xml";
 		}
+
+		// relax the plans first.
+		PatnaPlansRelaxor relaxor = new PatnaPlansRelaxor();
+		relaxor.run(new String[]{configFile, OUT_DIR+"/initialPlans2RelaxedPlans/"});
+
+		Config config = ConfigUtils.loadConfig(configFile);
+		config.plans().setInputFile(OUT_DIR+"/initialPlans2RelaxedPlans/output_plans.xml.gz");
+		OUT_DIR += "/calibration/";
 
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn); // must be warn, since opdyts override few things
 
@@ -99,6 +111,8 @@ public class PatnaOpdytsCalibrator {
 
 		ModalStatsControlerListner stasControlerListner = new ModalStatsControlerListner(modes2consider);
 
+		final BikeTimeDistanceTravelDisutilityFactory builder_bike =  new BikeTimeDistanceTravelDisutilityFactory("bike", config.planCalcScore());
+
 		// following is the  entry point to start a matsim controler together with opdyts
 		MATSimSimulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization);
 		simulator.addOverridingModule(new AbstractModule() {
@@ -106,8 +120,8 @@ public class PatnaOpdytsCalibrator {
 			@Override
 			public void install() {
 				// add here whatever should be attached to matsim controler
-				addTravelTimeBinding("bike").to(networkTravelTime());
-				addTravelDisutilityFactoryBinding("bike").to(carTravelDisutilityFactoryKey());
+				addTravelTimeBinding("bike").to(FreeSpeedTravelTimeForBike.class);
+				addTravelDisutilityFactoryBinding("bike").toInstance(builder_bike);
 				// no need to add travel time and travel disutility for motorbike (same as car), should be inserted auto-magically, now
 
 				// some stats
@@ -137,7 +151,8 @@ public class PatnaOpdytsCalibrator {
 		boolean includeCurrentBest = false;
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
-		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario, RandomizedUtilityParametersChoser.ONLY_ASC);
+		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
+				RandomizedUtilityParametersChoser.ONLY_ASC, randomVariance);
 
 		// what would be the decision variables to optimize the objective function.
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario);

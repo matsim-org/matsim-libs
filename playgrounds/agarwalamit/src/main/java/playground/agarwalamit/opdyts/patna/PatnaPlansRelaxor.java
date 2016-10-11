@@ -1,0 +1,92 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.agarwalamit.opdyts.patna;
+
+import java.util.HashSet;
+import java.util.Set;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.scenario.ScenarioUtils;
+import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListner;
+import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
+import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
+import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.mixedTraffic.patnaIndia.router.BikeTimeDistanceTravelDisutilityFactory;
+import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
+import playground.agarwalamit.opdyts.ModalStatsControlerListner;
+
+/**
+ * @author amit
+ */
+
+public class PatnaPlansRelaxor {
+
+	public void run (String[] args) {
+
+		Config config= ConfigUtils.loadConfig(args[0]);
+		config.controler().setOutputDirectory(args[1]);
+
+		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
+
+		config.controler().setFirstIteration(0);
+		config.controler().setLastIteration(200);
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+
+		Set<String> modes2consider = new HashSet<>();
+		modes2consider.add("car");
+		modes2consider.add("bike");
+		modes2consider.add("motorbike");
+		modes2consider.add("pt");
+		modes2consider.add("walk");
+
+		ModalStatsControlerListner stasControlerListner = new ModalStatsControlerListner(modes2consider);
+		final BikeTimeDistanceTravelDisutilityFactory builder_bike =  new BikeTimeDistanceTravelDisutilityFactory("bike", config.planCalcScore());
+
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				// add here whatever should be attached to matsim controler
+				addTravelTimeBinding("bike").to(FreeSpeedTravelTimeForBike.class);
+				addTravelDisutilityFactoryBinding("bike").toInstance(builder_bike);
+				// no need to add travel time and travel disutility for motorbike (same as car), should be inserted auto-magically, now
+
+				// some stats
+				addControlerListenerBinding().to(KaiAnalysisListener.class);
+				addControlerListenerBinding().toInstance(stasControlerListner);
+
+				this.bind(ModalShareEventHandler.class);
+				this.addControlerListenerBinding().to(ModalShareControlerListner.class);
+
+				this.bind(ModalTripTravelTimeHandler.class);
+				this.addControlerListenerBinding().to(ModalTravelTimeControlerListner.class);
+			}
+		});
+	controler.run();
+	}
+}
