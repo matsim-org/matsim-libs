@@ -80,13 +80,14 @@ public class VehicleSourceTest {
 
 	@Parameters(name = "{index}: vehicleSource == {0}; isUsingPersonIdForMissionVehicleId == {1}")
 	public static Collection<Object[]> parameterObjects () {
-		Object [][] vehicleSources = new Object [][] 
-		{ //AA_TODO : fix false cases
-			{ VehiclesSource.fromVehiclesData, true },
-//			{ VehiclesSource.fromVehiclesData, false },
-			{ VehiclesSource.modeVehicleTypesFromVehiclesData, true },
-//			{ VehiclesSource.modeVehicleTypesFromVehiclesData, false }
-		};
+		int nrow = VehiclesSource.values().length;
+		Object [][] vehicleSources = new Object [nrow][2];
+		int index = 0;
+		for (VehiclesSource vs : VehiclesSource.values()) {
+			vehicleSources[index] = new Object [] {vs, true};
+//			vehicleSources[index] = new Object [] {vs, false}; // TODO : fix false cases
+			index++;
+		}
 		return Arrays.asList(vehicleSources);
 	}
 
@@ -159,7 +160,7 @@ public class VehicleSourceTest {
 			travelTime1 = vehicleLinkTravelTimes.get(Id.create("0_bike", Vehicle.class));
 			break;
 		default:
-			break;
+			throw new RuntimeException("not implemented yet.");
 		}
 		
 		Map<Id<Link>, Double> travelTime2 = vehicleLinkTravelTimes.get(Id.create("1", Vehicle.class));
@@ -167,7 +168,19 @@ public class VehicleSourceTest {
 		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue(); 
 		int carTravelTime = travelTime2.get(Id.create("2", Link.class)).intValue();
 
-		Assert.assertEquals("Passing is not executed.", 150, bikeTravelTime - carTravelTime, MatsimTestUtils.EPSILON);
+		switch (this.vehicleSource) {
+			case defaultVehicle: // both bike and car are default vehicles (i.e. identical)
+				Assert.assertEquals("Both car, bike are default vehicles (i.e. identical), thus should have same travel time.",
+						0, bikeTravelTime - carTravelTime, MatsimTestUtils.EPSILON);
+				break;
+			case modeVehicleTypesFromVehiclesData:
+			case fromVehiclesData:
+				Assert.assertEquals("Passing is not executed.", 150, bikeTravelTime - carTravelTime, MatsimTestUtils.EPSILON);
+				break;
+			default:
+				throw new RuntimeException("not implemented yet.");
+		}
+
 	}
 
 	private void createNetwork(){
