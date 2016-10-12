@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -71,7 +72,7 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
  * @author ikaddoura , lkroeger
  *
  */
-
+@Ignore
 public class MarginalCongestionHandlerFlowQueueQsimTest {
 	
 	@Rule
