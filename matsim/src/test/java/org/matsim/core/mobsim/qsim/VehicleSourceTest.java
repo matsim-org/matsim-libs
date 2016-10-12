@@ -139,7 +139,7 @@ public class VehicleSourceTest {
 		cont.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes = new HashMap<>();
-		final PersonLinkTravelTimeEventHandler handler = new PersonLinkTravelTimeEventHandler(vehicleLinkTravelTimes);
+		final VehicleLinkTravelTimeEventHandler handler = new VehicleLinkTravelTimeEventHandler(vehicleLinkTravelTimes);
 
 		cont.addOverridingModule(new AbstractModule() {
 			@Override
@@ -235,11 +235,11 @@ public class VehicleSourceTest {
 		}
 	}
 
-	private static class PersonLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
+	private static class VehicleLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
 		private final Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleTravelTimes;
 
-		public PersonLinkTravelTimeEventHandler(Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes) {
+		public VehicleLinkTravelTimeEventHandler(Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes) {
 			this.vehicleTravelTimes = agentTravelTimes;
 		}
 
