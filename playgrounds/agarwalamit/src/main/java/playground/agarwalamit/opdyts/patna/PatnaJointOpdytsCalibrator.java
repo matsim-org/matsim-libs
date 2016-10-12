@@ -46,6 +46,7 @@ import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.BikeTimeDistanceTravelDisutilityFactory;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.opdyts.*;
 import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
@@ -55,7 +56,7 @@ import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVa
  * @author amit
  */
 
-public class PatnaUrbanOpdytsCalibrator {
+public class PatnaJointOpdytsCalibrator {
 
 	private static String OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/output222/";
 	private static final String configDir = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/input/";
@@ -63,14 +64,11 @@ public class PatnaUrbanOpdytsCalibrator {
 	public static void main(String[] args) {
 
 		String configFile;
-		int iterationsToConvergence = 10; //
-		int averagingIterations = 10;
-		boolean isRunningOnCluster = false;
+		int iterationsToConvergence = 300; //
+		int averagingIterations = 100;
 		double randomVariance = 0.1;
 
-		if (args.length>0) isRunningOnCluster = true;
-
-		if ( isRunningOnCluster ) {
+		if ( args.length>0 ) {
 			OUT_DIR = args[0];
 			configFile = args[1];
 			averagingIterations = Integer.valueOf(args[2]);
@@ -80,12 +78,7 @@ public class PatnaUrbanOpdytsCalibrator {
 			configFile = configDir+"/config_urban_1pct.xml";
 		}
 
-		// relax the plans first.
-		PatnaPlansRelaxor relaxor = new PatnaPlansRelaxor();
-		relaxor.run(new String[]{configFile, OUT_DIR+"/initialPlans2RelaxedPlans/"});
-
 		Config config = ConfigUtils.loadConfig(configFile);
-		config.plans().setInputFile(OUT_DIR+"/initialPlans2RelaxedPlans/output_plans.xml.gz");
 		OUT_DIR += "/calibration/";
 
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn); // must be warn, since opdyts override few things
@@ -152,7 +145,7 @@ public class PatnaUrbanOpdytsCalibrator {
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
-				RandomizedUtilityParametersChoser.ONLY_ASC, randomVariance, null);
+				RandomizedUtilityParametersChoser.ONLY_ASC, randomVariance, PatnaPersonFilter.PatnaUserGroup.urban.toString());
 
 		// what would be the decision variables to optimize the objective function.
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario);

@@ -36,17 +36,20 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
     private final Random rnd;
     private final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser;
     private final double randomVariance;
+    private final String subPopName;
 
-    public ModeChoiceRandomizer(final Scenario scenario, final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser,final double randomVariance) {
+    public ModeChoiceRandomizer(final Scenario scenario, final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser,
+                                final double randomVariance, final String subPopName) {
         this.scenario = scenario;
         this.rnd = new Random(4711);
         // (careful with using matsim-random since it is always the same sequence in one run)
         this.randomizedUtilityParametersChoser = randomizedUtilityParametersChoser;
         this.randomVariance = randomVariance;
+        this.subPopName = subPopName;
     }
 
     public ModeChoiceRandomizer(final Scenario scenario, final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser) {
-        this(scenario,randomizedUtilityParametersChoser,0.1);
+        this(scenario,randomizedUtilityParametersChoser,0.1, null);
     }
 
     @Override
@@ -54,10 +57,11 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
         final PlanCalcScoreConfigGroup oldScoringConfig = decisionVariable.getScoreConfig();
         List<ModeChoiceDecisionVariable> result = new ArrayList<>();
         {
+            PlanCalcScoreConfigGroup.ScoringParameterSet oldParameterSet = oldScoringConfig.getScoringParametersPerSubpopulation().get(this.subPopName);
             PlanCalcScoreConfigGroup newScoringConfig1 = new PlanCalcScoreConfigGroup();
             PlanCalcScoreConfigGroup newScoringConfig2 = new PlanCalcScoreConfigGroup();
-            for (String mode : oldScoringConfig.getModes().keySet()) {
-                PlanCalcScoreConfigGroup.ModeParams oldModeParams = oldScoringConfig.getModes().get(mode);
+            for (String mode : oldParameterSet.getModes().keySet()) {
+                PlanCalcScoreConfigGroup.ModeParams oldModeParams = oldParameterSet.getModes().get(mode);
 
                 if (TransportMode.car.equals(mode)) {// we leave car alone
                     newScoringConfig1.addModeParams(oldModeParams);
@@ -97,8 +101,8 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
                     newModeParams1.setMonetaryDistanceRate(oldModeParams.getMonetaryDistanceRate());
                     newModeParams2.setMonetaryDistanceRate(oldModeParams.getMonetaryDistanceRate());
 
-                    newScoringConfig1.addModeParams(newModeParams1);
-                    newScoringConfig2.addModeParams(newModeParams2);
+                    newScoringConfig1.getOrCreateScoringParameters(this.subPopName).addModeParams(newModeParams1);
+                    newScoringConfig2.getOrCreateScoringParameters(this.subPopName).addModeParams(newModeParams2);
                 }
             }
             result.add(new ModeChoiceDecisionVariable(newScoringConfig1, this.scenario));
