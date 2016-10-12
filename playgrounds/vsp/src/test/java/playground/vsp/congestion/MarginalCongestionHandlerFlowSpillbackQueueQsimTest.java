@@ -26,7 +26,6 @@ import java.util.*;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -78,7 +77,7 @@ import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
  * @author ikaddoura , lkroeger
  *
  */
-@Ignore
+
 public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	
 	@Rule
@@ -700,7 +699,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		Activity homeActLink1_2 = popFactory.createActivityFromLinkId("home", linkId1);
 		homeActLink1_2.setEndTime(101);
 		plan2.addActivity(homeActLink1_2);
-		plan2.addLeg(leg_1_5);
+		plan2.addLeg(copyOf(leg_1_5,popFactory));
 		plan2.addActivity(workActLink5);
 		person2.addPlan(plan2);
 		population.addPerson(person2);			
@@ -712,7 +711,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		Activity homeActLink1_3 = popFactory.createActivityFromLinkId("home", linkId1);
 		homeActLink1_3.setEndTime(102);
 		plan3.addActivity(homeActLink1_3);
-		plan3.addLeg(leg_1_5);
+		plan3.addLeg(copyOf(leg_1_5,popFactory));
 		plan3.addActivity(workActLink5);
 		person3.addPlan(plan3);
 		population.addPerson(person3);
@@ -752,7 +751,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		Activity homeActLink1_2 = popFactory.createActivityFromLinkId("home", linkId1);
 		homeActLink1_2.setEndTime(101);
 		plan2.addActivity(homeActLink1_2);
-		plan2.addLeg(leg_1_5);
+		plan2.addLeg(copyOf(leg_1_5,popFactory));
 		plan2.addActivity(workActLink5);
 		person2.addPlan(plan2);
 		population.addPerson(person2);
@@ -801,7 +800,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		Activity homeActLink1_1 = popFactory.createActivityFromLinkId("home", linkId1);
 		homeActLink1_1.setEndTime(100);
 		plan1.addActivity(homeActLink1_1);
-		plan1.addLeg(leg_1_5);
+		plan1.addLeg(copyOf(leg_1_5,popFactory));
 		plan1.addActivity(workActLink5);
 		person1.addPlan(plan1);
 		population.addPerson(person1);
@@ -811,7 +810,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		Activity homeActLink1_2 = popFactory.createActivityFromLinkId("home", linkId1);
 		homeActLink1_2.setEndTime(101);
 		plan2.addActivity(homeActLink1_2);
-		plan2.addLeg(leg_1_5);
+		plan2.addLeg(copyOf(leg_1_5,popFactory));
 		plan2.addActivity(workActLink5);
 		person2.addPlan(plan2);
 		population.addPerson(person2);
@@ -870,7 +869,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		Activity homeActLink1_2 = popFactory.createActivityFromLinkId("home", linkId1);
 		homeActLink1_2.setEndTime(106);
 		plan2.addActivity(homeActLink1_2);
-		plan2.addLeg(leg_1_5);
+		plan2.addLeg(copyOf(leg_1_5,popFactory));
 		plan2.addActivity(workActLink5);
 		person2.addPlan(plan2);
 		population.addPerson(person2);
@@ -893,6 +892,17 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		plan3.addActivity(workActLink5);
 		person3.addPlan(plan3);
 		population.addPerson(person3);
+	}
+
+	private Leg copyOf(final Leg leg, final PopulationFactory popFactory) {
+		// leg should be different for every person. amit Oct 2016
+		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
+		Leg newLeg = popFactory.createLeg(leg.getMode());
+		NetworkRoute route = (NetworkRoute) leg.getRoute();
+		NetworkRoute newRoute = (NetworkRoute) routeFactory.createRoute(route.getStartLinkId(),route.getEndLinkId());
+		newRoute.setLinkIds(route.getStartLinkId(), route.getLinkIds(), route.getEndLinkId());
+		newLeg.setRoute(newRoute);
+		return newLeg;
 	}
 
 	private Scenario loadScenario1() {
