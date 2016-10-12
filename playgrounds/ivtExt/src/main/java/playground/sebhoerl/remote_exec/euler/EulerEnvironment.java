@@ -144,6 +144,6 @@ public class EulerEnvironment implements RemoteEnvironment {
 
     @Override
     public boolean hasController(String controllerId) {
-        return false;
+        return euler.getControllers().containsKey(controllerId);
     }
 }

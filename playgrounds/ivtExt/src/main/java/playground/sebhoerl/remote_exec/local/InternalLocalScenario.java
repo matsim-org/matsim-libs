@@ -1,27 +1,31 @@
-package playground.sebhoerl.remote_exec.euler;
+package playground.sebhoerl.remote_exec.local;
 
-import com.fasterxml.jackson.annotation.*;
-import playground.sebhoerl.remote_exec.RemoteScenario;
-import playground.sebhoerl.remote_exec.RemoteSimulation;
+import com.fasterxml.jackson.annotation.JacksonInject;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
 
 @JsonIgnoreProperties({"simulationInstances"})
-public class InternalEulerScenario {
-    @JacksonInject  final private EulerInterface euler;
+public class InternalLocalScenario {
+    @JacksonInject
+    final private LocalInterface local;
     final private String id;
     final private LinkedList<String> simulations = new LinkedList<>();
     private String config = "config.xml";
 
-    public InternalEulerScenario(final EulerInterface euler, final String id) {
+    public InternalLocalScenario(final LocalInterface local, final String id) {
         this.id = id;
-        this.euler = euler;
+        this.local = local;
     }
 
     @JsonCreator
-    private InternalEulerScenario() {
+    private InternalLocalScenario() {
         this.id = "unassigned";
-        this.euler = null;
+        this.local = null;
     }
 
     void addSimulation(String id) {
@@ -41,7 +45,7 @@ public class InternalEulerScenario {
     }
 
     public void update() {
-        if (!euler.updateScenario(id)) {
+        if (!local.updateScenario(id)) {
             throw new RuntimeException("Failed to update scenario " + id);
         }
     }
@@ -51,7 +55,7 @@ public class InternalEulerScenario {
             throw new RuntimeException("Cannot remove scenario " + id + " while simulations are attached");
         }
 
-        if (!euler.removeScenario(id)) {
+        if (!local.removeScenario(id)) {
             throw new RuntimeException("Error while removing scenario " + id + " from Euler");
         }
     }
@@ -60,17 +64,17 @@ public class InternalEulerScenario {
         return simulations;
     }
 
-    public Collection<EulerSimulation> getSimulationInstances() {
-        Set<EulerSimulation> simulations = new HashSet<>();
+    public Collection<LocalSimulation> getSimulationInstances() {
+        Set<LocalSimulation> simulations = new HashSet<>();
 
         for (String simulationId : this.simulations) {
-            simulations.add(new EulerSimulation(euler, simulationId));
+            simulations.add(new LocalSimulation(local, simulationId));
         }
 
         return simulations;
     }
 
     public String getPath(String suffix) {
-        return euler.getScenarioPath(id, suffix);
+        return local.getScenarioPath(id, suffix);
     }
 }

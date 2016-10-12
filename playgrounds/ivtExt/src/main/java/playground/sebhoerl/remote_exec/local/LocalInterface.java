@@ -1,57 +1,52 @@
-package playground.sebhoerl.remote_exec.euler;
+package playground.sebhoerl.remote_exec.local;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jcraft.jsch.*;
+import com.jcraft.jsch.JSchException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.RegexFileFilter;
+import org.apache.commons.lang3.NotImplementedException;
+import org.geotools.filter.NotImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.MatsimEventsReader;
 import playground.sebhoerl.remote_exec.RemoteSimulation;
 
 import java.io.*;
-import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
-public class EulerInterface  {
-    final EulerConfiguration config;
-    final Session session;
-
-    final String indexPath;
-
-    static class EulerState {
-        @JsonCreator
-        public EulerState() {} // for json
-
-        public Map<String, InternalEulerScenario> scenarios = new HashMap<>();
-        public Map<String, InternalEulerSimulation> simulations = new HashMap<>();
-        public Map<String, InternalEulerController> controllers = new HashMap<>();
-    }
-
-    EulerState state = new EulerState();
-
+public class LocalInterface {
     final private ObjectMapper objectMapper = new ObjectMapper();
 
-    public Map<String, InternalEulerScenario> getScenarios() {
+    final LocalConfiguration config;
+    final String indexPath;
+
+    static class LocalState {
+        @JsonCreator
+        public LocalState() {} // for json
+
+        public Map<String, InternalLocalScenario> scenarios = new HashMap<>();
+        public Map<String, InternalLocalSimulation> simulations = new HashMap<>();
+        public Map<String, InternalLocalController> controllers = new HashMap<>();
+    }
+
+    LocalState state = new LocalState();
+
+    public Map<String, InternalLocalScenario> getScenarios() {
         return state.scenarios;
     }
-    public Map<String, InternalEulerSimulation> getSimulations() {
+    public Map<String, InternalLocalSimulation> getSimulations() {
         return state.simulations;
     }
-    public Map<String, InternalEulerController> getControllers() {
+    public Map<String, InternalLocalController> getControllers() {
         return state.controllers;
     }
 
-    public EulerInterface(Session session, EulerConfiguration config) throws JSchException, IOException {
-        if (!session.isConnected()) {
-            throw new RuntimeException("A connected session needs to be provided.");
-        }
-
+    public LocalInterface(LocalConfiguration config) throws IOException {
         this.config = config;
-        this.session = session;
 
         if (!checkDirectoryStructure()) {
             if (config.getCreateDirectoryStructure()) {
@@ -62,7 +57,7 @@ public class EulerInterface  {
         }
 
         InjectableValues injectableValues = new InjectableValues.Std()
-                .addValue(EulerInterface.class, this);
+                .addValue(LocalInterface.class, this);
         objectMapper.setInjectableValues(injectableValues);
 
         indexPath = config.getScenarioPath() + "/index.json";
@@ -70,11 +65,11 @@ public class EulerInterface  {
         readIndices();
     }
 
-    private boolean checkDirectoryStructure() throws IOException, JSchException {
+    private boolean checkDirectoryStructure() throws IOException {
         return checkPathExists(config.getScenarioPath()) && checkPathExists(config.getOutputPath());
     }
 
-    private void createDirectoryStructure() throws IOException, JSchException {
+    private void createDirectoryStructure() throws IOException {
         RunResult scenarioResult = runCommand("mkdir -p " + config.getScenarioPath());
         RunResult outputResult = runCommand("mkdir -p " + config.getOutputPath());
 
@@ -89,17 +84,17 @@ public class EulerInterface  {
 
     private boolean readingIndices = false;
 
-    private void readIndices() throws JSchException, IOException {
+    private void readIndices() throws IOException {
         readingIndices = true;
 
         if (checkPathExists(indexPath)) {
-            state = objectMapper.readValue(readFile(indexPath), EulerState.class);
+            state = objectMapper.readValue(readFile(indexPath), LocalInterface.LocalState.class);
         }
 
         readingIndices = false;
     }
 
-    private void writeIndices() throws IOException, JSchException {
+    private void writeIndices() throws IOException {
         if (readingIndices) {
             throw new IllegalStateException("Trying to write indices while reading them.");
         }
@@ -110,32 +105,26 @@ public class EulerInterface  {
 
     public RemoteSimulation.Status getSimulationStatus(String scenarioId, String simulationId) {
         try {
-            RunResult result = runCommand("bjobs -J " + makeJobId(scenarioId, simulationId));
-            String status = new String(result.getOutput());
+            RunResult result = runCommand("ps " + state.simulations.get(simulationId).getPid());
 
-            if (status.contains("RUN")) {
+            if (result.exitStatus == 0) {
                 return RemoteSimulation.Status.RUNNING;
-            } else if (status.contains("PEND")) {
-                return RemoteSimulation.Status.PENDING;
             }
 
-            result = runCommand("grep \"Successfully completed.\" " + makeSimulationDirectory(scenarioId, simulationId) + "/o.log");
-            if (result.getExitStatus() == 0) {
+            boolean logExists = checkPathExists(makeSimulationDirectory(scenarioId, simulationId) + "/o.log");
+            boolean outputDirectoryExists = checkPathExists(makeOutputDirectory(simulationId));
+            boolean outputEventsExists = checkPathExists(makeOutputDirectory(simulationId) + "/output_events.xml.gz");
+
+            if (!logExists) {
+                return RemoteSimulation.Status.IDLE;
+            }
+
+            if (outputEventsExists) {
                 return RemoteSimulation.Status.DONE;
             }
 
-            result = runCommand("grep \"job killed by owner.\" " + makeSimulationDirectory(scenarioId, simulationId) + "/o.log");
-            if (result.getExitStatus() == 0) {
-                return RemoteSimulation.Status.STOPPED;
-            }
-
-            result = runCommand("grep \"Exited with exit code\" " + makeSimulationDirectory(scenarioId, simulationId) + "/o.log");
-            if (result.getExitStatus() == 0) {
-                return RemoteSimulation.Status.ERROR;
-            }
-
-            return RemoteSimulation.Status.IDLE;
-        } catch (JSchException | IOException e) {
+            return RemoteSimulation.Status.ERROR;
+        } catch (IOException e) {
             return null;
         }
     }
@@ -162,7 +151,7 @@ public class EulerInterface  {
             } else {
                 return 0;
             }
-        } catch (JSchException | IOException e) {
+        } catch (IOException e) {
             System.err.println(e.toString());
             return -1;
         }
@@ -171,7 +160,7 @@ public class EulerInterface  {
     public boolean getSimulationFile(String simulationId, String path, OutputStream stream) {
         try {
             readFileByStream(makeOutputDirectory(simulationId), stream);
-        } catch (JSchException | IOException e) {
+        } catch (IOException e) {
             return false;
         }
 
@@ -181,7 +170,7 @@ public class EulerInterface  {
     public boolean getSimulationErrorLog(String scenarioId, String simulationId, OutputStream stream) {
         try {
             readFileByStream(makeSimulationDirectory(scenarioId, simulationId) + "/e.log", stream);
-        } catch (JSchException | IOException e) {
+        } catch (IOException e) {
             return false;
         }
 
@@ -191,7 +180,7 @@ public class EulerInterface  {
     public boolean getSimulationOutputLog(String scenarioId, String simulationId, OutputStream stream) {
         try {
             readFileByStream(makeSimulationDirectory(scenarioId, simulationId) + "/o.log", stream);
-        } catch (JSchException | IOException e) {
+        } catch (IOException e) {
             return false;
         }
 
@@ -204,14 +193,14 @@ public class EulerInterface  {
         if (iteration == null) {
             source = makeOutputDirectory(simulationId) + "/output_events.xml.gz";
         } else {
-            source = makeOutputDirectory(simulationId) + "/ITERS/it." + iteration + "/events.xml.gz";
+            source = makeOutputDirectory(simulationId) + "/ITERS/it." + iteration + "/" + iteration + ".events.xml.gz";
         }
 
         try {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             readFileByStream(source, output);
             new MatsimEventsReader(events).readStream(new GZIPInputStream(new ByteArrayInputStream(output.toByteArray())));
-        } catch (JSchException | IOException e) {
+        } catch (IOException e) {
             return false;
         }
 
@@ -227,9 +216,9 @@ public class EulerInterface  {
     }
 
     public boolean startSimulation(String scenarioId, String simulationId, String controllerId) {
-        InternalEulerScenario scenario = state.scenarios.get(scenarioId);
-        InternalEulerController controller = state.controllers.get(controllerId);
-        InternalEulerSimulation simulation = state.simulations.get(simulationId);
+        InternalLocalScenario scenario = state.scenarios.get(scenarioId);
+        InternalLocalController controller = state.controllers.get(controllerId);
+        InternalLocalSimulation simulation = state.simulations.get(simulationId);
 
         resetSimulation(scenarioId, simulationId);
 
@@ -252,42 +241,30 @@ public class EulerInterface  {
             command.add(makeControllerDirectory(controllerId) + "/" + controller.getClassPath());
             command.add(controller.getClassName());
             command.add(makeSimulationDirectory(scenarioId, simulationId) + "/config.xml");
+            command.add("1>");
+            command.add(makeSimulationDirectory(scenarioId, simulationId) + "/o.log");
+            command.add("2>");
+            command.add(makeSimulationDirectory(scenarioId, simulationId) + "/e.log");
+            command.add("&");
             String javaCommand = String.join(" ", command);
 
-            String matsimScript = "cd " + makeSimulationDirectory(scenarioId, simulationId) + "\nmodule load java\n" + javaCommand + "\n";
+            String pidPath = makeSimulationDirectory(scenarioId, simulationId) + "/matsim.pid";
+
+            String matsimScript = "cd " + makeSimulationDirectory(scenarioId, simulationId) + "\n" + javaCommand + "\necho $! > " + pidPath;
             byte[] matsimScriptData = matsimScript.getBytes();
 
-            writeFile(makeSimulationDirectory(scenarioId, simulationId) + "/matsim.sh",
-                    new ByteArrayInputStream(matsimScriptData), matsimScriptData.length);
-
-            List<String> bsub = new LinkedList<>();
-            bsub.add("bsub");
-            bsub.add("-J");
-            bsub.add(makeJobId(scenarioId, simulationId));
-            bsub.add("-o");
-            bsub.add(makeSimulationDirectory(scenarioId, simulationId) + "/o.log");
-            bsub.add("-e");
-            bsub.add(makeSimulationDirectory(scenarioId, simulationId) + "/e.log");
-            bsub.add("<");
-            bsub.add(makeSimulationDirectory(scenarioId, simulationId) + "/matsim.sh");
-
-
-            List<String> runner = new LinkedList<>();
-            runner.add("module load java");
-            runner.add(String.join(" ", bsub));
-            runner.add("");
-
-            byte[] runnerFile = String.join("\n", runner).getBytes();
-
             writeFile(makeSimulationDirectory(scenarioId, simulationId) + "/run.sh",
-                    new ByteArrayInputStream(runnerFile), runnerFile.length);
+                    new ByteArrayInputStream(matsimScriptData), matsimScriptData.length);
 
             RunResult result = runCommand("sh " + makeSimulationDirectory(scenarioId, simulationId) + "/run.sh");
 
-            if (result.exitStatus != 0) {
-                System.err.println("Run script failed.");
+            if (!checkPathExists(pidPath)) {
+                System.err.println("No PID found.");
                 return false;
             }
+
+            long pid = Long.parseLong(new String(readFile(pidPath)).trim());
+            simulation.setPid(pid);
 
             RemoteSimulation.Status status = getSimulationStatus(scenarioId, simulationId);
 
@@ -295,8 +272,20 @@ public class EulerInterface  {
                 System.err.println("Validation failed.");
                 return false;
             }
-        } catch (JSchException | IOException e) {
+
+            writeIndices();
+        } catch (IOException e) {
             System.out.println(e.toString());
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean stopSimulation(String scenarioId, String simulationId) {
+        try {
+            runCommand("kill " + state.simulations.get(simulationId).getPid());
+        } catch (IOException e) {
             return false;
         }
 
@@ -308,17 +297,7 @@ public class EulerInterface  {
             runCommand("rm -r " + makeSimulationDirectory(scenarioId, simulationId) + "/o.log");
             runCommand("rm -r " + makeSimulationDirectory(scenarioId, simulationId) + "/e.log");
             runCommand("rm -r " + makeOutputDirectory(simulationId));
-        } catch (JSchException | IOException e) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public boolean stopSimulation(String scenarioId, String simulationId) {
-        try {
-            runCommand("bkill -J " + makeJobId(scenarioId, simulationId));
-        } catch (JSchException | IOException e) {
+        } catch (IOException e) {
             return false;
         }
 
@@ -329,7 +308,7 @@ public class EulerInterface  {
         try {
             writeIndices();
             return true;
-        } catch (JSchException | IOException e) {
+        } catch (IOException e) {
             return false;
         }
     }
@@ -354,12 +333,12 @@ public class EulerInterface  {
         return inputString.getBytes();
     }
 
-    private byte[] readScenarioConfig(String scenarioId) throws IOException, JSchException {
-        InternalEulerScenario scenario = state.scenarios.get(scenarioId);
+    private byte[] readScenarioConfig(String scenarioId) throws IOException {
+        InternalLocalScenario scenario = state.scenarios.get(scenarioId);
         return readFile(makeScenarioDirectory(scenarioId) + "/" + scenario.getConfig());
     }
 
-    private void writeSimulationConfig(String scenarioId, String simulationId, byte[] data) throws IOException, JSchException {
+    private void writeSimulationConfig(String scenarioId, String simulationId, byte[] data) throws IOException {
         String target = makeSimulationDirectory(scenarioId, simulationId) + "/config.xml";
         writeFile(target, new ByteArrayInputStream(data), data.length);
     }
@@ -372,11 +351,11 @@ public class EulerInterface  {
                 return false;
             }
 
-            state.simulations.put(simulationId, new InternalEulerSimulation(this, simulationId, scenarioId, controllerId, parameters));
+            state.simulations.put(simulationId, new InternalLocalSimulation(this, simulationId, scenarioId, controllerId, parameters));
             state.scenarios.get(scenarioId).addSimulation(simulationId);
             state.controllers.get(controllerId).addSimulation(simulationId);
             writeIndices();
-        } catch (JSchException | IOException e) {
+        } catch (IOException e) {
             return false;
         }
 
@@ -395,7 +374,7 @@ public class EulerInterface  {
             state.scenarios.get(scenarioId).removeSimulation(simulationId);
             state.controllers.get(controllerId).removeSimulation(simulationId);
             writeIndices();
-        } catch (JSchException | IOException e) {
+        } catch (IOException e) {
             return false;
         }
 
@@ -405,9 +384,9 @@ public class EulerInterface  {
     public boolean createController(String controllerId, String localPath, String classPath, String className) {
         try {
             pushDirectory(localPath, makeControllerDirectory(controllerId));
-            state.controllers.put(controllerId, new InternalEulerController(this, controllerId, classPath, className));
+            state.controllers.put(controllerId, new InternalLocalController(this, controllerId, classPath, className));
             writeIndices();
-        } catch (IOException | JSchException e) {
+        } catch (IOException e) {
             return false;
         }
 
@@ -419,7 +398,7 @@ public class EulerInterface  {
             runCommand("rm -r " + makeControllerDirectory(controllerId));
             state.controllers.remove(controllerId);
             writeIndices();
-        } catch (JSchException | IOException e) {
+        } catch (IOException e) {
             return false;
         }
 
@@ -429,9 +408,9 @@ public class EulerInterface  {
     public boolean createScenario(String remoteId, String localPath) {
         try {
             pushDirectory(localPath, makeScenarioDirectory(remoteId));
-            state.scenarios.put(remoteId, new InternalEulerScenario(this, remoteId));
+            state.scenarios.put(remoteId, new InternalLocalScenario(this, remoteId));
             writeIndices();
-        } catch (IOException | JSchException e) {
+        } catch (IOException e) {
             return false;
         }
 
@@ -443,7 +422,7 @@ public class EulerInterface  {
             runCommand("rm -r " + makeScenarioDirectory(scenarioId));
             state.scenarios.remove(scenarioId);
             writeIndices();
-        } catch (JSchException | IOException e) {
+        } catch (IOException e) {
             return false;
         }
 
@@ -454,14 +433,10 @@ public class EulerInterface  {
         try {
             writeIndices();
             return true;
-        } catch (JSchException | IOException e) {
+        } catch (IOException e) {
             return false;
         }
     }
-
-
-
-    // ---- Handle SSH commands and SCP transmissions
 
     private class RunResult {
         final private int exitStatus;
@@ -487,154 +462,53 @@ public class EulerInterface  {
         }
     }
 
-    private RunResult runCommand(String command) throws IOException, JSchException {
-        ChannelExec channel = (ChannelExec) session.openChannel("exec");
-        channel.setCommand(command);
+    private RunResult runCommand(String command) throws IOException {
+        ByteArrayOutputStream commandOutputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream commandErrorStream = new ByteArrayOutputStream();
 
-        ByteArrayOutputStream errorOutput = new ByteArrayOutputStream();
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        ProcessBuilder builder = new ProcessBuilder();
+        builder.command(command.split(" "));
 
-        byte[] buffer = new byte[BUFFER_SIZE];
-        int length;
+        Process process = builder.start();
 
-        InputStream errorStream = channel.getErrStream();
-        InputStream outputStream = channel.getInputStream();
-
-        channel.connect();
-
-        while (!channel.isClosed() || errorStream.available() > 0 || outputStream.available() > 0) {
-            while (errorStream.available() > 0) {
-                length = errorStream.read(buffer);
-                errorOutput.write(buffer, 0, length);
+        while (process.isAlive()) {
+            if (process.getErrorStream().available() > 0) {
+                IOUtils.copy(process.getErrorStream(), commandErrorStream);
             }
 
-            while (outputStream.available() > 0) {
-                length = outputStream.read(buffer);
-                output.write(buffer, 0, length);
+            if (process.getInputStream().available() > 0) {
+                IOUtils.copy(process.getInputStream(), commandOutputStream);
             }
         }
 
-        channel.disconnect();
-
-        return new RunResult(channel.getExitStatus(), output.toByteArray(), errorOutput.toByteArray());
+        return new RunResult(process.exitValue(), commandOutputStream.toByteArray(), commandErrorStream.toByteArray());
     }
 
-    private boolean checkPathExists(String remotePath) throws IOException, JSchException {
+    private boolean checkPathExists(String remotePath) throws IOException {
         return runCommand("ls " + remotePath).exitStatus == 0;
-    }
-
-    private boolean checkTransmission(InputStream input) throws IOException {
-        int next = input.read();
-        if (next <= 0) return true;
-        throw new IOException();
     }
 
     final static int BUFFER_SIZE = 1024;
 
-    private void writeFile(String remotePath, InputStream contentStream, long filesize) throws JSchException, IOException {
+    private void writeFile(String remotePath, InputStream contentStream, long filesize) throws IOException {
         if (remotePath.endsWith("/")) {
             throw new IllegalArgumentException();
         }
 
-        ChannelExec channel = (ChannelExec) session.openChannel("exec");
-        channel.setCommand("scp -t " + remotePath);
-
-        OutputStream outputStream = channel.getOutputStream();
-        InputStream inputStream = channel.getInputStream();
-
-        channel.connect();
-
-        String header = "C0644 " + filesize + " localfile\n";
-        outputStream.write(header.getBytes());
-        outputStream.flush();
-
-        checkTransmission(inputStream);
-
-        byte[] buffer = new byte[BUFFER_SIZE];
-        int length;
-
-        while (contentStream.available() > 0) {
-            length = contentStream.read(buffer);
-            outputStream.write(buffer, 0, length);
-            outputStream.flush();
-        }
-
-        outputStream.write(0);
-        outputStream.flush();
-
-        checkTransmission(inputStream);
-        outputStream.close();
-
-        channel.disconnect();
+        IOUtils.copy(contentStream, new FileOutputStream(new File(remotePath)));
     }
 
-    private byte[] readFile(String remotePath) throws IOException, JSchException {
+    private byte[] readFile(String remotePath) throws IOException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         readFileByStream(remotePath, buffer);
         return buffer.toByteArray();
     }
 
-    private void readFileByStream(String remotePath, OutputStream output) throws JSchException, IOException {
-        ChannelExec channel = (ChannelExec) session.openChannel("exec");
-        channel.setCommand("scp -f " + remotePath);
-
-        OutputStream outputStream = channel.getOutputStream();
-        InputStream inputStream = channel.getInputStream();
-
-        byte[] buffer = new byte[BUFFER_SIZE];
-        int length;
-
-        channel.connect();
-        outputStream.write(0);
-        outputStream.flush();
-
-        inputStream.read(buffer, 0, 1); // read C
-        if (buffer[0] != 'C') {
-            throw new IOException();
-        }
-
-        inputStream.read(buffer, 0, 5); // read file permissions
-
-        buffer = new byte[BUFFER_SIZE];
-        length = 0;
-
-        do { // read file size terminated by space
-            inputStream.read(buffer, length, 1);
-        } while (buffer[length++] != ' ');
-
-        int filesize = Integer.parseInt(new String(buffer, 0, length - 1));
-        outputStream.write(0);
-        outputStream.flush();
-
-        length = 0;
-        do { // read file name terminated by newline
-            inputStream.read(buffer, length, 1);
-        } while (buffer[length++] != '\n');
-
-        //String filename = new String(buffer, 0, length - 1);
-
-        outputStream.write(0);
-        outputStream.flush();
-
-        while (filesize > 0 && !channel.isClosed()) { // read file
-            while (inputStream.available() > 0) {
-                length = inputStream.read(buffer);
-                output.write(buffer, 0, buffer[length - 1] == '\0' ? (length - 1) : length);
-                filesize -= length;
-            }
-        }
-
-        if (filesize > 0 || inputStream.available() > 0) { // there is something left ...
-            throw new IOException(remotePath);
-        }
-
-        outputStream.write(0);
-        outputStream.flush();
-
-        channel.disconnect();
+    private void readFileByStream(String remotePath, OutputStream output) throws IOException {
+        IOUtils.copy(new FileInputStream(new File(remotePath)), output);
     }
 
-    private void pushFile(String source, String target) throws IOException, JSchException {
+    private void pushFile(String source, String target) throws IOException {
         System.out.println(source + " --> " + target);
         File fh = FileUtils.getFile(source);
         writeFile(target, new FileInputStream(fh), fh.length());
@@ -644,9 +518,10 @@ public class EulerInterface  {
         }
     }
 
-    private void pushDirectory(String localSourceDirectory, String remoteTargetDirectory) throws IOException, JSchException {
+    private void pushDirectory(String localSourceDirectory, String remoteTargetDirectory) throws IOException {
         File root = FileUtils.getFile(localSourceDirectory);
 
+        System.out.println(localSourceDirectory);
         Collection<File> hits = FileUtils.listFilesAndDirs(root, new RegexFileFilter("^(.*?)"), DirectoryFileFilter.DIRECTORY);
 
         List<String> directories = new LinkedList<>();
@@ -709,6 +584,6 @@ public class EulerInterface  {
     }
 
     private String makeJobId(String scenarioId, String simulationId) {
-        return config.getJobPrefix() + simulationId;
+        return simulationId;
     }
 }

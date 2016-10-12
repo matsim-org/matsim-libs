@@ -1,16 +1,18 @@
-package playground.sebhoerl.remote_exec.euler;
+package playground.sebhoerl.remote_exec.local;
 
 import playground.sebhoerl.remote_exec.RemoteScenario;
-import playground.sebhoerl.remote_exec.RemoteSimulation;
 
 import java.util.Collection;
 
-public class EulerScenario implements RemoteScenario {
-    final EulerInterface euler;
+/**
+ * Created by sebastian on 11/10/16.
+ */
+public class LocalScenario implements RemoteScenario {
+    final LocalInterface local;
     final String id;
 
-    public EulerScenario(final EulerInterface euler, String id) {
-        this.euler = euler;
+    public LocalScenario(final LocalInterface local, String id) {
+        this.local = local;
         this.id = id;
     }
 
@@ -25,7 +27,7 @@ public class EulerScenario implements RemoteScenario {
     }
 
     @Override
-    public Collection<EulerSimulation> getSimulations() {
+    public Collection<LocalSimulation> getSimulations() {
         return getInternal().getSimulationInstances();
     }
 
@@ -45,8 +47,8 @@ public class EulerScenario implements RemoteScenario {
         return getInternal().getPath(suffix);
     }
 
-    private InternalEulerScenario getInternal() {
-        InternalEulerScenario internal = euler.getScenarios().get(id);
+    private InternalLocalScenario getInternal() {
+        InternalLocalScenario internal = local.getScenarios().get(id);
 
         if (internal == null) {
             throw new RuntimeException("Scenario " + id + " does not exist anymore");

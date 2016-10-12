@@ -1,21 +1,21 @@
-package playground.sebhoerl.remote_exec.euler;
+package playground.sebhoerl.remote_exec.local;
 
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.EventHandler;
 import playground.sebhoerl.remote_exec.RemoteSimulation;
 
 import java.io.OutputStream;
 import java.util.Map;
 
-public class EulerSimulation implements RemoteSimulation {
+/**
+ * Created by sebastian on 11/10/16.
+ */
+public class LocalSimulation implements RemoteSimulation {
     final private String id;
-    final private EulerInterface euler;
+    final private LocalInterface local;
 
-    public EulerSimulation(EulerInterface euler, String id) {
+    public LocalSimulation(LocalInterface local, String id) {
         this.id = id;
-        this.euler = euler;
+        this.local = local;
     }
 
     @Override
@@ -104,16 +104,6 @@ public class EulerSimulation implements RemoteSimulation {
         return getParameters().get(parameter);
     }
 
-    private InternalEulerSimulation getInternal() {
-        InternalEulerSimulation internal = euler.getSimulations().get(id);
-
-        if (internal == null) {
-            throw new RuntimeException("Simulation " + id + " does not exist anymore");
-        }
-
-        return internal;
-    }
-
     @Override
     public void setMemory(String bytes) {
         getInternal().setMemory(bytes);
@@ -122,5 +112,15 @@ public class EulerSimulation implements RemoteSimulation {
     @Override
     public String getMemory() {
         return getInternal().getMemory();
+    }
+
+    private InternalLocalSimulation getInternal() {
+        InternalLocalSimulation internal = local.getSimulations().get(id);
+
+        if (internal == null) {
+            throw new RuntimeException("Simulation " + id + " does not exist anymore");
+        }
+
+        return internal;
     }
 }

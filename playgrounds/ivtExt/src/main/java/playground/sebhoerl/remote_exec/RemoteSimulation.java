@@ -31,6 +31,11 @@ public interface RemoteSimulation {
     void getEvents(EventsManager eventsManager);
     void getFile(String path, OutputStream stream);
 
+    String getPath(String suffix);
+
     void setParameter(String parameter, String value);
     String getParameter(String parameter);
+
+    void setMemory(String memory);
+    String getMemory();
 }

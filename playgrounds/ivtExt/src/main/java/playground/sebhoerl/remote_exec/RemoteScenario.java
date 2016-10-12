@@ -11,4 +11,6 @@ public interface RemoteScenario {
 
     void setConfig(String path);
     void update();
+
+    String getPath(String suffix);
 }

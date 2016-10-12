@@ -1,21 +1,25 @@
-package playground.sebhoerl.remote_exec.euler;
+package playground.sebhoerl.remote_exec.local;
 
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.annotation.JacksonInject;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.matsim.core.api.experimental.events.EventsManager;
 import playground.sebhoerl.remote_exec.RemoteSimulation;
 import playground.sebhoerl.remote_exec.RemoteUtils;
 
 import java.io.OutputStream;
-import java.rmi.Remote;
 import java.util.HashMap;
 import java.util.Map;
 
 @JsonIgnoreProperties({"status"})
-public class InternalEulerSimulation {
-    @JacksonInject final private EulerInterface euler;
+public class InternalLocalSimulation {
+    @JacksonInject
+    final private LocalInterface local;
     final private String id;
+
+    private long pid = 0;
+    private String memory = null;
 
     //private RemoteSimulation.Status status = RemoteSimulation.Status.IDLE;
     private String scenarioId;
@@ -23,20 +27,19 @@ public class InternalEulerSimulation {
 
     private Map<String, String> parameters = new HashMap<>();
 
-    private String memory = null;
-
-    public InternalEulerSimulation(EulerInterface euler, String id, String scenarioId, String controllerId, Map<String, String> parameters) {
-        this.euler = euler;
+    public InternalLocalSimulation(LocalInterface local, String id, String scenarioId, String controllerId, Map<String, String> parameters) {
+        this.local = local;
         this.id = id;
         this.scenarioId = scenarioId;
         this.parameters = parameters;
         this.controllerId = controllerId;
+        this.pid = 0;
     }
 
     @JsonCreator
-    private InternalEulerSimulation() {
+    private InternalLocalSimulation() {
         this.id = "unassigned";
-        this.euler = null;
+        this.local = null;
     }
 
     public String getId() {
@@ -51,6 +54,14 @@ public class InternalEulerSimulation {
         return controllerId;
     }
 
+    public long getPid() {
+        return pid;
+    }
+
+    public void setPid(long pid) {
+        this.pid = pid;
+    }
+
     public String getMemory() {
         return memory;
     }
@@ -62,7 +73,7 @@ public class InternalEulerSimulation {
 
     @JsonIgnore
     public RemoteSimulation.Status getStatus() {
-        RemoteSimulation.Status status = euler.getSimulationStatus(scenarioId, id);
+        RemoteSimulation.Status status = local.getSimulationStatus(scenarioId, id);
 
         if (status == null) {
             throw new RuntimeException("Error while getting status for simulation " + id);
@@ -76,7 +87,7 @@ public class InternalEulerSimulation {
             throw new RuntimeException("Cannot remove ACTIVE simulation " + id);
         }
 
-        if (!euler.removeSimulation(scenarioId, id, controllerId)) {
+        if (!local.removeSimulation(scenarioId, id, controllerId)) {
             throw new RuntimeException("Could not remove simulation " + scenarioId + ":" + id + " from Euler");
         }
     }
@@ -94,7 +105,7 @@ public class InternalEulerSimulation {
             throw new RuntimeException("Cannot update ACTIVE simulation " + id);
         }
 
-        if (!euler.updateSimulation(scenarioId, id)) {
+        if (!local.updateSimulation(scenarioId, id)) {
             throw new RuntimeException("Error while updating simulation " + id);
         }
     }
@@ -104,7 +115,7 @@ public class InternalEulerSimulation {
             throw new RuntimeException("Cannot reset ACTIVE simulation " + id);
         }
 
-        if (!euler.resetSimulation(scenarioId, id)) {
+        if (!local.resetSimulation(scenarioId, id)) {
             throw new RuntimeException("Could not reset simulation " + id);
         }
     }
@@ -114,7 +125,7 @@ public class InternalEulerSimulation {
             throw new RuntimeException("Cannot start ACTIVE simulation " + id);
         }
 
-        if (!euler.startSimulation(scenarioId, id, controllerId)) {
+        if (!local.startSimulation(scenarioId, id, controllerId)) {
             throw new RuntimeException("Could not start simulation " + id);
         }
     }
@@ -124,14 +135,14 @@ public class InternalEulerSimulation {
             throw new RuntimeException("Cannot stop INACTIVE simulation " + id);
         }
 
-        if (!euler.stopSimulation(scenarioId, id)) {
+        if (!local.stopSimulation(scenarioId, id)) {
             throw new RuntimeException("Could not stop simulation " + id);
         }
     }
 
     @JsonIgnore
     public long getIteration() {
-        long iteration = euler.getSimulationIteration(scenarioId, id);
+        long iteration = local.getSimulationIteration(scenarioId, id);
 
         if (iteration == -1) {
             throw new RuntimeException("Error while getting iteration number for simulation " + id);
@@ -147,7 +158,7 @@ public class InternalEulerSimulation {
             throw new RuntimeException("Cannot get the log from pending simulation " + id);
         }
 
-        if (!euler.getSimulationOutputLog(scenarioId, id, stream)) {
+        if (!local.getSimulationOutputLog(scenarioId, id, stream)) {
             throw new RuntimeException("Error while getting output log for " + id);
         }
     }
@@ -159,7 +170,7 @@ public class InternalEulerSimulation {
             throw new RuntimeException("Cannot get the log from pending simulation " + id);
         }
 
-        if (!euler.getSimulationErrorLog(scenarioId, id, stream)) {
+        if (!local.getSimulationErrorLog(scenarioId, id, stream)) {
             throw new RuntimeException("Error while getting error log for " + id);
         }
     }
@@ -179,18 +190,18 @@ public class InternalEulerSimulation {
             throw new RuntimeException("Cannot read final events from simulation " + id + " because iteration " + iteration + " is not reached yet.");
         }
 
-        if (!euler.getSimulationEvents(id, events, iteration)) {
+        if (!local.getSimulationEvents(id, events, iteration)) {
             throw new RuntimeException("Error while getting events for " + id);
         }
     }
 
     public void getFile(String path, OutputStream stream) {
-        if (!euler.getSimulationFile(id, path, stream)) {
+        if (!local.getSimulationFile(id, path, stream)) {
             throw new RuntimeException("Error while getting file for " + id);
         }
     }
 
     public String getPath(String suffix) {
-        return euler.getSimulationPath(scenarioId, id, suffix);
+        return local.getSimulationPath(scenarioId, id, suffix);
     }
 }

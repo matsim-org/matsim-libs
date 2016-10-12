@@ -12,6 +12,9 @@ import playground.sebhoerl.remote_exec.*;
 import playground.sebhoerl.remote_exec.euler.EulerConfiguration;
 import playground.sebhoerl.remote_exec.euler.EulerEnvironment;
 import playground.sebhoerl.remote_exec.euler.EulerInterface;
+import playground.sebhoerl.remote_exec.local.LocalConfiguration;
+import playground.sebhoerl.remote_exec.local.LocalEnvironment;
+import playground.sebhoerl.remote_exec.local.LocalInterface;
 
 import java.io.*;
 
@@ -33,6 +36,15 @@ public class RunEquilOnEuler {
 
         prepareConfig(localPath); // We have to prepare the config to be compatible with the system
 
+        mainLocal(localPath);
+        //mainEuler(localPath);
+    }
+
+    static public void mainLocal(String localPath) throws IOException, InterruptedException, JSchException {
+        runMatsim(localPath, createLocalEnvironment());
+    }
+
+    static public void mainEuler(String localPath) throws IOException, JSchException, InterruptedException {
         // In order to work on Euler we need a SSH connection with JSch
         JSch jsch = new JSch();
         jsch.addIdentity("~/.ssh/eth");
@@ -42,7 +54,7 @@ public class RunEquilOnEuler {
 
         try {
             session.connect();
-            runMatsim(localPath, session);
+            runMatsim(localPath, createEulerEnvironment(session));
         } finally {
             session.disconnect();
         }
@@ -75,15 +87,23 @@ public class RunEquilOnEuler {
         // Instead of the fixed 4711 random seed, the placeholder %randomSeed has been added. It will be used later.
     }
 
-    static public void runMatsim(String localPath, Session session) throws IOException, JSchException, InterruptedException {
-        // Create a configuration for the Euler environment
+    static RemoteEnvironment createLocalEnvironment() throws IOException {
+        LocalConfiguration config = new LocalConfiguration();
+        config.setOutputPath("/home/sebastian/calibration/test_env2/output"); // Working directory on Euler for simulations
+        config.setScenarioPath("/home/sebastian/calibration/test_env2/scenario"); // Storage directory on Euler for scenarios and controllers
+
+        return new LocalEnvironment(new LocalInterface(config));
+    }
+
+    static RemoteEnvironment createEulerEnvironment(Session session) throws IOException, JSchException {
         EulerConfiguration config = new EulerConfiguration();
         config.setOutputPath("/cluster/scratch/shoerl/equil_remote"); // Working directory on Euler for simulations
         config.setScenarioPath("/cluster/home/shoerl/equil_remote"); // Storage directory on Euler for scenarios and controllers
 
-        // Create the Euler environment. The EulerInterface is only used internally to handle the communication.
-        RemoteEnvironment environment = new EulerEnvironment(new EulerInterface(session, config));
+        return new EulerEnvironment(new EulerInterface(session, config));
+    }
 
+    static public void runMatsim(String localPath, RemoteEnvironment environment) throws IOException, JSchException, InterruptedException {
         // First, the scenario has to be set up in the new environment
         //   An unique ID is given, as well as the local path to the scenario (containing the config and all assets)
         RemoteScenario scenario = environment.createScenario("equil", localPath + "/examples/equil");

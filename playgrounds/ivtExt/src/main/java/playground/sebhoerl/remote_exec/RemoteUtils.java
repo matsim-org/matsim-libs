@@ -23,7 +23,7 @@ public class RemoteUtils {
     }
 
     public static boolean isFinished(RemoteSimulation simulation) {
-        return isFinished(simulation);
+        return isFinished(simulation.getStatus());
     }
 
     public static boolean isIdle(RemoteSimulation.Status status) {
