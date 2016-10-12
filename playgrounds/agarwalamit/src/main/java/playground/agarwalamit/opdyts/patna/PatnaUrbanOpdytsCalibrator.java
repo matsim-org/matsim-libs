@@ -55,7 +55,7 @@ import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVa
  * @author amit
  */
 
-public class PatnaOpdytsCalibrator {
+public class PatnaUrbanOpdytsCalibrator {
 
 	private static String OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/output222/";
 	private static final String configDir = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/input/";
@@ -140,7 +140,7 @@ public class PatnaOpdytsCalibrator {
 
 		// this is the objective Function which returns the value for given SimulatorState
 		// in my case, this will be the distance based modal split
-		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(OpdytsObjectiveFunctionCases.PATNA); // in this, the method argument (SimulatorStat) is not used.
+		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(OpdytsObjectiveFunctionCases.PATNA_1Pct); // in this, the method argument (SimulatorStat) is not used.
 
 		//search algorithm
 		int maxIterations = 10; // this many times simulator.run(...) and thus controler.run() will be called.

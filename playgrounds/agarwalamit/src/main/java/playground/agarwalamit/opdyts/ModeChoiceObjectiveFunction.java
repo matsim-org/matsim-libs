@@ -54,6 +54,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
     private static final Logger log = Logger.getLogger( ModeChoiceObjectiveFunction.class );
 
     private MainModeIdentifier mainModeIdentifier ;
+    private final OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases;
 
     @Inject ExperiencedPlansService service ;
     @Inject TripRouter tripRouter ;
@@ -74,80 +75,19 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 
 
     public ModeChoiceObjectiveFunction(final OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases) {
+        this.opdytsObjectiveFunctionCases = opdytsObjectiveFunctionCases;
         for ( StatType statType : StatType.values() ) {
             // define the bin boundaries:
             switch ( statType ) {
                 case tripBeelineDistances: {
-                    double[] dataBoundariesTmp = getDataBoundaries(opdytsObjectiveFunctionCases);
+                    double[] dataBoundariesTmp = getDataBoundaries();
                     {
                         this.statsContainer.put( statType, new Databins<>( statType.name(), dataBoundariesTmp )) ;
                     }
                     {
                         final Databins<String> databins = new Databins<>( statType.name(), dataBoundariesTmp ) ;
 
-                        switch (opdytsObjectiveFunctionCases) {
-                            case EQUIL:
-                                double carVal = 1000. ;
-                                databins.addValue( TransportMode.car, 8, carVal);
-                                databins.addValue( TransportMode.pt, 8, 4000.-carVal);
-                                break;
-                            case EQUIL_MIXEDTRAFFIC:
-                                carVal = 1000.;
-                                databins.addValue( TransportMode.car, 8, carVal);
-                                databins.addValue( "bicycle", 8, 4000.- carVal);
-                                break;
-                            case PATNA:
-                                double totalLegs = 13278.0 * 2.0; // each person make two trips; here trips are counted not persons.
-                                double legsSumAllModes = 0;
-                            {
-                                double [] carVals = {6.0, 17.0, 20.0, 19.0, 26.0, 12.0};
-                                double carLegs = 0.02 * totalLegs;
-                                for (int idx = 0; idx < dataBoundariesTmp.length; idx++) {
-                                    double legs = Math.round( carLegs * carVals[idx] / 100.);
-                                    databins.addValue("car", idx, legs);
-                                    legsSumAllModes += legs;
-                                }
-                            }
-                            {
-                                double [] motorbikeVals = {7.0, 35.0, 19.0, 23.0, 8.0, 8.0};
-                                double motorbikeLegs = 0.14 * totalLegs;
-                                for (int idx = 0; idx < dataBoundariesTmp.length; idx++) {
-                                    double legs = Math.round( motorbikeLegs * motorbikeVals[idx] / 100.);
-                                    databins.addValue("motorbike", idx, legs);
-                                    legsSumAllModes += legs;
-                                }
-                            }
-                            {
-                                double [] bikeVals = {10.0, 51.0, 16.0, 15.0, 1.0, 7.0};
-                                double bikeLegs = 0.33 * totalLegs;
-                                for (int idx = 0; idx < dataBoundariesTmp.length; idx++) {
-                                    double legs = Math.round(bikeLegs * bikeVals[idx] / 100.);
-                                    databins.addValue("bike", idx, legs);
-                                    legsSumAllModes += legs;
-                                }
-                            }
-                            {
-                                double [] ptVals = {6.4, 23.9, 34.5, 10.5, 12.7, 12.0};
-                                double ptLegs = 0.22 * totalLegs;
-                                for (int idx = 0; idx < dataBoundariesTmp.length; idx++) {
-                                    double legs = Math.round(ptLegs * ptVals[idx] / 100.);
-                                    databins.addValue("pt", idx, legs);
-                                    legsSumAllModes += legs;
-                                }
-                            }
-                            {
-                                double [] walkVals = {70.0, 28.0, 1.0, 1., 0.0, 0.0};
-                                double walkLegs = 0.29 * totalLegs;
-                                for (int idx = 0; idx < dataBoundariesTmp.length; idx++) {
-                                    double legs = Math.round(walkLegs * walkVals[idx] / 100.);
-                                    databins.addValue("walk", idx, legs);
-                                    legsSumAllModes += legs;
-                                }
-                            }
-                            System.out.println("Total legs "+totalLegs+" ans sum of all legs "+legsSumAllModes);
-                            break;
-                            default: throw new RuntimeException("not implemented");
-                        }
+                        fillDatabins(databins, dataBoundariesTmp.length);
                         this.meaContainer.put( statType, databins) ;
                     }
                     break; }
@@ -162,7 +102,8 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                 mainModeIdentifier = new TransportPlanningMainModeIdentifier();
                 break;
             case EQUIL_MIXEDTRAFFIC:
-            case PATNA:
+            case PATNA_1Pct:
+            case PATNA_10Pct:
                 mainModeIdentifier = new MainModeIdentifier() {
                     @Override
                     public String identifyMainMode(List<? extends PlanElement> tripElements) {
@@ -177,12 +118,93 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         }
     }
 
-    private double [] getDataBoundaries(final OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases) {
-        switch (opdytsObjectiveFunctionCases){
+    private void fillDatabins(Databins<String> databins, int dataBoundariesLength) {
+        switch (this.opdytsObjectiveFunctionCases) {
+            case EQUIL:
+                double carVal = 1000. ;
+                databins.addValue( TransportMode.car, 8, carVal);
+                databins.addValue( TransportMode.pt, 8, 4000.-carVal);
+                break;
+            case EQUIL_MIXEDTRAFFIC:
+                carVal = 1000.;
+                databins.addValue( TransportMode.car, 8, carVal);
+                databins.addValue( "bicycle", 8, 4000.- carVal);
+                break;
+            case PATNA_1Pct:
+                double totalLegs = 13278.0 * 2.0; // each person make two trips; here trips are counted not persons.
+                patnaModalDistDistribution(totalLegs,databins,dataBoundariesLength);
+            break;
+            case PATNA_10Pct:
+                totalLegs = 13278.0 * 10 * 2.0; // each person make two trips; here trips are counted not persons.
+                patnaModalDistDistribution(totalLegs,databins,dataBoundariesLength);
+            default: throw new RuntimeException("not implemented");
+        }
+    }
+
+    private void patnaModalDistDistribution(final double totalLegs, final Databins<String> databins, final int dataBoundariesLength){
+        double legsSumAllModes = 0;
+        {
+            double [] carVals = {6.0, 17.0, 20.0, 19.0, 26.0, 12.0};
+            double carLegs = 0.02 * totalLegs;
+            for (int idx = 0; idx < dataBoundariesLength; idx++) {
+                double legs = Math.round( carLegs * carVals[idx] / 100.);
+                databins.addValue("car", idx, legs);
+                legsSumAllModes += legs;
+            }
+        }
+        {
+            double [] motorbikeVals = {7.0, 35.0, 19.0, 23.0, 8.0, 8.0};
+            double motorbikeLegs = 0.14 * totalLegs;
+            for (int idx = 0; idx < dataBoundariesLength; idx++) {
+                double legs = Math.round( motorbikeLegs * motorbikeVals[idx] / 100.);
+                databins.addValue("motorbike", idx, legs);
+                legsSumAllModes += legs;
+            }
+        }
+        {
+            double [] bikeVals = {10.0, 51.0, 16.0, 15.0, 1.0, 7.0};
+            double bikeLegs = 0.33 * totalLegs;
+            for (int idx = 0; idx < dataBoundariesLength; idx++) {
+                double legs = Math.round(bikeLegs * bikeVals[idx] / 100.);
+                databins.addValue("bike", idx, legs);
+                legsSumAllModes += legs;
+            }
+        }
+        {
+            double [] ptVals = {6.4, 23.9, 34.5, 10.5, 12.7, 12.0};
+            double ptLegs = 0.22 * totalLegs;
+            for (int idx = 0; idx < dataBoundariesLength; idx++) {
+                double legs = Math.round(ptLegs * ptVals[idx] / 100.);
+                databins.addValue("pt", idx, legs);
+                legsSumAllModes += legs;
+            }
+        }
+        {
+            double [] walkVals = {70.0, 28.0, 1.0, 1., 0.0, 0.0};
+            double walkLegs = 0.29 * totalLegs;
+            for (int idx = 0; idx < dataBoundariesLength; idx++) {
+                double legs = Math.round(walkLegs * walkVals[idx] / 100.);
+                databins.addValue("walk", idx, legs);
+                legsSumAllModes += legs;
+            }
+        }
+        System.out.println("Total legs "+totalLegs+" ans sum of all legs "+legsSumAllModes);
+
+        // check if difference is not greaater than 1%, due to rounding.
+        if( legsSumAllModes >= 0.99*totalLegs && legsSumAllModes <= 1.01 * totalLegs) {
+            // everything is fine
+        }  else {
+            throw new RuntimeException("sum of legs is wrong.");
+        }
+    }
+
+    private double [] getDataBoundaries() {
+        switch (this.opdytsObjectiveFunctionCases){
             case EQUIL:
             case EQUIL_MIXEDTRAFFIC:
                 return new double[] {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.};
-            case PATNA:
+            case PATNA_1Pct:
+            case PATNA_10Pct:
                 return new double[] {0., 2000., 4000., 6000., 8000., 10000.};
             default: throw new RuntimeException("not implemented");
         }
@@ -255,6 +277,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 
         }
     }
+
     private static int noCoordCnt = 0 ;
     private double calcBeelineDistance(final Activity fromAct, final Activity toAct) {
         double item;
@@ -272,7 +295,4 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         }
         return item;
     }
-
-
-
 }
