@@ -78,7 +78,7 @@ public class AccessibilityComputationCottbus {
 		//
 //		Config config = ConfigUtils.loadConfig(runOutputFolder + "output_config.xml.gz", new AccessibilityConfigGroup());
 //		Config config = ConfigUtils.loadConfig(runOutputFolder + "output_config_2.xml", new AccessibilityConfigGroup());
-		Config config = ConfigUtils.loadConfig(runOutputFolder + "config.xml", new AccessibilityConfigGroup());
+		Config config = ConfigUtils.loadConfig(runOutputFolder + "config.xml", new AccessibilityConfigGroup()); // adaption after change to relative path in config
 		//
 		
 		// Infrastructure
@@ -91,12 +91,12 @@ public class AccessibilityComputationCottbus {
 		config.controler().setOutputDirectory(accessibilityOutputDirectory);
 		
 //		config.network().setInputFile(runOutputFolder + "output_network.xml.gz");
-		config.network().setInputFile(runOutputFolder + "network_wgs84_utm33n.xml.gz");
+		config.network().setInputFile("network_wgs84_utm33n.xml.gz");
 		
 		config.controler().setLastIteration(0);
 		
 //		config.plans().setInputFile(runOutputFolder + "output_plans.xml.gz");
-		config.plans().setInputFile(runOutputFolder + "commuter_population_wgs84_utm33n_car_only.xml");
+		config.plans().setInputFile("commuter_population_wgs84_utm33n_car_only.xml.gz");
 		
 //		config.transit().setTransitScheduleFile(runOutputFolder + "output_transitSchedule.xml.gz");
 //		config.transit().setVehiclesFile(runOutputFolder + "output_transitVehicles.xml.gz");
