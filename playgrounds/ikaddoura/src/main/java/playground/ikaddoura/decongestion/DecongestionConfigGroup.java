@@ -40,7 +40,7 @@ public class DecongestionConfigGroup {
 	private double TOLL_BLEND_FACTOR = 1.0; // default: 1.0
 	private double Kp = 1.0;
 	private double Ki = 1.0;
-	private double Kd = 1.0;
+	private double Kd = 0.0;
 	
 	// General parameters
 	private boolean RUN_FINAL_ANALYSIS = true;
