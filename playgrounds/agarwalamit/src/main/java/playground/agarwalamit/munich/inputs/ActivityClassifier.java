@@ -51,18 +51,18 @@ public class ActivityClassifier {
 
 	public ActivityClassifier(Scenario scenario) {
 		this.sc = scenario;
-		actType2TypDur = new TreeMap<String, Double>();
+		actType2TypDur = new TreeMap<>();
 		LOG.info("Least integer [Math.floor()] of stated activity duration of an activity is set to typical duration.");
 		LOG.info("A person is skipped if first and last acitity are different and last activity starts after mid night.");
 		//TODO : might make more sense if I check above for all intermediate activities as well.
 	}
 
 	public static final Logger LOG = Logger.getLogger(ActivityClassifier.class.getSimpleName());
-	private Scenario sc ;
+	private final Scenario sc ;
 	private int zeroDurCount =0;
-	private SortedMap<String, Double> actType2TypDur;
+	private final SortedMap<String, Double> actType2TypDur;
 	private Scenario scOut;
-	private MunichPersonFilter pf = new MunichPersonFilter();
+	private final MunichPersonFilter pf = new MunichPersonFilter();
 	private int skippedPersons = 0;
 
 	/**
@@ -283,7 +283,7 @@ public class ActivityClassifier {
 			throw new RuntimeException("Duration is negative. Aborting...");
 		} else dur = duration;
 
-		return new Tuple<Double, Double>(dur, timeShift);
+		return new Tuple<>(dur, timeShift);
 	}
 
 	public Population getOutPopulation(){

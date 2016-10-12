@@ -51,9 +51,9 @@ public class DelaysAndEmissionCostsDiff {
 	private static final double MARGINAL_UTIL_TRAVEL_CAR_SEC=-0.0/3600;
 	private static final double MARGINAL_UTIL_TRAVEL_TIME = MARGINAL_UTIL_TRAVEL_CAR_SEC+MARGINAL_UTIL_PERF_SEC;
 	private static final double VTTS_CAR = MARGINAL_UTIL_TRAVEL_TIME/MARGINAL_UTIL_MONEY;
-	private String bau = "/baseCaseCtd/";
-	private String [] cases = {"ei","ci","eci"};
-	private String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
+	private final String bau = "/baseCaseCtd/";
+	private final String [] cases = {"ei","ci","eci"};
+	private final String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
 
 	public static void main(String[] args) {
 		new DelaysAndEmissionCostsDiff().run();
@@ -88,7 +88,7 @@ public class DelaysAndEmissionCostsDiff {
 	}
 
 	private SortedMap<UserGroup, Population> getPopulationPerUserGroup(){
-		SortedMap<UserGroup, Population> userGrpToPopulation =  new TreeMap<UserGroup, Population>();
+		SortedMap<UserGroup, Population> userGrpToPopulation = new TreeMap<>();
 		PersonFilter pf = new PersonFilter();
 		String plansFileBAU = outputDir+bau+"/output_plans.xml.gz";
 		Scenario scenario = LoadMyScenarios.loadScenarioFromPlans(plansFileBAU);
@@ -106,7 +106,7 @@ public class DelaysAndEmissionCostsDiff {
 
 		Scenario scBAU = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(plansFileBAU, networkFileBAU, configFileBAU);
 		Map<Id<Person>, Double> delaysCostsBAU = getDelaysPerPerson(configFileBAU, eventsFileBAU, scBAU);
-		Map<String, Map<Id<Person>, Double>> runCase2PersonId2DelaysCostDiff = new HashMap<String, Map<Id<Person>,Double>>();
+		Map<String, Map<Id<Person>, Double>> runCase2PersonId2DelaysCostDiff = new HashMap<>();
 
 		for(String run : cases){
 			String configFile = outputDir+run+"/output_config.xml";
@@ -130,7 +130,7 @@ public class DelaysAndEmissionCostsDiff {
 
 		Scenario scBAU = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(plansFileBAU, networkFileBAU, configFileBAU);
 		Map<Id<Person>, Double> emissionsCostsBAU = getEmissionsPerPerson(emissionEventsFileBAU, scBAU);
-		Map<String, Map<Id<Person>, Double>> runCase2PersonId2EmissionsCostDiff = new HashMap<String, Map<Id<Person>,Double>>();
+		Map<String, Map<Id<Person>, Double>> runCase2PersonId2EmissionsCostDiff = new HashMap<>();
 
 		for(String run : cases){
 			String configFile = outputDir+run+"/output_config.xml";
@@ -150,7 +150,7 @@ public class DelaysAndEmissionCostsDiff {
 		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile,sc,1);
 		personAnalyzer.run();
 
-		Map<Id<Person>, Double> personId2DelaysCosts= new HashMap<Id<Person>, Double>();
+		Map<Id<Person>, Double> personId2DelaysCosts= new HashMap<>();
 		Map<Id<Person>, Double> personId2DelaysInSec = personAnalyzer.getTimeBin2AffectedPersonId2Delay().get(sc.getConfig().qsim().getEndTime());
 		for(Id<Person> id :personId2DelaysInSec.keySet() ){
 			personId2DelaysCosts.put(id, VTTS_CAR*personId2DelaysInSec.get(id));
@@ -166,7 +166,7 @@ public class DelaysAndEmissionCostsDiff {
 		EmissionUtils emu = new EmissionUtils();
 		Map<Id<Person>, SortedMap<String, Double>> totalEmissions = ema.getPerson2totalEmissions();
 		Map<Id<Person>, SortedMap<String, Double>> personId2Emissions = emu.setNonCalculatedEmissionsForPopulation(sc.getPopulation(), totalEmissions);
-		Map<Id<Person>, Double> personId2EmissionsCosts= new HashMap<Id<Person>, Double>();
+		Map<Id<Person>, Double> personId2EmissionsCosts= new HashMap<>();
 		boolean considerCO2Costs = true;
 
 		for(Id<Person> id : personId2Emissions.keySet()){

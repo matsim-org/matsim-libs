@@ -126,7 +126,7 @@ class TestNetworkExperiment {
 		}
 		//		System.out.println("PersonID \t Delay affected(V4) \t Delay affected (V5) \t Delay affected (V6) \t Delay caused (V4) \t Delay caused (V5) \t Delay caused (V6) ");
 
-		Set<Id<Person>> personIds = new HashSet<Id<Person>>();
+		Set<Id<Person>> personIds = new HashSet<>();
 		personIds.addAll(personId2AffectedDelaysV4.keySet());
 		personIds.addAll(personId2CausingDelaysV4.keySet());
 		personIds.addAll(personId2AffectedDelaysV5.keySet());
@@ -157,9 +157,9 @@ class TestNetworkExperiment {
 
 		EventsManager events = EventsUtils.createEventsManager();
 
-		Map<Id<Person>, Double> personId2Delay = new HashMap<Id<Person>, Double>();
+		Map<Id<Person>, Double> personId2Delay = new HashMap<>();
 
-		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
+		final List<CongestionEvent> congestionEvents = new ArrayList<>();
 
 		events.addHandler( new CongestionEventHandler() {
 
@@ -207,7 +207,7 @@ class TestNetworkExperiment {
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
 
-		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
+		Map<String, VehicleType> modeVehicleTypes = new HashMap<>();
 
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
 		car.setMaximumVelocity(20);
@@ -243,10 +243,10 @@ class TestNetworkExperiment {
 	 *<p>				  o----5----o
 	 */
 	private class createPseudoInputs {
-		Scenario scenario;
-		Config config;
-		Network network;
-		Population population;
+		final Scenario scenario;
+		final Config config;
+		final Network network;
+		final Population population;
 		Link link1;
 		Link link2;
 		Link link3;
@@ -303,7 +303,7 @@ class TestNetworkExperiment {
 				plan.addLeg(leg);
 				LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 				NetworkRoute route;
-				List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+				List<Id<Link>> linkIds = new ArrayList<>();
 				if(i%2==0) {
 					route= (NetworkRoute) factory.createRoute(link1.getId(), link4.getId());
 					linkIds.add(link2.getId());

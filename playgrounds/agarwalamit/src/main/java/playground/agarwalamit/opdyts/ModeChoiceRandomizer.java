@@ -30,13 +30,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-final class ModeChoiceRandomizer implements DecisionVariableRandomizer<ModeChoiceDecisionVariable> {
+public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<ModeChoiceDecisionVariable> {
     private static final Logger log = Logger.getLogger( ModeChoiceRandomizer.class );
 
     private final Scenario scenario;
     private final Random rnd ;
 
-    ModeChoiceRandomizer(Scenario scenario) {
+    public ModeChoiceRandomizer(Scenario scenario) {
         this.scenario = scenario;
         this.rnd = new Random(4711) ;
         // (careful with using matsim-random since it is always the same sequence in one run)

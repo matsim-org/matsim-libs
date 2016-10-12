@@ -59,10 +59,10 @@ import org.matsim.core.scenario.ScenarioUtils;
  *<p>				  o----5----o
  */
  class DivergingNetworkAndPlans {
-	Scenario scenario;
-	Config config;
-	Network network;
-	Population population;
+	final Scenario scenario;
+	final Config config;
+	final Network network;
+	final Population population;
 	Link link0;
 	Link link1;
 	Link link2;
@@ -120,7 +120,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 			plan.addLeg(leg);
 			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 			NetworkRoute route;
-			List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+			List<Id<Link>> linkIds = new ArrayList<>();
 			if(i <= 4 ) { // first 4 agents towards bottleneck and then 2 agents to other destination
 				route= (NetworkRoute) factory.createRoute(link0.getId(), link3.getId());
 				linkIds.add(link1.getId());

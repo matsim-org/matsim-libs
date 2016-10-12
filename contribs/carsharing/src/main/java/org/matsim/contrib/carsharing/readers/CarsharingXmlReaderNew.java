@@ -150,9 +150,9 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 		else if (name.equals("twoway") || name.equals("oneway")) {
 			csType = name;
 			id = atts.getValue("id");
-			String lat = atts.getValue("lat");
-			String lon = atts.getValue("lon");
-			Coord coordStation = new Coord(Double.parseDouble(lat), Double.parseDouble(lon));
+			String xCoord = atts.getValue("x");
+			String yCoord = atts.getValue("y");
+			Coord coordStation = new Coord(Double.parseDouble(xCoord), Double.parseDouble(yCoord));
 				
 			link = (Link)NetworkUtils.getNearestLinkExactly(network, coordStation);
 			vehicles = new ArrayList<StationBasedVehicle>();
@@ -166,10 +166,10 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 		}
 		else if (name.equals("freefloating")) {
 			hasFF= true;
-			String lat = atts.getValue("lat");
-			String lon = atts.getValue("lon");
+			String xCoord = atts.getValue("x");
+			String yCoord = atts.getValue("y");
 			String type = atts.getValue("type");
-			Coord coordStation = new Coord(Double.parseDouble(lat), Double.parseDouble(lon));
+			Coord coordStation = new Coord(Double.parseDouble(xCoord), Double.parseDouble(yCoord));
 				
 			link = (Link)NetworkUtils.getNearestLinkExactly(network, coordStation);
 			FFVehicleImpl ffcsvehicle = new FFVehicleImpl(type, atts.getValue("id"), companyName);

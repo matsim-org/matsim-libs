@@ -19,8 +19,10 @@
 package tutorial.config;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,20 +47,40 @@ public class ExamplesByConfigfileTest {
 	
 	@Parameters(name = "{index}: configFilename == {0};")
 	public static Collection<Object[]> createTests() {
-		int nConfigFiles = 5 ;
-		Object [][] files2run = new Object [nConfigFiles][1]; 
-		files2run[0] = new Object [] {"examples/equil/config.xml"};
-		files2run[1] = new Object [] {"examples/equil-extended/config.xml"};
-		files2run[2] = new Object [] {"examples/tutorial/config/example1-config.xml"} ;
-		files2run[3] = new Object [] {"examples/tutorial/config/example5-config.xml"} ;
-		files2run[4] = new Object [] {"examples/tutorial/config/example5trips-config.xml"} ;
-//		files2run[5] = new Object [] {"examples/equil-extended/config-with-roadpricing.xml"}; // yyyy throws exception; should be investigated and fixed.  (This can not work from core matsim after roadpricing was moved into a contrib!) kai, sep'16
-//		files2run[3] = new Object [] {"examples/equil-mixedTraffic/config.xml"}; // yyyy throws exception; should be investigated and fixed.  kai, sep'16
-//		files2run[5] = new Object [] {"examples/tutorial/config/example2-config.xml"} ; // yyyy throws exception; should be investigated and fixed.  kai, sep'16
-//		files2run[8] = new Object [] {"examples/tutorial/config/externalReplanning.xml"} ; // yyyy throws exception; should be investigated and fixed.  kai, sep'16 
-//		files2run[2] = new Object [] {"examples/equil-extended/config-with-network-change-events.xml"}; // yyyy runs forever; should be investigated and fixed.  kai, sep'16
-//		files2run[1] = new Object [] {"examples/tutorial/config/externalMobsim.xml"} ; // yyyy throws exception; should be investigated and fixed.  kai, sep'16
-		return Arrays.asList(files2run);
+		Collection<Object[]> filesToRun = new ArrayList<Object[]>();
+//		----------
+//		already working configs
+		filesToRun.add(new Object [] {"examples/equil/config.xml"});
+		filesToRun.add(new Object [] {"examples/equil-extended/config.xml"});
+		filesToRun.add(new Object [] {"examples/tutorial/config/example1-config.xml"});
+		filesToRun.add(new Object [] {"examples/tutorial/config/example5-config.xml"});
+		filesToRun.add(new Object [] {"examples/tutorial/config/example5trips-config.xml"});
+		filesToRun.add(new Object [] {"examples/equil-mixedTraffic/config.xml"});
+//		----------
+		
+//		----------
+//		fixed configs
+//		-----
+		filesToRun.add(new Object [] {"examples/tutorial/config/example2-config.xml"}); // yyyy throws exception; should be investigated and fixed.  kai, sep'16
+		// Used config group "simulation" which no longer exists. Replaced with config group "qsim", which has the same parameter "snapshotperiod". Now running without exception. If only the name of the config group was changed from "simulation" to "qsim", this should be sufficient. vsp-gleich, sep'16
+//		----------
+		
+//		----------
+//		not working configs
+//		-----
+//		filesToRun.add(new Object [] {"examples/equil-extended/config-with-roadpricing.xml"}); // yyyy throws exception; should be investigated and fixed.  (This can not work from core matsim after roadpricing was moved into a contrib!) kai, sep'16
+//		-----
+//		filesToRun.add(new Object [] {"examples/tutorial/config/externalReplanning.xml"}); // yyyy throws exception; should be investigated and fixed.  kai, sep'16 		
+		// adjusted some file paths in externalReplanning.xml. However, there is no longer any replanning.jar as referenced in externalReplanning.xml (neither at the path indicated nor elsewhere in the matsim repository). Delete? vsp-gleich, oct'16
+//		-----
+//		filesToRun.add(new Object [] {"examples/equil-extended/config-with-network-change-events.xml"}); // yyyy runs forever; should be investigated and fixed.  kai, sep'16
+		// All agents drive by car from link 1 to link 20 and back to link 1. As the networkChangeEvents.xml sets the free speed of link 1 where all agents depart (and other links) to 0 m/s before the first agent departs, no agent will ever arrive during the first iteration. Keep link 1 open? vsp-gleich, oct'16
+//		-----
+//		filesToRun.add(new Object [] {"examples/tutorial/config/externalMobsim.xml"}); // yyyy throws exception; should be investigated and fixed.  kai, sep'16
+		// adjusted file paths in externalMobsim.xml. However, there is no longer any Mobsim.jar as referenced in externalMobsim.xml (neither at the path indicated nor elsewhere in the matsim repository). Uses config group "simulation" which no longer exists. Delete? vsp-gleich, oct'16
+//		-----
+		
+		return filesToRun;
 		
 		// the convention, I think, is that the output of the method marked by "@Parameters" is taken as input to the constructor
 		// before running each test. kai, jul'16

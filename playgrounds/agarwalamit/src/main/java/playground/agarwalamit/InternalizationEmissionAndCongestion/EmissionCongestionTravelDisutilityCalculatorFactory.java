@@ -41,7 +41,7 @@ public class EmissionCongestionTravelDisutilityCalculatorFactory implements Trav
 	private final EmissionModule emissionModule;
 	private final EmissionCostModule emissionCostModule;
 	private Set<Id<Link>> hotspotLinks;
-	private TollHandler tollHandler;
+	private final TollHandler tollHandler;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
 	
 	public EmissionCongestionTravelDisutilityCalculatorFactory(EmissionModule emissionModule, EmissionCostModule emissionCostModule, 

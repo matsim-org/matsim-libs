@@ -40,7 +40,7 @@ public class EmissionVehicleGenerator {
 
 
 	private final String outputVehicleFile;
-	private Scenario scenario;
+	private final Scenario scenario;
 
 	public EmissionVehicleGenerator(Scenario scenario, String outputVehicleFile) {
 		this.outputVehicleFile = outputVehicleFile;
@@ -87,6 +87,7 @@ public class EmissionVehicleGenerator {
 					vehicleAttributes.getHbefaSizeClass() + ";" + 
 					vehicleAttributes.getHbefaEmConcept(),VehicleType.class);
 			VehicleType vehicleType = VehicleUtils.getFactory().createVehicleType(vehTypeId);
+			vehicleType.setDescription(vehTypeId.toString());
 			if(!(outputVehicles.getVehicleTypes().containsKey(vehTypeId))){//getVehicles().containsKey(vehTypeId))){
 				outputVehicles.addVehicleType(vehicleType);
 			} else {

@@ -61,7 +61,7 @@ public class SubPopControler {
 
 		sc.getConfig().qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
-		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
+		Map<String, VehicleType> modesType = new HashMap<>();
 		VehicleType slumCar = VehicleUtils.getFactory().createVehicleType(Id.create("slum_car",VehicleType.class));
 		slumCar.setMaximumVelocity(60.0/3.6);
 		slumCar.setPcuEquivalents(1.0);
@@ -146,11 +146,11 @@ public class SubPopControler {
 			public void install() {
 				addPlanStrategyBinding("ChangeLegMode_slum").toProvider(new javax.inject.Provider<PlanStrategy>() {
 					final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
-					String[] availableModesSlum = {"slum_bike", "slum_motorbike", "slum_pt", "slum_walk"};
+					final String[] availableModesSlum = {"slum_bike", "slum_motorbike", "slum_pt", "slum_walk"};
 
 					@Override
 					public PlanStrategy get() {
-						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+						final Builder builder = new Builder(new RandomPlanSelector<>());
 						builder.addStrategyModule(new ChangeLegMode(controler.getConfig().global().getNumberOfThreads(), availableModesSlum, true));
 						builder.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
 						return builder.build();
@@ -164,11 +164,11 @@ public class SubPopControler {
 			public void install() {
 				addPlanStrategyBinding("ChangeLegMode_nonSlum").toProvider(new javax.inject.Provider<PlanStrategy>() {
 					final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
-					String[] availableModeNonSlum = {"nonSlum_car", "nonSlum_bike", "nonSlum_motorbike", "nonSlum_pt", "nonSlum_walk"};
+					final String[] availableModeNonSlum = {"nonSlum_car", "nonSlum_bike", "nonSlum_motorbike", "nonSlum_pt", "nonSlum_walk"};
 
 					@Override
 					public PlanStrategy get() {
-						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+						final Builder builder = new Builder(new RandomPlanSelector<>());
 						builder.addStrategyModule(new ChangeLegMode(controler.getConfig().global().getNumberOfThreads(), availableModeNonSlum, true));
 						builder.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
 						return builder.build();

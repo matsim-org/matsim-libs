@@ -93,7 +93,7 @@ public class ActivityType2ActivityDurationDistribution {
 		String outputConfig = outputDir+runCase+"/output_config.xml";
 		simEndTime = LoadMyScenarios.getSimulationEndTime(outputConfig);
 
-		timeClasses = new ArrayList<Integer>();
+		timeClasses = new ArrayList<>();
 		initializeTimeClasses();
 
 		getActType2ActDurationDistributionData();

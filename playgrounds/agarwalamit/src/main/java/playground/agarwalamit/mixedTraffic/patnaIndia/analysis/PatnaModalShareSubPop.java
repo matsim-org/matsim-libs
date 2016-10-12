@@ -40,8 +40,8 @@ public class PatnaModalShareSubPop {
 
 	private final static Logger LOG = Logger.getLogger(PatnaModalShareSubPop.class);
 
-	private SortedMap<PatnaUserGroup, SortedMap<String, Integer>> userGrp2Mode2Legs = new TreeMap<>();
-	private SortedMap<PatnaUserGroup, SortedMap<String, Double>> userGrp2ModalSplit = new TreeMap<>();
+	private final SortedMap<PatnaUserGroup, SortedMap<String, Integer>> userGrp2Mode2Legs = new TreeMap<>();
+	private final SortedMap<PatnaUserGroup, SortedMap<String, Double>> userGrp2ModalSplit = new TreeMap<>();
 
 	private SortedMap<String, Double> wholePopPctModalShare ;
 	private SortedMap<String, Integer> wholePopMode2Legs;

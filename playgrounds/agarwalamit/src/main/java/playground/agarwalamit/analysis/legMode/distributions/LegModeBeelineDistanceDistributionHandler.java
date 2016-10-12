@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -70,10 +69,10 @@ public class LegModeBeelineDistanceDistributionHandler extends AbstractAnalysisM
 		super(LegModeBeelineDistanceDistributionHandler.class.getSimpleName());
 		LOG.info("enabled");
 
-		this.distanceClasses = new ArrayList<Integer>();
-		this.usedModes = new TreeSet<String>();
-		this.mode2PersonId2dist = new TreeMap<String, Map<Id<Person>,List<Double>>>();
-		this.mode2DistanceClass2LegCount = new TreeMap<String, SortedMap<Integer,Integer>>();
+		this.distanceClasses = new ArrayList<>();
+		this.usedModes = new TreeSet<>();
+		this.mode2PersonId2dist = new TreeMap<>();
+		this.mode2DistanceClass2LegCount = new TreeMap<>();
 	}
 
 	public void init(final Scenario sc){
@@ -82,8 +81,8 @@ public class LegModeBeelineDistanceDistributionHandler extends AbstractAnalysisM
 		initializeUsedModes(this.scenario.getPopulation());
 
 		for(String mode:this.usedModes){
-			this.mode2PersonId2dist.put(mode, new HashMap<Id<Person>, List<Double>>());
-			SortedMap<Integer, Integer> distClass2Legs = new TreeMap<Integer, Integer>();
+			this.mode2PersonId2dist.put(mode, new HashMap<>());
+			SortedMap<Integer, Integer> distClass2Legs = new TreeMap<>();
 			for(int i: this.distanceClasses){
 				distClass2Legs.put(i, 0);
 			}
@@ -93,7 +92,7 @@ public class LegModeBeelineDistanceDistributionHandler extends AbstractAnalysisM
 
 	@Override
 	public List<EventHandler> getEventHandler() {
-		return new LinkedList<EventHandler>();
+		return new LinkedList<>();
 	}
 
 	@Override
@@ -119,7 +118,7 @@ public class LegModeBeelineDistanceDistributionHandler extends AbstractAnalysisM
 								throw new RuntimeException("A transit activity should follow a leg! Aborting...");
 							}
 							final int index = i;
-							PopulationUtils.removeActivity(((Plan) plan), index); // also removes the following leg
+							PopulationUtils.removeActivity(plan, index); // also removes the following leg
 							n -= 2;
 							i--;
 						}
@@ -169,7 +168,7 @@ public class LegModeBeelineDistanceDistributionHandler extends AbstractAnalysisM
 	private void calculateMode2DistanceClass2LegCount() {
 		Population pop = this.scenario.getPopulation();
 		for(Person person : pop.getPersons().values()){
-			Plan plan = (Plan) person.getSelectedPlan();
+			Plan plan = person.getSelectedPlan();
 			List<PlanElement> planElements = plan.getPlanElements();
 			for(PlanElement pe : planElements){
 				if(pe instanceof Leg){
@@ -192,7 +191,7 @@ public class LegModeBeelineDistanceDistributionHandler extends AbstractAnalysisM
 	private void calculateMode2PersonId2Distances() {
 		Population pop = this.scenario.getPopulation();
 		for(Person person : pop.getPersons().values()){
-			Plan plan = (Plan) person.getSelectedPlan();
+			Plan plan = person.getSelectedPlan();
 			List<PlanElement> planElements = plan.getPlanElements();
 			for(PlanElement pe : planElements){
 				if(pe instanceof Leg){
@@ -205,7 +204,7 @@ public class LegModeBeelineDistanceDistributionHandler extends AbstractAnalysisM
 						dists.add(distance);
 						personId2dist.put(person.getId(), dists);
 					} else {
-						List<Double> dists = new ArrayList<Double>();
+						List<Double> dists = new ArrayList<>();
 						dists.add(distance);
 						personId2dist.put(person.getId(), dists);
 					}
@@ -217,7 +216,7 @@ public class LegModeBeelineDistanceDistributionHandler extends AbstractAnalysisM
 	private double getLongestDistance(final Population pop){
 		double longestDistance = 0.0;
 		for(Person person : pop.getPersons().values()){
-			Plan plan = (Plan) person.getSelectedPlan();
+			Plan plan = person.getSelectedPlan();
 			List<PlanElement> planElements = plan.getPlanElements();
 			for(PlanElement pe : planElements){
 				if(pe instanceof Leg ){
@@ -267,9 +266,9 @@ public class LegModeBeelineDistanceDistributionHandler extends AbstractAnalysisM
 		return this.mode2PersonId2dist;
 	}
 	public SortedMap<String, Map<Id<Person>, Double>> getMode2PersonId2TotalRouteDistance(){
-		SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TotalRouteDist = new TreeMap<String, Map<Id<Person>,Double>>();
+		SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TotalRouteDist = new TreeMap<>();
 		for(String str:this.mode2PersonId2dist.keySet()){
-			Map<Id<Person>, Double> personIdeRouteDist = new HashMap<Id<Person>, Double>();
+			Map<Id<Person>, Double> personIdeRouteDist = new HashMap<>();
 			for(Id<Person> id:this.mode2PersonId2dist.get(str).keySet()){
 				double sum=0;
 				for(double d:this.mode2PersonId2dist.get(str).get(id)){

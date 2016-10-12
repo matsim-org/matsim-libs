@@ -23,15 +23,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordUtils;
-
 import playground.agarwalamit.mixedTraffic.patnaIndia.policies.PatnaTrafficRestrainer;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
@@ -92,8 +91,12 @@ public final class PatnaBikeTrackMerger {
 		}
 
 		for (Link l: bikeNetwork.getLinks().values() ) {
-			network.addLink(l);
-			bikeLinks.add(l.getId());
+			Node fromNode = network.getNodes().get(l.getFromNode().getId());
+			Node toNode = network.getNodes().get(l.getToNode().getId());
+			Link lNew = NetworkUtils.createAndAddLink(network, l.getId(), fromNode, toNode,
+					l.getLength(), l.getFreespeed(), l.getCapacity(), l.getNumberOfLanes());
+			lNew.setAllowedModes(l.getAllowedModes());
+			bikeLinks.add(lNew.getId());
 		}
 
 		// now connect track with the network.

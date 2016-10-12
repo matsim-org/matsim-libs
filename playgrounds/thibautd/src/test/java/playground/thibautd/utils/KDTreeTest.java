@@ -24,6 +24,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
@@ -85,18 +86,23 @@ public class KDTreeTest {
 
 		final Random random = new Random( 123 );
 
+		// be pretty restrictive on the predicate, to be able to detect early pruning.
 		for ( int i=0; i < 50; i++ ) {
 			final double[] c = new double[ 3 ];
 			for ( int j=0; j < c.length; j++ ) c[ j ] = random.nextDouble() * 100;
 
+			final int[] searched = new int[ 3 ];
+			for ( int j=0; j < searched.length; j++ ) searched[ j ] = random.nextInt( 100 );
+
 			final int[] closest =
 					tree.getClosestEuclidean(
 							c ,
-							a -> a[0] == a[1] );
+							a -> Arrays.equals( a , searched ) );
 
-			Assert.assertTrue(
+			Assert.assertArrayEquals(
 					"closest point does not obey predicate",
-					closest[0] == closest[1] );
+					searched,
+					closest );
 		}
 	}
 

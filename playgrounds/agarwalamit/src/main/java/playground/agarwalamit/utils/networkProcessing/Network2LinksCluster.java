@@ -39,8 +39,8 @@ public class Network2LinksCluster {
 		this.networkFile = networkFile;
 	}
 
-	private String networkFile;
-	private Map<String, Set<Id<Link>>> linkCluster = new HashMap<>();
+	private final String networkFile;
+	private final Map<String, Set<Id<Link>>> linkCluster = new HashMap<>();
 
 
 	public static void main(String[] args) {
@@ -61,7 +61,7 @@ public class Network2LinksCluster {
 				linkIds.add(l.getId());
 				linkCluster.put(linkAttributes, linkIds);
 			} else {
-				Set<Id<Link>> linkIds = new HashSet<Id<Link>>();
+				Set<Id<Link>> linkIds = new HashSet<>();
 				linkIds.add(l.getId());
 				linkCluster.put(linkAttributes, linkIds);
 			}

@@ -107,13 +107,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
-			<artifactId>map2mapmatching</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
-			<type>zip</type>
-			<classifier>release</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
 			<artifactId>matrixbasedptrouter</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 			<type>zip</type>

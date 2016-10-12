@@ -31,13 +31,13 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
+import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.initialdemandgeneration.socnetgen.analysis.ComputeSocialDistanceBetweenRandomIndividuals;
 import playground.thibautd.initialdemandgeneration.socnetgen.analysis.IdentifyAndWriteComponents;
 import playground.thibautd.initialdemandgeneration.socnetgen.analysis.WriteDegreeTable;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialPopulation;
 import playground.thibautd.initialdemandgeneration.socnetgen.scripts.RunTRBModel.ArentzeAgent;
-import playground.ivt.utils.MoreIOUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

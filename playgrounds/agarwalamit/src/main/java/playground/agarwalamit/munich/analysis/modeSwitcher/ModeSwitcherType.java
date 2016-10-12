@@ -25,6 +25,6 @@ package playground.agarwalamit.munich.analysis.modeSwitcher;
 
 public enum ModeSwitcherType {
 	
-	car2car, car2PT, PT2car, PT2PT;
+	car2car, car2PT, PT2car, PT2PT
 
 }

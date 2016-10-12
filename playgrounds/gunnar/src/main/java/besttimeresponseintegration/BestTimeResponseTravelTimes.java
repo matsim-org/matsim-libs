@@ -1,13 +1,12 @@
 package besttimeresponseintegration;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
+import java.util.List;
+
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.router.TripRouter;
+import org.matsim.facilities.Facility;
 
 import besttimeresponse.TripTravelTimes;
 import opdytsintegration.utils.TimeDiscretization;
@@ -17,96 +16,74 @@ import opdytsintegration.utils.TimeDiscretization;
  * @author Gunnar Flötteröd
  *
  */
-public class BestTimeResponseTravelTimes implements TripTravelTimes<Link, String>, TravelTime, TravelDisutility {
+public class BestTimeResponseTravelTimes implements TripTravelTimes<Facility, String> {
 
 	// -------------------- MEMBERS --------------------
 
 	private final TimeDiscretization timeDiscr;
 
-	private final TravelTime carTT;
+	private final TripRouter tripRouter;
 
-	private final Dijkstra router;
+	private final Person person;
 
-	private final boolean interpolate;
+	private TravelTimeCache<Facility, String> cache = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public BestTimeResponseTravelTimes(final TimeDiscretization timeDiscr, final TravelTime carTT,
-			final Network network, final boolean interpolate) {
+	public BestTimeResponseTravelTimes(final TimeDiscretization timeDiscr, final TripRouter tripRouter,
+			final Person person) {
 		this.timeDiscr = timeDiscr;
-		this.carTT = carTT;
-		this.router = new Dijkstra(network, this, this);
-		this.interpolate = interpolate;
+		this.tripRouter = tripRouter;
+		this.person = person;
+	}
+
+	public void setCache(final TravelTimeCache<Facility, String> cache) {
+		this.cache = cache;
 	}
 
 	// --------------- IMPLEMENTATION OF TripTravelTimes ---------------
 
 	@Override
-	public synchronized double getTravelTime_s(final Link origin, final Link destination, final double dptTime_s,
+	public double getTravelTime_s(final Facility origin, final Facility destination, final double dptTime_s,
 			final String mode) {
-		final Path path = this.getCarPath(origin, destination, dptTime_s);
-		if ("car".equals(mode)) {
-			return path.travelTime;
-		} else if ("pt".equals(mode)) {
-			return 2.0 * path.travelTime;
-		} else {
-			throw new UnsupportedOperationException("Unsupported mode: " + mode);
-		}
-	}
 
-	public Path getCarPath(final Link origin, final Link destination, final double dptTime_s) {
-		return this.router.calcLeastCostPath(origin.getToNode(), destination.getFromNode(), dptTime_s, null, null);
-	}
-
-	// --------------- IMPLEMENTATION OF TravelDisutility ---------------
-
-	/*
-	 * TODO This is likely to be inconsistent with what the actual re-planning
-	 * perceives as travel disutility.
-	 */
-
-	@Override
-	public double getLinkTravelDisutility(final Link link, final double entryTime_s, final Person person,
-			final Vehicle vehicle) {
-		return this.getLinkTravelTime(link, entryTime_s, person, vehicle);
-	}
-
-	@Override
-	public double getLinkMinimumTravelDisutility(final Link link) {
-		return link.getLength() / link.getFreespeed();
-	}
-
-	// -------------------- IMPLEMENTATION OF TravelTime --------------------
-
-	@Override
-	public double getLinkTravelTime(final Link link, final double entryTime_s, final Person person,
-			final Vehicle vehicle) {
-
-		if (this.interpolate) {
-
-			final int leftBin;
-			final int rightBin;
-			{
-				final int bin = this.timeDiscr.getBin(entryTime_s);
-				if (entryTime_s < this.timeDiscr.getBinCenterTime_s(bin)) {
-					// interpolate to the left (temporally downwards)
-					leftBin = bin - 1;
-					rightBin = bin;
-				} else {
-					// interpolate to the right
-					leftBin = bin;
-					rightBin = bin + 1;
-				}
+		final int leftBin;
+		{
+			final int bin = this.timeDiscr.getBin(dptTime_s);
+			if (dptTime_s < this.timeDiscr.getBinCenterTime_s(bin)) {
+				// interpolate to the left (temporally downwards)
+				leftBin = bin - 1;
+			} else {
+				// interpolate to the right
+				leftBin = bin;
 			}
-			final double weight = (entryTime_s - this.timeDiscr.getBinCenterTime_s(leftBin))
-					/ this.timeDiscr.getBinSize_s();
-			return weight * this.carTT.getLinkTravelTime(link, this.timeDiscr.getBinCenterTime_s(rightBin), null, null)
-					+ (1.0 - weight) * this.carTT.getLinkTravelTime(link, this.timeDiscr.getBinCenterTime_s(leftBin),
-							null, null);
-		} else {
-
-			return this.carTT.getLinkTravelTime(link, entryTime_s, null, null);
-
 		}
+		final double leftTT_s = this.computeOrGetTravelTime_s(leftBin, origin, destination, mode);
+
+		final int rightBin = leftBin + 1;
+		final double rightTT_s = this.computeOrGetTravelTime_s(rightBin, origin, destination, mode);
+
+		final double weight = (dptTime_s - this.timeDiscr.getBinCenterTime_s(leftBin)) / this.timeDiscr.getBinSize_s();
+		return (1.0 - weight) * leftTT_s + weight * rightTT_s;
+	}
+
+	private double computeOrGetTravelTime_s(final int bin, final Facility origin, final Facility destination,
+			final String mode) {
+		Double tt_s = null;
+		if (this.cache != null) {
+			tt_s = this.cache.getTT_s(bin, origin, destination, mode);
+		}
+		if (tt_s == null) {
+			final double tripDptTime_s = Math.max(this.timeDiscr.getBinStartTime_s(bin), 0);
+			final List<? extends PlanElement> tripSequence = this.tripRouter.calcRoute(mode, origin, destination,
+					tripDptTime_s, this.person);
+
+			final Leg lastLeg = (Leg) tripSequence.get(tripSequence.size() - 1);
+			tt_s = (lastLeg.getDepartureTime() + lastLeg.getTravelTime()) - tripDptTime_s;
+			if (this.cache != null) {
+				this.cache.putTT_s(bin, origin, destination, mode, tt_s);
+			}
+		}
+		return tt_s;
 	}
 }

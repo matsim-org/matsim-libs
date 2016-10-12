@@ -36,10 +36,12 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
+import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -176,18 +178,21 @@ BeforeMobsimListener, AfterMobsimListener  {
 				String filename = controlerIO.getIterationFilename(iter, "ptcountscompare.kmz");
 
 				// yy would be good to also just pass a collection/a map but we ain't there. kai, dec'13
-				Map< CountType, List<CountSimComparison> > comparisons = new HashMap< CountType, List<CountSimComparison> > () ;
+				Map< CountType, List<CountSimComparison> > comparisons = new HashMap< > () ;
 				for ( CountType countType : CountType.values()  ) {
 					if ( cca.get( countType ) != null ) {
 						comparisons.put( countType, cca.get(countType).getComparison() ) ;
 					}
 				}
+				final CoordinateTransformation coordTransform = TransformationFactory.getCoordinateTransformation(this.config.global().getCoordinateSystem(),TransformationFactory.WGS84);
 				// the following should work since comparisons.get(...) for material that does not exist should return null, which should be a valid 
 				// parameter.  kai, dec'13
-				PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(comparisons.get(CountType.Boarding), 
-						comparisons.get(CountType.Alighting), comparisons.get(CountType.Occupancy),
-						TransformationFactory.getCoordinateTransformation(this.config.global().getCoordinateSystem(),TransformationFactory.WGS84),
-						this.boardCounts, this.alightCounts,occupancyCounts);
+//				PtCountSimComparisonKMLWriter kmlWriterOrig = new PtCountSimComparisonKMLWriter(comparisons.get(CountType.Boarding), 
+//						comparisons.get(CountType.Alighting), comparisons.get(CountType.Occupancy),
+//						coordTransform,
+//						this.boardCounts, this.alightCounts,occupancyCounts);
+				
+				CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(comparisons.get(CountType.Occupancy), this.occupancyCounts, coordTransform, "ptCountsOccup") ;
 
 				kmlWriter.setIterationNumber(iter);
 				kmlWriter.writeFile(filename);

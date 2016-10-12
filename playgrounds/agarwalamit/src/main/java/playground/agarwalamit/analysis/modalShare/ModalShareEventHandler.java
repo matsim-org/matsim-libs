@@ -41,10 +41,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.pt.PtConstants;
 
 /**
- * @author amit
- */
-
-/**
  * If someone starts with transit_walk leg, and do not use pt before starting a regular act (home/work/leis/shop); it is walk
  * else it is pt mode.
  * @author amit

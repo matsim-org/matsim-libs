@@ -35,12 +35,12 @@ import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactor;
 import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactorKey;
 import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.utils.EmissionDescriptionMarker;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
 
 
 /**
@@ -57,6 +57,7 @@ public class WarmEmissionAnalysisModule {
 
 	private final EventsManager eventsManager;
 	private final Double emissionEfficiencyFactor;
+	private final EmissionsConfigGroup ecg;
 
 	private int vehAttributesNotSpecifiedCnt = 0;
 
@@ -79,14 +80,16 @@ public class WarmEmissionAnalysisModule {
 		public final Map<Integer, String> roadTypeMapping;
 		public final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 		public final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
+		private final EmissionsConfigGroup ecg;
 
 		public WarmEmissionAnalysisModuleParameter(
 				Map<Integer, String> roadTypeMapping,
 				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
-				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable) {
+				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable, EmissionsConfigGroup emissionsConfigGroup) {
 			this.roadTypeMapping = roadTypeMapping;
 			this.avgHbefaWarmTable = avgHbefaWarmTable;
 			this.detailedHbefaWarmTable = detailedHbefaWarmTable;
+			this.ecg = emissionsConfigGroup;
 			// check if all needed tables are non-null
 			if(roadTypeMapping == null){
 				 logger.error("Road type mapping not set. Aborting...");
@@ -116,9 +119,7 @@ public class WarmEmissionAnalysisModule {
 		this.detailedHbefaWarmTable = parameterObject.detailedHbefaWarmTable;
 		this.eventsManager = emissionEventsManager;
 		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
-		
-
-		
+		this.ecg = parameterObject.ecg;
 	}
 
 	public void reset() {
@@ -147,21 +148,38 @@ public class WarmEmissionAnalysisModule {
 			double linkLength,
 			double travelTime) {
 
-		Map<WarmPollutant, Double> warmEmissions;
-		if(vehicle == null || vehicle.getType() == null || vehicle.getType().getId() == null){
-			throw new RuntimeException("Vehicle type description for vehicle " + vehicle + "is missing. " +
+		if(this.ecg.isUsingVehicleIdAsVehicleDescription() ) {
+			if(vehicle.getType().getDescription()==null) {
+				vehicle.getType().setDescription(EmissionDescriptionMarker.BEGIN_EMISSIONS
+						+vehicle.getType().getId().toString()+EmissionDescriptionMarker.END_EMISSIONS);
+			}
+		}
+
+		Map<WarmPollutant, Double> warmEmissions = new HashMap<>();
+		if(vehicle == null ||
+				(vehicle.getType() == null && vehicle.getType().getDescription() == null) // if both are null together; no vehicle type information.
+				) {
+			throw new RuntimeException("Vehicle type description for vehicle " + vehicle + " is missing. " +
 					"Please make sure that requirements for emission vehicles in "
 					+ EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
-		
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleTypeId2VehicleInformationTuple(vehicle.getType().getId());
+
+		String vehicleDescription = vehicle.getType().getDescription();
+
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleTypeId2VehicleInformationTuple(vehicleDescription);
 		if (vehicleInformationTuple.getFirst() == null){
 			throw new RuntimeException("Vehicle category for vehicle " + vehicle + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
 					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
-		warmEmissions = calculateWarmEmissions(vehicle.getId(), travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple);
-		
+		if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.ZERO_EMISSION_VEHICLE)) {
+			for (WarmPollutant warmPollutant : WarmPollutant.values()) {
+				warmEmissions.put( warmPollutant, 0.0 );
+			}
+		} else {
+			warmEmissions = calculateWarmEmissions(vehicle.getId(), travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple);
+		}
+
 		// a basic apporach to introduce emission reduced cars:
 		if(emissionEfficiencyFactor != null){
 			warmEmissions = rescaleWarmEmissions(warmEmissions);
@@ -301,12 +319,15 @@ public class WarmEmissionAnalysisModule {
 		return warmEmissionsOfEvent;
 	}
 
-	private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleTypeId2VehicleInformationTuple(Id<VehicleType> vehicleTypeId) {
+	private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleTypeId2VehicleInformationTuple(String vehicleDescription) {
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
 		HbefaVehicleCategory hbefaVehicleCategory = null;
 		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 
-		String[] vehicleInformationArray = vehicleTypeId.toString().split(";");
+		int startIndex = vehicleDescription.indexOf(EmissionDescriptionMarker.BEGIN_EMISSIONS.toString()) + EmissionDescriptionMarker.BEGIN_EMISSIONS.toString().length();
+		int endIndex = vehicleDescription.lastIndexOf(EmissionDescriptionMarker.END_EMISSIONS.toString());
+
+		String[] vehicleInformationArray = vehicleDescription.substring(startIndex, endIndex).split(";");
 
 		for(HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()){
 			if(vehCat.toString().equals(vehicleInformationArray[0])){

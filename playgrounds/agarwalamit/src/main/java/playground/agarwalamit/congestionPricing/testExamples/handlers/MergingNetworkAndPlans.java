@@ -49,10 +49,10 @@ class MergingNetworkAndPlans {
 	/**
 	 * generates network with 3 links. 
 	 */
-	Scenario scenario;
-	Config config;
-	Network network;
-	Population population;
+    final Scenario scenario;
+	final Config config;
+	final Network network;
+	final Population population;
 	Link link1;
 	Link link2;
 	Link link3;
@@ -110,7 +110,7 @@ class MergingNetworkAndPlans {
 			plan.addLeg(leg);
 			LinkNetworkRouteFactory factory1 = new LinkNetworkRouteFactory();
 			NetworkRoute route1;
-			List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+			List<Id<Link>> linkIds = new ArrayList<>();
 			route1= (NetworkRoute) factory1.createRoute(link1.getId(), link4.getId());
 			linkIds.add(link2.getId());
 			linkIds.add(link3.getId());
@@ -134,7 +134,7 @@ class MergingNetworkAndPlans {
 			plan.addLeg(leg);
 			LinkNetworkRouteFactory factory1 = new LinkNetworkRouteFactory();
 			NetworkRoute route1;
-			List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+			List<Id<Link>> linkIds = new ArrayList<>();
 			route1= (NetworkRoute) factory1.createRoute(link5.getId(), link4.getId());
 			linkIds.add(link3.getId());
 			route1.setLinkIds(link5.getId(), linkIds, link4.getId());

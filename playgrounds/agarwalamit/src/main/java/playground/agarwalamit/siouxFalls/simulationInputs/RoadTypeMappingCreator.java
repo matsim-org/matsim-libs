@@ -46,7 +46,7 @@ public class RoadTypeMappingCreator {
 
 	public static void main(String[] args) {
 
-		roadTypeAndHBEFARoadType = new TreeMap<String, String[]>();
+		roadTypeAndHBEFARoadType = new TreeMap<>();
 		roadTypeAndHBEFARoadType.put("motorway", new String [] {"1","RUR/MW/120"});
 		roadTypeAndHBEFARoadType.put("motorway_link", new String [] {"2","URB/MW-Nat./80"});
 		roadTypeAndHBEFARoadType.put("trunk", new String [] {"3","URB/MW-City/80"});

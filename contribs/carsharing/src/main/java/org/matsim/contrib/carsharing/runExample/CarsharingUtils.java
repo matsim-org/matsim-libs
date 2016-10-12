@@ -50,7 +50,7 @@ public class CarsharingUtils {
 			
 			Map<String, CostCalculation> costCalculations = new HashMap<String, CostCalculation>();
 			
-			//=== here costumizeable cost structures come in ===
+			//=== here customizable cost structures come in ===
 			//===what follows is just an example!! and should be modified according to the study at hand===
 			costCalculations.put("freefloating", new CostCalculationExample());
 			costCalculations.put("twoway", new CostCalculationExample());

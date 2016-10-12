@@ -48,23 +48,23 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
 public class LegModeDistributionForActivityEndTimeAndActivityDuration extends AbstractAnalysisModule {
 
 	private final Logger logger = Logger.getLogger(LegModeDistributionForActivityEndTimeAndActivityDuration.class);
-	private LegModeActivityEndTimeAndActDurationHandler actStrEndur;
+	private final LegModeActivityEndTimeAndActDurationHandler actStrEndur;
 	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2ActEndTimes;
 	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2ActDurations;
-	private List<Integer> timeStepClasses;
+	private final List<Integer> timeStepClasses;
 	private List<String> travelModes;
 	private SortedMap<String, Map<Integer, Integer>> mode2ActEndTimeClasses2LegCount;
 	private SortedMap<String, Map<Integer, Integer>> mode2ActDurationClasses2LegCount;
-	private String eventsFile;
-	private String configFile;
+	private final String eventsFile;
+	private final String configFile;
 
 	public LegModeDistributionForActivityEndTimeAndActivityDuration(String eventsFile, String configFile, String plansFile) {
 		super(LegModeDistributionForActivityEndTimeAndActivityDuration.class.getSimpleName());
 
 		this.eventsFile = eventsFile;
 		this.configFile=configFile;
-		this.timeStepClasses=new ArrayList<Integer>();
-		this.travelModes = new ArrayList<String>();
+		this.timeStepClasses= new ArrayList<>();
+		this.travelModes = new ArrayList<>();
 
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(plansFile);
 		sc.getConfig().qsim().setEndTime(LoadMyScenarios.getSimulationEndTime(configFile));
@@ -112,10 +112,10 @@ public class LegModeDistributionForActivityEndTimeAndActivityDuration extends Ab
 	}
 
 	private SortedMap<String, Map<Integer, Integer>> calculateMode2ActTimeClases2LegCount (SortedMap<String,Map<Id<Person>,List<Double>>> mode2PersonId2ActEndTimes2) {
-		SortedMap<String, Map<Integer, Integer>> mode2ActEndTime2LegCount= new TreeMap<String, Map<Integer,Integer>>();
+		SortedMap<String, Map<Integer, Integer>> mode2ActEndTime2LegCount= new TreeMap<>();
 
 		for(String mode:mode2PersonId2ActEndTimes2.keySet()){
-			Map<Integer, Integer> timeClasses2LegCount = new HashMap<Integer,Integer>();
+			Map<Integer, Integer> timeClasses2LegCount = new HashMap<>();
 
 			for(Integer i:this.timeStepClasses){
 				timeClasses2LegCount.put(i, 0);
@@ -184,7 +184,7 @@ public class LegModeDistributionForActivityEndTimeAndActivityDuration extends Ab
 	}
 
 	private void getTravelModes(){
-		this.travelModes = new ArrayList<String>(this.mode2PersonId2ActEndTimes.keySet());
+		this.travelModes = new ArrayList<>(this.mode2PersonId2ActEndTimes.keySet());
 		this.logger.info("Travel modes are "+this.travelModes.toString());
 	}
 }

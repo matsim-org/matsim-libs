@@ -68,7 +68,7 @@ public class PtCountComparisonAlgorithm4confTimeBinSize {
 		for (Object object : this.counts.getCounts().values()) {
 			Count count = (Count)object;
 			//
-			Id<TransitStopFacility> stopId = Id.create(count.getLocId(), TransitStopFacility.class);
+			Id<TransitStopFacility> stopId = Id.create(count.getId(), TransitStopFacility.class);
 			if (!isInRange(count.getCoord())) {
 				continue;
 			}

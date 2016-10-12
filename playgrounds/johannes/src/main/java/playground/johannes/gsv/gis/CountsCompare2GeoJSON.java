@@ -66,7 +66,7 @@ public class CountsCompare2GeoJSON {
 		List<Feature> obsFeatures = new ArrayList<>(obsCounts.getCounts().size());
 
 		for (Count<Link> count : obsCounts.getCounts().values()) {
-			Id<Link> linkId = count.getLocId();
+			Id<Link> linkId = count.getId();
 			if (!linkId.toString().startsWith(ODCalibrator.VIRTUAL_ID_PREFIX)) {
 				Link link = network.getLinks().get(linkId);
 
@@ -89,7 +89,7 @@ public class CountsCompare2GeoJSON {
 
 				Map<String, Object> properties = new HashMap<>();
 
-				properties.put("id", count.getCsId());
+				properties.put("id", count.getCsLabel());
 				properties.put("simulation", simVal);
 				properties.put("observation", obsVal);
 				properties.put("error", relErr);

@@ -52,8 +52,8 @@ public class LinkVolumeHandler implements LinkLeaveEventHandler, VehicleEntersTr
 	private final Map<Id<Link>, Map<Integer,Double>> linkId2Time2PCUVol = new HashMap<>();
 	private final Map<Id<Link>, Map<Integer,List<Id<Vehicle>>>> linkId2Time2Persons = new HashMap<>();
 
-	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
-	private Map<Id<Person>, String> person2mode = new HashMap<>();
+	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	private final Map<Id<Person>, String> person2mode = new HashMap<>();
 	private final Map<String,Double> mode2pcu = new HashMap<>();
 	
 	public LinkVolumeHandler () {

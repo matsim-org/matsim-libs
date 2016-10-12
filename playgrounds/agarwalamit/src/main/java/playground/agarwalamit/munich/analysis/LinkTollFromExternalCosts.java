@@ -70,7 +70,7 @@ public class LinkTollFromExternalCosts {
 			Map<Id<Link>, Double> link2delaycost =  getLink2CongestionToll(sc).get(simEndTime);
 			Map<Id<Link>, Double> link2emissioncost = getLink2EmissionToll(sc);
 
-			Map<Id<Link>, Double> totalCost = new HashMap<Id<Link>, Double>();
+			Map<Id<Link>, Double> totalCost = new HashMap<>();
 
 			for(Link l : sc.getNetwork().getLinks().values()){
 				Id<Link> linkId = l.getId();
@@ -125,7 +125,7 @@ public class LinkTollFromExternalCosts {
 		emissionAnalyzer.postProcessData();
 		SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> link2TotalEmissions = emissionAnalyzer.getLink2TotalEmissions();
 
-		Map<Id<Link>, Double> linkEmissionCosts = new HashMap<Id<Link>, Double>();
+		Map<Id<Link>, Double> linkEmissionCosts = new HashMap<>();
 
 		if(noOfTimeBin!=1) throw new RuntimeException("This method is not yet adapted to more than 1 time bin. Aborting ....");
 

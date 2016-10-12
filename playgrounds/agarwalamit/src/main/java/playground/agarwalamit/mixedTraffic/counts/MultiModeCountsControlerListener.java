@@ -56,7 +56,7 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 	 */
 	public static final String OPERATION_COMPARECOUNTS = "compare with counts";
 
-	private ControlerConfigGroup controlerConfigGroup;
+	private final ControlerConfigGroup controlerConfigGroup;
 	private final CountsConfigGroup config; // useful to get the link ids of counting stations and other infor for averaging
 	private final Set<String> analyzedModes;
 	private final VolumesAnalyzer volumesAnalyzer;
@@ -64,7 +64,7 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 	private final OutputDirectoryHierarchy controlerIO;
 
 	@com.google.inject.Inject(optional=true)
-	private Counts<Link> counts = null;
+	private final Counts<Link> counts = null;
 
 	private final Map<Id<Link>, Map<String,double[]>> linkStats = new HashMap<>();
 	private int iterationsUsed = 0;
@@ -102,7 +102,8 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		if(counts==null) return;
+		if(counts==null) {
+        }
 		else if ( event.getIteration() == controlerConfigGroup.getFirstIteration()){	
 			// write the data for first iteration too
 			addVolumes(volumesAnalyzer);

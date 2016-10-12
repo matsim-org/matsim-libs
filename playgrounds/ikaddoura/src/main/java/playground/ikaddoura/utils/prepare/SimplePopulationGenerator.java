@@ -52,7 +52,7 @@ public class SimplePopulationGenerator {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
-		String populationFile = outputDirectory + "population_" + totalDemand + "trips_optimal.xml";
+		String populationFile = outputDirectory + "population_" + totalDemand + "trips_optimal_4-10.xml";
 		
 		SimplePopulationGenerator pG = new SimplePopulationGenerator(scenario);
 		pG.writePopulation(totalDemand, populationFile);
@@ -72,7 +72,7 @@ public class SimplePopulationGenerator {
 	}
 
 	private void generatePopulation(int totalNumberOfAgents) {
-		for (int i=0; i<totalNumberOfAgents; i++){
+		for (int i=0; i<totalNumberOfAgents; ){
 			Coord homeCoord = new Coord(0., 0.);	
 			Coord workCoord = new Coord(15000., 0.);
 			
@@ -80,22 +80,18 @@ public class SimplePopulationGenerator {
 			Plan plan = this.population.getFactory().createPlan();
 	
 			Activity activity1 = this.population.getFactory().createActivityFromCoord("home", homeCoord);
-			activity1.setEndTime(6.91 * 3600. + i);
+			activity1.setEndTime(4.0 * 3600. + i);
 			plan.addActivity(activity1);
 				
 			plan.addLeg(this.population.getFactory().createLeg(TransportMode.car));
 
 			Activity activity2 = this.population.getFactory().createActivityFromCoord("work", workCoord);
-//			activity2.setEndTime(activity1.getEndTime() + 8 * 3600.);
 			plan.addActivity(activity2);
-			
-//			plan.addLeg(this.population.getFactory().createLeg(TransportMode.pt));
-//
-//			Activity activity3 = this.population.getFactory().createActivityFromCoord("home", homeCoord);
-//			plan.addActivity(activity3);
-			
+						
 			person.addPlan(plan);
 			this.population.addPerson(person);
+			
+			i += 3;
 		}
 	}	
 	

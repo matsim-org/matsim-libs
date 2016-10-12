@@ -50,7 +50,7 @@ public class ApplyFactor {
 
 		for (Count count : counts.getCounts().values()) {
 			if (count.getVolume(1).getValue() != 0) {
-				Count newCount = newCounts.createAndAddCount(count.getLocId(), count.getCsId());
+				Count newCount = newCounts.createAndAddCount(count.getId(), count.getCsLabel());
 				for (int i = 1; i < 25; i++) {
 					newCount.createVolume(i, count.getVolume(i).getValue() * factor);
 				}

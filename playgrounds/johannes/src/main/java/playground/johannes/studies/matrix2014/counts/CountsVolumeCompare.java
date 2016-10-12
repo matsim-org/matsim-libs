@@ -59,7 +59,7 @@ public class CountsVolumeCompare {
 
 		int noMatch = 0;
 		for(Count refCount : refCounts.getCounts().values()) {
-			Count targetCount = targetCounts.getCount(refCount.getLocId());
+			Count targetCount = targetCounts.getCount(refCount.getId());
 			if(targetCount != null) {
 				double err = (targetCount.getVolume(1).getValue() - refCount.getVolume(1).getValue()) / refCount.getVolume(1).getValue();
 				double absErr = Math.abs(err);

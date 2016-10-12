@@ -53,14 +53,15 @@ public class UrbanCountsGenerator {
 	
 	private void writeCountsDataToFile(final String outCountsFile){
 		
-		Counts<Link> counts = new Counts<Link>();
+		Counts<Link> counts = new Counts<>();
 		counts.setYear(2008);
 		counts.setName("Patna_counts");
 		counts.setDescription("OnlyUrbanCountsCarMotorbikeBikeTruck");
 		for (Tuple<Id<Link>,String> mcs : countStation2time2countInfo.keySet()){
 			Count<Link> c = counts.createAndAddCount(mcs.getFirst(), mcs.getSecond());
 			for(Integer i : countStation2time2countInfo.get(mcs).keySet()){
-				c.createVolume(i, countStation2time2countInfo.get(mcs).get(i));
+                assert c != null;
+                c.createVolume(i, countStation2time2countInfo.get(mcs).get(i));
 			}
 		}
 		new CountsWriter(counts).write(outCountsFile);

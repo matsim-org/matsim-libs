@@ -59,9 +59,9 @@ public class CountsChecker {
 
 			if (maxVolume.getValue() / capacity < 0.5 || maxVolume.getValue() / capacity > 1.5) {
 				linkerrors++;
-				log.error("|" + links + "|" + capacity + "|" + maxVolume.getValue() + "|" + df.format(maxVolume.getValue() / capacity)  + "|" + count.getCsId() +"| ========== ERROR");
+				log.error("|" + links + "|" + capacity + "|" + maxVolume.getValue() + "|" + df.format(maxVolume.getValue() / capacity)  + "|" + count.getCsLabel() +"| ========== ERROR");
 			} else {
-				log.info("|" + links + "|" + capacity + "|" + maxVolume.getValue() + "|" + df.format(maxVolume.getValue() / capacity) + "|" + count.getCsId());
+				log.info("|" + links + "|" + capacity + "|" + maxVolume.getValue() + "|" + df.format(maxVolume.getValue() / capacity) + "|" + count.getCsLabel());
 			}
 		}
 		log.info("Number of errors : " + linkerrors + " of " + this.counts.getCounts().size() + " stations");

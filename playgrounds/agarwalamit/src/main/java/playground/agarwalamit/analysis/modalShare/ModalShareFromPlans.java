@@ -44,7 +44,7 @@ import playground.agarwalamit.utils.PersonFilter;
 public class ModalShareFromPlans implements ModalShare{
 
 	private final Population pop ;
-	private SortedMap<String, Integer> mode2numberOflegs = new TreeMap<>();
+	private final SortedMap<String, Integer> mode2numberOflegs = new TreeMap<>();
 	private SortedMap<String, Double> mode2PctOflegs = new TreeMap<>();
 	private final PersonFilter pf;
 	private final String userGroup;
@@ -69,7 +69,7 @@ public class ModalShareFromPlans implements ModalShare{
 	public void run() {
 		// first store used modes 
 		for(Person person : pop.getPersons().values()){
-			Plan plan = (Plan) person.getSelectedPlan();
+			Plan plan = person.getSelectedPlan();
 			List<PlanElement> planElements = plan.getPlanElements();
 			for(PlanElement pe : planElements){
 				if(pe instanceof Leg){
@@ -89,7 +89,7 @@ public class ModalShareFromPlans implements ModalShare{
 					&& ! this.userGroup.equals(this.pf.getUserGroupAsStringFromPersonId(person.getId())) // => and person not from desired user group 
 					) continue; 
 				
-				Plan plan = (Plan) person.getSelectedPlan();
+				Plan plan = person.getSelectedPlan();
 				List<PlanElement> planElements = plan.getPlanElements();
 				for(PlanElement pe : planElements){
 					if(pe instanceof Leg){

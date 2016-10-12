@@ -40,12 +40,12 @@ import playground.agarwalamit.utils.PersonFilter;
  */
 
 public class ModalTravelTimeAnalyzer {
-	private final SortedMap<String, Double> mode2AvgTripTime = new TreeMap<String, Double>();
-	private final SortedMap<String, Integer> mode2NumberOfLegs = new TreeMap<String, Integer>();
-	private final SortedMap<String, Double> mode2TotalTravelTime = new TreeMap<String, Double>();
+	private final SortedMap<String, Double> mode2AvgTripTime = new TreeMap<>();
+	private final SortedMap<String, Integer> mode2NumberOfLegs = new TreeMap<>();
+	private final SortedMap<String, Double> mode2TotalTravelTime = new TreeMap<>();
 	
-	private final SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TotalTravelTime = new TreeMap<String, Map<Id<Person>,Double>>();
-	private final SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2AvgTravelTime = new TreeMap<String, Map<Id<Person>,Double>>();
+	private final SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TotalTravelTime = new TreeMap<>();
+	private final SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2AvgTravelTime = new TreeMap<>();
 	
 	private final FilteredModalTripTravelTimeHandler travelTimeHandler ;
 	private final String eventsFile;
@@ -115,8 +115,8 @@ public class ModalTravelTimeAnalyzer {
 		SortedMap<String, Map<Id<Person>, List<Double>>> times = travelTimeHandler.getLegMode2PesonId2TripTimes();
 		
 		for(String mode: times.keySet()){
-			Map<Id<Person>, Double> personId2TotalTravelTime = new HashMap<Id<Person>, Double>();
-			Map<Id<Person>, Double> personId2AvgTravelTime = new HashMap<Id<Person>, Double>();
+			Map<Id<Person>, Double> personId2TotalTravelTime = new HashMap<>();
+			Map<Id<Person>, Double> personId2AvgTravelTime = new HashMap<>();
 			
 			for(Id<Person> id: times.get(mode).keySet()){
 				double totalTravelTime = ListUtils.doubleSum(times.get(mode).get(id));

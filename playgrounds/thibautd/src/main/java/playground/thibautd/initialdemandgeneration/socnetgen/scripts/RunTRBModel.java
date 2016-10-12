@@ -34,6 +34,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
+import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.Agent;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.LockedSocialNetwork;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.ModelIterator;
@@ -43,7 +44,6 @@ import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialNet
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialPopulation;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.ThresholdFunction;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.UtilityFunction;
-import playground.ivt.utils.MoreIOUtils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

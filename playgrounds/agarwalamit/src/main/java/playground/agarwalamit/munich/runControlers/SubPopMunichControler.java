@@ -21,15 +21,11 @@ package playground.agarwalamit.munich.runControlers;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.example.EmissionControlerListener;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -48,7 +44,6 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.agarwalamit.InternalizationEmissionAndCongestion.EmissionCongestionTravelDisutilityCalculatorFactory;
 import playground.agarwalamit.InternalizationEmissionAndCongestion.InternalizeEmissionsCongestionControlerListener;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
@@ -124,13 +119,14 @@ public class SubPopMunichControler {
 				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 				String ug = MunichUserGroup.Rev_Commuter.toString();
 				addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name().concat("_").concat(ug)).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					String[] availableModes = {"car", "pt_".concat(ug)};
-					String[] chainBasedModes = {"car", "bike"};
-					@Inject Scenario sc;
+					final String[] availableModes = {"car", "pt_".concat(ug)};
+					final String[] chainBasedModes = {"car", "bike"};
+					@Inject
+					Scenario sc;
 
 					@Override
 					public PlanStrategy get() {
-						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+						final Builder builder = new Builder(new RandomPlanSelector<>());
 						builder.addStrategyModule(new SubtourModeChoice(sc.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
 						builder.addStrategyModule(new ReRoute(sc, tripRouterProvider));
 						return builder.build();
@@ -147,7 +143,7 @@ public class SubPopMunichControler {
 		ecg.setDetailedColdEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_ColdStart_SubSegm_2005detailed.txt");
 		ecg.setDetailedWarmEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_HOT_SubSegm_2005detailed.txt");
 		ecg.setEmissionRoadTypeMappingFile("../../munich/input/roadTypeMapping.txt");
-		ecg.setEmissionVehicleFile("../../munich/input/emissionVehicles_1pct.xml.gz");
+		controler.getConfig().vehicles().setVehiclesFile("../../munich/input/emissionVehicles_1pct.xml.gz");
 
 		if(offline){
 			ecg.setAverageColdEmissionFactorsFile("../../../input/matsimHBEFAStandardsFiles/EFA_ColdStart_vehcat_2005average.txt");
@@ -155,7 +151,7 @@ public class SubPopMunichControler {
 			ecg.setDetailedColdEmissionFactorsFile("../../../input/matsimHBEFAStandardsFiles/EFA_ColdStart_SubSegm_2005detailed.txt");
 			ecg.setDetailedWarmEmissionFactorsFile("../../../input/matsimHBEFAStandardsFiles/EFA_HOT_SubSegm_2005detailed.txt");
 			ecg.setEmissionRoadTypeMappingFile("../../../input/munich/roadTypeMapping.txt");
-			ecg.setEmissionVehicleFile("../../../input/munich/emissionVehicles_1pct.xml.gz");
+			controler.getConfig().vehicles().setVehiclesFile("../../../input/munich/emissionVehicles_1pct.xml.gz");
 		}
 
 		ecg.setUsingDetailedEmissionCalculation(true);

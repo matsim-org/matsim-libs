@@ -44,7 +44,7 @@ public class DynamicLinkDemandAnalysisMain {
 		} else {
 			
 //			OUTPUT_BASE_DIR = "../../../runs-svn/berlin-1pct/";
-			OUTPUT_BASE_DIR = "../../../public-svn/matsim/scenarios/countries/de/cottbus/cottbus-with-pt/output/cb02/";		
+			OUTPUT_BASE_DIR = "/Users/ihab/Documents/workspace/runs-svn/incidents/output/2016-03-15_baseCase/";		
 		}
 
 		DynamicLinkDemandAnalysisMain analysis = new DynamicLinkDemandAnalysisMain();

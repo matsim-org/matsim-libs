@@ -46,7 +46,7 @@ public class ModalTravelTimeControlerListner implements StartupListener, Iterati
 
 	private int firstIteration = 0;
 	private int numberOfIterations = 0;
-	private SortedMap<String, double []> mode2AvgTripTimes = new TreeMap<>();
+	private final SortedMap<String, double []> mode2AvgTripTimes = new TreeMap<>();
 
 	@Inject
 	private ModalTripTravelTimeHandler travelTimeHandler;

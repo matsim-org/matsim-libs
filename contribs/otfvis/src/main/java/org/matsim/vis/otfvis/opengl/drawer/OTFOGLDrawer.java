@@ -60,8 +60,8 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class OTFOGLDrawer implements GLEventListener {
@@ -95,8 +95,6 @@ public class OTFOGLDrawer implements GLEventListener {
 	private int nRedrawn = 0;
 
     private final OTFClientQuadTree clientQ;
-
-	private int lastShot = -1;
 
 	private OTFQueryControl queryHandler = null;
 
@@ -137,6 +135,8 @@ public class OTFOGLDrawer implements GLEventListener {
 		((GLAutoDrawable) canvas).addGLEventListener(new OGLSimpleStaticNetLayer());
 		((GLAutoDrawable) canvas).addGLEventListener(this);
 		((GLAutoDrawable) canvas).addGLEventListener(new OTFScaleBarDrawer());
+		((GLAutoDrawable) canvas).addGLEventListener(new OTFGLOverlay("/res/matsim_logo_blue.png", -0.03f, 0.05f, 1.5f, false));
+		((GLAutoDrawable) canvas).addGLEventListener(new ScreenshotTaker(this.hostControlBar));
 		clientQ.getConstData();
 
 		MouseInputAdapter mouseMan = new MouseInputAdapter() {
@@ -310,7 +310,6 @@ public class OTFOGLDrawer implements GLEventListener {
 		canvas.addMouseListener(mouseMan);
 		canvas.addMouseMotionListener(mouseMan);
 		canvas.addMouseWheelListener(mouseMan);
-		((GLAutoDrawable) canvas).addGLEventListener(new OTFGLOverlay("/res/matsim_logo_blue.png", -0.03f, 0.05f, 1.5f, false));
 		Rectangle2D initialZoom = otfVisConfig.getZoomValue("*Initial*");
 		if (initialZoom != null) {
 			this.viewBounds = new Rect(initialZoom.getMinX(), initialZoom.getMinY(), initialZoom.getMaxX(), initialZoom.getMaxY());
@@ -382,22 +381,6 @@ public class OTFOGLDrawer implements GLEventListener {
 			this.alpha = 1.0f;
 		}
 
-		if (otfVisConfig.renderImages() && (this.lastShot < now)){
-			this.lastShot = now;
-			String nr = String.format("%07d", now);
-			try {
-				int screenshotInterval = 1;
-				if (now % screenshotInterval == 0) {
-					AWTGLReadBufferUtil glReadBufferUtil = new AWTGLReadBufferUtil(gl.getGLProfile(), true);
-					glReadBufferUtil.readPixels(gl, false);
-					glReadBufferUtil.write(new File("movie" + this + " Frame" + nr + ".jpg"));
-				}
-			} catch (GLException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				// could happen for folded displays on split screen... ignore
-			}
-		}
 		if (this.current == null) {
 			AWTGLReadBufferUtil glReadBufferUtil = new AWTGLReadBufferUtil(gl.getGLProfile(), true);
 			this.current = glReadBufferUtil.readPixelsToBufferedImage(gl, false);

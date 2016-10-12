@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.taxi.run;
 
+import java.net.URL;
 import java.util.Map;
 
 import org.matsim.core.config.*;
@@ -192,7 +193,10 @@ public class TaxiConfigGroup
     {
         return taxisFile;
     }
-
+    
+    public URL getTaxisFileUrl(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.taxisFile);
+	}
 
     @StringSetter(TAXIS_FILE)
     public void setTaxisFile(String taxisFile)

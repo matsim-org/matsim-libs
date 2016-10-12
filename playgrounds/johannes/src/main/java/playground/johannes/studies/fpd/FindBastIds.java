@@ -82,7 +82,7 @@ public class FindBastIds {
         Set<Count> remove = new HashSet<>();
 
         for(Count<Link> count : counts.getCounts().values()) {
-            Record record = records.get(count.getCsId());
+            Record record = records.get(count.getCsLabel());
             if(record != null) {
                 double pkwR1_h = record.pkwR1/24.0;
                 double pkwR2_h = record.pkwR2/24.0;
@@ -102,13 +102,13 @@ public class FindBastIds {
                     count.setCsId(record.id + "_R2");
                 }
             } else {
-                logger.warn(String.format("No count station with name %s found.", count.getCsId()));
+                logger.warn(String.format("No count station with name %s found.", count.getCsLabel()));
                 remove.add(count);
             }
         }
 
         for(Count<Link> count : remove) {
-            counts.getCounts().remove(count.getLocId());
+            counts.getCounts().remove(count.getId());
         }
 
         CountsWriter writer = new CountsWriter(counts);

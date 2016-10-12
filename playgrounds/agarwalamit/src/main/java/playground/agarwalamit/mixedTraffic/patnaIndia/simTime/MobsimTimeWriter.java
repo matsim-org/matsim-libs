@@ -36,7 +36,7 @@ import playground.agarwalamit.utils.FileUtils;
 
 public class MobsimTimeWriter {
 
-	private String respectiveFileDirectory = FileUtils.RUNS_SVN+"/patnaIndia/run110/100pct/";
+	private final String respectiveFileDirectory = FileUtils.RUNS_SVN+"/patnaIndia/run110/randomNrFix/fastCapacityUpdate/1pct/";
 	private BufferedWriter writer;
 
 	public static void main(String[] args) {
@@ -76,7 +76,7 @@ public class MobsimTimeWriter {
 			for ( TrafficDynamics td : TrafficDynamics.values()){
 				String queueModel = ld+"_"+td;
 				writeString(queueModel+"\t");
-				for(int i=2;i<12;i++){
+				for(int i=1;i<12;i++){
 					String stopwatchFile = respectiveFileDirectory + "/output_"+queueModel+"_"+i+"/stopwatch.txt";
 					if (! new File(stopwatchFile).exists() ) continue;
 					double mobsimTime = readAndReturnMobsimTime(stopwatchFile);
@@ -105,7 +105,7 @@ public class MobsimTimeWriter {
 				mobsimEndTime = parts[11];
 				mobsimTime += getMobsimTime(mobsimStartTime, mobsimEndTime);
 				line = reader.readLine();
-			} ;
+			}
 		} catch (Exception e) {
 			throw new RuntimeException("File not found. Reason "+ e);
 		}

@@ -142,7 +142,7 @@ public class PtRoutes2PaxAnalysis extends AbstractAnalysisModule {
 			for(int i = 0; i < transitRoute.getStops().size(); i++){
 				stopId = Id.create(i, Link.class);
 				c = counts.getCount(stopId);
-				w.write(String.valueOf(i) + ";" + c.getCsId() + ";" + transitRoute.getStops().get(i).getStopFacility().getName());
+				w.write(String.valueOf(i) + ";" + c.getCsLabel() + ";" + transitRoute.getStops().get(i).getStopFacility().getName());
 				for(int j = 0; j < (maxSlice + 1); j++){
 					v = c.getVolume(j);
 					String value = (v == null) ? "--" : String.valueOf(v.getValue());

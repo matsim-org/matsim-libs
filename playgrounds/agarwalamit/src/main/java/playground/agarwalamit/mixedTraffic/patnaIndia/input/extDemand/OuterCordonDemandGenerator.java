@@ -59,7 +59,7 @@ public class OuterCordonDemandGenerator {
 	private static final Logger LOG = Logger.getLogger(OuterCordonDemandGenerator.class);
 	private Scenario scenario;
 	private final String inputFilesDir = PatnaUtils.INPUT_FILES_DIR+"/raw/counts/externalDemandCountsFile/";
-	private Random random = MatsimRandom.getRandom();
+	private final Random random = MatsimRandom.getRandom();
 	private final String networkFile = PatnaUtils.INPUT_FILES_DIR+"/simulationInputs/network/"+PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/network.xml.gz";
 	public static void main(String[] args) {
 		new OuterCordonDemandGenerator().run();

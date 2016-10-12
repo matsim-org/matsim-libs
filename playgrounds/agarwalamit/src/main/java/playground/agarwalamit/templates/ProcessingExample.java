@@ -32,7 +32,7 @@ import processing.core.PApplet;
 
 public class ProcessingExample extends PApplet{
 	
-	private static int scaleDownSize = 2;
+	private static final int scaleDownSize = 2;
 	
 	private static Network net ;
 	

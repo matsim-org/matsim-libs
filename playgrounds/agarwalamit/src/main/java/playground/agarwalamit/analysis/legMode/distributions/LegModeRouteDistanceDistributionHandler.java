@@ -55,10 +55,10 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 	private final SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2distances = new TreeMap<>();
 	private final SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2OneTripdist = new TreeMap<>();
 	private final SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TeleportDist = new TreeMap<>();
-	private final List<String> mainModes = new ArrayList<String>();
+	private final List<String> mainModes = new ArrayList<>();
 	private final Map<Id<Person>, String> personId2LegModes = new HashMap<>();
 	private double maxDist = Double.NEGATIVE_INFINITY;
-	private final SortedMap<String, Double> mode2NumberOfLegs = new TreeMap<String, Double>();
+	private final SortedMap<String, Double> mode2NumberOfLegs = new TreeMap<>();
 
 	public LegModeRouteDistanceDistributionHandler(final Scenario scenario){
 		LOG.info("Route distance will be calculated based on events.");
@@ -81,7 +81,7 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 	public void handleEvent(LinkLeaveEvent event) {
 		Id<Person> personId = Id.createPersonId(event.getVehicleId().toString());
 		Id<Link> linkId = event.getLinkId();
-		// ZZ_TODO if a person is in more than two groups, then which one is correct mode ?
+		// TODO if a person is in more than two groups, then which one is correct mode ?
 		String mode = this.personId2LegModes.get(personId);
 		Map<Id<Person>, Double> person2Dist = mode2PersonId2OneTripdist.get(mode);
 		double distSoFar = person2Dist.get(personId);
@@ -128,11 +128,11 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 		if(mode2PersonId2distances.containsKey(tavelMode)){
 			Map<Id<Person>, List<Double>> personId2Dists = mode2PersonId2distances.get(tavelMode);
 			if(!personId2Dists.containsKey(personId)){
-				personId2Dists.put(personId, new ArrayList<Double>());
+				personId2Dists.put(personId, new ArrayList<>());
 			}
 		} else {
 			Map<Id<Person>, List<Double>> personId2Dists = new TreeMap<>();
-			personId2Dists.put(personId, new ArrayList<Double>());
+			personId2Dists.put(personId, new ArrayList<>());
 			mode2PersonId2distances.put(tavelMode, personId2Dists);
 		}
 	}
@@ -168,7 +168,7 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 	}
 
 	public SortedSet<String> getUsedModes (){
-		SortedSet<String> modes = new TreeSet<String>();
+		SortedSet<String> modes = new TreeSet<>();
 		modes.addAll(mode2PersonId2distances.keySet());
 		return modes;
 	}
@@ -181,7 +181,7 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 	public void handleEvent(TeleportationArrivalEvent event) {
 		Id<Person> personId = event.getPersonId();
 		String mode = this.personId2LegModes.get(personId);
-		// ZZ_TODO if a person is in more than two groups, then which one is correct mode ?
+		// TODO if a person is in more than two groups, then which one is correct mode ?
 		Map<Id<Person>, Double> person2Dist = mode2PersonId2TeleportDist.get(mode);
 		double teleportDist = event.getDistance();
 		person2Dist.put(personId, teleportDist);
@@ -191,10 +191,10 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 	 * @return  Total distance (summed for all trips for that person) for each person segregated w.r.t. travel modes.
 	 */
 	public SortedMap<String, Map<Id<Person>, Double>> getLegMode2PersonId2TotalTravelDistance(){
-		SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TotalTravelDistance = new TreeMap<String, Map<Id<Person>,Double>>();
+		SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TotalTravelDistance = new TreeMap<>();
 		for(String mode:this.mode2PersonId2distances.keySet()){
 			double noOfLeg =0;
-			Map<Id<Person>, Double> personId2TotalTravelDist = new HashMap<Id<Person>, Double>();
+			Map<Id<Person>, Double> personId2TotalTravelDist = new HashMap<>();
 			for(Id<Person> id:this.mode2PersonId2distances.get(mode).keySet()){
 				double travelDist=0;
 				for(double d:this.mode2PersonId2distances.get(mode).get(id)){

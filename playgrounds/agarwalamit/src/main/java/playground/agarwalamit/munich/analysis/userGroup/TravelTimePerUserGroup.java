@@ -48,7 +48,7 @@ public class TravelTimePerUserGroup  {
 		this.sc = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(this.populationFile, this.networkFile, this.configFile);
 		
 		this.usrGrpExtended = new UserGroupUtilsExtended();
-		this.userGrpToBoxPlotData = new TreeMap<UserGroup, List<Double>>();
+		this.userGrpToBoxPlotData = new TreeMap<>();
 		
 		int lastIteration = LoadMyScenarios.getLastIteration(this.configFile);
 		String eventsFile = this.outputDir+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
@@ -65,8 +65,8 @@ public class TravelTimePerUserGroup  {
 	private final String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
 	private final String configFile = outputDir+"/output_config.xml";//"/config.xml";//
 
-	private SortedMap<UserGroup, SortedMap<String, Double>> usrGrp2Mode2MeanTime = new TreeMap<UserGroup, SortedMap<String,Double>>();
-	private SortedMap<UserGroup, SortedMap<String, Double>> usrGrp2Mode2MedianTime = new TreeMap<UserGroup, SortedMap<String,Double>>();
+	private final SortedMap<UserGroup, SortedMap<String, Double>> usrGrp2Mode2MeanTime = new TreeMap<>();
+	private final SortedMap<UserGroup, SortedMap<String, Double>> usrGrp2Mode2MedianTime = new TreeMap<>();
 	
 	private final UserGroupUtilsExtended usrGrpExtended;
 	private final SortedMap<UserGroup, List<Double>> userGrpToBoxPlotData;

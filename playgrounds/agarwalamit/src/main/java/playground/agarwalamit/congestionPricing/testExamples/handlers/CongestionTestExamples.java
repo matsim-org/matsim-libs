@@ -111,21 +111,21 @@ public class CongestionTestExamples {
 	}
 	
 	private SortedMap<String,Tuple<Double, Double>> getId2CausedAndAffectedDelays(List<CongestionEvent> events, Scenario sc){
-		SortedMap<String,Tuple<Double, Double>> id2CausingAffectedDelays = new TreeMap<String, Tuple<Double,Double>>();
+		SortedMap<String,Tuple<Double, Double>> id2CausingAffectedDelays = new TreeMap<>();
 		
 		for(int i=1;i<=sc.getPopulation().getPersons().size();i++){
 			Id<Person> id = Id.createPersonId(i);
-			id2CausingAffectedDelays.put(id.toString(), new Tuple<Double, Double>(0., 0.));
+			id2CausingAffectedDelays.put(id.toString(), new Tuple<>(0., 0.));
 		}
 		
 		for(CongestionEvent e : events){
 			System.out.println(e.toString());
 			Tuple<Double, Double> causingPersonTup = id2CausingAffectedDelays.get(e.getCausingAgentId().toString());
-			causingPersonTup = new Tuple<Double, Double>(causingPersonTup.getFirst()+e.getDelay(), causingPersonTup.getSecond());
+			causingPersonTup = new Tuple<>(causingPersonTup.getFirst() + e.getDelay(), causingPersonTup.getSecond());
 			id2CausingAffectedDelays.put(e.getCausingAgentId().toString(), causingPersonTup);
 			
 			Tuple<Double, Double> affectedPersonTup = id2CausingAffectedDelays.get(e.getAffectedAgentId().toString());
-			affectedPersonTup = new Tuple<Double, Double>(affectedPersonTup.getFirst(), affectedPersonTup.getSecond()+e.getDelay());
+			affectedPersonTup = new Tuple<>(affectedPersonTup.getFirst(), affectedPersonTup.getSecond() + e.getDelay());
 			id2CausingAffectedDelays.put(e.getAffectedAgentId().toString(), affectedPersonTup);
 		}
 		return id2CausingAffectedDelays;
@@ -137,7 +137,7 @@ public class CongestionTestExamples {
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new printAllEvents());
 
-		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
+		final List<CongestionEvent> congestionEvents = new ArrayList<>();
 
 		events.addHandler( new CongestionEventHandler() {
 

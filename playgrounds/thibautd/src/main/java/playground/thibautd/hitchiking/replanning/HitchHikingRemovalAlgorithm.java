@@ -27,7 +27,6 @@ import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
-
 import playground.thibautd.hitchiking.HitchHikingConstants;
 
 import java.util.ArrayList;

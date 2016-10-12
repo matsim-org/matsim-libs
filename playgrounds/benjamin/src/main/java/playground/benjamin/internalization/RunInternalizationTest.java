@@ -98,7 +98,7 @@ public class RunInternalizationTest {
 		
 		this.controler = new Controler(this.scenario);
 		specifyControler();
-		
+
 		emissionModule = new EmissionModule(scenario, this.emissionVehicles);
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();

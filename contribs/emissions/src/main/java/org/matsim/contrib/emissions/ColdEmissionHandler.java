@@ -23,7 +23,7 @@ package org.matsim.contrib.emissions;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
@@ -45,9 +46,13 @@ import org.matsim.vehicles.Vehicles;
  */
 public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler {
 
+    private final Logger logger = Logger.getLogger(ColdEmissionHandler.class);
+
     private final Vehicles emissionVehicles;
     private final Network network;
     private final ColdEmissionAnalysisModule coldEmissionAnalysisModule;
+
+    private int nonCarWarn = 0;
 
     private final Map<Id<Vehicle>, Double> vehicleId2stopEngineTime = new HashMap<>();
     private final Map<Id<Vehicle>, Double> vehicleId2accumulatedDistance = new HashMap<>();
@@ -85,15 +90,17 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
             double distance = previousDistance + linkLength;
             double parkingDuration = this.vehicleId2parkingDuration.get(vehicleId);
             Id<Link> coldEmissionEventLinkId = this.vehicleId2coldEmissionEventLinkId.get(vehicleId);
-            Id<VehicleType> vehicleTypeId = emissionVehicles.getVehicles().get(vehicleId).getType().getId();
+
+            Vehicle vehicle = emissionVehicles.getVehicles().get(vehicleId);
+
             if ((distance / 1000) > 1.0) {
                 this.coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent(
                         coldEmissionEventLinkId,
-                        vehicleId,
+                        vehicle,
                         event.getTime(),
                         parkingDuration,
-                        2,
-                        vehicleTypeId);
+                        2
+                );
                 this.vehicleId2accumulatedDistance.remove(vehicleId);
             } else {
                 this.vehicleId2accumulatedDistance.put(vehicleId, distance);
@@ -103,8 +110,12 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
 
     @Override
     public void handleEvent(VehicleLeavesTrafficEvent event) {
-        if (!event.getNetworkMode().equals("car")) { // no emissions to calculate...
-            return;
+        if (!event.getNetworkMode().equals("car")) {
+            if( nonCarWarn <=1) {
+                logger.warn("non-car modes are supported, however, not properly tested yet.");
+                logger.warn(Gbl.ONLYONCE);
+                nonCarWarn++;
+            }
         }
         Id<Vehicle> vehicleId = event.getVehicleId();
         Double stopEngineTime = event.getTime();
@@ -114,8 +125,12 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
     // TODO actually, the engine starts before with the PersonEntersVehicleEvent
     @Override
     public void handleEvent(VehicleEntersTrafficEvent event) {
-        if (!event.getNetworkMode().equals("car")) { // no engine to start...
-            return;
+        if (!event.getNetworkMode().equals("car")) {
+            if( nonCarWarn <=1) {
+                logger.warn("non-car modes are supported, however, not properly tested yet.");
+                logger.warn(Gbl.ONLYONCE);
+                nonCarWarn++;
+            }
         }
         Id<Link> linkId = event.getLinkId();
         Id<Vehicle> vehicleId = event.getVehicleId();
@@ -132,12 +147,16 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
         }
         this.vehicleId2parkingDuration.put(vehicleId, parkingDuration);
         this.vehicleId2accumulatedDistance.put(vehicleId, 0.0);
+
+        Vehicle vehicle = emissionVehicles.getVehicles().get(vehicleId);
+        VehicleType vt = vehicle.getType();
+
         this.coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent(
                 linkId,
-                vehicleId,
+                vehicle,
                 startEngineTime,
                 parkingDuration,
-                1,
-                emissionVehicles.getVehicles().get(vehicleId).getType().getId());
+                1
+        );
     }
 }

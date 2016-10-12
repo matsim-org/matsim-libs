@@ -51,15 +51,15 @@ import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 public class UserBenefitsAndTotalWelfarePerUserGroup {
 
 	public static final Logger LOG = Logger.getLogger(UserBenefitsAndTotalWelfarePerUserGroup.class);
-	private String outputDir;
+	private final String outputDir;
 	private Map<Id<Person>, Double> personId2UserWelfareUtils;
 	private Map<Id<Person>, Double> personId2MonetarizedUserWelfare;
 	private Map<Id<Person>, Double> personId2MonetaryPayments;
 	private SortedMap<MunichUserGroup, Double>  userGrp2ExcludedToll;
 	private Scenario scenario;
 	private int lastIteration;
-	private boolean considerAllPersonsInSumOfTolls;
-	private MunichPersonFilter pf = new MunichPersonFilter();
+	private final boolean considerAllPersonsInSumOfTolls;
+	private final MunichPersonFilter pf = new MunichPersonFilter();
 	private final WelfareMeasure wm = WelfareMeasure.SELECTED;
 	
 	/**
@@ -203,7 +203,6 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 
 	private boolean isPersonIncluded(final Id<Person> personId){
 		double score = scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
-		if (score >= 0 ) return true;
-		else return false;
+        return score >= 0;
 	}
 }

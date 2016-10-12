@@ -19,6 +19,8 @@
 
 package playground.agarwalamit.opdyts;
 
+import java.util.HashSet;
+import java.util.Set;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
@@ -36,7 +38,6 @@ import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
@@ -48,9 +49,6 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable;
 import playground.kairuns.run.KNBerlinControler;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * @author amit
  */
@@ -58,7 +56,7 @@ import java.util.Set;
 public class MatsimOpdytsEquilIntegration {
 
 	private static final String EQUIL_DIR = "./matsim/examples/equil/";
-	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil-initialPlans-holes-withoutInflowConstraint/";
+	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,pt_withoutHoles_200its/";
 
 	public static void main(String[] args) {
 		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
@@ -89,8 +87,8 @@ public class MatsimOpdytsEquilIntegration {
 			params.setTypicalDurationScoreComputation( PlanCalcScoreConfigGroup.TypicalDurationScoreComputation.relative );
 		}
 
-		config.qsim().setTrafficDynamics( QSimConfigGroup.TrafficDynamics.withHoles );
-
+//		config.qsim().setTrafficDynamics( QSimConfigGroup.TrafficDynamics.withHoles );
+//
 //		if ( config.qsim().getTrafficDynamics()== QSimConfigGroup.TrafficDynamics.withHoles ) {
 //			config.qsim().setInflowConstraint(QSimConfigGroup.InflowConstraint.maxflowFromFdiag);
 //		}
@@ -141,7 +139,7 @@ public class MatsimOpdytsEquilIntegration {
 
 		// this is the objective Function which returns the value for given SimulatorState
 		// in my case, this will be the distance based modal split
-		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(false); // in this, the method argument (SimulatorStat) is not used.
+		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(OpdytsObjectiveFunctionCases.EQUIL); // in this, the method argument (SimulatorStat) is not used.
 
 		//search algorithm
 		int maxIterations = 10; // this many times simulator.run(...) and thus controler.run() will be called.
@@ -158,7 +156,7 @@ public class MatsimOpdytsEquilIntegration {
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario);
 
 		// what would decide the convergence of the objective function
-		final int iterationsToConvergence = 100; //
+		final int iterationsToConvergence = 200; //
 		final int averagingIterations = 10;
 		ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(iterationsToConvergence, averagingIterations);
 

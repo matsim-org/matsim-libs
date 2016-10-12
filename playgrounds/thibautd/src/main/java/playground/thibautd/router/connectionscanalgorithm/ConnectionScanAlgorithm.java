@@ -18,9 +18,6 @@
  * *********************************************************************** */
 package playground.thibautd.router.connectionscanalgorithm;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 /**
  * Simple implementation, without the various optimisations presented in "connection scan accelerated"
  *

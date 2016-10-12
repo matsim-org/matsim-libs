@@ -43,15 +43,15 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 public class StuckAgentsFilter extends AbstractAnalysisModule {
 	private static final Logger LOG = Logger.getLogger(StuckAgentsFilter.class);
-	private final Set<Id<Person>> stuckPersonsFromEventsFiles = new HashSet<Id<Person>>();
-	private final Set<PersonStuckEvent> stuckEventsFromEventsFiles = new HashSet<PersonStuckEvent>();
+	private final Set<Id<Person>> stuckPersonsFromEventsFiles = new HashSet<>();
+	private final Set<PersonStuckEvent> stuckEventsFromEventsFiles = new HashSet<>();
 	private final List<String> eventsFiles;
 	private final List<StuckEventsHandler> handlers;
 
 	public StuckAgentsFilter(final List<String> eventsFiles) {
 		super(StuckAgentsFilter.class.getSimpleName());
 		this.eventsFiles = eventsFiles;
-		this.handlers = new ArrayList<StuckEventsHandler>();
+		this.handlers = new ArrayList<>();
 	}
 
 	@Override
@@ -104,8 +104,8 @@ public class StuckAgentsFilter extends AbstractAnalysisModule {
 	//==========EventHandler=============
 	public class StuckEventsHandler implements PersonStuckEventHandler{
 
-		private final Set<Id<Person>> stuckPersons = new HashSet<Id<Person>>();
-		private final Set<PersonStuckEvent> stuckEvents = new HashSet<PersonStuckEvent>();
+		private final Set<Id<Person>> stuckPersons = new HashSet<>();
+		private final Set<PersonStuckEvent> stuckEvents = new HashSet<>();
 
 		@Override
 		public void reset(int iteration) {

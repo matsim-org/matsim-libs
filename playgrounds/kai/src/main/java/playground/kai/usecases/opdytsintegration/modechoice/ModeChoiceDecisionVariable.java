@@ -37,13 +37,9 @@ public final class ModeChoiceDecisionVariable implements DecisionVariable {
 	@Override public void implementInSimulation() {
 		for ( Entry<String, ScoringParameterSet> entry : newScoreConfig.getScoringParametersPerSubpopulation().entrySet() ) {
 			String subPopName = entry.getKey() ;
-//			log.warn( "treating sub-population with name=" + subPopName );
 			ScoringParameterSet newParameterSet = entry.getValue() ;
 			for ( ModeParams newModeParams : newParameterSet.getModes().values() ) {
-//				String mode = newModeParams.getMode() ;
-//				log.warn( "treating mode with name=" + mode ) ;
 				scenario.getConfig().planCalcScore().getScoringParameters( subPopName ).addModeParams( newModeParams ) ;
-//				log.warn("new mode params:" + scenario.getConfig().planCalcScore().getScoringParameters( subPopName ).getModes().get(mode) );
 			}
 		}
 	}

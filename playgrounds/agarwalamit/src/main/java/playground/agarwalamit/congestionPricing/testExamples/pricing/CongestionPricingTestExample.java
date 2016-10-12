@@ -69,12 +69,12 @@ class CongestionPricingTestExample {
 		this.isComparing = false;
 	}
 
-	private Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());;
-	private Link lo;
+	private final Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    private Link lo;
 	private Link ld1;
 	private Link ld2;
 	private String congestionImpl = "noToll";
-	private boolean isComparing;
+	private final boolean isComparing;
 
 	private final String outputDir = "../../../repos/shared-svn/papers/2014/congestionInternalization/implV4/hEART/testExample/";
 

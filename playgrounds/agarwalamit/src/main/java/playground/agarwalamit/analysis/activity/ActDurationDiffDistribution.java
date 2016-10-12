@@ -89,8 +89,8 @@ public class ActDurationDiffDistribution {
 
 	public void run (final String runCase){
 		personId2ActDurationDiff = new HashMap<>();
-		allDurDiffs = new ArrayList<Double>();
-		timeClasses = new ArrayList<Integer>();
+		allDurDiffs = new ArrayList<>();
+		timeClasses = new ArrayList<>();
 		actType2ActDurationDiff2LegCount = new TreeMap<>();
 		actTypes = new HashSet<>();
 
@@ -116,7 +116,7 @@ public class ActDurationDiffDistribution {
 			Map<String, List<Double>> actType2DurationDiff = new HashMap<>();
 			for(String actType : bauPerson2ActDurations.get(personId).keySet()){
 				actTypes.add(actType);
-				List<Double> actDurDiff = new ArrayList<Double>();
+				List<Double> actDurDiff = new ArrayList<>();
 				for(int i = 0; i< bauPerson2ActDurations.get(personId).get(actType).size();i++){
 					double bauDur = bauPerson2ActDurations.get(personId).get(actType).get(i);
 					double runCaseDur = runCasePerson2ActDurations.get(personId).get(actType).get(i);

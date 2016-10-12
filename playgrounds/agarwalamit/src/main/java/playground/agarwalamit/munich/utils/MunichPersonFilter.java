@@ -32,11 +32,11 @@ public class MunichPersonFilter extends PersonFilter implements playground.agarw
 
 	public enum MunichUserGroup {Urban, Rev_Commuter, Freight}
 
-	private PersonFilter pf = new PersonFilter();
+	private final PersonFilter pf = new PersonFilter();
 
-	public MunichPersonFilter (){};
+	public MunichPersonFilter (){}
 
-	@Override
+    @Override
 	public String getUserGroupAsStringFromPersonId (final Id<Person> personId) {
 		return getMunichUserGroupFromPersonId(personId).toString();
 	}

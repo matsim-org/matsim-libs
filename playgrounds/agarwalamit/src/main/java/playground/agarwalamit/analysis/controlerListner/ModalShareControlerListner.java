@@ -41,7 +41,7 @@ public class ModalShareControlerListner implements StartupListener, IterationEnd
 
 	private int firstIteration = 0;
 	private int numberOfIterations = 0;
-	private SortedMap<String, double []> mode2numberofLegs = new TreeMap<>();
+	private final SortedMap<String, double []> mode2numberofLegs = new TreeMap<>();
 
 	@Inject
 	private ModalShareEventHandler modalShareHandler;

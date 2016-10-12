@@ -49,16 +49,16 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class PeakHourTripTollAnalyzer {
 	private static final Logger LOG = Logger.getLogger(PeakHourTripTollAnalyzer.class);
-	private TripTollHandler tollHandler ;
+	private final TripTollHandler tollHandler ;
 
 	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{8., 9., 10., 16., 17., 18.,})); // => 7-10 and 15-18
 	private final MunichPersonFilter pf = new MunichPersonFilter();
-	private Map<Id<Person>,List<Double>> person2TollsPkHr = new HashMap<>();
-	private Map<Id<Person>,List<Double>> person2TollsOffPkHr = new HashMap<>();
-	private Map<Id<Person>,Integer> person2TripCountsPkHr = new HashMap<>();
-	private Map<Id<Person>,Integer> person2TripCountsOffPkHr = new HashMap<>();
-	private SortedMap<String, Tuple<Double,Double>> usrGrp2Tolls = new TreeMap<>();
-	private SortedMap<String, Tuple<Integer,Integer>> usrGrp2TripCounts = new TreeMap<>();
+	private final Map<Id<Person>,List<Double>> person2TollsPkHr = new HashMap<>();
+	private final Map<Id<Person>,List<Double>> person2TollsOffPkHr = new HashMap<>();
+	private final Map<Id<Person>,Integer> person2TripCountsPkHr = new HashMap<>();
+	private final Map<Id<Person>,Integer> person2TripCountsOffPkHr = new HashMap<>();
+	private final SortedMap<String, Tuple<Double,Double>> usrGrp2Tolls = new TreeMap<>();
+	private final SortedMap<String, Tuple<Integer,Integer>> usrGrp2TripCounts = new TreeMap<>();
 
 	public PeakHourTripTollAnalyzer(double simulationEndTime, int noOfTimeBins) {
 		LOG.warn("Peak hours are assumed as 07:00-10:00 and 15:00-18:00 by looking on the travel demand for BAU scenario.");
@@ -136,16 +136,16 @@ public class PeakHourTripTollAnalyzer {
 
 	private void storeUserGroupData(){
 		for(MunichUserGroup ug : MunichUserGroup.values()){
-			usrGrp2Tolls.put(ug.toString(), new Tuple<Double, Double>(0., 0.));
-			usrGrp2TripCounts.put(ug.toString(), new Tuple<Integer, Integer>(0, 0));
+			usrGrp2Tolls.put(ug.toString(), new Tuple<>(0., 0.));
+			usrGrp2TripCounts.put(ug.toString(), new Tuple<>(0, 0));
 		}
 		//first store peak hour data
 		for (Id<Person> personId : this.person2TollsPkHr.keySet()) {
 			String ug = pf.getUserGroupAsStringFromPersonId(personId);
 			double pkToll = usrGrp2Tolls.get(ug).getFirst() + ListUtils.doubleSum(this.person2TollsPkHr.get(personId));
 			int pkTripCount = usrGrp2TripCounts.get(ug).getFirst() + this.person2TripCountsPkHr.get(personId);
-			usrGrp2Tolls.put(ug, new Tuple<Double, Double>(pkToll, 0.));
-			usrGrp2TripCounts.put(ug, new Tuple<Integer,Integer>(pkTripCount,0) );
+			usrGrp2Tolls.put(ug, new Tuple<>(pkToll, 0.));
+			usrGrp2TripCounts.put(ug, new Tuple<>(pkTripCount, 0) );
 		}
 
 		//now store off-peak hour data
@@ -153,8 +153,8 @@ public class PeakHourTripTollAnalyzer {
 			String ug = pf.getUserGroupAsStringFromPersonId(personId);
 			double offpkToll = usrGrp2Tolls.get(ug).getSecond() + ListUtils.doubleSum(this.person2TollsOffPkHr.get(personId));
 			int offpkTripCount = usrGrp2TripCounts.get(ug).getSecond() + this.person2TripCountsOffPkHr.get(personId);
-			usrGrp2Tolls.put(ug, new Tuple<Double, Double>(usrGrp2Tolls.get(ug).getFirst(), offpkToll));
-			usrGrp2TripCounts.put(ug, new Tuple<Integer,Integer>(usrGrp2TripCounts.get(ug).getFirst(),offpkTripCount) );
+			usrGrp2Tolls.put(ug, new Tuple<>(usrGrp2Tolls.get(ug).getFirst(), offpkToll));
+			usrGrp2TripCounts.put(ug, new Tuple<>(usrGrp2TripCounts.get(ug).getFirst(), offpkTripCount) );
 		}
 	}
 

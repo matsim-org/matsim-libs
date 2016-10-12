@@ -62,7 +62,7 @@ public class PersonArrivalAnalyzer {
 		double endTime = config.qsim().getEndTime();
 
 		for ( String mode : mainModes){
-			SortedMap<Integer, Integer> bin2Nr = new TreeMap<Integer, Integer>();
+			SortedMap<Integer, Integer> bin2Nr = new TreeMap<>();
 			for(int timeBin = 1; timeBin<=Math.ceil(endTime/3600);timeBin++){
 				bin2Nr.put(timeBin, 0);
 			}

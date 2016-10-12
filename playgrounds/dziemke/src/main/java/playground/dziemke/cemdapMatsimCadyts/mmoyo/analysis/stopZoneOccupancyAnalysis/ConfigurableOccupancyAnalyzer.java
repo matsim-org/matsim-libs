@@ -27,21 +27,26 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.cadyts.pt.CadytsPtOccupancyAnalyzerI;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.counts.Counts;
 import org.matsim.pt.counts.OccupancyAnalyzer;
 import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import java.util.Collection;
 import java.util.Set;
 
 class ConfigurableOccupancyAnalyzer implements 	PersonEntersVehicleEventHandler,
 		PersonLeavesVehicleEventHandler,
 		VehicleArrivesAtFacilityEventHandler,
 		VehicleDepartsAtFacilityEventHandler,
-		TransitDriverStartsEventHandler {
+		TransitDriverStartsEventHandler , CadytsPtOccupancyAnalyzerI{
 
 	private static final Logger log = Logger.getLogger(ConfigurableOccupancyAnalyzer.class);
 	private OccupancyAnalyzer delegOccuAnalyzer;
@@ -103,5 +108,21 @@ class ConfigurableOccupancyAnalyzer implements 	PersonEntersVehicleEventHandler,
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {delegOccuAnalyzer.handleEvent(event);}
+
+	@Override
+	public int getOccupancyVolumeForStopAndTime(Id<TransitStopFacility> stopId, int time_s) {
+		return this.delegOccuAnalyzer.getOccupancyVolumesForStop(stopId)[this.delegOccuAnalyzer.getTimeSlotIndex(time_s)] ;
+	}
+
+	@Override
+	public void writeResultsForSelectedStopIds(String filename, Counts<Link> occupCounts,
+			Collection<Id<TransitStopFacility>> stopIds) {
+		log.warn("not implemented");
+	}
+
+	@Override
+	public int[] getOccupancyVolumesForStop(Id<TransitStopFacility> stopId) {
+		return this.getOccupancyVolumesForStop(stopId) ;
+	}
 
 }

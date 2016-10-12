@@ -22,14 +22,18 @@
 
 package org.matsim.core.router.costcalculators;
 
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 
 public class TravelDisutilityModule extends AbstractModule {
 
     @Override
     public void install() {
-        addTravelDisutilityFactoryBinding(TransportMode.car).toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig().planCalcScore()));
+        PlansCalcRouteConfigGroup routeConfigGroup = getConfig().plansCalcRoute();
+        for (String mode : routeConfigGroup.getNetworkModes()) {
+            addTravelDisutilityFactoryBinding(mode).toInstance(
+                    new RandomizingTimeDistanceTravelDisutilityFactory(mode, getConfig().planCalcScore()));
+        }
     }
 
 }

@@ -44,8 +44,8 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 public class OuterCountVolumeAnalyzer {
 
-	private LinkVolumeHandler handler = new LinkVolumeHandler();
-	private SortedMap<Id<Link>, Tuple<Integer,Integer>> link2totalCounts = new TreeMap<>();
+	private final LinkVolumeHandler handler = new LinkVolumeHandler();
+	private final SortedMap<Id<Link>, Tuple<Integer,Integer>> link2totalCounts = new TreeMap<>();
 	private static final int COUNT_SCALE_FACTOR = 10;
 	
 	public static void main(String[] args) {
@@ -136,7 +136,7 @@ public class OuterCountVolumeAnalyzer {
 					}
 				}
 			}
-			link2totalCounts.put(linkId, new Tuple<Integer, Integer>(e2eCount, e2iCount));
+			link2totalCounts.put(linkId, new Tuple<>(e2eCount, e2iCount));
 		}
 	}
 }

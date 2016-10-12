@@ -52,10 +52,10 @@ public class CorridorNetworkAndPlans {
 	 *<p>  o--0---o---1---o---2---o---3---o
 	 *<p>				  
 	 */
-	Scenario scenario;
-	Config config;
-	Network network;
-	Population population;
+    final Scenario scenario;
+	final Config config;
+	final Network network;
+	final Population population;
 	
 	Link link0;
 	Link link1;
@@ -106,7 +106,7 @@ public class CorridorNetworkAndPlans {
 			plan.addLeg(leg);
 			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 			NetworkRoute route;
-			List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+			List<Id<Link>> linkIds = new ArrayList<>();
 			route= (NetworkRoute) factory.createRoute(link0.getId(), link3.getId());
 			linkIds.add(link1.getId());
 			linkIds.add(link2.getId());

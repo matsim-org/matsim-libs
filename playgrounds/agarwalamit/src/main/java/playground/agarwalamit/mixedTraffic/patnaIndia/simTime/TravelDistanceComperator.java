@@ -40,7 +40,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.legMode.distributions.LegModeRouteDistanceDistributionHandler;
+import playground.agarwalamit.analysis.trip.FilteredTripDistanceHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
+import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.ListUtils;
 
 /**
@@ -49,19 +51,28 @@ import playground.agarwalamit.utils.ListUtils;
 
 public class TravelDistanceComperator {
 	
-	private String respectiveFileDirectory = "../../../../repos/runs-svn/patnaIndia/run110/100pct/";
-	private String netFile = "../../../../repos/runs-svn/patnaIndia/inputs/network.xml";
+	private final String respectiveFileDirectory ;
+	private final String netFile ;
 	private BufferedWriter writer;
-	private static final String LAST_IT = "200";
 
-	public static void main(String[] args) {
-		TravelDistanceComperator tdc = new TravelDistanceComperator();
-		tdc.openFile();
-		tdc.startProcessing();
-		tdc.closeFile();
+	TravelDistanceComperator(final String dir, final String networkFile) {
+		this.respectiveFileDirectory = dir;
+		this.netFile = networkFile;
 	}
 
-	public void openFile(){
+	public static void main(String[] args) {
+		TravelDistanceComperator tdc = new TravelDistanceComperator(FileUtils.RUNS_SVN+"/patnaIndia/run110/randomNrFix/fastCapacityUpdate/1pct/",
+				FileUtils.RUNS_SVN+"/patnaIndia/inputs/network.xml");
+		tdc.run();
+	}
+
+	void run (){
+		openFile();
+		startProcessing();
+		closeFile();
+	}
+
+	private void openFile(){
 		writer = IOUtils.getBufferedWriter(respectiveFileDirectory+"/travelDistance.txt");
 		try {
 			writeString("scenario\tmode\ttravelDistKm\n");
@@ -78,7 +89,7 @@ public class TravelDistanceComperator {
 		}
 	}
 
-	public void closeFile(){
+	private void closeFile(){
 		try{
 			writer.close();
 		} catch (Exception e) {
@@ -86,12 +97,12 @@ public class TravelDistanceComperator {
 		}
 	}
 
-	public void startProcessing(){
+	private void startProcessing(){
 		for (LinkDynamics ld : LinkDynamics.values() ) {
 			for ( TrafficDynamics td : TrafficDynamics.values()){
 				String queueModel = ld+"_"+td;
-				for(int i=2;i<12;i++){
-					String eventsFile = respectiveFileDirectory + "/output_"+queueModel+"_"+i+"/ITERS/it."+LAST_IT+"/"+LAST_IT+".events.xml.gz";
+				for(int i=1;i<12;i++){
+					String eventsFile = respectiveFileDirectory + "/output_"+queueModel+"_"+i+"/output_events.xml.gz";
 					if (! new File(eventsFile).exists() ) continue;
 					SortedMap<String,Double> mode2avgDist = getMode2Dist(eventsFile);
 					
@@ -110,25 +121,44 @@ public class TravelDistanceComperator {
 		Scenario sc = ScenarioUtils.loadScenario(config);
 		
 		EventsManager manager = EventsUtils.createEventsManager();
+		FilteredTripDistanceHandler handler_bike = new FilteredTripDistanceHandler(sc.getNetwork(),sc.getConfig().qsim().getEndTime(),1,"bike");
+		FilteredTripDistanceHandler handler_car = new FilteredTripDistanceHandler(sc.getNetwork(),sc.getConfig().qsim().getEndTime(),1,"car");
 		LegModeRouteDistanceDistributionHandler handler = new LegModeRouteDistanceDistributionHandler(sc);
 		manager.addHandler(handler);
+		manager.addHandler(handler_bike);
+		manager.addHandler(handler_car);
 		
 		MatsimEventsReader reader = new MatsimEventsReader(manager);
 		reader.readFile(eventsFile);
 		
 		SortedMap<String,Double> mode2dists = new TreeMap<>();
-		
 		SortedMap<String,Map<Id<Person>,List<Double>>> dists = handler.getMode2PersonId2TravelDistances();
-		
+
+		{
+			double [] sumCount = getAvgDist(handler_bike.getTimeBin2Person2TripsDistance().entrySet().iterator().next().getValue());
+			System.out.println("bike "+ sumCount[0]/sumCount[1]);
+		}
+
+		{
+			double [] sumCount = getAvgDist(handler_car.getTimeBin2Person2TripsDistance().entrySet().iterator().next().getValue());
+			System.out.println("car "+ sumCount[0]/sumCount[1]);
+		}
+
+
 		for (String mode :dists.keySet()) {
-			double modedistSum = 0;
-			double count = 0;
-			for(Id<Person> p : dists.get(mode).keySet()){
-				count += dists.get(mode).get(p).size();
-				modedistSum += ListUtils.doubleSum(dists.get(mode).get(p));
-			}
-			mode2dists.put(mode, modedistSum/(count*1000));
+			double sumAndCount [] = getAvgDist(dists.get(mode));
+			mode2dists.put(mode, sumAndCount[0]/(sumAndCount[1]*1000.));
 		}
 		return mode2dists;
+	}
+
+	private double [] getAvgDist (final Map<Id<Person>,List<Double>> dists) {
+		double modedistSum = 0;
+		double count = 0;
+		for(Id<Person> p : dists.keySet()){
+			count += dists.get(p).size();
+			modedistSum += ListUtils.doubleSum(dists.get(p));
+		}
+		return new double [] {modedistSum, count};
 	}
 }

@@ -56,6 +56,9 @@ public class CadytsScoring<T> implements SumScoringFunction.BasicScoring {
 
 	@Override
 	public double getScore() {
+		if ( score != 0. && score != -450. && score != 450. ) {
+			log.warn("cadyts correction=" + score );
+		}
 		return score;
 	}
 

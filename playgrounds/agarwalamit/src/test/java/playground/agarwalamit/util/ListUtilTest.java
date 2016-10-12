@@ -25,9 +25,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import playground.agarwalamit.utils.ListUtils;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by amit on 19/09/16.

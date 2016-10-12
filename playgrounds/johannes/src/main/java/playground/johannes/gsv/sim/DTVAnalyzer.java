@@ -94,14 +94,14 @@ public class DTVAnalyzer implements IterationEndsListener, IterationStartsListen
 			writer.newLine();
 			
 			for (Count count : obsCounts.getCounts().values()) {
-				Id linkId = count.getLocId();
+				Id linkId = count.getId();
 				double simVol = simCounts.getOccupancy(linkId) * factor;
 				double obsVol = 0;
 				for(int i = 1; i < 25; i++) {
 					obsVol += count.getVolume(i).getValue();
 				}
 
-				writer.write(count.getCsId());
+				writer.write(count.getCsLabel());
 				writer.write("\t");
 				writer.write(String.valueOf(obsVol));
 				writer.write("\t");

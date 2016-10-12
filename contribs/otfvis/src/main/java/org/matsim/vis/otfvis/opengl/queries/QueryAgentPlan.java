@@ -20,23 +20,9 @@
 
 package org.matsim.vis.otfvis.opengl.queries;
 
-import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.io.Serializable;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.GLUquadric;
@@ -48,11 +34,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.PtConstants;
@@ -70,7 +54,17 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
-import com.jogamp.common.nio.Buffers;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.jogamp.opengl.GL2GL3.GL_QUADS;
 
@@ -94,8 +88,8 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 	private SimulationViewForQueries simulationView;
 
 	@Override
-	public void installQuery(SimulationViewForQueries simulationView1) {
-		this.simulationView = simulationView1;
+	public void installQuery(SimulationViewForQueries simulationView) {
+		this.simulationView = simulationView;
 	}
 
 	@Override
@@ -122,7 +116,6 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	@Override
 	public OTFQueryResult query() {
-		Network net = simulationView.getNetwork();
 		Plan plan = simulationView.getPlans().get(this.agentId);
 		Result result = new Result();
 		result.agentId = this.agentId.toString();
@@ -133,27 +126,40 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 					if ( !includeRoutes && PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType()) ) {
 						continue ; // skip
 					}
-					Coord coord = act.getCoord();
-					if (coord == null) {
-						Link link = net.getLinks().get(act.getLinkId());
-						coord = link.getCoord();
-					}
-					Coord c2 = OTFServerQuadTree.getOTFTransformation().transform(coord);
+					Coord c2 = getCoord(act);
 					ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), act.getType());
-					activityInfo.finished = 0.5;
 					result.acts.add(activityInfo);
 				}
 			}
 
 			if ( includeRoutes ) {
-				result.buildRoute(plan, agentId, net, Level.ROUTES );
+				result.buildRoute(plan, agentId, simulationView.getNetwork(), Level.ROUTES );
 			} else {
-				result.buildRoute(plan, agentId, net, Level.PLANELEMENTS);
+				result.buildRoute(plan, agentId, simulationView.getNetwork(), Level.PLANELEMENTS);
 			}
 		} else {
 			log.error("No plan found for id " + this.agentId);
 		}
+		MobsimAgent mobsimAgent = simulationView.getAgents().get(this.agentId);
+		if (mobsimAgent != null && mobsimAgent.getState() == MobsimAgent.State.ACTIVITY) {
+			Activity act = (Activity) ((PlanAgent) mobsimAgent).getCurrentPlanElement();
+			Coord c2 = getCoord(act);
+			if (simulationView.getTime() > act.getStartTime() && simulationView.getTime() <= act.getEndTime()) {
+				ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), act.getType());
+				activityInfo.finished = (simulationView.getTime() - act.getStartTime()) / (act.getEndTime() - act.getStartTime());
+				result.acts.add(activityInfo);
+			}
+		}
 		return result;
+	}
+
+	private Coord getCoord( Activity act) {
+		Coord coord = act.getCoord();
+		if (coord == null) {
+			Link link = simulationView.getNetwork().getLinks().get(act.getLinkId());
+			coord = link.getCoord();
+		}
+		return OTFServerQuadTree.getOTFTransformation().transform(coord);
 	}
 
 	@Override
@@ -264,7 +270,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 				this.cols.put((byte) color.getRed());
 				this.cols.put((byte) color.getGreen());
 				this.cols.put((byte) color.getBlue());
-				this.cols.put((byte) 128);
+				this.cols.put((byte) 255);
 			}
 			this.vert.position(0);
 			this.cols.position(0);
@@ -327,7 +333,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		private void drawActivityTexts() {
 			GLAutoDrawable drawable = OTFClientControl.getInstance().getMainOTFDrawer().getCanvas();
 			TextRenderer textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 32), true, false);
-			textRenderer.setColor(new Color(50, 50, 128, 128));
+			textRenderer.setColor(new Color(50, 50, 128, 255));
 			for (ActivityInfo activityEntry : this.acts ) {
 				drawTextBox(drawable, textRenderer, activityEntry);
 			}
@@ -356,8 +362,9 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			Rectangle2D textBounds = textRenderer.getBounds(activityEntry.name);
 			textRenderer.end3DRendering();
 
+			gl.glPushMatrix();
 			gl.glEnable(GL.GL_BLEND);
-			gl.glColor4f(0.9f, 0.9f, 0.9f, 0.5f);
+			gl.glColor4f(0.9f, 0.9f, 0.9f, 0.9f);
 			float halfh = (float)textBounds.getHeight()/2;
 			gl.glTranslatef(0f, halfh, 0f);
 
@@ -385,7 +392,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			// Origin (0,0,0) is now again the activity location.
 			// Draw the progress bar.
 			if (activityEntry.finished > 0f) {
-				gl.glColor4f(0.9f, 0.7f, 0.7f, 0.5f);
+				gl.glColor4f(0.9f, 0.7f, 0.7f, 0.9f);
 				gl.glBegin(GL_QUADS);
 				gl.glVertex3d(0, -halfh, 0);
 				gl.glVertex3d(0, -halfh -7, 0);
@@ -399,8 +406,13 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 				gl.glVertex3d(textBounds.getWidth()*activityEntry.finished, -halfh -7, 0);
 				gl.glVertex3d(textBounds.getWidth()*activityEntry.finished, -halfh, 0);
 				gl.glEnd();
-				gl.glColor4f(0.9f, 0.9f, 0.9f, 0.5f);
 			}
+			gl.glPopMatrix();
+
+			textRenderer.begin3DRendering();
+			textRenderer.draw3D(activityEntry.name, 0f, 0f, 0f, 1f);
+			textRenderer.end3DRendering();
+
 			gl.glPopMatrix();
 			gl.glDisable(GL.GL_BLEND);
 		}
