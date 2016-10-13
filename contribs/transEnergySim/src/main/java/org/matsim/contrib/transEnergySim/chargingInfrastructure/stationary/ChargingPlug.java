@@ -40,4 +40,5 @@ public interface ChargingPlug extends Identifiable<ChargingPlug> {
 	void handleChargingSessionInterruption();
 
 	boolean isAvailable();
+	boolean isAccessible();
 }
