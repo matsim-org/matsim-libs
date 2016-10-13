@@ -70,7 +70,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 				// 1) proportional term
 				toll += this.K_p * averageDelay;
 				
-				// 2) integral term
+				// 2a) integral term - one side
 				double totalDelay = 0.;
 				if (this.congestionInfo.getlinkInfos().get(linkId).getTime2value().containsKey(intervalNr)) {
 					totalDelay = this.congestionInfo.getlinkInfos().get(linkId).getTime2value().get(intervalNr) + averageDelay;
@@ -80,6 +80,22 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 					this.congestionInfo.getlinkInfos().get(linkId).getTime2value().put(intervalNr, totalDelay);
 				}
 				toll += this.K_i * totalDelay;
+				
+//				// 2b) integral term - both sides
+//				double totalDelay = 0.;
+//				if (this.congestionInfo.getlinkInfos().get(linkId).getTime2value().containsKey(intervalNr)) {
+//					if (averageDelay < congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
+//						double totalDelaySoFar = this.congestionInfo.getlinkInfos().get(linkId).getTime2value().get(intervalNr);
+//						totalDelay = totalDelaySoFar - totalDelaySoFar *
+//					} else {
+//						totalDelay = this.congestionInfo.getlinkInfos().get(linkId).getTime2value().get(intervalNr) + averageDelay;
+//					}
+//					this.congestionInfo.getlinkInfos().get(linkId).getTime2value().put(intervalNr, totalDelay);
+//				} else {
+//					totalDelay = averageDelay;
+//					this.congestionInfo.getlinkInfos().get(linkId).getTime2value().put(intervalNr, totalDelay);
+//				}
+//				toll += this.K_i * totalDelay;
 
 				// 3) derivative term
 				double previousDelay = 0.;

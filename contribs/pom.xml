@@ -136,7 +136,6 @@
 		<module>pseudosimulation</module>
 		<module>common</module>
 		<module>eventsBasedPTRouter</module>
-		<module>map2mapmatching</module>
 		<module>travelsummary</module>
 		<module>deprecated</module>
 		<module>protobuf</module>

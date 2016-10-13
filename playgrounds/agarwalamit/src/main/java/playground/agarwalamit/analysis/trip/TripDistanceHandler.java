@@ -18,32 +18,15 @@
  * *********************************************************************** */
 package playground.agarwalamit.analysis.trip;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
+import java.util.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
-import org.matsim.core.gbl.Gbl;
 
 /**
  * Trip distances are calculated by summing up the link lengths for all link leave events which 
@@ -99,8 +82,6 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		if ( ! event.getLegMode().equals(TransportMode.car) ) return ; // excluding non car trips
-
 		Id<Person> personId = event.getPersonId();
 		double time = this.personId2TripDepartTimeBin.remove(personId);
 
@@ -115,14 +96,6 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if ( ! event.getLegMode().equals(TransportMode.car) ) { // excluding non car trips
-			if(nonCarWarning<1){
-				LOG.warn(TripDistanceHandler.class.getSimpleName()+" calculates trip info only for car mode.");
-				LOG.warn( Gbl.ONLYONCE );
-				nonCarWarning++;
-			}
-			return ;
-		}
 		// if time bin is less than 1 hour, than only integer does not make much sense.
 		double time = Math.max(1, Math.ceil( event.getTime()/this.timeBinSize) ) * this.timeBinSize; 
 		Id<Person> personId = event.getPersonId();

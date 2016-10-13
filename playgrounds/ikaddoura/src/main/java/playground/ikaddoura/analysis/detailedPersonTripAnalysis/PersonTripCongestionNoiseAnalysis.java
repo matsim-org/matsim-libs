@@ -231,7 +231,7 @@ public class PersonTripCongestionNoiseAnalysis {
 					+ "affected congestion (trip) [sec];"
 					+ "affected congestion cost (trip) [monetary units];"
 					+ "caused congestion (trip) [sec];"
-					+ "ASSUMED caused noise cost (trip) [sec]"); // TODO make this accurate?!
+					+ "approximate caused noise cost (trip) [monetary units]"); // TODO make this accurate?!
 			
 			bw.newLine();
 			

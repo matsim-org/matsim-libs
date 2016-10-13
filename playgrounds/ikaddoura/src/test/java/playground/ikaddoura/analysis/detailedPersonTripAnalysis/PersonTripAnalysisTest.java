@@ -181,7 +181,7 @@ public class PersonTripAnalysisTest {
 							"VTTS (trip) [monetary units per hour];departure time (trip) [sec];arrival time (trip) [sec];" +
 							"travel time (trip) [sec];travel distance (trip) [m];affected congestion (trip) [sec];" +
 							"affected congestion cost (trip) [monetary units];caused congestion (trip) [sec];" +
-							"ASSUMED caused noise cost (trip) [sec]"));
+							"approximate caused noise cost (trip) [monetary units]"));
 				} else {
 					tripInfos.add(line.split(";"));
 				}

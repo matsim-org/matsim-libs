@@ -4,6 +4,7 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.TextureCoords;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.opengl.gl.GLUtils;
 
@@ -41,9 +42,9 @@ class OTFGLOverlay implements GLEventListener {
 			int[] viewport = new int[4];
 			gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
 			float height = this.size * h / viewport[3];
-			float length = this.size * w / viewport[2];
+			float width = this.size * w / viewport[2];
 			int z = 0;
-			float startX = this.relX >= 0 ? -1.f + this.relX : 1.f - length + this.relX;
+			float startX = this.relX >= 0 ? -1.f + this.relX : 1.f - width + this.relX;
 			float startY = this.relY >= 0 ? -1.f + this.relY : 1.f - height + this.relY;
 
 			gl.glColor4d(1, 1, 1, 1);
@@ -63,14 +64,17 @@ class OTFGLOverlay implements GLEventListener {
 
 			texture.enable(gl);
 			texture.bind(gl);
+			TextureCoords tc = texture.getImageTexCoords();
 			gl.glBegin(GL2.GL_QUADS);
-			gl.glTexCoord2f(0, 1);
+			// In these lines, 'top' and 'bottom' must be flipped since the switch to jogl 2.3.2
+			// for no apparent reason.
+			gl.glTexCoord2f(tc.left(), tc.bottom());
 			gl.glVertex3f(startX, startY, z);
-			gl.glTexCoord2f(1, 1);
-			gl.glVertex3f(startX + length, startY, z);
-			gl.glTexCoord2f(1, 0);
-			gl.glVertex3f(startX + length, startY + height, z);
-			gl.glTexCoord2f(0, 0);
+			gl.glTexCoord2f(tc.right(), tc.bottom());
+			gl.glVertex3f(startX + width, startY, z);
+			gl.glTexCoord2f(tc.right(), tc.top());
+			gl.glVertex3f(startX + width, startY + height, z);
+			gl.glTexCoord2f(tc.left(), tc.top());
 			gl.glVertex3f(startX, startY + height, z);
 			gl.glEnd();
 			texture.disable(gl);
