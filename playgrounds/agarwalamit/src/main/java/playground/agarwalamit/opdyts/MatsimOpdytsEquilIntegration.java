@@ -46,7 +46,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
-import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable;
 import playground.kairuns.run.KNBerlinControler;
 
 /**
@@ -55,6 +54,7 @@ import playground.kairuns.run.KNBerlinControler;
 
 public class MatsimOpdytsEquilIntegration {
 
+	public static final OpdytsObjectiveFunctionCases EQUIL = OpdytsObjectiveFunctionCases.EQUIL;
 	private static final String EQUIL_DIR = "./matsim/examples/equil/";
 	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,pt_withoutHoles_200its/";
 
@@ -139,7 +139,7 @@ public class MatsimOpdytsEquilIntegration {
 
 		// this is the objective Function which returns the value for given SimulatorState
 		// in my case, this will be the distance based modal split
-		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(OpdytsObjectiveFunctionCases.EQUIL); // in this, the method argument (SimulatorStat) is not used.
+		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(EQUIL); // in this, the method argument (SimulatorStat) is not used.
 
 		//search algorithm
 		int maxIterations = 10; // this many times simulator.run(...) and thus controler.run() will be called.
@@ -150,10 +150,10 @@ public class MatsimOpdytsEquilIntegration {
 		boolean includeCurrentBest = false;
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
-		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario, RandomizedUtilityParametersChoser.ONLY_ASC);
+		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario, RandomizedUtilityParametersChoser.ONLY_ASC, EQUIL);
 
 		// what would be the decision variables to optimize the objective function.
-		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario);
+		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, EQUIL);
 
 		// what would decide the convergence of the objective function
 		final int iterationsToConvergence = 200; //

@@ -50,7 +50,6 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.opdyts.*;
 import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
-import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable;
 
 /**
  * @author amit
@@ -58,6 +57,8 @@ import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVa
 
 public class PatnaJointOpdytsCalibrator {
 
+	public static final String SUB_POP_NAME = PatnaPersonFilter.PatnaUserGroup.urban.toString();
+	public static final OpdytsObjectiveFunctionCases PATNA_10_PCT = OpdytsObjectiveFunctionCases.PATNA_10Pct;
 	private static String OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/output222/";
 	private static final String configDir = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/input/";
 
@@ -145,10 +146,10 @@ public class PatnaJointOpdytsCalibrator {
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
-				RandomizedUtilityParametersChoser.ONLY_ASC, randomVariance, PatnaPersonFilter.PatnaUserGroup.urban.toString());
+				RandomizedUtilityParametersChoser.ONLY_ASC, randomVariance, PATNA_10_PCT, SUB_POP_NAME);
 
 		// what would be the decision variables to optimize the objective function.
-		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario);
+		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, PATNA_10_PCT, SUB_POP_NAME);
 
 		// what would decide the convergence of the objective function
 		ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(iterationsToConvergence, averagingIterations);

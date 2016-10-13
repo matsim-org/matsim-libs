@@ -49,7 +49,6 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTime
 import playground.agarwalamit.opdyts.*;
 import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
-import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable;
 
 /**
  * @author amit
@@ -57,6 +56,7 @@ import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVa
 
 public class PatnaUrbanOpdytsCalibrator {
 
+	public static final OpdytsObjectiveFunctionCases PATNA_1_PCT = OpdytsObjectiveFunctionCases.PATNA_1Pct;
 	private static String OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/output222/";
 	private static final String configDir = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/input/";
 
@@ -140,7 +140,7 @@ public class PatnaUrbanOpdytsCalibrator {
 
 		// this is the objective Function which returns the value for given SimulatorState
 		// in my case, this will be the distance based modal split
-		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(OpdytsObjectiveFunctionCases.PATNA_1Pct); // in this, the method argument (SimulatorStat) is not used.
+		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(PATNA_1_PCT); // in this, the method argument (SimulatorStat) is not used.
 
 		//search algorithm
 		int maxIterations = 10; // this many times simulator.run(...) and thus controler.run() will be called.
@@ -152,10 +152,10 @@ public class PatnaUrbanOpdytsCalibrator {
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
-				RandomizedUtilityParametersChoser.ONLY_ASC, randomVariance, null);
+				RandomizedUtilityParametersChoser.ONLY_ASC, randomVariance, PATNA_1_PCT, null);
 
 		// what would be the decision variables to optimize the objective function.
-		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario);
+		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, PATNA_1_PCT);
 
 		// what would decide the convergence of the objective function
 		ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(iterationsToConvergence, averagingIterations);

@@ -47,7 +47,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
-import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable;
 import playground.kairuns.run.KNBerlinControler;
 
 /**
@@ -58,6 +57,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 	private static final String EQUIL_DIR = "./matsim/examples/equil-mixedTraffic/";
 	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil-mixedTraffic/";
+	public static final OpdytsObjectiveFunctionCases EQUIL_MIXEDTRAFFIC = OpdytsObjectiveFunctionCases.EQUIL_MIXEDTRAFFIC;
 
 	public static void main(String[] args) {
 		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
@@ -155,7 +155,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		// this is the objective Function which returns the value for given SimulatorState
 		// in my case, this will be the distance based modal split
-		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(OpdytsObjectiveFunctionCases.EQUIL_MIXEDTRAFFIC); // in this, the method argument (SimulatorStat) is not used.
+		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(EQUIL_MIXEDTRAFFIC); // in this, the method argument (SimulatorStat) is not used.
 
 		//search algorithm
 		int maxIterations = 10; // this many times simulator.run(...) and thus controler.run() will be called.
@@ -166,10 +166,10 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		boolean includeCurrentBest = false;
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
-		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario, RandomizedUtilityParametersChoser.ONLY_ASC);
+		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario, RandomizedUtilityParametersChoser.ONLY_ASC, EQUIL_MIXEDTRAFFIC);
 
 		// what would be the decision variables to optimize the objective function.
-		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario);
+		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, EQUIL_MIXEDTRAFFIC);
 
 		// what would decide the convergence of the objective function
 		final int iterationsToConvergence = 100; //

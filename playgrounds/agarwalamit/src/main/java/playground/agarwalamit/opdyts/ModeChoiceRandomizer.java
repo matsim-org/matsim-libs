@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable;
 
 public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<ModeChoiceDecisionVariable> {
     private static final Logger log = Logger.getLogger(ModeChoiceRandomizer.class);
@@ -37,19 +36,21 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
     private final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser;
     private final double randomVariance;
     private final String subPopName;
+    private final OpdytsObjectiveFunctionCases objectiveFunctionCases;
 
     public ModeChoiceRandomizer(final Scenario scenario, final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser,
-                                final double randomVariance, final String subPopName) {
+                                final double randomVariance, final OpdytsObjectiveFunctionCases objectiveFunctionCases, final String subPopName) {
         this.scenario = scenario;
         this.rnd = new Random(4711);
         // (careful with using matsim-random since it is always the same sequence in one run)
         this.randomizedUtilityParametersChoser = randomizedUtilityParametersChoser;
         this.randomVariance = randomVariance;
         this.subPopName = subPopName;
+        this.objectiveFunctionCases = objectiveFunctionCases;
     }
 
-    public ModeChoiceRandomizer(final Scenario scenario, final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser) {
-        this(scenario,randomizedUtilityParametersChoser,0.1, null);
+    public ModeChoiceRandomizer(final Scenario scenario, final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser, final OpdytsObjectiveFunctionCases objectiveFunctionCases) {
+        this(scenario,randomizedUtilityParametersChoser, 0.1, objectiveFunctionCases, null);
     }
 
     @Override
@@ -105,8 +106,8 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
                     newScoringConfig2.getOrCreateScoringParameters(this.subPopName).addModeParams(newModeParams2);
                 }
             }
-            result.add(new ModeChoiceDecisionVariable(newScoringConfig1, this.scenario));
-            result.add(new ModeChoiceDecisionVariable(newScoringConfig2, this.scenario));
+            result.add(new ModeChoiceDecisionVariable(newScoringConfig1, this.scenario, this.objectiveFunctionCases,this.subPopName));
+            result.add(new ModeChoiceDecisionVariable(newScoringConfig2, this.scenario, this.objectiveFunctionCases,this.subPopName));
         }
         log.warn("giving the following to opdyts:");
         for (ModeChoiceDecisionVariable var : result) {
