@@ -185,8 +185,6 @@ public class EquilMixedTrafficTest {
         }
 
         //
-        StrategyConfigGroup scg = scenario.getConfig().strategy();
-
         StrategyConfigGroup.StrategySettings ss = new StrategyConfigGroup.StrategySettings();
         ss.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.name());
         ss.setWeight(0.2);
@@ -195,10 +193,6 @@ public class EquilMixedTrafficTest {
 
         scenario.getConfig().controler().setDumpDataAtEnd(true);
         scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-
-        Map<String, Integer> mode2legsFromEvents = new HashMap<>();
-        mode2legsFromEvents.put("car", 0);
-        mode2legsFromEvents.put("bicycle", 0);
 
         ModalMaxSpeedEventHandler speedEventHandler = new ModalMaxSpeedEventHandler();
 

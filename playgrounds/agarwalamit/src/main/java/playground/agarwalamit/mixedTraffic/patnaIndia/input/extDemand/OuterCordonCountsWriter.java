@@ -62,7 +62,7 @@ public class OuterCordonCountsWriter {
 	}
 
 	private void writeCountsDataToFile(final String outCountsFile){
-		Counts<Link> counts = new Counts<Link>();
+		Counts<Link> counts = new Counts<>();
 		counts.setYear(2008);
 		counts.setName("Patna_counts");
 		counts.setDescription("OnlyOuterCordonCountsCarMotorbikeBikeTruck");
@@ -70,6 +70,7 @@ public class OuterCordonCountsWriter {
 			Count<Link> c = counts.createAndAddCount(mcs.getFirst(), mcs.getSecond());
 			for(Integer i : countStation2time2countInfo_in.get(mcs).keySet()){
 				double vol = countStation2time2countInfo_in.get(mcs).get(i) ;
+				assert c != null;
 				c.createVolume(i, vol );
 			}
 		}
@@ -78,6 +79,7 @@ public class OuterCordonCountsWriter {
 			for(Integer i : countStation2time2countInfo_out.get(mcs).keySet()){
 				double vol = Math.round(countStation2time2countInfo_out.get(mcs).get(i) 
 						* OuterCordonUtils.getModalOutTrafficAdjustmentFactor().get("total")); // this counts file is aggregated and therefore using aggregated factor
+				assert c != null;
 				c.createVolume(i, vol );
 			}
 		}
@@ -89,13 +91,13 @@ public class OuterCordonCountsWriter {
 			Map<Integer, Double> hourlyCounts = readFileAndReturnHourlyCounts(inDirectionFile);
 			String key = OuterCordonUtils.getCountingStationKey(countingStationNumber, "in");
 			Id<Link> linkId = new OuterCordonLinks(  PatnaUtils.PATNA_NETWORK_TYPE  ).getLinkId(key);
-			countStation2time2countInfo_in.put(new Tuple<Id<Link>, String>(linkId, countingStationNumber), hourlyCounts);
+			countStation2time2countInfo_in.put(new Tuple<>(linkId, countingStationNumber), hourlyCounts);
 		}
 		{
 			Map<Integer, Double> hourlyCounts = readFileAndReturnHourlyCounts(outDirectionFile);
 			String key = OuterCordonUtils.getCountingStationKey(countingStationNumber, "out");
 			Id<Link> linkId = new OuterCordonLinks(  PatnaUtils.PATNA_NETWORK_TYPE  ).getLinkId(key);
-			countStation2time2countInfo_out.put(new Tuple<Id<Link>, String>(linkId, countingStationNumber), hourlyCounts);
+			countStation2time2countInfo_out.put(new Tuple<>(linkId, countingStationNumber), hourlyCounts);
 		}
 	}
 

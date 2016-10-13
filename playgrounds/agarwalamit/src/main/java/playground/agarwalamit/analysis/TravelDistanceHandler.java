@@ -231,7 +231,7 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 	 * @return timeBin to toll values for whole population
 	 */
 	public SortedMap<Double,Double> getTimeBin2TravelDist(){
-		SortedMap<Double, Double> timebin2Dist = new TreeMap<Double, Double>();
+		SortedMap<Double, Double> timebin2Dist = new TreeMap<>();
 		for (double d :this.timeBin2personId2travelledDistance.keySet()){
 			timebin2Dist.put(d, MapUtils.doubleValueSum(timeBin2personId2travelledDistance.get(d)));
 		}

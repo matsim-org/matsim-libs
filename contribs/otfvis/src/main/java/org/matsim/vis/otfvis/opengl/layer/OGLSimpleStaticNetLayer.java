@@ -95,7 +95,7 @@ public class OGLSimpleStaticNetLayer implements GLEventListener {
 				@Override
 				public void execute(double x, double y, OTFDataReader object) {
 					if (object instanceof OTFLinkAgentsHandler) {
-						((OTFLinkAgentsHandler) object).getQuadReceiver().draw();
+						((OTFLinkAgentsHandler) object).drawLink();
 					}
 				}
 			});
@@ -105,7 +105,7 @@ public class OGLSimpleStaticNetLayer implements GLEventListener {
 					@Override
 					public void execute(double x, double y, OTFDataReader object) {
 						if (object instanceof OTFLinkAgentsHandler) {
-							((OTFLinkAgentsHandler) object).getQuadReceiver().prepareLinkId(coordStringPairs);
+							((OTFLinkAgentsHandler) object).prepareLinkId(coordStringPairs);
 						}
 					}
 				});

@@ -43,9 +43,9 @@ import org.matsim.core.utils.collections.Tuple;
  */
 public class ActivityType2DurationHandler implements ActivityEndEventHandler, ActivityStartEventHandler {
 	public static final Logger LOG = Logger.getLogger(ActivityType2DurationHandler.class);
-	private Map<Id<Person>, PersonActivityInfo> personId2ActInfo;
-	private double midNightTime;
-	private Set<String> actTyps;
+	private final Map<Id<Person>, PersonActivityInfo> personId2ActInfo;
+	private final double midNightTime;
+	private final Set<String> actTyps;
 	
 	public ActivityType2DurationHandler(final double midNightTime) {
 		this.personId2ActInfo = new HashMap<>();
@@ -67,7 +67,7 @@ public class ActivityType2DurationHandler implements ActivityEndEventHandler, Ac
 	public void handleEvent(ActivityStartEvent event) {
 		if(personId2ActInfo.containsKey(event.getPersonId())){
 			PersonActivityInfo perActInfo = personId2ActInfo.get(event.getPersonId());
-			Tuple<String, Double> act2Time = new Tuple<String, Double>(event.getActType(), event.getTime());
+			Tuple<String, Double> act2Time = new Tuple<>(event.getActType(), event.getTime());
 			perActInfo.getActType2StartTimes().add(act2Time);
 		} else throw new RuntimeException("Person"+event.getPersonId()+" must have ended home activity first and then"
 				+ " must have started "+event.getActType()+" activity. It should have"
@@ -80,15 +80,15 @@ public class ActivityType2DurationHandler implements ActivityEndEventHandler, Ac
 
 		if(personId2ActInfo.containsKey(event.getPersonId())){
 			PersonActivityInfo perActInfo = personId2ActInfo.get(event.getPersonId());
-			Tuple<String, Double> actEndTime = new Tuple<String, Double>(event.getActType(), event.getTime());
+			Tuple<String, Double> actEndTime = new Tuple<>(event.getActType(), event.getTime());
 			perActInfo.getActType2EndTimes().add(actEndTime);
 		} else{
 			PersonActivityInfo perActInfo =  new PersonActivityInfo(event.getPersonId());
 
-			Tuple<String, Double> homeStartTime = new Tuple<String, Double>(event.getActType(), 0.0);
+			Tuple<String, Double> homeStartTime = new Tuple<>(event.getActType(), 0.0);
 			perActInfo.getActType2StartTimes().add(homeStartTime);
 
-			Tuple<String, Double> actEndTime = new Tuple<String, Double>(event.getActType(), event.getTime());
+			Tuple<String, Double> actEndTime = new Tuple<>(event.getActType(), event.getTime());
 			perActInfo.getActType2EndTimes().add(actEndTime);
 
 			personId2ActInfo.put(event.getPersonId(), perActInfo);
@@ -100,7 +100,7 @@ public class ActivityType2DurationHandler implements ActivityEndEventHandler, Ac
 	}
 
 	public Map<Id<Person>, List<Tuple<String, Double>>> getPersonId2ActStartTimes(){
-		Map<Id<Person>, List<Tuple<String, Double>>> personId2ActStartTimes = new HashMap<Id<Person>, List<Tuple<String,Double>>>();
+		Map<Id<Person>, List<Tuple<String, Double>>> personId2ActStartTimes = new HashMap<>();
 		for(Id<Person> personId : personId2ActInfo.keySet()){
 			personId2ActStartTimes.put(personId, personId2ActInfo.get(personId).getActType2StartTimes());
 		}
@@ -108,7 +108,7 @@ public class ActivityType2DurationHandler implements ActivityEndEventHandler, Ac
 	}
 
 	public Map<Id<Person>, List<Tuple<String, Double>>> getPersonId2ActEndTimes(){
-		Map<Id<Person>, List<Tuple<String, Double>>> personId2ActEndTimes = new HashMap<Id<Person>, List<Tuple<String,Double>>>();
+		Map<Id<Person>, List<Tuple<String, Double>>> personId2ActEndTimes = new HashMap<>();
 		for(Id<Person> personId : personId2ActInfo.keySet()){
 			personId2ActEndTimes.put(personId, personId2ActInfo.get(personId).getActType2EndTimes());
 		}
@@ -124,7 +124,7 @@ public class ActivityType2DurationHandler implements ActivityEndEventHandler, Ac
 	 */
 	public Map<Id<Person>, Map<String, List<Double>>> getPersonId2ActDurations(){
 		Map<Id<Person>, Map<String, List<Double>>> personId2ActType2ActDurations =
-				new HashMap<Id<Person>, Map<String,List<Double>>>();
+				new HashMap<>();
 
 		int warnCount =0;
 		for(Id<Person> personId : personId2ActInfo.keySet()){
@@ -135,17 +135,17 @@ public class ActivityType2DurationHandler implements ActivityEndEventHandler, Ac
 			if(actStartTimes.size()!=actEndTimes.size()) {
 				int noOfActivities = actStartTimes.size();
 				String lastActType = actStartTimes.get(noOfActivities-1).getFirst();
-				actEndTimes.add(new Tuple<String, Double>(lastActType, midNightTime));
+				actEndTimes.add(new Tuple<>(lastActType, midNightTime));
 			} else {
 				if(warnCount==0){
 					LOG.warn("Person "+personId+" do not have any open ended activity and simulation ends."
 							+ "Possible explanation must be stuckAndAbort.");
-					Gbl.ONLYONCE.toString();
+					LOG.warn(Gbl.ONLYONCE);
 				}
 				warnCount++;
 			}
 
-			Map<String, List<Double>> actType2ActDurations = new HashMap<String, List<Double>>();
+			Map<String, List<Double>> actType2ActDurations = new HashMap<>();
 
 			Tuple<String, Double> firstActAndDur = null;
 
@@ -156,14 +156,14 @@ public class ActivityType2DurationHandler implements ActivityEndEventHandler, Ac
 				if(actType2ActDurations.containsKey(actType)){
 					actDurations = actType2ActDurations.get(actType);
 				} else {
-					actDurations = new ArrayList<Double>();
+					actDurations = new ArrayList<>();
 				}
 				double actStartTime = actStartTimes.get(i).getSecond();
 				double actEndTime = actEndTimes.get(i).getSecond();
 				double duration = actEndTime - actStartTime;
 
 				if(i==0){
-					firstActAndDur = new Tuple<String, Double>(actType, duration);
+					firstActAndDur = new Tuple<>(actType, duration);
 				}
 
 				// check if first and last activity are same

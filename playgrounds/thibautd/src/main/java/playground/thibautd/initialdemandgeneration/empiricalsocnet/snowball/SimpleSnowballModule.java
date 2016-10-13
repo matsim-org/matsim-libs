@@ -63,9 +63,7 @@ public class SimpleSnowballModule extends AbstractModule {
 			case cliqueBased:
 				bind( EgoCharacteristicsDistribution.class ).to( CliqueEgoDistribution.class );
 				bind( CliquesFiller.class ).to( CliquesDistributionCliquesFiller.class );
-				if ( true ) throw new RuntimeException( "clique based sampling is bugged. Need to take care of ego Id in SnowballCliques and CliqueEgoDistribution before using" );
 				break;
-				// TODO
 			default:
 				throw new RuntimeException( configGroup.getSamplingMethod()+" not implemented yet" );
 		}

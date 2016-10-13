@@ -61,10 +61,10 @@ public class LegModeRouteDistanceDistributionAnalyzer extends AbstractAnalysisMo
 		LOG.info("enabled");
 		this.userGroup = userGroup;
 
-		this.distanceClasses = new ArrayList<Integer>();
-		this.usedModes = new TreeSet<String>();
-		this.mode2PersonId2dist = new TreeMap<String, Map<Id<Person>,List<Double>>>();
-		this.mode2DistanceClass2LegCount = new TreeMap<String, SortedMap<Integer,Integer>>();
+		this.distanceClasses = new ArrayList<>();
+		this.usedModes = new TreeSet<>();
+		this.mode2PersonId2dist = new TreeMap<>();
+		this.mode2DistanceClass2LegCount = new TreeMap<>();
 	}
 	
 	public LegModeRouteDistanceDistributionAnalyzer() {
@@ -94,7 +94,7 @@ public class LegModeRouteDistanceDistributionAnalyzer extends AbstractAnalysisMo
 		this.mode2PersonId2dist = lmrdh.getMode2PersonId2TravelDistances();
 
 		for(String mode:this.usedModes){
-			SortedMap<Integer, Integer> distClass2Legs = new TreeMap<Integer, Integer>();
+			SortedMap<Integer, Integer> distClass2Legs = new TreeMap<>();
 			for(int i: this.distanceClasses){
 				distClass2Legs.put(i, 0);
 			}

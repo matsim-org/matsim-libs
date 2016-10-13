@@ -20,12 +20,12 @@
 
 package playground.ikaddoura.analysis;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -43,7 +43,7 @@ public class IKAnalysisMain1 {
 	private void run() {
 	
 		Config config = ConfigUtils.loadConfig(configFile);
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();
 		
 		IKEventHandler handler1 = new IKEventHandler(scenario.getNetwork());

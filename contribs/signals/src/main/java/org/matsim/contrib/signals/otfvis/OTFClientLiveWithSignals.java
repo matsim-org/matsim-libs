@@ -22,14 +22,14 @@
 
 package org.matsim.contrib.signals.otfvis;
 
-import org.jdesktop.swingx.mapviewer.DefaultTileFactory;
-import org.jdesktop.swingx.mapviewer.TileFactory;
-import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
-import org.jdesktop.swingx.mapviewer.wms.WMSService;
+import org.jxmapviewer.viewer.DefaultTileFactory;
+import org.jxmapviewer.viewer.TileFactory;
+import org.jxmapviewer.viewer.TileFactoryInfo;
+import org.jxmapviewer.viewer.wms.WMSService;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.vis.otfvis.OTFClient;
+import org.matsim.vis.otfvis.gui.OTFVisFrame;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
@@ -46,8 +46,6 @@ import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
-import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -62,7 +60,6 @@ public class OTFClientLiveWithSignals {
 				OTFConnectionManager connectionManager = new OTFConnectionManager();
 				connectionManager.connectLinkToWriter(OTFLinkAgentsHandler.Writer.class);
 				connectionManager.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
-				connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
 				connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
 				
 				if (config.transit().isUseTransit()) {
@@ -96,8 +93,8 @@ public class OTFClientLiveWithSignals {
 				OTFQueryControl queryControl = new OTFQueryControl(server, visconf);
 				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, visconf);
 				queryControl.setQueryTextField(queryControlBar.getTextField());
-				OTFClient otfClient = new OTFClient(canvas, server, hostControlBar, mainDrawer, saver);
-				otfClient.getContentPane().add(queryControlBar, BorderLayout.SOUTH);
+				OTFVisFrame otfVisFrame = new OTFVisFrame(canvas, server, hostControlBar, mainDrawer, saver);
+				otfVisFrame.getContentPane().add(queryControlBar, BorderLayout.SOUTH);
 				mainDrawer.setQueryHandler(queryControl);
 				if (otfVisConfigGroup.isMapOverlayMode()) {
 					TileFactory tf;
@@ -108,10 +105,10 @@ public class OTFClientLiveWithSignals {
 						WMSService wms = new WMSService(otfVisConfigGroup.getMapBaseURL(), otfVisConfigGroup.getMapLayer());
 						tf = new OTFVisWMSTileFactory(wms, otfVisConfigGroup.getMaximumZoom());
 					}
-					otfClient.addMapViewer(tf);
+					otfVisFrame.addMapViewer(tf);
 				}
-                otfClient.pack();
-				otfClient.setVisible(true);
+                otfVisFrame.pack();
+				otfVisFrame.setVisible(true);
 			}
 		});
 	}
@@ -142,7 +139,7 @@ public class OTFClientLiveWithSignals {
 	
 	private static class OTFVisWMSTileFactory extends DefaultTileFactory {
 		public OTFVisWMSTileFactory(final WMSService wms, final int maxZoom) {
-			super(new TileFactoryInfo(0, maxZoom, maxZoom, 
+			super(new TileFactoryInfo(0, maxZoom, maxZoom,
 					256, true, true, // tile size and x/y orientation is r2l & t2b
 					"","x","y","zoom") {
 				@Override

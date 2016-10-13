@@ -38,10 +38,10 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  */
 public class PerLinkCongestionData {
 	private final Logger logger = Logger.getLogger(PerLinkCongestionData.class);
-	private  String outputDir = "/Users/aagarwal/Desktop/ils/agarwal/siouxFalls/output/run1/";/*"./output/run2/";*/
-	private  String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
-	private  String configFile = outputDir+"/output_config.xml";//"/config.xml";//
-	private  String eventFile = outputDir+"/ITERS/it.100/100.events.xml.gz";//"/events.xml";//
+	private final String outputDir = "/Users/aagarwal/Desktop/ils/agarwal/siouxFalls/output/run1/";/*"./output/run2/";*/
+	private final String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
+	private final String configFile = outputDir+"/output_config.xml";//"/config.xml";//
+	private final String eventFile = outputDir+"/ITERS/it.100/100.events.xml.gz";//"/events.xml";//
 
 	private Network network;
 

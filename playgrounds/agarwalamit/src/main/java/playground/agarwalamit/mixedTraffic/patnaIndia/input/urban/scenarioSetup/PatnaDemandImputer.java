@@ -46,9 +46,9 @@ public class PatnaDemandImputer {
 
 	public static final Logger LOG = Logger.getLogger(PatnaCalibrationUtils.class);
 
-	Map<String,Integer> mode2counter = new HashMap<>();
-	Map<String,Integer> inc2counter = new HashMap<>();
-	Map<String,Integer> dailyExp2counter = new HashMap<>();
+	final Map<String,Integer> mode2counter = new HashMap<>();
+	final Map<String,Integer> inc2counter = new HashMap<>();
+	final Map<String,Integer> dailyExp2counter = new HashMap<>();
 
 	//to remove the top element, linkedlist is used.
 	List<String> randomModes = new LinkedList<>();

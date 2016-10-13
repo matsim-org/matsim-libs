@@ -21,7 +21,6 @@ package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.cli
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.misc.Counter;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesFiller;
@@ -37,13 +36,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
-import static playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SocialPositions.EgoClass;
 
 /**
  * @author thibautd
@@ -87,16 +82,18 @@ public class CliquesDistributionCliquesFiller implements CliquesFiller {
 			final KDTree<Ego> egosWithFreeStubs ) {
 		// TODO condition sampling of clique on ego characteristic?
 		while ( !stopConsidering( ego ) ) {
+			final int size = CliqueEgoDistribution.getCliqueStructure( ego ).getRandomSize( random );
 			final SocialPositions.CliquePositions clique =
 					allCliques.sampleClique(
 							random,
-							CliqueEgoDistribution.getCliqueStructure( ego ).getRandomSize( random ) );
+							size );
+			assert clique.size() == size;
 
+			final double rotation = random.nextDouble() * 2 * Math.PI;
 			final Set<Ego> members = new HashSet<>();
 			members.add( ego );
 			for ( SocialPositions.CliquePosition cliqueMember : clique ) {
-				// TODO: rotate? -> only once per clique
-				final double[] point = position.calcPosition( ego, cliqueMember );
+				final double[] point = position.calcPosition( ego, cliqueMember , rotation );
 				final Ego member = findEgo( egosWithFreeStubs, clique, point, members );
 
 				if ( member == null ) {

@@ -40,8 +40,8 @@ public class ReadAndAddSubActivities {
 	}
 
 	private Config config;
-	private String inputConfig;
-	private Scenario sc;
+	private final String inputConfig;
+	private final Scenario sc;
 	
 	public static void main(String[] args) {
 		

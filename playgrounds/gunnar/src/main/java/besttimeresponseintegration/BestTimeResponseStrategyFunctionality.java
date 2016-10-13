@@ -39,6 +39,8 @@ public class BestTimeResponseStrategyFunctionality {
 
 	private final BestTimeResponseTravelTimes myTravelTimes;
 
+	private final boolean verbose = false;
+	
 	// -------------------- CONSTRUCTION --------------------
 
 	public BestTimeResponseStrategyFunctionality(final Plan plan, final Network network,
@@ -76,12 +78,24 @@ public class BestTimeResponseStrategyFunctionality {
 			final Double earliestEndTime_s = ((params.getEarliestEndTime() == Time.UNDEFINED_TIME) ? null
 					: params.getEarliestEndTime());
 
+			final double betaDur_1_s = personScoringParams.marginalUtilityOfPerforming_s;
+			final double betaTravel_1_s = personScoringParams.modeParams
+					.get(matsimNextLeg.getMode()).marginalUtilityOfTraveling_s;
+			final double betaLateArr_1_s = personScoringParams.marginalUtilityOfLateArrival_s;
+			final double betaEarlyDpt_1_s = personScoringParams.marginalUtilityOfEarlyDeparture_s;
+
 			final PlannedActivity<Facility, String> plannedAct = new PlannedActivity<>(
 					(Facility) new ActivityWrapperFacility(matsimAct), matsimNextLeg.getMode(),
 					params.getTypicalDuration(), Units.S_PER_H * params.getZeroUtilityDuration_h(), openingTime_s,
-					closingTime_s, latestStartTime_s, earliestEndTime_s);
+					closingTime_s, latestStartTime_s, earliestEndTime_s, betaDur_1_s, betaEarlyDpt_1_s, betaLateArr_1_s,
+					betaTravel_1_s);
 
 			this.plannedActivities.add(plannedAct);
+			
+			if (this.verbose) {
+				System.out.println(plannedAct);
+			}
+			
 		}
 
 		/*
@@ -94,10 +108,7 @@ public class BestTimeResponseStrategyFunctionality {
 		this.myTravelTimes = myTravelTimes;
 
 		this.timeAlloc = new TimeAllocator<>(timeDiscretization, this.myTravelTimes,
-				personScoringParams.marginalUtilityOfPerforming_s,
-				personScoringParams.modeParams.get("car").marginalUtilityOfTraveling_s,
-				personScoringParams.marginalUtilityOfLateArrival_s,
-				personScoringParams.marginalUtilityOfEarlyDeparture_s, repairTimeStructure, randomSmoothing);
+				repairTimeStructure, randomSmoothing);
 	}
 
 	// -------------------- IMPLEMENTATION --------------------

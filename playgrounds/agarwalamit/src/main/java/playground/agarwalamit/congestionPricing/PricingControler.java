@@ -135,12 +135,12 @@ class PricingControler {
 				public void install() {
 					final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 					addPlanStrategyBinding("SubtourModeChoice_".concat("COMMUTER_REV_COMMUTER")).toProvider(new javax.inject.Provider<PlanStrategy>() {
-						String[] availableModes = {"car", "pt_COMMUTER_REV_COMMUTER"};
-						String[] chainBasedModes = {"car", "bike"};
+						final String[] availableModes = {"car", "pt_COMMUTER_REV_COMMUTER"};
+						final String[] chainBasedModes = {"car", "bike"};
 
 						@Override
 						public PlanStrategy get() {
-							final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+							final Builder builder = new Builder(new RandomPlanSelector<>());
 							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
 							builder.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
 							return builder.build();
@@ -158,7 +158,7 @@ class PricingControler {
 
 						@Override
 						public PlanStrategy get() {
-							final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+							final Builder builder = new Builder(new RandomPlanSelector<>());
 							builder.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
 							return builder.build();
 						}

@@ -22,12 +22,11 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.simTime;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.util.SortedMap;
-
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
+import playground.agarwalamit.utils.FileUtils;
 
 /**
  * @author amit
@@ -35,21 +34,28 @@ import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 
 public class TravelTimeComperator {
 	
-	private String respectiveFileDirectory = "../../../../repos/runs-svn/patnaIndia/run110/100pct/";
+	private final String respectiveFileDirectory ;
 	private BufferedWriter writer;
-	private static final String LAST_IT = "200";
+
+	TravelTimeComperator(final String dir) {
+		this.respectiveFileDirectory = dir;
+	}
 
 	public static void main(String[] args) {
-		TravelTimeComperator ttc = new TravelTimeComperator();
-		ttc.openFile();
-		ttc.startProcessing();
-		ttc.closeFile();
+		TravelTimeComperator ttc = new TravelTimeComperator(FileUtils.RUNS_SVN+"/patnaIndia/run110/randomNrFix/slowCapacityUpdate/1pct/");
+		ttc.run();
+	}
+
+	void run (){
+		openFile();
+		startProcessing();
+		closeFile();
 	}
 
 	public void openFile(){
 		writer = IOUtils.getBufferedWriter(respectiveFileDirectory+"/travelTime.txt");
 		try {
-			writeString("scenario\tmode\ttravelTime\n");
+			writeString("scenario\tmode\ttravelTimeInSec\n");
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written to a file. Reason :"+ e);
 		}
@@ -75,8 +81,8 @@ public class TravelTimeComperator {
 		for (LinkDynamics ld : LinkDynamics.values() ) {
 			for ( TrafficDynamics td : TrafficDynamics.values()){
 				String queueModel = ld+"_"+td;
-				for(int i=2;i<12;i++){
-					String eventsFile = respectiveFileDirectory + "/output_"+queueModel+"_"+i+"/ITERS/it."+LAST_IT+"/"+LAST_IT+".events.xml.gz";
+				for(int i=1;i<12;i++){
+					String eventsFile = respectiveFileDirectory + "/output_"+queueModel+"_"+i+"/output_events.xml.gz";
 					if (! new File(eventsFile).exists() ) continue;
 					ModalTravelTimeAnalyzer timeAnalyzer  = new ModalTravelTimeAnalyzer(eventsFile);
 					timeAnalyzer.run();

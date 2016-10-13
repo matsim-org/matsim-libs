@@ -33,8 +33,8 @@ import org.matsim.core.utils.misc.StringUtils;
  */
 public class ModalCountsReader {
 
-	private String countsTextFile;
-	private Map<Id<Link>, Map<String, double[]>> count = new TreeMap<>();
+	private final String countsTextFile;
+	private final Map<Id<Link>, Map<String, double[]>> count = new TreeMap<>();
 
 	public ModalCountsReader(final String countsTextFile){
 		this.count.clear();
@@ -55,7 +55,7 @@ public class ModalCountsReader {
 					Id<Link> id = Id.create(values[0], Link.class);
 					String mode = values[1];
 					if (!this.count.containsKey(id)) {
-						this.count.put(id, new TreeMap<String, double[]>());
+						this.count.put(id, new TreeMap<>());
 					}
 
 					double vol [] = new double [24];

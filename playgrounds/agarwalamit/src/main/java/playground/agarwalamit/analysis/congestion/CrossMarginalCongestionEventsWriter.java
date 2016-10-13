@@ -46,7 +46,7 @@ public class CrossMarginalCongestionEventsWriter {
 	private final String inputEventsFile ;
 	private final Scenario sc;
 	private final int lastIt;
-	private final List<CongestionEvent> conEvents = new ArrayList<CongestionEvent>();
+	private final List<CongestionEvent> conEvents = new ArrayList<>();
 	
 	public CrossMarginalCongestionEventsWriter(final Scenario sc) {
 		this.sc = sc;
@@ -66,7 +66,7 @@ public class CrossMarginalCongestionEventsWriter {
 		EventHandler eh = null;
 
 		switch (congestionImpl){
-		case "implV3" : eh = new CongestionHandlerImplV3(manager, (MutableScenario) this.sc); break;
+		case "implV3" : eh = new CongestionHandlerImplV3(manager, this.sc); break;
 		case "implV4" : eh = new CongestionHandlerImplV4(manager, sc); break;
 //		case "implV6" : eh = new CongestionHandlerImplV6(manager, sc); break;
 		default : throw new RuntimeException(congestionImpl+ "is not supported. Available implementations are implV3, implV4, implV6. Aborting ...");

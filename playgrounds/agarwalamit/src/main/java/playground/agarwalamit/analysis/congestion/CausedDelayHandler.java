@@ -41,9 +41,9 @@ import playground.vsp.congestion.handlers.CongestionEventHandler;
 public class CausedDelayHandler implements CongestionEventHandler {
 	
 	private final double timeBinSize;
-	private final SortedMap<Double,Map<Id<Link>,Double>> timeBin2Link2DelayCaused = new TreeMap<Double, Map<Id<Link>,Double>>();
-	private final SortedMap<Double,Map<Id<Link>,Set<Id<Person>>>> timeBin2Link2Persons = new TreeMap<Double, Map<Id<Link>,Set<Id<Person>>>>();
-	private final SortedMap<Double,Map<Id<Person>,Double>> timeBin2Person2DelayCaused = new TreeMap<Double, Map<Id<Person>,Double>>();
+	private final SortedMap<Double,Map<Id<Link>,Double>> timeBin2Link2DelayCaused = new TreeMap<>();
+	private final SortedMap<Double,Map<Id<Link>,Set<Id<Person>>>> timeBin2Link2Persons = new TreeMap<>();
+	private final SortedMap<Double,Map<Id<Person>,Double>> timeBin2Person2DelayCaused = new TreeMap<>();
 	
 	/**
 	 * Required to get timeBin2 userGroup2 tolledTrips
@@ -61,16 +61,16 @@ public class CausedDelayHandler implements CongestionEventHandler {
 	
 	private void initialize(final int noOfTimeBin, final Scenario scenario) {
 		for (int i=0;i<noOfTimeBin;i++){
-			this.timeBin2Link2DelayCaused.put(this.timeBinSize*(i+1), new HashMap<Id<Link>,Double>());
-			this.timeBin2Person2DelayCaused.put(this.timeBinSize*(i+1), new HashMap<Id<Person>,Double>());
-			this.timeBin2Link2Persons.put(this.timeBinSize*(i+1), new HashMap<Id<Link>,Set<Id<Person>>>());
-			this.timeBin2ListOfTollPayers.put(this.timeBinSize*(i+1), new HashSet<Id<Person>>());
+			this.timeBin2Link2DelayCaused.put(this.timeBinSize*(i+1), new HashMap<>());
+			this.timeBin2Person2DelayCaused.put(this.timeBinSize*(i+1), new HashMap<>());
+			this.timeBin2Link2Persons.put(this.timeBinSize*(i+1), new HashMap<>());
+			this.timeBin2ListOfTollPayers.put(this.timeBinSize*(i+1), new HashSet<>());
 			
 			Map<Id<Link>,Double> link2del = this.timeBin2Link2DelayCaused.get(this.timeBinSize*(i+1));
 			Map<Id<Link>, Set<Id<Person>>> link2CausingPersonCount = this.timeBin2Link2Persons.get(this.timeBinSize*(i+1));
 			for (Id<Link> linkId : this.network.getLinks().keySet()){
 				link2del.put(linkId, 0.);
-				link2CausingPersonCount.put(linkId, new HashSet<Id<Person>>());
+				link2CausingPersonCount.put(linkId, new HashSet<>());
 			}
 			
 			Map<Id<Person>,Double> person2del = this.timeBin2Person2DelayCaused.get(this.timeBinSize*(i+1));				

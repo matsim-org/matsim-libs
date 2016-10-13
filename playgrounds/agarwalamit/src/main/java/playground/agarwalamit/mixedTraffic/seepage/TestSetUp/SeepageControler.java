@@ -57,7 +57,7 @@ public class SeepageControler {
 		
 		sc.getConfig().qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
-		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
+		Map<String, VehicleType> modeVehicleTypes = new HashMap<>();
 
 		for(String travelMode:MAIN_MODES){
 			VehicleType mode = VehicleUtils.getFactory().createVehicleType(Id.create(travelMode,VehicleType.class));

@@ -32,6 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -89,6 +90,11 @@ public class OnTheFlyServer implements OTFLiveServer {
 		}
 
 		@Override
+		public Map<Id<Person>, MobsimAgent> getAgents() {
+			return ((QSim) visMobsim).getAgentMap();
+		}
+
+		@Override
 		public Network getNetwork() {
 			return scenario.getNetwork();
 		}
@@ -111,6 +117,11 @@ public class OnTheFlyServer implements OTFLiveServer {
 		@Override
 		public VisData getNonNetwokAgentSnapshots() {
 			return visMobsim.getNonNetworkAgentSnapshots();
+		}
+
+		@Override
+		public double getTime() {
+			return ((QSim) visMobsim).getSimTimer().getTimeOfDay();
 		}
 
 	}

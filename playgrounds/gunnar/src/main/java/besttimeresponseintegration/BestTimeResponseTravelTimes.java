@@ -74,10 +74,12 @@ public class BestTimeResponseTravelTimes implements TripTravelTimes<Facility, St
 			tt_s = this.cache.getTT_s(bin, origin, destination, mode);
 		}
 		if (tt_s == null) {
+			final double tripDptTime_s = Math.max(this.timeDiscr.getBinStartTime_s(bin), 0);
 			final List<? extends PlanElement> tripSequence = this.tripRouter.calcRoute(mode, origin, destination,
-					this.timeDiscr.getBinStartTime_s(bin), person);
+					tripDptTime_s, this.person);
+
 			final Leg lastLeg = (Leg) tripSequence.get(tripSequence.size() - 1);
-			tt_s = lastLeg.getDepartureTime() + lastLeg.getTravelTime();
+			tt_s = (lastLeg.getDepartureTime() + lastLeg.getTravelTime()) - tripDptTime_s;
 			if (this.cache != null) {
 				this.cache.putTT_s(bin, origin, destination, mode, tt_s);
 			}

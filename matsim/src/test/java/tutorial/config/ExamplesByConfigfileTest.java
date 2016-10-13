@@ -19,13 +19,18 @@
 package tutorial.config;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.matsim.core.utils.io.IOUtils;
+
+import tutorial.config.RunFromConfigfileExample;
 
 /**
  * @author nagel
@@ -42,20 +47,18 @@ public class ExamplesByConfigfileTest {
 	
 	@Parameters(name = "{index}: configFilename == {0};")
 	public static Collection<Object[]> createTests() {
-		int nConfigFiles = 6 ;
-		Object [][] files2run = new Object [nConfigFiles][1]; 
-		files2run[0] = new Object [] {"examples/equil/config.xml"};
-		files2run[1] = new Object [] {"examples/equil-extended/config.xml"};
-		files2run[2] = new Object [] {"examples/tutorial/config/example1-config.xml"} ;
-		files2run[3] = new Object [] {"examples/tutorial/config/example5-config.xml"} ;
-		files2run[4] = new Object [] {"examples/tutorial/config/example5trips-config.xml"} ;
-		files2run[5] = new Object [] {"examples/equil-mixedTraffic/config.xml"};
-//		files2run[5] = new Object [] {"examples/equil-extended/config-with-roadpricing.xml"}; // yyyy throws exception; should be investigated and fixed.  (This can not work from core matsim after roadpricing was moved into a contrib!) kai, sep'16
-//		files2run[5] = new Object [] {"examples/tutorial/config/example2-config.xml"} ; // yyyy throws exception; should be investigated and fixed.  kai, sep'16
-//		files2run[8] = new Object [] {"examples/tutorial/config/externalReplanning.xml"} ; // yyyy throws exception; should be investigated and fixed.  kai, sep'16 
-//		files2run[2] = new Object [] {"examples/equil-extended/config-with-network-change-events.xml"}; // yyyy runs forever; should be investigated and fixed.  kai, sep'16
-//		files2run[1] = new Object [] {"examples/tutorial/config/externalMobsim.xml"} ; // yyyy throws exception; should be investigated and fixed.  kai, sep'16
-		return Arrays.asList(files2run);
+		Collection<Object[]> filesToRun = new ArrayList<Object[]>();
+
+		filesToRun.add(new Object [] {"examples/equil/config.xml"});
+		filesToRun.add(new Object [] {"examples/equil-extended/config.xml"});
+		filesToRun.add(new Object [] {"examples/tutorial/config/example1-config.xml"});
+		filesToRun.add(new Object [] {"examples/tutorial/config/example5-config.xml"});
+		filesToRun.add(new Object [] {"examples/tutorial/config/example5trips-config.xml"});
+		filesToRun.add(new Object [] {"examples/equil-mixedTraffic/config.xml"});
+		filesToRun.add(new Object [] {"examples/tutorial/config/example2-config.xml"});
+		filesToRun.add(new Object [] {"examples/equil-extended/config-with-network-change-events.xml"});
+		
+		return filesToRun;
 		
 		// the convention, I think, is that the output of the method marked by "@Parameters" is taken as input to the constructor
 		// before running each test. kai, jul'16

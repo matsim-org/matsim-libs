@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,24 +17,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.mzilske.osm;
+/**
+ * 
+ */
+package playground.jbischoff.pt;
 
-import org.jdesktop.swingx.mapviewer.DefaultTileFactory;
-import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
-import org.jdesktop.swingx.mapviewer.wms.WMSService;
+import java.util.Collection;
 
-public class MyWMSTileFactory extends DefaultTileFactory {
-	public MyWMSTileFactory(final WMSService wms, final int maxZoom) {
-		super(new TileFactoryInfo(0, maxZoom, maxZoom, 
-				256, true, true, // tile size and x/y orientation is r2l & t2b
-				"","x","y","zoom") {
-			@Override
-			public String getTileUrl(int x, int y, int zoom) {
-				int zz = maxZoom - zoom;
-				int z = (int)Math.pow(2,(double)zz-1);
-				return wms.toWMSURL(x-z, z-1-y, zz, getTileSize(zoom));
-			}
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
-		});
+/**
+ * @author  jbischoff
+ *
+ */
+/**
+ *
+ */
+public class VariableAccessConfigGroup extends ReflectiveConfigGroup {
+
+	public static final String GROUPNAME = "variableAccess";
+	
+	
+	public static final String MODEGROUPNAME = "variableAccessMode";
+
+	/**
+	 * @param name
+	 */
+	public VariableAccessConfigGroup() {
+		super(GROUPNAME);
+		// TODO Auto-generated constructor stub
 	}
+	
+	  public Collection< ConfigGroup> getVariableAccessModeConfigGroups()
+	    {
+	        return (Collection<ConfigGroup>) getParameterSets(MODEGROUPNAME);
+	    }
+	  
+	  public void setAccessModeGroup(ConfigGroup modeConfig)
+	    {
+	        addParameterSet(modeConfig);
+	    }
+
+
 }

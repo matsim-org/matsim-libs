@@ -19,12 +19,7 @@
 package playground.agarwalamit.munich.analysis.userGroup.toll;
 
 import java.io.BufferedWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
+import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -33,11 +28,11 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.agarwalamit.analysis.Toll.TripTollHandler;
-import playground.agarwalamit.analysis.trip.TripDistanceHandler;
+import playground.agarwalamit.analysis.trip.FilteredTripDistanceHandler;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
+import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.ListUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
@@ -48,19 +43,19 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 public class HourlyTripTollPerKmWriter {
 	
 	private final TripTollHandler tollHandler ;
-	private final TripDistanceHandler distHandler;
+	private final FilteredTripDistanceHandler distHandler;
 	private final MunichPersonFilter pf = new MunichPersonFilter();
 	
 	public HourlyTripTollPerKmWriter(final Network network, final double simulationEndTime, final int noOfTimeBins) {
 		this.tollHandler = new TripTollHandler( simulationEndTime, noOfTimeBins );
-		this.distHandler = new TripDistanceHandler(network, simulationEndTime, noOfTimeBins);
+		this.distHandler = new FilteredTripDistanceHandler(network, simulationEndTime, noOfTimeBins);
 	}
 	
 	public static void main(String[] args) {
 //		String [] pricingSchemes = new String [] {"eci"};
 		String [] pricingSchemes = new String [] {"ei","ci","eci"};
 		for (String str :pricingSchemes) {
-			String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/";
+			String dir = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/iatbr/output/";
 			String eventsFile = dir+str+"/ITERS/it.1500/1500.events.xml.gz";
 //			String eventsFile = dir+str+"/ITERS/it.1500/1500.events_congestionAndMoneyEvent.xml.gz";
 			String networkFile = dir+str+"/output_network.xml.gz";
@@ -90,11 +85,11 @@ public class HourlyTripTollPerKmWriter {
 
 		//initialize
 		for(double d : timebin2persontoll.keySet()){
-			userGroup2timebin2tolls.put(d, new TreeMap<String, List<Double>>());
+			userGroup2timebin2tolls.put(d, new TreeMap<>());
 				SortedMap<String, List<Double>> time2totalToll = new TreeMap<>();
 				
 				for(MunichUserGroup ug : MunichUserGroup.values()){
-					time2totalToll.put(ug.toString(), new ArrayList<Double>());
+					time2totalToll.put(ug.toString(), new ArrayList<>());
 				}
 				userGroup2timebin2tolls.put(d, time2totalToll);
 		}

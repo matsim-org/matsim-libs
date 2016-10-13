@@ -47,11 +47,11 @@ import org.matsim.pt.router.TransitRouterNetwork;
 import playground.ivt.matsim2030.Matsim2030Utils;
 import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
 import playground.ivt.matsim2030.router.TransitRouterNetworkReader;
-import playground.thibautd.eunoia.scoring.Matsim2010BikeSharingScoringFunctionFactory;
 import playground.ivt.router.CachingRoutingModuleWrapper;
+import playground.ivt.utils.SoftCache;
+import playground.thibautd.eunoia.scoring.Matsim2010BikeSharingScoringFunctionFactory;
 import playground.thibautd.router.multimodal.CachingLeastCostPathAlgorithmWrapper;
 import playground.thibautd.router.multimodal.LinkSlopeScorer;
-import playground.ivt.utils.SoftCache;
 
 import java.io.File;
 import java.util.Map;

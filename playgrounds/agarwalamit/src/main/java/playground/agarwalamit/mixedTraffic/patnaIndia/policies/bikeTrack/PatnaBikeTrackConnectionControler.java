@@ -85,7 +85,7 @@ public class PatnaBikeTrackConnectionControler {
 	private static int updateConnectorsAfterIteration = 10;
 	private static int maxItration = 100;
 
-	private static boolean isAllwoingMotorbikeOnBikeTrack = false;
+	private static final boolean isAllwoingMotorbikeOnBikeTrack = false;
 
 	public static void main(String[] args) {
 
@@ -127,7 +127,8 @@ public class PatnaBikeTrackConnectionControler {
 			}
 
 			for(Link l : connectionIdentifier.getBikeTrackNetwork().getLinks().values()){
-				if (scenario.getNetwork().getLinks().containsKey(l.getId()) ) continue;
+				if (scenario.getNetwork().getLinks().containsKey(l.getId()) ) {
+                }
 				else{
 					// link must be re-created so that node objects are same.
 					addLinkToScenario(scenario, l);
@@ -321,10 +322,14 @@ public class PatnaBikeTrackConnectionControler {
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
-			@Inject Network network;
-			@Inject Population population;
-			@Inject PlanCalcScoreConfigGroup planCalcScoreConfigGroup; // to modify the util parameters
-			@Inject ScenarioConfigGroup scenarioConfig;
+			@Inject
+			Network network;
+			@Inject
+			Population population;
+			@Inject
+			PlanCalcScoreConfigGroup planCalcScoreConfigGroup; // to modify the util parameters
+			@Inject
+			ScenarioConfigGroup scenarioConfig;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );

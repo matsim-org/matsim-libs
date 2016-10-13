@@ -47,8 +47,8 @@ public class PersonsCloner {
 		this.random = MatsimRandom.getRandom();
 	}
 
-	private Scenario sc;
-	private Random random;
+	private final Scenario sc;
+	private final Random random;
 
 	public static void main(String[] args) {
 		String plansFile = "../../../../repos/runs-svn/patnaIndia/run106/inputs/SelectedPlansOnly.xml";

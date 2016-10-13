@@ -34,7 +34,7 @@ public class LinkCapacityModifier {
 
 	private static final Logger LOG = Logger.getLogger(LinkCapacityModifier.class);
 
-	private Network network;
+	private final Network network;
 
 	public LinkCapacityModifier(Network network) {
 		this.network = network;

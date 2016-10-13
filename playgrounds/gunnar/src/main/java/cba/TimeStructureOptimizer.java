@@ -28,32 +28,24 @@ class TimeStructureOptimizer {
 
 	private final TimeDiscretization timeDiscretization;
 
-	// private final TravelTime carTravelTime;
-
 	private final SubpopulationCharyparNagelScoringParameters scoringParams;
-
-	// private final BestTimeResponseTravelTimes travelTimes;
 
 	final Provider<TripRouter> tripRouterProvider;
 
+	private final int maxTrials;
+
+	private final int maxFailures;
+
 	// -------------------- CONSTRUCTION --------------------
 
-	TimeStructureOptimizer(final Scenario scenario, final Provider<TripRouter> tripRouterProvider) {
+	TimeStructureOptimizer(final Scenario scenario, final Provider<TripRouter> tripRouterProvider, final int maxTrials,
+			final int maxFailures) {
 		this.scenario = scenario;
 		this.timeDiscretization = TimeDiscretizationFactory.newInstance(scenario.getConfig());
-		// this.carTravelTime = carTravelTime;
 		this.scoringParams = new SubpopulationCharyparNagelScoringParameters(scenario);
-
-		// if (carTravelTime == null) {
-		// this.travelTimes = null;
-		// } else {
-		// this.travelTimes = new
-		// BestTimeResponseTravelTimes(this.timeDiscretization, carTravelTime,
-		// scenario.getNetwork(), true);
-		// this.travelTimes.setCaching(true);
-		// }
-
 		this.tripRouterProvider = tripRouterProvider;
+		this.maxTrials = maxTrials;
+		this.maxFailures = maxFailures;
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
@@ -64,17 +56,12 @@ class TimeStructureOptimizer {
 				this.tripRouterProvider.get(), plan.getPerson());
 
 		final BestTimeResponseStrategyFunctionality initialPlanData = new BestTimeResponseStrategyFunctionality(plan,
-				this.scenario.getNetwork(), this.scoringParams, this.timeDiscretization,
-				// carTravelTime, true, true
-				travelTimes);
+				this.scenario.getNetwork(), this.scoringParams, this.timeDiscretization, travelTimes);
 
 		final TimeAllocator<Facility, String> timeAlloc = initialPlanData.getTimeAllocator();
 
-		final int maxTrials = 1;
-		final int maxFailures = 1;
-		timeAlloc.optimizeDepartureTimes(initialPlanData.plannedActivities, maxTrials, maxFailures);
+		timeAlloc.optimizeDepartureTimes(initialPlanData.plannedActivities, this.maxTrials, this.maxFailures);
 
 		return timeAlloc.getResultValue();
-
 	}
 }

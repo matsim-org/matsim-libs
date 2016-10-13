@@ -23,6 +23,8 @@ public class SearchRepeater<D> {
 
 	private int failures;
 
+	private boolean minimize = true;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	public SearchRepeater(final int maxTrials, final int maxFailures) {
@@ -30,11 +32,39 @@ public class SearchRepeater<D> {
 		this.maxFailures = maxFailures;
 	}
 
+	// -------------------- SETTERS AND GETTERS --------------------
+
+	public void setMinimize() {
+		this.minimize = true;
+	}
+
+	public void setMaximize() {
+		this.minimize = false;
+	}
+
+	public boolean getMinimize() {
+		return this.minimize;
+	}
+
+	public boolean getMaximize() {
+		return (!this.minimize);
+	}
+
 	// -------------------- IMPLEMENTATION --------------------
+
+	private boolean isImprovement(final double newObjFctVal) {
+		return ((this.getMinimize() && (newObjFctVal < this.objectiveFunctionValue))
+				|| (this.getMaximize() && (newObjFctVal > this.objectiveFunctionValue)));
+	}
 
 	public void run(final SearchAlgorithm<? extends D> algo) {
 
-		this.objectiveFunctionValue = Double.POSITIVE_INFINITY;
+		if (this.minimize) {
+			this.objectiveFunctionValue = Double.POSITIVE_INFINITY;
+		} else {
+			this.objectiveFunctionValue = Double.NEGATIVE_INFINITY;
+		}
+
 		this.decisionVariable = null;
 		this.trials = 0;
 		this.failures = 0;
@@ -45,7 +75,8 @@ public class SearchRepeater<D> {
 			this.trials++;
 
 			final Double newObjFctVal = algo.getObjectiveFunctionValue();
-			if (newObjFctVal < this.objectiveFunctionValue) {
+			// if (newObjFctVal < this.objectiveFunctionValue) {
+			if (this.isImprovement(newObjFctVal)) {
 				this.objectiveFunctionValue = newObjFctVal;
 				this.decisionVariable = algo.getDecisionVariable();
 				this.failures = 0;

@@ -52,11 +52,11 @@ public class MyPositionSnapShotWriter implements SnapshotWriter {
 
 	private BufferedWriter out = null;
 	private double currentTime = -1;
-	private Scenario scenario; 
-	private Map<Id<Person>, Id<Link>> person2link = new HashMap<>();
+	private final Scenario scenario;
+	private final Map<Id<Person>, Id<Link>> person2link = new HashMap<>();
 	private final static Logger LOG = Logger.getLogger(MyPositionSnapShotWriter.class);
 
-	public static enum Labels { TIME, VEHICLE, LINK_ID, DISTANCE_FROM_FROMNODE, SPEED } ;
+	public enum Labels { TIME, VEHICLE, LINK_ID, DISTANCE_FROM_FROMNODE, SPEED }
 
 	@Inject 
 	public MyPositionSnapShotWriter(Scenario scenario) {
@@ -164,7 +164,7 @@ public class MyPositionSnapShotWriter implements SnapshotWriter {
 		} 
 		else if(agentPrevLink!=null && link2positions.containsKey(agentPrevLink) ) 
 		{ // if it was already on some link, then it is most likely to be at the end of the link
-			return new Tuple<>(agentPrevLink, link2positions.get(link2positions));
+			return new Tuple<>(agentPrevLink, link2positions.get(link2positions.size()));
 		} 
 		else 
 		{ // agent is never seen before, most likely departed thus should be at the end of the link
@@ -181,6 +181,7 @@ public class MyPositionSnapShotWriter implements SnapshotWriter {
 			// this is possible if storage cap =1 or linkLength = euclidien dist between nodes.
 			LOG.warn("Can not dertermine the link information. Thus getting the nearest link for given easting northing.");
 			Link l = NetworkUtils.getNearestLink(scenario.getNetwork(), new Coord(easting, northing));
+			assert l != null;
 			double dist_f_fromNode = Point2D.distance(easting, northing, l.getFromNode().getCoord().getX(), l.getFromNode().getCoord().getY());
 			return new Tuple<>(l.getId(),dist_f_fromNode);
 		

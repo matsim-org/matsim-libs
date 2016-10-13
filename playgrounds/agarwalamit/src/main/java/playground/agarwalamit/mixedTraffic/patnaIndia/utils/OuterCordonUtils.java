@@ -157,7 +157,7 @@ public class OuterCordonUtils {
 
 		private final double factor;
 
-		private OuterCordonDirectionalFactors(final double factor){
+		OuterCordonDirectionalFactors(final double factor){
 			this.factor = factor;
 		}
 

@@ -51,7 +51,7 @@ public class CountsInserter {
 	private final Map<Tuple<Id<Link>,String>, Map<String, Map<Integer,Double>>> countStation2time2countInfo = new HashMap<>();
 	
 	private Counts<ModalLink> counts = new Counts<>();
-	private Map<String,ModalLink> mappedModalLink = new HashMap<>(); // central database of objects to retrieve, if needed. (similar to links in the scenario)
+	private final Map<String,ModalLink> mappedModalLink = new HashMap<>(); // central database of objects to retrieve, if needed. (similar to links in the scenario)
 
 	public Map<String, ModalLink> getModalLinkContainer() {
 		return mappedModalLink;
@@ -74,7 +74,7 @@ public class CountsInserter {
 			for (String mode : this.countStation2time2countInfo.get(mcs).keySet()) {
 				if(mode.equals("total")) continue;				
 				if(counts==null) {
-					counts = new Counts<ModalLink>();
+					counts = new Counts<>();
 				}
 
 				ModalLink ml = new ModalLink(mode, mcs.getFirst()); 
@@ -84,6 +84,7 @@ public class CountsInserter {
 				Count<ModalLink> c = counts.createAndAddCount(modalLinkId, mcs.getSecond());
 				for(Integer i : countStation2time2countInfo.get(mcs).get(mode).keySet()){
 					double vol = countStation2time2countInfo.get(mcs).get(mode).get(i) ;
+					assert c != null;
 					c.createVolume(i, vol );
 				}
 			}
@@ -110,7 +111,7 @@ public class CountsInserter {
 				String surveyLocation = parts[0];
 				String linkId = parts[1];
 
-				Tuple<Id<Link>,String> nowTuple = new Tuple<Id<Link>, String>(Id.createLinkId(linkId), surveyLocation);
+				Tuple<Id<Link>,String> nowTuple = new Tuple<>(Id.createLinkId(linkId), surveyLocation);
 				link2stationNumber = nowTuple;
 
 				int timebin = Integer.valueOf(parts[2]);

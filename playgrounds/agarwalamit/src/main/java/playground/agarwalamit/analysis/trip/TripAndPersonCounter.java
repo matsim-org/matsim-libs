@@ -44,9 +44,9 @@ public class TripAndPersonCounter implements PersonDepartureEventHandler, Person
 	private final List<Id<Person>> departureList;
 	
 	public TripAndPersonCounter() {
-		this.personId2CarTripCounter = new HashMap<Id<Person>, Integer>();
+		this.personId2CarTripCounter = new HashMap<>();
 		this.personId2AllTripCounter = new HashMap<>();
-		this.departureList = new ArrayList<Id<Person>>();
+		this.departureList = new ArrayList<>();
 	}
 
 	@Override

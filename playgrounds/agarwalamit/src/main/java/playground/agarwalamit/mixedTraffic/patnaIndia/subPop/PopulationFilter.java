@@ -34,9 +34,9 @@ public final class PopulationFilter {
 	
 	private PopulationFilter() {}
 	
-	private enum PatnaSubPopulations {slum, nonSlum};
-	
-	public static Population getSubPopulation(final Population population, final PatnaSubPopulations subPopulationType){
+	private enum PatnaSubPopulations {slum, nonSlum}
+
+    public static Population getSubPopulation(final Population population, final PatnaSubPopulations subPopulationType){
 		Population filteredPopulation = null;
 		if(subPopulationType.equals(PatnaSubPopulations.slum)) filteredPopulation = getSlumPopulation(population);
 		else if(subPopulationType.equals(PatnaSubPopulations.nonSlum)) filteredPopulation = getNonSlumPopulation(population);

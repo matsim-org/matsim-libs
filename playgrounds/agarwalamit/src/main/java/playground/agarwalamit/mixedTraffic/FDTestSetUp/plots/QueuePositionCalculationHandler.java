@@ -52,12 +52,12 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 
 	private static final Logger LOG = Logger.getLogger(QueuePositionCalculationHandler.class);
 	private final Map<Id<Link>,LinkPersonInfoContainer> linkid2Container = new HashMap<>();
-	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	private final Map<Id<Person>,SortedMap<Double,String>> person2startTime2PersonQPos = new HashMap<>();
 	private final Map<Id<Person>,SortedMap<Double,String>> person2startTime2PersonLinkInfo = new HashMap<>();
 	
-	private final Map<Id<Person>, String> personId2LegMode = new TreeMap<Id<Person>, String>();
-	private Tuple<Id<Person>, Double> lastDepartedPerson = new Tuple<Id<Person>, Double>(null, 0.);
+	private final Map<Id<Person>, String> personId2LegMode = new TreeMap<>();
+	private Tuple<Id<Person>, Double> lastDepartedPerson = new Tuple<>(null, 0.);
 	
 	private final Scenario scenario;
 	private double lastEventTimeStep = 0;
@@ -80,7 +80,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 	@Override
 	public void handleEvent(PersonDepartureEvent event){
 		this.personId2LegMode.put(event.getPersonId(), event.getLegMode());
-		this.lastDepartedPerson = new Tuple<Id<Person>, Double>(event.getPersonId(), event.getTime());
+		this.lastDepartedPerson = new Tuple<>(event.getPersonId(), event.getTime());
 	}
 
 	@Override

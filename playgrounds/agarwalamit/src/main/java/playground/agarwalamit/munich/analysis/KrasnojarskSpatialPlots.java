@@ -19,22 +19,13 @@
 package playground.agarwalamit.munich.analysis;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.emissions.types.WarmPollutant;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
@@ -43,11 +34,7 @@ import playground.agarwalamit.analysis.spatial.GeneralGrid.GridType;
 import playground.agarwalamit.analysis.spatial.SpatialDataInputs.LinkWeightMethod;
 import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
 import playground.agarwalamit.analysis.spatial.SpatialInterpolation;
-import playground.agarwalamit.analysis.userBenefits.MyUserBenefitsAnalyzer;
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.benjamin.utils.spatialAvg.LinkLineWeightUtil;
-import playground.vsp.analysis.modules.monetaryTransferPayments.MonetaryPaymentsAnalyzer;
-import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -57,14 +44,14 @@ import com.vividsolutions.jts.geom.Point;
 
 public class KrasnojarskSpatialPlots {
 
-	String runDir = "../../runs-svn/krasnojarsk/";
-	String bau = runDir + "bau";
+	final String runDir = "../../runs-svn/krasnojarsk/";
+	final String bau = runDir + "bau";
 //	String policyName = "ei";
 //	String policyCase = runDir + policyName;
 	private final double countScaleFactor = 10;
 	private final double gridSize = 250;
-	private boolean isWritingGGPLOTData = false;
-	private int noOfBins = 1;
+	private final boolean isWritingGGPLOTData = false;
+	private final int noOfBins = 1;
 
 	public static void main(String[] args) {
 		KrasnojarskSpatialPlots plots = new KrasnojarskSpatialPlots();

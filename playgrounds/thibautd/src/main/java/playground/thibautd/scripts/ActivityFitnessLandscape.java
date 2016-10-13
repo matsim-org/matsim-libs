@@ -26,9 +26,9 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

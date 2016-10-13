@@ -63,7 +63,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private final Vehicle2DriverEventHandler veh2DriverDelegate = new Vehicle2DriverEventHandler();
 	private final MunichPersonFilter pf = new MunichPersonFilter();
 	private final Collection<Geometry> zonalGeoms;
-	private Network network;
+	private final Network network;
 	private final String ug ;
 
 	private final Map<Id<Person>,Id<Link>> person2DepartureLeaveLink = new HashMap<>();

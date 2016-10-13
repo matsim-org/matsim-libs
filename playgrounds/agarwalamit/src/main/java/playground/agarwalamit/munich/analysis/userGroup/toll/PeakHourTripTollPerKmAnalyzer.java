@@ -20,14 +20,7 @@ package playground.agarwalamit.munich.analysis.userGroup.toll;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
+import java.util.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,11 +31,11 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.agarwalamit.analysis.Toll.TripTollHandler;
-import playground.agarwalamit.analysis.trip.TripDistanceHandler;
+import playground.agarwalamit.analysis.trip.FilteredTripDistanceHandler;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
+import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.ListUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
@@ -54,7 +47,7 @@ public class PeakHourTripTollPerKmAnalyzer {
 	
 	private static final Logger LOG = Logger.getLogger(PeakHourTripTollPerKmAnalyzer.class);
 	private final TripTollHandler tollHandler ;
-	private final TripDistanceHandler distHandler;
+	private final FilteredTripDistanceHandler distHandler;
 
 	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{8., 9., 10., 16., 17., 18.,})); // => 7-10 and 15-18
 	private final MunichPersonFilter pf = new MunichPersonFilter();
@@ -68,13 +61,14 @@ public class PeakHourTripTollPerKmAnalyzer {
 	public PeakHourTripTollPerKmAnalyzer(final Network network, final double simulationEndTime, final int noOfTimeBins) {
 		LOG.warn("Peak hours are assumed as 07:00-10:00 and 15:00-18:00 by looking on the travel demand for BAU scenario.");
 		this.tollHandler = new TripTollHandler( simulationEndTime, noOfTimeBins );
-		this.distHandler = new TripDistanceHandler(network, simulationEndTime, noOfTimeBins);
+		this.distHandler = new FilteredTripDistanceHandler(network, simulationEndTime, noOfTimeBins);
+		throw new RuntimeException("looks, there is some problem somewhere, cant reproduce the results (Oct 2016).");
 	} 
 
 	public static void main(String[] args) {
 		String [] pricingSchemes = new String [] {"ei","ci","eci"};
 		for (String str :pricingSchemes) {
-			String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/";
+			String dir = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/iatbr/output/";
 			String eventsFile = dir+str+"/ITERS/it.1500/1500.events.xml.gz";
 			String networkFile = dir+str+"/output_network.xml.gz";
 			String configFile = dir+str+"/output_config.xml.gz";
@@ -129,8 +123,8 @@ public class PeakHourTripTollPerKmAnalyzer {
 
 	private void storeUserGroupData(){
 		for(MunichUserGroup ug : MunichUserGroup.values()){
-			usrGrp2TollsPerKm.put(ug.toString(), new Tuple<Double, Double>(0., 0.));
-			usrGrp2TripCounts.put(ug.toString(), new Tuple<Integer, Integer>(0, 0));
+			usrGrp2TollsPerKm.put(ug.toString(), new Tuple<>(0., 0.));
+			usrGrp2TripCounts.put(ug.toString(), new Tuple<>(0, 0));
 		}
 		//first store peak hour data
 		for (Id<Person> personId : this.person2TollsPerKmPkHr.keySet()) {
@@ -138,8 +132,8 @@ public class PeakHourTripTollPerKmAnalyzer {
 			double tollInMeter = ListUtils.doubleSum(this.person2TollsPerKmPkHr.get(personId));
 			double pkTollInKm = usrGrp2TollsPerKm.get(ug).getFirst() + 1000*tollInMeter;
 			int pkTripCount = usrGrp2TripCounts.get(ug).getFirst() + this.person2TripCountsPkHr.get(personId);
-			usrGrp2TollsPerKm.put(ug, new Tuple<Double, Double>(pkTollInKm, 0.));
-			usrGrp2TripCounts.put(ug, new Tuple<Integer,Integer>(pkTripCount,0) );
+			usrGrp2TollsPerKm.put(ug, new Tuple<>(pkTollInKm, 0.));
+			usrGrp2TripCounts.put(ug, new Tuple<>(pkTripCount, 0) );
 		}
 
 		//now store off-peak hour data
@@ -148,8 +142,8 @@ public class PeakHourTripTollPerKmAnalyzer {
 			double tollInMeter = ListUtils.doubleSum(this.person2TollsPerKmOffPkHr.get(personId));
 			double offpkToll = usrGrp2TollsPerKm.get(ug).getSecond() + 1000*tollInMeter;
 			int offpkTripCount = usrGrp2TripCounts.get(ug).getSecond() + this.person2TripCountsOffPkHr.get(personId);
-			usrGrp2TollsPerKm.put(ug, new Tuple<Double, Double>(usrGrp2TollsPerKm.get(ug).getFirst(), offpkToll));
-			usrGrp2TripCounts.put(ug, new Tuple<Integer,Integer>(usrGrp2TripCounts.get(ug).getFirst(),offpkTripCount) );
+			usrGrp2TollsPerKm.put(ug, new Tuple<>(usrGrp2TollsPerKm.get(ug).getFirst(), offpkToll));
+			usrGrp2TripCounts.put(ug, new Tuple<>(usrGrp2TripCounts.get(ug).getFirst(), offpkTripCount) );
 		}
 	}
 
@@ -186,9 +180,7 @@ public class PeakHourTripTollPerKmAnalyzer {
 					if (person2TollsPerKmOffPkHr.containsKey(person) ) {
 						List<Double> existingTollsPerMeter = person2TollsPerKmOffPkHr.get(person);
 						List<Double> additionalTollsPerMeter = ListUtils.divide(timebin2person2tripTolls.get(d).get(person), timebin2person2tripDists.get(d).get(person));
-						if(additionalTollsPerMeter==null){
-							System.out.println("problem.");
-						}
+						assert additionalTollsPerMeter != null;
 						existingTollsPerMeter.addAll(additionalTollsPerMeter);
 						if(! (timebin2person2tripCounts.get(d).get(person)).equals(timebin2person2tripDistCounts.get(d).get(person)) ) {
 							throw new RuntimeException("Trip count should be equal in both lists. Aborting ...");

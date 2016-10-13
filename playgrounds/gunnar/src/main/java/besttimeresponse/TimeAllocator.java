@@ -39,27 +39,14 @@ public class TimeAllocator<L, M> {
 
 	private final boolean randomSmoothing;
 
-	private final double betaDur_1_s;
-
-	private final double betaTravel_1_s;
-
-	private final double betaLateArr_1_s;
-
-	private final double betaEarlyDpt_1_s;
-
 	private final boolean verbose = false;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	public TimeAllocator(final TimeDiscretization timeDiscretization, final TripTravelTimes<L, M> travelTimes,
-			final double betaDur_1_s, final double betaTravel_1_s, final double betaLateArr_1_s,
-			final double betaEarlyDpt_1_s, final boolean repairTimeStructure, final boolean randomSmoothing) {
+			final boolean repairTimeStructure, final boolean randomSmoothing) {
 		this.timeDiscretization = timeDiscretization;
 		this.travelTimes = travelTimes;
-		this.betaDur_1_s = betaDur_1_s;
-		this.betaTravel_1_s = betaTravel_1_s;
-		this.betaLateArr_1_s = betaLateArr_1_s;
-		this.betaEarlyDpt_1_s = betaEarlyDpt_1_s;
 		this.repairTimeStructure = repairTimeStructure;
 		this.randomSmoothing = randomSmoothing;
 	}
@@ -81,8 +68,7 @@ public class TimeAllocator<L, M> {
 			builder.addActivity(plannedActivities.get(q), initialDptTimes_s[q]);
 		}
 		builder.build();
-		return new TimeAllocationProblem(builder.getResult(), this.betaDur_1_s, this.betaTravel_1_s,
-				this.betaLateArr_1_s, this.betaEarlyDpt_1_s);
+		return new TimeAllocationProblem(builder.getResult());
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
@@ -124,10 +110,7 @@ public class TimeAllocator<L, M> {
 
 			double[] newDptTimes_s = (new SimplexSolver())
 					.optimize(problem.getObjectiveFunction(), problem.getConstraints(), GoalType.MAXIMIZE).getPoint();
-			// System.out.println(" BEFORE: " + Arrays.toString(newDptTimes_s));
 			problem = this.newTimeAllocationProblem(plannedActivities, newDptTimes_s);
-			// System.out.println(" AFTER: " +
-			// Arrays.toString(problem.getInitialSolution()));
 			final double newScore = problem.getTimeScoreAtInitialSolution();
 			final RealVector newGradient = problem.get__dScore_dDptTimes__1_s();
 
@@ -221,6 +204,7 @@ public class TimeAllocator<L, M> {
 		final TimeAllocator<L, M> enclosingTimeAllocator = this;
 
 		final SearchRepeater<double[]> repeater = new SearchRepeater<>(maxTrials, maxFailures);
+		repeater.setMaximize();
 		repeater.run(new SearchAlgorithm<double[]>() {
 			private double[] departureTimes = null;
 			private Double timeScore = null;

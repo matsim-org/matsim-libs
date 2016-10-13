@@ -90,7 +90,7 @@ public class PatnaNonSlumDemandCalibrator {
 	 */
 	public void processForZone27To42(String outputFile) {
 
-		List<Integer> originZones = new ArrayList<Integer>(); // order is maintained and we know the numbers
+		List<Integer> originZones = new ArrayList<>(); // order is maintained and we know the numbers
 		{ // origin zones == between 27 to 42
 
 			for (int idx = 0; idx < TOTAL_PLANS_REQUIRED; idx++) {

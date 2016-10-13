@@ -52,7 +52,7 @@ public class AbsoluteEmissions {
 
 		SortedMap<String, SortedMap<String, Double>> emissions = new TreeMap<>();
 		SortedMap<String, Double> emissionCost = new TreeMap<>();
-		Set<String> pollutants = new HashSet<String>();
+		Set<String> pollutants = new HashSet<>();
 
 		for(String runCase:runCases){
 			SortedMap<String, Double> em = calculateTotalEmissions(runCase);

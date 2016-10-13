@@ -22,7 +22,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -48,7 +47,6 @@ import playground.ivt.utils.MoreIOUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 
 /**
  * @author thibautd

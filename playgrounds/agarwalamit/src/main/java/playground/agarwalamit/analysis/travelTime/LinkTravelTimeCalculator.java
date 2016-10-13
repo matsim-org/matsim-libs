@@ -121,7 +121,7 @@ public class LinkTravelTimeCalculator extends AbstractAnalysisModule {
 					tts = link2PersonTravelTime.get(linkId).get(personId);
 					tts.add( leaveTime - link2PersonEnterTime.get(linkId).get(personId));
 				}else {
-					tts = new ArrayList<Double>();
+					tts = new ArrayList<>();
 					tts.add( leaveTime - link2PersonEnterTime.get(linkId).get(personId));
 				}
 				p2tt.put(personId, tts);
@@ -130,7 +130,7 @@ public class LinkTravelTimeCalculator extends AbstractAnalysisModule {
 			} else {
 
 				Map<Id<Person>,List<Double>> p2tt = new HashMap<>();
-				List<Double> tts = new ArrayList<Double>();
+				List<Double> tts = new ArrayList<>();
 				tts.add(leaveTime - link2PersonEnterTime.get(linkId).get(personId));
 				p2tt.put(personId, tts);
 				link2PersonTravelTime.put(linkId, p2tt);

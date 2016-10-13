@@ -43,7 +43,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 public class ChoiceSetAnalysis {
 
-	private PersonFilter pf = new PersonFilter();
+	private final PersonFilter pf = new PersonFilter();
 	private Map<List<String>, Integer> modeSequence2Count;
 	private Map<List<String>, Double> modeSequence2TotalScore;
 	private Map<List<String>, Double> modeSequence2TotalBestScore;
@@ -93,13 +93,13 @@ public class ChoiceSetAnalysis {
 	private void processScenario(Population pop){
 		
 		//initialize maps
-		modeSequence2Count = new HashMap<List<String>, Integer>(); 
-		modeSequence2TotalScore = new HashMap<List<String>, Double>();
-		modeSequence2TotalBestScore = new HashMap<List<String>, Double>();
-		modeSequence2TotalExecutedScore = new HashMap<List<String>, Double>();
+		modeSequence2Count = new HashMap<>();
+		modeSequence2TotalScore = new HashMap<>();
+		modeSequence2TotalBestScore = new HashMap<>();
+		modeSequence2TotalExecutedScore = new HashMap<>();
 		
 		for(Person p :pop.getPersons().values()){
-			List<String> modes = new ArrayList<String>();
+			List<String> modes = new ArrayList<>();
 			double score = 0.;
 			for(Plan plan :p.getPlans()){
 				modes.add(getTravelMode(plan));

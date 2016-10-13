@@ -42,7 +42,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class CausedDelayUserGroup {
 
-	private String outputDir;
+	private final String outputDir;
 	private  double marginalUtlMoney;
 	private  double marginalUtlPerformingSec;
 	private  double marginalUtlTravelingCarSec;
@@ -51,7 +51,7 @@ public class CausedDelayUserGroup {
 	private SortedMap<MunichUserGroup, Double> userGroupToDelays;
 	private Map<Id<Person>, Double> personId2CausingDelay;
 	private Scenario scenario;
-	private MunichPersonFilter pf = new MunichPersonFilter();
+	private final MunichPersonFilter pf = new MunichPersonFilter();
 
 	public CausedDelayUserGroup(final String outputDir) {
 		this.outputDir = outputDir;
@@ -120,8 +120,8 @@ public class CausedDelayUserGroup {
 	}
 
 	private void init(final String runCase){
-		this.userGroupToDelays  = new TreeMap<MunichUserGroup, Double>();
-		this.personId2CausingDelay = new HashMap<Id<Person>, Double>();
+		this.userGroupToDelays  = new TreeMap<>();
+		this.personId2CausingDelay = new HashMap<>();
 
 		for (MunichUserGroup ug : MunichUserGroup.values()) {
 			this.userGroupToDelays.put(ug, 0.0);

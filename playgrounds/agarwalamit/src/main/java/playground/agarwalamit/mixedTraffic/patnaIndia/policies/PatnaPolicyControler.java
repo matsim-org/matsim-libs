@@ -216,10 +216,14 @@ public class PatnaPolicyControler {
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
-			@Inject Network network;
-			@Inject Population population;
-			@Inject PlanCalcScoreConfigGroup planCalcScoreConfigGroup; // to modify the util parameters
-			@Inject ScenarioConfigGroup scenarioConfig;
+			@Inject
+             Network network;
+			@Inject
+             Population population;
+			@Inject
+             PlanCalcScoreConfigGroup planCalcScoreConfigGroup; // to modify the util parameters
+			@Inject
+             ScenarioConfigGroup scenarioConfig;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );

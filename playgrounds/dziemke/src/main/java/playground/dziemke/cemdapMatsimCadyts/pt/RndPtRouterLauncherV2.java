@@ -1,19 +1,10 @@
 package playground.dziemke.cemdapMatsimCadyts.pt;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
-import org.matsim.contrib.cadyts.general.CadytsContextI;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
-import org.matsim.contrib.cadyts.pt.CadytsPtContext;
 import org.matsim.contrib.cadyts.pt.CadytsPtOccupancyAnalyzerI;
 import org.matsim.contrib.common.randomizedtransitrouter.RandomizingTransitRouterTravelTimeAndDisutility;
 import org.matsim.core.config.Config;
@@ -28,21 +19,17 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.core.scoring.functions.*;
+import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
 import playground.dziemke.cemdapMatsimCadyts.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author gthunig on 14.07.2016.
@@ -64,10 +51,22 @@ public class RndPtRouterLauncherV2 {
 
 	public static void main(final String[] args) {
 
-		final double cadytsWeight = 30.0;
-		String configFile = "../../../shared-svn/projects/ptManuel/calibration/moyo24hrs.xml";
+		double cadytsWeight = 30.0;
+
+		String configFile;
+		if (args.length == 0) {
+			configFile = "../../../shared-svn/projects/ptManuel/calibration/moyo24hrs.xml";
+		} else if (args.length == 1){
+			configFile = args[0];
+		} else {
+			configFile = args[0];
+			cadytsWeight = Double.parseDouble(args[1]);
+		}
+		final double finalCadytsWeight = cadytsWeight;
 
 		Config config = ConfigUtils.loadConfig(configFile);
+
+		config.ptCounts().setPtCountsInterval(5);
 
 //		config.vspExperimental().setAbleToOverwritePtInteractionParams(true);
 		// should work without this, otherwise something is wrong
@@ -165,7 +164,7 @@ public class RndPtRouterLauncherV2 {
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
 				final CadytsScoring<TransitStopFacility> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cadytsContext);
-				final double cadytsScoringWeight = cadytsWeight * config.planCalcScore().getBrainExpBeta();
+				final double cadytsScoringWeight = finalCadytsWeight * config.planCalcScore().getBrainExpBeta();
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight);
 				sumScoringFunction.addScoringFunction(scoringFunction);
 

@@ -19,6 +19,8 @@
 
 package playground.agarwalamit.emisisons;
 
+import java.util.HashSet;
+import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -37,14 +39,11 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * @author julia, benjamin, amit
  */
 
-public class EquilTestSetUp {
+class EquilTestSetUp {
 
 	public Scenario createConfigAndReturnScenario(){
 		Config config = ConfigUtils.createConfig();
@@ -60,7 +59,7 @@ public class EquilTestSetUp {
 		ccg.setWriteEventsInterval(1);
 		ccg.setMobsim("qsim");
 
-		Set<EventsFileFormat> set = new HashSet<EventsFileFormat>();
+		Set<EventsFileFormat> set = new HashSet<>();
 		set.add(EventsFileFormat.xml);
 		ccg.setEventsFileFormats(set);
 
@@ -104,7 +103,7 @@ public class EquilTestSetUp {
 	 * Exposure to these agents will result in toll for active agent.
 	 */
 	public void createPassiveAgents(Scenario scenario) {
-		PopulationFactory pFactory = (PopulationFactory) scenario.getPopulation().getFactory();
+		PopulationFactory pFactory = scenario.getPopulation().getFactory();
 		// passive agents' home coordinates are around node 9 (12500, 7500)
 		for(Integer i=0; i<5; i++){ // x
 			for(Integer j=0; j<4; j++){
@@ -171,7 +170,7 @@ public class EquilTestSetUp {
 	 * Simplified form of Equil network.
 	 */
 	public void createNetwork(Scenario scenario) {
-		Network network = (Network) scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(1.0, 10000.0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord(2500.0, 10000.0));
@@ -182,41 +181,21 @@ public class EquilTestSetUp {
 		Node node7 = NetworkUtils.createAndAddNode(network, Id.create("7", Node.class), new Coord(1.0, 1500.0));
 		Node node8 = NetworkUtils.createAndAddNode(network, Id.create("8", Node.class), new Coord(12500.0, 12499.0));
 		Node node9 = NetworkUtils.createAndAddNode(network, Id.create("9", Node.class), new Coord(12500.0, 7500.0));
-		final Node fromNode = node1;
-		final Node toNode = node2;
 
 
 		//freeSpeed is 100km/h for roadType 22.
-		NetworkUtils.createAndAddLink(network,Id.create("12", Link.class), fromNode, toNode, (double) 1000, 100.00/3.6, (double) 3600, (double) 1, null, (String) "22");
-		final Node fromNode1 = node2;
-		final Node toNode1 = node3;
-		NetworkUtils.createAndAddLink(network,Id.create("23", Link.class), fromNode1, toNode1, (double) 2000, 100.00/3.6, (double) 3600, (double) 1, null, (String) "22");
-		final Node fromNode2 = node4;
-		final Node toNode2 = node5;
-		NetworkUtils.createAndAddLink(network,Id.create("45", Link.class), fromNode2, toNode2, (double) 2000, 100.00/3.6, (double) 3600, (double) 1, null, (String) "22");
-		final Node fromNode3 = node5;
-		final Node toNode3 = node6;
-		NetworkUtils.createAndAddLink(network,Id.create("56", Link.class), fromNode3, toNode3, (double) 1000, 100.00/3.6, (double) 3600, (double) 1, null, (String) "22");
-		final Node fromNode4 = node6;
-		final Node toNode4 = node7;
-		NetworkUtils.createAndAddLink(network,Id.create("67", Link.class), fromNode4, toNode4, (double) 1000, 100.00/3.6, (double) 3600, (double) 1, null, (String) "22");
-		final Node fromNode5 = node7;
-		final Node toNode5 = node1;
-		NetworkUtils.createAndAddLink(network,Id.create("71", Link.class), fromNode5, toNode5, (double) 1000, 100.00/3.6, (double) 3600, (double) 1, null, (String) "22");
-		final Node fromNode6 = node3;
-		final Node toNode6 = node8;
+		NetworkUtils.createAndAddLink(network,Id.create("12", Link.class), node1, node2, (double) 1000, 100.00/3.6, (double) 3600, (double) 1, null, "22");
+		NetworkUtils.createAndAddLink(network,Id.create("23", Link.class), node2, node3, (double) 2000, 100.00/3.6, (double) 3600, (double) 1, null, "22");
+		NetworkUtils.createAndAddLink(network,Id.create("45", Link.class), node4, node5, (double) 2000, 100.00/3.6, (double) 3600, (double) 1, null, "22");
+		NetworkUtils.createAndAddLink(network,Id.create("56", Link.class), node5, node6, (double) 1000, 100.00/3.6, (double) 3600, (double) 1, null, "22");
+		NetworkUtils.createAndAddLink(network,Id.create("67", Link.class), node6, node7, (double) 1000, 100.00/3.6, (double) 3600, (double) 1, null, "22");
+		NetworkUtils.createAndAddLink(network,Id.create("71", Link.class), node7, node1, (double) 1000, 100.00/3.6, (double) 3600, (double) 1, null, "22");
 
 		// two similar path from node 3 to node 4 - north: route via node 8, south: route via node 9
-		NetworkUtils.createAndAddLink(network,Id.create("38", Link.class), fromNode6, toNode6, (double) 5000, 100.00/3.6, (double) 3600, (double) 1, null, (String) "22");
-		final Node fromNode7 = node3;
-		final Node toNode7 = node9;
-		NetworkUtils.createAndAddLink(network,Id.create("39", Link.class), fromNode7, toNode7, (double) 5000, 100.00/3.6, (double) 3600, (double) 1, null, (String) "22");
-		final Node fromNode8 = node8;
-		final Node toNode8 = node4;
-		NetworkUtils.createAndAddLink(network,Id.create("84", Link.class), fromNode8, toNode8, (double) 5000, 100.00/3.6, (double) 3600, (double) 1, null, (String) "22");
-		final Node fromNode9 = node9;
-		final Node toNode9 = node4;
-		NetworkUtils.createAndAddLink(network,Id.create("94", Link.class), fromNode9, toNode9, (double) 4999, 100.00/3.6, (double) 3600, (double) 1, null, (String) "22");
+		NetworkUtils.createAndAddLink(network,Id.create("38", Link.class), node3, node8, (double) 5000, 100.00/3.6, (double) 3600, (double) 1, null, "22");
+		NetworkUtils.createAndAddLink(network,Id.create("39", Link.class), node3, node9, (double) 5000, 100.00/3.6, (double) 3600, (double) 1, null, "22");
+		NetworkUtils.createAndAddLink(network,Id.create("84", Link.class), node8, node4, (double) 5000, 100.00/3.6, (double) 3600, (double) 1, null, "22");
+		NetworkUtils.createAndAddLink(network,Id.create("94", Link.class), node9, node4, (double) 4999, 100.00/3.6, (double) 3600, (double) 1, null, "22");
 
 		for(Integer i=0; i<5; i++){ // x
 			for(Integer j=0; j<4; j++){
@@ -228,9 +207,7 @@ public class EquilTestSetUp {
 				// add a link for each person
 				Node nodeA = NetworkUtils.createAndAddNode(network, Id.create("node_"+idpart+"A", Node.class), new Coord(xCoord, yCoord));
 				Node nodeB = NetworkUtils.createAndAddNode(network, Id.create("node_"+idpart+"B", Node.class), new Coord(xCoord, yCoord + 1.));
-				final Node fromNode10 = nodeA;
-				final Node toNode10 = nodeB;
-				NetworkUtils.createAndAddLink(network,Id.create("link_p"+idpart, Link.class), fromNode10, toNode10, (double) 10, 30.0, (double) 3600, (double) 1 );
+				NetworkUtils.createAndAddLink(network,Id.create("link_p"+idpart, Link.class), nodeA, nodeB, (double) 10, 30.0, (double) 3600, (double) 1 );
 			}
 		}
 	}

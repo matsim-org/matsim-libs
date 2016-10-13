@@ -54,7 +54,7 @@ public class EmissionUtilsExtended extends EmissionUtils{
 	}
 
 	public Map<String, Double> getTotalColdEmissions(final Map<Id<Person>, Map<ColdPollutant, Double>> person2TotalColdEmissions) {
-		Map<String, Double> totalColdEmissions = new TreeMap<String, Double>();
+		Map<String, Double> totalColdEmissions = new TreeMap<>();
 
 		for(Id<Person> personId : person2TotalColdEmissions.keySet()){
 			Map<ColdPollutant, Double> individualColdEmissions = person2TotalColdEmissions.get(personId);
@@ -72,7 +72,7 @@ public class EmissionUtilsExtended extends EmissionUtils{
 	}
 
 	public Map<String, Double> getTotalWarmEmissions(final Map<Id<Person>, Map<WarmPollutant, Double>> person2TotalWarmEmissions) {
-		Map<String, Double> totalWarmEmissions = new TreeMap<String, Double>();
+		Map<String, Double> totalWarmEmissions = new TreeMap<>();
 
 		for(Id<Person> personId : person2TotalWarmEmissions.keySet()){
 			Map<WarmPollutant, Double> individualWarmEmissions = person2TotalWarmEmissions.get(personId);
@@ -114,7 +114,7 @@ public class EmissionUtilsExtended extends EmissionUtils{
 		return outWarmEmiss;
 	}
 	public Map<WarmPollutant, Double> addTwoWarmEmissionsMap (final Map<WarmPollutant, Double> warmEmission1, final Map<WarmPollutant, Double> warmEmission2){
-		Map<WarmPollutant, Double> warmEmissionOut = new HashMap<WarmPollutant, Double>();
+		Map<WarmPollutant, Double> warmEmissionOut = new HashMap<>();
 
 		for(WarmPollutant wm : warmEmission1.keySet()){
 			warmEmissionOut.put(wm, warmEmission1.get(wm)+warmEmission2.get(wm));
@@ -122,7 +122,7 @@ public class EmissionUtilsExtended extends EmissionUtils{
 		return warmEmissionOut;
 	}
 	public Map<WarmPollutant, Double> subtractTwoWarmEmissionsMap (final Map<WarmPollutant, Double> warmEmissionBigger, final Map<WarmPollutant, Double> warmEmissionSmaller){
-		Map<WarmPollutant, Double> warmEmissionOut = new HashMap<WarmPollutant, Double>();
+		Map<WarmPollutant, Double> warmEmissionOut = new HashMap<>();
 
 		for(WarmPollutant wm : warmEmissionBigger.keySet()){
 			warmEmissionOut.put(wm, warmEmissionBigger.get(wm)-warmEmissionSmaller.get(wm));

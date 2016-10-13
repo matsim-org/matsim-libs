@@ -34,7 +34,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class AreaFilter {
 
-	private Collection<Geometry> features;
+	private final Collection<Geometry> features;
 	private final static String MUNICH_SHAPE_FILE  = "../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 
 	/**

@@ -19,9 +19,6 @@
 package playground.agarwalamit.flowDynamics;
 
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -35,11 +32,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -123,25 +116,16 @@ public class MatsimFreeSpeedTravelTimeTest {
 			config.qsim().setFlowCapFactor(1.0);
 			config.qsim().setStorageCapFactor(1.0);
 
-			network = (Network) scenario.getNetwork();
+			network = scenario.getNetwork();
 
 			Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord(-100., -100.0));
 			Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId("2"), new Coord(0.0, 0.0));
 			Node node3 = NetworkUtils.createAndAddNode(network, Id.createNodeId("3"), new Coord(1000.0, 0.0));
 			Node node4 = NetworkUtils.createAndAddNode(network, Id.createNodeId("4"), new Coord(1000.0, 100.0));
 
-			Set<String> allowedModes = new HashSet<String>(); allowedModes.addAll(Arrays.asList(TransportMode.car,TransportMode.walk));
-			final Node fromNode = node1;
-			final Node toNode = node2;
-
-			link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId("1"), fromNode, toNode, (double) 1000, (double) 25, (double) 3600, (double) 1, null, (String) "22");
-			final Node fromNode1 = node2;
-			final Node toNode1 = node3;
-			final double freespeed = maxLinkSpeed; 
-			link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId("2"), fromNode1, toNode1, (double) 1000, freespeed, (double) 3600, (double) 1, null, (String) "22");
-			final Node fromNode2 = node3;
-			final Node toNode2 = node4;	//flow capacity is 1 PCU per min.
-			link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId("3"), fromNode2, toNode2, (double) 1000, (double) 25, (double) 3600, (double) 1, null, (String) "22");
+            link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId("1"), node1, node2, (double) 1000, (double) 25, (double) 3600, (double) 1, null, "22");
+            link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId("2"), node2, node3, (double) 1000, maxLinkSpeed, (double) 3600, (double) 1, null, "22");
+            link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId("3"), node3, node4, (double) 1000, (double) 25, (double) 3600, (double) 1, null, "22");
 
 			population = scenario.getPopulation();
 

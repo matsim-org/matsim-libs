@@ -94,14 +94,14 @@ public class GenerateFundamentalDiagramData {
 	private int flowUnstableWarnCount [] ;
 	private int speedUnstableWarnCount [] ;
 
-	private InputsForFDTestSetUp inputs;
+	private final InputsForFDTestSetUp inputs;
 	private PrintStream writer;
-	private Scenario scenario;
+	private final Scenario scenario;
 
 	static GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
 	private PassingEventsUpdator passingEventsUpdator;
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
-	private final Map<Id<Person>, String> person2Mode = new HashMap<Id<Person>, String>();
+	private final Map<Id<Person>, String> person2Mode = new HashMap<>();
 
 	private Integer[] startingPoint;
 	private Integer [] maxAgentDistribution;
@@ -220,13 +220,13 @@ public class GenerateFundamentalDiagramData {
 	private void parametricRunAccordingToGivenModalSplit(){
 
 		//	Creating minimal configuration respecting modal split in PCU and integer agent numbers
-		List<Double> pcus = new ArrayList<Double>();
+		List<Double> pcus = new ArrayList<>();
 		for(int index =0 ;index<travelModes.length;index++){
 			double tempPCU = MixedTrafficVehiclesUtils.getPCU(travelModes[index]);
 			pcus.add(tempPCU);
 		}
 
-		List<Integer> minSteps = new ArrayList<Integer>();
+		List<Integer> minSteps = new ArrayList<>();
 		for (double modalSplit : Arrays.asList(modalSplitInPCU)){
 			minSteps.add(Integer.valueOf( (int) modalSplit*100) ) ;
 		}
@@ -268,9 +268,9 @@ public class GenerateFundamentalDiagramData {
 		}
 		int numberOfPoints = (int) Math.ceil(networkDensity/sumOfPCUInEachStep) +5;
 
-		List<List<Integer>> pointsToRun = new ArrayList<List<Integer>>();
+		List<List<Integer>> pointsToRun = new ArrayList<>();
 		for (int m=1; m<numberOfPoints; m++){
-			List<Integer> pointToRun = new ArrayList<Integer>();
+			List<Integer> pointToRun = new ArrayList<>();
 			for (int i=0; i<travelModes.length; i++){
 				pointToRun.add(minSteps.get(i)*m);
 			}
@@ -295,7 +295,7 @@ public class GenerateFundamentalDiagramData {
 
 		for(int ii=0;ii<travelModes.length;ii++){
 			this.startingPoint [ii] =0;
-			this.stepSize [ii] = this.reduceDataPointsByFactor*1;
+			this.stepSize [ii] = this.reduceDataPointsByFactor;
 		}
 		this.startingPoint = new Integer[] {1,1};
 
@@ -339,7 +339,7 @@ public class GenerateFundamentalDiagramData {
 
 		//Actually going through the n-dimensional grid
 		BinaryAdditionModule iterationModule = new BinaryAdditionModule(Arrays.asList(maxAgentDistribution), Arrays.asList(stepSize), startingPoint);
-		List<List<Integer>> pointsToRun = new ArrayList<List<Integer>>();
+		List<List<Integer>> pointsToRun = new ArrayList<>();
 		for (int i=0; i<numberOfPoints; i++){
 			Integer[] newPoint = new Integer[maxAgentDistribution.length];
 			for (int j=0; j<newPoint.length; j++){
@@ -467,7 +467,10 @@ public class GenerateFundamentalDiagramData {
 			writer.print("\n");
 		}
 
-		if(isWritingEventsFileForEachIteration) eventWriter.closeFile();
+		if(isWritingEventsFileForEachIteration) {
+			assert eventWriter != null;
+			eventWriter.closeFile();
+		}
 	}
 	
 	private Netsim createModifiedQSim(Scenario sc, EventsManager events) {
@@ -490,7 +493,7 @@ public class GenerateFundamentalDiagramData {
 		}
 
 		//modification: Mobsim needs to know the different vehicle types (and their respective physical parameters)
-		final Map<String, VehicleType> travelModesTypes = new HashMap<String, VehicleType>();
+		final Map<String, VehicleType> travelModesTypes = new HashMap<>();
 		for (Id<VehicleType> id : mode2FlowData.keySet()){
 			VehicleType vT = mode2FlowData.get(id).getVehicleType();
 			travelModesTypes.put(id.toString(), vT);
@@ -500,12 +503,12 @@ public class GenerateFundamentalDiagramData {
 
 			@Override
 			public void insertAgentsIntoMobsim() {
-				
+
 				for ( Id<Person> personId : person2Mode.keySet()) {
 					String travelMode = person2Mode.get(personId);
 					double randDouble = MatsimRandom.getRandom().nextDouble();
 					double actEndTime = randDouble*InputsForFDTestSetUp.MAX_ACT_END_TIME;
-					
+
 					MobsimAgent agent = new MySimplifiedRoundAndRoundAgent(personId, actEndTime, travelMode);
 					qSim.insertAgentIntoMobsim(agent);
 
@@ -669,9 +672,9 @@ public class GenerateFundamentalDiagramData {
 		}
 
 		private Id<Link> currentLinkId = ORIGIN_LINK_ID;
-		private State agentState= MobsimAgent.State.ACTIVITY;;
+		private State agentState= MobsimAgent.State.ACTIVITY;
 
-		@Override
+        @Override
 		public Id<Link> getCurrentLinkId() {
 			return this.currentLinkId;
 		}

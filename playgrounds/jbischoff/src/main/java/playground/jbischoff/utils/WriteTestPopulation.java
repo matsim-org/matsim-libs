@@ -22,6 +22,9 @@
  */
 package playground.jbischoff.utils;
 
+import java.util.Random;
+
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -31,6 +34,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -45,25 +49,29 @@ public class WriteTestPopulation {
 		// TODO Auto-generated method stub
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationFactory fac = scenario.getPopulation().getFactory();
+		Random r = MatsimRandom.getLocalInstance();
 		int n = 100;
 		for (int i = 0 ; i < n; i++){
 			Person p = fac.createPerson(Id.createPersonId(i));
 			Plan plan = fac.createPlan();
 			p.addPlan(plan);
-			Activity h1 = fac.createActivityFromLinkId("home", Id.createLinkId(114));
-			h1.setEndTime(7*3600+i*60);
+			Coord hCoord = new Coord(r.nextInt(4000),r.nextInt(4000));
+			Coord wCoord = new Coord(r.nextInt(4000),r.nextInt(4000));
+
+			Activity h1 = fac.createActivityFromCoord("h", hCoord);
+			h1.setEndTime(7*3600+r.nextInt(7200));
 			plan.addActivity(h1);
-			Leg l1 = fac.createLeg("car");
+			Leg l1 = fac.createLeg("pt");
 			plan.addLeg(l1);
-			Activity w1 = fac.createActivityFromLinkId("work", Id.createLinkId(349));
-			w1.setEndTime(8*3600+i*60);
+			Activity w1 = fac.createActivityFromCoord("w", wCoord);;
+			w1.setEndTime(15*3600+r.nextInt(7200));
 			plan.addActivity(w1);
-			plan.addLeg(fac.createLeg("car"));
-			Activity h2 = fac.createActivityFromLinkId("home", Id.createLinkId(114));
+			plan.addLeg(fac.createLeg("pt"));
+			Activity h2 = fac.createActivityFromCoord("h", hCoord);
 			plan.addActivity(h2);
 			scenario.getPopulation().addPerson(p);
 		}
-		new PopulationWriter(scenario.getPopulation()).write("../../../shared-svn/projects/bmw_carsharing/example/population"+n+".xml");
+		new PopulationWriter(scenario.getPopulation()).write("C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/example/population"+n+".xml");
 				
 	}
 

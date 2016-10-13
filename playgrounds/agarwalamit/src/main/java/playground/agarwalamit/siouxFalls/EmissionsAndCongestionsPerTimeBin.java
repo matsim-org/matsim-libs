@@ -57,7 +57,7 @@ public class EmissionsAndCongestionsPerTimeBin {
 	private final double simulationEndTime = LoadMyScenarios.getSimulationEndTime(this.configFile) ;
 	private final Scenario scenario = LoadMyScenarios.loadScenarioFromNetworkAndConfig(this.networkFile,this.configFile);
 	private final int lastIteration = LoadMyScenarios.getLastIteration(this.configFile);
-	private List<Double> allTimeBins = new ArrayList<Double>();
+	private final List<Double> allTimeBins = new ArrayList<>();
 
 	public static void main(String[] args)  {
 		EmissionsAndCongestionsPerTimeBin emissionsVsCongestionData = new EmissionsAndCongestionsPerTimeBin();
@@ -118,7 +118,7 @@ public class EmissionsAndCongestionsPerTimeBin {
 			writer2.write("time"+"\t"+"delays_sec"+"\t"+"CO"+"\t"+"CO2_Total"+"\t"+"FC"+"\t"+"HC"+"\t"+"NMHC"+"\t"+"NO2"+"\t"+"NOX"+"\t"+"PM"+"\t"+"SO2"+"\n");
 			for(double time : time2EmissionsTotalFilled.keySet()){
 				double networkDelay = 0;
-				SortedMap<String, Double> networkEmissions = new TreeMap<String, Double>();
+				SortedMap<String, Double> networkEmissions = new TreeMap<>();
 				for(Link link : this.network.getLinks().values()){
 					double delay;
 					if(time2linkIdDelays.get(time)!=null) {
@@ -170,7 +170,7 @@ public class EmissionsAndCongestionsPerTimeBin {
 
 		for(double endOfTimeInterval : this.allTimeBins){
 			if(!time2EmissionsTotal.containsKey(endOfTimeInterval)){
-				time2EmissionsTotal.put(endOfTimeInterval, new HashMap<Id<Link>, SortedMap<String, Double>>());
+				time2EmissionsTotal.put(endOfTimeInterval, new HashMap<>());
 			}
 
 			Map<Id<Link>, SortedMap<String, Double>> emissionsTotalFilled = this.emissionUtils.setNonCalculatedEmissionsForNetwork(this.network, time2EmissionsTotal.get(endOfTimeInterval));

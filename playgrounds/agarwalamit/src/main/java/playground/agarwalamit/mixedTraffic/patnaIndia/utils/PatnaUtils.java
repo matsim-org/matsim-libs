@@ -50,8 +50,8 @@ public final class PatnaUtils {
 	public static final Double MEADIAM_INCOME = 4000.0;
 	
 	public enum PatnaUrbanActivityTypes {
-		home, work, educational, social, other, unknown;
-	}
+		home, work, educational, social, other, unknown
+    }
 
 	public static final Collection <String> URBAN_MAIN_MODES = Arrays.asList("car","motorbike","bike");
 	public static final Collection <String> URBAN_ALL_MODES = Arrays.asList("car","motorbike","bike","pt","walk");

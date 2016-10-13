@@ -27,30 +27,13 @@ class TimeAllocationProblem {
 	// chronological list of realized activities
 	private final List<RealizedActivity<?, ?>> realizedActivities;
 
-	// coefficient for activity duration
-	private final double betaDur_1_s;
-
-	// coefficient for travel duration
-	private final double betaTravel_1_s;
-
-	// coefficient for early departure
-	private final double betaEarlyDpt_1_s;
-
-	// coefficient for late arrival
-	private final double betaLateArr_1_s;
-
 	// overlap between travel time bins
 	private final double slack_s = 1.0;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	<L, M> TimeAllocationProblem(final List<RealizedActivity<L, M>> realizedActivities, final double betaDur_1_s,
-			final double betaTravel_1_s, final double betaLateArr_1_s, final double betaEarlyDpt_1_s) {
+	<L, M> TimeAllocationProblem(final List<RealizedActivity<L, M>> realizedActivities) {
 		this.realizedActivities = new ArrayList<RealizedActivity<?, ?>>(realizedActivities);
-		this.betaDur_1_s = betaDur_1_s;
-		this.betaTravel_1_s = betaTravel_1_s;
-		this.betaLateArr_1_s = betaLateArr_1_s;
-		this.betaEarlyDpt_1_s = betaEarlyDpt_1_s;
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
@@ -68,16 +51,20 @@ class TimeAllocationProblem {
 		double result = 0.0;
 		for (int q = 0; q < _N; q++) {
 			final RealizedActivity<?, ?> act = this.realizedActivities.get(q);
-			result += this.betaDur_1_s * act.plannedActivity.desiredDur_s
-					* log(max(MINACTDUR_S, act.effectiveDuration_s()) / max(MINACTDUR_S, act.plannedActivity.minDur_s));
+			result += act.plannedActivity.betaDur_1_s * act.plannedActivity.desiredDur_s
+					* log(max(MINACTDUR_S, act.effectiveDuration_s())
+							/ max(MINACTDUR_S, act.plannedActivity.zeroUtilityDur_s));
 			if (act.isLateArrival()) {
-				result += this.betaLateArr_1_s * (act.realizedArrTime_s - act.plannedActivity.latestArrTime_s);
+				result += act.plannedActivity.betaLateArr_1_s
+						* (act.realizedArrTime_s - act.plannedActivity.latestArrTime_s);
 			}
 			if (act.isEarlyDeparture()) {
-				result += this.betaEarlyDpt_1_s * (act.plannedActivity.earliestDptTime_s - act.realizedDptTime_s);
+				result += act.plannedActivity.betaEarlyDpt_1_s
+						* (act.plannedActivity.earliestDptTime_s - act.realizedDptTime_s);
 			}
-			result += this.betaTravel_1_s * (this.realizedActivities.get((q + 1) < _N ? (q + 1) : 0).realizedArrTime_s
-					- act.realizedDptTime_s);
+			result += act.plannedActivity.betaTravel_1_s
+					* (this.realizedActivities.get((q + 1) < _N ? (q + 1) : 0).realizedArrTime_s
+							- act.realizedDptTime_s);
 		}
 		return result;
 	}
@@ -99,28 +86,28 @@ class TimeAllocationProblem {
 			final double a = act.nextTripTravelTime.dTT_dDptTime;
 
 			// travel time
-			dScore_dDptTimes__1_s.addToEntry(q, this.betaTravel_1_s * a);
+			dScore_dDptTimes__1_s.addToEntry(q, act.plannedActivity.betaTravel_1_s * a);
 
 			// current activity duration
 			if (!act.isClosedAtDeparture()) {
-				dScore_dDptTimes__1_s.addToEntry(q, this.betaDur_1_s * act.plannedActivity.desiredDur_s
+				dScore_dDptTimes__1_s.addToEntry(q, act.plannedActivity.betaDur_1_s * act.plannedActivity.desiredDur_s
 						/ max(MINACTDUR_S, act.effectiveDuration_s()));
 			}
 
 			// next activity duration
 			if (!nextAct.isClosedAtArrival()) {
-				dScore_dDptTimes__1_s.addToEntry(q, (-1.0) * (1.0 + a) * this.betaDur_1_s
+				dScore_dDptTimes__1_s.addToEntry(q, (-1.0) * (1.0 + a) * nextAct.plannedActivity.betaDur_1_s
 						* nextAct.plannedActivity.desiredDur_s / max(MINACTDUR_S, nextAct.effectiveDuration_s()));
 			}
 
 			// early departure from current activity
 			if (act.isEarlyDeparture()) {
-				dScore_dDptTimes__1_s.addToEntry(q, -this.betaEarlyDpt_1_s);
+				dScore_dDptTimes__1_s.addToEntry(q, -act.plannedActivity.betaEarlyDpt_1_s);
 			}
 
 			// late arrival at next activity
 			if (nextAct.isLateArrival()) {
-				dScore_dDptTimes__1_s.addToEntry(q, this.betaLateArr_1_s * (1.0 + a));
+				dScore_dDptTimes__1_s.addToEntry(q, nextAct.plannedActivity.betaLateArr_1_s * (1.0 + a));
 			}
 		}
 

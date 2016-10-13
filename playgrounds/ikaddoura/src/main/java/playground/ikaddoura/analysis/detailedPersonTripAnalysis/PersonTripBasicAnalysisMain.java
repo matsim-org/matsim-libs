@@ -77,7 +77,7 @@ public class PersonTripBasicAnalysisMain {
 			
 		} else {
 			
-			String baiscDirectoryPath = "../../../runs-svn/decongestion/output/output_2016-07-12_12-35-56 _V9/";
+			String baiscDirectoryPath = "../../../runs-svn/cn2/output/cn8/";
 						
 			runDirectory = baiscDirectoryPath;
 			log.info("Could not find run-directory in args. Using the directory " + runDirectory);
@@ -95,9 +95,9 @@ public class PersonTripBasicAnalysisMain {
 	}
 
 	public void run() {
-					
-		String networkFile = "output_network.xml.gz";
+
 		String configFile = runDirectory + "output_config.xml.gz";
+		String networkFile = "output_network.xml.gz";
 		String populationFile = "output_plans.xml.gz";
 
 		Config config = ConfigUtils.loadConfig(configFile);	
@@ -172,6 +172,27 @@ public class PersonTripBasicAnalysisMain {
 		
 		analysis.printAggregatedResults(outputPath, TransportMode.car, personId2userBenefit, basicHandler, vttsHandler);
 		analysis.printAggregatedResults(outputPath, null, personId2userBenefit, basicHandler, vttsHandler);
+		
+		String[] excludedIdPrefixes = {"wv", "lkw"};
+		SortedMap<Double, List<Double>> departureTime2tolls_excluded = analysis.getParameter2Values(TransportMode.car, excludedIdPrefixes, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "tollsPerDepartureTime_car_without-wv-lkw_3600.csv", departureTime2tolls_excluded);
+		
+		SortedMap<Double, List<Double>> departureTime2vtts_excluded = analysis.getParameter2Values(TransportMode.car, excludedIdPrefixes, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), vttsHandler.getPersonId2TripNr2VTTSh(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "VTTSPerDepartureTime_car_without-wv-lkw_3600.csv", departureTime2vtts_excluded);
+		
+		SortedMap<Double, List<Double>> departureTime2vtts = analysis.getParameter2Values(TransportMode.car, excludedIdPrefixes, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), vttsHandler.getPersonId2TripNr2VTTSh(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "VTTSPerDepartureTime_car_3600.csv", departureTime2vtts);
+		
+		SortedMap<Double, List<Double>> departureTime2tollPerDistance_excluded = analysis.getTollPerDistancePerTime(TransportMode.car, excludedIdPrefixes, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), basicHandler.getPersonId2tripNumber2tripDistance(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "tollsPerDistancePerDepartureTime_car_without-wv-lkw_3600.csv", departureTime2tollPerDistance_excluded);
+		
+		String[] excludedIdPrefixes2 = {"wv", "lkw", "t", "fh"};
+		SortedMap<Double, List<Double>> departureTime2tolls_excluded2 = analysis.getParameter2Values(TransportMode.car, excludedIdPrefixes2, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "tollsPerDepartureTime_car_without-wv-lkw-t-fh_3600.csv", departureTime2tolls_excluded2);
+		
+		SortedMap<Double, List<Double>> departureTime2tollPerDistance_excluded2 = analysis.getTollPerDistancePerTime(TransportMode.car, excludedIdPrefixes2, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), basicHandler.getPersonId2tripNumber2tripDistance(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "tollsPerDistancePerDepartureTime_car_without-wv-lkw-t-fh_3600.csv", departureTime2tollPerDistance_excluded2);
+				
 	}
 }
 		

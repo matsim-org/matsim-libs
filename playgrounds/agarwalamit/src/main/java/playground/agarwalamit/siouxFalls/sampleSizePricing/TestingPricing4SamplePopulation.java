@@ -81,10 +81,10 @@ public class TestingPricing4SamplePopulation {
 		ecg.setUsingDetailedEmissionCalculation(false);
 		config.addModule(ecg);
 
-		SortedMap<Double, Double> flowCap2DelaysCosts = new TreeMap<Double, Double>();
-		SortedMap<Double, Double > flowCap2EmissionsCosts = new TreeMap<Double, Double>();
-		SortedMap<Double, Integer > flowCap2NoOfPersons = new TreeMap<Double, Integer>();
-		SortedMap<Double, Integer > flowCap2NoOfCarPersons = new TreeMap<Double, Integer>();
+		SortedMap<Double, Double> flowCap2DelaysCosts = new TreeMap<>();
+		SortedMap<Double, Double > flowCap2EmissionsCosts = new TreeMap<>();
+		SortedMap<Double, Integer > flowCap2NoOfPersons = new TreeMap<>();
+		SortedMap<Double, Integer > flowCap2NoOfCarPersons = new TreeMap<>();
 
 		for(double d:samplePopulation){
 			LOG.info("Running sample Population "+d+".");
@@ -123,7 +123,7 @@ public class TestingPricing4SamplePopulation {
 			flowCap2NoOfPersons.put(d, scenario.getPopulation().getPersons().size());
 			int carCounter =0;
 			for(Person p:scenario.getPopulation().getPersons().values()){
-				List<PlanElement> pes = new ArrayList<PlanElement>(p.getSelectedPlan().getPlanElements());
+				List<PlanElement> pes = new ArrayList<>(p.getSelectedPlan().getPlanElements());
 				for(PlanElement  pe :pes){
 					if(pe instanceof Leg){
 						String mode = ((Leg) pe).getMode();

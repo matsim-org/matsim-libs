@@ -45,12 +45,12 @@ import playground.vsp.congestion.handlers.CongestionEventHandler;
 
 public class CompareCongestionEvents  {
 
-	private String eventsFileV3 = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run203/implV3/ITERS/it.1000/1000.events.xml.gz";
-	private String eventsFileV4 = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run203/implV3/ITERS/it.1000/1000.events_implV4.xml.gz";
+	private final String eventsFileV3 = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run203/implV3/ITERS/it.1000/1000.events.xml.gz";
+	private final String eventsFileV4 = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run203/implV3/ITERS/it.1000/1000.events_implV4.xml.gz";
 
 	private List<CongestionEvent>  getCongestionEvents (String eventsFile){
 
-		final List<CongestionEvent> congestionevents = new ArrayList<CongestionEvent>();
+		final List<CongestionEvent> congestionevents = new ArrayList<>();
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		CongestionEventsReader reader = new CongestionEventsReader(eventsManager);
@@ -93,16 +93,16 @@ public class CompareCongestionEvents  {
 		System.out.println("V3 list size"+eventsImpl3List.size());
 		System.out.println("V4 list size"+eventsImpl4List.size());
 
-		Set<String> eventsImpl3 = new LinkedHashSet<String>();
+		Set<String> eventsImpl3 = new LinkedHashSet<>();
 		eventsImpl3.addAll(eventsImpl3List);
 
-		Set<String> eventsImpl4 = new LinkedHashSet<String>();
+		Set<String> eventsImpl4 = new LinkedHashSet<>();
 		eventsImpl4.addAll(eventsImpl4List);
 
 		System.out.println("V3 set size"+eventsImpl3.size());
 		System.out.println("V4 set size"+eventsImpl4.size());
 
-		wronglyChargedEventsList = new ArrayList<String>();
+		wronglyChargedEventsList = new ArrayList<>();
 		
 		for(String e3 : eventsImpl3){
 			if(eventsImpl4.contains(e3)){
@@ -119,9 +119,9 @@ public class CompareCongestionEvents  {
 	
 	private void checkWrongEventsList(){
 		double wrongDelays = 0;
-		Set<String> causingPersons = new HashSet<String>();
-		Set<String> affectedPersons = new HashSet<String>();
-		Set<Double> delays = new HashSet<Double>();
+		Set<String> causingPersons = new HashSet<>();
+		Set<String> affectedPersons = new HashSet<>();
+		Set<Double> delays = new HashSet<>();
 		
 		for(String e:wronglyChargedEventsList){
 			
@@ -144,7 +144,7 @@ public class CompareCongestionEvents  {
 	}
 
 	private List<String> eventList2StringList(List<CongestionEvent> l){
-		List<String> outList = new ArrayList<String>();
+		List<String> outList = new ArrayList<>();
 
 		for(CongestionEvent e :l){
 			outList.add(e.toString());	
@@ -173,7 +173,7 @@ public class CompareCongestionEvents  {
 	}
 
 	private Set<Id<Person>> getAffectedPersons(List<CongestionEvent> mce){
-		Set<Id<Person>> affectedPersons = new HashSet<Id<Person>>();
+		Set<Id<Person>> affectedPersons = new HashSet<>();
 		for(CongestionEvent e : mce) {
 			affectedPersons.add(e.getAffectedAgentId());
 		}
@@ -181,7 +181,7 @@ public class CompareCongestionEvents  {
 	}
 
 	private Set<Id<Person>> getCausingPersons(List<CongestionEvent> mce){
-		Set<Id<Person>> causingPersons = new HashSet<Id<Person>>();
+		Set<Id<Person>> causingPersons = new HashSet<>();
 		for(CongestionEvent e : mce) {
 			causingPersons.add(e.getCausingAgentId());
 		}

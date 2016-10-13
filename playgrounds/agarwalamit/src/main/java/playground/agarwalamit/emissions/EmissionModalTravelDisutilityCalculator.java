@@ -19,6 +19,8 @@
 
 package playground.agarwalamit.emissions;
 
+import java.util.Map;
+import java.util.Set;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -35,23 +37,20 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import playground.benjamin.internalization.EmissionCostModule;
 
-import java.util.Map;
-import java.util.Set;
-
 /**
  * @author benjamin
  *
  */
 public class EmissionModalTravelDisutilityCalculator implements TravelDisutility {
 
-    TravelTime timeCalculator;
-    double marginalUtlOfMoney;
+    final TravelTime timeCalculator;
+    final double marginalUtlOfMoney;
 //    double distanceCostRateCar;
 //    double marginalUtlOfTravelTime;
-    EmissionModule emissionModule;
-    EmissionCostModule emissionCostModule;
+final EmissionModule emissionModule;
+    final EmissionCostModule emissionCostModule;
     private final Set<Id<Link>> hotspotLinks;
-    private PlanCalcScoreConfigGroup cnScoringGroup;
+    private final PlanCalcScoreConfigGroup cnScoringGroup;
 
 
     public EmissionModalTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionCostModule emissionCostModule, Set<Id<Link>> hotspotLinks) {
@@ -76,7 +75,7 @@ public class EmissionModalTravelDisutilityCalculator implements TravelDisutility
                 emissionVehicle = VehicleUtils.getFactory().createVehicle(Id.createVehicleId("defaultVehicle"), VehicleUtils.getDefaultVehicleType());
             } else {
                 // a person is given -> use the vehicle for that person given in emissionModule
-                emissionVehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(person.getId());
+                emissionVehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(Id.createVehicleId(person.getId()));
             }
         }
 

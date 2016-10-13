@@ -41,10 +41,10 @@ public final class OuterCordonLinks{
 	 * D -- Danapur
 	 * N -- Noera (patna)
 	 */
-	private Map<String, String> countingStation2Link ;
+	private final Map<String, String> countingStation2Link ;
 	
 	public OuterCordonLinks (final PatnaNetworkType pnt){
-		countingStation2Link = new HashMap<String, String>();
+		countingStation2Link = new HashMap<>();
 		switch (pnt) {
 		case osmNetwork:
 			// x=fatua

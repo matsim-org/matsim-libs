@@ -84,7 +84,7 @@ class ChoiceModel {
 	Plan simulateChoice(final Link homeLoc, final Person person) {
 
 		final List<Plan> planAlternatives = new ArrayList<>(this.alternatives.size());
-
+		
 		// compute utilities
 		final List<Double> utilities = new ArrayList<>(this.alternatives.size());
 		double maxUtility = Double.NEGATIVE_INFINITY;
@@ -92,6 +92,7 @@ class ChoiceModel {
 			final Plan plan = alternative.asPlan(this.scenario, homeLoc.getId(), person);
 			planAlternatives.add(plan);
 			final double utility = this.utilityFunction.getUtility(plan);
+			plan.setScore(utility);
 			utilities.add(utility);
 			maxUtility = Math.max(maxUtility, utility);
 		}

@@ -63,10 +63,10 @@ public class ModalCadytsContext implements CadytsContextI<ModalLink>, StartupLis
 	private AnalyticalCalibrator<ModalLink> calibrator;
 	private ModalPlansTranslatorBasedOnEvents plansTranslator;
 	private SimResults<ModalLink> simResults;
-	private Scenario scenario;
-	private EventsManager eventsManager;
-	private VolumesAnalyzer volumesAnalyzer;
-	private OutputDirectoryHierarchy controlerIO;
+	private final Scenario scenario;
+	private final EventsManager eventsManager;
+	private final VolumesAnalyzer volumesAnalyzer;
+	private final OutputDirectoryHierarchy controlerIO;
 	
 	private final Map<String,ModalLink> modalLinkContainer;
 
@@ -132,7 +132,7 @@ public class ModalCadytsContext implements CadytsContextI<ModalLink>, StartupLis
 		// write some output
 		String filename = controlerIO.getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
-			new CadytsCostOffsetsXMLFileIO<ModalLink>(new ModalLinkLookUp(modalLinkContainer), ModalLink.class)
+			new CadytsCostOffsetsXMLFileIO<>(new ModalLinkLookUp(modalLinkContainer), ModalLink.class)
 			.write(filename, this.calibrator.getLinkCostOffsets());
 		} catch (IOException e) {
 			log.error("Could not write link cost offsets!", e);

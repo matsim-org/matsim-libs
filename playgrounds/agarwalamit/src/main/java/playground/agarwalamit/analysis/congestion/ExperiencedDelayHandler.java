@@ -74,7 +74,6 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 	private final SortedMap<String, Double> mode2Speed = new TreeMap<>();
 
 	private double timeBinSize;
-	private Network network;
 
 	public ExperiencedDelayHandler(final Scenario scenario, final int noOfTimeBins){
 		initialize(scenario, noOfTimeBins);
@@ -83,7 +82,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 	private void initialize(final Scenario scenario, final int noOfTimeBins){
 		double simulationEndTime = scenario.getConfig().qsim().getEndTime();
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
-		this.network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		for(VehicleType vt :scenario.getVehicles().getVehicleTypes().values()) {
 			mode2Speed.put(vt.getId().toString(), vt.getMaximumVelocity());
@@ -93,8 +92,8 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 			mode2Speed.put(TransportMode.car, Double.MAX_VALUE);
 		}
 		
-		for (Link link : this.network.getLinks().values()) {
-			this.linkId2PersonIdLinkEnterTime.put(link.getId(), new HashMap<Id<Person>, Double>());
+		for (Link link : network.getLinks().values()) {
+			this.linkId2PersonIdLinkEnterTime.put(link.getId(), new HashMap<>());
 			Map<String,Double> mode2freeSpeedTime = new HashMap<>();
 			for (String mode : mode2Speed.keySet()) {
 				Double freeSpeedLinkTravelTime = Double.valueOf( Math.floor(link.getLength()/ Math.min( link.getFreespeed(), mode2Speed.get(mode)) ) + 1 );
@@ -104,16 +103,16 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 		}
 
 		for(int i =0;i<noOfTimeBins;i++){
-			this.timebin2PersonId2Delay.put(this.timeBinSize*(i+1), new HashMap<Id<Person>, Double>());
-			this.timebin2LinkId2Delay.put(this.timeBinSize*(i+1), new HashMap<Id<Link>, Double>());
-			this.timebin2LinkIdLeaveCount.put(this.timeBinSize*(i+1), new HashMap<Id<Link>, Integer>());
+			this.timebin2PersonId2Delay.put(this.timeBinSize*(i+1), new HashMap<>());
+			this.timebin2LinkId2Delay.put(this.timeBinSize*(i+1), new HashMap<>());
+			this.timebin2LinkIdLeaveCount.put(this.timeBinSize*(i+1), new HashMap<>());
 
 			for(Person person : scenario.getPopulation().getPersons().values()){
 				Map<Id<Person>, Double>	delayForPerson = this.timebin2PersonId2Delay.get(this.timeBinSize*(i+1));
 				delayForPerson.put(person.getId(), Double.valueOf(0.));
 			}
 
-			for(Link link : this.network.getLinks().values()) {
+			for(Link link : network.getLinks().values()) {
 				Map<Id<Link>, Double>	delayOnLink = this.timebin2LinkId2Delay.get(this.timeBinSize*(i+1));
 				delayOnLink.put(link.getId(), Double.valueOf(0.));
 				Map<Id<Link>, Integer> countOnLink = this.timebin2LinkIdLeaveCount.get(this.timeBinSize*(i+1));
@@ -203,7 +202,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEven
 					+ "Link enter times are "+this.linkId2PersonIdLinkEnterTime.get(linkId).get(personId)+" and "+time);
 			LOG.warn("Reason might be : There is at least one teleport activity departing on the link (and thus derived link "
 					+ "enter time) and later person is entering the link with main congested mode. In such cases, the old time will be replaced.");
-			Gbl.ONLYONCE.toString();
+			LOG.warn(Gbl.ONLYONCE);
 		}
 
 		Map<Id<Person>, Double> personId2LinkEnterTime = this.linkId2PersonIdLinkEnterTime.get(linkId);

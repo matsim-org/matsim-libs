@@ -50,7 +50,7 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
 public class TollAnalyzer extends AbstractAnalysisModule {
 	private static final Logger LOG = Logger.getLogger(TollAnalyzer.class);
 	private final String eventsFile;
-	private FilteredTollHandler handler;
+	private final FilteredTollHandler handler;
 
 	/**
 	 * No filtering will be used, result will include all links, persons from all user groups.
@@ -193,7 +193,7 @@ public class TollAnalyzer extends AbstractAnalysisModule {
 			BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/boxPlot/toll_"+prefix+".txt");
 			try {
 				// sum all the values for different time bins
-				Map<Id<Person>,Double> personToll  = new HashMap<Id<Person>, Double>();
+				Map<Id<Person>,Double> personToll  = new HashMap<>();
 				for (double d : time2person2toll.keySet()){
 					for( Id<Person> person : time2person2toll.get(d).keySet() ) {
 						if(personToll.containsKey(person)) personToll.put(person, personToll.get(person) + time2person2toll.get(d).get(person) );

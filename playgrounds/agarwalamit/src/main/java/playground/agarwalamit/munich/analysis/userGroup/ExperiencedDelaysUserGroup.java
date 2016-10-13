@@ -54,13 +54,13 @@ public class ExperiencedDelaysUserGroup {
 	}
 
 	private int lastIteration;
-	public static Logger logger = Logger.getLogger(ExperiencedDelaysUserGroup.class);
-	private String outputDir;
+	public static final Logger logger = Logger.getLogger(ExperiencedDelaysUserGroup.class);
+	private final String outputDir;
 
 	private SortedMap<MunichUserGroup, Double> userGroupToDelays;
 	private Map<Double, Map<Id<Person>, Double>> time2linkIdDelays;
 	private Scenario scenario;
-	private MunichPersonFilter pf = new MunichPersonFilter();
+	private final MunichPersonFilter pf = new MunichPersonFilter();
 
 	public static void main(String[] args) throws IOException {
 		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";/*"./output/run2/";*/
@@ -70,8 +70,8 @@ public class ExperiencedDelaysUserGroup {
 	}
 
 	private void init(final String runCase){
-		this.userGroupToDelays  = new TreeMap<MunichUserGroup, Double>();
-		this.time2linkIdDelays = new HashMap<Double, Map<Id<Person>,Double>>();
+		this.userGroupToDelays  = new TreeMap<>();
+		this.time2linkIdDelays = new HashMap<>();
 		for (MunichUserGroup ug:MunichUserGroup.values()) {
 			this.userGroupToDelays.put(ug, 0.0);
 		}

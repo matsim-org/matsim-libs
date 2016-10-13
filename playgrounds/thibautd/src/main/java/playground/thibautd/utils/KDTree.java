@@ -31,8 +31,6 @@ import java.util.Random;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleBiFunction;
 
-import static playground.ivt.router.TripSoftCache.LocationType.coord;
-
 /**
  * Basic implementation of a KD-Tree, to answer spatial queries in spaces of arbitrary dimensions.
  * Balance is not enforced (yet).

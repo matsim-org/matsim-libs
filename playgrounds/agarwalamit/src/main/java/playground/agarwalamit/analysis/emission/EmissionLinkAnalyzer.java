@@ -55,8 +55,8 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
 public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 	private static final Logger LOG = Logger.getLogger(EmissionLinkAnalyzer.class);
 	private final String emissionEventsFile;
-	private final EmissionUtils emissionUtils = new EmissionUtils();;
-	private final FilteredWarmEmissionHandler warmHandler;
+	private final EmissionUtils emissionUtils = new EmissionUtils();
+    private final FilteredWarmEmissionHandler warmHandler;
 	private final FilteredColdEmissionHandler coldHandler;
 	private Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> link2WarmEmissions;
 	private Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> link2ColdEmissions;
@@ -145,8 +145,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 
 	@Override
 	public List<EventHandler> getEventHandler() {
-		List<EventHandler> handler = new LinkedList<EventHandler>();
-		return handler;
+		return new LinkedList<>();
 	}
 
 	@Override

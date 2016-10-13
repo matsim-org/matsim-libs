@@ -101,18 +101,86 @@ public class SimpleCliquesFiller implements CliquesFiller {
 			cliqueSampler = allCliques;
 		}
 
+		switch ( configGroup.getConflictResolutionMethod() ) {
+			case overload:
+				return sampleOverloadedClique( ego, egosWithFreeStubs, cliqueSampler );
+			case resample:
+				final Set<Ego> members = new HashSet<>();
+				// actually no strict need to check number of free stubs: overlap possible (even if improbable)
+				for ( int maxSize = Math.min(
+						cliqueSampler.getMaxSize(),
+					    ego.getFreeStubs() + 1 );
+					  maxSize > 1; ) {
+					final SocialPositions.CliquePositions clique =
+							sampleMaxSizedClique(
+									ego,
+									egosWithFreeStubs,
+									cliqueSampler,
+									maxSize,
+									members );
+					if ( clique == null ) break;
+					if ( clique.size() == members.size() ) return members;
+					members.clear();
+					// only cliques smaller than the current cliques are feasible
+					if ( log.isTraceEnabled() ) log.trace( "re sampling using max size "+(clique.size() - 1)+" instead of "+maxSize );
+					maxSize = clique.size() - 1;
+				}
+				// no clique was found...
+				log.debug( "No clique was found for ego "+ego );
+				log.debug( "Aborting search for ego "+ego );
+				egosWithFreeStubs.remove( ego );
+				return null;
+			default:
+				throw new RuntimeException( "unknown "+configGroup.getConflictResolutionMethod() );
+		}
+	}
+
+	private SocialPositions.CliquePositions sampleMaxSizedClique(
+			final Ego ego,
+			final KDTree<Ego> egosWithFreeStubs,
+			final CliqueSampler cliqueSampler,
+			final int maxSize,
+			final Set<Ego> members ) {
+		final SocialPositions.CliquePositions clique = cliqueSampler.sampleClique( random , maxSize );
+		if ( clique == null ) {
+			// no possible clique at all
+			return null;
+		}
+
+		final double rotation = random.nextDouble() * 2 * Math.PI;
+		members.add( ego );
+		for ( SocialPositions.CliquePosition cliqueMember : clique ) {
+			final double[] point = position.calcPosition( ego , cliqueMember , rotation );
+			final Ego member = findEgo( egosWithFreeStubs, clique, point , members , 1 );
+
+			if ( member == null ) {
+				// return clique to allow restarting at lower clique size
+				return clique;
+			}
+
+			members.add( member );
+		}
+
+		SocialPositions.link( members );
+
+		return clique;
+	}
+
+	private Set<Ego> sampleOverloadedClique( final Ego ego,
+			final KDTree<Ego> egosWithFreeStubs,
+			final CliqueSampler cliqueSampler ) {
 		final SocialPositions.CliquePositions clique = cliqueSampler.sampleClique( random , egosWithFreeStubs.size() );
 		if ( clique == null ) {
 			egosWithFreeStubs.remove( ego );
 			return null;
 		}
 
+		final double rotation = random.nextDouble() * 2 * Math.PI;
 		final Set<Ego> members = new HashSet<>();
 		members.add( ego );
 		for ( SocialPositions.CliquePosition cliqueMember : clique ) {
-			// TODO: rotate? -> only once per clique
-			final double[] point = position.calcPosition( ego , cliqueMember );
-			final Ego member = findEgo( egosWithFreeStubs, clique, point , members );
+			final double[] point = position.calcPosition( ego , cliqueMember , rotation );
+			final Ego member = findEgo( egosWithFreeStubs, clique, point , members , Integer.MAX_VALUE );
 
 			if ( member == null ) {
 				throw new RuntimeException( "no alter found at "+ Arrays.toString( point )+" for clique size "+clique.size() );
@@ -129,16 +197,17 @@ public class SimpleCliquesFiller implements CliquesFiller {
 		return ego.getDegree() <= ego.getAlters().size();
 	}
 
-	public static Ego findEgo( final KDTree<Ego> egosWithFreeStubs,
+	private static Ego findEgo( final KDTree<Ego> egosWithFreeStubs,
 			final SocialPositions.CliquePositions clique,
 			final double[] point,
-			final Set<Ego> currentClique ) {
+			final Collection<Ego> currentClique,
+			final int maxIter ) {
 		// Allow more ties than stubs in case no agent can be found.
 		// should remain OK, because:
 		// - clique size cannot exceed number of agents with free stubs
 		// - this can happen at most once per agent
 		// - we keep the increase minimal, by increasingly increasing tolerance.
-		for ( int i = 1; true; i++ ) {
+		for ( int i = 1; i <= maxIter; i++ ) {
 			final int freeStubs = clique.size() - i;
 			final Ego member =
 					egosWithFreeStubs.getClosestEuclidean(
@@ -146,6 +215,7 @@ public class SimpleCliquesFiller implements CliquesFiller {
 							( e ) -> e.getFreeStubs() >= freeStubs && !currentClique.contains( e ) );
 			if ( member != null ) return member;
 		}
+		return null;
 	}
 
 	public static class CliqueSampler {
@@ -183,6 +253,10 @@ public class SimpleCliquesFiller implements CliquesFiller {
 					maxSize,
 					0 , currentMaxIndex );
 			currentMaxSize = maxSize;
+		}
+
+		public int getMaxSize() {
+			return cliques[ cliques.length - 1 ].size();
 		}
 	}
 }

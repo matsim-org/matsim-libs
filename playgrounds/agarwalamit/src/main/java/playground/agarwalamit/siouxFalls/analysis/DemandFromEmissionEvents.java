@@ -44,9 +44,9 @@ public class DemandFromEmissionEvents {
 	private final String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
 	private final int noOfTimeBins = 30;
 	private double simulationEndTime;
-	private String configFile ="/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_munich_1pct_baseCaseCtd.xml";
+	private final String configFile ="/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_munich_1pct_baseCaseCtd.xml";
 
-	private String [] runNumber =  {"baseCaseCtd","ei"};
+	private final String [] runNumber =  {"baseCaseCtd","ei"};
 	private final String netFile1 = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
 	private Network network;
 
@@ -115,11 +115,11 @@ public class DemandFromEmissionEvents {
 	}
 
 	private Map<Double, Map<Id<Link>,  Double>> filterLinks (Map<Double, Map<Id<Link>, Double>> time2LinksData) {
-		Map<Double, Map<Id<Link>, Double>> time2LinksDataFiltered = new HashMap<Double, Map<Id<Link>, Double>>();
+		Map<Double, Map<Id<Link>, Double>> time2LinksDataFiltered = new HashMap<>();
 
 		for(Double endOfTimeInterval : time2LinksData.keySet()){
 			Map<Id<Link>,  Double> linksData = time2LinksData.get(endOfTimeInterval);
-			Map<Id<Link>, Double> linksDataFiltered = new HashMap<Id<Link>, Double>();
+			Map<Id<Link>, Double> linksDataFiltered = new HashMap<>();
 
 			for(Link link : this.network.getLinks().values()){
 				Id<Link> linkId = link.getId();

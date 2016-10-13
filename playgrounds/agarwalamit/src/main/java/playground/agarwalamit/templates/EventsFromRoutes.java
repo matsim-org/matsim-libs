@@ -90,7 +90,7 @@ public class EventsFromRoutes {
 		QSim qSim = qSim1;
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
+		Map<String, VehicleType> modeVehicleTypes = new HashMap<>();
 
 		VehicleType cars = VehicleUtils.getFactory().createVehicleType(Id.create("car",VehicleType.class));
 		cars.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed(cars.getId().toString()));
@@ -111,7 +111,7 @@ public class EventsFromRoutes {
 	private static class PersonLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
 		private final Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes;
-		private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+		private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 		public PersonLinkTravelTimeEventHandler(Map<Id<Person>, Map<Id<Link>, Double>> agentTravelTimes) {
 			this.personLinkTravelTimes = agentTravelTimes;

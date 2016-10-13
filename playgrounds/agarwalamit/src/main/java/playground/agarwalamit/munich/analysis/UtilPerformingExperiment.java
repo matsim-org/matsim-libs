@@ -45,16 +45,16 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  */
 public class UtilPerformingExperiment extends AbstractAnalysisModule {
 
-	private LegModeActivityEndTimeAndActDurationHandler actDurationUtilHandler;
-	private String eventsFile;
-	private String outputDir;
+	private final LegModeActivityEndTimeAndActDurationHandler actDurationUtilHandler;
+	private final String eventsFile;
+	private final String outputDir;
 	private static final Logger LOG = Logger.getLogger(UtilPerformingExperiment.class);
 
-	private Map<String, Double> actType2TypicalDuration ;
+	private final Map<String, Double> actType2TypicalDuration ;
 	private double marginalUtilPerformingSec ;
-	private SortedMap<String, Double> actType2UnderPerformUtils;
-	private SortedMap<String, Double> actType2OverPerformUtils;
-	private SortedMap<String, Double> actType2EqualPerformUtils;
+	private final SortedMap<String, Double> actType2UnderPerformUtils;
+	private final SortedMap<String, Double> actType2OverPerformUtils;
+	private final SortedMap<String, Double> actType2EqualPerformUtils;
 
 	public UtilPerformingExperiment(String outputDir, Scenario scenario) {
 		super(UtilPerformingExperiment.class.getSimpleName());
@@ -63,10 +63,10 @@ public class UtilPerformingExperiment extends AbstractAnalysisModule {
 		int lastIt = scenario.getConfig().controler().getLastIteration();
 		eventsFile = outputDir+"/ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz";
 
-		actType2TypicalDuration = new HashMap<String, Double>();
-		actType2UnderPerformUtils = new TreeMap<String, Double>();
-		actType2EqualPerformUtils = new TreeMap<String, Double>();
-		actType2OverPerformUtils = new TreeMap<String, Double>();
+		actType2TypicalDuration = new HashMap<>();
+		actType2UnderPerformUtils = new TreeMap<>();
+		actType2EqualPerformUtils = new TreeMap<>();
+		actType2OverPerformUtils = new TreeMap<>();
 
 		initializeActType2DurationsMaps(scenario.getConfig());
 	}

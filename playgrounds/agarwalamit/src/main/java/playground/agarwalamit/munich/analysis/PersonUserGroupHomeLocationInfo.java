@@ -38,7 +38,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 public class PersonUserGroupHomeLocationInfo {
 
-	private PersonFilter pf = new PersonFilter();
+	private final PersonFilter pf = new PersonFilter();
 
 	public static void main(String[] args) {
 
@@ -67,6 +67,7 @@ public class PersonUserGroupHomeLocationInfo {
 							break;
 						} else homeCoord = new Coord(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 					}
+					assert homeCoord != null;
 					writer.write(p.getId()+"\t"+ug+"\t"+homeCoord.getX()+"\t"+homeCoord.getY()+"\n");
 				}
 			}

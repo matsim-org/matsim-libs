@@ -31,9 +31,9 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class SpatialDataInputs {
 
-	public enum LinkWeightMethod {line, point};
-	
-	public final static Logger LOG = Logger.getLogger(SpatialDataInputs.class);
+	public enum LinkWeightMethod {line, point}
+
+    public final static Logger LOG = Logger.getLogger(SpatialDataInputs.class);
 	
 	private final LinkWeightMethod linkWeigthMethod;
 	

@@ -231,11 +231,16 @@ public class JointCalibrationControler {
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
-			@Inject Network network;
-			@Inject Population population;
-			@Inject PlanCalcScoreConfigGroup planCalcScoreConfigGroup; // to modify the util parameters
-			@Inject ScenarioConfigGroup scenarioConfig;
-			@Inject ModalCadytsContext cContext;
+			@Inject
+             Network network;
+			@Inject
+             Population population;
+			@Inject
+             PlanCalcScoreConfigGroup planCalcScoreConfigGroup; // to modify the util parameters
+			@Inject
+             ScenarioConfigGroup scenarioConfig;
+			@Inject
+             ModalCadytsContext cContext;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
@@ -244,7 +249,7 @@ public class JointCalibrationControler {
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 				
-				final CadytsScoring<ModalLink> scoringFunction = new CadytsScoring<ModalLink>(person.getSelectedPlan(), config, cContext);
+				final CadytsScoring<ModalLink> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cContext);
 				
 				if(isUsingCadyts){
 					final double cadytsScoringWeight = 15.0;
