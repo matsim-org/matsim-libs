@@ -69,9 +69,9 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         tripBeelineDistances
     }
 
-    private final Map<StatType,Databins<String>> statsContainer = new TreeMap<>() ;
+    private final Map<StatType,Databins<String>> simStatsContainer = new TreeMap<>() ;
     private final Map<StatType,DataMap<String>> sumsContainer  = new TreeMap<>() ;
-    private final Map<StatType,Databins<String>> meaContainer = new TreeMap<>() ;
+    private final Map<StatType,Databins<String>> refStatsContainer = new TreeMap<>() ;
 
 
     public ModeChoiceObjectiveFunction(final OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases) {
@@ -82,13 +82,13 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                 case tripBeelineDistances: {
                     double[] dataBoundariesTmp = getDataBoundaries();
                     {
-                        this.statsContainer.put( statType, new Databins<>( statType.name(), dataBoundariesTmp )) ;
+                        this.simStatsContainer.put( statType, new Databins<>( statType.name(), dataBoundariesTmp )) ;
                     }
                     {
                         final Databins<String> databins = new Databins<>( statType.name(), dataBoundariesTmp ) ;
 
                         fillDatabins(databins, dataBoundariesTmp.length);
-                        this.meaContainer.put( statType, databins) ;
+                        this.refStatsContainer.put( statType, databins) ;
                     }
                     break; }
                 default:
@@ -210,38 +210,124 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         }
     }
 
-    @Override public double value(SimulatorState state) {
+    @Override
+    public double value(SimulatorState state) {
 
         resetContainers();
 
-        StatType statType = StatType.tripBeelineDistances ;
+        StatType statType = StatType.tripBeelineDistances;
 
-        for ( Plan plan : service.getExperiencedPlans().values() ) {
-            List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan, tripRouter.getStageActivityTypes() ) ;
-            for ( TripStructureUtils.Trip trip : trips ) {
-                List<String> tripTypes = new ArrayList<>() ;
+        for (Plan plan : service.getExperiencedPlans().values()) {
+            List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan, tripRouter.getStageActivityTypes());
+            for (TripStructureUtils.Trip trip : trips) {
+                List<String> tripTypes = new ArrayList<>();
                 String mode = mainModeIdentifier.identifyMainMode(trip.getLegsOnly());
-                tripTypes.add(mode) ;
-                double item = calcBeelineDistance( trip.getOriginActivity(), trip.getDestinationActivity() ) ;
+                tripTypes.add(mode);
+                double item = calcBeelineDistance(trip.getOriginActivity(), trip.getDestinationActivity());
                 addItemToAllRegisteredTypes(tripTypes, statType, item);
             }
         }
 
+         /*
+          *  From Gunnar,
+          *  The (..)^2 objective function becomes very steep when one is very far away from its minimum.
+          *  Meaning that once one is far off, it becomes difficult to get back because
+          *  then the effects even of very small decision variable variations get strongly amplified in the objective function.
+          */
+        switch (this.opdytsObjectiveFunctionCases) {
+            case EQUIL:
+            case EQUIL_MIXEDTRAFFIC:
+                return getEquilObjectiveFunctionValue();
+            case PATNA_1Pct:
+            case PATNA_10Pct:
+                return getPatnaObjectiveFunctionValue();
+            default:
+                throw new RuntimeException("not implemented yet.");
+        }
+    }
+
+    // this and the method below it return same value.
+//    private double getPatnaObjectiveFunctionValue() {
+//        double objective = 0.;
+//        int dataBoundariesLength = getDataBoundaries().length;
+//        for (int ii = 0; ii<dataBoundariesLength ; ii ++) {
+//            for ( Map.Entry<StatType, Databins<String>> entry : simStatsContainer.entrySet() ) {
+//
+//                StatType theStatType = entry.getKey();  // currently only one type ;
+//                log.warn( "statType=" + theStatType );
+//                if(! theStatType.equals(StatType.tripBeelineDistances)) throw new RuntimeException("not implemented yet.");
+//
+//                Databins<String> databins = entry.getValue() ;
+//                double diff = 0.;
+//                for ( Map.Entry<String, double[]> theEntry : databins.entrySet() ) {
+//                    String mode = theEntry.getKey();
+//                    log.warn("mode=" + mode);
+//
+//                    double simValue = theEntry.getValue()[ii];
+//                    double realValue = this.refStatsContainer.get(theStatType).getValues(mode)[ii];
+//                    diff += Math.abs(simValue - realValue);
+//                }
+//                // since sum of legs from all modes for index ii will be same, keep it outside mode for loop
+//                objective  += diff * getSumFromIndex(databins, ii);
+//            }
+//        }
+//        log.warn( "objective=" + objective );
+//        return objective ;
+//    }
+
+
+
+    private double getPatnaObjectiveFunctionValue() {
         double objective = 0. ;
-        double sum = 0.;
-        for ( Map.Entry<StatType, Databins<String>> entry : statsContainer.entrySet() ) {
+        for ( Map.Entry<StatType, Databins<String>> entry : simStatsContainer.entrySet() ) {
             StatType theStatType = entry.getKey() ;  // currently only one type ;
-            log.warn( "statType=" + statType );
+            log.warn( "statType=" + theStatType );
+            if(! theStatType.equals(StatType.tripBeelineDistances)) throw new RuntimeException("not implemented yet.");
+
             Databins<String> databins = entry.getValue() ;
             for ( Map.Entry<String, double[]> theEntry : databins.entrySet() ) {
                 String mode = theEntry.getKey() ;
                 log.warn("mode=" + mode);
-                double[] value = theEntry.getValue() ;
-                double[] reaVal = this.meaContainer.get( theStatType).getValues(mode) ;
-                for ( int ii=0 ; ii<value.length ; ii++ ) {
-                    double diff = value[ii] - reaVal[ii] ;
-                    if ( reaVal[ii]>0.1 || value[ii]>0.1 ) {
-                        log.warn( "distanceBnd=" + databins.getDataBoundaries()[ii] + "; objVal=" + reaVal[ii] + "; simVal=" + value[ii] ) ;
+
+                double[] simValue = theEntry.getValue() ;
+                double[] reaVal = this.refStatsContainer.get( theStatType).getValues(mode) ;
+                for ( int ii=0 ; ii<simValue.length ; ii++ ) {
+                    double diff = Math.abs( simValue[ii] - reaVal[ii] ) ;
+                    if ( reaVal[ii]>0.1 || simValue[ii]>0.1 ) {
+                        log.warn( "distanceBnd=" + databins.getDataBoundaries()[ii] + "; objVal=" + reaVal[ii] + "; simVal=" + simValue[ii] ) ;
+                    }
+                    objective +=  diff * getSumFromIndex(databins, ii) ;
+                }
+            }
+        }
+        log.warn( "objective=" + objective );
+        return objective ;
+    }
+
+    private double getSumFromIndex (final Databins<String> databins, final int index) {
+        double sum = 0;
+        for(Map.Entry<String, double []> entry :  databins.entrySet()) {
+            sum += entry.getValue()[index];
+        }
+        return sum;
+    }
+
+    private double getEquilObjectiveFunctionValue (){
+        double objective = 0. ;
+        double sum = 0.;
+        for ( Map.Entry<StatType, Databins<String>> entry : simStatsContainer.entrySet() ) {
+            StatType theStatType = entry.getKey() ;  // currently only one type ;
+            log.warn( "statType=" + theStatType );
+            Databins<String> databins = entry.getValue() ;
+            for ( Map.Entry<String, double[]> theEntry : databins.entrySet() ) {
+                String mode = theEntry.getKey() ;
+                log.warn("mode=" + mode);
+                double[] simValue = theEntry.getValue() ;
+                double[] reaVal = this.refStatsContainer.get( theStatType).getValues(mode) ;
+                for ( int ii=0 ; ii<simValue.length ; ii++ ) {
+                    double diff = simValue[ii] - reaVal[ii] ;
+                    if ( reaVal[ii]>0.1 || simValue[ii]>0.1 ) {
+                        log.warn( "distanceBnd=" + databins.getDataBoundaries()[ii] + "; objVal=" + reaVal[ii] + "; simVal=" + simValue[ii] ) ;
                     }
                     objective += diff * diff ;
                     sum += reaVal[ii] ;
@@ -251,12 +337,11 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         objective /= (sum*sum) ;
         log.warn( "objective=" + objective );
         return objective ;
-
     }
 
     private void resetContainers() {
         for ( StatType statType : StatType.values() ) {
-            this.statsContainer.get(statType).clear() ;
+            this.simStatsContainer.get(statType).clear() ;
             if ( this.sumsContainer.get(statType)==null ) {
                 this.sumsContainer.put( statType, new DataMap<>() ) ;
             }
@@ -269,8 +354,8 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         for ( String filter : filters ) {
 
             // ...  add the "item" to the correct bin in the container:
-            int idx = this.statsContainer.get(statType).getIndex(item) ;
-            this.statsContainer.get(statType).inc( filter, idx ) ;
+            int idx = this.simStatsContainer.get(statType).getIndex(item) ;
+            this.simStatsContainer.get(statType).inc( filter, idx ) ;
 
             // also add it to the sums container:
             this.sumsContainer.get(statType).addValue( filter, item ) ;
