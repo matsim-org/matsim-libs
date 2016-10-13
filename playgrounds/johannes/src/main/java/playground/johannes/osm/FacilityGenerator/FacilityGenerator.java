@@ -33,15 +33,15 @@ public class FacilityGenerator {
 
     public static void main(String[] args) throws Exception {
 
-        if (args.length != 3) {
-            System.out.println("Wrong arguments provided. Pattern: [0] path to osm file [1] output xml path [2] minimum area for unclassified buildings");
+        if (args.length != 4) {
+            System.out.println("Wrong arguments provided. Pattern: [0] path to osm file [1] output xml path [2] minimum area for unclassified buildings [3] tag2type csv file");
             return;
         }
 
         FileAppender fileAppender = new FileAppender(new SimpleLayout(), "logs/" + LocalDate.now().toString() + "_" + LocalTime.now().getHour() + "-" + LocalTime.now().getMinute() + ".log", false);
         logger.addAppender(fileAppender);
 
-        Set<OSMObject> objects = parseOsm(args[0]);
+        Set<OSMObject> objects = parseOsm(args[0], args[3]);
 
         logger.info("Transforming objects...");
         transform(objects);
@@ -61,9 +61,9 @@ public class FacilityGenerator {
 
     }
 
-    static Set<OSMObject> parseOsm(String input) throws SQLException {
+    static Set<OSMObject> parseOsm(String input, String tag2Type) throws SQLException {
 
-        Mapping.initTag2TypeFromCsv("H:/MATSim/Facilities/tag2type.csv");
+        Mapping.initTag2TypeFromCsv(tag2Type);
 
         XMLParser parser = new XMLParser();
         parser.setValidating(false);
