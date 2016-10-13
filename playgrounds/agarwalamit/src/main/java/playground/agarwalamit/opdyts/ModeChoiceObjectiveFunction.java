@@ -268,7 +268,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 //                    diff += Math.abs(simValue - realValue);
 //                }
 //                // since sum of legs from all modes for index ii will be same, keep it outside mode for loop
-//                objective  += diff * getSumFromIndex(databins, ii);
+//                objective  += diff ;
 //            }
 //        }
 //        log.warn( "objective=" + objective );
@@ -296,20 +296,12 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                     if ( reaVal[ii]>0.1 || simValue[ii]>0.1 ) {
                         log.warn( "distanceBnd=" + databins.getDataBoundaries()[ii] + "; objVal=" + reaVal[ii] + "; simVal=" + simValue[ii] ) ;
                     }
-                    objective +=  diff * getSumFromIndex(databins, ii) ;
+                    objective +=  diff ;
                 }
             }
         }
         log.warn( "objective=" + objective );
         return objective ;
-    }
-
-    private double getSumFromIndex (final Databins<String> databins, final int index) {
-        double sum = 0;
-        for(Map.Entry<String, double []> entry :  databins.entrySet()) {
-            sum += entry.getValue()[index];
-        }
-        return sum;
     }
 
     private double getEquilObjectiveFunctionValue (){
