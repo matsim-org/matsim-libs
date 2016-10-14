@@ -148,7 +148,7 @@ public class WarmEmissionAnalysisModule {
 			double linkLength,
 			double travelTime) {
 
-		if(this.ecg.isUsingVehicleIdAsVehicleDescription() ) {
+		if(this.ecg.isUsingVehicleTypeIdAsVehicleDescription() ) {
 			if(vehicle.getType().getDescription()==null) {
 				vehicle.getType().setDescription(EmissionDescriptionMarker.BEGIN_EMISSIONS
 						+vehicle.getType().getId().toString()+EmissionDescriptionMarker.END_EMISSIONS);

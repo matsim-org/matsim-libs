@@ -139,8 +139,8 @@ public class RunEmissionToolOnline {
         controler.getConfig().addModule(ecg);
         ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
 		config.vehicles().setVehiclesFile(emissionVehicleFile);
-		ecg.setUsingVehicleIdAsVehicleDescription(true);
-		
+		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
+
         ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
         ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
         

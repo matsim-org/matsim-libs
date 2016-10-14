@@ -48,7 +48,7 @@ public class EmissionsConfigGroup
     private static final String EMISSION_FACTORS_COLD_FILE_DETAILED = "detailedColdEmissionFactorsFile";
     private String detailedColdEmissionFactorsFile;
 
-    private static final String IS_USING_VEHICLE_ID_AS_VEHICLE_DESCRIPTION = "isUsingVehicleIdAsVehicleDescription";
+    private static final String IS_USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION = "isUsingVehicleTypeIdAsVehicleDescription";
     private boolean isUsingVehicleIdAsVehicleDescription = false;
 
     @Override
@@ -74,7 +74,7 @@ public class EmissionsConfigGroup
 
         map.put(EMISSION_FACTORS_COLD_FILE_DETAILED, "OPTIONAL: file with HBEFA 3.1 detailed cold emission factors");
 
-        map.put(IS_USING_VEHICLE_ID_AS_VEHICLE_DESCRIPTION, "OPTIONAL: vehicle id is used for the description. " +
+        map.put(IS_USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION, "OPTIONAL: vehicle id is used for the description. " +
                 "The vehicle information (or vehicles file) should be passed to the scenario."+
                 "The description of a vehicle for every person (who is allowed to choose a vehicle in the simulation) should be " +
                 "surrounded by emission descrption markers i.e. "+EmissionDescriptionMarker.BEGIN_EMISSIONS+" and +" +
@@ -141,13 +141,13 @@ public class EmissionsConfigGroup
         super(GROUP_NAME);
     }
 
-    @StringGetter(IS_USING_VEHICLE_ID_AS_VEHICLE_DESCRIPTION)
-    public boolean isUsingVehicleIdAsVehicleDescription() {
+    @StringGetter(IS_USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION)
+    public boolean isUsingVehicleTypeIdAsVehicleDescription() {
         return isUsingVehicleIdAsVehicleDescription;
     }
 
-    @StringSetter(IS_USING_VEHICLE_ID_AS_VEHICLE_DESCRIPTION)
-    public void setUsingVehicleIdAsVehicleDescription(boolean usingVehicleIdAsVehicleDescription) {
+    @StringSetter(IS_USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION)
+    public void setUsingVehicleTypeIdAsVehicleDescription(boolean usingVehicleIdAsVehicleDescription) {
         isUsingVehicleIdAsVehicleDescription = usingVehicleIdAsVehicleDescription;
     }
 }
