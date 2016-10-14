@@ -1,12 +1,12 @@
 package playground.sebhoerl.avtaxi.vrpagent;
 
+import com.google.inject.Inject;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dynagent.DynAction;
-import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 
 import playground.sebhoerl.avtaxi.passenger.AVPassengerDropoffActivity;
 import playground.sebhoerl.avtaxi.passenger.AVPassengerPickupActivity;
@@ -14,22 +14,20 @@ import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
 import playground.sebhoerl.avtaxi.schedule.AVTask;
 
+import javax.inject.Named;
+
 public class AVActionCreator implements VrpAgentLogic.DynActionCreator {
     public static final String PICKUP_ACTIVITY_TYPE = "AVPickup";
     public static final String DROPOFF_ACTIVITY_TYPE = "AVDropoff";
 
-    private final PassengerEngine passengerEngine;
-    private final VrpLegs.LegCreator legCreator;
-    private final double pickupDuration;
-    private final TaxiActionCreator delegate;
+    @Inject
+    private PassengerEngine passengerEngine;
 
-    public AVActionCreator(PassengerEngine passengerEngine, VrpLegs.LegCreator legCreator, double pickupDuration, TaxiActionCreator delegate)
-    {
-        this.passengerEngine = passengerEngine;
-        this.legCreator = legCreator;
-        this.pickupDuration = pickupDuration;
-        this.delegate = delegate;
-    }
+    @Inject
+    private VrpLegs.LegCreator legCreator;
+
+    @Inject @Named("pickupDuration")
+    private Double pickupDuration;
 
     @Override
     public DynAction createAction(final Task task, double now)

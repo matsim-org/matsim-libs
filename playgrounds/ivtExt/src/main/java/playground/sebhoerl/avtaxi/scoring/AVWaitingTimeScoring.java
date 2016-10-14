@@ -3,7 +3,6 @@ package playground.sebhoerl.avtaxi.scoring;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.scoring.SumScoringFunction;
 import playground.sebhoerl.av.framework.AVModule;
 

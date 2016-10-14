@@ -1,13 +1,11 @@
 package playground.sebhoerl.avtaxi.schedule;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
-import org.matsim.contrib.taxi.data.TaxiRequest;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 public class AVPickupTask extends StayTaskImpl implements AVTaskWithRequests, AVTask {
@@ -16,6 +14,13 @@ public class AVPickupTask extends StayTaskImpl implements AVTaskWithRequests, AV
 	public AVPickupTask(double beginTime, double endTime, Link link) {
         super(beginTime, endTime, link);
 	}
+
+    public AVPickupTask(double beginTime, double endTime, Link link, Collection<AVRequest> requests) {
+        this(beginTime, endTime, link);
+
+        this.requests.addAll(requests);
+        for (AVRequest request : requests) request.setPickupTask(this);
+    }
     
     @Override
     public AVTaskType getAVTaskType() {
@@ -24,7 +29,8 @@ public class AVPickupTask extends StayTaskImpl implements AVTaskWithRequests, AV
     
     @Override
     public void addRequest(AVRequest request) {
-    	requests.add(request);
+        requests.add(request);
+        request.setPickupTask(this);
     }
 
     @Override

@@ -1,13 +1,11 @@
 package playground.sebhoerl.avtaxi.schedule;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
-import org.matsim.contrib.taxi.data.TaxiRequest;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 public class AVDriveTask extends DriveTaskImpl implements AVTaskWithRequests, AVTask {
@@ -15,6 +13,11 @@ public class AVDriveTask extends DriveTaskImpl implements AVTaskWithRequests, AV
 	
 	public AVDriveTask(VrpPathWithTravelData path) {
 		super(path);
+	}
+
+	public AVDriveTask(VrpPathWithTravelData path, Collection<AVRequest> requests) {
+		this(path);
+		this.requests.addAll(requests);
 	}
 
 	@Override

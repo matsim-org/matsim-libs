@@ -1,13 +1,11 @@
 package playground.sebhoerl.avtaxi.schedule;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
-import org.matsim.contrib.taxi.data.TaxiRequest;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 public class AVDropoffTask extends StayTaskImpl implements AVTaskWithRequests, AVTask {
@@ -15,6 +13,13 @@ public class AVDropoffTask extends StayTaskImpl implements AVTaskWithRequests, A
 	
 	public AVDropoffTask(double beginTime, double endTime, Link link) {
         super(beginTime, endTime, link);
+	}
+
+	public AVDropoffTask(double beginTime, double endTime, Link link, Collection<AVRequest> requests) {
+		super(beginTime, endTime, link);
+
+		this.requests.addAll(requests);
+		for (AVRequest request : requests) request.setDropoffTask(this);
 	}
 
 	@Override
@@ -29,7 +34,8 @@ public class AVDropoffTask extends StayTaskImpl implements AVTaskWithRequests, A
 
 	@Override
 	public void addRequest(AVRequest request) {
-    	requests.add(request);
+		requests.add(request);
+		request.setDropoffTask(this);
 	}
 
     @Override

@@ -9,15 +9,22 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 
 public class AVVehicle extends VehicleImpl {
-    private final AVOperator operator;
+    private AVOperator operator;
 
     public AVVehicle(Id<Vehicle> id, Link startLink, double capacity, double t0, double t1, AVOperator operator) {
         super(id, startLink, capacity, t0, t1);
-
         this.operator = operator;
+    }
+
+    public AVVehicle(Id<Vehicle> id, Link startLink, double capacity, double t0, double t1) {
+        this(id, startLink, capacity, t0, t1, null);
     }
 
     public AVOperator getOperator() {
         return operator;
+    }
+
+    public void setOpeartor(AVOperator operator) {
+        this.operator = operator;
     }
 }

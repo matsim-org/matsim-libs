@@ -1,13 +1,14 @@
 package playground.sebhoerl.avtaxi.dispatcher;
 
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
+import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
+import playground.sebhoerl.avtaxi.schedule.AVTask;
 
-/**
- * Created by sebastian on 04/10/16.
- */
 public interface AVDispatcher {
-    void nextLinkEntered(AVDriveTask task);
-    void requestSubmitted(AVRequest request);
+    void onRequestSubmitted(AVRequest request);
+    void onNextTaskStarted(AVTask task);
+    void onNextTimestep(double now);
+
+    void addVehicle(AVVehicle vehicle);
 }

@@ -13,19 +13,22 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.data.VehicleImpl;
-import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.core.gbl.MatsimRandom;
+import playground.sebhoerl.avtaxi.data.AVData;
+import playground.sebhoerl.avtaxi.data.AVOperator;
+import playground.sebhoerl.avtaxi.data.AVVehicle;
 
-public class VehicleGeneratorByDensity {
+public class AVVehicleGeneratorByDensity {
     final private Population population;
     final private Network network;
-    final private TaxiData data;
+    final private AVData data;
+    final private AVOperator operator;
     
-    public VehicleGeneratorByDensity(TaxiData data, Network network, Population population) {
+    public AVVehicleGeneratorByDensity(AVData data, Network network, Population population, AVOperator operator) {
         this.population = population;
         this.network = network;
         this.data = data;
+        this.operator = operator;
     }
 
 	public void generate(int numberOfVehicles) {
@@ -83,12 +86,13 @@ public class VehicleGeneratorByDensity {
         
         // Create vehicles
         for (Id<Link> linkId : selection) {
-        	data.addVehicle(new VehicleImpl(
-            	Id.create("Taxi" + String.valueOf(id), Vehicle.class),
-            	network.getLinks().get(linkId),
-            	4.0,
-            	0.0,
-            	108000.0
+        	data.addVehicle(new AVVehicle(
+            	    Id.create("av" + String.valueOf(id), Vehicle.class),
+            	    network.getLinks().get(linkId),
+            	    4.0,
+            	    0.0,
+            	    108000.0,
+                    operator
             	));
         	
         	id++;

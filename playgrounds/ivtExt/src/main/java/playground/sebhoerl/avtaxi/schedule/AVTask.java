@@ -4,7 +4,7 @@ import org.matsim.contrib.dvrp.schedule.Task;
 
 public interface AVTask extends Task {
 	static enum AVTaskType {
-		PICKUP, DROPOFF, DRIVE
+		PICKUP, DROPOFF, DRIVE, STAY
 	}
 	
 	AVTaskType getAVTaskType();
