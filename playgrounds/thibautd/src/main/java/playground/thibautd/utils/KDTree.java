@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
 import java.util.function.Predicate;
@@ -50,6 +51,9 @@ public class KDTree<T> {
 	private int stepsToRebalance = 100;
 	private int size = 0;
 
+	public enum SearchStrategy { DFS, BBF }
+	private final SearchStrategy searchStrategy;
+
 	public interface Coordinate<T> {
 		double[] getCoord( T object );
 	}
@@ -69,6 +73,15 @@ public class KDTree<T> {
 			final boolean rebalance,
 			final int nDimensions,
 			final Coordinate<T> coord ) {
+		this( SearchStrategy.DFS , rebalance , nDimensions , coord );
+	}
+
+	public KDTree(
+			final SearchStrategy searchStrategy,
+			final boolean rebalance,
+			final int nDimensions,
+			final Coordinate<T> coord ) {
+		this.searchStrategy = searchStrategy;
 		this.rebalance = rebalance;
 		this.nDimensions = nDimensions;
 		this.coordinate = coord;
@@ -87,6 +100,7 @@ public class KDTree<T> {
 		if ( rebalance && stepsToRebalance-- == 0 ) {
 			final Collection<T> all = getAll();
 			root = new Node<>( 0 );
+			size = 0;
 			add( all );
 		}
 	}
@@ -403,8 +417,43 @@ public class KDTree<T> {
 		return getClosest( coord , distance , predicate , 0d );
 	}
 
-
 	public T getClosest(
+			final double[] coord ,
+			final ToDoubleBiFunction<double[],double[]> distance,
+			final Predicate<T> predicate,
+			final double precision) {
+		final Queue<Node<T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
+		return getClosest( stack , coord , distance , predicate , precision );
+	}
+
+	public T getClosestDFS(
+			final double[] coord ,
+			final ToDoubleBiFunction<double[],double[]> distance,
+			final Predicate<T> predicate,
+			final double precision) {
+		final Queue<Node<T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
+		return getClosest( stack , coord , distance , predicate , precision );
+	}
+
+	public T getClosestBBF(
+			final double[] coord ,
+			final ToDoubleBiFunction<double[],double[]> distance,
+			final Predicate<T> predicate,
+			final double precision) {
+		final Queue<Node<T>> stack =
+				new PriorityQueue<>(
+						size(),
+						( n1, n2 ) -> {
+							final double d1 = distance.applyAsDouble( n1.coordinate, coord );
+							final double d2 = distance.applyAsDouble( n2.coordinate, coord );
+							// head of queue is least element: always pick the one with the smallest distance
+							return Double.compare( d1, d2 );
+						} );
+		return getClosest( stack , coord , distance , predicate , precision );
+	}
+
+	private T getClosest(
+			final Queue<Node<T>> stack,
 			final double[] coord ,
 			final ToDoubleBiFunction<double[],double[]> distance,
 			final Predicate<T> predicate,
@@ -412,7 +461,6 @@ public class KDTree<T> {
 		T closest = null;
 		double bestDist = Double.POSITIVE_INFINITY;
 
-		final Queue<Node<T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
 		stack.add( root );
 
 		// First find a good candidate without too much effort: search for the "insertion point", and check the distance
