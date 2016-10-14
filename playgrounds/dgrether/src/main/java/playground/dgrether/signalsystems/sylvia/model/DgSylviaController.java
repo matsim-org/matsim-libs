@@ -92,7 +92,6 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 
 
 	private void initCycle() {
-		// TODO check whether -1 is correct as this implies starting to count with 0 and not 1
 		this.secondInSylviaCycle = -1; //as this is incremented before use
 		this.secondInCycle = -1;
 		this.extensionTime = 0;
@@ -180,7 +179,7 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 		}
 		
 		// stop criterion, i.e. start with the next cycle:
-		if (this.secondInSylviaCycle == this.activeSylviaPlan.getCycleTime()) { 
+		if (this.secondInSylviaCycle == this.activeSylviaPlan.getCycleTime() - 1) { 
 			// the base plan cycle including all extensions is processed. init data structure for the next cycle.
 			this.initCycle();
 		}
