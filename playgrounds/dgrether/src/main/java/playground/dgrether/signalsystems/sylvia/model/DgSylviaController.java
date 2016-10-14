@@ -193,7 +193,6 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 	private boolean isExtensionTimeLeft(){
 		if (this.sylviaConfig.isUseFixedTimeCycleAsMaximalExtension()){
 			return this.extensionTime < this.activeSylviaPlan.getMaxExtensionTime();
-			// TODO why not this.secondInCycle < this.activeSylviaPlan.getFixedTimeCycle() ?
 		}
 		return true;
 	}
@@ -253,7 +252,6 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 		for (SignalData signal : extensionPoint.getSignals()){
 			if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
 				noCars = this.sensorManager.getNumberOfCarsInDistance(signal.getLinkId(), this.sylviaConfig.getSensorDistanceMeter(), currentTime);
-				// TODO check sensorManager. always returns 0
 				if (noCars > 0){
 					return true;
 				}
@@ -355,8 +353,8 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 			if (! this.extensionPointMap.containsKey(extensionMoment)){
 				extPoint = new DgExtensionPoint(extensionMoment);
 				this.extensionPointMap.put(extensionMoment, extPoint);
-				// TODO why is this needed?
-				sylvia.addExtensionPoint(extPoint); 
+//				// comment this out because it is not needed and not used. tt, oct'16
+//				sylvia.addExtensionPoint(extPoint); 
 			}
 			extPoint = this.extensionPointMap.get(extensionMoment);
 			extPoint.addSignalGroupId(settings.getSignalGroupId());

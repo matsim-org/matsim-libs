@@ -61,6 +61,7 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 
 	private Map<Id<Link>, Map<Id<Lane>, DgLaneSensor>> linkIdLaneIdSensorMap = new HashMap<>();
 	
+	@Deprecated // not tested
 	private Map<Id<Link>, Tuple<Double, Double>> linkFirstSecondDistanceMeterMap = new HashMap<>();
 
 	private Network network;
@@ -121,8 +122,8 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 	
 	}
 
-	
-	public void registerCarsAtDistancePerSecondMonitoring(Id<Link> linkId, Double distanceMeter){
+	@Deprecated //not tested
+	private void registerCarsAtDistancePerSecondMonitoring(Id<Link> linkId, Double distanceMeter){
 		double firstDistanceMeter = distanceMeter;
 		Link link = this.network.getLinks().get(linkId);
 		double secondDistanceMeter = distanceMeter -  2 * link.getFreespeed();
@@ -138,7 +139,8 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 		this.registerNumberOfCarsInDistanceMonitoring(linkId, secondDistanceMeter);
 	}
 	
-	public int getNumberOfCarsAtDistancePerSecond(Id<Link> linkId, Double distanceMeter, double timeSeconds){
+	@Deprecated //not tested
+	private int getNumberOfCarsAtDistancePerSecond(Id<Link> linkId, Double distanceMeter, double timeSeconds){
 		Tuple<Double, Double> tuple = this.linkFirstSecondDistanceMeterMap.get(linkId);
 		int numberOfCarsFirstDetector = this.getNumberOfCarsInDistance(linkId, tuple.getFirst(), timeSeconds);
 		int numberOfCarsSecondDetector = this.getNumberOfCarsInDistance(linkId, tuple.getSecond(), timeSeconds);
@@ -170,7 +172,6 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 		if (!this.linkIdSensorMap.containsKey(linkId)){
 			throw new IllegalStateException("No sensor on link " + linkId + "! Register measurement for this link by calling one of the 'register...' methods of this class first.");
 		}
-		//TODO add further check
 		return this.linkIdSensorMap.get(linkId).getNumberOfCarsInDistance(distanceMeter, timeSeconds);
 	}
 	
