@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -74,6 +73,7 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.Default
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import scenarios.illustrative.analysis.TtSignalAnalysisTool;
@@ -90,14 +90,13 @@ public class SylviaTest {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	@Ignore
 	public void testDemandAB(){
 		double[] noPersons = {3600, 3600};
 		TtSignalAnalysisTool signalAnalyzer = runScenario(noPersons);
 		
 		// check signal results
-		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime(); // should be equal
-		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerCycle(); // should be equal and 25
+		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime(); // should be more or less equal (OW direction is always favored as the first phase)
+		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerCycle(); // should be more or less equal and around 25
 		Map<Id<SignalSystem>, Double> avgCycleTimePerSystem = signalAnalyzer.calculateAvgCycleTimePerSignalSystem(); // should be 60
 		Id<SignalGroup> signalGroupId1 = Id.create("SignalGroup1", SignalGroup.class);
 		Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup2", SignalGroup.class);
@@ -106,21 +105,20 @@ public class SylviaTest {
 		log.info("total signal green times: " + totalSignalGreenTimes.get(signalGroupId1) + ", " + totalSignalGreenTimes.get(signalGroupId2));
 		log.info("avg signal green times per cycle: " + avgSignalGreenTimePerCycle.get(signalGroupId1) + ", " + avgSignalGreenTimePerCycle.get(signalGroupId2));
 		log.info("avg cycle time per system: " + avgCycleTimePerSystem.get(signalSystemId));
-		Assert.assertEquals("total signal green times of both groups are not similiar enough", totalSignalGreenTimes.get(signalGroupId1), totalSignalGreenTimes.get(signalGroupId2), totalSignalGreenTimes.get(signalGroupId1)/100);
-		Assert.assertEquals("avg green time per cycle of signal group 1 is wrong", 25, avgSignalGreenTimePerCycle.get(signalGroupId1), 1);
-		Assert.assertEquals("avg green time per cycle of signal group 2 is wrong", 25, avgSignalGreenTimePerCycle.get(signalGroupId2), 1);
+		Assert.assertEquals("total signal green times of both groups are not similiar enough", 0.0, totalSignalGreenTimes.get(signalGroupId1)-totalSignalGreenTimes.get(signalGroupId2), totalSignalGreenTimes.get(signalGroupId1)/3); // may differ by 1/3
+		Assert.assertEquals("avg green time per cycle of signal group 1 is wrong", 25, avgSignalGreenTimePerCycle.get(signalGroupId1), 5);
+		Assert.assertEquals("avg green time per cycle of signal group 2 is wrong", 25, avgSignalGreenTimePerCycle.get(signalGroupId2), 5);
 		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), MatsimTestUtils.EPSILON);	
 	}
 
 	@Test
-	@Ignore
 	public void testDemandA(){
 		double[] noPersons = {3600, 0};
 		TtSignalAnalysisTool signalAnalyzer = runScenario(noPersons);
 		
 		// check signal results
 		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime(); // group 1 should have more total green time than group 2
-		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerCycle(); // should be 45 vs 5
+		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerCycle(); // should be 45 vs 5 (excluding initial phase)
 		Map<Id<SignalSystem>, Double> avgCycleTimePerSystem = signalAnalyzer.calculateAvgCycleTimePerSignalSystem(); // should be 60
 		Id<SignalGroup> signalGroupId1 = Id.create("SignalGroup1", SignalGroup.class);
 		Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup2", SignalGroup.class);
@@ -130,20 +128,19 @@ public class SylviaTest {
 		log.info("avg signal green times per cycle: " + avgSignalGreenTimePerCycle.get(signalGroupId1) + ", " + avgSignalGreenTimePerCycle.get(signalGroupId2));
 		log.info("avg cycle time per system: " + avgCycleTimePerSystem.get(signalSystemId));
 		Assert.assertTrue("total signal green time of group 1 is not bigger than of group 2", totalSignalGreenTimes.get(signalGroupId1) > totalSignalGreenTimes.get(signalGroupId2));
-		Assert.assertEquals("avg green time per cycle of signal group 1 is wrong", 45, avgSignalGreenTimePerCycle.get(signalGroupId1), 1);
-		Assert.assertEquals("avg green time per cycle of signal group 2 is wrong", 5, avgSignalGreenTimePerCycle.get(signalGroupId2), 1);
+		Assert.assertEquals("avg green time per cycle of signal group 1 is wrong", 45, avgSignalGreenTimePerCycle.get(signalGroupId1), 5);
+		Assert.assertEquals("avg green time per cycle of signal group 2 is wrong", 5, avgSignalGreenTimePerCycle.get(signalGroupId2), 5);
 		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), MatsimTestUtils.EPSILON);	
 	}
 	
 	@Test
-	@Ignore
 	public void testDemandB(){
 		double[] noPersons = {0, 3600};
 		TtSignalAnalysisTool signalAnalyzer = runScenario(noPersons);
 		
 		// check signal results
 		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime(); // group 1 should have less total green time than group 2
-		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerCycle(); // should be 5 vs 45
+		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerCycle(); // should be 5 vs 45 (excluding initial phase)
 		Map<Id<SignalSystem>, Double> avgCycleTimePerSystem = signalAnalyzer.calculateAvgCycleTimePerSignalSystem(); // should be 60
 		Id<SignalGroup> signalGroupId1 = Id.create("SignalGroup1", SignalGroup.class);
 		Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup2", SignalGroup.class);
@@ -153,8 +150,8 @@ public class SylviaTest {
 		log.info("avg signal green times per cycle: " + avgSignalGreenTimePerCycle.get(signalGroupId1) + ", " + avgSignalGreenTimePerCycle.get(signalGroupId2));
 		log.info("avg cycle time per system: " + avgCycleTimePerSystem.get(signalSystemId));
 		Assert.assertTrue("total signal green time of group 1 is not less than of group 2", totalSignalGreenTimes.get(signalGroupId1) < totalSignalGreenTimes.get(signalGroupId2));
-		Assert.assertEquals("avg green time per cycle of signal group 1 is wrong", 5, avgSignalGreenTimePerCycle.get(signalGroupId1), 1);
-		Assert.assertEquals("avg green time per cycle of signal group 2 is wrong", 45, avgSignalGreenTimePerCycle.get(signalGroupId2), 1);
+		Assert.assertEquals("avg green time per cycle of signal group 1 is wrong", 5, avgSignalGreenTimePerCycle.get(signalGroupId1), 5);
+		Assert.assertEquals("avg green time per cycle of signal group 2 is wrong", 45, avgSignalGreenTimePerCycle.get(signalGroupId2), 5);
 		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), MatsimTestUtils.EPSILON);	
 	}
 	
@@ -172,7 +169,12 @@ public class SylviaTest {
 		
 		Controler controler = new Controler(scenario);
 		// add missing modules
-		controler.addOverridingModule(new SylviaSignalsModule());
+		SylviaSignalsModule signalsModule = new SylviaSignalsModule();
+		DgSylviaConfig sylviaConfig = new DgSylviaConfig();
+		// this is only needed because the default is to small (1.5)
+		sylviaConfig.setSignalGroupMaxGreenScale(100);
+		signalsModule.setSylviaConfig(sylviaConfig);
+		controler.addOverridingModule(signalsModule);
 		
 		// add signal analysis tool
 		TtSignalAnalysisTool signalAnalyzer = new TtSignalAnalysisTool();
