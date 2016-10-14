@@ -43,9 +43,11 @@ public class KDTree<T> {
 	private static final int SUBLIST_SIZE_MEDIAN = 100;
 
 	private final int nDimensions;
-	private final Node<T> root = new Node<>( 0 );
+	private Node<T> root = new Node<>( 0 );
 	private final Coordinate<T> coordinate;
 
+	private final boolean rebalance;
+	private int stepsToRebalance = 100;
 	private int size = 0;
 
 	public interface Coordinate<T> {
@@ -60,6 +62,14 @@ public class KDTree<T> {
 	 *              of adding elements, but should have no influence on the query performance.
 	 */
 	public KDTree( final int nDimensions , final Coordinate<T> coord ) {
+		this( false , nDimensions , coord );
+	}
+
+	public KDTree(
+			final boolean rebalance,
+			final int nDimensions,
+			final Coordinate<T> coord ) {
+		this.rebalance = rebalance;
 		this.nDimensions = nDimensions;
 		this.coordinate = coord;
 	}
@@ -70,6 +80,15 @@ public class KDTree<T> {
 	 */
 	public void add( final T value ) {
 		add( root , Collections.singleton( value ) );
+		rebalanceIfNecessary();
+	}
+
+	private void rebalanceIfNecessary() {
+		if ( rebalance && stepsToRebalance-- == 0 ) {
+			final Collection<T> all = getAll();
+			root = new Node<>( 0 );
+			add( all );
+		}
 	}
 
 	public Collection<T> getAll() {
@@ -157,6 +176,7 @@ public class KDTree<T> {
 		current.left = null;
 		current.right = null;
 
+		rebalanceIfNecessary();
 		return true;
 	}
 
@@ -214,6 +234,9 @@ public class KDTree<T> {
 	 * Add a set of points to the tree. Although no rebalancing is performed, the newly created subtrees should be balanced.
 	 * For optimal results, the tree should be constructed by one single call to this method.
 	 *
+	 * Complexity should be O( n sqrt(n) ) (it is O( n ) for each level of the tree, and there are of the order of sqrt(n)
+	 * levels in the balanced case)
+	 *
 	 * @param points
 	 */
 	public void add( Collection<T> points ) {
@@ -222,6 +245,10 @@ public class KDTree<T> {
 
 	private void add( Node<T> addRoot , Collection<T> points ) {
 		size += points.size();
+		// very rough heuristic. No theory behind it.
+		// optimal value depends on the ratio modification/query
+		// TODO: make more configurable
+		stepsToRebalance = size / 3;
 		final Queue<AddFrame<T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
 
 		// copy parameter list as it is modified in place
