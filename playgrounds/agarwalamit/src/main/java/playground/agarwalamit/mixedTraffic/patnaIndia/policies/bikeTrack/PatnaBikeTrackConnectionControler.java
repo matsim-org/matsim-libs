@@ -35,6 +35,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -43,7 +44,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -56,9 +56,6 @@ import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
-import playground.agarwalamit.mixedTraffic.patnaIndia.router.BikeTimeDistanceTravelDisutilityFactory;
-import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
-import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForTruck;
 import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
@@ -268,29 +265,19 @@ public class PatnaBikeTrackConnectionControler {
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
 		config.vspExperimental().setWritingOutputEvents(true);
 
+		config.travelTimeCalculator().setFilterModes(true);
+		config.travelTimeCalculator().setAnalyzedModes(String.join(",", PatnaUtils.ALL_MAIN_MODES));
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		// no vehicle info should be present if using VehiclesSource.modeVEhicleTypesFromVehiclesData 
+		scenario.getVehicles().getVehicles().clear();
+		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+
 		return scenario;
 	}
 
 	private static void addOverrides(Controler controler) {
-		final BikeTimeDistanceTravelDisutilityFactory builder_bike =  new BikeTimeDistanceTravelDisutilityFactory("bike", controler.getScenario().getConfig().planCalcScore());
-		final RandomizingTimeDistanceTravelDisutilityFactory builder_truck =  new RandomizingTimeDistanceTravelDisutilityFactory("truck", controler.getScenario().getConfig().planCalcScore());
-
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-
-				addTravelTimeBinding("bike").to(FreeSpeedTravelTimeForBike.class);
-				addTravelDisutilityFactoryBinding("bike").toInstance(builder_bike);
-
-				addTravelTimeBinding("truck").to(FreeSpeedTravelTimeForTruck.class);
-				addTravelDisutilityFactoryBinding("truck").toInstance(builder_truck);
-
-				addTravelTimeBinding("motorbike").to(networkTravelTime());
-				addTravelDisutilityFactoryBinding("motorbike").to(carTravelDisutilityFactoryKey());
-			}
-		});
-
 		controler.addOverridingModule(new AbstractModule() { // plotting modal share over iterations
 			@Override
 			public void install() {
