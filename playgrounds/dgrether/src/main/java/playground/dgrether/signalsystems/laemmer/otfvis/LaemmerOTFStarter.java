@@ -52,8 +52,7 @@ public class LaemmerOTFStarter {
 	public void playScenario(Scenario scenario){
 		EventsManager events = EventsUtils.createEventsManager();
 
-		DgSensorManager sensorManager = new DgSensorManager(scenario.getNetwork());
-		sensorManager.setLaneDefinitions((Lanes) scenario.getScenarioElement(Lanes.ELEMENT_NAME));
+		DgSensorManager sensorManager = new DgSensorManager(scenario);
 		events.addHandler(sensorManager);
 		
 		DefaultSignalModelFactory defaultSignalModelFactory = new DefaultSignalModelFactory();

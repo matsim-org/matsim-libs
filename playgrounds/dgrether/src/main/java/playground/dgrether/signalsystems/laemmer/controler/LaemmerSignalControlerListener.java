@@ -53,8 +53,7 @@ public class LaemmerSignalControlerListener implements SignalsControllerListener
 	public void notifyStartup(StartupEvent event) {
 		MutableScenario scenario = (MutableScenario) event.getServices().getScenario();
 		
-		this.sensorManager = new DgSensorManager(event.getServices().getScenario().getNetwork());
-		this.sensorManager.setLaneDefinitions((Lanes) scenario.getScenarioElement(Lanes.ELEMENT_NAME));
+		this.sensorManager = new DgSensorManager(event.getServices().getScenario());
 		event.getServices().getEvents().addHandler(sensorManager);
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 
