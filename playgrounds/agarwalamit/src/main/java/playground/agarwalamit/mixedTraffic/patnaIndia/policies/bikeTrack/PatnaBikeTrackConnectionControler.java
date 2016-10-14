@@ -56,6 +56,7 @@ import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.PatnaVehiclesGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
@@ -244,7 +245,7 @@ public class PatnaBikeTrackConnectionControler {
 		String inPlans = inputDir+"baseCaseOutput_plans.xml.gz";
 		config.plans().setInputFile( inPlans);
 		config.plans().setInputPersonAttributeFile(inputDir+"output_personAttributes.xml.gz");
-		config.vehicles().setVehiclesFile(inputDir+"output_vehicles.xml.gz");
+		config.vehicles().setVehiclesFile(null); // see below for vehicle type info
 
 		//==
 		// after calibration;  departure time is fixed for urban; check if time choice is not present
@@ -270,8 +271,12 @@ public class PatnaBikeTrackConnectionControler {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		// no vehicle info should be present if using VehiclesSource.modeVEhicleTypesFromVehiclesData 
-		scenario.getVehicles().getVehicles().clear();
+		String vehiclesFile = inputDir+"output_vehicles.xml.gz";
+		PatnaVehiclesGenerator.addVehiclesToScenarioFromVehicleFile(vehiclesFile, scenario);
+
+		// no vehicle info should be present if using VehiclesSource.modeVEhicleTypesFromVehiclesData
+		if ( scenario.getVehicles().getVehicles().size() != 0 ) throw new RuntimeException("Only vehicle types should be loaded if vehicle source "+
+				QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData +" is assigned.");
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
 		return scenario;

@@ -34,6 +34,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
@@ -66,7 +67,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class PatnaPolicyControler {
 
-	private static String dir = "../../../../repos/runs-svn/patnaIndia/run108/jointDemand/policies/0.15pcu/";
+	private static String dir = FileUtils.RUNS_SVN + "/patnaIndia/run108/jointDemand/policies/0.15pcu/";
 	private static boolean applyTrafficRestrain = false;
 	private static boolean addBikeTrack = false;
 	private static boolean isAllwoingMotorbikeOnBikeTrack = true;
@@ -134,6 +135,11 @@ public class PatnaPolicyControler {
 		}
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		if ( scenario.getVehicles().getVehicles().size() != 0 ) throw new RuntimeException("Only vehicle types should be loaded if vehicle source "+
+				QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData +" is assigned.");
+		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+
 		final Controler controler = new Controler(scenario);
 
 		// removal of some links may lead to exception if routes are not removed from leg.

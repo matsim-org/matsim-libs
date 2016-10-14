@@ -27,10 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.*;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
@@ -42,6 +39,14 @@ public class PatnaVehiclesGenerator {
 
 	private final Scenario scenario ;
 	private static double pcu_2w = Double.NaN;
+
+	public static void addVehiclesToScenarioFromVehicleFile(final String vehiclesFile, final Scenario scenario){
+		Vehicles vehs = VehicleUtils.createVehiclesContainer();
+		new VehicleReaderV1(vehs).readFile(vehiclesFile);
+		for(VehicleType vt : vehs.getVehicleTypes().values()) {
+			scenario.getVehicles().addVehicleType(vt);
+		}
+	}
 
 	/**
 	 * @param plansFile is required to get vehicles for each agent type in population.
