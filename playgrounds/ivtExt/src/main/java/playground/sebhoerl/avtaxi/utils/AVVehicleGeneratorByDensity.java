@@ -86,14 +86,17 @@ public class AVVehicleGeneratorByDensity {
         
         // Create vehicles
         for (Id<Link> linkId : selection) {
-        	data.addVehicle(new AVVehicle(
+        	AVVehicle vehicle = new AVVehicle(
             	    Id.create("av" + String.valueOf(id), Vehicle.class),
             	    network.getLinks().get(linkId),
             	    4.0,
             	    0.0,
             	    108000.0,
                     operator
-            	));
+            	);
+
+            data.addVehicle(vehicle);
+            operator.getDispatcher().addVehicle(vehicle);
         	
         	id++;
         }
