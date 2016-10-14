@@ -51,9 +51,6 @@ public class KDTree<T> {
 	private int stepsToRebalance = 100;
 	private int size = 0;
 
-	public enum SearchStrategy { DFS, BBF }
-	private final SearchStrategy searchStrategy;
-
 	public interface Coordinate<T> {
 		double[] getCoord( T object );
 	}
@@ -73,15 +70,6 @@ public class KDTree<T> {
 			final boolean rebalance,
 			final int nDimensions,
 			final Coordinate<T> coord ) {
-		this( SearchStrategy.DFS , rebalance , nDimensions , coord );
-	}
-
-	public KDTree(
-			final SearchStrategy searchStrategy,
-			final boolean rebalance,
-			final int nDimensions,
-			final Coordinate<T> coord ) {
-		this.searchStrategy = searchStrategy;
 		this.rebalance = rebalance;
 		this.nDimensions = nDimensions;
 		this.coordinate = coord;
@@ -396,7 +384,7 @@ public class KDTree<T> {
 		return getClosest( coord , KDTree::euclidean , predicate );
 	}
 
-	private static double euclidean( double[] c1 , double[] c2 ) {
+	public static double euclidean( double[] c1 , double[] c2 ) {
 		double d = 0;
 
 		for (int i=0; i < c1.length; i++ ) {
@@ -422,34 +410,26 @@ public class KDTree<T> {
 			final ToDoubleBiFunction<double[],double[]> distance,
 			final Predicate<T> predicate,
 			final double precision) {
-		final Queue<Node<T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
-		return getClosest( stack , coord , distance , predicate , precision );
+		return getClosest( coord , distance , predicate , precision , Integer.MAX_VALUE );
 	}
 
-	public T getClosestDFS(
+	public T getClosest(
 			final double[] coord ,
 			final ToDoubleBiFunction<double[],double[]> distance,
 			final Predicate<T> predicate,
-			final double precision) {
-		final Queue<Node<T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
-		return getClosest( stack , coord , distance , predicate , precision );
-	}
-
-	public T getClosestBBF(
-			final double[] coord ,
-			final ToDoubleBiFunction<double[],double[]> distance,
-			final Predicate<T> predicate,
-			final double precision) {
+			final double precision,
+			final int maxVisitedLeaves ) {
+		// use "Best Bin First": no influence if exact search, but big influence if restrict to N leaves
 		final Queue<Node<T>> stack =
 				new PriorityQueue<>(
-						size(),
+						(int) Math.sqrt( size() ),
 						( n1, n2 ) -> {
 							final double d1 = distance.applyAsDouble( n1.coordinate, coord );
 							final double d2 = distance.applyAsDouble( n2.coordinate, coord );
 							// head of queue is least element: always pick the one with the smallest distance
 							return Double.compare( d1, d2 );
 						} );
-		return getClosest( stack , coord , distance , predicate , precision );
+		return getClosest( stack , coord , distance , predicate , precision , maxVisitedLeaves );
 	}
 
 	private T getClosest(
@@ -457,11 +437,12 @@ public class KDTree<T> {
 			final double[] coord ,
 			final ToDoubleBiFunction<double[],double[]> distance,
 			final Predicate<T> predicate,
-			final double precision) {
+			final double precision,
+			final int maxVisitedLeaves ) {
 		T closest = null;
 		double bestDist = Double.POSITIVE_INFINITY;
 
-		stack.add( root );
+		add( stack , root );
 
 		// First find a good candidate without too much effort: search for the "insertion point", and check the distance
 		// on the way (having a good start will improve pruning in the later stage)
@@ -477,15 +458,15 @@ public class KDTree<T> {
 
 			final boolean isLeft = isLeft( current.dimension , coord , current.coordinate );
 
-			if ( isLeft ) stack.add( current.left );
-			else stack.add( current.right );
+			if ( isLeft ) add( stack , current.left );
+			else add( stack , current.right );
 		}
 
 		// now, go down the full tree, pruning half-spaces further away than the current best distance
-		stack.add( root );
+		add( stack , root );
+		int remainingLeaves = maxVisitedLeaves;
 		while ( !stack.isEmpty() ) {
 			final Node<T> current = stack.poll();
-			if ( current.value == null ) continue;
 
 			// if the cutting hyperplane is further away than the best distance, only explore on "our side" of it
 			final double[] projected = Arrays.copyOf( coord , coord.length );
@@ -496,8 +477,8 @@ public class KDTree<T> {
 				final boolean isLeft = isLeft( current.dimension , current.coordinate , coord );
 
 				// if we are to far left, only continue to the right, and vice versa
-				if ( isLeft ) stack.add( current.right );
-				else stack.add( current.left );
+				if ( isLeft ) add( stack , current.right );
+				else add( stack , current.left );
 			}
 			else {
 				final double currentDist = distance.applyAsDouble( coord , current.coordinate );
@@ -509,12 +490,18 @@ public class KDTree<T> {
 				}
 
 				// could take care of order to make pruning more probable
-				stack.add( current.left );
-				stack.add( current.right );
+				add( stack , current.left );
+				add( stack , current.right );
 			}
+
+			if ( isLeaf( current ) && remainingLeaves-- == 0 ) return closest;
 		}
 
 		return closest;
+	}
+
+	private static <T> void add( final Queue<Node<T>> stack, final Node<T> right ) {
+		if ( right != null && right.value != null ) stack.add( right );
 	}
 
 	private static boolean isLeft( int dim , double[] coord , double[] of ) {

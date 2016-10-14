@@ -39,7 +39,7 @@ public class BenchmarkKDTreeNearestNeighbor {
 	public static void main( final String... args ) {
 		//try ( final BufferedWriter writer = IOUtils.getBufferedWriter( args[ 0 ] ) ) {
 		try ( final BufferedWriter writer = IOUtils.getBufferedWriter( "times.dat" ) ) {
-			writer.write( "size\tdimension\tstrategy\tnQueries\ttime_ms" );
+			writer.write( "size\tdimension\tnQueries\texact_time_ms\tdistance_exact\tappr_time_ms\tdistance_appr" );
 
 			for ( int size=100; size < 1E8; size *= 10  ) {
 				log.info( "look at size "+size );
@@ -67,21 +67,11 @@ public class BenchmarkKDTreeNearestNeighbor {
 			points.add( p );
 		}
 
-		final KDTree<double[]> dfs =
+		final KDTree<double[]> qt =
 				new KDTree<>(
-						KDTree.SearchStrategy.DFS,
-						false,
 						dim,
 						d -> d );
-		dfs.add( points );
-
-		final KDTree<double[]> bbf =
-				new KDTree<>(
-						KDTree.SearchStrategy.BBF,
-						false,
-						dim,
-						d -> d );
-		bbf.add( points );
+		qt.add( points );
 
 		for ( int i=0; i < 100; i++ ) {
 			final Collection<double[]> searched = new ArrayList<>(  );
@@ -91,16 +81,20 @@ public class BenchmarkKDTreeNearestNeighbor {
 				searched.add( p );
 			}
 
-			long start = System.currentTimeMillis();
-			for ( double[] p : searched ) dfs.getClosestEuclidean( p );
-			long mid = System.currentTimeMillis();
-			for ( double[] p : searched ) bbf.getClosestEuclidean( p );
-			long end = System.currentTimeMillis();
+			final long start = System.currentTimeMillis();
+			final double distExact = searched.stream()
+					.mapToDouble( p -> KDTree.euclidean( p , qt.getClosestEuclidean( p ) ) )
+					.average()
+					.getAsDouble();
+			final long mid = System.currentTimeMillis();
+			final double distAppr = searched.stream()
+					.mapToDouble( p -> KDTree.euclidean( p , qt.getClosest( p , KDTree::euclidean , x -> true , 0.1 , size ) ) )
+					.average()
+					.getAsDouble();
+			final long end = System.currentTimeMillis();
 
 			writer.newLine();
-			writer.write( size+"\t"+dim+"\tDFS\t"+N_QUERIES+"\t"+(mid - start) );
-			writer.newLine();
-			writer.write( size+"\t"+dim+"\tBBF\t"+N_QUERIES+"\t"+(end - mid) );
+			writer.write( size+"\t"+dim+"\t"+N_QUERIES+"\t"+(mid - start)+"\t"+distExact+"\t"+(end - mid)+"\t"+distAppr );
 		}
 	}
 }
