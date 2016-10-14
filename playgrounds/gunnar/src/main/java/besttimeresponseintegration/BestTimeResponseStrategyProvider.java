@@ -1,5 +1,7 @@
 package besttimeresponseintegration;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -12,6 +14,7 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.facilities.ActivityFacilities;
 
@@ -40,14 +43,17 @@ public class BestTimeResponseStrategyProvider implements Provider<PlanStrategy> 
 	private final Provider<TripRouter> tripRouterProvider;
 
 	@Inject
+	private Map<String, TravelTime> mode2travelTime;
+	
+	@Inject
 	private GlobalConfigGroup globalConfigGroup;
 	@Inject
 	private ActivityFacilities facilities;
 
 	private final boolean reRouteBefore = false; // useless anyway
 	private final boolean reRouteAfter = true;
-	private final int maxTrials = 10;
-	private final int maxFailures = 3;
+	private final int maxTrials = 100;
+	private final int maxFailures = 50;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -72,7 +78,8 @@ public class BestTimeResponseStrategyProvider implements Provider<PlanStrategy> 
 		final PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(this.randomPlanSelector);
 		final BestTimeResponseStrategyModule module = new BestTimeResponseStrategyModule(this.scenario,
 				this.scoringParams, this.timeDiscr, // this.experiencedScoreAnalyzer,
-				this.tripRouterProvider.get(), this.maxTrials, this.maxFailures);
+				this.tripRouterProvider.get(), 
+				this.mode2travelTime, this.maxTrials, this.maxFailures);
 		if (this.reRouteBefore) {
 			builder.addStrategyModule(
 					new org.matsim.core.replanning.modules.ReRoute(facilities, tripRouterProvider, globalConfigGroup));

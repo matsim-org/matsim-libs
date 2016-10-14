@@ -1,5 +1,7 @@
 package besttimeresponseintegration;
 
+import java.util.Map;
+
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -8,6 +10,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.facilities.Facility;
 
@@ -32,6 +35,8 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 	// private final ExperiencedScoreAnalyzer experiencedScoreAnalyzer;
 
 	private final TripRouter tripRouter;
+	
+	private final Map<String, TravelTime> mode2travelTime;
 
 	private final int maxTrials;
 
@@ -45,12 +50,15 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 			final TimeDiscretization timeDiscretization, // final
 															// ExperiencedScoreAnalyzer
 															// experiencedScoreAnalyzer,
-			final TripRouter tripRouter, final int maxTrials, final int maxFailures) {
+			final TripRouter tripRouter, 
+			final Map<String, TravelTime> mode2travelTime,
+			final int maxTrials, final int maxFailures) {
 		this.scenario = scenario;
 		this.scoringParams = scoringParams;
 		this.timeDiscretization = timeDiscretization;
 		// this.experiencedScoreAnalyzer = experiencedScoreAnalyzer;
 		this.tripRouter = tripRouter;
+		this.mode2travelTime = mode2travelTime;
 		this.maxTrials = maxTrials;
 		this.maxFailures = maxFailures;
 	}
@@ -64,8 +72,10 @@ class BestTimeResponseStrategyModule implements PlanStrategyModule {
 			return; // nothing to do when just staying at home
 		}
 
-		final BestTimeResponseTravelTimes travelTimes = new BestTimeResponseTravelTimes(this.timeDiscretization,
-				this.tripRouter, plan.getPerson());
+		final BestTimeResponseTravelTimes travelTimes = new BestTimeResponseTravelTimes(
+				this.scenario.getNetwork(),
+				this.timeDiscretization,
+				this.tripRouter, plan.getPerson(), this.mode2travelTime);
 
 		final BestTimeResponseStrategyFunctionality initialPlanData = new BestTimeResponseStrategyFunctionality(plan,
 				this.scenario.getNetwork(), this.scoringParams, this.timeDiscretization, travelTimes);

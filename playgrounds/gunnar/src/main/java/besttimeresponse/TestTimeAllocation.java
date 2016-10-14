@@ -45,7 +45,7 @@ public class TestTimeAllocation {
 						// dptTime_s / Units.S_PER_D));
 					}
 				}, 
-				true, true);
+				true, true, true);
 		final double[] result = timeAlloc.optimizeDepartureTimes(Arrays.asList(home, work, shop),
 				new double[] { dptFromHome_s, dptFromWork_s, dptFromShop_s });
 

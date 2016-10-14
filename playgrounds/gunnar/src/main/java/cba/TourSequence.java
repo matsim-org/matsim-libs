@@ -35,7 +35,7 @@ class TourSequence {
 		return purposes;
 	}
 
-	Plan asPlan(final Scenario scenario, final Id<Link> homeLinkId, final Person person) {
+	synchronized Plan asPlan(final Scenario scenario, final Id<Link> homeLinkId, final Person person) {
 
 		final Plan result = scenario.getPopulation().getFactory().createPlan();
 

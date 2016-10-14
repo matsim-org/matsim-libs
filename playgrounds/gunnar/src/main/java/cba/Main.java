@@ -3,26 +3,25 @@ package cba;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import com.google.inject.Provider;
 
@@ -41,61 +40,76 @@ public class Main {
 	 * ============================================================
 	 */
 
-	static final int outerIts = 10;
-	static final int popSize = 1000;
-	static final double replanProba = 0.1;
+	static final int outerIts = 1;
+	static final int popSize = 1;
+	static final double replanProba = 1.0;
 	static final String expectationFilePrefix = "./testdata/cba/expectation-before-it";
 	static final String experienceFilePrefix = "./testdata/cba/experience-after-it";
+	static final String demandStatsFilePrefix = "./testdata/cba/demandStats-in-it";
 
-	static final int maxTrials = 1;
-	static final int maxFailures = 1;
+	static final int maxTrials = 100;
+	static final int maxFailures = 50;
+
+	final static int minLocChoiceSetSize = 1;
+	final static int maxLocChoiceSetSize = 1;
+
+	final static double carAvailProba = 1.0;
 	
+	static final int ttAvgIts = 10;
+
 	/*-
 	 * ============================================================ 
 	 *      DEMAND MODEL
 	 * ============================================================
 	 */
 
+	private static AverageTravelTime avgTravelTimes = null;
+
 	private static void runDemandModel(final Scenario scenario, final int outerIt) {
 
 		if (outerIt == 1) {
-
-			DemandModel.initializePopulation(scenario, popSize);
-
-		} else {
-
-			final EventsManager events = EventsUtils.createEventsManager();
-			final TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculator(scenario.getNetwork(),
-					(TravelTimeCalculatorConfigGroup) scenario.getConfig().getModule("travelTimeCalculator"));
-			events.addHandler(travelTimeCalculator);
-			final MatsimEventsReader reader = new MatsimEventsReader(events);
-			final int lastIt = scenario.getConfig().controler().getLastIteration();
-			reader.readFile("./testdata/cba/output/ITERS/it." + lastIt + "/" + lastIt + ".events.xml.gz");
-			final TravelTime carTravelTime = travelTimeCalculator.getLinkTravelTimes();
-
-			final com.google.inject.Injector injector = org.matsim.core.controler.Injector
-					.createInjector(scenario.getConfig(), new AbstractModule() {
-						@Override
-						public void install() {
-							install(AbstractModule.override(Arrays.asList(new TripRouterModule()),
-									new AbstractModule() {
-										@Override
-										public void install() {
-											install(new ScenarioByInstanceModule(scenario));
-											addTravelTimeBinding("car").toInstance(carTravelTime);
-											install(new TravelDisutilityModule());
-										}
-									}));
-						}
-					});
-			final Provider<TripRouter> factory = injector.getProvider(TripRouter.class);
-
-			DemandModel.replanPopulation(scenario, factory, replanProba,
-					expectationFilePrefix + outerIt + ".txt", maxTrials, maxFailures);
+			DemandModel.createPopulation(scenario, popSize, minLocChoiceSetSize, maxLocChoiceSetSize, carAvailProba);
 		}
+
+		final TravelTime carTravelTime;
+		if (outerIt == 1) {
+			carTravelTime = new FreeSpeedTravelTime();
+		} else {
+			if (avgTravelTimes == null) {
+				assert (outerIt != 2);
+				avgTravelTimes = new AverageTravelTime(scenario, ttAvgIts);
+			} else {
+				avgTravelTimes.addData(scenario, ttAvgIts);
+			}
+			carTravelTime = avgTravelTimes;
+		}
+
+		final com.google.inject.Injector injector = org.matsim.core.controler.Injector
+				.createInjector(scenario.getConfig(), new AbstractModule() {
+					@Override
+					public void install() {
+						install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {
+							@Override
+							public void install() {
+								install(new ScenarioByInstanceModule(scenario));
+								addTravelTimeBinding("car").toInstance(carTravelTime);
+								install(new TravelDisutilityModule());
+							}
+						}));
+					}
+				});
+		final Provider<TripRouter> factory = injector.getProvider(TripRouter.class);
+
+		final Map<String, TravelTime> mode2tt = new LinkedHashMap<>();
+		mode2tt.put("car", carTravelTime);
+		
+		DemandModel.replanPopulation(scenario, factory, outerIt == 1 ? 1.0 : replanProba,
+				expectationFilePrefix + outerIt + ".txt", demandStatsFilePrefix + outerIt + ".txt", maxTrials,
+				maxFailures, mode2tt);
 
 		final PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		popwriter.write("testdata/cba/triangle-population.xml");
+		// System.exit(0);
 	}
 
 	/*-
@@ -104,35 +118,43 @@ public class Main {
 	 * ============================================================
 	 */
 
-	private static void runSupplyModel(final Scenario scenario, final int outerIt) {
+	private static void runSupplyModel(final Scenario scenario, final int outerIt,
+			final ExperiencedScoreAnalyzer experiencedScoreAnalyzer) {
 		final Controler controler = new Controler(scenario);
-		// controler.addOverridingModule(new AbstractModule() {
-		// @Override
-		// public void install() {
-		// addControlerListenerBinding().to(ExperiencedScoreAnalyzer.class);
-		// bind(ExperiencedScoreAnalyzer.class);
-		// }
-		// });
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(TimeDiscretizationInjection.class);
 			}
 		});
-		// controler.addOverridingModule(new ExperiencedPlansModule());
 		controler.run();
 
+		for (Person person : controler.getScenario().getPopulation().getPersons().values()) {
+			experiencedScoreAnalyzer.add(person.getId(), person.getSelectedPlan().getScore());
+		}
 		final PrintWriter writer;
 		try {
 			writer = new PrintWriter(experienceFilePrefix + outerIt + ".txt");
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
-		for (Person person : controler.getScenario().getPopulation().getPersons().values()) {
-			writer.println(person.getId() + "\t" + person.getSelectedPlan().getScore());
-		}
+		writer.println(experiencedScoreAnalyzer.toString());
 		writer.flush();
 		writer.close();
+
+		// final PrintWriter writer;
+		// try {
+		// writer = new PrintWriter(experienceFilePrefix + outerIt + ".txt");
+		// } catch (FileNotFoundException e) {
+		// throw new RuntimeException(e);
+		// }
+		// for (Person person :
+		// controler.getScenario().getPopulation().getPersons().values()) {
+		// writer.println(person.getId() + "\t" +
+		// person.getSelectedPlan().getScore());
+		// }
+		// writer.flush();
+		// writer.close();
 	}
 
 	/*-
@@ -143,7 +165,12 @@ public class Main {
 
 	public static void main(String[] args) {
 
+		// (new ObjectAttributesXmlWriter(new
+		// ObjectAttributes())).writeFile("./testdata/cba/person-attributes.xml");
+
 		System.out.println("STARTED");
+
+		final ExperiencedScoreAnalyzer experiencedScoreAnalyzer = new ExperiencedScoreAnalyzer();
 
 		for (int outerIt = 1; outerIt <= outerIts; outerIt++) {
 
@@ -151,6 +178,7 @@ public class Main {
 				System.out.println("OUTER ITERATION " + outerIt + ", running DEMAND model");
 
 				final Config config = ConfigUtils.loadConfig("./testdata/cba/config.xml");
+				config.global().setRandomSeed(new Random().nextLong());
 				if (outerIt > 1) {
 					config.getModule("plans").addParam("inputPlansFile", "triangle-population.xml");
 				}
@@ -162,12 +190,12 @@ public class Main {
 				System.out.println("OUTER ITERATION " + outerIt + ", running SUPPLY model");
 
 				final Config config = ConfigUtils.loadConfig("./testdata/cba/config.xml");
+				config.global().setRandomSeed(new Random().nextLong());
 				config.controler()
 						.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 				config.getModule("plans").addParam("inputPlansFile", "triangle-population.xml");
 				final Scenario scenario = ScenarioUtils.loadScenario(config);
-
-				runSupplyModel(scenario, outerIt);
+				runSupplyModel(scenario, outerIt, experiencedScoreAnalyzer);
 			}
 
 			System.out.println("DONE");

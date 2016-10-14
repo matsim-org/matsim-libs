@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -17,6 +18,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import com.google.inject.Provider;
 
@@ -27,7 +31,11 @@ import com.google.inject.Provider;
  */
 class DemandModel {
 
-	static void initializePopulation(final Scenario scenario, final double approxPopSize) {
+	static final String choicesetsize = "choicesetsize";
+	static final String caravailable = "caravailable";
+
+	static void createPopulation(final Scenario scenario, final double approxPopSize, final int minLocChoiceSetSize,
+			final int maxLocChoiceSetSize, final double carAvailProba) {
 
 		/*
 		 * Create one home location per person, according to hard-coded logic.
@@ -90,23 +98,44 @@ class DemandModel {
 
 		scenario.getPopulation().getPersons().clear();
 
-		final List<TourSequence> tourSequenceAlternatives = ChoiceModel.newTourSeqAlternatives(scenario);
+		// final List<TourSequence> tourSequenceAlternatives =
+		// ChoiceModel.newTourSeqAlternatives(scenario);
 
 		for (int personNumber = 0; personNumber < homeLocs.size(); personNumber++) {
 			final Person person = scenario.getPopulation().getFactory().createPerson(Id.createPersonId(personNumber));
 			scenario.getPopulation().addPerson(person);
 
-			final Plan plan = ChoiceModel.selectUniformly(homeLocs.get(personNumber), person, tourSequenceAlternatives, scenario);
+			final Activity homeAct = scenario.getPopulation().getFactory().createActivityFromLinkId("home",
+					homeLocs.get(personNumber).getId());
+			final Plan plan = scenario.getPopulation().getFactory().createPlan();
+			plan.addActivity(homeAct);
+
 			person.addPlan(plan);
 			plan.setPerson(person);
 			person.setSelectedPlan(plan);
 		}
+
+		/*
+		 * Create AND SAVE new person attributes.
+		 */
+
+		final Random rnd = new Random();
+		final ObjectAttributes personAttrs = scenario.getPopulation().getPersonAttributes();
+		personAttrs.clear();
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			personAttrs.putAttribute(person.getId().toString(), choicesetsize,
+					minLocChoiceSetSize + rnd.nextInt(1 + maxLocChoiceSetSize - minLocChoiceSetSize));
+			personAttrs.putAttribute(person.getId().toString(), caravailable, (rnd.nextDouble() < carAvailProba));
+		}
+		(new ObjectAttributesXmlWriter(personAttrs)).writeFile("testdata/cba/person-attributes.xml");
 	}
 
 	static void replanPopulation(final Scenario scenario, final Provider<TripRouter> tripRouterProvider,
-			final double replanProba, final String expectationFileName, final int maxTrials, final int maxFailures) {
-		
-		final ChoiceModel choiceModel = new ChoiceModel(scenario, tripRouterProvider, maxTrials, maxFailures);
+			final double replanProba, final String expectationFileName, final String demandStatsFileName,
+			final int maxTrials, final int maxFailures, final Map<String, TravelTime> mode2travelTime) {
+
+		final ChoiceModel choiceModel = new ChoiceModel(scenario, tripRouterProvider, mode2travelTime, maxTrials,
+				maxFailures);
 
 		final Map<Person, ChoiceRunner> person2choiceRunner = new LinkedHashMap<>();
 
@@ -118,7 +147,13 @@ class DemandModel {
 				// System.out.println("replanning person " + person.getId());
 				final Link homeLoc = scenario.getNetwork().getLinks()
 						.get(((Activity) person.getSelectedPlan().getPlanElements().get(0)).getLinkId());
-				final ChoiceRunner choiceRunner = choiceModel.newChoiceRunner(homeLoc, person);
+				final int locChoiceSetSize = (Integer) scenario.getPopulation().getPersonAttributes()
+						.getAttribute(person.getId().toString(), choicesetsize);
+				final boolean carAvailable = (Boolean) scenario.getPopulation().getPersonAttributes()
+						.getAttribute(person.getId().toString(), caravailable);
+
+				final ChoiceRunner choiceRunner = choiceModel.newChoiceRunner(homeLoc, person, locChoiceSetSize,
+						locChoiceSetSize, carAvailable);
 				person2choiceRunner.put(person, choiceRunner);
 				threadPool.execute(choiceRunner);
 			}
@@ -132,13 +167,14 @@ class DemandModel {
 
 		// Collect replanning results.
 
+		final DemandAnalyzer demandAnalyzer = new DemandAnalyzer();
+
 		final PrintWriter expectationWriter;
 		try {
 			expectationWriter = new PrintWriter(expectationFileName);
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
-
 		for (Map.Entry<Person, ChoiceRunner> entry : person2choiceRunner.entrySet()) {
 			final Person person = entry.getKey();
 			final Plan plan = entry.getValue().getChosenPlan();
@@ -148,9 +184,19 @@ class DemandModel {
 			plan.setPerson(person);
 			person.setSelectedPlan(plan);
 			expectationWriter.println(person.getId() + "\t" + plan.getScore());
+			demandAnalyzer.registerChoice(plan);
 		}
-
 		expectationWriter.flush();
 		expectationWriter.close();
+
+		final PrintWriter demandStatsWriter;
+		try {
+			demandStatsWriter = new PrintWriter(demandStatsFileName);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+		demandStatsWriter.println(demandAnalyzer.toString());
+		demandStatsWriter.flush();
+		demandStatsWriter.close();
 	}
 }

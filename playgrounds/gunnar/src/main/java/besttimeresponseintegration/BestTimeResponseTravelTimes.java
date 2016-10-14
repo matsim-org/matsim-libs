@@ -1,11 +1,17 @@
 package besttimeresponseintegration;
 
 import java.util.List;
+import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
 
 import besttimeresponse.TripTravelTimes;
@@ -20,6 +26,10 @@ public class BestTimeResponseTravelTimes implements TripTravelTimes<Facility, St
 
 	// -------------------- MEMBERS --------------------
 
+	private final Network network;
+
+	private final Map<String, TravelTime> mode2travelTime;
+
 	private final TimeDiscretization timeDiscr;
 
 	private final TripRouter tripRouter;
@@ -30,11 +40,13 @@ public class BestTimeResponseTravelTimes implements TripTravelTimes<Facility, St
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public BestTimeResponseTravelTimes(final TimeDiscretization timeDiscr, final TripRouter tripRouter,
-			final Person person) {
+	public BestTimeResponseTravelTimes(final Network network, final TimeDiscretization timeDiscr,
+			final TripRouter tripRouter, final Person person, final Map<String, TravelTime> mode2travelTime) {
+		this.network = network;
 		this.timeDiscr = timeDiscr;
 		this.tripRouter = tripRouter;
 		this.person = person;
+		this.mode2travelTime = mode2travelTime;
 	}
 
 	public void setCache(final TravelTimeCache<Facility, String> cache) {
@@ -44,7 +56,7 @@ public class BestTimeResponseTravelTimes implements TripTravelTimes<Facility, St
 	// --------------- IMPLEMENTATION OF TripTravelTimes ---------------
 
 	@Override
-	public double getTravelTime_s(final Facility origin, final Facility destination, final double dptTime_s,
+	synchronized public double getTravelTime_s(final Facility origin, final Facility destination, final double dptTime_s,
 			final String mode) {
 
 		final int leftBin;
@@ -74,12 +86,51 @@ public class BestTimeResponseTravelTimes implements TripTravelTimes<Facility, St
 			tt_s = this.cache.getTT_s(bin, origin, destination, mode);
 		}
 		if (tt_s == null) {
+
 			final double tripDptTime_s = Math.max(this.timeDiscr.getBinStartTime_s(bin), 0);
 			final List<? extends PlanElement> tripSequence = this.tripRouter.calcRoute(mode, origin, destination,
 					tripDptTime_s, this.person);
 
-			final Leg lastLeg = (Leg) tripSequence.get(tripSequence.size() - 1);
-			tt_s = (lastLeg.getDepartureTime() + lastLeg.getTravelTime()) - tripDptTime_s;
+			// >>> TODO NEW >>>
+
+			double startTime_s = tripDptTime_s;
+			double time_s = tripDptTime_s;
+
+			for (int i = 0; i < tripSequence.size(); i++) {
+				final Leg leg = (Leg) tripSequence.get(i);
+				if (leg.getRoute() instanceof NetworkRoute) {
+					final TravelTime travelTime = this.mode2travelTime.get(leg.getMode());
+					final NetworkRoute route = (NetworkRoute) leg.getRoute();
+					for (Id<Link> linkId : route.getLinkIds()) {
+						final Link link = this.network.getLinks().get(linkId);
+						final double linkTT_s = travelTime.getLinkTravelTime(link, time_s, this.person, null);
+						time_s += linkTT_s;
+					}
+					final Link endLink = this.network.getLinks().get(route.getEndLinkId());
+					time_s += travelTime.getLinkTravelTime(endLink, time_s, this.person, null);
+				} else {
+					time_s += leg.getTravelTime();
+				}
+			}
+
+			tt_s = time_s - startTime_s;
+			
+			// TODO <<< NEW <<<
+
+//			{
+//				final Leg lastLeg = (Leg) tripSequence.get(tripSequence.size() - 1);
+//				tt_s = (lastLeg.getDepartureTime() + lastLeg.getTravelTime()) - tripDptTime_s;
+//			}
+//
+//			{
+//				final Leg lastLeg = (Leg) tripSequence.get(tripSequence.size() - 1);
+//				if (lastLeg.getRoute() instanceof NetworkRoute) {
+//					final NetworkRoute lastRoute = (NetworkRoute) lastLeg.getRoute();
+//					final Link lastLink = this.network.getLinks().get(lastRoute.getEndLinkId());
+//					tt_s += lastLink.getLength() / lastLink.getFreespeed();
+//				}
+//			}
+
 			if (this.cache != null) {
 				this.cache.putTT_s(bin, origin, destination, mode, tt_s);
 			}
