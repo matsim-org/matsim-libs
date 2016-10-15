@@ -29,15 +29,6 @@ class DemandAnalyzer {
 	private int legCnt = 0;
 
 	DemandAnalyzer() {
-		// this.actSeq2cnt.put(unmodifiableList(asList("home", "work", "home")),
-		// 0);
-		// this.actSeq2cnt.put(unmodifiableList(asList("home", "other",
-		// "home")), 0);
-		// this.actSeq2cnt.put(unmodifiableList(asList("home", "work", "home",
-		// "other", "home")), 0);
-		//
-		// this.mode2cnt.put("car", 0);
-		// this.mode2cnt.put("pt", 0);
 	}
 
 	private <K> void add(final K key, final double addend, final Map<K, Double> key2cnt) {
