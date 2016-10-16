@@ -26,7 +26,7 @@ import org.junit.Test;
  * @author nagel
  *
  */
-public class SubpopulationsExampleTest {
+public class SubpopulationsExampleIT {
 
 	/**
 	 * Test method for {@link tutorial.programming.example18MultipleSubpopulations.RunSubpopulationsExample#main(java.lang.String[])}.

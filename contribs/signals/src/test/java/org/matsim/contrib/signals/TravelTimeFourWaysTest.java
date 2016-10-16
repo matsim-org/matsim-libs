@@ -54,7 +54,7 @@ public class TravelTimeFourWaysTest {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
 	private Scenario createTestScenario(){
-		Config conf = ConfigUtils.createConfig(testUtils.classInputResourcePath());
+		Config conf = ConfigUtils.createConfig(testUtils.getClassInputResourcePath());
 		conf.controler().setMobsim("qsim");
 		conf.network().setInputFile("network.xml.gz");
 		conf.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");

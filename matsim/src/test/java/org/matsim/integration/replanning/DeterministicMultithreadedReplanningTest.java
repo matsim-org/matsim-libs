@@ -172,7 +172,7 @@ public class DeterministicMultithreadedReplanningTest {
 		Config config = testUtils.loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setLastIteration(lastIteration);
 		config.global().setNumberOfThreads(4); // just use any number > 1
-		config.plans().setInputFile(IOUtils.newUrl(testUtils.classInputResourcePath(), "plans1.xml").toString());
+		config.plans().setInputFile(IOUtils.newUrl(testUtils.getClassInputResourcePath(), "plans1.xml").toString());
 		{
 			// setup run1
 			PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());

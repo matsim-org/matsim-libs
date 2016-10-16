@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Permission;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.rules.TestWatchman;
 import org.junit.runners.model.FrameworkMethod;
@@ -46,6 +47,7 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
  * @author mrieser
  */
 public class MatsimTestUtils extends TestWatchman {
+	private static final Logger log = Logger.getLogger(MatsimTestUtils.class) ;
 
 	/** A constant for the exactness when comparing doubles. */
 	public static final double EPSILON = 1e-10;
@@ -80,7 +82,7 @@ public class MatsimTestUtils extends TestWatchman {
 
 	public Config createConfigWithInputResourcePathAsContext() {
 		Config config = ConfigUtils.createConfig();
-		config.setContext(inputResourcePath());
+		config.setContext(getInputResourcePath());
 		this.outputDirectory = getOutputDirectory();
 		config.controler().setOutputDirectory(this.outputDirectory);
 		return config;
@@ -88,7 +90,7 @@ public class MatsimTestUtils extends TestWatchman {
 
 	public Config createConfigWithClassInputResourcePathAsContext() {
 		Config config = ConfigUtils.createConfig();
-		config.setContext(classInputResourcePath());
+		config.setContext(getClassInputResourcePath());
 		this.outputDirectory = getOutputDirectory();
 		config.controler().setOutputDirectory(this.outputDirectory);
 		return config;
@@ -96,21 +98,21 @@ public class MatsimTestUtils extends TestWatchman {
 
 	public Config createConfigWithPackageInputResourcePathAsContext() {
 		Config config = ConfigUtils.createConfig();
-		config.setContext(packageInputResourcePath());
+		config.setContext(getPackageInputResourcePath());
 		this.outputDirectory = getOutputDirectory();
 		config.controler().setOutputDirectory(this.outputDirectory);
 		return config;
 	}
 
-	public URL inputResourcePath() {
+	public URL getInputResourcePath() {
 		return getResourceNotNull("/" + getClassInputDirectory() + getMethodName() + "/.");
 	}
 
-	public URL classInputResourcePath() {
+	public URL getClassInputResourcePath() {
 		return getResourceNotNull("/" + getClassInputDirectory() + "/.");
 	}
 
-	public URL packageInputResourcePath() {
+	public URL getPackageInputResourcePath() {
 		return getResourceNotNull("/" + getPackageInputDirectory() + "/.");
 	}
 
@@ -143,7 +145,28 @@ public class MatsimTestUtils extends TestWatchman {
 	}
 
 	public URL getTestScenarioURL(String name) {
-		return this.testClass.getResource("/test/scenarios/"+ name +"/");
+		// yyyy see msg1 and msg2 below.  kai, oct'16
+		final String msg1 = "Could not find test scenario. Note that this relies on a stupid test for |playground| or |contrib| "
+				+ "in the package name which will not get all cases right.";
+		final String msg2 = "If someone has a more robust idea of how to do this, please go ahead and modify the getTestScenarioURL(...) method.";
+
+		if ( getPackageInputDirectory().contains("playground") || getPackageInputDirectory().contains("contrib") ) {
+			try {
+				return IOUtils.getUrlFromFileOrResource("../../matsim/src/test/resources/test/scenarios/" + name + "/" ) ;
+			} catch ( Exception ee ) {
+				log.fatal(msg1);
+				log.fatal(msg2 ) ;
+				throw new RuntimeException( ee ) ;
+			}
+		} else {
+			try { 
+				return IOUtils.getUrlFromFileOrResource("src/test/resources/test/scenarios/" + name + "/" ) ;
+			} catch ( Exception ee ) {
+				log.fatal(msg1);
+				log.fatal(msg2 ) ;
+				throw new RuntimeException( ee ) ;
+			}
+		}
 	}
 
 

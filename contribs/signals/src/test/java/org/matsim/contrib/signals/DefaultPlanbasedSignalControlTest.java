@@ -52,7 +52,7 @@ public class DefaultPlanbasedSignalControlTest {
 	 */
 	@Test
 	public final void planSwitchingTest() {
-		Config config = ConfigUtils.createConfig(utils.classInputResourcePath());
+		Config config = ConfigUtils.createConfig(utils.getClassInputResourcePath());
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());

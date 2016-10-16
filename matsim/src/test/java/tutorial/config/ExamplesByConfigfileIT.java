@@ -20,9 +20,7 @@ package tutorial.config;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,24 +28,22 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.matsim.core.utils.io.IOUtils;
 
-import tutorial.config.RunFromConfigfileExample;
-
 /**
  * @author nagel
  *
  */
 @RunWith(Parameterized.class)
-public class ExamplesByConfigfileTest {
+public class ExamplesByConfigfileIT {
 	
 	private String configFile;
 
-	public ExamplesByConfigfileTest( String configFile ) {
+	public ExamplesByConfigfileIT( String configFile ) {
 		this.configFile = configFile ;
 	}
 	
 	@Parameters(name = "{index}: configFilename == {0};")
 	public static Collection<Object[]> createTests() {
-		Collection<Object[]> filesToRun = new ArrayList<Object[]>();
+		Collection<Object[]> filesToRun = new ArrayList<>();
 
 		filesToRun.add(new Object [] {"examples/equil/config.xml"});
 		filesToRun.add(new Object [] {"examples/equil-extended/config.xml"});
