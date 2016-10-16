@@ -11,7 +11,7 @@ public class URLTest {
 
 	@Test
 	public void testLoadWithURL() throws MalformedURLException {
-		Config config = ConfigUtils.loadConfig(new URL("file:examples/equil/config.xml"));
+		Config config = ConfigUtils.loadConfig(new URL("file:../examples/scenarios/equil/config.xml"));
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 	}
 

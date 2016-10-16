@@ -30,6 +30,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;
@@ -55,7 +56,7 @@ public class ResumableRunsTest {
 	 */
 	@Test
 	public void testResumableRuns() {
-		Config config = utils.loadConfig(IOUtils.newUrl(utils.getTestScenarioURL("equil"), "config.xml"));
+		Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controler().setLastIteration(11);
 		config.controler().setWriteEventsInterval(1);
 		config.global().setNumberOfThreads(1); // only use one thread to rule out other disturbances for the test

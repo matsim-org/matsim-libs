@@ -9,7 +9,7 @@
 	<build>
 		<resources>
 			<resource>
-				<directory>examples</directory>
+				<directory>scenarios</directory>
 				<targetPath>test/scenarios</targetPath>
 			</resource>
 		</resources>

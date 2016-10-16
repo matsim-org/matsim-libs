@@ -43,6 +43,7 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioByConfigModule;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.Collections;
@@ -62,7 +63,7 @@ public class InnovationSwitchOffTest {
 	 */
 	@Test
 	public void testInnovationSwitchOff() {
-		Config config = ConfigUtils.createConfig(utils.getTestScenarioURL("equil"));
+		Config config = ConfigUtils.createConfig(ExamplesUtils.getTestScenarioURL("equil"));
 		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
 
 		config.network().setInputFile("network.xml");

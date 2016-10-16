@@ -29,6 +29,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -41,7 +43,7 @@ public class ControlerMobsimIntegrationTest {
 
 	@Test
 	public void testRunMobsim_customMobsim() {
-		Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		Config cfg = this.utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		cfg.controler().setLastIteration(0);
 		cfg.controler().setMobsim("counting");
 		cfg.controler().setWritePlansInterval(0);

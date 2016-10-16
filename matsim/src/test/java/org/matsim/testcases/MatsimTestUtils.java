@@ -142,10 +142,6 @@ public class MatsimTestUtils extends TestWatchman {
 		return config;
 	}
 
-	public URL getTestScenarioURL(String name) {
-		return this.testClass.getResource("/test/scenarios/"+ name +"/");
-	}
-
 
 	/**
 	 * Loads a configuration from file (or the default config if <code>configfile</code> is <code>null</code>).

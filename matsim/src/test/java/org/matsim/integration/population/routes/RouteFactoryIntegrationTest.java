@@ -31,6 +31,7 @@ import org.matsim.core.population.routes.*;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.Collection;
@@ -48,7 +49,7 @@ public class RouteFactoryIntegrationTest {
 	 */
 	@Test
 	public void testRouteFactoryIntegration() {
-		Config config = utils.loadConfig(IOUtils.newUrl(utils.getTestScenarioURL("equil"), "config.xml"));
+		Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.plans().setInputFile("plans2.xml");
 		Collection<StrategySettings> settings = config.strategy().getStrategySettings();
 		for (StrategySettings setting: settings) {
