@@ -7,6 +7,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class NewControlerTest {
@@ -16,7 +18,7 @@ public class NewControlerTest {
 
 	@Test
 	public void testInjectionBeforeControler() {
-		Config config = testUtils.loadConfig("examples/equil/config.xml");
+		Config config = testUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controler().setLastIteration(1);
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		final Scenario scenario = ScenarioUtils.createScenario(config);

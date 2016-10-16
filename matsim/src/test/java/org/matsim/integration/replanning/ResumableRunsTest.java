@@ -34,6 +34,7 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;
+import java.net.MalformedURLException;
 
 /**
  * Tests that a run can be started from a given plan-file and generates
@@ -55,7 +56,7 @@ public class ResumableRunsTest {
 	 * re-planning, which both could depend on random numbers.
 	 */
 	@Test
-	public void testResumableRuns() {
+	public void testResumableRuns() throws MalformedURLException {
 		Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controler().setLastIteration(11);
 		config.controler().setWriteEventsInterval(1);
@@ -78,7 +79,7 @@ public class ResumableRunsTest {
 		// run2
 		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/run2/");
 		config.controler().setFirstIteration(10);
-		config.plans().setInputFile(new File(utils.getOutputDirectory() + "/run1/ITERS/it.10/10.plans.xml.gz").getAbsolutePath());
+		config.plans().setInputFile(new File(utils.getOutputDirectory() + "/run1/ITERS/it.10/10.plans.xml.gz").toURI().toURL().toString());
 		Controler controler2 = new Controler(config);
         controler2.getConfig().controler().setCreateGraphs(false);
 		controler2.getConfig().controler().setDumpDataAtEnd(false);
