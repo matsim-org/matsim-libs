@@ -11,16 +11,18 @@
 		<param name="inputNetworkFile" value="network.xml" />
 	</module>
 
+	<module name="facilities">
+		<param name="inputFacilitiesFile" value="facilities.xml" />
+	</module>
+
 	<module name="plans">
 		<param name="inputPlansFile" value="plans100.xml" />
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="output/example" />
+		<param name="outputDirectory" value="./output" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
-		<param name="mobsim" value="qsim" />
-		<param name="snapshotFormat" value="" />
 	</module>
 
 	<module name="qsim">
@@ -28,12 +30,7 @@
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
 	
-		<param name = "snapshotperiod"	value = "00:01:00"/> <!-- 00:00:00 means NO snapshot writing -->
-
-
-		<param name="trafficDynamics" value="withHoles" />
-		<param name="snapshotStyle" value="withHoles" />
-
+		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
 	</module>
 
 	<module name="planCalcScore">
@@ -49,11 +46,13 @@
 		<param name="activityType_0"            value="h" /> <!-- home -->
 		<param name="activityPriority_0"        value="1" />
 		<param name="activityTypicalDuration_0" value="12:00:00" />
+		<param name="activityMinimalDuration_0" value="08:00:00" />
 	
 		<param name="activityType_1"            value="w" /> <!-- work -->
 		<param name="activityPriority_1"        value="1" />
 		<param name="activityTypicalDuration_1" value="08:00:00" />
-		<param name="activityOpeningTime_1"     value="06:00:00" />
+		<param name="activityMinimalDuration_1" value="06:00:00" />
+		<param name="activityOpeningTime_1"     value="07:00:00" />
 		<param name="activityLatestStartTime_1" value="09:00:00" />
 		<param name="activityEarliestEndTime_1" value="" />
 		<param name="activityClosingTime_1"     value="18:00:00" />
