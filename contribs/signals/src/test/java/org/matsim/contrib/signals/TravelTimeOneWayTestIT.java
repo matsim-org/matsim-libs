@@ -70,7 +70,7 @@ public class TravelTimeOneWayTestIT {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	private Scenario loadScenario(boolean useLanes) {
-		Config conf = ConfigUtils.createConfig(testUtils.getClassInputResourcePath());
+		Config conf = ConfigUtils.createConfig(testUtils.classInputResourcePath());
 		conf.controler().setMobsim("qsim");
 		conf.network().setInputFile("network.xml");
 		conf.plans().setInputFile("plans.xml.gz");

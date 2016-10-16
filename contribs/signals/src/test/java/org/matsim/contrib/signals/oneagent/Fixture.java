@@ -58,7 +58,7 @@ public class Fixture {
 		} catch (NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
 		}
-		Config conf = ConfigUtils.createConfig(testUtils.getClassInputResourcePath());
+		Config conf = ConfigUtils.createConfig(testUtils.classInputResourcePath());
 		ActivityParams params = new ActivityParams("h");
 		params.setTypicalDuration(24.0 * 3600.0);
 		conf.planCalcScore().addActivityParams(params);
