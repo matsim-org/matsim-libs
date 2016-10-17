@@ -116,9 +116,10 @@ public class EmissionModule {
 		averageFleetWarmEmissionFactorsFile = ecg.getAverageWarmEmissionFactorsFileURL(context).getFile();
 		averageFleetColdEmissionFactorsFile = ecg.getAverageColdEmissionFactorsFileURL(context).getFile();
 		
-		
-		detailedWarmEmissionFactorsFile = ecg.getDetailedWarmEmissionFactorsFileURL(context).getFile();
-		detailedColdEmissionFactorsFile = ecg.getDetailedColdEmissionFactorsFileURL(context).getFile();
+		if(ecg.isUsingDetailedEmissionCalculation()) {
+			detailedWarmEmissionFactorsFile = ecg.getDetailedWarmEmissionFactorsFileURL(context).getFile();
+			detailedColdEmissionFactorsFile = ecg.getDetailedColdEmissionFactorsFileURL(context).getFile();
+		}
 	}
 
 	public void createEmissionHandler() {
