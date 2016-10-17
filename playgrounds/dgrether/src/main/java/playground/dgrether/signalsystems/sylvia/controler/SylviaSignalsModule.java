@@ -71,20 +71,13 @@ public class SylviaSignalsModule extends AbstractModule {
             bind(SignalsControllerListener.class).to(DgSylviaSignalControlerListener.class);
             addControlerListenerBinding().to(SignalsControllerListener.class);
             addMobsimListenerBinding().to(QSimSignalEngine.class);
+            bind(DgSensorManager.class).asEagerSingleton();
             addEventHandlerBinding().to(DgSensorManager.class);
             // bind tool to write information about signal states for via
 			bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
             addEventHandlerBinding().to(SignalEvents2ViaCSVWriter.class);
             addControlerListenerBinding().to(SignalEvents2ViaCSVWriter.class);
         }
-	}
-	
-	@Provides DgSensorManager provideDgSensorManager(Scenario scenario) {
-		DgSensorManager sensorManager = new DgSensorManager(scenario.getNetwork());
-		if (scenario.getConfig().network().getLaneDefinitionsFile() != null || scenario.getConfig().qsim().isUseLanes()) {
-			sensorManager.setLaneDefinitions(scenario.getLanes());
-		}
-		return sensorManager;
 	}
 	
 	@Provides SignalSystemsManager provideSignalSystemsManager(Scenario scenario, EventsManager eventsManager, ReplanningContext replanningContext, DgSensorManager sensorManager) {	

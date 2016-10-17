@@ -72,10 +72,10 @@
 			<param name="disableAfterIteration" value="190" />
 
 			<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
-			<param name="moduleName" value="ChangeExpBeta" />
+			<param name="strategyName" value="ChangeExpBeta" />
 
 			<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
-			<param name="probability" value="0.9" />
+			<param name="weight" value="0.9" />
 		</parameterset>
 
 		<!--<parameterset type="strategysettings" >-->
@@ -86,10 +86,10 @@
 		<parameterset type="strategysettings" >
 
 			<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
-			<param name="moduleName" value="ReRoute" />
+			<param name="strategyName" value="ReRoute" />
 
 			<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
-			<param name="probability" value="0.1" />
+			<param name="weight" value="0.1" />
 		</parameterset>
 	</module>
 

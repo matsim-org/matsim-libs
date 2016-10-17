@@ -24,14 +24,15 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
@@ -41,6 +42,8 @@ import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.lanes.data.Lane;
 import org.matsim.lanes.data.Lanes;
+
+import com.google.inject.Inject;
 
 
 /**
@@ -58,14 +61,18 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 
 	private Map<Id<Link>, Map<Id<Lane>, DgLaneSensor>> linkIdLaneIdSensorMap = new HashMap<>();
 	
+	@Deprecated // not tested
 	private Map<Id<Link>, Tuple<Double, Double>> linkFirstSecondDistanceMeterMap = new HashMap<>();
 
 	private Network network;
-
 	private Lanes laneDefinitions = null;
 	
-	public DgSensorManager(Network network){
-		this.network = network;
+	@Inject
+	public DgSensorManager(Scenario scenario){
+		this.network = scenario.getNetwork();
+		if (scenario.getConfig().network().getLaneDefinitionsFile() != null || scenario.getConfig().qsim().isUseLanes()) {
+			laneDefinitions = scenario.getLanes();
+		}
 	}
 	
 	public void registerNumberOfCarsMonitoring(Id<Link> linkId){
@@ -115,8 +122,8 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 	
 	}
 
-	
-	public void registerCarsAtDistancePerSecondMonitoring(Id<Link> linkId, Double distanceMeter){
+	@Deprecated //not tested
+	private void registerCarsAtDistancePerSecondMonitoring(Id<Link> linkId, Double distanceMeter){
 		double firstDistanceMeter = distanceMeter;
 		Link link = this.network.getLinks().get(linkId);
 		double secondDistanceMeter = distanceMeter -  2 * link.getFreespeed();
@@ -132,7 +139,8 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 		this.registerNumberOfCarsInDistanceMonitoring(linkId, secondDistanceMeter);
 	}
 	
-	public int getNumberOfCarsAtDistancePerSecond(Id<Link> linkId, Double distanceMeter, double timeSeconds){
+	@Deprecated //not tested
+	private int getNumberOfCarsAtDistancePerSecond(Id<Link> linkId, Double distanceMeter, double timeSeconds){
 		Tuple<Double, Double> tuple = this.linkFirstSecondDistanceMeterMap.get(linkId);
 		int numberOfCarsFirstDetector = this.getNumberOfCarsInDistance(linkId, tuple.getFirst(), timeSeconds);
 		int numberOfCarsSecondDetector = this.getNumberOfCarsInDistance(linkId, tuple.getSecond(), timeSeconds);
@@ -164,7 +172,6 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 		if (!this.linkIdSensorMap.containsKey(linkId)){
 			throw new IllegalStateException("No sensor on link " + linkId + "! Register measurement for this link by calling one of the 'register...' methods of this class first.");
 		}
-		//TODO add further check
 		return this.linkIdSensorMap.get(linkId).getNumberOfCarsInDistance(distanceMeter, timeSeconds);
 	}
 	
@@ -200,10 +207,6 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 	public void reset(int iteration) {
 		this.linkIdSensorMap.clear();
 		this.linkFirstSecondDistanceMeterMap.clear();
-	}
-
-	public void setLaneDefinitions(Lanes laneDefinitions) {
-		this.laneDefinitions  = laneDefinitions;
 	}
 
 	@Override
