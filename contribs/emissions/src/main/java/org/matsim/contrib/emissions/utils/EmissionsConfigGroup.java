@@ -19,7 +19,9 @@
 
 package org.matsim.contrib.emissions.utils;
 
+import java.net.URL;
 import java.util.Map;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class EmissionsConfigGroup
@@ -95,6 +97,10 @@ public class EmissionsConfigGroup
         return this.emissionRoadTypeMappingFile;
     }
 
+    public URL getEmissionRoadTypeMappingFileURL(URL context) {
+        return ConfigGroup.getInputFileURL(context, this.emissionRoadTypeMappingFile);
+    }
+
     @StringSetter(EMISSION_FACTORS_WARM_FILE_AVERAGE)
     public void setAverageWarmEmissionFactorsFile(String averageFleetWarmEmissionFactorsFile) {
         this.averageFleetWarmEmissionFactorsFile = averageFleetWarmEmissionFactorsFile;
@@ -103,6 +109,11 @@ public class EmissionsConfigGroup
     public String getAverageWarmEmissionFactorsFile() {
         return this.averageFleetWarmEmissionFactorsFile;
     }
+
+    public URL getAverageWarmEmissionFactorsFileURL(URL context) {
+        return ConfigGroup.getInputFileURL(context, this.averageFleetWarmEmissionFactorsFile);
+    }
+
     @StringSetter(EMISSION_FACTORS_COLD_FILE_AVERAGE)
     public void setAverageColdEmissionFactorsFile(String averageFleetColdEmissionFactorsFile) {
         this.averageFleetColdEmissionFactorsFile = averageFleetColdEmissionFactorsFile;
@@ -111,6 +122,11 @@ public class EmissionsConfigGroup
     public String getAverageColdEmissionFactorsFile() {
         return this.averageFleetColdEmissionFactorsFile;
     }
+
+    public URL getAverageColdEmissionFactorsFileURL(URL context) {
+        return ConfigGroup.getInputFileURL(context, this.averageFleetColdEmissionFactorsFile);
+    }
+
     @StringGetter(USING_DETAILED_EMISSION_CALCULATION)
     public boolean isUsingDetailedEmissionCalculation(){
         return this.isUsingDetailedEmissionCalculation;
@@ -127,6 +143,11 @@ public class EmissionsConfigGroup
     public String getDetailedWarmEmissionFactorsFile() {
         return this.detailedWarmEmissionFactorsFile;
     }
+
+    public URL getDetailedWarmEmissionFactorsFileURL(URL context) {
+        return ConfigGroup.getInputFileURL(context, this.detailedWarmEmissionFactorsFile);
+    }
+
     @StringSetter(EMISSION_FACTORS_COLD_FILE_DETAILED)
     public void setDetailedColdEmissionFactorsFile(String detailedColdEmissionFactorsFile) {
         this.detailedColdEmissionFactorsFile = detailedColdEmissionFactorsFile;
@@ -134,6 +155,10 @@ public class EmissionsConfigGroup
     @StringGetter(EMISSION_FACTORS_COLD_FILE_DETAILED)
     public String getDetailedColdEmissionFactorsFile(){
         return this.detailedColdEmissionFactorsFile;
+    }
+
+    public URL getDetailedColdEmissionFactorsFileURL(URL context) {
+        return ConfigGroup.getInputFileURL(context, this.detailedColdEmissionFactorsFile);
     }
     
     public EmissionsConfigGroup()

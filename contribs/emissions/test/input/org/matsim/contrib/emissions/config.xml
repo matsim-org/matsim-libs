@@ -29,19 +29,19 @@
 	<module name="emissions" >
 
 		<!-- REQUIRED: file with HBEFA 3.1 fleet average cold emission factors -->
-		<param name="averageFleetColdEmissionFactorsFile" value="./test/input/org/matsim/contrib/emissions/sample_EFA_ColdStart_vehcat_2005average.txt" />
+		<param name="averageFleetColdEmissionFactorsFile" value="sample_EFA_ColdStart_vehcat_2005average.txt" />
 
 		<!-- REQUIRED: file with HBEFA 3.1 fleet average warm emission factors -->
-		<param name="averageFleetWarmEmissionFactorsFile" value="./test/input/org/matsim/contrib/emissions/sample_EFA_HOT_vehcat_2005average.txt" />
+		<param name="averageFleetWarmEmissionFactorsFile" value="sample_EFA_HOT_vehcat_2005average.txt" />
 
 		<!-- OPTIONAL: file with HBEFA 3.1 detailed cold emission factors -->
-		<param name="detailedColdEmissionFactorsFile" value="./test/input/org/matsim/contrib/emissions/sample_EFA_ColdStart_SubSegm_2005detailed.txt" />
+		<param name="detailedColdEmissionFactorsFile" value="sample_EFA_ColdStart_SubSegm_2005detailed.txt" />
 
 		<!-- OPTIONAL: file with HBEFA 3.1 detailed warm emission factors -->
-		<param name="detailedWarmEmissionFactorsFile" value="./test/input/org/matsim/contrib/emissions/sample_EFA_HOT_SubSegm_2005detailed.txt" />
+		<param name="detailedWarmEmissionFactorsFile" value="sample_EFA_HOT_SubSegm_2005detailed.txt" />
 
 		<!-- REQUIRED: mapping from input road types to HBEFA 3.1 road type strings -->
-		<param name="emissionRoadTypeMappingFile" value="./test/input/org/matsim/contrib/emissions/sample_roadTypeMapping.txt" />
+		<param name="emissionRoadTypeMappingFile" value="sample_roadTypeMapping.txt" />
 
 		<!-- definition of a vehicle for every person (who is allowed to choose a vehicle in the simulation):
 		 - REQUIRED: vehicle type Id must start with the respective HbefaVehicleCategory followed by `;'

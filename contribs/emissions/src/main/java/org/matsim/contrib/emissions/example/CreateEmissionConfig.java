@@ -50,14 +50,19 @@ public class CreateEmissionConfig {
 		private static final String emissionVehicleFile = //inputPath + 
 				"sample_emissionVehicles.xml";
 		
-		private static final String roadTypeMappingFile = inputPath + "sample_roadTypeMapping.txt";
+		private static final String roadTypeMappingFile = //inputPath +
+				"sample_roadTypeMapping.txt";
 		
-		private static final String averageFleetWarmEmissionFactorsFile = inputPath + "sample_EFA_HOT_vehcat_2005average.txt";
-		private static final String averageFleetColdEmissionFactorsFile = inputPath + "sample_EFA_ColdStart_vehcat_2005average.txt";
+		private static final String averageFleetWarmEmissionFactorsFile = //inputPath +
+				"sample_EFA_HOT_vehcat_2005average.txt";
+		private static final String averageFleetColdEmissionFactorsFile = //inputPath +
+				"sample_EFA_ColdStart_vehcat_2005average.txt";
 		
 		private static final boolean isUsingDetailedEmissionCalculation = true;
-		private static final String detailedWarmEmissionFactorsFile = inputPath + "sample_EFA_HOT_SubSegm_2005detailed.txt";
-		private static final String detailedColdEmissionFactorsFile = inputPath + "sample_EFA_ColdStart_SubSegm_2005detailed.txt";
+		private static final String detailedWarmEmissionFactorsFile = //inputPath +
+				"sample_EFA_HOT_SubSegm_2005detailed.txt";
+		private static final String detailedColdEmissionFactorsFile = //inputPath +
+			 	"sample_EFA_ColdStart_SubSegm_2005detailed.txt";
 		
 		private static final String outputPath = "./test/output/";
 		private static final String configFilePath = inputPath + "config.xml";
