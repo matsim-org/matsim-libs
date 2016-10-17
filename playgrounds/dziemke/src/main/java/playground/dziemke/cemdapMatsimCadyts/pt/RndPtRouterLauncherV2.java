@@ -34,7 +34,7 @@ import java.util.Set;
  * @author gthunig on 14.07.2016.
  */
 public class RndPtRouterLauncherV2 {
-	private static enum Variant { orig, reduced } ;
+	private enum Variant { orig, reduced }
 	private static final Variant variant = Variant.orig ;
 
 	private static Provider<TransitRouter> createRandomizedTransitRouterFactory (final TransitSchedule schedule, final TransitRouterConfig trConfig, final TransitRouterNetwork routerNetwork){

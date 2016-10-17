@@ -31,7 +31,7 @@ public class SimCountDif {
 			Double countVal = Double.parseDouble(line[3]);
 			double ratio = (countVal-simVal)/countVal;
 			Double deviation = ratio * 100;
-			Double absDeviation = Math.abs(deviation);
+//			Double absDeviation = Math.abs(deviation);
 			if (countVal >= 0) {
 				Integer[] dev = new Integer[2];
 				dev[0] = deviation.intValue();
