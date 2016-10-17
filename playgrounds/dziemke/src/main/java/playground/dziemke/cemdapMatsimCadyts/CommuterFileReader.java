@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -32,13 +31,13 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 import playground.dziemke.utils.TwoAttributeShapeReader;
 
-
 /**
- * @author dziemke
  * Based on "playground.vsp.demandde.pendlermatrix.PendlerMatrixReader.java"
+ * 
+ * @author dziemke
  */
 public class CommuterFileReader {
-	private static final Logger log = Logger.getLogger(CommuterFileReader.class);
+	private static final Logger LOG = Logger.getLogger(CommuterFileReader.class);
 	
 	// class variables
 	private String shapeFile;
@@ -47,7 +46,8 @@ public class CommuterFileReader {
 	private String commuterFileOut;
 	private double carShareInterior;
 	private double factor;
-		
+	
+	// Storage objects
 	private List <CommuterRelation> commuterRelations = new ArrayList <CommuterRelation>();
 	private Map <Integer, String> municipalitiesMap = new HashMap <Integer, String>();
 			
@@ -72,7 +72,7 @@ public class CommuterFileReader {
 	// read in the commuter file and extract and store relevant information
 	private void readFile(final String filename, final Integer planningAreaId) {
 	//private void readFile(final String filename, final String planningAreaId) {
-		log.info("======================" + "\n"
+		LOG.info("======================" + "\n"
 						   + "Start reading " + filename + "\n"
 						   + "======================" + "\n");
 				
@@ -94,12 +94,12 @@ public class CommuterFileReader {
 	            		considerRow = true;
 	            		return;
         			} else {
-        				log.info("Row does not start with planning area ID.");
+        				LOG.info("Row does not start with planning area ID.");
 	            	}
         			
         			// if considerRow is false do nothing and return
         			if (considerRow == false) {
-        				log.info("ConsiderRow is set to false. Therefore ignore row.");
+        				LOG.info("ConsiderRow is set to false. Therefore ignore row.");
 	                    return;
 	                }
         			
@@ -121,20 +121,20 @@ public class CommuterFileReader {
 	                        // exterior is used here and this car share relates to people LIVING exterior of planning area.
 	                        int scaledTrips = scale(trips, carShareExterior);
 	                        String label = row[3];
-	                        log.info("Label = " + row[3] + " - Quelle = " + row[2] + " - Ziel = " + destination + " - Trips = " + row[4]);
+	                        LOG.info("Label = " + row[3] + " - Quelle = " + row[2] + " - Ziel = " + destination + " - Trips = " + row[4]);
 	                        
 	                        if (!origin.equals(destination)) {
 	                        	if (!label.contains("brige ")) {
 	                        		process(origin, destination, scaledTrips);
 	                        	} else {
-	                        		log.info("Other municipalities of " + label + " with " + trips + " trips are not considered.");
+	                        		LOG.info("Other municipalities of " + label + " with " + trips + " trips are not considered.");
 	                        	}
 	                        } else {
 	                        	// IMPORTANT!!!
-	                        	log.info("Ignoring this entry since interior traffic will otherweise be counted twice.");
+	                        	LOG.info("Ignoring this entry since interior traffic will otherweise be counted twice.");
 	                        }
 	                    } catch (Exception e) {
-	                    	log.error("Failure while reading the origin: " + origin);
+	                    	LOG.error("Failure while reading the origin: " + origin);
 	                    }
 	                }
 	                	                
@@ -145,27 +145,27 @@ public class CommuterFileReader {
 	                        int trips = Integer.parseInt(row[4]);
 	                        int scaledTrips = scale(trips, carShareInterior);
 	                        String label = row[3] ;
-	                        log.info("Label = " + row[3] + " - Quelle = " + origin + " - Ziel = " + row[2] + " - Trips = " + row[4]);
+	                        LOG.info("Label = " + row[3] + " - Quelle = " + origin + " - Ziel = " + row[2] + " - Trips = " + row[4]);
 	                        
 	                        if (!label.contains("brige ")) {
 	                        	process(origin, destination, scaledTrips);
 	                        } else {
-	                            log.info("Other municipalities of " + label + " with " + trips + " trips are not considered.");
+	                            LOG.info("Other municipalities of " + label + " with " + trips + " trips are not considered.");
 	                        }
 	                    } catch (Exception e) {
-	                    	log.error("Failure while reading the origin: " + origin);
+	                    	LOG.error("Failure while reading the origin: " + origin);
 	                    }
 	                }
 	                else{
-	                	log.error("ATTENTION: Check filename!") ;
+	                	LOG.error("ATTENTION: Check filename!") ;
 	                }
         		} else {
-        			log.info("Row array has less than two fields. This means it cannot be a commuter entry. Therefore, ignore row.");
+        			LOG.info("Row array has less than two fields. This means it cannot be a commuter entry. Therefore, ignore row.");
         			return;
         		}
             }
         });
-        log.info("Finished reading in commuter file.");
+        LOG.info("Finished reading in commuter file.");
 	}
 	
 	
@@ -179,15 +179,15 @@ public class CommuterFileReader {
 		String sink = this.municipalitiesMap.get(destination);
 		
 		if (source == null) {
-			log.info("Source: " + origin + " unknown. Therefore not including its commuter relations.");
+			LOG.info("Source: " + origin + " unknown. Therefore not including its commuter relations.");
 			return;
 		}
 		if (sink == null) {
-			log.info("Sink: " + destination + " unknown. Therefore not including its commuter relations.");
+			LOG.info("Sink: " + destination + " unknown. Therefore not including its commuter relations.");
 			return;
 		}
 
-		log.info(origin + "->" + destination + ": " + trips + " car trips");
+		LOG.info(origin + "->" + destination + ": " + trips + " car trips");
 		CommuterRelation commuterRelation = new CommuterRelation(origin, source, destination, sink, trips);
 		this.commuterRelations.add(commuterRelation);
 	}

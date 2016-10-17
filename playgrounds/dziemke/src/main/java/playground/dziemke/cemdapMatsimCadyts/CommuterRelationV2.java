@@ -19,62 +19,40 @@
 package playground.dziemke.cemdapMatsimCadyts;
 
 /**
+ * Storage object for commuter relations.
+ * 
  * @author dziemke
  */
-public class CommuterRelation {
+public class CommuterRelationV2 {
 
-	private int from;
-	private String fromName;
-	private int to;
-	private String toName;
-	private int trips;
+	private int origin;
+	private int destination;
+	private int tripsAll;
+	private int tripsMale;
+	private int tripsFemale;
+
 		
-	public CommuterRelation(int from, String fromName, int to, String toName, int trips) {
-		this.from = from;
-		this.fromName = fromName;
-		this.to = to;
-		this.toName = toName;
-		this.trips = trips;
+	public CommuterRelationV2(int origin, int destination, int TripsAll, int tripsMale, int tripsFemale) {
+		this.origin = origin;
+		this.destination = destination;
+		this.tripsAll = tripsAll;
+		this.tripsMale = tripsMale;
+		this.tripsFemale = tripsFemale;
 	}
 
 	public int getFrom() {
-		return this.from;
+		return this.origin;
 	}
-
-//	public void setFrom(int from) {
-//		this.from = from;
-//	}
-	
-//	public String getFromName() {
-//		return this.fromName;
-//	}
-
-//	public void setFromName(String fromName) {
-//		this.fromName = fromName;
-//	}
 
 	public int getTo() {
-		return this.to;
+		return this.destination;
 	}
 
-//	public void setTo(int to) {
-//		this.to = to;
-//	}
-	
-//	public String getToName() {
-//		return this.toName;
-//	}
-
-//	public void setToName(String toName) {
-//		this.toName = toName;
-//	}
-
-	public int getQuantity() {
-		return this.trips;
+	public int getTripsMale() {
+		return this.tripsMale;
 	}
 
-//	public void setQuantity(int quantity) {
-//		this.quantity = quantity;
-//	}
-
+	public int getTripsFeale() {
+		return this.tripsFemale;
+	}
 }
