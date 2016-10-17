@@ -181,11 +181,15 @@
 								<title>vis</title>
 								<packages>org.matsim.vis:org.matsim.vis.*</packages>
 							</group>
-							<group>
-								<title>tutorial</title>
-								<packages>tutorial:tutorial.*</packages>
-							</group>
 						</groups>
+						<additionalDependencies>
+							<additionalDependency>
+								<groupId>org.matsim</groupId>
+								<artifactId>matsim-tutorial</artifactId>
+								<version>0.9.0-SNAPSHOT</version>
+							</additionalDependency>
+						</additionalDependencies>
+						<detectLinks>true</detectLinks>
 					</configuration>
 				</plugin>
 			</plugins>
