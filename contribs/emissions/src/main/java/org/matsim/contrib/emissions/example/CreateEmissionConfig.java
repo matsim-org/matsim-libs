@@ -47,10 +47,10 @@ public class CreateEmissionConfig {
 				"sample_network.xml";
 		private static final String plansFile = //inputPath + 
 				"sample_population.xml";
-		
-		private static final String roadTypeMappingFile = inputPath + "sample_roadTypeMapping.txt";
 		private static final String emissionVehicleFile = //inputPath + 
 				"sample_emissionVehicles.xml";
+		
+		private static final String roadTypeMappingFile = inputPath + "sample_roadTypeMapping.txt";
 		
 		private static final String averageFleetWarmEmissionFactorsFile = inputPath + "sample_EFA_HOT_vehcat_2005average.txt";
 		private static final String averageFleetColdEmissionFactorsFile = inputPath + "sample_EFA_ColdStart_vehcat_2005average.txt";
