@@ -314,40 +314,44 @@ public class NetworkUtils {
     /**
      * Finds the (approx.) nearest link to a given point on the map,
      * such that the point lies on the right side of the directed link,
-     * if such a link exists.<br />
+     * if such a link exists.
+	 *
      * It searches first for the nearest node, and then for the nearest link
      * originating or ending at that node and fulfilling the above constraint.
      * <p>
-     * <b>Special cases:</b> <tt>nodes:o ; links:<-- ; coord:x</tt><br/>
-     * <i>No right entry link exists</i><br/>
-     * <tt>
-     * o<-1--o returning<br/>
-     * | . . ^ nearest left<br/>
-     * |2 . 4| entry link<br/>
-     * v .x. | (link.id=3)<br/>
+     * <b>Special cases:</b> {@code nodes:o ; links:<-- ; coord:x}
+     * <i>No right entry link exists</i>
+     * <pre>
+	 * {@code
+     * o<-1--o returning
+     * | . . ^ nearest left
+     * |2 . 4| entry link
+     * v .x. | (link.id=3)
      * o--3->o<br/>
-     * </tt>
-     * <br/>
-     * <i>No right entry link exists but more than one nearest left entry link exist</i><br/>
-     * <tt>
-     * o<-1--o returning<br/>
-     * | . . ^ nearest left<br/>
-     * |2 x 4| entry link with the<br/>
-     * v . . | lowest link id<br/>
-     * o--3->o (link.id=1)<br/>
-     * </tt>
-     * <br/>
-     * <i>More than one nearest right entry link exist</i><br/>
-     * <tt>
-     * o--1->o returning<br/>
-     * ^ . . | nearest right<br/>
-     * |2 x 4| entry link with the<br/>
-     * | . . v lowest link id<br/>
-     * o<-3--o (link.id=1)<br/>
-     * <br/>
-     * o<----7&8--x->o (link.id=7)<br/>
-     * </tt>
-     * </p>
+	 * }
+     * </pre>
+     * <i>No right entry link exists but more than one nearest left entry link exist</i>
+	 * <pre>
+	 * {@code
+	 * o<-1--o returning
+     * | . . ^ nearest left
+     * |2 x 4| entry link with the
+     * v . . | lowest link id
+     * o--3->o (link.id=1)
+	 * }
+	 * </pre>
+     * <i>More than one nearest right entry link exist</i>
+	 * <pre>
+	 * {@code
+     * o--1->o returning
+     * ^ . . | nearest right
+     * |2 x 4| entry link with the
+     * | . . v lowest link id
+     * o<-3--o (link.id=1)
+	 *
+     * o<----7&8--x->o (link.id=7)
+	 * }
+	 * </pre>
      *
      * @param coord
      *          the coordinate for which the closest link should be found
@@ -423,7 +427,7 @@ public class NetworkUtils {
     }
 
     /**
-     * Finds the (approx.) nearest link to a given point on the map.<br />
+     * Finds the (approx.) nearest link to a given point on the map.
      * It searches first for the nearest node, and then for the nearest link
      * originating or ending at that node.
      *
@@ -488,11 +492,11 @@ public class NetworkUtils {
 	 * Calculates the orientation of outgoing links for a given 
 	 * incoming link beginning from the right if the inLink goes 
 	 * north to south. The most 'left' outLink comes last. The link back to the 
-	 * inLink's upstream Node is ignored. 
+	 * inLink's upstream Node is ignored.
 	 * <br><br>
 	 * Comments/questions:<ul>
 	 * <li> What does the "north to south" part mean?  Can't we just sort outLinks right to left no matter where we come from?  kai, aug'16
-	 * <li> In fact, a test ({@link NetworkUtilsTest#getOutLinksSortedByAngleTest()}) does not confirm the javadoc.  The "north to south"
+	 * <li> In fact, a test (NetworkUtilsTest.getOutLinksSortedByAngleTest()) does not confirm the javadoc.  The "north to south"
 	 * is irrelevant.  But instead, it sorts links <i> left to right </i> instead of right to left.
 	 * <br>
 	 * </ul>

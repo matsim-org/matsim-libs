@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.network.Link;
  * An optimized data structure to answer nearest-neighbor queries for links in a
  * network. Implementation is based on the idea of a MX-CIF quadtree (Kedem,
  * 1981).
- * <p/>
+ * <p>
  * "The MX-CIF quadtree of Kedem (1981) (see also Abel and Smith 1983) is a
  * region-based representation where each rectangle is associated with the
  * quadtree node corresponding to the smallest block which contains it in its
@@ -17,7 +17,7 @@ import org.matsim.api.core.v01.network.Link;
  * Alternatively, subdivision can also cease once a quadtree block is smaller
  * than a predetermined threshold size." (H. Samet, Hierarchical spatial data
  * structures, www.cs.umd.edu/~hjs/pubs/SametSSD89.pdf)
- * <p/>
+ * </p>
  * After having looked at the code for 5 min, I cannot, however, tell if this is
  * exactly what the code is doing, and if so, which version. kai, jul'12
  *
