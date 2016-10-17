@@ -67,12 +67,16 @@ public class PricingRunner {
 	
 	private static PricingApproach pricingApproach = PricingApproach.DecongestionBangBangA;
 	
+	private static double parameterKp = Double.NEGATIVE_INFINITY;
+	private static double parameterKi = Double.NEGATIVE_INFINITY;
+	private static double parameterKd = Double.NEGATIVE_INFINITY;
+	
 	private enum PricingApproach {
         NoPricing,
         V3, V7, V8, V9, V10,
         DecongestionNoPricing,
         DecongestionBangBangA, DecongestionBangBangB,
-        DecongestionP, DecongestionI, DecongestionD, DecongestionPID
+        DecongestionP, DecongestionI, DecongestionD, DecongestionPID, DecongestionPIDwithParameters
 	}
 		
 	public static void main(String[] args) throws IOException {		
@@ -117,6 +121,8 @@ public class PricingRunner {
 				pricingApproach = PricingApproach.DecongestionD;
 			} else if (pricingApproachString.equals(PricingApproach.DecongestionPID.toString())) {
 				pricingApproach = PricingApproach.DecongestionPID;
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionPIDwithParameters.toString())) {
+				pricingApproach = PricingApproach.DecongestionPIDwithParameters;
 			
 			// unknown pricing approach
 			} else {
@@ -124,6 +130,17 @@ public class PricingRunner {
 			}
 			
 			log.info("pricing approach: " + pricingApproach);
+			
+			if (args.length > 3) {
+				parameterKp = Double.valueOf(args[3]);
+				parameterKi = Double.valueOf(args[4]);
+				parameterKd = Double.valueOf(args[5]);
+				
+				log.info("Kp: " + parameterKp);
+				log.info("Ki: " + parameterKi);
+				log.info("Kd: " + parameterKd);
+			}			
+						
 		}
 
 		PricingRunner main = new PricingRunner();
@@ -322,6 +339,22 @@ public class PricingRunner {
 			decongestionSettings.setKp(1.0);
 			decongestionSettings.setKi(1.0);
 			decongestionSettings.setKd(1.0);
+			
+			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
+			Decongestion decongestion = new Decongestion(info);
+			controler = decongestion.getControler();	
+			
+		} else if (pricingApproach.equals(PricingApproach.DecongestionPIDwithParameters)) {
+			log.info(">>> Decongestion PID Controller (with parameters)");
+			
+			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
+			decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
+			decongestionSettings.setKp(parameterKp);
+			decongestionSettings.setKi(parameterKi);
+			decongestionSettings.setKd(parameterKd);
 			
 			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
 			Decongestion decongestion = new Decongestion(info);

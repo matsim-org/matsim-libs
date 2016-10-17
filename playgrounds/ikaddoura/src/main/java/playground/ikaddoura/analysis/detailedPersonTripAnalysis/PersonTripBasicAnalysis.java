@@ -284,6 +284,67 @@ public class PersonTripBasicAnalysis {
 	}
 	
 	public SortedMap<Double, List<Double>> getParameter2Values(
+			String mode, String[] excludedIdPrefixes,
+			BasicPersonTripAnalysisHandler basicHandler,
+			Map<Id<Person>, Map<Integer, Double>> personId2tripNumber2parameter,
+			Map<Id<Person>, Map<Integer, Double>> personId2tripNumber2value,
+			double intervalLength, double finalInterval) {
+		
+		Map<Id<Person>, Map<Integer, String>> personId2tripNumber2legMode = basicHandler.getPersonId2tripNumber2legMode();
+		
+		SortedMap<Double, List<Double>> parameter2values = new TreeMap<>();
+		Map<Integer, List<Double>> nr2values = new HashMap<>();
+		
+		for (Id<Person> id : personId2tripNumber2legMode.keySet()) {
+			
+			if (excludePerson(id, excludedIdPrefixes)) {
+
+			} else {
+				
+				for (Integer trip : personId2tripNumber2legMode.get(id).keySet()) {
+					
+					if (personId2tripNumber2legMode.get(id).get(trip).equals(mode)) {
+						
+						double departureTime = personId2tripNumber2parameter.get(id).get(trip);
+						int nr = (int) (departureTime / intervalLength) + 1;
+						
+						double value = 0.;
+						if (personId2tripNumber2value.containsKey(id) && personId2tripNumber2value.get(id).containsKey(trip)) {
+							value = personId2tripNumber2value.get(id).get(trip);
+						}
+						
+						if (nr2values.containsKey(nr)) {
+							List<Double> values = nr2values.get(nr);
+							values.add(value);
+							nr2values.put(nr, values);
+						} else {
+							List<Double> values = new ArrayList<>();
+							values.add(value);
+							nr2values.put(nr, values);
+						}				
+					}
+				}
+			}
+		}
+		for (Integer nr : nr2values.keySet()) {
+			parameter2values.put(nr * intervalLength, nr2values.get(nr));
+		}
+		return parameter2values;
+	}
+	
+	private boolean excludePerson(Id<Person> id, String[] excludedIdPrefixes) {
+		
+		boolean excludePerson = false;
+		
+		for (String prefix : excludedIdPrefixes) {
+			if (id.toString().startsWith(prefix)) {
+				excludePerson = true;
+			}
+		}
+		return excludePerson;
+	}
+
+	public SortedMap<Double, List<Double>> getParameter2Values(
 			String mode,
 			BasicPersonTripAnalysisHandler basicHandler,
 			Map<Id<Person>, Map<Integer, Double>> personId2tripNumber2parameter,
@@ -304,13 +365,18 @@ public class PersonTripBasicAnalysis {
 					double departureTime = personId2tripNumber2parameter.get(id).get(trip);
 					int nr = (int) (departureTime / intervalLength) + 1;
 					
+					double value = 0.;
+					if (personId2tripNumber2value.containsKey(id) && personId2tripNumber2value.get(id).containsKey(trip)) {
+						value = personId2tripNumber2value.get(id).get(trip);
+					}
+					
 					if (nr2values.containsKey(nr)) {
 						List<Double> values = nr2values.get(nr);
-						values.add(personId2tripNumber2value.get(id).get(trip));
+						values.add(value);
 						nr2values.put(nr, values);
 					} else {
 						List<Double> values = new ArrayList<>();
-						values.add(personId2tripNumber2value.get(id).get(trip));
+						values.add(value);
 						nr2values.put(nr, values);
 					}				
 				}
@@ -463,5 +529,112 @@ public class PersonTripBasicAnalysis {
 			e.printStackTrace();
 		}
 		
+	}
+
+	public SortedMap<Double, List<Double>> getTollPerDistancePerTime(
+			String mode, String[] excludedIdPrefixes,
+			BasicPersonTripAnalysisHandler basicHandler,
+			Map<Id<Person>, Map<Integer, Double>> personId2tripNumber2departureTime,
+			Map<Id<Person>, Map<Integer, Double>> personId2tripNumber2toll,
+			Map<Id<Person>, Map<Integer, Double>> personId2tripNumber2distance,
+			double intervalLength, double finalInterval) {
+
+		Map<Id<Person>, Map<Integer, String>> personId2tripNumber2legMode = basicHandler.getPersonId2tripNumber2legMode();
+		
+		SortedMap<Double, List<Double>> parameter2values = new TreeMap<>();
+		Map<Integer, List<Double>> nr2values = new HashMap<>();
+		
+		for (Id<Person> id : personId2tripNumber2legMode.keySet()) {
+			
+			if (excludePerson(id, excludedIdPrefixes)) {
+
+			} else {
+				
+				for (Integer trip : personId2tripNumber2legMode.get(id).keySet()) {
+					
+					if (personId2tripNumber2legMode.get(id).get(trip).equals(mode)) {
+						
+						double departureTime = personId2tripNumber2departureTime.get(id).get(trip);
+						int nr = (int) (departureTime / intervalLength) + 1;
+						
+						double value = 0.;
+						if (personId2tripNumber2toll.containsKey(id) && personId2tripNumber2toll.get(id).containsKey(trip)) {
+							value = personId2tripNumber2toll.get(id).get(trip);
+						}
+						
+						if (nr2values.containsKey(nr)) {
+							List<Double> values = nr2values.get(nr);
+							if (personId2tripNumber2distance.get(id).get(trip) > 0) {
+								double tollPerDistance = value / personId2tripNumber2distance.get(id).get(trip);
+								values.add(tollPerDistance);
+								nr2values.put(nr, values);
+							}
+						} else {
+							List<Double> values = new ArrayList<>();
+							if (personId2tripNumber2distance.get(id).get(trip) > 0) {
+								double tollPerDistance = value / personId2tripNumber2distance.get(id).get(trip);
+								values.add(tollPerDistance);
+								nr2values.put(nr, values);
+							}							
+						}				
+					}
+				}
+			}
+		}
+		for (Integer nr : nr2values.keySet()) {
+			parameter2values.put(nr * intervalLength, nr2values.get(nr));
+		}
+		return parameter2values;
+	}
+
+	public SortedMap<Double, List<Double>> getAffectedCongestionCostPerTime(String mode, String[] excludedIdPrefixes,
+			BasicPersonTripAnalysisHandler basicHandler,
+			Map<Id<Person>, Map<Integer, Double>> personId2tripNumber2departureTime,
+			Map<Id<Person>, Map<Integer, Double>> personId2tripNumber2affectedCongestionCost,
+			Map<Id<Person>, Map<Integer, Double>> personId2tripNumber2vtts,
+			double intervalLength, double finalInterval) {
+
+		Map<Id<Person>, Map<Integer, String>> personId2tripNumber2legMode = basicHandler.getPersonId2tripNumber2legMode();
+		
+		SortedMap<Double, List<Double>> parameter2values = new TreeMap<>();
+		Map<Integer, List<Double>> nr2values = new HashMap<>();
+		
+		for (Id<Person> id : personId2tripNumber2legMode.keySet()) {
+			
+			if (excludePerson(id, excludedIdPrefixes)) {
+
+			} else {
+				
+				for (Integer trip : personId2tripNumber2legMode.get(id).keySet()) {
+					
+					if (personId2tripNumber2legMode.get(id).get(trip).equals(mode)) {
+						
+						double departureTime = personId2tripNumber2departureTime.get(id).get(trip);
+						int nr = (int) (departureTime / intervalLength) + 1;
+						
+						double value = 0.;
+						if (personId2tripNumber2affectedCongestionCost.containsKey(id) && personId2tripNumber2affectedCongestionCost.get(id).containsKey(trip)) {
+							value = personId2tripNumber2affectedCongestionCost.get(id).get(trip) / 3600 * personId2tripNumber2vtts.get(id).get(trip);
+						}
+						
+						if (nr2values.containsKey(nr)) {
+							List<Double> values = nr2values.get(nr);
+							double affectedCongestionCost = value;
+							values.add(affectedCongestionCost);
+							nr2values.put(nr, values);
+						} else {
+							List<Double> values = new ArrayList<>();
+							double affectedCongestionCost = value;
+							values.add(affectedCongestionCost);
+							nr2values.put(nr, values);
+						}				
+					}
+				}
+			}
+		}
+		for (Integer nr : nr2values.keySet()) {
+			parameter2values.put(nr * intervalLength, nr2values.get(nr));
+		}
+		return parameter2values;
 	}
 }

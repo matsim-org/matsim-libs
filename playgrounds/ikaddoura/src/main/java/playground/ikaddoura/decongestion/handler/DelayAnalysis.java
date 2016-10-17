@@ -37,6 +37,8 @@ import org.matsim.vehicles.Vehicle;
  * 
  * Computes the total delay and travel time.
  * 
+ * WARNING: Link-based analysis. Ignores the travel time and delay on the first link of each trip, i.e. the link on which the trip has started.
+ * 
  * @author ikaddoura
  */
 

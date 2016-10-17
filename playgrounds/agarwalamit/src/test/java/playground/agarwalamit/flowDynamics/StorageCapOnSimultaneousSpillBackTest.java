@@ -59,6 +59,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * 
@@ -96,49 +97,49 @@ public class StorageCapOnSimultaneousSpillBackTest {
 		 */
 
 		Tuple<Id<Link>, Id<Link>> startLinkIds = new Tuple<>(Id.createLinkId(1), Id.createLinkId(4)); // agent 2,4 depart on link 1
-		Map<Id<Person>, Tuple<Double,Double>> person2EnterTime = getPerson2LinkEnterTime(startLinkIds);
+		Map<Id<Vehicle>, Tuple<Double,Double>> vehicle2EnterTime = getVehicle2LinkEnterTime(startLinkIds);
 
 		if (this.isUsingFastCapacityUpdate ) {
-			Assert.assertEquals("Person 3 is entering on link 2 at wrong time.", 13.0, person2EnterTime.get(Id.createPersonId(3)).getFirst(),MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Person 3 is leaving from link 2 at wrong time.", 23.0, person2EnterTime.get(Id.createPersonId(3)).getSecond(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 3 is entering on link 2 at wrong time.", 13.0, vehicle2EnterTime.get(Id.createPersonId(3)).getFirst(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 3 is leaving from link 2 at wrong time.", 23.0, vehicle2EnterTime.get(Id.createPersonId(3)).getSecond(),MatsimTestUtils.EPSILON);
 
-			Assert.assertEquals("Person 4 is entering on link 2 at wrong time.", 23.0, person2EnterTime.get(Id.createPersonId(4)).getFirst(),MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Person 4 is leaving from link 2 at wrong time.", 33.0, person2EnterTime.get(Id.createPersonId(4)).getSecond(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 4 is entering on link 2 at wrong time.", 23.0, vehicle2EnterTime.get(Id.createPersonId(4)).getFirst(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 4 is leaving from link 2 at wrong time.", 33.0, vehicle2EnterTime.get(Id.createPersonId(4)).getSecond(),MatsimTestUtils.EPSILON);
 
 		} else { // here are some rounding errors --> person 1 leave, link blocked for 10 sec, person 2 leave after 11 sec, link blocked again for 10 sec, person 2 leave after 10 sec.
-			Assert.assertEquals("Person 3 is entering on link 2 at wrong time.", 14.0, person2EnterTime.get(Id.createPersonId(3)).getFirst(),MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Person 3 is leaving from link 2 at wrong time.", 24.0, person2EnterTime.get(Id.createPersonId(3)).getSecond(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 3 is entering on link 2 at wrong time.", 14.0, vehicle2EnterTime.get(Id.createPersonId(3)).getFirst(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 3 is leaving from link 2 at wrong time.", 24.0, vehicle2EnterTime.get(Id.createPersonId(3)).getSecond(),MatsimTestUtils.EPSILON);
 
-			Assert.assertEquals("Person 4 is entering on link 2 at wrong time.", 24.0, person2EnterTime.get(Id.createPersonId(4)).getFirst(),MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Person 4 is leaving from link 2 at wrong time.", 34.0, person2EnterTime.get(Id.createPersonId(4)).getSecond(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 4 is entering on link 2 at wrong time.", 24.0, vehicle2EnterTime.get(Id.createPersonId(4)).getFirst(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 4 is leaving from link 2 at wrong time.", 34.0, vehicle2EnterTime.get(Id.createPersonId(4)).getSecond(),MatsimTestUtils.EPSILON);
 		}
 
 
-		for(Id<Person> personId : person2EnterTime.keySet()){
-			System.out.println("Person "+personId+ " is entering link 2 at time "+person2EnterTime.get(personId).getFirst() +" and leaving at time "+person2EnterTime.get(personId).getSecond());
+		for(Id<Vehicle> personId : vehicle2EnterTime.keySet()){
+			System.out.println("Person "+personId+ " is entering link 2 at time "+vehicle2EnterTime.get(personId).getFirst() +" and leaving at time "+vehicle2EnterTime.get(personId).getSecond());
 		}
 
 		//changing the links order such that agent 2,4 depart on link 4
 		startLinkIds = new Tuple<>(Id.createLinkId(4), Id.createLinkId(1));
-		person2EnterTime = getPerson2LinkEnterTime(startLinkIds);
+		vehicle2EnterTime = getVehicle2LinkEnterTime(startLinkIds);
 
 		if(this.isUsingFastCapacityUpdate) { 
-			Assert.assertEquals("Person 3 is entering on link 2 at wrong time.", 23.0, person2EnterTime.get(Id.createPersonId(3)).getFirst(),MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Person 3 is leaving from link 2 at wrong time.", 33.0, person2EnterTime.get(Id.createPersonId(3)).getSecond(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 3 is entering on link 2 at wrong time.", 23.0, vehicle2EnterTime.get(Id.createPersonId(3)).getFirst(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 3 is leaving from link 2 at wrong time.", 33.0, vehicle2EnterTime.get(Id.createPersonId(3)).getSecond(),MatsimTestUtils.EPSILON);
 
-			Assert.assertEquals("Person 4 is entering on link 2 at wrong time.", 13.0, person2EnterTime.get(Id.createPersonId(4)).getFirst(),MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Person 4 is leaving from link 2 at wrong time.", 23.0, person2EnterTime.get(Id.createPersonId(4)).getSecond(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 4 is entering on link 2 at wrong time.", 13.0, vehicle2EnterTime.get(Id.createPersonId(4)).getFirst(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 4 is leaving from link 2 at wrong time.", 23.0, vehicle2EnterTime.get(Id.createPersonId(4)).getSecond(),MatsimTestUtils.EPSILON);
 		} else {
-			Assert.assertEquals("Person 3 is entering on link 2 at wrong time.", 24.0, person2EnterTime.get(Id.createPersonId(3)).getFirst(),MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Person 3 is leaving from link 2 at wrong time.", 34.0, person2EnterTime.get(Id.createPersonId(3)).getSecond(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 3 is entering on link 2 at wrong time.", 24.0, vehicle2EnterTime.get(Id.createPersonId(3)).getFirst(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 3 is leaving from link 2 at wrong time.", 34.0, vehicle2EnterTime.get(Id.createPersonId(3)).getSecond(),MatsimTestUtils.EPSILON);
 
-			Assert.assertEquals("Person 4 is entering on link 2 at wrong time.", 14.0, person2EnterTime.get(Id.createPersonId(4)).getFirst(),MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Person 4 is leaving from link 2 at wrong time.", 24.0, person2EnterTime.get(Id.createPersonId(4)).getSecond(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 4 is entering on link 2 at wrong time.", 14.0, vehicle2EnterTime.get(Id.createPersonId(4)).getFirst(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 4 is leaving from link 2 at wrong time.", 24.0, vehicle2EnterTime.get(Id.createPersonId(4)).getSecond(),MatsimTestUtils.EPSILON);
 		}
 
 	}
 
-	private Map<Id<Person>, Tuple<Double,Double>> getPerson2LinkEnterTime(final Tuple<Id<Link>, Id<Link>> startLinkIds){
+	private Map<Id<Vehicle>, Tuple<Double,Double>> getVehicle2LinkEnterTime(final Tuple<Id<Link>, Id<Link>> startLinkIds){
 
 		MatsimRandom.reset(); // resetting the random nos with default seed.
 
@@ -148,40 +149,40 @@ public class StorageCapOnSimultaneousSpillBackTest {
 		Scenario sc = pseudoInputs.scenario;
 
 		ScenarioUtils.loadScenario(sc);
-		Map<Id<Person>, Tuple<Double,Double>> person2LinkEnterTime = new HashMap<>();
+		Map<Id<Vehicle>, Tuple<Double,Double>> vehicle2LinkEnterTime = new HashMap<>();
 
 		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(new PersonLinkEnterLeaveTime(person2LinkEnterTime));
+		events.addHandler(new VehicleLinkEnterLeaveTime(vehicle2LinkEnterTime));
 		QSim sim = QSimUtils.createDefaultQSim(sc, events);
 		sim.run();
-		return person2LinkEnterTime;
+		return vehicle2LinkEnterTime;
 	}
 
-	private class PersonLinkEnterLeaveTime implements LinkEnterEventHandler, LinkLeaveEventHandler{
+	private class VehicleLinkEnterLeaveTime implements LinkEnterEventHandler, LinkLeaveEventHandler{
 
-		final Map<Id<Person>, Tuple<Double,Double>> person2linkleaveEnterTime ;
+		final Map<Id<Vehicle>, Tuple<Double,Double>> vehicle2linkleaveEnterTime;
 
-		private PersonLinkEnterLeaveTime(Map<Id<Person>, Tuple<Double,Double>> person2LinkEnterTime){
-			this.person2linkleaveEnterTime = person2LinkEnterTime;
+		private VehicleLinkEnterLeaveTime(Map<Id<Vehicle>, Tuple<Double,Double>> vehicle2LinkEnterTime){
+			this.vehicle2linkleaveEnterTime = vehicle2LinkEnterTime;
 		}
 
 		@Override
 		public void reset(int iteration) {
-			this.person2linkleaveEnterTime.clear();
+			this.vehicle2linkleaveEnterTime.clear();
 		}
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
 			if(event.getLinkId().equals(Id.createLinkId(2))){
-				Tuple<Double, Double> linkEnterTime = person2linkleaveEnterTime.get(Id.createPersonId(event.getVehicleId()));
-				person2linkleaveEnterTime.put(Id.createPersonId(event.getVehicleId()), new Tuple<>(linkEnterTime.getFirst(), event.getTime()));
+				Tuple<Double, Double> linkEnterTime = vehicle2linkleaveEnterTime.get(event.getVehicleId());
+				vehicle2linkleaveEnterTime.put( event.getVehicleId(), new Tuple<>(linkEnterTime.getFirst(), event.getTime()));
 			}
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			if(event.getLinkId().equals(Id.createLinkId(2))){
-				person2linkleaveEnterTime.put(Id.createPersonId(event.getVehicleId()), new Tuple<>(event.getTime(), 0.));
+				vehicle2linkleaveEnterTime.put(event.getVehicleId(), new Tuple<>(event.getTime(), 0.));
 			}
 		}
 	}

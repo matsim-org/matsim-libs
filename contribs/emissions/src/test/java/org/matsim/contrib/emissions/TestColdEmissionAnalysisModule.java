@@ -223,7 +223,7 @@ public class TestColdEmissionAnalysisModule {
         Double rescaleFactor = -.001;
 
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		ecg.setUsingVehicleIdAsVehicleDescription(true);
+		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 
         ColdEmissionAnalysisModule ceam = new ColdEmissionAnalysisModule(new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable, ecg), emissionEventManager, rescaleFactor);
 		HandlerToTestEmissionAnalysisModules.reset();
@@ -251,7 +251,7 @@ public class TestColdEmissionAnalysisModule {
 
         EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		ecg.setUsingVehicleIdAsVehicleDescription(true);
+		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 		ceam = new ColdEmissionAnalysisModule(new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable, ecg), emissionEventManager, null);
 		
 	}

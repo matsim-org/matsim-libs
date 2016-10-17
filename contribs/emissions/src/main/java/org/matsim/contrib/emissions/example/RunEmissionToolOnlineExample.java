@@ -50,7 +50,7 @@ public class RunEmissionToolOnlineExample {
 		// following is only for backward compatibility in which vehicle description is null;
 		// for the new scenarios, setting vehicle description should be preferred.; Amit, sep 2016.
 		EmissionsConfigGroup emissionsConfigGroup = new EmissionsConfigGroup();
-		emissionsConfigGroup.setUsingVehicleIdAsVehicleDescription(true);
+		emissionsConfigGroup.setUsingVehicleTypeIdAsVehicleDescription(true);
 
 		if ( args==null || args.length==0 ) {
 			config = ConfigUtils.loadConfig(configFile, emissionsConfigGroup);

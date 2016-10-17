@@ -20,14 +20,7 @@ package playground.agarwalamit.munich.analysis.userGroup.toll;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
+import java.util.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,11 +31,11 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.agarwalamit.analysis.Toll.TripTollHandler;
-import playground.agarwalamit.analysis.trip.TripDistanceHandler;
+import playground.agarwalamit.analysis.trip.FilteredTripDistanceHandler;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
+import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.ListUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
@@ -54,7 +47,7 @@ public class PeakHourTripTollPerKmAnalyzer {
 	
 	private static final Logger LOG = Logger.getLogger(PeakHourTripTollPerKmAnalyzer.class);
 	private final TripTollHandler tollHandler ;
-	private final TripDistanceHandler distHandler;
+	private final FilteredTripDistanceHandler distHandler;
 
 	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{8., 9., 10., 16., 17., 18.,})); // => 7-10 and 15-18
 	private final MunichPersonFilter pf = new MunichPersonFilter();
@@ -68,13 +61,14 @@ public class PeakHourTripTollPerKmAnalyzer {
 	public PeakHourTripTollPerKmAnalyzer(final Network network, final double simulationEndTime, final int noOfTimeBins) {
 		LOG.warn("Peak hours are assumed as 07:00-10:00 and 15:00-18:00 by looking on the travel demand for BAU scenario.");
 		this.tollHandler = new TripTollHandler( simulationEndTime, noOfTimeBins );
-		this.distHandler = new TripDistanceHandler(network, simulationEndTime, noOfTimeBins);
+		this.distHandler = new FilteredTripDistanceHandler(network, simulationEndTime, noOfTimeBins);
+		throw new RuntimeException("looks, there is some problem somewhere, cant reproduce the results (Oct 2016).");
 	} 
 
 	public static void main(String[] args) {
 		String [] pricingSchemes = new String [] {"ei","ci","eci"};
 		for (String str :pricingSchemes) {
-			String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/";
+			String dir = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/iatbr/output/";
 			String eventsFile = dir+str+"/ITERS/it.1500/1500.events.xml.gz";
 			String networkFile = dir+str+"/output_network.xml.gz";
 			String configFile = dir+str+"/output_config.xml.gz";

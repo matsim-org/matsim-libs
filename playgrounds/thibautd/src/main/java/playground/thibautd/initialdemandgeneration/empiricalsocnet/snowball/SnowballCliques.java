@@ -18,31 +18,43 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.core.utils.misc.Counter;
 import playground.thibautd.utils.CsvParser;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
 
 
 /**
  * @author thibautd
  */
 public class SnowballCliques {
+	private static final Logger log = Logger.getLogger( SnowballCliques.class );
 	private final Map<Id<Clique>,Clique> cliques = new HashMap<>();
+	private final Map<Id<Member>,Set<Clique>> cliquesPerEgo = new HashMap<>();
+
 	private final List<Member> egos = new ArrayList<>();
 
 	public Map<Id<Clique>, Clique> getCliques() {
 		return cliques;
+	}
+
+	public Map<Id<Member>, Set<Clique>> getCliquesPerEgo() {
+		return cliquesPerEgo;
 	}
 
 	public List<Member> getEgos() {
@@ -67,6 +79,7 @@ public class SnowballCliques {
 				final int egoAge = parser.getIntField( "E_age" );
 				final int egoDegree = parser.getIntField( "E_degree" );
 
+				final Id<Member> alterId = parser.getIdField( "A_Alter_ID" , Member.class );
 				final Sex alterSex = parser.getEnumField( "A_sex" , Sex.class );
 				final double alterLatitude = parser.getDoubleField( "A_latitude" );
 				final double alterLongitude = parser.getDoubleField( "A_longitude" );
@@ -81,15 +94,64 @@ public class SnowballCliques {
 					clique = new Clique( cliqueId , ego );
 					cliques.cliques.put( cliqueId , clique );
 					cliques.egos.add( ego );
+					MapUtils.getSet( egoId , cliques.cliquesPerEgo ).add( clique );
 				}
-				clique.alters.add( new Member( egoId , alterSex , alterCoord , alterAge , -1 ) );
+				clique.alters.add( new Member( alterId , alterSex , alterCoord , alterAge , -1 ) );
 			}
 		}
 		catch ( IOException e ) {
 			throw new UncheckedIOException( e );
 		}
 
+		cliques.cleanupCliques();
 		return cliques;
+	}
+
+	private void cleanupCliques() {
+		log.info( "Start cleaning up clique composition: ");
+		log.info( "Cliques that are a subset of other cliques of the same ego will be removed" );
+
+		final Counter removalCounter = new Counter( "Remove redundant subclique # " , " / "+cliques.size()+" cliques" );
+		final Counter counter = new Counter( "Analyse ego # " , " / "+cliquesPerEgo.size() );
+
+		for ( Set<Clique> cliquesOfEgo : cliquesPerEgo.values() ) {
+			counter.incCounter();
+
+			final Set<Clique> redundant = new HashSet<>();
+			for ( Clique clique : cliquesOfEgo ) {
+				if ( isRedundant( clique , cliquesOfEgo ) ) {
+					removalCounter.incCounter();
+					redundant.add( clique );
+				}
+			}
+
+			cliquesOfEgo.removeAll( redundant );
+			for ( Clique c : redundant ) cliques.remove( c.getCliqueId() );
+		}
+		removalCounter.printCounter();
+		counter.printCounter();
+		log.info( "Finished cleaning up clique composition: ");
+		log.info( cliques.size()+" cliques remain." );
+		assert cliques.size() == cliquesPerEgo.values().stream().mapToInt( Set::size ).sum();
+	}
+
+	private static boolean isRedundant( final Clique clique , final Collection<Clique> in ) {
+		for ( Clique other : in ) {
+			if ( clique == other ) continue;
+			if ( isSubset( clique , other ) ) {
+				if ( clique.getAlters().size() == other.getAlters().size() ) {
+					// avoid removing all duplicates: arbitrary criterion to keep one
+					return clique.getCliqueId().compareTo( other.getCliqueId() ) > 0;
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean isSubset( final Clique subset , final Clique of ) {
+		return of.getEgo().getId().equals( of.getEgo().getId() ) &&
+				of.alters.containsAll( subset.alters );
 	}
 
 	public enum Sex { female, male }

@@ -16,11 +16,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball;
+package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.scalability;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -33,6 +34,9 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSampler;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplingConfigGroup;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SimpleSnowballModule;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballSamplingConfigGroup;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -48,30 +52,28 @@ public class RunScalabilityAnalysis {
 
 	public static void main( String[] args ) {
 		final ScalabilityConfigGroup scalabilityConfigGroup = new ScalabilityConfigGroup();
-		final Config config = ConfigUtils.loadConfig( args[ 0 ] , scalabilityConfigGroup );
+		final Config config = ConfigUtils.loadConfig( args[ 0 ] , scalabilityConfigGroup , new SocialNetworkSamplingConfigGroup() );
 		MoreIOUtils.initOut( config.controler().getOutputDirectory() );
 
-		try ( final BufferedWriter writer = IOUtils.getBufferedWriter( config.controler().getOutputDirectory()+"/times.dat" ) ) {
-			writer.write( "sample\ttry\ttime_ms" );
+		try ( final ScalabilityStatisticsListener statsListenner = new ScalabilityStatisticsListener( config.controler().getOutputDirectory()+"/stats.dat"  )) {
 
 			for ( double sample : scalabilityConfigGroup.getSamples() ) {
 				for ( int tryNr = 0; tryNr < scalabilityConfigGroup.getnTries(); tryNr++ ) {
 					final SnowballSamplingConfigGroup configGroup = new SnowballSamplingConfigGroup();
-					final Config tryConfig = ConfigUtils.loadConfig( args[ 0 ], configGroup );
+					final Config tryConfig = ConfigUtils.loadConfig( args[ 0 ], configGroup , new SocialNetworkSamplingConfigGroup() );
 
 					final String outputDir = config.controler().getOutputDirectory() + "/tmp/";
-					config.controler().setOutputDirectory( outputDir );
+					tryConfig.controler().setOutputDirectory( outputDir );
 					MoreIOUtils.deleteDirectoryIfExists( outputDir );
 
-					final long start = System.currentTimeMillis();
-					runTry( tryConfig , sample);
-					final long end = System.currentTimeMillis();
+					final Scenario scenario = ScenarioUtils.loadScenario( tryConfig );
+					samplePopulation( scenario , sample );
 
-					writer.newLine();
-					writer.write( (sample * scalabilityConfigGroup.getBasisSample())+"\t" );
-					writer.write( tryNr+"\t"+(end - start) );
-					// make results available directly
-					writer.flush();
+					statsListenner.startTry( sample , tryNr );
+
+					final SocialNetwork network = runTry( scenario , statsListenner );
+
+					statsListenner.endTry( network );
 				}
 			}
 		}
@@ -83,18 +85,22 @@ public class RunScalabilityAnalysis {
 		}
 	}
 
-	private static void runTry( final Config config , final double sample ) {
+	private static SocialNetwork runTry(
+			final Scenario scenario,
+			final ScalabilityStatisticsListener statsListenner ) {
 		try ( final AutocloserModule closer = new AutocloserModule() ) {
-			final Scenario scenario = ScenarioUtils.loadScenario( config );
-			samplePopulation( scenario , sample );
 			final com.google.inject.Injector injector =
-					Injector.createInjector( config,
+					Injector.createInjector( scenario.getConfig(),
 							closer,
-							new SimpleSnowballModule( config ),
+							new SimpleSnowballModule( scenario.getConfig() ),
 							new ScenarioByInstanceModule( scenario ),
-							b -> b.bind( SocialNetworkSampler.class ) );
+							b -> b.bind( SocialNetworkSampler.class ),
+							b -> b.bind( ScalabilityStatisticsListener.class ).toInstance( statsListenner ) );
 
-			injector.getInstance( SocialNetworkSampler.class ).sampleSocialNetwork();
+			return injector.getInstance( SocialNetworkSampler.class ).sampleSocialNetwork();
+		}
+		catch ( RuntimeException e ) {
+			throw e;
 		}
 		catch ( Exception e ) {
 			throw new RuntimeException( e );
@@ -117,7 +123,7 @@ public class RunScalabilityAnalysis {
 	private static class ScalabilityConfigGroup extends ReflectiveConfigGroup {
 		private double basisSample = 0.1;
 		private double[] samples = {0.125,0.25,0.5,1};
-		private int nTries = 5;
+		private int nTries = 1;
 
 		public ScalabilityConfigGroup() {
 			super( "scalability" );

@@ -60,7 +60,7 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 	private DgSylviaSignalPlan activeSylviaPlan = null;
 	private boolean extensionActive = false;
 	private boolean forcedExtensionActive = false;
-	private int secondInSylviaCycle = -1;
+	private int secondInSylviaCycle = -1; //as this is incremented before use
 	private Map<Integer, DgExtensionPoint> extensionPointMap = null;
 	private Map<Integer, DgExtensionPoint> forcedExtensionPointMap = null;
 	private Map<Id<SignalGroup>, Double> greenGroupId2OnsetMap = null;
@@ -93,81 +93,100 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 
 	private void initCycle() {
 		this.secondInSylviaCycle = -1; //as this is incremented before use
-		// TODO ist es nicht verstaendlicher das bei 0 starten zu lassen und am ende statt am anfang hochzaehlen zu lassen?
 		this.secondInCycle = -1;
 		this.extensionTime = 0;
 	}
 	
-	// TODO comment this method
+	/**
+	 * Decide how to control the signals in this second. Possibilities:
+	 * (1) continue with the sylvia base plan.
+	 * (2) extend a signal phase when more vehicles are arriving.
+	 * (3) extend the last signal phase when fixed time cycle time is not reached yet (forced extension).
+	 */
 	@Override
 	public void updateState(double currentTime) {
-//		int secondInFixedTimeCycle = (int) (timeSeconds % this.activeSylviaPlan.getFixedTimeCycle());
-		if (this.secondInSylviaCycle == this.activeSylviaPlan.getCycleTime() - 1) { 
-			// the base plan cycle including all extensions is processed. init data structure for the next cycle.
-			this.initCycle();
-			// TODO muss das nicht eher am ende der methode passieren, nachdem dropping/onset etc abgearbeitet?
-		}
 		this.secondInCycle++;
 		
-		if (this.forcedExtensionActive){
+		if (this.forcedExtensionActive){ 
 			// forced means last phase of the plan, i.e. has to be extended until the end of the cycle
-			this.forcedExtensionActive = this.checkForcedExtensionCondition();
-			return;
+			
+			this.extensionTime++;
+			// check whether the extension should hold on
+			if (this.checkForcedExtensionCondition()){
+				// extension holds on. nothing else has to be done in this time step
+				return;
+			} else { // stop extension
+				this.forcedExtensionActive = false;
+				// no return because droppings/onsets of this second has to be processed, see (*) below.
+			}
 		}
 		else if (this.extensionActive){
 			this.extensionTime++;
 			// check whether the extension should hold on
-			if (! this.checkExtensionCondition(currentTime, this.currentExtensionPoint)) {
-				this.stopExtension();
+			if (this.checkExtensionCondition(currentTime, this.currentExtensionPoint)) {
+				// extension holds on. nothing else has to be done in this time step
+				return;
+			} else { // stop extension
+				this.extensionActive = false;
+				this.currentExtensionPoint = null;
+				// no return because droppings/onsets of this second has to be processed, see (*) below.
 			}
-			return;
 		}
 		else { // no extension is active
 			// increment the number of seconds that the basic plan is processed
 			this.secondInSylviaCycle++;
-			//check for forced extension trigger
-			if (this.forcedExtensionPointMap.containsKey(this.secondInSylviaCycle)){ // TODO this is never filled! fill it with last signal group
+			
+			//check for forced extension trigger (end of the last phase of the plan)
+			if (this.forcedExtensionPointMap.containsKey(this.secondInSylviaCycle)){
 				if (this.checkForcedExtensionCondition()){
 					this.forcedExtensionActive = true;
+					// extension starts. nothing else has to be done in this time step
 					return;
 				}
+				/* else: no extension starts. 
+				 * droppings/onsets of this second has to be processed, see (*) below. */
 			}
-			//check for extension trigger
+			//check for extension trigger (end of an arbitrary phase of the plan)
 			else if (this.extensionPointMap.containsKey(this.secondInSylviaCycle)){
 				this.currentExtensionPoint = this.extensionPointMap.get(this.secondInSylviaCycle);
 				if (this.checkExtensionCondition(currentTime, this.currentExtensionPoint)){
 					this.extensionActive = true;
+					// extension starts. nothing else has to be done in this time step
 					return;
 				}
-				else { // disable all used state variables of a extension
-					this.stopExtension();
-				}
-			}
-			//else no extension...
-			List<Id<SignalGroup>> droppings = this.activeSylviaPlan.getDroppings(this.secondInSylviaCycle);
-			if (droppings != null){
-				for (Id<SignalGroup> groupId : droppings){
-					this.system.scheduleDropping(currentTime, groupId);
-					this.greenGroupId2OnsetMap.remove(groupId);
-				}
-			}
-			List<Id<SignalGroup>> onsets = this.activeSylviaPlan.getOnsets(this.secondInSylviaCycle);
-			if (onsets != null){
-				for (Id<SignalGroup> groupId : onsets){
-					this.system.scheduleOnset(currentTime, groupId);
-					this.greenGroupId2OnsetMap.put(groupId, currentTime);
+				else { // no extension starts.
+					this.currentExtensionPoint = null;
+					// no return because droppings/onsets of this second has to be processed, see (*) below.
 				}
 			}
 		}
-	}
-	
-	private void stopExtension(){
-		this.extensionActive = false;
-		this.currentExtensionPoint = null;
+		
+		/* stopped extension or no extension at all. 
+		 * process droppings and onsets of this second in cycle. (*) */
+		List<Id<SignalGroup>> droppings = this.activeSylviaPlan.getDroppings(this.secondInSylviaCycle);
+		if (droppings != null) {
+			for (Id<SignalGroup> groupId : droppings) {
+				this.system.scheduleDropping(currentTime, groupId);
+				this.greenGroupId2OnsetMap.remove(groupId);
+			}
+		}
+		List<Id<SignalGroup>> onsets = this.activeSylviaPlan.getOnsets(this.secondInSylviaCycle);
+		if (onsets != null) {
+			for (Id<SignalGroup> groupId : onsets) {
+				this.system.scheduleOnset(currentTime, groupId);
+				this.greenGroupId2OnsetMap.put(groupId, currentTime);
+			}
+		}
+		
+		// stop criterion, i.e. start with the next cycle:
+		if (this.secondInSylviaCycle == this.activeSylviaPlan.getCycleTime() - 1) { 
+			// the base plan cycle including all extensions is processed. init data structure for the next cycle.
+			this.initCycle();
+		}
 	}
 
 	/**
-	 * Check whether there is time left to extend phases.
+	 * Checks whether there is time left to extend phases.
 	 * If the fixed time cycle time is used as maximal extension time, this method checks whether it is already reached.
 	 * If not, extension is always allowed.
 	 */
@@ -178,12 +197,28 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 		return true;
 	}
 	
-	private boolean isGreenTimeLeft(double timeSeconds, Id<SignalGroup> groupId, int maxGreenTime){
-		int greenTime = (int) (timeSeconds - this.greenGroupId2OnsetMap.get(groupId));
+	/**
+	 * Checks whether the maximal green time of the signal is already reached.
+	 * 
+	 * @return false if maximal green time is reached or if signal has not been switched on (first second of the simulation);
+	 * true if signal can be extended based on the number of current green time seconds.
+	 */
+	private boolean isGreenTimeLeft(double currentTime, Id<SignalGroup> groupId, int maxGreenTime){
+		if (!this.greenGroupId2OnsetMap.containsKey(groupId)){
+			/* signals that have not been switched on should not be extended.
+			 * this may happen when the signal has its dropping in the first second of the simulation. */
+			return false;
+		}
+		int greenTime = (int) (currentTime - this.greenGroupId2OnsetMap.get(groupId));
 		return greenTime < maxGreenTime;
 	}
 	
-	// TODO comment
+	/**
+	 * Checks whether the phase should be forced to extend. 
+	 * This is the case if there is cycle time left.
+	 * 
+	 * @return true if it should be forced to extend; false if not
+	 */
 	private boolean checkForcedExtensionCondition(){
 		return isExtensionTimeLeft();
 	}
@@ -250,6 +285,15 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 		this.init();
 	}
 	
+	/**
+	 * Is called when mobsim is initialized.
+	 * The parameter simStartTimeSeconds is not used.
+	 * 
+	 * This method initializes all elements needed for the sylvia controller:
+	 * it collects relevant (sylvia and fixed time) signal plans, 
+	 * determines possible extension points (in time)
+	 * and prepares sensors (event handlers) to count vehicles in front of signals.
+	 */
 	@Override
 	public void simulationInitialized(double simStartTimeSeconds) {
 		Tuple<SignalPlan, DgSylviaSignalPlan> plans = this.searchActivePlans();
@@ -271,6 +315,10 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 	}
 
 
+	/**
+	 * Collects sylvia and fixed time signal plans of this signal system from the signal plan container.
+	 * @return tuple of both (sylvia and fixed time) signal plans
+	 */
 	private Tuple<SignalPlan,DgSylviaSignalPlan> searchActivePlans() {
 		DgSylviaSignalPlan sylviaPlan = null;
 		SignalPlan fixedTimePlan = null;
@@ -288,7 +336,13 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 		return new Tuple<SignalPlan, DgSylviaSignalPlan>(fixedTimePlan, sylviaPlan);
 	}
 
-	
+	/**
+	 * This method determines points in time when extension is possible (extension points).
+	 * It calculates maximal green times based on maximal cycle time and maximal green time scale.
+	 * The last extension point in a cycle is defined as a forced extension point.
+	 * 
+	 * @param plans
+	 */
 	private void calculateExtensionPoints(Tuple<SignalPlan,DgSylviaSignalPlan> plans) {
 		SignalPlan fixedTime = plans.getFirst();
 		DgSylviaSignalPlan sylvia = plans.getSecond();
@@ -296,27 +350,22 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 		if (sylvia.getOffset() != null){
 			offset = sylvia.getOffset();
 		}
+		int lastExtensionMoment = 0;
 		for (SignalGroupSettingsData settings : sylvia.getPlanData().getSignalGroupSettingsDataByGroupId().values()){
-			Integer extensionMoment;
-			if (settings.getDropping() == 0) {
-				extensionMoment = sylvia.getCycleTime() - 1; // TODO + offset is missing
+			// set the extension moment to the second of the dropping (but respecting offset and cycle time)
+			Integer extensionMoment = (settings.getDropping() + offset) % sylvia.getCycleTime();
+			// remember last extension moment
+			if (extensionMoment > lastExtensionMoment){
+				lastExtensionMoment = extensionMoment;
 			}
-			else {
-				//set the extension point one second before the dropping
-				extensionMoment = settings.getDropping() - 1 + offset;
-			}
-			// TODO use this instead of the above:
-//			// set the extension moment one second before the dropping, but inside the cycle time
-//			extensionMoment = (settings.getDropping() - 1 + offset) % sylvia.getCycleTime();
-			
-			// TODO warum -1? ist es nicht besser in dropping sec ueber verlaengern nachzudenken?
 			
 			// put all extension points in a map ordered by time
 			DgExtensionPoint extPoint = null;
 			if (! this.extensionPointMap.containsKey(extensionMoment)){
 				extPoint = new DgExtensionPoint(extensionMoment);
 				this.extensionPointMap.put(extensionMoment, extPoint);
-				sylvia.addExtensionPoint(extPoint); // TODO why is this needed?
+//				// comment this out because it is not needed and not used. tt, oct'16
+//				sylvia.addExtensionPoint(extPoint); 
 			}
 			extPoint = this.extensionPointMap.get(extensionMoment);
 			extPoint.addSignalGroupId(settings.getSignalGroupId());
@@ -325,11 +374,18 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 			SignalGroupSettingsData fixedTimeSettings = ((DatabasedSignalPlan)fixedTime).getPlanData().getSignalGroupSettingsDataByGroupId().get(settings.getSignalGroupId());
 			int fixedTimeGreen = DgSignalsUtils.calculateGreenTimeSeconds(fixedTimeSettings, fixedTime.getCycleTime());
 			int maxGreen = (int) (fixedTimeGreen * this.sylviaConfig.getSignalGroupMaxGreenScale());
-			if (maxGreen >= fixedTime.getCycleTime()){
-				maxGreen = fixedTimeGreen; // TODO warum nicht fixedTime.getCycleTime() oder cycle time - sylvia time der remaining groups... !?
-			}
+//			// comment this out because isExtensionTimeLeft() already checks whether cycle time is exceeded. tt, oct'16
+//			if (maxGreen >= fixedTime.getCycleTime()){
+//				maxGreen = fixedTimeGreen;
+//			}
 			extPoint.setMaxGreenTime(settings.getSignalGroupId(), maxGreen);
 		}
+		
+		if (this.sylviaConfig.isUseFixedTimeCycleAsMaximalExtension()){
+			// convert last extension point in cycle into a forced extension point (has to be extended until fixed time cycle time is reached).
+			forcedExtensionPointMap.put(lastExtensionMoment, extensionPointMap.remove(lastExtensionMoment));
+		}
+		
 	}
 
 	private void dumpSylviaPlan() {
@@ -344,6 +400,10 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 	}
 
 	
+	/**
+	 * Collect all signals of the signal system and prepare sensors (event handlers) in front of them
+	 * to count vehicles in a specific distance (when no lanes are used) or on the last lane (if lanes are used).
+	 */
 	private void initializeSensoring(){
 		for (DgExtensionPoint extPoint : this.extensionPointMap.values()){
 			Set<SignalData> extPointSignals = new HashSet<SignalData>();

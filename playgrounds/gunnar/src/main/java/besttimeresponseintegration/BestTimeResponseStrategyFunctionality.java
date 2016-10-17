@@ -103,12 +103,13 @@ public class BestTimeResponseStrategyFunctionality {
 		 */
 
 		final boolean repairTimeStructure = true;
-		final boolean randomSmoothing = true;
-
+		final boolean randomSmoothing = false;
+		final boolean interpolate = false;
+		
 		this.myTravelTimes = myTravelTimes;
 
 		this.timeAlloc = new TimeAllocator<>(timeDiscretization, this.myTravelTimes,
-				repairTimeStructure, randomSmoothing);
+				repairTimeStructure, randomSmoothing, interpolate);
 	}
 
 	// -------------------- IMPLEMENTATION --------------------

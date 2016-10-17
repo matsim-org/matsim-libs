@@ -32,6 +32,8 @@ public interface ChargingPoint extends Identifiable<ChargingPoint> {
 
 	void createSlowChargingQueue(int numberOfAvailableParkingSpots);
 
+	boolean isSlowChargingQueueAccessible();
+
 	void handleEndChargingSession(ChargingPlug plug, VehicleAgent agent);
 
 	void removeVehicleFromQueue(ChargingPlug plug, VehicleAgent vehicle);

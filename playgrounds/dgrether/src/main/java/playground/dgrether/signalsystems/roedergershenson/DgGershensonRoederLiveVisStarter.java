@@ -65,7 +65,7 @@ public class DgGershensonRoederLiveVisStarter {
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, new DgGershensonRoederSignalModelFactory(new DefaultSignalModelFactory()) , events);
 		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
-		DgSensorManager sensorManager = new DgSensorManager(scenario.getNetwork());
+		DgSensorManager sensorManager = new DgSensorManager(scenario);
 		events.addHandler(sensorManager);
 		for (SignalSystem ss : signalManager.getSignalSystems().values()){
 			if (ss.getSignalController() instanceof DgRoederGershensonController){
