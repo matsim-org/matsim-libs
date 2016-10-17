@@ -56,7 +56,12 @@ public class RunEmissionToolOfflineExample {
 		Config config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
+
+		// following is only for backward compatibility in which vehicle description is null;
+		// for the new scenarios, setting vehicle description should be preferred.; Amit, sep 2016.
+		EmissionsConfigGroup ecg = (EmissionsConfigGroup)scenario.getConfig().getModule(EmissionsConfigGroup.GROUP_NAME);
+		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
+
 		EmissionModule emissionModule = new EmissionModule(scenario);
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
