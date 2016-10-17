@@ -306,6 +306,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		ecg.setEmissionRoadTypeMappingFile(inputFilesDir + "/roadTypeMapping.txt");
 		ecg.setAverageWarmEmissionFactorsFile(inputFilesDir + "/EFA_HOT_vehcat_2005average.txt");
 		ecg.setAverageColdEmissionFactorsFile(inputFilesDir + "/EFA_ColdStart_vehcat_2005average.txt");
+		ecg.setUsingVehicleTypeIdAsVehicleDescription(false);
 		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 
 		// TODO: the following does not work yet. Need to force services to always write events in the last iteration.
