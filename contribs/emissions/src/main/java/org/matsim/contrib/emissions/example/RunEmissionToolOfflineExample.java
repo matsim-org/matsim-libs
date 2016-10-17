@@ -43,7 +43,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class RunEmissionToolOfflineExample {
 	
 	private final static String runDirectory = "./test/output/";
-	private static final String configFile = runDirectory + "output_config.xml.gz";
+	private static final String configFile = "./test/input/org/matsim/contrib/emissions/config.xml";
 	private final static Integer lastIteration = getLastIteration();
 	
 	private static final String eventsPath = runDirectory + "ITERS/it." + lastIteration + "/" +  lastIteration;
@@ -54,7 +54,7 @@ public class RunEmissionToolOfflineExample {
 	
 	public static void main (String[] args) throws Exception{
 		Config config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
-		
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		// following is only for backward compatibility in which vehicle description is null;
