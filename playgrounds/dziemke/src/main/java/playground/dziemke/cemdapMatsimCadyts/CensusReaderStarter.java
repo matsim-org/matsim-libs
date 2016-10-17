@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
  * @author dziemke
  */
 public class CensusReaderStarter {
-	private static final Logger LOG = Logger.getLogger(DemandGeneratorCensus.class);
+	private static final Logger LOG = Logger.getLogger(CensusReaderStarter.class);
 
 	public static void main(String[] args) {
 		String censusFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/zensus_2011/bevoelkerung/csv_Bevoelkerung/Zensus11_Datensatz_Bevoelkerung.csv";

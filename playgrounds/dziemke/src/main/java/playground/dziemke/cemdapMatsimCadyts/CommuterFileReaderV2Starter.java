@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
  * @author dziemke
  */
 public class CommuterFileReaderV2Starter {
-	private static final Logger log = Logger.getLogger(DemandGeneratorCensus.class);
+	private static final Logger LOG = Logger.getLogger(CommuterFileReaderV2Starter.class);
 
 	public static void main(String[] args) {
 		String commuterFileOutgoing = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil1BR2009Ga.txt";
