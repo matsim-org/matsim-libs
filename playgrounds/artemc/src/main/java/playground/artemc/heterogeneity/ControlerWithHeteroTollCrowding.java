@@ -32,7 +32,6 @@ import playground.artemc.pricing.LinkOccupancyAnalyzerModule;
 import playground.artemc.pricing.RoadPricingWithoutTravelDisutilityModule;
 import playground.artemc.pricing.UpdateSocialCostPricingSchemeWithSpillAndOffSwitch;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
-import tutorial.programming.individualizedScoringParameters.ExampleIndividualizedScoringFunctionModule;
 
 import java.io.File;
 import java.util.HashSet;

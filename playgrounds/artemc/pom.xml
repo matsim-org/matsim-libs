@@ -11,7 +11,12 @@
   <name>artemc</name>
 
   <dependencies>
-  <dependency>
+      <dependency>
+          <groupId>org.matsim</groupId>
+          <artifactId>matsim-examples</artifactId>
+          <version>0.9.0-SNAPSHOT</version>
+      </dependency>
+    <dependency>
   	<groupId>org.apache.commons</groupId>
   	<artifactId>commons-compress</artifactId>
   	<version>1.4.1</version>

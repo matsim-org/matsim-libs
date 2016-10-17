@@ -43,9 +43,9 @@ import playground.jbischoff.analysis.TripHistogram;
  * 
  * @author gleich
  */
-public class TripHistogramTest {
+public class TripHistogramIT {
 
-	private final static Logger log = Logger.getLogger(TripHistogramTest.class);
+	private final static Logger log = Logger.getLogger(TripHistogramIT.class);
 	
 	public @Rule MatsimTestUtils utils = new MatsimTestUtils();
 	
@@ -57,10 +57,8 @@ public class TripHistogramTest {
 	 */
 	@Test
 	public void ensure_trip_counts_equal_number_of_planned_legs_in_input_population_file() {
-//		Config config = this.utils.loadConfig("examples/pt-tutorial/0.config.xml");
-		Config config = this.utils.loadConfig("../../matsim/examples/pt-tutorial/0.config.xml");
-		// (this is no longer in the resource path. ../../matsim fixes it for me locally; not sure what the build servers will do ...  kai, sep'16)
-		
+		Config config = this.utils.loadConfig("../../examples/scenarios/pt-tutorial/0.config.xml");
+
 		config.vspExperimental().setAbleToOverwritePtInteractionParams(true);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(0);

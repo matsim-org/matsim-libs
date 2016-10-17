@@ -131,7 +131,7 @@ public class CorrectedUtilityCreatorTest {
 	}
 
 	private Scenario loadScenario() {
-		final Config config = ConfigUtils.loadConfig("test/scenarios/chessboard/config.xml");
+		final Config config = ConfigUtils.loadConfig("../../examples/scenarios/chessboard/config.xml");
 		final ConstrainedAccessibilityConfigGroup configGroup = new ConstrainedAccessibilityConfigGroup();
 		config.addModule(configGroup);
 

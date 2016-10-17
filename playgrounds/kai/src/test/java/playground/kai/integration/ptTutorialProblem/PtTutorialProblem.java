@@ -30,6 +30,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -41,7 +42,7 @@ public class PtTutorialProblem {
 	
 	@Test
 	public final void test() {
-		final URL configURL = IOUtils.newUrl(getClass().getResource("/test/scenarios/pt-tutorial/"),  "config.xml");
+		final URL configURL = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "0.config.xml");
 		Config config = ConfigUtils.loadConfig( configURL ) ;
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		

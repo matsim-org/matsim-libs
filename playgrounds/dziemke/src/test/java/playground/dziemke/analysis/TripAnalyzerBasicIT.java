@@ -13,7 +13,7 @@ import java.io.IOException;
 /**
  * @author gthunig
  */
-public class TripAnalyzerBasicTest {
+public class TripAnalyzerBasicIT {
 
     @Rule
     public MatsimTestUtils utils = new MatsimTestUtils();
@@ -21,7 +21,7 @@ public class TripAnalyzerBasicTest {
     @Test
     public final void testTripAnalyzerBasic() {
         String[] args = new String[3];
-        args[0] = "../../matsim/examples/equil/network.xml";
+        args[0] = "../../examples/scenarios/equil/network.xml";
         File network = new File(args[0]);
         try {
             System.out.println(network.getCanonicalPath());
