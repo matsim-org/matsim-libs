@@ -197,8 +197,19 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 		return true;
 	}
 	
-	private boolean isGreenTimeLeft(double timeSeconds, Id<SignalGroup> groupId, int maxGreenTime){
-		int greenTime = (int) (timeSeconds - this.greenGroupId2OnsetMap.get(groupId));
+	/**
+	 * Checks whether the maximal green time of the signal is already reached.
+	 * 
+	 * @return false if maximal green time is reached or if signal has not been switched on (first second of the simulation);
+	 * true if signal can be extended based on the number of current green time seconds.
+	 */
+	private boolean isGreenTimeLeft(double currentTime, Id<SignalGroup> groupId, int maxGreenTime){
+		if (!this.greenGroupId2OnsetMap.containsKey(groupId)){
+			/* signals that have not been switched on should not be extended.
+			 * this may happen when the signal has its dropping in the first second of the simulation. */
+			return false;
+		}
+		int greenTime = (int) (currentTime - this.greenGroupId2OnsetMap.get(groupId));
 		return greenTime < maxGreenTime;
 	}
 	
