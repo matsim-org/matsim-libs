@@ -9,11 +9,11 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="test/scenarios/berlin/network.xml.gz" />
+		<param name="inputNetworkFile" value="../berlin/network.xml.gz" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="test/scenarios/berlin/plans_hwh_1pct.xml.gz" /> <!-- 1% sample of commuters, 15931 agents -->
+		<param name="inputPlansFile" value="../berlin/plans_hwh_1pct.xml.gz" /> <!-- 1% sample of commuters, 15931 agents -->
 	</module>
 
 	<module name="controler">
@@ -24,7 +24,7 @@
 		<param name= "routingAlgorithmType" value="Dijkstra" />
 	</module>
 
-	<module name="simulation">
+	<module name="qsim">
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
 	
