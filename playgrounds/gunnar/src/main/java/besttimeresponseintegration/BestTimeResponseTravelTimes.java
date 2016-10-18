@@ -56,8 +56,8 @@ public class BestTimeResponseTravelTimes implements TripTravelTimes<Facility, St
 	// --------------- IMPLEMENTATION OF TripTravelTimes ---------------
 
 	@Override
-	synchronized public double getTravelTime_s(final Facility origin, final Facility destination, final double dptTime_s,
-			final String mode) {
+	synchronized public double getTravelTime_s(final Facility origin, final Facility destination,
+			final double dptTime_s, final String mode) {
 
 		final int leftBin;
 		{
@@ -91,11 +91,8 @@ public class BestTimeResponseTravelTimes implements TripTravelTimes<Facility, St
 			final List<? extends PlanElement> tripSequence = this.tripRouter.calcRoute(mode, origin, destination,
 					tripDptTime_s, this.person);
 
-			// >>> TODO NEW >>>
-
 			double startTime_s = tripDptTime_s;
 			double time_s = tripDptTime_s;
-
 			for (int i = 0; i < tripSequence.size(); i++) {
 				final Leg leg = (Leg) tripSequence.get(i);
 				if (leg.getRoute() instanceof NetworkRoute) {
@@ -104,32 +101,15 @@ public class BestTimeResponseTravelTimes implements TripTravelTimes<Facility, St
 					for (Id<Link> linkId : route.getLinkIds()) {
 						final Link link = this.network.getLinks().get(linkId);
 						final double linkTT_s = travelTime.getLinkTravelTime(link, time_s, this.person, null);
-						time_s += linkTT_s;
+						time_s += linkTT_s + 1.0;
 					}
 					final Link endLink = this.network.getLinks().get(route.getEndLinkId());
-					time_s += travelTime.getLinkTravelTime(endLink, time_s, this.person, null);
+					time_s += travelTime.getLinkTravelTime(endLink, time_s, this.person, null) + 1.0;
 				} else {
 					time_s += leg.getTravelTime();
 				}
 			}
-
 			tt_s = time_s - startTime_s;
-			
-			// TODO <<< NEW <<<
-
-//			{
-//				final Leg lastLeg = (Leg) tripSequence.get(tripSequence.size() - 1);
-//				tt_s = (lastLeg.getDepartureTime() + lastLeg.getTravelTime()) - tripDptTime_s;
-//			}
-//
-//			{
-//				final Leg lastLeg = (Leg) tripSequence.get(tripSequence.size() - 1);
-//				if (lastLeg.getRoute() instanceof NetworkRoute) {
-//					final NetworkRoute lastRoute = (NetworkRoute) lastLeg.getRoute();
-//					final Link lastLink = this.network.getLinks().get(lastRoute.getEndLinkId());
-//					tt_s += lastLink.getLength() / lastLink.getFreespeed();
-//				}
-//			}
 
 			if (this.cache != null) {
 				this.cache.putTT_s(bin, origin, destination, mode, tt_s);

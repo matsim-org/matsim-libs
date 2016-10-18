@@ -98,9 +98,6 @@ class DemandModel {
 
 		scenario.getPopulation().getPersons().clear();
 
-		// final List<TourSequence> tourSequenceAlternatives =
-		// ChoiceModel.newTourSeqAlternatives(scenario);
-
 		for (int personNumber = 0; personNumber < homeLocs.size(); personNumber++) {
 			final Person person = scenario.getPopulation().getFactory().createPerson(Id.createPersonId(personNumber));
 			scenario.getPopulation().addPerson(person);
@@ -136,11 +133,9 @@ class DemandModel {
 
 		final ChoiceModel choiceModel = new ChoiceModel(scenario, tripRouterProvider, mode2travelTime, maxTrials,
 				maxFailures);
-
 		final Map<Person, ChoiceRunner> person2choiceRunner = new LinkedHashMap<>();
 
 		// Replan in parallel.
-
 		final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			if (Math.random() < replanProba) {

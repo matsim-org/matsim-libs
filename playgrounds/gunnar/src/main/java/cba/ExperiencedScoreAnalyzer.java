@@ -22,7 +22,7 @@ class ExperiencedScoreAnalyzer {
 
 	void add(final Id<Person> personId, final double score) {
 		List<Double> list = this.personId2scoreList.get(personId);
-		if (list == null) {
+		if (true || list == null) {
 			list = new ArrayList<>();
 			this.personId2scoreList.put(personId, list);
 		}

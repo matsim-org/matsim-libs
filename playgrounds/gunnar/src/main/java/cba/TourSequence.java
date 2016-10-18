@@ -1,8 +1,6 @@
 package cba;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
@@ -11,7 +9,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.gbl.MatsimRandom;
 
 import floetteroed.utilities.Units;
 
@@ -52,15 +49,6 @@ class TourSequence {
 		final int dptTimeInc_s = (int) (Units.S_PER_D / (2 * this.tours.size()));
 		int dptTime_s = dptTimeInc_s / 2;
 
-		// >>>>>>>>>>>>>>>>>>>> TODO NEW >>>>>>>>>>>>>>>>>>>>
-//		final LinkedList<Double> dptTimes_s = new LinkedList<>();
-//		for (int i = 0; i < 2 * this.tours.size(); i++) {
-//			dptTimes_s.add(MatsimRandom.getRandom().nextDouble() * Units.S_PER_D);
-//		}
-//		Collections.sort(dptTimes_s);
-//		System.out.println(dptTimes_s);
-		// <<<<<<<<<<<<<<<<<<<< TODO NEW <<<<<<<<<<<<<<<<<<<<
-
 		for (Tour tour : this.tours) {
 
 			final Activity home = scenario.getPopulation().getFactory()
@@ -75,7 +63,6 @@ class TourSequence {
 			final Activity tourAct = scenario.getPopulation().getFactory().createActivityFromLinkId(tour.act.toString(),
 					tour.destination.getId());
 			tourAct.setEndTime(dptTime_s);
-			// tourAct.setEndTime(dptTimes_s.removeFirst());
 			result.addActivity(tourAct);
 			dptTime_s += dptTimeInc_s;
 

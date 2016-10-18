@@ -31,8 +31,10 @@ public class BestTimeResponseStrategyFunctionality {
 
 	// -------------------- MEMBERS --------------------
 
+	// TODO encapsulate
 	public final List<PlannedActivity<Facility, String>> plannedActivities;
 
+	// TODO encapsulate
 	public final List<Double> initialDptTimes_s;
 
 	private final TimeAllocator<Facility, String> timeAlloc;
@@ -40,7 +42,13 @@ public class BestTimeResponseStrategyFunctionality {
 	private final BestTimeResponseTravelTimes myTravelTimes;
 
 	private final boolean verbose = false;
-	
+
+	private final boolean repairTimeStructure = true;
+
+	private final boolean randomSmoothing = false;
+
+	private final boolean interpolate = false;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	public BestTimeResponseStrategyFunctionality(final Plan plan, final Network network,
@@ -91,25 +99,17 @@ public class BestTimeResponseStrategyFunctionality {
 					betaTravel_1_s);
 
 			this.plannedActivities.add(plannedAct);
-			
+
 			if (this.verbose) {
 				System.out.println(plannedAct);
 			}
-			
+
 		}
 
-		/*
-		 * Evaluating the plan.
-		 */
-
-		final boolean repairTimeStructure = true;
-		final boolean randomSmoothing = false;
-		final boolean interpolate = false;
-		
 		this.myTravelTimes = myTravelTimes;
 
-		this.timeAlloc = new TimeAllocator<>(timeDiscretization, this.myTravelTimes,
-				repairTimeStructure, randomSmoothing, interpolate);
+		this.timeAlloc = new TimeAllocator<>(timeDiscretization, this.myTravelTimes, this.repairTimeStructure,
+				this.randomSmoothing, this.interpolate);
 	}
 
 	// -------------------- IMPLEMENTATION --------------------

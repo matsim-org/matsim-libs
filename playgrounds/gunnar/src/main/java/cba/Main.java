@@ -40,22 +40,22 @@ public class Main {
 	 * ============================================================
 	 */
 
-	static final int outerIts = 1;
-	static final int popSize = 1;
+	static final int outerIts = 5;
+	static final int popSize = 1000;
 	static final double replanProba = 1.0;
 	static final String expectationFilePrefix = "./testdata/cba/expectation-before-it";
 	static final String experienceFilePrefix = "./testdata/cba/experience-after-it";
 	static final String demandStatsFilePrefix = "./testdata/cba/demandStats-in-it";
 
-	static final int maxTrials = 100;
-	static final int maxFailures = 50;
+	static final int maxTrials = 10;
+	static final int maxFailures = 3;
 
 	final static int minLocChoiceSetSize = 1;
-	final static int maxLocChoiceSetSize = 1;
+	final static int maxLocChoiceSetSize = 10;
 
-	final static double carAvailProba = 1.0;
-	
-	static final int ttAvgIts = 10;
+	final static double carAvailProba = 0.5;
+
+	static final int ttAvgIts = 1;
 
 	/*-
 	 * ============================================================ 
@@ -102,7 +102,7 @@ public class Main {
 
 		final Map<String, TravelTime> mode2tt = new LinkedHashMap<>();
 		mode2tt.put("car", carTravelTime);
-		
+
 		DemandModel.replanPopulation(scenario, factory, outerIt == 1 ? 1.0 : replanProba,
 				expectationFilePrefix + outerIt + ".txt", demandStatsFilePrefix + outerIt + ".txt", maxTrials,
 				maxFailures, mode2tt);
@@ -141,20 +141,6 @@ public class Main {
 		writer.println(experiencedScoreAnalyzer.toString());
 		writer.flush();
 		writer.close();
-
-		// final PrintWriter writer;
-		// try {
-		// writer = new PrintWriter(experienceFilePrefix + outerIt + ".txt");
-		// } catch (FileNotFoundException e) {
-		// throw new RuntimeException(e);
-		// }
-		// for (Person person :
-		// controler.getScenario().getPopulation().getPersons().values()) {
-		// writer.println(person.getId() + "\t" +
-		// person.getSelectedPlan().getScore());
-		// }
-		// writer.flush();
-		// writer.close();
 	}
 
 	/*-
