@@ -87,8 +87,10 @@ public class BenchmarkKDTreeNearestNeighbor {
 					.average()
 					.getAsDouble();
 			final long mid = System.currentTimeMillis();
+			// in perfectly balanced binary tree, number of leaves is (n + 1) / 2
+			// so size / x is a good way to define Emax
 			final double distAppr = searched.stream()
-					.mapToDouble( p -> KDTree.euclidean( p , qt.getClosest( p , KDTree::euclidean , x -> true , 0.1 , size ) ) )
+					.mapToDouble( p -> KDTree.euclidean( p , qt.getClosest( p , KDTree::euclidean , x -> true , 0. , size / 100 ) ) )
 					.average()
 					.getAsDouble();
 			final long end = System.currentTimeMillis();
