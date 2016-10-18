@@ -34,8 +34,6 @@ import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListn
 import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
-import playground.agarwalamit.mixedTraffic.patnaIndia.router.BikeTimeDistanceTravelDisutilityFactory;
-import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.opdyts.ModalStatsControlerListner;
 
 /**
@@ -65,16 +63,12 @@ public class PatnaPlansRelaxor {
 		modes2consider.add("walk");
 
 		ModalStatsControlerListner stasControlerListner = new ModalStatsControlerListner(modes2consider);
-		final BikeTimeDistanceTravelDisutilityFactory builder_bike =  new BikeTimeDistanceTravelDisutilityFactory("bike", config.planCalcScore());
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				// add here whatever should be attached to matsim controler
-				addTravelTimeBinding("bike").to(FreeSpeedTravelTimeForBike.class);
-				addTravelDisutilityFactoryBinding("bike").toInstance(builder_bike);
-				// no need to add travel time and travel disutility for motorbike (same as car), should be inserted auto-magically, now
 
 				// some stats
 				addControlerListenerBinding().to(KaiAnalysisListener.class);

@@ -44,8 +44,6 @@ import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListn
 import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
-import playground.agarwalamit.mixedTraffic.patnaIndia.router.BikeTimeDistanceTravelDisutilityFactory;
-import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.opdyts.*;
 import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
@@ -111,8 +109,6 @@ public class PatnaUrbanOpdytsCalibrator {
 
 		ModalStatsControlerListner stasControlerListner = new ModalStatsControlerListner(modes2consider);
 
-		final BikeTimeDistanceTravelDisutilityFactory builder_bike =  new BikeTimeDistanceTravelDisutilityFactory("bike", config.planCalcScore());
-
 		// following is the  entry point to start a matsim controler together with opdyts
 		MATSimSimulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization);
 		simulator.addOverridingModule(new AbstractModule() {
@@ -120,9 +116,6 @@ public class PatnaUrbanOpdytsCalibrator {
 			@Override
 			public void install() {
 				// add here whatever should be attached to matsim controler
-				addTravelTimeBinding("bike").to(FreeSpeedTravelTimeForBike.class);
-				addTravelDisutilityFactoryBinding("bike").toInstance(builder_bike);
-				// no need to add travel time and travel disutility for motorbike (same as car), should be inserted auto-magically, now
 
 				// some stats
 				addControlerListenerBinding().to(KaiAnalysisListener.class);
