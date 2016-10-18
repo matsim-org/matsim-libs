@@ -2,9 +2,11 @@ package cba;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -48,26 +50,32 @@ class ChoiceModel {
 	ChoiceRunner newChoiceRunner(final Link homeLoc, final Person person, final int workAlts, final int otherAlts,
 			final boolean carAvailable) {
 		return new ChoiceRunner(this.scenario, this.tripRouterProvider, this.mode2travelTime, homeLoc, person,
-				newTourSeqAlternatives(this.scenario, workAlts, otherAlts, carAvailable), this.maxTrials,
+				newTourSeqAlternatives(this.scenario, workAlts, otherAlts, carAvailable, homeLoc), this.maxTrials,
 				this.maxFailures);
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	private List<Link> sampleLinks(final Scenario scenario, final int cnt) {
+	private List<Link> sampleLinks(final Scenario scenario, final int cnt, final Set<Link> excluded) {
 		final LinkedList<Link> fullList = new LinkedList<>(scenario.getNetwork().getLinks().values());
 		final ArrayList<Link> result = new ArrayList<>(cnt);
 		while (result.size() < cnt) {
-			result.add(fullList.remove(MatsimRandom.getRandom().nextInt(fullList.size())));
+			final int index = MatsimRandom.getRandom().nextInt(fullList.size());
+			if (!excluded.contains(fullList.get(index))) {
+				result.add(fullList.remove(index));
+			}
 		}
 		return result;
 	}
 
 	private List<TourSequence> newTourSeqAlternatives(final Scenario scenario, final int workLocCnt,
-			final int otherLocCnt, final boolean carAvailable) {
+			final int otherLocCnt, final boolean carAvailable, final Link homeLoc) {
 
-		final List<Link> workLocs = sampleLinks(scenario, workLocCnt);
-		final List<Link> otherLocs = sampleLinks(scenario, otherLocCnt);
+		final Set<Link> excludedFromSampling = new LinkedHashSet<>(3);
+		excludedFromSampling.add(homeLoc);
+		final List<Link> workLocs = sampleLinks(scenario, workLocCnt, excludedFromSampling);
+		excludedFromSampling.addAll(workLocs);
+		final List<Link> otherLocs = sampleLinks(scenario, otherLocCnt, excludedFromSampling);
 
 		final Tour.Mode[] availableModes;
 		if (carAvailable) {
