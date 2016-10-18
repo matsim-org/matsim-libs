@@ -5,8 +5,9 @@ import com.google.inject.Injector;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Id;
+import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
+import playground.sebhoerl.avtaxi.config.AVOperatorConfig;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.dispatcher.AVDispatcherFactory;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,20 +19,11 @@ public class AVOperatorFactory {
     Injector injector;
 
     @Inject
-    Map<String, Class<? extends AVDispatcher>> dispatcherStrategies;
+    Map<String, Class<? extends AVDispatcher.AVDispatcherFactory>> dispatcherStrategies;
 
-    public AVOperator createOperator(String id, String dispatchmentStrategy) {
-        /*AVDispatcherFactory dispatcherFactory = dispatcherFactories.get(dispatchmentStrategy);
-
-        if (dispatcherFactory == null) {
-            throw new IllegalArgumentException("Dispatchment strategy '" + dispatchmentStrategy + "' does not exist.");
-        }*/
-
-        System.out.println(dispatchmentStrategy);
-        System.out.println(dispatcherStrategies.get(dispatchmentStrategy));
-
+    public AVOperator createOperator(Id<AVOperator> id, AVOperatorConfig config) {
         return new AVOperatorImpl(
-                Id.create(id, AVOperator.class),
-                injector.getInstance(dispatcherStrategies.get(dispatchmentStrategy)));
+                id,
+                injector.getInstance(dispatcherStrategies.get(config.getDispatcherConfig().getStrategyName())).createDispatcher(config.getDispatcherConfig()));
     }
 }

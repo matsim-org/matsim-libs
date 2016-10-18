@@ -8,11 +8,12 @@ import org.matsim.contrib.dvrp.schedule.AbstractTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.taxi.schedule.*;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
+import playground.sebhoerl.avtaxi.config.AVConfig;
+import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
+import playground.sebhoerl.avtaxi.config.AVTimingParameters;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
@@ -20,13 +21,12 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.avtaxi.schedule.*;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class SingleFIFODispatcher implements AVDispatcher {
     @Inject
-    private AVConfigGroup config;
+    private AVConfig config;
 
     @Inject @Named(AVModule.AV_MODE)
     private LeastCostPathCalculator router;
@@ -68,7 +68,8 @@ public class SingleFIFODispatcher implements AVDispatcher {
     }
 
     void performAssignment(AVVehicle vehicle, AVRequest request, double now) {
-        @SuppressWarnings("unchecked")
+        AVTimingParameters timing = config.getTimingParameters();
+
         Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicle.getSchedule();
         AVStayTask stayTask = (AVStayTask) Schedules.getLastTask(schedule);
 
@@ -82,17 +83,17 @@ public class SingleFIFODispatcher implements AVDispatcher {
         }
 
         VrpPathWithTravelData pickupPath = VrpPaths.calcAndCreatePath(stayTask.getLink(), request.getFromLink(), startTime, router, travelTime);
-        VrpPathWithTravelData dropoffPath = VrpPaths.calcAndCreatePath(request.getFromLink(), request.getToLink(), pickupPath.getArrivalTime() + config.getPickupDuration(), router, travelTime);
+        VrpPathWithTravelData dropoffPath = VrpPaths.calcAndCreatePath(request.getFromLink(), request.getToLink(), pickupPath.getArrivalTime() + timing.getPickupDurationPerStop(), router, travelTime);
 
         AVDriveTask pickupDriveTask = new AVDriveTask(pickupPath);
         AVPickupTask pickupTask = new AVPickupTask(
                 pickupPath.getArrivalTime(),
-                pickupPath.getArrivalTime() + config.getPickupDuration(),
+                pickupPath.getArrivalTime() + timing.getDropoffDurationPerStop(),
                 request.getFromLink(), Arrays.asList(request));
         AVDriveTask dropoffDriveTask = new AVDriveTask(dropoffPath, Arrays.asList(request));
         AVDropoffTask dropoffTask = new AVDropoffTask(
                 dropoffPath.getArrivalTime(),
-                dropoffPath.getArrivalTime() + config.getDropoffDuration(),
+                dropoffPath.getArrivalTime() + timing.getDropoffDurationPerStop(),
                 request.getToLink(),
                 Arrays.asList(request));
 
@@ -115,5 +116,12 @@ public class SingleFIFODispatcher implements AVDispatcher {
     @Override
     public void onNextTimestep(double now) {
         if (reoptimize) reoptimize(now);
+    }
+
+    static public class Factory implements AVDispatcherFactory {
+        @Override
+        public AVDispatcher createDispatcher(ConfigGroup config) {
+            return new SingleFIFODispatcher();
+        }
     }
 }

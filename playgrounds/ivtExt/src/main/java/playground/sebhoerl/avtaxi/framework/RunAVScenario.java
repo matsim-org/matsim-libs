@@ -2,7 +2,6 @@ package playground.sebhoerl.avtaxi.framework;
 
 import java.net.MalformedURLException;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
@@ -10,11 +9,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.sebhoerl.avtaxi.data.AVData;
-import playground.sebhoerl.avtaxi.data.AVOperator;
-import playground.sebhoerl.avtaxi.data.AVOperatorImpl;
-import playground.sebhoerl.avtaxi.utils.AVVehicleGeneratorByDensity;
 
 public class RunAVScenario {
 	public static void main(String[] args) throws MalformedURLException {

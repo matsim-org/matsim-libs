@@ -10,6 +10,7 @@ import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vehicles.VehicleType;
+import playground.sebhoerl.avtaxi.config.AVConfig;
 import playground.sebhoerl.avtaxi.data.AVData;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatchmentListener;
 import playground.sebhoerl.avtaxi.passenger.AVRequestCreator;
@@ -19,17 +20,17 @@ import playground.sebhoerl.avtaxi.vrpagent.AVActionCreator;
 import javax.inject.Named;
 
 public class AVQSimModule extends com.google.inject.AbstractModule {
-    final private AVConfigGroup config;
+    final private AVConfig config;
     final private QSim qsim;
 
-    public AVQSimModule(AVConfigGroup config, QSim qsim) {
+    public AVQSimModule(AVConfig config, QSim qsim) {
         this.config = config;
         this.qsim = qsim;
     }
 
     @Override
     protected void configure() {
-        bind(Double.class).annotatedWith(Names.named("pickupDuration")).toInstance(config.getPickupDuration());
+        bind(Double.class).annotatedWith(Names.named("pickupDuration")).toInstance(config.getTimingParameters().getPickupDurationPerStop());
         bind(AVOptimizer.class);
         bind(AVActionCreator.class);
         bind(AVRequestCreator.class);

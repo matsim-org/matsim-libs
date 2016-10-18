@@ -31,7 +31,7 @@ public class AVVehicleGeneratorByDensity {
         this.operator = operator;
     }
 
-	public void generate(int numberOfVehicles) {
+	public void generate(long numberOfVehicles) {
         Map<Id<Link>, Double> density = new HashMap<Id<Link>, Double>();
         
         double sum = 0.0;

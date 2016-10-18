@@ -15,6 +15,7 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 
 import com.google.inject.Inject;
 
+import playground.sebhoerl.avtaxi.config.AVConfig;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatchmentListener;
 import playground.sebhoerl.avtaxi.schedule.AVOptimizer;
 
@@ -24,7 +25,7 @@ public class AVQSimProvider implements Provider<Mobsim> {
     @Inject private Scenario scenario;
 
     @Inject private Injector injector;
-    @Inject private AVConfigGroup config;
+    @Inject private AVConfig config;
 
     @Override
     public Mobsim get() {

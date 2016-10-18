@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!ELEMENT av (param*, timing?, operator*)>
+<!ELEMENT operator (param*, timing?, generator, dispatcher)>
+<!ELEMENT timing (param*)>
+<!ELEMENT param EMPTY>
+<!ELEMENT dispatcher (param*)>
+<!ELEMENT generator (param*)>
+
+<!ATTLIST param
+        name    CDATA   #REQUIRED
+        value   CDATA   #REQUIRED
+        >
+
+<!ATTLIST operator
+        id      CDATA #REQUIRED
+        >
+
+<!ATTLIST dispatcher
+        name      CDATA #REQUIRED
+        >
