@@ -66,9 +66,9 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 		info.setAccessStartTime(event.getTime());
 		info.setStartTime(event.getTime());
 		info.setOriginLinkId(event.getOriginLinkId());
-		info.setPickupLinkId(event.getPickuplinkId());	
+		info.setPickupLinkId(event.getPickuplinkId());
+
 		if (agentRentalsMap.containsKey(event.getPersonId())) {
-			
 			AgentRentals agentRentals = this.agentRentalsMap.get(event.getPersonId());
 			agentRentals.getStatsPerVehicle().put(event.getvehicleId(), info);
 			
@@ -84,11 +84,14 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 	public void handleEvent(LinkLeaveEvent event) {
 		if (carsharingTrip(event.getVehicleId())) {
 			Id<Person> personId = this.vehiclePersonMap.get(event.getVehicleId());
-			AgentRentals agentRentals = this.agentRentalsMap.get(personId);
 			Network network = this.scenario.getNetwork();
-			RentalInfo info = agentRentals.getStatsPerVehicle().get(event.getVehicleId().toString());
-			info.setVehId(event.getVehicleId());
-			info.setDistance(info.getDistance() + network.getLinks().get(event.getLinkId()).getLength());
+
+			if (agentRentalsMap.containsKey(personId)) {
+				AgentRentals agentRentals = this.agentRentalsMap.get(personId);
+				RentalInfo info = agentRentals.getStatsPerVehicle().get(event.getVehicleId().toString());
+				info.setVehId(event.getVehicleId());
+				info.setDistance(info.getDistance() + network.getLinks().get(event.getLinkId()).getLength());
+			}
 		}
 		
 	}
@@ -100,11 +103,14 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 			this.enterVehicleTimes.put(event.getPersonId(), event.getTime());
 			
 			Id<Person> personId = this.vehiclePersonMap.get(event.getVehicleId());
-			AgentRentals agentRentals = this.agentRentalsMap.get(personId);
-			
-			RentalInfo info = agentRentals.getStatsPerVehicle().get(event.getVehicleId().toString());
-			if (info.getAccessEndTime() == 0.0)
-				info.setAccessEndTime(event.getTime());
+
+			if (agentRentalsMap.containsKey(event.getPersonId())) {
+				AgentRentals agentRentals = this.agentRentalsMap.get(personId);
+				RentalInfo info = agentRentals.getStatsPerVehicle().get(event.getVehicleId().toString());
+
+				if (info.getAccessEndTime() == 0.0)
+					info.setAccessEndTime(event.getTime());
+			}
 		}
 		
 	}
@@ -115,10 +121,14 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 		if (carsharingTrip(event.getVehicleId())) {
 			double enterTime = this.enterVehicleTimes.get(event.getPersonId());	
 			double totalTime = event.getTime() - enterTime;
+
 			Id<Person> personId = this.vehiclePersonMap.get(event.getVehicleId());
-			AgentRentals agentRentals = this.agentRentalsMap.get(personId);
-			RentalInfo info = agentRentals.getStatsPerVehicle().get(event.getVehicleId().toString());
-			info.setInVehicleTime(info.getInVehicleTime() + totalTime);
+
+			if (agentRentalsMap.containsKey(event.getPersonId())) {
+				AgentRentals agentRentals = this.agentRentalsMap.get(personId);
+				RentalInfo info = agentRentals.getStatsPerVehicle().get(event.getVehicleId().toString());
+				info.setInVehicleTime(info.getInVehicleTime() + totalTime);
+			}
 		}
 	}
 
