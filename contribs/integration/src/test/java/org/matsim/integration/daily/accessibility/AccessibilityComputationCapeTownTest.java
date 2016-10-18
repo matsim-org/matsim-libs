@@ -79,7 +79,7 @@ public class AccessibilityComputationCapeTownTest {
 		
 		// Parameters
 		final String crs = TransformationFactory.WGS84_SA_Albers;
-		final String runId = "za_capetown_" + cellSize.toString().split("\\.")[0];
+		final String runId = "za_capetown_" + PathUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
 		final boolean push2Geoserver = false;
 
 		// QGis parameters

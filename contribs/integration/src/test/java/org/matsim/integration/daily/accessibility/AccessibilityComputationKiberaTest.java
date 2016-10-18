@@ -73,7 +73,7 @@ public class AccessibilityComputationKiberaTest {
 		// Parameters
 		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		final Envelope envelope = new Envelope(251000, 9853000, 256000, 9857000);
-		final String runId = "ke_kibera_" + cellSize.toString().split("\\.")[0];
+		final String runId = "ke_kibera_" + PathUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
 		final boolean push2Geoserver = false;
 
 		// QGis parameters

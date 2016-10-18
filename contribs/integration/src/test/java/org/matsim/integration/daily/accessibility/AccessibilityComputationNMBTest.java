@@ -57,7 +57,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class AccessibilityComputationNMBTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationNMBTest.class ) ;
 
-	private static final Double cellSize = 1000.;
+	private static final Double cellSize = 10000.;
 //	private static final double timeOfDay = 8.*60*60;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
@@ -80,8 +80,8 @@ public class AccessibilityComputationNMBTest {
 		// Parameters
 		final String crs = TransformationFactory.WGS84_SA_Albers;
 		final Envelope envelope = new Envelope(115000,161000,-3718000,-3679000);
-		final String runId = "za_nmb_2016-10-18_" + cellSize.toString().split("\\.")[0];
-		final boolean push2Geoserver = false;
+		final String runId = "za_nmb_" + PathUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
+		final boolean push2Geoserver = true;
 		
 		// QGis parameters
 		boolean createQGisOutput = true;
