@@ -16,6 +16,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Provider;
 
@@ -42,8 +43,8 @@ class UtilityFunction {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	UtilityFunction(final Scenario scenario, final Provider<TripRouter> tripRouterProvider, final int maxTrials,
-			final int maxFailures) {
+	UtilityFunction(final Scenario scenario, final Provider<TripRouter> tripRouterProvider,
+			final Map<String, TravelTime> mode2travelTime, final int maxTrials, final int maxFailures) {
 
 		this.scenario = scenario;
 
@@ -154,7 +155,7 @@ class UtilityFunction {
 		this.tourActSeq2asc.put(new ArrayList<Tour.Act>(0), 0.0);
 		this.tourActSeq2asc.put(Arrays.asList(Tour.Act.work), 0.0);
 		this.tourActSeq2asc.put(Arrays.asList(Tour.Act.other), 0.0);
-		this.tourActSeq2asc.put(Arrays.asList(Tour.Act.work, Tour.Act.other), -9.0);
+		this.tourActSeq2asc.put(Arrays.asList(Tour.Act.work, Tour.Act.other), -4.0);
 
 		this.mode2asc.put(Tour.Mode.car, 0.0);
 		this.mode2asc.put(Tour.Mode.pt, 0.0);
@@ -164,7 +165,8 @@ class UtilityFunction {
 		 */
 
 		if (tripRouterProvider != null) {
-			this.timeOpt = new TimeStructureOptimizer(this.scenario, tripRouterProvider, maxTrials, maxFailures);
+			this.timeOpt = new TimeStructureOptimizer(this.scenario, tripRouterProvider, maxTrials, maxFailures,
+					mode2travelTime);
 		} else {
 			this.timeOpt = null;
 		}
@@ -207,17 +209,32 @@ class UtilityFunction {
 	private List<Link> tourLocations = null;
 	private List<Tour.Mode> tourModes = null;
 
-	double getUtility(final Plan plan) {
+	private Double matsimUtility = null;
+	private Double sampersUtility = null;
+
+	Double getMATSimUtility() {
+		return this.matsimUtility;
+	}
+	
+	Double getSampersUtility() {
+		return this.sampersUtility;
+	}
+
+	Double getTotalUtility() {
+		return this.getMATSimUtility() + this.getSampersUtility();
+	}
+	
+	void evaluate(final Plan plan) {
 
 		this.extractTourData(plan); // result in member variables
 
-		// ASC for activity sequence
-		double result = this.tourActSeq2asc.get(this.tourPurposes);
-
 		// Score of optimal time structure
 		if (this.timeOpt != null) {
-			result += this.timeOpt.computeScore(plan);
+			this.matsimUtility = this.timeOpt.computeScore(plan);
 		}
+
+		// ASC for activity sequence
+		this.sampersUtility = this.tourActSeq2asc.get(this.tourPurposes);
 
 		for (int i = 0; i < this.tourPurposes.size(); i++) {
 			final Tour.Act act = this.tourPurposes.get(i);
@@ -225,12 +242,10 @@ class UtilityFunction {
 			final Tour.Mode mode = this.tourModes.get(i);
 
 			// Size of activity location.
-			result += this.act2betaSize.get(act) * this.act2link2logSize.get(act).get(loc);
+			this.sampersUtility += this.act2betaSize.get(act) * this.act2link2logSize.get(act).get(loc);
 
 			// ASC for mode.
-			result += this.mode2asc.get(mode);
+			this.sampersUtility += this.mode2asc.get(mode);
 		}
-
-		return result;
 	}
 }

@@ -34,6 +34,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSampler;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplingConfigGroup;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SimpleSnowballModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballSamplingConfigGroup;
 
@@ -51,7 +52,7 @@ public class RunScalabilityAnalysis {
 
 	public static void main( String[] args ) {
 		final ScalabilityConfigGroup scalabilityConfigGroup = new ScalabilityConfigGroup();
-		final Config config = ConfigUtils.loadConfig( args[ 0 ] , scalabilityConfigGroup );
+		final Config config = ConfigUtils.loadConfig( args[ 0 ] , scalabilityConfigGroup , new SocialNetworkSamplingConfigGroup() );
 		MoreIOUtils.initOut( config.controler().getOutputDirectory() );
 
 		try ( final ScalabilityStatisticsListener statsListenner = new ScalabilityStatisticsListener( config.controler().getOutputDirectory()+"/stats.dat"  )) {
@@ -59,15 +60,18 @@ public class RunScalabilityAnalysis {
 			for ( double sample : scalabilityConfigGroup.getSamples() ) {
 				for ( int tryNr = 0; tryNr < scalabilityConfigGroup.getnTries(); tryNr++ ) {
 					final SnowballSamplingConfigGroup configGroup = new SnowballSamplingConfigGroup();
-					final Config tryConfig = ConfigUtils.loadConfig( args[ 0 ], configGroup );
+					final Config tryConfig = ConfigUtils.loadConfig( args[ 0 ], configGroup , new SocialNetworkSamplingConfigGroup() );
 
 					final String outputDir = config.controler().getOutputDirectory() + "/tmp/";
-					config.controler().setOutputDirectory( outputDir );
+					tryConfig.controler().setOutputDirectory( outputDir );
 					MoreIOUtils.deleteDirectoryIfExists( outputDir );
+
+					final Scenario scenario = ScenarioUtils.loadScenario( tryConfig );
+					samplePopulation( scenario , sample );
 
 					statsListenner.startTry( sample , tryNr );
 
-					final SocialNetwork network = runTry( tryConfig , sample , statsListenner );
+					final SocialNetwork network = runTry( scenario , statsListenner );
 
 					statsListenner.endTry( network );
 				}
@@ -81,21 +85,22 @@ public class RunScalabilityAnalysis {
 		}
 	}
 
-	private static SocialNetwork runTry( final Config config,
-			final double sample,
+	private static SocialNetwork runTry(
+			final Scenario scenario,
 			final ScalabilityStatisticsListener statsListenner ) {
 		try ( final AutocloserModule closer = new AutocloserModule() ) {
-			final Scenario scenario = ScenarioUtils.loadScenario( config );
-			samplePopulation( scenario , sample );
 			final com.google.inject.Injector injector =
-					Injector.createInjector( config,
+					Injector.createInjector( scenario.getConfig(),
 							closer,
-							new SimpleSnowballModule( config ),
+							new SimpleSnowballModule( scenario.getConfig() ),
 							new ScenarioByInstanceModule( scenario ),
 							b -> b.bind( SocialNetworkSampler.class ),
 							b -> b.bind( ScalabilityStatisticsListener.class ).toInstance( statsListenner ) );
 
 			return injector.getInstance( SocialNetworkSampler.class ).sampleSocialNetwork();
+		}
+		catch ( RuntimeException e ) {
+			throw e;
 		}
 		catch ( Exception e ) {
 			throw new RuntimeException( e );

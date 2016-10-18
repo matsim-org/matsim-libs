@@ -47,6 +47,7 @@ public class SocialNetworkSampler {
 	private final EgoCharacteristicsDistribution egoDistribution;
 	private final CliquesFiller cliquesFiller;
 	private final EgoLocator egoLocator;
+	private final SocialNetworkSamplingConfigGroup configGroup;
 
 	private Consumer<Set<Ego>> cliquesListener = (e) -> {};
 
@@ -55,11 +56,13 @@ public class SocialNetworkSampler {
 			final Population population,
 			final EgoCharacteristicsDistribution degreeDistribution,
 			final CliquesFiller cliquesFiller,
-			final EgoLocator egoLocator ) {
+			final EgoLocator egoLocator,
+			final SocialNetworkSamplingConfigGroup configGroup ) {
 		this.population = population;
 		this.egoDistribution = degreeDistribution;
 		this.cliquesFiller = cliquesFiller;
 		this.egoLocator = egoLocator;
+		this.configGroup = configGroup;
 	}
 
 	public void addCliqueListener( final Consumer<Set<Ego>> l ) {
@@ -72,7 +75,11 @@ public class SocialNetworkSampler {
 			final Ego ego = egoDistribution.sampleEgo( p );
 			egos.put( p.getId() , ego );
 		}
-		final KDTree<Ego> egosWithFreeStubs = new KDTree<>( egoLocator.getDimensionality() , egoLocator );
+		final KDTree<Ego> egosWithFreeStubs =
+				new KDTree<>(
+						configGroup.doRebalanceKdTree(),
+						egoLocator.getDimensionality(),
+						egoLocator );
 		egosWithFreeStubs.add( egos.values() );
 
 		log.info( "Start sampling with "+egosWithFreeStubs.size()+" egos with free stubs" );

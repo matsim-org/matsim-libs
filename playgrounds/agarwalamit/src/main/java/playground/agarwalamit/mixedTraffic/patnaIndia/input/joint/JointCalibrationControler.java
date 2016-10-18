@@ -21,9 +21,10 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.input.joint;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Map;
-
 import javax.inject.Inject;
-
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -36,30 +37,19 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.*;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Counts;
-
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
-
 import playground.agarwalamit.analysis.StatsWriter;
 import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListner;
 import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
@@ -68,16 +58,13 @@ import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
-import playground.agarwalamit.mixedTraffic.patnaIndia.router.BikeTimeDistanceTravelDisutilityFactory;
-import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
-import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForTruck;
 import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.multiModeCadyts.CountsInserter;
 import playground.agarwalamit.multiModeCadyts.ModalCadytsContext;
 import playground.agarwalamit.multiModeCadyts.ModalLink;
-import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 /**
  * @author amit
@@ -93,6 +80,9 @@ public class JointCalibrationControler {
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
+
+		config.travelTimeCalculator().setFilterModes(true);
+		config.travelTimeCalculator().setAnalyzedModes(String.join(",", PatnaUtils.ALL_MAIN_MODES));
 
 		if(args.length>0){
 			String dir = "/net/ils4/agarwal/patnaIndia/run108/";
@@ -118,26 +108,13 @@ public class JointCalibrationControler {
 
 		Scenario sc = ScenarioUtils.loadScenario(config);
 
+		// no vehicle info should be present if using VehiclesSource.modeVEhicleTypesFromVehiclesData
+		if ( sc.getVehicles().getVehicles().size() != 0 ) throw new RuntimeException("Only vehicle types should be loaded if vehicle source "+
+				QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData +" is assigned.");
+		sc.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+
 		final Controler controler = new Controler(sc);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
-
-		final BikeTimeDistanceTravelDisutilityFactory builder_bike =  new BikeTimeDistanceTravelDisutilityFactory("bike", config.planCalcScore());
-		final RandomizingTimeDistanceTravelDisutilityFactory builder_truck =  new RandomizingTimeDistanceTravelDisutilityFactory("truck", config.planCalcScore());
-
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-
-				addTravelTimeBinding("bike").to(FreeSpeedTravelTimeForBike.class);
-				addTravelDisutilityFactoryBinding("bike").toInstance(builder_bike);
-
-				addTravelTimeBinding("truck").to(FreeSpeedTravelTimeForTruck.class);
-				addTravelDisutilityFactoryBinding("truck").toInstance(builder_truck);
-
-				addTravelTimeBinding("motorbike").to(networkTravelTime());
-				addTravelDisutilityFactoryBinding("motorbike").to(carTravelDisutilityFactoryKey());					
-			}
-		});
 
 		controler.addOverridingModule(new AbstractModule() { // plotting modal share over iterations
 			@Override

@@ -152,7 +152,7 @@ public class TestWarmEmissionAnalysisModule {
 	public void testWarmEmissionAnalysisParameter(){
 		setUp();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		ecg.setUsingVehicleIdAsVehicleDescription(true);
+		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 
 		WarmEmissionAnalysisModuleParameter weamp = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, null, ecg);
 		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
@@ -753,7 +753,7 @@ public class TestWarmEmissionAnalysisModule {
 		double rescaleF = 1.0003;
 
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		ecg.setUsingVehicleIdAsVehicleDescription(true);
+		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 
 		WarmEmissionAnalysisModuleParameter weamParameter = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, ecg);
 		WarmEmissionAnalysisModule weam = new WarmEmissionAnalysisModule(weamParameter , emissionEventManager, rescaleF);
@@ -791,7 +791,7 @@ public class TestWarmEmissionAnalysisModule {
 
         EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
         EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		ecg.setUsingVehicleIdAsVehicleDescription(true);
+		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 
 		WarmEmissionAnalysisModuleParameter warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, ecg);
 		weam = new WarmEmissionAnalysisModule(warmEmissionParameterObject, emissionEventManager, null);

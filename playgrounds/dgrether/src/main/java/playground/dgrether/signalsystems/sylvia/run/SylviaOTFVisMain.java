@@ -25,6 +25,7 @@ import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.mobsim.SignalEngine;
+import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -32,10 +33,9 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.Lanes;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+
 import playground.dgrether.signalsystems.DgSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.model.DgSylviaSignalModelFactory;
@@ -71,8 +71,7 @@ public class SylviaOTFVisMain {
 		EventsManager events = EventsUtils.createEventsManager();
 //		scenario.getConfig().otfVis().setAgentSize(40.0f);
 
-		DgSensorManager sensorManager = new DgSensorManager(scenario.getNetwork());
-		sensorManager.setLaneDefinitions((Lanes) scenario.getScenarioElement(Lanes.ELEMENT_NAME));
+		DgSensorManager sensorManager = new DgSensorManager(scenario);
 		events.addHandler(sensorManager);
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 

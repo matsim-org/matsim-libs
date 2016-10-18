@@ -116,7 +116,7 @@ public class ColdEmissionAnalysisModule {
 			double parkingDuration,
 			int distance_km) {
 
-		if(this.ecg.isUsingVehicleIdAsVehicleDescription() ) {
+		if(this.ecg.isUsingVehicleTypeIdAsVehicleDescription() ) {
 			if(vehicle.getType().getDescription()==null) {
 				vehicle.getType().setDescription(EmissionDescriptionMarker.BEGIN_EMISSIONS
 						+vehicle.getType().getId().toString()+EmissionDescriptionMarker.END_EMISSIONS);

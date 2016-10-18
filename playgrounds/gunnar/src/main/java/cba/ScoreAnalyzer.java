@@ -76,7 +76,7 @@ public class ScoreAnalyzer {
 		final ScoreAnalyzer analyzer = new ScoreAnalyzer(Main.expectationFilePrefix, 
 				Main.experienceFilePrefix);
 
-		System.out.println(analyzer.comparisonAsString(2));
+		System.out.println(analyzer.comparisonAsString(10));
 	}
 	
 }

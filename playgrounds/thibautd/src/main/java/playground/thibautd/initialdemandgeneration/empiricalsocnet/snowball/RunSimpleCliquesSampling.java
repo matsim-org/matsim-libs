@@ -23,10 +23,14 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import playground.ivt.utils.MoreIOUtils;
+import playground.polettif.publicTransitMapping.workbench.Run;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesCsvWriter;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplerUtils;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplingConfigGroup;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.StopwatchCsvWriter;
+
+import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
 
 /**
  * @author thibautd
@@ -34,7 +38,7 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Sto
 public class RunSimpleCliquesSampling {
 	public static void main( String[] args ) {
 		final SnowballSamplingConfigGroup configGroup = new SnowballSamplingConfigGroup();
-		final Config config = ConfigUtils.loadConfig( args[ 0 ] , configGroup );
+		final Config config = ConfigUtils.loadConfig( args[ 0 ] , configGroup , new SocialNetworkSamplingConfigGroup() );
 
 		MoreIOUtils.initOut( config.controler().getOutputDirectory() , config );
 
@@ -50,6 +54,9 @@ public class RunSimpleCliquesSampling {
 							new SimpleSnowballModule( config ) );
 
 			new SocialNetworkWriter( socialNetwork ).write( config.controler().getOutputDirectory() + "/output_socialNetwork.xml.gz" );
+		}
+		catch ( RuntimeException e ) {
+			throw e;
 		}
 		catch ( Exception e ) {
 			throw new RuntimeException( e );

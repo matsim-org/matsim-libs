@@ -43,18 +43,26 @@ import org.matsim.core.controler.MatsimServices;
 public class CreateEmissionConfig {
 
 		private static final String inputPath = "./test/input/org/matsim/contrib/emissions/";
-		private static final String networkFile = inputPath + "sample_network.xml";
-		private static final String plansFile = inputPath + "sample_population.xml";
+		private static final String networkFile = //inputPath + 
+				"sample_network.xml";
+		private static final String plansFile = //inputPath + 
+				"sample_population.xml";
+		private static final String emissionVehicleFile = //inputPath + 
+				"sample_emissionVehicles.xml";
 		
-		private static final String roadTypeMappingFile = inputPath + "sample_roadTypeMapping.txt";
-		private static final String emissionVehicleFile = inputPath + "sample_emissionVehicles.xml";
+		private static final String roadTypeMappingFile = //inputPath +
+				"sample_roadTypeMapping.txt";
 		
-		private static final String averageFleetWarmEmissionFactorsFile = inputPath + "sample_EFA_HOT_vehcat_2005average.txt";
-		private static final String averageFleetColdEmissionFactorsFile = inputPath + "sample_EFA_ColdStart_vehcat_2005average.txt";
+		private static final String averageFleetWarmEmissionFactorsFile = //inputPath +
+				"sample_EFA_HOT_vehcat_2005average.txt";
+		private static final String averageFleetColdEmissionFactorsFile = //inputPath +
+				"sample_EFA_ColdStart_vehcat_2005average.txt";
 		
 		private static final boolean isUsingDetailedEmissionCalculation = true;
-		private static final String detailedWarmEmissionFactorsFile = inputPath + "sample_EFA_HOT_SubSegm_2005detailed.txt";
-		private static final String detailedColdEmissionFactorsFile = inputPath + "sample_EFA_ColdStart_SubSegm_2005detailed.txt";
+		private static final String detailedWarmEmissionFactorsFile = //inputPath +
+				"sample_EFA_HOT_SubSegm_2005detailed.txt";
+		private static final String detailedColdEmissionFactorsFile = //inputPath +
+			 	"sample_EFA_ColdStart_SubSegm_2005detailed.txt";
 		
 		private static final String outputPath = "./test/output/";
 		private static final String configFilePath = inputPath + "config.xml";
@@ -102,17 +110,15 @@ public class CreateEmissionConfig {
 	        EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
 	        controler.getConfig().addModule(ecg);
 	        ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
-
-			// emission vehicles should be set in the default vehicle container
-			config.vehicles().setVehiclesFile(emissionVehicleFile);
-	        
+	        // emission vehicles are now set in the default vehicle container
+	        config.vehicles().setVehiclesFile(emissionVehicleFile);
+	        ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 	        ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 	        ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
-	        
 	        ecg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
 	        ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
 	        ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
-			
+	        
 	   // write config     
 	        ConfigWriter cw = new ConfigWriter(config);
 			cw.write(configFilePath);

@@ -53,6 +53,7 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 	abstract void setNearestLink(Link link);
 
 	abstract void createFastChargingQueue(int maxQueueLength);
+	boolean isFastChargingQueueAccessible();
 	
 	abstract void handleBeginChargeEvent(ChargingPlug plug,VehicleAgent agent);
 	abstract void handleBeginChargingSession(ChargingPlug plug,VehicleAgent agent);
@@ -68,5 +69,6 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 	abstract void registerVehicleDeparture(VehicleAgent agent);
 
 	abstract int getNumAvailablePlugsOfType(ChargingPlugType plugType);
+
 
 }
