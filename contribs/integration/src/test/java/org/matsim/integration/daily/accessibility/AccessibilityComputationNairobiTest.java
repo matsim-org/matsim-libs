@@ -80,8 +80,8 @@ public class AccessibilityComputationNairobiTest {
 		// Parameters
 		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		final Envelope envelope = new Envelope(240000, 280000, 9844000, 9874000);
-		String name = "ke_nairobi_" + cellSize.toString().split("\\.")[0];
-		name = name + "_airport_min";
+		final String runId = "ke_nairobi_" + cellSize.toString().split("\\.")[0];
+		final boolean push2Geoserver = false;
 		
 		// QGis parameters
 		boolean createQGisOutput = true;
@@ -143,7 +143,7 @@ public class AccessibilityComputationNairobiTest {
 
 		// Controller
 		final Controler controler = new Controler(scenario);
-		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, name, envelope, cellSize));
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, runId, envelope, cellSize, push2Geoserver));
 		controler.run();
 
 		// QGis

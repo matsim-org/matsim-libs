@@ -73,8 +73,9 @@ public class AccessibilityComputationKiberaTest {
 		// Parameters
 		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		final Envelope envelope = new Envelope(251000, 9853000, 256000, 9857000);
-		final String runName = "ke_kibera_drinkingwater_" + cellSize.toString().split("\\.")[0];
-		
+		final String runId = "ke_kibera_" + cellSize.toString().split("\\.")[0];
+		final boolean push2Geoserver = false;
+
 		// QGis parameters
 		boolean createQGisOutput = true;
 		final boolean includeDensityLayer = false;
@@ -137,7 +138,7 @@ public class AccessibilityComputationKiberaTest {
 
 		// Controller
 		final Controler controler = new Controler(scenario);
-		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, runName, analysisEnvelope, cellSize));
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, runId, analysisEnvelope, cellSize, push2Geoserver));
 		controler.run();
 		
 		// QGis

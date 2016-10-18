@@ -57,7 +57,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class AccessibilityComputationNMBTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationNMBTest.class ) ;
 
-	private static final Double cellSize = 20000.;
+	private static final Double cellSize = 1000.;
 //	private static final double timeOfDay = 8.*60*60;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
@@ -80,7 +80,8 @@ public class AccessibilityComputationNMBTest {
 		// Parameters
 		final String crs = TransformationFactory.WGS84_SA_Albers;
 		final Envelope envelope = new Envelope(115000,161000,-3718000,-3679000);
-		final String name = "za_nmb_" + cellSize.toString().split("\\.")[0];
+		final String runId = "za_nmb_2016-10-18_" + cellSize.toString().split("\\.")[0];
+		final boolean push2Geoserver = false;
 		
 		// QGis parameters
 		boolean createQGisOutput = true;
@@ -88,7 +89,7 @@ public class AccessibilityComputationNMBTest {
 		final Double lowerBound = -3.5; // (upperBound - lowerBound) is ideally easily divisible by 7
 		final Double upperBound = 3.5;
 		final Integer range = 9; // in the current implementation, this must always be 9
-		final int symbolSize = 20010;
+		final int symbolSize = 1000;
 		final int populationThreshold = (int) (120 / (1000/cellSize * 1000/cellSize));
 		
 		// Config and scenario
@@ -103,9 +104,9 @@ public class AccessibilityComputationNMBTest {
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, false);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, false);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 		
 		// Some (otherwise irrelevant) settings to make the vsp check happy
 		config.timeAllocationMutator().setMutationRange(7200.);
@@ -141,6 +142,7 @@ public class AccessibilityComputationNMBTest {
 		final List<String> activityTypes = new ArrayList<>();
 		activityTypes.add("education");
 		activityTypes.add("shopping");
+		activityTypes.add("leisure");
 		
 		// Collect homes
 		String activityFacilityType = "home";
@@ -148,7 +150,7 @@ public class AccessibilityComputationNMBTest {
 		
 		// Controller
 		final Controler controler = new Controler(scenario);
-		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, name, networkEnvelope, cellSize));
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, runId, networkEnvelope, cellSize, push2Geoserver));
 		controler.addOverridingModule(new MatrixBasedPtModule());
 		controler.run();
 		

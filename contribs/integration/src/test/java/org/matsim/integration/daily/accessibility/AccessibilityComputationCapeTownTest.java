@@ -79,8 +79,9 @@ public class AccessibilityComputationCapeTownTest {
 		
 		// Parameters
 		final String crs = TransformationFactory.WGS84_SA_Albers;
-		final String name = "za_capetown_" + cellSize.toString().split("\\.")[0];
-		
+		final String runId = "za_capetown_" + cellSize.toString().split("\\.")[0];
+		final boolean push2Geoserver = false;
+
 		// QGis parameters
 		boolean createQGisOutput = false;
 		final boolean includeDensityLayer = true;
@@ -153,7 +154,7 @@ public class AccessibilityComputationCapeTownTest {
 
 		// Controller
 		final Controler controler = new Controler(scenario);
-		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, name, networkEnvelope, cellSize));
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, runId, networkEnvelope, cellSize, push2Geoserver));
 		controler.run();
 		
 		// QGis
