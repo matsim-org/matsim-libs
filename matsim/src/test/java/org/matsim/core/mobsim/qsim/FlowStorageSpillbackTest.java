@@ -60,6 +60,7 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -211,9 +212,7 @@ public class FlowStorageSpillbackTest {
 
 		// leg: 1,2,3: testAgent4
 		Leg leg_1_3_testAgent4 = popFactory.createLeg("car");
-		NetworkRoute route3_testAgent4 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
-		route3_testAgent4.setLinkIds(linkId1, linkIds3, linkId3);
-		leg_1_3_testAgent4.setRoute(route3_testAgent4);
+		PopulationUtils.copyFromTo(leg_1_3_testAgent3, leg_1_3_testAgent4);
 		
 		// ################################################################
 		// first agent activating the flow capacity on link3 (3 --> 4)

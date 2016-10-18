@@ -57,6 +57,7 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
@@ -699,7 +700,11 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		Activity homeActLink1_2 = popFactory.createActivityFromLinkId("home", linkId1);
 		homeActLink1_2.setEndTime(101);
 		plan2.addActivity(homeActLink1_2);
-		plan2.addLeg(copyOf(leg_1_5,popFactory));
+		{
+			Leg leg = popFactory.createLeg(leg_1_5.getMode());
+			PopulationUtils.copyFromTo(leg_1_5, leg);
+			plan2.addLeg(leg);
+		}
 		plan2.addActivity(workActLink5);
 		person2.addPlan(plan2);
 		population.addPerson(person2);			
@@ -711,7 +716,11 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		Activity homeActLink1_3 = popFactory.createActivityFromLinkId("home", linkId1);
 		homeActLink1_3.setEndTime(102);
 		plan3.addActivity(homeActLink1_3);
-		plan3.addLeg(copyOf(leg_1_5,popFactory));
+		{
+			Leg leg = popFactory.createLeg(leg_1_5.getMode());
+			PopulationUtils.copyFromTo(leg_1_5, leg);
+			plan3.addLeg(leg);
+		}
 		plan3.addActivity(workActLink5);
 		person3.addPlan(plan3);
 		population.addPerson(person3);
@@ -751,7 +760,11 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		Activity homeActLink1_2 = popFactory.createActivityFromLinkId("home", linkId1);
 		homeActLink1_2.setEndTime(101);
 		plan2.addActivity(homeActLink1_2);
-		plan2.addLeg(copyOf(leg_1_5,popFactory));
+		{
+			Leg leg = popFactory.createLeg(leg_1_5.getMode());
+			PopulationUtils.copyFromTo(leg_1_5, leg);
+			plan2.addLeg(leg);
+		}
 		plan2.addActivity(workActLink5);
 		person2.addPlan(plan2);
 		population.addPerson(person2);
@@ -800,7 +813,11 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		Activity homeActLink1_1 = popFactory.createActivityFromLinkId("home", linkId1);
 		homeActLink1_1.setEndTime(100);
 		plan1.addActivity(homeActLink1_1);
-		plan1.addLeg(copyOf(leg_1_5,popFactory));
+		{
+			Leg leg = popFactory.createLeg(leg_1_5.getMode());
+			PopulationUtils.copyFromTo(leg_1_5, leg);
+			plan1.addLeg(leg);
+		}
 		plan1.addActivity(workActLink5);
 		person1.addPlan(plan1);
 		population.addPerson(person1);
@@ -810,7 +827,11 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		Activity homeActLink1_2 = popFactory.createActivityFromLinkId("home", linkId1);
 		homeActLink1_2.setEndTime(101);
 		plan2.addActivity(homeActLink1_2);
-		plan2.addLeg(copyOf(leg_1_5,popFactory));
+		{
+			Leg leg = popFactory.createLeg(leg_1_5.getMode());
+			PopulationUtils.copyFromTo(leg_1_5, leg);
+			plan2.addLeg(leg);
+		}
 		plan2.addActivity(workActLink5);
 		person2.addPlan(plan2);
 		population.addPerson(person2);
@@ -863,13 +884,21 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		plan1.addActivity(workActLink5);
 		person1.addPlan(plan1);
 		population.addPerson(person1);
-		
+		{
+			Leg leg = popFactory.createLeg(leg_1_5.getMode());
+			PopulationUtils.copyFromTo(leg_1_5, leg);
+			plan1.addLeg(leg);
+		}
 		Person person2 = popFactory.createPerson(testAgent2);
 		Plan plan2 = popFactory.createPlan();
 		Activity homeActLink1_2 = popFactory.createActivityFromLinkId("home", linkId1);
 		homeActLink1_2.setEndTime(106);
 		plan2.addActivity(homeActLink1_2);
-		plan2.addLeg(copyOf(leg_1_5,popFactory));
+		{
+			Leg leg = popFactory.createLeg(leg_1_5.getMode());
+			PopulationUtils.copyFromTo(leg_1_5, leg);
+			plan2.addLeg(leg);
+		}
 		plan2.addActivity(workActLink5);
 		person2.addPlan(plan2);
 		population.addPerson(person2);
@@ -892,17 +921,6 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		plan3.addActivity(workActLink5);
 		person3.addPlan(plan3);
 		population.addPerson(person3);
-	}
-
-	private Leg copyOf(final Leg leg, final PopulationFactory popFactory) {
-		// leg should be different for every person. amit Oct 2016
-		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
-		Leg newLeg = popFactory.createLeg(leg.getMode());
-		NetworkRoute route = (NetworkRoute) leg.getRoute();
-		NetworkRoute newRoute = (NetworkRoute) routeFactory.createRoute(route.getStartLinkId(),route.getEndLinkId());
-		newRoute.setLinkIds(route.getStartLinkId(), route.getLinkIds(), route.getEndLinkId());
-		newLeg.setRoute(newRoute);
-		return newLeg;
 	}
 
 	private Scenario loadScenario1() {
