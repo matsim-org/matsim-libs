@@ -813,11 +813,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		Activity homeActLink1_1 = popFactory.createActivityFromLinkId("home", linkId1);
 		homeActLink1_1.setEndTime(100);
 		plan1.addActivity(homeActLink1_1);
-		{
-			Leg leg = popFactory.createLeg(leg_1_5.getMode());
-			PopulationUtils.copyFromTo(leg_1_5, leg);
-			plan1.addLeg(leg);
-		}
+		plan1.addLeg(leg_1_5);
 		plan1.addActivity(workActLink5);
 		person1.addPlan(plan1);
 		population.addPerson(person1);
@@ -884,11 +880,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		plan1.addActivity(workActLink5);
 		person1.addPlan(plan1);
 		population.addPerson(person1);
-		{
-			Leg leg = popFactory.createLeg(leg_1_5.getMode());
-			PopulationUtils.copyFromTo(leg_1_5, leg);
-			plan1.addLeg(leg);
-		}
+
 		Person person2 = popFactory.createPerson(testAgent2);
 		Plan plan2 = popFactory.createPlan();
 		Activity homeActLink1_2 = popFactory.createActivityFromLinkId("home", linkId1);

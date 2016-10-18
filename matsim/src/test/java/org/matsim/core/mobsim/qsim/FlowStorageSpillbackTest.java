@@ -203,16 +203,16 @@ public class FlowStorageSpillbackTest {
 
 		// leg for every agent should be different object. amit Oct, 2016
 		// leg: 1,2,3: testAgent3
-		Leg leg_1_3_testAgent3 = popFactory.createLeg("car");
+		Leg leg_1_3 = popFactory.createLeg("car");
 		List<Id<Link>> linkIds3 = new ArrayList<Id<Link>>();
 		linkIds3.add(linkId2);
-		NetworkRoute route3_testAgent3 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
-		route3_testAgent3.setLinkIds(linkId1, linkIds3, linkId3);
-		leg_1_3_testAgent3.setRoute(route3_testAgent3);
+		NetworkRoute route3 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
+		route3.setLinkIds(linkId1, linkIds3, linkId3);
+		leg_1_3.setRoute(route3);
 
 		// leg: 1,2,3: testAgent4
 		Leg leg_1_3_testAgent4 = popFactory.createLeg("car");
-		PopulationUtils.copyFromTo(leg_1_3_testAgent3, leg_1_3_testAgent4);
+		PopulationUtils.copyFromTo(leg_1_3, leg_1_3_testAgent4);
 		
 		// ################################################################
 		// first agent activating the flow capacity on link3 (3 --> 4)
@@ -246,7 +246,7 @@ public class FlowStorageSpillbackTest {
 //		act3.setEndTime(104);
 		act3.setEndTime(99);
 		plan3.addActivity(act3);
-		plan3.addLeg(leg_1_3_testAgent3);
+		plan3.addLeg(leg_1_3);
 		plan3.addActivity(lastActLink3);
 		person3.addPlan(plan3);
 		population.addPerson(person3);
