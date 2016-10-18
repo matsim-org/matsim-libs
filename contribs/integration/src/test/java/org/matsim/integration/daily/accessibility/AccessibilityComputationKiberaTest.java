@@ -73,7 +73,7 @@ public class AccessibilityComputationKiberaTest {
 		// Parameters
 		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		final Envelope envelope = new Envelope(251000, 9853000, 256000, 9857000);
-		final String runName = "ke_kibera_" + cellSize.toString().split("\\.")[0];
+		final String runName = "ke_kibera_drinkingwater_" + cellSize.toString().split("\\.")[0];
 		
 		// QGis parameters
 		boolean createQGisOutput = true;
@@ -81,7 +81,7 @@ public class AccessibilityComputationKiberaTest {
 		final Double lowerBound = 0.; // (upperBound - lowerBound) is ideally easily divisible by 7
 		final Double upperBound = 3.5;
 		final Integer range = 9; // in the current implementation, this need always be 9
-		final int symbolSize = 110;
+		final int symbolSize = 10;
 		final int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 		
 		// Config and scenario
@@ -147,9 +147,11 @@ public class AccessibilityComputationKiberaTest {
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
-							lowerBound, upperBound, range, symbolSize, populationThreshold);
-					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					if (acg.getIsComputingMode().contains(mode)) {
+						VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
+								lowerBound, upperBound, range, symbolSize, populationThreshold);
+						VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					}
 				}
 			}  
 		}

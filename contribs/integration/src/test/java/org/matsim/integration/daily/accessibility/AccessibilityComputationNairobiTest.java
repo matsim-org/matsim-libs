@@ -153,9 +153,11 @@ public class AccessibilityComputationNairobiTest {
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
-							lowerBound, upperBound, range, symbolSize, populationThreshold);
-					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					if (acg.getIsComputingMode().contains(mode)) {
+						VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
+								lowerBound, upperBound, range, symbolSize, populationThreshold);
+						VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					}
 				}
 			}  
 		}
