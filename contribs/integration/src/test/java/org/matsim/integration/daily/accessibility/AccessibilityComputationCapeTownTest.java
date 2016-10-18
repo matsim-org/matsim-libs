@@ -99,10 +99,12 @@ public class AccessibilityComputationCapeTownTest {
 		config.controler().setLastIteration(0);
 		
 		// Choose modes for accessibility computation
-		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
-			accessibilityConfigGroup.setComputingAccessibilityForMode(mode, true);
-		}
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
 		
 		// Some (otherwise irrelevant) settings to make the vsp check happy
 		config.timeAllocationMutator().setMutationRange(7200.);

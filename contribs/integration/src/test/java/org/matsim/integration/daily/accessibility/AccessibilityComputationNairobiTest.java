@@ -102,9 +102,9 @@ public class AccessibilityComputationNairobiTest {
 		config.planCalcScore().setBrainExpBeta(200); // Set to high value to base computation on time to nearest facility only
 		
 		// Choose modes for accessibility computation
-		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.abort);
 
