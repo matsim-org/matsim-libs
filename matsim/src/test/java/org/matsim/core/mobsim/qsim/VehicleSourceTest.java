@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit;
+package org.matsim.core.mobsim.qsim;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -80,13 +80,14 @@ public class VehicleSourceTest {
 
 	@Parameters(name = "{index}: vehicleSource == {0}; isUsingPersonIdForMissionVehicleId == {1}")
 	public static Collection<Object[]> parameterObjects () {
-		Object [][] vehicleSources = new Object [][] 
-		{ //AA_TODO : fix false cases
-			{ VehiclesSource.fromVehiclesData, true },
-//			{ VehiclesSource.fromVehiclesData, false },
-			{ VehiclesSource.modeVehicleTypesFromVehiclesData, true },
-//			{ VehiclesSource.modeVehicleTypesFromVehiclesData, false }
-		};
+		int nrow = VehiclesSource.values().length;
+		Object [][] vehicleSources = new Object [nrow][2];
+		int index = 0;
+		for (VehiclesSource vs : VehiclesSource.values()) {
+			vehicleSources[index] = new Object [] {vs, true};
+//			vehicleSources[index] = new Object [] {vs, false}; // TODO : fix false cases
+			index++;
+		}
 		return Arrays.asList(vehicleSources);
 	}
 
@@ -138,8 +139,9 @@ public class VehicleSourceTest {
 		final Controler cont = new Controler(scenario);
 		cont.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes = new HashMap<>();
-		PersonLinkTravelTimeEventHandler handler = new PersonLinkTravelTimeEventHandler(personLinkTravelTimes);
+		Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes = new HashMap<>();
+		final VehicleLinkTravelTimeEventHandler handler = new VehicleLinkTravelTimeEventHandler(vehicleLinkTravelTimes);
+
 		cont.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -148,13 +150,37 @@ public class VehicleSourceTest {
 		});
 		cont.run();
 
-		Map<Id<Link>, Double> travelTime1 = personLinkTravelTimes.get(Id.create("0", Person.class));
-		Map<Id<Link>, Double> travelTime2 = personLinkTravelTimes.get(Id.create("1", Person.class));
+		Map<Id<Link>, Double> travelTime1= null ;
+		switch( this.vehicleSource ) {
+		case defaultVehicle:
+		case fromVehiclesData:
+			travelTime1 = vehicleLinkTravelTimes.get(Id.create("0", Vehicle.class));
+			break;
+		case modeVehicleTypesFromVehiclesData:
+			travelTime1 = vehicleLinkTravelTimes.get(Id.create("0_bike", Vehicle.class));
+			break;
+		default:
+			throw new RuntimeException("not implemented yet.");
+		}
+		
+		Map<Id<Link>, Double> travelTime2 = vehicleLinkTravelTimes.get(Id.create("1", Vehicle.class));
 
 		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue(); 
 		int carTravelTime = travelTime2.get(Id.create("2", Link.class)).intValue();
 
-		Assert.assertEquals("Passing is not executed.", 150, bikeTravelTime - carTravelTime, MatsimTestUtils.EPSILON);
+		switch (this.vehicleSource) {
+			case defaultVehicle: // both bike and car are default vehicles (i.e. identical)
+				Assert.assertEquals("Both car, bike are default vehicles (i.e. identical), thus should have same travel time.",
+						0, bikeTravelTime - carTravelTime, MatsimTestUtils.EPSILON);
+				break;
+			case modeVehicleTypesFromVehiclesData:
+			case fromVehiclesData:
+				Assert.assertEquals("Passing is not executed.", 150, bikeTravelTime - carTravelTime, MatsimTestUtils.EPSILON);
+				break;
+			default:
+				throw new RuntimeException("not implemented yet.");
+		}
+
 	}
 
 	private void createNetwork(){
@@ -222,27 +248,27 @@ public class VehicleSourceTest {
 		}
 	}
 
-	private static class PersonLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
+	private static class VehicleLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
-		private final Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes;
+		private final Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleTravelTimes;
 
-		public PersonLinkTravelTimeEventHandler(Map<Id<Person>, Map<Id<Link>, Double>> agentTravelTimes) {
-			this.personLinkTravelTimes = agentTravelTimes;
+		public VehicleLinkTravelTimeEventHandler(Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes) {
+			this.vehicleTravelTimes = agentTravelTimes;
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(Id.createPersonId(event.getVehicleId()));
+			Map<Id<Link>, Double> travelTimes = this.vehicleTravelTimes.get(event.getVehicleId());
 			if (travelTimes == null) {
 				travelTimes = new HashMap<>();
-				this.personLinkTravelTimes.put(Id.createPersonId(event.getVehicleId()), travelTimes);
+				this.vehicleTravelTimes.put(event.getVehicleId(), travelTimes);
 			}
 			travelTimes.put(event.getLinkId(), Double.valueOf(event.getTime()));
 		}
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(Id.createPersonId(event.getVehicleId()));
+			Map<Id<Link>, Double> travelTimes = this.vehicleTravelTimes.get( event.getVehicleId() );
 			if (travelTimes != null) {
 				Double d = travelTimes.get(event.getLinkId());
 				if (d != null) {
@@ -254,7 +280,7 @@ public class VehicleSourceTest {
 
 		@Override
 		public void reset(int iteration) {
-			personLinkTravelTimes.clear();
+			vehicleTravelTimes.clear();
 		}
 	}
 }

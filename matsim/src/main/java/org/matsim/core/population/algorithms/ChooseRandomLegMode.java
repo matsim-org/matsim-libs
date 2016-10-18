@@ -27,8 +27,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * Changes the transportation mode of all legs in a plan to a randomly chosen
@@ -102,7 +104,12 @@ public class ChooseRandomLegMode implements PlanAlgorithm {
 	private void changeLegModeTo(final List<PlanElement> tour, final String newMode) {
 		for (PlanElement pe : tour) {
 			if (pe instanceof Leg) {
-				((Leg) pe).setMode(newMode);
+				Leg leg = ((Leg) pe);
+				leg.setMode(newMode);
+				Route route = leg.getRoute();
+				if(route!=null && route instanceof NetworkRoute) {
+					((NetworkRoute) route).setVehicleId(null);
+				}
 			}
 		}
 	}
