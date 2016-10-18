@@ -1,6 +1,6 @@
 /**
  * This package contains code related to accessibility computations for the MAXess project.
- * <br/>
+ * <br>
  * It contains code for two purposes:
  * <ul>
  *		<li>Convert travel diary data (in the form of MATSim plans) to a dataset for estimating choice models externally

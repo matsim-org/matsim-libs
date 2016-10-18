@@ -31,7 +31,7 @@ import org.matsim.facilities.Facility;
  * Defines classes responsible for routing for a given
  * (main)-mode.
  * It does not modify the plan.  
- * <p/>
+ * <p></p>
  * See {@link tutorial.programming.example12PluggableTripRouter.RunPluggableTripRouterExample} for an example how to use this interface.
  * 
  * @author thibautd

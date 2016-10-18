@@ -17,23 +17,23 @@ buttons in javadoc.) </p>
 
 <h1>Behavioral modules</h1>
 
-<h3>Alternative innovative modules<h3>
+<h2>Alternative innovative modules</h2>
 
-<h3>Alternative scoring functions<h3>
+<h2>Alternative scoring functions</h2>
 
-<h1>Alternative mobsims</h1>
+<h2>Alternative mobsims</h2>
 
-<h1>Events</h1>
+<h2>Events</h2>
 
 <p> Listen to events: {@link tutorial.programming.example06EventsHandling} </p>
 
-<h1>Controler listeners</h1>
+<h2>Controler listeners</h2>
 
 <p> Insert additional code into control flow: {@link tutorial.programming.example07ControlerListener} </p>
 
-<h1>User defined attributes</h1>
+<h2>User defined attributes</h2>
 
-<h1>Convert to other tools</h1>
+<h2>Convert to other tools</h2>
 
 <p> Convert network to shp file: {@link tutorial.programming.createNetworkSHP} </p>
 

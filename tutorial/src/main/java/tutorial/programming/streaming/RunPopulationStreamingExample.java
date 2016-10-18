@@ -32,7 +32,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * Example for how to use the revised streaming API.  Streaming is no longer in the Population (as it was before), but in a special reader.
- * <p/>
+ * <p></p>
  * The class below was not tested; writing a regression test around it (and making in work if necessary) would be highly welcome.
  * 
  * @author nagel

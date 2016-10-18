@@ -56,7 +56,7 @@ public class CRCChecksum {
 	 * Calculates the checksum of the content of the given file. If the filename ends in ".gz",
 	 * the file is assumed to be gzipped and the checksum over the <em>uncompressed</em> content 
 	 * will be calculated. If a file is not found at its expected place, it is searched via the class loader.
-	 * <p/>
+	 * <p></p>
 	 * Comments:<ul>
 	 * <li> Some version of this method, possibly the variant with the class loader, does some caching: If I replace
 	 * the original file in a test case, I need to restart eclipse before it works correctly.  ???  kai, feb'14

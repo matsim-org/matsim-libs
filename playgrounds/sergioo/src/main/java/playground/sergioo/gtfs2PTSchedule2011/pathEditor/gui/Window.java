@@ -64,10 +64,10 @@ public class Window extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	//Enumerations
 	public enum Option {
-		SELECT_LINK("<html>L<br/>I<br/>N<br/>K</html>"),
-		SELECT_STOP("<html>S<br/>T<br/>O<br/>P</html>"),
-		SELECT_NODE("<html>N<br/>O<br/>D<br/>E</html>"),
-		ZOOM("<html>Z<br/>O<br/>O<br/>M</html>");
+		SELECT_LINK("<html>L<br>I<br>N<br>K</html>"),
+		SELECT_STOP("<html>S<br>T<br>O<br>P</html>"),
+		SELECT_NODE("<html>N<br>O<br>D<br>E</html>"),
+		ZOOM("<html>Z<br>O<br>O<br>M</html>");
 		public String caption;
 		private Option(String caption) {
 			this.caption = caption;

@@ -65,7 +65,7 @@ public class FreeFloatingParkingPersonDriverAgentImplNew implements MobsimDriver
 	 * <li> define more meaningful local variables.  This can be done by "extract local variable" re-factorings in eclipse.
 	 * <li> consider using the {@link EditRoutes} infrastructure.  It does similar splicing.
 	 * </ul> kai, feb'16
-	 * <p/>
+	 * <p></p>
 	 * 2016-02-18 After trying around with this, coming up with the following intuitions:<ul>
 	 * <li> Code can be made easier to read, see {@link #insertFreeFloatingTripWhenEndingActivity()}.  The main device is to
 	 * replace repeated chained variable lookups by local variables.  This can be done automatically: re-factor --> "extract local variable".

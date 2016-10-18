@@ -54,7 +54,7 @@ import java.io.File;
  *  </ol>
  *  For both these subpopulations the indicated strategy will be chosen 20% of
  *  the time while the balance will use the <em>ChangeExpBeta</em> strategy.
- *  <p/>
+ *  <p></p>
  *  The results are best visualised using senozon's Via, and colouring the two
  *  subpopulations differently. To do that you will need two lists, each 
  *  containing the {@link Id}s of all the agents in that specific subpopulation.

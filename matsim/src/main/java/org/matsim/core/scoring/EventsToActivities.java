@@ -45,7 +45,7 @@ import javax.inject.Inject;
  * Converts a stream of Events into a stream of Activities. Passes Activities to a single ActivityHandler which must be registered with this class.
  * Mainly intended for scoring, but can be used for any kind of Activity related statistics. Essentially, it allows you to read
  * Activities from the simulation like you would read Activities from Plans, except that the Plan does not even need to exist.
- * <p/>
+ * <p></p>
  * Note that the instances of Activity passed to the LegHandler will never be identical to those in the Scenario! Even
  * in a "no-op" simulation which only reproduces the Plan, new instances will be created. So if you attach your own data
  * to the Activities in the Scenario, that's your own lookout.

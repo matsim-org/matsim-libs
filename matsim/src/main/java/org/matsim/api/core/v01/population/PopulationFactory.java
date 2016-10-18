@@ -39,7 +39,7 @@ public interface PopulationFactory extends MatsimFactory {
 	 * @param actType - the type of the activity, which needs to correspond to some string in the config file
 	 * @param coord - the coordinates of the activity
 	 * @return the activity
-	 * <p/>
+	 * <p></p>
 	 * It might in fact make sense to add a creational method that takes coord <i>and</i> link id.  kai, aug'10
 	 */
 	Activity createActivityFromCoord(String actType, Coord coord);

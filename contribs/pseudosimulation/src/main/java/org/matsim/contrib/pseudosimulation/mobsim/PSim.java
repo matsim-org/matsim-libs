@@ -56,15 +56,15 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author illenberger
- *         <p/>
+ *         <p></p>
  *         Original car mode code and multi-threading by Johannes Illenberger
  *         for his social network research.
  * @author fouriep
- *         <p/>
+ *         <p></p>
  *         Extended to produce link events, making it compatible with road
  *         pricing.
  * @author fouriep, sergioo
- *         <p/>
+ *         <p></p>
  *         Extended for transit simulation.
  */
 public class PSim implements Mobsim {

@@ -37,13 +37,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * This is is an example, taken from Thibaut, of how to set an additional route factory before the controler has started.
- * <p/>
+ * <p></p>
  * This will generate the route, with start and end link id.  It will also set distance and travel time if they
  * are in the file.  This is sufficient information for teleportation.  Additional information needs to come from elsewhere, 
  * or the corresponding {@link MatsimReader} needs to be modified.
- * <p/>
+ * <p></p>
  * Note, however, that for pure teleportation it is not necessary to set the route factory since the default {@link RouteFactories} 
- * will already generate an instance of {@link GenericRoute} when a mode is not registered. 
+ * will already generate an instance of {@link org.matsim.core.population.routes.GenericRouteImpl} when a mode is not registered.
  * 
  * @author nagel
  * @author thibautd

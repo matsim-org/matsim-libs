@@ -27,7 +27,7 @@ import java.util.Map;
 
 /**
  * Example to show how the standard queue can be replaced by something else.  Search for PassingVehicleQ in the code below.
- * <p/>
+ * <p></p>
  * I have a version of this that was running about a year ago in my playground.  This "tutorial" version has never been tested (but please
  * feel free to test, report back, and fix).
  * 

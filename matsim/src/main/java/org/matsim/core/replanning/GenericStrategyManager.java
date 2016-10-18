@@ -320,7 +320,7 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 	 * Sets a plan selector to be used for choosing plans for removal, if they
 	 * have more plans than the specified maximum. This defaults to
 	 * {@link WorstPlanForRemovalSelector}.
-	 * <p/>
+	 * <p></p>
 	 * Thoughts about using the logit-type selectors with negative logit model scale parameter:<ul>
 	 * <li> Look at one agent.
 	 * <li> Assume she has the choice between <i>n</i> different plans (although fewer of them are in the MATSim choice set).
@@ -337,7 +337,7 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 	 *
 	 * </ul>
 	 * The implication seems to be: divide the user-configured beta by two, use one half for choice and the other for plans removal.
-	 * <p/>
+	 * <p></p>
 	 * The path size version still needs to be tested (both for choice and for plans removal).
 	 *
 	 *

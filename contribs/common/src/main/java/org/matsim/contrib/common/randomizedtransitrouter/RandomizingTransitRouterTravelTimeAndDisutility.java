@@ -37,7 +37,7 @@ import java.util.Map;
 /**
  * When plugged into the transit router, will switch to a different, randomly generated combination of
  * marginal utilities every time it is called for a new agent.
- * <p/>
+ * <p></p>
  * Comments:<ul>
  * <li> In the literature, they seem to use log-normal distributions for the tastes.  (Makes sense
  * since it addresse the symmetry problem which I am addressing ad-hoc.) [M. K. Anderson, hEART'13]

@@ -262,7 +262,7 @@ public class Config implements MatsimExtensionPoint {
 	/**
 	 * Adds the specified module / config-group with the specified name to the
 	 * configuration.
-	 * <p/>
+	 * <p></p>
 	 * This is the typical way to "materialize" material that, so far, exists only as Map, into a specialized module.
 	 * @param specializedConfigModule
 	 *

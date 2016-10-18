@@ -29,7 +29,7 @@ import org.matsim.core.api.internal.MatsimPopulationObject;
  * A plan contains the intention of an agent.  In consequence, all information is <i>expected</i>.  For example,
  * travel times and travel distances in routes are expected.  Even something like mode could be expected, if the
  * plan is fed into a mobsim that is within-day replanning capable at the mode level.
- * <p/>
+ * <p></p>
  * The only thing which is not "expected" in the same sense is the score.
  *
  */

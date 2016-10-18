@@ -22,7 +22,7 @@ package org.matsim.core.api.internal;
 
 /**
  * marker interface.  Don't use.  kai, oct'09
- * <p/>
+ * <p></p>
  * This is Matsim"Some"Reader for those who do not obey the standard of {@link MatsimReader}.
  * 
  * @author nagel

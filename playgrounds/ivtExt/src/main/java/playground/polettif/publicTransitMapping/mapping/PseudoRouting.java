@@ -8,7 +8,7 @@ import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.*;
 /**
  * Generates and calculates the {@link PseudoTransitRoute} for each queued
  * {@link TransitLine} using a {@link PseudoGraph}. Stores the PseudoTransitRoutes
- * in a {@link PseudoSchedule}.<p/>
+ * in a {@link PseudoSchedule}.<p></p>
  *
  * If no path on the network can be found, an {@link ArtificialLink} between
  * {@link LinkCandidate}s can be added to a network.

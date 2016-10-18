@@ -327,7 +327,7 @@ public class NetworkUtils {
      * | . . ^ nearest left
      * |2 . 4| entry link
      * v .x. | (link.id=3)
-     * o--3->o<br/>
+     * o--3->o<br>
 	 * }
      * </pre>
      * <i>No right entry link exists but more than one nearest left entry link exist</i>

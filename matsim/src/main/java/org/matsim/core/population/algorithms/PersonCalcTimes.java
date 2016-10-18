@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.misc.Time;
 
 /**
- * Calculates all time informations in all plans of a person<br/>
+ * Calculates all time informations in all plans of a person<br>
  * The algorithm does the following steps:
  * <ul>
  * <li>set start-time of first act to 00:00</li>

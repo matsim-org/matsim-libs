@@ -78,7 +78,7 @@ public interface RoadPricingScheme {
 	 * is done by the classes which use this interface, depending on the value 
 	 * of getType().
 	 * 
-	 * <br/>
+	 * <br>
 	 * Design issues:<ul>
 	 * 		<li> I have decided to put the person into the method call rather 
 	 * 			 than the setPerson construction in TravelDisutility etc.
