@@ -268,7 +268,7 @@ public class PatnaBikeTrackConnectionControler {
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
 		config.vspExperimental().setWritingOutputEvents(true);
 
-		config.travelTimeCalculator().setFilterModes(true);
+		config.travelTimeCalculator().setSeparateModes(true);
 		config.travelTimeCalculator().setAnalyzedModes(String.join(",", PatnaUtils.ALL_MAIN_MODES));
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
