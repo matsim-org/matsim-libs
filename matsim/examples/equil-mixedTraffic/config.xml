@@ -95,7 +95,7 @@
 	
 	<module name="travelTimeCalculator" >
 		<param name="analyzedModes" value="car,bicycle" />
-		<param name="filterModes" value="false" />
+		<param name="separateModes" value="true" />
 	</module>		
 
 </config>
