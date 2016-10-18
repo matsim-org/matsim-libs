@@ -258,6 +258,7 @@ public class CemdapStopsParser {
 	
 	
 	// information from Subodh, Nov 2014
+	// see: shared-svn/projects/cemdapMatsimCadyts/cemdap_software/cemdap-11-2014/Activity_Mapping_Nov13.xlsx
 	// coding from UCSB can remain according to this information
 	private final String transformActType(int activityTypeNumber) {
 		switch (activityTypeNumber) {

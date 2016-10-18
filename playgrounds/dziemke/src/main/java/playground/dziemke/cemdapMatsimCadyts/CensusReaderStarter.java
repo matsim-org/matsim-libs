@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,63 +18,20 @@
  * *********************************************************************** */
 package playground.dziemke.cemdapMatsimCadyts;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author dziemke
  */
-public class CommuterRelation {
+public class CensusReaderStarter {
+	private static final Logger LOG = Logger.getLogger(CensusReaderStarter.class);
 
-	private int from;
-	private String fromName;
-	private int to;
-	private String toName;
-	private int trips;
+	public static void main(String[] args) {
+		String censusFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/zensus_2011/bevoelkerung/csv_Bevoelkerung/Zensus11_Datensatz_Bevoelkerung.csv";
+		String delimiter = ";";
 		
-	public CommuterRelation(int from, String fromName, int to, String toName, int trips) {
-		this.from = from;
-		this.fromName = fromName;
-		this.to = to;
-		this.toName = toName;
-		this.trips = trips;
+		CensusReader censusReader = new CensusReader(censusFile, delimiter);
+		
+		LOG.info("Test: 434 = " + censusReader.getMunicipalities().getAttribute("16077039", "marriedMale"));
 	}
-
-	public int getFrom() {
-		return this.from;
-	}
-
-//	public void setFrom(int from) {
-//		this.from = from;
-//	}
-	
-//	public String getFromName() {
-//		return this.fromName;
-//	}
-
-//	public void setFromName(String fromName) {
-//		this.fromName = fromName;
-//	}
-
-	public int getTo() {
-		return this.to;
-	}
-
-//	public void setTo(int to) {
-//		this.to = to;
-//	}
-	
-//	public String getToName() {
-//		return this.toName;
-//	}
-
-//	public void setToName(String toName) {
-//		this.toName = toName;
-//	}
-
-	public int getQuantity() {
-		return this.trips;
-	}
-
-//	public void setQuantity(int quantity) {
-//		this.quantity = quantity;
-//	}
-
 }

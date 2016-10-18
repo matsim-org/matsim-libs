@@ -21,6 +21,7 @@ package org.matsim.contrib.emissions;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -106,16 +107,19 @@ public class EmissionModule {
 	}
 
 	private void getInputFiles() {
-	      EmissionsConfigGroup ecg = (EmissionsConfigGroup)scenario.getConfig().getModule("emissions");
+	    EmissionsConfigGroup ecg = (EmissionsConfigGroup)scenario.getConfig().getModule("emissions");
 
-		roadTypeMappingFile = ecg.getEmissionRoadTypeMappingFile();
+		URL context = scenario.getConfig().getContext();
 
-		averageFleetWarmEmissionFactorsFile = ecg.getAverageWarmEmissionFactorsFile();
-		averageFleetColdEmissionFactorsFile = ecg.getAverageColdEmissionFactorsFile();
+		roadTypeMappingFile = ecg.getEmissionRoadTypeMappingFileURL(context).getFile();
+
+		averageFleetWarmEmissionFactorsFile = ecg.getAverageWarmEmissionFactorsFileURL(context).getFile();
+		averageFleetColdEmissionFactorsFile = ecg.getAverageColdEmissionFactorsFileURL(context).getFile();
 		
-		
-		detailedWarmEmissionFactorsFile = ecg.getDetailedWarmEmissionFactorsFile();
-		detailedColdEmissionFactorsFile = ecg.getDetailedColdEmissionFactorsFile();
+		if(ecg.isUsingDetailedEmissionCalculation()) {
+			detailedWarmEmissionFactorsFile = ecg.getDetailedWarmEmissionFactorsFileURL(context).getFile();
+			detailedColdEmissionFactorsFile = ecg.getDetailedColdEmissionFactorsFileURL(context).getFile();
+		}
 	}
 
 	public void createEmissionHandler() {

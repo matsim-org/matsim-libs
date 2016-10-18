@@ -1,7 +1,6 @@
 package playground.dziemke.cemdapMatsimCadyts.pt;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
@@ -35,7 +34,7 @@ import java.util.Set;
  * @author gthunig on 14.07.2016.
  */
 public class RndPtRouterLauncherV2 {
-	private static enum Variant { orig, reduced } ;
+	private enum Variant { orig, reduced }
 	private static final Variant variant = Variant.orig ;
 
 	private static Provider<TransitRouter> createRandomizedTransitRouterFactory (final TransitSchedule schedule, final TransitRouterConfig trConfig, final TransitRouterNetwork routerNetwork){
@@ -51,6 +50,7 @@ public class RndPtRouterLauncherV2 {
 
 	public static void main(final String[] args) {
 
+		int lastIteration = 500;
 		double cadytsWeight = 30.0;
 
 		String configFile;
@@ -60,12 +60,14 @@ public class RndPtRouterLauncherV2 {
 			configFile = args[0];
 		} else {
 			configFile = args[0];
-			cadytsWeight = Double.parseDouble(args[1]);
+			lastIteration = Integer.parseInt(args[1]);
+			cadytsWeight = Double.parseDouble(args[2]);
 		}
 		final double finalCadytsWeight = cadytsWeight;
 
 		Config config = ConfigUtils.loadConfig(configFile);
 
+		config.controler().setLastIteration(lastIteration);
 		config.ptCounts().setPtCountsInterval(5);
 
 //		config.vspExperimental().setAbleToOverwritePtInteractionParams(true);
@@ -99,19 +101,19 @@ public class RndPtRouterLauncherV2 {
 			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
 			stratSets.setStrategyName(DefaultStrategy.ReRoute.name()); 
 			stratSets.setWeight(0.1);
-			stratSets.setDisableAfter(400) ;
+			stratSets.setDisableAfter((new Double(lastIteration * 0.9)).intValue());
 			config.strategy().addStrategySettings(stratSets);
 		}
-		{
-			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
-			stratSets.setStrategyName(DefaultStrategy.ChangeSingleTripMode.name()); 
-			stratSets.setWeight(0.1);
-			stratSets.setDisableAfter(400) ;
-			config.strategy().addStrategySettings(stratSets);
-			
-			config.changeMode().setIgnoreCarAvailability(true);
-			config.changeMode().setModes( new String[]{TransportMode.car, TransportMode.walk, TransportMode.pt });
-		}
+//		{
+//			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
+//			stratSets.setStrategyName(DefaultStrategy.ChangeSingleTripMode.name());
+//			stratSets.setWeight(0.1);
+//			stratSets.setDisableAfter((new Double(lastIteration * 0.9)).intValue());
+//			config.strategy().addStrategySettings(stratSets);
+//
+//			config.changeMode().setIgnoreCarAvailability(true);
+//			config.changeMode().setModes( new String[]{TransportMode.car, TransportMode.walk, TransportMode.pt });
+//		}
 
 		CadytsConfigGroup ccc = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class ) ;
 
