@@ -123,28 +123,31 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 
 		String vehId = event.getVehicleId().toString();
 		String arrivalMode = this.personArrivalMode.get(event.getPersonId());
-		if (vehId.startsWith("OW") &&
-				!arrivalMode.equals("access_walk_ow")) {
-			Id<Link> linkId = this.personDepartureMap.get(event.getPersonId());
-			Link link = network.getLinks().get(linkId);
-			this.carsharingManager.freeParkingSpot(vehId, linkId);
 
-			this.currentDemand.removeVehicle(event.getPersonId(), link, carsharingSupply.getAllVehicles().get(vehId), "oneway");
-		
-		}		
-		else if (vehId.startsWith("FF") &&
-				!arrivalMode.equals("access_walk_ff")) {
-			Id<Link> linkId = this.personDepartureMap.get(event.getPersonId());
-			Link link = network.getLinks().get(linkId);
+		if (arrivalMode != null) {
+			if (vehId.startsWith("OW") &&
+					!arrivalMode.equals("access_walk_ow")) {
+				Id<Link> linkId = this.personDepartureMap.get(event.getPersonId());
+				Link link = network.getLinks().get(linkId);
+				this.carsharingManager.freeParkingSpot(vehId, linkId);
 
-			this.currentDemand.removeVehicle(event.getPersonId(), link, carsharingSupply.getAllVehicles().get(vehId), "freefloating");
-		}
-		else if (vehId.startsWith("TW") &&
-				!arrivalMode.equals("access_walk_tw")) {
-			Id<Link> linkId = this.personDepartureMap.get(event.getPersonId());
-			Link link = network.getLinks().get(linkId);
+				this.currentDemand.removeVehicle(event.getPersonId(), link, carsharingSupply.getAllVehicles().get(vehId), "oneway");
+			
+			}		
+			else if (vehId.startsWith("FF") &&
+					!arrivalMode.equals("access_walk_ff")) {
+				Id<Link> linkId = this.personDepartureMap.get(event.getPersonId());
+				Link link = network.getLinks().get(linkId);
 
-			this.currentDemand.removeVehicle(event.getPersonId(), link, carsharingSupply.getAllVehicles().get(vehId), "twoway");
+				this.currentDemand.removeVehicle(event.getPersonId(), link, carsharingSupply.getAllVehicles().get(vehId), "freefloating");
+			}
+			else if (vehId.startsWith("TW") &&
+					!arrivalMode.equals("access_walk_tw")) {
+				Id<Link> linkId = this.personDepartureMap.get(event.getPersonId());
+				Link link = network.getLinks().get(linkId);
+
+				this.currentDemand.removeVehicle(event.getPersonId(), link, carsharingSupply.getAllVehicles().get(vehId), "twoway");
+			}
 		}
 	}	
 }

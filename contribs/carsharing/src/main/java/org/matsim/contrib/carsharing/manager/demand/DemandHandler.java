@@ -102,7 +102,7 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 			Id<Person> personId = this.vehiclePersonMap.get(event.getVehicleId());
 			AgentRentals agentRentals = this.agentRentalsMap.get(personId);
 			
-			RentalInfo info = agentRentals.getStatsPerVehicle().get(event.getVehicleId().toString());			
+			RentalInfo info = agentRentals.getStatsPerVehicle().get(event.getVehicleId().toString());
 			if (info.getAccessEndTime() == 0.0)
 				info.setAccessEndTime(event.getTime());
 		}
