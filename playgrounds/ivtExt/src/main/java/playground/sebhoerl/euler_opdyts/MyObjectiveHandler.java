@@ -26,19 +26,8 @@ public class MyObjectiveHandler implements RemoteStateHandler, PersonDepartureEv
         if (!departures.containsKey(mode)) {
             departures.put(mode, (long) 1);
         } else {
-            departures.put(mode, departures.get(mode));
+            departures.put(mode, departures.get(mode) + 1);
         }
-    }
-
-    @Override
-    public double getValue() {
-        long sum = 0;
-
-        for (Long partial : departures.values()) {
-            sum += partial;
-        }
-
-        return -Math.pow(0.5 - (double) departures.get("car") / (double) sum, 2.0);
     }
 
     @Override

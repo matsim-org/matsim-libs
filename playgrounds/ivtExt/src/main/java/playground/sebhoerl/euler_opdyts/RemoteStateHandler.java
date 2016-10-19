@@ -8,6 +8,5 @@ import floetteroed.utilities.math.Vector;
 import org.matsim.core.events.handler.EventHandler;
 
 interface RemoteStateHandler extends EventHandler {
-    double getValue();
     Vector getState();
 }
