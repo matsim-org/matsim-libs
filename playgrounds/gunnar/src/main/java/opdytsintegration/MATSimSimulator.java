@@ -44,7 +44,8 @@ public class MATSimSimulator<U extends DecisionVariable> implements Simulator<U>
 	private int nextControlerRun = 0;
 
 	private ScoringFunctionFactory scoringFunctionFactory = null;
-
+	
+	private int stateMemory = 1;
 
 	// -------------------- CONSTRUCTOR --------------------
 
@@ -94,6 +95,11 @@ public class MATSimSimulator<U extends DecisionVariable> implements Simulator<U>
 		this.scoringFunctionFactory = factory;
 	}
 
+	// TODO NEW
+	public void setStateMemory(final int stateMemory) {
+		this.stateMemory = stateMemory;
+	}
+	
 	// --------------- IMPLEMENTATION OF Simulator INTERFACE ---------------
 
 	@Override
@@ -124,7 +130,7 @@ public class MATSimSimulator<U extends DecisionVariable> implements Simulator<U>
 			matsimDecisionVariableEvaluator.enablePT(this.relevantStopIds);
 		}
 
-		matsimDecisionVariableEvaluator.setMemory(1); // TODO make configurable
+		matsimDecisionVariableEvaluator.setMemory(this.stateMemory); // TODO make configurable
 		// matsimDecisionVariableEvaluator.setStandardLogFileName("./opdyts.log");
 
 		/*
