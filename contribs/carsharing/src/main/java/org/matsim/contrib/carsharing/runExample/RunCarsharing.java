@@ -102,8 +102,7 @@ public class RunCarsharing {
 
 			@Override
 			public void install() {
-				bind(KeepingTheCarModel.class)
-				.toInstance(keepingCarModel);
+				bind(KeepingTheCarModel.class).toInstance(keepingCarModel);
 				bind(ChooseTheCompany.class).toInstance(chooseCompany);
 				bind(ChooseVehicleType.class).toInstance(chooseCehicleType);
 				bind(RouterProvider.class).toInstance(routerProvider);

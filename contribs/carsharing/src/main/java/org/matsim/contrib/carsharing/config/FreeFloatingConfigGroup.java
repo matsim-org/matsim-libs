@@ -33,6 +33,8 @@ public class FreeFloatingConfigGroup extends ReflectiveConfigGroup {
 	private String constantFreeFloating = null;
 	
 	private String vehiclelocationsInputFile = null;
+
+	private String areasInputFile = null;
 	
 	private String timeFeeFreeFloating = null;
 	
@@ -82,7 +84,17 @@ public class FreeFloatingConfigGroup extends ReflectiveConfigGroup {
 	public void setvehiclelocations(final String vehiclelocationsInputFile) {
 		this.vehiclelocationsInputFile = vehiclelocationsInputFile;
 	}
-	
+
+	@StringGetter( "areasFreefloating" )
+	public String getAreas() {
+		return this.areasInputFile;
+	}
+
+	@StringSetter( "areasFreefloating" )
+	public void setAreas(final String areasInputFile) {
+		this.areasInputFile = areasInputFile;
+	}
+
 	@StringGetter( "timeFeeFreeFloating" )
 	public String timeFeeFreeFloating() {
 		return this.timeFeeFreeFloating;
