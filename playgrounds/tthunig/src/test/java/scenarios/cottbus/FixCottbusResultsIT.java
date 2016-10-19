@@ -114,7 +114,7 @@ public class FixCottbusResultsIT {
 		if (scenarioType.equals(ScenarioType.BaseCase)){
 			config.network().setInputFile(testUtils.getClassInputDirectory() + "matsimData/network_wgs84_utm33n.xml.gz");
 			config.network().setLaneDefinitionsFile(testUtils.getClassInputDirectory() + "matsimData/lanes.xml");
-			config.plans().setInputFile(testUtils.getClassInputDirectory() + "matsimData/cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only.xml.gz");
+			config.plans().setInputFile(testUtils.getClassInputDirectory() + "matsimData/commuter_population_wgs84_utm33n_car_only.xml.gz");
 		} else { // BaseCaseContinued
 			config.network().setInputFile(testUtils.getClassInputDirectory() + "btuOpt/network_small_simplified.xml.gz");
 			config.network().setLaneDefinitionsFile(testUtils.getClassInputDirectory() + "btuOpt/lanes_network_small.xml.gz");
