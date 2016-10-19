@@ -1,11 +1,9 @@
 package org.matsim.contrib.carsharing.qsim;
 
-import java.io.IOException;
+import java.util.ArrayList;
+
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.carsharing.config.FreefloatingAreasReader;
-import org.matsim.contrib.carsharing.config.FreeFloatingConfigGroup;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -13,37 +11,46 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 
 public class FreefloatingAreas {
-	private Scenario scenario;
-
 	private PointFeatureFactory pointFeatureFactory;
 
-	public static final String ELEMENT_NAME = "carSharingAreas";
+	private SimpleFeature areas = null;
 
-	private SimpleFeature carsharingAreas = null;
+	private ArrayList<String> ids = new ArrayList<String>();
 
-	public FreefloatingAreas(Scenario scenario) {
+	public FreefloatingAreas() {
 		this.pointFeatureFactory = new PointFeatureFactory.Builder()
 				.setName("point")
 				.setCrs(DefaultGeographicCRS.WGS84)
 				.create();
-
-		this.scenario = scenario;
 	}
 
-	public void readCarsharingAreas() throws IOException {
-		final FreeFloatingConfigGroup configGroupff = (FreeFloatingConfigGroup)
-				this.scenario.getConfig().getModule( FreeFloatingConfigGroup.GROUP_NAME );
+	public void add(SimpleFeature area) {
+		String id = (String) area.getAttribute("id");
 
-		FreefloatingAreasReader reader = new FreefloatingAreasReader();
-		reader.readFile(configGroupff.getAreas());
-		this.carsharingAreas = reader.getCarsharingAreas();
+		if (this.ids.contains(id) == false) {
+			this.ids.add(id);
+
+			if (this.areas == null) {
+				this.areas = area;
+			} else {
+				// merge geometries!
+				MultiPolygon oldPolygons = (MultiPolygon) this.areas.getAttribute("the_geom");
+				MultiPolygon newPolygon = (MultiPolygon) area.getAttribute("the_geom");
+				MultiPolygon unitedPolygons = (MultiPolygon) oldPolygons.union(newPolygon);
+				this.areas.setAttribute("the_geom", unitedPolygons);
+			}
+		}
 	}
 
 	public boolean contains(Coord coord) {
-		MultiPolygon area = (MultiPolygon) this.carsharingAreas.getAttribute("the_geom");
+		if (this.areas == null) {
+			return true;
+		}
+
+		MultiPolygon polygons = (MultiPolygon) this.areas.getAttribute("the_geom");
 		SimpleFeature pointFeature = this.pointFeatureFactory.createPoint(coord, new Object[0], null);
 		Point point = (Point) pointFeature.getAttribute("the_geom");
 
-		return area.contains(point);
+		return polygons.contains(point);
 	}
 }

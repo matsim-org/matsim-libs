@@ -6,6 +6,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
+import org.matsim.contrib.carsharing.config.FreeFloatingConfigGroup;
+import org.matsim.contrib.carsharing.config.FreefloatingAreasReader;
 import org.matsim.contrib.carsharing.control.listeners.CarsharingListener;
 import org.matsim.contrib.carsharing.events.handlers.PersonArrivalDepartureHandler;
 import org.matsim.contrib.carsharing.manager.CarsharingManagerInterface;
@@ -27,6 +29,7 @@ import org.matsim.contrib.carsharing.models.ChooseVehicleType;
 import org.matsim.contrib.carsharing.models.ChooseVehicleTypeExample;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModel;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModelExample;
+import org.matsim.contrib.carsharing.qsim.FreefloatingAreas;
 import org.matsim.contrib.carsharing.readers.CarsharingXmlReaderNew;
 import org.matsim.contrib.carsharing.replanning.CarsharingSubtourModeChoiceStrategy;
 import org.matsim.contrib.carsharing.replanning.RandomTripToCarsharingStrategy;
@@ -59,13 +62,19 @@ public class ServiceAreasControler {
 
 	public static void installCarSharing(final Controler controler) {
 		final Scenario scenario = controler.getScenario();
-		CarsharingXmlReaderNew reader = new CarsharingXmlReaderNew(scenario.getNetwork());
 
 		final CarsharingConfigGroup configGroup = (CarsharingConfigGroup) scenario.getConfig().getModule( CarsharingConfigGroup.GROUP_NAME );
+		final FreeFloatingConfigGroup ffConfigGroup = (FreeFloatingConfigGroup) scenario.getConfig().getModule(FreeFloatingConfigGroup.GROUP_NAME);
+
+		FreefloatingAreasReader ffAreasReader = new FreefloatingAreasReader();
+		ffAreasReader.readFile(ffConfigGroup.getAreas());
+		final FreefloatingAreas freefloatingAreas = ffAreasReader.getFreefloatingAreas();
+
+		CarsharingXmlReaderNew reader = new CarsharingXmlReaderNew(scenario.getNetwork());
+		reader.setFreefloatingAreas(freefloatingAreas);
 
 		// this is necessary to populate the companies list
 		reader.readFile(configGroup.getvehiclelocations());
-
 		Set<String> carsharingCompanies = reader.getCompanies().keySet();
 
 		MembershipReader membershipReader = new MembershipReader();
@@ -98,6 +107,7 @@ public class ServiceAreasControler {
 				bind(MembershipContainer.class).toInstance(memberships);
 			    bind(CarsharingSupplyInterface.class).toInstance(carsharingSupplyContainer);
 			    bind(CarsharingManagerInterface.class).toInstance(carsharingManager);
+				bind(FreefloatingAreas.class).toInstance(freefloatingAreas);
 				bind(DemandHandler.class).asEagerSingleton();
 			}
 		});
