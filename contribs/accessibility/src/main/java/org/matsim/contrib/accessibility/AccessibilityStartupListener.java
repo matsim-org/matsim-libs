@@ -31,17 +31,19 @@ public final class AccessibilityStartupListener implements StartupListener {
 		final List<String> activityTypes;
 		final ActivityFacilities densityFacilities;
 		private final String crs;
-		private final String runName;
+		private final String runId;
 		Envelope envelope;
 		Double cellSize;
+		boolean push2Geoserver;
 		
-		public AccessibilityStartupListener(List<String> activityTypes, ActivityFacilities densityFacilities, String crs, String runName, Envelope envelope, Double cellSize) {
+		public AccessibilityStartupListener(List<String> activityTypes, ActivityFacilities densityFacilities, String crs, String runId, Envelope envelope, Double cellSize, boolean push2Geoserver) {
 			this.activityTypes = activityTypes;
 			this.densityFacilities = densityFacilities;
 			this.crs = crs;
-			this.runName = runName;
+			this.runId = runId;
 			this.envelope = envelope;
 			this.cellSize = cellSize;
+			this.push2Geoserver = push2Geoserver;
 		}
 		
 		@Override
@@ -60,7 +62,9 @@ public final class AccessibilityStartupListener implements StartupListener {
 				listener.addAdditionalFacilityData(densityFacilities);
 				listener.writeToSubdirectoryWithName(activityType);
 				// Geoserver
-				accessibilityCalculator.addFacilityDataExchangeListener(new GeoserverUpdater(crs, runName));
+				if (push2Geoserver == true) {
+					accessibilityCalculator.addFacilityDataExchangeListener(new GeoserverUpdater(crs, runId + "_" + activityType));
+				}
 				listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that are related to matsim4urbansim
 				controlerListenerManager.addControlerListener(listener);
 			}

@@ -80,8 +80,8 @@ public class AccessibilityComputationNairobiTest {
 		// Parameters
 		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		final Envelope envelope = new Envelope(240000, 280000, 9844000, 9874000);
-		String name = "ke_nairobi_" + cellSize.toString().split("\\.")[0];
-		name = name + "_airport_min";
+		final String runId = "ke_nairobi_" + PathUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
+		final boolean push2Geoserver = false;
 		
 		// QGis parameters
 		boolean createQGisOutput = true;
@@ -102,9 +102,9 @@ public class AccessibilityComputationNairobiTest {
 		config.planCalcScore().setBrainExpBeta(200); // Set to high value to base computation on time to nearest facility only
 		
 		// Choose modes for accessibility computation
-		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.abort);
 
@@ -143,7 +143,7 @@ public class AccessibilityComputationNairobiTest {
 
 		// Controller
 		final Controler controler = new Controler(scenario);
-		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, name, envelope, cellSize));
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, runId, envelope, cellSize, push2Geoserver));
 		controler.run();
 
 		// QGis
@@ -153,9 +153,11 @@ public class AccessibilityComputationNairobiTest {
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
-							lowerBound, upperBound, range, symbolSize, populationThreshold);
-					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					if (acg.getIsComputingMode().contains(mode)) {
+						VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
+								lowerBound, upperBound, range, symbolSize, populationThreshold);
+						VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					}
 				}
 			}  
 		}

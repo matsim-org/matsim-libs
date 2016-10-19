@@ -79,8 +79,9 @@ public class AccessibilityComputationCapeTownTest {
 		
 		// Parameters
 		final String crs = TransformationFactory.WGS84_SA_Albers;
-		final String name = "za_capetown_" + cellSize.toString().split("\\.")[0];
-		
+		final String runId = "za_capetown_" + PathUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
+		final boolean push2Geoserver = false;
+
 		// QGis parameters
 		boolean createQGisOutput = false;
 		final boolean includeDensityLayer = true;
@@ -99,10 +100,12 @@ public class AccessibilityComputationCapeTownTest {
 		config.controler().setLastIteration(0);
 		
 		// Choose modes for accessibility computation
-		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
-			accessibilityConfigGroup.setComputingAccessibilityForMode(mode, true);
-		}
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
 		
 		// Some (otherwise irrelevant) settings to make the vsp check happy
 		config.timeAllocationMutator().setMutationRange(7200.);
@@ -151,7 +154,7 @@ public class AccessibilityComputationCapeTownTest {
 
 		// Controller
 		final Controler controler = new Controler(scenario);
-		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, name, networkEnvelope, cellSize));
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, runId, networkEnvelope, cellSize, push2Geoserver));
 		controler.run();
 		
 		// QGis
@@ -161,9 +164,11 @@ public class AccessibilityComputationCapeTownTest {
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
-							lowerBound, upperBound, range, symbolSize, populationThreshold);
-					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					if (acg.getIsComputingMode().contains(mode)) {
+						VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
+								lowerBound, upperBound, range, symbolSize, populationThreshold);
+						VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					}
 				}
 			}  
 		}

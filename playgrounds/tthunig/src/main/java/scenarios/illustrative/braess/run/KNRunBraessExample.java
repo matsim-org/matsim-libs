@@ -16,9 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.kai.run;
-
-import scenarios.illustrative.braess.run.RunBraessSimulation;
+package scenarios.illustrative.braess.run;
 
 /**
  * @author nagel
