@@ -117,7 +117,7 @@ public class SnowballCliques {
 		for ( Set<Clique> cliquesOfEgo : cliquesPerEgo.values() ) {
 			counter.incCounter();
 
-			final Set<Clique> redundant = new HashSet<>();
+			final Collection<Clique> redundant = new HashSet<>();
 			for ( Clique clique : cliquesOfEgo ) {
 				if ( isRedundant( clique , cliquesOfEgo ) ) {
 					removalCounter.incCounter();
@@ -135,22 +135,20 @@ public class SnowballCliques {
 		assert cliques.size() == cliquesPerEgo.values().stream().mapToInt( Set::size ).sum();
 	}
 
-	private static boolean isRedundant( final Clique clique , final Collection<Clique> in ) {
+	private static boolean isRedundant( final Clique clique , final Iterable<Clique> in ) {
 		for ( Clique other : in ) {
 			if ( clique == other ) continue;
 			if ( isSubset( clique , other ) ) {
-				if ( clique.getAlters().size() == other.getAlters().size() ) {
-					// avoid removing all duplicates: arbitrary criterion to keep one
-					return clique.getCliqueId().compareTo( other.getCliqueId() ) > 0;
-				}
-				return true;
+				return clique.getAlters().size() != other.getAlters().size() ||
+						// avoid removing all duplicates: arbitrary criterion to keep one
+						clique.getCliqueId().compareTo( other.getCliqueId() ) > 0;
 			}
 		}
 		return false;
 	}
 
 	private static boolean isSubset( final Clique subset , final Clique of ) {
-		return of.getEgo().getId().equals( of.getEgo().getId() ) &&
+		return of.getEgo().getId().equals( subset.getEgo().getId() ) &&
 				of.alters.containsAll( subset.alters );
 	}
 
