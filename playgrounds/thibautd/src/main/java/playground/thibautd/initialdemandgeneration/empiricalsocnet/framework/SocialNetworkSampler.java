@@ -41,7 +41,6 @@ import java.util.function.Consumer;
 @Singleton
 public class SocialNetworkSampler {
 	private static final Logger log = Logger.getLogger( SocialNetworkSampler.class );
-	private final Random random = MatsimRandom.getLocalInstance();
 
 	private final Population population;
 	private final EgoCharacteristicsDistribution egoDistribution;
@@ -87,7 +86,7 @@ public class SocialNetworkSampler {
 		while ( egosWithFreeStubs.size() > 1 ) {
 			counter.incCounter();
 
-			final Ego ego = egosWithFreeStubs.get( random.nextInt( egosWithFreeStubs.size() ) );
+			final Ego ego = egosWithFreeStubs.getAny();
 
 			final Set<Ego> clique = cliquesFiller.sampleClique( ego , egosWithFreeStubs );
 			// cliquesFiller is allowed to choke on a agent, but it is then expected to take care

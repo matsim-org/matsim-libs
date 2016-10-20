@@ -136,6 +136,10 @@ public class KDTree<T> {
 		throw new IllegalArgumentException( "Index too high" );
 	}
 
+	public T getAny() {
+		return root.value;
+	}
+
 	public boolean isEmpty() {
 		return size == 0;
 	}
