@@ -22,7 +22,7 @@ package playground.thibautd.utils.spatialcollections;
  * @author thibautd
  */
 public class SpatialCollectionUtils {
-	public static double euclidean( double[] c1 , double[] c2 ) {
+	public static double squaredEuclidean( double[] c1 , double[] c2 ) {
 		double d = 0;
 
 		for (int i=0; i < c1.length; i++ ) {
@@ -30,6 +30,10 @@ public class SpatialCollectionUtils {
 		}
 
 		return d;
+	}
+
+	public static double euclidean( double[] c1 , double[] c2 ) {
+		return Math.sqrt( squaredEuclidean( c1 , c2 ) );
 	}
 
 	public interface Coordinate<T> extends GenericCoordinate<double[],T> {}

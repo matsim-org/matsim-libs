@@ -373,11 +373,11 @@ public class KDTree<T> {
 	}
 
 	public T getClosestEuclidean( final double[] coord ) {
-		return getClosest( coord , SpatialCollectionUtils::euclidean );
+		return getClosest( coord , SpatialCollectionUtils::squaredEuclidean );
 	}
 
 	public T getClosestEuclidean( final double[] coord , final Predicate<T> predicate ) {
-		return getClosest( coord , SpatialCollectionUtils::euclidean , predicate );
+		return getClosest( coord , SpatialCollectionUtils::squaredEuclidean, predicate );
 	}
 
 	public T getClosest( final double[] coord , final ToDoubleBiFunction<double[],double[]> distance ) {
