@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.utils;
+package playground.thibautd.utils.spatialcollections;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;

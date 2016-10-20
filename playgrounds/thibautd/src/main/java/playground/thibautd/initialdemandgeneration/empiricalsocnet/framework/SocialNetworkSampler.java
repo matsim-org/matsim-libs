@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.misc.Counter;
-import playground.thibautd.utils.KDTree;
+import playground.thibautd.utils.spatialcollections.KDTree;
 
 import java.util.HashMap;
 import java.util.Map;

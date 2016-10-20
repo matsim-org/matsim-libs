@@ -16,23 +16,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
-
-import playground.thibautd.utils.spatialcollections.KDTree;
-
-import java.util.Set;
+package playground.thibautd.utils.spatialcollections;
 
 /**
  * @author thibautd
  */
-public interface CliquesFiller {
-	/**
-	 * Sample a feasible clique, fills the alters lists of the egos, and returns the clique.
-	 * @param ego the "center" of the clique
-	 * @param egosWithFreeStubs
-	 * @return The set of egos pertaining to the clique, including the "center", already modified.
-	 */
-	Set<Ego> sampleClique( Ego ego, KDTree<Ego> egosWithFreeStubs );
+public class SpatialCollectionUtils {
+	public static double euclidean( double[] c1 , double[] c2 ) {
+		double d = 0;
 
-	boolean stopConsidering( Ego ego );
+		for (int i=0; i < c1.length; i++ ) {
+			d += Math.pow( c1[ i ] - c2[ i ] , 2 );
+		}
+
+		return d;
+	}
+
+	public interface Coordinate<T> extends GenericCoordinate<double[],T> {}
+
+	public interface GenericCoordinate<C,T> {
+		C getCoord( T object );
+	}
+
+	public interface Metric<C> {
+		double calcDistance( C t1, C t2 );
+	}
+
+	public interface Distance extends Metric<double[]> {}
 }

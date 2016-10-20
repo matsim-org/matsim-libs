@@ -30,7 +30,7 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.Snow
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballSamplingConfigGroup;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SocialPositions;
 import playground.thibautd.utils.ArrayUtils;
-import playground.thibautd.utils.KDTree;
+import playground.thibautd.utils.spatialcollections.KDTree;
 
 import java.util.ArrayList;
 import java.util.Arrays;
