@@ -28,6 +28,7 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.misc.Counter;
 import playground.thibautd.utils.spatialcollections.KDTree;
+import playground.thibautd.utils.spatialcollections.SpatialTree;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -74,7 +75,7 @@ public class SocialNetworkSampler {
 			final Ego ego = egoDistribution.sampleEgo( p );
 			egos.put( p.getId() , ego );
 		}
-		final KDTree<Ego> egosWithFreeStubs =
+		final SpatialTree<double[],Ego> egosWithFreeStubs =
 				new KDTree<>(
 						configGroup.doRebalanceKdTree(),
 						egoLocator.getDimensionality(),

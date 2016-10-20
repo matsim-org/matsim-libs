@@ -31,6 +31,7 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.Snow
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SocialPositions;
 import playground.thibautd.utils.ArrayUtils;
 import playground.thibautd.utils.spatialcollections.KDTree;
+import playground.thibautd.utils.spatialcollections.SpatialTree;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -89,7 +90,7 @@ public class SimpleCliquesFiller implements CliquesFiller {
 	@Override
 	public Set<Ego> sampleClique(
 			final Ego ego,
-			final KDTree<Ego> egosWithFreeStubs ) {
+			final SpatialTree<double[], Ego> egosWithFreeStubs ) {
 		final SocialPositions.EgoClass egoClass = SocialPositions.createEgoClass( configGroup , ego );
 		CliqueSampler cliqueSampler = cliques.get( egoClass );
 
@@ -137,7 +138,7 @@ public class SimpleCliquesFiller implements CliquesFiller {
 
 	private SocialPositions.CliquePositions sampleMaxSizedClique(
 			final Ego ego,
-			final KDTree<Ego> egosWithFreeStubs,
+			final SpatialTree<double[],Ego> egosWithFreeStubs,
 			final CliqueSampler cliqueSampler,
 			final int maxSize,
 			final Set<Ego> members ) {
@@ -167,7 +168,7 @@ public class SimpleCliquesFiller implements CliquesFiller {
 	}
 
 	private Set<Ego> sampleOverloadedClique( final Ego ego,
-			final KDTree<Ego> egosWithFreeStubs,
+			final SpatialTree<double[],Ego> egosWithFreeStubs,
 			final CliqueSampler cliqueSampler ) {
 		final SocialPositions.CliquePositions clique = cliqueSampler.sampleClique( random , egosWithFreeStubs.size() );
 		if ( clique == null ) {
@@ -197,7 +198,7 @@ public class SimpleCliquesFiller implements CliquesFiller {
 		return ego.getDegree() <= ego.getAlters().size();
 	}
 
-	private static Ego findEgo( final KDTree<Ego> egosWithFreeStubs,
+	private static Ego findEgo( final SpatialTree<double[],Ego> egosWithFreeStubs,
 			final SocialPositions.CliquePositions clique,
 			final double[] point,
 			final Collection<Ego> currentClique,
@@ -210,7 +211,7 @@ public class SimpleCliquesFiller implements CliquesFiller {
 		for ( int i = 1; i <= maxIter; i++ ) {
 			final int freeStubs = clique.size() - i;
 			final Ego member =
-					egosWithFreeStubs.getClosestEuclidean(
+					egosWithFreeStubs.getClosest(
 							point,
 							( e ) -> e.getFreeStubs() >= freeStubs && !currentClique.contains( e ) );
 			if ( member != null ) return member;

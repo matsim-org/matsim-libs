@@ -38,7 +38,7 @@ import java.util.function.ToDoubleBiFunction;
  *
  * @author thibautd
  */
-public class KDTree<T> {
+public class KDTree<T> implements SpatialTree<double[],T> {
 	// used only to balance the tree
 	private final Random random = MatsimRandom.getLocalInstance();
 	private static final int SUBLIST_SIZE_MEDIAN = 100;
@@ -180,6 +180,21 @@ public class KDTree<T> {
 
 		rebalanceIfNecessary();
 		return true;
+	}
+
+	@Override
+	public boolean contains( final T value ) {
+		return find( value ) != null;
+	}
+
+	@Override
+	public T getClosest( final double[] coord ) {
+		return getClosestEuclidean( coord );
+	}
+
+	@Override
+	public T getClosest( final double[] coord, final Predicate<T> predicate ) {
+		return getClosestEuclidean( coord , predicate );
 	}
 
 	private Node<T> findMin( final Node<T> start, final int dimension ) {

@@ -31,7 +31,7 @@ import java.util.function.Predicate;
 /**
  * @author thibautd
  */
-public class VPTree<C,T> {
+public class VPTree<C,T> implements SpatialTree<C, T> {
 	private static final int SUBLIST_SIZE_MEDIAN = 100;
 	private final SpatialCollectionUtils.Metric<C> metric;
 	private final SpatialCollectionUtils.GenericCoordinate<C,T> coordinate;
@@ -47,10 +47,28 @@ public class VPTree<C,T> {
 	}
 
 
+	@Override
 	public int size() {
 		return size;
 	}
 
+	@Override
+	public T getAny() {
+		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
+		stack.add( root );
+
+		while ( !stack.isEmpty() ) {
+			final Node<C,T> current = stack.poll();
+
+			if ( current.value != null ) return current.value;
+			if ( current.close != null ) stack.add( current.close );
+			if ( current.far != null ) stack.add( current.far );
+		}
+
+		return null;
+	}
+
+	@Override
 	public Collection<T> getAll() {
 		return getAll( root );
 	}
@@ -72,6 +90,7 @@ public class VPTree<C,T> {
 		return all;
 	}
 
+	@Override
 	public void add( final Collection<T> toAdd ) {
 		if ( size() > 0 ) throw new IllegalStateException();
 		add( root , toAdd );
@@ -164,6 +183,7 @@ public class VPTree<C,T> {
 		add( toReadd );
 	}
 
+	@Override
 	public boolean remove( final T value ) {
 		final Node<C,T> node = find( value );
 
@@ -187,6 +207,7 @@ public class VPTree<C,T> {
 		return true;
 	}
 
+	@Override
 	public boolean contains( final T value ) {
 		return find( value ) != null;
 	}
@@ -213,10 +234,12 @@ public class VPTree<C,T> {
 		return null;
 	}
 
+	@Override
 	public T getClosest( final C coord ) {
 		return getClosest( coord , t -> true );
 	}
 
+	@Override
 	public T getClosest(
 			final C coord,
 			final Predicate<T> predicate ) {
