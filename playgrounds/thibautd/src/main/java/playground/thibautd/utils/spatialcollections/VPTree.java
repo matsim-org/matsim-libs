@@ -36,8 +36,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	private final SpatialCollectionUtils.Metric<C> metric;
 	private final SpatialCollectionUtils.GenericCoordinate<C,T> coordinate;
 
-	private int countRemove = 0;
-	private final static int REBUILD_PERIOD = 1000;
+	private int stepsToRemove = 0;
 
 	private Node<C,T> root = new Node<>();
 	private int size = 0;
@@ -101,6 +100,8 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 
 	private void add( final Node<C,T> addRoot , final Collection<T> points ) {
 		size += points.size();
+		// TODO: extract in some other place, not to mix it here
+		stepsToRemove += size / 2;
 
 		final Queue<AddFrame<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
 
@@ -187,7 +188,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	}
 
 	/**
-	 * Naively optimized remove. Invalidates values, and rebuilds after successfully invalidating 1000 values.
+	 * Naively optimized remove. Invalidates values, and rebuilds after successfully invalidating 1/2 of the values.
 	 * Not based on any theory.
 	 *
 	 * @param value
@@ -197,9 +198,9 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	public boolean remove( final T value ) {
 		boolean isRemoved = invalidate( value );
 
-		if ( isRemoved && ++countRemove == REBUILD_PERIOD ) {
+		if ( isRemoved && --stepsToRemove == 0 ) {
+			// rebuild updates steps to remove
 			rebuild();
-			countRemove = 0;
 		}
 
 		return isRemoved;
