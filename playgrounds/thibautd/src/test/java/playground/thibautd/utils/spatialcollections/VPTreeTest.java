@@ -40,7 +40,7 @@ public class VPTreeTest {
 			final VPTree<double[], Point> tree = createTree();
 
 			final int initialSize = tree.size();
-			tree.remove(
+			tree.trueRemove(
 					new Point(
 							random.nextInt( GRID_SIZE ),
 							random.nextInt( GRID_SIZE ),

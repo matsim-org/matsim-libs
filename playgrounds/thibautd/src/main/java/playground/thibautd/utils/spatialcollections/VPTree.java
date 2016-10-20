@@ -36,6 +36,9 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	private final SpatialCollectionUtils.Metric<C> metric;
 	private final SpatialCollectionUtils.GenericCoordinate<C,T> coordinate;
 
+	private int countRemove = 0;
+	private final static int REBUILD_PERIOD = 1000;
+
 	private Node<C,T> root = new Node<>();
 	private int size = 0;
 	private final Random r = new Random( 123 );
@@ -183,8 +186,26 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 		add( toReadd );
 	}
 
+	/**
+	 * Naively optimized remove. Invalidates values, and rebuilds after successfully invalidating 1000 values.
+	 * Not based on any theory.
+	 *
+	 * @param value
+	 * @return
+	 */
 	@Override
 	public boolean remove( final T value ) {
+		boolean isRemoved = invalidate( value );
+
+		if ( isRemoved && ++countRemove == REBUILD_PERIOD ) {
+			rebuild();
+			countRemove = 0;
+		}
+
+		return isRemoved;
+	}
+
+	public boolean trueRemove( final T value ) {
 		final Node<C,T> node = find( value );
 
 		if ( node == null ) return false;
