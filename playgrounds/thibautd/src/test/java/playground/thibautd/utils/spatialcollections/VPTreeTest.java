@@ -34,6 +34,123 @@ public class VPTreeTest {
 	private static final int GRID_SIZE = 50;
 
 	@Test
+	public void testRemove() {
+		final Random random = new Random( 123 );
+		for ( int r = 0; r < 10; r++ ) {
+			final VPTree<double[], Point> tree = createTree();
+
+			final int initialSize = tree.size();
+			tree.remove(
+					new Point(
+							random.nextInt( GRID_SIZE ),
+							random.nextInt( GRID_SIZE ),
+							random.nextInt( GRID_SIZE )) );
+
+			Assert.assertEquals(
+				"unexpected claimed size",
+				tree.size(),
+				tree.getAll().size() );
+
+			Assert.assertEquals( "unexpected size" , initialSize - 1 , tree.size() );
+
+			// check tree is still valid
+			for ( int i = 0; i < 500; i++ ) {
+				final double[] c = new double[ 3 ];
+				for ( int j = 0; j < c.length; j++ ) c[ j ] = random.nextDouble() * ( GRID_SIZE - 1 );
+
+				final Point closest = tree.getClosest( c );
+
+				final int[] expected = new int[ 3 ];
+				for ( int j = 0; j < c.length; j++ ) expected[ j ] = (int) Math.round( c[ j ] );
+
+				Assert.assertArrayEquals(
+						"unexpected closest point " + Arrays.toString( closest.ints ) + " for " + Arrays.toString( c ),
+						expected,
+						closest.ints );
+			}
+		}
+	}
+
+	@Test
+	public void testInvalidate() {
+		final Random random = new Random( 123 );
+		for ( int r = 0; r < 10; r++ ) {
+			final VPTree<double[], Point> tree = createTree();
+
+			final int initialSize = tree.size();
+			tree.invalidate(
+					new Point(
+							random.nextInt( GRID_SIZE ),
+							random.nextInt( GRID_SIZE ),
+							random.nextInt( GRID_SIZE )) );
+
+			Assert.assertEquals(
+				"unexpected claimed size",
+				tree.size(),
+				tree.getAll().size() );
+
+			Assert.assertEquals( "unexpected size" , initialSize - 1 , tree.size() );
+
+			// check tree is still valid
+			for ( int i = 0; i < 500; i++ ) {
+				final double[] c = new double[ 3 ];
+				for ( int j = 0; j < c.length; j++ ) c[ j ] = random.nextDouble() * ( GRID_SIZE - 1 );
+
+				final Point closest = tree.getClosest( c );
+
+				final int[] expected = new int[ 3 ];
+				for ( int j = 0; j < c.length; j++ ) expected[ j ] = (int) Math.round( c[ j ] );
+
+				Assert.assertArrayEquals(
+						"unexpected closest point " + Arrays.toString( closest.ints ) + " for " + Arrays.toString( c ),
+						expected,
+						closest.ints );
+			}
+		}
+	}
+
+	@Test
+	public void testInvalidateAndRebuild() {
+		final Random random = new Random( 123 );
+		for ( int r = 0; r < 10; r++ ) {
+			final VPTree<double[], Point> tree = createTree();
+
+			for ( int inv = 0; inv < tree.size() / 2; inv++ ) {
+				tree.invalidate(
+						new Point(
+								random.nextInt( GRID_SIZE ),
+								random.nextInt( GRID_SIZE ),
+								random.nextInt( GRID_SIZE ) ) );
+			}
+
+			tree.rebuild();
+
+			Assert.assertEquals(
+				"unexpected claimed size",
+				tree.size(),
+				tree.getAll().size() );
+
+			// check tree is still valid
+			for ( int i = 0; i < 50; i++ ) {
+				final double[] c = new double[ 3 ];
+				for ( int j = 0; j < c.length; j++ ) c[ j ] = random.nextDouble() * ( GRID_SIZE - 1 );
+
+				final Point closest = tree.getClosest( c );
+
+				final int[] expected = new int[ 3 ];
+				for ( int j = 0; j < c.length; j++ ) expected[ j ] = (int) Math.round( c[ j ] );
+
+				if ( tree.contains( new Point( expected ) ) ) {
+					Assert.assertArrayEquals(
+							"unexpected closest point " + Arrays.toString( closest.ints ) + " for " + Arrays.toString( c ),
+							expected,
+							closest.ints );
+				}
+			}
+		}
+	}
+
+	@Test
 	public void testClosest() {
 		final VPTree<double[],Point> tree = createTree();
 
@@ -99,7 +216,7 @@ public class VPTreeTest {
 		private final double[] coord;
 		private final int[] ints;
 
-		private Point( final int[] ints ) {
+		private Point( final int... ints ) {
 			this.ints = ints;
 			this.coord = toDouble( ints );
 		}
@@ -115,7 +232,8 @@ public class VPTreeTest {
 
 		@Override
 		public boolean equals( final Object other ) {
-			return other instanceof Point && Arrays.equals( ints, ( (Point) other ).ints );
+			return other instanceof Point &&
+					Arrays.equals( ints, ( (Point) other ).ints );
 		}
 	}
 }

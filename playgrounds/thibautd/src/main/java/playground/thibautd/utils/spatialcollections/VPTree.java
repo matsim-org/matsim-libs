@@ -52,17 +52,19 @@ public class VPTree<C,T> {
 	}
 
 	public Collection<T> getAll() {
+		return getAll( root );
+	}
+
+	private Collection<T> getAll( final Node<C,T> node ) {
+		if ( node == null ) return Collections.emptyList();
 		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
-		stack.add( root );
+		stack.add( node );
 
 		final Collection<T> all = new ArrayList<>();
 		while ( !stack.isEmpty() ) {
 			final Node<C,T> current = stack.poll();
 
-			if ( current.value == null ) continue;
-
-			all.add( current.value );
-
+			if ( current.value != null ) all.add( current.value );
 			if ( current.close != null ) stack.add( current.close );
 			if ( current.far != null ) stack.add( current.far );
 		}
@@ -130,6 +132,87 @@ public class VPTree<C,T> {
 		}
 	}
 
+	/**
+	 * Fastest version of remove. Does not remove the node, only the point.
+	 * Removal itself is faster, but latter queries are slower.
+	 *
+	 * @param value
+	 */
+	public boolean invalidate( final T value ) {
+		final Node<C,T> node = find( value );
+		if ( node == null ) return false;
+		node.value = null;
+		size--;
+		return true;
+	}
+
+	/**
+	 * rebuilds the full tree. Might help to rebalance a tree imbalanced by removals, or make a tree with lots of
+	 * invalidated values smaller.
+	 */
+	public void rebuild() {
+		final Collection<T> toReadd = getAll();
+
+		// invalidate root
+		root.cuttoffDistance = -1;
+		root.far = null;
+		root.close = null;
+		root.coordinate = null;
+		root.value = null;
+
+		size = 0;
+		add( toReadd );
+	}
+
+	public boolean remove( final T value ) {
+		final Node<C,T> node = find( value );
+
+		if ( node == null ) return false;
+
+		// get all children
+		final Collection<T> toReadd = new ArrayList<>( getAll( node.close ) );
+		toReadd.addAll( getAll( node.far ) );
+
+		// invalidate node
+		node.cuttoffDistance = -1;
+		node.far = null;
+		node.close = null;
+		node.coordinate = null;
+		node.value = null;
+
+		size -= toReadd.size() + 1;
+		// this part might be expensive. Way to make it faster?
+		add( node , toReadd );
+
+		return true;
+	}
+
+	public boolean contains( final T value ) {
+		return find( value ) != null;
+	}
+
+	private Node<C,T> find( final T value ) {
+		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
+
+		// copy parameter list as it is modified in place
+		stack.add( root );
+
+		final C coord = coordinate.getCoord( value );
+		while ( !stack.isEmpty() ) {
+			final Node<C,T> current = stack.poll();
+
+			if ( value.equals( current.value ) ) return current;
+
+			final double distanceToVp = metric.calcDistance( current.coordinate , coord );
+			if ( distanceToVp <= current.cuttoffDistance ) {
+				if ( current.close != null ) stack.add( current.close );
+			}
+			else if ( current.far != null ) stack.add( current.far );
+		}
+
+		return null;
+	}
+
 	public T getClosest( final C coord ) {
 		return getClosest( coord , t -> true );
 	}
@@ -145,16 +228,19 @@ public class VPTree<C,T> {
 
 		while( !stack.isEmpty() ) {
 			final Node<C,T> current = stack.poll();
-			if ( current.value == null ) {
-				assert current.close == null;
-				assert current.far == null;
+
+			if ( current.value == null &&
+					current.close == null &&
+					current.far == null ) {
 				continue;
 			}
 
 			final double distToVp = metric.calcDistance( coord , current.coordinate );
 
 			// check if current VP closest than closest known
-			if ( distToVp < bestDist && predicate.test( current.value ) ) {
+			if ( current.value != null &&
+					distToVp < bestDist &&
+					predicate.test( current.value ) ) {
 				closest = current.value;
 				bestDist = distToVp;
 			}
