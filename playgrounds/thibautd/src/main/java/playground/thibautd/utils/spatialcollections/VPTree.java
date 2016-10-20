@@ -20,15 +20,13 @@ package playground.thibautd.utils.spatialcollections;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 import java.util.function.Predicate;
-
-import static playground.ivt.router.TripSoftCache.LocationType.coord;
 
 /**
  * @author thibautd
@@ -48,7 +46,32 @@ public class VPTree<C,T> {
 		this.coordinate = coordinate;
 	}
 
+
+	public int size() {
+		return size;
+	}
+
+	public Collection<T> getAll() {
+		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
+		stack.add( root );
+
+		final Collection<T> all = new ArrayList<>();
+		while ( !stack.isEmpty() ) {
+			final Node<C,T> current = stack.poll();
+
+			if ( current.value == null ) continue;
+
+			all.add( current.value );
+
+			if ( current.close != null ) stack.add( current.close );
+			if ( current.far != null ) stack.add( current.far );
+		}
+
+		return all;
+	}
+
 	public void add( final Collection<T> toAdd ) {
+		if ( size() > 0 ) throw new IllegalStateException();
 		add( root , toAdd );
 	}
 
@@ -62,38 +85,48 @@ public class VPTree<C,T> {
 
 		while ( !stack.isEmpty() ) {
 			final AddFrame<C,T> currentFrame = stack.poll();
-
 			if ( currentFrame.toAdd.isEmpty() ) continue;
 
 			final T vantagePoint = removeVantagePoint( currentFrame.toAdd );
+
+			assert vantagePoint != null;
+			currentFrame.node.value = vantagePoint;
+			currentFrame.node.coordinate = coordinate.getCoord( vantagePoint );
+
+			if ( currentFrame.toAdd.isEmpty() ) continue;
+
 			final double medianDistance = medianDistance( vantagePoint , currentFrame.toAdd );
 
+			// avoid wasting memory by reusing toAdd list
 			final AddFrame<C,T> closeFrame =
 					new AddFrame<>(
 							new Node<>(),
-							new ArrayList<>( currentFrame.toAdd.size() / 2 + 1 ) );
+							currentFrame.toAdd );
 			final AddFrame<C,T> farFrame =
 					new AddFrame<>(
 							new Node<>(),
 							new ArrayList<>( currentFrame.toAdd.size() / 2 + 1 ) );
 
-			currentFrame.node.value = vantagePoint;
-			currentFrame.node.coordinate = coordinate.getCoord( vantagePoint );
 			currentFrame.node.cuttoffDistance = medianDistance;
-			currentFrame.node.close = closeFrame.node;
-			currentFrame.node.far = farFrame.node;
 
-			for ( T v : currentFrame.toAdd ) {
-				if ( calcDistance( vantagePoint, v ) < medianDistance ) {
-					closeFrame.toAdd.add( v );
-				}
-				else {
+			for ( Iterator<T> it = currentFrame.toAdd.iterator(); it.hasNext(); ) {
+				final T v = it.next();
+				final double distanceToVP = metric.calcDistance( currentFrame.node.coordinate , coordinate.getCoord( v ) );
+
+				if ( distanceToVP > medianDistance ) {
+					it.remove();
 					farFrame.toAdd.add( v );
 				}
 			}
 
-			stack.add( closeFrame );
-			stack.add( farFrame );
+			if ( !closeFrame.toAdd.isEmpty() ) {
+				currentFrame.node.close = closeFrame.node;
+				stack.add( closeFrame );
+			}
+			if ( !farFrame.toAdd.isEmpty() ) {
+				currentFrame.node.far = farFrame.node;
+				stack.add( farFrame );
+			}
 		}
 	}
 
@@ -109,9 +142,14 @@ public class VPTree<C,T> {
 
 		T closest = null;
 		double bestDist = Double.POSITIVE_INFINITY;
+
 		while( !stack.isEmpty() ) {
 			final Node<C,T> current = stack.poll();
-			if ( current.value == null ) continue;
+			if ( current.value == null ) {
+				assert current.close == null;
+				assert current.far == null;
+				continue;
+			}
 
 			final double distToVp = metric.calcDistance( coord , current.coordinate );
 
@@ -122,8 +160,8 @@ public class VPTree<C,T> {
 			}
 
 			// test intersection of disc of points closest than best so far with the children
-			if ( distToVp + bestDist >= current.cuttoffDistance ) stack.add( current.far );
-			if ( distToVp - bestDist <= current.cuttoffDistance ) stack.add( current.close );
+			if ( current.close != null && distToVp - bestDist <= current.cuttoffDistance ) stack.add( current.close );
+			if ( current.far != null && distToVp + bestDist >= current.cuttoffDistance ) stack.add( current.far );
 		}
 
 		return closest;
@@ -149,7 +187,7 @@ public class VPTree<C,T> {
 	private <E> List<E> sublist( final List<E> l ) {
 		if ( l.size() < SUBLIST_SIZE_MEDIAN ) return l;
 
-		final List<E> sublist = new ArrayList<>();
+		final List<E> sublist = new ArrayList<>( (int) (SUBLIST_SIZE_MEDIAN * 1.5) );
 		final double prob = ((double) SUBLIST_SIZE_MEDIAN) / l.size();
 
 		for ( E e : l ) {
@@ -166,7 +204,7 @@ public class VPTree<C,T> {
 	private static class Node<C,T> {
 		private C coordinate;
 		private T value = null;
-		private double cuttoffDistance = -1;
+		private double cuttoffDistance = Double.NaN;
 		private Node<C,T> close = null;
 		private Node<C,T> far = null;
 	}

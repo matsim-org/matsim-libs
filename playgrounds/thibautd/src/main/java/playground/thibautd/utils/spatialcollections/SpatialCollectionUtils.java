@@ -22,6 +22,16 @@ package playground.thibautd.utils.spatialcollections;
  * @author thibautd
  */
 public class SpatialCollectionUtils {
+	public static double manhattan( double[] c1 , double[] c2 ) {
+		double d = 0;
+
+		for (int i=0; i < c1.length; i++ ) {
+			d += Math.abs( c1[ i ] - c2[ i ] );
+		}
+
+		return d;
+	}
+
 	public static double squaredEuclidean( double[] c1 , double[] c2 ) {
 		double d = 0;
 
