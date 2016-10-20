@@ -62,6 +62,7 @@ public class ServiceAreasControler {
 
 	public static void installCarSharing(final Controler controler) {
 		final Scenario scenario = controler.getScenario();
+		CarsharingXmlReaderNew reader = new CarsharingXmlReaderNew(scenario.getNetwork());
 
 		final CarsharingConfigGroup configGroup = (CarsharingConfigGroup) scenario.getConfig().getModule( CarsharingConfigGroup.GROUP_NAME );
 		final FreeFloatingConfigGroup ffConfigGroup = (FreeFloatingConfigGroup) scenario.getConfig().getModule(FreeFloatingConfigGroup.GROUP_NAME);
@@ -69,9 +70,6 @@ public class ServiceAreasControler {
 		FreefloatingAreasReader ffAreasReader = new FreefloatingAreasReader();
 		ffAreasReader.readFile(ffConfigGroup.getAreas());
 		final FreefloatingAreas freefloatingAreas = ffAreasReader.getFreefloatingAreas();
-
-		CarsharingXmlReaderNew reader = new CarsharingXmlReaderNew(scenario.getNetwork());
-		reader.setFreefloatingAreas(freefloatingAreas);
 
 		// this is necessary to populate the companies list
 		reader.readFile(configGroup.getvehiclelocations());

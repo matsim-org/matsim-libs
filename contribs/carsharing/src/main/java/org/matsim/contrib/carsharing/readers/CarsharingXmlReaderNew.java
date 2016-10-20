@@ -15,7 +15,6 @@ import org.matsim.contrib.carsharing.manager.supply.FreeFloatingVehiclesContaine
 import org.matsim.contrib.carsharing.manager.supply.OneWayContainer;
 import org.matsim.contrib.carsharing.manager.supply.TwoWayContainer;
 import org.matsim.contrib.carsharing.manager.supply.VehiclesContainer;
-import org.matsim.contrib.carsharing.qsim.FreefloatingAreas;
 import org.matsim.contrib.carsharing.stations.CarsharingStation;
 import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
 import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
@@ -44,13 +43,6 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 	private boolean hasTW = false;
 	private Map<String, CompanyContainer> companies = new HashMap<String, CompanyContainer>();
 	private Set<String> companyNames = new TreeSet<String>();
-
-	private FreefloatingAreas freefloatingAreas;
-
-	public void setFreefloatingAreas(FreefloatingAreas freefloatingAreas) {
-		this.freefloatingAreas = freefloatingAreas;
-	}
-
 	public Set<String> getCompanyNames() {
 		return this.companyNames;
 	}
@@ -178,11 +170,7 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 			String yCoord = atts.getValue("y");
 			String type = atts.getValue("type");
 			Coord coordStation = new Coord(Double.parseDouble(xCoord), Double.parseDouble(yCoord));
-
-			if ((this.freefloatingAreas != null) && (this.freefloatingAreas.contains(coordStation) == false)) {
-				return;
-			}
-
+				
 			link = (Link)NetworkUtils.getNearestLinkExactly(network, coordStation);
 			FFVehicleImpl ffcsvehicle = new FFVehicleImpl(type, atts.getValue("id"), companyName);
 			ffVehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), ffcsvehicle);
