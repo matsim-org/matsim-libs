@@ -28,7 +28,9 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.misc.Counter;
 import playground.thibautd.utils.spatialcollections.KDTree;
+import playground.thibautd.utils.spatialcollections.SpatialCollectionUtils;
 import playground.thibautd.utils.spatialcollections.SpatialTree;
+import playground.thibautd.utils.spatialcollections.VPTree;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -75,11 +77,7 @@ public class SocialNetworkSampler {
 			final Ego ego = egoDistribution.sampleEgo( p );
 			egos.put( p.getId() , ego );
 		}
-		final SpatialTree<double[],Ego> egosWithFreeStubs =
-				new KDTree<>(
-						configGroup.doRebalanceKdTree(),
-						egoLocator.getDimensionality(),
-						egoLocator );
+		final SpatialTree<double[],Ego> egosWithFreeStubs = createSpatialTree();
 		egosWithFreeStubs.add( egos.values() );
 
 		log.info( "Start sampling with "+egosWithFreeStubs.size()+" egos with free stubs" );
@@ -118,6 +116,22 @@ public class SocialNetworkSampler {
 		log.info( "Number of excedentary ties: "+(sumActualDegrees - sumPlannedDegrees) );
 
 		return new SampledSocialNetwork( egos );
+	}
+
+	private SpatialTree<double[],Ego> createSpatialTree() {
+		switch ( configGroup.getSpatialTreeType() ) {
+			case KDTree:
+				return new KDTree<>(
+						configGroup.doRebalanceKdTree(),
+						egoLocator.getDimensionality(),
+						egoLocator );
+			case VPTree:
+				return new VPTree<>(
+						SpatialCollectionUtils::squaredEuclidean,
+						egoLocator );
+			default:
+				throw new RuntimeException( configGroup.getSpatialTreeType()+"?" );
+		}
 	}
 
 }
