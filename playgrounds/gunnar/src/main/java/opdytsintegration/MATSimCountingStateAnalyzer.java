@@ -12,6 +12,7 @@ import org.matsim.core.events.handler.EventHandler;
 
 import floetteroed.utilities.DynamicData;
 import opdytsintegration.utils.RecursiveCountAverage;
+import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * Keeps track of a (part of a) MATSim state vector that is composed of counts
@@ -42,10 +43,13 @@ public class MATSimCountingStateAnalyzer<L extends Object> implements EventHandl
 
 	// -------------------- CONSTRUCTION --------------------
 
-	// TODO use TimeDiscretization as argument, also in DynamicData
 	public MATSimCountingStateAnalyzer(final int startTime_s, final int binSize_s, final int binCnt) {
 		this.counts = new DynamicData<>(startTime_s, binSize_s, binCnt);
 		this.reset(-1);
+	}
+
+	public MATSimCountingStateAnalyzer(final TimeDiscretization timeDiscr) {
+		this(timeDiscr.getStartTime_s(), timeDiscr.getBinSize_s(), timeDiscr.getBinCnt());
 	}
 
 	// -------------------- IMPLEMENTATION OF EventHandler --------------------

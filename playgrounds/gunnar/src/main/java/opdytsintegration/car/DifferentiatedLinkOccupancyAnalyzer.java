@@ -1,4 +1,4 @@
-package opdytsintegration.networkmodes;
+package opdytsintegration.car;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -22,6 +22,9 @@ import opdytsintegration.MATSimCountingStateAnalyzer;
 import opdytsintegration.utils.TimeDiscretization;
 
 /**
+ * Keeps track of link occupancies per time bin and network mode.
+ * 
+ * TODO: The mode String comparisons could probably be sped up.
  * 
  * @author Gunnar Flötteröd
  *
@@ -31,27 +34,24 @@ public class DifferentiatedLinkOccupancyAnalyzer implements LinkLeaveEventHandle
 
 	// -------------------- MEMBERS --------------------
 
-	private final Set<Id<Link>> relevantLinks;
-
+	// one occupancy analyzer per considered mode
 	private final Map<String, MATSimCountingStateAnalyzer<Link>> mode2stateAnalyzer;
 
+	// where occupancies are to be tracked
+	private final Set<Id<Link>> relevantLinks;
+
+	// fast occupancy analyzer lookup for each currently traveling vehicle
 	private Map<Id<Vehicle>, MATSimCountingStateAnalyzer<Link>> vehicleId2stateAnalyzer = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public DifferentiatedLinkOccupancyAnalyzer(final int startTime_s, final int binSize_s, final int binCnt,
+	public DifferentiatedLinkOccupancyAnalyzer(final TimeDiscretization timeDiscretization,
 			final Set<String> relevantModes, final Set<Id<Link>> relevantLinks) {
 		this.mode2stateAnalyzer = new LinkedHashMap<>();
 		for (String mode : relevantModes) {
-			this.mode2stateAnalyzer.put(mode, new MATSimCountingStateAnalyzer<Link>(startTime_s, binSize_s, binCnt));
+			this.mode2stateAnalyzer.put(mode, new MATSimCountingStateAnalyzer<Link>(timeDiscretization));
 		}
 		this.relevantLinks = relevantLinks;
-	}
-
-	public DifferentiatedLinkOccupancyAnalyzer(final TimeDiscretization timeDiscretization,
-			final Set<String> relevantModes, final Set<Id<Link>> relevantLinks) {
-		this(timeDiscretization.getStartTime_s(), timeDiscretization.getBinSize_s(), timeDiscretization.getBinCnt(),
-				relevantModes, relevantLinks);
 	}
 
 	// -------------------- INTERNALS --------------------
@@ -60,6 +60,11 @@ public class DifferentiatedLinkOccupancyAnalyzer implements LinkLeaveEventHandle
 		return ((this.relevantLinks == null) || this.relevantLinks.contains(link));
 	}
 
+	// TODO: Encapsulate and provide access to the full real-valued state vector per mode.
+	public MATSimCountingStateAnalyzer<Link> getNetworkModeAnalyzer(final String mode) {
+		return this.mode2stateAnalyzer.get(mode);
+	}
+	
 	// ---------- IMPLEMENTATION OF *EventHandler INTERFACES ----------
 
 	@Override
@@ -119,7 +124,8 @@ public class DifferentiatedLinkOccupancyAnalyzer implements LinkLeaveEventHandle
 			if (this.relevantLink(event.getLinkId())) {
 				stateAnalyzer.registerDecrease(event.getLinkId(), (int) event.getTime());
 			}
-			// TODO What does an abort imply? Should the vehicle be taken out?
+			// TODO: Based on the assumption "abort = abort trip".
+			this.vehicleId2stateAnalyzer.remove(event.getVehicleId());
 		}
 	}
 }
