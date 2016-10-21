@@ -119,7 +119,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 						stationLink, destinationLink, true, false);
 			}
 			else {
-				if (carsharingType.equals("oneway")) {
+				if ((carsharingType.equals("oneway")) || (carsharingType.equals("freefloating"))) {
 					Link parkingStationLink = this.carsharingSupplyContainer.findClosestAvailableParkingSpace(
 							destinationLink, carsharingType, companyId, searchDistance);
 					if (parkingStationLink == null)

@@ -4,7 +4,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.carsharing.qsim.FreefloatingAreas;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
+import org.matsim.core.network.SearchableNetwork;
 import org.matsim.core.utils.collections.QuadTree;
 /** 
  * @author balac
@@ -12,9 +14,11 @@ import org.matsim.core.utils.collections.QuadTree;
 public class FreeFloatingVehiclesContainer implements VehiclesContainer{	
 	
 	private QuadTree<CSVehicle> availableFFVehicleLocationQuadTree;	
-	private Map<String, CSVehicle> ffvehicleIdMap ;
-	private Map<CSVehicle, Link> availableFFvehiclesMap ;
-		
+	private Map<String, CSVehicle> ffvehicleIdMap;
+	private Map<CSVehicle, Link> availableFFvehiclesMap;
+	private SearchableNetwork network;
+	private FreefloatingAreas freefloatingAreas;
+
 	public FreeFloatingVehiclesContainer(QuadTree<CSVehicle> ffVehicleLocationQuadTree,
 			Map<String, CSVehicle> ffvehicleIdMap, Map<CSVehicle, Link> ffvehiclesMap) {
 		
@@ -23,24 +27,40 @@ public class FreeFloatingVehiclesContainer implements VehiclesContainer{
 		this.ffvehicleIdMap = ffvehicleIdMap;
 		
 	}
-	
+
 	public QuadTree<CSVehicle> getFfVehicleLocationQuadTree() {
 		return availableFFVehicleLocationQuadTree;
 	}
+
 	public Map<String, CSVehicle> getFfvehicleIdMap() {
 		return ffvehicleIdMap;
 	}
+
 	public Map<CSVehicle, Link> getFfvehiclesMap() {
 		return availableFFvehiclesMap;
 	}
-	
-	public void reserveVehicle(CSVehicle vehicle) {	
-			
+
+	public void setNetwork(SearchableNetwork network) {
+		this.network = network;
+	}
+
+	public SearchableNetwork getNetwork() {
+		return this.network;
+	}
+
+	public void setFreefloatingAreas(FreefloatingAreas areas) {
+		this.freefloatingAreas = areas;
+	}
+
+	public FreefloatingAreas getFreefloatingAreas() {
+		return this.freefloatingAreas;
+	}
+
+	public void reserveVehicle(CSVehicle vehicle) {
 		Link link = this.availableFFvehiclesMap.get(vehicle);
 		Coord coord = link.getCoord();
 		this.availableFFvehiclesMap.remove(vehicle);
 		this.availableFFVehicleLocationQuadTree.remove(coord.getX(), coord.getY(), vehicle);
-			
 	}
 
 	public void parkVehicle(CSVehicle vehicle, Link link) {
@@ -48,7 +68,6 @@ public class FreeFloatingVehiclesContainer implements VehiclesContainer{
 					
 		availableFFVehicleLocationQuadTree.put(coord.getX(), coord.getY(), vehicle);
 		availableFFvehiclesMap.put(vehicle, link);
-				
 	}
 
 	@Override
@@ -65,12 +84,27 @@ public class FreeFloatingVehiclesContainer implements VehiclesContainer{
 
 	@Override
 	public Link findClosestAvailableParkingLocation(Link destinationLink, double searchDistance) {
-		return null;
+		if (this.getFreefloatingAreas() == null) {
+			return destinationLink;
+		}
+
+		Coord destination = destinationLink.getCoord();
+
+		if (this.getFreefloatingAreas().contains(destination)) {
+			return destinationLink;
+		} else {
+			Coord[] nearestPoints = this.getFreefloatingAreas().nearestPoints(destination);
+
+			if (this.getNetwork() != null) {
+				return this.getNetwork().getNearestLinkExactly(nearestPoints[0]);
+			} else {
+				return null;
+			}
+		}
 	}
 
 	@Override
 	public void reserveParking(Link destinationLink) {
 		
 	}
-	
 }

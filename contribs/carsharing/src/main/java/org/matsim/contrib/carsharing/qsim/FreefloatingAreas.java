@@ -7,8 +7,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.opengis.feature.simple.SimpleFeature;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.operation.distance.DistanceOp;
 
 public class FreefloatingAreas {
 	private PointFeatureFactory pointFeatureFactory;
@@ -52,5 +54,27 @@ public class FreefloatingAreas {
 		Point point = (Point) pointFeature.getAttribute("the_geom");
 
 		return polygons.contains(point);
+	}
+
+	public Coord[] nearestPoints(Coord coord) {
+		if (this.areas == null) {
+			return new Coord[]{coord};
+		}
+
+		MultiPolygon polygons = (MultiPolygon) this.areas.getAttribute("the_geom");
+		SimpleFeature pointFeature = this.pointFeatureFactory.createPoint(coord, new Object[0], null);
+		Point point = (Point) pointFeature.getAttribute("the_geom");
+
+		Coordinate[] coordinates = DistanceOp.nearestPoints(polygons, point);
+		Coord[] coords = new Coord[coordinates.length];
+
+		int index = 0;
+		for (Coordinate coordinate : coordinates) {
+			Coord nearestCoord = new Coord(coordinate.x, coordinate.y);
+			coords[index] = nearestCoord;
+			index++;
+		}
+
+		return coords;
 	}
 }

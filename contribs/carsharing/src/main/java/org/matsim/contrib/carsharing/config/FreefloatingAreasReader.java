@@ -1,6 +1,8 @@
 package org.matsim.contrib.carsharing.config;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -15,9 +17,11 @@ import org.xml.sax.Attributes;
 public class FreefloatingAreasReader extends MatsimXmlParser {
 	private PolygonFeatureFactory polygonFeatureFactory;
 
-	private FreefloatingAreas freefloatingAreas = null;
+	private Map<String, FreefloatingAreas> freefloatingAreas = new HashMap<String, FreefloatingAreas>();
 
 	private Counter counter;
+
+	private String companyName;
 
 	private String idString = null;
 
@@ -35,6 +39,10 @@ public class FreefloatingAreasReader extends MatsimXmlParser {
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (name.equals("areas")) {
 			counter = new Counter("reading freefloating area # ");
+		}
+
+		if (name.equals("company")) {
+			this.companyName = atts.getValue("name");
 		}
 
 		if (name.equals("area")) {
@@ -71,18 +79,18 @@ public class FreefloatingAreasReader extends MatsimXmlParser {
 		}
 	}
 
-	public FreefloatingAreas getFreefloatingAreas() {
+	public Map<String, FreefloatingAreas> getFreefloatingAreas() {
 		return this.freefloatingAreas;
 	}
 
 	public void addArea(SimpleFeature area) {
 		// TODO: what was the purpose of this check?
 		if (area.getName().getLocalPart() == "freefloating_area") {
-			if (this.freefloatingAreas == null) {
-				this.freefloatingAreas = new FreefloatingAreas();
+			if (this.getFreefloatingAreas().containsKey(this.companyName) == false) {
+				this.getFreefloatingAreas().put(this.companyName, new FreefloatingAreas());
 			}
 
-			this.freefloatingAreas.add(area);
+			this.getFreefloatingAreas().get(this.companyName).add(area);
 		}
 	}
 }
