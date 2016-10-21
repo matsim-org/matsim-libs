@@ -41,4 +41,6 @@ public interface ChargingPlug extends Identifiable<ChargingPlug> {
 
 	boolean isAvailable();
 	boolean isAccessible();
+
+	void resetAll();
 }

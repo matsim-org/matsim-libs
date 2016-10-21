@@ -91,8 +91,8 @@ public class ScalabilityStatisticsListener implements AutoCloseable {
 		for ( Ego e : clique ) {
 			nCliqueTies.adjustOrPutValue(
 					e,
-					clique.size(),
-					clique.size() );
+					clique.size() - 1,
+					clique.size() - 1 );
 		}
 	}
 

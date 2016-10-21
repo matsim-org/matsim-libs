@@ -70,5 +70,7 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 
 	abstract int getNumAvailablePlugsOfType(ChargingPlugType plugType);
 
+	abstract void resetAll();
+
 
 }

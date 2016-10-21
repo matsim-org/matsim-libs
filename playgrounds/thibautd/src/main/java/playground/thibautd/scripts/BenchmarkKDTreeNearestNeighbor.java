@@ -20,7 +20,8 @@ package playground.thibautd.scripts;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
-import playground.thibautd.utils.KDTree;
+import playground.thibautd.utils.spatialcollections.KDTree;
+import playground.thibautd.utils.spatialcollections.SpatialCollectionUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -83,12 +84,14 @@ public class BenchmarkKDTreeNearestNeighbor {
 
 			final long start = System.currentTimeMillis();
 			final double distExact = searched.stream()
-					.mapToDouble( p -> KDTree.euclidean( p , qt.getClosestEuclidean( p ) ) )
+					.mapToDouble( p -> SpatialCollectionUtils.euclidean( p , qt.getClosestEuclidean( p ) ) )
 					.average()
 					.getAsDouble();
 			final long mid = System.currentTimeMillis();
+			// in perfectly balanced binary tree, number of leaves is (n + 1) / 2
+			// so size / x is a good way to define Emax
 			final double distAppr = searched.stream()
-					.mapToDouble( p -> KDTree.euclidean( p , qt.getClosest( p , KDTree::euclidean , x -> true , 0.1 , size ) ) )
+					.mapToDouble( p -> SpatialCollectionUtils.euclidean( p , qt.getClosest( p , SpatialCollectionUtils::euclidean , x -> true , 0. , size / 100 ) ) )
 					.average()
 					.getAsDouble();
 			final long end = System.currentTimeMillis();

@@ -265,7 +265,7 @@ public class FacilityGenerator {
                 List<OSMObject> result = buildingTree.query(poi.getGeometry().getEnvelopeInternal());
                 boolean hit = false;
                 for (OSMObject geo : result) {
-                    if (geo.getGeometry().contains(poi.getGeometry())) {
+                    if (geo.getGeometry().contains(poi.getGeometry()) && poi.getFacilityType().equals(geo.getFacilityType())) {
                         hit = true;
                         poiIgnored++;
                         break;
@@ -273,17 +273,17 @@ public class FacilityGenerator {
                 }
 
                 // check if in area
-                if (!hit) {
-                    result = quadTree.query(poi.getGeometry().getEnvelopeInternal());
-                    hit = false;
-                    for (OSMObject geo : result) {
-                        if (geo.getGeometry().contains(poi.getGeometry())) {
-                            hit = true;
-                            poiIgnored++;
-                            break;
-                        }
-                    }
-                }
+//                if (!hit) {
+//                    result = quadTree.query(poi.getGeometry().getEnvelopeInternal());
+//                    hit = false;
+//                    for (OSMObject geo : result) {
+//                        if (geo.getGeometry().contains(poi.getGeometry())) {
+//                            hit = true;
+//                            poiIgnored++;
+//                            break;
+//                        }
+//                    }
+//                }
 
                 if (!hit) {
                     String type = poi.getFacilityType();
