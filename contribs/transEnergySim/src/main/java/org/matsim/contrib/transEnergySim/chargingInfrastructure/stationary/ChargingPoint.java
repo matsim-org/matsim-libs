@@ -41,4 +41,6 @@ public interface ChargingPoint extends Identifiable<ChargingPoint> {
 	void registerPlugAvailable(ChargingPlug chargingPlugImpl);
 
 	void registerPlugUnavailable(ChargingPlug chargingPlugImpl);
+
+	void resetAll();
 }
