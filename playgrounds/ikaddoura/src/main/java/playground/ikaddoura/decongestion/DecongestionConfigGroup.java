@@ -39,8 +39,8 @@ public class DecongestionConfigGroup {
 	private TollingApproach TOLLING_APPROACH = TollingApproach.PID;
 	private double TOLL_BLEND_FACTOR = 1.0; // default: 1.0
 	private double Kp = 1.0;
-	private double Ki = 1.0;
 	private double Kd = 1.0;
+	private double Ki = 1.0;
 	
 	// General parameters
 	private boolean RUN_FINAL_ANALYSIS = true;
