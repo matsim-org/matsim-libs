@@ -98,13 +98,13 @@ public class MATSimCountingStateAnalyzer<L extends Object> implements EventHandl
 
 	// -------------------- SETTERS --------------------
 
-	protected void registerIncrease(final Id<L> location, final int time_s) {
+	public void registerIncrease(final Id<L> location, final int time_s) {
 		this.checkLocked();
 		this.completeBinsUntilTime(time_s);
 		this.avg(location).inc(time_s);
 	}
 
-	protected void registerDecrease(final Id<L> location, final int time_s) {
+	public void registerDecrease(final Id<L> location, final int time_s) {
 		this.checkLocked();
 		this.completeBinsUntilTime(time_s);
 		this.avg(location).dec(time_s);

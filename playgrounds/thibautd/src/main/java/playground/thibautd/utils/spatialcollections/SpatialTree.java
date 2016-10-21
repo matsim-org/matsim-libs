@@ -16,23 +16,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
+package playground.thibautd.utils.spatialcollections;
 
-import playground.thibautd.utils.spatialcollections.SpatialTree;
-
-import java.util.Set;
+import java.util.Collection;
+import java.util.function.Predicate;
 
 /**
  * @author thibautd
  */
-public interface CliquesFiller {
-	/**
-	 * Sample a feasible clique, fills the alters lists of the egos, and returns the clique.
-	 * @param ego the "center" of the clique
-	 * @param egosWithFreeStubs
-	 * @return The set of egos pertaining to the clique, including the "center", already modified.
-	 */
-	Set<Ego> sampleClique( Ego ego, SpatialTree<double[], Ego> egosWithFreeStubs );
+public interface SpatialTree<C, T> {
+	int size();
 
-	boolean stopConsidering( Ego ego );
+	T getAny();
+
+	Collection<T> getAll();
+
+	void add( Collection<T> toAdd );
+
+	boolean remove( T value );
+
+	boolean contains( T value );
+
+	T getClosest( C coord );
+
+	T getClosest(
+			C coord,
+			Predicate<T> predicate );
 }

@@ -30,7 +30,8 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.Snow
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballSamplingConfigGroup;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SocialPositions;
 import playground.thibautd.utils.ArrayUtils;
-import playground.thibautd.utils.KDTree;
+import playground.thibautd.utils.spatialcollections.KDTree;
+import playground.thibautd.utils.spatialcollections.SpatialTree;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,7 +80,7 @@ public class CliquesDistributionCliquesFiller implements CliquesFiller {
 	@Override
 	public Set<Ego> sampleClique(
 			final Ego ego,
-			final KDTree<Ego> egosWithFreeStubs ) {
+			final SpatialTree<double[], Ego> egosWithFreeStubs ) {
 		// TODO condition sampling of clique on ego characteristic?
 		while ( !stopConsidering( ego ) ) {
 			final int size = CliqueEgoDistribution.getCliqueStructure( ego ).getRandomSize( random );
@@ -125,13 +126,13 @@ public class CliquesDistributionCliquesFiller implements CliquesFiller {
 		return !CliqueEgoDistribution.getCliqueStructure( ego ).hasUnassignedCliques();
 	}
 
-	public static Ego findEgo( final KDTree<Ego> egosWithFreeStubs,
+	public static Ego findEgo( final SpatialTree<double[],Ego> egosWithFreeStubs,
 			final SocialPositions.CliquePositions clique,
 			final double[] point,
 			final Collection<Ego> currentClique ) {
 		// TODO: could it be improved by putting size into coordinate system?
 		// would increase tree complexity but decrease search space, and thus the number of unfulfilled predicates...
-		return egosWithFreeStubs.getClosestEuclidean(
+		return egosWithFreeStubs.getClosest(
 				point,
 				e1 -> CliqueEgoDistribution.getCliqueStructure( e1 ).hasSize( clique.size() ) && !currentClique.contains( e1 ) );
 	}

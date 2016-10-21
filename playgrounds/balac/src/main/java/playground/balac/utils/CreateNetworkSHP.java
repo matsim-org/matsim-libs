@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03PlustoCH1903LV03;
@@ -31,7 +30,7 @@ public class CreateNetworkSHP {
     	double centerX = 683217.0; 
     	double centerY = 247300.0;	    	
         Config config = ConfigUtils.createConfig();
-        config.network().setInputFile("file:///C:/Users/balacm/Downloads/infrastructure_only_data_for_Milos_3.xml");
+        config.network().setInputFile("file:///C:/Users/balacm/Documents/Networks/zh/mmNetwork.xml");
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
              
@@ -50,9 +49,10 @@ public class CreateNetworkSHP {
                 addAttribute("fromID", String.class).
                 addAttribute("toID", String.class).
                 addAttribute("length", Double.class).
-               // addAttribute("type", String.class).
-              //  addAttribute("capacity", Double.class).
-              //  addAttribute("freespeed", Double.class).
+                addAttribute("capacity", Double.class).
+                addAttribute("freespeed", Double.class).
+                addAttribute("modes", String.class).
+
                 create();
         
         PointFeatureFactory nodeFactory = new PointFeatureFactory.Builder().
@@ -76,7 +76,8 @@ public class CreateNetworkSHP {
 		            Coordinate toNodeCoordinate = new Coordinate(transformation.transform(link.getToNode().getCoord()).getX(), transformation.transform(link.getToNode().getCoord()).getY());
 		            Coordinate linkCoordinate = new Coordinate(coordLinkT.getX(), coordLinkT.getY());
 		            SimpleFeature ft = linkFactory.createPolyline(new Coordinate [] {fromNodeCoordinate, linkCoordinate, toNodeCoordinate},
-		                    new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), link.getLength()}, null);
+		                    new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), 
+		                    		link.getLength(), link.getCapacity(), link.getFreespeed(), link.getAllowedModes().toString()}, null);
 		            featuresLink.add(ft);
 	            
 				//}
@@ -92,8 +93,8 @@ public class CreateNetworkSHP {
         	
             featuresNode.add(ft);
         }
-        ShapeFileWriter.writeGeometries(featuresLink, "C:/Users/balacm/Downloads/infrastructure_only_data_for_Milos_3_links.shp");
-        ShapeFileWriter.writeGeometries(featuresNode, "C:/Users/balacm/Downloads/infrastructure_only_data_for_Milos_3_nodess.shp");
+        ShapeFileWriter.writeGeometries(featuresLink, "C:/Users/balacm/Documents/Networks/zh/links.shp");
+        ShapeFileWriter.writeGeometries(featuresNode, "C:/Users/balacm/Documents/Networks/zh/nodes.shp");
 
       /*  features = new ArrayList();
         PointFeatureFactory nodeFactory = new PointFeatureFactory.Builder().

@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.utils;
+package playground.thibautd.utils.spatialcollections;
 
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -38,22 +38,18 @@ import java.util.function.ToDoubleBiFunction;
  *
  * @author thibautd
  */
-public class KDTree<T> {
+public class KDTree<T> implements SpatialTree<double[],T> {
 	// used only to balance the tree
 	private final Random random = MatsimRandom.getLocalInstance();
 	private static final int SUBLIST_SIZE_MEDIAN = 100;
 
 	private final int nDimensions;
 	private Node<T> root = new Node<>( 0 );
-	private final Coordinate<T> coordinate;
+	private final SpatialCollectionUtils.Coordinate<T> coordinate;
 
 	private final boolean rebalance;
 	private int stepsToRebalance = 100;
 	private int size = 0;
-
-	public interface Coordinate<T> {
-		double[] getCoord( T object );
-	}
 
 	/**
 	 * Creates an empty kd-tree
@@ -62,14 +58,14 @@ public class KDTree<T> {
 	 *              The implementation should be relatively efficient. Inefficient implementations will impact the performance
 	 *              of adding elements, but should have no influence on the query performance.
 	 */
-	public KDTree( final int nDimensions , final Coordinate<T> coord ) {
+	public KDTree( final int nDimensions , final SpatialCollectionUtils.Coordinate<T> coord ) {
 		this( false , nDimensions , coord );
 	}
 
 	public KDTree(
 			final boolean rebalance,
 			final int nDimensions,
-			final Coordinate<T> coord ) {
+			final SpatialCollectionUtils.Coordinate<T> coord ) {
 		this.rebalance = rebalance;
 		this.nDimensions = nDimensions;
 		this.coordinate = coord;
@@ -140,6 +136,10 @@ public class KDTree<T> {
 		throw new IllegalArgumentException( "Index too high" );
 	}
 
+	public T getAny() {
+		return root.value;
+	}
+
 	public boolean isEmpty() {
 		return size == 0;
 	}
@@ -180,6 +180,21 @@ public class KDTree<T> {
 
 		rebalanceIfNecessary();
 		return true;
+	}
+
+	@Override
+	public boolean contains( final T value ) {
+		return find( value ) != null;
+	}
+
+	@Override
+	public T getClosest( final double[] coord ) {
+		return getClosestEuclidean( coord );
+	}
+
+	@Override
+	public T getClosest( final double[] coord, final Predicate<T> predicate ) {
+		return getClosestEuclidean( coord , predicate );
 	}
 
 	private Node<T> findMin( final Node<T> start, final int dimension ) {
@@ -377,21 +392,11 @@ public class KDTree<T> {
 	}
 
 	public T getClosestEuclidean( final double[] coord ) {
-		return getClosest( coord , KDTree::euclidean );
+		return getClosest( coord , SpatialCollectionUtils::squaredEuclidean );
 	}
 
 	public T getClosestEuclidean( final double[] coord , final Predicate<T> predicate ) {
-		return getClosest( coord , KDTree::euclidean , predicate );
-	}
-
-	public static double euclidean( double[] c1 , double[] c2 ) {
-		double d = 0;
-
-		for (int i=0; i < c1.length; i++ ) {
-			d += Math.pow( c1[ i ] - c2[ i ] , 2 );
-		}
-
-		return d;
+		return getClosest( coord , SpatialCollectionUtils::squaredEuclidean, predicate );
 	}
 
 	public T getClosest( final double[] coord , final ToDoubleBiFunction<double[],double[]> distance ) {
