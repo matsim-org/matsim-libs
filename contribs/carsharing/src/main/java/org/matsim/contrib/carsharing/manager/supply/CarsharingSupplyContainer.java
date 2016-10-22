@@ -91,17 +91,20 @@ public class CarsharingSupplyContainer implements CarsharingSupplyInterface {
 	public void populateSupply() {
 		Network network = this.scenario.getNetwork();
 
+		final CarsharingConfigGroup configGroup = (CarsharingConfigGroup)
+				scenario.getConfig().getModule( CarsharingConfigGroup.GROUP_NAME );
+
 		final FreeFloatingConfigGroup ffConfigGroup = (FreeFloatingConfigGroup)
 				this.scenario.getConfig().getModule(FreeFloatingConfigGroup.GROUP_NAME);
 
-		FreefloatingAreasReader ffAreasReader = new FreefloatingAreasReader();
-		ffAreasReader.readFile(ffConfigGroup.getAreas());
-
 		CarsharingXmlReaderNew reader = new CarsharingXmlReaderNew(network);
-		reader.setFreefloatingAreas(ffAreasReader.getFreefloatingAreas());
-		
-		final CarsharingConfigGroup configGroup = (CarsharingConfigGroup)
-				scenario.getConfig().getModule( CarsharingConfigGroup.GROUP_NAME );
+
+		String areasFile = ffConfigGroup.getAreas();
+		if (areasFile != null) {
+			FreefloatingAreasReader ffAreasReader = new FreefloatingAreasReader();
+			ffAreasReader.readFile(areasFile);
+			reader.setFreefloatingAreas(ffAreasReader.getFreefloatingAreas());
+		}
 
 		reader.readFile(configGroup.getvehiclelocations());
 		this.companies = reader.getCompanies();
