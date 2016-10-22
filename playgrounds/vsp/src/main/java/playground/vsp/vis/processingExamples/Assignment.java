@@ -32,30 +32,42 @@ public class Assignment extends PApplet {
 		
 		this.strokeWeight(1);
 		
-		this.stroke(255,0,0) ;
-		this.line(originX, originY, originZ, originX+500, originY, originZ);
-		
-		this.stroke(0,255,0) ;
-		this.line(originX, originY, originZ, originX, originY+500, originZ);
-
-		this.stroke(0,0,255) ;
-		this.line(originX, originY, originZ, originX, originY, originZ-500);
+//		this.stroke(255,0,0) ;
+//		this.line(originX, originY, originZ, originX+500, originY, originZ);
+//		
+//		this.stroke(0,255,0) ;
+//		this.line(originX, originY, originZ, originX, originY+500, originZ);
+//
+//		this.stroke(0,0,255) ;
+//		this.line(originX, originY, originZ, originX, originY, originZ-500);
 
 		noStroke() ;
 		
-		
-		drawFlow(0, 0, 300, 100,0, 0xFFFF0000 );
-		if ( cnt >=1 ) {
-			drawFlow(0, 0, 300, 100,1, 0xFF00FF00 );
+		if ( cnt>=1 ) {
+			drawFlow(-300, -100, -100, 0, 0, 0xFFFF0000 );
+			drawFlow(-100, 0, 100, 0, 0, 0xFFFF0000 );
+			drawFlow(100, 0, 300, 100,0, 0xFFFF0000 );
 		}
+
 		if ( cnt >=2 ) {
-			drawFlow(300,100,600,0,0, 0xFFFF0000 ) ;
+			drawFlow(-300, 100, -100, 0, 0, 0xFF00FF00 );
+			drawFlow(-100, 00, 100, 0, 1, 0xFF00FF00 );
+			drawFlow(100, 0, 300, -100, 0, 0xFF00FF00 );
+		}
+		if ( cnt >=3 ) {
+			drawFlow(-300,100,-100,0,1, 0xFF0000FF ) ;
+			drawFlow(-100,0,100,0,2, 0xFF0000FF ) ;
+			drawFlow(100,0,300,100,1, 0xFF0000FF ) ;
 		}
 		
 	}
 	
-	@Override public void mouseClicked() {
-		cnt++ ;
+	@Override public void mousePressed() {
+		if ( this.mouseButton==LEFT ) {
+			cnt++ ;
+		} else {
+			cnt-- ;
+		}
 	}
 
 	private void drawFlow(float x0, float y0, float x1, float y1, float level, int color) {
