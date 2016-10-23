@@ -117,7 +117,7 @@ public class RunSiouxFallsCalibration {
                 numberOfOpdytsTransitions * candidatePoolSize + candidatePoolSize * numberOfOpdytsIterations,
                 candidatePoolSize,
                 new Random(),
-                false,
+                true,
                 objectiveFunction,
                 false
         );

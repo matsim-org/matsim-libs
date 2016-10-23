@@ -19,11 +19,14 @@ public class MyDecisionVariableRandomizer implements DecisionVariableRandomizer<
         double costs = Double.parseDouble(remoteDecisionVariable.getParameters().get("car_costs"));
         LinkedList<RemoteDecisionVariable> variations = new LinkedList<>();
 
+        double costsCtPerKm = costs * 100.0 * 1000;
+        double std = 10; // 2ct standard deviation
+
         for (int i = 0; i < candidatePoolSize; i++) {
             Map<String, String> newParameters = new HashMap<>();
-            double diff = ((20.0 - 40.0 * random.nextDouble()) / 100.0) / 1000.0;
+            double newCtPerKm = costsCtPerKm + std * random.nextGaussian();
 
-            newParameters.put("car_costs", String.valueOf(costs + diff));
+            newParameters.put("car_costs", String.valueOf(newCtPerKm / 100.0 / 1000.0));
             variations.add(new RemoteDecisionVariable(newParameters));
         }
 

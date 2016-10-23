@@ -34,6 +34,7 @@ public class RemoteSimulator implements Simulator<RemoteDecisionVariable> {
 
         RemoteSimulatorState state = new RemoteSimulatorState(simulation, handler.getState());
         trajectorySampler.afterIteration(state);
+
         return state;
     }
 
@@ -43,6 +44,8 @@ public class RemoteSimulator implements Simulator<RemoteDecisionVariable> {
         RemoteObjectiveFunction objectiveFunction = (RemoteObjectiveFunction) trajectorySampler.getObjectiveFunction();
 
         trajectorySampler.initialize();
+
+        System.out.println("NEW SIMULATION");
 
         RemoteSimulation simulation = factory.createSimulation(state == null ? null : state.getSimulation(), trajectorySampler.getCurrentDecisionVariable());
         simulation.start();
@@ -64,6 +67,7 @@ public class RemoteSimulator implements Simulator<RemoteDecisionVariable> {
 
             if (temporaryIteration > activeIteration) {
                 activeIteration = temporaryIteration;
+                System.out.println("MATSIM ITERATION " + activeIteration + "(" + factory.getNumberOfIterationsPerTransition() + " iterations per transition)");
             }
 
             while (nextTransitionIteration < activeIteration) {

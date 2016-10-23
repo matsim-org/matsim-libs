@@ -9,6 +9,7 @@ public class RemoteDecisionVariable implements DecisionVariable {
 
     public RemoteDecisionVariable(Map<String, String> parameters) {
         this.parameters = parameters;
+        System.out.println("NEW DECISION VARIABLE " + this.toString());
     }
 
     public Map<String, String> getParameters() {

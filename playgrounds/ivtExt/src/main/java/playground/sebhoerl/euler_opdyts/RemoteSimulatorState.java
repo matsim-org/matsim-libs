@@ -11,6 +11,8 @@ public class RemoteSimulatorState implements SimulatorState {
     public RemoteSimulatorState(RemoteSimulation simulation, Vector stateVectorRepresentation) {
         this.simulation = simulation;
         this.stateVectorRepresentation = stateVectorRepresentation;
+
+        System.out.println("NEW STATE " + stateVectorRepresentation.toString());
     }
 
     @Override
