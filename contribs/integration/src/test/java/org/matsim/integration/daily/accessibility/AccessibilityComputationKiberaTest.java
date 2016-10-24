@@ -64,15 +64,17 @@ public class AccessibilityComputationKiberaTest {
 		// Input and output
 		String folderStructure = "../../";
 		String networkFile = "matsimExamples/countries/ke/kibera/2015-11-05_network_paths_detailed.xml";
+//		String networkFile = "../shared-svn/projects/maxess/data/nairobi/network/2015-11-05_kibera_paths_detailed.xml";
 		// Adapt folder structure that may be different on different machines, in particular on server
 		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
 		networkFile = folderStructure + networkFile ;
 		final String facilitiesFile = folderStructure + "matsimExamples/countries/ke/kibera/2015-11-05_facilities.xml";
+//		final String facilitiesFile = folderStructure + "../shared-svn/projects/maxess/data/nairobi/facilities/03/facilities.xml";
 		final String outputDirectory = utils.getOutputDirectory();
 		
 		// Parameters
 		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
-		final Envelope envelope = new Envelope(251000, 9853000, 256000, 9857000);
+		final Envelope envelope = new Envelope(252000, 256000, 9854000, 9856000);
 		final String runId = "ke_kibera_" + PathUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
 		final boolean push2Geoserver = false;
 
@@ -80,6 +82,7 @@ public class AccessibilityComputationKiberaTest {
 		boolean createQGisOutput = true;
 		final boolean includeDensityLayer = false;
 		final Double lowerBound = 0.; // (upperBound - lowerBound) is ideally easily divisible by 7
+//		final Double lowerBound = 1.75; // (upperBound - lowerBound) is ideally easily divisible by 7
 		final Double upperBound = 3.5;
 		final Integer range = 9; // in the current implementation, this need always be 9
 		final int symbolSize = 10;
@@ -120,8 +123,8 @@ public class AccessibilityComputationKiberaTest {
 		
 		// Network bounds
 		// TODO check if this works more direct
-		BoundingBox networkBounds = BoundingBox.createBoundingBox(scenario.getNetwork());
-		Envelope analysisEnvelope = new Envelope(networkBounds.getXMin(), networkBounds.getXMax(), networkBounds.getYMin(), networkBounds.getYMax());
+//		BoundingBox networkBounds = BoundingBox.createBoundingBox(scenario.getNetwork());
+//		Envelope analysisEnvelope = new Envelope(networkBounds.getXMin(), networkBounds.getXMax(), networkBounds.getYMin(), networkBounds.getYMax());
 		
 		// Collect activity types
 //		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
@@ -138,7 +141,7 @@ public class AccessibilityComputationKiberaTest {
 
 		// Controller
 		final Controler controler = new Controler(scenario);
-		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, runId, analysisEnvelope, cellSize, push2Geoserver));
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, runId, envelope, cellSize, push2Geoserver));
 		controler.run();
 		
 		// QGis
