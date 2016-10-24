@@ -57,6 +57,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private final Logger slaveLogger;
     private final PlanCatcher plancatcher;
     private static double slaveMutationRate;
+    private final int numberOfPlansOnSlave;
     private boolean initialRouting;
     private int numberOfIterations = -1;
     private int executedPlanCount;
@@ -174,6 +175,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         slaveLogger = Logger.getLogger(("SLAVE_" + myNumber));
 
         numberOfPSimIterationsPerCycle = reader.readInt();
+        numberOfPlansOnSlave = reader.readInt();
         slaveMutationRate = reader.readDouble();
         slaveLogger.warn("Running " + numberOfPSimIterationsPerCycle + " PSim iterations for every QSim iter");
         config.controler().setLastIteration(reader.readInt());
@@ -291,6 +293,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         //no use for this, if you don't exactly know the communicationsMode of population when something goes wrong.
         // better to have plans written out every n successful iterations, specified in the config
         matsimControler.getConfig().controler().setDumpDataAtEnd(false);
+        matsimControler.getConfig().strategy().setMaxAgentPlanMemorySize(numberOfPlansOnSlave);
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {

@@ -73,6 +73,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private int numSlaves = 1;
     private static double MasterBorrowingRate = 0.6667;
     private int innovationEndsAtIter = -1;
+    private int slaveNumberOfPlans=3;
 
     public static boolean isTrackGenome() {
         return TrackGenome;
@@ -143,6 +144,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 .hasArg(true)
                 .withArgName("iters")
                 .create("i"));
+        options.addOption(OptionBuilder.withLongOpt("slavePlans")
+                .withDescription("Number of plans on slave.")
+                .hasArg(true)
+                .withArgName("slavePlans")
+                .create("sp"));
         options.addOption(OptionBuilder.withLongOpt("masterMutationRate")
                 .withDescription("The proportion of mutation allocated in replanning on master. " +
                         "Defaults to whatever is specified in the config.")
@@ -260,6 +266,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             masterInitialLogString.append("MASTER borrowing rate set to" + MasterBorrowingRate + " \n");
         }
 
+        if (commandLine.hasOption("sp")) {
+            slaveNumberOfPlans = Integer.parseInt(commandLine.getOptionValue("sp"));
+            masterInitialLogString.append("Number of plans per agent on slaves " + slaveNumberOfPlans + " \n");
+        }
+
         if (commandLine.hasOption("sr")) {
             SlaveMutationRate = Double.parseDouble(commandLine.getOptionValue("sr"));
             masterInitialLogString.append("SLAVE mutation rate set to" + SlaveMutationRate + " \n");
@@ -327,12 +338,12 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         ServerSocket writeServer = new ServerSocket(socketNumber);
         for (int i = 0; i < numSlaves; i++) {
             Socket socket = writeServer.accept();
-            masterInitialLogString.append("SlaveHandler " + (i + 1) + " out of an initial " + numSlaves + " accepted.\n");
+            System.out.println("Slave " + (i + 1) + " out of an initial " + numSlaves + " accepted.\n");
             SlaveHandler slaveHandler = new SlaveHandler(socket, slaveUniqueNumber);
             slaveHandlerTreeMap.put(slaveUniqueNumber, slaveHandler);
             //order is important
             initializeSlave(slaveHandler, slaveUniqueNumber++, initialRoutingOnSlaves);
-            Thread.sleep(1000);
+            Thread.sleep(10);
         }
         writeServer.close();
         masterInitialLogString.append("MASTER accepted minimum number of incoming connections. All further slaves will be registered on the Hydra.\n");
@@ -408,7 +419,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
         String outputDirectory = config.controler().getOutputDirectory();
         outputDirectory += "_P" + numberOfPSimIterations +
-                String.format("_mr%.3f_mb%.3f_sr%.3f", MasterMutationRate, MasterBorrowingRate, SlaveMutationRate) +
+                String.format("_mr%.3f_mb%.3f_sr%.3f_sp%03d", MasterMutationRate, MasterBorrowingRate, SlaveMutationRate,slaveNumberOfPlans) +
                 (SelectedSimulationMode.equals(SimulationMode.SERIAL) ? "_m" : "") +
                 (FullTransitPerformanceTransmission ? "_f" : "") +
                 (TrackGenome ? "_g" : "") +
@@ -1183,6 +1194,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private void initializeSlave(SlaveHandler slaveHandler, int i, boolean initialRoutingOnSlaves) throws IOException {
         slaveHandler.sendNumber(i);
         slaveHandler.sendNumber(numberOfPSimIterations);
+        slaveHandler.sendNumber(slaveNumberOfPlans);
         slaveHandler.sendDouble(SlaveMutationRate);
         slaveHandler.sendNumber(config.controler().getLastIteration() * numberOfPSimIterations);
         slaveHandler.sendBoolean(initialRoutingOnSlaves);
