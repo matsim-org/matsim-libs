@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
 import java.util.function.Predicate;
@@ -54,7 +55,11 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 
 	@Override
 	public T getAny() {
-		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
+		final Queue<Node<C,T>> stack =
+				new PriorityQueue<>(
+						100 ,
+						// not consistent, but OK: just to explore branches in random order to get some noise
+						(n1,n2) -> r.nextBoolean() ? 1 : -1 );
 		stack.add( root );
 
 		while ( !stack.isEmpty() ) {
