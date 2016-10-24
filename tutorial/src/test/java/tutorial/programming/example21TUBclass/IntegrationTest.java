@@ -21,6 +21,7 @@ package tutorial.programming.example21TUBclass;
 
 import java.io.File;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -33,6 +34,7 @@ import tutorial.programming.example21tutorialTUBclass.leastCostPath.RunLeastCost
 public class IntegrationTest {
 
 	@Test
+	@Ignore
 	public void test() {
 		final String pathname = "./output/example";
 		try{

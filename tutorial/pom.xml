@@ -6,6 +6,9 @@
 	<packaging>jar</packaging>
 	<version>0.9.0-SNAPSHOT</version>
 	<name>MATSim Tutorial</name>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 	<build>
 		<plugins>
 			<plugin>
