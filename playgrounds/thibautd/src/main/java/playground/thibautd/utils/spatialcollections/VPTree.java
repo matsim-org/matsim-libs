@@ -200,7 +200,10 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 
 		// remove totally invalidated branch ends, to speed up latter queries
 		for( ;
-				node.value == null && node.far == null && node.close == null;
+				node.value == null &&
+						node.far == null &&
+						node.close == null &&
+						node.parent != null;
 				node = node.parent ) {
 			if ( node.parent.close == node ) node.parent.close = null;
 			if ( node.parent.far == node ) node.parent.far = null;
@@ -227,9 +230,6 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	}
 
 	/**
-	 * Naively optimized remove. Invalidates values, and rebuilds after successfully invalidating 1/2 of the values.
-	 * Not based on any theory.
-	 *
 	 * @param value
 	 * @return
 	 */
