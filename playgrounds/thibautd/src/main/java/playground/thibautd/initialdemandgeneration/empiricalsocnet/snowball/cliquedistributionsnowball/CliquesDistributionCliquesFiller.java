@@ -53,7 +53,7 @@ public class CliquesDistributionCliquesFiller implements CliquesFiller {
 
 	private final Position position;
 
-	private final Counter abortCounter = new Counter( "Abort clique construction " );
+	private final Counter abortCounter = new Counter( "Incomplete clique # " );
 
 	@Inject
 	public CliquesDistributionCliquesFiller(
@@ -101,29 +101,22 @@ public class CliquesDistributionCliquesFiller implements CliquesFiller {
 				// there does not seem to remain enough agents for the given clique size.
 				// for now just ignore them, and do something smarter only if it appears to bias a lot
 				// given how we failed, those should be the only egos with this clique size to allocate
-				members.forEach( freeStubs::remove );
 				break;
 			}
 			members.add( member );
 		}
 
-		if ( members.size() == clique.size() ) {
-			for ( CliqueStub member : members ) {
-				freeStubs.remove( member );
-			}
-
-			final Set<Ego> cliqueMembers =
-					members.stream()
-							.map( CliqueStub::getEgo )
-							.collect( Collectors.toSet() );
-			SocialPositions.link( cliqueMembers );
-			return cliqueMembers;
-		}
-		else {
-			freeStubs.remove( cliqueStub );
+		for ( CliqueStub member : members ) {
+			freeStubs.remove( member );
 		}
 
-		return null;
+		final Set<Ego> cliqueMembers =
+				members.stream()
+						.map( CliqueStub::getEgo )
+						.collect( Collectors.toSet() );
+		SocialPositions.link( cliqueMembers );
+
+		return cliqueMembers.size() > 1 ? cliqueMembers : null;
 	}
 
 	public static CliqueStub findEgo( final SpatialTree<double[],CliqueStub> egosWithFreeStubs,
