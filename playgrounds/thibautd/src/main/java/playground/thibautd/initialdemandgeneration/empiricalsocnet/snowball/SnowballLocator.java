@@ -22,6 +22,7 @@ import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.PersonUtils;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliqueStub;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoLocator;
 
@@ -31,7 +32,8 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego
 @Singleton
 public class SnowballLocator implements EgoLocator, Position {
 	// a difference in the categorical variables is equivalent to 10'000 km
-	private static double NON_SPATIAL_FACTOR = 10 * 1000 * 1000;
+	private static final double NON_SPATIAL_FACTOR = 10 * 1000 * 1000;
+	private static final double CLIQUE_SIZE_FACTOR = 100 * NON_SPATIAL_FACTOR;
 
 	@Override
 	public int getDimensionality() {
@@ -48,18 +50,21 @@ public class SnowballLocator implements EgoLocator, Position {
 	}
 
 	@Override
-	public double[] getCoord( final Ego ego ) {
+	public double[] getCoord( final CliqueStub stub ) {
+		final Ego ego = stub.getEgo();
 		final Coord coord = calcCoord( ego );
 
 		return new double[]{
 				coord.getX() ,
 				coord.getY() ,
 				NON_SPATIAL_FACTOR * SocialPositions.calcAgeClass( PersonUtils.getAge( ego.getPerson() ) ) ,
-				NON_SPATIAL_FACTOR * SocialPositions.getSex( ego ).ordinal() };
+				NON_SPATIAL_FACTOR * SocialPositions.getSex( ego ).ordinal(),
+				stub.getCliqueSize() * CLIQUE_SIZE_FACTOR };
 	}
 
 	@Override
-	public double[] calcPosition( final Ego center,
+	public double[] calcPosition(
+			final CliqueStub center,
 			final SocialPositions.CliquePosition position,
 			final double rotation ) {
 		final double[] egoCoord = getCoord( center );
@@ -74,6 +79,7 @@ public class SnowballLocator implements EgoLocator, Position {
 				// can go out of bounds, in which case the closest is the first or last class.
 				// would be better to manage to get something "at a distance", whatever the direction...
 				egoCoord[ 2 ] + NON_SPATIAL_FACTOR * position.getAgeClassDistance() ,
-				position.isSameSex() ? egoCoord[ 3 ] : NON_SPATIAL_FACTOR - egoCoord[ 3 ] };
+				position.isSameSex() ? egoCoord[ 3 ] : NON_SPATIAL_FACTOR - egoCoord[ 3 ],
+				egoCoord[ 4 ] };
 	}
 }

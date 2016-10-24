@@ -23,6 +23,6 @@ import playground.thibautd.utils.spatialcollections.SpatialCollectionUtils;
 /**
  * @author thibautd
  */
-public interface EgoLocator extends SpatialCollectionUtils.Coordinate<Ego> {
+public interface EgoLocator extends SpatialCollectionUtils.Coordinate<CliqueStub> {
 	int getDimensionality();
 }

@@ -16,37 +16,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.degreebased;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.gbl.MatsimRandom;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoCharacteristicsDistribution;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballCliques;
-
-import java.util.Random;
+package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
 
 /**
- * Very simple implementation, that does not care about socio-demographics
- *
  * @author thibautd
  */
-@Singleton
-public class SimpleEgoDistribution implements EgoCharacteristicsDistribution {
-	private final Random random = MatsimRandom.getLocalInstance();
-	// could be compressed a lot, by storing (cumulative) counts in another array and searching with binary search on count
-	private final int[] degrees;
+public class CliqueStub {
+	private final int cliqueSize;
+	private final Ego ego;
 
-	@Inject
-	public SimpleEgoDistribution( final SnowballCliques cliques ) {
-		degrees = new int[ cliques.getEgos().size() ];
-		for ( int i = 0; i < degrees.length; i++ ) degrees[ i ] = cliques.getEgos().get( i ).getDegree();
+	public CliqueStub( final int cliqueSize, final Ego ego ) {
+		this.cliqueSize = cliqueSize;
+		this.ego = ego;
 	}
 
-	@Override
-	public Ego sampleEgo( final Person person ) {
-		return new Ego( person , degrees[ random.nextInt( degrees.length ) ] );
+	public Ego getEgo() {
+		return ego;
+	}
+
+	public int getCliqueSize() {
+		return cliqueSize;
 	}
 }

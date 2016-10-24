@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.misc.Counter;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliqueStub;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesFiller;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.Position;
@@ -30,7 +31,6 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.Snow
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballSamplingConfigGroup;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SocialPositions;
 import playground.thibautd.utils.ArrayUtils;
-import playground.thibautd.utils.spatialcollections.KDTree;
 import playground.thibautd.utils.spatialcollections.SpatialTree;
 
 import java.util.ArrayList;
@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author thibautd
@@ -79,62 +80,61 @@ public class CliquesDistributionCliquesFiller implements CliquesFiller {
 
 	@Override
 	public Set<Ego> sampleClique(
-			final Ego ego,
-			final SpatialTree<double[], Ego> egosWithFreeStubs ) {
-		// TODO condition sampling of clique on ego characteristic?
-		while ( !stopConsidering( ego ) ) {
-			final int size = CliqueEgoDistribution.getCliqueStructure( ego ).getRandomSize( random );
-			final SocialPositions.CliquePositions clique =
-					allCliques.sampleClique(
-							random,
-							size );
-			assert clique.size() == size;
+			final CliqueStub cliqueStub,
+			final SpatialTree<double[], CliqueStub> freeStubs ) {
+		final int size = cliqueStub.getCliqueSize();
+		final SocialPositions.CliquePositions clique =
+				allCliques.sampleClique(
+						random,
+						size );
+		assert clique.size() == size;
 
-			final double rotation = random.nextDouble() * 2 * Math.PI;
-			final Set<Ego> members = new HashSet<>();
-			members.add( ego );
-			for ( SocialPositions.CliquePosition cliqueMember : clique ) {
-				final double[] point = position.calcPosition( ego, cliqueMember , rotation );
-				final Ego member = findEgo( egosWithFreeStubs, clique, point, members );
+		final double rotation = random.nextDouble() * 2 * Math.PI;
+		final Set<CliqueStub> members = new HashSet<>();
+		members.add( cliqueStub );
+		for ( SocialPositions.CliquePosition cliqueMember : clique ) {
+			final double[] point = position.calcPosition( cliqueStub, cliqueMember , rotation );
+			final CliqueStub member = findEgo( freeStubs, clique, point, members );
 
-				if ( member == null ) {
-					abortCounter.incCounter();
-					// there does not seem to remain enough agents for the given clique size.
-					// for now just ignore them, and do something smarter only if it appears to bias a lot
-					// given how we failed, those should be the only egos with this clique size to allocate
-					for ( Ego e : members ) {
-						CliqueEgoDistribution.getCliqueStructure( e ).removeSize( clique.size() );
-						if ( stopConsidering( e ) ) egosWithFreeStubs.remove( e );
-					}
-					break;
-				}
-				members.add( member );
+			if ( member == null ) {
+				abortCounter.incCounter();
+				// there does not seem to remain enough agents for the given clique size.
+				// for now just ignore them, and do something smarter only if it appears to bias a lot
+				// given how we failed, those should be the only egos with this clique size to allocate
+				members.forEach( freeStubs::remove );
+				break;
+			}
+			members.add( member );
+		}
+
+		if ( members.size() == clique.size() ) {
+			for ( CliqueStub member : members ) {
+				freeStubs.remove( member );
 			}
 
-			if ( members.size() == clique.size() ) {
-				for ( Ego member : members ) CliqueEgoDistribution.getCliqueStructure( member ).removeSize( members.size() );
-				SocialPositions.link( members );
-				return members;
-			}
+			final Set<Ego> cliqueMembers =
+					members.stream()
+							.map( CliqueStub::getEgo )
+							.collect( Collectors.toSet() );
+			SocialPositions.link( cliqueMembers );
+			return cliqueMembers;
+		}
+		else {
+			freeStubs.remove( cliqueStub );
 		}
 
 		return null;
 	}
 
-	@Override
-	public boolean stopConsidering( final Ego ego ) {
-		return !CliqueEgoDistribution.getCliqueStructure( ego ).hasUnassignedCliques();
-	}
-
-	public static Ego findEgo( final SpatialTree<double[],Ego> egosWithFreeStubs,
+	public static CliqueStub findEgo( final SpatialTree<double[],CliqueStub> egosWithFreeStubs,
 			final SocialPositions.CliquePositions clique,
 			final double[] point,
-			final Collection<Ego> currentClique ) {
+			final Collection<CliqueStub> currentClique ) {
 		// TODO: could it be improved by putting size into coordinate system?
 		// would increase tree complexity but decrease search space, and thus the number of unfulfilled predicates...
 		return egosWithFreeStubs.getClosest(
 				point,
-				e1 -> CliqueEgoDistribution.getCliqueStructure( e1 ).hasSize( clique.size() ) && !currentClique.contains( e1 ) );
+				e1 -> !currentClique.contains( e1 ) );
 	}
 
 	public static class CliqueSampler {
