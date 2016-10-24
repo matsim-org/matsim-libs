@@ -154,7 +154,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 			final AddFrame<C,T> closeFrame =
 					new AddFrame<>(
 							new Node<>(),
-							currentFrame.toAdd );
+							new ArrayList<>( currentFrame.toAdd.size() / 2 + 1 ) );
 			final AddFrame<C,T> farFrame =
 					new AddFrame<>(
 							new Node<>(),
@@ -162,13 +162,14 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 
 			currentFrame.node.cuttoffDistance = medianDistance;
 
-			for ( Iterator<T> it = currentFrame.toAdd.iterator(); it.hasNext(); ) {
-				final T v = it.next();
+			for ( T v : currentFrame.toAdd ) {
 				final double distanceToVP = metric.calcDistance( currentFrame.node.coordinate , coordinate.getCoord( v ) );
 
 				if ( distanceToVP > medianDistance ) {
-					it.remove();
 					farFrame.toAdd.add( v );
+				}
+				else {
+					closeFrame.toAdd.add( v );
 				}
 			}
 
