@@ -37,7 +37,7 @@ public class SnowballLocator implements EgoLocator, Position {
 
 	@Override
 	public int getDimensionality() {
-		return 4;
+		return 5;
 	}
 
 	public static Coord calcCoord( final Ego ego ) {
