@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
+import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 
 import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
@@ -128,7 +129,12 @@ public class ScalabilityStatisticsListener implements AutoCloseable {
 			writer.write( "\t" );
 
 			log.info( "write overlap statistics..." );
-			writeBoxPlot( egos , (Ego e) -> nCliqueTies.get( e ) / e.getAlters().size() );
+			writeBoxPlot(
+					egos.stream()
+							.filter(
+									e -> e.getAlters().size() > 0 )
+							.collect( Collectors.toList() ),
+					(Ego e) -> nCliqueTies.get( e ) / e.getAlters().size() );
 
 			log.info( "write connected components statistics..." );
 			final Collection<Set<Id>> components = SnaUtils.identifyConnectedComponents( sn );
