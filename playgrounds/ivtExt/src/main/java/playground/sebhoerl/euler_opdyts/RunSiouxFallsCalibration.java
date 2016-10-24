@@ -8,9 +8,8 @@ import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCri
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import org.apache.commons.io.FileUtils;
-import playground.sebhoerl.remote_exec.RemoteController;
-import playground.sebhoerl.remote_exec.RemoteEnvironment;
-import playground.sebhoerl.remote_exec.RemoteScenario;
+import org.apache.log4j.Logger;
+import playground.sebhoerl.remote_exec.*;
 import playground.sebhoerl.remote_exec.local.LocalConfiguration;
 import playground.sebhoerl.remote_exec.local.LocalEnvironment;
 import playground.sebhoerl.remote_exec.local.LocalInterface;
@@ -22,6 +21,8 @@ import java.util.Map;
 import java.util.Random;
 
 public class RunSiouxFallsCalibration {
+    final private static Logger log = Logger.getLogger(RunSiouxFallsCalibration.class);
+
     private static String localPath;
     private static String environmentName;
 
@@ -81,6 +82,22 @@ public class RunSiouxFallsCalibration {
     }
 
     static void runCalibration(RemoteEnvironment environment) throws IOException {
+        for (RemoteSimulation simulation : environment.getSimulations()) {
+            log.info("Stopping and removing zombie simulation " + simulation.getId());
+
+            if (simulation.getStatus() == RemoteSimulation.Status.RUNNING) {
+                simulation.stop();
+            }
+
+            while (RemoteUtils.isActive(simulation)) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {}
+            }
+
+            simulation.remove();
+        }
+
         /*final int candidatePoolSize = 5;
 
         final int numberOfOpdytsIterations = 4;
@@ -94,19 +111,20 @@ public class RunSiouxFallsCalibration {
         RemoteController controller = environment.getController("standard");
         RemoteScenario scenario = environment.getScenario("sioux2016");
 
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("car_costs", String.valueOf((-40.0 / 100.0) / 1000.0));
-        RemoteDecisionVariable initial = new RemoteDecisionVariable(parameters);
-
         RemoteStateHandler handler = new MyObjectiveHandler();
         ObjectiveFunction objectiveFunction = new RemoteObjectiveFunction();
-
-        DecisionVariableRandomizer<RemoteDecisionVariable> randomizer = new MyDecisionVariableRandomizer(candidatePoolSize);
 
         ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(numberOfTransitionsPerOpdytsRun, numberOfTransitionsPerOpdytsRun);
 
         RemoteSimulationFactory simulationFactory = new RemoteSimulationFactory(environment, scenario, controller, numberOfSimulationIterationsPerOpdytsRun, numberOfSimulationIterationsPerTransition);
-        RemoteSimulator simulator = new RemoteSimulator(simulationFactory, handler);
+        ParallelSimulation parallelSimulation = new ParallelSimulation(simulationFactory, handler, numberOfSimulationIterationsPerTransition);
+        RemoteSimulator simulator = new RemoteSimulator(parallelSimulation);
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("car_costs", String.valueOf((-40.0 / 100.0) / 1000.0));
+        RemoteDecisionVariable initial = new RemoteDecisionVariable(parallelSimulation, parameters);
+
+        DecisionVariableRandomizer<RemoteDecisionVariable> randomizer = new MyDecisionVariableRandomizer(parallelSimulation, candidatePoolSize);
 
         RandomSearch<RemoteDecisionVariable> randomSearch = new RandomSearch<>(
                 simulator,

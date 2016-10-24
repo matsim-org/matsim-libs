@@ -68,7 +68,6 @@ public class InternalLocalSimulation {
 
     public void setMemory(String memory) {
         this.memory = memory;
-        update();
     }
 
     @JsonIgnore

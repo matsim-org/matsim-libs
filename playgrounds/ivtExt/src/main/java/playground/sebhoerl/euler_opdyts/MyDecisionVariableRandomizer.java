@@ -8,10 +8,12 @@ import java.util.*;
 public class MyDecisionVariableRandomizer implements DecisionVariableRandomizer<RemoteDecisionVariable> {
     final Random random;
     final int candidatePoolSize;
+    final private ParallelSimulation simulation;
 
-    public MyDecisionVariableRandomizer(int candidatePoolSize) {
+    public MyDecisionVariableRandomizer(ParallelSimulation simulation, int candidatePoolSize) {
         this.candidatePoolSize = candidatePoolSize;
         this.random = new Random();
+        this.simulation = simulation;
     }
 
     @Override
@@ -27,7 +29,7 @@ public class MyDecisionVariableRandomizer implements DecisionVariableRandomizer<
             double newCtPerKm = costsCtPerKm + std * random.nextGaussian();
 
             newParameters.put("car_costs", String.valueOf(newCtPerKm / 100.0 / 1000.0));
-            variations.add(new RemoteDecisionVariable(newParameters));
+            variations.add(new RemoteDecisionVariable(simulation, newParameters));
         }
 
         return variations;

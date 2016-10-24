@@ -47,15 +47,17 @@ public class RemoteSimulationFactory {
 
         do {
             simulationIndex++;
-            simulationId = prefix + "it_" + simulationIndex;
+            simulationId = prefix + "sim_" + simulationIndex;
         } while (environment.hasSimulation(simulationId));
 
         return simulationId;
     }
 
-    RemoteSimulation createSimulation(RemoteSimulation previous, RemoteDecisionVariable decisionVariable) {
+    RemoteSimulation createSimulation(RemoteSimulatorState previousState, RemoteDecisionVariable decisionVariable) {
+        RemoteSimulation previousSimulation = previousState.getSimulation();
+
         RemoteSimulation simulation = environment.createSimulation(createNewId(), scenario, controller);
-        String population = previous == null ? scenario.getPath("population.xml.gz") : previous.getPath("output_plans.xml.gz");
+        String population = previousSimulation == null ? scenario.getPath("population.xml.gz") : previousSimulation.getPath("ITERS/it." + previousState.getIteration() + "/" + previousState.getIteration() +  ".plans.xml.gz");
 
         // Custom parameters
         simulation.getParameters().putAll(decisionVariable.getParameters());

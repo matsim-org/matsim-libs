@@ -1,15 +1,22 @@
 package playground.sebhoerl.euler_opdyts;
 
 import floetteroed.opdyts.DecisionVariable;
+import org.apache.log4j.Logger;
 
 import java.util.Map;
 
 public class RemoteDecisionVariable implements DecisionVariable {
-    final private Map<String, String> parameters;
+    final private static Logger log = Logger.getLogger(RemoteDecisionVariable.class);
+    static private long staticIndex = 0;
 
-    public RemoteDecisionVariable(Map<String, String> parameters) {
+    final private Map<String, String> parameters;
+    final private ParallelSimulation simulation;
+    final private long index;
+
+    public RemoteDecisionVariable(ParallelSimulation simulation, Map<String, String> parameters) {
+        this.simulation = simulation;
         this.parameters = parameters;
-        System.out.println("NEW DECISION VARIABLE " + this.toString());
+        this.index = ++staticIndex;
     }
 
     public Map<String, String> getParameters() {
@@ -17,7 +24,9 @@ public class RemoteDecisionVariable implements DecisionVariable {
     }
 
     @Override
-    public void implementInSimulation() {}
+    public void implementInSimulation() {
+        simulation.implementDecisionVariable(this);
+    }
 
     @Override
     public String toString() {
@@ -31,6 +40,6 @@ public class RemoteDecisionVariable implements DecisionVariable {
         }
 
         builder.deleteCharAt(builder.length() - 1);
-        return builder.toString();
+        return "DV(" + String.valueOf(index) + ", " + builder.toString() + ")";
     }
 }
