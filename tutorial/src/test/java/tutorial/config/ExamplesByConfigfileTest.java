@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -47,7 +48,7 @@ public class ExamplesByConfigfileTest {
 	public static Collection<Object[]> createTests() {
 		Collection<Object[]> filesToRun = new ArrayList<Object[]>();
 
-		filesToRun.add(new Object [] {"../examples/scenarios/equil/config.xml"});
+//		filesToRun.add(new Object [] {"../examples/scenarios/equil/config.xml"});
 		filesToRun.add(new Object [] {"../examples/scenarios//equil-extended/config.xml"});
 		filesToRun.add(new Object [] {"examples/tutorial/config/example1-config.xml"});
 		filesToRun.add(new Object [] {"examples/tutorial/config/example5-config.xml"});
