@@ -146,10 +146,12 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 
 			if ( !closeFrame.toAdd.isEmpty() ) {
 				currentFrame.node.close = closeFrame.node;
+				closeFrame.node.parent = currentFrame.node;
 				stack.add( closeFrame );
 			}
 			if ( !farFrame.toAdd.isEmpty() ) {
 				currentFrame.node.far = farFrame.node;
+				farFrame.node.parent = currentFrame.node;
 				stack.add( farFrame );
 			}
 		}
@@ -162,10 +164,19 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	 * @param value
 	 */
 	public boolean invalidate( final T value ) {
-		final Node<C,T> node = find( value );
+		Node<C,T> node = find( value );
+
 		if ( node == null ) return false;
 		node.value = null;
 		size--;
+
+		// remove totally invalidated branch ends, to speed up latter queries
+		for( ;
+				node.value == null && node.far == null && node.close == null;
+				node = node.parent ) {
+			if ( node.parent.close == node ) node.parent.close = null;
+			if ( node.parent.far == node ) node.parent.far = null;
+		}
 		return true;
 	}
 
@@ -338,6 +349,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 		private double cuttoffDistance = Double.NaN;
 		private Node<C,T> close = null;
 		private Node<C,T> far = null;
+		private Node<C,T> parent = null;
 	}
 
 	private static class AddFrame<C,T> {
