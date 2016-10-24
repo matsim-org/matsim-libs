@@ -3,6 +3,8 @@ package playground.pieter.network.matsimintramax.network;
 
 
 import java.awt.Color;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -11,7 +13,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkReaderMatsimV2;
 import org.matsim.core.scenario.ScenarioUtils;
 
 //import com.processinghacks.arcball.ArcBall;
@@ -37,7 +39,7 @@ public class LinksSelector extends PApplet {
 	private SortedMap<Float, Color> colorsMap;
 	{
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario.getNetwork()).parse("f:/matsimWorkspace/playgrounds/pieter/data/singapore1_no_rail_CLEAN.xml");
+		new NetworkReaderMatsimV2(scenario.getNetwork()).readFile("");
 		network = scenario.getNetwork();
 		for(Node node:network.getNodes().values()) {
 			if(minX>node.getCoord().getX())

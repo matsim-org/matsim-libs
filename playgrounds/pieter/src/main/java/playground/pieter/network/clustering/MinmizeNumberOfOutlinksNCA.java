@@ -3,7 +3,7 @@ package playground.pieter.network.clustering;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkReaderMatsimV2;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.HashSet;
@@ -81,7 +81,7 @@ public class MinmizeNumberOfOutlinksNCA extends NodeClusteringAlgorithm {
 		String fileName = args[1];
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
 				.createConfig());
-		MatsimNetworkReader nwr = new MatsimNetworkReader(scenario.getNetwork());
+		NetworkReaderMatsimV2 nwr = new NetworkReaderMatsimV2(scenario.getNetwork());
 		// nwr.readFile(args[0]);
 //		 nwr.readFile("F:/TEMP/smallnet.xml");
 		nwr.readFile(args[0]);

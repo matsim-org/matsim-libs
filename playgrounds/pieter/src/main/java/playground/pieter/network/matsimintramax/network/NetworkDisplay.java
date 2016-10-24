@@ -1,5 +1,6 @@
 package playground.pieter.network.matsimintramax.network;
 
+import org.matsim.core.network.io.NetworkReaderMatsimV2;
 import playground.pieter.network.clustering.*;
 import processing.core.PApplet;
 
@@ -15,8 +16,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class NetworkDisplay extends PApplet {
@@ -33,7 +32,7 @@ public class NetworkDisplay extends PApplet {
 	MinmizeNumberOfOutlinksNCA nca;
 	Scenario scenario = ScenarioUtils
 			.createScenario(ConfigUtils.createConfig());
-	MatsimNetworkReader nwr = new MatsimNetworkReader(scenario.getNetwork());
+	NetworkReaderMatsimV2 nwr = new NetworkReaderMatsimV2(scenario.getNetwork());
 	int[] colorsForDisplay;
 	{
 

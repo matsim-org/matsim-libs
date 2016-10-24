@@ -9,10 +9,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.network.io.NetworkReaderMatsimV2;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
@@ -129,7 +129,7 @@ public class DrunkDudePathfinder implements LeastCostPathCalculator {
     public static void main(String[] args) {
         Scenario scenario;
         scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario.getNetwork())
+        new NetworkReaderMatsimV2(scenario.getNetwork())
                 .readFile(args[0]);
         Network network = scenario.getNetwork();
         Network net = NetworkUtils.createNetwork();

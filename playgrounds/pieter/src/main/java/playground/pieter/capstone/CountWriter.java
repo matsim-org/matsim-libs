@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkReaderMatsimV2;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -23,7 +23,7 @@ public class CountWriter {
         String properties = "connections/capstone.properties";
         DataBaseAdmin dba = new DataBaseAdmin(new File(properties));
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("/Users/fouriep/Documents/capstone/50_calibration/final/network/SingaporeNetworkwFreightOtherPassengerTypes.xml");
+        new NetworkReaderMatsimV2(scenario.getNetwork()).readFile("/Users/fouriep/Documents/capstone/50_calibration/final/network/SingaporeNetworkwFreightOtherPassengerTypes.xml");
 //		get all the modes
         String[] modes = new String[]{"car", "hgv", "lgv", "motorcycle", "other", "privateBus", "publicBus", "taxiFull", "taxiEmpty", "vhgv"};
 

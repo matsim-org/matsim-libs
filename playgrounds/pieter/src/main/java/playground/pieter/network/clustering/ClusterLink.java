@@ -11,7 +11,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-class ClusterLink implements Link {
+public class ClusterLink implements Link {
 	private final Link link;
 	private NodeCluster rootCluster;
 	// set this to true if the link is an interlink

@@ -10,8 +10,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.NetworkReaderMatsimV2;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -33,7 +33,7 @@ public class SimpleNetworkPainter extends JFrame {
 
         SimpleNetworkPainter lineComponent = new SimpleNetworkPainter(400, 400);
         Network network = NetworkUtils.createNetwork();
-        MatsimNetworkReader reader = new MatsimNetworkReader(network);
+        NetworkReaderMatsimV2 reader = new NetworkReaderMatsimV2(network);
         reader.readFile(args[0]);
         lineComponent.setNetworkTransformation(network);
 
