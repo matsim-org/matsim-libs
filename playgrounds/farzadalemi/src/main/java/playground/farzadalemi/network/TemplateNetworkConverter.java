@@ -24,8 +24,8 @@ package playground.farzadalemi.network;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
-import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.utils.io.IOUtils;
 
 import java.io.BufferedReader;
@@ -151,6 +151,6 @@ public class TemplateNetworkConverter {
 	 */
 	private static void testNetwork(String pathToOutputFile) {
 		NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(NetworkUtils.createNetwork());
-		networkReader.parse(pathToOutputFile);
+		networkReader.readFile(pathToOutputFile);
 	}
 }

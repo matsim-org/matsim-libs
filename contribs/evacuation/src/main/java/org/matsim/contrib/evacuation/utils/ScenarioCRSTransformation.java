@@ -54,7 +54,8 @@ public abstract class ScenarioCRSTransformation {
             }
             handled.add(c);
             Coord cc = ct.transform(c);
-            c.setXY(cc.getX(), cc.getY());
+//            c.setXY(cc.getX(), cc.getY());
+            n.setCoord( cc );
         }
 //		for (Link l : sc.getNetwork().getLinks().values()) {
 //			Coord c = l.getCoord();
@@ -76,7 +77,8 @@ public abstract class ScenarioCRSTransformation {
                         }
                         handled.add(c);
                         Coord cc = ct.transform(c);
-                        c.setXY(cc.getX(), cc.getY());
+//                        c.setXY(cc.getX(), cc.getY());
+                        act.setCoord(cc);
                     }
                 }
             }

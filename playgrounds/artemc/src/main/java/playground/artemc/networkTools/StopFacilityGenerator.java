@@ -12,12 +12,13 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
@@ -59,9 +60,9 @@ public class StopFacilityGenerator {
 	
 	TransitStopFacility lastStopFacility = null;
 
-	private NetworkImpl network;
+	private Network network;
 
-	public NetworkImpl getNetwork() {
+	public Network getNetwork() {
 		return network;
 	}
 
@@ -197,7 +198,7 @@ public class StopFacilityGenerator {
 		this.sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		prepareConfig();
 		new MatsimNetworkReader(sc.getNetwork()).readFile(network);
-		this.network = (NetworkImpl) sc.getNetwork();
+		this.network = (Network) sc.getNetwork();
 		this.stopDistance = distanceBetweenStops;	
 		this.allowedModes.add("car");
 		this.allowedModes.add("pt");
@@ -326,13 +327,17 @@ public class StopFacilityGenerator {
 									c++;
 								}while(network.getNodes().containsKey(newNodeId));
 
-								newNodeXY = convertDistanceToCoordinates(linkToEdit,nodeDistanceOnMap);	
-								network.createAndAddNode(newNodeId, newNodeXY);
+								newNodeXY = convertDistanceToCoordinates(linkToEdit,nodeDistanceOnMap);
+								final Id<Node> id2 = newNodeId;
+								final Coord coord = newNodeXY;	
+								NetworkUtils.createAndAddNode(network, id2, coord);
 								nodes.add(network.getNodes().get(newNodeId));
 
 								//Create new Link
-								newLinkId = Id.create(linkToEdit.getId().toString()+"_"+(nodes.size()-1), Link.class);									
-								network.createAndAddLink(newLinkId, nodes.get(nodes.size()-2), nodes.get(nodes.size()-1), stopDistance, linkToEdit.getFreespeed(), linkToEdit.getCapacity(), linkToEdit.getNumberOfLanes());
+								newLinkId = Id.create(linkToEdit.getId().toString()+"_"+(nodes.size()-1), Link.class);
+								final Id<Link> id1 = newLinkId;
+								final double length = stopDistance;									
+								NetworkUtils.createAndAddLink(network,id1, nodes.get(nodes.size()-2), nodes.get(nodes.size()-1), length, linkToEdit.getFreespeed(), linkToEdit.getCapacity(), linkToEdit.getNumberOfLanes() );
 								network.getLinks().get(newLinkId).setAllowedModes(allowedModes);
 								links.add(network.getLinks().get(newLinkId));
 								removedLinks.get(linkToEdit.getId()).add(newLinkId);
@@ -343,8 +348,10 @@ public class StopFacilityGenerator {
 								//Check if new links have been created
 								if(nodes.size()>1){
 									//Create last new Link
-									newLinkId = Id.create(linkToEdit.getId().toString()+"_"+(nodes.size()), Link.class);									
-									network.createAndAddLink(newLinkId, nodes.get(nodes.size()-1), linkToEdit.getToNode(), restLinkLengthFromStop, linkToEdit.getFreespeed(), linkToEdit.getCapacity(), linkToEdit.getNumberOfLanes());
+									newLinkId = Id.create(linkToEdit.getId().toString()+"_"+(nodes.size()), Link.class);
+									final Id<Link> id1 = newLinkId;
+									final double length = restLinkLengthFromStop;									
+									NetworkUtils.createAndAddLink(network,id1, nodes.get(nodes.size()-1), linkToEdit.getToNode(), length, linkToEdit.getFreespeed(), linkToEdit.getCapacity(), linkToEdit.getNumberOfLanes() );
 									network.getLinks().get(newLinkId).setAllowedModes(allowedModes);									
 									links.add(network.getLinks().get(newLinkId));	
 									removedLinks.get(linkToEdit.getId()).add(newLinkId);

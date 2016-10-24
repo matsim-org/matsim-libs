@@ -54,18 +54,19 @@ import cadyts.demand.PlanBuilder;
 	private final Scenario sc;
 	private final TransitSchedule schedule;
 
-	private final Map<Id, Collection<Id>> personsFromVehId = new HashMap<Id, Collection<Id>>();
+	private final Map<Id, Collection<Id>> personsFromVehId = new HashMap<>();
 
 	private int iteration = -1;
 
 	// this is _only_ there for output:
-	Set<Plan> plansEverSeen = new HashSet<Plan>();
+	Set<Plan> plansEverSeen = new HashSet<>();
 
 	private static final String STR_PLANSTEPFACTORY = "planStepFactory";
 	private static final String STR_ITERATION = "iteration";
+	// (better to do it this way since when plans are removed, this additional info is removed as well)
 
-	private final Set<Id> transitDrivers = new HashSet<Id>();
-	private final Set<Id> transitVehicles = new HashSet<Id>();
+	private final Set<Id> transitDrivers = new HashSet<>();
+	private final Set<Id> transitVehicles = new HashSet<>();
 	private final Set<Id<TransitLine>> calibratedLines;
 
 	PtPlanToPlanStepBasedOnEvents(final Scenario sc, final Set<Id<TransitLine>> calibratedLines) {
@@ -79,8 +80,7 @@ import cadyts.demand.PlanBuilder;
 
 	@Override
 	public final cadyts.demand.Plan<T> getCadytsPlan(final Plan plan) {
-		@SuppressWarnings("unchecked") // getting stuff from custom attributes has to be untyped.  (Although I am not sure why it is necessary to put this
-		// there in the first place. kai, jul'13)
+		@SuppressWarnings("unchecked") // getting stuff from custom attributes has to be untyped. 
 		PlanBuilder<T> planStepFactory = (PlanBuilder<T>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
 		if (planStepFactory == null) {
 			this.plansNotFound++;
@@ -98,6 +98,22 @@ import cadyts.demand.PlanBuilder;
 		log.warn("found " + this.plansFound + " out of " + (this.plansFound + this.plansNotFound) + " ("
 				+ (100. * this.plansFound / (this.plansFound + this.plansNotFound)) + "%)");
 		log.warn("(above values may both be at zero for a couple of iterations if multiple plans per agent all have no score)");
+		
+		long nPlans = 0 ;
+		long nMemorizedPlans = 0 ;
+		
+		for ( Person person : this.sc.getPopulation().getPersons().values() ) {
+			for ( Plan plan : person.getPlans() ) {
+				nPlans ++ ;
+				@SuppressWarnings("unchecked") // getting stuff from custom attributes has to be untyped. 
+				PlanBuilder<T> planStepFactory = (PlanBuilder<T>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
+				if ( planStepFactory!=null ) {
+					nMemorizedPlans ++ ;
+				}
+			}
+		}
+		
+		log.warn( "nPlans=" + nPlans + ", nMemorizedPlans=" + nMemorizedPlans );
 
 		this.personsFromVehId.clear();
 		this.transitDrivers.clear();
@@ -165,7 +181,7 @@ import cadyts.demand.PlanBuilder;
 
 		if (personsInVehicle == null) {
 			// means does not exist yet
-			personsInVehicle = new ArrayList<Id>();
+			personsInVehicle = new ArrayList<>();
 			this.personsFromVehId.put(vehId, personsInVehicle);
 		}
 
@@ -194,7 +210,7 @@ import cadyts.demand.PlanBuilder;
 			selectedPlan.getCustomAttributes().put(STR_ITERATION, this.iteration);
 
 			// construct a new PlanBulder and attach it to the plan:
-			planStepFactory = new PlanBuilder<TransitStopFacility>();
+			planStepFactory = new PlanBuilder<>();
 			selectedPlan.getCustomAttributes().put(STR_PLANSTEPFACTORY, planStepFactory);
 
 			// memorize the plan as being seen:

@@ -106,7 +106,7 @@ public class TaxiHistogramsWriter
         for (int i = 0; i < histogram.getBinCount(); i++) {
             lineBuilder.addf("%.2f+", histogram.getBin(i));
         }
-        writer.writeNext(lineBuilder.build());
+        writer.writeNext(lineBuilder);
     }
 
 
@@ -116,6 +116,6 @@ public class TaxiHistogramsWriter
         for (int i = 0; i < histogram.getBinCount(); i++) {
             lineBuilder.add(histogram.getCount(i) + "");
         }
-        writer.writeNext(lineBuilder.build());
+        writer.writeNext(lineBuilder);
     }
 }

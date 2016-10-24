@@ -1,6 +1,9 @@
 package org.matsim.contrib.carsharing.runExample;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -8,13 +11,19 @@ import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.FreeFloatingConfigGroup;
 import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
+import org.matsim.contrib.carsharing.manager.supply.costs.CompanyCosts;
+import org.matsim.contrib.carsharing.manager.supply.costs.CostCalculation;
+import org.matsim.contrib.carsharing.manager.supply.costs.CostCalculationExample;
+import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContainer;
 import org.matsim.contrib.carsharing.router.FreeFloatingRoutingModule;
 import org.matsim.contrib.carsharing.router.OneWayCarsharingRoutingModule;
 import org.matsim.contrib.carsharing.router.TwoWayCarsharingRoutingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.*;
-
+/** 
+ * @author balac
+ */
 public class CarsharingUtils {
 	public static Config addConfigModules(Config config) {
 		
@@ -33,15 +42,37 @@ public class CarsharingUtils {
     	return config;
 		
 	}
-	public static AbstractModule createModule() {
+	public static CostsCalculatorContainer createCompanyCostsStructure(Set<String> companies) {
+		
+		CostsCalculatorContainer companyCostsContainer = new CostsCalculatorContainer();
+		
+		for (String s : companies) {
+			
+			Map<String, CostCalculation> costCalculations = new HashMap<String, CostCalculation>();
+			
+			//=== here customizable cost structures come in ===
+			//===what follows is just an example!! and should be modified according to the study at hand===
+			costCalculations.put("freefloating", new CostCalculationExample());
+			costCalculations.put("twoway", new CostCalculationExample());
+			costCalculations.put("oneway", new CostCalculationExample());
+			CompanyCosts companyCosts = new CompanyCosts(costCalculations);
+			
+			companyCostsContainer.getCompanyCostsMap().put(s, companyCosts);
+		}
+		
+		return companyCostsContainer;
+		
+	}
+	public static AbstractModule createRoutingModule() {
 
+		//=== routing moduels for carsharing trips ===
         return new AbstractModule() {
 
             @Override
             public void install() {
-                addRoutingModuleBinding("twowaycarsharing").toInstance(new TwoWayCarsharingRoutingModule());
+                addRoutingModuleBinding("twoway").toInstance(new TwoWayCarsharingRoutingModule());
                 addRoutingModuleBinding("freefloating").toInstance(new FreeFloatingRoutingModule());
-                addRoutingModuleBinding("onewaycarsharing").toInstance(new OneWayCarsharingRoutingModule());
+                addRoutingModuleBinding("oneway").toInstance(new OneWayCarsharingRoutingModule());
                 bind(MainModeIdentifier.class).toInstance(new MainModeIdentifier() {
                     final MainModeIdentifier defaultModeIdentifier = new MainModeIdentifierImpl();
 
@@ -52,11 +83,11 @@ public class CarsharingUtils {
                         // as being twowaycarsharing trips.
                         // This is for instance used at re-routing.
                         for ( PlanElement pe : tripElements ) {
-                            if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twowaycarsharing" ) ) {
-                                return "twowaycarsharing";
+                            if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twoway" ) ) {
+                                return "twoway";
                             }
-                            else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "onewaycarsharing" ) ) {
-                                return "onewaycarsharing";
+                            else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "oneway" ) ) {
+                                return "oneway";
                             }
                             else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "freefloating" ) ) {
                                 return "freefloating";

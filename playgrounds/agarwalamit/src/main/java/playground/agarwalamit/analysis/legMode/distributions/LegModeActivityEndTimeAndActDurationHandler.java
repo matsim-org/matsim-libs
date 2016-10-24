@@ -77,8 +77,8 @@ ActivityEndEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 
 		for(Person p: scenario.getPopulation().getPersons().values()){
 			Id<Person> id = p.getId();
-			this.personId2ActEndTimes.put(id, new TreeMap<String, Double>());
-			this.personId2ActStartTimes.put(id, new TreeMap<String, Double>());
+			this.personId2ActEndTimes.put(id, new TreeMap<>());
+			this.personId2ActStartTimes.put(id, new TreeMap<>());
 		}
 	}
 
@@ -139,17 +139,16 @@ ActivityEndEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 	}
 
 	private SortedMap<String, Map<Id<Person>, List<Double>>> sortingPersonWRTMode(final Map<Id<Person>, SortedMap<String,Double>> pId2Times){
-		SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2Times = new TreeMap<String, Map<Id<Person>,List<Double>>>();
+		SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2Times = new TreeMap<>();
 
 		for(String travelMode :this.personId2LegModes.values()){
-			Map<Id<Person>, List<Double>> localPId2times = new HashMap<Id<Person>, List<Double>>();
-			mode2PersonId2Times.put(travelMode, localPId2times);
+			mode2PersonId2Times.put(travelMode, new HashMap<>());
 		}
 
 		for(Id<Person> id:pId2Times.keySet()){
 			String mode = this.personId2LegModes.get(id);
 			Map<Id<Person>, List<Double>> localPersonId2ActTimes = mode2PersonId2Times.get(mode);
-			localPersonId2ActTimes.put(id, new ArrayList<Double>(pId2Times.get(id).values()));
+			localPersonId2ActTimes.put(id, new ArrayList<>(pId2Times.get(id).values()));
 		}
 		return mode2PersonId2Times;
 	}
@@ -166,12 +165,12 @@ ActivityEndEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 	public Map<Id<Person>, SortedMap<String,Double>> getPersonId2ActType2ActDurations(){
 		if(this.warnCount>0) LOG.warn(this.warnCount+" 'StuckAndAbort' events are thrown. "
 				+ "Correctness of travel durations for stuck persons can not be guaranteed. Therefore, excluding such agents in the calculations.");
-		Map<Id<Person>, SortedMap<String,Double>> personId2Durations = new HashMap<Id<Person>, SortedMap<String,Double>>();
+		Map<Id<Person>, SortedMap<String,Double>> personId2Durations = new HashMap<>();
 		for(Id<Person> id:this.personId2ActEndTimes.keySet()){
 			if(!stuckPersons.contains(id)){
 				SortedMap<String,Double> actEndTimes = this.personId2ActEndTimes.get(id);
 				SortedMap<String,Double> actStartTimes = this.personId2ActStartTimes.get(id);
-				SortedMap<String,Double> actDurations = new TreeMap<String, Double>();
+				SortedMap<String,Double> actDurations = new TreeMap<>();
 				for(String act : actEndTimes.keySet()){
 					double dur = actEndTimes.get(act)-actStartTimes.get(act);
 					if(dur<0) dur=dur+this.simEndTime;

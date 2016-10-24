@@ -32,39 +32,63 @@ import java.io.Serializable;
  *   (0/0) ---->
  * </pre>
  */
-public class Coord implements Serializable {
+public final class Coord implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	private double x;
 	private double y;
+	private double z = Double.NEGATIVE_INFINITY;
 
+	/**
+	 * Added this constructor so that Gson can again parse 2D coordinates from json files, e.g. via
+	 * <p>
+	 * Coord coord = new Gson().fromJson("{\"x\":123.0,\"y\":456.0}", Coord.class);
+	 * </p>
+	 * Without the constructor, the default values are ignored and the non-existing z-coordinate is initialized with the JAVA default of 0.0.
+	 * {@linkplain Double}s would be initialized with {@code null}. This could also better indicate that there is indeed no information on the z-coordinate. However, memory consumption goes up.
+	 * AN, 09/2016 
+	 */
+	public Coord() {
+	}
+	
 	public Coord(final double x, final double y) {
 		this.x = x;
 		this.y = y;
+		this.z = Double.NEGATIVE_INFINITY;
 	}
-
+	
+	
+	public Coord(final double x, final double y, final double z){
+		if(z == Double.NEGATIVE_INFINITY){
+			throw new IllegalArgumentException("Double.NEGATIVE_INFINITY is an invalid elevation. " + 
+					"If you want to ignore elevation, use Coord(x, y) constructor instead.");
+		}
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+	
 
 	public double getX() {
 		return this.x;
 	}
-
+	
 	public double getY() {
 		return this.y;
 	}
-
-	public void setX(final double x) {
-		this.x = x;
+	
+	public double getZ() {
+		if ( !hasZ() ){
+			throw new IllegalStateException("Requesting elevation (z) without having first set it.");
+		}
+		return this.z;
 	}
 
-	public void setY(final double y) {
-		this.y = y;
+	public boolean hasZ() {
+		return this.z != Double.NEGATIVE_INFINITY;
 	}
 
-	public void setXY(final double x, final double y) {
-		this.x = x;
-		this.y = y;
-	}
 
 	@Override
 	public boolean equals(final Object other) {
@@ -72,23 +96,48 @@ public class Coord implements Serializable {
 			return false;
 		}
 		Coord o = (Coord)other;
-		return ((this.x == o.getX()) && (this.y == o.getY()));
+		
+		if( !hasZ() ){
+			/* this object is a 2D coordinate. */
+
+			if ( o.hasZ() ) return false;
+
+			/* both are 2D coordinates. */
+			return (this.x == o.getX()) && (this.y == o.getY());
+		}
+		else {
+			/* this object is 3D coordinate. */
+
+			if ( !o.hasZ() ) return false;
+
+			/* both objects are 3D coordinates. */
+			return
+					(this.x == o.getX()) &&
+					(this.y == o.getY()) &&
+					(this.z == o.getZ());
+		}
 	}
 
+	
 	@Override
 	public int hashCode() {
 		// Implementation based on chapter 3 of Joshua Bloch's "Effective Java"
 		long xbits = Double.doubleToLongBits(this.x);
 		long ybits = Double.doubleToLongBits(this.y);
+		long zbits = Double.doubleToLongBits(this.z);
 		int result = (int) (xbits ^ (xbits >>> 32));
 		result = 31 * result + (int) (ybits ^ (ybits >>> 32));
+		result = 31 * result + (int) (zbits ^ (zbits >>> 32));
 		return result;
 	}
 
+	
 	@Override
 	public final String toString() {
-		return "[x=" + this.x + "][y=" + this.y + "]";
+		if( !hasZ() ){
+			return "[x=" + this.x + "][y=" + this.y + "]";
+		} else{
+			return "[x=" + this.x + "][y=" + this.y + "][z=" + this.z + "]";
+		}
 	}
-
-
 }

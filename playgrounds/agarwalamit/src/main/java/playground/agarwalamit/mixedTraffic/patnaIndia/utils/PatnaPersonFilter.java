@@ -23,18 +23,30 @@ import java.util.Arrays;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
+import playground.agarwalamit.utils.PersonFilter;
+
 /**
  * @author amit
  */
 
-public class PatnaPersonFilter{
+public class PatnaPersonFilter implements PersonFilter{
 	
 	public enum PatnaUserGroup {
-		urban, commuter, through;
-	}
+		urban, commuter, through
+    }
 	
 	public static boolean isPersonBelongsToUrban(Id<Person> personId){
 		if ( personId.toString().startsWith("slum") || personId.toString().startsWith("nonSlum") ) return true;
+		else return false;
+	}
+	
+	public static boolean isPersonBelongsToSlum(Id<Person> personId){
+		if ( personId.toString().startsWith("slum") ) return true;
+		else return false;
+	}
+	
+	public static boolean isPersonBelongsToNonSlum(Id<Person> personId){
+		if ( personId.toString().startsWith("nonsSum") ) return true;
 		else return false;
 	}
 
@@ -53,5 +65,11 @@ public class PatnaPersonFilter{
 		else if(isPersonBelongsToCommuter(personId)) return PatnaUserGroup.commuter;
 		else if (isPersonBelongsToThroughTraffic(personId)) return PatnaUserGroup.through;
 		else throw new RuntimeException("Person id "+personId+" do not belong to any of the predefined user group. Aborting ...");
+	}
+
+	@Override
+	public String getUserGroupAsStringFromPersonId(Id<Person> personId) {
+		PatnaUserGroup pug = PatnaPersonFilter.getUserGroup(personId);
+		return pug.toString();
 	}
 }

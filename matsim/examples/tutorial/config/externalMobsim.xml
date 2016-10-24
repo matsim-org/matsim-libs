@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
-		<!ENTITY INPUTBASE    "./examples/equil">
+		<!ENTITY INPUTBASE    "../../equil">
 		<!ENTITY OUTPUTBASE   "./output/externalMobsim">
 	]
 >
@@ -27,7 +27,7 @@
 	</module>
 
 	<module name="simulation">
-		<param name="externalExe" value="java -jar ./examples/external/mobsim.jar" />
+		<param name="externalExe" value="java -jar ../../external/mobsim.jar" />
 	</module>
 
 	<module name="planCalcScore">

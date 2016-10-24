@@ -57,7 +57,7 @@ public class RegentPopulationReader {
 		this.personAttributes = personAttributes;
 		final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
 				personAttributes);
-		reader.parse(populationFileName);
+		reader.readFile(populationFileName);
 
 		// final Set<String> housingTypes = new LinkedHashSet<String>();
 		// final Set<String> workTourModes = new LinkedHashSet<String>();

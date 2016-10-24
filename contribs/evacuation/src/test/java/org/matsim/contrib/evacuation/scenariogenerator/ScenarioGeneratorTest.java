@@ -125,7 +125,7 @@ public class ScenarioGeneratorTest {
 		HashMap<Id<Link>, String> roadClosures = new HashMap<Id<Link>, String>();
 		for (Id<Link> id : closedRoadIDs)
 			roadClosures.put(id, "00:00");
-		boolean saved = ConfigIO.saveRoadClosures(controller, roadClosures);
+		boolean saved = ConfigIO.saveRoadClosures(controller, roadClosures, outputDir+"/changeEvents.xml");
 		Assert.assertTrue("could not save road closures", saved);
 		
 		//simulate and check scenario

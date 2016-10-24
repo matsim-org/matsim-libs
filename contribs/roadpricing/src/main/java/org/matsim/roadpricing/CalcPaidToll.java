@@ -42,15 +42,16 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
 /**
- * Calculates the toll agents pay during a simulation by analyzing events. Add an instance of this class as an EventHandler.
+ * Calculates the toll agents pay during a simulation by analyzing events. 
+ * Add an instance of this class as an EventHandler.
  * 
- * Users of this class can get to the amounts which have to be paid by the agents by using the getter methods
- * and/or by asking for a stream of AgentMoneyEvent instances.
- *
+ * Users of this class can get to the amounts which have to be paid by the 
+ * agents by using the getter methods and/or by asking for a stream of 
+ * AgentMoneyEvent instances.
  *
  * @author mrieser
  */
-public class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+public final class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	Logger log = Logger.getLogger( CalcPaidToll.class ) ;
 
@@ -67,8 +68,9 @@ public class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersTraffic
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
     @Inject
-	CalcPaidToll(final Network network, final RoadPricingScheme scheme) {
+	CalcPaidToll(final Network network, final RoadPricingScheme scheme, EventsManager events ) {
 		super();
+		events.addHandler(this);
 		this.network = network;
 		this.scheme = scheme;
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType())) {
@@ -207,7 +209,12 @@ public class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersTraffic
 				double newToll = link.getLength() * cost.amount;
 				AgentTollInfo info = CalcPaidToll.this.agents.get(driverId);
 				if (info == null) {
+					/* The agent is not yet "registered". */
+					
+					/* Generate a "registration object. */
 					info = new AgentTollInfo();
+					
+					/* Register it. */
 					CalcPaidToll.this.agents.put(driverId, info);
 				}
 				info.toll += newToll;
@@ -215,6 +222,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersTraffic
 		}
 	}
 
+	
 	class LinkTollBehaviour implements TollBehaviourI {
 		@Override
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
@@ -226,12 +234,12 @@ public class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersTraffic
 
 				AgentTollInfo info = CalcPaidToll.this.agents.get(driverId);
 				if (info == null) {
-					// (the agent is not yet "registered"):
+					/* The agent is not yet "registered" */
 
-					// generate a "registration object":
+					/* Generate a "registration object" */
 					info = new AgentTollInfo();
 
-					// register it:
+					/* Register it. */
 					CalcPaidToll.this.agents.put(driverId, info);
 				}
 				info.toll += cost.amount;
@@ -242,9 +250,11 @@ public class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersTraffic
 	/** Handles the calculation of the area toll. Whenever the agent is seen on
 	 * one of the tolled link, the constant toll amount has to be paid once.
 	 * <br/>
-	 * Design comments:<ul>
-	 * <li> This implementation becomes a problem if someone tries to implement more than one area which do
-	 * not share the same flat fee.  kai, mar'12
+	 * Design comments:
+	 * <ul>
+	 * 		<li> This implementation becomes a problem if someone tries to 
+	 * 			 implement more than one area which do not share the same flat 
+	 * 			 fee.  kai, mar'12
 	 * </ul> 
 	 */
 	class AreaTollBehaviour implements TollBehaviourI {
@@ -255,15 +265,16 @@ public class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersTraffic
 			if (cost != null) {
 				AgentTollInfo info = CalcPaidToll.this.agents.get(driverId);
 				if (info == null) {
-					// (the agent is not yet "registered")
+					/* The agent is not yet "registered" */
 
-					// generate a "registration object":
+					/* Generate a "registration object" */
 					info = new AgentTollInfo();
 
-					// register it:
+					/* Register it. */
 					CalcPaidToll.this.agents.put(driverId, info);
 
-					// the toll amount comes from the current link, but should be the same for all links:
+					/* The toll amount comes from the current link, but should 
+					 * be the same for all links. */
 					info.toll = cost.amount;
 				}
 			}

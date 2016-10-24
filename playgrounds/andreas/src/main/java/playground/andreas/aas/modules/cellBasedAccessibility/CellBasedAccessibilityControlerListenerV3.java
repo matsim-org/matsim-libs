@@ -3,11 +3,11 @@ package playground.andreas.aas.modules.cellBasedAccessibility;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -165,7 +165,7 @@ public class CellBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		// get travel distance (in meter)
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttc, new TravelDistanceCalculator());
 
-        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
+        Network network = (Network) controler.getScenario().getNetwork();
 
 		try{
 			log.info("Computing and writing cell based accessibility measures ...");

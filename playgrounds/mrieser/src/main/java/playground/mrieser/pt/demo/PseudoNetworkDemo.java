@@ -39,7 +39,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
@@ -74,7 +74,7 @@ public class PseudoNetworkDemo {
 		Network network = scenario.getNetwork();
 //		network.setCapacityPeriod(3600.0);
 		if (networkFile != null) {
-			new MatsimNetworkReader(scenario.getNetwork()).parse(networkFile);
+			new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		}
 
 		TransitSchedule schedule = scenario.getTransitSchedule();

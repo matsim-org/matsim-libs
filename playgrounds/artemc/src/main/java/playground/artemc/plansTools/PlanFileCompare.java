@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -28,8 +28,8 @@ public class PlanFileCompare {
 	String prevActivity="";
 	Scenario scenario1 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	new PopulationReader(scenario1).parse("H:/MATSimSimuliations/output_10000_19788pt_links_FC/it.0/0.plans.xml/0.plans.xml");
-	new PopulationReader(scenario2).parse("H:/MATSimSimuliations/output_10000_19788pt_links_FC/it.0/0.plans.xml/0.plans.xml");
+	new PopulationReader(scenario1).readFile("H:/MATSimSimuliations/output_10000_19788pt_links_FC/it.0/0.plans.xml/0.plans.xml");
+	new PopulationReader(scenario2).readFile("H:/MATSimSimuliations/output_10000_19788pt_links_FC/it.0/0.plans.xml/0.plans.xml");
 	Population population1 = scenario1.getPopulation();
 	Population population2 = scenario1.getPopulation();
 

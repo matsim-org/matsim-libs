@@ -1,8 +1,6 @@
-package playground.tschlenther.parkingSearch;
+/*package playground.tschlenther.parkingSearch;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,31 +9,22 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
-import org.matsim.contrib.carsharing.events.NoParkingSpaceEvent;
 import org.matsim.contrib.carsharing.events.NoVehicleCarSharingEvent;
-import org.matsim.contrib.carsharing.facility.DummyFacility;
-import org.matsim.contrib.carsharing.qsim.CarSharingVehicles;
-import org.matsim.contrib.carsharing.stations.FreeFloatingStation;
-import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
-import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
-import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.contrib.carsharing.manager.CarSharingVehiclesNew;
+import org.matsim.contrib.carsharing.vehicles.FFCSVehicle;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.core.mobsim.qsim.agents.BasicPlanAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentImpl;
@@ -45,8 +34,6 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.TripRouter;
@@ -59,25 +46,27 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.withinday.utils.EditRoutes;
 
-/**
+*//**
  * @author balac, tschlenther
- */
+ *//*
 public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, PTPassengerAgent {
 
 	private static final Logger log = Logger.getLogger(PSAndCSPersonDriverAgentImpl.class);
 
+	enum ParkingMode{
+		SEARCHING,
+		DRIVING,
+	}
 	private static final double MAXIMUM_WALKING_TIME = 660;
 	private ParkingMode searchMode = ParkingMode.DRIVING;
 	
-	private CarSharingVehicles carSharingVehicles;
-	private String ffVehId;
+	private CarSharingVehiclesNew carSharingVehicles;
+	private ArrayList<FFCSVehicle> ffVehicles = new ArrayList<FFCSVehicle>();	
 
 	double beelineFactor = 0.0;
 	double walkSpeed = 0.0;
 
-	private TripRouter tripRouter;
 
 	private final BasicPlanAgentImpl basicAgentDelegate ;
 	private final TransitAgentImpl transitAgentDelegate ;
@@ -85,7 +74,7 @@ public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPa
 	private LeastCostPathCalculator pathCalculator;
 
 	public PSAndCSPersonDriverAgentImpl(final Plan plan, final Netsim simulation, 
-			CarSharingVehicles carSharingVehicles, TripRouter tripRouter, LeastCostPathCalculator pathCalculator) {
+			CarSharingVehiclesNew carSharingVehicles, TripRouter tripRouter, LeastCostPathCalculator pathCalculator) {
 		this.pathCalculator = pathCalculator;
 		Scenario scenario = simulation.getScenario() ;
 
@@ -97,7 +86,6 @@ public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPa
 
 		this.carSharingVehicles = carSharingVehicles;
 
-		this.tripRouter = tripRouter;
 
 		beelineFactor = scenario.getConfig().plansCalcRoute().getBeelineDistanceFactors().get("walk");
 		walkSpeed = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get("walk");
@@ -128,7 +116,8 @@ public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPa
 
 	private void insertFreeFloatingTripWhenEndingActivity(double now) {
 		// (_next_ plan element is (presumably) a leg)
-		
+		Map<FFCSVehicle, Link> ffvehiclesmap = this.carSharingVehicles.getFfvehiclesMap();
+
 		List<PlanElement> planElements = this.basicAgentDelegate.getCurrentPlan().getPlanElements();
 		int indexOfInsertion = planElements.indexOf(this.basicAgentDelegate.getCurrentPlanElement()) + 1;
 
@@ -144,16 +133,20 @@ public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPa
 		final Link currentLink = scenario.getNetwork().getLinks().get(route.getStartLinkId());
 		final Link destinationLink = scenario.getNetwork().getLinks().get(route.getEndLinkId());
 
-		FreeFloatingStation station = findClosestAvailableCar(currentLink);
-		if (station == null) {
+		FFCSVehicle vehicleToBeUsed = findClosestAvailableCar(currentLink);
+		if (vehicleToBeUsed == null) {
 			this.setStateToAbort(now);
 			this.basicAgentDelegate.getEvents().processEvent(new NoVehicleCarSharingEvent(now, currentLink.getId(), "ff"));
 			return;
 		}
-		ffVehId = station.getIDs().get(0);
+		ffVehicles.add(vehicleToBeUsed);
+
+		String ffVehId = vehicleToBeUsed.getVehicleId();
 		
-		final Link stationLink = scenario.getNetwork().getLinks().get( station.getLinkId() ) ;
-		this.carSharingVehicles.getFreeFLoatingVehicles().removeVehicle(stationLink, ffVehId); 
+		final Link stationLink = ffvehiclesmap.get(vehicleToBeUsed) ;
+		Coord coordStation = stationLink.getCoord();
+		this.carSharingVehicles.getFfVehicleLocationQuadTree().remove(coordStation.getX(),
+				coordStation.getY(), vehicleToBeUsed); 
 		
 		Route routeToCar = routeFactory.createRoute( Route.class, currentLink.getId(), stationLink.getId() ) ; 
 		final double dist = CoordUtils.calcEuclideanDistance(currentLink.getCoord(), stationLink.getCoord()) * beelineFactor;
@@ -226,27 +219,24 @@ public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPa
 
 
 	private void parkCSVehicle() {
-		String currentLegMode = ((Leg) this.basicAgentDelegate.getCurrentPlanElement() ).getMode() ;
-		Scenario scenario = this.basicAgentDelegate.getScenario() ;
+		Leg currentLeg = (Leg) this.basicAgentDelegate.getCurrentPlanElement() ;
+
+		String currentLegMode = currentLeg.getMode() ;
 		if (currentLegMode.equals("freefloating")) {
-			this.carSharingVehicles.getFreeFLoatingVehicles().addVehicle(scenario.getNetwork().getLinks().get(this.getDestinationLinkId()), ffVehId);
-			ffVehId = null;
+			Network network = this.basicAgentDelegate.getScenario().getNetwork();
+			FFCSVehicle vehicleToBeReturned = this.ffVehicles.get(this.ffVehicles.size() - 1);
+			Link endLink = network.getLinks().get(currentLeg.getRoute().getEndLinkId());
+			Coord coord = endLink.getCoord();
+			this.carSharingVehicles.getFfVehicleLocationQuadTree().put(coord.getX(), coord.getY(), vehicleToBeReturned);
+			ffVehicles.remove(vehicleToBeReturned);
 		}
 	}
-
-	@Deprecated // use method below directly (do lookup in calling method)
-	private FreeFloatingStation findClosestAvailableCar(Id<Link> linkId) {		
-		//find the closest available car in the quad tree(?) reserve it (make it unavailable)
-		Link link = this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(linkId);
-
-		return findClosestAvailableCar(link);
+	
+	private FFCSVehicle findClosestAvailableCar(Link link) {
+		FFCSVehicle vehicle = this.carSharingVehicles.getFfVehicleLocationQuadTree()
+				.getClosest(link.getCoord().getX(), link.getCoord().getY());
+		return vehicle;
 	}
-
-	private FreeFloatingStation findClosestAvailableCar(Link link) {
-		FreeFloatingStation location = this.carSharingVehicles.getFreeFLoatingVehicles().getQuadTree().getClosest(link.getCoord().getX(), link.getCoord().getY());
-		return location;
-	}
-
 	void resetCaches() {
 		WithinDayAgentUtils.resetCaches(this.basicAgentDelegate);
 	}
@@ -371,13 +361,13 @@ public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPa
 		this.driverAgentDelegate.notifyMoveOverNode(newLinkId);
 	}
 
-	/**
+	*//**
 	 * when not searching for parking space, method is delegated
 	 * when in searching mode, it is assumed that agents know the surrounding area: they choose the one link out of
 	 * the outlinks of currentlink that has the closest toNode to the toNode of the destination link.
 	 * in networks with high percentage of bidirectional links, this may not be very constructive.
 	 * if the next link is the destination link, the agent is put in search mode.
-	 */
+	 *//*
 	@Override
 	public Id<Link> chooseNextLinkId() {
 		Id<Link> destination = this.getDestinationLinkId();
@@ -423,14 +413,14 @@ public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPa
 		}
 	}
 	
-	/**
+	*//**
 	 * as long as the agent is not searching for parking space, this method gets delegated.
 	 * it is assumed that agents have a maximum walking time to their activity and know the walking times in
 	 * the surrounding area of their destination link.
 	 * if the destination link's toNode is reachable of the current link's toNode within this time, the agent looks for a parking lot.
 	 * at the moment, availabilty of parking spaces is modeled by a randomly drawn number.
 	 * if the agent does not park on the destination link, a walk leg must be inserted into the plan.
-	 */
+	 *//*
 	@Override
 	public boolean isWantingToArriveOnCurrentLink() {
 		if ( this.searchMode.equals(ParkingMode.DRIVING) ) {
@@ -478,3 +468,4 @@ public class PSAndCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPa
 
 }
 
+*/

@@ -22,9 +22,9 @@ package playground.wrashid.PSF.converter.addingParkings;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
+
 import playground.wrashid.PSF.ParametersPSF;
 
 public class TestConfig3 extends MatsimTestCase {

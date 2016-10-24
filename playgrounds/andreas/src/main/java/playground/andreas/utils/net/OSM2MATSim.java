@@ -4,10 +4,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkSegmentDoubleLinks;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -22,7 +23,7 @@ public class OSM2MATSim {
 
 	public static void main(final String[] args) {
 
-		NetworkImpl network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 //		OsmNetworkReader osmReader = new OsmNetworkReader(network, new WGS84toCH1903LV03());
 		OsmNetworkReader osmReader = new OsmNetworkReader(network,
 				TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
@@ -117,7 +118,7 @@ public class OSM2MATSim {
 
 		// Simplifier
 		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		network = (NetworkImpl) scenario.getNetwork();
+		network = (Network) scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(outputFile + "_cl.xml.gz");
 
 		NetworkSimplifier nsimply = new NetworkSimplifier();

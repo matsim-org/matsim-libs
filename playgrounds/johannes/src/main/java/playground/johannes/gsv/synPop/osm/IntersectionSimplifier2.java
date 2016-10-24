@@ -23,11 +23,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.*;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -39,7 +42,7 @@ import java.util.*;
  */
 public class IntersectionSimplifier2 {
 
-	private NetworkImpl network;
+	private Network network;
 
 	private final double maxSearchRadius = 50;
 
@@ -59,10 +62,10 @@ public class IntersectionSimplifier2 {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario.getNetwork());
-		reader.parse("/home/johannes/gsv/osm/network/germany-20140909.3.xml");
+		reader.readFile("/home/johannes/gsv/osm/network/germany-20140909.3.xml");
 		
 		IntersectionSimplifier2 simplifier = new IntersectionSimplifier2();
-		simplifier.network = (NetworkImpl) scenario.getNetwork();
+		simplifier.network = (Network) scenario.getNetwork();
 		
 		simplifier.maxNodeId = Long.MIN_VALUE;
 		for(Node node : scenario.getNetwork().getNodes().values()) {
@@ -163,7 +166,7 @@ public class IntersectionSimplifier2 {
 						newLink.setLength(link.getLength() + d);
 
 						newLink.setNumberOfLanes(link.getNumberOfLanes());
-						((LinkImpl)newLink).setOrigId(((LinkImpl)link).getOrigId());
+						NetworkUtils.setOrigId( ((Link)newLink), (String) NetworkUtils.getOrigId( ((Link)link) ) ) ;
 					}
 				}
 			}
@@ -171,7 +174,7 @@ public class IntersectionSimplifier2 {
 	}
 
 	private Node getNearestConnected(Node seed) {
-		Collection<Node> nodes = network.getNearestNodes(seed.getCoord(), maxSearchRadius);
+		Collection<Node> nodes = NetworkUtils.getNearestNodes(network,seed.getCoord(), maxSearchRadius);
 		nodes.remove(seed);
 		Node nearest = null;
 		if (!nodes.isEmpty()) {

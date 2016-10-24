@@ -2,9 +2,9 @@ package playground.wrashid.artemis.parking;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -55,7 +55,7 @@ public class RegressionModel {
 	
 	
 	private static DoubleValueHashMap<Id> getNumberOfStreetParkingsPerHub() {
-		NetworkImpl network = getNetwork();
+		Network network = getNetwork();
 		String inputGarageFacilitiesPath="C:/data/My Dropbox/ETH/Projekte/Parkplätze/data zürich/facilities/output/streetpark_facilities.xml";
 		
 		return getNumberOfParkingsPerHub(network, inputGarageFacilitiesPath);
@@ -65,7 +65,7 @@ public class RegressionModel {
 
 
 	private static DoubleValueHashMap<Id> getNumberOfGarageParkingsPerHub() {
-		NetworkImpl network = getNetwork();
+		Network network = getNetwork();
 		String inputGarageFacilitiesPath="C:/data/My Dropbox/ETH/Projekte/Parkplätze/data zürich/facilities/output/garage_facilities_ohne öffnungszeiten.xml";
 		
 		return getNumberOfParkingsPerHub(network, inputGarageFacilitiesPath);
@@ -74,7 +74,7 @@ public class RegressionModel {
 
 
 
-	private static DoubleValueHashMap<Id> getNumberOfParkingsPerHub(NetworkImpl network, String inputParkingFacilitiesPath) {
+	private static DoubleValueHashMap<Id> getNumberOfParkingsPerHub(Network network, String inputParkingFacilitiesPath) {
 		ActivityFacilities garageParkingFacilities = GeneralLib.readActivityFacilities(inputParkingFacilitiesPath);
 		
 		DoubleValueHashMap<Id> numberOfParkingsPerHub = new DoubleValueHashMap<Id>();
@@ -85,16 +85,16 @@ public class RegressionModel {
 		return numberOfParkingsPerHub;
 	}
 
-	private static NetworkImpl getNetwork() {
+	private static Network getNetwork() {
 		String inputNetworkPath="C:/eTmp/run10/output_network.xml.gz";
-		NetworkImpl network= (NetworkImpl) GeneralLib.readNetwork(inputNetworkPath);
+		Network network= (Network) GeneralLib.readNetwork(inputNetworkPath);
 		return network;
 	}
 
 	
 
 	private static DoubleValueHashMap<Id> getNumberOfKilometersStreetPerHub() {
-		NetworkImpl network = getNetwork();
+		Network network = getNetwork();
 		
 		DoubleValueHashMap<Id> numberOfKilometersOfStreetsInHub = new DoubleValueHashMap<Id>();
 		

@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
@@ -299,8 +299,8 @@ public class TransitScheduleAnalyserToCSVandTEX {
 	public static void main(String[] args) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().transit().setUseTransit(true);
-		(new NetworkReaderMatsimV1(sc.getNetwork())).parse("F:/temp/network.final.xml.gz");
-		(new TransitScheduleReaderV1(sc)).parse("F:/temp/transitSchedule_basecase.xml.gz");
+		(new NetworkReaderMatsimV1(sc.getNetwork())).readFile("F:/temp/network.final.xml.gz");
+		(new TransitScheduleReaderV1(sc)).readFile("F:/temp/transitSchedule_basecase.xml.gz");
 		
 		TransitScheduleAnalyserToCSVandTEX.transitScheduleAnalyser(sc.getTransitSchedule(), sc.getNetwork(), "F:/temp");
 	}

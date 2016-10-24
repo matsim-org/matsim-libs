@@ -48,7 +48,7 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.TransitRouter;
 
@@ -103,12 +103,12 @@ public class ControlerWSPreCalcTimes {
         );
         //need to make MRT slower, so identify the links with this mode with a hotfix
         for (Link l : controler.getScenario().getNetwork().getLinks().values()) {
-            LinkImpl l1 = (LinkImpl) l;
+            Link l1 = (Link) l;
             String[] parts = l.getId().toString().split(TransitSheduleToNetwork.SEPARATOR);
             if (parts[0].matches("[A-Z]+[0-9]*[_a-z]*")) {
-                l1.setType("rail");
+                NetworkUtils.setType( l1, (String) "rail");
             }else{
-                l1.setType("road");
+                NetworkUtils.setType( l1, (String) "road");
             }
         }
         final PTLinkSpeedCalculatorWithPreCalcTimes linkSpeedCalculatorWithPreCalcTimes = new PTLinkSpeedCalculatorWithPreCalcTimes(preloadedStopStopTimes, true);

@@ -76,7 +76,7 @@ public class AnalyseCoPresence {
 
 		final ObjectAttributes personAttributes = new ObjectAttributes();
 		if ( attributesFile != null ) {
-			new ObjectAttributesXmlReader( personAttributes ).parse( attributesFile );
+			new ObjectAttributesXmlReader( personAttributes ).readFile( attributesFile );
 		}
 
 		final EventsManager events = EventsUtils.createEventsManager( );
@@ -106,7 +106,7 @@ public class AnalyseCoPresence {
 				// TODO Auto-generated method stub
 
 			}
-		}.parse( populationFile );
+		}.readFile( populationFile );
 
 		events.addHandler( new BasicEventHandler() {
 			@Override public void reset( int i ) {}
@@ -132,7 +132,7 @@ public class AnalyseCoPresence {
 			}
 		} );
 
-		new EventsReaderXMLv1( events ).parse( eventsFile );
+		new EventsReaderXMLv1( events ).readFile( eventsFile );
 
 		try ( final BufferedWriter writer = IOUtils.getBufferedWriter( outputFile ) ) {
 			writer.write( "personId\tnMetContacts\ttimePassedWithContacts\tcumulatedTimePassedWithContacts\tmaxSimultaneousContacts" );

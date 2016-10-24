@@ -42,11 +42,11 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -122,7 +122,8 @@ public class BetaTravelTest extends MatsimTestCase {
 	 *  @author mrieser
 	 */
 	public void testBetaTravel_6() {
-		Config config = loadConfig(getInputDirectory() + "config.xml");
+		Config config = loadConfig("test/scenarios/equil/config.xml");
+		ConfigUtils.loadConfig(config, getInputDirectory() + "config.xml");
 		config.controler().setWritePlansInterval(0);	
 		config.plans().setActivityDurationInterpretation( ActivityDurationInterpretation.tryEndTimeThenDuration );
 		/*
@@ -152,7 +153,8 @@ public class BetaTravelTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testBetaTravel_66() {
-		Config config = loadConfig(getInputDirectory() + "config.xml");
+		Config config = loadConfig("test/scenarios/equil/config.xml");
+		ConfigUtils.loadConfig(config, getInputDirectory() + "config.xml");
 		config.controler().setWritePlansInterval(0);
 		// ---
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -220,7 +222,7 @@ public class BetaTravelTest extends MatsimTestCase {
 		@Override
 		public void handleEvent(final LinkEnterEvent event) {
 			if (event.getLinkId().toString().equals(this.linkId)) {
-				this.enterTimes.add(Double.valueOf(event.getTime()));
+				this.enterTimes.add(event.getTime());
 				if (event.getTime() < this.firstCarEnter) this.firstCarEnter = event.getTime();
 				if (event.getTime() > this.lastCarEnter) this.lastCarEnter = event.getTime();
 			}
@@ -229,7 +231,7 @@ public class BetaTravelTest extends MatsimTestCase {
 		@Override
 		public void handleEvent(final LinkLeaveEvent event) {
 			if (event.getLinkId().toString().equals(this.linkId)) {
-				this.leaveTimes.add(Double.valueOf(event.getTime()));
+				this.leaveTimes.add(event.getTime());
 				if (event.getTime() < this.firstCarLeave) this.firstCarLeave = event.getTime();
 				if (event.getTime() > this.lastCarLeave) this.lastCarLeave = event.getTime();
 			}
@@ -242,8 +244,8 @@ public class BetaTravelTest extends MatsimTestCase {
 			int idxLeave = 0;
 			int cars = 0;
 
-			double timeLeave = this.leaveTimes.get(idxLeave).doubleValue();
-			double timeEnter = this.enterTimes.get(idxEnter).doubleValue();
+			double timeLeave = this.leaveTimes.get(idxLeave);
+			double timeEnter = this.enterTimes.get(idxEnter);
 			double time;
 
 			while ((timeLeave != Double.POSITIVE_INFINITY) && (timeEnter != Double.POSITIVE_INFINITY)) {
@@ -251,7 +253,7 @@ public class BetaTravelTest extends MatsimTestCase {
 					time = timeLeave;
 					idxLeave++;
 					if (idxLeave < this.leaveTimes.size()) {
-						timeLeave = this.leaveTimes.get(idxLeave).doubleValue();
+						timeLeave = this.leaveTimes.get(idxLeave);
 					} else {
 						timeLeave = Double.POSITIVE_INFINITY;
 					}
@@ -260,7 +262,7 @@ public class BetaTravelTest extends MatsimTestCase {
 					time = timeEnter;
 					idxEnter++;
 					if (idxEnter < this.enterTimes.size()) {
-						timeEnter = this.enterTimes.get(idxEnter).doubleValue();
+						timeEnter = this.enterTimes.get(idxEnter);
 					} else {
 						timeEnter = Double.POSITIVE_INFINITY;
 					}
@@ -486,11 +488,8 @@ public class BetaTravelTest extends MatsimTestCase {
 						now += leg.getTravelTime();
 					}
 					// set planned arrival time accordingly
-					if (pe instanceof Leg) {
-						final double arrTime = now;
-						Leg r = ((Leg) leg);
-						r.setTravelTime( arrTime - r.getDepartureTime() );
-					}
+					final double arrTime = now;
+					leg.setTravelTime( arrTime - leg.getDepartureTime() );
 
 				}
 			}
@@ -532,7 +531,7 @@ public class BetaTravelTest extends MatsimTestCase {
 		@Override
 		public void handleEvent(final PersonDepartureEvent event) {
 			if (!this.agentSeen.contains(event.getPersonId())) { // only store first departure
-				this.agentDepTimes.put(event.getPersonId(), Double.valueOf(event.getTime()));
+				this.agentDepTimes.put(event.getPersonId(), event.getTime());
 				this.agentSeen.add(event.getPersonId());
 			}
 		}
@@ -541,7 +540,7 @@ public class BetaTravelTest extends MatsimTestCase {
 		public void handleEvent(final PersonArrivalEvent event) {
 			Double depTime = this.agentDepTimes.remove(event.getPersonId());
 			if (depTime != null) {
-				this.depTimes[this.agentCounter] = depTime.doubleValue() / 3600.0;
+				this.depTimes[this.agentCounter] = depTime / 3600.0;
 				this.arrTimes[this.agentCounter] = event.getTime() / 3600.0;
 				this.agentCounter++;
 			}

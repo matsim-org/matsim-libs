@@ -31,7 +31,7 @@ import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.socnetgen.sna.math.Distribution;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -92,8 +92,8 @@ public class TravelTimeTask extends AnalyzerTask {
 				e.printStackTrace();
 			}
 
-			Node n1 = ((NetworkImpl)network).getNearestNode(new Coord(points1[0], points1[1]));
-			Node n2 = ((NetworkImpl)network).getNearestNode(new Coord(points2[0], points2[1]));
+			Node n1 = NetworkUtils.getNearestNode(((Network)network),new Coord(points1[0], points1[1]));
+			Node n2 = NetworkUtils.getNearestNode(((Network)network),new Coord(points2[0], points2[1]));
 			
 			Path path = router.calcLeastCostPath(n1, n2, 0, null, null);
 			

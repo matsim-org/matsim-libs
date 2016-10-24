@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.integration.lanes11.MixedLaneTestFixture;
-import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.Lane;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;

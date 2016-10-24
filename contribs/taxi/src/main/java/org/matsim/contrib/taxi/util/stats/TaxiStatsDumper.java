@@ -36,10 +36,10 @@ public class TaxiStatsDumper
     implements AfterMobsimListener, ShutdownListener
 {
     private static final String[] HEADER = { "iter", null, //
-            "TP_avg", "TP_sd", "TP_95%ile", "TP_max", null, //
-            "RE_fleet", "RE_avg", "RE_sd", null, //
-            "RW_fleet", "RW_avg", "RW_sd", null, //
-            "TO" };
+            "PassWaitTime_avg", "PassWaitTime_sd", "PassWaitTime_95%ile", "PassWaitTime_max", null, //
+            "EmptyDriveRatio_fleetAvg", "EmptyDriveRatio_avg", "EmptyDriveRatio_sd", null, //
+            "StayRatio_fleetAvg", "StayRatio_avg", "StayRatio_sd", null, //
+            "OccupDriveRatio_fleetAvg" };
 
     private final TaxiData taxiData;
     private final TaxiConfigGroup taxiCfg;

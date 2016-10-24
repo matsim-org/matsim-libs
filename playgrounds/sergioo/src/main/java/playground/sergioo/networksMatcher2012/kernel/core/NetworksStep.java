@@ -6,7 +6,7 @@ import java.util.List;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 
 public abstract class NetworksStep {
@@ -72,8 +72,8 @@ public abstract class NetworksStep {
 	}
 
 	private Network[] execute() {
-		Network oldNetworkA = NetworkImpl.createNetwork();
-		Network oldNetworkB = NetworkImpl.createNetwork();
+		Network oldNetworkA = NetworkUtils.createNetwork();
+		Network oldNetworkB = NetworkUtils.createNetwork();
 		saveOldNetworks(oldNetworkA, oldNetworkB);
 		process(oldNetworkA, oldNetworkB);
 		Network[] reduced = new Network[] {networkA, networkB};

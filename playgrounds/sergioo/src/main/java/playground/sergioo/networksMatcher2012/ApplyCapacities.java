@@ -36,12 +36,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -99,7 +98,7 @@ public class ApplyCapacities {
 				link.setFreespeed(freeSpeedsMap.get((Integer)feature.getAttribute("VDF"))/3.6);
 				link.setNumberOfLanes((Double)feature.getAttribute("LANES"));
 				link.setLength((Double)feature.getAttribute("LENGTH"));
-				((LinkImpl)link).setOrigId(feature.getID());
+				NetworkUtils.setOrigId( ((Link)link), (String) feature.getID() ) ;
 				network.addLink(link);
 			}
 		return network;
@@ -138,7 +137,7 @@ public class ApplyCapacities {
 		Network networkHighResolution = scenario.getNetwork();
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SVY21, TransformationFactory.WGS84_UTM48N);
 		for(Node node:networkLowResolution.getNodes().values())
-			((NodeImpl)node).setCoord(coordinateTransformation.transform(node.getCoord()));
+			((Node)node).setCoord(coordinateTransformation.transform(node.getCoord()));
 		CrossingMatchingStep.CAPACITIES_FILE = new File("./data/matching/capacities/linksChanged.txt");
 		Map<Link, Tuple<Link,Double>> result = loadCapacities(CrossingMatchingStep.CAPACITIES_FILE, networkLowResolution, networkHighResolution);
 		LayersWindow windowHR2 = new DoubleNetworkCapacitiesWindow("Networks capacities", networkLowResolution, networkHighResolution, result);

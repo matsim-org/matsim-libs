@@ -27,7 +27,7 @@ public class SimulationParser implements TransitDriverStartsEventHandler, LinkEn
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new SimulationParser());
 		MatsimXmlParser matsimXmlParser = new EventsReaderXMLv1(events);
-		matsimXmlParser.parse("./data/ezLinkDataSimulation/output/ITERS/it.0/0.events.xml.gz");
+		matsimXmlParser.readFile("./data/ezLinkDataSimulation/output/ITERS/it.0/0.events.xml.gz");
 	}
 
 	private PrintWriter printWriter;

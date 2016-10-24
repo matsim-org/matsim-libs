@@ -22,7 +22,7 @@ package org.matsim.utils.gis.matsim2esri.network;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.network.Network;
 
 public class LanesBasedWidthCalculator implements WidthCalculator {
 
@@ -34,7 +34,7 @@ public class LanesBasedWidthCalculator implements WidthCalculator {
 	/**
 	 * This constructor is used by reflection. It's signature mustn't be changed or it won't work anymore. :-(
 	 */
-	public LanesBasedWidthCalculator(final NetworkImpl network, final Double coef) {
+	public LanesBasedWidthCalculator(final Network network, final Double coef) {
 		double w = network.getEffectiveLaneWidth();
 		if (Double.isNaN(w)) {
 			log.warn("Effective lane width in network is set to Double.NaN. Set a real value in your network.xml to make this tool work with this value. Using 3.75 as effective lane width...");

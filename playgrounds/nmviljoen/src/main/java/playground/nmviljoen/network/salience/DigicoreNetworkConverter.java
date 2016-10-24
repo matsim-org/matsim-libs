@@ -38,7 +38,7 @@ public class DigicoreNetworkConverter {
 		
 		LOG.info("Parsing path-dependent network...");
 		DigicorePathDependentNetworkReader_v1 pdnr = new DigicorePathDependentNetworkReader_v1();
-		pdnr.parse(filename);
+		pdnr.readFile(filename);
 		PathDependentNetwork pdn = pdnr.getPathDependentNetwork();
 		pdn.writeNetworkStatisticsToConsole();
 

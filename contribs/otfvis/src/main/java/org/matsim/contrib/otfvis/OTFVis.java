@@ -37,7 +37,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
@@ -122,31 +122,6 @@ public class OTFVis {
 			}
 		}
 	}
-
-//	private static String chooseFile() {
-//		JFileChooser fc = new JFileChooser();
-//		fc.setFileFilter( new FileFilter() {
-//			@Override public boolean accept( File f ) {
-//				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".xml" );
-//			}
-//			@Override public String getDescription() { return "MATSim net or config file (*.xml)"; }
-//		} );
-//
-//		fc.setFileFilter( new FileFilter() {
-//			@Override public boolean accept( File f ) {
-//				return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith( ".mvi" );
-//			}
-//			@Override public String getDescription() { return "OTFVis movie file (*.mvi)"; }
-//		} );
-//
-//		int state = fc.showOpenDialog( null );
-//		if ( state == JFileChooser.APPROVE_OPTION ) {
-//			String filename = fc.getSelectedFile().getAbsolutePath();
-//			return filename;
-//		}
-//		System.out.println( "No file selected." );
-//		return null;
-//	}
 
 	public static void playMVI(final String[] args) {
 		playMVI(args[0]);

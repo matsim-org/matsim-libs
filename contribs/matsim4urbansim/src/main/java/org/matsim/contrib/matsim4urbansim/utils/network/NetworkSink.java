@@ -9,8 +9,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.openstreetmap.osmosis.core.container.v0_6.BoundContainer;
@@ -66,7 +65,7 @@ public class NetworkSink implements SinkSource {
 					throw new RuntimeException("Missing node: "+toNode.getNodeId());
 				}
 				double length = CoordUtils.calcEuclideanDistance(fromMatsimNode.getCoord(), toMatsimNode.getCoord());
-				createLink((NetworkImpl) this.network, entry, fromNode, toNode, length);
+				createLink((Network) this.network, entry, fromNode, toNode, length);
 				fromNode = toNode;
 			}
 		}
@@ -87,7 +86,7 @@ public class NetworkSink implements SinkSource {
 		sink.release();
 	}
 
-	private void createLink(final NetworkImpl network, final Way way, final WayNode fromNode, final WayNode toNode, final double length) {
+	private void createLink(final Network network, final Way way, final WayNode fromNode, final WayNode toNode, final double length) {
 		TagCollectionImpl tagCollection = new TagCollectionImpl(way.getTags());
 		Map<String, String> tags = tagCollection.buildMap();
 		String highway = tags.get("highway");
@@ -148,8 +147,13 @@ public class NetworkSink implements SinkSource {
 		if (!onewayReverse) {
 			Id<Link> id = Id.create(Long.toString(way.getId())+"_"+Long.toString(fromNodeNumber)+"_"+Long.toString(toNodeNumber), Link.class);
 			if (!network.getLinks().containsKey(id)) {
-				Link l = network.createAndAddLink(id, network.getNodes().get(Id.create(fromNodeNumber, org.matsim.api.core.v01.network.Node.class)), network.getNodes().get(Id.create(toNodeNumber, org.matsim.api.core.v01.network.Node.class)), length, freespeed, capacity, nofLanes);
-				((LinkImpl) l).setOrigId(origId);
+				final Id<Link> id2 = id;
+				final double freespeed1 = freespeed;
+				final double capacity1 = capacity;
+				final double numLanes = nofLanes;
+				Link l = NetworkUtils.createAndAddLink(network,id2, network.getNodes().get(Id.create(fromNodeNumber, org.matsim.api.core.v01.network.Node.class)), network.getNodes().get(Id.create(toNodeNumber, org.matsim.api.core.v01.network.Node.class)), length, freespeed1, capacity1, numLanes );
+				final String id1 = origId;
+				NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				tagWayForward(way, l);
 			} else {
 				log.warn("Duplicate link: " + id);
@@ -158,8 +162,13 @@ public class NetworkSink implements SinkSource {
 		if (!oneway) {
 			Id<Link> id = Id.create(Long.toString(way.getId())+"_"+Long.toString(fromNodeNumber)+"_"+Long.toString(toNodeNumber)+"_R", Link.class);
 			if (!network.getLinks().containsKey(id)) {
-				Link l = network.createAndAddLink(id, network.getNodes().get(Id.create(toNodeNumber, org.matsim.api.core.v01.network.Node.class)), network.getNodes().get(Id.create(fromNodeNumber, org.matsim.api.core.v01.network.Node.class)), length, freespeed, capacity, nofLanes);
-				((LinkImpl) l).setOrigId(origId);
+				final Id<Link> id2 = id;
+				final double freespeed1 = freespeed;
+				final double capacity1 = capacity;
+				final double numLanes = nofLanes;
+				Link l = NetworkUtils.createAndAddLink(network,id2, network.getNodes().get(Id.create(toNodeNumber, org.matsim.api.core.v01.network.Node.class)), network.getNodes().get(Id.create(fromNodeNumber, org.matsim.api.core.v01.network.Node.class)), length, freespeed1, capacity1, numLanes );
+				final String id1 = origId;
+				NetworkUtils.setOrigId( ((Link) l), id1 ) ;
 				tagWayBackward(way, l);
 			} else {
 				log.warn("Duplicate link: " + id);

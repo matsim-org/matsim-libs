@@ -48,7 +48,7 @@ public class LinkActsAndLegs {
 	public static void main(String[] args) throws IOException {
 		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
-		parser.parse("/home/johannes/gsv/germany-scenario/mid2008/pop/pop.xml");
+		parser.readFile("/home/johannes/gsv/germany-scenario/mid2008/pop/pop.xml");
 
 		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 

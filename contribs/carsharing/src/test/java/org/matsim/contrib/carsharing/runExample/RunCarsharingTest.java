@@ -61,23 +61,23 @@ public class RunCarsharingTest {
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles );
 
-		config.network().setInputFile( utils.getClassInputDirectory()+"/network.xml" );
+		config.network().setInputFile("network.xml" );
 
-		config.plans().setInputFile( utils.getClassInputDirectory()+"/10persons.xml");
-		config.plans().setInputPersonAttributeFile( utils.getClassInputDirectory()+"/1000desiresAttributes.xml");
+		config.plans().setInputFile("10persons.xml");
+		config.plans().setInputPersonAttributeFile("1000desiresAttributes.xml");
 
-		config.facilities().setInputFile( utils.getClassInputDirectory()+"/facilities.xml" );
+		config.facilities().setInputFile("facilities.xml" );
 		
 		config.plansCalcRoute().setInsertingAccessEgressWalk(false); // otherwise does not work. kai,feb'16
 
-		FreeFloatingConfigGroup ffConfig = (FreeFloatingConfigGroup) config.getModule( FreeFloatingConfigGroup.GROUP_NAME ) ;
-		ffConfig.setvehiclelocations( utils.getClassInputDirectory()+"/Stations.txt");
+		CarsharingConfigGroup csConfig = (CarsharingConfigGroup) config.getModule( CarsharingConfigGroup.GROUP_NAME ) ;
+		csConfig.setvehiclelocations( utils.getClassInputDirectory()+"/CarsharingStations.xml");
+		csConfig.setmembership(utils.getClassInputDirectory() + "/CSMembership.xml");
+		//OneWayCarsharingConfigGroup oneWayConfig = (OneWayCarsharingConfigGroup) config.getModule( OneWayCarsharingConfigGroup.GROUP_NAME ) ;
+		//oneWayConfig.setvehiclelocations( utils.getClassInputDirectory()+"/Stations.txt");
 
-		OneWayCarsharingConfigGroup oneWayConfig = (OneWayCarsharingConfigGroup) config.getModule( OneWayCarsharingConfigGroup.GROUP_NAME ) ;
-		oneWayConfig.setvehiclelocations( utils.getClassInputDirectory()+"/Stations.txt");
-
-		TwoWayCarsharingConfigGroup twoWayConfig = (TwoWayCarsharingConfigGroup) config.getModule( TwoWayCarsharingConfigGroup.GROUP_NAME ) ;
-		twoWayConfig.setvehiclelocations( utils.getClassInputDirectory()+"/Stations.txt");
+		//TwoWayCarsharingConfigGroup twoWayConfig = (TwoWayCarsharingConfigGroup) config.getModule( TwoWayCarsharingConfigGroup.GROUP_NAME ) ;
+		//twoWayConfig.setvehiclelocations( utils.getClassInputDirectory()+"/CarsharingStations.xml");
 
 		// ---
 
@@ -121,85 +121,64 @@ public class RunCarsharingTest {
 				for (int nofDepartures : this.histogram.getDepartures(legMode)) {
 					nOfModeLegs += nofDepartures;
 				}
-				//				if (nofModeLegs != 0) {
-				//					log.warn("number of " + legMode + " legs:\t"  + nofModeLegs + "\t" + (nofModeLegs * 100.0 / nofLegs) + "%");
-				//					if ( TransportMode.car.equals(legMode) ) {
-				//						log.info("(car legs include legs by pt vehicles)") ;
-				//					}
-				//				}
-				if ( iteration==1 ) {
-					if ( TransportMode.car.equals(legMode) ) {
-						Assert.assertEquals(10, nOfModeLegs );
-					} else if ( "freefloating".equals(legMode) ) {
+				if ( iteration==0 ) {
+					if ( TransportMode.walk.equals(legMode) ) {
+						Assert.assertEquals(0, nOfModeLegs );
+					} else if ( "oneway_vehicle".equals(legMode) ) {
 						Assert.assertEquals( 0, nOfModeLegs ) ;
-					} else if ( "onewaycarsharing".equals(legMode) ) {
+					} else if ( TransportMode.car.equals(legMode) ) {
+						Assert.assertEquals( 22, nOfModeLegs ) ;
+					} else if ( "egress_walk_ow".equals(legMode) ) {
 						Assert.assertEquals( 0, nOfModeLegs ) ;
-					} else if ( "twowaycarsharing".equals(legMode) ) {
-						Assert.assertEquals( 2, nOfModeLegs ) ;
 					}
-					else if ( "walk_rb".equals(legMode) ) {
-						Assert.assertEquals( 2, nOfModeLegs ) ;
+					else if ( "access_walk_ow".equals(legMode) ) {
+						Assert.assertEquals( 0, nOfModeLegs ) ;
 					}
-				} else if ( iteration==2 ) {
-					if ( TransportMode.car.equals(legMode) ) {
-						Assert.assertEquals(6, nOfModeLegs );
-					} else if ( "freefloating".equals(legMode) ) {
-						Assert.assertEquals( 2, nOfModeLegs ) ;
-					} else if ( "onewaycarsharing".equals(legMode) ) {
+				}
+				else if (iteration == 10) {
+					
+					if ( TransportMode.walk.equals(legMode) ) {
+						Assert.assertEquals(5, nOfModeLegs );
+					} else if ( "freefloating_vehicle".equals(legMode) ) {
 						Assert.assertEquals( 1, nOfModeLegs ) ;
-					} else if ( "twowaycarsharing".equals(legMode) ) {
+					} else if ( TransportMode.car.equals(legMode) ) {
+						Assert.assertEquals( 4, nOfModeLegs ) ;
+					} else if ( "twoway_vehicle".equals(legMode) ) {
+						Assert.assertEquals( 8, nOfModeLegs ) ;
+					}
+					else if ( "oneway_vehicle".equals(legMode) ) {
+						Assert.assertEquals( 1, nOfModeLegs ) ;
+					
+					} else if ( "egress_walk_ow".equals(legMode) ) {
+						Assert.assertEquals( 1, nOfModeLegs ) ;
+					}
+					else if ( "access_walk_ow".equals(legMode) ) {
+						Assert.assertEquals( 1, nOfModeLegs ) ;
+					} else if ( "egress_walk_tw".equals(legMode) ) {
 						Assert.assertEquals( 4, nOfModeLegs ) ;
 					}
-					else if ( "walk_rb".equals(legMode) ) {
-						Assert.assertEquals( 4, nOfModeLegs ) ; 
-					}
-				} else if ( iteration==3 ) {
-					if ( TransportMode.car.equals(legMode) ) {
-						Assert.assertEquals(6, nOfModeLegs );
-					} else if ( "freefloating".equals(legMode) ) {
-						Assert.assertEquals( 2, nOfModeLegs ) ;
-					} else if ( "onewaycarsharing".equals(legMode) ) {
-						Assert.assertEquals( 2, nOfModeLegs ) ;
-					} else if ( "twowaycarsharing".equals(legMode) ) {
-						Assert.assertEquals( 6, nOfModeLegs ) ;
-					}
-					else if ( "walk_rb".equals(legMode) ) {
-						Assert.assertEquals( 6, nOfModeLegs ) ; 
-					}
-				} else if ( iteration==4 ) {
-					if ( TransportMode.car.equals(legMode) ) {
-						Assert.assertEquals(6, nOfModeLegs );
-					} 
-					else if ( "freefloating".equals(legMode) ) {
-						Assert.assertEquals(4, nOfModeLegs ) ;
-					} 
-					else if ( "onewaycarsharing".equals(legMode) ) {
-						Assert.assertEquals( 2, nOfModeLegs ) ;
-					} 
-					else if ( "twowaycarsharing".equals(legMode) ) {
+					else if ( "access_walk_tw".equals(legMode) ) {
 						Assert.assertEquals( 4, nOfModeLegs ) ;
-					} 
-					else if ( "walk_ff".equals(legMode) ) {
-						Assert.assertEquals( 4, nOfModeLegs ) ; // presumably: walking to the car, but parking the car at the destination => ff x 1
-					} 
-					else if ( "walk_ow_sb".equals(legMode) ) {
-						Assert.assertEquals( 4, nOfModeLegs ) ; // presumably: walk to car, walk from car => 1-way x 2
-					} 
-					else if ( "walk_rb".equals(legMode) ) {
-						Assert.assertEquals( 4, nOfModeLegs ) ; 
+					} else if ( "egress_walk_ff".equals(legMode) ) {
+						Assert.assertEquals( 1, nOfModeLegs ) ;
 					}
-				} else if ( iteration==10 ) {
-					if ( TransportMode.car.equals(legMode) ) {
+					else if ( "access_walk_ff".equals(legMode) ) {
+						Assert.assertEquals( 1, nOfModeLegs ) ;
+					}
+				}
+							
+				else if ( iteration==20 ) {
+					if ( TransportMode.walk.equals(legMode) ) {
 						Assert.assertEquals(2, nOfModeLegs );
-					} else if ( "freefloating".equals(legMode) ) {
-						Assert.assertEquals(3, nOfModeLegs ) ;
-					} else if ( "onewaycarsharing".equals(legMode) ) {
+					} else if ( "oneway_vehicle".equals(legMode) ) {
+						Assert.assertEquals( 2, nOfModeLegs ) ;
+					} else if ( TransportMode.car.equals(legMode) ) {
+						Assert.assertEquals( 0, nOfModeLegs ) ;
+					} else if ( "egress_walk_ow".equals(legMode) ) {
 						Assert.assertEquals( 1, nOfModeLegs ) ;
-					} else if ( "twowaycarsharing".equals(legMode) ) {
-						Assert.assertEquals( 4, nOfModeLegs ) ;
 					}
-					else if ( "walk_rb".equals(legMode) ) {
-						Assert.assertEquals( 4, nOfModeLegs ) ;
+					else if ( "access_walk_ow".equals(legMode) ) {
+						Assert.assertEquals( 1, nOfModeLegs ) ;
 					}
 				}
 			}

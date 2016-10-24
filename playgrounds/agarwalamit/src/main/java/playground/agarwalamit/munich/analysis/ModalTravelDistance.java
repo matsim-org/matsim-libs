@@ -65,8 +65,8 @@ public class ModalTravelDistance {
 
 		SortedMap<String,Map<Id<Person>,List<Double>>> mode2Person2TripDistances = distHandler.getMode2PersonId2TravelDistances();
 
-		SortedMap<String, Double> mode2TotalTripDists = new TreeMap<String, Double>();
-		SortedMap<String, Integer> mode2NoOfLegs = new TreeMap<String, Integer>();
+		SortedMap<String, Double> mode2TotalTripDists = new TreeMap<>();
+		SortedMap<String, Integer> mode2NoOfLegs = new TreeMap<>();
 
 		for(String mode : mode2Person2TripDistances.keySet()){
 			double modeSum = 0.;

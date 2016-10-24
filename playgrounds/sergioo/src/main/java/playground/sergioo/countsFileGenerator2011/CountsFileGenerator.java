@@ -16,7 +16,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -97,10 +97,10 @@ public class CountsFileGenerator {
 				System.out.println(line);
 			Map<String,Count> aCounts = null;
 			for(Count count:allCounts.get(MODES[0]).getCounts().values())
-				if(count.getCsId().equals(code+SEPARATOR+movement)) {
+				if(count.getCsLabel().equals(code+SEPARATOR+movement)) {
 					aCounts = new HashMap<String, Count>();
 					for(String mode:MODES)
-						aCounts.put(mode,allCounts.get(mode).getCounts().get(count.getLocId()));
+						aCounts.put(mode,allCounts.get(mode).getCounts().get(count.getId()));
 				}
 			if(aCounts==null) {
 				Entry<String, Coord> entryLocation = null;

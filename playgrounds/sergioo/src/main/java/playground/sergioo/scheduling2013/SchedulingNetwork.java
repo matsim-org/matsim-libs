@@ -19,12 +19,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -34,6 +33,7 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import playground.sergioo.passivePlanning2012.core.population.PlacesConnoisseur;
 import playground.sergioo.passivePlanning2012.core.population.PlacesConnoisseur.KnownPlace;
 import playground.sergioo.passivePlanning2012.core.population.PlacesSharer;
@@ -45,17 +45,23 @@ import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning
 
 public class SchedulingNetwork implements Network {
 
+
 	//Predecessor
 	
-	public class SchedulingNode extends NodeImpl implements Node {
+	public class SchedulingNode implements Node {
 		
 		private double time;
 		private List<SchedulingLink> path;
 		private double utility = -Double.MAX_VALUE;
 		private final double maxUtilityFrom;
 		
+		private Node delegateNode ;
+		
 		public SchedulingNode(Id<Node> id, Coord coord, double time, double maxUtilityFrom) {
-			super(id, coord);
+//			super(id, coord);
+			// I replaced inheritance by delegation.  kai, jul'16
+			
+			delegateNode = NetworkUtils.createNode(id, coord) ;
 			this.time = time;
 			this.maxUtilityFrom = maxUtilityFrom;
 		}
@@ -75,6 +81,46 @@ public class SchedulingNetwork implements Network {
 			}
 		}
 
+		public Id<Node> getId() {
+			return this.delegateNode.getId();
+		}
+
+		public Coord getCoord() {
+			return this.delegateNode.getCoord();
+		}
+
+		public boolean addInLink(Link link) {
+			return this.delegateNode.addInLink(link);
+		}
+
+		public boolean addOutLink(Link link) {
+			return this.delegateNode.addOutLink(link);
+		}
+
+		public Map<Id<Link>, ? extends Link> getInLinks() {
+			return this.delegateNode.getInLinks();
+		}
+
+		public Map<Id<Link>, ? extends Link> getOutLinks() {
+			return this.delegateNode.getOutLinks();
+		}
+
+		public Link removeInLink(Id<Link> linkId) {
+			return this.delegateNode.removeInLink(linkId);
+		}
+
+		public Link removeOutLink(Id<Link> outLinkId) {
+			return this.delegateNode.removeOutLink(outLinkId);
+		}
+
+		public void setCoord(Coord coord) {
+			this.delegateNode.setCoord(coord);
+		}
+
+		@Override
+		public Attributes getAttributes() {
+			return delegateNode.getAttributes();
+		}
 	}
 	
 	public abstract class SchedulingLink implements Link {
@@ -91,7 +137,19 @@ public class SchedulingNetwork implements Network {
 			this.toNode = toNode;
 			this.duration = duration;
 		}
+		@Override
+		public double getFlowCapacityPerSec() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public double getFlowCapacityPerSec(double time) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
 	
+
 		public double getDuration() {
 			return duration; 
 		}
@@ -177,7 +235,11 @@ public class SchedulingNetwork implements Network {
 		public Set<String> getAllowedModes() {
 			return null;
 		}
-	
+
+		@Override
+		public Attributes getAttributes() {
+			throw new UnsupportedOperationException();
+		}
 	}
 	
 	public class ActivitySchedulingLink extends SchedulingLink {
@@ -201,7 +263,7 @@ public class SchedulingNetwork implements Network {
 		public String toString() {
 			return "("+activityType+")"+((SchedulingNode)getToNode()).time+"<"+facilityId+">";
 		}
-	
+
 	}
 	public class JourneySchedulingLink extends SchedulingLink {
 	
@@ -222,7 +284,7 @@ public class SchedulingNetwork implements Network {
 	
 	}
 
-	private static final Map<String, Double> FACTORS = new HashMap<String, Double>();
+	private static final Map<String, Double> FACTORS = new HashMap<>();
 	{
 		FACTORS.put("car", 2.0);
 		FACTORS.put("pt", 2.0);
@@ -232,7 +294,7 @@ public class SchedulingNetwork implements Network {
 	private static final double MAX_ACTIVITY_UTILITY = 60.0/3600;
 	private static final double MAX_FREQUENCY = 1.0/3600;
 	
-	private static final Map<String, Double> SPEEDS = new HashMap<String, Double>();
+	private static final Map<String, Double> SPEEDS = new HashMap<>();
 	private static final int MAX_PLACES = 22;
 	private static final int MAX_DEPTH = 10;
 	{
@@ -241,7 +303,7 @@ public class SchedulingNetwork implements Network {
 		SPEEDS.put("walk", 1.2);
 	}
 	
-	private NetworkImpl delegate = (NetworkImpl) NetworkUtils.createNetwork();
+	private Network delegate = (Network) NetworkUtils.createNetwork();
 	private CurrentTime now;
 	private double fastest;
 	private List<Tuple<String, Tuple<Double, Double>>> previousActivities;
@@ -824,5 +886,39 @@ public class SchedulingNetwork implements Network {
         frame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
 		frame.setVisible(true);*/
 	}
-	
+
+	public void setCapacityPeriod(double capPeriod) {
+		this.delegate.setCapacityPeriod(capPeriod);
+	}
+
+	public void setEffectiveCellSize(double effectiveCellSize) {
+		this.delegate.setEffectiveCellSize(effectiveCellSize);
+	}
+
+	public void setEffectiveLaneWidth(double effectiveLaneWidth) {
+		this.delegate.setEffectiveLaneWidth(effectiveLaneWidth);
+	}
+
+	@Override
+	public void setName(String name) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public double getEffectiveCellSize() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
+	}
 }

@@ -38,10 +38,10 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  */
 public class DensityVsOvertakenBicycleDistribution extends AbstractAnalysisModule {
 
-	private DensityVsPassingDistributionHandler dpd;
-	private DensityVsFractionOfStoppedVehiclesHandler dfsv;
-	private String eventFile;
-	BufferedWriter writer1;
+	private final DensityVsPassingDistributionHandler dpd;
+	private final DensityVsFractionOfStoppedVehiclesHandler dfsv;
+	private final String eventFile;
+	final BufferedWriter writer1;
 
 	public DensityVsOvertakenBicycleDistribution(String eventFile, String outputFolder) {
 		super(DensityVsOvertakenBicycleDistribution.class.getSimpleName());

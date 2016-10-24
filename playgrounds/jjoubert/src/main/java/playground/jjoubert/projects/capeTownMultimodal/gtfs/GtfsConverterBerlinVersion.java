@@ -30,9 +30,9 @@ import org.matsim.contrib.gtfs.GtfsConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -79,10 +79,10 @@ public class GtfsConverterBerlinVersion {
 		LOG.trace("    base: " + inputNetwork);
 		LOG.trace("  myCiTi: " + transitFolder + "transitNetwork.xml.gz");
 		Network baseNetwork = NetworkUtils.createNetwork();
-		new MatsimNetworkReader(baseNetwork ).parse(inputNetwork);
+		new MatsimNetworkReader(baseNetwork ).readFile(inputNetwork);
 		String prefix = "";
 		Network myCiTiNetwork = NetworkUtils.createNetwork();
-		new MatsimNetworkReader(myCiTiNetwork).parse(transitFolder + "transitNetwork.xml.gz");
+		new MatsimNetworkReader(myCiTiNetwork).readFile(transitFolder + "transitNetwork.xml.gz");
 		
 		MergeNetworks.merge(baseNetwork, prefix, myCiTiNetwork);
 		new NetworkWriter(baseNetwork).write(outputNetwork);

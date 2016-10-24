@@ -20,7 +20,7 @@
 
 package org.matsim.vis.otfvis.utils;
 
-import org.jdesktop.swingx.mapviewer.util.MercatorUtils;
+import org.jxmapviewer.viewer.util.MercatorUtils;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
@@ -38,7 +38,14 @@ public class WGS84ToMercator {
 
 		@Override
 		public Coord transform(Coord coord) {
-			Coord otherResult = new Coord((double) MercatorUtils.longToX(coord.getX(), radius), (double) MercatorUtils.latToY(coord.getY(), radius));
+			Coord otherResult; 
+			double elevation;
+			try{
+				elevation = coord.getZ();
+				otherResult = new Coord((double) MercatorUtils.longToX(coord.getX(), radius), (double) MercatorUtils.latToY(coord.getY(), radius), elevation);
+			} catch (Exception e){
+				otherResult = new Coord((double) MercatorUtils.longToX(coord.getX(), radius), (double) MercatorUtils.latToY(coord.getY(), radius));
+			}
 			return otherResult;
 		}
 
@@ -63,9 +70,15 @@ public class WGS84ToMercator {
 
 		@Override
 		public Coord transform(Coord coord) {
-			Coord otherResult = new Coord(MercatorUtils.xToLong((int) coord.getX(), radius), MercatorUtils.yToLat((int) coord.getY(), radius));
+			Coord otherResult; 
+			double elevation;
+			try{
+				elevation = coord.getZ();
+				otherResult = new Coord(MercatorUtils.xToLong((int) coord.getX(), radius), MercatorUtils.yToLat((int) coord.getY(), radius), elevation);
+			} catch (Exception e){
+				otherResult = new Coord(MercatorUtils.xToLong((int) coord.getX(), radius), MercatorUtils.yToLat((int) coord.getY(), radius));
+			}
 			return otherResult;
-			
 		}
 
 		private int widthOfWorldInPixels(int zoom, int TILE_SIZE) {

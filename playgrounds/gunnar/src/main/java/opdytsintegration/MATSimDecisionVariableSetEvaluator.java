@@ -48,13 +48,13 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 
 	private boolean averageMemory = false;
 
-	// created during runtime:
-
 	@Inject
 	private EventsManager eventsManager;
 
 	@Inject
 	private Population population;
+
+	// created during runtime:
 
 	// must be linked to ensure a unique iteration ordering
 	private LinkedHashSet<Id<Link>> relevantLinkIds;
@@ -72,23 +72,6 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public void enableCarTraffic(final Collection<Id<Link>> relevantLinkIds) {
-		this.relevantLinkIds = new LinkedHashSet<>(relevantLinkIds);
-	}
-
-	// public void enableCarTraffic(final Network network) {
-	// this.relevantLinkIds = new LinkedHashSet<>(network.getLinks().keySet());
-	// }
-
-	public void enablePT(final Collection<Id<TransitStopFacility>> relevantStopIds) {
-		this.relevantStopIds = new LinkedHashSet<>(relevantStopIds);
-	}
-
-	// public void enablePT(final TransitSchedule schedule) {
-	// this.relevantStopIds = new
-	// LinkedHashSet<>(schedule.getFacilities().keySet());
-	// }
-
 	public MATSimDecisionVariableSetEvaluator(final TrajectorySampler<U> trajectorySampler,
 			final MATSimStateFactory<U> stateFactory, final TimeDiscretization timeDiscretization) {
 		this.trajectorySampler = trajectorySampler;
@@ -98,66 +81,13 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 		this.relevantStopIds = null;
 	}
 
-	// /**
-	// * Constructor for both car and public transport.
-	// */
-	// public MATSimDecisionVariableSetEvaluator(final TrajectorySampler<U>
-	// trajectorySampler,
-	// final MATSimStateFactory<U> stateFactory, final TimeDiscretization
-	// timeDiscretization,
-	// final Collection<Id<Link>> relevantLinkIds, final
-	// Collection<Id<TransitStopFacility>> relevantStopIds,
-	// final Network network, final TransitSchedule schedule) {
-	// this.trajectorySampler = trajectorySampler;
-	// this.stateFactory = stateFactory;
-	// this.timeDiscretization = timeDiscretization;
-	// if (relevantLinkIds == null) {
-	// // TODO network should not be passed in here at all
-	// if (network != null) {
-	// this.relevantLinkIds = new LinkedHashSet<>(network.getLinks().keySet());
-	// } else {
-	// this.relevantLinkIds = new LinkedHashSet<>();
-	// }
-	// } else {
-	// this.relevantLinkIds = new LinkedHashSet<>(relevantLinkIds);
-	// }
-	// if (relevantStopIds == null) {
-	// // TODO schedule should not be passed in here at all
-	// if (schedule != null) {
-	// this.relevantStopIds = new
-	// LinkedHashSet<>(schedule.getFacilities().keySet());
-	// } else {
-	// this.relevantStopIds = new LinkedHashSet<>();
-	// }
-	// } else {
-	// this.relevantStopIds = new LinkedHashSet<>(relevantStopIds);
-	// }
-	// }
+	public void enableCarTraffic(final Collection<Id<Link>> relevantLinkIds) {
+		this.relevantLinkIds = new LinkedHashSet<>(relevantLinkIds);
+	}
 
-	// /**
-	// * @see Constructor for only car.
-	// */
-	// public MATSimDecisionVariableSetEvaluator(final TrajectorySampler<U>
-	// trajectorySampler,
-	// final MATSimStateFactory<U> stateFactory, final TimeDiscretization
-	// timeDiscretization,
-	// final Collection<Id<Link>> relevantLinkIds, final Network network) {
-	// this(trajectorySampler, stateFactory, timeDiscretization,
-	// relevantLinkIds, null, network, null);
-	// }
-	//
-	// /**
-	// * Constructor for only public transport.
-	// */
-	// public MATSimDecisionVariableSetEvaluator(final TrajectorySampler<U>
-	// trajectorySampler,
-	// final MATSimStateFactory<U> stateFactory, final TimeDiscretization
-	// timeDiscretization,
-	// final Collection<Id<TransitStopFacility>> relevantStopIds, final
-	// TransitSchedule schedule) {
-	// this(trajectorySampler, stateFactory, timeDiscretization, null,
-	// relevantStopIds, null, schedule);
-	// }
+	public void enablePT(final Collection<Id<TransitStopFacility>> relevantStopIds) {
+		this.relevantStopIds = new LinkedHashSet<>(relevantStopIds);
+	}
 
 	// -------------------- SETTERS AND GETTERS --------------------
 
@@ -198,36 +128,6 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 		return this.averageMemory;
 	}
 
-	/**
-	 * Where to write standard logging information.
-	 */
-	// public void setStandardLogFileName(final String logFileName) {
-	// this.trajectorySampler.setStandardLogFileName(logFileName);
-	// this.trajectorySampler.addStatistic(logFileName,
-	// new TransientObjectiveFunctionValue<U>());
-	// this.trajectorySampler.addStatistic(logFileName,
-	// new EquilibriumGapWeight<U>());
-	// this.trajectorySampler.addStatistic(logFileName,
-	// new EquilibriumGap<U>());
-	// this.trajectorySampler.addStatistic(logFileName,
-	// new UniformityGapWeight<U>());
-	// this.trajectorySampler
-	// .addStatistic(logFileName, new UniformityGap<U>());
-	// this.trajectorySampler.addStatistic(logFileName,
-	// new SurrogateObjectiveFunctionValue<U>());
-	// this.trajectorySampler.addStatistic(logFileName,
-	// new LastObjectiveFunctionValue<U>());
-	// this.trajectorySampler.addStatistic(logFileName,
-	// new LastEquilibriumGap<U>());
-	// this.trajectorySampler.addStatistic(logFileName, new
-	// TotalMemory<U>());
-	// this.trajectorySampler.addStatistic(logFileName, new
-	// FreeMemory<U>());
-	// this.trajectorySampler.addStatistic(logFileName, new MaxMemory<U>());
-	// this.trajectorySampler.addStatistic(logFileName,
-	// new LastDecisionVariable<U>());
-	// }
-
 	public MATSimState getFinalState() {
 		return finalState;
 	}
@@ -257,17 +157,9 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 
-		// if (this.relevantLinkIds == null) {
-		// this.relevantLinkIds = new
-		// LinkedHashSet<>(this.network.getLinks().keySet());
-		// }
-		// if (this.relevantStopIds == null) {
-		// this.relevantStopIds = new
-		// LinkedHashSet<>(this.schedule.getFacilities().keySet());
-		// }
 		this.stateList = new LinkedList<Vector>();
 
-		if ((this.relevantLinkIds != null) & (this.relevantLinkIds.size() > 0)) {
+		if ((this.relevantLinkIds != null) && (this.relevantLinkIds.size() > 0)) {
 			this.carOccupancyAnalyzer = new LinkOccupancyAnalyzer(this.timeDiscretization, this.relevantLinkIds);
 			this.eventsManager.addHandler(this.carOccupancyAnalyzer);
 		}

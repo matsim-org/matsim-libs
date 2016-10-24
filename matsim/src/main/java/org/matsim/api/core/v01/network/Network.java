@@ -24,11 +24,12 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * A topological network representation.
  */
-public interface Network extends MatsimToplevelContainer {
+public interface Network extends MatsimToplevelContainer, Attributable {
 
 	/**
 	 * Returns the builder for network elements
@@ -98,5 +99,17 @@ public interface Network extends MatsimToplevelContainer {
 	 * @return the removed link, or <code>null</code> if no such link was found
 	 */
 	public Link removeLink(final Id<Link> linkId);
+
+	void setCapacityPeriod(double capPeriod);
+
+	void setEffectiveCellSize(double effectiveCellSize);
+
+	void setEffectiveLaneWidth(double effectiveLaneWidth);
+
+	void setName(String name);
+
+	String getName();
+
+	double getEffectiveCellSize();
 
 }

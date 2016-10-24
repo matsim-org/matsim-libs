@@ -24,7 +24,7 @@ public class EducationFacilityCreation {
 
         // Load input facilities
         final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(inputConfig));
-        new FacilitiesReaderMatsimV1(scenario).parse(scenario.getConfig().facilities().getInputFile());
+        new FacilitiesReaderMatsimV1(scenario).readFile(scenario.getConfig().facilities().getInputFile());
         final ActivityFacilities originalFacilities = scenario.getActivityFacilities();
 
         // Create new facilities

@@ -40,16 +40,16 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  */
 public class QPositionDataWriterForR {
 
-	private static String outputDir ="../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/withoutHoles/car_SW//";
+	private static final String outputDir ="../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/withoutHoles/car_SW//";
 	private static final String SUFFIX = "events[120]";
-	private static String eventFile = outputDir+"/events/"+SUFFIX+".xml";
-	private static String networkFile=outputDir+"/network.xml";
+	private static final String eventFile = outputDir+"/events/"+SUFFIX+".xml";
+	private static final String networkFile=outputDir+"/network.xml";
 	
 	private static Scenario scenario;
 	private static QueuePositionCalculationHandler calculationHandler;
 	private Map<Id<Person>,SortedMap<Double,String>> person2startTime2data;
 	private Map<Id<Person>, SortedMap<Double, String>> person2StartTime2AccumulatedPos;
-	private Tuple<Id<Person>, Double> lastDepartedPerson = new Tuple<Id<Person>, Double>(null, 0.);
+	private Tuple<Id<Person>, Double> lastDepartedPerson = new Tuple<>(null, 0.);
 	private final boolean isWritingDataAfterDepartureOfLastPerson = false;
 	
 	private final static Logger LOG = Logger.getLogger(QPositionDataWriterForR.class);

@@ -48,7 +48,7 @@ public class RelationStats {
 	public static void main(String[] args) throws IOException {
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse("/home/johannes/gsv/matrices/refmatrices/tomtom.xml");
+		reader.readFile("/home/johannes/gsv/matrices/refmatrices/tomtom.xml");
 		NumericMatrix m = reader.getMatrix();
 
 		ZoneCollection zones = new ZoneCollection(null);

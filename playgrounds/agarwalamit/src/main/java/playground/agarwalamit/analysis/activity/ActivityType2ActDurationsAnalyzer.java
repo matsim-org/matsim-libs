@@ -63,7 +63,7 @@ public class ActivityType2ActDurationsAnalyzer extends AbstractAnalysisModule {
 	
 	@Override
 	public List<EventHandler> getEventHandler() {
-		return new ArrayList<EventHandler>();
+		return new ArrayList<>();
 	}
 
 	@Override

@@ -48,18 +48,18 @@ public class CountsVolumeCompare {
 
 		Counts<Link> refCounts = new Counts();
 		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(refCounts);
-		reader.parse(refFile);
+		reader.readFile(refFile);
 		
 		Counts<Link> targetCounts = new Counts();
 		reader = new CountsReaderMatsimV1(targetCounts);
-		reader.parse(targetFile);
+		reader.readFile(targetFile);
 
 		TDoubleArrayList errors = new TDoubleArrayList();
 		TDoubleArrayList absErrors = new TDoubleArrayList();
 
 		int noMatch = 0;
 		for(Count refCount : refCounts.getCounts().values()) {
-			Count targetCount = targetCounts.getCount(refCount.getLocId());
+			Count targetCount = targetCounts.getCount(refCount.getId());
 			if(targetCount != null) {
 				double err = (targetCount.getVolume(1).getValue() - refCount.getVolume(1).getValue()) / refCount.getVolume(1).getValue();
 				double absErr = Math.abs(err);

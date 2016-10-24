@@ -37,7 +37,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -194,7 +194,7 @@ public class ExposureCostPerKmAnalysis {
 		EventsReaderXMLv1 eventsReader = new EventsReaderXMLv1(eventsManager);
 		TollPerKmHandler tollperKmHandler = new TollPerKmHandler(scenario.getNetwork(), munichShapeFile);
 		eventsManager.addHandler(tollperKmHandler);
-		eventsReader.parse(eventsFile);
+		eventsReader.readFile(eventsFile);
 		
 		// combine link leave events with money events to paid toll per km 
 		System.out.println("----- get person id 2 list ");

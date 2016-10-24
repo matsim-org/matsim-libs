@@ -12,6 +12,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.testcases.MatsimTestUtils;
@@ -36,7 +38,13 @@ public class NetworkReprojectionIOTest {
 				new CoordinateTransformation() {
 					@Override
 					public Coord transform(Coord coord) {
-						return new Coord( 1000 , 1000 );
+						double elevation;
+						try{
+							elevation = coord.getZ();
+							return new Coord( 1000 , 1000 , elevation);
+						} catch (Exception e){
+							return new Coord( 1000 , 1000 );
+						}
 					}
 				},
 				readNetwork ).readFile( networkFile );
@@ -47,10 +55,16 @@ public class NetworkReprojectionIOTest {
 				readNetwork.getNodes().size() );
 
 		for ( Node n : readNetwork.getNodes().values() ) {
-			Assert.assertEquals(
-					"Unexpected coordinate",
-					new Coord( 1000 , 1000 ),
-					n.getCoord() );
+			double elevation;
+			Coord c;
+			try{
+				elevation = n.getCoord().getZ();
+				c = new Coord(1000, 1000, elevation);
+			} catch (Exception e){
+				c = new Coord(1000, 1000);
+			}
+
+			Assert.assertEquals( "Unexpected coordinate", c, n.getCoord() );
 		}
 	}
 
@@ -64,7 +78,13 @@ public class NetworkReprojectionIOTest {
 				new CoordinateTransformation() {
 					@Override
 					public Coord transform(Coord coord) {
-						return new Coord( 9999 , 9999 );
+						double elevation;
+						try{
+							elevation = coord.getZ();
+							return new Coord( 9999 , 9999 , elevation);
+						} catch (Exception e){
+							return new Coord( 9999 , 9999 );
+						}
 					}
 				},
 				initialNetwork ).write( networkFile );

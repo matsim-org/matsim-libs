@@ -19,18 +19,25 @@
 
 package org.matsim.contrib.cadyts.pt;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -40,8 +47,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.*;
-
 /**
  * Collects occupancy data of transit-line stations
  * <p/>
@@ -49,8 +54,7 @@ import java.util.*;
  * (obviously) depends on the fact that the counts are actually what it thinks, and so it makes sense to decouple this from the upstream
  * counting method and leave it here. kai, sep'13 
  */
-class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
-		PersonLeavesVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
+public class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 
 	private final int timeBinSize, maxSlotIndex;
 	private final double maxTime;
@@ -62,9 +66,12 @@ class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, Pers
 	private final Set<Id> analyzedTransitVehicles = new HashSet<>();
 	private final Set<Id<TransitLine>> calibratedLines;
 
-	public CadytsPtOccupancyAnalyzer(final Set<Id<TransitLine>> calibratedLines, int timeBinSize_s ) {
-		this.calibratedLines = calibratedLines;
-		this.timeBinSize = timeBinSize_s ;
+	@Inject
+	public CadytsPtOccupancyAnalyzer( Config config ) {
+		CadytsConfigGroup ccc = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class ) ;
+
+		this.calibratedLines = toTransitLineIdSet( ccc.getCalibratedItems() ) ;
+		this.timeBinSize = ccc.getTimeBinSize() ;
 
 		this.maxTime = Time.MIDNIGHT-1; //24 * 3600 - 1;
 		// (yy not completely clear if it might be better to use 24*this.timeBimSize, but it is overall not so great
@@ -180,11 +187,15 @@ class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, Pers
 	 *         {@code stopId} per time bin, starting with time bin 0 from 0 seconds to
 	 *         (timeBinSize-1)seconds.
 	 */
-	@Deprecated // try to use request that also contains time instead
-	int[] getOccupancyVolumesForStop(final Id<TransitStopFacility> stopId) {
+	@Override
+	public int[] getOccupancyVolumesForStop(final Id<TransitStopFacility> stopId) {
 		return this.occupancies.get(stopId);
 	}
-	 public int getOccupancyVolumeForStopAndTime(final Id<TransitStopFacility> stopId, final int time_s ) {
+	 /* (non-Javadoc)
+	 * @see org.matsim.contrib.cadyts.pt.CadytsPtOccupancyAnalyzerI#getOccupancyVolumeForStopAndTime(org.matsim.api.core.v01.Id, int)
+	 */
+	@Override
+	public int getOccupancyVolumeForStopAndTime(final Id<TransitStopFacility> stopId, final int time_s ) {
 		 if ( this.occupancies.get(stopId) != null ) {
 			 int timeBinIndex = getTimeSlotIndex( time_s ) ;
 			 return this.occupancies.get(stopId)[timeBinIndex] ;
@@ -197,6 +208,7 @@ class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, Pers
 		return this.occupancies.keySet();
 	}
 
+	@Override
 	public void writeResultsForSelectedStopIds(final String filename, final Counts<Link> occupCounts, final Collection<Id<TransitStopFacility>> stopIds) {
 		SimpleWriter writer = new SimpleWriter(filename);
 
@@ -235,7 +247,7 @@ class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, Pers
 			for (int anOcuppancy : ocuppancy) {
 				writer.write((anOcuppancy) + TAB);
 			}
-			writer.write(count.getCoord().toString() + TAB + count.getCsId() + NL);
+			writer.write(count.getCoord().toString() + TAB + count.getCsLabel() + NL);
 		}
 		writer.write(this.occupancyRecord.toString());
 		writer.close();
@@ -270,6 +282,16 @@ class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, Pers
 
 		}
 		return stringBuffer2.toString();
+	}
+
+	public static Set<Id<TransitLine>> toTransitLineIdSet(Set<String> list) {
+		Set<Id<TransitLine>> converted = new LinkedHashSet<>();
+		
+		for ( String id : list) {
+			converted.add(Id.create(id, TransitLine.class));
+		}
+		
+		return converted;
 	}
 
 

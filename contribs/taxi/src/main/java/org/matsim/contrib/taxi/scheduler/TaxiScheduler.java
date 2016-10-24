@@ -583,8 +583,8 @@ public class TaxiScheduler
             }
         }
     }
-    
-    
+
+
     //only for planned/started schedule
     private void cleanupScheduleAfterTaskRemoval(Schedule<TaxiTask> schedule)
     {
@@ -594,7 +594,7 @@ public class TaxiScheduler
             return;
         }
         //else: PLANNED, STARTED
-        
+
         TaxiTask lastTask = Schedules.getLastTask(schedule);
         double tBegin = schedule.getEndTime();
         double tEnd = Math.max(tBegin, schedule.getVehicle().getT1());

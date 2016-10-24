@@ -31,12 +31,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.PopulationWriter;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ucsb.UCSBUtils;
@@ -71,12 +72,12 @@ public class PlansRemover {
 		Set<Id<Person>> pids = UCSBUtils.parseObjectIds(inputPidFile, Person.class);
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(inputNetworkfile);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(inputNetworkfile);
 
 		Population pop = (Population)scenario.getPopulation();
 		StreamingUtils.setIsStreaming(pop, true);
 		StreamingUtils.addAlgorithm(pop, new PersonRemovePlans(pids));
-		PopulationWriter writer = new PopulationWriter(pop,scenario.getNetwork());
+		StreamingPopulationWriter writer = new StreamingPopulationWriter(pop,scenario.getNetwork());
 		writer.startStreaming(outputBase+"/plans.tmp.xml.gz");
 		final PersonAlgorithm algo = writer;
 		StreamingUtils.addAlgorithm(pop, algo);

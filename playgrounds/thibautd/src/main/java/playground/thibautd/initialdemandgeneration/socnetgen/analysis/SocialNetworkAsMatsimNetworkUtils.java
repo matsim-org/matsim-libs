@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.Map;
@@ -41,7 +41,7 @@ public class SocialNetworkAsMatsimNetworkUtils {
 	public static Network parseSocialNetworkAsMatsimNetwork(
 			final String file) {
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new SocialNetworkReader( sc ).parse( file );
+		new SocialNetworkReader( sc ).readFile( file );
 	
 		final SocialNetwork sn = (SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME );
 		return convertToNetwork( sn );
@@ -52,7 +52,7 @@ public class SocialNetworkAsMatsimNetworkUtils {
 	}
 
 	public static Network convertToNetwork(final SocialNetwork sn, final Map<Id<Person>, Coord> agentCoords) {
-		final Network net = NetworkImpl.createNetwork();
+		final Network net = NetworkUtils.createNetwork();
 
 		final Coord dummyCoord = new Coord((double) 0, (double) 0);
 		for ( Id ego : sn.getEgos() ) {

@@ -30,10 +30,9 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.lanes.ModelLane;
-import org.matsim.lanes.data.v20.Lanes;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesToLinkAssignment;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.lanes.LanesUtils;
@@ -74,7 +73,7 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 	@Override
 	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
 		this.netsimEngine = netsimEngine1 ;
-		double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
+		double effectiveCellSize = ((Network) network).getEffectiveCellSize() ;
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );
 		if (! Double.isNaN(network.getEffectiveLaneWidth())){
@@ -88,7 +87,7 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 	@Override
 	public QLinkI createNetsimLink(Link link, QNode queueNode) {
 		QLinkI ql = null;
-		LanesToLinkAssignment20 l2l = this.laneDefinitions.getLanesToLinkAssignments().get(link.getId());
+		LanesToLinkAssignment l2l = this.laneDefinitions.getLanesToLinkAssignments().get(link.getId());
 		if (l2l != null){
 			List<ModelLane> lanes = LanesUtils.createLanes(link, l2l);
 			ql = new QLinkLanesImpl(link, queueNode, lanes, context, netsimEngine);

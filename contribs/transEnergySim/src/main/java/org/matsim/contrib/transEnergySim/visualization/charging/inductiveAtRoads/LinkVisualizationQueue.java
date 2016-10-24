@@ -25,10 +25,10 @@ import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.SortableMapObject;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingOutputLog;
-import org.matsim.core.network.NetworkImpl;
 
 /**
  * 

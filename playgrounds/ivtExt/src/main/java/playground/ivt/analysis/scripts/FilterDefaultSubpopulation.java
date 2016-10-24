@@ -22,11 +22,11 @@ package playground.ivt.analysis.scripts;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.StreamingPopulationReader;
-import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -56,7 +56,7 @@ public class FilterDefaultSubpopulation {
 		StreamingUtils.setIsStreaming(reader, true);
 
 		final String attName = new PlansConfigGroup().getSubpopulationAttributeName();
-		final PopulationWriter writer = new PopulationWriter( sc.getPopulation() , sc.getNetwork() );
+		final StreamingPopulationWriter writer = new StreamingPopulationWriter( sc.getPopulation() , sc.getNetwork() );
 
 		reader.addAlgorithm(new PersonAlgorithm() {
 			@Override
@@ -69,7 +69,7 @@ public class FilterDefaultSubpopulation {
 			}
 		});
 
-		new ObjectAttributesXmlReader( sc.getPopulation().getPersonAttributes() ).parse( inAttributes );
+		new ObjectAttributesXmlReader( sc.getPopulation().getPersonAttributes() ).readFile( inAttributes );
 
 		writer.startStreaming( outPlansFile );
 		new PopulationReader( sc ).readFile( inPlansFile );

@@ -20,23 +20,13 @@
 
 package org.matsim.vis.otfvis.opengl.queries;
 
-import java.awt.Color;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
-import java.io.Serializable;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.glu.GLU;
+import com.jogamp.opengl.glu.GLUquadric;
+import com.jogamp.opengl.util.awt.TextRenderer;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -44,14 +34,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
@@ -61,14 +48,25 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
+import org.matsim.vis.otfvis.opengl.gl.GLUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
-import org.matsim.vis.otfvis.opengl.layer.OGLAgentPointLayer;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
-import com.jogamp.common.nio.Buffers;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.jogamp.opengl.GL2GL3.GL_QUADS;
 
 /**
  * For a given agentID this QueryAgentPlan draws a visual representation of the
@@ -87,56 +85,11 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	private Id<Person> agentId;
 
-	private transient Result result;
-
 	private SimulationViewForQueries simulationView;
 
 	@Override
-	public void installQuery(SimulationViewForQueries simulationView1) {
-		this.simulationView = simulationView1;
-		Network net = simulationView1.getNetwork();
-		Plan plan = simulationView1.getPlans().get(this.agentId);
-		result = new Result();
-		result.agentId = this.agentId.toString();
-		if (plan != null) {
-			simulationView1.addTrackedAgent(this.agentId);
-			fillResult(net, plan);
-		} else {
-			log.error("No plan found for id " + this.agentId);
-		}
-	}
-
-	private void fillResult(Network net, Plan plan) {
-		for (PlanElement e : plan.getPlanElements()) {
-			if (e instanceof Activity) {
-				Activity act = (Activity) e;
-				if ( !includeRoutes && PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType()) ) {
-					continue ; // skip
-				}
-				Coord coord = act.getCoord();
-				if (coord == null) {
-					Link link = net.getLinks().get(act.getLinkId());
-					coord = link.getCoord();
-				}
-				Coord c2 = OTFServerQuadTree.getOTFTransformation().transform(coord);
-				
-				String txt = act.getType();
-				// there used to be a "cake" diagram, showing which fraction of the activity duration was spent.  That somehow
-				// is gone.  Outputting the activity end time instead.  kai, nov'15
-				// But somehow the below does not work; it generates some exception.  Thus commented out again. kai, nov'15
-//				 txt += "-"+Time.writeTime(act.getEndTime(), ':');
-//				if ( act.getEndTime()== Time.UNDEFINED_TIME ) {
-//					txt = act.getType() ;
-//				}
-				result.acts.add(new MyInfoText((float) c2.getX(), (float) c2.getY(), txt ) ) ;
-			}
-		}
-
-		if ( includeRoutes ) {
-			result.buildRoute(plan, agentId, net, Level.ROUTES ); 
-		} else {
-			result.buildRoute(plan, agentId, net, Level.PLANELEMENTS); 
-		}
+	public void installQuery(SimulationViewForQueries simulationView) {
+		this.simulationView = simulationView;
 	}
 
 	@Override
@@ -163,7 +116,50 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	@Override
 	public OTFQueryResult query() {
+		Plan plan = simulationView.getPlans().get(this.agentId);
+		Result result = new Result();
+		result.agentId = this.agentId.toString();
+		if (plan != null) {
+			for (PlanElement e : plan.getPlanElements()) {
+				if (e instanceof Activity) {
+					Activity act = (Activity) e;
+					if ( !includeRoutes && PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType()) ) {
+						continue ; // skip
+					}
+					Coord c2 = getCoord(act);
+					ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), act.getType());
+					result.acts.add(activityInfo);
+				}
+			}
+
+			if ( includeRoutes ) {
+				result.buildRoute(plan, agentId, simulationView.getNetwork(), Level.ROUTES );
+			} else {
+				result.buildRoute(plan, agentId, simulationView.getNetwork(), Level.PLANELEMENTS);
+			}
+		} else {
+			log.error("No plan found for id " + this.agentId);
+		}
+		MobsimAgent mobsimAgent = simulationView.getAgents().get(this.agentId);
+		if (mobsimAgent != null && mobsimAgent.getState() == MobsimAgent.State.ACTIVITY) {
+			Activity act = (Activity) ((PlanAgent) mobsimAgent).getCurrentPlanElement();
+			Coord c2 = getCoord(act);
+			if (simulationView.getTime() > act.getStartTime() && simulationView.getTime() <= act.getEndTime()) {
+				ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), act.getType());
+				activityInfo.finished = (simulationView.getTime() - act.getStartTime()) / (act.getEndTime() - act.getStartTime());
+				result.acts.add(activityInfo);
+			}
+		}
 		return result;
+	}
+
+	private Coord getCoord( Activity act) {
+		Coord coord = act.getCoord();
+		if (coord == null) {
+			Link link = simulationView.getNetwork().getLinks().get(act.getLinkId());
+			coord = link.getCoord();
+		}
+		return OTFServerQuadTree.getOTFTransformation().transform(coord);
 	}
 
 	@Override
@@ -178,7 +174,6 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	@Override
 	public void uninstall() {
-		simulationView.removeTrackedAgent(this.agentId);
 	}
 
 
@@ -188,11 +183,11 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		private List<Coord> vertex = new ArrayList<>();
 		private List<Color> colors = new ArrayList<>();
 		private FloatBuffer vert;
-		private List<MyInfoText> acts = new ArrayList<>();
-		private List<InfoText> activityTexts;
-		private InfoText agentText = null;
+		private List<ActivityInfo> acts = new ArrayList<>();
 		private ByteBuffer cols;
 
+		public Result() {
+		}
 
 		private void buildRoute(Plan plan, Id<Person> agentId, Network net, Level level) {
 			Color carColor = Color.ORANGE;
@@ -275,7 +270,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 				this.cols.put((byte) color.getRed());
 				this.cols.put((byte) color.getGreen());
 				this.cols.put((byte) color.getBlue());
-				this.cols.put((byte) 128);
+				this.cols.put((byte) 255);
 			}
 			this.vert.position(0);
 			this.cols.position(0);
@@ -285,57 +280,39 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		private void addCoord(Coord coord, Color col) {
 			vertex.add(coord);
 			colors.add(col);
-//			log.info( " east: " + coord.getX() + " north: " +coord.getY() );
-			// really slow!
 		}
 
 		@Override
 		public void draw(OTFOGLDrawer drawer) {
 			GL2 gl = OTFGLAbstractDrawable.getGl();
 			if (vert != null) {
-				drawPlanPoly(gl);
+				drawPlanPolyLine(gl);
 			}
-			createActivityTextsIfNecessary(drawer);
-			OGLAgentPointLayer layer = drawer.getCurrentSceneGraph().getAgentPointLayer();
-			Point2D.Double pos = tryToFindAgentPosition(layer);
-			if (pos != null) {
+			drawActivityTexts();
+			Point2D.Double agentCoords = drawer.getCurrentSceneGraph().getAgentPointLayer().getAgentCoords(this.agentId.toCharArray());
+			if (agentCoords != null) {
 				// We know where the agent is, so we draw stuff around them.
-				drawArrowFromAgentToTextLabel(pos, gl);
-				drawCircleAroundAgent(pos, gl);
-				createLabelTextIfNecessary(drawer, pos);
-
-			} 
-			unPrepare(gl);
+				drawArrowFromAgentToTextLabel(agentCoords, gl);
+				drawCircleAroundAgent(agentCoords, gl);
+				drawLabelText(drawer, agentCoords);
+			}
 		}
 
-		private Point2D.Double tryToFindAgentPosition(OGLAgentPointLayer layer) {
-			return getAgentPositionFromPointLayer(this.agentId, layer);
-		}
-
-		private void drawPlanPoly(GL2 gl) {
+		private void drawPlanPolyLine(GL2 gl) {
 			Color color = Color.ORANGE;
-			gl.glColor4d(color.getRed() / 255., color.getGreen() / 255., color
-					.getBlue() / 255., .5);
+			gl.glColor4d(color.getRed() / 255., color.getGreen() / 255., color.getBlue() / 255., .5);
 			gl.glEnable(GL2.GL_BLEND);
 			gl.glEnable(GL2.GL_LINE_SMOOTH);
 			gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
 			gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-			gl.glLineWidth(1.f * getLineWidth());
+			gl.glLineWidth(1.f * OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
 			gl.glColorPointer(4, GL2.GL_UNSIGNED_BYTE, 0, cols);
 			gl.glVertexPointer(2, GL2.GL_FLOAT, 0, this.vert);
 			gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, this.vertex.size());
 			gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
 			gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
 			gl.glDisable(GL2.GL_LINE_SMOOTH);
-		}
-
-		private static void unPrepare(GL2 gl) {
 			gl.glDisable(GL2.GL_BLEND);
-		}
-
-		private static float getLineWidth() {
-			return OTFClientControl.getInstance().getOTFVisConfig()
-					.getLinkWidth();
 		}
 
 		private static void drawArrowFromAgentToTextLabel(Point2D.Double pos, GL2 gl) {
@@ -348,30 +325,103 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		}
 
 		private static void drawCircleAroundAgent(Point2D.Double pos, GL2 gl) {
-			DrawingUtils.drawCircle(gl, (float) pos.x, (float) pos.y, 200.f);
+			float scale = (float) OTFClientControl.getInstance().getMainOTFDrawer().getScale();
+			float size = 10.f * scale;
+			GLUtils.drawCircle(gl, (float) pos.x, (float) pos.y, size);
 		}
 
-		private static Double getAgentPositionFromPointLayer(String agentIdString,
-				OGLAgentPointLayer layer) {
-			return layer.getAgentCoords(agentIdString.toCharArray());
-		}
-
-		private void createActivityTextsIfNecessary(OTFOGLDrawer drawer) {
-			activityTexts = new ArrayList<>();
-			for (MyInfoText activityEntry : this.acts ) {
-				InfoText activityText = new InfoText(
-						activityEntry.name, activityEntry.east, activityEntry.north);
-				activityText.setAlpha(0.5f);
-				activityText.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
-				this.activityTexts.add(activityText);
+		private void drawActivityTexts() {
+			GLAutoDrawable drawable = OTFClientControl.getInstance().getMainOTFDrawer().getCanvas();
+			TextRenderer textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 32), true, false);
+			textRenderer.setColor(new Color(50, 50, 128, 255));
+			for (ActivityInfo activityEntry : this.acts ) {
+				drawTextBox(drawable, textRenderer, activityEntry);
 			}
 		}
 
-		private void createLabelTextIfNecessary(OTFOGLDrawer drawer, Point2D.Double pos) {
-			this.agentText = new InfoText(
-					this.agentId, (float) pos.x + 250, (float) pos.y + 250);
-			this.agentText.setAlpha(0.7f);
-			this.agentText.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
+		private void drawTextBox(GLAutoDrawable drawable, TextRenderer textRenderer, ActivityInfo activityEntry) {
+			float scale = (float) OTFClientControl.getInstance().getMainOTFDrawer().getScale();
+
+			// The size of the whole text box, including the progress bar.
+			// Multiply it by scale so that it is independent of zoom factor.
+			float size = 1.0f * scale;
+
+			GL2 gl = (GL2) drawable.getGL();
+
+			GLU glu = new GLU();
+			gl.glPushMatrix();
+			gl.glTranslatef(activityEntry.east, activityEntry.north, 0f);
+			gl.glScalef(size, size, 1f);
+
+			// Origin (0,0,0) is now the activity location.
+			// That's where the bottom left corner of the text will go.
+			textRenderer.begin3DRendering();
+			textRenderer.draw3D(activityEntry.name, 0f, 0f, 0f, 1f);
+			// Only the TextRenderer knows how big the letters are.
+			// We memorize it so we can then draw a widget around the text.
+			Rectangle2D textBounds = textRenderer.getBounds(activityEntry.name);
+			textRenderer.end3DRendering();
+
+			gl.glPushMatrix();
+			gl.glEnable(GL.GL_BLEND);
+			gl.glColor4f(0.9f, 0.9f, 0.9f, 0.9f);
+			float halfh = (float)textBounds.getHeight()/2;
+			gl.glTranslatef(0f, halfh, 0f);
+
+			// Origin (0,0,0) is now the left end of the center line of the text.
+			// Draw the left cap.
+			GLUquadric quad1 = glu.gluNewQuadric();
+			glu.gluPartialDisk(quad1, 0, halfh, 12, 2, 180, 180);
+			glu.gluDeleteQuadric(quad1);
+			// Draw the rectangle.
+			gl.glBegin(GL_QUADS);
+			gl.glVertex3d(0, -halfh, 0);
+			gl.glVertex3d(0, halfh, 0);
+			gl.glVertex3d(textBounds.getWidth(), halfh, 0);
+			gl.glVertex3d(textBounds.getWidth(), -halfh, 0);
+			gl.glEnd();
+			gl.glPushMatrix();
+			gl.glTranslatef((float)textBounds.getWidth(), 0f, 0f);
+			// Origin (0,0,0) is now the right end of the center line of the text.
+			// Draw the right cap.
+			GLUquadric quad2 = glu.gluNewQuadric();
+			glu.gluPartialDisk(quad2, 0, halfh, 12, 2, 0, 180);
+			glu.gluDeleteQuadric(quad2);
+			gl.glPopMatrix();
+
+			// Origin (0,0,0) is now again the activity location.
+			// Draw the progress bar.
+			if (activityEntry.finished > 0f) {
+				gl.glColor4f(0.9f, 0.7f, 0.7f, 0.9f);
+				gl.glBegin(GL_QUADS);
+				gl.glVertex3d(0, -halfh, 0);
+				gl.glVertex3d(0, -halfh -7, 0);
+				gl.glVertex3d(textBounds.getWidth(), -halfh -7, 0);
+				gl.glVertex3d(textBounds.getWidth(), -halfh, 0);
+				gl.glEnd();
+				gl.glColor4f(0.9f, 0.5f, 0.5f, 0.9f);
+				gl.glBegin(GL_QUADS);
+				gl.glVertex3d(0, -halfh, 0);
+				gl.glVertex3d(0, -halfh -7, 0);
+				gl.glVertex3d(textBounds.getWidth()*activityEntry.finished, -halfh -7, 0);
+				gl.glVertex3d(textBounds.getWidth()*activityEntry.finished, -halfh, 0);
+				gl.glEnd();
+			}
+			gl.glPopMatrix();
+
+			textRenderer.begin3DRendering();
+			textRenderer.draw3D(activityEntry.name, 0f, 0f, 0f, 1f);
+			textRenderer.end3DRendering();
+
+			gl.glPopMatrix();
+			gl.glDisable(GL.GL_BLEND);
+		}
+
+		private void drawLabelText(OTFOGLDrawer drawer, Point2D.Double pos) {
+			TextRenderer textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 32), true, false);
+			InfoText agentText = new InfoText(this.agentId, (float) pos.x + 250, (float) pos.y + 250);
+			agentText.setAlpha(0.7f);
+			agentText.draw(textRenderer, OTFClientControl.getInstance().getMainOTFDrawer().getCanvas(), drawer.getViewBoundsAsQuadTreeRect());
 		}
 
 		@Override
@@ -386,13 +436,14 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	}
 
-	private class MyInfoText implements Serializable {
+	private class ActivityInfo implements Serializable {
 
 		private static final long serialVersionUID = 1L;
 		float east, north;
 		String name;
+		public double finished;
 
-		public MyInfoText(float east, float north, String name) {
+		ActivityInfo(float east, float north, String name) {
 			this.east = east;
 			this.north = north;
 			this.name = name;

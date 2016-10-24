@@ -112,7 +112,7 @@ public class AasRunner {
 		
 		// TODO: what if there are no events in the directory? bk oct'12
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
-		reader.parse(this.eventsFile);
+		reader.readFile(this.eventsFile);
 	}
 	
 	public void postProcess(){

@@ -14,7 +14,7 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class PlotPlans {
@@ -28,10 +28,10 @@ public class PlotPlans {
 
         final Carriers carriers = new Carriers();
 //		new CarrierPlanXmlReaderV2(carriers).read("input/usecases/chessboard/freight/singleCarrierTwentyActivities.xml");
-        new CarrierPlanXmlReaderV2(carriers).read("output/ITERS/it.140/140.carrierPlans.xml");
+        new CarrierPlanXmlReaderV2(carriers).readFile("output/ITERS/it.140/140.carrierPlans.xml");
 
         CarrierVehicleTypes types = new CarrierVehicleTypes();
-        new CarrierVehicleTypeReader(types).read("input/usecases/chessboard/freight/vehicleTypes.xml");
+        new CarrierVehicleTypeReader(types).readFile("input/usecases/chessboard/freight/vehicleTypes.xml");
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 
         final Carrier carrier = carriers.getCarriers().get(Id.create("carrier1",Carrier.class));

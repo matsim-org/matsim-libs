@@ -7,9 +7,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToActivities;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
@@ -77,7 +77,7 @@ public class EventsToPlans implements ActivityHandler, LegHandler {
 		eventsToLegs.addLegHandler(eventsToPlans);
 		eventsManager.addHandler(eventsToActivities);
 		eventsManager.addHandler(eventsToLegs);
-		new EventsReaderXMLv1(eventsManager).parse(args[2]);
+		new EventsReaderXMLv1(eventsManager).readFile(args[2]);
 		eventsToPlans.writeExperiencedPlans(args[3]);
 	}
 

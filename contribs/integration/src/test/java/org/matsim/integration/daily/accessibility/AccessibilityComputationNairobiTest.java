@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityStartupListener;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
+import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.core.config.Config;
@@ -80,16 +80,16 @@ public class AccessibilityComputationNairobiTest {
 		// Parameters
 		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		final Envelope envelope = new Envelope(240000, 280000, 9844000, 9874000);
-		String name = "ke_nairobi_" + cellSize.toString().split("\\.")[0];
-		name = name + "_airport_min";
+		final String runId = "ke_nairobi_" + PathUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
+		final boolean push2Geoserver = false;
 		
 		// QGis parameters
 		boolean createQGisOutput = true;
 		final boolean includeDensityLayer = true;
 		final Double lowerBound = -7.; // (upperBound - lowerBound) is ideally easily divisible by 7
 		final Double upperBound = 0.0;
-		final Integer range = 9; // in the current implementation, this must always be 9
-		final int symbolSize = 510;
+		final Integer range = 9; // In the current implementation, this must always be 9
+		final int symbolSize = 510; // Usually chosen a little bit larger than cellSize
 		final int populationThreshold = (int) (1 / (1000/cellSize * 1000/cellSize));
 		
 		// Config and scenario
@@ -99,23 +99,16 @@ public class AccessibilityComputationNairobiTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
-		
-		// new
-		config.planCalcScore().setBrainExpBeta(200);
+		config.planCalcScore().setBrainExpBeta(200); // Set to high value to base computation on time to nearest facility only
 		
 		// Choose modes for accessibility computation
-		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 
-		// Matrix-based pt
-//		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
-//		mbpcg.setPtStopsInputFile(ptStops);
-//		mbpcg.setUsingTravelTimesAndDistances(true);
-//		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrix);
-//		mbpcg.setPtTravelTimesInputFile(travelTimeMatrix);
-		
-		// Some (otherwise irrelevant) settings to make the vsp check happy
+		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.abort);
+
+		// Some (otherwise irrelevant) settings to make the vsp check happy:
 		config.timeAllocationMutator().setMutationRange(7200.);
 		config.timeAllocationMutator().setAffectingDuration(false);
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
@@ -143,16 +136,16 @@ public class AccessibilityComputationNairobiTest {
 //		activityTypes.add("Recreational"); // land-use file version
 		
 		// Network density points
-		ActivityFacilities measuringPoints = AccessibilityRunUtils.createMeasuringPointsFromNetwork(scenario.getNetwork(), cellSize);
+		ActivityFacilities measuringPoints = AccessibilityUtils.createMeasuringPointsFromNetworkBounds(scenario.getNetwork(), cellSize);
 		double maximumAllowedDistance = 0.5 * cellSize;
-		final ActivityFacilities densityFacilities = AccessibilityRunUtils.createNetworkDensityFacilities(
+		final ActivityFacilities densityFacilities = AccessibilityUtils.createNetworkDensityFacilities(
 				scenario.getNetwork(), measuringPoints, maximumAllowedDistance);
 
 		// Controller
 		final Controler controler = new Controler(scenario);
-		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, name, envelope, cellSize));
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, runId, envelope, cellSize, push2Geoserver));
 		controler.run();
-		
+
 		// QGis
 		if (createQGisOutput == true) {
 			String osName = System.getProperty("os.name");
@@ -160,9 +153,11 @@ public class AccessibilityComputationNairobiTest {
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
-							lowerBound, upperBound, range, symbolSize, populationThreshold);
-					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					if (acg.getIsComputingMode().contains(mode)) {
+						VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
+								lowerBound, upperBound, range, symbolSize, populationThreshold);
+						VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					}
 				}
 			}  
 		}

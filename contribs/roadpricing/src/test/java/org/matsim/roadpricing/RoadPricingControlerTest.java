@@ -45,7 +45,7 @@ public class RoadPricingControlerTest {
 		// first run basecase
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setLastIteration(0);
-		config.plans().setInputFile("test/scenarios/equil/plans1.xml");
+		config.plans().setInputFile("plans1.xml");
 		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/basecase/");
 		config.controler().setWritePlansInterval(0);
 		Controler controler1 = new Controler(config);

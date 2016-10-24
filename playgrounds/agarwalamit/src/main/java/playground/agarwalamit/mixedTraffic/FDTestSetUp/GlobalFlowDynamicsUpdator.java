@@ -49,12 +49,12 @@ import org.matsim.vehicles.VehicleType;
 
 class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartureEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	
-	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> travelModesFlowData;
-	private TravelModesFlowDynamicsUpdator globalFlowData;
-	private final Map<Id<Person>, String> person2Mode = new HashMap<Id<Person>, String>();
+	private final Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> travelModesFlowData;
+	private final TravelModesFlowDynamicsUpdator globalFlowData;
+	private final Map<Id<Person>, String> person2Mode = new HashMap<>();
 	
 	public final static Id<Link> FLOW_DYNAMICS_UPDATE_LINK = Id.createLinkId(0);
-	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	
 	private boolean permanentRegime;
 

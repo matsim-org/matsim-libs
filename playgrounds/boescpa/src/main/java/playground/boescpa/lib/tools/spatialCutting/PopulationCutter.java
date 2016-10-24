@@ -33,15 +33,15 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.boescpa.lib.tools.coordUtils.CoordFilter;
@@ -102,9 +102,9 @@ public class PopulationCutter {
 
         log.info(" Setting up population objects...");
         StreamingUtils.setIsStreaming(population, true);
-        PopulationWriter pop_writer = new PopulationWriter(population, scenario.getNetwork());
+        StreamingPopulationWriter pop_writer = new StreamingPopulationWriter(population, scenario.getNetwork());
         pop_writer.startStreaming(populationOutputFile);
-        MatsimPopulationReader pop_reader = new PopulationReader(scenario);
+        MatsimReader pop_reader = new PopulationReader(scenario);
 
         log.info(" Adding person modules...");
         PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(pop_writer, areaOfInterest, network);

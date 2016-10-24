@@ -128,6 +128,12 @@ public class TripChoicesIdentifier implements ChoicesIdentifier<TripChoiceSituat
 					public Id<ActivityFacility> getId() {
 						throw new UnsupportedOperationException( "This is a dummy facility, only link and coord are available." );
 					}
+
+					@Override
+					public void setCoord(Coord coord) {
+						// TODO Auto-generated method stub
+						throw new RuntimeException("not implemented") ;
+					}
 				};
 	}
 }

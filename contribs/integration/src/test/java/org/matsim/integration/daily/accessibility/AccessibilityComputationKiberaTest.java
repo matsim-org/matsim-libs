@@ -32,7 +32,7 @@ import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityStartupListener;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
+import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
@@ -73,15 +73,16 @@ public class AccessibilityComputationKiberaTest {
 		// Parameters
 		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		final Envelope envelope = new Envelope(251000, 9853000, 256000, 9857000);
-		final String name = "ke_kibera_" + cellSize.toString().split("\\.")[0];
-		
+		final String runId = "ke_kibera_" + PathUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
+		final boolean push2Geoserver = false;
+
 		// QGis parameters
 		boolean createQGisOutput = true;
 		final boolean includeDensityLayer = false;
 		final Double lowerBound = 0.; // (upperBound - lowerBound) is ideally easily divisible by 7
 		final Double upperBound = 3.5;
 		final Integer range = 9; // in the current implementation, this need always be 9
-		final int symbolSize = 110;
+		final int symbolSize = 10;
 		final int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 		
 		// Config and scenario
@@ -93,10 +94,12 @@ public class AccessibilityComputationKiberaTest {
 		config.controler().setLastIteration(0);
 		
 		// Choose modes for accessibility computation
-		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
-			accessibilityConfigGroup.setComputingAccessibilityForMode(mode, true);
-		}
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
 		
 		// Some (otherwise irrelevant) settings to make the vsp check happy
 		config.timeAllocationMutator().setMutationRange(7200.);
@@ -116,8 +119,9 @@ public class AccessibilityComputationKiberaTest {
 		assertNotNull(config);
 		
 		// Network bounds
+		// TODO check if this works more direct
 		BoundingBox networkBounds = BoundingBox.createBoundingBox(scenario.getNetwork());
-		Envelope networkEnvelope = new Envelope(networkBounds.getXMin(), networkBounds.getXMax(), networkBounds.getYMin(), networkBounds.getYMax());
+		Envelope analysisEnvelope = new Envelope(networkBounds.getXMin(), networkBounds.getXMax(), networkBounds.getYMin(), networkBounds.getYMax());
 		
 		// Collect activity types
 //		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
@@ -127,14 +131,14 @@ public class AccessibilityComputationKiberaTest {
 //		activityTypes.add(FacilityTypes.TOILETS);
 		
 		// Network density points
-		ActivityFacilities measuringPoints = AccessibilityRunUtils.createMeasuringPointsFromNetwork(scenario.getNetwork(), cellSize);
+		ActivityFacilities measuringPoints = AccessibilityUtils.createMeasuringPointsFromNetworkBounds(scenario.getNetwork(), cellSize);
 		double maximumAllowedDistance = 0.5 * cellSize;
-		final ActivityFacilities densityFacilities = AccessibilityRunUtils.createNetworkDensityFacilities(
+		final ActivityFacilities densityFacilities = AccessibilityUtils.createNetworkDensityFacilities(
 				scenario.getNetwork(), measuringPoints, maximumAllowedDistance);
 
 		// Controller
 		final Controler controler = new Controler(scenario);
-		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, name, networkEnvelope, cellSize));
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, runId, analysisEnvelope, cellSize, push2Geoserver));
 		controler.run();
 		
 		// QGis
@@ -144,9 +148,11 @@ public class AccessibilityComputationKiberaTest {
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
-							lowerBound, upperBound, range, symbolSize, populationThreshold);
-					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					if (acg.getIsComputingMode().contains(mode)) {
+						VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
+								lowerBound, upperBound, range, symbolSize, populationThreshold);
+						VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					}
 				}
 			}  
 		}

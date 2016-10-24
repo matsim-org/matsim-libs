@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public abstract class AbstractRoutingNetwork implements RoutingNetwork {
 	
@@ -92,5 +93,31 @@ public abstract class AbstractRoutingNetwork implements RoutingNetwork {
 	public Link removeLink(Id<Link> linkId) {
 		throw new RuntimeException("Not supported operation!");
 	}
+	@Override
+	public void setCapacityPeriod(double capPeriod) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
 
+	@Override
+	public void setEffectiveCellSize(double effectiveCellSize) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public void setEffectiveLaneWidth(double effectiveLaneWidth) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+	@Override
+	public double getEffectiveCellSize() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return this.network.getAttributes();
+	}
 }

@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
@@ -39,9 +40,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -53,7 +54,7 @@ public class HITSToMATSim {
 	private Scenario scenario; // used if you want to generate matsim
 								// populations
 	private Population population;
-	private NetworkImpl network;
+	private Network network;
 	private HashMap<Integer, Integer> zip2DGP;
 	private HashMap<Integer, ArrayList<Integer>> DGP2Zip;
 	private HashMap<Integer, HashMap<String, ArrayList<Integer>>> DGP2Type2Zip;
@@ -69,7 +70,7 @@ public class HITSToMATSim {
 
 	private LeastCostPathCalculator leastCostPathCalculator;
 	private HashMap<String, Double> personShortestPathDayTotals;
-    private Map<Id<Link>, Link> links;
+    private Map<Id<Link>, ? extends Link> links;
 
 	private HITSToMATSim(HITSData h2, Connection conn2) throws ParseException {
 		this();
@@ -93,7 +94,7 @@ public class HITSToMATSim {
 		this.population = scenario.getPopulation();
 		new MatsimNetworkReader(scenario.getNetwork())
 				.readFile("data/singapore1_no_rail_CLEAN.xml");
-		NetworkImpl subNet = NetworkImpl.createNetwork();
+		Network subNet = NetworkUtils.createNetwork();
 		TransportModeNetworkFilter t = new TransportModeNetworkFilter(scenario.getNetwork());
 		HashSet set = new HashSet<String>();
 		set.add("car");
@@ -700,11 +701,10 @@ public class HITSToMATSim {
 		}
 	}
 
-	private Coord shoot(Coord coord) {
+	private static Coord shoot(Coord coord) {
 		// scatters coords within a 200x200m2 square
 		int squareSize = 200;
-		coord.setX(coord.getX() + squareSize * Math.random() - squareSize / 2);
-		coord.setY(coord.getY() + squareSize * Math.random() - squareSize / 2);
+		new Coord( coord.getX() + squareSize * Math.random() - squareSize / 2, coord.getY() + squareSize * Math.random() - squareSize / 2 ) ;
 		return coord;
 	}
 

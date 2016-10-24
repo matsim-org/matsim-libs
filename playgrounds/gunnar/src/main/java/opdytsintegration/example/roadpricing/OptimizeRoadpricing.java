@@ -137,7 +137,7 @@ class OptimizeRoadpricing {
 						RoadPricingConfigGroup.class);
 		final RoadPricingSchemeImpl roadPricingScheme = new RoadPricingSchemeImpl();
 		new RoadPricingReaderXMLv1(roadPricingScheme)
-				.parse(roadPricingConfigGroup.getTollLinksFile());
+				.readFile(roadPricingConfigGroup.getTollLinksFile());
 		final AbstractModule roadpricingModule = new ControlerDefaultsWithRoadPricingModule(
 				roadPricingScheme);
 
@@ -176,9 +176,11 @@ class OptimizeRoadpricing {
 		final double tollScale = 0.0;
 		final MATSimSimulator<TollLevels> matsimSimulator = new MATSimSimulator<>(
 				new RoadpricingStateFactory(timeDiscretization, occupancyScale,
-						tollScale), scenario, timeDiscretization,
+						tollScale), scenario, timeDiscretization //,
 				// relevantLinkIds, null, 
-				roadpricingModule);
+//				roadpricingModule
+				);
+		matsimSimulator.setReplacingModules(roadpricingModule);
 		matsimSimulator
 				.setScoringFunctionFactory(new RandomizedCharyparNagelScoringFunctionFactory(
 						scenario));

@@ -27,9 +27,8 @@ import org.matsim.contrib.accessibility.gis.ZoneLayer;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.contrib.matsim4urbansim.utils.io.misc.ProgressBar;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -331,7 +330,7 @@ public class NetworkInspector {//TODO pfade ändern
 		logger.info("checking link attributes...");
 		
 		int writerIndex = 0;
-		double cellWidth = ((NetworkImpl)NetworkInspector.scenario.getNetwork()).getEffectiveCellSize();
+		double cellWidth = ((Network)NetworkInspector.scenario.getNetwork()).getEffectiveCellSize();
 		for(Link link : NetworkInspector.scenario.getNetwork().getLinks().values()){
 			double geometricLength = 
 					Math.sqrt(Math.pow(link.getToNode().getCoord().getX() -

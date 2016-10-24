@@ -65,7 +65,7 @@ public class Proxy2Matsim {
 
 		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
-		parser.parse(args[0]);
+		parser.readFile(args[0]);
 
 		TaskRunner.run(new Convert2MatsimModes(), parser.getPersons());
 

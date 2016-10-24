@@ -20,6 +20,9 @@
 
 package org.matsim.core.config.groups;
 
+import java.net.URL;
+
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
@@ -46,7 +49,10 @@ public final class HouseholdsConfigGroup extends ReflectiveConfigGroup {
 	public String getInputFile() {
 		return this.inputFile;
 	}
-	
+	public URL getInputFileURL(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.inputFile);
+	}
+
 	@StringSetter( INPUT_FILE )
 	public void setInputFile(final String inputFile) {
 		this.inputFile = inputFile;

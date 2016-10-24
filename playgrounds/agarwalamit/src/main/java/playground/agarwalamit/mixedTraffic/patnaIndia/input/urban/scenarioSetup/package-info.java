@@ -26,8 +26,10 @@
  * </li>
  * 
  * <li>
- * Then run the cleaner, this will clean the files and put mostly meaningful data, if somethign 
+ * Then run the cleaner, this will clean the files and put mostly meaningful data, if some data 
  * is not available, it will randomly produce based on the given distribution in the Patna CMP.
+ * <b> The important thing is, the distribution is adjusted for unknown data so that the distribution for all (known+unknown) is
+ * same as given distribution.</b>
  * </li>
  * 
  * <li>

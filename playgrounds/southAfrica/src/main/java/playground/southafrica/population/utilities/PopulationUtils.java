@@ -36,8 +36,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -64,7 +64,7 @@ public class PopulationUtils {
 	 */
 	public static void extractActivityDurations(String populationFile, String outputFile){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(sc).parse(populationFile);
+		new PopulationReader(sc).readFile(populationFile);
 		
 		/*TODO Remove after debugging. */
 		double maxS = Double.NEGATIVE_INFINITY;
@@ -171,7 +171,7 @@ public class PopulationUtils {
 	public static void printHouseholdStatistics(String householdsFilename){
 		Households households = new HouseholdsImpl();
 		HouseholdsReaderV10 hr = new HouseholdsReaderV10(households);
-		hr.parse(householdsFilename);
+		hr.readFile(householdsFilename);
 		
 		/* Get the number of members. */
 		int members = 0;

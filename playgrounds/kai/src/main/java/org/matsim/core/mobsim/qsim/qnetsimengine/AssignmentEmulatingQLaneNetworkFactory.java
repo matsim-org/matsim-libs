@@ -2,6 +2,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import javax.inject.Inject;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -16,51 +17,57 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLink
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.lanes.data.Lane;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 public final class AssignmentEmulatingQLaneNetworkFactory extends QNetworkFactory {
-	@Inject private QSimConfigGroup qsimConfig ;
-	@Inject private EventsManager events ;
-	@Inject Network network ;
-	@Inject Scenario scenario ;
 	
-	private NetsimInternalInterface netsimEngine;
-	private NetsimEngineContext context;
+	private QNode.Builder nodeBuilder;
+	private QLinkImpl.Builder linkBuilder;
+	private Scenario scenario;
+	private EventsManager events;
+	
+	@Inject
+	public AssignmentEmulatingQLaneNetworkFactory( Scenario scenario, EventsManager events ) {
+		this.scenario = scenario ;
+		this.events = events ;
+		throw new RuntimeException( AssignmentEmulatingQLane.DO_NOT_USE_ASSIGNMENT_EMULATING_QLANE ) ;
+	}
+
+	@Override
+	void initializeFactory(AgentCounter agentCounter1, MobsimTimer mobsimTimer1, NetsimInternalInterface netsimEngine) {
+		QSimConfigGroup qsimConfig = scenario.getConfig().qsim() ;
+		Network network = scenario.getNetwork() ;
+
+		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+		linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );
+		linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
+
+		AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
+
+		final NetsimEngineContext context = new NetsimEngineContext(events, network.getEffectiveCellSize(), agentCounter1, snapshotInfoBuilder, qsimConfig, mobsimTimer1, linkWidthCalculator ) ;
+
+		nodeBuilder = new QNode.Builder( netsimEngine, context );
+
+		linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
+		linkBuilder.setLaneFactory(new LaneFactory() {
+			@Override public QLaneI createLane(AbstractQLink qLinkImpl) {
+				VehicleQ<QVehicle> vehicleQueue = new FIFOVehicleQ() ; 
+				LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
+				final Id<Lane> laneId = Id.create( qLinkImpl.getLink().getId(), Lane.class ) ;
+				return new AssignmentEmulatingQLane(qLinkImpl, vehicleQueue, laneId, context, linkSpeedCalculator ) ;
+			}
+		});
+	}
 
 	@Override
 	public QNode createNetsimNode(Node node) {
-		QNode.Builder builder = new QNode.Builder( netsimEngine, context ) ;
-		return builder.build( node ) ;
+		return nodeBuilder.build( node ) ;
 	}
 
 	@Override
 	public QLinkI createNetsimLink(Link link, QNode queueNode) {
-		LaneFactory roadFactory = new LaneFactory() {
-			@Override
-			public QLaneI createLane(AbstractQLink qLinkImpl) {
-				VehicleQ<QVehicle> vehicleQueue = new FIFOVehicleQ() ; 
-				LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
-				return new AssignmentEmulatingQLane(qLinkImpl, vehicleQueue, qLinkImpl.getLink().getId(), context, netsimEngine, linkSpeedCalculator ) ;
-			}
-		} ;
-		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
-		linkBuilder.setLaneFactory(roadFactory);
 		return linkBuilder.build(link, queueNode) ; 
 	}
 
-	@Override
-	void initializeFactory(AgentCounter agentCounter1, MobsimTimer mobsimTimer1, NetsimInternalInterface netsimEngine1) {
-		this.netsimEngine = netsimEngine1 ;
-		double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
-		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-		linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );
-		if (! Double.isNaN(network.getEffectiveLaneWidth())){
-			linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
-		}
-		AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
-		AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
-		this.context = new NetsimEngineContext(events, effectiveCellSize, agentCounter1, snapshotInfoBuilder, qsimConfig, mobsimTimer1, linkWidthCalculator ) ;
-	}
 }

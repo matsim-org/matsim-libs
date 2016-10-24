@@ -9,7 +9,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -30,7 +30,7 @@ public class CSRentalTimesFromEvents {
     	CSEventsHandler rentalTimes = new CSEventsHandler(sc.getNetwork());
     	
     	events.addHandler(rentalTimes);
-    	reader.parse(s);
+    	reader.readFile(s);
     	/*int[] rentalTime = rentalTimes.rentalTimes;
     	System.out.println(rentalTimes.number1());
     	System.out.println(rentalTimes.number());

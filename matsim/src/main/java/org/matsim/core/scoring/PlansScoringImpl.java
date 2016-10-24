@@ -66,7 +66,7 @@ final class PlansScoringImpl implements PlansScoring, ScoringListener, Iteration
 			final int writePlansInterval = controlerConfigGroup.getWritePlansInterval();
 			if (writePlansInterval > 0 && event.getIteration() % writePlansInterval == 0) {
 				this.experiencedPlansService.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans.xml.gz"));
-				this.scoringFunctionsForPopulation.writePartialScores(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans_scores.xml.gz"));
+				this.scoringFunctionsForPopulation.writePartialScores(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans_scores.txt.gz"));
 			}
 		}
 		if (planCalcScoreConfigGroup.isMemorizingExperiencedPlans() ) {

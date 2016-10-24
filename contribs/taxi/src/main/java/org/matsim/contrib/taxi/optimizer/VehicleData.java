@@ -30,20 +30,18 @@ import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 public class VehicleData
 {
     public static class Entry
+        extends LinkTimePair
     {
         public final int idx;
         public final Vehicle vehicle;
-        public final Link link;
-        public final double time;
         public final boolean idle;
 
 
         public Entry(int idx, Vehicle vehicle, Link link, double time, boolean idle)
         {
+            super(link, time);
             this.idx = idx;
             this.vehicle = vehicle;
-            this.link = link;
-            this.time = time;
             this.idle = idle;
         }
     }
@@ -66,7 +64,7 @@ public class VehicleData
                 idleCounter++;
             }
         }
-        
+
         idleCount = idleCounter;
     }
 

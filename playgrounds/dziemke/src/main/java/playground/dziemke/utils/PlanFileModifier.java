@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -28,26 +28,30 @@ public class PlanFileModifier {
 	
 	// Parameters
 	static double selectionProbability = 1.;
-	static boolean onlyTransferSelectedPlan = true;
+	static boolean onlyTransferSelectedPlan = false;
 	static boolean considerHomeStayingAgents = true;
 	static boolean includeStayHomePlans = true;
 	static boolean onlyConsiderPeopleAlwaysGoingByCar = false;
 	static int maxNumberOfAgentsConsidered = 1000000;
-	static String runId = "run_194";
-	static int iteration = 300;
+//	static String runId = "run_194";
+//	static int iteration = 300;
 	static boolean removeLinksAndRoutes = true;
 	
 	
 	// Input and output files
-	static final String INPUT_PLANS_FILE = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
-			+ "/" + runId + "." + iteration + ".plans.xml.gz";
-	static final String OUTPUT_PLANS_FILE = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
-			+ "/" + runId + "." + iteration + ".plans_selected_no_links_routes.xml.gz";
+//	static final String INPUT_PLANS_FILE = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
+//			+ "/" + runId + "." + iteration + ".plans.xml.gz";
+//	static final String OUTPUT_PLANS_FILE = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
+//			+ "/" + runId + "." + iteration + ".plans_selected_no_links_routes.xml.gz";
 //	static final String INPUT_PLANS_FILE = "../../../shared-svn/projects/tum-with-moeckel/data/"
 //			+ "mstm_run/run_04/siloMatsim/population_2000.xml";
 //	static final String OUTPUT_ROOT = "../../../../SVN/shared-svn/projects/tum-with-moeckel/data/"
 //			+ "mstm_run/run_04/siloMatsim/population_2000_half/";
 //	static final String OUTPUT_PLANS_FILE = OUTPUT_ROOT + "population.xml";
+	
+	// In case using input plans that have not yet been iterated
+	static final String INPUT_PLANS_FILE = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/30/plans.xml.gz";
+	static final String OUTPUT_PLANS_FILE = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/30/plans_no_links_routes.xml.gz";
 	
 	
 //	if (onlyTransferSelectedPlan == true) {

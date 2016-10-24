@@ -14,11 +14,11 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.vehicles.Vehicle;
 
 import saleem.stockholmscenario.utils.CollectionUtil;
@@ -26,7 +26,7 @@ import saleem.stockholmscenario.utils.CollectionUtil;
 //For Generic Junctions
 
 public class GenericP0ControlHandler implements BasicEventHandler{
-	NetworkImpl network;int iteration;double bintime=0;double totalincap=0;
+	Network network;int iteration;double bintime=0;double totalincap=0;
 	List<Link> inLinks = new ArrayList<Link>();//Incoming links
 	List<Link> outLinks = new ArrayList<Link>();//Outgoing links
 	Map<Id<Link>, Link> allLinks = new HashMap<Id<Link>, Link>();//Both incoming and outgoing links in the junction
@@ -52,7 +52,7 @@ public class GenericP0ControlHandler implements BasicEventHandler{
 	Map<Id<Link>, Double> totalVehCountsLinks = new LinkedHashMap<Id<Link>, Double>();//Per day
 	Scenario scenario;
 	public static List<Double> changeeventtimes= new ArrayList<Double>();//To keep track of all event times added so that times of two events dont concide.
-	public GenericP0ControlHandler(Scenario scenario, List<Link> inLinks, List<Link> outLinks, NetworkImpl network) {
+	public GenericP0ControlHandler(Scenario scenario, List<Link> inLinks, List<Link> outLinks, Network network) {
 		this.network=network;
 		this.inLinks=inLinks;
 		this.outLinks=outLinks;
@@ -72,15 +72,16 @@ public class GenericP0ControlHandler implements BasicEventHandler{
 		initer = this.inLinks.iterator();
 		while(initer.hasNext()){
 			Link link = initer.next();
-			NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(0.0 + Math.random() + Math.random()/10 + Math.random()/100+ Math.random()/1000+ Math.random()/10000+Math.random()/100000);//Assuming the simulations start at 06:00
+			NetworkChangeEvent change = new NetworkChangeEvent(0.0 + Math.random() + Math.random()/10 + Math.random()/100+ Math.random()/1000+ Math.random()/10000+Math.random()/100000);//Assuming the simulations start at 06:00
 			while(changeeventtimes.contains(change.getStartTime())){
-				change = network.getFactory().createNetworkChangeEvent(0.0 + Math.random() + Math.random()/10 + Math.random()/100+ Math.random()/1000 + Math.random()/10000+Math.random()/100000);//Assuming the simulations start at 06:00
+				change = new NetworkChangeEvent(0.0 + Math.random() + Math.random()/10 + Math.random()/100+ Math.random()/1000 + Math.random()/10000+Math.random()/100000);//Assuming the simulations start at 06:00
 			}
 			changeeventtimes.add(change.getStartTime());
 			change.addLink(link);
 			double cap = (link.getCapacity()/totalincap)*(link.getCapacity()/3600);//Initial green time share depending on the capacity of the link
-			// The statement 1/inLinks.size() to give equal percentage initially to all links
-			change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE,cap));
+			// The statement 1.0/inLinks.size() to give equal percentage initially to all links
+			// The statement link.getCapacity()/totalincap to give capacity based percentage initially to all links
+			change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS,cap));
 			events.add(change);
 		}
 	}
@@ -155,13 +156,13 @@ public class GenericP0ControlHandler implements BasicEventHandler{
 			Iterator<Double> biniter = capsatbins.keySet().iterator();
 			while(biniter.hasNext()){
 				Double bin = biniter.next();
-				NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(bin + Math.random() + Math.random()/10 + Math.random()/100+ Math.random()/1000+ Math.random()/10000+Math.random()/100000);//Assuming the simulations start at 06:00
+				NetworkChangeEvent change = new NetworkChangeEvent(bin + Math.random() + Math.random()/10 + Math.random()/100+ Math.random()/1000+ Math.random()/10000+Math.random()/100000);//Assuming the simulations start at 06:00
 				while(changeeventtimes.contains(change.getStartTime())){
-					 change = network.getFactory().createNetworkChangeEvent(bin + Math.random() + Math.random()/10 + Math.random()/100+ Math.random()/1000 + Math.random()/10000+Math.random()/100000);//Assuming the simulations start at 06:00
+					 change = new NetworkChangeEvent(bin + Math.random() + Math.random()/10 + Math.random()/100+ Math.random()/1000 + Math.random()/10000+Math.random()/100000);//Assuming the simulations start at 06:00
 				}
 				changeeventtimes.add(change.getStartTime());
 				change.addLink(link);
-				change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, capsatbins.get(bin)/3600));
+				change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, capsatbins.get(bin)/3600));
 				events.add(change);
 			}
 			
@@ -246,6 +247,7 @@ public class GenericP0ControlHandler implements BasicEventHandler{
 			Id<Link> linkid = iterator.next().getId();
 //			System.out.println("Average Delays: " + time + "..." + delayinthisbinoverlinks.get(linkid));
 			double abspres = delayinthisbinoverlinks.get(linkid)*satCapacities.get(linkid);
+//			double abspres = delayinthisbinoverlinks.get(linkid)*1500;//Just based on delay
 			abspressures.put(linkid, abspres);
 			avgpressure += abspres;
 		}

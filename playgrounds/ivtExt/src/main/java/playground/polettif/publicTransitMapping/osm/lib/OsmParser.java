@@ -63,7 +63,7 @@ public class OsmParser {
 		if (filename.toLowerCase(Locale.ROOT).endsWith(".osm.pbf")) {
 			log.error("*.osm.pbf are not supported. Use *.osm (xml format) instead.");
 		} else {
-			new OsmXmlParser(distributor).parse(filename);
+			new OsmXmlParser(distributor).readFile(filename);
 		}
 	}
 

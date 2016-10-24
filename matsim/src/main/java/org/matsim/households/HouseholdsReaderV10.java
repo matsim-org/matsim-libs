@@ -18,8 +18,6 @@
 
 package org.matsim.households;
 
-import org.matsim.core.utils.io.UncheckedIOException;
-
 /**
  * @author dgrether
  */
@@ -28,10 +26,6 @@ public class HouseholdsReaderV10 extends AbstractHouseholdsReaderV10 {
 
 	public HouseholdsReaderV10(Households households) {
 		super(households);
-	}
-	
-	public void readFile(String filename) throws UncheckedIOException {
-		parse(filename);
 	}
 	
 }

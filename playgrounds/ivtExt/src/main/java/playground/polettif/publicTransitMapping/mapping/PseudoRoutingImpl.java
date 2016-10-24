@@ -47,6 +47,7 @@ import java.util.*;
  *
  * @author polettif
  */
+@Deprecated
 public class PseudoRoutingImpl implements PseudoRouting {
 
 	protected static Logger log = Logger.getLogger(PseudoRoutingImpl.class);

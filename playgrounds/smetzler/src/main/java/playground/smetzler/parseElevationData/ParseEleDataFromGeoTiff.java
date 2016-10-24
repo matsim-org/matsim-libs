@@ -25,34 +25,32 @@ public class ParseEleDataFromGeoTiff {
 	}
 
 	private void initTif() throws Exception {
-		// download data from http://earthexplorer.usgs.gov/ (login in required)
-//		// SRTM1
-//		File tiffFile = new File("../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_berlin/n52_e013_1arc_v3.tif");
-		// SRTM3 download: (http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp)
+		
+		//Where to download elevation Raw Data?
+		// SRTM1:  http://earthexplorer.usgs.gov/ (login in required)
+		// SRTM3:  http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp
+		// EU-DEM: http://data.eox.at/eudem
 		
 		
-	//	EU-DEM http://data.eox.at/eudem/#map/13.27/52.43/10
-				
-//		
-//		
-//////		//berlin
+		//berlin SRTM3
 //		File tiffFile = new File(
-//				"../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_berlin/srtm3/srtm_39_02.tif");
-		//berlin EU-DEM
-//		File tiffFile = new File(
-//				"../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_berlin/BerlinEUDEM.tif");
+//				"../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_berlin/srtm3/srtm_39_02.tif");
 		
-
-//		//paris
-//		File tiffFile = new File(
-//				"../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_paris/srtm_37_03.tif");
-//		//stuttgart
-//		File tiffFile = new File(
-//				"../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_stuttgart/srtm_38_03.tif");
-		
-//		//brasilia srtm3
+	    //berlin EU-DEM
 		File tiffFile = new File(
-				"../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_brasilia/srtm_27_16.tif");
+				"../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_berlin/BerlinEUDEM.tif");
+		
+//		//stuttgart EUDEM
+//		File tiffFile = new File(
+//				"../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_stuttgart/stuttgartEUDEM.tif");		
+//		
+//		//stuttgart SRTM3
+//		File tiffFile = new File(
+//				"../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_stuttgart/srtm_38_03.tif");
+//		
+//		//brasilia SRTM3
+//		File tiffFile = new File(
+//				"../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_brasilia/srtm_27_16.tif");
 		
 		
 		GeoTiffReader reader = new GeoTiffReader(tiffFile);
@@ -66,10 +64,10 @@ public class ParseEleDataFromGeoTiff {
 
 		GridGeometry2D gg = grid.getGridGeometry();
 
-		//da die GeoTiff in WGS84 ist, jedoch das MAtsim Netz in DHDN, müssen die übergebenen Koordinaten von DHDN in WGS84 transformiert werden
-
+		
+		//convert the the projection used in the MATSim Berlin scenario (DHDN / 3-degree Gauss-Kruger zone 4) to one used in the elevation data (Geotiff, WGS84) 
 		//new
-		CoordinateReferenceSystem sourceCRS = CRS.decode("EPSG:4326", true);//"EPSG:31468", true); // DHDN / 3-degree Gauss-Kruger zone 4
+		CoordinateReferenceSystem sourceCRS = CRS.decode("EPSG:31468", true); // DHDN / 3-degree Gauss-Kruger zone 4
 		CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:4326", true);  //WGS84
 
 		MathTransform mathTransform = CRS.findMathTransform(sourceCRS, targetCRS, true);

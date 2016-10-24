@@ -34,7 +34,7 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.congestion.CausedDelayAnalyzer;
 import playground.agarwalamit.analysis.congestion.CrossMarginalCongestionEventsWriter;
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -55,16 +55,16 @@ public class BAUDelayAnalyzer {
 		this.congestionImpl = congestionImpl;
 	}
 
-	private int noOfTimeBins = 30;
-	private String eventsFile ;
-	private double simulationEndTime;
-	private String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run11/policies/bau/";
-	private String congestionEventsFile;
-	private Scenario scenario;
-	private String congestionImpl;
+	private final int noOfTimeBins = 30;
+	private final String eventsFile ;
+	private final double simulationEndTime;
+	private final String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run11/policies/bau/";
+	private final String congestionEventsFile;
+	private final Scenario scenario;
+	private final String congestionImpl;
 	
 
-	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private final MunichPersonFilter pf = new MunichPersonFilter();
 	
 	public static void main(String[] args) {
 		BAUDelayAnalyzer analyzer = new BAUDelayAnalyzer("implV3");
@@ -88,7 +88,7 @@ public class BAUDelayAnalyzer {
 			writer.write("timeBin \t personId \t userGroup \t delayInHr \n");
 			for (double d : timeBin2CausingPerson2Delay.keySet()){
 				for (Id<Person> personId : timeBin2CausingPerson2Delay.get(d).keySet()){
-					writer.write(d+"\t"+personId+"\t"+pf.getUserGroupFromPersonId(personId)+"\t"+timeBin2CausingPerson2Delay.get(d).get(personId) / 3600+"\n");
+					writer.write(d+"\t"+personId+"\t"+pf.getMunichUserGroupFromPersonId(personId)+"\t"+timeBin2CausingPerson2Delay.get(d).get(personId) / 3600+"\n");
 				}
 			}
 			writer.close();
@@ -115,7 +115,7 @@ public class BAUDelayAnalyzer {
 		try {
 			writer.write("personId\tuserGroup\taffectedDelayInHr\tcausedDelayInHr\n");
 			for (Id<Person> id :causedPerson2Delay.keySet()){
-				writer.write(id+"\t"+pf.getUserGroupFromPersonId(id)+"\t"+affectedperson2Delay.get(id) / 3600+"\t"+causedPerson2Delay.get(id) / 3600+"\n");
+				writer.write(id+"\t"+pf.getMunichUserGroupFromPersonId(id)+"\t"+affectedperson2Delay.get(id) / 3600+"\t"+causedPerson2Delay.get(id) / 3600+"\n");
 			}
 			writer.close();
 		} catch (Exception e) {
@@ -173,7 +173,7 @@ public class BAUDelayAnalyzer {
 	}
 
 	private SortedMap<Double, Map<Id<Person>, Double>> getExperiencedPersonDelay(int noOfTimeBin){
-		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, scenario, noOfTimeBin, scenario.getConfig().qsim().getEndTime());
+		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, scenario, noOfTimeBin);
 		personAnalyzer.run();
 		return personAnalyzer.getTimeBin2AffectedPersonId2Delay();
 	}

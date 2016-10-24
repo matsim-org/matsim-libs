@@ -2,6 +2,7 @@ package playground.boescpa.analysis.trips;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+
 import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 
 /**

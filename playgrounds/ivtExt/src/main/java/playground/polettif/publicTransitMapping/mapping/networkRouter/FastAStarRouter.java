@@ -43,6 +43,7 @@ import java.util.Set;
  *
  * @author polettif
  */
+@Deprecated
 public class FastAStarRouter implements Router {
 
 	private final Network network;

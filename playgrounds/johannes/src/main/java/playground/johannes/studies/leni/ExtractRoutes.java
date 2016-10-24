@@ -45,12 +45,12 @@ public class ExtractRoutes {
     public static final void main(String args[]) throws IOException {
         XMLReader reader = new XMLReader();
         reader.setValidating(false);
-        reader.parse("/Users/johannes/Desktop/341.xml");
+        reader.readFile("/Users/johannes/Desktop/341.xml");
         Map<String, List<String>> routes1 = reader.getRoutes();
 
         reader = new XMLReader();
         reader.setValidating(false);
-        reader.parse("/Users/johannes/Desktop/351d.xml");
+        reader.readFile("/Users/johannes/Desktop/351d.xml");
         Map<String, List<String>> routes2 = reader.getRoutes();
 
         Set<String> ids = new TreeSet<>(routes1.keySet());

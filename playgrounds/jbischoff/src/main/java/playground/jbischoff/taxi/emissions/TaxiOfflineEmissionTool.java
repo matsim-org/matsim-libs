@@ -26,7 +26,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.*;
 import org.matsim.core.events.*;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -53,9 +53,11 @@ public class TaxiOfflineEmissionTool {
 		ecg.setDetailedWarmEmissionFactorsFile(dir+"hbefa/EFA_HOT_SubSegm_2005detailed.txt");
 		ecg.setDetailedColdEmissionFactorsFile(dir+"hbefa/EFA_ColdStart_SubSegm_2005detailed.txt");
 		ecg.setEmissionRoadTypeMappingFile(dir+"roadTypeMapping.txt");
-		ecg.setEmissionVehicleFile(dir+"emissionVehicles.xml");
-		
+
 		Config config = ConfigUtils.createConfig(ecg);
+
+		config.vehicles().setVehiclesFile(dir+"emissionVehicles.xml");
+
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		

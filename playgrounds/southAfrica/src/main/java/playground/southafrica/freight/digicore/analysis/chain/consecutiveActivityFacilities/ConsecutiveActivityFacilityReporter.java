@@ -149,7 +149,7 @@ public class ConsecutiveActivityFacilityReporter {
 			
 			/* Read the vehicle. */
 			DigicoreVehicleReader dvr = new DigicoreVehicleReader();
-			dvr.parse(this.vehicle.getAbsolutePath());
+			dvr.readFile(this.vehicle.getAbsolutePath());
 			DigicoreVehicle dv = dvr.getVehicle();			
 			
 			/* Process each chain. */

@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -126,7 +126,7 @@ public class cleanGautengNetwork {
 		this.log.info("Updating lane definitions...");
 		sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkReaderMatsimV1 nwr = new NetworkReaderMatsimV1(sc.getNetwork());
-		nwr.parse(networkToRead);
+		nwr.readFile(networkToRead);
 
 		File folder = new File(this.laneDefinitionFolder);
 		if(folder.isDirectory()){
@@ -186,7 +186,7 @@ public class cleanGautengNetwork {
 		this.log.info("Reading cleaned network from " + networkToRead);
 		sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		new NetworkReaderMatsimV1(sc.getNetwork()).parse(networkToRead);
+		new NetworkReaderMatsimV1(sc.getNetwork()).readFile(networkToRead);
 		this.log.info("Network read successfully.");
 	}
 	

@@ -33,13 +33,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -88,7 +88,7 @@ public class AgentPositionWriter {
 		if( IS_WRITING_TRANSIM_FILE ){
 			// not sure, if following three lines are required.
 			sc.getConfig().qsim().setLinkWidthForVis((float)0);
-			((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(0.);
+			((Network)sc.getNetwork()).setEffectiveLaneWidth(0.);
 
 			sc.getConfig().controler().setSnapshotFormat(Arrays.asList("transims"));
 			transimFile = apw.createAndReturnTransimSnapshotFile(sc, eventsFile);
@@ -138,13 +138,13 @@ public class AgentPositionWriter {
 		new MatsimEventsReader(manager).readFile(eventsFile);
 	}
 
-	private BufferedWriter writer ;
+	private final BufferedWriter writer ;
 
-	private Map<Id<Person>,String> person2mode = new HashMap<>();
-	private Map<Id<Person>,Double> prevTime = new HashMap<>();
-	private Map<Id<Person>,Double> prevTrackPositions = new HashMap<>();
-	private Map<Id<Person>,Integer> prevCycle = new HashMap<>();
-	private Map<Id<Person>,Double> prevLink = new HashMap<>();
+	private final Map<Id<Person>,String> person2mode = new HashMap<>();
+	private final Map<Id<Person>,Double> prevTime = new HashMap<>();
+	private final Map<Id<Person>,Double> prevTrackPositions = new HashMap<>();
+	private final Map<Id<Person>,Integer> prevCycle = new HashMap<>();
+	private final Map<Id<Person>,Double> prevLink = new HashMap<>();
 
 	public void readTransimFileAndWriteData(String inputFile)
 	{
@@ -156,7 +156,7 @@ public class AgentPositionWriter {
 		config.setDelimiterTags( new String []{"\t"} );
 		// ---
 		TabularFileHandler handler = new TabularFileHandler(){
-			List<String> labels = new ArrayList<>() ;
+			final List<String> labels = new ArrayList<>() ;
 			@Override
 			public void startRow(String[] row) {
 				List<String> strs = Arrays.asList( row ) ;
@@ -305,6 +305,7 @@ public class AgentPositionWriter {
 		if( Double.isNaN(distFromFromNode) ) { // this is possible, because of minor errors --
 
 			Link nearestLink = NetworkUtils.getNearestLink(sc.getNetwork(), eastinNorthing);
+			assert nearestLink != null;
 			linkId = Double.valueOf(nearestLink.getId().toString());
 			distFromFromNode = NetworkUtils.getEuclideanDistance(eastinNorthing, nearestLink.getFromNode().getCoord());
 
@@ -315,6 +316,6 @@ public class AgentPositionWriter {
 			LOGGER.info("Thus, identified link is "+nearestLink.getId()+" and the distance of the point from from node is "+distFromFromNode);
 			//throw new RuntimeException("Easting, northing ("+ eastinNorthing.getX() +","+eastinNorthing.getY() +") is outside the network.");
 		}
-		return new Tuple<Double, Double>(distFromFromNode, linkId);
+		return new Tuple<>(distFromFromNode, linkId);
 	}
 }

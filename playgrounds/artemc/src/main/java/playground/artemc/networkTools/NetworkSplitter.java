@@ -12,11 +12,12 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -42,8 +43,8 @@ public class NetworkSplitter {
 
 		BufferedWriter linkMapWrtiter = new BufferedWriter(new FileWriter(linkMapPath));
 
-		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkPath);
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(networkPath);
+		Network network = (Network) scenario.getNetwork();
 
 		Set<Id> allLinks = new HashSet<Id>();
 
@@ -89,15 +90,18 @@ public class NetworkSplitter {
 					newNodeId = Id.create(originNode.getId().toString() + "_" + linkToEdit.getId().toString()
 							+ (count + 1), Node.class);
 					newNodeXY = convertDistanceToCoordinates(linkToEdit, nodeDistanceOnMap);
-					network.createAndAddNode(newNodeId, newNodeXY);
+					final Id<Node> id1 = newNodeId;
+					final Coord coord = newNodeXY;
+					NetworkUtils.createAndAddNode(network, id1, coord);
 					nodes.add(network.getNodes().get(newNodeId));
 					nodeDistanceOnMap = nodeDistanceOnMap + totalLinkLengthOnMap / newNumberOfLinks;
 					System.out.println("   Adding new node: " + newNodeId.toString() + " with coord: "
 							+ network.getNodes().get(newNodeId).getCoord());
 				}
+				final Id<Link> id = newLinkId;
+				final double length = newLinkLength;
 
-				network.createAndAddLink(newLinkId, nodes.get(nodes.size() - 2), nodes.get(nodes.size() - 1), newLinkLength,
-						linkToEdit.getFreespeed(), linkToEdit.getCapacity(), linkToEdit.getNumberOfLanes());
+				NetworkUtils.createAndAddLink(network,id, nodes.get(nodes.size() - 2), nodes.get(nodes.size() - 1), length, linkToEdit.getFreespeed(), linkToEdit.getCapacity(), linkToEdit.getNumberOfLanes() );
 				network.getLinks().get(newLinkId).setAllowedModes(linkToEdit.getAllowedModes());
 				newLinks.add(network.getLinks().get(newLinkId));
 				count++;

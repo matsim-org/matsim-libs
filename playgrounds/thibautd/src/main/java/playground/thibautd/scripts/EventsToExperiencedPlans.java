@@ -22,7 +22,6 @@ package playground.thibautd.scripts;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
@@ -31,7 +30,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.ReplayEvents;
 import org.matsim.core.events.EventsManagerModule;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
@@ -64,7 +63,7 @@ public class EventsToExperiencedPlans {
 		final String inPopFile = args[ 1 ];
 		final String outputPlansFile = args[ 2 ];
 
-		new PopulationReader( inputSc ).parse( inPopFile );
+		new PopulationReader( inputSc ).readFile( inPopFile );
 
 		final EventsToPlans eventsToPlans =
 			new EventsToPlans(

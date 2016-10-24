@@ -33,7 +33,7 @@ public class PrtLauncher {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         
 		TaxiData taxiData = new TaxiData();
-        new VehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
+        new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
 		
 		Controler controler = new Controler(config);
 		controler.getConfig().controler().setOverwriteFileSetting(

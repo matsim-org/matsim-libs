@@ -32,9 +32,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -141,7 +141,7 @@ public abstract class AbstractResizeLinksByCount {
 					break;
 				}
 				if(!(outLink == null)){
-					newCount = tempCounts.createAndAddCount(outLink, oldCount.getCsId());
+					newCount = tempCounts.createAndAddCount(outLink, oldCount.getCsLabel());
 					newCount.setCoord(oldCount.getCoord());
 					for(Entry<Integer, Volume> ee : oldCount.getVolumes().entrySet()){
 						newCount.createVolume(ee.getKey().intValue(), ee.getValue().getValue());
@@ -174,8 +174,8 @@ public abstract class AbstractResizeLinksByCount {
 		return this.oldNet;
 	}
 	
-	public LinkImpl getOriginalLink(Id id){
-		return (LinkImpl) this.oldNet.getLinks().get(id);
+	public Link getOriginalLink(Id id){
+		return (Link) this.oldNet.getLinks().get(id);
 	}
 	
 	public Network getNewNetwork(){
@@ -195,7 +195,7 @@ public abstract class AbstractResizeLinksByCount {
 		
 		Count temp ;
 		for(Count<Link> c : this.origCounts.getCounts().values()){
-			temp = rescaledCounts.createAndAddCount(c.getLocId(), c.getCsId());
+			temp = rescaledCounts.createAndAddCount(c.getId(), c.getCsLabel());
 			temp.setCoord(c.getCoord());
 			for(Entry<Integer, Volume> ee : c.getVolumes().entrySet()){
 				temp.createVolume(ee.getKey().intValue(), ee.getValue().getValue() * this.scaleFactor);
@@ -233,7 +233,7 @@ public abstract class AbstractResizeLinksByCount {
 		attrib.put("oldCap", String.valueOf(this.oldNet.getLinks().get(link).getCapacity()));
 		attrib.put("newCap", String.valueOf(this.newNet.getLinks().get(link).getCapacity()));
 		attrib.put("diffCap", String.valueOf(this.newNet.getLinks().get(link).getCapacity() - this.oldNet.getLinks().get(link).getCapacity()));		
-		attrib.put("origId", ((LinkImpl)this.oldNet.getLinks().get(link)).getOrigId());
+		attrib.put("origId", NetworkUtils.getOrigId( ((Link)this.oldNet.getLinks().get(link)) ));
 		
 		this.modAttributes.put(link, attrib);
 	}

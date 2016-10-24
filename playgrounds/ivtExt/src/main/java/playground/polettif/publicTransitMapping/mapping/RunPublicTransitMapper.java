@@ -32,6 +32,7 @@ import playground.polettif.publicTransitMapping.config.CreateDefaultConfig;
  *
  * @author polettif
  */
+@Deprecated
 public class RunPublicTransitMapper {
 
 	/**

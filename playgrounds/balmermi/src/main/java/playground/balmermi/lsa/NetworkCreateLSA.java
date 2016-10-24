@@ -32,7 +32,7 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.misc.Time;
 
 public class NetworkCreateLSA {
@@ -43,7 +43,7 @@ public class NetworkCreateLSA {
 
 	private final String inputfolder = "../../input/";
 	private final String outputfolder = "../../output/";
-	private final NetworkImpl network;
+	private final Network network;
 	private final HashMap<Integer,Intersection> intersections = new HashMap<>();
 	private final HashMap<Id<Link>,HashSet<LSA>> lsalinklist = new HashMap<>();
 
@@ -51,7 +51,7 @@ public class NetworkCreateLSA {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public NetworkCreateLSA(NetworkImpl network) {
+	public NetworkCreateLSA(Network network) {
 		this.network = network;
 		this.readIntersections(this.inputfolder+"Knoten.txt");
 		this.readLSAs(this.inputfolder+"LSAs.txt");

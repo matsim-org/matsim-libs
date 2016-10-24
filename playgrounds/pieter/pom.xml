@@ -77,5 +77,10 @@
 			<artifactId>core</artifactId>
 			<version>3.0.1</version>
 		</dependency>
+        <dependency>
+        	<groupId>org.apache.directory.studio</groupId>
+        	<artifactId>org.apache.commons.collections</artifactId>
+        	<version>3.2.1</version>
+        </dependency>
 	</dependencies>
 </project>

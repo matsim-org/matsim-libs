@@ -5,9 +5,12 @@ import org.apache.log4j.Logger;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
- * @author dziemke, tthunig
+ * @author dziemke, tthunig, gthunig
  */
 public class GnuplotUtils {
 	public static final Logger log = Logger.getLogger(GnuplotUtils.class);
@@ -16,12 +19,10 @@ public class GnuplotUtils {
 		runGnuplotScript(pathToSpecificAnalysisDir, relativePathToGnuplotScript, "");
 	}
 
-	public static void runGnuplotScript(String pathToSpecificAnalysisDir, String relativePathToGnuplotScript, String gnuplotArgument){
+	public static void runGnuplotScript(String pathToSpecificAnalysisDir, String relativePathToGnuplotScript, String... gnuplotArguments){
 		/*
-			right now this only works with one argument
-			if you need to pass more then one change "String gnuplotArgument" to "String... gnuplotArguments"
-			also you have to think about a way to pass the multiple arguments dynamicly to the ProcessBuilder
-			(you could also just implement the specific case for yourself)
+			arguments will now be passed dynamically on windows
+			may work on mac as well, not tested
 
 			a fine testscript for gnuplot would be:
 				#!/usr/local/bin/gnuplot --persist
@@ -30,6 +31,8 @@ public class GnuplotUtils {
 				print "second argument    : ", ARG2
 				print "third argument     : ", ARG3
 				print "number of arguments: ", ARGC
+
+			[gthunig]
 		*/
 		log.info("Analysis directory is = " + pathToSpecificAnalysisDir);
 		log.info("Relative path from analysis directory to directory with gnuplot script is = " + relativePathToGnuplotScript);
@@ -47,12 +50,26 @@ public class GnuplotUtils {
 			
 			// If OS is Windows --- example (daniel r) // os.arch=amd64 // os.name=Windows 7 // os.version=6.1
 			if (osName.contains("Win") || osName.contains("win")) {
-				String[] args = {"one", "two", "three", "four", "five"};
-				processBuilder = new ProcessBuilder( "cmd", "/c", "cd", pathToSpecificAnalysisDir, "&", "gnuplot", "-c", relativePathToGnuplotScript, gnuplotArgument);
-			
+				List<String> commands = new ArrayList<>();
+				commands.add("cmd");
+				commands.add("/c");
+				commands.add("cd");
+				commands.add(pathToSpecificAnalysisDir);
+				commands.add("&");
+				commands.add("gnuplot");
+				commands.add("-c");
+				commands.add(relativePathToGnuplotScript);
+				Collections.addAll(commands, gnuplotArguments);
+				processBuilder = new ProcessBuilder(commands);
+
 			// If OS is Macintosh --- example (dominik) // os.arch=x86_64 // os.name=Mac OS X // os.version=10.10.2
 			} else if ( osName.contains("Mac") || osName.contains("mac") ) {
-				processBuilder = new ProcessBuilder("bash", "-c", "(cd " + pathToSpecificAnalysisDir + " && /usr/local/bin/gnuplot -c " + relativePathToGnuplotScript + " " + gnuplotArgument + ")");
+				String argumentsAsString = "";
+				for (String argument : gnuplotArguments) {
+					argumentsAsString += argument;
+					argumentsAsString += " ";
+				}
+				processBuilder = new ProcessBuilder("bash", "-c", "(cd " + pathToSpecificAnalysisDir + " && /usr/local/bin/gnuplot -c " + relativePathToGnuplotScript + " " + argumentsAsString + ")");
 			
 			// If OS is Linux --- example (benjamin) // os.arch=amd64 // os.name=Linux	// os.version=3.13.0-45-generic
 			} else if ( osName.contains("Lin") || osName.contains("lin") ) {
@@ -63,7 +80,8 @@ public class GnuplotUtils {
 			} else {
 				log.error("Not implemented for os.arch=" + System.getProperty("os.arch") );
 			}
-			
+
+			assert processBuilder != null;
 			Process process = processBuilder.start();
 			
 			/* Print command line infos and errors on console */

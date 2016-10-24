@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * Some comments:<ul>
@@ -57,6 +58,8 @@ import org.matsim.facilities.ActivityFacility;
 	private Coord coord = null;
 	private Id<Link> linkId = null;
 	private Id<ActivityFacility> facilityId = null;
+
+	private final Attributes attributes = new Attributes();
 	
 	/*package*/ ActivityImpl(final String type) {
 		this.type = type.intern();
@@ -151,7 +154,12 @@ import org.matsim.facilities.ActivityFacility;
 	public void setMaximumDuration(final double dur) {
 		this.dur = dur;
 	}
-	
+
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
+
 //	private boolean locked = false ;
 //	public final void setLocked() {
 //		this.locked = true ;

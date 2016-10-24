@@ -4,13 +4,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
@@ -84,10 +85,10 @@ public class ConstantSpeedAccessibilityContributionCalculator implements Accessi
 	@Override
 	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
 		// get the nearest link:
-		Link nearestLink = ((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(origin.getCoord());
+		Link nearestLink = NetworkUtils.getNearestLinkExactly(((Network)scenario.getNetwork()),origin.getCoord());
 
 		// captures the distance (as walk time) between the origin via the link to the node:
-		Distances distance = NetworkUtil.getDistances2Node(origin.getCoord(), nearestLink, fromNode);
+		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
 
 		// get stored network node (this is the nearest node next to an aggregated work place)
 		Node destinationNode = destination.getNearestNode();
@@ -96,17 +97,17 @@ public class ConstantSpeedAccessibilityContributionCalculator implements Accessi
 		// In the state found before modularization (june 15), this was anyway not consistent accross modes
 		// (different for PtMatrix), pointing to the fact that making this mode-specific might make sense.
 		// distance to road, and then to node:
-		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
+		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Intersection() / this.walkSpeedMeterPerHour;
 
 		// disutilities to get on or off the network
-		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distance.getDistancePoint2Road() * betaWalkTD);
+		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distance.getDistancePoint2Intersection() * betaWalkTD);
 		double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
 		double sumExpVjkWalk = destination.getSum();
 
 
-		double road2NodeBikeTime_h					= distance.getDistanceRoad2Node() / speedMeterPerHour;
+		double road2NodeBikeTime_h					= distance.getDistanceIntersection2Node() / speedMeterPerHour;
 		double travelDistance_meter = lcptTravelDistance.getTree().get(destinationNode.getId()).getCost(); 				// travel link distances on road network for bicycle and walk
-		double bikeDisutilityRoad2Node = (road2NodeBikeTime_h * betaTT) + (distance.getDistanceRoad2Node() * betaTD); // toll or money ???
+		double bikeDisutilityRoad2Node = (road2NodeBikeTime_h * betaTT) + (distance.getDistanceIntersection2Node() * betaTD); // toll or money ???
 		double bikeDisutility = ((travelDistance_meter/ speedMeterPerHour) * betaTT) + (travelDistance_meter * betaTD);// toll or money ???
 		// This is equivalent to the sum of the exponential of the utilities for all destinations (I had to write it on
 		// paper to check it is correct...)

@@ -44,7 +44,7 @@ public class AuxDischargingHandler
 
 
     @Override
-    public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e)
+    public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e)
     {
         if ( (e.getSimulationTime() + 1) % auxDischargeTimeStep == 0) {
             for (ElectricVehicle ev : eVehicles) {

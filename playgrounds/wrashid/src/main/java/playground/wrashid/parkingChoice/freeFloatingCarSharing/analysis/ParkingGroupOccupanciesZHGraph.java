@@ -34,7 +34,7 @@ public class ParkingGroupOccupanciesZHGraph {
 		events.addHandler(parkingGroupOccupanciesZH);
 
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(eventsFile);
+		reader.readFile(eventsFile);
 		parkingGroupOccupanciesZH.showPlot();
 	}
 

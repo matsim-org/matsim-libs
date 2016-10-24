@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.counts.Count;
@@ -59,9 +59,9 @@ public class CountsChecker {
 
 			if (maxVolume.getValue() / capacity < 0.5 || maxVolume.getValue() / capacity > 1.5) {
 				linkerrors++;
-				log.error("|" + links + "|" + capacity + "|" + maxVolume.getValue() + "|" + df.format(maxVolume.getValue() / capacity)  + "|" + count.getCsId() +"| ========== ERROR");
+				log.error("|" + links + "|" + capacity + "|" + maxVolume.getValue() + "|" + df.format(maxVolume.getValue() / capacity)  + "|" + count.getCsLabel() +"| ========== ERROR");
 			} else {
-				log.info("|" + links + "|" + capacity + "|" + maxVolume.getValue() + "|" + df.format(maxVolume.getValue() / capacity) + "|" + count.getCsId());
+				log.info("|" + links + "|" + capacity + "|" + maxVolume.getValue() + "|" + df.format(maxVolume.getValue() / capacity) + "|" + count.getCsLabel());
 			}
 		}
 		log.info("Number of errors : " + linkerrors + " of " + this.counts.getCounts().size() + " stations");

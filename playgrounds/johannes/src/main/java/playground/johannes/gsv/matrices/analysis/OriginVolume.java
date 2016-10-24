@@ -43,7 +43,7 @@ public class OriginVolume {
 	public static void main(String[] args) throws IOException {
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse("/home/johannes/sge/prj/matsim/run/874/output/matrices-averaged/miv.sym.xml");
+		reader.readFile("/home/johannes/sge/prj/matsim/run/874/output/matrices-averaged/miv.sym.xml");
 		
 		NumericMatrix m = reader.getMatrix();
 

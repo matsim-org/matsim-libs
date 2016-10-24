@@ -32,10 +32,10 @@ public class CarrierPlanXmlReaderV2 implements MatsimReader {
 	 * @param filename
 	 */
 	@Override
-	public void read(String filename) {
+	public void readFile(String filename) {
 		logger.info("read carrier plans");
 		this.delegate.setValidating(false);
-		this.delegate.parse(filename);
+		this.delegate.readFile(filename);
 		logger.info("done");
 
 	}

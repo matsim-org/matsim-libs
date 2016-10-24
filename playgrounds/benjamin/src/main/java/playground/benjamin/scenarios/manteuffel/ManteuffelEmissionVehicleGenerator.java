@@ -19,10 +19,7 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.manteuffel;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,13 +33,7 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.VehicleWriterV1;
-import org.matsim.vehicles.Vehicles;
-
-import playground.vsp.analysis.modules.ptLines2PaxAnalysis.TransitLines2PaxCounts;
+import org.matsim.vehicles.*;
 
 
 /**
@@ -122,7 +113,10 @@ public class ManteuffelEmissionVehicleGenerator {
 						vehicleAttributes.getHbefaSizeClass() + ";" + 
 						vehicleAttributes.getHbefaEmConcept(), VehicleType.class);
 				VehicleType vehicleType = VehicleUtils.getFactory().createVehicleType(vehTypeId);
-				
+
+				// either set following or use switch in EmissionConfigGroup to use vehicle id for vehicle description. Amit sep 2016
+				vehicleType.setDescription(vehTypeId.toString());
+
 				if(!(outputVehicles.getVehicleTypes().containsKey(vehTypeId))){
 					outputVehicles.addVehicleType(vehicleType);
 				} else {
@@ -139,7 +133,7 @@ public class ManteuffelEmissionVehicleGenerator {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
 		eventsManager.addHandler(new ManteuffelLinkLeaveHandler(outputVehicles, transitLines));
-		reader.parse(eventsFile);
+		reader.readFile(eventsFile);
 		
 		//=== TODO: fix this?
 //		List<String> nonCondideredPersons = new ArrayList<>();

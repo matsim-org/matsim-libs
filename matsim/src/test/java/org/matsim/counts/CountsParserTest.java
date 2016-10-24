@@ -55,7 +55,7 @@ public class CountsParserTest extends MatsimTestCase {
 		reader.startElement("", "count", "count", attributeFactory.createCountAttributes());
 
 		Count count = counts.getCount(Id.create(1, Link.class));
-		assertEquals("Count attribute setting failed", "testNr", count.getCsId());
+		assertEquals("Count attribute setting failed", "testNr", count.getCsLabel());
 		assertNull("Count attributes x,y should not be set", count.getCoord());
 
 		reader.endElement("", "count", "count");

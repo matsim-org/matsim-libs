@@ -32,9 +32,9 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.CausedDelayAnalyzer;
 import playground.agarwalamit.analysis.congestion.CrossMarginalCongestionEventsWriter;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 /**
  * @author amit
@@ -42,16 +42,16 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 public class CausedDelayUserGroup {
 
-	private String outputDir;
+	private final String outputDir;
 	private  double marginalUtlMoney;
 	private  double marginalUtlPerformingSec;
 	private  double marginalUtlTravelingCarSec;
 	private  double marginalUtlOfTravelTime ;
 	private  double vttsCar ;
-	private SortedMap<UserGroup, Double> userGroupToDelays;
+	private SortedMap<MunichUserGroup, Double> userGroupToDelays;
 	private Map<Id<Person>, Double> personId2CausingDelay;
 	private Scenario scenario;
-	private ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private final MunichPersonFilter pf = new MunichPersonFilter();
 
 	public CausedDelayUserGroup(final String outputDir) {
 		this.outputDir = outputDir;
@@ -98,7 +98,7 @@ public class CausedDelayUserGroup {
 		}
 
 		for(Id<Person> p : personId2CausingDelay.keySet()){
-			UserGroup ug = pf.getUserGroupFromPersonId(p);
+			MunichUserGroup ug = pf.getMunichUserGroupFromPersonId(p);
 			double delaySoFar = this.userGroupToDelays.get(ug);
 			this.userGroupToDelays.put(ug, delaySoFar+this.personId2CausingDelay.get(p));
 		}
@@ -110,7 +110,7 @@ public class CausedDelayUserGroup {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try{
 			writer.write("userGroup \t causedDelaySeconds \t causedDelaysMoney \n");
-			for(UserGroup ug:this.userGroupToDelays.keySet()){
+			for(MunichUserGroup ug:this.userGroupToDelays.keySet()){
 				writer.write(ug+"\t"+this.userGroupToDelays.get(ug)+"\t"+this.userGroupToDelays.get(ug)*this.vttsCar+"\n");
 			}
 			writer.close();
@@ -120,10 +120,10 @@ public class CausedDelayUserGroup {
 	}
 
 	private void init(final String runCase){
-		this.userGroupToDelays  = new TreeMap<UserGroup, Double>();
-		this.personId2CausingDelay = new HashMap<Id<Person>, Double>();
+		this.userGroupToDelays  = new TreeMap<>();
+		this.personId2CausingDelay = new HashMap<>();
 
-		for (UserGroup ug:UserGroup.values()) {
+		for (MunichUserGroup ug : MunichUserGroup.values()) {
 			this.userGroupToDelays.put(ug, 0.0);
 		}
 

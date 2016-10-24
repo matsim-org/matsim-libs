@@ -19,11 +19,10 @@
 
 package org.matsim.contrib.transEnergySim.vehicles.api;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.MathLib;
 import org.matsim.contrib.transEnergySim.agents.VehicleAgent;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.stationary.ChargingPlugType;
@@ -43,6 +42,7 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 	 */
 	protected double usableBatteryCapacityInJoules;
 	private boolean ignoreOverCharging = false;
+	private static double overchargingErrorMargin=1;
 
 	/**
 	 * state of charge
@@ -55,13 +55,13 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 	protected Id<Vehicle> vehicleId;
 	private boolean isBEV = true; //TODO set this based on vehicle type
 	private Double maxDischargingPowerInKW, maxLevel2ChargingPowerInKW, maxLevel3ChargingPowerInKW;
-	private HashSet<ChargingPlugType> compatiblePlugTypes;
+	private LinkedHashSet<ChargingPlugType> compatiblePlugTypes;
 	private VehicleAgent agent;
 
 	public double getRequiredEnergyInJoules() {
 		double requiredEnergyInJoules = getUsableBatteryCapacityInJoules() - socInJoules;
 
-		if (!MathLib.equals(requiredEnergyInJoules, 0, GeneralLib.EPSILON * 100) && requiredEnergyInJoules < 0) {
+		if (!MathLib.equals(requiredEnergyInJoules, 0, overchargingErrorMargin * 100) && requiredEnergyInJoules < 0) {
 			DebugLib.stopSystemAndReportInconsistency("soc bigger than battery size");
 		}
 
@@ -86,7 +86,7 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 	public double addEnergyToVehicleBattery(double energyChargeInJoule) {
 		if (!ignoreOverCharging) {
 			socInJoules += energyChargeInJoule;
-			if (!MathLib.equals(socInJoules, getUsableBatteryCapacityInJoules(), GeneralLib.EPSILON * 100) && socInJoules > getUsableBatteryCapacityInJoules()) {
+			if (!MathLib.equals(socInJoules, getUsableBatteryCapacityInJoules(), overchargingErrorMargin * 100) && socInJoules > getUsableBatteryCapacityInJoules()) {
 				DebugLib.stopSystemAndReportInconsistency("the car has been overcharged soc(" + socInJoules + ") > battery capacity (" + getUsableBatteryCapacityInJoules() + ")");
 			}
 		}
@@ -121,20 +121,23 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 			case 1:
 				return 1.5;
 			case 2:
-				return 6.7;
+				return Math.min(getMaxLevel2ChargingPowerInKW(),plugType.getChargingPowerInKW());
 			case 3:
-				return 50;
+				return Math.min(getMaxLevel3ChargingPowerInKW(),plugType.getChargingPowerInKW());
 		}
 		return 0.0;
+	}
+	public double getRemainingRangeInMiles() {
+		return getRemainingRangeInMeters()/1609.34;
 	}
 	public double getRemainingRangeInMeters() {
 		return this.socInJoules / this.electricDriveEnergyConsumptionModel.getEnergyConsumptionRateInJoulesPerMeter();
 	}
 	public boolean isBEV() {
-		return this.isBEV;
+		return this instanceof BatteryElectricVehicle;
 	}
 	public void setChargingFields(String vehicleTypeName, Double maxDischargingPowerInKW,
-			Double maxLevel2ChargingPowerInKW, Double maxLevel3ChargingPowerInKW, HashSet<ChargingPlugType> compatiblePlugTypes) {
+			Double maxLevel2ChargingPowerInKW, Double maxLevel3ChargingPowerInKW, LinkedHashSet<ChargingPlugType> compatiblePlugTypes) {
 		this.maxDischargingPowerInKW = maxDischargingPowerInKW;
 		this.maxLevel2ChargingPowerInKW = maxLevel2ChargingPowerInKW;
 		this.maxLevel3ChargingPowerInKW = maxLevel3ChargingPowerInKW;
@@ -153,11 +156,11 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 		return maxLevel2ChargingPowerInKW;
 	}
 
-	public Double getMaxLevel3CharginPowerInKW() {
+	public Double getMaxLevel3ChargingPowerInKW() {
 		return maxLevel3ChargingPowerInKW;
 	}
 
-	public HashSet<ChargingPlugType> getCompatiblePlugTypes() {
+	public LinkedHashSet<ChargingPlugType> getCompatiblePlugTypes() {
 		return compatiblePlugTypes;
 	}
 

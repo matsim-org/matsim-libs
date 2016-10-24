@@ -29,7 +29,7 @@ import org.apache.velocity.context.Context;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.michalm.jtrrouter.*;

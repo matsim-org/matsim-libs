@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import playground.boescpa.analysis.spatialCutters.CirclePointCutter;
 import playground.boescpa.analysis.spatialCutters.NoCutter;
 
@@ -123,6 +124,16 @@ public class TestSpatialTripCutter {
 		throw new RuntimeException("not implemented") ;
 	}
 
+	@Override
+	public void setCoord(Coord coord) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+        @Override
+        public Attributes getAttributes() {
+        	throw new UnsupportedOperationException();
+        }
     }
     private class DummyLink implements Link {
         private final Node to;
@@ -228,6 +239,22 @@ public class TestSpatialTripCutter {
             return null;
         }
 
+	@Override
+	public double getFlowCapacityPerSec() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public double getFlowCapacityPerSec(double time) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+        @Override
+        public Attributes getAttributes() {
+            throw new UnsupportedOperationException();
+        }
     }
 
 }

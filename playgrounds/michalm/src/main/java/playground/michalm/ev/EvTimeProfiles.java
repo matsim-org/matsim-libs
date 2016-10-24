@@ -19,31 +19,36 @@
 
 package playground.michalm.ev;
 
-import java.util.*;
-
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.taxi.util.stats.TimeProfiles;
+import org.matsim.contrib.util.histogram.UniformHistogram;
+
+import com.google.common.collect.Iterables;
 
 import playground.michalm.ev.data.*;
 
 
 public class EvTimeProfiles
 {
-    public static ProfileCalculator createUnderchargedVehiclesCounter(final EvData evData,
-            final double relativeSoc)
+    public static ProfileCalculator createSocHistogramCalculator(final EvData evData)
     {
-        return new TimeProfiles.SingleValueProfileCalculator("undercharged") {
+        String[] header = { "0", "0.1+", "0.2+", "0.3+", "0.4+", "0.5+", "0.6+", "0.7+", "0.8+",
+                "0.9+" };
+        return new TimeProfiles.MultiValueProfileCalculator(header) {
             @Override
-            public String calcValue()
+            public String[] calcValues()
             {
-                int count = 0;
+                UniformHistogram histogram = new UniformHistogram(0.1, header.length);
                 for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
-                    if (ev.getBattery().getSoc() < relativeSoc * ev.getBattery().getCapacity()) {
-                        count++;
-                    }
+                    histogram.addValue(ev.getBattery().getSoc() / ev.getBattery().getCapacity());
                 }
-                return count + "";
+
+                String[] values = new String[header.length];
+                for (int b = 0; b < header.length; b++) {
+                    values[b] = histogram.getCount(b) + "";
+                }
+                return values;
             }
         };
     }
@@ -59,29 +64,38 @@ public class EvTimeProfiles
                 for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
                     mean.increment(ev.getBattery().getSoc());
                 }
-                return (mean.getResult() / UnitConversionRatios.J_PER_kWh) + "";//print out in [kWh]
+                return String.format("%.3f", mean.getResult() / EvUnitConversions.J_PER_kWh);//print out in [kWh]
             }
         };
     }
 
 
+    private static final int MAX_VEHICLE_COLUMNS = 50;
+
+
     public static ProfileCalculator createIndividualSocCalculator(final EvData evData)
     {
-        List<String> ids = new ArrayList<>(evData.getElectricVehicles().size());
-        for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
-            ids.add(ev.getId() + "");
+        int columns = Math.min(evData.getElectricVehicles().size(), MAX_VEHICLE_COLUMNS);
+        Iterable<ElectricVehicle> selectedEvs = Iterables
+                .limit(evData.getElectricVehicles().values(), columns);
+
+        String[] header = new String[columns];
+        int col = 0;
+        for (ElectricVehicle ev : selectedEvs) {
+            header[col++] = ev.getId() + "";
         }
-        String[] header = ids.toArray(new String[ids.size()]);
 
         return new TimeProfiles.MultiValueProfileCalculator(header) {
             @Override
             public String[] calcValues()
             {
-                List<String> vals = new ArrayList<>(evData.getElectricVehicles().size());
-                for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
-                    vals.add( (ev.getBattery().getSoc() / UnitConversionRatios.J_PER_kWh) + "");
+                String[] vals = new String[columns];
+                int col = 0;
+                for (ElectricVehicle ev : selectedEvs) {
+                    vals[col++] = String.format("%.3f",
+                            ev.getBattery().getSoc() / EvUnitConversions.J_PER_kWh);//print out in [kWh]
                 }
-                return vals.toArray(new String[vals.size()]);
+                return vals;
             }
         };
     }

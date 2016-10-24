@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -43,7 +43,7 @@ public class NotWorkingCottbusOsmSmallNetworkGenerator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		OsmNetworkReader osmReader = new OsmNetworkReader(network,
 				TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,TransformationFactory.WGS84_UTM33N),  false);
 		osmReader.setKeepPaths(false);

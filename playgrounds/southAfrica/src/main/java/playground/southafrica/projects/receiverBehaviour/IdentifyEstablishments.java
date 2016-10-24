@@ -42,7 +42,7 @@ public class IdentifyEstablishments {
 		String rFile = args[1];
 		
 		DigicorePathDependentNetworkReader_v1 nr = new DigicorePathDependentNetworkReader_v1();
-		nr.parse(networkFile);
+		nr.readFile(networkFile);
 
 		/* Set up the three shopping area locations. */
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_SA_Albers");

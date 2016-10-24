@@ -23,6 +23,7 @@
 package org.matsim.core.router.old;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -41,7 +42,9 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.Arrays;
@@ -49,10 +52,13 @@ import java.util.List;
 
 public class PlanRouterTest {
 
+    @Rule
+    public MatsimTestUtils utils = new MatsimTestUtils();
+
     @Test
     public void passesVehicleFromOldPlan() {
-        final Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
-        config.plans().setInputFile("test/scenarios/equil/plans1.xml");
+        final Config config = ConfigUtils.loadConfig(IOUtils.newUrl(utils.getTestScenarioURL("equil"), "config.xml"));
+        config.plans().setInputFile("plans1.xml");
         final Scenario scenario = ScenarioUtils.loadScenario(config);
         com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
             @Override
@@ -80,8 +86,8 @@ public class PlanRouterTest {
 
     @Test
     public void keepsVehicleIfTripRouterUsesOneAlready() {
-        final Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
-        config.plans().setInputFile("test/scenarios/equil/plans1.xml");
+        final Config config = ConfigUtils.loadConfig(IOUtils.newUrl(utils.getTestScenarioURL("equil"), "config.xml"));
+        config.plans().setInputFile("plans1.xml");
         final Scenario scenario = ScenarioUtils.loadScenario(config);
         final DijkstraFactory leastCostAlgoFactory = new DijkstraFactory();
         final OnlyTimeDependentTravelDisutilityFactory disutilityFactory = new OnlyTimeDependentTravelDisutilityFactory();

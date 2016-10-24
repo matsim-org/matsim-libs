@@ -75,7 +75,7 @@ public class MyUserBenefitsAnalyzer extends AbstractAnalysisModule{
 	
 	@Override
 	public List<EventHandler> getEventHandler() {
-		return new LinkedList<EventHandler>();
+		return new LinkedList<>();
 	}
 
 	@Override

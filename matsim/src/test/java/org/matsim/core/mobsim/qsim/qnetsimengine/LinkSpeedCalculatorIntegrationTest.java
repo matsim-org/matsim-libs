@@ -68,7 +68,6 @@ import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl.Builder;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -140,7 +139,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 						this.mobsimTimer = mobsimTimer1 ;
 						this.netsimEngine = netsimEngine1 ;
 
-						double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
+						double effectiveCellSize = ((Network) network).getEffectiveCellSize() ;
 
 						SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 						AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
@@ -223,7 +222,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 						this.mobsimTimer = mobsimTimer1 ;
 						this.netsimEngine = netsimEngine1 ;
 
-						double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
+						double effectiveCellSize = ((Network) network).getEffectiveCellSize() ;
 
 						SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 						AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);

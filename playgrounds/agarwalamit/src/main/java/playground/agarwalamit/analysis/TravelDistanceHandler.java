@@ -49,11 +49,11 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.GeometryUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 /**
  * @author amit
@@ -62,7 +62,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private static final Logger LOGGER = Logger.getLogger(TravelDistanceHandler.class.getName());
 	private final Vehicle2DriverEventHandler veh2DriverDelegate = new Vehicle2DriverEventHandler();
-	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private final MunichPersonFilter pf = new MunichPersonFilter();
 
 	private final double timeBinSize ;
 	private final Network network;
@@ -115,7 +115,7 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 	}
 
 	public static void main(String[] args) {
-		ExtendedPersonFilter pf = new ExtendedPersonFilter();
+		MunichPersonFilter pf = new MunichPersonFilter();
 		String scenario = "ei";
 		String eventsFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/ITERS/it.1500/1500.events.xml.gz";
 		String configFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/output_config.xml.gz";
@@ -134,16 +134,15 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 
 		for(int ii=0; ii<areas.length;ii++) {
 			SortedMap<String, Double> usrGrp2Dist = new TreeMap<>();
-			for ( UserGroup ug : UserGroup.values() ) {
-				String myUg = pf.getMyUserGroup(ug);
-				if(area2usrGrp2Dist.containsKey(myUg)) continue;
+			for ( MunichUserGroup ug : MunichUserGroup.values() ) {
+				if(area2usrGrp2Dist.containsKey(ug.toString())) continue;
 
 				EventsManager em = EventsUtils.createEventsManager();
-				TravelDistanceHandler tdh = new TravelDistanceHandler(simEndTime, 1, network, areas[ii],  myUg);
+				TravelDistanceHandler tdh = new TravelDistanceHandler(simEndTime, 1, network, areas[ii],  ug.toString());
 				em.addHandler(tdh);
 				MatsimEventsReader reader = new MatsimEventsReader(em);
 				reader.readFile(eventsFile);
-				usrGrp2Dist.put(myUg, MapUtils.doubleValueSum(tdh.getTimeBin2TravelDist() ) );
+				usrGrp2Dist.put(ug.toString(), MapUtils.doubleValueSum(tdh.getTimeBin2TravelDist() ) );
 			}
 			usrGrp2Dist.put("allPersons", MapUtils.doubleValueSum(usrGrp2Dist));
 			area2usrGrp2Dist.put(areasName[ii], usrGrp2Dist);
@@ -179,11 +178,11 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 
 		if(this.ug!=null){ 
 			if ( ! this.zonalGeoms.isEmpty() ) { // filtering for both
-				if ( this.pf.getMyUserGroupFromPersonId(driverId).equals(ug)  && GeometryUtils.isLinkInsideGeometries(zonalGeoms, link)   ) {
+				if ( this.pf.getUserGroupAsStringFromPersonId(driverId).equals(ug)  && GeometryUtils.isLinkInsideGeometries(zonalGeoms, link)   ) {
 					dist = link.getLength();
 				}
 			} else { // filtering for user group only
-				if ( this.pf.getMyUserGroupFromPersonId(driverId).equals(ug)  ) {
+				if ( this.pf.getUserGroupAsStringFromPersonId(driverId).equals(ug)  ) {
 					dist = link.getLength();
 				}
 			}
@@ -232,7 +231,7 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 	 * @return timeBin to toll values for whole population
 	 */
 	public SortedMap<Double,Double> getTimeBin2TravelDist(){
-		SortedMap<Double, Double> timebin2Dist = new TreeMap<Double, Double>();
+		SortedMap<Double, Double> timebin2Dist = new TreeMap<>();
 		for (double d :this.timeBin2personId2travelledDistance.keySet()){
 			timebin2Dist.put(d, MapUtils.doubleValueSum(timeBin2personId2travelledDistance.get(d)));
 		}

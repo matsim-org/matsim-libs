@@ -109,7 +109,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		this.plansTranslator = new PlansTranslatorBasedOnEvents(scenario);
 		this.eventsManager.addHandler(plansTranslator);
 
-		this.calibrator = CadytsBuilder.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.calibrationCounts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class);
+		this.calibrator = new CadytsBuilderImpl().buildCalibratorAndAddMeasurements(scenario.getConfig(), this.calibrationCounts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class);
 	}
 
 	@Override

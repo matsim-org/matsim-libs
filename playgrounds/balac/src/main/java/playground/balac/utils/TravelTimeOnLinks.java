@@ -12,7 +12,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -30,7 +30,7 @@ public class TravelTimeOnLinks {
         
         events.addHandler(eventHandler);
         EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-        reader.parse(eventsFile);
+        reader.readFile(eventsFile);
 		
         
        System.out.println(eventHandler.getTravelTime1() + " " + eventHandler.getTravelTime2() + " " +eventHandler.getTravelTime3());

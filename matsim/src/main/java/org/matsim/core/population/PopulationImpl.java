@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author nagel
@@ -36,6 +37,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 /* deliberately package */ class PopulationImpl implements Population, Lockable {
 	private static final Logger log = Logger.getLogger(PopulationImpl.class);
 
+	private final Attributes attributes = new Attributes();
 	private String name;
 	private Map<Id<Person>, Person> persons = new LinkedHashMap<>();
 	private final PopulationFactory populationFactory;
@@ -110,4 +112,13 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 		log.info(" person # " + this.counter);
 	}
 
+	/**
+	 * Attributes of the population itself. Can be used as metadata, for instance to store source of data,
+	 * date of conversion, authors, sampling rate, or whatever is felt useful
+	 * @return
+	 */
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
 }

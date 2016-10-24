@@ -26,7 +26,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.MutableScenario;
-import org.matsim.lanes.data.v20.Lanes;
+import org.matsim.lanes.data.Lanes;
 import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -61,7 +61,7 @@ public class DgRoederGershensonControllerListener implements SignalsControllerLi
 
 		
 		//TODO init gershenson controller and sensor manager here
-		DgSensorManager sensorManager = new DgSensorManager(scenario.getNetwork());
+		DgSensorManager sensorManager = new DgSensorManager(scenario);
 		event.getServices().getEvents().addHandler(sensorManager);
 		for (SignalSystem ss : this.signalManager.getSignalSystems().values()){
 			if (ss.getSignalController() instanceof DgRoederGershensonController){

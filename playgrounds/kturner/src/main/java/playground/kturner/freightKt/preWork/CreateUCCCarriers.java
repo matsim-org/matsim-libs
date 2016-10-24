@@ -80,9 +80,9 @@ class CreateUCCCarriers {
 
 		//Carrier-Stuff
 //		Carriers carriers = new Carriers() ;
-		new CarrierPlanXmlReaderV2(carriers).read(CARRIERFILE) ;
+		new CarrierPlanXmlReaderV2(carriers).readFile(CARRIERFILE) ;
 //		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-		new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPEFILE) ;
+		new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPEFILE) ;
 
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes) ;
 
@@ -165,7 +165,7 @@ class CreateUCCCarriers {
 		try {
 //			RoadPricingConfigGroup rpConfig = (RoadPricingConfigGroup) config.getModule(RoadPricingConfigGroup.GROUP_NAME) ;
 //			rpConfig.setTollLinksFile("F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Berlin_Szenario/toll_distance_test_kt.xml");
-			rpReader.parse(TOLLFILE);
+			rpReader.readFile(TOLLFILE);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

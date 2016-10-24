@@ -46,7 +46,7 @@ public class ExtractActivityDurations {
 		final Handler handler = new Handler( outFile );
 		final EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler( handler );
-		new EventsReaderXMLv1( events ).parse( eventFile );
+		new EventsReaderXMLv1( events ).readFile( eventFile );
 		handler.close();
 	}
 

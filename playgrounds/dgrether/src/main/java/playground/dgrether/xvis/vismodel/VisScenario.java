@@ -96,7 +96,14 @@ public class VisScenario {
 			@Override
 			public Coord transform(Coord c) {
 				final double y = -(c.getY() + offsetY);
-				return new Coord(c.getX() + offsetX, y);
+				
+				double elevation;
+				try{
+					elevation = c.getZ();
+					return new Coord(c.getX() + offsetX, y, elevation);
+				} catch (Exception e){
+					return new Coord(c.getX() + offsetX, y);
+				}
 			}
 		};
 	}

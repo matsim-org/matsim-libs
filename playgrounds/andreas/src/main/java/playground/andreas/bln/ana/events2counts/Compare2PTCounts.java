@@ -12,11 +12,12 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.counts.Counts;
-import org.matsim.pt.counts.PtCountSimComparisonKMLWriter;
+import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -294,8 +295,12 @@ public class Compare2PTCounts extends Events2PTCounts{
 		}
 
 
-		PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(boardCountSimCompList, alightCountSimCompList, occupancyCountSimCompList,
-				TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84), boardCounts, alightCounts, occupancyCounts);
+		final CoordinateTransformation coordTransform = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84);
+//		PtCountSimComparisonKMLWriter kmlWriter2 = new PtCountSimComparisonKMLWriter(boardCountSimCompList, alightCountSimCompList, occupancyCountSimCompList,
+//				coordTransform, boardCounts, alightCounts, occupancyCounts);
+		
+		CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(occupancyCountSimCompList, occupancyCounts, coordTransform, "ptCountsOccup") ;
+
 		kmlWriter.setIterationNumber(0);
 		kmlWriter.writeFile(this.outDir + "out.kmz");
 

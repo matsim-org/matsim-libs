@@ -85,6 +85,7 @@ public class ControlerTest {
 	public static Collection<Object> parameterObjects () {
 		Object [] capacityUpdates = new Object [] { false, true };
 		return Arrays.asList(capacityUpdates);
+		// yyyy I am not sure why it is doing this ... it is necessary to do this around the qsim, but why here?  kai, aug'16
 	}
 	
 	@Test
@@ -146,7 +147,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testTravelTimeCalculation() {
-		Config config = this.utils.loadConfig(null);
+		Config config = this.utils.loadConfig((String) null);
 		Fixture f = new Fixture(config);
 
 		/* Create 2 persons driving from link 1 to link 3, both starting at the
@@ -246,7 +247,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testSetScoringFunctionFactory() {
-		final Config config = this.utils.loadConfig(null);
+		final Config config = this.utils.loadConfig((String) null);
 		config.controler().setLastIteration(0);
 
 		config.qsim().setUsingFastCapacityUpdate( this.isUsingFastCapacityUpdate );
@@ -294,7 +295,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testCalcMissingRoutes() {
-		Config config = this.utils.loadConfig(null);
+		Config config = this.utils.loadConfig((String) null);
 		Fixture f = new Fixture(config);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
@@ -383,7 +384,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testCalcMissingActLinks() {
-		Config config = this.utils.loadConfig(null);
+		Config config = this.utils.loadConfig((String) null);
 		Fixture f = new Fixture(config);
 
 		/* Create a person with two plans, driving from link 1 to link 3, starting at 7am.  */
@@ -503,9 +504,11 @@ public class ControlerTest {
 		final Controler controler = new Controler(config);
 		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
 				3 == controler.getConfig().controler().getWriteEventsInterval());
+
 		controler.getConfig().controler().setWriteEventsInterval(3);
 		assertEquals(3, controler.getConfig().controler().getWriteEventsInterval());
-        controler.getConfig().controler().setCreateGraphs(false);
+
+		controler.getConfig().controler().setCreateGraphs(false);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

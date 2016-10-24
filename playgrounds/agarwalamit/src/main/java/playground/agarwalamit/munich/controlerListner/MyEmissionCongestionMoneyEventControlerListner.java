@@ -43,18 +43,18 @@ import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandle
  */
 
 public class MyEmissionCongestionMoneyEventControlerListner implements StartupListener, IterationEndsListener{
-	public static Logger log =Logger.getLogger(MyEmissionCongestionMoneyEventControlerListner.class);
+	public static final Logger log =Logger.getLogger(MyEmissionCongestionMoneyEventControlerListner.class);
 
 	private Map<Id<Person>, Double> pId2ColdEmissionsCosts = new HashMap<>();
 	private Map<Id<Person>, Double> pId2WarmEmissionsCosts= new HashMap<>();
 	private Map<Id<Person>, Double> pId2CongestionCosts= new HashMap<>();
 	private Map<Id<Person>, Double> pId2Tolls= new HashMap<>();
 	private MutableScenario scenario;
-	private EmissionCostModule emissionCostModule;
+	private final EmissionCostModule emissionCostModule;
 
 	private MoneyEventHandler moneyHandler;
 	private ExperiencedDelayHandler congestionCostHandler;
-	private EmissionModule emissionModule;
+	private final EmissionModule emissionModule;
 	private EmissionCostsCollector emissCostHandler;
 	private double vttsCar;
 	
@@ -70,7 +70,7 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 
 		this.emissCostHandler = new EmissionCostsCollector(emissionCostModule);
 		this.moneyHandler = new MoneyEventHandler();
-		this.congestionCostHandler = new ExperiencedDelayHandler(scenario,1, this.scenario.getConfig().qsim().getEndTime());
+		this.congestionCostHandler = new ExperiencedDelayHandler(scenario,1);
 
 		event.getServices().getEvents().addHandler(congestionCostHandler);
 		event.getServices().getEvents().addHandler(moneyHandler);

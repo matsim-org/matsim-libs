@@ -46,7 +46,7 @@ public class ClonePopulation {
 		parser.setValidating(false);
 	
 		logger.info("Loading persons...");
-		parser.parse(args[0]);
+		parser.readFile(args[0]);
 		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 		

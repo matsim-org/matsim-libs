@@ -53,6 +53,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.CountSimComparison;
+import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.graphs.BiasErrorGraph;
 import org.matsim.counts.algorithms.graphs.BoxPlotErrorGraph;
 import org.matsim.counts.algorithms.graphs.CountsGraph;
@@ -106,12 +107,11 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * constant for the file suffix of graphs
 	 */
 	private static final String PNG = ".png";
-	/**
-	 * constant for the file name of the CountsSimRealPerHourGraphs
-	 */
-	private static final String SIMREALGRAPHNAME = "countsSimRealPerHour_";
+	private final String graphname ;
 
 	private final Network network;
+	private final Counts counts ;
+	
 	private CoordinateTransformation coordTransform = null;
 	private ObjectFactory kmlObjectFactory = new ObjectFactory();
 	/**
@@ -140,15 +140,25 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	private static final Logger log = Logger.getLogger(CountSimComparisonKMLWriter.class);
 
 	/**
-	 * Sets the data to the fields of this class
-	 * @param countSimCompList
-	 * @param network
-	 * @param coordTransform
+	 * Sets the data to the fields of this class.  We either accept "network" or "counts" to localize the counting stations.
 	 */
 	public CountSimComparisonKMLWriter(final List<CountSimComparison> countSimCompList, final Network network, final CoordinateTransformation coordTransform) {
 		super(countSimCompList);
 		this.network = network;
+		this.counts = null ;
 		this.coordTransform = coordTransform;
+		this.graphname = "countsSimRealPerHour_";
+	}
+	/**
+	 * Sets the data to the fields of this class.  We either accept "network" or "counts" to localize the counting stations.
+	 * @param graphname TODO
+	 */
+	public CountSimComparisonKMLWriter(final List<CountSimComparison> countSimCompList, final Counts counts, final CoordinateTransformation coordTransform, String graphname) {
+		super(countSimCompList);
+		this.network = null ;
+		this.counts = counts ;
+		this.coordTransform = coordTransform;
+		this.graphname = graphname ;
 	}
 
 	/**
@@ -262,20 +272,32 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(simRealFolder));
 
 		// error graphs and awtv graph
-		ScreenOverlayType errorGraph = createBiasErrorGraph(filename);
-		errorGraph.setVisibility(Boolean.TRUE);
-		this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(errorGraph));
-
-		errorGraph = createBoxPlotErrorGraph();
-		if (errorGraph != null) {
-			errorGraph.setVisibility(Boolean.FALSE);
+		{
+			ScreenOverlayType errorGraph = createBiasErrorGraph(filename);
+			errorGraph.setVisibility(Boolean.TRUE);
 			this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(errorGraph));
 		}
-
-		ScreenOverlayType awtv=this.createAWTVGraph();
-		if (awtv != null) {
-			awtv.setVisibility(Boolean.FALSE);
-			this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(awtv));
+		{
+			ScreenOverlayType errorGraph = createBoxPlotErrorGraph();
+			if (errorGraph != null) {
+				errorGraph.setVisibility(Boolean.FALSE);
+				this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(errorGraph));
+			}
+		}
+		{
+			ScreenOverlayType awtv = null ;
+			try {
+				awtv=this.createAWTVGraph();
+			} catch ( Exception ee ) {
+				log.warn("generating awtv (average weekday traffic volumes) graph failed; printing stacktrace but continuing anyways ...") ;
+				for ( int ii=0 ; ii<ee.getStackTrace().length ; ii++ ) {
+					log.info( ee.getStackTrace()[ii].toString() );
+				}
+			}
+			if (awtv != null) {
+				awtv.setVisibility(Boolean.FALSE);
+				this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(awtv));
+			}
 		}
 
 		// link graphs
@@ -373,23 +395,22 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @param folder The folder to which to add the data in the kml-file.
 	 */
 	private void writeLinkData(final List<CountSimComparison> countSimComparisonList, final FolderType folder) {
-		Id<Link> linkid;
-		Link link;
 		PlacemarkType placemark;
 		double relativeError;
-		Coord coord;
 		PointType point;
 		for (CountSimComparison csc : countSimComparisonList) {
+			Id itemId = csc.getId() ;
+			Coord coord = null;
 			
-			// yyyy going via the link does not seem that helpful when the count in fact has a coordinate! kai, dec'13
-			
-			linkid = csc.getId();
-			link = this.network.getLinks().get(linkid);
-
-			coord = this.coordTransform.transform(calculatePlacemarkPosition(link));
+			if ( counts==null ) {			
+				Link link = this.network.getLinks().get(itemId);
+				coord = this.coordTransform.transform(calculatePlacemarkPosition(link));
+			} else {
+				coord = this.coordTransform.transform(counts.getCount( itemId ).getCoord()) ;
+			}
 			relativeError = csc.calculateRelativeError();
 			// build placemark
-			placemark = createPlacemark(linkid.toString(), csc, relativeError, csc.getHour());
+			placemark = createPlacemark(itemId.toString(), csc, relativeError, csc.getHour());
 			point = kmlObjectFactory.createPointType();
 			point.getCoordinates().add(Double.toString(coord.getX()) + "," + Double.toString(coord.getY()) + ",0.0");
 			placemark.setAbstractGeometryGroup(kmlObjectFactory.createPoint(point));
@@ -514,7 +535,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 
 		try {
 			//add the file to the kmz
-			filename = new StringBuffer(SIMREALGRAPHNAME);
+			filename = new StringBuffer(graphname);
 			filename.append(Integer.toString(timestep));
 			filename.append(PNG);
 
@@ -669,7 +690,11 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	}
 
 	/**
-	 * Creates the CountsSimReal24Graph for all the data
+	 * Creates the CountsSimReal24Graph for all the data. AWTV = average weekday traffic volumes.
+	 * <br/><br/>
+	 * Notes:<ul>
+	 * <li> I think that "weekday" means "day-of-week", i.e. the method does not care when it is sunday. kai, sep'16
+	 * </ul>
 	 * @param visible true if initially visible
 	 * @return the ScreenOverlay Feature
 	 */
@@ -715,5 +740,6 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	private void finish() {
 		this.writer.writeMainKml(this.mainKml);
 		this.writer.close();
+		log.info("DONE with writing kml file.");
 	}
 }

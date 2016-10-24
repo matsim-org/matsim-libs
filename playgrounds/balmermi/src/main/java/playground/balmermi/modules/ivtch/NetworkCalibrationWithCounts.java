@@ -26,8 +26,8 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -55,7 +55,7 @@ public class NetworkCalibrationWithCounts {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void writeGTFfile(final NetworkImpl network) {
+	private final void writeGTFfile(final Network network) {
 		try {
 //			double capperiod = network.getCapacityPeriod();
 			FileWriter fw = new FileWriter(this.gtf_outfile);
@@ -65,18 +65,18 @@ public class NetworkCalibrationWithCounts {
 			double maxval = 0.0;
 			while (c_it.hasNext()) {
 				Count c = c_it.next();
-				Link l = network.getLinks().get(c.getLocId());
-				if (l == null) { System.out.println("csid="+c.getCsId()+";locid="+c.getLocId()+": link not found"); }
+				Link l = network.getLinks().get(c.getId());
+				if (l == null) { System.out.println("csid="+c.getCsLabel()+";locid="+c.getId()+": link not found"); }
 				else {
 					l.setFreespeed(360.0/3.6);
-					out.write("\t<linkgtfs id=\""+l.getId()+"\" time_period=\"24:00:00\" desc=\"from csid "+c.getCsId()+"\">\n");
+					out.write("\t<linkgtfs id=\""+l.getId()+"\" time_period=\"24:00:00\" desc=\"from csid "+c.getCsLabel()+"\">\n");
 					for (int h=1; h<25; h++) {
 						int time_start = (h-1)*3600;
 //						int time = h*3600-1800;
 						int time_end = h*3600-1;
 //						System.out.println("lcap="+l.getCapacity()+";vol("+h+")="+c.getVolume(h));
 						double val = c.getVolume(h).getValue()/(l.getCapacity()/network.getCapacityPeriod()*3600);
-						if (val >= 1.0) { System.out.println("csid="+c.getCsId()+";locid="+c.getLocId()+": val="+val); }
+						if (val >= 1.0) { System.out.println("csid="+c.getCsLabel()+";locid="+c.getId()+": val="+val); }
 						if (val < 0.01) { val = 0.01; }
 						out.write("\t\t<gtf time=\""+Time.writeTime(time_start)+"\" val=\""+val+"\"/>\n");
 //						out.write("\t\t<gtf time=\""+Time.writeTime(time)+"\" val=\""+val+"\"/>\n");
@@ -100,7 +100,7 @@ public class NetworkCalibrationWithCounts {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(NetworkImpl network) {
+	public void run(Network network) {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 //		for (Link l : network.getLinks().values()) { l.setCapacity(l.getCapacity(org.matsim.utils.misc.Time.UNDEFINED_TIME)*1.5); }
 		for (Link l : network.getLinks().values()) { l.setCapacity(10000.0); l.setNumberOfLanes(5.0); l.setFreespeed(36.0/3.6); }

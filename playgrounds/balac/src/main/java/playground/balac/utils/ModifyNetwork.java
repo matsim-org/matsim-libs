@@ -2,8 +2,8 @@ package playground.balac.utils;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 /**
@@ -14,7 +14,7 @@ public class ModifyNetwork {
 
 	MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
-	double freeSpeedFactor = 1.5;
+	double freeSpeedFactor = 1.3;
 	String outputFilePath = null;
 	String networkFilePath = null;
 	public ModifyNetwork(String networkFilePath, String outputFilePath) {
@@ -41,7 +41,7 @@ public class ModifyNetwork {
 			
 		}
 		
-		new NetworkWriter(scenario.getNetwork()).write(outputFilePath + "/network" + "_increased_50perc.xml.gz");
+		new NetworkWriter(scenario.getNetwork()).write(outputFilePath + "/network" + "_increased_30perc.xml.gz");
 	}
 	
 	

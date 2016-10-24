@@ -19,6 +19,23 @@
  * *********************************************************************** */
 package playground.thibautd.scripts.scenariohandling;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
+import playground.ivt.utils.ArgParser;
+import playground.ivt.utils.ArgParser.Args;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -26,24 +43,6 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.StreamingPopulationReader;
-import org.matsim.core.population.StreamingUtils;
-import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Counter;
-
-import playground.ivt.utils.ArgParser;
-import playground.ivt.utils.ArgParser.Args;
 
 /**
  * @author thibautd
@@ -85,8 +84,8 @@ public class DuplicatePersons {
 		
 		StreamingUtils.setIsStreaming(reader, true);
 
-		final PopulationWriter writer =
-			new PopulationWriter(
+		final StreamingPopulationWriter writer =
+			new StreamingPopulationWriter(
 					scenario.getPopulation(),
 					scenario.getNetwork() );
 		writer.writeStartPlans( outPopulation );
@@ -108,7 +107,7 @@ public class DuplicatePersons {
 			}
 		});
 
-		new PopulationReader( scenario ).parse( inPopulation );
+		new PopulationReader( scenario ).readFile( inPopulation );
 		writer.writeEndPlans();
 
 		if ( inAttributes != null ) filterAttributes( clones , inAttributes , outAttributes );

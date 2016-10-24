@@ -20,7 +20,7 @@ import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.utils.SignalUtils;
-import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.Lane;
 
 public class Link2LinkTestSignalsCreator {
 	

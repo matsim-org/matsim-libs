@@ -49,7 +49,7 @@ public class RemoveLongTrips {
 	public static void main(String[] args) {
 		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
-		parser.parse(args[0]);
+		parser.readFile(args[0]);
 		
 		Set<? extends Person> persons = parser.getPersons();
 		

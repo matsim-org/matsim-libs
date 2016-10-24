@@ -28,12 +28,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
@@ -97,11 +97,12 @@ public class TestSchedulingHITS {
 		private Node node;
 		private Set<String> types = new HashSet<>();
 		private Set<String> purposes = new HashSet<>();
-		public LocationInfo(String location, NetworkImpl net) {
+		public LocationInfo(String location, Network net) {
 			super();
 			this.location = location;
 			this.coord = coordinateTransformation.transform(Household.LOCATIONS.get(location).getCoord());
-			this.node = net.getNearestNode(coord);
+			final Coord coord1 = coord;
+			this.node = NetworkUtils.getNearestNode(net,coord1);
 		}
 	}
 	private static class TypePlaceInfo {
@@ -301,7 +302,7 @@ public class TestSchedulingHITS {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("C:/Users/sergioo/workspace2/playgrounds/sergioo/input/network/network100.xml.gz");
 		new TransitScheduleReader(scenario).readFile("C:/Users/sergioo/workspace2/playgrounds/sergioo/input/transit/transitSchedule.xml");
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
-		NetworkImpl net = (NetworkImpl) NetworkUtils.createNetwork();
+		Network net = (Network) NetworkUtils.createNetwork();
 		HashSet<String> modes = new HashSet<String>();
 		modes.add(TransportMode.car);
 		filter.filter(net, modes);

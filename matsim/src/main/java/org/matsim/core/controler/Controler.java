@@ -378,7 +378,7 @@ public final class Controler implements ControlerI, MatsimServices {
         this.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-				bind(ScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
+            		this.bindScoringFunctionFactory().toInstance(scoringFunctionFactory);
 			}
         });
 	}

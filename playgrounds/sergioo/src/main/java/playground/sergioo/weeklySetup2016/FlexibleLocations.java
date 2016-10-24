@@ -17,10 +17,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -226,7 +225,7 @@ public class FlexibleLocations {
 		new MatsimNetworkReader(allNetwork).readFile(args[2]);
 		Set<String> carMode = new HashSet<String>();
 		carMode.add("car");
-		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
+		Network network = (Network) NetworkUtils.createNetwork();
 		new TransportModeNetworkFilter(allNetwork).filter(network, carMode);
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -256,7 +255,7 @@ public class FlexibleLocations {
 						simpleCategoryText = "SHOP_LOW";
 				}
 				if(!simpleCategoryText.equals("SHOP")) {
-					Node carNode = ((NetworkImpl)network).getNearestNode(location.coord);
+					Node carNode = NetworkUtils.getNearestNode(((Network)network),location.coord);
 					TransitRouterNetworkNode ptNode = networkPT.getNearestNode(location.coord);
 					writer.println(location.postalCode+","+location.coord.getX()+","+location.coord.getY()+","+carNode.getId().toString()+","+CoordUtils.calcEuclideanDistance(location.coord, carNode.getCoord())*WALK_BL/WALK_SPEED+","+ptNode.getStop().getStopFacility().getId().toString()+","+CoordUtils.calcEuclideanDistance(location.coord, ptNode.getCoord())*WALK_BL/WALK_SPEED+","+simpleCategoryText+","+simpleCategory.getValue());
 				}

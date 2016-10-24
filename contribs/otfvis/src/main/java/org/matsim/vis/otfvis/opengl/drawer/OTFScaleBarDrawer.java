@@ -2,12 +2,14 @@ package org.matsim.vis.otfvis.opengl.drawer;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureCoords;
-import org.matsim.core.gbl.MatsimResource;
-import org.matsim.vis.otfvis.caching.SceneGraph;
+import org.matsim.vis.otfvis.OTFClientControl;
+import org.matsim.vis.otfvis.opengl.gl.GLUtils;
 
 import java.awt.*;
 
@@ -18,87 +20,91 @@ import java.awt.*;
  * @author laemmel
  *
  */
-public class OTFScaleBarDrawer extends OTFGLAbstractDrawableReceiver {
+class OTFScaleBarDrawer implements GLEventListener {
 
-	private TextRenderer textRenderer = null;
-	double[] modelview = new double[16];
-	double[] projection = new double[16];
-	int[] viewport = new int[4];
-	
-	Texture back = null;
+	private TextRenderer textRenderer;
+	private Texture back;
 	private Texture sc;
-	
-	private final String bg;
-	private final String sb;
 
-	public OTFScaleBarDrawer() {
-		this.bg = "sb_background.png";
-		this.sb = "scalebar.png";
-		// Create the text renderer
-		Font font = new Font("SansSerif", Font.PLAIN, 30);
-		this.textRenderer = new TextRenderer(font, true, false);
+	private double[] modelview = new double[16];
+	private double[] projection = new double[16];
+	private int[] viewport = new int[4];
+
+	@Override
+	public void init(GLAutoDrawable glAutoDrawable) {
+		GL2 gl = (GL2) glAutoDrawable.getGL();
+		this.textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 30), true, false);
+		this.back = GLUtils.createTexture(gl, getClass().getResourceAsStream("/res/otfvis/sb_background.png"));
+		this.sc = GLUtils.createTexture(gl, getClass().getResourceAsStream("/res/otfvis/scalebar.png"));
 	}
 
 	@Override
-	public void onDraw(GL2 gl) {
-		if (this.back == null){
-			this.back = OTFOGLDrawer.createTexture(gl, MatsimResource.getAsInputStream(this.bg));
-			this.sc = OTFOGLDrawer.createTexture(gl, MatsimResource.getAsInputStream(this.sb));
+	public void display(GLAutoDrawable glAutoDrawable) {
+		if (OTFClientControl.getInstance().getOTFVisConfig().drawScaleBar()) {
+			GL2 gl = (GL2) glAutoDrawable.getGL();
+
+			// update matrices for mouse position calculation
+			gl.glGetDoublev(GL2.GL_MODELVIEW_MATRIX, this.modelview, 0);
+			gl.glGetDoublev(GL2.GL_PROJECTION_MATRIX, this.projection, 0);
+			gl.glGetIntegerv(GL2.GL_VIEWPORT, this.viewport, 0);
+			float[] fl = getKoords();
+
+			final TextureCoords tc = this.back.getImageTexCoords();
+			final float tx1 = tc.left();
+			final float ty1 = tc.top();
+			final float tx2 = tc.right();
+			final float ty2 = tc.bottom();
+
+			float width2 = (float) this.textRenderer.getBounds("METERS").getWidth() * fl[8];
+
+			gl.glEnable(GL.GL_BLEND);
+			gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+			this.back.enable(gl);
+			this.back.bind(gl);
+			gl.glColor4f(1, 1, 1, 1);
+
+			gl.glBegin(GL2.GL_QUADS);
+			gl.glTexCoord2f(tx1, ty1);
+			gl.glVertex3f(fl[4], fl[5], 0f);
+			gl.glTexCoord2f(tx2, ty1);
+			gl.glVertex3f(fl[4], fl[7], 0f);
+			gl.glTexCoord2f(tx2, ty2);
+			gl.glVertex3f(fl[2] + width2 + width2 / 3.f, fl[7], 0f);
+			gl.glTexCoord2f(tx1, ty2);
+			gl.glVertex3f(fl[2] + width2 + width2 / 3.f, fl[5], 0f);
+			gl.glEnd();
+			this.back.disable(gl);
+
+			gl.glDisable(GL.GL_BLEND);
+
+			this.sc.enable(gl);
+			this.sc.bind(gl);
+
+			gl.glColor4f(1, 1, 1, 1);
+
+			gl.glBegin(GL2.GL_QUADS);
+			gl.glTexCoord2f(tx1, ty1);
+			gl.glVertex3f(fl[0], fl[1], 0f);
+			gl.glTexCoord2f(tx2, ty1);
+			gl.glVertex3f(fl[0], fl[3], 0f);
+			gl.glTexCoord2f(tx2, ty2);
+			gl.glVertex3f(fl[2], fl[3], 0f);
+			gl.glTexCoord2f(tx1, ty2);
+			gl.glVertex3f(fl[2], fl[1], 0f);
+			gl.glEnd();
+			this.sc.disable(gl);
+
+			this.textRenderer.begin3DRendering();
+			float c = 0.f;
+			String text = "" + (int) fl[10];
+			float width = (float) this.textRenderer.getBounds(text).getWidth() * fl[8];
+			// Render the text
+			this.textRenderer.setColor(c, c, c, 1.f);
+			this.textRenderer.draw3D(text, fl[2] - width / 2.f, fl[9], 0f, fl[8]);
+
+			this.textRenderer.draw3D("METERS", fl[2] + width2 / 4.f, fl[3], 0f, fl[8]);
+			this.textRenderer.end3DRendering();
 		}
-		
-		updateMatrices(gl);
-		float [] fl = getKoords();
-		
-		final TextureCoords tc = this.back.getImageTexCoords();
-		final float tx1 = tc.left();
-		final float ty1 = tc.top();
-		final float tx2 = tc.right();
-		final float ty2 = tc.bottom();
-
-		final float z = 1.1f;
-
-		float width2 = (float) this.textRenderer.getBounds("METERS").getWidth() * fl[8];
-		
-		gl.glEnable(GL.GL_BLEND);
-		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-		this.back.enable(gl);
-		this.back.bind(gl);
-		gl.glColor4f(1,1,1,1);
-
-		gl.glBegin(GL2.GL_QUADS);
-		gl.glTexCoord2f(tx1, ty1); gl.glVertex3f(fl[4], fl[5], z);
-		gl.glTexCoord2f(tx2, ty1); gl.glVertex3f(fl[4], fl[7], z);
-		gl.glTexCoord2f(tx2, ty2); gl.glVertex3f(fl[2]+width2 + width2/3.f, fl[7], z);
-		gl.glTexCoord2f(tx1, ty2); gl.glVertex3f(fl[2]+width2 + width2/3.f, fl[5], z);
-		gl.glEnd();
-		this.back.disable(gl);
-
-		gl.glDisable(GL.GL_BLEND);
-
-		this.sc.enable(gl);
-		this.sc.bind(gl);
-		
-		gl.glColor4f(1,1,1,1);
-		
-		gl.glBegin(GL2.GL_QUADS);
-		gl.glTexCoord2f(tx1, ty1); gl.glVertex3f(fl[0], fl[1], z);
-		gl.glTexCoord2f(tx2, ty1); gl.glVertex3f(fl[0], fl[3], z);
-		gl.glTexCoord2f(tx2, ty2); gl.glVertex3f(fl[2], fl[3], z);
-		gl.glTexCoord2f(tx1, ty2); gl.glVertex3f(fl[2], fl[1], z);
-		gl.glEnd();
-		this.sc.disable(gl);
-		
-		this.textRenderer.begin3DRendering();
-		float c = 0.f;
-		String text = ""+(int)fl[10];
-		float width = (float) this.textRenderer.getBounds(text).getWidth() * fl[8];
-		// Render the text
-		this.textRenderer.setColor(c, c, c, 1.f);
-		this.textRenderer.draw3D(text, fl[2] - width/2.f,fl[9],1.1f,fl[8]);
-
-		this.textRenderer.draw3D("METERS", fl[2] + width2/4.f,fl[3],1.1f,fl[8]);
-		this.textRenderer.end3DRendering();
-
 	}
 	
 	private float [] getKoords() {
@@ -106,9 +112,7 @@ public class OTFScaleBarDrawer extends OTFGLAbstractDrawableReceiver {
 		int scrTY = this.viewport[1];
 		int scrBX = this.viewport[2];
 		int scrBY = this.viewport[3];
-		
-		
-		
+
 		int scrWidth = scrBX -scrTX;
 		int diagonal = (int) Math.sqrt(scrBX*scrBX + scrBY * scrBY);
 		
@@ -176,26 +180,15 @@ public class OTFScaleBarDrawer extends OTFGLAbstractDrawableReceiver {
 		
 	}
 
-	public void updateMatrices(GL2 gl) {
-		// update matrices for mouse position calculation
-		gl.glGetDoublev( GL2.GL_MODELVIEW_MATRIX, this.modelview,0);
-		gl.glGetDoublev( GL2.GL_PROJECTION_MATRIX, this.projection,0);
-		gl.glGetIntegerv( GL2.GL_VIEWPORT, this.viewport,0 );
-	}
-
 	private float [] getOGLPos(int x, int y) {
-		
-		
 		double[] obj_pos = new double[3];
 		float winX, winY;//, winZ = cameraStart.getZ();
 		float posX, posY;//, posZ;
 		double[] w_pos = new double[3];
-		double[] z_pos = new double[1];
 
 
 		winX = x;
 		winY = this.viewport[3] - y;
-		z_pos[0]=1;
 
 		GLU glu = new GLU();
 		obj_pos[2]=0; // Check view relative z-coord of layer zero == visnet layer
@@ -206,11 +199,14 @@ public class OTFScaleBarDrawer extends OTFGLAbstractDrawableReceiver {
 		posY = (float)obj_pos[1];
 		return new float []{posX, posY};
 	}
-	
+
 	@Override
-	public void addToSceneGraph(SceneGraph graph) {
-		graph.addItem(this);
+	public void dispose(GLAutoDrawable glAutoDrawable) {
+
 	}
 
+	@Override
+	public void reshape(GLAutoDrawable glAutoDrawable, int i, int i1, int i2, int i3) {
 
+	}
 }

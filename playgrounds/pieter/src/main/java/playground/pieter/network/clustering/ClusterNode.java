@@ -6,13 +6,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NodeImpl;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class ClusterNode implements Node {
-	private final NodeImpl node;
+	private final Node node;
 
-    public ClusterNode(NodeImpl n ) {
+    public ClusterNode(Node n ) {
 		this.node = n;
 	}
 	
@@ -135,4 +136,8 @@ public class ClusterNode implements Node {
 	}
 
 
+	@Override
+	public Attributes getAttributes() {
+		return node.getAttributes();
+	}
 }

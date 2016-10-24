@@ -23,6 +23,11 @@
  */
 package org.matsim.core.network;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -34,11 +39,6 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
-
 
 /**
  * A parser building a list of {@link NetworkChangeEvent} out of a xml file.
@@ -46,7 +46,7 @@ import java.util.Stack;
  * @author illenberger
  * 
  */
-public class NetworkChangeEventsParser extends MatsimXmlParser {
+public final class NetworkChangeEventsParser extends MatsimXmlParser {
 	
 	// ========================================================================
 	// static fields
@@ -86,62 +86,63 @@ public class NetworkChangeEventsParser extends MatsimXmlParser {
 	
 	private NetworkChangeEvent currentEvent;
 	
-	private List<NetworkChangeEvent> events;
+	private final List<NetworkChangeEvent> events ;
 	
 	// ========================================================================
 	// constructor
 	// ========================================================================
 
-	public NetworkChangeEventsParser(Network network) {
+	public NetworkChangeEventsParser(Network network, List<NetworkChangeEvent> events ) {
 		this.network = network;
+		this.events = events;
 	}
 	
 	// ========================================================================
 	// parsing
 	// ========================================================================
 	
-	/**
-	 * Parses a file with network change events and returns a list with
-	 * instances of {@link NetworkChangeEvent}.
-	 * 
-	 * @param file
-	 *            a xml file containing network change events.
-	 */
-	public List<NetworkChangeEvent> parseEvents(String file) {
-		events = new ArrayList<>();
-		super.parse(file);
-		return events;
-	}
-	
-
-	@Override
-	public void parse(String filename) throws UncheckedIOException {
-		events = new ArrayList<>();
-		super.parse(filename);
-	}
-
-	@Override
-	public void parse(URL url) throws UncheckedIOException {
-		events = new ArrayList<>();
-		super.parse(url);
-	}
+//	/**
+//	 * Parses a file with network change events and returns a list with
+//	 * instances of {@link NetworkChangeEvent}.
+//	 * 
+//	 * @param file
+//	 *            a xml file containing network change events.
+//	 */
+//	public List<NetworkChangeEvent> parseEvents(String file) {
+//		events = new ArrayList<>();
+//		super.parse(file);
+//		return events;
+//	}
+//	
+//
+//	@Override
+//	public void parse(String filename) throws UncheckedIOException {
+//		events = new ArrayList<>();
+//		super.parse(filename);
+//	}
+//
+//	@Override
+//	public void parse(URL url) throws UncheckedIOException {
+//		events = new ArrayList<>();
+//		super.parse(url);
+//	}
 	
 	// ========================================================================
 	// accessor
 	// ========================================================================
 
-	/**
-	 * Returns the list with network change events. Be sure to call
-	 * {@link #parseEvents(String)}, {@link #parse(String)} or
-	 * {@link #parse(URL)} before.
-	 * 
-	 * @return a list of network change events, or <tt>null</tt> if
-	 *         {@link #parseEvents(String)}, {@link #parse(String)} nor
-	 *         {@link #parse(URL)} has been called before.
-	 */
-	public List<NetworkChangeEvent> getEvents() {
-		return events;
-	}
+//	/**
+//	 * Returns the list with network change events. Be sure to call
+//	 * {@link #parseEvents(String)}, {@link #parse(String)} or
+//	 * {@link #parse(URL)} before.
+//	 * 
+//	 * @return a list of network change events, or <tt>null</tt> if
+//	 *         {@link #parseEvents(String)}, {@link #parse(String)} nor
+//	 *         {@link #parse(URL)} has been called before.
+//	 */
+//	public List<NetworkChangeEvent> getEvents() {
+//		return events;
+//	}
 	
 	// ========================================================================
 	// parsing methods
@@ -202,11 +203,11 @@ public class NetworkChangeEventsParser extends MatsimXmlParser {
 		
 	}
 
-	private ChangeValue newNetworkChangeType(String typeStr, String valueStr) {
+	private static ChangeValue newNetworkChangeType(String typeStr, String valueStr) {
 		if(typeStr != null && valueStr != null) {
 			double value = Double.parseDouble(valueStr);
 			if(typeStr.equalsIgnoreCase(ABSOLUTE_VALUE))
-				return new ChangeValue(ChangeType.ABSOLUTE, value);
+				return new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, value);
 			else if(typeStr.equalsIgnoreCase(FACTOR_VALUE))
 				return new ChangeValue(ChangeType.FACTOR, value);
 			else {

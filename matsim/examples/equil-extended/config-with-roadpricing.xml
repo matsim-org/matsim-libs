@@ -8,19 +8,19 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="./network.xml" />
+		<param name="inputNetworkFile" value="network.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="./plans2000.xml.gz" />
+		<param name="inputPlansFile" value="plans2000.xml.gz" />
 	</module>
 
 	<module name="roadpricing" >
-		<param name="tollLinksFile" value="./toll.xml" />
+		<param name="tollLinksFile" value="toll.xml" />
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="./output/equil" />
+		<param name="outputDirectory" value="./output/example" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="200" />
 		<param name="mobsim" value="qsim" />
@@ -72,10 +72,10 @@
 			<param name="disableAfterIteration" value="190" />
 
 			<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
-			<param name="moduleName" value="ChangeExpBeta" />
+			<param name="strategyName" value="ChangeExpBeta" />
 
 			<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
-			<param name="probability" value="0.9" />
+			<param name="weight" value="0.9" />
 		</parameterset>
 
 		<!--<parameterset type="strategysettings" >-->
@@ -86,10 +86,10 @@
 		<parameterset type="strategysettings" >
 
 			<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
-			<param name="moduleName" value="ReRoute" />
+			<param name="strategyName" value="ReRoute" />
 
 			<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
-			<param name="probability" value="0.1" />
+			<param name="weight" value="0.1" />
 		</parameterset>
 	</module>
 

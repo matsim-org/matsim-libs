@@ -1,30 +1,22 @@
 package org.matsim.contrib.matsim4urbansim.config;
 
 import java.io.File;
-import java.io.IOException;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimConfigType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.ObjectFactory;
-import org.matsim.core.utils.io.MatsimJaxbXmlParser;
-import org.xml.sax.SAXException;
 
-public class JAXBUnmarshalV3 extends MatsimJaxbXmlParser{
+public class JAXBUnmarshalV3 {
 
 	// logger
 	private static final Logger log = Logger.getLogger(JAXBUnmarshalV3.class);
-	
-	public JAXBUnmarshalV3(){
-		super(InternalConstants.CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG);
-	}
-	
+
 	/**
 	 * reads matsim config generated from urbansim and inits jaxbv3 object structure
 	 * @param matsimConfigFile
@@ -38,14 +30,12 @@ public class JAXBUnmarshalV3 extends MatsimJaxbXmlParser{
 		log.info("Unmaschalling MATSim configuration from: " + matsimConfigFile);
 		log.info("...");
 		try {
-			
+
 			JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
 			// create an unmaschaller (write xml file)
 			Unmarshaller unmarschaller = jaxbContext.createUnmarshaller();
-			
-			// validate file
-			super.validateFile(matsimConfigFile, unmarschaller);
-			
+			unmarschaller.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/matsim4urbansim_v3.xsd")));
+
 			File inputFile = new File( matsimConfigFile );
 			isFileAvailable(matsimConfigFile, inputFile);
 			// contains the content of the MATSim config.
@@ -57,10 +47,6 @@ public class JAXBUnmarshalV3 extends MatsimJaxbXmlParser{
 			else
 				m4uConfigType = (( JAXBElement<Matsim4UrbansimConfigType>) object).getValue();
 
-		} catch (JAXBException je) {
-			System.out.flush() ;
-			je.printStackTrace();
-			throw new RuntimeException("unmarschalling failed; aborting ...") ;
 		} catch (Exception e) {
 			System.out.flush() ;
 			e.printStackTrace();
@@ -82,10 +68,5 @@ public class JAXBUnmarshalV3 extends MatsimJaxbXmlParser{
 		}
 	}
 	
-	@Override
-	public void readFile(String filename) throws JAXBException, SAXException,
-			ParserConfigurationException, IOException {
-		throw new UnsupportedOperationException("Use unmaschalMATSimConfig()");
-	}
 	
 }

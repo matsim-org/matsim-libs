@@ -59,7 +59,7 @@ public class TTOverIteration  implements PersonDepartureEventHandler, PersonArri
 				TTOverIteration t = new TTOverIteration();
 				e.addHandler(t);
 				EventsReaderXMLv1 r = new EventsReaderXMLv1(e);
-				r.parse(dir);
+				r.readFile(dir);
 				tt.add(t.getAvgTT());
 				System.out.println(t.getAvgTT());
 
@@ -81,7 +81,7 @@ public class TTOverIteration  implements PersonDepartureEventHandler, PersonArri
 				TTOverIteration t = new TTOverIteration();
 				e.addHandler(t);
 				EventsReaderXMLv1 r = new EventsReaderXMLv1(e);
-				r.parse(dir);
+				r.readFile(dir);
 				tt.add(t.getAvgTT());
 				System.out.println(t.getAvgTT());
 

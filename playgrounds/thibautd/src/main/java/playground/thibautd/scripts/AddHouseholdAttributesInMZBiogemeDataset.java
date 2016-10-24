@@ -26,7 +26,6 @@ import playground.thibautd.utils.CsvUtils;
 import playground.thibautd.utils.CsvWriter;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * @author thibautd
@@ -38,7 +37,7 @@ public class AddHouseholdAttributesInMZBiogemeDataset {
 		final String outDataSet = args[ 2 ];
 
 		final ObjectAttributes attributes = new ObjectAttributes();
-		new ObjectAttributesXmlReader( attributes ).parse( inAttributes );
+		new ObjectAttributesXmlReader( attributes ).readFile( inAttributes );
 
 		try ( final CsvParser parser = new CsvParser( '\t' , '"' , inDataSet );
 				  final CsvWriter writer = new CsvWriter( '\t' , '"' , expand( parser.getTitleLine() ), outDataSet ) ) {

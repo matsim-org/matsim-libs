@@ -26,12 +26,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.StreamingUtils;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -52,15 +52,15 @@ public class KeepOnlySelectedPlanAndSimplifyTrips {
 
 		final ObjectAttributes atts = new ObjectAttributes();
 		if ( inputAttributes != null ) {
-			new ObjectAttributesXmlReader( atts ).parse( inputAttributes );
+			new ObjectAttributesXmlReader( atts ).readFile( inputAttributes );
 		}
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		final Population pop = (Population) scenario.getPopulation();
 		StreamingUtils.setIsStreaming(pop, true);
 
-		final PopulationWriter writer =
-			new PopulationWriter(
+		final StreamingPopulationWriter writer =
+			new StreamingPopulationWriter(
 					scenario.getPopulation(),
 					scenario.getNetwork() );
 		writer.writeStartPlans( outPopulation );
@@ -90,7 +90,7 @@ public class KeepOnlySelectedPlanAndSimplifyTrips {
 			}
 		});
 
-		new PopulationReader( scenario ).parse( inPopulation );
+		new PopulationReader( scenario ).readFile( inPopulation );
 		writer.writeEndPlans();
 	}
 }

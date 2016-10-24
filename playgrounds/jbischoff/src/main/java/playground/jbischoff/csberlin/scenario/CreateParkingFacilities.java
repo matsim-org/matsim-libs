@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -51,12 +51,12 @@ public class CreateParkingFacilities {
 	public static void main(String[] args) {
 		
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario.getNetwork()).readFile("../../../shared-svn/projects/bmw_carsharing/example/grid_network.xml");
-//		new MatsimNetworkReader(scenario.getNetwork()).readFile("../../../shared-svn/projects/bmw_carsharing/data/scenario/network.xml.gz");
+//		new MatsimNetworkReader(scenario.getNetwork()).readFile("../../../shared-svn/projects/bmw_carsharing/example/grid_network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("../../../shared-svn/projects/bmw_carsharing/data/scenario/network.xml.gz");
 		final ActivityFacilitiesFactory fac = scenario.getActivityFacilities().getFactory();
 		TabularFileParserConfig config = new TabularFileParserConfig();
         config.setDelimiterTags(new String[] {"\t"});
-        config.setFileName("../../../shared-svn/projects/bmw_carsharing/example/parking.txt");
+        config.setFileName("../../../shared-svn/projects/bmw_carsharing/data/parkplaetze-poster.txt");
         config.setCommentTags(new String[] { "#" });
         new TabularFileParser().parse(config, new TabularFileHandler() {
 
@@ -73,7 +73,7 @@ public class CreateParkingFacilities {
 			}
 		
 	});
-        new FacilitiesWriter(scenario.getActivityFacilities()).write("../../../shared-svn/projects/bmw_carsharing/example/parkingFacilities.xml");
+        new FacilitiesWriter(scenario.getActivityFacilities()).write("../../../shared-svn/projects/bmw_carsharing/data/scenario/parkingFacilities-poster.xml");
         
 	}
 	

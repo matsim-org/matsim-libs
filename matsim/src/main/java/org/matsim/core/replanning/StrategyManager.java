@@ -204,7 +204,8 @@ public class StrategyManager implements MatsimManager {
 	 * @return the chosen strategy
 	 */
 	public GenericPlanStrategy<Plan, Person> chooseStrategy(final Person person, final String subpopulation) {
-		return delegate.chooseStrategy(subpopulation);
+		final GenericPlanStrategy<Plan, Person> strategy = delegate.chooseStrategy(subpopulation);
+		return strategy;
 	}
 
 	/**

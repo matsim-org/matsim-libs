@@ -22,7 +22,6 @@
 
 package org.matsim.roadpricing;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -71,7 +70,7 @@ public class ModuleTest {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         RoadPricingConfigGroup roadPricingConfigGroup = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
         RoadPricingSchemeImpl roadPricingScheme = new RoadPricingSchemeImpl() ;
-        new RoadPricingReaderXMLv1(roadPricingScheme).parse(roadPricingConfigGroup.getTollLinksFile());
+        new RoadPricingReaderXMLv1(roadPricingScheme).readFile(roadPricingConfigGroup.getTollLinksFile());
 
 
         Controler controler1 = new Controler(scenario);

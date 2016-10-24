@@ -1,8 +1,8 @@
-package playground.tschlenther.parkingSearch;
+/*package playground.tschlenther.parkingSearch;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.carsharing.qsim.CarSharingVehicles;
+import org.matsim.contrib.carsharing.manager.CarSharingVehiclesNew;
 import org.matsim.contrib.carsharing.qsim.ParkCSVehicles;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -24,12 +24,11 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-import java.io.IOException;
 import java.util.Map;
 
-/**
+*//**
  * only difference to the CarSharingQsimFactory is, that we need to bind our own agentfactory (schlenther 04/16)
- */
+ *//*
 
 public class ParkSearchAndCarsharingQsimFactory implements Provider<Netsim>{
 
@@ -64,38 +63,34 @@ public class ParkSearchAndCarsharingQsimFactory implements Provider<Netsim>{
 				
 		AgentFactory agentFactory = null;			
 			
-		try {
-			CarSharingVehicles carSharingVehicles = new CarSharingVehicles(sc);
+		CarSharingVehiclesNew carSharingVehicles = new CarSharingVehiclesNew(sc);
 		//added part
 		//a simple way to place vehicles at the original location at the start of each simulation
 		carSharingVehicles.readVehicleLocations();
-				
+					
 		TravelTime travelTime = travelTimes.get( TransportMode.car ) ;
-
+		
 		TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get( TransportMode.car ) ;
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime) ;
-
+		
 		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(sc.getNetwork(), travelDisutility, travelTime ) ;
 		
 		agentFactory = new ParkSearchAndCarsharingAgentFactory(qSim, sc, tripRouterProvider, carSharingVehicles, pathCalculator);
 		
 		
 		if (sc.getConfig().network().isTimeVariantNetwork()) {
-			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
+				qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
 		}
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
 		
 		//we need to park carsharing vehicles on the network
 		ParkCSVehicles parkSource = new ParkCSVehicles(sc.getPopulation(), agentFactory, qSim,
-				carSharingVehicles.getFreeFLoatingVehicles(), carSharingVehicles.getOneWayVehicles(), carSharingVehicles.getTwoWayVehicles());
+					carSharingVehicles);
 		qSim.addAgentSource(agentSource);
 		qSim.addAgentSource(parkSource);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 		return qSim;
 	}
 		
 }
+*/

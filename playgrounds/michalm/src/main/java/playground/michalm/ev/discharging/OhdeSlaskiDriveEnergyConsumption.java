@@ -70,6 +70,10 @@ public class OhdeSlaskiDriveEnergyConsumption
     @Override
     public double calcEnergyConsumption(Link link, double travelTime)
     {
+        if (travelTime == 0) {
+            return 0;
+        }
+        
         double avgSpeed = link.getLength() / travelTime;
         int idx = (int)Math.round(avgSpeed * speedStepsPerUnit);
         return power[idx] * travelTime;

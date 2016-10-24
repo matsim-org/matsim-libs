@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * A very simple Mock for {@link Link} to be used in tests.
@@ -160,5 +161,22 @@ public class FakeLink implements Link {
 	@Override
 	public String toString() {
 		return "FakeLink_" + this.id.toString();
+	}
+
+	@Override
+	public double getFlowCapacityPerSec() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public double getFlowCapacityPerSec(double time) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
 	}
 }

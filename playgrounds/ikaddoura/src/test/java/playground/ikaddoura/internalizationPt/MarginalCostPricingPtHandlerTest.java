@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -49,7 +50,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
@@ -99,7 +99,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
     public final void testInVehicleDelay01() {
    	 	
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -203,7 +203,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testInVehicleDelay02(){
 	
-	Config config = utils.loadConfig(null);
+	Config config = utils.createConfig();
 	
 	config.controler().setOutputDirectory(utils.getOutputDirectory());
 	config.controler().setLastIteration(0);
@@ -323,7 +323,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testInVehicleDelay03(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -482,7 +482,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testWaitingDelay01(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -581,7 +581,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testWaitingDelay02(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -682,7 +682,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testWaitingDelay03(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -789,7 +789,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testWaitingDelay03b(){
 			
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 			
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -797,8 +797,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		config.setParam("vspExperimental", "isGeneratingBoardingDeniedEvent", "true");
 			
 		config.transit().setUseTransit(true);
-		config.scenario().setUseVehicles(true);
-			
+
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(hParams);
@@ -891,7 +890,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testWaitingDelay04(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -1012,7 +1011,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testWaitingDelay05(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -1133,7 +1132,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testWaitingDelay06(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -1252,7 +1251,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testCapacityDelay01(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -1323,7 +1322,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testCapacityDelay02(){
 	
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -1391,7 +1390,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testCapacityDelay03(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -1471,7 +1470,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testCapacityDelay04(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -1548,7 +1547,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	@Test
 	public final void testCapacityDelay05(){
 		
-		Config config = utils.loadConfig(null);
+		Config config = utils.createConfig();
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -1649,7 +1648,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	
 	private void setNetworkOneWay(Scenario scenario){
 		
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
 		network.setCapacityPeriod(3600.);
 
@@ -1727,7 +1726,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	
 	private void setNetworkRoundTrip(Scenario scenario){
 		
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
 		network.setCapacityPeriod(3600.);
 

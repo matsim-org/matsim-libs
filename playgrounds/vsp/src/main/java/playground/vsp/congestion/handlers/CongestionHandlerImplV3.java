@@ -66,7 +66,7 @@ public final class CongestionHandlerImplV3 implements CongestionHandler, Activit
 
 	private CongestionHandlerBaseImpl delegate;
 
-	private final Map<Id<Person>, Double> agentId2storageDelay = new HashMap<Id<Person>, Double>();
+	private final Map<Id<Person>, Double> agentId2storageDelay = new HashMap<>();
 	private double delayNotInternalized_spillbackNoCausingAgent = 0.;
 
 	public CongestionHandlerImplV3(EventsManager events, Scenario scenario) {

@@ -22,7 +22,7 @@ package playground.mrieser.svi.pt;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 import playground.mrieser.svi.converters.DynusTNetworkReader;
@@ -47,7 +47,7 @@ public class PostAnalysis {
 		String ptStatsFilename = "/Volumes/Data/projects/sviDosierungsanlagen/scenarios/output_ohne36_10/ITERS/it.70/70.ptStats_FIXED.txt";
 		
 		log.info("Reading DynusT-network..." + modelDirectory);
-		Network dynusTNetwork = NetworkImpl.createNetwork();
+		Network dynusTNetwork = NetworkUtils.createNetwork();
 		new DynusTNetworkReader(dynusTNetwork).readFiles(modelDirectory + "/xy.dat", modelDirectory + "/network.dat");
 		
 		ZoneIdToIndexMapping zoneIdToIndexMapping = new ZoneIdToIndexMapping();

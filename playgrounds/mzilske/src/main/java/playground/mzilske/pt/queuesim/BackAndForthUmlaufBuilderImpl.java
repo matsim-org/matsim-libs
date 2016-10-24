@@ -9,9 +9,9 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -40,12 +40,12 @@ public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
 
 	};
 
-	private final NetworkImpl network;
+	private final Network network;
 	private final Collection<TransitLine> transitLines;
 	private ArrayList<Umlauf> umlaeufe;
 	private final PlanCalcScoreConfigGroup config;
 
-	public BackAndForthUmlaufBuilderImpl(NetworkImpl network, Collection<TransitLine> transitLines, PlanCalcScoreConfigGroup config) {
+	public BackAndForthUmlaufBuilderImpl(Network network, Collection<TransitLine> transitLines, PlanCalcScoreConfigGroup config) {
 		this.network = network;
 		this.transitLines = transitLines;
 		this.config = config;

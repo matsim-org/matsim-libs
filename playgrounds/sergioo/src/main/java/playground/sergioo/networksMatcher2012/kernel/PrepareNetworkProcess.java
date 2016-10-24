@@ -5,7 +5,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 import playground.sergioo.networksMatcher2012.kernel.core.ComposedLink;
 import playground.sergioo.networksMatcher2012.kernel.core.ComposedNode;
@@ -37,7 +37,7 @@ public class PrepareNetworkProcess extends NetworksStep {
 	}
 	
 	private Network convert(Network oldNetwork) {
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		for(Node node:oldNetwork.getNodes().values())
 			network.addNode(new ComposedNode(node));
 		for(Link link:oldNetwork.getLinks().values()) {

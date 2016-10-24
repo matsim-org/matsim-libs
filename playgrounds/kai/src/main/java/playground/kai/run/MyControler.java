@@ -65,7 +65,7 @@ class MyControler {
 		// prepare the control(l)er:
 		Controler controler = new Controler( scenario ) ;
 		controler.addControlerListener(new KaiAnalysisListener()) ;
-		controler.addOverridingModule(new OTFVisLiveModule());
+//		controler.addOverridingModule(new OTFVisLiveModule());
 //		controler.setMobsimFactory(new OldMobsimFactory()) ;
 		
 		controler.addOverridingModule(new AbstractModule(){

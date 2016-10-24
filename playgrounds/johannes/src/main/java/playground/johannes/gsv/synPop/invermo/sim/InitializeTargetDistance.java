@@ -105,7 +105,7 @@ public class InitializeTargetDistance implements EpisodeTask {
 		parser.addToBlacklist("delete");
 		
 		logger.info("Loading persons...");
-		parser.parse("/home/johannes/gsv/invermo/5.pop.xml");
+		parser.readFile("/home/johannes/gsv/invermo/5.pop.xml");
 		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 		

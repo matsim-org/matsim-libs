@@ -20,22 +20,12 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.utils;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 
-import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils.PatnaNetworkType;
+import playground.agarwalamit.utils.FileUtils;
 
 /**
  * @author amit
@@ -48,57 +38,35 @@ public final class PatnaUtils {
 	public static final String EPSG = "EPSG:24345";
 	public static final CoordinateTransformation COORDINATE_TRANSFORMATION = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, PatnaUtils.EPSG);
 
-	public static final String INPUT_FILES_DIR = "../../../../repos/shared-svn/projects/patnaIndia/inputs/";
+	public static final String INPUT_FILES_DIR = FileUtils.SHARED_SVN+"/projects/patnaIndia/inputs/";
 	public static final String ZONE_FILE = PatnaUtils.INPUT_FILES_DIR+"/raw/others/wardFile/Wards.shp";
 
 	public static final String INCOME_ATTRIBUTE = "monthlyIncome";
 	public static final String TRANSPORT_COST_ATTRIBUTE = "dailyTransportCost";
-	public final static String SUBPOP_ATTRIBUTE = "userGroup";
+	public static final String SUBPOP_ATTRIBUTE = "userGroup";
+	
+//	public static final Double SLUM_AVG_INCOME = 3109.0; // sec 5.2.4, Patna CMP 
+//	public static final Double NONSLUM_AVG_INCOME = 7175.0;
+	public static final Double MEADIAM_INCOME = 4000.0;
 	
 	public enum PatnaUrbanActivityTypes {
-		home, work, educational, social, other, unknown;
-	}
+		home, work, educational, social, other, unknown
+    }
 
 	public static final Collection <String> URBAN_MAIN_MODES = Arrays.asList("car","motorbike","bike");
 	public static final Collection <String> URBAN_ALL_MODES = Arrays.asList("car","motorbike","bike","pt","walk");
 
-	public static final Collection <String> EXT_MAIN_MODES = Arrays.asList("car_ext","motorbike_ext","bike_ext","truck_ext");
+	public static final Collection <String> EXT_MAIN_MODES = Arrays.asList("car","motorbike","bike","truck"); //Arrays.asList("car_ext","motorbike_ext","bike_ext","truck_ext");
 
-	public static final Collection <String> ALL_MAIN_MODES =  Arrays.asList("car","motorbike","bike","car_ext","motorbike_ext","bike_ext","truck_ext");
+	public static final Collection <String> ALL_MAIN_MODES =  Arrays.asList("car","motorbike","bike","truck"); //Arrays.asList("car","motorbike","bike","car_ext","motorbike_ext","bike_ext","truck_ext");
 //			
-	public static final Collection <String> ALL_MODES = Arrays.asList("car_ext","motorbike_ext","truck_ext","bike_ext","pt","walk","car","motorbike","bike");
+	public static final Collection <String> ALL_MODES = Arrays.asList("car","motorbike","bike","truck", "pt", "walk"); //Arrays.asList("car_ext","motorbike_ext","truck_ext","bike_ext","pt","walk","car","motorbike","bike");
+
+	public static final Double INR_USD_RATE = 66.6; // 08 June 2016 
 	
+	public static final Double PCU_2W = 0.15;
 
 	private PatnaUtils(){} 
-
-	/**
-	 * @param scenario
-	 * It creates first vehicle types and add them to scenario and then create and add vehicles to the scenario.
-	 */
-	public static void createAndAddVehiclesToScenario(final Scenario scenario, final Collection <String> modes){
-		final Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
-
-		for (String mode : modes){
-			VehicleType vehicle = VehicleUtils.getFactory().createVehicleType(Id.create(mode,VehicleType.class));
-			vehicle.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed(mode));
-			vehicle.setPcuEquivalents( MixedTrafficVehiclesUtils.getPCU(mode) );
-			modesType.put(mode, vehicle);
-			scenario.getVehicles().addVehicleType(vehicle);
-		}
-
-		for(Person p:scenario.getPopulation().getPersons().values()){
-			Id<Vehicle> vehicleId = Id.create(p.getId(),Vehicle.class);
-			String travelMode = null;
-			for(PlanElement pe :p.getSelectedPlan().getPlanElements()){
-				if (pe instanceof Leg) {
-					travelMode = ((Leg)pe).getMode();
-					break;
-				}
-			}
-			final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId,modesType.get(travelMode));
-			scenario.getVehicles().addVehicle(vehicle);
-		}
-	}
 
 	public static int getAverageIncome(final String incomeCode){
 		switch (incomeCode) {

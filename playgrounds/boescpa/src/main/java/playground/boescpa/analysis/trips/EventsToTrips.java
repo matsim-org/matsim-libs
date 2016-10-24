@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+
 import playground.boescpa.lib.tools.NetworkUtils;
 
 import java.util.List;
@@ -70,7 +71,7 @@ public class EventsToTrips {
 		log.info("Reading events file...");
 		if (pathToEventsFile.endsWith(".xml.gz")) { // if events-File is in the newer xml-format
 			EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-			reader.parse(pathToEventsFile);
+			reader.readFile(pathToEventsFile);
 		}
 		else {
 			throw new IllegalArgumentException("Given events-file not of known format.");

@@ -21,14 +21,13 @@ package playground.jbischoff.networkChange;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkFactory;
-import org.matsim.core.network.LinkFactoryImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class FreeSpeedReducer
@@ -44,9 +43,9 @@ public class FreeSpeedReducer
     
         Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(sc.getNetwork()).readFile("\\\\vsp-nas\\jbischoff\\WinHome\\Docs\\svn-checkouts\\L013_matsim\\2014_ss\\ue\\ue6\\network.xml");
-        NetworkImpl net1 = (NetworkImpl)sc.getNetwork();
+        Network net1 = (Network)sc.getNetwork();
         
-        NetworkImpl net2 = (NetworkImpl)NetworkUtils.createNetwork();
+        Network net2 = (Network)NetworkUtils.createNetwork();
 
         for (Node n : net1.getNodes().values()){
             Node newNode = n;
@@ -55,7 +54,7 @@ public class FreeSpeedReducer
             net2.addNode(newNode);
         }
         
-        LinkFactory lf = new LinkFactoryImpl();
+        LinkFactory lf = NetworkUtils.createLinkFactory();
         for (Link l : net1.getLinks().values()){
             double oldFs = l.getFreespeed();
             double newFs = oldFs * FACTOR;

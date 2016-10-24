@@ -24,7 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -56,8 +56,7 @@ public class DgScenarioUtils {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(c2);
 		
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-				new SignalsScenarioLoader(signalsConfigGroup).loadSignalsData());
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(c2).loadSignalsData());
 		
 		return scenario;
 	}

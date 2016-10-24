@@ -19,13 +19,11 @@
 
 package org.matsim.contrib.cadyts.pt;
 
-import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import cadyts.measurements.SingleLinkMeasurement.TYPE;
-import cadyts.supply.SimResults;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
@@ -33,11 +31,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.cadyts.general.*;
+import org.matsim.contrib.cadyts.general.CadytsBuilderImpl;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
+import org.matsim.contrib.cadyts.general.CadytsContextI;
+import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
+import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PtCountsConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -51,13 +52,15 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
-import org.matsim.pt.counts.PtCountSimComparisonKMLWriter;
+import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import javax.inject.Inject;
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import cadyts.measurements.SingleLinkMeasurement.TYPE;
+import cadyts.supply.SimResults;
 
 /**
  * @author nagel
@@ -77,7 +80,7 @@ CadytsContextI<TransitStopFacility> {
 	private final Counts occupCounts = new Counts();
 	//	private final Counts boardCounts = new Counts();
 	//	private final Counts alightCounts = new Counts();
-	private final CadytsPtOccupancyAnalyzer cadytsPtOccupAnalyzer;
+	private final CadytsPtOccupancyAnalyzerI cadytsPtOccupAnalyzer;
 	private PtPlanToPlanStepBasedOnEvents<TransitStopFacility> ptStep ;
 
 	private CadytsConfigGroup cadytsConfig;
@@ -87,17 +90,19 @@ CadytsContextI<TransitStopFacility> {
 	private IterationStopWatch stopWatch;
 
 	@Inject
-	CadytsPtContext(final Config config, EventsManager events, Scenario scenario, OutputDirectoryHierarchy controlerIO, IterationStopWatch stopWatch) {
+	CadytsPtContext(final Config config, EventsManager events, Scenario scenario, OutputDirectoryHierarchy controlerIO,
+					IterationStopWatch stopWatch, final CadytsPtOccupancyAnalyzerI cadytsPtOccupancyAnalyzer ) {
 		this.events = events;
 		this.scenario = scenario;
 		this.controlerIO = controlerIO;
 		this.stopWatch = stopWatch;
 		cadytsConfig = (CadytsConfigGroup) config.getModule(CadytsConfigGroup.GROUP_NAME);
+		this.cadytsPtOccupAnalyzer = cadytsPtOccupancyAnalyzer ;
 
 		// === prepare the structure which extracts the measurements from the simulation:
 		// since there is already some other method, we just need to write a wrapper.
 		
-		this.cadytsPtOccupAnalyzer = new CadytsPtOccupancyAnalyzer(toTransitLineIdSet(cadytsConfig.getCalibratedItems()), cadytsConfig.getTimeBinSize() );
+//		this.cadytsPtOccupAnalyzer = new CadytsPtOccupancyAnalyzer(CadytsPtOccupancyAnalyzer.toTransitLineIdSet(cadytsConfig.getCalibratedItems()), cadytsConfig.getTimeBinSize() );
 		events.addHandler(this.cadytsPtOccupAnalyzer);
 
 		this.simResults = new SimResults<TransitStopFacility>() {
@@ -118,6 +123,9 @@ CadytsContextI<TransitStopFacility> {
 				default:
 					throw new RuntimeException("not implemented ...") ;
 				}
+//				if ( retval != 0. ) {
+//					log.warn("retval=" + retval );
+//				}
 				return retval ;
 			}
 			@Override
@@ -136,22 +144,12 @@ CadytsContextI<TransitStopFacility> {
 		String occupancyCountsFilename = scenario.getConfig().ptCounts().getOccupancyCountsFileName();
 		new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
 
-		// build the calibrator. This is a static method, and in consequence has no side effects
-		this.calibrator = CadytsBuilder.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.occupCounts, new TransitStopFacilityLookUp(scenario) , TransitStopFacility.class);
+		// === build the calibrator:
+		this.calibrator = CadytsBuilderImpl.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.occupCounts, new TransitStopFacilityLookUp(scenario) , TransitStopFacility.class);
 
 		// === find out which plan is contributing what to each measurement:
-		this.ptStep = new PtPlanToPlanStepBasedOnEvents<>(scenario, toTransitLineIdSet(cadytsConfig.getCalibratedItems()));
+		this.ptStep = new PtPlanToPlanStepBasedOnEvents<>(scenario, CadytsPtOccupancyAnalyzer.toTransitLineIdSet(cadytsConfig.getCalibratedItems()));
 		events.addHandler(ptStep);
-	}
-
-	private static Set<Id<TransitLine>> toTransitLineIdSet(Set<String> list) {
-		Set<Id<TransitLine>> converted = new LinkedHashSet<>();
-		
-		for ( String id : list) {
-			converted.add(Id.create(id, TransitLine.class));
-		}
-		
-		return converted;
 	}
 
 	@Override
@@ -247,12 +245,11 @@ CadytsContextI<TransitStopFacility> {
 			String filename = controlerIO.getIterationFilename(iter, "cadytsPtCountscompare.kmz");
 			final CoordinateTransformation coordTransform = TransformationFactory.getCoordinateTransformation(scenario.getConfig()
 					.global().getCoordinateSystem(), TransformationFactory.WGS84);
-			PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(null,
-					null, ccaOccupancy.getComparison(), coordTransform, null, null, 
-					this.occupCounts);
+//			PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(null,
+//					null, ccaOccupancy.getComparison(), coordTransform, null, null, 
+//					this.occupCounts);
 
-			//					CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(ccaOccupancy.getComparison(), network, coordTransform) ;
-			// will not work since "network" contains the wrong information.
+			CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(ccaOccupancy.getComparison(), this.occupCounts, coordTransform, "ptCountsOccup") ;
 
 			kmlWriter.setIterationNumber(iter);
 			kmlWriter.writeFile(filename);

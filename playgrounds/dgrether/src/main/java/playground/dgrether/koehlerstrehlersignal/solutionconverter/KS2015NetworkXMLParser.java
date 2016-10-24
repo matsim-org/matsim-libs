@@ -66,11 +66,15 @@ public class KS2015NetworkXMLParser extends MatsimXmlParser {
 	private DgProgram currentProgram;
 	private Map<Id<DgCrossingNode>, DgCrossingNode> allCrossingNodes = new HashMap<>();
 	
-	public void readFile(final String filename) {
+	public KS2015NetworkXMLParser() {
 		this.setValidating(false);
-		parse(filename);
-		log.info("Read ks network from file " + filename);
 	}
+	
+//	public void readFile(final String filename) {
+//		this.setValidating(false);
+//		readFile(filename);
+//		log.info("Read ks network from file " + filename);
+//	}
 	
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {

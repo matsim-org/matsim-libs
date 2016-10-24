@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -187,7 +186,7 @@ public class Incident2Network {
 		log.info("Creating car network... ");
 
 		Network carNetwork = NetworkUtils.createNetwork();
-		NetworkFactory factory = new NetworkFactoryImpl(carNetwork);
+		NetworkFactory factory = carNetwork.getFactory();
 		
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			if (link.getAllowedModes().contains(TransportMode.car)) {

@@ -77,12 +77,12 @@ public class ChangeableNetworkCreatorTest {
 				
 		NetworkChangeEvent nce0 = ncc.getNetworkChangeEvents().get(0);
 		Assert.assertEquals(0, nce0.getStartTime(),1);
-		Assert.assertEquals(ChangeType.ABSOLUTE, nce0.getFreespeedChange().getType());
+		Assert.assertEquals(ChangeType.ABSOLUTE_IN_SI_UNITS, nce0.getFreespeedChange().getType());
 		Assert.assertEquals(3.0,nce0.getFreespeedChange().getValue(),1);
 		
 		NetworkChangeEvent nce1 = ncc.getNetworkChangeEvents().get(1);
 		Assert.assertEquals(900, nce1.getStartTime(),1);
-		Assert.assertEquals(ChangeType.ABSOLUTE, nce1.getFreespeedChange().getType());
+		Assert.assertEquals(ChangeType.ABSOLUTE_IN_SI_UNITS, nce1.getFreespeedChange().getType());
 		Assert.assertEquals(6.0,nce1.getFreespeedChange().getValue(),1);
 	}
 

@@ -22,7 +22,6 @@ package org.matsim.contrib.taxi.optimizer;
 import org.apache.commons.configuration.*;
 import org.matsim.contrib.taxi.optimizer.assignment.*;
 import org.matsim.contrib.taxi.optimizer.fifo.*;
-import org.matsim.contrib.taxi.optimizer.mip.*;
 import org.matsim.contrib.taxi.optimizer.rules.*;
 import org.matsim.core.config.ConfigGroup;
 
@@ -35,7 +34,7 @@ public class DefaultTaxiOptimizerFactory
 
     public enum OptimizerType
     {
-        ASSIGNMENT, FIFO, MIP, RULE_BASED, ZONAL;
+        ASSIGNMENT, FIFO, RULE_BASED, ZONAL;
     }
 
 
@@ -54,10 +53,6 @@ public class DefaultTaxiOptimizerFactory
             case FIFO:
                 return new FifoTaxiOptimizer(optimContext,
                         new FifoTaxiOptimizerParams(optimizerConfig));
-
-            case MIP:
-                return new MIPTaxiOptimizer(optimContext,
-                        new MIPTaxiOptimizerParams(optimizerConfig));
 
             case RULE_BASED:
                 return new RuleBasedTaxiOptimizer(optimContext,

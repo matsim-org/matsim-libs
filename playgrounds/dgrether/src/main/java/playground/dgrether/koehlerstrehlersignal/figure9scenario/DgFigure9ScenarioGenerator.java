@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
@@ -53,18 +53,17 @@ import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesWriter;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.Lanes;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
 import playground.dgrether.DgPaths;
 
@@ -101,7 +100,7 @@ public class DgFigure9ScenarioGenerator {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(config);
 		ScenarioUtils.loadScenario(sc);
 		
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(ConfigUtils.addOrGetModule(sc.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
+		SignalsDataLoader signalsLoader = new SignalsDataLoader(config);
 		SignalsData signals = signalsLoader.loadSignalsData();
 		sc.addScenarioElement(SignalsData.ELEMENT_NAME, signals);
 		return sc;
@@ -122,7 +121,7 @@ public class DgFigure9ScenarioGenerator {
 		log.info("network written to " + networkOutfile);
 		//lanes
 		Lanes lanes = createLanes((MutableScenario)scenario);
-		LaneDefinitionsWriter20 laneWriter = new LaneDefinitionsWriter20(lanes);
+		LanesWriter laneWriter = new LanesWriter(lanes);
 		laneWriter.write(lanesOutfile);
 		log.info("lanes written to " + lanesOutfile);
 		//signals
@@ -421,7 +420,7 @@ public class DgFigure9ScenarioGenerator {
 		if (net.getCapacityPeriod() != 3600.0){
 			throw new IllegalStateException();
 		}
-		((NetworkImpl)net).setEffectiveLaneWidth(1.0);
+		((Network)net).setEffectiveLaneWidth(1.0);
 		NetworkFactory fac = net.getFactory();
 		double scale = 300.0;
 		Node n1, n2, n3, n4, n5, n6, n7, n8;

@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
+
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -33,7 +34,7 @@ public class LinkCapacityModifier {
 
 	private static final Logger LOG = Logger.getLogger(LinkCapacityModifier.class);
 
-	private Network network;
+	private final Network network;
 
 	public LinkCapacityModifier(Network network) {
 		this.network = network;

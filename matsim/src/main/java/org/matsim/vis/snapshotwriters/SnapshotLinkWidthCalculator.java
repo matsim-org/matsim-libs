@@ -36,7 +36,10 @@ public class SnapshotLinkWidthCalculator {
 	private double laneWidth = 3.75; //default in NetworkImpl and network_v1.dtd
 	
 	public void setLaneWidth( double dd ) {
-		laneWidth = dd ;
+		if ( !Double.isNaN(dd) ) {
+			// ( seems that this can be NaN when coming from reading a regular network. kai, jul'16 )
+			laneWidth = dd ;
+		}
 	}
 	
 	public double getLaneWidth(){

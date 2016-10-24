@@ -72,7 +72,7 @@ public class MultiNodeDijkstra extends Dijkstra {
 	 * is in a not reachable part of the network, the algorithm will process the
 	 * entire reachable part of the network before terminating.
 	 */
-	private final boolean searchAllEndNodes;
+	private boolean searchAllEndNodes;
 	
 	public MultiNodeDijkstra(Network network, TravelDisutility costFunction, TravelTime timeFunction, boolean searchAllEndNodes) {
 		super(network, costFunction, timeFunction);
@@ -85,11 +85,11 @@ public class MultiNodeDijkstra extends Dijkstra {
 		this.searchAllEndNodes = searchAllEndNodes;
 	}
 	
-	public ImaginaryNode createImaginaryNode(Collection<InitialNode> nodes) {
+	public ImaginaryNode createImaginaryNode(Collection<? extends InitialNode> nodes) {
 		return new ImaginaryNode(nodes);
 	}
 	
-	public ImaginaryNode createImaginaryNode(Collection<InitialNode> nodes, Coord coord) {
+	public ImaginaryNode createImaginaryNode(Collection<? extends InitialNode> nodes, Coord coord) {
 		return new ImaginaryNode(nodes, coord);
 	}
 	
@@ -118,7 +118,7 @@ public class MultiNodeDijkstra extends Dijkstra {
 			
 			Map<Id<Node>, InitialNode> endNodes = new HashMap<>();
 			
-			Collection<InitialNode> initialNodes = ((ImaginaryNode) toNode).initialNodes;
+			Collection<? extends InitialNode> initialNodes = ((ImaginaryNode) toNode).initialNodes;
 			for (InitialNode initialNode : initialNodes) endNodes.put(initialNode.node.getId(), initialNode);
 
 			// find out which one is the cheapest end node
@@ -275,5 +275,12 @@ public class MultiNodeDijkstra extends Dijkstra {
 			return constructPath(fromNode, toNode, startTime, arrivalTime);			
 		}
 	}
-	
+
+    public boolean isSearchAllEndNodes() {
+        return searchAllEndNodes;
+    }
+
+    public void setSearchAllEndNodes(boolean searchAllEndNodes) {
+        this.searchAllEndNodes = searchAllEndNodes;
+    }
 }

@@ -28,7 +28,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -116,7 +116,7 @@ public class CreateCountsFromEvents {
 						try {
 							final Coord c = count.getCoord() != null ?
 									count.getCoord() :
-									network.getLinks().get( count.getLocId() ).getCoord();
+									network.getLinks().get( count.getId() ).getCoord();
 							return CoordUtils.calcEuclideanDistance( c , center ) <= radius;
 						}
 						catch ( Exception e ) {

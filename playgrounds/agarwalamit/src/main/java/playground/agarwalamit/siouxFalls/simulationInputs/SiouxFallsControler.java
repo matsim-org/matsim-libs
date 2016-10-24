@@ -77,7 +77,7 @@ public class SiouxFallsControler {
 		ecg.setAverageColdEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_ColdStart_vehcat_2005average.txt");
 		ecg.setAverageWarmEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_HOT_vehcat_2005average.txt");
 		ecg.setEmissionRoadTypeMappingFile("../../siouxFalls/input/SiouxFalls_roadTypeMapping.txt");
-		ecg.setEmissionVehicleFile("../../siouxFalls/input/SiouxFalls_emissionVehicles.xml");
+		controler.getConfig().vehicles().setVehiclesFile("../../siouxFalls/input/SiouxFalls_emissionVehicles.xml");
 		ecg.setUsingDetailedEmissionCalculation(false);
 		//===only emission events genertaion; used with all runs for comparisons
 		EmissionModule emissionModule = new EmissionModule(ScenarioUtils.loadScenario(config));

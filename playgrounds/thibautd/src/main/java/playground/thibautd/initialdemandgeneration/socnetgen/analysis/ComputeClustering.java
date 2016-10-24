@@ -38,7 +38,7 @@ public class ComputeClustering {
 		final String socialNetworkFile = args[ 0 ];
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new SocialNetworkReader( sc ).parse( socialNetworkFile );
+		new SocialNetworkReader( sc ).readFile( socialNetworkFile );
 	
 		final SocialNetwork socialNetwork = (SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME );
 		log.info( "clustering: "+SnaUtils.calcClusteringCoefficient( socialNetwork ) );

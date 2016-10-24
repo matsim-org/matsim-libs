@@ -21,15 +21,15 @@
 package playground.balmermi.datapuls;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.StreamingPopulationReader;
-import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
@@ -64,8 +64,8 @@ public class CBPopulationPreparation {
 //		final Population population = (Population) scenario.getPopulation();
 		StreamingPopulationReader population = new StreamingPopulationReader( scenario ) ;
 		StreamingUtils.setIsStreaming(population, true);
-		MatsimPopulationReader plansReader = new PopulationReader(scenario);
-		PopulationWriter plansWriter = new PopulationWriter(null, scenario.getNetwork());
+		MatsimReader plansReader = new PopulationReader(scenario);
+		StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(null, scenario.getNetwork());
 		plansWriter.startStreaming(args[1].trim());
 
 		ActivityFacilities afs = scenario.getActivityFacilities();

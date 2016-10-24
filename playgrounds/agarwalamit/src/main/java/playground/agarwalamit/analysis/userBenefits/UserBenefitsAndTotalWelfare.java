@@ -114,7 +114,7 @@ public class UserBenefitsAndTotalWelfare {
 		double excludedToll =0;
 
 		MonetaryPaymentsAnalyzer paymentsAnalyzer = new MonetaryPaymentsAnalyzer();
-		paymentsAnalyzer.init((MutableScenario) sc);
+		paymentsAnalyzer.init(sc);
 		paymentsAnalyzer.preProcessData();
 
 		EventsManager events = EventsUtils.createEventsManager();
@@ -144,14 +144,12 @@ public class UserBenefitsAndTotalWelfare {
 
 		if(!considerAllPersonsInSumOfTolls) LOGGER.warn("Person having negative score in their executed plans are excluded in the calculation."
 				+ " \n and thus toll payments which is excluded is " +excludedToll);
-		double [] tollInfo = new double [] {totalToll, excludedToll};
-		return tollInfo;
+		return new double [] {totalToll, excludedToll};
 	}
 
 	private boolean isPersonIncluded(final Id<Person> personId){
 		Id<Person> id = Id.createPersonId(personId.toString());
 		double score = sc.getPopulation().getPersons().get(id).getSelectedPlan().getScore();
-		if (score < 0 ) return false;
-		else return true;
+        return score >= 0;
 	}
 }

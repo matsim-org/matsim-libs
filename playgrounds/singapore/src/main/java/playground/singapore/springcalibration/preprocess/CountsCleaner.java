@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.counts.Count;
@@ -53,8 +53,8 @@ public class CountsCleaner {
 					log.info("HW link:       " + link.getId().toString() + " capacity: " + capacity);
 					log.info("original link: " + originallink.getId().toString() + " capacity: " + originalcapacity);
 					HashMap<Integer,Volume> volumes = originalcount.getVolumes();
-					this.createHWCount(link.getId(), originalcount.getCsId(), volumes, counts, capacity / totalcapacity);
-					this.adaptOriginalCount(originallink.getId(), originalcount.getCsId(), volumes, counts, originalcapacity / totalcapacity);
+					this.createHWCount(link.getId(), originalcount.getCsLabel(), volumes, counts, capacity / totalcapacity);
+					this.adaptOriginalCount(originallink.getId(), originalcount.getCsLabel(), volumes, counts, originalcapacity / totalcapacity);
 				}
 				
 				

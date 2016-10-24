@@ -1,4 +1,21 @@
-package playground.dziemke.cemdapMatsimCadyts.oneperson;
+/* *********************************************************************** *
+ * project: org.matsim.*												   *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */package playground.dziemke.cemdapMatsimCadyts.oneperson;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -19,6 +36,9 @@ import org.opengis.feature.simple.SimpleFeature;
 import playground.dziemke.cemdapMatsimCadyts.CommuterFileReader;
 import playground.dziemke.cemdapMatsimCadyts.CommuterRelation;
 
+/**
+ * @author dziemke
+ */
 public class DemandGeneratorOnePersonV1 {
 	private static final Logger log = Logger.getLogger(DemandGeneratorOnePersonV1.class);
   

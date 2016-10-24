@@ -159,6 +159,7 @@ public class OTFVisConfigGroup extends ConfigGroup {
 	 * @return the modified
 	 */
 	public boolean isModified() {
+		// yy called from nowhere (as far as I can tell).  kai, jul'16
 		return this.modified;
 	}
 	/**
@@ -423,7 +424,7 @@ public class OTFVisConfigGroup extends ConfigGroup {
 		return this.renderImages = render;
 	}
 
-	public boolean renderImages() {
+	public boolean getRenderImages() {
 		return this.renderImages;
 	}
 

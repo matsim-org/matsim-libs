@@ -44,6 +44,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * Converting the TransitRouterNetwork into a {@link org.matsim.core.router.util.RoutingNetwork} might
@@ -63,6 +64,7 @@ public final class TransitRouterNetwork implements Network {
 
 	private long nextNodeId = 0;
 	private long nextLinkId = 0;
+
 
 	public static final class TransitRouterNetworkNode implements Node {
 
@@ -137,6 +139,17 @@ public final class TransitRouterNetwork implements Network {
 		public Link removeOutLink(Id<Link> outLinkId) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public void setCoord(Coord coord) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public Attributes getAttributes() {
+			throw new UnsupportedOperationException();
 		}
 	}
 
@@ -275,6 +288,22 @@ public final class TransitRouterNetwork implements Network {
 			return "[" + this.id.toString() + " (" + this.getFromNode().id + " > " + this.getToNode().id + ")]";
 		}
 
+		@Override
+		public double getFlowCapacityPerSec() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public double getFlowCapacityPerSec(double time) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public Attributes getAttributes() {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	public TransitRouterNetworkNode createNode(final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
@@ -429,5 +458,46 @@ public final class TransitRouterNetwork implements Network {
 		log.info(" # transfer links:  " + toBeAdded.size());
 
 		return network;
+	}
+
+	@Override
+	public void setCapacityPeriod(double capPeriod) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public void setEffectiveCellSize(double effectiveCellSize) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public void setEffectiveLaneWidth(double effectiveLaneWidth) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public void setName(String name) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public double getEffectiveCellSize() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
 	}
 }

@@ -40,7 +40,7 @@ public class KeyMatrix2Txt {
 	public static void main(String[] args) throws IOException {
 		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse(args[0]);
+		reader.readFile(args[0]);
 		NumericMatrix m = reader.getMatrix();
 
 		int odId = 0;

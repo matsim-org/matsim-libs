@@ -30,7 +30,7 @@ import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialSparseGraph;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;

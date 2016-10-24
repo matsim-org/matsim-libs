@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 
 public class ComposedNode implements Node {
@@ -20,6 +21,7 @@ public class ComposedNode implements Node {
 	//Constants
 
 	public static final String SEPARATOR = "-";
+
 
 
 	//Enums
@@ -78,10 +80,16 @@ public class ComposedNode implements Node {
 			idText+=node.getId()+SEPARATOR;
 		idText=idText.substring(0, idText.length()-1);
 		id = Id.create(idText, Node.class);
-		coord = new Coord((double) 0, (double) 0);
-		for(Node node:nodes)
-			coord.setXY(coord.getX()+node.getCoord().getX(), coord.getY()+node.getCoord().getY());
-		coord.setXY(coord.getX()/nodes.size(), coord.getY()/nodes.size());
+//		coord = new Coord((double) 0, (double) 0);
+		double xx = 0. ;
+		double yy = 0. ;
+		for(Node node:nodes) {
+//			coord.setXY(coord.getX()+node.getCoord().getX(), coord.getY()+node.getCoord().getY());
+			xx += node.getCoord().getX();
+			yy += node.getCoord().getY();
+		}
+//		coord.setXY(coord.getX()/nodes.size(), coord.getY()/nodes.size());
+		this.coord = new Coord(xx/nodes.size(), yy/nodes.size());
 		this.nodes = nodes;
 		inLinks = new HashMap<Id<Link>, Link>();
 		outLinks = new HashMap<Id<Link>, Link>();
@@ -309,5 +317,15 @@ public class ComposedNode implements Node {
 		throw new RuntimeException("not implemented") ;
 	}
 
+	@Override
+	public void setCoord(Coord coord) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
 
+
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
+	}
 }

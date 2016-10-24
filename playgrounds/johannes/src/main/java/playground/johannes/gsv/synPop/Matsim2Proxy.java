@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
@@ -63,7 +63,7 @@ public class Matsim2Proxy {
 		logger.info("Loading proxy persons...");
 		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
-		parser.parse(args[1]);
+		parser.readFile(args[1]);
 		logger.info(String.format("Loaded %s proxy persons.", parser.getPersons().size()));
 		
 		Map<Id<Person>, ? extends Person> matsimPersons = scenario.getPopulation().getPersons();

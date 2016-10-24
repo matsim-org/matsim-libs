@@ -109,7 +109,7 @@ public class ContinuousAgeArentzePopulationModule extends AbstractModule {
 			@Override
 			public void endTag(String name, String content,
 					Stack<String> context) {}
-		}.parse( populationFile );
+		}.readFile( populationFile );
 
 		counter.printCounter();
 		coordPool.printStats( "Coord pool" );

@@ -41,7 +41,7 @@ public class PersonTravelInfoFromEventsToSQL {
 		TravelTimeListener ttl = new TravelTimeListener();
 		events.addHandler(ttl);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(inFileName);
+		reader.readFile(inFileName);
 		this.paxTravelTimes = ttl.getPaxTravelTimes();
 		this.paxModes = ttl.getPaxModes();
 	}

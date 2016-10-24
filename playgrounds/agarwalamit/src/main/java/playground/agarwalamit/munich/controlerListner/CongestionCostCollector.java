@@ -40,7 +40,7 @@ public class CongestionCostCollector implements CongestionEventHandler {
 	private final MutableScenario scenario;
 	private final double vttsCar;
 	private double amountSum = 0.;
-	private Map<Id<Person>, Double> causingPerson2Cost = new HashMap<>();
+	private final Map<Id<Person>, Double> causingPerson2Cost = new HashMap<>();
 
 	public CongestionCostCollector(MutableScenario scenario) {
 		this.scenario = scenario;

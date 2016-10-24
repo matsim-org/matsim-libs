@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
@@ -43,12 +44,10 @@ import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.lanes.ModelLane;
-import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.Lane;
 import org.matsim.lanes.vis.VisLane;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
 import org.matsim.lanes.vis.VisLinkWLanes;
@@ -415,7 +414,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		for (QLaneI lane : this.laneQueues.values()) {
 			lane.changeEffectiveNumberOfLanes( getLink().getNumberOfLanes( now ) ) ;
 			lane.changeSpeedMetersPerSecond( getLink().getFreespeed(now) ) ;
-			lane.changeUnscaledFlowCapacityPerSecond( ((LinkImpl)getLink()).getFlowCapacityPerSec(now) );
+			lane.changeUnscaledFlowCapacityPerSecond( ((Link)getLink()).getFlowCapacityPerSec(now) );
 		}
 	}
 

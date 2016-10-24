@@ -25,7 +25,7 @@ public class WorkLengthAfterMode {
 		Purpose purpose = new Purpose();
     	
     	events.addHandler(purpose);
-    	reader.parse(s);
+    	reader.readFile(s);
     	int[] purposeSplit = purpose.purposeSplitCar();
     	
     	for (int i = 0; i < 5; i++) { 

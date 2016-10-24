@@ -50,13 +50,14 @@ public class KS2015RouteXMLParser extends MatsimXmlParser{
 	public KS2015RouteXMLParser(DgIdConverter idConverter){
 		super();
 		this.idConverter = idConverter;
+		this.setValidating(false);
 	}
 	
-	public void readFile(final String filename) {
-		this.setValidating(false);
-		parse(filename);
-		log.info("Read " + this.comsWithRoutes.getNumberOfCommodites() + " routes");
-	}
+//	public void readFile(final String filename) {
+//		this.setValidating(false);
+//		readFile(filename);
+//		log.info("Read " + this.comsWithRoutes.getNumberOfCommodites() + " routes");
+//	}
 	
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {

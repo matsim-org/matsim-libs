@@ -51,15 +51,19 @@ public class KS2010SolutionXMLParser10 extends MatsimXmlParser {
 	
 	private List<KS2010CrossingSolution> solutionCrossingByIdMap = new ArrayList<KS2010CrossingSolution>();
 	
+	public KS2010SolutionXMLParser10() {
+		this.setValidating(false);
+	}
+	
 	public List<KS2010CrossingSolution> getSolutionCrossingByIdMap(){
 		return this.solutionCrossingByIdMap;
 	}
 	
-	public void readFile(final String filename) {
-		this.setValidating(false);
-		parse(filename);
-		log.info("Read " + solutionCrossingByIdMap.size() + " solutions");
-	}
+//	public void readFile(final String filename) {
+//		this.setValidating(false);
+//		readFile(filename);
+//		log.info("Read " + solutionCrossingByIdMap.size() + " solutions");
+//	}
 	
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {

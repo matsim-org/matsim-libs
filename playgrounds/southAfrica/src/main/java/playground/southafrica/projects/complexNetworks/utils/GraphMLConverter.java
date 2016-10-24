@@ -34,8 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -75,7 +74,8 @@ public class GraphMLConverter {
 	
 	/**
 	 * Parses a MATSim-format {@link Network}, and translates it into a GraphML 
-	 * format using the {@link com.tinkerpop.blueprints.util.io.graphml.GraphMLWriter}. Then writes the resulting GraphML format to disk.
+	 * format using the {@link com.tinkerpop.blueprints.util.io.graphml.GraphMLWriter}. 
+	 * Then writes the resulting GraphML format to disk.
 	 * @param networkFile
 	 * @param gephiFile
 	 */
@@ -84,7 +84,7 @@ public class GraphMLConverter {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader mnr = new MatsimNetworkReader(sc.getNetwork());
 		mnr.readFile(networkFile);
-		NetworkImpl n = (NetworkImpl) sc.getNetwork();
+		Network n = (Network) sc.getNetwork();
 		LOG.info("Total number of links to add: " + sc.getNetwork().getLinks().size());
 		Counter counter = new Counter("  links # ");
 		
@@ -94,7 +94,7 @@ public class GraphMLConverter {
 			g = new TinkerGraph();
 			
 			/* Populate the graph with the network elements. */
-			Iterator<Link> li = n.getLinks().values().iterator();
+			Iterator<? extends Link> li = n.getLinks().values().iterator();
 			List<Id> nodeList = new ArrayList<Id>();
 			while(li.hasNext()){
 				Link l = li.next();

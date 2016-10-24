@@ -46,7 +46,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -221,7 +221,7 @@ public class XferEventsFromLoResToHiResNetwork{
 		eventsManager.addHandler(new VehicleLinkEventLoader());
 		
 		EventsReaderXMLv1 eventReader = new EventsReaderXMLv1(eventsManager);
-		eventReader.parse(outpath.getPath()+"/linktemp/link_events.xml");
+		eventReader.readFile(outpath.getPath()+"/linktemp/link_events.xml");
 		
 	}
 
@@ -232,7 +232,7 @@ public class XferEventsFromLoResToHiResNetwork{
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(eventSplitter);
 		EventsReaderXMLv1 eventReader = new EventsReaderXMLv1(eventsManager);
-		eventReader.parse(loResEvents);
+		eventReader.readFile(loResEvents);
 		eventSplitter.close();	
 
 	}

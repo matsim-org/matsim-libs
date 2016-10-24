@@ -28,9 +28,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -46,7 +46,7 @@ public class RoadTypeMappingCreator {
 
 	public static void main(String[] args) {
 
-		roadTypeAndHBEFARoadType = new TreeMap<String, String[]>();
+		roadTypeAndHBEFARoadType = new TreeMap<>();
 		roadTypeAndHBEFARoadType.put("motorway", new String [] {"1","RUR/MW/120"});
 		roadTypeAndHBEFARoadType.put("motorway_link", new String [] {"2","URB/MW-Nat./80"});
 		roadTypeAndHBEFARoadType.put("trunk", new String [] {"3","URB/MW-City/80"});
@@ -67,7 +67,7 @@ public class RoadTypeMappingCreator {
 		for (Link link : network.getLinks().values()) {
 			String linkIdentifier = link.getId().toString().split("___")[1];
 			if(roadTypeAndHBEFARoadType.containsKey(linkIdentifier)){
-				((LinkImpl) link).setType(roadTypeAndHBEFARoadType.get(linkIdentifier)[0]);
+				NetworkUtils.setType( ((Link) link), (String) roadTypeAndHBEFARoadType.get(linkIdentifier)[0]);
 			} else {
 				throw new RuntimeException("Road Category "+linkIdentifier+" is not defined.");
 			}

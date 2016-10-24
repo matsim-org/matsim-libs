@@ -61,7 +61,7 @@ public class HouseholdsStreamingReaderV10 extends AbstractHouseholdsReaderV10 {
 		}
 		hhWriter = new HouseholdsWriterV10(super.getHouseholds());
 		hhWriter.openFileAndWritePreamble(outputFile);
-		super.parse(inputFile);
+		super.readFile(inputFile);
 		counter.printCounter();
 		hhWriter.writeEndAndCloseFile();
 		log.info("Done reading households, running algorithms, and writing file");

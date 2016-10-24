@@ -142,7 +142,7 @@ public class GRIPSAnalyzer implements PersonDepartureEventHandler, PersonArrival
 		EventsManagerImpl m = new EventsManagerImpl();
 		GRIPSAnalyzer handl = new GRIPSAnalyzer();
 		m.addHandler(handl);
-		new EventsReaderXMLv1(m).parse(events);
+		new EventsReaderXMLv1(m).readFile(events);
 		BufferedWriter w = new BufferedWriter(new FileWriter(new File("/Users/laemmel/devel/hhw_hybrid/plots/ne")));
 		System.out.println(handl);
 		w.append(handl.toString());

@@ -140,7 +140,7 @@ public class ConfigCreator {
 		
 		counts.setAnalyzedModes(TransportMode.car);
 		counts.setAverageCountsOverIterations(1);
-		counts.setCountsFileName(Global.matsimInputDir + "Counts/counts.xml");
+		counts.setInputFile(Global.matsimInputDir + "Counts/counts.xml");
 		counts.setCountsScaleFactor(Global.N/Global.getN());
 		counts.setDistanceFilter(null);
 		counts.setDistanceFilterCenterNode(null);

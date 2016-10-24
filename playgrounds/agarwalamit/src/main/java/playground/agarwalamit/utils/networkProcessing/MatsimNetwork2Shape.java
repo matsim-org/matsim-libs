@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
@@ -55,7 +55,7 @@ public class MatsimNetwork2Shape {
         Network network = scenario.getNetwork();
         
         CoordinateReferenceSystem crs = MGC.getCRS("EPSG:3459");//i have tried 2842 3659,2455  32035 and  32135
-        Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+        Collection<SimpleFeature> features = new ArrayList<>();
         PolylineFeatureFactory linkFactory = new PolylineFeatureFactory.Builder().setCrs(crs).
         		setName("link").
                 addAttribute("ID", String.class).
@@ -71,12 +71,12 @@ public class MatsimNetwork2Shape {
         	Coordinate toNodeCoordinate = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
         	Coordinate linkCoordinate = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
         	SimpleFeature ft = linkFactory.createPolyline(new Coordinate [] {fromNodeCoordinate, linkCoordinate, toNodeCoordinate},
-					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), link.getLength(), ((LinkImpl)link).getType(), link.getCapacity(), link.getFreespeed()}, null);
+					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), link.getLength(), NetworkUtils.getType(((Link)link)), link.getCapacity(), link.getFreespeed()}, null);
 			features.add(ft);
         }
        new File("./clusterOutput/networkShape/").mkdir();
         ShapeFileWriter.writeGeometries(features, OUT_SHAPE_LOCATION+"network_links.shp");
-        features = new ArrayList<SimpleFeature>();
+        features = new ArrayList<>();
 		PointFeatureFactory nodeFactory = new PointFeatureFactory.Builder().
 				setCrs(crs).
 				setName("nodes").

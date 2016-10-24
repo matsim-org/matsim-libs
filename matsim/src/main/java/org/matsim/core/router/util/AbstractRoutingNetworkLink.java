@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public abstract class AbstractRoutingNetworkLink implements RoutingNetworkLink {
 
@@ -37,6 +38,14 @@ public abstract class AbstractRoutingNetworkLink implements RoutingNetworkLink {
 		this.link = link;
 		this.fromNode = fromNode;
 		this.toNode = toNode;
+	}
+	@Override
+	public double getFlowCapacityPerSec() {
+		return this.link.getFlowCapacityPerSec() ;
+	}
+	@Override
+	public double getFlowCapacityPerSec( double time ) {
+		return this.link.getFlowCapacityPerSec(time) ;
 	}
 	
 	@Override
@@ -139,4 +148,8 @@ public abstract class AbstractRoutingNetworkLink implements RoutingNetworkLink {
 		return this.link.getCoord();
 	}
 
+	@Override
+	public Attributes getAttributes() {
+		return link.getAttributes();
+	}
 }

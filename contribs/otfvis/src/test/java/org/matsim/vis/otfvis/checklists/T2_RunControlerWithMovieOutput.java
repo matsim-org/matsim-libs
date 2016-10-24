@@ -30,7 +30,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 public class T2_RunControlerWithMovieOutput {
 
 	public static void main(String[] args) {
-		Controler con = new Controler("./test/input/org/matsim/vis/otfvis/checklists/config-qsim.xml");
+		Controler con = new Controler("test/scenarios/equil/config-qsim.xml");
 		con.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		con.addOverridingModule(new OTFVisFileWriterModule());
 		con.run();

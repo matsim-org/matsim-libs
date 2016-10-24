@@ -1,30 +1,27 @@
-/*
- *  *********************************************************************** *
- *  * project: org.matsim.*
- *  * CadytsControlerListener.java
- *  *                                                                         *
- *  * *********************************************************************** *
- *  *                                                                         *
- *  * copyright       : (C) 2014 by the members listed in the COPYING, *
- *  *                   LICENSE and WARRANTY file.                            *
- *  * email           : info at matsim dot org                                *
- *  *                                                                         *
- *  * *********************************************************************** *
- *  *                                                                         *
- *  *   This program is free software; you can redistribute it and/or modify  *
- *  *   it under the terms of the GNU General Public License as published by  *
- *  *   the Free Software Foundation; either version 2 of the License, or     *
- *  *   (at your option) any later version.                                   *
- *  *   See also COPYING, LICENSE and WARRANTY file                           *
- *  *                                                                         *
- *  * ***********************************************************************
- */
+/* *********************************************************************** *
+ * project: org.matsim.*                                                   *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 
 package playground.dziemke.cemdapMatsimCadyts.measurement;
 
-import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import cadyts.measurements.SingleLinkMeasurement.TYPE;
-import cadyts.supply.SimResults;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -42,8 +39,9 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import cadyts.measurements.SingleLinkMeasurement.TYPE;
+import cadyts.supply.SimResults;
 
 /**
  * {@link org.matsim.core.replanning.PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
@@ -53,7 +51,6 @@ import javax.inject.Singleton;
 class CadytsControlerListener implements BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
 
     private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
-
 
     @Inject
     PlansTranslatorBasedOnEvents ptStep;
@@ -120,5 +117,4 @@ class CadytsControlerListener implements BeforeMobsimListener, AfterMobsimListen
 	private boolean isActiveInThisIteration(final int iter) {
 		return (iter > 0 && iter % scenario.getConfig().counts().getWriteCountsInterval() == 0);
 	}
-
 }

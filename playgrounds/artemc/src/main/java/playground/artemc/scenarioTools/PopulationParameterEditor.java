@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -28,7 +28,7 @@ public class PopulationParameterEditor {
 		Population population = (Population) scenario.getPopulation();
 
 		new PopulationReader(scenario).readFile(populationPath);
-		new ObjectAttributesXmlReader(population.getPersonAttributes()).parse(personAttributePath);
+		new ObjectAttributesXmlReader(population.getPersonAttributes()).readFile(personAttributePath);
 
 //		//Random generator = new Random(10830239345L);
 //		Random generator = new Random(4600062981430244332L);

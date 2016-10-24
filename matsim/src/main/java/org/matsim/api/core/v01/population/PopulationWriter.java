@@ -24,15 +24,20 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.utils.objectattributes.AttributeConverter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author nagel
  */
 public final class PopulationWriter implements MatsimWriter {
-
+	
 	private final CoordinateTransformation transformation;
 	private final Population population;
 	private final Network network;
+	private final Map<Class<?>,AttributeConverter<?>> attributeConverters = new HashMap<>();
 
 	public PopulationWriter(
 			final CoordinateTransformation transformation,
@@ -56,12 +61,21 @@ public final class PopulationWriter implements MatsimWriter {
 		this( new IdentityTransformation() , population , null );
 	}
 
+
+	public <T> void putAttributeConverter(Class<T> clazz, AttributeConverter<T> converter) {
+		this.attributeConverters.put( clazz , converter );
+	}
+
+	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
+		this.attributeConverters.putAll( converters );
+	}
+
 	/**
-	 * Writes the population in the most current format (currently population_v5.dtd).
+	 * Writes the population in the most current format (currently population_v6.dtd).
 	 */
 	@Override
 	public void write(final String filename) {
-		new org.matsim.core.population.PopulationWriter(transformation , this.population, this.network).write(filename);
+		writeV6( filename );
 	}
 
 	/**
@@ -70,7 +84,7 @@ public final class PopulationWriter implements MatsimWriter {
 	 * @param filename
 	 */
 	public void writeV4(final String filename) {
-		new org.matsim.core.population.PopulationWriter(transformation , this.population, this.network).writeV4(filename);
+		new org.matsim.core.population.io.PopulationWriter(transformation , this.population, this.network).writeV4(filename);
 	}
 
 	/**
@@ -79,7 +93,18 @@ public final class PopulationWriter implements MatsimWriter {
 	 * @param filename
 	 */
 	public void writeV5(final String filename) {
-		new org.matsim.core.population.PopulationWriter( transformation , this.population, this.network).writeV5(filename);
+		new org.matsim.core.population.io.PopulationWriter( transformation , this.population, this.network).writeV5(filename);
 	}
 
+	/**
+	 * Writes the population in the format of population_v5.dtd
+	 *
+	 * @param filename
+	 */
+	public void writeV6(final String filename) {
+		final org.matsim.core.population.io.PopulationWriter writer =
+				new org.matsim.core.population.io.PopulationWriter( transformation , this.population, this.network);
+		writer.putAttributeConverters( attributeConverters );
+		writer.writeV6(filename);
+	}
 }

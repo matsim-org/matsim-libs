@@ -23,12 +23,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand.OuterCordonLinks;
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand.OuterCordonModalCountsAdjustmentCalculator;
 
 /**
  * @author amit
@@ -40,9 +42,19 @@ public class OuterCordonUtils {
 	public static final double SAMPLE_SIZE = 0.1;
 
 	/**
-	 * correction factor only from car/motorbike/truck/bike and not from all vehicles (additionally, walk, cycle rickshaw, pt)
+	 * modal correction factor only from car/motorbike/truck/bike and not from all vehicles (additionally, walk, cycle rickshaw, pt)
+	 * see {@link OuterCordonModalCountsAdjustmentCalculator}
 	 */
-	public static final double E2I_TRIP_REDUCTION_FACTOR = 0.853; 
+//	public static final double E2I_TRIP_REDUCTION_FACTOR = 0.853; 
+	public static Map<String,Double> getModalOutTrafficAdjustmentFactor (){
+		Map<String, Double> mode2adjustmentFactor = new HashMap<>();
+		mode2adjustmentFactor.put("car", 0.98);
+		mode2adjustmentFactor.put("motorbike", 0.86);
+		mode2adjustmentFactor.put("bike", 0.68);
+		mode2adjustmentFactor.put("truck", 1.16);
+		mode2adjustmentFactor.put("total", 0.94);
+		return mode2adjustmentFactor;
+	}
 
 	public static Map<String, List<Integer>> getAreaType2ZoneIds(){//(from Fig.4-9 in PatnaReport)
 		Map<String, List<Integer>> areas2zones = new HashMap<>();
@@ -145,7 +157,7 @@ public class OuterCordonUtils {
 
 		private final double factor;
 
-		private OuterCordonDirectionalFactors(final double factor){
+		OuterCordonDirectionalFactors(final double factor){
 			this.factor = factor;
 		}
 
@@ -177,16 +189,16 @@ public class OuterCordonUtils {
 
 	public static List<Id<Link>> getExternalToInternalCountStationLinkIds(final PatnaNetworkType pnt){
 		List<Id<Link>> links = new ArrayList<>();
-		for(String l : new OuterCordonLinks(pnt).getCountingStationToLink().keySet()){
-			if(l.toString().split("_")[1].equals("X2P")) links.add( Id.createLinkId(l) ) ;
+		for(Entry<String,String> e : new OuterCordonLinks(pnt).getCountingStationToLink().entrySet()){
+			if(e.getKey().toString().split("_")[1].equals("X2P")) links.add( Id.createLinkId(e.getValue()) ) ;
 		}
 		return links;
 	}
 
 	public static List<Id<Link>> getInternalToExternalCountStationLinkIds(final PatnaNetworkType pnt){
 		List<Id<Link>> links = new ArrayList<>();
-		for(String l : new OuterCordonLinks(pnt).getCountingStationToLink().keySet()){
-			if(l.toString().split("_")[1].equals("P2X")) links.add( Id.createLinkId(l) ) ;
+		for(Entry<String,String> e : new OuterCordonLinks(pnt).getCountingStationToLink().entrySet()){
+			if(e.getKey().toString().split("_")[1].equals("P2X")) links.add( Id.createLinkId(e.getValue()) ) ;
 		}
 		return links;
 	}

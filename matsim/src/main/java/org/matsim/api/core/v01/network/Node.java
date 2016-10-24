@@ -23,8 +23,10 @@ package org.matsim.api.core.v01.network;
 import java.util.Map;
 
 import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * A topological representation of an network node.
@@ -34,7 +36,7 @@ import org.matsim.api.core.v01.Identifiable;
  * the context.
  * (This becomes clear if you think about a nodeId/linkId given by person.)
  */
-public interface Node extends BasicLocation<Node>, Identifiable<Node> {
+public interface Node extends BasicLocation<Node>, Identifiable<Node>, Attributable {
 
 	/**
 	 * Adds a non-<code>null</code> link to this node's set of ingoing links.
@@ -84,6 +86,8 @@ public interface Node extends BasicLocation<Node>, Identifiable<Node> {
 	Link removeInLink(Id<Link> linkId);
 
 	Link removeOutLink(Id<Link> outLinkId);
+
+	void setCoord(Coord coord);
 
 
 }

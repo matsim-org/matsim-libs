@@ -47,9 +47,9 @@ public class ModeSwitcherInfoCollector {
 
 		for(ModeSwitcherType str :ModeSwitcherType.values()){
 			this.modeSwitchType2numberOfLegs.put(str, 0);
-			this.modeSwitchType2PersonIds.put(str, new ArrayList<Id<Person>>());
-			this.modeSwitchType2TripDistances.put(str, new Tuple<Double, Double>(0., 0.));
-			this.modeSwitchType2TripTimes.put(str, new Tuple<Double, Double>(0., 0.));
+			this.modeSwitchType2PersonIds.put(str, new ArrayList<>());
+			this.modeSwitchType2TripDistances.put(str, new Tuple<>(0., 0.));
+			this.modeSwitchType2TripTimes.put(str, new Tuple<>(0., 0.));
 		}
 		LOG.info("This will collect the information of mode switchers between two different iterations.");
 		LOG.warn("DO NOT USE TRIP TIME AND TRIP DISTANCE MAPS SIMULTANEOUSLY.");
@@ -63,8 +63,8 @@ public class ModeSwitcherInfoCollector {
 		swicherIds.add(personId);
 		this.modeSwitchType2PersonIds.put(modeSwitchTyp, swicherIds);
 
-		Tuple<Double, Double> nowFirstLastItsTripTimes = new Tuple<Double, Double>(this.modeSwitchType2TripTimes.get(modeSwitchTyp).getFirst()+travelTimes.getFirst(), 
-				this.modeSwitchType2TripTimes.get(modeSwitchTyp).getSecond()+travelTimes.getSecond());
+		Tuple<Double, Double> nowFirstLastItsTripTimes = new Tuple<>(this.modeSwitchType2TripTimes.get(modeSwitchTyp).getFirst() + travelTimes.getFirst(),
+                this.modeSwitchType2TripTimes.get(modeSwitchTyp).getSecond() + travelTimes.getSecond());
 		this.modeSwitchType2TripTimes.put(modeSwitchTyp, nowFirstLastItsTripTimes);
 	}
 
@@ -76,8 +76,8 @@ public class ModeSwitcherInfoCollector {
 		swicherIds.add(personId);
 		this.modeSwitchType2PersonIds.put(modeSwitchTyp, swicherIds);
 
-		Tuple<Double, Double> nowFirstLastItsTripTimes = new Tuple<Double, Double>(this.modeSwitchType2TripDistances.get(modeSwitchTyp).getFirst()+travelDistances.getFirst(), 
-				this.modeSwitchType2TripDistances.get(modeSwitchTyp).getSecond()+travelDistances.getSecond());
+		Tuple<Double, Double> nowFirstLastItsTripTimes = new Tuple<>(this.modeSwitchType2TripDistances.get(modeSwitchTyp).getFirst() + travelDistances.getFirst(),
+                this.modeSwitchType2TripDistances.get(modeSwitchTyp).getSecond() + travelDistances.getSecond());
 		this.modeSwitchType2TripDistances.put(modeSwitchTyp, nowFirstLastItsTripTimes);
 	}
 

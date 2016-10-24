@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -62,7 +62,7 @@ public class AnalyseNmbmSamplePopulation {
 		/* Read in the population. */
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader pr = new PopulationReader(sc);
-		pr.parse(args[1]);
+		pr.readFile(args[1]);
 		
 		/* Determine statistics for activity types. */
 		extractActivityCoordinates(outputFolder, sc);

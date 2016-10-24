@@ -235,7 +235,7 @@ public class ZHScenarioGlobal {
 		} else {
 			String linkSlopeAttributeFile = ZHScenarioGlobal.loadStringParam("networkLinkSlopes");
 			ObjectAttributes lp = new ObjectAttributes();
-			new ObjectAttributesXmlReader(lp).parse(linkSlopeAttributeFile);
+			new ObjectAttributesXmlReader(lp).readFile(linkSlopeAttributeFile);
 
 			for (Id<Link> linkId : scenario.getNetwork().getLinks().keySet()) {
 				linkSlopes.put(linkId, (Double) lp.getAttribute(linkId.toString(), "slope"));

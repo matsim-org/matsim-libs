@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.johannes.gsv.matrices.misc.SpanningTree.NodeData;
@@ -232,7 +232,7 @@ public class TTMatrixGenerator {
 		
 		logger.info("Loading network...");
 		MatsimNetworkReader reader = new MatsimNetworkReader(scenario.getNetwork());
-		reader.parse(netFile);
+		reader.readFile(netFile);
 		
 		logger.info("Loading zones...");
 		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zoneFile, zoneIdKey, null);

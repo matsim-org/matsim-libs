@@ -25,16 +25,6 @@ package org.matsim.contrib.signals;
  * @author dgrether
  */
 public class MatsimSignalSystemsReader {
-	/**
-	 * @deprecated use new file formats
-	 */
-	@Deprecated
-	public static final String SIGNALSYSTEMS10 = "http://www.matsim.org/files/dtd/lightSignalSystems_v1.0.xsd";
-	/**
-	 * @deprecated use new file formats
-	 */
-	@Deprecated
-	public static final String SIGNALSYSTEMS11 = "http://www.matsim.org/files/dtd/signalSystems_v1.1.xsd";
 
 	public static final String SIGNALSYSTEMS20 = "http://www.matsim.org/files/dtd/signalSystems_v2.0.xsd";
 

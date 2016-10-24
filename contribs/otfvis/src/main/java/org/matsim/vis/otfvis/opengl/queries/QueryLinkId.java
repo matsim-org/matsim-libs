@@ -33,10 +33,10 @@ import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
+import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.snapshotwriters.VisLink;
 
 /**
@@ -120,12 +120,12 @@ public class QueryLinkId extends AbstractQuery {
 						if (minDist - dist > epsilon) result.linkIds.clear();
 
 						minDist = dist;
-						Point2D.Float anchor = OGLSimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);
+						Point2D.Float anchor = OTFLinkAgentsHandler.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);
 						result.linkIds.put(new Coord(middleX + anchor.x, middleY + anchor.y), link.getId().toString());
 					}
 
 				} else {
-					Point2D.Float anchor = OGLSimpleQuadDrawer.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);
+					Point2D.Float anchor = OTFLinkAgentsHandler.calcOrtho(fromX, fromY, middleX, middleY, cellWidth/2.);
 					result.linkIds.put(new Coord(middleX + anchor.x, middleY + anchor.y), link.getId().toString());
 				}
 			}

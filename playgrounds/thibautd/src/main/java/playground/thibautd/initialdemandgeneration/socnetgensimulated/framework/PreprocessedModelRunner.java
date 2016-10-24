@@ -20,12 +20,8 @@
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
 import com.google.inject.Inject;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TIntDoubleMap;
 import gnu.trove.map.hash.TIntDoubleHashMap;
-import gnu.trove.procedure.TIntDoubleProcedure;
-import gnu.trove.procedure.TIntProcedure;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import org.apache.log4j.Logger;
@@ -111,7 +107,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 			}
 		}
 		else {
-			this.preprocess = new WeightedSocialNetworkReader().read( config.getInputPreprocessedNetwork() );
+			this.preprocess = new WeightedSocialNetworkReader().createAndReadSocialNetwork( config.getInputPreprocessedNetwork() );
 			this.updateSecondaryPreprocess( lowestStoredPrimary );
 		}
 	}

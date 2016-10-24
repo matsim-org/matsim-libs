@@ -1,7 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
   [
-   <!ENTITY INPUTBASE   "./test/input/org/matsim/contrib/minibus/integration/PControlerTest/input/">
    <!ENTITY OUTPUTBASE	"./test/output/org/matsim/contrib/minibus/integration/PControlerTest/testPControler/">
    <!ENTITY SCENARIO	"corr_s1">
    <!ENTITY NAME	"0">
@@ -130,7 +129,7 @@
 <!-- ====================================================================== -->
 
 	<module name="network">
-		<param name="inputNetworkFile" value="&INPUTBASE;network_corridor.xml" />
+		<param name="inputNetworkFile" value="input/network_corridor.xml" />
 	</module>
 
 <!-- ====================================================================== -->
@@ -214,7 +213,7 @@
 <!-- ====================================================================== -->
 
 	<module name="plans">
-		<param name="inputPlansFile" value="&INPUTBASE;pop_corr_s1.xml.gz" />
+		<param name="inputPlansFile" value="input/pop_corr_s1.xml.gz" />
 	</module>
 
 <!-- ====================================================================== -->
@@ -283,8 +282,8 @@
 	</module>
 
 	<module name="transit">
-		<param name="transitScheduleFile" value="&INPUTBASE;transitSchedule.xml" />
-		<param name="vehiclesFile" value="&INPUTBASE;transitVehicles.xml" />
+		<param name="transitScheduleFile" value="input/transitSchedule.xml" />
+		<param name="vehiclesFile" value="input/transitVehicles.xml" />
 		<param name="transitModes" value="pt" />
 		
 				<!-- Set this parameter to true if transit should be simulated, false if not. -->

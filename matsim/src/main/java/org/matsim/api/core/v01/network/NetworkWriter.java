@@ -21,6 +21,10 @@
 package org.matsim.api.core.v01.network;
 
 import org.matsim.core.api.internal.MatsimWriter;
+import org.matsim.utils.objectattributes.AttributeConverter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author nagel
@@ -29,17 +33,26 @@ import org.matsim.core.api.internal.MatsimWriter;
 public class NetworkWriter implements MatsimWriter {
 
 	private final Network network ;
-	
+	private final Map<Class<?>,AttributeConverter<?>> converters = new HashMap<>();
+
 	public NetworkWriter(final Network network) {
 		this.network = network ;
 	}
-	
+
+	public void putAttributeConverters(final Map<Class<?>, AttributeConverter<?>> converters) {
+		this.converters.putAll( converters );
+	}
+
+	public void putAttributeConverter(Class<?> clazz , AttributeConverter<?> converter) {
+		this.converters.put(  clazz , converter );
+	}
+
 	/**
 	 * Writes the network in the current default format (currently network_v1.dtd). 
 	 */
 	@Override
 	public void write(final String filename) {
-		writeV1(filename);
+		writeV2(filename);
 	}
 		
 	/**
@@ -48,7 +61,14 @@ public class NetworkWriter implements MatsimWriter {
 	 * @param filename
 	 */
 	public void writeV1(final String filename) {
-		new org.matsim.core.network.NetworkWriter(network).writeFileV1(filename);
+		new org.matsim.core.network.io.NetworkWriter(network).writeFileV1(filename);
 	}
-	
+
+	public void writeV2(final String filename) {
+		final org.matsim.core.network.io.NetworkWriter writer =
+				new org.matsim.core.network.io.NetworkWriter(network);
+		writer.putAttributeConverters( converters );
+		writer.writeFileV2(filename);
+	}
+
 }

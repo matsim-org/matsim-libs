@@ -31,12 +31,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -59,7 +59,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  *  instead, sum of distance between (993.0,0) (1000.0,0.0) and (1000,0) (991,14).
  *  This is here only for documentation, I will remove the whole class eventually.
  *  
- *  Alternatively see {@link AgentPositionWriter.class}
+ *  Alternatively see {@link AgentPositionWriter}
  * @author amit 
  */
 
@@ -88,7 +88,7 @@ public class AgentPositionWriterOld {
 		if( IS_WRITING_TRANSIM_FILE ){
 			// not sure, if following three lines are required.
 			sc.getConfig().qsim().setLinkWidthForVis((float)0);
-			((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(0.);
+			((Network)sc.getNetwork()).setEffectiveLaneWidth(0.);
 
 			sc.getConfig().controler().setSnapshotFormat(Arrays.asList("transims"));
 			transimFile = apw.createAndReturnTransimSnapshotFile(sc, eventsFile);
@@ -137,13 +137,13 @@ public class AgentPositionWriterOld {
 		new MatsimEventsReader(manager).readFile(eventsFile);
 	}
 
-	private BufferedWriter writer ;
+	private final BufferedWriter writer ;
 
-	private Map<Id<Person>,String> person2mode = new HashMap<>();
-	private Map<Id<Person>,Tuple<Double,Double>> prevEastingNorthing = new HashMap<>();
-	private Map<Id<Person>,Double> prevPosition = new HashMap<>();
-	private Map<Id<Person>,Double> prevTime = new HashMap<>();
-	private Map<Id<Person>,Integer> prevCycle = new HashMap<>();
+	private final Map<Id<Person>,String> person2mode = new HashMap<>();
+	private final Map<Id<Person>,Tuple<Double,Double>> prevEastingNorthing = new HashMap<>();
+	private final Map<Id<Person>,Double> prevPosition = new HashMap<>();
+	private final Map<Id<Person>,Double> prevTime = new HashMap<>();
+	private final Map<Id<Person>,Integer> prevCycle = new HashMap<>();
 
 	private void readTransimFileAndWriteData(String inputFile)
 	{
@@ -154,7 +154,7 @@ public class AgentPositionWriterOld {
 		config.setDelimiterTags( new String []{"\t"} );
 		// ---
 		TabularFileHandler handler = new TabularFileHandler(){
-			List<String> labels = new ArrayList<>() ;
+			final List<String> labels = new ArrayList<>() ;
 			@Override
 			public void startRow(String[] row) {
 				List<String> strs = Arrays.asList( row ) ;
@@ -195,7 +195,7 @@ public class AgentPositionWriterOld {
 							prevPosition.put(agentId, 0.);
 							prevCycle.put(agentId, 1);
 						}
-						prevEastingNorthing.put(agentId, new Tuple<Double, Double>(easting, northing));
+						prevEastingNorthing.put(agentId, new Tuple<>(easting, northing));
 						prevTime.put(agentId, time);
 					} catch (Exception e) {
 						throw new RuntimeException("Data is not written to the file. Reason :"+e);

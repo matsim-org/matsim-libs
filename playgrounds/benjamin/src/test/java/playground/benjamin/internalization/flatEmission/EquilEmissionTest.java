@@ -50,6 +50,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.benjamin.internalization.EmissionCostFactors;
@@ -90,12 +91,13 @@ public class EquilEmissionTest {
 		
 		EquilTestSetUp equilTestSetUp = new EquilTestSetUp();
 
-		Scenario sc = equilTestSetUp.createConfig();
+		Scenario sc = equilTestSetUp.createConfigAndReturnScenario();
 		equilTestSetUp.createNetwork(sc);
 		equilTestSetUp.createActiveAgents(sc);
 		equilTestSetUp.createPassiveAgents(sc);
 
 		emissionSettings(sc);
+		ScenarioUtils.loadScenario(sc); // need to load vehicles. Amit Sep 2016
 
 		Controler controler = new Controler(sc);
 		String outputDirectory = helper.getOutputDirectory() + "/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/");
@@ -128,7 +130,7 @@ public class EquilEmissionTest {
 		MyEmissionEventHandler emissEventHandler = new MyEmissionEventHandler();
 		events.addHandler(emissEventHandler);
 		int lastIt = sc.getConfig().controler().getLastIteration();
-		reader.parse(outputDirectory + "/ITERS/it."+lastIt+"/"+lastIt+".emission.events.xml.gz");
+		reader.readFile(outputDirectory + "/ITERS/it."+lastIt+"/"+lastIt+".emission.events.xml.gz");
 
 		// first check for cold emission, which are generated only on departure link.
 		for (ColdEmissionEvent e : emissEventHandler.coldEvents ) {
@@ -209,7 +211,7 @@ public class EquilEmissionTest {
 		Config config = scenario.getConfig();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
 		ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
-		ecg.setEmissionVehicleFile(emissionVehicleFile);
+		config.vehicles().setVehiclesFile(emissionVehicleFile);
 
 		ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 		ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
@@ -217,6 +219,7 @@ public class EquilEmissionTest {
 		ecg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
 		ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
 		ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
+		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 
 		config.addModule(ecg);
 	}

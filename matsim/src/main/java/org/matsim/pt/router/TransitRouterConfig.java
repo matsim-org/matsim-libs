@@ -91,6 +91,8 @@ public class TransitRouterConfig implements MatsimParameters {
 
 	private double utilityOfLineSwitch_utl;
 
+	private Double beelineDistanceFactor;
+
 	public TransitRouterConfig(final Config config) {
 		this(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 	}
@@ -101,9 +103,11 @@ public class TransitRouterConfig implements MatsimParameters {
 		pcsConfig.setLocked(); pcrConfig.setLocked() ; trConfig.setLocked() ; vspConfig.setLocked() ;
 		
 		// walk:
-		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk)
-				/ pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() ;
+		this.beelineDistanceFactor = pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
 
+		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk)
+				/ beelineDistanceFactor ;
+		
 		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
 		
 		this.marginalUtilityOfTravelDistanceWalk_utl_m = pcsConfig.getMarginalUtilityOfMoney() * pcsConfig.getModes().get(TransportMode.walk).getMonetaryDistanceRate();
@@ -225,6 +229,10 @@ public class TransitRouterConfig implements MatsimParameters {
 
 	public void setAdditionalTransferTime(double additionalTransferTime) {
 		this.additionalTransferTime = additionalTransferTime;
+	}
+
+	public final Double getBeelineDistanceFactor() {
+		return this.beelineDistanceFactor;
 	}
 
 }

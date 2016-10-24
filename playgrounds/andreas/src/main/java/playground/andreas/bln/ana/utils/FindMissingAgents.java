@@ -30,7 +30,7 @@ public class FindMissingAgents implements EventHandler, PersonDepartureEventHand
 		events.addHandler(this);
 		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(filename);
+		reader.readFile(filename);
 	}
 	
 	private void run(String eventsFile) {

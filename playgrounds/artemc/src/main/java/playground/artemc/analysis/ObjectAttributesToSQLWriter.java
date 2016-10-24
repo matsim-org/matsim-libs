@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -47,7 +47,7 @@ public class ObjectAttributesToSQLWriter {
 		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		new PopulationReader(scenario).readFile(populationPath);
-		new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes()).parse(personAttributePath);
+		new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes()).readFile(personAttributePath);
 	}
 
 	public void writeToDatabase(String connectionPropertiesFile, String schema, String tableName) {

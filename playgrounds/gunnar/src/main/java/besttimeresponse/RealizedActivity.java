@@ -1,26 +1,74 @@
 package besttimeresponse;
 
+import static java.lang.Double.NEGATIVE_INFINITY;
+import static java.lang.Double.POSITIVE_INFINITY;
+
+import floetteroed.utilities.Units;
+import floetteroed.utilities.math.MathHelpers;
+
 /**
  * 
  * @author Gunnar Flötteröd
  *
+ * @param L
+ *            the location type (generic such that both link-to-link and
+ *            zone-to-zone are supported)
+ * @param M
+ *            the mode type
  */
-class RealizedActivity {
+class RealizedActivity<L, M> {
 
-	final PlannedActivity plannedActivity;
+	// -------------------- CONSTANTS --------------------
 
-	final double realizedArrivalTime_s;
+	final PlannedActivity<L, M> plannedActivity;
 
-	final double realizedDepartureTime_s;
+	final TripTime nextTripTravelTime;
 
-	final InterpolatedTravelTimes.Entry nextTripTravelTime;
+	final double realizedArrTime_s;
 
-	RealizedActivity(final PlannedActivity plannedActivity, final double realizedArrivalTime_s,
-			final double realizedDepartureTime_s, final InterpolatedTravelTimes.Entry nextTripTravelTime) {
+	final double realizedDptTime_s;
+
+	// -------------------- CONSTRUCTION --------------------
+
+	RealizedActivity(final PlannedActivity<L, M> plannedActivity, final TripTime nextTripTimes,
+			final double realizedArrTime_s, final double realizedDptTime_s) {
 		this.plannedActivity = plannedActivity;
-		this.realizedArrivalTime_s = realizedArrivalTime_s;
-		this.realizedDepartureTime_s = realizedDepartureTime_s;
-		this.nextTripTravelTime = nextTripTravelTime;
+		this.nextTripTravelTime = nextTripTimes;
+		this.realizedArrTime_s = realizedArrTime_s;
+		this.realizedDptTime_s = realizedDptTime_s;
 	}
 
+	// -------------------- GETTERS --------------------
+
+	boolean isLateArrival() {
+		return this.plannedActivity.isLateArrival(this.realizedArrTime_s);
+	}
+
+	boolean isEarlyDeparture() {
+		return this.plannedActivity.isEarlyDeparture(this.realizedDptTime_s);
+	}
+
+	boolean isClosedAtArrival() {
+		return this.plannedActivity.isClosed(this.realizedArrTime_s);
+	}
+
+	boolean isClosedAtDeparture() {
+		return this.plannedActivity.isClosed(this.realizedDptTime_s);
+	}
+
+	double effectiveDuration_s() {
+		final double result;
+		if (this.realizedArrTime_s > this.realizedDptTime_s) {
+			// An overnight activity, always open.
+			result = this.realizedDptTime_s + (Units.S_PER_D - this.realizedArrTime_s);
+		} else {
+			// A within-day activity, possibly closed.
+			result = MathHelpers.overlap(this.realizedArrTime_s, this.realizedDptTime_s,
+					(this.plannedActivity.openingTime_s != null) ? this.plannedActivity.openingTime_s
+							: NEGATIVE_INFINITY,
+					(this.plannedActivity.closingTime_s != null) ? this.plannedActivity.closingTime_s
+							: POSITIVE_INFINITY);
+		}
+		return result;
+	}
 }

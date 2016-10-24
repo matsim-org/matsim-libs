@@ -4,12 +4,12 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingUtils;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
@@ -87,8 +87,8 @@ public class SimpleXY2Links {
 
 		final Population plans = (Population) scenario.getPopulation();
 		StreamingUtils.setIsStreaming(plans, true);
-		final MatsimPopulationReader plansReader = new PopulationReader(scenario);
-		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
+		final MatsimReader plansReader = new PopulationReader(scenario);
+		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(plans, network);
 		plansWriter.startStreaming(this.plansfileOUT);
 		StreamingUtils.addAlgorithm(plans, new org.matsim.core.population.algorithms.XY2Links(network, null));
 		StreamingUtils.addAlgorithm(plans, plansWriter);

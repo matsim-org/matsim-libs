@@ -51,7 +51,7 @@ public class RunResizeLinksByCount extends AbstractResizeLinksByCount{
 
 		Counts counts = new Counts();
 		CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(counts);
-		countsReader.parse(countsFile);
+		countsReader.readFile(countsFile);
 
 		RunResizeLinksByCount rrc = new RunResizeLinksByCount(networkFile, counts, 1.1);
 		rrc.run(outputFile);
@@ -62,7 +62,7 @@ public class RunResizeLinksByCount extends AbstractResizeLinksByCount{
 		TreeMap<Id<Link>, Count> counts = this.getOriginalCounts().getCounts();
 		Map<Id<Link>, ? extends Link> links = this.getOrigNetwork().getLinks();
 		for(Count count : counts.values()){
-			Id locId = count.getLocId();
+			Id locId = count.getId();
 			Id linkId = links.get(locId).getId();
 			double maxCount = count.getMaxVolume().getValue();
 			

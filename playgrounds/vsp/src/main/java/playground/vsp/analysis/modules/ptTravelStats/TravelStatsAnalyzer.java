@@ -56,8 +56,8 @@ public class TravelStatsAnalyzer extends AbstractAnalysisModule {
 	public final static String OCCUPANCY = "occupancy";
 	
 	private final static Logger log = Logger.getLogger(TravelStatsAnalyzer.class);
-	private final String separator = "\t";
-	private final String header = "# Link Id" + separator + "x1" + separator + "y1" + separator + "x2" + separator + "y2" + separator + "total";
+	private final String separator = ";";
+	private final String header = "linkId" + separator + "x1" + separator + "y1" + separator + "x2" + separator + "y2" + separator + "total";
 	private Scenario scenario;
 	private TravelStatsHandler handler;
 	
@@ -246,6 +246,6 @@ public class TravelStatsAnalyzer extends AbstractAnalysisModule {
 	}
 	
 	private String createFilename(String mode, String identifier){
-		return mode + "_" + identifier + ".txt";
+		return mode + "_" + identifier + ".csv";
 	}
 }

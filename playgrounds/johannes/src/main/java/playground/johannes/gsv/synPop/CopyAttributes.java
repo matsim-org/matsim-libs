@@ -46,13 +46,13 @@ public class CopyAttributes {
 		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 //		subsample = true;
-		parser.parse(args[0]);
+		parser.readFile(args[0]);
 		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 
 		parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 //		subsample = false;
-		parser.parse(args[1]);
+		parser.readFile(args[1]);
 
 		Map<String, PlainPerson> templates = new HashMap<>();
 		for (PlainPerson person : (Set<PlainPerson>)parser.getPersons()) {

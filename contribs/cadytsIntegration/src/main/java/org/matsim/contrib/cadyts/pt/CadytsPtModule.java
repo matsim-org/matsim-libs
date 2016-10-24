@@ -8,5 +8,6 @@ public class CadytsPtModule extends AbstractModule {
 	public void install() {
 		bind(CadytsPtContext.class).asEagerSingleton();
 		addControlerListenerBinding().to(CadytsPtContext.class);
+		bind(CadytsPtOccupancyAnalyzerI.class).to(CadytsPtOccupancyAnalyzer.class);
 	}
 }

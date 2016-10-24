@@ -54,7 +54,7 @@ public class EventStripperHITSPlans {
 		TrimEventWriterHITS filteredWriter = new TrimEventWriterHITS(outfileName,this.origIds);
 		events.addHandler(filteredWriter);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(inFileName);
+		reader.readFile(inFileName);
 		filteredWriter.closeFile();
 	}
 	

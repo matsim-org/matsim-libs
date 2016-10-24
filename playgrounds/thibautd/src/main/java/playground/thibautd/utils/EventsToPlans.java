@@ -19,23 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
-import com.google.common.eventbus.Subscribe;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scoring.*;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
 import org.matsim.core.scoring.EventsToLegs.LegHandler;
+import org.matsim.core.scoring.PersonExperiencedActivity;
+import org.matsim.core.scoring.PersonExperiencedLeg;
 import org.matsim.core.utils.collections.MapUtils;
 
 import java.util.HashMap;

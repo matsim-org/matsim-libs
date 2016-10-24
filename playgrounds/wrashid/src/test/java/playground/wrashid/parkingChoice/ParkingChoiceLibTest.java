@@ -40,10 +40,10 @@ public class ParkingChoiceLibTest extends TestCase {
 	}
 	
 	private Scenario getScenario() {
-		String basePath="test/scenarios/chessboard/";
-		String plansFile=basePath + "plans.xml";
-		String networkFile=basePath + "network.xml";
-		String facilititiesPath=basePath + "facilities.xml";
+		String basePath="test/input/scenarios/chessboard/";
+		String plansFile=basePath+"plans.xml";
+		String networkFile=basePath+"network.xml";
+		String facilititiesPath=basePath+"facilities.xml";
 		Scenario scenario = GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
 		return scenario;
 	}

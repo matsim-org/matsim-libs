@@ -31,7 +31,7 @@ public class ArrivalStopTimeMutatorPlanStrategy implements PlanStrategy {
 			agentAttributes0.putAttribute(person.getId().toString(), ORIGINAL_TIME, new Double((int)(Math.random()*3600*30)));
 		new ObjectAttributesXmlWriter(agentAttributes0).writeFile(folder+INPUT_FILE);
 		ObjectAttributes agentAttributes = new ObjectAttributes();
-		new ObjectAttributesXmlReader(agentAttributes).parse(folder+INPUT_FILE);
+		new ObjectAttributesXmlReader(agentAttributes).readFile(folder+INPUT_FILE);
 		for(Person person:scenario.getPopulation().getPersons().values())
 			times.put(person.getId(), (Double)agentAttributes.getAttribute(person.getId().toString(), ORIGINAL_TIME));
 		delegate = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());

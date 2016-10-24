@@ -47,7 +47,7 @@ import org.matsim.contrib.socnetgen.sna.math.LogNormalDistribution;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.xml.sax.SAXException;
@@ -79,7 +79,7 @@ public class RunErgmSimulator {
 		 */
 		Config config = new Config();
 		ConfigReader creader = new ConfigReader(config);
-		creader.parse(args[0]);
+		creader.readFile(args[0]);
 		/*
 		 * load population
 		 */

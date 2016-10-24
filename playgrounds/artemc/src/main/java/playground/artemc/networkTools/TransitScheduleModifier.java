@@ -7,8 +7,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -31,7 +30,7 @@ import org.matsim.vehicles.VehiclesFactory;
 public class TransitScheduleModifier {
 
 	private MutableScenario sc;	
-	private NetworkImpl network;
+	private Network network;
 	private TransitSchedule transitSchedule;
 	public MutableScenario getSc() {
 		return sc;
@@ -110,7 +109,7 @@ public class TransitScheduleModifier {
 		config.scenario().setUseVehicles(true);
 
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
-		this.network = (NetworkImpl) sc.getNetwork();
+		this.network = (Network) sc.getNetwork();
 
 		this.transitSchedule = readTransitSchedule(this.network, transitScheduleFile);
 	

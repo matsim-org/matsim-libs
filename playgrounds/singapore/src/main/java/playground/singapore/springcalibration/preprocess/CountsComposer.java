@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.counts.Count;
@@ -90,9 +90,9 @@ public class CountsComposer {
 		double scale = 1.0;
 		if (mode.equals("bus"))  scale = this.scaleFactor;
 						
-		Count<Link> composedCount = this.composedcounts.getCount(countstoadd.getLocId());
+		Count<Link> composedCount = this.composedcounts.getCount(countstoadd.getId());
 		if (composedCount == null) {
-			composedCount = this.composedcounts.createAndAddCount(countstoadd.getLocId(), countstoadd.getCsId());
+			composedCount = this.composedcounts.createAndAddCount(countstoadd.getId(), countstoadd.getCsLabel());
 		}
 		
 		double totalCount = 0;

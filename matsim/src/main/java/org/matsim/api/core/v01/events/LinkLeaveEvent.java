@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
-public class LinkLeaveEvent extends Event {
+public class LinkLeaveEvent extends Event implements HasLinkId {
 
 	public static final String EVENT_TYPE = "left link";
 	public static final String ATTRIBUTE_LINK = "link";
@@ -62,6 +62,7 @@ public class LinkLeaveEvent extends Event {
 		throw new RuntimeException(missingDriverIdMessage ) ;
 	}
 
+	@Override
 	public Id<Link> getLinkId() {
 		return this.linkId;
 	}

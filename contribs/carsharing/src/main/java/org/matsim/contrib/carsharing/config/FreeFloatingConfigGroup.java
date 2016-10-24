@@ -20,7 +20,9 @@
 package org.matsim.contrib.carsharing.config;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
-
+/** 
+ * @author balac
+ */
 
 public class FreeFloatingConfigGroup extends ReflectiveConfigGroup {
 	

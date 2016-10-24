@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -68,7 +68,7 @@ public class TestNetworkMatcher {
 			@Override
 			protected Network providePreparedNetwork(String path2Network, String path2VissimZoneShp) {
 				Network network = NetworkUtils.createNetwork();
-				NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(network);
+				NetworkFactory networkFactory = network.getFactory();
 				network.addNode(networkFactory.createNode(Id.create(1, Node.class), new Coord((double) 10, (double) 30)));
 				network.addNode(networkFactory.createNode(Id.create(2, Node.class), new Coord((double) 110, (double) 130)));
 				network.addLink(networkFactory.createLink(Id.create(101, Link.class),

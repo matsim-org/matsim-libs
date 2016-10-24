@@ -29,24 +29,24 @@
 	<module name="emissions" >
 
 		<!-- REQUIRED: file with HBEFA 3.1 fleet average cold emission factors -->
-		<param name="averageFleetColdEmissionFactorsFile" value="./test/input/org/matsim/contrib/emissions/sample_EFA_ColdStart_vehcat_2005average.txt" />
+		<param name="averageFleetColdEmissionFactorsFile" value="sample_EFA_ColdStart_vehcat_2005average.txt" />
 
 		<!-- REQUIRED: file with HBEFA 3.1 fleet average warm emission factors -->
-		<param name="averageFleetWarmEmissionFactorsFile" value="./test/input/org/matsim/contrib/emissions/sample_EFA_HOT_vehcat_2005average.txt" />
+		<param name="averageFleetWarmEmissionFactorsFile" value="sample_EFA_HOT_vehcat_2005average.txt" />
 
 		<!-- OPTIONAL: file with HBEFA 3.1 detailed cold emission factors -->
-		<param name="detailedColdEmissionFactorsFile" value="./test/input/org/matsim/contrib/emissions/sample_EFA_ColdStart_SubSegm_2005detailed.txt" />
+		<param name="detailedColdEmissionFactorsFile" value="sample_EFA_ColdStart_SubSegm_2005detailed.txt" />
 
 		<!-- OPTIONAL: file with HBEFA 3.1 detailed warm emission factors -->
-		<param name="detailedWarmEmissionFactorsFile" value="./test/input/org/matsim/contrib/emissions/sample_EFA_HOT_SubSegm_2005detailed.txt" />
+		<param name="detailedWarmEmissionFactorsFile" value="sample_EFA_HOT_SubSegm_2005detailed.txt" />
 
 		<!-- REQUIRED: mapping from input road types to HBEFA 3.1 road type strings -->
-		<param name="emissionRoadTypeMappingFile" value="./test/input/org/matsim/contrib/emissions/sample_roadTypeMapping.txt" />
+		<param name="emissionRoadTypeMappingFile" value="sample_roadTypeMapping.txt" />
 
 		<!-- definition of a vehicle for every person (who is allowed to choose a vehicle in the simulation):
 		 - REQUIRED: vehicle type Id must start with the respective HbefaVehicleCategory followed by `;'
 		 - OPTIONAL: if detailed emission calculation is switched on, vehicle type Id should aditionally contain HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in detailedWarmEmissionFactorsFile -->
-		<param name="emissionVehicleFile" value="./test/input/org/matsim/contrib/emissions/sample_emissionVehicles.xml" />
+		<!-- ><param name="emissionVehicleFile" value="./test/input/org/matsim/contrib/emissions/sample_emissionVehicles.xml" /> -->
 
 		<!-- if true then detailed emission factor files must be provided! -->
 		<param name="usingDetailedEmissionCalculation" value="true" />
@@ -125,7 +125,7 @@
 
 	<module name="network" >
 		<param name="inputChangeEventsFile" value="null" />
-		<param name="inputNetworkFile" value="./test/input/org/matsim/contrib/emissions/sample_network.xml" />
+		<param name="inputNetworkFile" value="sample_network.xml" />
 		<param name="laneDefinitionsFile" value="null" />
 		<param name="timeVariantNetwork" value="false" />
 	</module>
@@ -297,7 +297,7 @@
 		<!-- Path to a file containing person attributes (required file format: ObjectAttributes). -->
 		<param name="inputPersonAttributesFile" value="null" />
 
-		<param name="inputPlansFile" value="./test/input/org/matsim/contrib/emissions/sample_population.xml" />
+		<param name="inputPlansFile" value="sample_population.xml" />
 
 		<!-- Defines how routes are stored in memory. Currently supported: LinkNetworkRoute, CompressedNetworkRoute. -->
 		<param name="networkRouteType" value="LinkNetworkRoute" />
@@ -432,9 +432,6 @@
 		<!-- `queue' for the standard queue model, `withHoles' (experimental!!) for the queue model with holes -->
 		<param name="trafficDynamics" value="queue" />
 
-		<!-- If this is true, we do not expect (or use) vehicles from the vehicles database, but create vehicles on the fly with default properties. -->
-		<param name="useDefaultVehicles" value="true" />
-
 		<!-- If a route does not reference a vehicle, agents will use the vehicle with the same id as their own. -->
 		<param name="usePersonIdForMissingVehicleId" value="true" />
 
@@ -443,7 +440,13 @@
 	</module>
 
 <!-- ====================================================================== -->
-
+	
+	<module name="vehicles" >
+		<param name="vehiclesFile" value="sample_emissionVehicles.xml" /> 
+	</module>
+	
+<!-- ====================================================================== -->
+	
 	<module name="scenario" >
 
 		<!-- Set this parameter to true if households should be used, false if not. -->

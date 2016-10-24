@@ -52,7 +52,7 @@ public class DigicoreVehicleReaderTest {
 		dvw.write(utils.getOutputDirectory() + "tmp.xml", v1);
 		
 		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-		dvr.parse(utils.getOutputDirectory() + "tmp.xml");
+		dvr.readFile(utils.getOutputDirectory() + "tmp.xml");
 		DigicoreVehicle v2 = dvr.getVehicle();
 		
 		Assert.assertEquals("Wrong id.", true, v1.getId().toString().equalsIgnoreCase(v2.getId().toString()));

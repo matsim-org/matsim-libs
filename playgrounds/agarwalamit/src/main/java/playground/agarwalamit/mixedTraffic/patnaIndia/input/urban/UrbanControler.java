@@ -25,9 +25,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.Vehicles;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike;
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaVehiclesGenerator;
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.PatnaVehiclesGenerator;
+import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.plans.BackwardCompatibilityForOldPlansType;
 
@@ -55,12 +56,12 @@ public class UrbanControler {
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
 		PatnaVehiclesGenerator pvg = new PatnaVehiclesGenerator(plansFile);
-		pvg.createVehicles(PatnaUtils.URBAN_MAIN_MODES);
+		Vehicles vehs = pvg.createAndReturnVehicles(PatnaUtils.URBAN_MAIN_MODES);
 		String patnaVehicles = INPUT_FILE_DIR+"/patnaVehicles.xml.gz";
-		new VehicleWriterV1(pvg.getPatnaVehicles()).writeFile(patnaVehicles);
+		new VehicleWriterV1(vehs).writeFile(patnaVehicles);
 
 		config.plans().setInputFile(plansFile);
-		config.counts().setCountsFileName(INPUT_FILE_DIR+"/countsCarMotorbikeBike.xml");
+		config.counts().setInputFile(INPUT_FILE_DIR+"/countsCarMotorbikeBike.xml");
 		config.vehicles().setVehiclesFile(patnaVehicles);
 
 		config.controler().setOutputDirectory(OUTPUT_DIR);

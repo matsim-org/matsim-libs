@@ -35,6 +35,7 @@ import java.util.Map;
  *
  * @author polettif
  */
+@Deprecated
 public class CoordTools {
 
 	private CoordTools() {}

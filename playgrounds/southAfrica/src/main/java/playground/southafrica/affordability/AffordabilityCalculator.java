@@ -18,8 +18,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -72,7 +72,7 @@ public class AffordabilityCalculator {
 		String personAttributesFile = args[2];
 		ObjectAttributes oa = new ObjectAttributes();
 		ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(oa);
-		oar.parse(personAttributesFile);
+		oar.readFile(personAttributesFile);
 		/* Add attributes to population. */
 		for(Id<Person> id : sc.getPopulation().getPersons().keySet()){
 			String hhId = (String) oa.getAttribute(id.toString(), "householdId");

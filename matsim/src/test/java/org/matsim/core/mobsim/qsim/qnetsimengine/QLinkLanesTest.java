@@ -31,10 +31,9 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.v20.*;
+import org.matsim.lanes.data.*;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -45,7 +44,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class QLinkLanesTest extends MatsimTestCase {
 
   private Network initNetwork(Network network) {
-		((NetworkImpl) network).setCapacityPeriod(3600.0);
+		((Network) network).setCapacityPeriod(3600.0);
 	  Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 	  Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord((double) 1, (double) 0));
 	  Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord((double) 2, (double) 0));
@@ -66,9 +65,9 @@ public class QLinkLanesTest extends MatsimTestCase {
 	private Lanes createOneLane(Scenario scenario, int numberOfRepresentedLanes) {
 		scenario.getConfig().qsim().setUseLanes(true);
 		Lanes lanes = scenario.getLanes();
-		LaneDefinitionsFactory20 builder = lanes.getFactory();
+		LanesFactory builder = lanes.getFactory();
 		//lanes for link 1
-		LanesToLinkAssignment20 lanesForLink1 = builder.createLanesToLinkAssignment(Id.create(1, Link.class));
+		LanesToLinkAssignment lanesForLink1 = builder.createLanesToLinkAssignment(Id.create(1, Link.class));
 		Lane link1FirstLane = builder.createLane(Id.create("1.ol", Lane.class));
 		link1FirstLane.addToLaneId(Id.create(1, Lane.class));
 		link1FirstLane.setNumberOfRepresentedLanes(2.0);
@@ -89,9 +88,9 @@ public class QLinkLanesTest extends MatsimTestCase {
 	private Lanes createLanes(Scenario scenario) {
 		scenario.getConfig().qsim().setUseLanes(true);
 		Lanes lanes = scenario.getLanes();
-		LaneDefinitionsFactory20 builder = lanes.getFactory();
+		LanesFactory builder = lanes.getFactory();
 		//lanes for link 1
-		LanesToLinkAssignment20 lanesForLink1 = builder.createLanesToLinkAssignment(Id.create("1", Link.class));
+		LanesToLinkAssignment lanesForLink1 = builder.createLanesToLinkAssignment(Id.create("1", Link.class));
 		
 		Lane link1FirstLane = builder.createLane(Id.create("1.ol", Lane.class));
 		link1FirstLane.addToLaneId(Id.create("1", Lane.class));

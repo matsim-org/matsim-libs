@@ -35,10 +35,10 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  */
 public class ShareOfUserGroups {
 
-	private static String outputDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9//";/*"./output/run2/";*/
+	private static final String outputDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9//";/*"./output/run2/";*/
 //	private static String populationFile =outputDir+ "/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";//"/network.xml";
-	private static String populationFile = outputDir+"/baseCaseCtd/output_plans.xml.gz";
-	private static String networkFile =outputDir+ "/baseCaseCtd/output_network.xml.gz";//"/network.xml";
+	private static final String populationFile = outputDir+"/baseCaseCtd/output_plans.xml.gz";
+	private static final String networkFile =outputDir+ "/baseCaseCtd/output_network.xml.gz";//"/network.xml";
 
 	public static void main(String[] args) {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/analysis/subPopulationShare.txt");

@@ -20,19 +20,17 @@ public class StreetParkingReader {
 			line = br.readLine(); // do not parse first line which just
 									// contains column headers
 			line = br.readLine();
-			String token = null;
 			Coord coord=null;
 			while (line != null) {
-				coord= new Coord((double) 0, (double) 0);
 				
 				
 				tokenizer = new StringTokenizer(line);
 
-				token = tokenizer.nextToken();
-				coord.setX(Double.parseDouble(token));
+				String token1 = tokenizer.nextToken();
 				
-				token = tokenizer.nextToken();
-				coord.setY(Double.parseDouble(token));
+				String token2 = tokenizer.nextToken();
+
+				coord = new Coord( Double.parseDouble(token1), Double.parseDouble(token2));
 
 				
 				streetData.add(coord);

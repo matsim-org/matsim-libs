@@ -11,13 +11,13 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.michalm.berlin.BerlinZoneUtils;
-
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
+
+import playground.michalm.TaxiBerlin.TaxiBerlinZoneUtils;
 
 
 public class BerlinBrandenburgShape2ZoneConverter
@@ -76,7 +76,7 @@ public class BerlinBrandenburgShape2ZoneConverter
             Zone zone = new Zone(zoneId, zoneId.toString(), e.getValue());
             zoneMap.put(zoneId, zone);
         }
-        Zones.writeZones(zoneMap, BerlinZoneUtils.ZONE_COORD_SYSTEM,
+        Zones.writeZones(zoneMap, TaxiBerlinZoneUtils.ZONE_COORD_SYSTEM,
                 "C:/local_jb/data/OD/shp_merged/zones.xml",
                 "C:/local_jb/data/OD/shp_merged/zones.shp");
     }

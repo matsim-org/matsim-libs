@@ -41,7 +41,7 @@ public class ExtractLongDistancePersons {
 		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 
-		parser.parse(args[0]);
+		parser.readFile(args[0]);
 		logger.info(String.format("Loaded %s persons.", parser.getPersons().size()));
 		
 		double threshold = Double.parseDouble(args[3]);

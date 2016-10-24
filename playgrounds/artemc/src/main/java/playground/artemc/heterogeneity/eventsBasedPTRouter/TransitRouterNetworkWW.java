@@ -32,6 +32,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.*;
 
@@ -51,6 +52,7 @@ public final class TransitRouterNetworkWW implements Network {
 
 	private long nextNodeId = 0;
 	protected long nextLinkId = 0;
+
 
 	public static final class TransitRouterNetworkNode implements Node {
 
@@ -120,6 +122,17 @@ public final class TransitRouterNetworkWW implements Network {
 		public Link removeOutLink(Id<Link> outLinkId) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public void setCoord(Coord coord) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public Attributes getAttributes() {
+			throw new UnsupportedOperationException();
 		}
 	}
 
@@ -256,6 +269,22 @@ public final class TransitRouterNetworkWW implements Network {
 			return line;
 		}
 
+		@Override
+		public double getFlowCapacityPerSec() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public double getFlowCapacityPerSec(double time) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public Attributes getAttributes() {
+			throw new UnsupportedOperationException();
+		}
 	}
 	public TransitRouterNetworkNode createNode(final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
 		Id id = null;
@@ -420,6 +449,47 @@ public final class TransitRouterNetworkWW implements Network {
 
 	@Override
 	public Node removeNode(Id nodeId) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setCapacityPeriod(double capPeriod) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public void setEffectiveCellSize(double effectiveCellSize) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public void setEffectiveLaneWidth(double effectiveLaneWidth) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public void setName(String name) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public double getEffectiveCellSize() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Attributes getAttributes() {
 		throw new UnsupportedOperationException();
 	}
 }

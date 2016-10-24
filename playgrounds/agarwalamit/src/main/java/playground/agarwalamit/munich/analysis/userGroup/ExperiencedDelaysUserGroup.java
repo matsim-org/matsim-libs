@@ -33,9 +33,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 /**
  * A class to get absolute experienced delays and delays costs per user group.
@@ -54,13 +54,13 @@ public class ExperiencedDelaysUserGroup {
 	}
 
 	private int lastIteration;
-	public static Logger logger = Logger.getLogger(ExperiencedDelaysUserGroup.class);
-	private String outputDir;
+	public static final Logger logger = Logger.getLogger(ExperiencedDelaysUserGroup.class);
+	private final String outputDir;
 
-	private SortedMap<UserGroup, Double> userGroupToDelays;
+	private SortedMap<MunichUserGroup, Double> userGroupToDelays;
 	private Map<Double, Map<Id<Person>, Double>> time2linkIdDelays;
 	private Scenario scenario;
-	private ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private final MunichPersonFilter pf = new MunichPersonFilter();
 
 	public static void main(String[] args) throws IOException {
 		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";/*"./output/run2/";*/
@@ -70,9 +70,9 @@ public class ExperiencedDelaysUserGroup {
 	}
 
 	private void init(final String runCase){
-		this.userGroupToDelays  = new TreeMap<UserGroup, Double>();
-		this.time2linkIdDelays = new HashMap<Double, Map<Id<Person>,Double>>();
-		for (UserGroup ug:UserGroup.values()) {
+		this.userGroupToDelays  = new TreeMap<>();
+		this.time2linkIdDelays = new HashMap<>();
+		for (MunichUserGroup ug:MunichUserGroup.values()) {
 			this.userGroupToDelays.put(ug, 0.0);
 		}
 		
@@ -91,7 +91,7 @@ public class ExperiencedDelaysUserGroup {
 		for(String runCase:runCases){
 			init(runCase);
 			String eventFile = this.outputDir+runCase+"/ITERS/it."+this.lastIteration+"/"+this.lastIteration+".events.xml.gz";//"/events.xml";//
-			ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventFile, this.scenario, 1, scenario.getConfig().qsim().getEndTime());
+			ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventFile, this.scenario, 1);
 			personAnalyzer.run();
 			personAnalyzer.checkTotalDelayUsingAlternativeMethod();
 			this.time2linkIdDelays = personAnalyzer.getTimeBin2AffectedPersonId2Delay();
@@ -105,7 +105,7 @@ public class ExperiencedDelaysUserGroup {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try{
 			writer.write("userGroup \t delaySeconds \t delaysMoney \n");
-			for(UserGroup ug:this.userGroupToDelays.keySet()){
+			for(MunichUserGroup ug:this.userGroupToDelays.keySet()){
 				writer.write(ug+"\t"+this.userGroupToDelays.get(ug)+"\t"+this.userGroupToDelays.get(ug)*this.vttsCar+"\n");
 			}
 			writer.close();
@@ -118,7 +118,7 @@ public class ExperiencedDelaysUserGroup {
 	private void getTotalDelayPerUserGroup(final Map<Double, Map<Id<Person>, Double>> delaysPerPersonPerTimeBin){
 		for(double d:delaysPerPersonPerTimeBin.keySet()){
 			for(Id<Person> personId : delaysPerPersonPerTimeBin.get(d).keySet()){
-				UserGroup ug = pf.getUserGroupFromPersonId(personId);
+				MunichUserGroup ug = pf.getMunichUserGroupFromPersonId(personId);
 				double delaySoFar = this.userGroupToDelays.get(ug);
 				double newDelays = delaySoFar+delaysPerPersonPerTimeBin.get(d).get(personId);
 				this.userGroupToDelays.put(ug, newDelays);

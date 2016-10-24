@@ -142,7 +142,7 @@ public final class RunWagonSim {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		ObjectAttributes vehicleLinkSpeedAttributes = new ObjectAttributes();
-		new ObjectAttributesXmlReader(vehicleLinkSpeedAttributes).parse(vehicleAttributeFile);
+		new ObjectAttributesXmlReader(vehicleLinkSpeedAttributes).readFile(vehicleAttributeFile);
 		Map<Id<TransitStopFacility>, Double> minShuntingTimes;
 		try { minShuntingTimes = Utils.parseShuntingTimes(shuntingTimesFile); }
 		catch (IOException e) { throw new RuntimeException(e); }

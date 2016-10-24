@@ -10,13 +10,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.FastAStarLandmarks;
@@ -34,7 +35,7 @@ import others.sergioo.util.dataBase.*;
 class PlanFindLegDistances {
 	private final MutableScenario scenario;
 	private final Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities;
-	private final NetworkImpl network;
+	private final Network network;
 	private final RouteFactories routeFactory;
 	private final DataBaseAdmin dba;
 	private final FastAStarLandmarks leastCostPathCalculator;
@@ -42,7 +43,7 @@ class PlanFindLegDistances {
 	public PlanFindLegDistances(Scenario scenario, DataBaseAdmin dba) {
 		super();
 		this.scenario = (MutableScenario) scenario;
-		this.network = (NetworkImpl) scenario.getNetwork();
+		this.network = (Network) scenario.getNetwork();
 		this.facilities = this.scenario.getActivityFacilities().getFacilities();
 		TravelDisutility travelMinCost = new TravelDisutility() {
 
@@ -77,8 +78,10 @@ class PlanFindLegDistances {
 
 	public double getShortestPathDistance(Coord startCoord, Coord endCoord) {
 		double distance = 0;
-		Node startNode = network.getNearestNode(startCoord);
-		Node endNode = network.getNearestNode(endCoord);
+		final Coord coord = startCoord;
+		Node startNode = NetworkUtils.getNearestNode(network,coord);
+		final Coord coord1 = endCoord;
+		Node endNode = NetworkUtils.getNearestNode(network,coord1);
 
 		Path path = leastCostPathCalculator.calcLeastCostPath(startNode,
 				endNode, 0, null, null);

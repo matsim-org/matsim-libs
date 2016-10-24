@@ -3,7 +3,7 @@ package playground.sergioo.workplaceCapacities2012.gui;
 import java.io.FileNotFoundException;
 
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.MatsimFacilitiesReader;

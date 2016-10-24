@@ -143,7 +143,8 @@ class ArticleFigureCreator {
 
 		System.out.println("STARTED ...");
 
-		final int[] populationSizes = new int[] { 2, 4, 8, 16, 32, 64, 128 };
+		final String suffix = "_long";
+		final int[] populationSizes = new int[] { 4 }; // , 4, 8, 16, 32, 64, 128 };
 		final String[] runIdentifiers = new String[] { "a", "b", "c", "d", "e",
 				"f", "g", "h", "i", "j" };
 
@@ -154,7 +155,7 @@ class ArticleFigureCreator {
 			for (String run : runIdentifiers) {
 				{ // read naive
 					final String naiveFileName = "./output/roadpricing/logfiles/naive_"
-							+ populationSize + run + ".opt";
+							+ populationSize + run + suffix + ".opt";
 					if (new File(naiveFileName).exists()) {
 						final OptFileReader reader = new OptFileReader(
 								naiveFileName);
@@ -163,7 +164,7 @@ class ArticleFigureCreator {
 				}
 				{ // read proposed
 					final String proposedFileName = "./output/roadpricing/logfiles/search_"
-							+ populationSize + run + ".opt";
+							+ populationSize + run + suffix + ".opt";
 					if (new File(proposedFileName).exists()) {
 						final OptFileReader reader = new OptFileReader(
 								proposedFileName);
@@ -180,7 +181,7 @@ class ArticleFigureCreator {
 				{
 					final PrintWriter writer = new PrintWriter(
 							"./output/roadpricing/latex/ObjFctVals_popSize"
-									+ populationSize + "_naive.tex");
+									+ populationSize + "_naive" + suffix + ".tex");
 					writer.println(afcNaive.asPSTricksSnippet(xFact, yFact,
 							"[linestyle=solid]", WhatToWrite.ObjFctVals));
 					writer.flush();
@@ -189,7 +190,7 @@ class ArticleFigureCreator {
 				{
 					final PrintWriter writer = new PrintWriter(
 							"./output/roadpricing/latex/ObjFctVals_popSize"
-									+ populationSize + "_search.tex");
+									+ populationSize + "_search" + suffix + ".tex");
 					writer.println(afcProposed.asPSTricksSnippet(xFact, yFact,
 							"[linestyle=solid]", WhatToWrite.ObjFctVals));
 					writer.flush();
@@ -202,7 +203,7 @@ class ArticleFigureCreator {
 			try {
 				final PrintWriter writer = new PrintWriter(
 						"./output/roadpricing/latex/EquilGaps_popSize"
-								+ populationSize + ".tex");
+								+ populationSize + suffix + ".tex");
 				writer.println(afcProposed.asPSTricksSnippet(xFact, yFact,
 						"[linestyle=solid]", WhatToWrite.EquilGaps));
 				writer.flush();
@@ -214,7 +215,7 @@ class ArticleFigureCreator {
 			try {
 				final PrintWriter writer = new PrintWriter(
 						"./output/roadpricing/latex/UnifGaps_popSize"
-								+ populationSize + ".tex");
+								+ populationSize + suffix + ".tex");
 				writer.println(afcProposed.asPSTricksSnippet(xFact, yFact,
 						"[linestyle=solid]", WhatToWrite.UnifGaps));
 				writer.flush();
@@ -404,7 +405,7 @@ class ArticleFigureCreator {
 
 	public static void main(String[] args) {
 		// createDetourFlows();
-		// createLatex();
-		createWeights();
+		createLatex();
+		// createWeights();
 	}
 }

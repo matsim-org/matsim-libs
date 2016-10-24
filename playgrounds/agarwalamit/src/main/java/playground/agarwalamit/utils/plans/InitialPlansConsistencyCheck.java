@@ -54,15 +54,15 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  */
 public class InitialPlansConsistencyCheck {
 	public static final Logger LOG = Logger.getLogger(InitialPlansConsistencyCheck.class);
-	private Scenario sc;
-	private Map<Person, List<String>> person2ActivityType = new HashMap<Person, List<String>>();
-	private Map<Person, List<String>> person2Legs = new HashMap<Person, List<String>>();
-	private Map<UserGroup, Integer> userGroup2NumberOfPersons = new HashMap<UserGroup, Integer>();
+	private final Scenario sc;
+	private final Map<Person, List<String>> person2ActivityType = new HashMap<>();
+	private final Map<Person, List<String>> person2Legs = new HashMap<>();
+	private final Map<UserGroup, Integer> userGroup2NumberOfPersons = new HashMap<>();
 	private PersonFilter pf;
 	private BufferedWriter writer;
 	
-	private String configFile ;
-	private String outputDir;
+	private final String configFile ;
+	private final String outputDir;
 
 	public InitialPlansConsistencyCheck(String initialPlans, String outputFile, String configFile) {
 		this.configFile = configFile;
@@ -131,8 +131,8 @@ public class InitialPlansConsistencyCheck {
 		}
 
 		for(Person p : sc.getPopulation().getPersons().values()){
-			person2ActivityType.put(p, new ArrayList<String>());
-			person2Legs.put(p, new ArrayList<String>());
+			person2ActivityType.put(p, new ArrayList<>());
+			person2Legs.put(p, new ArrayList<>());
 			for(UserGroup ug : UserGroup.values()){
 				if(pf.isPersonIdFromUserGroup(p.getId(), ug)) {
 					int countSoFar = userGroup2NumberOfPersons.get(ug);

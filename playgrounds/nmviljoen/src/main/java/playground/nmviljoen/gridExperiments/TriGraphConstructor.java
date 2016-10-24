@@ -164,7 +164,7 @@ public class TriGraphConstructor {
 		return myGraphRessler;
 
 	}
-	
+
 	public static DirectedGraph<NmvNode, NmvLink> constructNavabiGraph(String path){
 		//get the linklist
 		//		String path = "/Users/nadiaviljoen/Documents/ComplexNetworks/PhD_gridNetwork/MalikLab/TestJune2016/";
@@ -241,7 +241,10 @@ public class TriGraphConstructor {
 
 			//this call gives you all the shortest paths between two connected malik nodes
 			//			System.out.println("Source Grid ID: "+assocList[source][3]+" Target Grid ID: "+assocList[target][3]);
-			int [][] interimPathCollect = pathBuilder(myGraphGrid, nodeListGrid,assocList[source][3], assocList[target][3]);
+			int [][] interimPathCollect = new int[0][0];
+			if((assocList[source][3]!=999)&&(assocList[target][3]!=999)){
+				interimPathCollect = pathBuilder(myGraphGrid, nodeListGrid,assocList[source][3], assocList[target][3]);
+			}
 
 			//			System.out.println(interimPathCollect.length);
 			//now add it to the logicalPathCollect
@@ -295,423 +298,423 @@ public class TriGraphConstructor {
 		}
 		System.out.println("Segment paths written to "+filenameL);
 
-//		//Now you have all the shortest paths for all the directly connected Malik links. Put them together to build the whole set.
-//
-//		//		Create set of all shortest paths for Ghost Network
-//		int [][] fullPathCollect = new int[fullPathSize][55];
-//		for (int[] row: fullPathCollect){
-//			Arrays.fill(row, 999);
-//		}
-//		DijkstraShortestPath<NmvNode, NmvLink> mPath = new DijkstraShortestPath<NmvNode, NmvLink>(myGraphMalik);
-//		//		int marker =0;
-//		//		int test =0;
-//		//for each node pair in the assocList - remember that shortest path sets may eventually not be symmetric and therefore you have to do all
-//
-//
-//		int rows=0;
-//		for (int y = 0; y<assocList.length;y++){
-//			for (int x = 0; x<assocList.length;x++){
-//
-//				//		for (int y = 0; y<3;y++){ //test
-//				//			for (int x = 1; x<8;x++){ //test
-//				if (x!=y){
-//
-//					int[][] segment1 = new int[segSize][segPathLength];
-//					for (int[] row: segment1){
-//						Arrays.fill(row, 999);
-//					}
-//					int seg1C=0;
-//					int[][] segment2 = new int[segSize][segPathLength];
-//					for (int[] row: segment2){
-//						Arrays.fill(row, 999);
-//					}
-//					int seg2C=0;
-//					int[][] segment3 = new int[segSize][segPathLength];
-//					for (int[] row: segment3){
-//						Arrays.fill(row, 999);
-//					}
-//					int seg3C=0;
-//
-//					//get the logical shortest path first
-//					List <NmvLink> shortestPathMalik = mPath.getPath(nodeListMalik.get(assocList[y][1]), nodeListMalik.get(assocList[x][1]));
-//					NmvNode FROM = null;
-//					NmvNode TO = null;
-//					//decide which loop depending on the logical path length
-//					if(shortestPathMalik.size()==1){
-//						Iterator<NmvLink> PathIterator = shortestPathMalik.iterator();
-//						nodeTrack=myGraphMalik.getIncidentVertices(PathIterator.next()); //gets incident vertices to a link
-//						Iterator <NmvNode> NodeIterator = nodeTrack.iterator();
-//						//if only one leg
-//						//populate the segment from the LogicalPathCollect
-//						FROM = NodeIterator.next();
-//						TO = NodeIterator.next();
-//						//first find the paths and populate segment1
-//						int w=0;
-//						for(int q=0;q<rowMarker;q++){
-//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
-//								//								System.out.println("In here 1");
-//								w=0;
-//								while (logicalPathCollect[q][5+w]!=999){
-//									segment1[seg1C][w]=logicalPathCollect[q][5+w];
-//									w++;
-//
-//								}
-//								seg1C++;
-//							}
-//						}//now all the paths are transferred to segment 1
-//
-//						//						for(int q=0;q<seg1C;q++){
-//						//							System.out.println(String.format("%s,%s,%s\n",nodeListGrid.get(segment1[q][0]).getId(),nodeListGrid.get(segment1[q][1]).getId(),nodeListGrid.get(segment1[q][2]).getId()));
-//						//						}
-//						//transfer to fullPathCollect
-//						int v=0;
-//						for (int u=0;u<seg1C;u++){
-//							v=0;
-//							while (segment1[u][v]!=999){
-//								fullPathCollect[rows+u][v]=segment1[u][v];
-//								v++;
-//							}
-//						}
-//						rows=rows+seg1C;
-//						//						System.out.println("Fullpath rows: "+rows);
-//
-//						//						for (int q=0;q<seg1C;q++){
-//						//							System.out.print(String.format("%s,%s,%s\n",nodeListGrid.get(fullPathCollect[q][0]).getId(),nodeListGrid.get(fullPathCollect[q][1]).getId(),nodeListGrid.get(fullPathCollect[q][2]).getId()));
-//						//						}
-//
-//					}else if(shortestPathMalik.size()==2){
-//						//if two legs
-//						Iterator<NmvLink> PathIterator = shortestPathMalik.iterator();
-//						//FIRST SEGMENT
-//						nodeTrack=myGraphMalik.getIncidentVertices(PathIterator.next());
-//						Iterator <NmvNode> NodeIterator = nodeTrack.iterator();
-//						//populate the segment from the LogicalPathCollect
-//						FROM = NodeIterator.next();
-//						TO = NodeIterator.next();
-//						//first find the paths and populate segment1
-//						int w=0;
-//						for(int q=0;q<rowMarker;q++){
-//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
-//								w=0;
-//								while (logicalPathCollect[q][5+w]!=999){
-//									segment1[seg1C][w]=logicalPathCollect[q][5+w];
-//									w++;
-//
-//								}
-//								seg1C++;
-//							}
-//						}//now all the paths are transferred to segment 1
-//						//						System.out.println("Segment 1");
-//						//						for(int q=0;q<seg1C;q++){
-//						//							System.out.print(String.format("%s,%s,%s\n",nodeListGrid.get(segment1[q][0]).getId(),nodeListGrid.get(segment1[q][1]).getId(),nodeListGrid.get(segment1[q][2]).getId()));
-//						//						}
-//
-//						//SECOND SEGMENT
-//						nodeTrack=myGraphMalik.getIncidentVertices(PathIterator.next());
-//
-//						NodeIterator = nodeTrack.iterator();
-//						//populate the segment from the LogicalPathCollect
-//						FROM = NodeIterator.next();
-//						TO = NodeIterator.next();
-//						//first find the paths and populate segment2
-//						w=0;
-//						for(int q=0;q<rowMarker;q++){
-//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
-//
-//								w=0;
-//								while (logicalPathCollect[q][5+w]!=999){
-//									segment2[seg2C][w]=logicalPathCollect[q][5+w];
-//									w++;
-//
-//								}
-//								seg2C++;
-//							}
-//						}//now all the paths are transferred to segment 2
-//						//						System.out.println("Segment 2");
-//						//						for(int q=0;q<seg2C;q++){
-//						//							System.out.print(String.format("%s,%s,%s\n",nodeListGrid.get(segment2[q][0]).getId(),nodeListGrid.get(segment2[q][1]).getId(),nodeListGrid.get(segment2[q][2]).getId()));
-//						//						}
-//
-//
-//						//transfer to fullPathCollect
-//						int v=0;
-//						int v1=1;
-//
-//						for (int u=0;u<seg1C;u++){
-//							for (int r=0;r<seg2C;r++){
-//								v=0;
-//								v1=1;
-//								while (segment1[u][v]!=999){ //add first segment
-//									fullPathCollect[rows][v]=segment1[u][v];
-//									v++;
-//								}
-//								while (segment2[r][v1]!=999){ //add second segment
-//									fullPathCollect[rows][v]=segment2[r][v1];
-//									v++;
-//									v1++;
-//								}
-//								rows++;
-//							}
-//						}
-//						//						System.out.println("Fullpath rows: "+rows);
-//
-//					}else if(shortestPathMalik.size()==3){
-//						Iterator<NmvLink> PathIterator = shortestPathMalik.iterator();
-//
-//						//FIRST SEGMENT
-//						nodeTrack=myGraphMalik.getIncidentVertices(PathIterator.next());
-//						Iterator <NmvNode> NodeIterator = nodeTrack.iterator();
-//
-//						//populate the segment from the LogicalPathCollect
-//						FROM = NodeIterator.next();
-//						TO = NodeIterator.next();
-//						//first find the paths and populate segment1
-//						int w=0;
-//						for(int q=0;q<rowMarker;q++){
-//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
-//								w=0;
-//								while (logicalPathCollect[q][5+w]!=999){
-//									segment1[seg1C][w]=logicalPathCollect[q][5+w];
-//									w++;
-//
-//								}
-//								seg1C++;
-//							}
-//						}//now all the paths are transferred to segment 1
-//
-//						//SECOND SEGMENT
-//						nodeTrack=myGraphMalik.getIncidentVertices(PathIterator.next());
-//						NodeIterator = nodeTrack.iterator();
-//						//populate the segment from the LogicalPathCollect
-//						FROM = NodeIterator.next();
-//						TO = NodeIterator.next();
-//						//first find the paths and populate segment2
-//						w=0;
-//						for(int q=0;q<rowMarker;q++){
-//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
-//								w=0;
-//								while (logicalPathCollect[q][5+w]!=999){
-//									segment2[seg2C][w]=logicalPathCollect[q][5+w];
-//									w++;
-//
-//								}
-//								seg2C++;
-//							}
-//						}//now all the paths are transferred to segment 2
-//
-//						//THIRD SEGMENT
-//						nodeTrack=myGraphMalik.getIncidentVertices(PathIterator.next());
-//						NodeIterator = nodeTrack.iterator();
-//						//populate the segment from the LogicalPathCollect
-//						FROM = NodeIterator.next();
-//						TO = NodeIterator.next();
-//						//first find the paths and populate segment3
-//						w=0;
-//						for(int q=0;q<rowMarker;q++){
-//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
-//								w=0;
-//								while (logicalPathCollect[q][5+w]!=999){
-//									segment3[seg3C][w]=logicalPathCollect[q][5+w];
-//									w++;
-//
-//								}
-//								seg3C++;
-//							}
-//						}//now all the paths are transferred to segment 3
-//
-//						//transfer to fullPathCollect
-//						int v=0;
-//						int v1=1;
-//						int v2=1;
-//
-//						for (int u=0;u<seg1C;u++){
-//							for (int r=0;r<seg2C;r++){
-//								for (int p=0; p<seg3C;p++){
-//									v=0;
-//									v1=1;
-//									v2=1;
-//									while (segment1[u][v]!=999){ //add first segment
-//										fullPathCollect[rows][v]=segment1[u][v];
-//										v++;
-//									}
-//									while (segment2[r][v1]!=999){ //add second segment
-//										fullPathCollect[rows][v]=segment2[r][v1];
-//										v++;
-//										v1++;
-//									}
-//									while (segment3[p][v2]!=999){ //add third segment
-//										fullPathCollect[rows][v]=segment3[p][v2];
-//										v++;
-//										v2++;
-//									}
-//									rows++;
-//								}
-//							}
-//						}
-//
-//
-//					}else System.out.println("YOUR LOGICAL PATH HAS MORE THAN THREE SEGMENTS");
-//
-//					//				int [][] interimPathCollect = pathBuilder(myGraphGrid, nodeListGrid,assocList[y][3], assocList[x][3]);
-//					//				//					int [][] interimPathCollect = pathBuilder(myGraphGrid, nodeListGrid,assocList[1][3], assocList[2][3]);
-//					//				//insert into fullPathCollect
-//					//				for (int u = 0; u<interimPathCollect.length;u++){
-//					//					for (int g=0;g<interimPathCollect[0].length;g++){
-//					//						fullPathCollect[marker][g]=interimPathCollect[u][g];
-//					//					}	
-//					//					marker++;
-//					//
-//					//				}
-//					//				test=test+interimPathCollect.length;
-//				}
-//			}
-//		}
-//		//write out full path set (on screen)
-//
-//
-////		//write fullPathCollect out
-////		String filename = path+"shortestPathSet.csv";
-////		BufferedWriter bf = IOUtils.getBufferedWriter(filename);
-////		try{
-////			for (int j =0; j< rows;j++){
-////				for (int r=0;r<fullPathCollect[0].length;r++){
-////					if (fullPathCollect[j][r]!=999){
-////						bf.write(nodeListGrid.get(fullPathCollect[j][r]).getId()+" ");
-////					}	
-////				}
-////				bf.newLine();	
-////			}
-////		} catch (IOException e) {
-////			e.printStackTrace();
-////		} finally{
-////			try {
-////				bf.close();
-////			} catch (IOException e) {
-////				e.printStackTrace();
-////			}
-////		}
-////		System.out.println("Full path set written to file "+filename);
-//
-//		//trim fullpathset
-//		int [][] fullPathTrim = new int[rows][55];
-//		for (int[] row: fullPathTrim){
-//			Arrays.fill(row, 999);
-//		}
-//		for (int j =0; j< rows;j++){
-//			for (int t=0;t<55;t++){
-//				if(fullPathCollect[j][t]!=999){
-//					fullPathTrim[j][t]=Integer.parseInt(nodeListGrid.get(fullPathCollect[j][t]).getId());
-//				}
-//
-//			}
-//		}
-//
-//		//				System.out.println("fullPathTrim.length = "+fullPathTrim.length);
-//		//				System.out.println();
-//		//				for (int y = 0;y<5;y++){
-//		//					System.out.println("# of entries"+fullPathTrim[y].length);
-//		//					for (int r=0;r<21;r++){
-//		//						System.out.print(fullPathTrim[y][r]+" ");
-//		//					}
-//		//					System.out.println();
-//		//
-//		//				}
-//
-//		String filename2 = path+"shortestPathSetTRIM.csv";
-//		BufferedWriter bt = IOUtils.getBufferedWriter(filename2);
-//		try{
-//			for (int j =0; j< rows;j++){
-//				for (int r=0;r<fullPathTrim[0].length;r++){
-//					if (fullPathTrim[j][r]!=999){
-//						bt.write(fullPathTrim[j][r]+" ");
-//					}	
-//				}
-//				bt.newLine();	
-//			}
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} finally{
-//			try {
-//				bt.close();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		System.out.println("Full path set TRIM written to file "+filename2);
-//
-//
-//		//get the linklist
-//		//		int[][] linkList= GhostLinkList.linkList(path, fullPathTrim); 
-//		int[][] linkList= GhostLinkList.linkList(path, rows); 
-//
-//		double defaultTransProb = 1;
-//
-//		myGraphGhost = new DirectedSparseMultigraph<NmvNode, NmvLink>();
-//		//create the node list
-//		int [] uniqueNodesTemp = new int[linkList.length*2];
-//		int count=0;
-//		boolean flag = true;
-//		int cur1=0;
-//		int cur2=0;
-//		int r=0;
-//		uniqueNodesTemp[0]=linkList[0][0];
-//		for (int y = 0; y<linkList.length;y++){
-//			cur1=linkList[y][0];
-//			cur2=linkList[y][1];
-//			r=0;
-//			flag=true;
-//			while ((flag)&&(r<=count)){
-//				if(uniqueNodesTemp[r]==cur1){
-//					flag=false;
-//				}else r++;
-//			}	
-//			if (flag){
-//				count++;
-//				uniqueNodesTemp[count]=cur1;
-//			}
-//			r=0;
-//			flag = true;
-//			while ((flag)&&(r<=count)){
-//				if(uniqueNodesTemp[r]==cur2){
-//					flag=false;
-//				}else r++;
-//			}	
-//			if (flag){
-//				count++;
-//				uniqueNodesTemp[count]=cur2;
-//
-//			}
-//		}
-//		int[] uniqueNodes = new int[count+1];
-//		for (int w =0; w<=count;w++){
-//			uniqueNodes[w]=uniqueNodesTemp[w];
-//		}
-//
-//		ArrayList<NmvNode> nodeList = new ArrayList<NmvNode>();
-//		//what you have in linkList is the grid graph ID not the index
-//		for (int m =0; m<uniqueNodes.length;m++){
-//			NmvNode currentNode = new NmvNode("","", 0, 0);
-//			currentNode = new NmvNode(Integer.toString(m),Integer.toString(uniqueNodes[m]),0,0);
-//			nodeList.add(m, currentNode);
-//		}
-//		int indexTo = 0;
-//		int indexFrom = 0;
-//		for (int w = 0; w<linkList.length;w++){
-//			for (int q =0;q<uniqueNodes.length;q++){
-//				if(uniqueNodes[q]==linkList[w][0]){
-//					indexFrom=q;
-//					break;
-//				}
-//			}
-//			for (int p =0;p<uniqueNodes.length;p++){
-//				if(uniqueNodes[p]==linkList[w][1]){
-//					indexTo=p;
-//					break;
-//				}
-//			}
-//			myGraphGhost.addEdge(new NmvLink(Integer.toString(w),linkList[w][2],defaultTransProb),nodeList.get(indexFrom),nodeList.get(indexTo),EdgeType.DIRECTED);
-//		}
-//		return myGraphGhost;
+		//		//Now you have all the shortest paths for all the directly connected Malik links. Put them together to build the whole set.
+		//
+		//		//		Create set of all shortest paths for Ghost Network
+		//		int [][] fullPathCollect = new int[fullPathSize][55];
+		//		for (int[] row: fullPathCollect){
+		//			Arrays.fill(row, 999);
+		//		}
+		//		DijkstraShortestPath<NmvNode, NmvLink> mPath = new DijkstraShortestPath<NmvNode, NmvLink>(myGraphMalik);
+		//		//		int marker =0;
+		//		//		int test =0;
+		//		//for each node pair in the assocList - remember that shortest path sets may eventually not be symmetric and therefore you have to do all
+		//
+		//
+		//		int rows=0;
+		//		for (int y = 0; y<assocList.length;y++){
+		//			for (int x = 0; x<assocList.length;x++){
+		//
+		//				//		for (int y = 0; y<3;y++){ //test
+		//				//			for (int x = 1; x<8;x++){ //test
+		//				if (x!=y){
+		//
+		//					int[][] segment1 = new int[segSize][segPathLength];
+		//					for (int[] row: segment1){
+		//						Arrays.fill(row, 999);
+		//					}
+		//					int seg1C=0;
+		//					int[][] segment2 = new int[segSize][segPathLength];
+		//					for (int[] row: segment2){
+		//						Arrays.fill(row, 999);
+		//					}
+		//					int seg2C=0;
+		//					int[][] segment3 = new int[segSize][segPathLength];
+		//					for (int[] row: segment3){
+		//						Arrays.fill(row, 999);
+		//					}
+		//					int seg3C=0;
+		//
+		//					//get the logical shortest path first
+		//					List <NmvLink> shortestPathMalik = mPath.getPath(nodeListMalik.get(assocList[y][1]), nodeListMalik.get(assocList[x][1]));
+		//					NmvNode FROM = null;
+		//					NmvNode TO = null;
+		//					//decide which loop depending on the logical path length
+		//					if(shortestPathMalik.size()==1){
+		//						Iterator<NmvLink> PathIterator = shortestPathMalik.iterator();
+		//						nodeTrack=myGraphMalik.getIncidentVertices(PathIterator.next()); //gets incident vertices to a link
+		//						Iterator <NmvNode> NodeIterator = nodeTrack.iterator();
+		//						//if only one leg
+		//						//populate the segment from the LogicalPathCollect
+		//						FROM = NodeIterator.next();
+		//						TO = NodeIterator.next();
+		//						//first find the paths and populate segment1
+		//						int w=0;
+		//						for(int q=0;q<rowMarker;q++){
+		//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
+		//								//								System.out.println("In here 1");
+		//								w=0;
+		//								while (logicalPathCollect[q][5+w]!=999){
+		//									segment1[seg1C][w]=logicalPathCollect[q][5+w];
+		//									w++;
+		//
+		//								}
+		//								seg1C++;
+		//							}
+		//						}//now all the paths are transferred to segment 1
+		//
+		//						//						for(int q=0;q<seg1C;q++){
+		//						//							System.out.println(String.format("%s,%s,%s\n",nodeListGrid.get(segment1[q][0]).getId(),nodeListGrid.get(segment1[q][1]).getId(),nodeListGrid.get(segment1[q][2]).getId()));
+		//						//						}
+		//						//transfer to fullPathCollect
+		//						int v=0;
+		//						for (int u=0;u<seg1C;u++){
+		//							v=0;
+		//							while (segment1[u][v]!=999){
+		//								fullPathCollect[rows+u][v]=segment1[u][v];
+		//								v++;
+		//							}
+		//						}
+		//						rows=rows+seg1C;
+		//						//						System.out.println("Fullpath rows: "+rows);
+		//
+		//						//						for (int q=0;q<seg1C;q++){
+		//						//							System.out.print(String.format("%s,%s,%s\n",nodeListGrid.get(fullPathCollect[q][0]).getId(),nodeListGrid.get(fullPathCollect[q][1]).getId(),nodeListGrid.get(fullPathCollect[q][2]).getId()));
+		//						//						}
+		//
+		//					}else if(shortestPathMalik.size()==2){
+		//						//if two legs
+		//						Iterator<NmvLink> PathIterator = shortestPathMalik.iterator();
+		//						//FIRST SEGMENT
+		//						nodeTrack=myGraphMalik.getIncidentVertices(PathIterator.next());
+		//						Iterator <NmvNode> NodeIterator = nodeTrack.iterator();
+		//						//populate the segment from the LogicalPathCollect
+		//						FROM = NodeIterator.next();
+		//						TO = NodeIterator.next();
+		//						//first find the paths and populate segment1
+		//						int w=0;
+		//						for(int q=0;q<rowMarker;q++){
+		//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
+		//								w=0;
+		//								while (logicalPathCollect[q][5+w]!=999){
+		//									segment1[seg1C][w]=logicalPathCollect[q][5+w];
+		//									w++;
+		//
+		//								}
+		//								seg1C++;
+		//							}
+		//						}//now all the paths are transferred to segment 1
+		//						//						System.out.println("Segment 1");
+		//						//						for(int q=0;q<seg1C;q++){
+		//						//							System.out.print(String.format("%s,%s,%s\n",nodeListGrid.get(segment1[q][0]).getId(),nodeListGrid.get(segment1[q][1]).getId(),nodeListGrid.get(segment1[q][2]).getId()));
+		//						//						}
+		//
+		//						//SECOND SEGMENT
+		//						nodeTrack=myGraphMalik.getIncidentVertices(PathIterator.next());
+		//
+		//						NodeIterator = nodeTrack.iterator();
+		//						//populate the segment from the LogicalPathCollect
+		//						FROM = NodeIterator.next();
+		//						TO = NodeIterator.next();
+		//						//first find the paths and populate segment2
+		//						w=0;
+		//						for(int q=0;q<rowMarker;q++){
+		//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
+		//
+		//								w=0;
+		//								while (logicalPathCollect[q][5+w]!=999){
+		//									segment2[seg2C][w]=logicalPathCollect[q][5+w];
+		//									w++;
+		//
+		//								}
+		//								seg2C++;
+		//							}
+		//						}//now all the paths are transferred to segment 2
+		//						//						System.out.println("Segment 2");
+		//						//						for(int q=0;q<seg2C;q++){
+		//						//							System.out.print(String.format("%s,%s,%s\n",nodeListGrid.get(segment2[q][0]).getId(),nodeListGrid.get(segment2[q][1]).getId(),nodeListGrid.get(segment2[q][2]).getId()));
+		//						//						}
+		//
+		//
+		//						//transfer to fullPathCollect
+		//						int v=0;
+		//						int v1=1;
+		//
+		//						for (int u=0;u<seg1C;u++){
+		//							for (int r=0;r<seg2C;r++){
+		//								v=0;
+		//								v1=1;
+		//								while (segment1[u][v]!=999){ //add first segment
+		//									fullPathCollect[rows][v]=segment1[u][v];
+		//									v++;
+		//								}
+		//								while (segment2[r][v1]!=999){ //add second segment
+		//									fullPathCollect[rows][v]=segment2[r][v1];
+		//									v++;
+		//									v1++;
+		//								}
+		//								rows++;
+		//							}
+		//						}
+		//						//						System.out.println("Fullpath rows: "+rows);
+		//
+		//					}else if(shortestPathMalik.size()==3){
+		//						Iterator<NmvLink> PathIterator = shortestPathMalik.iterator();
+		//
+		//						//FIRST SEGMENT
+		//						nodeTrack=myGraphMalik.getIncidentVertices(PathIterator.next());
+		//						Iterator <NmvNode> NodeIterator = nodeTrack.iterator();
+		//
+		//						//populate the segment from the LogicalPathCollect
+		//						FROM = NodeIterator.next();
+		//						TO = NodeIterator.next();
+		//						//first find the paths and populate segment1
+		//						int w=0;
+		//						for(int q=0;q<rowMarker;q++){
+		//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
+		//								w=0;
+		//								while (logicalPathCollect[q][5+w]!=999){
+		//									segment1[seg1C][w]=logicalPathCollect[q][5+w];
+		//									w++;
+		//
+		//								}
+		//								seg1C++;
+		//							}
+		//						}//now all the paths are transferred to segment 1
+		//
+		//						//SECOND SEGMENT
+		//						nodeTrack=myGraphMalik.getIncidentVertices(PathIterator.next());
+		//						NodeIterator = nodeTrack.iterator();
+		//						//populate the segment from the LogicalPathCollect
+		//						FROM = NodeIterator.next();
+		//						TO = NodeIterator.next();
+		//						//first find the paths and populate segment2
+		//						w=0;
+		//						for(int q=0;q<rowMarker;q++){
+		//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
+		//								w=0;
+		//								while (logicalPathCollect[q][5+w]!=999){
+		//									segment2[seg2C][w]=logicalPathCollect[q][5+w];
+		//									w++;
+		//
+		//								}
+		//								seg2C++;
+		//							}
+		//						}//now all the paths are transferred to segment 2
+		//
+		//						//THIRD SEGMENT
+		//						nodeTrack=myGraphMalik.getIncidentVertices(PathIterator.next());
+		//						NodeIterator = nodeTrack.iterator();
+		//						//populate the segment from the LogicalPathCollect
+		//						FROM = NodeIterator.next();
+		//						TO = NodeIterator.next();
+		//						//first find the paths and populate segment3
+		//						w=0;
+		//						for(int q=0;q<rowMarker;q++){
+		//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
+		//								w=0;
+		//								while (logicalPathCollect[q][5+w]!=999){
+		//									segment3[seg3C][w]=logicalPathCollect[q][5+w];
+		//									w++;
+		//
+		//								}
+		//								seg3C++;
+		//							}
+		//						}//now all the paths are transferred to segment 3
+		//
+		//						//transfer to fullPathCollect
+		//						int v=0;
+		//						int v1=1;
+		//						int v2=1;
+		//
+		//						for (int u=0;u<seg1C;u++){
+		//							for (int r=0;r<seg2C;r++){
+		//								for (int p=0; p<seg3C;p++){
+		//									v=0;
+		//									v1=1;
+		//									v2=1;
+		//									while (segment1[u][v]!=999){ //add first segment
+		//										fullPathCollect[rows][v]=segment1[u][v];
+		//										v++;
+		//									}
+		//									while (segment2[r][v1]!=999){ //add second segment
+		//										fullPathCollect[rows][v]=segment2[r][v1];
+		//										v++;
+		//										v1++;
+		//									}
+		//									while (segment3[p][v2]!=999){ //add third segment
+		//										fullPathCollect[rows][v]=segment3[p][v2];
+		//										v++;
+		//										v2++;
+		//									}
+		//									rows++;
+		//								}
+		//							}
+		//						}
+		//
+		//
+		//					}else System.out.println("YOUR LOGICAL PATH HAS MORE THAN THREE SEGMENTS");
+		//
+		//					//				int [][] interimPathCollect = pathBuilder(myGraphGrid, nodeListGrid,assocList[y][3], assocList[x][3]);
+		//					//				//					int [][] interimPathCollect = pathBuilder(myGraphGrid, nodeListGrid,assocList[1][3], assocList[2][3]);
+		//					//				//insert into fullPathCollect
+		//					//				for (int u = 0; u<interimPathCollect.length;u++){
+		//					//					for (int g=0;g<interimPathCollect[0].length;g++){
+		//					//						fullPathCollect[marker][g]=interimPathCollect[u][g];
+		//					//					}	
+		//					//					marker++;
+		//					//
+		//					//				}
+		//					//				test=test+interimPathCollect.length;
+		//				}
+		//			}
+		//		}
+		//		//write out full path set (on screen)
+		//
+		//
+		////		//write fullPathCollect out
+		////		String filename = path+"shortestPathSet.csv";
+		////		BufferedWriter bf = IOUtils.getBufferedWriter(filename);
+		////		try{
+		////			for (int j =0; j< rows;j++){
+		////				for (int r=0;r<fullPathCollect[0].length;r++){
+		////					if (fullPathCollect[j][r]!=999){
+		////						bf.write(nodeListGrid.get(fullPathCollect[j][r]).getId()+" ");
+		////					}	
+		////				}
+		////				bf.newLine();	
+		////			}
+		////		} catch (IOException e) {
+		////			e.printStackTrace();
+		////		} finally{
+		////			try {
+		////				bf.close();
+		////			} catch (IOException e) {
+		////				e.printStackTrace();
+		////			}
+		////		}
+		////		System.out.println("Full path set written to file "+filename);
+		//
+		//		//trim fullpathset
+		//		int [][] fullPathTrim = new int[rows][55];
+		//		for (int[] row: fullPathTrim){
+		//			Arrays.fill(row, 999);
+		//		}
+		//		for (int j =0; j< rows;j++){
+		//			for (int t=0;t<55;t++){
+		//				if(fullPathCollect[j][t]!=999){
+		//					fullPathTrim[j][t]=Integer.parseInt(nodeListGrid.get(fullPathCollect[j][t]).getId());
+		//				}
+		//
+		//			}
+		//		}
+		//
+		//		//				System.out.println("fullPathTrim.length = "+fullPathTrim.length);
+		//		//				System.out.println();
+		//		//				for (int y = 0;y<5;y++){
+		//		//					System.out.println("# of entries"+fullPathTrim[y].length);
+		//		//					for (int r=0;r<21;r++){
+		//		//						System.out.print(fullPathTrim[y][r]+" ");
+		//		//					}
+		//		//					System.out.println();
+		//		//
+		//		//				}
+		//
+		//		String filename2 = path+"shortestPathSetTRIM.csv";
+		//		BufferedWriter bt = IOUtils.getBufferedWriter(filename2);
+		//		try{
+		//			for (int j =0; j< rows;j++){
+		//				for (int r=0;r<fullPathTrim[0].length;r++){
+		//					if (fullPathTrim[j][r]!=999){
+		//						bt.write(fullPathTrim[j][r]+" ");
+		//					}	
+		//				}
+		//				bt.newLine();	
+		//			}
+		//		} catch (IOException e) {
+		//			e.printStackTrace();
+		//		} finally{
+		//			try {
+		//				bt.close();
+		//			} catch (IOException e) {
+		//				e.printStackTrace();
+		//			}
+		//		}
+		//		System.out.println("Full path set TRIM written to file "+filename2);
+		//
+		//
+		//		//get the linklist
+		//		//		int[][] linkList= GhostLinkList.linkList(path, fullPathTrim); 
+		//		int[][] linkList= GhostLinkList.linkList(path, rows); 
+		//
+		//		double defaultTransProb = 1;
+		//
+		//		myGraphGhost = new DirectedSparseMultigraph<NmvNode, NmvLink>();
+		//		//create the node list
+		//		int [] uniqueNodesTemp = new int[linkList.length*2];
+		//		int count=0;
+		//		boolean flag = true;
+		//		int cur1=0;
+		//		int cur2=0;
+		//		int r=0;
+		//		uniqueNodesTemp[0]=linkList[0][0];
+		//		for (int y = 0; y<linkList.length;y++){
+		//			cur1=linkList[y][0];
+		//			cur2=linkList[y][1];
+		//			r=0;
+		//			flag=true;
+		//			while ((flag)&&(r<=count)){
+		//				if(uniqueNodesTemp[r]==cur1){
+		//					flag=false;
+		//				}else r++;
+		//			}	
+		//			if (flag){
+		//				count++;
+		//				uniqueNodesTemp[count]=cur1;
+		//			}
+		//			r=0;
+		//			flag = true;
+		//			while ((flag)&&(r<=count)){
+		//				if(uniqueNodesTemp[r]==cur2){
+		//					flag=false;
+		//				}else r++;
+		//			}	
+		//			if (flag){
+		//				count++;
+		//				uniqueNodesTemp[count]=cur2;
+		//
+		//			}
+		//		}
+		//		int[] uniqueNodes = new int[count+1];
+		//		for (int w =0; w<=count;w++){
+		//			uniqueNodes[w]=uniqueNodesTemp[w];
+		//		}
+		//
+		//		ArrayList<NmvNode> nodeList = new ArrayList<NmvNode>();
+		//		//what you have in linkList is the grid graph ID not the index
+		//		for (int m =0; m<uniqueNodes.length;m++){
+		//			NmvNode currentNode = new NmvNode("","", 0, 0);
+		//			currentNode = new NmvNode(Integer.toString(m),Integer.toString(uniqueNodes[m]),0,0);
+		//			nodeList.add(m, currentNode);
+		//		}
+		//		int indexTo = 0;
+		//		int indexFrom = 0;
+		//		for (int w = 0; w<linkList.length;w++){
+		//			for (int q =0;q<uniqueNodes.length;q++){
+		//				if(uniqueNodes[q]==linkList[w][0]){
+		//					indexFrom=q;
+		//					break;
+		//				}
+		//			}
+		//			for (int p =0;p<uniqueNodes.length;p++){
+		//				if(uniqueNodes[p]==linkList[w][1]){
+		//					indexTo=p;
+		//					break;
+		//				}
+		//			}
+		//			myGraphGhost.addEdge(new NmvLink(Integer.toString(w),linkList[w][2],defaultTransProb),nodeList.get(indexFrom),nodeList.get(indexTo),EdgeType.DIRECTED);
+		//		}
+		//		return myGraphGhost;
 
 	}
 	public static void constructGhostGraphRessler(String path, int[][]assocList, int fullPathSize, int segSize, int segPathLength){
@@ -763,7 +766,12 @@ public class TriGraphConstructor {
 
 			//this call gives you all the shortest paths between two connected ressler nodes
 			//			System.out.println("Source Grid ID: "+assocList[source][3]+" Target Grid ID: "+assocList[target][3]);
-			int [][] interimPathCollect = pathBuilder(myGraphGrid, nodeListGrid,assocList[source][3], assocList[target][3]);
+
+			int [][] interimPathCollect = new int[0][0];
+			if((assocList[source][3]!=999)&&(assocList[target][3]!=999)){
+				interimPathCollect = pathBuilder(myGraphGrid, nodeListGrid,assocList[source][3], assocList[target][3]);
+			}
+
 
 			//			System.out.println(interimPathCollect.length);
 			//now add it to the logicalPathCollect
@@ -817,204 +825,204 @@ public class TriGraphConstructor {
 		}
 		System.out.println("Segment paths written to "+filenameL);
 
-//		//Now you have all the shortest paths for all the directly connected Ressler links. Put them together to build the whole set.
-//
-//		//		Create set of all shortest paths for Ghost Network
-//		int [][] fullPathCollect = new int[fullPathSize][55];
-//		for (int[] row: fullPathCollect){
-//			Arrays.fill(row, 999);
-//		}
-//		DijkstraShortestPath<NmvNode, NmvLink> rPath = new DijkstraShortestPath<NmvNode, NmvLink>(myGraphRessler);
-//		//		int marker =0;
-//		//		int test =0;
-//		//for each node pair in the assocList - remember that shortest path sets may eventually not be symmetric and therefore you have to do all
-//
-//
-//		int rows=0;
-//		for (int y = 0; y<assocList.length;y++){
-//			for (int x = 0; x<assocList.length;x++){
-//
-//				//		for (int y = 0; y<3;y++){ //test
-//				//			for (int x = 1; x<8;x++){ //test
-//				if (x!=y){
-//
-//					int[][] segment1 = new int[segSize][segPathLength];
-//					for (int[] row: segment1){
-//						Arrays.fill(row, 999);
-//					}
-//					int seg1C=0;
-//					int[][] segment2 = new int[segSize][segPathLength];
-//					for (int[] row: segment2){
-//						Arrays.fill(row, 999);
-//					}
-//					int seg2C=0;
-//
-//
-//					//get the logical shortest path first
-//					List <NmvLink> shortestPathRessler = rPath.getPath(nodeListRessler.get(assocList[y][1]), nodeListRessler.get(assocList[x][1]));
-//					NmvNode FROM = null;
-//					NmvNode TO = null;
-//					//decide which loop depending on the logical path length
-//					if(shortestPathRessler.size()==1){
-//						Iterator<NmvLink> PathIterator = shortestPathRessler.iterator();
-//						nodeTrack=myGraphRessler.getIncidentVertices(PathIterator.next()); //gets incident vertices to a link
-//						Iterator <NmvNode> NodeIterator = nodeTrack.iterator();
-//
-//						//if only one leg
-//						//populate the segment from the LogicalPathCollect
-//						FROM = NodeIterator.next();
-//						TO = NodeIterator.next();
-//						//first find the paths and populate segment1
-//						int w=0;
-//						for(int q=0;q<rowMarker;q++){
-//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
-//								//								System.out.println("In here 1");
-//								w=0;
-//								while (logicalPathCollect[q][5+w]!=999){
-//									segment1[seg1C][w]=logicalPathCollect[q][5+w];
-//									w++;
-//
-//								}
-//								seg1C++;
-//							}
-//						}//now all the paths are transferred to segment 1
-//
-//						//						for(int q=0;q<seg1C;q++){
-//						//							System.out.println(String.format("%s,%s,%s\n",nodeListGrid.get(segment1[q][0]).getId(),nodeListGrid.get(segment1[q][1]).getId(),nodeListGrid.get(segment1[q][2]).getId()));
-//						//						}
-//						//transfer to fullPathCollect
-//						int v=0;
-//						for (int u=0;u<seg1C;u++){
-//							v=0;
-//							while (segment1[u][v]!=999){
-//								fullPathCollect[rows+u][v]=segment1[u][v];
-//								v++;
-//							}
-//						}
-//						rows=rows+seg1C;
-//						//						System.out.println("Fullpath rows: "+rows);
-//
-//						//						for (int q=0;q<seg1C;q++){
-//						//							System.out.print(String.format("%s,%s,%s\n",nodeListGrid.get(fullPathCollect[q][0]).getId(),nodeListGrid.get(fullPathCollect[q][1]).getId(),nodeListGrid.get(fullPathCollect[q][2]).getId()));
-//						//						}
-//
-//					}else if(shortestPathRessler.size()==2){
-//						//if two legs
-//						Iterator<NmvLink> PathIterator = shortestPathRessler.iterator();
-//						//FIRST SEGMENT
-//						nodeTrack=myGraphRessler.getIncidentVertices(PathIterator.next());
-//						Iterator <NmvNode> NodeIterator = nodeTrack.iterator();
-//						//populate the segment from the LogicalPathCollect
-//						FROM = NodeIterator.next();
-//						TO = NodeIterator.next();
-//						//first find the paths and populate segment1
-//						int w=0;
-//						for(int q=0;q<rowMarker;q++){
-//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
-//								w=0;
-//								while (logicalPathCollect[q][5+w]!=999){
-//									segment1[seg1C][w]=logicalPathCollect[q][5+w];
-//									w++;
-//
-//								}
-//								seg1C++;
-//							}
-//						}//now all the paths are transferred to segment 1
-//						//						System.out.println("Segment 1");
-//						//						for(int q=0;q<seg1C;q++){
-//						//							System.out.print(String.format("%s,%s,%s\n",nodeListGrid.get(segment1[q][0]).getId(),nodeListGrid.get(segment1[q][1]).getId(),nodeListGrid.get(segment1[q][2]).getId()));
-//						//						}
-//
-//						//SECOND SEGMENT
-//						nodeTrack=myGraphRessler.getIncidentVertices(PathIterator.next());
-//
-//						NodeIterator = nodeTrack.iterator();
-//						//populate the segment from the LogicalPathCollect
-//						FROM = NodeIterator.next();
-//						TO = NodeIterator.next();
-//						//first find the paths and populate segment2
-//						w=0;
-//						for(int q=0;q<rowMarker;q++){
-//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
-//
-//								w=0;
-//								while (logicalPathCollect[q][5+w]!=999){
-//									segment2[seg2C][w]=logicalPathCollect[q][5+w];
-//									w++;
-//
-//								}
-//								seg2C++;
-//							}
-//						}//now all the paths are transferred to segment 2
-//						//						System.out.println("Segment 2");
-//						//						for(int q=0;q<seg2C;q++){
-//						//							System.out.print(String.format("%s,%s,%s\n",nodeListGrid.get(segment2[q][0]).getId(),nodeListGrid.get(segment2[q][1]).getId(),nodeListGrid.get(segment2[q][2]).getId()));
-//						//						}
-//
-//
-//						//transfer to fullPathCollect
-//						int v=0;
-//						int v1=1;
-//
-//						for (int u=0;u<seg1C;u++){
-//							for (int r=0;r<seg2C;r++){
-//								v=0;
-//								v1=1;
-//								while (segment1[u][v]!=999){ //add first segment
-//									fullPathCollect[rows][v]=segment1[u][v];
-//									v++;
-//								}
-//								while (segment2[r][v1]!=999){ //add second segment
-//									fullPathCollect[rows][v]=segment2[r][v1];
-//									v++;
-//									v1++;
-//								}
-//								rows++;
-//							}
-//						}
-//					}else System.out.println("YOUR LOGICAL PATH HAS MORE THAN TWO SEGMENTS");
-//				}
-//			}
-//		}
-//		//write out full path set (on screen)
+		//		//Now you have all the shortest paths for all the directly connected Ressler links. Put them together to build the whole set.
+		//
+		//		//		Create set of all shortest paths for Ghost Network
+		//		int [][] fullPathCollect = new int[fullPathSize][55];
+		//		for (int[] row: fullPathCollect){
+		//			Arrays.fill(row, 999);
+		//		}
+		//		DijkstraShortestPath<NmvNode, NmvLink> rPath = new DijkstraShortestPath<NmvNode, NmvLink>(myGraphRessler);
+		//		//		int marker =0;
+		//		//		int test =0;
+		//		//for each node pair in the assocList - remember that shortest path sets may eventually not be symmetric and therefore you have to do all
+		//
+		//
+		//		int rows=0;
+		//		for (int y = 0; y<assocList.length;y++){
+		//			for (int x = 0; x<assocList.length;x++){
+		//
+		//				//		for (int y = 0; y<3;y++){ //test
+		//				//			for (int x = 1; x<8;x++){ //test
+		//				if (x!=y){
+		//
+		//					int[][] segment1 = new int[segSize][segPathLength];
+		//					for (int[] row: segment1){
+		//						Arrays.fill(row, 999);
+		//					}
+		//					int seg1C=0;
+		//					int[][] segment2 = new int[segSize][segPathLength];
+		//					for (int[] row: segment2){
+		//						Arrays.fill(row, 999);
+		//					}
+		//					int seg2C=0;
+		//
+		//
+		//					//get the logical shortest path first
+		//					List <NmvLink> shortestPathRessler = rPath.getPath(nodeListRessler.get(assocList[y][1]), nodeListRessler.get(assocList[x][1]));
+		//					NmvNode FROM = null;
+		//					NmvNode TO = null;
+		//					//decide which loop depending on the logical path length
+		//					if(shortestPathRessler.size()==1){
+		//						Iterator<NmvLink> PathIterator = shortestPathRessler.iterator();
+		//						nodeTrack=myGraphRessler.getIncidentVertices(PathIterator.next()); //gets incident vertices to a link
+		//						Iterator <NmvNode> NodeIterator = nodeTrack.iterator();
+		//
+		//						//if only one leg
+		//						//populate the segment from the LogicalPathCollect
+		//						FROM = NodeIterator.next();
+		//						TO = NodeIterator.next();
+		//						//first find the paths and populate segment1
+		//						int w=0;
+		//						for(int q=0;q<rowMarker;q++){
+		//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
+		//								//								System.out.println("In here 1");
+		//								w=0;
+		//								while (logicalPathCollect[q][5+w]!=999){
+		//									segment1[seg1C][w]=logicalPathCollect[q][5+w];
+		//									w++;
+		//
+		//								}
+		//								seg1C++;
+		//							}
+		//						}//now all the paths are transferred to segment 1
+		//
+		//						//						for(int q=0;q<seg1C;q++){
+		//						//							System.out.println(String.format("%s,%s,%s\n",nodeListGrid.get(segment1[q][0]).getId(),nodeListGrid.get(segment1[q][1]).getId(),nodeListGrid.get(segment1[q][2]).getId()));
+		//						//						}
+		//						//transfer to fullPathCollect
+		//						int v=0;
+		//						for (int u=0;u<seg1C;u++){
+		//							v=0;
+		//							while (segment1[u][v]!=999){
+		//								fullPathCollect[rows+u][v]=segment1[u][v];
+		//								v++;
+		//							}
+		//						}
+		//						rows=rows+seg1C;
+		//						//						System.out.println("Fullpath rows: "+rows);
+		//
+		//						//						for (int q=0;q<seg1C;q++){
+		//						//							System.out.print(String.format("%s,%s,%s\n",nodeListGrid.get(fullPathCollect[q][0]).getId(),nodeListGrid.get(fullPathCollect[q][1]).getId(),nodeListGrid.get(fullPathCollect[q][2]).getId()));
+		//						//						}
+		//
+		//					}else if(shortestPathRessler.size()==2){
+		//						//if two legs
+		//						Iterator<NmvLink> PathIterator = shortestPathRessler.iterator();
+		//						//FIRST SEGMENT
+		//						nodeTrack=myGraphRessler.getIncidentVertices(PathIterator.next());
+		//						Iterator <NmvNode> NodeIterator = nodeTrack.iterator();
+		//						//populate the segment from the LogicalPathCollect
+		//						FROM = NodeIterator.next();
+		//						TO = NodeIterator.next();
+		//						//first find the paths and populate segment1
+		//						int w=0;
+		//						for(int q=0;q<rowMarker;q++){
+		//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
+		//								w=0;
+		//								while (logicalPathCollect[q][5+w]!=999){
+		//									segment1[seg1C][w]=logicalPathCollect[q][5+w];
+		//									w++;
+		//
+		//								}
+		//								seg1C++;
+		//							}
+		//						}//now all the paths are transferred to segment 1
+		//						//						System.out.println("Segment 1");
+		//						//						for(int q=0;q<seg1C;q++){
+		//						//							System.out.print(String.format("%s,%s,%s\n",nodeListGrid.get(segment1[q][0]).getId(),nodeListGrid.get(segment1[q][1]).getId(),nodeListGrid.get(segment1[q][2]).getId()));
+		//						//						}
+		//
+		//						//SECOND SEGMENT
+		//						nodeTrack=myGraphRessler.getIncidentVertices(PathIterator.next());
+		//
+		//						NodeIterator = nodeTrack.iterator();
+		//						//populate the segment from the LogicalPathCollect
+		//						FROM = NodeIterator.next();
+		//						TO = NodeIterator.next();
+		//						//first find the paths and populate segment2
+		//						w=0;
+		//						for(int q=0;q<rowMarker;q++){
+		//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
+		//
+		//								w=0;
+		//								while (logicalPathCollect[q][5+w]!=999){
+		//									segment2[seg2C][w]=logicalPathCollect[q][5+w];
+		//									w++;
+		//
+		//								}
+		//								seg2C++;
+		//							}
+		//						}//now all the paths are transferred to segment 2
+		//						//						System.out.println("Segment 2");
+		//						//						for(int q=0;q<seg2C;q++){
+		//						//							System.out.print(String.format("%s,%s,%s\n",nodeListGrid.get(segment2[q][0]).getId(),nodeListGrid.get(segment2[q][1]).getId(),nodeListGrid.get(segment2[q][2]).getId()));
+		//						//						}
+		//
+		//
+		//						//transfer to fullPathCollect
+		//						int v=0;
+		//						int v1=1;
+		//
+		//						for (int u=0;u<seg1C;u++){
+		//							for (int r=0;r<seg2C;r++){
+		//								v=0;
+		//								v1=1;
+		//								while (segment1[u][v]!=999){ //add first segment
+		//									fullPathCollect[rows][v]=segment1[u][v];
+		//									v++;
+		//								}
+		//								while (segment2[r][v1]!=999){ //add second segment
+		//									fullPathCollect[rows][v]=segment2[r][v1];
+		//									v++;
+		//									v1++;
+		//								}
+		//								rows++;
+		//							}
+		//						}
+		//					}else System.out.println("YOUR LOGICAL PATH HAS MORE THAN TWO SEGMENTS");
+		//				}
+		//			}
+		//		}
+		//		//write out full path set (on screen)
 
 
-//		//write fullPathCollect out
-//		String filename = path+"shortestPathSet.csv";
-//		BufferedWriter bf = IOUtils.getBufferedWriter(filename);
-//		try{
-//			for (int j =0; j< rows;j++){
-//				for (int r=0;r<fullPathCollect[0].length;r++){
-//					if (fullPathCollect[j][r]!=999){
-//						bf.write(nodeListGrid.get(fullPathCollect[j][r]).getId()+" ");
-//					}	
-//				}
-//				bf.newLine();	
-//			}
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} finally{
-//			try {
-//				bf.close();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		System.out.println("Full path set written to file "+filename);
+		//		//write fullPathCollect out
+		//		String filename = path+"shortestPathSet.csv";
+		//		BufferedWriter bf = IOUtils.getBufferedWriter(filename);
+		//		try{
+		//			for (int j =0; j< rows;j++){
+		//				for (int r=0;r<fullPathCollect[0].length;r++){
+		//					if (fullPathCollect[j][r]!=999){
+		//						bf.write(nodeListGrid.get(fullPathCollect[j][r]).getId()+" ");
+		//					}	
+		//				}
+		//				bf.newLine();	
+		//			}
+		//		} catch (IOException e) {
+		//			e.printStackTrace();
+		//		} finally{
+		//			try {
+		//				bf.close();
+		//			} catch (IOException e) {
+		//				e.printStackTrace();
+		//			}
+		//		}
+		//		System.out.println("Full path set written to file "+filename);
 
-//		//trim fullpathset
-//		int [][] fullPathTrim = new int[rows][55];
-//		for (int[] row: fullPathTrim){
-//			Arrays.fill(row, 999);
-//		}
-//		for (int j =0; j< rows;j++){
-//			for (int t=0;t<55;t++){
-//				if(fullPathCollect[j][t]!=999){
-//					fullPathTrim[j][t]=Integer.parseInt(nodeListGrid.get(fullPathCollect[j][t]).getId());
-//				}
-//
-//			}
-//		}
+		//		//trim fullpathset
+		//		int [][] fullPathTrim = new int[rows][55];
+		//		for (int[] row: fullPathTrim){
+		//			Arrays.fill(row, 999);
+		//		}
+		//		for (int j =0; j< rows;j++){
+		//			for (int t=0;t<55;t++){
+		//				if(fullPathCollect[j][t]!=999){
+		//					fullPathTrim[j][t]=Integer.parseInt(nodeListGrid.get(fullPathCollect[j][t]).getId());
+		//				}
+		//
+		//			}
+		//		}
 
 		//				System.out.println("fullPathTrim.length = "+fullPathTrim.length);
 		//				System.out.println();
@@ -1027,104 +1035,104 @@ public class TriGraphConstructor {
 		//
 		//				}
 
-//		String filename2 = path+"shortestPathSetTRIM.csv";
-//		BufferedWriter bt = IOUtils.getBufferedWriter(filename2);
-//		try{
-//			for (int j =0; j< rows;j++){
-//				for (int r=0;r<fullPathTrim[0].length;r++){
-//					if (fullPathTrim[j][r]!=999){
-//						bt.write(fullPathTrim[j][r]+" ");
-//					}	
-//				}
-//				bt.newLine();	
-//			}
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} finally{
-//			try {
-//				bt.close();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		System.out.println("Full path set TRIM written to file "+filename2);
-//
-//
-//		//get the linklist
-//		//		int[][] linkList= GhostLinkList.linkList(path, fullPathTrim); 
-//		int[][] linkList= GhostLinkList.linkList(path, rows); 
-//
-//		double defaultTransProb = 1;
-//
-//		myGraphGhost = new DirectedSparseMultigraph<NmvNode, NmvLink>();
-//		//create the node list
-//		int [] uniqueNodesTemp = new int[linkList.length*2];
-//		int count=0;
-//		boolean flag = true;
-//		int cur1=0;
-//		int cur2=0;
-//		int r=0;
-//		uniqueNodesTemp[0]=linkList[0][0];
-//		for (int y = 0; y<linkList.length;y++){
-//			cur1=linkList[y][0];
-//			cur2=linkList[y][1];
-//			r=0;
-//			flag=true;
-//			while ((flag)&&(r<=count)){
-//				if(uniqueNodesTemp[r]==cur1){
-//					flag=false;
-//				}else r++;
-//			}	
-//			if (flag){
-//				count++;
-//				uniqueNodesTemp[count]=cur1;
-//			}
-//			r=0;
-//			flag = true;
-//			while ((flag)&&(r<=count)){
-//				if(uniqueNodesTemp[r]==cur2){
-//					flag=false;
-//				}else r++;
-//			}	
-//			if (flag){
-//				count++;
-//				uniqueNodesTemp[count]=cur2;
-//
-//			}
-//		}
-//		int[] uniqueNodes = new int[count+1];
-//		for (int w =0; w<=count;w++){
-//			uniqueNodes[w]=uniqueNodesTemp[w];
-//		}
-//
-//		ArrayList<NmvNode> nodeList = new ArrayList<NmvNode>();
-//		//what you have in linkList is the grid graph ID not the index
-//		for (int m =0; m<uniqueNodes.length;m++){
-//			NmvNode currentNode = new NmvNode("","", 0, 0);
-//			currentNode = new NmvNode(Integer.toString(m),Integer.toString(uniqueNodes[m]),0,0);
-//			nodeList.add(m, currentNode);
-//		}
-//		int indexTo = 0;
-//		int indexFrom = 0;
-//		for (int w = 0; w<linkList.length;w++){
-//			for (int q =0;q<uniqueNodes.length;q++){
-//				if(uniqueNodes[q]==linkList[w][0]){
-//					indexFrom=q;
-//					break;
-//				}
-//			}
-//			for (int p =0;p<uniqueNodes.length;p++){
-//				if(uniqueNodes[p]==linkList[w][1]){
-//					indexTo=p;
-//					break;
-//				}
-//			}
-//			myGraphGhost.addEdge(new NmvLink(Integer.toString(w),linkList[w][2],defaultTransProb),nodeList.get(indexFrom),nodeList.get(indexTo),EdgeType.DIRECTED);
-//		}
-//		return myGraphGhost;
+		//		String filename2 = path+"shortestPathSetTRIM.csv";
+		//		BufferedWriter bt = IOUtils.getBufferedWriter(filename2);
+		//		try{
+		//			for (int j =0; j< rows;j++){
+		//				for (int r=0;r<fullPathTrim[0].length;r++){
+		//					if (fullPathTrim[j][r]!=999){
+		//						bt.write(fullPathTrim[j][r]+" ");
+		//					}	
+		//				}
+		//				bt.newLine();	
+		//			}
+		//		} catch (IOException e) {
+		//			e.printStackTrace();
+		//		} finally{
+		//			try {
+		//				bt.close();
+		//			} catch (IOException e) {
+		//				e.printStackTrace();
+		//			}
+		//		}
+		//		System.out.println("Full path set TRIM written to file "+filename2);
+		//
+		//
+		//		//get the linklist
+		//		//		int[][] linkList= GhostLinkList.linkList(path, fullPathTrim); 
+		//		int[][] linkList= GhostLinkList.linkList(path, rows); 
+		//
+		//		double defaultTransProb = 1;
+		//
+		//		myGraphGhost = new DirectedSparseMultigraph<NmvNode, NmvLink>();
+		//		//create the node list
+		//		int [] uniqueNodesTemp = new int[linkList.length*2];
+		//		int count=0;
+		//		boolean flag = true;
+		//		int cur1=0;
+		//		int cur2=0;
+		//		int r=0;
+		//		uniqueNodesTemp[0]=linkList[0][0];
+		//		for (int y = 0; y<linkList.length;y++){
+		//			cur1=linkList[y][0];
+		//			cur2=linkList[y][1];
+		//			r=0;
+		//			flag=true;
+		//			while ((flag)&&(r<=count)){
+		//				if(uniqueNodesTemp[r]==cur1){
+		//					flag=false;
+		//				}else r++;
+		//			}	
+		//			if (flag){
+		//				count++;
+		//				uniqueNodesTemp[count]=cur1;
+		//			}
+		//			r=0;
+		//			flag = true;
+		//			while ((flag)&&(r<=count)){
+		//				if(uniqueNodesTemp[r]==cur2){
+		//					flag=false;
+		//				}else r++;
+		//			}	
+		//			if (flag){
+		//				count++;
+		//				uniqueNodesTemp[count]=cur2;
+		//
+		//			}
+		//		}
+		//		int[] uniqueNodes = new int[count+1];
+		//		for (int w =0; w<=count;w++){
+		//			uniqueNodes[w]=uniqueNodesTemp[w];
+		//		}
+		//
+		//		ArrayList<NmvNode> nodeList = new ArrayList<NmvNode>();
+		//		//what you have in linkList is the grid graph ID not the index
+		//		for (int m =0; m<uniqueNodes.length;m++){
+		//			NmvNode currentNode = new NmvNode("","", 0, 0);
+		//			currentNode = new NmvNode(Integer.toString(m),Integer.toString(uniqueNodes[m]),0,0);
+		//			nodeList.add(m, currentNode);
+		//		}
+		//		int indexTo = 0;
+		//		int indexFrom = 0;
+		//		for (int w = 0; w<linkList.length;w++){
+		//			for (int q =0;q<uniqueNodes.length;q++){
+		//				if(uniqueNodes[q]==linkList[w][0]){
+		//					indexFrom=q;
+		//					break;
+		//				}
+		//			}
+		//			for (int p =0;p<uniqueNodes.length;p++){
+		//				if(uniqueNodes[p]==linkList[w][1]){
+		//					indexTo=p;
+		//					break;
+		//				}
+		//			}
+		//			myGraphGhost.addEdge(new NmvLink(Integer.toString(w),linkList[w][2],defaultTransProb),nodeList.get(indexFrom),nodeList.get(indexTo),EdgeType.DIRECTED);
+		//		}
+		//		return myGraphGhost;
 
 	}
-	
+
 	public static void constructGhostGraphNavabi(String path, int[][]assocList, int fullPathSize, int segSize, int segPathLength){
 		ArrayList<NmvNode> nodeListGrid = new ArrayList<NmvNode>(TriGraphConstructor.myGraphGrid.getVertices());
 		ArrayList<NmvLink> linkListNavabi = new ArrayList<NmvLink>(TriGraphConstructor.myGraphNavabi.getEdges());
@@ -1174,7 +1182,10 @@ public class TriGraphConstructor {
 
 			//this call gives you all the shortest paths between two connected navabi nodes
 			//			System.out.println("Source Grid ID: "+assocList[source][3]+" Target Grid ID: "+assocList[target][3]);
-			int [][] interimPathCollect = pathBuilder(myGraphGrid, nodeListGrid,assocList[source][3], assocList[target][3]);
+			int [][] interimPathCollect = new int[0][0];
+			if((assocList[source][3]!=999)&&(assocList[target][3]!=999)){
+				interimPathCollect = pathBuilder(myGraphGrid, nodeListGrid,assocList[source][3], assocList[target][3]);
+			}
 
 			//			System.out.println(interimPathCollect.length);
 			//now add it to the logicalPathCollect
@@ -1228,198 +1239,198 @@ public class TriGraphConstructor {
 		}
 		System.out.println("Segment paths written to "+filenameL);
 
-//		//Now you have all the shortest paths for all the directly connected Navabi links. Put them together to build the whole set.
-//
-//		//		Create set of all shortest paths for Ghost Network
-//		int [][] fullPathCollect = new int[fullPathSize][55];
-//		for (int[] row: fullPathCollect){
-//			Arrays.fill(row, 999);
-//		}
-//		DijkstraShortestPath<NmvNode, NmvLink> nPath = new DijkstraShortestPath<NmvNode, NmvLink>(myGraphNavabi);
-//		//		int marker =0;
-//		//		int test =0;
-//		//for each node pair in the assocList - remember that shortest path sets may eventually not be symmetric and therefore you have to do all
-//
-//
-//		int rows=0;
-//		for (int y = 0; y<assocList.length;y++){
-//			for (int x = 0; x<assocList.length;x++){
-//
-//				//		for (int y = 0; y<3;y++){ //test
-//				//			for (int x = 1; x<8;x++){ //test
-//				if (x!=y){
-//
-//					int[][] segment1 = new int[segSize][segPathLength];
-//					for (int[] row: segment1){
-//						Arrays.fill(row, 999);
-//					}
-//					int seg1C=0;
-//
-//
-//					//get the logical shortest path first
-//					List <NmvLink> shortestPathNavabi = nPath.getPath(nodeListNavabi.get(assocList[y][1]), nodeListNavabi.get(assocList[x][1]));
-//					NmvNode FROM = null;
-//					NmvNode TO = null;
-//					//decide which loop depending on the logical path length
-//					if(shortestPathNavabi.size()==1){
-//						Iterator<NmvLink> PathIterator = shortestPathNavabi.iterator();
-//						nodeTrack=myGraphNavabi.getIncidentVertices(PathIterator.next()); //gets incident vertices to a link
-//						Iterator <NmvNode> NodeIterator = nodeTrack.iterator();
-//
-//						//if only one leg
-//						//populate the segment from the LogicalPathCollect
-//						FROM = NodeIterator.next();
-//						TO = NodeIterator.next();
-//						//first find the paths and populate segment1
-//						int w=0;
-//						for(int q=0;q<rowMarker;q++){
-//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
-//								//								System.out.println("In here 1");
-//								w=0;
-//								while (logicalPathCollect[q][5+w]!=999){
-//									segment1[seg1C][w]=logicalPathCollect[q][5+w];
-//									w++;
-//
-//								}
-//								seg1C++;
-//							}
-//						}//now all the paths are transferred to segment 1
-//
-//						//						for(int q=0;q<seg1C;q++){
-//						//							System.out.println(String.format("%s,%s,%s\n",nodeListGrid.get(segment1[q][0]).getId(),nodeListGrid.get(segment1[q][1]).getId(),nodeListGrid.get(segment1[q][2]).getId()));
-//						//						}
-//						//transfer to fullPathCollect
-//						int v=0;
-//						for (int u=0;u<seg1C;u++){
-//							v=0;
-//							while (segment1[u][v]!=999){
-//								fullPathCollect[rows+u][v]=segment1[u][v];
-//								v++;
-//							}
-//						}
-//						rows=rows+seg1C;
-//						//						System.out.println("Fullpath rows: "+rows);
-//
-//						//						for (int q=0;q<seg1C;q++){
-//						//							System.out.print(String.format("%s,%s,%s\n",nodeListGrid.get(fullPathCollect[q][0]).getId(),nodeListGrid.get(fullPathCollect[q][1]).getId(),nodeListGrid.get(fullPathCollect[q][2]).getId()));
-//						//						}
-//
-//					}else System.out.println("YOUR LOGICAL PATH HAS MORE THAN ONE SEGMENTS");
-//				}
-//			}
-//		}
-//
-//
-//		//trim fullpathset
-//		int [][] fullPathTrim = new int[rows][55];
-//		for (int[] row: fullPathTrim){
-//			Arrays.fill(row, 999);
-//		}
-//		for (int j =0; j< rows;j++){
-//			for (int t=0;t<55;t++){
-//				if(fullPathCollect[j][t]!=999){
-//					fullPathTrim[j][t]=Integer.parseInt(nodeListGrid.get(fullPathCollect[j][t]).getId());
-//				}
-//
-//			}
-//		}
-//
-//
-//		String filename2 = path+"shortestPathSetTRIM.csv";
-//		BufferedWriter bt = IOUtils.getBufferedWriter(filename2);
-//		try{
-//			for (int j =0; j< rows;j++){
-//				for (int r=0;r<fullPathTrim[0].length;r++){
-//					if (fullPathTrim[j][r]!=999){
-//						bt.write(fullPathTrim[j][r]+" ");
-//					}	
-//				}
-//				bt.newLine();	
-//			}
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} finally{
-//			try {
-//				bt.close();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		System.out.println("Full path set TRIM written to file "+filename2);
-//
-//
-//		//get the linklist
-//		//		int[][] linkList= GhostLinkList.linkList(path, fullPathTrim); 
-//		int[][] linkList= GhostLinkList.linkList(path, rows); 
-//
-//		double defaultTransProb = 1;
-//
-//		myGraphGhost = new DirectedSparseMultigraph<NmvNode, NmvLink>();
-//		//create the node list
-//		int [] uniqueNodesTemp = new int[linkList.length*2];
-//		int count=0;
-//		boolean flag = true;
-//		int cur1=0;
-//		int cur2=0;
-//		int r=0;
-//		uniqueNodesTemp[0]=linkList[0][0];
-//		for (int y = 0; y<linkList.length;y++){
-//			cur1=linkList[y][0];
-//			cur2=linkList[y][1];
-//			r=0;
-//			flag=true;
-//			while ((flag)&&(r<=count)){
-//				if(uniqueNodesTemp[r]==cur1){
-//					flag=false;
-//				}else r++;
-//			}	
-//			if (flag){
-//				count++;
-//				uniqueNodesTemp[count]=cur1;
-//			}
-//			r=0;
-//			flag = true;
-//			while ((flag)&&(r<=count)){
-//				if(uniqueNodesTemp[r]==cur2){
-//					flag=false;
-//				}else r++;
-//			}	
-//			if (flag){
-//				count++;
-//				uniqueNodesTemp[count]=cur2;
-//
-//			}
-//		}
-//		int[] uniqueNodes = new int[count+1];
-//		for (int w =0; w<=count;w++){
-//			uniqueNodes[w]=uniqueNodesTemp[w];
-//		}
-//
-//		ArrayList<NmvNode> nodeList = new ArrayList<NmvNode>();
-//		//what you have in linkList is the grid graph ID not the index
-//		for (int m =0; m<uniqueNodes.length;m++){
-//			NmvNode currentNode = new NmvNode("","", 0, 0);
-//			currentNode = new NmvNode(Integer.toString(m),Integer.toString(uniqueNodes[m]),0,0);
-//			nodeList.add(m, currentNode);
-//		}
-//		int indexTo = 0;
-//		int indexFrom = 0;
-//		for (int w = 0; w<linkList.length;w++){
-//			for (int q =0;q<uniqueNodes.length;q++){
-//				if(uniqueNodes[q]==linkList[w][0]){
-//					indexFrom=q;
-//					break;
-//				}
-//			}
-//			for (int p =0;p<uniqueNodes.length;p++){
-//				if(uniqueNodes[p]==linkList[w][1]){
-//					indexTo=p;
-//					break;
-//				}
-//			}
-//			myGraphGhost.addEdge(new NmvLink(Integer.toString(w),linkList[w][2],defaultTransProb),nodeList.get(indexFrom),nodeList.get(indexTo),EdgeType.DIRECTED);
-//		}
-//		return myGraphGhost;
+		//		//Now you have all the shortest paths for all the directly connected Navabi links. Put them together to build the whole set.
+		//
+		//		//		Create set of all shortest paths for Ghost Network
+		//		int [][] fullPathCollect = new int[fullPathSize][55];
+		//		for (int[] row: fullPathCollect){
+		//			Arrays.fill(row, 999);
+		//		}
+		//		DijkstraShortestPath<NmvNode, NmvLink> nPath = new DijkstraShortestPath<NmvNode, NmvLink>(myGraphNavabi);
+		//		//		int marker =0;
+		//		//		int test =0;
+		//		//for each node pair in the assocList - remember that shortest path sets may eventually not be symmetric and therefore you have to do all
+		//
+		//
+		//		int rows=0;
+		//		for (int y = 0; y<assocList.length;y++){
+		//			for (int x = 0; x<assocList.length;x++){
+		//
+		//				//		for (int y = 0; y<3;y++){ //test
+		//				//			for (int x = 1; x<8;x++){ //test
+		//				if (x!=y){
+		//
+		//					int[][] segment1 = new int[segSize][segPathLength];
+		//					for (int[] row: segment1){
+		//						Arrays.fill(row, 999);
+		//					}
+		//					int seg1C=0;
+		//
+		//
+		//					//get the logical shortest path first
+		//					List <NmvLink> shortestPathNavabi = nPath.getPath(nodeListNavabi.get(assocList[y][1]), nodeListNavabi.get(assocList[x][1]));
+		//					NmvNode FROM = null;
+		//					NmvNode TO = null;
+		//					//decide which loop depending on the logical path length
+		//					if(shortestPathNavabi.size()==1){
+		//						Iterator<NmvLink> PathIterator = shortestPathNavabi.iterator();
+		//						nodeTrack=myGraphNavabi.getIncidentVertices(PathIterator.next()); //gets incident vertices to a link
+		//						Iterator <NmvNode> NodeIterator = nodeTrack.iterator();
+		//
+		//						//if only one leg
+		//						//populate the segment from the LogicalPathCollect
+		//						FROM = NodeIterator.next();
+		//						TO = NodeIterator.next();
+		//						//first find the paths and populate segment1
+		//						int w=0;
+		//						for(int q=0;q<rowMarker;q++){
+		//							if ((logicalPathCollect[q][0]==Integer.parseInt(FROM.getId()))&& (logicalPathCollect[q][1]==Integer.parseInt(TO.getId()))){
+		//								//								System.out.println("In here 1");
+		//								w=0;
+		//								while (logicalPathCollect[q][5+w]!=999){
+		//									segment1[seg1C][w]=logicalPathCollect[q][5+w];
+		//									w++;
+		//
+		//								}
+		//								seg1C++;
+		//							}
+		//						}//now all the paths are transferred to segment 1
+		//
+		//						//						for(int q=0;q<seg1C;q++){
+		//						//							System.out.println(String.format("%s,%s,%s\n",nodeListGrid.get(segment1[q][0]).getId(),nodeListGrid.get(segment1[q][1]).getId(),nodeListGrid.get(segment1[q][2]).getId()));
+		//						//						}
+		//						//transfer to fullPathCollect
+		//						int v=0;
+		//						for (int u=0;u<seg1C;u++){
+		//							v=0;
+		//							while (segment1[u][v]!=999){
+		//								fullPathCollect[rows+u][v]=segment1[u][v];
+		//								v++;
+		//							}
+		//						}
+		//						rows=rows+seg1C;
+		//						//						System.out.println("Fullpath rows: "+rows);
+		//
+		//						//						for (int q=0;q<seg1C;q++){
+		//						//							System.out.print(String.format("%s,%s,%s\n",nodeListGrid.get(fullPathCollect[q][0]).getId(),nodeListGrid.get(fullPathCollect[q][1]).getId(),nodeListGrid.get(fullPathCollect[q][2]).getId()));
+		//						//						}
+		//
+		//					}else System.out.println("YOUR LOGICAL PATH HAS MORE THAN ONE SEGMENTS");
+		//				}
+		//			}
+		//		}
+		//
+		//
+		//		//trim fullpathset
+		//		int [][] fullPathTrim = new int[rows][55];
+		//		for (int[] row: fullPathTrim){
+		//			Arrays.fill(row, 999);
+		//		}
+		//		for (int j =0; j< rows;j++){
+		//			for (int t=0;t<55;t++){
+		//				if(fullPathCollect[j][t]!=999){
+		//					fullPathTrim[j][t]=Integer.parseInt(nodeListGrid.get(fullPathCollect[j][t]).getId());
+		//				}
+		//
+		//			}
+		//		}
+		//
+		//
+		//		String filename2 = path+"shortestPathSetTRIM.csv";
+		//		BufferedWriter bt = IOUtils.getBufferedWriter(filename2);
+		//		try{
+		//			for (int j =0; j< rows;j++){
+		//				for (int r=0;r<fullPathTrim[0].length;r++){
+		//					if (fullPathTrim[j][r]!=999){
+		//						bt.write(fullPathTrim[j][r]+" ");
+		//					}	
+		//				}
+		//				bt.newLine();	
+		//			}
+		//		} catch (IOException e) {
+		//			e.printStackTrace();
+		//		} finally{
+		//			try {
+		//				bt.close();
+		//			} catch (IOException e) {
+		//				e.printStackTrace();
+		//			}
+		//		}
+		//		System.out.println("Full path set TRIM written to file "+filename2);
+		//
+		//
+		//		//get the linklist
+		//		//		int[][] linkList= GhostLinkList.linkList(path, fullPathTrim); 
+		//		int[][] linkList= GhostLinkList.linkList(path, rows); 
+		//
+		//		double defaultTransProb = 1;
+		//
+		//		myGraphGhost = new DirectedSparseMultigraph<NmvNode, NmvLink>();
+		//		//create the node list
+		//		int [] uniqueNodesTemp = new int[linkList.length*2];
+		//		int count=0;
+		//		boolean flag = true;
+		//		int cur1=0;
+		//		int cur2=0;
+		//		int r=0;
+		//		uniqueNodesTemp[0]=linkList[0][0];
+		//		for (int y = 0; y<linkList.length;y++){
+		//			cur1=linkList[y][0];
+		//			cur2=linkList[y][1];
+		//			r=0;
+		//			flag=true;
+		//			while ((flag)&&(r<=count)){
+		//				if(uniqueNodesTemp[r]==cur1){
+		//					flag=false;
+		//				}else r++;
+		//			}	
+		//			if (flag){
+		//				count++;
+		//				uniqueNodesTemp[count]=cur1;
+		//			}
+		//			r=0;
+		//			flag = true;
+		//			while ((flag)&&(r<=count)){
+		//				if(uniqueNodesTemp[r]==cur2){
+		//					flag=false;
+		//				}else r++;
+		//			}	
+		//			if (flag){
+		//				count++;
+		//				uniqueNodesTemp[count]=cur2;
+		//
+		//			}
+		//		}
+		//		int[] uniqueNodes = new int[count+1];
+		//		for (int w =0; w<=count;w++){
+		//			uniqueNodes[w]=uniqueNodesTemp[w];
+		//		}
+		//
+		//		ArrayList<NmvNode> nodeList = new ArrayList<NmvNode>();
+		//		//what you have in linkList is the grid graph ID not the index
+		//		for (int m =0; m<uniqueNodes.length;m++){
+		//			NmvNode currentNode = new NmvNode("","", 0, 0);
+		//			currentNode = new NmvNode(Integer.toString(m),Integer.toString(uniqueNodes[m]),0,0);
+		//			nodeList.add(m, currentNode);
+		//		}
+		//		int indexTo = 0;
+		//		int indexFrom = 0;
+		//		for (int w = 0; w<linkList.length;w++){
+		//			for (int q =0;q<uniqueNodes.length;q++){
+		//				if(uniqueNodes[q]==linkList[w][0]){
+		//					indexFrom=q;
+		//					break;
+		//				}
+		//			}
+		//			for (int p =0;p<uniqueNodes.length;p++){
+		//				if(uniqueNodes[p]==linkList[w][1]){
+		//					indexTo=p;
+		//					break;
+		//				}
+		//			}
+		//			myGraphGhost.addEdge(new NmvLink(Integer.toString(w),linkList[w][2],defaultTransProb),nodeList.get(indexFrom),nodeList.get(indexTo),EdgeType.DIRECTED);
+		//		}
+		//		return myGraphGhost;
 
 	}
 
@@ -1430,7 +1441,7 @@ public class TriGraphConstructor {
 
 		DijkstraShortestPath<NmvNode, NmvLink> gPath = new DijkstraShortestPath<NmvNode, NmvLink>(myGraphGrid);
 		List <NmvLink> shortestPathGrid = gPath.getPath(gridNodes.get(s),gridNodes.get(t));
-		//				System.out.println("Path length"+shortestPathGrid.size());
+
 		int numSteps = shortestPathGrid.size();
 		int count = 0;
 		int nonzeroSize=0;
@@ -1595,13 +1606,20 @@ public class TriGraphConstructor {
 
 		//Grid index
 		for(int r=0;r<12;r++){
+			boolean found = false;
 			for (int u =0;u< nodeListGrid.size();u++){
 				if ((nodeListGrid.get(u).getId().equals(String.valueOf(assocList[r][2])))){
 					assocList[r][3]=u;
+					found=true;
 					break;
 				}
 			}
+			if (!(found)){
+				assocList[r][3]=999;
+			}
 		}
+
+
 		String assocFile = path+"assocListSim.csv";
 		BufferedWriter bw = IOUtils.getBufferedWriter(assocFile);
 		try{
@@ -1803,22 +1821,28 @@ public class TriGraphConstructor {
 		ArrayList<NmvNode> nodeListRessler = new ArrayList<NmvNode>(TriGraphConstructor.myGraphRessler.getVertices());
 
 		//Malik index
+
 		for(int r=0;r<12;r++){
+
 			for (int u =0;u< nodeListRessler.size();u++){
 				if ((nodeListRessler.get(u).getId().equals(String.valueOf(assocList[r][0])))){
-					assocList[r][1]=u;
+					assocList[r][1]=u;	
 					break;
 				}
 			}
 		}
-
 		//Grid index
 		for(int r=0;r<12;r++){
+			boolean found = false;
 			for (int u =0;u< nodeListGrid.size();u++){
 				if ((nodeListGrid.get(u).getId().equals(String.valueOf(assocList[r][2])))){
 					assocList[r][3]=u;
+					found=true;
 					break;
 				}
+			}
+			if (!(found)){
+				assocList[r][3]=999;
 			}
 		}
 		String assocFile = path+"assocListSim.csv";
@@ -1899,8 +1923,8 @@ public class TriGraphConstructor {
 					assocList[j-1][1] = u;//Ressler hub index
 				}
 			}
-			
-			
+
+
 			assocList[j-1][2]=gen; //Grid number
 			taken[j-1] = gen;
 			flag = true;
@@ -1932,7 +1956,7 @@ public class TriGraphConstructor {
 		System.out.println("Association list written to file "+assocFile);
 		return assocList;
 	}
-	
+
 	public static int [][] layerNavabiSim(String path){
 		//Because you are recreating the internal Grid and Navabi graph, the id's will have different internal indices
 		//Therefore you can read in the ids but have to search for the indices again
@@ -1980,11 +2004,16 @@ public class TriGraphConstructor {
 
 		//Grid index
 		for(int r=0;r<12;r++){
+			boolean found = false;
 			for (int u =0;u< nodeListGrid.size();u++){
 				if ((nodeListGrid.get(u).getId().equals(String.valueOf(assocList[r][2])))){
 					assocList[r][3]=u;
+					found=true;
 					break;
 				}
+			}
+			if (!(found)){
+				assocList[r][3]=999;
 			}
 		}
 		String assocFile = path+"assocListSim.csv";
@@ -2007,7 +2036,7 @@ public class TriGraphConstructor {
 		System.out.println("Association list written to file "+assocFile);
 		return assocList;
 	}
-	
+
 	public static int [][] layerNavabi(String path,DirectedGraph<NmvNode, NmvLink> myGraphNavabi,DirectedGraph<NmvNode, NmvLink> myGraphGrid){
 
 		ArrayList<NmvNode> nodeListGrid = new ArrayList<NmvNode>(TriGraphConstructor.myGraphGrid.getVertices());

@@ -15,7 +15,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.algorithms.CalcBoundingBox;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -55,7 +54,7 @@ public class CarSharingStations
 	      if (parts.length == 7) {
             Coord coord = new Coord(Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
 	        int cars = Integer.parseInt(parts[6]);
-	        LinkImpl stationLink = MyLinkUtils.getClosestLink(this.network, coord);
+	        Link stationLink = MyLinkUtils.getClosestLink(this.network, coord);
 	        CarSharingStation csStation = new CarSharingStation(Id.create(parts[0], CarSharingStation.class), coord, stationLink, cars);
 	        this.stations.put(coord.getX(), coord.getY(), csStation);
 	        stationsArr.add(csStation);
@@ -87,7 +86,7 @@ public class CarSharingStations
 
 	        int cars = Integer.parseInt(mapa.get(parts[0]));
 	        
-	        LinkImpl stationLink =(LinkImpl) network.getLinks().get(Id.create(parts[3], Link.class));
+	        Link stationLink =(Link) network.getLinks().get(Id.create(parts[3], Link.class));
 	        CarSharingStation csStation = new CarSharingStation(Id.create(parts[0], CarSharingStation.class), coord, stationLink, cars);
 	        this.stations.put(coord.getX(), coord.getY(), csStation);
 	        log.info("The station " + csStation.getId() + " has been added");

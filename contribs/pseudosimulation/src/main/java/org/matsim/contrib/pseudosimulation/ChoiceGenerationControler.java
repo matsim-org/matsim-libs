@@ -75,7 +75,7 @@ public ChoiceGenerationControler(String[] args) {
     eventsManager.addHandler(waitTimeCalculator);
     eventsManager.addHandler(stopStopTimeCalculator);
     eventsManager.addHandler(travelTimeCalculator);
-    reader.parse(args[1]);
+    reader.readFile(args[1]);
 
     pSimFactory = new PSimFactory(scenario, eventsManager);
     controler.addOverridingModule(new AbstractModule() {

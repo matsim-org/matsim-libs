@@ -53,7 +53,10 @@ public class DumpSizeOfSelectedJointPlans {
 		writer.write( "personId\tsize" );
 
 		final Counter counter = new Counter( "parse joint plan # " );
-		new MatsimXmlParser( false ) {
+		new MatsimXmlParser( ) {
+			{
+				setValidating(false) ;
+			}
 			int size = -1;
 			boolean isSelected = false;
 			final List<Id> persons = new ArrayList<Id>();
@@ -103,7 +106,7 @@ public class DumpSizeOfSelectedJointPlans {
 					}
 				}
 			}
-		}.parse( jointPlansFile );
+		}.readFile( jointPlansFile );
 
 		for ( Id p : agentWithNoJointPlan ) {
 			writer.newLine();
@@ -148,7 +151,7 @@ public class DumpSizeOfSelectedJointPlans {
 					final String content,
 					final Stack<String> context) {
 			}
-		}.parse( plansFile );
+		}.readFile( plansFile );
 
 		counter.printCounter();
 

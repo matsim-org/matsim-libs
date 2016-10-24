@@ -60,7 +60,6 @@ TransitDriverStartsEventHandler, ActivityStartEventHandler {
 	private final SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2TravelTimes;
 	private final Map<Id<Person>, Double> personId2DepartureTime;
 	private int warnCount = 0;
-	private final SortedMap<String, Double> mode2NumberOfLegs ;
 	private final List<Id<Person>> transitDriverPersons = new ArrayList<>();
 	// agents who first departs with transitWalk and their subsequent modes are stored here until it starts a regular act (home/work/leis/shop)
 	private final Map<Id<Person>, List<String>> modesForTransitUsers = new HashMap<>();
@@ -68,9 +67,8 @@ TransitDriverStartsEventHandler, ActivityStartEventHandler {
 	private final Map<Id<Person>, Double> transitUserArrivalTime = new HashMap<>(); 
 
 	public ModalTripTravelTimeHandler() {
-		this.mode2PersonId2TravelTimes = new TreeMap<String, Map<Id<Person>,List<Double>>>();
-		this.personId2DepartureTime = new HashMap<Id<Person>, Double>();
-		this.mode2NumberOfLegs = new TreeMap<String, Double>();
+		this.mode2PersonId2TravelTimes = new TreeMap<>();
+		this.personId2DepartureTime = new HashMap<>();
 		LOGGER.warn("Excluding the departure and arrivals of transit drivers.");
 	}
 
@@ -78,7 +76,6 @@ TransitDriverStartsEventHandler, ActivityStartEventHandler {
 	public void reset(int iteration) {
 		this.mode2PersonId2TravelTimes.clear();
 		this.personId2DepartureTime.clear();
-		this.mode2NumberOfLegs.clear();
 		this.modesForTransitUsers.clear();
 		this.transitDriverPersons.clear();
 		this.modesForTransitUsers.clear();
@@ -90,8 +87,10 @@ TransitDriverStartsEventHandler, ActivityStartEventHandler {
 		String legMode = event.getLegMode();
 		double arrivalTime = event.getTime();
 
-		if(transitDriverPersons.remove(personId)) return; // exclude arrivals of transit drivers
-		else { 
+		if(transitDriverPersons.remove(personId)) {
+			// exclude arrivals of transit drivers ;
+		}
+		else {
 			if( legMode.equals(TransportMode.transit_walk) || legMode.equals(TransportMode.pt) ){
 				transitUserArrivalTime.put(personId, event.getTime()); // store the arrival time
 			} else { // rest of the modes
@@ -109,8 +108,7 @@ TransitDriverStartsEventHandler, ActivityStartEventHandler {
 
 		if(transitDriverPersons.contains(personId)) {
 			// exclude departures of transit drivers and remove them from arrivals
-			return; 
-		} else { 
+		} else {
 			if (legMode.equals(TransportMode.transit_walk) || legMode.equals(TransportMode.pt) ) { 
 				// transit_walk - transit_walk || transit_walk - pt
 				if(modesForTransitUsers.containsKey(personId)) {
@@ -174,13 +172,13 @@ TransitDriverStartsEventHandler, ActivityStartEventHandler {
 				travelTimes.add(travelTime);
 				personId2TravelTimes.put(personId, travelTimes);
 			} else {
-				List<Double> travelTimes = new ArrayList<Double>();
+				List<Double> travelTimes = new ArrayList<>();
 				travelTimes.add(travelTime);
 				personId2TravelTimes.put(personId, travelTimes);
 			}
 		} else { 
-			Map<Id<Person>, List<Double>> personId2TravelTimes = new HashMap<Id<Person>, List<Double>>();
-			List<Double> travelTimes = new ArrayList<Double>();
+			Map<Id<Person>, List<Double>> personId2TravelTimes = new HashMap<>();
+			List<Double> travelTimes = new ArrayList<>();
 			travelTimes.add(travelTime);
 			personId2TravelTimes.put(personId, travelTimes);
 			this.mode2PersonId2TravelTimes.put(legMode, personId2TravelTimes);

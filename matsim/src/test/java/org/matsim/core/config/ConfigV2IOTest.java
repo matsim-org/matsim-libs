@@ -49,7 +49,7 @@ public class ConfigV2IOTest {
 		new ConfigWriter( outConfig ).writeFileV2( file );
 
 		final Config inConfig = ConfigUtils.createConfig();
-		new ConfigReaderMatsimV2( inConfig ).parse( file );
+		new ConfigReaderMatsimV2( inConfig ).readFile( file );
 
 		assertTheSame( outConfig , inConfig );
 	}

@@ -7,7 +7,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
@@ -25,7 +25,7 @@ public class CarAccessibility {
 		TravelTimeCalculator travelTimeCalculator = TravelTimeCalculator.create(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
 		eventsManager.addHandler(travelTimeCalculator);
-		(new EventsReaderXMLv1(eventsManager)).parse(args[2]);
+		(new EventsReaderXMLv1(eventsManager)).readFile(args[2]);
 		TravelDisutility disutilityFunction = (new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, scenario.getConfig().planCalcScore() )).createTravelDisutility(travelTimeCalculator.getLinkTravelTimes());
 		PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
 		preProcessDijkstra.run(scenario.getNetwork());

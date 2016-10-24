@@ -12,12 +12,13 @@ import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerDa
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesWriter;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
-import org.matsim.lanes.data.v20.Lanes;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
+
 import playground.andreas.intersection.zuerich.lanes.LanesConsistencyChecker;
 
 import java.util.HashMap;
@@ -86,7 +87,7 @@ public class GenerateZuerrichOutput {
 			new LanesConsistencyChecker(net, lanes20).checkConsistency();
 			
 			//write data
-			LaneDefinitionsWriter20 writerDelegate = new LaneDefinitionsWriter20(lanes20);
+			LanesWriter writerDelegate = new LanesWriter(lanes20);
 			writerDelegate.write(lanesOutputFile);
 		}
 

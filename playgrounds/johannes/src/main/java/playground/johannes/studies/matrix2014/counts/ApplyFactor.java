@@ -41,7 +41,7 @@ public class ApplyFactor {
 
 		Counts<Link> counts = new Counts();
 		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
-		reader.parse(inFile);
+		reader.readFile(inFile);
 
 		Counts<Link> newCounts = new Counts();
 		newCounts.setDescription(counts.getDescription());
@@ -50,7 +50,7 @@ public class ApplyFactor {
 
 		for (Count count : counts.getCounts().values()) {
 			if (count.getVolume(1).getValue() != 0) {
-				Count newCount = newCounts.createAndAddCount(count.getLocId(), count.getCsId());
+				Count newCount = newCounts.createAndAddCount(count.getId(), count.getCsLabel());
 				for (int i = 1; i < 25; i++) {
 					newCount.createVolume(i, count.getVolume(i).getValue() * factor);
 				}

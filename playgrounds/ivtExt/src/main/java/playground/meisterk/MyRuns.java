@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -39,22 +40,20 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NodeImpl;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingPopulationReader;
-import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PersonRemoveLinkAndRoute;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -153,7 +152,7 @@ public class MyRuns {
 
 		Network network = scenario.getNetwork();
 
-		NodeImpl node = null;
+		Node node = null;
 
 		node = NetworkUtils.createNode(Id.create(1, Node.class));
 		final double x = -824635.0;
@@ -227,7 +226,7 @@ public class MyRuns {
 
 		// ... but I think we can just give the existing scenario to the reader, so I am changing this.  There is so much commented out in this
 		// code that it is probably no longer used anyways. kai, sep'15
-		new MatsimNetworkReader(scenario.getNetwork()).parse(config.getParam(MeisterkConfigGroup.GROUP_NAME, "inputSecondNetworkFile"));
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.getParam(MeisterkConfigGroup.GROUP_NAME, "inputSecondNetworkFile"));
 
 		// run XY2Links
 		XY2Links xY2Links = new XY2Links();
@@ -370,7 +369,7 @@ public class MyRuns {
 		// - facilities
 		logger.info("Reading facilities xml file...");
 		ActivityFacilities facilities = scenario.getActivityFacilities();
-		new MatsimFacilitiesReader(scenario).parse(config.facilities().getInputFile());
+		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
 		logger.info("Reading facilities xml file...");
 
 		// - population
@@ -485,7 +484,7 @@ public class MyRuns {
 				}
 			}
 		}
-		MatsimPopulationReader plansReader = new PopulationReader(scenario);
+		MatsimReader plansReader = new PopulationReader(scenario);
 		plansReader.readFile(inputFilename);
 		PopulationUtils.printPlansCount(reader) ;
 		System.out.println("  done.");
@@ -494,7 +493,7 @@ public class MyRuns {
 //		return population ;
 	}
 
-	public static void readEvents(final EventsManager events, final NetworkImpl network, final String eventsInputFile) {
+	public static void readEvents(final EventsManager events, final Network network, final String eventsInputFile) {
 
 		// load test events
 		long startTime, endTime;
@@ -529,7 +528,7 @@ public class MyRuns {
 
 		Population matsimAgentPopulation = (Population) scenario.getPopulation();
 		StreamingUtils.setIsStreaming(matsimAgentPopulation, true);
-		MatsimPopulationReader plansReader = new PopulationReader(scenario);
+		MatsimReader plansReader = new PopulationReader(scenario);
 		plansReader.readFile(scenario.getConfig().plans().getInputFile());
 		PopulationUtils.printPlansCount(matsimAgentPopulation) ;
 		int[][] numDeps = ((PersonAnalyseTimesByActivityType) pa).getNumDeps();

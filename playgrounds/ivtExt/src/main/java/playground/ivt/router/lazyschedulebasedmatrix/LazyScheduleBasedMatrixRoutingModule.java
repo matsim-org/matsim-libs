@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
@@ -191,10 +191,8 @@ public class LazyScheduleBasedMatrixRoutingModule implements RoutingModule {
 				f = atX.get( cellY );
 				if ( f == null ) {
 					f = new Facility() {
-						private Coord coord = new Coord(
-								cellX * cellSize_m + cellSize_m / 2,
-								cellY * cellSize_m + cellSize_m / 2 );
-						private Id<Link> linkId = ( (NetworkImpl) network ).getNearestLinkExactly( coord ).getId();
+						private Coord coord = new Coord( cellX * cellSize_m + cellSize_m / 2, cellY * cellSize_m + cellSize_m / 2 );
+						private Id<Link> linkId = NetworkUtils.getNearestLinkExactly( network , coord ).getId();
 
 						@Override
 						public Id<Link> getLinkId() {

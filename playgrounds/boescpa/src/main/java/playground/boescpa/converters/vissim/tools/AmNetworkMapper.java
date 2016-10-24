@@ -24,7 +24,6 @@ package playground.boescpa.converters.vissim.tools;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 
@@ -48,7 +47,7 @@ public class AmNetworkMapper extends AbstractNetworkMapper {
 	@Override
 	protected Network providePreparedNetwork(String path2VissimNetworkAnm, String notUsed) {
 		final Network network = NetworkUtils.createNetwork();
-		final NetworkFactory networkFactory = new NetworkFactoryImpl(network);
+		final NetworkFactory networkFactory = network.getFactory();
 		final Set<SimpleAnmParser.AnmLink> links = new HashSet<SimpleAnmParser.AnmLink>();
 
 		// parse anm-file:
@@ -62,7 +61,7 @@ public class AmNetworkMapper extends AbstractNetworkMapper {
 				network.addNode(networkFactory.createNode(anmNode.id, anmNode.coord));
 			}
 		});
-		xmlParser.parse(path2VissimNetworkAnm);
+		xmlParser.readFile(path2VissimNetworkAnm);
 
 		// create links:
 		int countErrLinks = 0;

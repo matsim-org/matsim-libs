@@ -61,8 +61,9 @@ public class FacilitiesDistributeCenter {
 			Coord c = f.getCoord();
 			if (c.getX()%100 != 0) { throw new RuntimeException("f_id="+f.getId()+" xccord is not a heactar!"); }
 			if (c.getY()%100 != 0) { throw new RuntimeException("f_id="+f.getId()+" xccord is not a heactar!"); }
-			c.setX(c.getX()+MatsimRandom.getRandom().nextDouble()*100.0);
-			c.setY(c.getY()+MatsimRandom.getRandom().nextDouble()*100.0);
+			double newX = c.getX()+MatsimRandom.getRandom().nextDouble()*100.0;
+			double newY = c.getY()+MatsimRandom.getRandom().nextDouble()*100.0;
+			f.setCoord(new Coord(newX,newY)) ;
 		}
 
 		log.info("      # facilities = " + facilities.getFacilities().size());

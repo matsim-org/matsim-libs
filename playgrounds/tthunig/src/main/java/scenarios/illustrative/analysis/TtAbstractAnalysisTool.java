@@ -33,11 +33,13 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.Tuple;
@@ -66,13 +68,12 @@ import com.google.inject.Inject;
  * regarding to the flow capacity of the first link. If they are delayed because
  * of storage capacity the results are still fine.
  * 
- * The results may be plotted by gnuplot scripts (see e.g.
- * runs-svn/braess/analysis).
+ * The results can be plotted by gnuplot scripts (see e.g. runs-svn/braess/analysis).
  * 
  * @author tthunig, tschlenther
  */
-public abstract class TtAbstractAnalysisTool implements PersonArrivalEventHandler,
-PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, PersonEntersVehicleEventHandler{
+public abstract class TtAbstractAnalysisTool implements PersonArrivalEventHandler, PersonDepartureEventHandler, 
+	LinkEnterEventHandler, PersonStuckEventHandler, PersonEntersVehicleEventHandler, PersonMoneyEventHandler {
 
 	private static final Logger log = Logger.getLogger(TtAbstractAnalysisTool.class);
 	
@@ -80,20 +81,25 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 	private double[] totalRouteTTs;
 	private int[] routeUsers;
 	private int numberOfStuckedAgents = 0;
+	private double[] totalRouteTolls;
 
 	// collects the departure times per person
 	private Map<Id<Person>, Double> personDepartureTimes;
-	
 	// collects information about the used route per person
 	private Map<Id<Person>, Integer> personRouteChoice;
+	// collects tolls paid per person
+	private Map<Id<Person>, Double> personTolls;
+	
 	// counts the number of route starts per second (gets filled when the agent
 	// arrives)
 	private Map<Double, int[]> routeStartsPerSecond;
 	// counts the number of agents on each route per second
 	private Map<Double, int[]> onRoutePerSecond;
 
+	private Map<Double, double[]> totalRouteTollsByDepartureTime;	
 	private Map<Double, double[]> totalRouteTTsByDepartureTime;
 	private Map<Double, int[]> routeUsersByDepartureTime;
+	
 	
 	private Map<Id<Vehicle>, Set<Id<Person>>> vehicle2PersonsMap;
 	
@@ -114,14 +120,17 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 		this.totalRouteTTs = new double[numberOfRoutes];
 		this.routeUsers = new int[numberOfRoutes];
 		this.numberOfStuckedAgents = 0;
+		this.totalRouteTolls = new double[numberOfRoutes];
 		
 		this.personDepartureTimes = new HashMap<>();
 		this.personRouteChoice = new HashMap<>();
 		this.routeStartsPerSecond = new TreeMap<>();
 		this.onRoutePerSecond = new TreeMap<>();
+		this.personTolls = new HashMap<>();
 
 		this.totalRouteTTsByDepartureTime = new TreeMap<>();
 		this.routeUsersByDepartureTime = new TreeMap<>();
+		this.totalRouteTollsByDepartureTime = new TreeMap<>();
 		
 		this.vehicle2PersonsMap = new HashMap<>();
 	}
@@ -207,21 +216,27 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 				.getPersonId());
 		double personTotalTT = personArrivalTime - personDepartureTime;
 		this.totalTT += personTotalTT;
+		double personTotalToll = this.personTolls.containsKey(event.getPersonId())? this.personTolls.get(event.getPersonId()) : 0.0;
 
 		// store route specific information
 		int personRoute = this.personRouteChoice.get(event.getPersonId());
 		this.totalRouteTTs[personRoute] += personTotalTT;
 		this.routeUsers[personRoute]++;
+		this.totalRouteTolls[personRoute] += personTotalToll;
 
 		// fill maps for calculating avg tt per route
 		if (!this.totalRouteTTsByDepartureTime.containsKey(personDepartureTime)) {
 			// this is equivalent to
 			// !this.routeUsersPerDepartureTime.containsKey(personDepartureTime)
+			// and
+			// !this.totalRouteTollsByDepartureTime.containsKey(personDepartureTime)
 			this.totalRouteTTsByDepartureTime.put(personDepartureTime, new double[numberOfRoutes]);
 			this.routeUsersByDepartureTime.put(personDepartureTime, new int[numberOfRoutes]);
+			this.totalRouteTollsByDepartureTime.put(personDepartureTime, new double[numberOfRoutes]);
 		}
 		this.totalRouteTTsByDepartureTime.get(personDepartureTime)[personRoute] += personTotalTT;
 		this.routeUsersByDepartureTime.get(personDepartureTime)[personRoute]++;
+		this.totalRouteTollsByDepartureTime.get(personDepartureTime)[personRoute] += personTotalToll;
 
 		// increase the number of persons on route for each second the
 		// person is traveling on it
@@ -256,6 +271,21 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 		
 		numberOfStuckedAgents++;
 	}
+	
+	@Override
+	public void handleEvent(PersonMoneyEvent event) {
+		if (!this.personTolls.containsKey(event.getPersonId())) {
+			this.personTolls.put(event.getPersonId(), 0.);
+		}
+
+		// assume a negative toll
+		if (event.getAmount() > 0){
+			log.error("An agent got money instead of paying tolls. The toll analyzer does not support this option.");
+		}
+		
+		// add the current toll to the previous tolls of this person
+		this.personTolls.put(event.getPersonId(), this.personTolls.get(event.getPersonId()) - event.getAmount());
+	}
 
 	/**
 	 * Calculates and returns the average travel times on the single routes in
@@ -267,9 +297,30 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 	public double[] calculateAvgRouteTTs() {
 		double[] avgRouteTTs = new double[numberOfRoutes];
 		for (int i = 0; i < numberOfRoutes; i++) {
-			avgRouteTTs[i] = this.totalRouteTTs[i] / this.routeUsers[i];
+			if (this.routeUsers[i] == 0)
+				avgRouteTTs[i] = Double.NaN;
+			else
+				avgRouteTTs[i] = this.totalRouteTTs[i] / this.routeUsers[i];
 		}
 		return avgRouteTTs;
+	}
+	
+	/**
+	 * Calculates and returns the average tolls paid on the single routes in
+	 * Braess' example. The first entry corresponds to the upper route, the
+	 * second to the middle route and the third to the lower route.
+	 * 
+	 * @return average tolls
+	 */
+	public double[] calculateAvgRouteTolls() {
+		double[] avgRouteTolls = new double[numberOfRoutes];
+		for (int i = 0; i < numberOfRoutes; i++) {
+			if (this.routeUsers[i] == 0)
+				avgRouteTolls[i] = Double.NaN;
+			else
+				avgRouteTolls[i] = this.totalRouteTolls[i] / this.routeUsers[i];
+		}
+		return avgRouteTolls;
 	}
 
 	public double getTotalTT() {
@@ -277,11 +328,25 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 	}
 
 	public double[] getTotalRouteTTs() {
+		// return NaN for routes where no agent has traveled
+		for (int i = 0; i < numberOfRoutes; i++){
+			if (routeUsers[i] == 0)
+				totalRouteTTs[i] = Double.NaN;
+		}
 		return totalRouteTTs;
 	}
 
 	public int[] getRouteUsers() {
 		return routeUsers;
+	}
+	
+	public double[] getTotalRouteTolls() {
+		// return NaN for routes where no agent has traveled
+		for (int i = 0; i < numberOfRoutes; i++){
+			if (routeUsers[i] == 0)
+				totalRouteTolls[i] = Double.NaN;
+		}
+		return totalRouteTolls;
 	}
 
 	/**
@@ -324,7 +389,7 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 	 * Thereby a route start is the departure event of an agent using this route.
 	 * For each time step all bygone route starts are summed up.
 	 */
-	public Map<Double, int[]> getSummedRouteDeparturesPerSecond(){
+	public Map<Double, int[]> calculateSummedRouteDeparturesPerSecond(){
 		
 		// determine minimum and maximum departure time
 		Tuple<Double, Double> firstLastDepartureTuple = determineMinMaxDoubleInSet(this.routeStartsPerSecond.keySet());
@@ -404,7 +469,7 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 		}
 		for (long l = firstDeparture; l <= lastDeparture; l++) {
 			if (!avgTTsPerRouteByDepartureTime.containsKey((double) l)) {
-				// add NaN-values as travel times when no agent has a departure
+				// add NaN-values as travel times when no agent departures
 				double[] nanTTsPerRoute = new double[numberOfRoutes];
 				for (int i = 0; i < numberOfRoutes; i++){
 					nanTTsPerRoute[i] = Double.NaN;
@@ -414,6 +479,57 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 		}
 
 		return avgTTsPerRouteByDepartureTime;
+	}
+	
+	/**
+	 * @return the average route tolls by departure time.
+	 * 
+	 * Thereby the double array in each map entry contains the average
+	 * route toll for all different routes in the network
+	 * (always for agents with the specific departure time)
+	 */
+	public Map<Double, double[]> calculateAvgRouteTollsByDepartureTime() {
+		Map<Double, double[]> avgTollsPerRouteByDepartureTime = new TreeMap<>();
+
+		// calculate average route tolls for existing departure times
+		for (Double departureTime : this.totalRouteTollsByDepartureTime.keySet()) {
+			double[] totalTollsPerRoute = this.totalRouteTollsByDepartureTime
+					.get(departureTime);
+			int[] usersPerRoute = this.routeUsersByDepartureTime
+					.get(departureTime);
+			double[] avgTollPerRoute = new double[numberOfRoutes];
+			for (int i = 0; i < numberOfRoutes; i++) {
+				if (usersPerRoute[i] == 0)
+					// no agent is departing for the specific route at this time
+					avgTollPerRoute[i] = Double.NaN;
+				else
+					avgTollPerRoute[i] = totalTollsPerRoute[i] / usersPerRoute[i];
+			}
+			avgTollsPerRouteByDepartureTime.put(departureTime, avgTollPerRoute);
+		}
+
+		// fill missing time steps between first and last departure
+		long firstDeparture = Long.MAX_VALUE;
+		long lastDeparture = Long.MIN_VALUE;
+		for (Double departureTime : avgTollsPerRouteByDepartureTime.keySet()) {
+			// matsim departure times are always integer
+			if (departureTime < firstDeparture)
+				firstDeparture = departureTime.longValue();
+			if (departureTime > lastDeparture)
+				lastDeparture = departureTime.longValue();
+		}
+		for (long l = firstDeparture; l <= lastDeparture; l++) {
+			if (!avgTollsPerRouteByDepartureTime.containsKey((double) l)) {
+				// add NaN-values as tolls when no agent departures
+				double[] nanTollsPerRoute = new double[numberOfRoutes];
+				for (int i = 0; i < numberOfRoutes; i++){
+					nanTollsPerRoute[i] = Double.NaN;
+				}
+				avgTollsPerRouteByDepartureTime.put((double) l, nanTollsPerRoute);
+			}
+		}
+
+		return avgTollsPerRouteByDepartureTime;
 	}
 
 	public int getNumberOfStuckedAgents() {

@@ -45,6 +45,7 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -59,7 +60,7 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -199,14 +200,19 @@ public class FlowStorageSpillbackTest {
 		NetworkRoute route2 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId4);
 		route2.setLinkIds(linkId2, linkIds2, linkId4);
 		leg_2_4.setRoute(route2);
-		
-		// leg: 1,2,3
+
+		// leg for every agent should be different object. amit Oct, 2016
+		// leg: 1,2,3: testAgent3
 		Leg leg_1_3 = popFactory.createLeg("car");
 		List<Id<Link>> linkIds3 = new ArrayList<Id<Link>>();
 		linkIds3.add(linkId2);
 		NetworkRoute route3 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
 		route3.setLinkIds(linkId1, linkIds3, linkId3);
 		leg_1_3.setRoute(route3);
+
+		// leg: 1,2,3: testAgent4
+		Leg leg_1_3_testAgent4 = popFactory.createLeg("car");
+		PopulationUtils.copyFromTo(leg_1_3, leg_1_3_testAgent4);
 		
 		// ################################################################
 		// first agent activating the flow capacity on link3 (3 --> 4)
@@ -253,7 +259,7 @@ public class FlowStorageSpillbackTest {
 //		act4.setEndTime(105);
 		act4.setEndTime(100);
 		plan4.addActivity(act4);
-		plan4.addLeg(leg_1_3);
+		plan4.addLeg(leg_1_3_testAgent4);
 		plan4.addActivity(lastActLink3);	
 		person4.addPlan(plan4);
 		population.addPerson(person4);
@@ -264,10 +270,10 @@ public class FlowStorageSpillbackTest {
 			
 		// (0)-----link1-----(1)-----link2-----(2)-----link3-----(3)-----link4-----(4)
 		
-		Config config = testUtils.loadConfig(null);
+		Config config = testUtils.loadConfig((String) null);
 		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		Network network = (Network) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
 		network.setCapacityPeriod(3600.);
 

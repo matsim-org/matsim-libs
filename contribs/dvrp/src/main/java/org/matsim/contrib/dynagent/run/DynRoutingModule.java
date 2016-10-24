@@ -32,13 +32,13 @@ public class DynRoutingModule
     implements RoutingModule
 {
     private final String mode;
-
+    private StageActivityTypes stageActivityTypes = null;
 
     public DynRoutingModule(String mode)
     {
         this.mode = mode;
     }
-
+    
 
     @Override
     public List<? extends PlanElement> calcRoute(Facility<?> fromFacility, Facility<?> toFacility,
@@ -56,10 +56,17 @@ public class DynRoutingModule
         return Collections.singletonList(leg);
     }
 
-
+    /**
+	 * @param stageActivityTypes the stageActivityTypes to set
+	 */
+	public void setStageActivityTypes(StageActivityTypes stageActivityTypes) {
+		this.stageActivityTypes = stageActivityTypes;
+	}
+    
     @Override
     public StageActivityTypes getStageActivityTypes()
     {
-        return EmptyStageActivityTypes.INSTANCE;
+    	
+        return ((this.stageActivityTypes!=null)?this.stageActivityTypes:EmptyStageActivityTypes.INSTANCE);
     }
 }

@@ -22,9 +22,11 @@ package playground.jbischoff.taxibus.algorithm.optimizer.sharedTaxi;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.util.Schedules2GIS;
 
 import playground.jbischoff.taxibus.algorithm.optimizer.AbstractTaxibusOptimizer;
 import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizerContext;
@@ -95,9 +97,12 @@ public class SharedTaxiOptimizer extends AbstractTaxibusOptimizer {
 		if (busyVehicles.contains(bestPath.vehicle)){
 			//Shared ride: We need to get rid of the previous planned objects in schedule. In our case we know it must be 3 (Stay,Drive,Dropoff)
 			Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>) bestPath.vehicle.getSchedule();
-			schedule.removeLastTask(); // Stay
-			schedule.removeLastTask(); // Dropoff
-			schedule.removeLastTask(); // DriveWithPassenger
+			int oldcount = schedule.getTaskCount() ;
+			for (int ix = oldcount ;ix>schedule.getCurrentTask().getTaskIdx()+2; ix--){
+				schedule.removeLastTask();
+			}
+//			Logger.getLogger(getClass()).info(schedule.getTasks().get(schedule.getTaskCount()-1));
+
 			
 			for (TaxibusRequest all : bestPath.requests){
 				all.setDropoffTask(null);

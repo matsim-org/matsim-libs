@@ -36,8 +36,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.network.NetworkChangeEventsWriter;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
@@ -47,8 +47,8 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsWriterV10;
-import org.matsim.lanes.data.v20.Lanes;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesWriter;
 import org.matsim.pt.transitSchedule.api.Transit;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
@@ -168,7 +168,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpLanes() {
 		try {
-			new LaneDefinitionsWriter20(lanes).write(controlerIO.getOutputFilename(Controler.FILENAME_LANES));
+			new LanesWriter(lanes).write(controlerIO.getOutputFilename(Controler.FILENAME_LANES));
 		} catch ( Exception ee ) {}
 	}
 
@@ -218,7 +218,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private void dumpNetworkChangeEvents() {
 		if (config.network().isTimeVariantNetwork()) {
 			new NetworkChangeEventsWriter().write(controlerIO.getOutputFilename("output_change_events.xml.gz"),
-					((NetworkImpl) network).getNetworkChangeEvents());
+					NetworkUtils.getNetworkChangeEvents(((Network) network)));
 		}
 	}
 
@@ -272,17 +272,21 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		final String internalCRS = config.global().getCoordinateSystem();
 
 		if ( inputCRS == null ) {
-			new PopulationWriter(population, network).write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
+			final PopulationWriter writer = new PopulationWriter(population, network);
+			writer.putAttributeConverters( attributeConverters );
+			writer.write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
 		}
 		else {
-				log.info( "re-projecting population from "+internalCRS+" back to "+inputCRS+" for export" );
+			log.info( "re-projecting population from "+internalCRS+" back to "+inputCRS+" for export" );
 
-				final CoordinateTransformation transformation =
-						TransformationFactory.getCoordinateTransformation(
-								internalCRS,
-								inputCRS );
+			final CoordinateTransformation transformation =
+					TransformationFactory.getCoordinateTransformation(
+							internalCRS,
+							inputCRS );
 
-			new PopulationWriter(transformation , population, network).write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
+			final PopulationWriter writer = new PopulationWriter(transformation , population, network);
+			writer.putAttributeConverters( attributeConverters );
+			writer.write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
 
 		}
 

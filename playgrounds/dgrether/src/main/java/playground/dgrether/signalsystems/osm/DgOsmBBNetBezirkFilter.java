@@ -30,8 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -81,7 +80,7 @@ public class DgOsmBBNetBezirkFilter {
 	
 	public Network filterNetwork(Network net){
 		GeometryFactory factory = new GeometryFactory();
-		NetworkImpl n = (NetworkImpl) ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork();
+		Network n = (Network) ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork();
 		n.setCapacityPeriod(net.getCapacityPeriod());
 		n.setEffectiveLaneWidth(net.getEffectiveLaneWidth());
 		for (Link orgLink : net.getLinks().values()){

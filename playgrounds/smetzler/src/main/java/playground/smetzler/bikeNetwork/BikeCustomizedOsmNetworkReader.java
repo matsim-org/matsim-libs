@@ -39,8 +39,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -112,6 +111,7 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 	private final static String TAG_SMOOTHNESS = "smoothness";
 	private final static String TAG_BICYCLE = "bicycle";
 	private final static String TAG_NOONEWAYBIKE = "oneway:bicycle";
+	
 
 
 	//	private final static String TAG_SIGNAL = "traffic_signal";
@@ -153,6 +153,9 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 
 	/*package*/ final List<OsmFilter> hierarchyLayers = new ArrayList<OsmFilter>();
 
+	private boolean constructingBikeNetwork = true;
+	private boolean constructingCarNetwork = true;
+
 	/**
 	 * Creates a new Reader to convert OSM data into a MATSim network.
 	 *
@@ -192,18 +195,20 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			this.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300);
 
 			//for cycleways
-			//highway=
+			//highway=    ( http://wiki.openstreetmap.org/wiki/Key:highway )
 			this.setHighwayDefaults(7, "track",			 1,  10.0/3.6, 1.0,  50);	
 			this.setHighwayDefaults(7, "cycleway",		 1,  10.0/3.6, 1.0,  50);
 
-			this.setHighwayDefaults(8, "service",		 1,  10.0/3.6, 1.0,  50);	
-			this.setHighwayDefaults(8, "path", 		   	 1,  10.0/3.6, 1.0,  50); // wenn bicycle=yes oder designated
-			this.setHighwayDefaults(8, "pedestrian", 	 1,  10.0/3.6, 1.0,  50); // wenn bicycle=yes, sonst nur schieben(=langsam!)
-			this.setHighwayDefaults(8, "footway", 		 1,  10.0/3.6, 1.0,  50); // wenn bicycle=yes			
-			//			this.setHighwayDefaults(9, "steps", 		 1,   2.0/3.6, 1.0,  50);
+			this.setHighwayDefaults(8, "service",		 1,  10.0/3.6, 1.0,  50);
+			
+			//if bicycle=yes/designated they can ride, otherwise freespeed is 8km/h
+			this.setHighwayDefaults(8, "path", 		   	 1,  10.0/3.6, 1.0,  50);
+			this.setHighwayDefaults(8, "pedestrian", 	 1,  10.0/3.6, 1.0,  50); 
+			this.setHighwayDefaults(8, "footway", 		 1,  10.0/3.6, 1.0,  50); 	
+			//	this.setHighwayDefaults(10, "steps", 		 1,   2.0/3.6, 1.0,  50);
 
-			/// unterscheidung der einzelenen cyclewaytypes? http://wiki.openstreetmap.org/wiki/Key:highway
-			// lane, track, shared_busway
+			///what cyclewaytypes do exist on osm? - lane, track, shared_busway
+		
 		}
 	}
 
@@ -247,14 +252,14 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			if (stream != null) {
 				parser.parse(new InputSource(stream));
 			} else {
-				parser.parse(osmFilename);
+				parser.readFile(osmFilename);
 			}
 			log.info("parsing osm file second time: loading required nodes and ways");
 			parser.enableOptimization(2);
 			if (stream != null) {
 				parser.parse(new InputSource(stream));
 			} else {
-				parser.parse(osmFilename);
+				parser.readFile(osmFilename);
 			}
 			log.info("done loading data");
 		} else {
@@ -262,7 +267,7 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			if (stream != null) {
 				parser.parse(new InputSource(stream));
 			} else {
-				parser.parse(osmFilename);
+				parser.readFile(osmFilename);
 			}
 		}
 		convert();
@@ -272,14 +277,14 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		log.info("MATSim: # nodes created: " + this.network.getNodes().size());
 		log.info("MATSim: # links created: " + this.network.getLinks().size());
 		//new
-		log.info("BikeObjectAttributs for cyclewaytype created: " + countCyclewaytype);
-		log.info("BikeObjectAttributs for surface created: " + countSurface);
-		log.info("BikeObjectAttributs for smoothness created: " + countSmoothness);
+		log.info("BikeObjectAttributs for cyclewaytype created: " + countCyclewaytype + " which is " + ((float)countCyclewaytype/this.network.getLinks().size())*100 + "%");
+		log.info("BikeObjectAttributs for surface created:      " + countSurface      + " which is " + ((float)countSurface/this.network.getLinks().size())*100 + "%");
+		log.info("BikeObjectAttributs for smoothness created:   " + countSmoothness   + " which is " + ((float)countSmoothness/this.network.getLinks().size())*100 + "%");
 
-		log.info("No of Signalnodes: " + signalNodes.size());
-		log.info("BikeObjectAttributs for signalLink created: " + countSignalLinks);
-
-		log.info("No of Pegelnodes: " + monitorNodes.size());
+//		log.info("No of Signalnodes: " + signalNodes.size());
+//		log.info("BikeObjectAttributs for signalLink created: " + countSignalLinks);
+//
+//		log.info("No of Pegelnodes: " + monitorNodes.size());
 
 		if (this.unknownHighways.size() > 0) {
 			log.info("The following highway-types had no defaults set and were thus NOT converted:");
@@ -376,8 +381,8 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 	}
 
 	private void convert() {
-		if (this.network instanceof NetworkImpl) {
-			((NetworkImpl) this.network).setCapacityPeriod(3600);
+		if (this.network instanceof Network) {
+			((Network) this.network).setCapacityPeriod(3600);
 		}
 
 		Iterator<Entry<Long, OsmWay>> it = this.ways.entrySet().iterator();
@@ -642,130 +647,95 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			/////////BIKE AND CAR //////
 			////hin
 			if (!onewayReverse ) {
-				Link bikel = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(fromId), network.getNodes().get(toId));
-				if (  !((defaults.hierarchy == 1) || (defaults.hierarchy == 2)) && ( //autobahnen raus und schnellstarassen
-						(defaults.hierarchy != 8) || 
-						(defaults.hierarchy == 8) && (bicycleTag!= null && (bicycleTag.equals("yes") || bicycleTag.equals("designated"))) 
-						)){ 
-					bikel.setLength(length);
-					bikel.setFreespeed(getBikeFreespeed(way, fromNode, toNode, length, true, this.id));
-					bikel.setCapacity(capacity);
-					bikel.setNumberOfLanes(nofLanes);
-					modesB.add("bike");
-					bikel.setAllowedModes(modesB);
-					if (bikel instanceof LinkImpl) {
-						((LinkImpl) bikel).setOrigId(origId);
-					}
-					network.addLink(bikel);
-					bikeLinkAtts(way, fromNode, toNode, length, true, this.id);
+				if (constructingBikeNetwork) {
+					Link bikel = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(fromId), network.getNodes().get(toId));
+					if (  !((defaults.hierarchy == 1) || (defaults.hierarchy == 2)) && ( //autobahnen raus und schnellstarassen
+							(defaults.hierarchy != 8) || 
+							(defaults.hierarchy == 8) && (bicycleTag!= null && (bicycleTag.equals("yes") || bicycleTag.equals("designated")))
+							)){ 
+						bikel.setLength(length);
+						bikel.setFreespeed(getBikeFreespeed(way, fromNode, toNode, length, true, this.id));
+						bikel.setCapacity(capacity);
+						bikel.setNumberOfLanes(nofLanes);
+						modesB.add("bike");
+						bikel.setAllowedModes(modesB);
+						if (bikel instanceof Link) {
+							final String id1 = origId;
+							NetworkUtils.setOrigId( ((Link) bikel), id1 ) ;
+						}
+						network.addLink(bikel);
+						bikeLinkAtts(way, fromNode, toNode, length, true, this.id);
+				
+					}	
+				}
 			
-				}	
-			
-				if (defaults.hierarchy == 7 || defaults.hierarchy == 8) {
-					//do nothing
-				}else{
-					Link l = network.getFactory().createLink(Id.create(this.id+"_car", Link.class), network.getNodes().get(fromId), network.getNodes().get(toId));
-					l.setLength(length);
-					l.setFreespeed(freespeed);
-					l.setCapacity(capacity);
-					l.setNumberOfLanes(nofLanes);
-					if (l instanceof LinkImpl) {
-						((LinkImpl) l).setOrigId(origId);
-					}
-					network.addLink(l);
-				}	
+				if (constructingCarNetwork) {
+					if (defaults.hierarchy == 6 || defaults.hierarchy == 7 || defaults.hierarchy == 8) {
+						//do nothing
+					}else{
+						Link l = network.getFactory().createLink(Id.create(this.id+"_car", Link.class), network.getNodes().get(fromId), network.getNodes().get(toId));
+						l.setLength(length);
+						l.setFreespeed(freespeed);
+						l.setCapacity(capacity);
+						l.setNumberOfLanes(nofLanes);
+						if (l instanceof Link) {
+							final String id1 = origId;
+							NetworkUtils.setOrigId( ((Link) l), id1 ) ;
+						}
+						network.addLink(l);
+					}	
+				}
+				
 				this.id++;
 			}
 			
 			//rueck
 			if (!oneway || onewayReverseBikeallowed) {
-//				if (onewayReverseBikeallowed)
-//				{
-//					System.out.println("bla");
-//				}
-				Link bikel = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(toId), network.getNodes().get(fromId));
-				if (  !((defaults.hierarchy == 1) || (defaults.hierarchy == 2)) && ( //autobahnen raus und schnellstarassen
-						(defaults.hierarchy != 8) || 
-						(defaults.hierarchy == 8) && (bicycleTag!= null && (bicycleTag.equals("yes") || bicycleTag.equals("designated")))
-						)){ 
-					bikel.setLength(length);
-					bikel.setFreespeed(getBikeFreespeed(way, fromNode, toNode, length, false, this.id));
-					bikel.setCapacity(capacity);
-					bikel.setNumberOfLanes(nofLanes);
-					modesB.add("bike");
-					bikel.setAllowedModes(modesB);
-					if (bikel instanceof LinkImpl) {
-						((LinkImpl) bikel).setOrigId(origId);
+
+				if (constructingBikeNetwork) {
+					Link bikel = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(toId), network.getNodes().get(fromId));
+					if (  !((defaults.hierarchy == 1) || (defaults.hierarchy == 2)) && ( //autobahnen raus und schnellstarassen
+							(defaults.hierarchy != 8) || 
+							(defaults.hierarchy == 8) && (bicycleTag!= null && (bicycleTag.equals("yes") || bicycleTag.equals("designated")))
+							)){ 
+//					if (  !((defaults.hierarchy == 1) || (defaults.hierarchy == 2))  //autobahnen raus und schnellstarassen
+//							){ 
+						bikel.setLength(length);
+						bikel.setFreespeed(getBikeFreespeed(way, fromNode, toNode, length, false, this.id));
+						bikel.setCapacity(capacity);
+						bikel.setNumberOfLanes(nofLanes);
+						modesB.add("bike");
+						bikel.setAllowedModes(modesB);
+						if (bikel instanceof Link) {
+							final String id1 = origId;
+							NetworkUtils.setOrigId( ((Link) bikel), id1 ) ;
+						}
+						network.addLink(bikel);
+						bikeLinkAtts(way, fromNode, toNode, length, false, this.id);
+				
 					}
-					network.addLink(bikel);
-					bikeLinkAtts(way, fromNode, toNode, length, false, this.id);
-			
 				}
 			
-				//autolink nur wenn straße groß genug
-				if (defaults.hierarchy == 7 || defaults.hierarchy == 8) {
-					//do nothing
-				}else{
-					Link l = network.getFactory().createLink(Id.create(this.id+"_car", Link.class), network.getNodes().get(toId), network.getNodes().get(fromId));
-					l.setLength(length);
-					l.setFreespeed(freespeed);
-					l.setCapacity(capacity);
-					l.setNumberOfLanes(nofLanes);
-					if (l instanceof LinkImpl) {
-						((LinkImpl) l).setOrigId(origId);
-					}
-					network.addLink(l);
-				}	
+				if (constructingCarNetwork) {
+					//autolink nur wenn straße groß genug
+					if (defaults.hierarchy == 6 || defaults.hierarchy == 7 || defaults.hierarchy == 8) {
+						//do nothing
+					}else{
+						Link l = network.getFactory().createLink(Id.create(this.id+"_car", Link.class), network.getNodes().get(toId), network.getNodes().get(fromId));
+						l.setLength(length);
+						l.setFreespeed(freespeed);
+						l.setCapacity(capacity);
+						l.setNumberOfLanes(nofLanes);
+						if (l instanceof Link) {
+							final String id1 = origId;
+							NetworkUtils.setOrigId( ((Link) l), id1 ) ;
+						}
+						network.addLink(l);
+					}	
+				}
 				this.id++;
 			}
 			
-			
-			
-
-//			///////BIKE Only //////
-//			//hin
-//			if (!onewayReverse ) {
-//				Link bikel = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(fromId), network.getNodes().get(toId));
-//				if (  !((defaults.hierarchy == 1) || (defaults.hierarchy == 2)) && ( //autobahnen raus und schnellstarassen
-//						(defaults.hierarchy != 8) || 
-//						(defaults.hierarchy == 8) && (bicycleTag!= null && (bicycleTag.equals("yes") || bicycleTag.equals("designated"))) 
-//						)){ 
-//					bikel.setLength(length);
-//					bikel.setFreespeed(getBikeFreespeed(way, fromNode, toNode, length, true, this.id));
-//					bikel.setCapacity(capacity);
-//					bikel.setNumberOfLanes(nofLanes);
-//					modesB.add("bike");
-//					bikel.setAllowedModes(modesB);
-//					if (bikel instanceof LinkImpl) {
-//						((LinkImpl) bikel).setOrigId(origId);
-//					}
-//					network.addLink(bikel);
-//					bikeLinkAtts(way, fromNode, toNode, length, true, this.id);
-//					this.id++;
-//				}		
-//			}
-//
-//			//rueck
-//			if (!oneway || onewayReverseBikeallowed) {
-//				Link bikel = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(toId), network.getNodes().get(fromId));
-//				if (  !((defaults.hierarchy == 1) || (defaults.hierarchy == 2)) && ( //autobahnen raus und schnellstarassen
-//						(defaults.hierarchy != 8) || 
-//						(defaults.hierarchy == 8) && (bicycleTag!= null && (bicycleTag.equals("yes") || bicycleTag.equals("designated")))
-//						)){ 
-//					bikel.setLength(length);
-//					bikel.setFreespeed(getBikeFreespeed(way, fromNode, toNode, length, false, this.id));
-//					bikel.setCapacity(capacity);
-//					bikel.setNumberOfLanes(nofLanes);
-//					modesB.add("bike");
-//					bikel.setAllowedModes(modesB);
-//					if (bikel instanceof LinkImpl) {
-//						((LinkImpl) bikel).setOrigId(origId);
-//					}
-//					network.addLink(bikel);
-//					bikeLinkAtts(way, fromNode, toNode, length, false, this.id);
-//					this.id++;
-//				}
-//			}
 		}
 	}
 
@@ -776,15 +746,40 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		double bike_freespeed_highway = 0;
 		double bike_freespeed_surface = 0;
 		
+		String bicycleTag = way.tags.get(TAG_BICYCLE);
+
+
+		
 		/// HIGHWAY
 		String highwayTag = way.tags.get(TAG_HIGHWAY);
 		if (highwayTag != null) {
 			switch (highwayTag){
 			case "cycleway": 			bike_freespeed_highway= 18; break;
 
-			case "path":				bike_freespeed_highway= 12; break; 
-			case "footway": 			bike_freespeed_highway=  8; break; //TODO lets rethink this
-			case "pedestrian":			bike_freespeed_highway=  8; break; 
+			case "path":
+			if (bicycleTag != null) {	
+				if (bicycleTag.equals("yes") || bicycleTag.equals("designated")) {		
+					bike_freespeed_highway=  15; break;}
+				else 
+					bike_freespeed_highway=  12; break;}
+			else
+				{bike_freespeed_highway=  12; break;}
+			case "footway": 
+				if (bicycleTag != null) {	
+					if (bicycleTag.equals("yes") || bicycleTag.equals("designated")) {		
+						bike_freespeed_highway=  15; break;}
+					else 
+						bike_freespeed_highway=  8; break;}
+				else
+					{bike_freespeed_highway=  8; break;}
+			case "pedestrian":
+				if (bicycleTag != null) {	
+					if (bicycleTag.equals("yes") || bicycleTag.equals("designated")) {		
+						bike_freespeed_highway=  15; break;}
+					else 
+						bike_freespeed_highway=  8; break;}
+				else
+					{bike_freespeed_highway=  8; break;}
 			case "track": 				bike_freespeed_highway= 12; break; 
 			case "service": 			bike_freespeed_highway= 14; break; 
 			case "residential":			bike_freespeed_highway= 18; break;
@@ -793,15 +788,15 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			case "unclassified":		bike_freespeed_highway= 16; break;  // if no other highway applies
 			case "road": 				bike_freespeed_highway= 12; break;  // unknown road
 
-//			case "trunk": 				bike_freespeed_highway= 18; break;  // should be used by bikes anyways
-//			case "trunk_link":			bike_freespeed_highway= 18; break; 	// should be used by bikes anyways
+//			case "trunk": 				bike_freespeed_highway= 18; break;  // shouldnt be used by bikes anyways
+//			case "trunk_link":			bike_freespeed_highway= 18; break; 	// shouldnt be used by bikes anyways
 			case "primary": 			bike_freespeed_highway= 18; break; 
 			case "primary_link":		bike_freespeed_highway= 18; break; 
 			case "secondary":			bike_freespeed_highway= 18; break; 
 			case "secondary_link":		bike_freespeed_highway= 18; break; 
 			case "tertiary": 			bike_freespeed_highway= 18; break;	 
 			case "tertiary_link":		bike_freespeed_highway= 18; break; 
-			case "living_street":		bike_freespeed_highway= 12; break;
+			case "living_street":		bike_freespeed_highway= 14; break;
 		//	case "steps":				bike_freespeed_highway=  2; break; //should steps be added??
 			default: 					bike_freespeed_highway=  14; log.info(highwayTag + " highwayTag not recognized");
 			}
@@ -817,8 +812,8 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		//      TrackTypeSpeed("grade4", 6);
 		//      TrackTypeSpeed("grade5", 4); // like sand/grass   
 
+		
 		// 	TODO may be useful to combine with smoothness-tag
-
 		/// SURFACE
 		String surfaceTag = way.tags.get(TAG_SURFACE);
 		if (surfaceTag != null) {
@@ -845,17 +840,17 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			case "earth": 					bike_freespeed_surface=  12; break;
 			case "fine_gravel": 			bike_freespeed_surface=  16; break;
 
-			case "gravel": 					bike_freespeed_surface=   8; break;
+			case "gravel": 					bike_freespeed_surface=  10; break;
 			case "ground": 					bike_freespeed_surface=  12; break;
 			case "wood": 					bike_freespeed_surface=   8; break;
 			case "pebblestone": 			bike_freespeed_surface=  16; break;
-			case "sand": 					bike_freespeed_surface=   8; break;
+			case "sand": 					bike_freespeed_surface=   8; break; //very different kinds of sand :(
 
 			case "bricks": 					bike_freespeed_surface=  14; break;
-			case "stone": 					bike_freespeed_surface=  12; break;
+			case "stone": 					bike_freespeed_surface=  14; break;
 			case "grass": 					bike_freespeed_surface=   8; break;
 
-			case "compressed": 				bike_freespeed_surface=  10; break; //guter sandbelag
+			case "compressed": 				bike_freespeed_surface=  14; break; //guter sandbelag
 			case "asphalt;paving_stones:35":bike_freespeed_surface=  16; break;
 			case "paving_stones:3": 		bike_freespeed_surface=  12; break;
 
@@ -863,8 +858,14 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			}		
 		}
 		else {
-			bike_freespeed_surface = 14;
-			//log.info("no surface info");
+			if (highwayTag != null) {
+				if (highwayTag.equals("primary") || highwayTag.equals("primary_link") ||highwayTag.equals("secondary") || highwayTag.equals("secondary_link")) {	
+					bike_freespeed_surface= 18;
+				} else {
+					bike_freespeed_surface = 14;
+					//log.info("no surface info");
+				}
+			}
 		}
 		
 		//Minimum of surface_speed and highwaytype_speed
@@ -875,8 +876,9 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		/// SLOPE
 		double slopeTag = getSlope(way, fromNode, toNode, length, hinweg, matsimID);
 		double slopeSpeedFactor = 1; 
+	
 
-		if (slopeTag > 0.10) {								//// bergauf
+		if (slopeTag > 0.10) {								//// uphill
 			slopeSpeedFactor= 0.1;
 		} else if (slopeTag <=  0.10 && slopeTag >  0.05) {		
 			slopeSpeedFactor= 0.4;		
@@ -884,9 +886,9 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			slopeSpeedFactor= 0.6;	
 		} else if (slopeTag <=  0.03 && slopeTag >  0.01) {
 			slopeSpeedFactor= 0.8;
-		} else if (slopeTag <=  0.01 && slopeTag > -0.01) { //// eben
+		} else if (slopeTag <=  0.01 && slopeTag > -0.01) { //// flat
 			slopeSpeedFactor= 1;
-		} else if (slopeTag <= -0.01 && slopeTag > -0.03) {	//// bergab
+		} else if (slopeTag <= -0.01 && slopeTag > -0.03) {	//// downhill
 			slopeSpeedFactor= 1.2;
 		} else if (slopeTag <= -0.03 && slopeTag > -0.05) {	
 			slopeSpeedFactor= 1.3;
@@ -895,18 +897,19 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		} else if (slopeTag <= -0.10) {	
 			slopeSpeedFactor= 1.5;
 		}
-
-
-		// Geschwindigkeit von links, die auf eine Ampel führen, wird um 10% reduziert
-		double signalSpeedReductionFactor = 1;
-		for (Long SigNodeID : signalNodes) {
-			if (toNode.id == SigNodeID){
-				signalSpeedReductionFactor= 0.9;
-			}
-		}
+		
+		/// SIGNALS
+//		// speed on links that lead to a signal crossing are reduced by 10%
+//		//unfortunatly not reliable enough
+//		double signalSpeedReductionFactor = 1;
+//		for (Long SigNodeID : signalNodes) {
+//			if (toNode.id == SigNodeID){
+//				signalSpeedReductionFactor= 0.9;
+//			}
+//		}
 
 		//bike_freespeed incl. slope und signal
-		double bike_freespeed= bike_freespeedMin*slopeSpeedFactor*signalSpeedReductionFactor;
+		double bike_freespeed= bike_freespeedMin*slopeSpeedFactor; //*signalSpeedReductionFactor;
 
 		//not slower than 4km/h
 		bike_freespeed = Math.max(bike_freespeed, 4.0);
@@ -962,14 +965,25 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			bikeAttributes.putAttribute(matsimId, "cyclewaytype", cyclewaytypeTag);
 			countCyclewaytype++;
 		};
+		
+		//highwaytype
+		String highwayTag = way.tags.get(TAG_HIGHWAY);
+		if (highwayTag != null) {
+			bikeAttributes.putAttribute(matsimId, "highway", highwayTag);
+			//countHighway++;
+		};
 
-		//surfacetype  //TODO add "asphalt" to prim and sec highways
+		//surfacetype
 		String surfaceTag = way.tags.get(TAG_SURFACE);
 		if (surfaceTag != null) {
 			bikeAttributes.putAttribute(matsimId, "surface", surfaceTag);
 			countSurface++;
 		};
-		
+			//osm defaeult for prim and sec highways is asphalt
+			if ((surfaceTag != null) && (highwayTag.equals("primary") || highwayTag.equals("primary_link") || highwayTag.equals("secondary") || highwayTag.equals("secondary_link"))){
+			bikeAttributes.putAttribute(matsimId, "surface", "asphalt");
+			countSurface++;
+			};
 
 		//smoothness
 		String smoothnessTag = way.tags.get(TAG_SMOOTHNESS);
@@ -978,12 +992,7 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			countSmoothness++;
 		};
 
-		//highwaytype
-		String highwayTag = way.tags.get(TAG_HIGHWAY);
-		if (highwayTag != null) {
-			bikeAttributes.putAttribute(matsimId, "highway", highwayTag);
-			//countHighway++;
-		};
+
 
 		//bicycleTag
 		String bicycleTag = way.tags.get(TAG_BICYCLE);
@@ -993,29 +1002,30 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		};
 
 
-		/// Crossing and Signal
-		//		for (Long CroNodeID : crossingNodes) {
-		//			if (toNode.id == CroNodeID)
-		//				bikeAttributes.putAttribute(matsimId, "junctionTag", 1);   
-		//		};
-		//info hier
-		for (Long SigNodeID : signalNodes) {
-			if (toNode.id == SigNodeID){
-				bikeAttributes.putAttribute(matsimId, "junctionTag", "signal");
-				countSignalLinks++;}
-		};
+//		//Crossing and Signal
+//		//		for (Long CroNodeID : crossingNodes) {
+//		//			if (toNode.id == CroNodeID)
+//		//				bikeAttributes.putAttribute(matsimId, "junctionTag", 1);   
+//		//		};
+//		//info hier
+//		for (Long SigNodeID : signalNodes) {
+//			if (toNode.id == SigNodeID){
+//				bikeAttributes.putAttribute(matsimId, "junctionTag", "signal");
+//				countSignalLinks++;}
+//		};
 
 
-		///monitoring tag
-		//iterates over all nodes that are on this way, is one of them a pegelnode?
-		for(int i=0; i<way.nodes.size(); i++) {
-			Long AllWayNodesIDs = way.nodes.get(i).longValue();
-			for (Long MoniNodeID : monitorNodes) {
-				if (MoniNodeID.equals(AllWayNodesIDs)) {
-					bikeAttributes.putAttribute(matsimId, "pegel", 1);   
-				}
-			};
-		}
+//		///Monitoring tag
+//		// can locate count monitors taht are tagged in OSM
+//		//iterates over all nodes that are on this way, is one of them a pegelnode?
+//		for(int i=0; i<way.nodes.size(); i++) {
+//			Long AllWayNodesIDs = way.nodes.get(i).longValue();
+//			for (Long MoniNodeID : monitorNodes) {
+//				if (MoniNodeID.equals(AllWayNodesIDs)) {
+//					bikeAttributes.putAttribute(matsimId, "pegel", 1);   
+//				}
+//			};
+//		}
 		//new end
 
 	}
@@ -1051,7 +1061,7 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		public final long id;
 		public boolean used = false;
 		public int ways = 0;
-		public final Coord coord;
+		public /*final*/ Coord coord;
 		//		public final Map<String, String> Nodetags = new HashMap<String, String>(4);
 
 		//public final Map<String, String> NodeTags = new HashMap<String, String>(4);
@@ -1128,14 +1138,6 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		}
 
 
-		// this method needs to be here if the network reader is not in the same package as the MatsimXmlParser
-		// as it wont be found otherwise
-		// cf. CustomizedOsmNetworkReader
-		@Override
-		protected void parse(InputSource input) throws UncheckedIOException {
-			super.parse(input);
-		}
-
 		@Override
 		public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 
@@ -1155,7 +1157,8 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 						double lon = Double.parseDouble(atts.getValue("lon"));
 
 						Coord c = this.transform.transform(new Coord(lon, lat));
-						node.coord.setXY(c.getX(), c.getY());
+//						node.coord.setXY(c.getX(), c.getY());
+						node.coord = c ;
 						this.nodeCounter.incCounter();
 					}
 				}
@@ -1260,234 +1263,16 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			return s;
 		}
 	}
+
+	public void constructBikeNetwork(String inputOSM) {
+		constructingBikeNetwork = true;
+		constructingCarNetwork = false;
+		parse(inputOSM);
+	}
+
+	public void constructCarNetwork(String inputOSM) {
+		constructingBikeNetwork = false;
+		constructingCarNetwork = true;
+		parse(inputOSM);
+	}
 }
-
-
-///
-/////////BIKE AND CAR //////
-////hin
-//if (!onewayReverse ) {
-//	Link bikel = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(fromId), network.getNodes().get(toId));
-//	if ((defaults.hierarchy != 8) || 
-//			((defaults.hierarchy == 8) && (bicycleTag!= null && (bicycleTag.equals("yes") || bicycleTag.equals("designated"))))
-//			){ 
-//		bikel.setLength(length);
-//		bikel.setFreespeed(getBikeFreespeed(way, fromNode, toNode, length, true, this.id));
-//		bikel.setCapacity(capacity);
-//		bikel.setNumberOfLanes(nofLanes);
-//		modesB.add("bike");
-//		bikel.setAllowedModes(modesB);
-//		if (bikel instanceof LinkImpl) {
-//			((LinkImpl) bikel).setOrigId(origId);
-//		}
-//		network.addLink(bikel);
-//		bikeLinkAtts(way, fromNode, toNode, length, true, this.id);
-//
-//	}	
-//
-//	if (defaults.hierarchy == 7 || defaults.hierarchy == 8) {
-//		//do nothing
-//	}else{
-//		Link l = network.getFactory().createLink(Id.create(this.id+"_car", Link.class), network.getNodes().get(fromId), network.getNodes().get(toId));
-//		l.setLength(length);
-//		l.setFreespeed(freespeed);
-//		l.setCapacity(capacity);
-//		l.setNumberOfLanes(nofLanes);
-//		if (l instanceof LinkImpl) {
-//			((LinkImpl) l).setOrigId(origId);
-//		}
-//		network.addLink(l);
-//	}	
-//	this.id++;
-//}
-//
-////rueck
-//if (!oneway || onewayReverseBikeallowed) {
-//	if (onewayReverseBikeallowed)
-//	{
-//		System.out.println("bla");
-//	}
-//	Link bikel = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(toId), network.getNodes().get(fromId));
-//	if ((defaults.hierarchy != 8) || 
-//			((defaults.hierarchy == 8) && (bicycleTag!= null && (bicycleTag.equals("yes") || bicycleTag.equals("designated"))))
-//			){ 
-//		bikel.setLength(length);
-//		bikel.setFreespeed(getBikeFreespeed(way, fromNode, toNode, length, false, this.id));
-//		bikel.setCapacity(capacity);
-//		bikel.setNumberOfLanes(nofLanes);
-//		modesB.add("bike");
-//		bikel.setAllowedModes(modesB);
-//		if (bikel instanceof LinkImpl) {
-//			((LinkImpl) bikel).setOrigId(origId);
-//		}
-//		network.addLink(bikel);
-//		bikeLinkAtts(way, fromNode, toNode, length, false, this.id);
-//
-//	}
-//
-//	//autolink nur wenn straße groß genug
-//	if (defaults.hierarchy == 7 || defaults.hierarchy == 8) {
-//		//do nothing
-//	}else{
-//		Link l = network.getFactory().createLink(Id.create(this.id+"_car", Link.class), network.getNodes().get(toId), network.getNodes().get(fromId));
-//		l.setLength(length);
-//		l.setFreespeed(freespeed);
-//		l.setCapacity(capacity);
-//		l.setNumberOfLanes(nofLanes);
-//		if (l instanceof LinkImpl) {
-//			((LinkImpl) l).setOrigId(origId);
-//		}
-//		network.addLink(l);
-//	}	
-//	this.id++;
-//}
-
-
-
-
-
-
-
-
-//////ganz alt
-
-//////CAR
-//if (!onewayReverse) {
-//	if (defaults.hierarchy == 7 || defaults.hierarchy == 8) {
-//		//do nothing
-//	}else{
-//		Link l = network.getFactory().createLink(Id.create(this.id+"_car", Link.class), network.getNodes().get(fromId), network.getNodes().get(toId));
-//		l.setLength(length);
-//		l.setFreespeed(freespeed);
-//		l.setCapacity(capacity);
-//		l.setNumberOfLanes(nofLanes);
-//		if (l instanceof LinkImpl) {
-//			((LinkImpl) l).setOrigId(origId);
-//		}
-//		network.addLink(l);
-//	}
-//}
-//
-//// für links die kein Einbahnstraßen  sind
-//if (!oneway) {
-//	//autolink nur wenn straße groß genug
-//	if (defaults.hierarchy == 7 || defaults.hierarchy == 8) {
-//		//do nothing
-//	}else{
-//		Link l = network.getFactory().createLink(Id.create(this.id+"_car", Link.class), network.getNodes().get(toId), network.getNodes().get(fromId));
-//		l.setLength(length);
-//		l.setFreespeed(freespeed);
-//		l.setCapacity(capacity);
-//		l.setNumberOfLanes(nofLanes);
-//		if (l instanceof LinkImpl) {
-//			((LinkImpl) l).setOrigId(origId);
-//		}
-//		network.addLink(l);
-//	}
-//}
-
-
-//not oneway is onewayReverse
-//			if (!onewayReverse) {
-//				//				if (defaults.hierarchy == 7 || defaults.hierarchy == 8) {
-//				//					//do nothing
-//				//				}else{
-//				//					Link l = network.getFactory().createLink(Id.create(this.id+"_car", Link.class), network.getNodes().get(fromId), network.getNodes().get(toId));
-//				//					l.setLength(length);
-//				//					l.setFreespeed(freespeed);
-//				//					l.setCapacity(capacity);
-//				//					l.setNumberOfLanes(nofLanes);
-//				//					if (l instanceof LinkImpl) {
-//				//						((LinkImpl) l).setOrigId(origId);
-//				//					}
-//				//					network.addLink(l);
-//				//				}
-//
-//				////new
-//				// für den typ 8 sollen nur links erstellt werden wenn auch bicycleTag == "yes" || bicycleTag == "designated
-//				if (defaults.hierarchy != 8) { 
-//					Link lbike = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(fromId), network.getNodes().get(toId));
-//					lbike.setLength(length);
-//					lbike.setFreespeed(5);
-//					lbike.setCapacity(5);
-//					lbike.setNumberOfLanes(1);
-//					modesB.add("bike");
-//					lbike.setAllowedModes(modesB);
-//					if (lbike instanceof LinkImpl) {
-//						((LinkImpl) lbike).setOrigId(origId);
-//					}
-//					network.addLink(lbike);
-//					bikeLinkAtts(way, fromNode, toNode, length, true, this.id);
-//					this.id++;
-//				}else{
-//					if (bicycleTag!= null && (bicycleTag.equals("yes") || bicycleTag.equals("designated"))){
-//						//System.out.println("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz");
-//						Link lbike = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(fromId), network.getNodes().get(toId));
-//						lbike.setLength(length);
-//						lbike.setFreespeed(5);
-//						lbike.setCapacity(5);
-//						lbike.setNumberOfLanes(1);
-//						modesB.add("bike");
-//						lbike.setAllowedModes(modesB);
-//						if (lbike instanceof LinkImpl) {
-//							((LinkImpl) lbike).setOrigId(origId);
-//						}
-//						network.addLink(lbike);
-//						bikeLinkAtts(way, fromNode, toNode, length, true, this.id);
-//						this.id++;
-//					}
-//				}
-//			}
-//			// für links die kein Einbahnstraßen  sind
-//			if (!oneway) {
-//				//autolink nur wenn straße groß genug
-//				//				if (defaults.hierarchy == 7 || defaults.hierarchy == 8) {
-//				//					//do nothing
-//				//				}else{
-//				//					Link l = network.getFactory().createLink(Id.create(this.id+"_car", Link.class), network.getNodes().get(toId), network.getNodes().get(fromId));
-//				//					l.setLength(length);
-//				//					l.setFreespeed(freespeed);
-//				//					l.setCapacity(capacity);
-//				//					l.setNumberOfLanes(nofLanes);
-//				//					if (l instanceof LinkImpl) {
-//				//						((LinkImpl) l).setOrigId(origId);
-//				//					}
-//				//					network.addLink(l);
-//				//				}
-//
-//				////new 
-//				// für den typ 8 sollen nur links erstellt werden wenn auch bicycleTag == "yes" || bicycleTag == "designated
-//				if (defaults.hierarchy != 8) { 
-//					Link lbike = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(fromId), network.getNodes().get(toId));
-//					lbike.setLength(length);
-//					lbike.setFreespeed(5);
-//					lbike.setCapacity(5);
-//					lbike.setNumberOfLanes(1);
-//					modesB.add("bike");
-//					lbike.setAllowedModes(modesB);
-//					if (lbike instanceof LinkImpl) {
-//						((LinkImpl) lbike).setOrigId(origId);
-//					}
-//					network.addLink(lbike);
-//					bikeLinkAtts(way, fromNode, toNode, length, false, this.id);
-//					this.id++;
-//				}else{
-//					if (bicycleTag!= null && (bicycleTag.equals("yes") || bicycleTag.equals("designated"))){
-////						System.out.println("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz");
-//						Link lbike = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(fromId), network.getNodes().get(toId));
-//						lbike.setLength(length);
-//						lbike.setFreespeed(5);
-//						lbike.setCapacity(5);
-//						lbike.setNumberOfLanes(1);
-//						modesB.add("bike");
-//						lbike.setAllowedModes(modesB);
-//						if (lbike instanceof LinkImpl) {
-//							((LinkImpl) lbike).setOrigId(origId);
-//						}
-//						network.addLink(lbike);
-//						bikeLinkAtts(way, fromNode, toNode, length, false, this.id);
-//						this.id++;
-//					}
-//				}
-//
-//			}

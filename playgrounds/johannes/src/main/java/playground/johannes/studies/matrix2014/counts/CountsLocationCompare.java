@@ -50,21 +50,21 @@ public class CountsLocationCompare {
 
         Counts<Link> refCounts = new Counts<>();
         MatsimCountsReader countsReader = new MatsimCountsReader(refCounts);
-        countsReader.parse(refFile);
+        countsReader.readFile(refFile);
 
         Map<String, Coord> refCoords = new HashMap<>();
         for(Count<Link> count : refCounts.getCounts().values()) {
-            refCoords.put(count.getCsId(), count.getCoord());
+            refCoords.put(count.getCsLabel(), count.getCoord());
         }
 
         Counts<Link> targetCounts = new Counts<>();
         countsReader = new MatsimCountsReader(targetCounts);
 //        countsReader.setValidating(false);
-        countsReader.parse(targetFile);
+        countsReader.readFile(targetFile);
 
         Map<String, Coord> targetCoords = new HashMap<>();
         for(Count<Link> count : targetCounts.getCounts().values()) {
-            targetCoords.put(count.getCsId(), count.getCoord());
+            targetCoords.put(count.getCsLabel(), count.getCoord());
         }
         DistanceCalculator distanceCalculator = CartesianDistanceCalculator.getInstance();
 

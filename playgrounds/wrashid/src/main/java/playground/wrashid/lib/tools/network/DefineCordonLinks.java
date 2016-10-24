@@ -4,8 +4,8 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.network.NetworkImpl;
 
 public class DefineCordonLinks {
 
@@ -17,7 +17,7 @@ public class DefineCordonLinks {
 		Coord center = new Coord(682548.0, 247525.5);
 		double radiusInMeters = 1500;
 		
-		NetworkImpl network = (NetworkImpl) GeneralLib.readNetwork(inputNetworkPath);
+		Network network = (Network) GeneralLib.readNetwork(inputNetworkPath);
 		
 		LinkedList<Link> incomingLinks=new LinkedList<Link>();
 		LinkedList<Link> outgoingLinks=new LinkedList<Link>();

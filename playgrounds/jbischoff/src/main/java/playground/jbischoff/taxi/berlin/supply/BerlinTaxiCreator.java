@@ -27,13 +27,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.util.random.WeightedRandomSelection;
 import org.matsim.contrib.zone.Zone;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 import playground.jbischoff.taxi.berlin.demand.TaxiDemandWriter;
-import playground.michalm.berlin.BerlinZoneUtils;
+import playground.michalm.TaxiBerlin.TaxiBerlinZoneUtils;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -46,7 +47,7 @@ public class BerlinTaxiCreator
     private static final double PAXPERCAR = 4;
 
     private final Map<Id<Zone>, Zone> zones;
-    private final NetworkImpl network;
+    private final Network network;
     private final WeightedRandomSelection<Id<Zone>> lorSelection;
     private final double evShare;
 
@@ -60,7 +61,7 @@ public class BerlinTaxiCreator
         this.lorSelection = lorSelection;
         this.evShare = evShare;
 
-        network = (NetworkImpl)scenario.getNetwork();
+        network = (Network)scenario.getNetwork();
     }
 
 
@@ -90,8 +91,9 @@ public class BerlinTaxiCreator
 //        log.info(id);
         Point p = TaxiDemandWriter.getRandomPointInFeature(RND, this.zones.get(id)
                 .getMultiPolygon());
-        Coord coord = BerlinZoneUtils.ZONE_TO_NETWORK_COORD_TRANSFORMATION.transform(new Coord(p.getX(), p.getY()));
-        Link link = network.getNearestLinkExactly(coord);
+        Coord coord = TaxiBerlinZoneUtils.ZONE_TO_NETWORK_COORD_TRANSFORMATION.transform(new Coord(p.getX(), p.getY()));
+	final Coord coord1 = coord;
+        Link link = NetworkUtils.getNearestLinkExactly(network,coord1);
 
         return link;
     }

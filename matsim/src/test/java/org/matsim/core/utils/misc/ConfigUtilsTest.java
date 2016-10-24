@@ -22,29 +22,35 @@ package org.matsim.core.utils.misc;
 import java.io.IOException;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser
  */
 public class ConfigUtilsTest {
 
+	@Rule
+	public MatsimTestUtils util = new MatsimTestUtils();
+
 	@Test
 	public void testLoadConfig_filenameOnly() throws IOException {
-		Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
+		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(util.getTestScenarioURL("equil"), "config.xml"));
 		Assert.assertNotNull(config);
-		Assert.assertEquals("test/scenarios/equil/network.xml", config.network().getInputFile());
+		Assert.assertEquals("network.xml", config.network().getInputFile());
 	}
 
 	@Test
 	public void testLoadConfig_emptyConfig() throws IOException {
 		Config config = new Config();
 		Assert.assertNull(config.network());
-		ConfigUtils.loadConfig(config, "test/scenarios/equil/config.xml");
+		ConfigUtils.loadConfig(config, IOUtils.newUrl(util.getTestScenarioURL("equil"), "config.xml"));
 		Assert.assertNotNull(config.network());
-		Assert.assertEquals("test/scenarios/equil/network.xml", config.network().getInputFile());
+		Assert.assertEquals("network.xml", config.network().getInputFile());
 	}
 
 	@Test
@@ -53,24 +59,24 @@ public class ConfigUtilsTest {
 		config.addCoreModules();
 		Assert.assertNotNull(config.network());
 		Assert.assertNull(config.network().getInputFile());
-		ConfigUtils.loadConfig(config, "test/scenarios/equil/config.xml");
-		Assert.assertEquals("test/scenarios/equil/network.xml", config.network().getInputFile());
+		ConfigUtils.loadConfig(config, IOUtils.newUrl(util.getTestScenarioURL("equil"), "config.xml"));
+		Assert.assertEquals("network.xml", config.network().getInputFile());
 	}
 
 	@Test
 	public void testModifyPaths_missingSeparator() throws IOException {
-		Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
-		Assert.assertEquals("test/scenarios/equil/network.xml", config.network().getInputFile());
+		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(util.getTestScenarioURL("equil"), "config.xml"));
+		Assert.assertEquals("network.xml", config.network().getInputFile());
 		ConfigUtils.modifyFilePaths(config, "/home/username/matsim");
-		Assert.assertEquals("/home/username/matsim/test/scenarios/equil/network.xml", config.network().getInputFile());
+		Assert.assertEquals("/home/username/matsim/network.xml", config.network().getInputFile());
 	}
 
 	@Test
 	public void testModifyPaths_withSeparator() throws IOException {
-		Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
-		Assert.assertEquals("test/scenarios/equil/network.xml", config.network().getInputFile());
+		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(util.getTestScenarioURL("equil"), "config.xml"));
+		Assert.assertEquals("network.xml", config.network().getInputFile());
 		ConfigUtils.modifyFilePaths(config, "/home/username/matsim/");
-		Assert.assertEquals("/home/username/matsim/test/scenarios/equil/network.xml", config.network().getInputFile());
+		Assert.assertEquals("/home/username/matsim/network.xml", config.network().getInputFile());
 	}
 
 }

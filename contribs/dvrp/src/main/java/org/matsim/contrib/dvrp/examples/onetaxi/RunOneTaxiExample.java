@@ -55,7 +55,7 @@ public class RunOneTaxiExample
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
         final VrpData vrpData = new VrpDataImpl();
-        new VehicleReader(scenario.getNetwork(), vrpData).parse(oneTaxiCfg.getValue(TAXIS_FILE));
+        new VehicleReader(scenario.getNetwork(), vrpData).readFile(oneTaxiCfg.getValue(TAXIS_FILE));
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new AbstractModule() {

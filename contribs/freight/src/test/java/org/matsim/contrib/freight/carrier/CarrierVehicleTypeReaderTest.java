@@ -12,7 +12,7 @@ public class CarrierVehicleTypeReaderTest extends MatsimTestCase{
 	public void setUp() throws Exception{
 		super.setUp();
 		types = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader(types).read(getClassInputDirectory() + "vehicleTypes.xml");
+		new CarrierVehicleTypeReader(types).readFile(getClassInputDirectory() + "vehicleTypes.xml");
 	}
 	
 	public void test_whenReadingTypes_nuOfTypesIsReadCorrectly(){

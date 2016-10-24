@@ -29,6 +29,7 @@ import org.matsim.core.controler.*;
 
 import playground.michalm.ev.*;
 import playground.michalm.ev.data.*;
+import playground.michalm.ev.data.file.ChargerReader;
 import playground.michalm.taxi.data.file.EvrpVehicleReader;
 import playground.michalm.taxi.ev.*;
 
@@ -62,9 +63,9 @@ public class RunETaxiBenchmark
 
         Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
         final TaxiData taxiData = new TaxiData();
-        new EvrpVehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
+        new EvrpVehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
         EvData evData = new EvDataImpl();
-        new ChargerReader(scenario, evData).parse(evCfg.getChargerFile());
+        new ChargerReader(scenario.getNetwork(), evData).readFile(evCfg.getChargerFile());
         ETaxiUtils.initEvData(taxiData, evData);
 
         Controler controler = RunTaxiBenchmark.createControler(scenario, taxiData, runs);
@@ -75,7 +76,8 @@ public class RunETaxiBenchmark
             @Override
             public void install()
             {
-                addMobsimListenerBinding().toProvider(ETaxiTimeProfileCollectorProvider.class);
+                addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
+                addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyXYDataProvider.class);
                 //override the binding in RunTaxiBenchmark
                 bind(TaxiBenchmarkStats.class).to(ETaxiBenchmarkStats.class).asEagerSingleton();
             }

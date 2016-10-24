@@ -19,14 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsimusages.analysis;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -35,10 +27,10 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.StreamingPopulationReader;
-import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
@@ -51,8 +43,15 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.PtConstants;
-
 import playground.ivt.utils.Filter;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author thibautd
@@ -184,7 +183,7 @@ public class LocatedTripsWriter {
 		StreamingUtils.setIsStreaming(reader, true);
 		reader.addAlgorithm(new InfoFiller( filter , infos ));
 
-		new PopulationReader( scenario ).parse( inPopFile );
+		new PopulationReader( scenario ).readFile( inPopFile );
 		return infos;
 	}
 

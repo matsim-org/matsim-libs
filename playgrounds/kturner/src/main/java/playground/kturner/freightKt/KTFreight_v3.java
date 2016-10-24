@@ -18,12 +18,12 @@
  * *********************************************************************** */
 package playground.kturner.freightKt;
 
-import jsprit.analysis.toolbox.Plotter;
-import jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
-import jsprit.core.problem.VehicleRoutingProblem;
-import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import jsprit.core.util.Solutions;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -31,8 +31,17 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
+import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
+import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.controler.CarrierModule;
@@ -47,18 +56,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -67,19 +72,14 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import jsprit.analysis.toolbox.Plotter;
+import jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
+import jsprit.core.problem.VehicleRoutingProblem;
+import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import jsprit.core.util.Solutions;
 
 /**
  * Kurzfassung:
@@ -317,7 +317,7 @@ public class KTFreight_v3 {
 
 	private static Carriers createCarriers(CarrierVehicleTypes vehicleTypes) {
 		Carriers carriers = new Carriers() ;
-		new CarrierPlanXmlReaderV2(carriers).read(CARRIERFILE) ;
+		new CarrierPlanXmlReaderV2(carriers).readFile(CARRIERFILE) ;
 
 		// assign vehicle types to the carriers
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes) ;
@@ -326,7 +326,7 @@ public class KTFreight_v3 {
 
 	private static CarrierVehicleTypes createVehicleTypes() {
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-		new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPEFILE) ;
+		new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPEFILE) ;
 		return vehicleTypes;
 	}
 
@@ -474,35 +474,38 @@ public class KTFreight_v3 {
 	 *  Für alle Kanten mit freespeed > 25 km/h wird dieser auf 50% reduziert.
 	 */
 	private static void configureTimeDependentNetwork(Scenario scenario) {
-		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl() ;
 		for ( Link link : scenario.getNetwork().getLinks().values() ) {
 			double speed = link.getFreespeed() ;
 
 			final double threshold = 25./3.6;		//25km/h
 			if ( speed > threshold ) {
 				{
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(7*3600.) ;
+					NetworkChangeEvent event = new NetworkChangeEvent(7*3600.) ;
 					event.setFreespeedChange(new ChangeValue( ChangeType.FACTOR,  0.5 )); 
 					event.addLink(link);
-					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+					final NetworkChangeEvent event1 = event;
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 				}
 				{
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(10*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
+					NetworkChangeEvent event = new NetworkChangeEvent(10*3600.) ;
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  speed ));
 					event.addLink(link);
-					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+					final NetworkChangeEvent event1 = event;
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 				}
 				{
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(16.5*3600.) ;
+					NetworkChangeEvent event = new NetworkChangeEvent(16.5*3600.) ;
 					event.setFreespeedChange(new ChangeValue( ChangeType.FACTOR,  0.5 )); 
 					event.addLink(link);
-					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+					final NetworkChangeEvent event1 = event;
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 				}
 				{
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(19*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
+					NetworkChangeEvent event = new NetworkChangeEvent(19*3600.) ;
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  speed ));
 					event.addLink(link);
-					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+					final NetworkChangeEvent event1 = event;
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 				}
 			}
 		}
@@ -528,7 +531,7 @@ public class KTFreight_v3 {
 		try {
 			RoadPricingConfigGroup rpConfig = (RoadPricingConfigGroup) config.getModule(RoadPricingConfigGroup.GROUP_NAME) ;
 			rpConfig.setTollLinksFile(TOLLFILE);
-			rpReader.parse(rpConfig.getTollLinksFile());
+			rpReader.readFile(rpConfig.getTollLinksFile());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

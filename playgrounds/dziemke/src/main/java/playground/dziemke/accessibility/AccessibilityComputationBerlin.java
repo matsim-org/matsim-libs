@@ -14,7 +14,7 @@ import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.gis.GridUtils;
-import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
+import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
@@ -56,7 +56,7 @@ public class AccessibilityComputationBerlin {
 		// now using work facilities
 		String facilitiesFile = "../../../../SVN/shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/facilities.xml";
 		
-		String outputDirectory = "../../../../SVN/shared-svn/projects/accessibility_berlin/output/08/";
+		String outputDirectory = "../../../../SVN/shared-svn/projects/accessibility_berlin/output/08_test/";
 //		String travelTimeMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelDistanceMatrix.csv.gz";
 //		String ptStops = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/stops.csv.gz";
@@ -144,7 +144,7 @@ public class AccessibilityComputationBerlin {
 
 		// collect homes
 		String activityFacilityType = FacilityTypes.HOME;
-		final ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityFacilityType);
+		final ActivityFacilities homes = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityFacilityType);
 
 		final Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {
@@ -161,7 +161,7 @@ public class AccessibilityComputationBerlin {
 						public ControlerListener get() {
 							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, (Scenario) scenario);
 							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2((double) 4574000, (double) 5802000, (double) 4620000, (double) 5839000, cellSize));
-							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, (ActivityFacilities) AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType), ptMatrix, config, scenario, travelTimes,
+							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, (ActivityFacilities) AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType), ptMatrix, config, scenario, travelTimes,
 							travelDisutilityFactories, 4574000, 5802000, 4620000, 5839000, cellSize);
 							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.car, true);

@@ -45,7 +45,7 @@ public class OsmObjectsToFacilities {
 		log.info("Creating activity facilities from " + osmFile);
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
-		parser.parse(osmFile);
+		parser.readFile(osmFile);
 		
 		Collection<OSMNode> nodes = parser.getNodes().values();
 		Collection<OSMWay> ways = parser.getWays().values();

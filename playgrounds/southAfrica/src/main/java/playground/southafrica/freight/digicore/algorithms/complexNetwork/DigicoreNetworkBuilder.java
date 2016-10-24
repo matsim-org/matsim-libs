@@ -155,7 +155,7 @@ public class DigicoreNetworkBuilder {
 		for(File f : fileList){
 			/* Read the vehicle file. */
 			DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-			dvr.parse(f.getAbsolutePath());
+			dvr.readFile(f.getAbsolutePath());
 			DigicoreVehicle dv = dvr.getVehicle();
 			
 			/* Process vehicle's activities. */

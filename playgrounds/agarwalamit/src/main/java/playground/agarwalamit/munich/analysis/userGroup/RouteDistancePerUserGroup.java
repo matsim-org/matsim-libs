@@ -51,22 +51,22 @@ public class RouteDistancePerUserGroup {
 		super();
 		this.sc = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(plansFile, networkFile, configFile);
 		this.usrGrpExtended = new UserGroupUtilsExtended();
-		userGrpToBoxPlotData = new TreeMap<UserGroup, List<Double>>();
+		userGrpToBoxPlotData = new TreeMap<>();
 	}
 
-	private Logger logger = Logger.getLogger(RouteDistancePerUserGroup.class);
-	private  String outputDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run10/policies/backcasting/exposure/25ExI/";
-	private  String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
-	private  String plansFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
-	private String configFile = outputDir+"/output_config.xml";
-	private int lastIteration = LoadMyScenarios.getLastIteration(configFile);
-	private String eventsFile = outputDir+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
-	private Scenario sc;
-	private UserGroupUtilsExtended usrGrpExtended;
-	private SortedMap<UserGroup, SortedMap<String, Double>> usrGrp2Mode2MeanDistance = new TreeMap<UserGroup, SortedMap<String,Double>>();
-	private SortedMap<UserGroup, SortedMap<String, Double>> usrGrp2Mode2MedianDistance = new TreeMap<UserGroup, SortedMap<String,Double>>();
+	private final Logger logger = Logger.getLogger(RouteDistancePerUserGroup.class);
+	private final String outputDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run10/policies/backcasting/exposure/25ExI/";
+	private final String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
+	private final String plansFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
+	private final String configFile = outputDir+"/output_config.xml";
+	private final int lastIteration = LoadMyScenarios.getLastIteration(configFile);
+	private final String eventsFile = outputDir+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
+	private final Scenario sc;
+	private final UserGroupUtilsExtended usrGrpExtended;
+	private final SortedMap<UserGroup, SortedMap<String, Double>> usrGrp2Mode2MeanDistance = new TreeMap<>();
+	private final SortedMap<UserGroup, SortedMap<String, Double>> usrGrp2Mode2MedianDistance = new TreeMap<>();
 	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2RouteDist;
-	private SortedMap<UserGroup, List<Double>> userGrpToBoxPlotData;
+	private final SortedMap<UserGroup, List<Double>> userGrpToBoxPlotData;
 	private final String mainMode = TransportMode.car;
 	
 	public static void main(String[] args) {

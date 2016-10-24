@@ -46,7 +46,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.utils.GeometryUtils;
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
@@ -61,9 +61,9 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private final TollInfoHandler delegate;
 	private final Vehicle2DriverEventHandler veh2DriverDelegate = new Vehicle2DriverEventHandler();
-	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private final MunichPersonFilter pf = new MunichPersonFilter();
 	private final Collection<Geometry> zonalGeoms;
-	private Network network;
+	private final Network network;
 	private final String ug ;
 
 	private final Map<Id<Person>,Id<Link>> person2DepartureLeaveLink = new HashMap<>();
@@ -128,11 +128,11 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 //				Id<Link> linkId = this.person2DepartureLeaveLink.remove(event.getPersonId());
 				Id<Link> linkId = this.person2DepartureLeaveLink.get(event.getPersonId());
 				Link link = network.getLinks().get(linkId);
-				if ( this.pf.getMyUserGroupFromPersonId(driverId).equals(ug)  && GeometryUtils.isLinkInsideGeometries(zonalGeoms, link)   ) {
+				if ( this.pf.getUserGroupAsStringFromPersonId(driverId).equals(ug)  && GeometryUtils.isLinkInsideGeometries(zonalGeoms, link)   ) {
 					delegate.handleEvent(event);
 				}
 			} else { // filtering for user group only
-				if ( this.pf.getMyUserGroupFromPersonId(driverId).equals(ug)  ) {
+				if ( this.pf.getUserGroupAsStringFromPersonId(driverId).equals(ug)  ) {
 					delegate.handleEvent(event);
 				}
 			}

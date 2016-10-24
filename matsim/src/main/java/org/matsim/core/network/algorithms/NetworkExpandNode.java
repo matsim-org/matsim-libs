@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -227,9 +227,9 @@ public class NetworkExpandNode {
 			l.setCapacity(inlink.getCapacity());
 			l.setNumberOfLanes(inlink.getNumberOfLanes());
 			l.setAllowedModes(inlink.getAllowedModes());
-			if (inlink instanceof LinkImpl) {
-				((LinkImpl) l).setOrigId(((LinkImpl) inlink).getOrigId());
-				((LinkImpl) l).setType(((LinkImpl) inlink).getType());
+			if (inlink instanceof Link) {
+				NetworkUtils.setOrigId( ((Link) l), NetworkUtils.getOrigId( ((Link) inlink) ) ) ;
+				NetworkUtils.setType( ((Link) l), NetworkUtils.getType(((Link) inlink)));
 			}
 			network.addLink(l);
 		}
@@ -256,9 +256,9 @@ public class NetworkExpandNode {
 			l.setCapacity(outlink.getCapacity());
 			l.setNumberOfLanes(outlink.getNumberOfLanes());
 			l.setAllowedModes(outlink.getAllowedModes());
-			if (outlink instanceof LinkImpl) {
-				((LinkImpl) l).setOrigId(((LinkImpl) outlink).getOrigId());
-				((LinkImpl) l).setType(((LinkImpl) outlink).getType());
+			if (outlink instanceof Link) {
+				NetworkUtils.setOrigId( ((Link) l), NetworkUtils.getOrigId( ((Link) outlink) ) ) ;
+				NetworkUtils.setType( ((Link) l), NetworkUtils.getType(((Link) outlink)));
 			}
 			network.addLink(l);
 		}
@@ -284,9 +284,9 @@ public class NetworkExpandNode {
 			} else {
 				l.setAllowedModes(turn.getModes());
 			}
-			if (fromLink instanceof LinkImpl) {
-				((LinkImpl) l).setOrigId(((LinkImpl) fromLink).getOrigId());
-				((LinkImpl) l).setType(((LinkImpl) fromLink).getType());
+			if (fromLink instanceof Link) {
+				NetworkUtils.setOrigId( ((Link) l), NetworkUtils.getOrigId( ((Link) fromLink) ) ) ;
+				NetworkUtils.setType( ((Link) l), NetworkUtils.getType(((Link) fromLink)));
 			}
 			network.addLink(l);
 			newLinks.add(l);

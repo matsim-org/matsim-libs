@@ -74,7 +74,7 @@ public class RunTaxiMiniBenchmark
         final Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60,
                 30 * 3600);
         final TaxiData taxiData = new TaxiData();
-        new VehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
+        new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
 
         final EventsManager events = EventsUtils.createEventsManager();
         final Collection<AbstractQSimPlugin> plugins = DynQSimModule.createQSimPlugins(config);

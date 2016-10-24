@@ -17,7 +17,7 @@ public class ETaxiBenchmarkStats
     extends TaxiBenchmarkStats
 {
     public static final String[] HEADER = ObjectArrays.concat(TaxiBenchmarkStats.HEADER,
-            "QueuedTimeRatio");
+            "QueuedTimeRatio_fleetAvg");
 
     private final SummaryStatistics queuedTimeRatio = new SummaryStatistics();
 

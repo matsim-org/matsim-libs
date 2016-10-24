@@ -24,7 +24,7 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
@@ -35,7 +35,7 @@ import org.xml.sax.Attributes;
  *
  * @author mrieser
  */
-public class PopulationReader extends MatsimXmlParser implements MatsimPopulationReader {
+public class PopulationReader extends MatsimXmlParser implements MatsimReader {
 
 	private final static String POPULATION_V5 = "population_v5.dtd";
 	private final static String POPULATION_POPS = "population_pops.dtd";
@@ -57,18 +57,6 @@ public class PopulationReader extends MatsimXmlParser implements MatsimPopulatio
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		this.delegate.endTag(name, content, context);
-	}
-
-	/**
-	 * Parses the specified plans file. This method calls {@link #parse(String)}, but handles all
-	 * possible exceptions on its own.
-	 *
-	 * @param filename The name of the file to parse.
-	 * @throws UncheckedIOException
-	 */
-	@Override
-	public void readFile(final String filename) throws UncheckedIOException {
-		parse(filename);
 	}
 
 	@Override

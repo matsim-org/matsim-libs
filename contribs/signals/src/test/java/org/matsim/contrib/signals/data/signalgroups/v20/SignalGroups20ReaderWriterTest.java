@@ -32,7 +32,6 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.signals.MatsimSignalSystemsReader;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -54,24 +53,19 @@ public class SignalGroups20ReaderWriterTest {
 
 	private Id<SignalSystem> id23 = Id.create("23", SignalSystem.class);
 	private Id<Signal> id1 = Id.create("1", Signal.class);
-	private Id<Signal> id2 = Id.create("2", Signal.class);
 	private Id<Signal> id4 = Id.create("4", Signal.class);
 	private Id<Signal> id5 = Id.create("5", Signal.class);
 	private Id<SignalSystem> id42 = Id.create("42", SignalSystem.class);
 
 	private Id<SignalGroup> idSg1 = Id.create("1", SignalGroup.class);
 	private Id<SignalGroup> idSg2 = Id.create("2", SignalGroup.class);
-	Set<Id<Signal>> sg;
-
-
-
 
 
 	@Test
 	public void testParser() throws IOException, JAXBException, SAXException,
 			ParserConfigurationException {
 		SignalGroupsData sgd = new SignalGroupsDataImpl();
-		SignalGroupsReader20 reader = new SignalGroupsReader20(sgd,MatsimSignalSystemsReader.SIGNALGROUPS20);
+		SignalGroupsReader20 reader = new SignalGroupsReader20(sgd);
 		reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
 		checkContent(sgd);
 
@@ -84,7 +78,7 @@ public class SignalGroups20ReaderWriterTest {
 		log.debug("reading file...");
 		// read the test file
 		SignalGroupsData sgd = new SignalGroupsDataImpl();
-		SignalGroupsReader20 reader = new SignalGroupsReader20(sgd, MatsimSignalSystemsReader.SIGNALGROUPS20);
+		SignalGroupsReader20 reader = new SignalGroupsReader20(sgd);
 		reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
 
 		// write the test file
@@ -94,7 +88,7 @@ public class SignalGroups20ReaderWriterTest {
 
 		log.debug("and read it again");
 		sgd = new SignalGroupsDataImpl();
-		reader = new SignalGroupsReader20(sgd, MatsimSignalSystemsReader.SIGNALGROUPS20);
+		reader = new SignalGroupsReader20(sgd);
 		reader.readFile(testoutput);
 		checkContent(sgd);
 	}
@@ -110,7 +104,7 @@ public class SignalGroups20ReaderWriterTest {
 		Map<Id<SignalGroup>,SignalGroupData> ss23 = sgd.getSignalGroupDataBySystemId(id23);
 		Assert.assertEquals(id23,ss23.get(idSg1).getSignalSystemId());
 
-		sg =  ss23.get(idSg1).getSignalIds();
+		Set<Id<Signal>> sg = ss23.get(idSg1).getSignalIds();
 		Assert.assertTrue(sg.contains(id1));
 		
 		//sg42

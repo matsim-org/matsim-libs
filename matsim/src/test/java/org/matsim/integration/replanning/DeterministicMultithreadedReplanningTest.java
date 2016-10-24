@@ -37,6 +37,7 @@ import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -171,7 +172,7 @@ public class DeterministicMultithreadedReplanningTest {
 		Config config = testUtils.loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setLastIteration(lastIteration);
 		config.global().setNumberOfThreads(4); // just use any number > 1
-		config.plans().setInputFile(testUtils.getClassInputDirectory() + "plans1.xml");
+		config.plans().setInputFile(IOUtils.newUrl(testUtils.classInputResourcePath(), "plans1.xml").toString());
 		{
 			// setup run1
 			PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());

@@ -42,7 +42,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -243,7 +243,8 @@ public class ShapeConverterPopRandom {
 		Double firstx = firstAct.getCoord().getX();
 		Double firsty = firstAct.getCoord().getY();
 		Activity lastAct = (Activity) newPlan.getPlanElements().get(newPlan.getPlanElements().size()-1);
-		lastAct.getCoord().setXY(firstx, firsty);
+//		lastAct.getCoord().setXY(firstx, firsty);
+		lastAct.setCoord( new Coord( firstx, firsty ) );
 		
 		newPerson.addPlan(newPlan);
 		newPersons.add(newPerson);

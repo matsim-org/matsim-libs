@@ -33,8 +33,8 @@ import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.io.ColorUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -88,7 +88,7 @@ public class NetLoad {
 		 */
 		NumericMatrixXMLReader mReader = new NumericMatrixXMLReader();
 		mReader.setValidating(false);
-		mReader.parse(matrixFile);
+		mReader.readFile(matrixFile);
 		NumericMatrix m = mReader.getMatrix();
 
 		MatrixOperations.applyFactor(m, 1.952898582487276);
@@ -108,7 +108,7 @@ public class NetLoad {
 		 */
 		Counts<Link> counts = new Counts();
 		CountsReaderMatsimV1 cReader = new CountsReaderMatsimV1(counts);
-		cReader.parse(countsFile);
+		cReader.readFile(countsFile);
 		/*
 		 * load zones
 		 */
@@ -156,7 +156,7 @@ public class NetLoad {
 		cwriter.write("obs\tsim");
 		cwriter.newLine();
 		for (Count count : counts.getCounts().values()) {
-			Id<Link> id = count.getLocId();
+			Id<Link> id = count.getId();
 			Link link = network.getLinks().get(id);
 			double simVol = linkVolumes.get(link);
 			double obsVol = count.getVolume(1).getValue() * 24;
@@ -257,7 +257,7 @@ public class NetLoad {
 		List<Feature> obsFeatures = new ArrayList<>(obsCounts.getCounts().size());
 
 		for (Count<Link> count : obsCounts.getCounts().values()) {
-			Id<Link> linkId = count.getLocId();
+			Id<Link> linkId = count.getId();
 			if (!linkId.toString().startsWith(ODCalibrator.VIRTUAL_ID_PREFIX)) {
 				Link link = network.getLinks().get(linkId);
 

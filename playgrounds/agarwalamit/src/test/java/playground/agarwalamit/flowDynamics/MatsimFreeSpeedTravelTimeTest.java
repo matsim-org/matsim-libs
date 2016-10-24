@@ -19,9 +19,6 @@
 package playground.agarwalamit.flowDynamics;
 
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -33,19 +30,16 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -109,7 +103,7 @@ public class MatsimFreeSpeedTravelTimeTest {
 
 		final Config config;
 		final Scenario scenario ;
-		final NetworkImpl network;
+		final Network network;
 		final Population population;
 		final Link link1;
 		final Link link2;
@@ -122,18 +116,16 @@ public class MatsimFreeSpeedTravelTimeTest {
 			config.qsim().setFlowCapFactor(1.0);
 			config.qsim().setStorageCapFactor(1.0);
 
-			network = (NetworkImpl) scenario.getNetwork();
+			network = scenario.getNetwork();
 
-			Node node1 = network.createAndAddNode(Id.createNodeId("1"), new Coord(-100., -100.0));
-			Node node2 = network.createAndAddNode(Id.createNodeId("2"), new Coord(0.0, 0.0));
-			Node node3 = network.createAndAddNode(Id.createNodeId("3"), new Coord(1000.0, 0.0));
-			Node node4 = network.createAndAddNode(Id.createNodeId("4"), new Coord(1000.0, 100.0));
+			Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord(-100., -100.0));
+			Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId("2"), new Coord(0.0, 0.0));
+			Node node3 = NetworkUtils.createAndAddNode(network, Id.createNodeId("3"), new Coord(1000.0, 0.0));
+			Node node4 = NetworkUtils.createAndAddNode(network, Id.createNodeId("4"), new Coord(1000.0, 100.0));
 
-			Set<String> allowedModes = new HashSet<String>(); allowedModes.addAll(Arrays.asList(TransportMode.car,TransportMode.walk));
-
-			link1 = network.createAndAddLink(Id.createLinkId("1"), node1, node2, 1000, 25, 3600, 1, null, "22"); 
-			link2 = network.createAndAddLink(Id.createLinkId("2"), node2, node3, 1000, maxLinkSpeed, 3600, 1, null, "22");	//flow capacity is 1 PCU per min.
-			link3 = network.createAndAddLink(Id.createLinkId("3"), node3, node4, 1000, 25, 3600, 1, null, "22");
+            link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId("1"), node1, node2, (double) 1000, (double) 25, (double) 3600, (double) 1, null, "22");
+            link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId("2"), node2, node3, (double) 1000, maxLinkSpeed, (double) 3600, (double) 1, null, "22");
+            link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId("3"), node3, node4, (double) 1000, (double) 25, (double) 3600, (double) 1, null, "22");
 
 			population = scenario.getPopulation();
 

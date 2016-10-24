@@ -72,7 +72,7 @@ public class TransmodelerMobsim implements Mobsim {
 		final ObjectAttributes linkAttributes = new ObjectAttributes();
 		final ObjectAttributesXmlReader linkAttrReader = new ObjectAttributesXmlReader(
 				linkAttributes);
-		linkAttrReader.parse(this.linkAttributesFileName);
+		linkAttrReader.readFile(this.linkAttributesFileName);
 
 		/*
 		 * Write Transmodeler routes and trips file.

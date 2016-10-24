@@ -18,8 +18,7 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -50,7 +49,7 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		new DbInspireNetworkParser(scenario, "EPSG:32632").parse(
+		new DbInspireNetworkParser(scenario, "EPSG:32632").parseAndConvert(
 				"/home/dhosse/Dokumente/10_data/data.db/DB-Netz_INSPIRE_20131128.gml");
 		
 		new NetworkWriter(scenario.getNetwork()).write("/home/dhosse/inspire-railNetwork.xml");
@@ -155,10 +154,9 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 		
 	}
 	
-	@Override
-	public void parse(String filename){
+	public void parseAndConvert(String filename){
 		
-		super.parse(filename);
+		super.readFile(filename);
 		log.info("Converting...");
 		convert();
 		logConversionInfo();
@@ -391,8 +389,8 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 			Id<Node> fromNodeId = Id.createNodeId(link.fromNodeId);
 			Id<Node> toNodeId = Id.createNodeId(link.toNodeId + "_2");
 			
-			List<Node> nodes = (List<Node>) ((NetworkImpl)this.network).getNearestNodes(link.fromCoord, 0);
-			List<Node> nodes2 = (List<Node>) ((NetworkImpl)this.network).getNearestNodes(link.toCoord, 0);
+			List<Node> nodes = (List<Node>) NetworkUtils.getNearestNodes(((Network)this.network),link.fromCoord, (double) 0);
+			List<Node> nodes2 = (List<Node>) NetworkUtils.getNearestNodes(((Network)this.network),link.toCoord, (double) 0);
 			
 			Node fromNode = nodes.size() > 0 ? nodes.get(0) : null;
 			if(fromNode == null){
@@ -428,7 +426,7 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 			ll.setAllowedModes(this.modes);
 			ll.setCapacity(30);
 			ll.setLength(link.length);
-			((LinkImpl)ll).setOrigId(this.linkId2LineId.get(link.id));
+			NetworkUtils.setOrigId( ((Link)ll), (String) this.linkId2LineId.get(link.id) ) ;
 			this.network.addLink(ll);
 			
 			if(!fromNode.getOutLinks().containsKey(ll.getId())){
@@ -479,7 +477,7 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 						reverse.setFreespeed(ref.getFreespeed());
 						reverse.setLength(ref.getLength());
 						reverse.setNumberOfLanes(ref.getNumberOfLanes());
-						((LinkImpl)reverse).setOrigId(((LinkImpl)ref).getOrigId());
+						NetworkUtils.setOrigId( ((Link)reverse), (String) NetworkUtils.getOrigId( ((Link)ref) ) ) ;
 						
 						this.network.addLink(reverse);
 						
@@ -515,7 +513,7 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 						reverse.setFreespeed(designSpeed);
 						reverse.setLength(ref.getLength());
 						reverse.setNumberOfLanes(nTracks);
-						((LinkImpl)reverse).setOrigId(((LinkImpl)ref).getOrigId());
+						NetworkUtils.setOrigId( ((Link)reverse), (String) NetworkUtils.getOrigId( ((Link)ref) ) ) ;
 						
 						this.network.addLink(reverse);
 						this.network.removeLink(ref.getId());
@@ -549,8 +547,9 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 		for(RailwayStationNode s : this.stations.values()){
 			
 			Coord coord = s.coord;
+			final Coord coord1 = coord;
 			
-			Node nearestNode = ((NetworkImpl)this.network).getNearestNode(coord);
+			Node nearestNode = NetworkUtils.getNearestNode(((Network)this.network),coord1);
 			
 			int i = 0;
 			

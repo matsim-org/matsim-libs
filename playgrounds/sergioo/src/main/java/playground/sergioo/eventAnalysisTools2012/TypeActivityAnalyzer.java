@@ -112,7 +112,7 @@ public class TypeActivityAnalyzer implements ActivityStartEventHandler, Activity
 		EventsManager events = EventsUtils.createEventsManager();
 		TypeActivityAnalyzer typeActivityAnalyzer = new TypeActivityAnalyzer(300,30*3600);
 		events.addHandler(typeActivityAnalyzer);
-		new EventsReaderXMLv1(events).parse(args[0]);
+		new EventsReaderXMLv1(events).readFile(args[0]);
 		typeActivityAnalyzer.finishActivities();
 		PrintWriter writer = new PrintWriter(new File("./data/durationsByType.txt"));
 		for(String type:typeActivityAnalyzer.getDurations().keySet()) {

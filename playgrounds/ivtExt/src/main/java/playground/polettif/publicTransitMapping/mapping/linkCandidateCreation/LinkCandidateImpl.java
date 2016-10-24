@@ -30,6 +30,7 @@ import playground.polettif.publicTransitMapping.tools.CoordTools;
 /**
  * @author polettif
  */
+@Deprecated
 public class LinkCandidateImpl implements LinkCandidate {
 
 	private final String id;

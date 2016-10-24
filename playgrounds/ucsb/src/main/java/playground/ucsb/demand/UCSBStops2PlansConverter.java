@@ -35,9 +35,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -109,9 +109,9 @@ public class UCSBStops2PlansConverter {
 		ObjectAttributes personObjectAttributes = new ObjectAttributes();
 
 		log.info("parsing network data...");
-		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkFile);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(networkFile);
 		ObjectAttributes linkObjectAttributes = new ObjectAttributes();
-		new ObjectAttributesXmlReader(linkObjectAttributes).parse(linkObjectAttributeFile);
+		new ObjectAttributesXmlReader(linkObjectAttributes).readFile(linkObjectAttributeFile);
 		log.info("done. (parsing)");
 
 		log.info("extracting subnetwork...");

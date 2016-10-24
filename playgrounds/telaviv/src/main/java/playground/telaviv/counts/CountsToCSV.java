@@ -45,7 +45,7 @@ public class CountsToCSV {
 	
 	public CountsToCSV(String countsInFile, String countsOutFile) throws IOException {
 		Counts <Link>counts = new Counts();
-		new CountsReaderMatsimV1(counts).parse(countsInFile);
+		new CountsReaderMatsimV1(counts).readFile(countsInFile);
 		
 		BufferedWriter writer = IOUtils.getBufferedWriter(countsOutFile, charset);
 		writeHeader(writer);
@@ -68,9 +68,9 @@ public class CountsToCSV {
 	}
 	
 	private void writeRow(BufferedWriter writer, Count count) throws IOException {
-		writer.write(count.getLocId().toString());
+		writer.write(count.getId().toString());
 		writer.write(separator);
-		writer.write(count.getCsId());
+		writer.write(count.getCsLabel());
 		for (int i = 1; i < 25; i++) {
 			writer.write(separator);
 			Volume volume = count.getVolume(i);

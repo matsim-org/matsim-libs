@@ -19,10 +19,11 @@
 
 package playground.johannes.gsv.sim.cadyts;
 
+import org.matsim.api.core.v01.network.Link;
+
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.supply.SimResults;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
-import org.matsim.api.core.v01.network.Link;
 import playground.johannes.gsv.sim.LinkOccupancyCalculator;
 
 /**

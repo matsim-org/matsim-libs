@@ -58,13 +58,13 @@ public class LegModeDepartureArrivalTimeHandler implements PersonDepartureEventH
 				List<Double> departureTimes  = personId2DepartureTime.get(personId);
 				departureTimes.add(departureTime);
 			} else {
-				List<Double> departureTimes = new ArrayList<Double>();
+				List<Double> departureTimes = new ArrayList<>();
 				departureTimes.add(departureTime);
 				personId2DepartureTime.put(personId, departureTimes );
 			}
 		} else {
 			Map<Id<Person>, List<Double> > personId2DepartureTime = new HashMap<>();
-			List<Double>   departureTimes  = new ArrayList<Double>();
+			List<Double>   departureTimes  = new ArrayList<>();
 			departureTimes.add(departureTime);
 			personId2DepartureTime.put(personId, departureTimes);
 			this.mode2PersonId2DepartureTime.put(legMode, personId2DepartureTime);
@@ -83,13 +83,13 @@ public class LegModeDepartureArrivalTimeHandler implements PersonDepartureEventH
 				List<Double> arrivalTimes = personId2ArrivalTime.get(personId);
 				arrivalTimes.add(arrivalTime);
 			} else {
-				List<Double> arrivalTimes  = new ArrayList<Double>();
+				List<Double> arrivalTimes  = new ArrayList<>();
 				arrivalTimes.add(arrivalTime);
 				personId2ArrivalTime.put(personId,arrivalTimes );
 			}
 		} else {
 			Map<Id<Person>, List<Double> > personId2ArrivalTime = new HashMap<>();
-			List<Double> arrivalTimes  = new ArrayList<Double>();
+			List<Double> arrivalTimes  = new ArrayList<>();
 			arrivalTimes.add(arrivalTime);
 			personId2ArrivalTime.put(personId, arrivalTimes);
 			this.mode2PersonId2ArrivalTime.put(legMode, personId2ArrivalTime);

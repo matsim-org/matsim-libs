@@ -54,6 +54,7 @@ public class QVehicle extends QItem implements MobsimVehicle {
 
 	private static int warnCount = 0;
 
+	private double linkEnterTime = 0. ;
 	private double earliestLinkExitTime = 0;
 	private DriverAgent driver = null;
 	private Collection<PassengerAgent> passengers = null;
@@ -211,5 +212,14 @@ public class QVehicle extends QItem implements MobsimVehicle {
 	@Override
 	public int getPassengerCapacity() {
 		return this.passengerCapacity;
+	}
+
+	final double getLinkEnterTime() {
+		return this.linkEnterTime;
+	}
+
+	final void setLinkEnterTime(double linkEnterTime) {
+		// yyyyyy use in code!
+		this.linkEnterTime = linkEnterTime;
 	}
 }

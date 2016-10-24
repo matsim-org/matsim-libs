@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover;
-import org.matsim.contrib.common.randomizedtransitrouter.RandomizedTransitRouterModule;
+import org.matsim.contrib.common.randomizedtransitrouter.RandomizingTransitRouterModule;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
@@ -231,8 +231,8 @@ public class RunPSim {
                 }
             });
             disutilityFactory.setSigma(0.1);
+            matsimControler.addOverridingModule(new RandomizingTransitRouterModule());
 
-            matsimControler.addOverridingModule(new RandomizedTransitRouterModule());
         }
 
         if (TrackGenome) {
@@ -259,9 +259,9 @@ public class RunPSim {
                 appendString;
         config.controler().setOutputDirectory(outputDirectory);
         matsimControler.getConfig().controler().setOverwriteFileSetting(
-                true ?
-                        OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-                        OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
     }
 
     public static void main(String args[]) throws ParseException {

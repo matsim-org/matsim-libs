@@ -1,6 +1,8 @@
 package opdytsintegration.utils;
 
 /**
+ * Computes recursively the average value of an integer counting process over a
+ * time dimension.
  * 
  * @author Gunnar Flötteröd
  *
@@ -19,6 +21,10 @@ public class RecursiveCountAverage {
 
 	// -------------------- CONSTRUCTION --------------------
 
+	/**
+	 * @param initialTime
+	 *            the time from which on one wishes to average
+	 */
 	public RecursiveCountAverage(final double initialTime) {
 		this.initialTime = initialTime;
 		this.lastTime = initialTime;
@@ -36,13 +42,10 @@ public class RecursiveCountAverage {
 
 	public void advanceTo(final double time) {
 		if (time < this.lastTime) {
-			throw new IllegalArgumentException("current time " + time
-					+ " is before last time " + this.lastTime);
+			throw new IllegalArgumentException("current time " + time + " is before last time " + this.lastTime);
 		}
-		final double innoWeight = (time - this.lastTime)
-				/ Math.max(1e-8, time - this.initialTime);
-		this.averageValue = (1.0 - innoWeight) * this.averageValue + innoWeight
-				* this.lastValue;
+		final double innoWeight = (time - this.lastTime) / Math.max(1e-8, time - this.initialTime);
+		this.averageValue = (1.0 - innoWeight) * this.averageValue + innoWeight * this.lastValue;
 		this.lastTime = time;
 	}
 
@@ -52,6 +55,9 @@ public class RecursiveCountAverage {
 	}
 
 	public void dec(final double time) {
+		if (this.lastValue == 0) {
+			throw new RuntimeException("Cannot decrease a zero counting value further.");
+		}
 		this.advanceTo(time);
 		this.lastValue--;
 	}
@@ -77,7 +83,7 @@ public class RecursiveCountAverage {
 		avg.dec(4.0);
 		avg.dec(5.0);
 		avg.advanceTo(6.0);
-		System.out.println("Average between " + avg.getInitialTime() + " and "
-				+ avg.getFinalTime() + " is " + avg.getAverage());
+		System.out.println(
+				"Average between " + avg.getInitialTime() + " and " + avg.getFinalTime() + " is " + avg.getAverage());
 	}
 }

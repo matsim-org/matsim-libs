@@ -48,7 +48,7 @@ public class ConvertCliquesToHouseholds {
 				0.5;
 
 		final ConvertingParser parser = new ConvertingParser();
-		parser.parse( inputFile );
+		parser.readFile( inputFile );
 
 		int currentVehicle = 0;
 		for ( Household household : parser.households.getHouseholds().values() ) {
@@ -72,7 +72,7 @@ public class ConvertCliquesToHouseholds {
 		private List<Id<Person>> currentMembers = null;
 
 		public ConvertingParser() {
-			super( false );
+			setValidating( false );
 		}
 
 		@Override

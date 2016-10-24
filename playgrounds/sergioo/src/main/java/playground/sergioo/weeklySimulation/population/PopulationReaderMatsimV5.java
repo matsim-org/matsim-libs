@@ -33,8 +33,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -49,7 +49,7 @@ import playground.sergioo.weeklySimulation.util.misc.Time;
  * @author mrieser
  * @author balmermi
  */
-public class PopulationReaderMatsimV5 extends MatsimXmlParser implements MatsimPopulationReader {
+public class PopulationReaderMatsimV5 extends MatsimXmlParser implements MatsimReader {
 
 	private final static String POPULATION = "population";
 	private final static String PERSON = "person";
@@ -139,16 +139,6 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements MatsimP
 		} else if (ROUTE.equals(name)) {
 			this.routeDescription = content;
 		}
-	}
-
-	/**
-	 * Parses the specified plans file. This method calls {@link #parse(String)}.
-	 *
-	 * @param filename The name of the file to parse.
-	 */
-	@Override
-	public void readFile(final String filename) throws UncheckedIOException {
-		parse(filename);
 	}
 
 	private void startPopulation(final Attributes atts) {

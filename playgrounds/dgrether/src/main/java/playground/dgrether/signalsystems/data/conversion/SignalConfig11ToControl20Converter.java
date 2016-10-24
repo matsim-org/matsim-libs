@@ -91,20 +91,11 @@ public class SignalConfig11ToControl20Converter {
 	}
 
 	private XMLSignalSystemConfig readSignalConfigs11(String signalConfigs11) {
-		SignalSystemConfigurationsReader11 reader = new SignalSystemConfigurationsReader11("http://www.matsim.org/files/dtd/signalSystemsConfig_v1.1.xsd");
-		XMLSignalSystemConfig xmlSignalControl = null;
 		try {
-			xmlSignalControl = reader.readSignalSystemConfig11File(signalConfigs11);
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (JAXBException e) {
-			e.printStackTrace();
+			return new SignalSystemConfigurationsReader11().readSignalSystemConfig11File(signalConfigs11);
+		} catch (SAXException | ParserConfigurationException | JAXBException | IOException e) {
+			throw new RuntimeException(e);
 		}
-		return xmlSignalControl;
 	}
 
 	private Tuple<XMLSignalControl, XMLAmberTimes> createSignalControl20AndAmberTimes10(
@@ -139,7 +130,7 @@ public class SignalConfig11ToControl20Converter {
 				signalControler20.setControllerIdentifier(adaptivecontrolInfo11.getAdaptiveControler());
 			}
 		}
-		return new Tuple<XMLSignalControl, XMLAmberTimes>(signalControl20, amberTimes10);
+		return new Tuple<>(signalControl20, amberTimes10);
 	}
 	
 	private XMLSignalSystem searchAmberSignalSystem(List<XMLSignalSystem> amberSystems, String id){
@@ -187,7 +178,7 @@ public class SignalConfig11ToControl20Converter {
 		plan20.setOffset(xmlOffset);
 		xmlOffset.setSec(plan11.getSynchronizationOffset().getSec());
 		
-		List<XMLSignal> amberSignals = new ArrayList<XMLSignal>();
+		List<XMLSignal> amberSignals = new ArrayList<>();
 		//process signalGroupSettings
 		for (org.matsim.jaxb.signalsystemsconfig11.XMLSignalGroupSettingsType settings11 : plan11.getSignalGroupSettings()){
 			XMLSignalGroupSettingsType xmlSgSettings = fac20.createXMLSignalGroupSettingsType();
@@ -226,13 +217,10 @@ public class SignalConfig11ToControl20Converter {
 				amberSignals.add(amberSignal);
 			}
 		}
-		return new Tuple<XMLSignalPlanType, List<XMLSignal>>(plan20, amberSignals);
+		return new Tuple<>(plan20, amberSignals);
 	}
 	
 	
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		String base = "./test/input/org/matsim/";
 		//one agent test

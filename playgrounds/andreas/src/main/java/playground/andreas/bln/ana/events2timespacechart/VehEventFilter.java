@@ -127,7 +127,7 @@ class VehEventFilter implements VehicleDepartsAtFacilityEventHandler, VehicleArr
 		events.addHandler(this);
 		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(filename);
+		reader.readFile(filename);
 	}
 
 	public void addVehToEvaluate(Id veh) {

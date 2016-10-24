@@ -20,7 +20,6 @@
 package playground.dgrether.koehlerstrehlersignal.demand;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.NetworkImpl;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.signalsystems.utils.DgSignalsBoundingBox;
@@ -61,7 +60,7 @@ public class ZoneBuilder {
 		zoneOdWriter.writePolygonZones2Shapefile(shapeFileDirectory + "zones.shp");
 
 	//zones to links matching
-		DgZoneUtils.createZoneCenter2LinkMapping(zones, (NetworkImpl)network);
+		DgZoneUtils.createZoneCenter2LinkMapping(zones, (Network)network);
 		DgZoneUtils.writeLinksOfZones2Shapefile(zones, crs, shapeFileDirectory + "links_for_zones.shp");
 		
 		return zones;

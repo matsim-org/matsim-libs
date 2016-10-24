@@ -1,11 +1,13 @@
 package org.matsim.contrib.transEnergySim.vehicles.energyConsumption;
 
+import java.io.Serializable;
+
 /**
  * container for energy consumption for driving at given given speed.
  * 
  * @author rashid_waraich
  */
-public class EnergyConsumption implements Comparable<EnergyConsumption> {
+public class EnergyConsumption implements Comparable<EnergyConsumption>,Serializable {
 	private double speedInMeterPerSecond=0;
 	private double energyConsumptionInJoule=0; // consumed energy in [J] (by driving one meter with the given speed)
 	

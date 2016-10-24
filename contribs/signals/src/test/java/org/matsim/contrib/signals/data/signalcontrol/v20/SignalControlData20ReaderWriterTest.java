@@ -29,7 +29,6 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.signals.MatsimSignalSystemsReader;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
@@ -68,7 +67,7 @@ public class SignalControlData20ReaderWriterTest {
 	@Test
 	public void testReader() throws JAXBException, SAXException, ParserConfigurationException, IOException{
 		SignalControlData controlData = new SignalControlDataImpl();
-		SignalControlReader20 reader = new SignalControlReader20(controlData, MatsimSignalSystemsReader.SIGNALCONTROL20);
+		SignalControlReader20 reader = new SignalControlReader20(controlData);
 		reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
 		checkContent(controlData);
 	}
@@ -79,7 +78,7 @@ public class SignalControlData20ReaderWriterTest {
   	log.debug("reading file...");
   	//read the test file
 		SignalControlData controlData = new SignalControlDataImpl();
-		SignalControlReader20 reader = new SignalControlReader20(controlData, MatsimSignalSystemsReader.SIGNALCONTROL20);
+		SignalControlReader20 reader = new SignalControlReader20(controlData);
 		reader.readFile(this.testUtils.getPackageInputDirectory() + TESTXML);
   	
   	//write the test file
@@ -89,7 +88,7 @@ public class SignalControlData20ReaderWriterTest {
   	
   	log.debug("and read it again");
 		controlData = new SignalControlDataImpl();
-		reader = new SignalControlReader20(controlData, MatsimSignalSystemsReader.SIGNALCONTROL20);
+		reader = new SignalControlReader20(controlData);
 		reader.readFile(testoutput);
   	checkContent(controlData);
   }

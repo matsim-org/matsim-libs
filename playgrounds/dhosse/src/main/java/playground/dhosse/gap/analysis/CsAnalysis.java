@@ -19,8 +19,8 @@ import org.matsim.contrib.minibus.genericUtils.RecursiveStatsContainer;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -52,7 +52,7 @@ public class CsAnalysis {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(Global.runInputDir + "networkMultimodal.xml");
 		ObjectAttributes attributes = new ObjectAttributes();
-		new ObjectAttributesXmlReader(attributes).parse(Global.runInputDir + "subpopulationAtts.xml");
+		new ObjectAttributesXmlReader(attributes).readFile(Global.runInputDir + "subpopulationAtts.xml");
 		
 		BufferedReader reader = IOUtils.getBufferedReader("/home/dhosse/cs_stations/" + sc + "/" + it + ".OW_CS");
 		Set<String> userIds = new HashSet<>();

@@ -65,7 +65,7 @@ public class TollInfoHandler implements PersonMoneyEventHandler {
 			}
 
 		} else {
-			Map<Id<Person>,Double> person2Toll = new HashMap<Id<Person>, Double>();
+			Map<Id<Person>,Double> person2Toll = new HashMap<>();
 			person2Toll.put(event.getPersonId(), event.getAmount());
 			timeBin2Person2Toll.put(endOfTimeInterval, person2Toll);
 		}
@@ -82,7 +82,7 @@ public class TollInfoHandler implements PersonMoneyEventHandler {
 	 * @return timeBin to toll values for whole population
 	 */
 	public SortedMap<Double,Double> getTimeBin2Toll(){
-		SortedMap<Double, Double> timebin2Toll = new TreeMap<Double, Double>();
+		SortedMap<Double, Double> timebin2Toll = new TreeMap<>();
 		for (double d :this.timeBin2Person2Toll.keySet()){
 			timebin2Toll.put(d, MapUtils.doubleValueSum(timeBin2Person2Toll.get(d)));
 		}

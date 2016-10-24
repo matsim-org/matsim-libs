@@ -21,6 +21,8 @@
 package org.matsim.core.utils.io;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.internal.MatsimReader;
+import org.matsim.core.gbl.Gbl;
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -33,26 +35,30 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Stack;
+import java.util.zip.GZIPInputStream;
 
 /**
  * An abstract XML-Parser which can be easily extended for reading custom XML-formats. This class handles all the low level
  * functionality required to parse xml-files. Extending classes have only to implement {@link #startTag} and {@link #endTag}
  * to implement a custom parser.<br/>
- * The parser implements a custom <code>EntityResolver</code> to look
+ * The parser implements a custom <code>EntityResolver</code> to look for DTDs in the MATSim world.
+ * <p/>
+ * Notes:<ul>
+ * <li> If implementing classes want to override the final methods, the will have to resort to delegation.   
+ * </ul>
  *
  * @author mrieser
  */
-public abstract class MatsimXmlParser extends DefaultHandler {
+public abstract class MatsimXmlParser extends DefaultHandler implements MatsimReader {
 
 	private static final Logger log = Logger.getLogger(MatsimXmlParser.class);
 
-	private final Stack<StringBuffer> buffers = new Stack<StringBuffer>();
-	private final Stack<String> context = new Stack<String>();
+	private final Stack<StringBuffer> buffers = new Stack<>();
+	private final Stack<String> theContext = new Stack<>();
 
 	private boolean isValidating = true;
 	private boolean isNamespaceAware = true;
 
-//	private String localDtdBase = "dtd";
 	private String localDtdBase = null;
 	// yy this is NOT working for me with "dtd", but it IS working with null. 
 	// Note that I am typically NOT running java from the root of the classpath. kai, mar'15
@@ -64,17 +70,12 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	 * As the mechanism implemented in InputSource is not really working for error handling
 	 * the source to be parsed is stored here for error handling.
 	 */
-	private String source;
+	private String theSource;
 
 	/**
 	 * Creates a validating XML-parser.
 	 */
 	public MatsimXmlParser() {
-		this(true);
-	}
-
-	public MatsimXmlParser(final boolean validateXml) {
-		this.isValidating = validateXml;
 		String localDtd = System.getProperty("matsim.preferLocalDtds");
 		if (localDtd != null) {
 			this.preferLocalDtds = Boolean.parseBoolean(localDtd);
@@ -107,7 +108,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	 *
 	 * @param validateXml Whether the parsed XML should be validated or not.
 	 */
-	public void setValidating(final boolean validateXml) {
+	public final void setValidating(final boolean validateXml) {
 		this.isValidating = validateXml;
 	}
 
@@ -118,7 +119,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	 * @param awareness true if the parser produced by this code will provide support for XML namespaces; false otherwise.
 	 * @see{javax.xml.parsers.SAXParserFactory.setNamespaceAware(boolean)}
 	 */
-	public void setNamespaceAware(final boolean awareness) {
+	public final void setNamespaceAware(final boolean awareness) {
 		this.isNamespaceAware = awareness;
 	}
 
@@ -128,7 +129,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	 *
 	 * @param localDtdDirectory
 	 */
-	public void setLocalDtdDirectory(final String localDtdDirectory) {
+	public final void setLocalDtdDirectory(final String localDtdDirectory) {
 		this.localDtdBase = localDtdDirectory;
 	}
 
@@ -141,24 +142,34 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	 * @param filename The filename of the file to read, optionally ending with ".gz" to force reading a gzip-compressed file.
 	 * @throws UncheckedIOException
 	 */
-	public void parse(final String filename) throws UncheckedIOException {
+	@Override
+	public final void readFile(final String filename) throws UncheckedIOException {
 		log.info("starting to parse xml from file " + filename + " ...");
-		this.source = filename;
+		this.theSource = filename;
 		parse(new InputSource(IOUtils.getBufferedReader(filename)));
 	}
 
-	public void parse(final URL url) throws UncheckedIOException {
-		this.source = url.toString();
-		log.info("starting to parse xml from url " + this.source + " ...");
-		parse(new InputSource(url.toExternalForm()));
+	public final void parse(final URL url) throws UncheckedIOException {
+		Gbl.assertNotNull(url);
+		this.theSource = url.toString();
+		log.info("starting to parse xml from url " + this.theSource + " ...");
+		if (url.getFile().endsWith(".gz")) {
+			try {
+				parse(new InputSource(new GZIPInputStream(url.openStream())));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			parse(new InputSource(url.toExternalForm()));
+		}
 	}
 
-	public void parse(final InputStream stream) throws UncheckedIOException {
-		this.source = "stream";
+	public final void parse(final InputStream stream) throws UncheckedIOException {
+		this.theSource = "stream";
 		parse(new InputSource(stream));
 	}
 
-	protected void parse(final InputSource input) throws UncheckedIOException {
+	public final void parse(final InputSource input) throws UncheckedIOException {
 		try {
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			factory.setValidating(this.isValidating);
@@ -169,42 +180,47 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 				SAXParser parser = factory.newSAXParser();
 				XMLReader reader = parser.getXMLReader();
 				reader.setContentHandler(this);
-				reader.setErrorHandler(getErrorHandler());
-				reader.setEntityResolver(getEntityResolver());
+//				reader.setErrorHandler(getErrorHandler());      // (**)
+//				reader.setEntityResolver(getEntityResolver()); // (**)
+				reader.setErrorHandler(this);
+				reader.setEntityResolver(this);
 				reader.parse(input);
 			} else {
 				SAXParser parser = factory.newSAXParser();
 				parser.parse(input, this);
 			}
-		} catch (SAXException e) {
-			throw new UncheckedIOException(e);
-		} catch (ParserConfigurationException e) {
-			throw new UncheckedIOException(e);
-		} catch (IOException e) {
+		} catch (SAXException | ParserConfigurationException | IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
 
-	protected ErrorHandler getErrorHandler() {
-		return this;
-	}
-
-	protected EntityResolver getEntityResolver() {
-		return this;
-	}
+	// the following may be useful.  But it is nowhere used, so I am not sure if we fully understand its longterm maintenance implications, 
+	// so I rather comment it out. If it is needed somewhere, just comment it back in (and probably (**) above) 
+	// and leave a comment.  kai, jul'16
+//	protected ErrorHandler getErrorHandler() {
+//		return this;
+//	}
+//
+//	protected EntityResolver getEntityResolver() {
+//		return this;
+//	}
 
 	public final String getDoctype() {
 		return this.doctype;
 	}
 
 	protected void setDoctype(final String doctype) {
+		// implementation of this method is what reacts to the different version of the file formats, so we cannot make it final. kai, jul'16
+		
 		this.doctype = doctype;
 	}
 
 	/* implement EntityResolver */
 
 	@Override
-	public InputSource resolveEntity(final String publicId, final String systemId) {
+	public final InputSource resolveEntity(final String publicId, final String systemId) {
+		// ConfigReader* did override this.  Not sure if it did that for good reaons.  kai, jul'16
+		
 		// extract the last part of the systemId
 		int index = systemId.replace('\\', '/').lastIndexOf('/');
 		String shortSystemId = systemId.substring(index + 1);
@@ -249,7 +265,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 		return source;
     }
 
-	private InputSource findDtdInRemoteLocation(final String fullSystemId) {
+	private static InputSource findDtdInRemoteLocation(final String fullSystemId) {
 		log.info("Trying to load " + fullSystemId + ". In some cases (e.g. network interface up but no connection), this may take a bit.");
 		try {
 			URL url = new URL(fullSystemId);
@@ -274,9 +290,9 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 		if (this.localDtdBase != null) {
 			String localFileName = this.localDtdBase + "/" + shortSystemId;
 			File dtdFile = new File(localFileName);
-			log.debug("dtdfile: " + dtdFile.getAbsolutePath());
+//			log.debug("dtdfile: " + dtdFile.getAbsolutePath());
 			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
-				log.info("Using the local DTD " + localFileName);
+				log.info("Using the local DTD " + localFileName + " with absolute path " + dtdFile.getAbsolutePath() );
 				return new InputSource(dtdFile.getAbsolutePath());
 			}
 		}
@@ -287,13 +303,13 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 		// still no success, try to load it with the ClassLoader, in case we're stuck in a jar...
 		InputStream stream = this.getClass().getResourceAsStream("/dtd/" + shortSystemId);
 		if (stream != null) {
-			log.info("Using local DTD from classpath: /dtd/" + shortSystemId);
+			log.info("Using local DTD from classpath:dtd/" + shortSystemId);
 			return new InputSource(stream);
 		}
 		return null;
 	}
 	
-	private InputSource findDtdInDefaultLocation(final String shortSystemId) {
+	private static InputSource findDtdInDefaultLocation(final String shortSystemId) {
 		log.info("Trying to access local dtd folder at standard location ./dtd...");
 		File dtdFile = new File("./dtd/" + shortSystemId);
 		if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
@@ -307,6 +323,8 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 
 	@Override
 	public void characters(final char[] ch, final int start, final int length) throws SAXException {
+		// has to be non-final since otherwise the events parser does not work.  Probably ok (this here is just a default implementation). kai, jul'16
+		
 		StringBuffer buffer = this.buffers.peek();
 		if (buffer != null) {
 			buffer.append(ch, start, length);
@@ -315,25 +333,29 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 
 	@Override
 	public final void startElement(final String uri, final String localName, final String qName, Attributes atts) throws SAXException {
+		// I have not good intuition if making this one non-final might be ok.  kai, jul'16
+
 		String tag = (uri.length() == 0) ? qName : localName;
 		this.buffers.push(new StringBuffer());
-		this.startTag(tag, atts, this.context);
-		this.context.push(tag);
+		this.startTag(tag, atts, this.theContext);
+		this.theContext.push(tag);
 	}
 
 	@Override
-	public void endElement(final String uri, final String localName, final String qName) throws SAXException {
+	public final void endElement(final String uri, final String localName, final String qName) throws SAXException {
+		// I have not good intuition if making this one non-final might be ok.  kai, jul'16
+		
 		String tag = (uri.length() == 0) ? qName : localName;
-		this.context.pop();
+		this.theContext.pop();
 		StringBuffer buffer = this.buffers.pop();
-		this.endTag(tag, buffer.toString(), this.context);
+		this.endTag(tag, buffer.toString(), this.theContext);
 	}
 
 	/* implement ErrorHandler */
 
 	@Override
-	public void error(final SAXParseException ex) throws SAXException {
-		if (this.context.isEmpty()) {
+	public final void error(final SAXParseException ex) throws SAXException {
+		if (this.theContext.isEmpty()) {
 			System.err.println("Missing DOCTYPE.");
 		}
 		System.err.println("XML-ERROR: " + getInputSource(ex) + ", line " + ex.getLineNumber() + ", column " + ex.getColumnNumber() + ":");
@@ -342,14 +364,14 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	}
 
 	@Override
-	public void fatalError(final SAXParseException ex) throws SAXException {
+	public final void fatalError(final SAXParseException ex) throws SAXException {
 		System.err.println("XML-FATAL: " + getInputSource(ex) + ", line " + ex.getLineNumber() + ", column " + ex.getColumnNumber() + ":");
 		System.err.println(ex.toString());
 		throw ex;
 	}
 
 	@Override
-	public void warning(final SAXParseException ex) throws SAXException {
+	public final void warning(final SAXParseException ex) throws SAXException {
 		System.err.println("XML-WARNING: " + getInputSource(ex) + ", line " + ex.getLineNumber() + ", column " + ex.getColumnNumber() + ":");
 		System.err.println(ex.getMessage());
 	}
@@ -367,7 +389,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 			return ex.getPublicId();
 		}
 		//try to use the locally stored inputSource
-		return this.source;
+		return this.theSource;
 	}
 
 }

@@ -41,9 +41,8 @@ import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -99,6 +98,7 @@ public class InputsForFDTestSetUp {
 		config.qsim().setMainModes(Arrays.asList(this.travelModes));
 		config.qsim().setStuckTime(stuckTime);//allows to overcome maximal density regime
 		config.qsim().setEndTime(END_TIME);
+		config.qsim().setUsingFastCapacityUpdate(true);
 
 		config.qsim().setLinkDynamics(linkDynamics.toString());
 		GenerateFundamentalDiagramData.LOG.info("==========The chosen link dynamics is "+linkDynamics+". =========="); 
@@ -153,7 +153,7 @@ public class InputsForFDTestSetUp {
 
 		if(isTimeDependentNetwork) {
 			scenario.getConfig().network().setTimeVariantNetwork(true);
-			NetworkImpl netImpl = (NetworkImpl) scenario.getNetwork();
+			Network netImpl = (Network) scenario.getNetwork();
 			netImpl.getFactory().setLinkFactory( new VariableIntervalTimeVariantLinkFactory() );
 		}
 

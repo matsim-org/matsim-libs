@@ -26,13 +26,13 @@ public class ConfigToCluster {
 		cc.setOutputDirectory(pathForCluster + "output/" );
 
 		CountsConfigGroup counts = config.counts();
-		counts.setCountsFileName(pathForCluster + "input/counts_merged_VEH_C01.xml" );
+		counts.setInputFile(pathForCluster + "input/counts_merged_VEH_C01.xml" );
 
 		NetworkConfigGroup net = config.network();
 		net.setInputFile(pathForCluster + "input/network_merged_cl.xml.gz" );
 		
 		PlansConfigGroup plans = config.plans();
-		plans.setInputPersonAttributeFile(pathForCluster + "input/agentAttributes.xml" );
+		plans.setInputPersonAttributeFile(pathForCluster + "input/expandedAgentAttributes.xml" );
 		plans.setInputFile(pathForCluster + "input/randomized_expanded_plans.xml.gz" );
 		
 		TransitConfigGroup transit = config.transit();

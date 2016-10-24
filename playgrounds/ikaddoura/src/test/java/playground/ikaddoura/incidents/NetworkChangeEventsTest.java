@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.TimeVariantLinkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -54,8 +53,8 @@ public class NetworkChangeEventsTest {
 		
 		Scenario scenario = loadScenario();
 				
-//		LinkImpl link = (LinkImpl) scenario.getNetwork().getLinks().get(linkId1);
-		TimeVariantLinkImpl link = (TimeVariantLinkImpl) scenario.getNetwork().getLinks().get(linkId1);
+		Link link = (Link) scenario.getNetwork().getLinks().get(linkId1);
+//		TimeVariantLinkImpl link = (TimeVariantLinkImpl) scenario.getNetwork().getLinks().get(linkId1);
 		
 		Assert.assertEquals("Wrong capacity (before network change event).", 1000. / 3600., link.getFlowCapacityPerSec(6 * 3600.), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong capacity (after network change event).", 123., link.getFlowCapacityPerSec(16 * 3600.), MatsimTestUtils.EPSILON);

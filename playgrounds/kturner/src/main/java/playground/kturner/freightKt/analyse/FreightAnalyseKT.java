@@ -54,10 +54,10 @@ public class FreightAnalyseKT {
 			EventsManager events = EventsUtils.createEventsManager();
 			
 			CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-			new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPEFILE) ;
+			new CarrierVehicleTypeReader(vehicleTypes).readFile(VEHTYPEFILE) ;
 			
 			Carriers carriers = new Carriers() ;
-			new CarrierPlanXmlReaderV2(carriers).read(carrierFile) ;
+			new CarrierPlanXmlReaderV2(carriers).readFile(carrierFile) ;
 
 			TripEventHandler tripHandler = new TripEventHandler(scenario, vehicleTypes);
 			events.addHandler(tripHandler);

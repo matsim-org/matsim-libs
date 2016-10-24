@@ -23,14 +23,13 @@ import java.util.Arrays;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -66,7 +65,7 @@ public class ShockwaveExperiment {
 
 		if (! isUsingOTFVis ) { //necessary to avoid placement on link/lane (2-D) if using the data to plot only one-D space.
 			sc.getConfig().qsim().setLinkWidthForVis((float)0);
-			((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(0.);		
+			((Network) sc.getNetwork()).setEffectiveLaneWidth(0.);		
 		}
 
 		ScenarioUtils.loadScenario(sc);
@@ -74,18 +73,19 @@ public class ShockwaveExperiment {
 
 
 		double flowCapBefore = desiredLink.getCapacity();
-		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl() ;
 		{
-			NetworkChangeEvent event = cef.createNetworkChangeEvent(35.*60.) ;
-			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, 0.0)); 
+			NetworkChangeEvent event = new NetworkChangeEvent(35.*60.) ;
+			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 0.0)); 
 			event.addLink(desiredLink);
-			((NetworkImpl)sc.getNetwork()).addNetworkChangeEvent(event);
+			final NetworkChangeEvent event1 = event;
+			NetworkUtils.addNetworkChangeEvent(((Network)sc.getNetwork()),event1);
 		}
 		{
-			NetworkChangeEvent event = cef.createNetworkChangeEvent(35.*60.+60*5) ;
-			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, flowCapBefore/3600.)); // value should be in pcu/s
+			NetworkChangeEvent event = new NetworkChangeEvent(35.*60.+60*5) ;
+			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, flowCapBefore/3600.)); // value should be in pcu/s
 			event.addLink(desiredLink);
-			((NetworkImpl)sc.getNetwork()).addNetworkChangeEvent(event);
+			final NetworkChangeEvent event1 = event;
+			NetworkUtils.addNetworkChangeEvent(((Network)sc.getNetwork()),event1);
 		}
 		generateFDData.run();
 	}

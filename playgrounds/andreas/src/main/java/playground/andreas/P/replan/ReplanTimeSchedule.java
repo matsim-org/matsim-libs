@@ -24,7 +24,6 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
@@ -63,7 +62,7 @@ public class ReplanTimeSchedule {
 			if(plan.getBestPlan() != null){
 				inSchedule.addTransitLine(plan.getBestPlan());
 			} else {
-				inSchedule.addTransitLine(CreateInitialTimeSchedule.createSingleTransitLine((NetworkImpl) net, inSchedule, plan.getAgentId()));
+				inSchedule.addTransitLine(CreateInitialTimeSchedule.createSingleTransitLine((Network) net, inSchedule, plan.getAgentId()));
 			}				
 		}	
 		new TransitScheduleWriterV1(inSchedule).write(pConfig.getNextOutputBase() + "transitSchedule.xml");

@@ -57,7 +57,7 @@ public class DelayAnalyzer {
 		this.handler = new DelayHandler(this.treshold, this.schedule);
 		events.addHandler(this.handler);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(filename);
+		reader.readFile(filename);
 		
 //		handler.printStats();
 	}

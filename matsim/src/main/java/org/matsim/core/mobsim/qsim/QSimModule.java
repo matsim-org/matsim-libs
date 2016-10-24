@@ -30,7 +30,17 @@ public class QSimModule extends AbstractModule {
 		if ( config.qsim().isUseLanes() ) { 
 			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ) ;
 		} else {
-			bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
+			switch( config.qsim().getTrafficDynamics() ) {
+//			case assignmentEmulating:
+//				bind(QNetworkFactory.class).to( AssignmentEmulatingQLaneNetworkFactory.class ) ;
+//				break;
+			case queue:
+			case withHoles:
+				bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
+				break;
+			default:
+				throw new RuntimeException("not implemented") ;
+			}
 		}
 	}
 

@@ -8,12 +8,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-
+import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.*;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
@@ -38,10 +35,10 @@ public class FakeScenario {
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimFacilitiesReader(scenario).readFile("out/dcs.xml");
         new MatsimFacilitiesReader(scenario).readFile("out/pharmacies.xml");
-        new NetworkReaderMatsimV1(scenario.getNetwork()).parse("/Users/schroeder/DLR/Pharma/data/network.xml");
+        new NetworkReaderMatsimV1(scenario.getNetwork()).readFile("/Users/schroeder/DLR/Pharma/data/network.xml");
         ActivityFacilities facilities = scenario.getActivityFacilities();
 
-        new WorldConnectLocations(config).connectFacilitiesWithLinks(facilities, (NetworkImpl) scenario.getNetwork());
+        new WorldConnectLocations(config).connectFacilitiesWithLinks(facilities, (Network) scenario.getNetwork());
 
         ActivityFacility dlr = facilities.getFacilitiesForActivityType("pickup").values().iterator().next();
 

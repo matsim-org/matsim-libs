@@ -19,23 +19,13 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import java.util.*;
 import javax.inject.Inject;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -107,24 +97,46 @@ public final class PopulationAgentSource implements AgentSource {
 
 	private void insertVehicles(Person p) {
 		Plan plan = p.getSelectedPlan();
-		Set<String> seenModes = new HashSet<>();
+		Map<String,Id<Vehicle>> seenModes = new HashMap<>();
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof Leg) {
 				Leg leg = (Leg) planElement;
 				if (this.mainModes.contains(leg.getMode())) { // only simulated modes get vehicles
-					if (!seenModes.contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
-						NetworkRoute route = (NetworkRoute) leg.getRoute();
-						Id<Vehicle> vehicleId = null ;
-						if (route != null) {
-							vehicleId = route.getVehicleId(); // may be null!
-						}
+					NetworkRoute route = (NetworkRoute) leg.getRoute();
+					Id<Vehicle> vehicleId = null ;
+					if (route != null) {
+						vehicleId = route.getVehicleId(); // may be null!
+					}
+					if (!seenModes.keySet().contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
+						// yyyy this is already getting rather messy; need to consider simplifications ...  kai/amit, sep'16
+						
 						if (vehicleId == null) {
 							if (qsim.getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
-								vehicleId = Id.create(p.getId(), Vehicle.class);
+
+								switch (qsim.getScenario().getConfig().qsim().getVehiclesSource()) {
+									case defaultVehicle:
+									case fromVehiclesData:
+										vehicleId = Id.createVehicleId(p.getId());
+										break;
+									case modeVehicleTypesFromVehiclesData:
+										if(!leg.getMode().equals(TransportMode.car)) {
+											String vehIdString = p.getId().toString() + "_" + leg.getMode() ;
+											vehicleId = Id.create(vehIdString, Vehicle.class);
+										} else {
+											vehicleId = Id.createVehicleId(p.getId());
+										}
+										break;
+									default:
+										throw new RuntimeException("not implemented") ;
+								}
+								if(route!=null) route.setVehicleId(vehicleId);
 							} else {
 								throw new IllegalStateException("Found a network route without a vehicle id.");
 							}
 						}
+
+						// so here we have a vehicle id, now try to find or create a physical vehicle:
+						
 						Vehicle vehicle = null ;
 						switch ( qsim.getScenario().getConfig().qsim().getVehiclesSource() ) {
 						case defaultVehicle:
@@ -140,6 +152,8 @@ public final class PopulationAgentSource implements AgentSource {
 						default:
 							throw new RuntimeException("not implemented") ;
 						}
+						
+						// place the vehicle:
 						Id<Link> vehicleLinkId = findVehicleLink(p);
 						
 						// Checking if the vehicle has been seen before:
@@ -155,7 +169,12 @@ public final class PopulationAgentSource implements AgentSource {
 							this.seenVehicleIds.put( vehicleId, vehicleLinkId ) ;
 							qsim.createAndParkVehicleOnLink(vehicle, vehicleLinkId);
 						}
-						seenModes.add(leg.getMode());
+						seenModes.put(leg.getMode(),vehicleId);
+					} else {
+						if (vehicleId==null && route!=null) {
+							vehicleId = seenModes.get(leg.getMode());
+							route.setVehicleId( vehicleId );
+						}
 					}
 				}
 			}

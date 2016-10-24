@@ -9,6 +9,8 @@ public class PHEV extends AbstractHybridElectricVehicle {
 
 	public PHEV(EnergyConsumptionModel ecm, EnergyConsumptionModel engineECM, double usableBatteryCapacityInJoules, Id<Vehicle> vehicleId) {
 		this.electricDriveEnergyConsumptionModel=ecm;
+		//TODO replace with real energy consumption model
+		this.setHybridDriveEnergyConsumptionModel(ecm);
 		this.engineECM=engineECM;
 		this.usableBatteryCapacityInJoules=usableBatteryCapacityInJoules;
 		this.socInJoules=usableBatteryCapacityInJoules;

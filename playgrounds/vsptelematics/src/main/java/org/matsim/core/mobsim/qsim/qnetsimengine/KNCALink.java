@@ -52,10 +52,9 @@ import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl.LaneFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
-import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -422,7 +421,7 @@ public class KNCALink {
 		private AgentSnapshotInfoFactory snapshotInfoFactory;
 
 		@Override void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
-			double effectiveCellSize = ((NetworkImpl)network).getEffectiveCellSize() ;
+			double effectiveCellSize = ((Network)network).getEffectiveCellSize() ;
 
 			SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 			linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );

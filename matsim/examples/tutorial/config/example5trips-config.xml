@@ -4,15 +4,15 @@
 <config>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="./examples/equil/network.xml" />
+		<param name="inputNetworkFile" value="../../equil/network.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="./examples/equil/plans100trips.xml" />
+		<param name="inputPlansFile" value="../../equil/plans100trips.xml" />
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="./output/example5trips" />
+		<param name="outputDirectory" value="./output/example" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
 		<param name="eventsFileFormat" value="xml" />

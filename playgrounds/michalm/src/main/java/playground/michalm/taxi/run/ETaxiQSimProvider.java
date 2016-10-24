@@ -43,6 +43,7 @@ import com.google.inject.name.Named;
 import playground.michalm.ev.data.EvData;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.assignment.*;
+import playground.michalm.taxi.optimizer.rules.*;
 import playground.michalm.taxi.scheduler.ETaxiScheduler;
 import playground.michalm.taxi.vrpagent.ETaxiActionCreator;
 

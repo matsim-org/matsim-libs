@@ -31,15 +31,15 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
+import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.StreamingUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.population.io.StreamingUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -114,9 +114,9 @@ public class ZurichFromSwitzerland {
 		log.info("  setting up population objects...");
 		Population pop = (Population) scenario.getPopulation();
 		StreamingUtils.setIsStreaming(pop, true);
-		PopulationWriter pop_writer = new PopulationWriter(pop, scenario.getNetwork());
+		StreamingPopulationWriter pop_writer = new StreamingPopulationWriter(pop, scenario.getNetwork());
 		pop_writer.startStreaming(filenameOutput);
-		MatsimPopulationReader pop_reader = new PopulationReader(scenario);
+		MatsimReader pop_reader = new PopulationReader(scenario);
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////

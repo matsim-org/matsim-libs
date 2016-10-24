@@ -30,7 +30,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.FakeFacility;
-import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;

@@ -21,7 +21,7 @@ package org.matsim.contrib.parking.lib.obj.network;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.QuadTree;
 
 /**
@@ -32,7 +32,7 @@ import org.matsim.core.utils.collections.QuadTree;
  */
 public class QuadTreeInitializer<T> {
 
-	public QuadTree<T> getLinkQuadTree(NetworkImpl network) {
+	public QuadTree<T> getLinkQuadTree(Network network) {
 		double minX = Double.MAX_VALUE;
 		double minY = Double.MAX_VALUE;
 		double maxX = Double.MIN_VALUE;

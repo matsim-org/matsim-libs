@@ -20,20 +20,20 @@
 
 package org.matsim.core.network;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.IdentifiableArrayMap;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-public class NodeImpl implements Node {
+/*deliberately package*/ class NodeImpl implements Node, Lockable {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -47,14 +47,16 @@ public class NodeImpl implements Node {
 
 	private Coord coord;
 	private final Id<Node> id;
+	private boolean locked = false ;
 
-	private final static Logger log = Logger.getLogger(NodeImpl.class);
+	private final static Logger log = Logger.getLogger(Node.class);
+	private final Attributes attributes = new Attributes();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	protected NodeImpl(final Id<Node> id, final Coord coord) {
+	NodeImpl(final Id<Node> id, final Coord coord) {
 		this(id, coord, null);
 	}
 
@@ -104,12 +106,13 @@ public class NodeImpl implements Node {
 		this.outlinks.put(linkid, outlink);
 		return true ; // yy should return true only if collection changed as result of call
 	}
-
+	@Override
 	public void setCoord(final Coord coord){
+		testForLocked();
 		this.coord = coord;
 	}
 
-	/*pakcage*/ void setOrigId(final String origId){
+	/*package*/ void setOrigId(final String origId){
 		this.origid = origId ;
 	}
 
@@ -141,12 +144,12 @@ public class NodeImpl implements Node {
 	
 	@Override
 	public Map<Id<Link>, ? extends Link> getInLinks() {
-		return this.inlinks;
+		return Collections.unmodifiableMap(this.inlinks);
 	}
 
 	@Override
 	public Map<Id<Link>, ? extends Link> getOutLinks() {
-		return this.outlinks;
+		return Collections.unmodifiableMap(this.outlinks);
 	}
 
 	@Override
@@ -160,13 +163,13 @@ public class NodeImpl implements Node {
 	}
 
 
-	private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
-		ois.defaultReadObject();
-
-		inlinks = new LinkedHashMap<>(4, 0.95f);
-		outlinks = new LinkedHashMap<>(4, 0.95f);
-
-	}
+//	private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+//		ois.defaultReadObject();
+//
+//		inlinks = new LinkedHashMap<>(4, 0.95f);
+//		outlinks = new LinkedHashMap<>(4, 0.95f);
+//
+//	}
 
 	//////////////////////////////////////////////////////////////////////
 	// print methods
@@ -181,4 +184,18 @@ public class NodeImpl implements Node {
 				"[nof_outlinks=" + this.outlinks.size() + "]";
 	}
 
+	@Override
+	public void setLocked() {
+		this.locked = true ;
+	}
+	private void testForLocked() {
+		if ( locked ) {
+			throw new RuntimeException( "Network is locked; too late to do this.  See comments in code.") ;
+		}
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
 }

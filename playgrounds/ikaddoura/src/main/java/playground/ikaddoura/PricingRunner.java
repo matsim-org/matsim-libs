@@ -63,14 +63,20 @@ public class PricingRunner {
 	private static final Logger log = Logger.getLogger(PricingRunner.class);
 
 	private static String configFile = "../../../runs-svn/decongestion/input/config.xml";
-	private static String outputBaseDirectory = "../../../runs-svn/decongestion/output_FINAL/";
+	private static String outputBaseDirectory = "../../../runs-svn/decongestion/output/";
 	
-	private static PricingApproach pricingApproach = PricingApproach.V3;
+	private static PricingApproach pricingApproach = PricingApproach.DecongestionBangBangA;
+	
+	private static double parameterKp = Double.NEGATIVE_INFINITY;
+	private static double parameterKi = Double.NEGATIVE_INFINITY;
+	private static double parameterKd = Double.NEGATIVE_INFINITY;
 	
 	private enum PricingApproach {
         NoPricing,
         V3, V7, V8, V9, V10,
-        DecongestionNoPricing, DecongestionV8a, DecongestionV8b, DecongestionV8c, DecongestionV8d
+        DecongestionNoPricing,
+        DecongestionBangBangA, DecongestionBangBangB,
+        DecongestionP, DecongestionI, DecongestionD, DecongestionPID, DecongestionPIDwithParameters
 	}
 		
 	public static void main(String[] args) throws IOException {		
@@ -103,14 +109,20 @@ public class PricingRunner {
 				pricingApproach = PricingApproach.V10;
 			
 			// interval-based pricing
-			} else if (pricingApproachString.equals(PricingApproach.DecongestionV8a.toString())) {
-				pricingApproach = PricingApproach.DecongestionV8a;
-			} else if (pricingApproachString.equals(PricingApproach.DecongestionV8b.toString())) {
-				pricingApproach = PricingApproach.DecongestionV8b;
-			} else if (pricingApproachString.equals(PricingApproach.DecongestionV8c.toString())) {
-				pricingApproach = PricingApproach.DecongestionV8c;
-			} else if (pricingApproachString.equals(PricingApproach.DecongestionV8d.toString())) {
-				pricingApproach = PricingApproach.DecongestionV8d;
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionBangBangA.toString())) {
+				pricingApproach = PricingApproach.DecongestionBangBangA;
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionBangBangB.toString())) {
+				pricingApproach = PricingApproach.DecongestionBangBangB;
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionP.toString())) {
+				pricingApproach = PricingApproach.DecongestionP;
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionI.toString())) {
+				pricingApproach = PricingApproach.DecongestionI;
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionD.toString())) {
+				pricingApproach = PricingApproach.DecongestionD;
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionPID.toString())) {
+				pricingApproach = PricingApproach.DecongestionPID;
+			} else if (pricingApproachString.equals(PricingApproach.DecongestionPIDwithParameters.toString())) {
+				pricingApproach = PricingApproach.DecongestionPIDwithParameters;
 			
 			// unknown pricing approach
 			} else {
@@ -118,6 +130,17 @@ public class PricingRunner {
 			}
 			
 			log.info("pricing approach: " + pricingApproach);
+			
+			if (args.length > 3) {
+				parameterKp = Double.valueOf(args[3]);
+				parameterKi = Double.valueOf(args[4]);
+				parameterKd = Double.valueOf(args[5]);
+				
+				log.info("Kp: " + parameterKp);
+				log.info("Ki: " + parameterKi);
+				log.info("Kd: " + parameterKd);
+			}			
+						
 		}
 
 		PricingRunner main = new PricingRunner();
@@ -128,7 +151,7 @@ public class PricingRunner {
 
 		Config config = ConfigUtils.loadConfig(configFile);
 		
-		SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd_HH-mm-ss ");
+		SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd_HH-mm-ss");
 		Date currentTime = new Date();
 		String dateTime = formatter.format(currentTime);
 		String outputDirectory = outputBaseDirectory + "output_" + dateTime + "_" + pricingApproach.toString() + "/";
@@ -219,63 +242,124 @@ public class PricingRunner {
 			
 			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 			decongestionSettings.setTOLLING_APPROACH(TollingApproach.NoPricing);
+			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
 			
 			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
 			Decongestion decongestion = new Decongestion(info);
 			controler = decongestion.getControler();
 			
-		} else if (pricingApproach.equals(PricingApproach.DecongestionV8a)) {
-			log.info(">>> Decongestion V8a");
+		} else if (pricingApproach.equals(PricingApproach.DecongestionBangBangA)) {
+			log.info(">>> Decongestion Bang Bang A");
 			
 			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-			decongestionSettings.setTOLLING_APPROACH(TollingApproach.V8);
-			decongestionSettings.setTOLL_ADJUSTMENT(0.0);
-			decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
-			decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
+			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
+			decongestionSettings.setTOLLING_APPROACH(TollingApproach.BangBang);
+			decongestionSettings.setINITIAL_TOLL(10.0);
+			decongestionSettings.setTOLL_ADJUSTMENT(1.0);
 			
 			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
 			Decongestion decongestion = new Decongestion(info);
-			controler = decongestion.getControler();
+			controler = decongestion.getControler();	
 			
-		} else if (pricingApproach.equals(PricingApproach.DecongestionV8b)) {
-			log.info(">>> Decongestion V8b");
+		} else if (pricingApproach.equals(PricingApproach.DecongestionBangBangB)) {
+			log.info(">>> Decongestion Bang Bang B");
 			
 			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-			decongestionSettings.setTOLLING_APPROACH(TollingApproach.V8);
-			decongestionSettings.setTOLL_ADJUSTMENT(0.1);
-			decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
-			decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
+			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
+			decongestionSettings.setTOLLING_APPROACH(TollingApproach.BangBang);
+			decongestionSettings.setINITIAL_TOLL(10.0);
+			decongestionSettings.setTOLL_ADJUSTMENT(10.0);
 			
 			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
 			Decongestion decongestion = new Decongestion(info);
-			controler = decongestion.getControler();
+			controler = decongestion.getControler();		
 			
-		} else if (pricingApproach.equals(PricingApproach.DecongestionV8c)) {
-			log.info(">>> Decongestion V8c");
+		} else if (pricingApproach.equals(PricingApproach.DecongestionP)) {
+			log.info(">>> Decongestion P Controller");
 			
 			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-			decongestionSettings.setTOLLING_APPROACH(TollingApproach.V8);
-			decongestionSettings.setTOLL_ADJUSTMENT(0.1);
-			decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
-			decongestionSettings.setTOLL_BLEND_FACTOR(0.9);
+			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
+			decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
+			decongestionSettings.setKp(1.0);
+			decongestionSettings.setKi(0.0);
+			decongestionSettings.setKd(0.0);
 			
 			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
 			Decongestion decongestion = new Decongestion(info);
 			controler = decongestion.getControler();
 		
-		} else if (pricingApproach.equals(PricingApproach.DecongestionV8d)) {
-			log.info(">>> Decongestion V8d");
+		} else if (pricingApproach.equals(PricingApproach.DecongestionI)) {
+			log.info(">>> Decongestion I Controller");
 			
 			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-			decongestionSettings.setTOLLING_APPROACH(TollingApproach.V8);
-			decongestionSettings.setTOLL_ADJUSTMENT(0.1);
-			decongestionSettings.setUPDATE_PRICE_INTERVAL(10);
-			decongestionSettings.setTOLL_BLEND_FACTOR(1);
+			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
+			decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
+			decongestionSettings.setKp(0.0);
+			decongestionSettings.setKi(1.0);
+			decongestionSettings.setKd(0.0);
 			
 			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
 			Decongestion decongestion = new Decongestion(info);
 			controler = decongestion.getControler();
 		
+		} else if (pricingApproach.equals(PricingApproach.DecongestionD)) {
+			log.info(">>> Decongestion D Controller");
+			
+			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
+			decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
+			decongestionSettings.setKp(0.0);
+			decongestionSettings.setKi(0.0);
+			decongestionSettings.setKd(1.0);
+			
+			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
+			Decongestion decongestion = new Decongestion(info);
+			controler = decongestion.getControler();	
+		
+		} else if (pricingApproach.equals(PricingApproach.DecongestionPID)) {
+			log.info(">>> Decongestion PID Controller");
+			
+			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
+			decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
+			decongestionSettings.setKp(1.0);
+			decongestionSettings.setKi(1.0);
+			decongestionSettings.setKd(1.0);
+			
+			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
+			Decongestion decongestion = new Decongestion(info);
+			controler = decongestion.getControler();	
+			
+		} else if (pricingApproach.equals(PricingApproach.DecongestionPIDwithParameters)) {
+			log.info(">>> Decongestion PID Controller (with parameters)");
+			
+			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
+			decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
+			decongestionSettings.setKp(parameterKp);
+			decongestionSettings.setKi(parameterKi);
+			decongestionSettings.setKd(parameterKd);
+			
+			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
+			Decongestion decongestion = new Decongestion(info);
+			controler = decongestion.getControler();	
+			
 		} else {
 			throw new RuntimeException("Unknown pricing approach: " + pricingApproach + ". Aborting...");
 		}
@@ -287,14 +371,9 @@ public class PricingRunner {
 		analysis.run();
 		
 		try {
-			MATSimVideoUtils.createLegHistogramVideo(config.controler().getOutputDirectory());
+			MATSimVideoUtils.createLegHistogramVideo(controler.getConfig().controler().getOutputDirectory());
 		} catch (IOException e1) {
 			e1.printStackTrace();
-		}
-		try {
-			MATSimVideoUtils.createVideo(config.controler().getOutputDirectory(), 1, "tolls");
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 }

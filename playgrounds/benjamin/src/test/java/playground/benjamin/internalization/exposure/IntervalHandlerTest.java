@@ -45,7 +45,7 @@ public class IntervalHandlerTest {
 	@Test
 	public void activityDurationForActiveAgentTest ( ) {
 		EquilTestSetUp equilTestSetUp = new EquilTestSetUp();
-		Scenario sc = equilTestSetUp.createConfig();
+		Scenario sc = equilTestSetUp.createConfigAndReturnScenario();
 		
 		sc.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(false);
 		// for "true" would need to locate activities such that access/egress walk does not consume time. kai, jun'16
@@ -99,7 +99,7 @@ public class IntervalHandlerTest {
 	@Test
 	public void activityDurationForActiveAndPassiveAgentTest ( ) {
 		EquilTestSetUp equilTestSetUp = new EquilTestSetUp();
-		Scenario sc = equilTestSetUp.createConfig();
+		Scenario sc = equilTestSetUp.createConfigAndReturnScenario();
 		
 		sc.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(false);
 		// for "true" would need to locate activities such that access/egress walk does not consume time. kai, jun'16

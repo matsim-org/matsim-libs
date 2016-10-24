@@ -65,7 +65,7 @@ public class MainDensityAnalysisWithPt {
 		
 		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(eventsFile);
+		reader.readFile(eventsFile);
 		
 		HashMap<Id<Link>, int[]> linkInFlow = inflowHandler.getLinkInFlow();	//get the matrix
 		HashMap<Id<Link>, int[]> linkOutFlow = outflowHandler.getLinkOutFlow();	
