@@ -55,7 +55,7 @@ public class ParallelSimulation {
         runningSimulations.clear();
         previousIterations.clear();
 
-        log.info("Reset. All simulations stopped and dummy state implemented.");
+        log.info("Reset. All warmups stopped and dummy state implemented.");
     }
 
     private RemoteSimulation getOrCreateSimulation(RemoteDecisionVariable decisionVariable, RemoteSimulatorState state) {

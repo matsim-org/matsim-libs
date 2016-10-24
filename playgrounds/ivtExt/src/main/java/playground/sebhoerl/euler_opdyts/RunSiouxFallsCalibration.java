@@ -116,7 +116,9 @@ public class RunSiouxFallsCalibration {
 
         ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(numberOfTransitionsPerOpdytsRun, numberOfTransitionsPerOpdytsRun);
 
-        RemoteSimulationFactory simulationFactory = new RemoteSimulationFactory(environment, scenario, controller, numberOfSimulationIterationsPerOpdytsRun, numberOfSimulationIterationsPerTransition);
+        RemoteSimulationFactory simulationFactory = new RemoteSimulationFactoryImpl(environment, scenario, controller, numberOfSimulationIterationsPerOpdytsRun, numberOfSimulationIterationsPerTransition);
+        //WarmupFactory warmupFactory = new WarmupFactory(simulationFactory);
+
         ParallelSimulation parallelSimulation = new ParallelSimulation(simulationFactory, handler, numberOfSimulationIterationsPerTransition);
         RemoteSimulator simulator = new RemoteSimulator(parallelSimulation);
 
