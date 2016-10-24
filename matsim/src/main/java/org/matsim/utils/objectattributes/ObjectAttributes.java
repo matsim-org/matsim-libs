@@ -79,6 +79,29 @@ public class ObjectAttributes implements MatsimExtensionPoint {
 		return attMap.get(attribute.intern());
 	}
 
+	/**
+	 * pieter: Useful for serialization/deserialization of objects.
+	 *
+	 * @param objectId
+	 * @return All the attributes associated with this object
+     */
+	public Map<String, Object>  getAllAttributes(final String objectId) {
+		Map<String, Object> attMap = this.attributes.get(objectId);
+		return attMap;
+	}
+
+	public void putAllAttributes(final String objectId, final Map<String, Object> serializedMap) {
+		Map<String, Object> attMap = this.attributes.get(objectId);
+		if (attMap == null) {
+			attMap = new IdentityHashMap<String, Object>(serializedMap.size());
+			this.attributes.put(objectId, attMap);
+		}
+//		fill the attribute map
+		for (String attribute : serializedMap.keySet()) {
+			 attMap.put(attribute.intern(), serializedMap.get(attribute));
+		}
+	}
+
 	public Object removeAttribute(final String objectId, final String attribute) {
 		Map<String, Object> attMap = this.attributes.get(objectId);
 		if (attMap == null) {
