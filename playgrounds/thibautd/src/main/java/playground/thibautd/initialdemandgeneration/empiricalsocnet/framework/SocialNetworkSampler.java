@@ -72,7 +72,7 @@ public class SocialNetworkSampler {
 	}
 
 	public SocialNetwork sampleSocialNetwork() {
-		final List<Tuple<Ego,Collection<CliqueStub>>> egos = new ArrayList<>();
+		final Collection<Tuple<Ego, Collection<CliqueStub>>> egos = new ArrayList<>();
 		for ( Person p : population.getPersons().values() ) {
 			final Tuple<Ego,Collection<CliqueStub>> ego = egoDistribution.sampleEgo( p );
 			egos.add( ego );
@@ -84,7 +84,8 @@ public class SocialNetworkSampler {
 						.flatMap( Collection::stream )
 						.collect( Collectors.toList() ) );
 
-		log.info( "Start sampling with "+freeStubs.size()+" egos with free stubs" );
+		log.info( "Start sampling with "+egos.size()+" egos" );
+		log.info( "Start sampling with "+freeStubs.size()+" free stubs" );
 		final Counter counter = new Counter( "Sample clique # " );
 		while ( freeStubs.size() > 1 ) {
 			counter.incCounter();
@@ -92,8 +93,6 @@ public class SocialNetworkSampler {
 			final CliqueStub stub = freeStubs.getAny();
 
 			final Set<Ego> clique = cliquesFiller.sampleClique( stub , freeStubs );
-			// cliquesFiller is allowed to choke on a agent, but it is then expected to take care
-			// of updating freeStubs itself.
 			if ( clique == null ) continue;
 
 			cliquesListener.accept( clique );
