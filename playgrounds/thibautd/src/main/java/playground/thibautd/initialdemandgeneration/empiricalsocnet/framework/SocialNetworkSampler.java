@@ -72,6 +72,7 @@ public class SocialNetworkSampler {
 	}
 
 	public SocialNetwork sampleSocialNetwork() {
+		log.info( "Prepare data for social network sampling" );
 		final Collection<Tuple<Ego, Collection<CliqueStub>>> egos = new ArrayList<>();
 		for ( Person p : population.getPersons().values() ) {
 			final Tuple<Ego,Collection<CliqueStub>> ego = egoDistribution.sampleEgo( p );
