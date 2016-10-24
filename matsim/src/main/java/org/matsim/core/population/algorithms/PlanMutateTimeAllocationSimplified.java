@@ -31,7 +31,7 @@ import org.matsim.core.utils.misc.Time;
 
 /**
  * Mutates the duration of activities randomly within a specified range.
- * <br/>
+ * <br>
  * Other than the "full" version, this version just mutates activity end time and activity duration if they are defined,
  * without thinking any further.  If this produces invalid plans, they will eventually be removed through the selection
  * process.  kai, jun'12

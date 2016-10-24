@@ -31,6 +31,9 @@ class AverageTravelTime implements TravelTime {
 	}
 
 	void addData(final Scenario scenario, final int avgIts) {
+		
+		this.myTravelTimes.clear();
+		
 		final int lastIt = scenario.getConfig().controler().getLastIteration();
 		for (int it = lastIt - avgIts + 1; it <= lastIt; it++) {
 			final EventsManager events = EventsUtils.createEventsManager();

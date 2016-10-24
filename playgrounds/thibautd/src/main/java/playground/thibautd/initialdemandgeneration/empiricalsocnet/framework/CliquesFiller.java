@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
 
-import playground.thibautd.utils.KDTree;
+import playground.thibautd.utils.spatialcollections.SpatialTree;
 
 import java.util.Set;
 
@@ -28,11 +28,9 @@ import java.util.Set;
 public interface CliquesFiller {
 	/**
 	 * Sample a feasible clique, fills the alters lists of the egos, and returns the clique.
-	 * @param ego the "center" of the clique
-	 * @param egosWithFreeStubs
+	 * @param stub the "center" of the clique
+	 * @param freeStubs
 	 * @return The set of egos pertaining to the clique, including the "center", already modified.
 	 */
-	Set<Ego> sampleClique( Ego ego, KDTree<Ego> egosWithFreeStubs );
-
-	boolean stopConsidering( Ego ego );
+	Set<Ego> sampleClique( CliqueStub stub , SpatialTree<double[], CliqueStub> freeStubs );
 }

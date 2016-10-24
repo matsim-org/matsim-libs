@@ -89,7 +89,7 @@ public class NetworkTools {
 	 * Looks for nodes within search radius of coord (using,
 	 * fetches all in- and outlinks returns the link with the smallest distance
 	 * to the given coordinate. If there are two opposite links, the link with
-	 * the coordinate on its right side is returned.<p/>
+	 * the coordinate on its right side is returned.<p></p>
 	 *
 	 * @param network (instance of NetworkImpl)
 	 * @param coord   the coordinate
@@ -147,11 +147,11 @@ public class NetworkTools {
 	 * Looks for nodes within search radius of <tt>coord</tt>,
 	 * fetches all in- and outlinks and sorts them ascending by their
 	 * distance to the coordiantes given.
-	 * <p/>
+	 * <p></p>
 	 * The method then returns <tt>maxNLinks</tt> or all links within <tt>maxLinkDistance</tt>
 	 * (whichever is reached earlier). Note: This method returns more than N links if two links have the same
 	 * distance to the facility.
-	 * <p/>
+	 * <p></p>
 	 * Distance Link to Coordinate is calculated using {@link org.matsim.core.utils.geometry.CoordUtils#distancePointLinesegment}).
 
 	 * @param network               	The network (must be instance of {@link Network})

@@ -139,7 +139,7 @@ public class OutputDelegate {
 
 			writer.println("<div id=\"header\">");
 			writer.println("<div id=\"logo\">");
-			writer.println("<img src=\"div/logo.png\" width=\"224\" height=\"52\" style=\"border:none;\" alt=\"logo\"/><br/>Multi-Agent Transport Simulation Toolkit");
+			writer.println("<img src=\"div/logo.png\" width=\"224\" height=\"52\" style=\"border:none;\" alt=\"logo\"/><br>Multi-Agent Transport Simulation Toolkit");
 			writer.println("</div>");
 			writer.println("<h3>Counting Volumes</h3>");
 			writer.println("</div>");

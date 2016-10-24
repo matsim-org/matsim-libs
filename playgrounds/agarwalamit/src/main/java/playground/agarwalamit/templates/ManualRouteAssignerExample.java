@@ -19,11 +19,11 @@
 
 package playground.agarwalamit.templates;
 
-import static org.eclipse.jetty.http.HttpParser.LOG;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -55,7 +55,7 @@ public class ManualRouteAssignerExample {
 
 
     private void reassignRoutes() {
-        LOG.info("Routes of all bike plans will be re-assinged.");
+        Logger.getLogger(ManualRouteAssignerExample.class).info("Routes of all bike plans will be re-assinged.");
 
         // following is required to get the routes (or links) from base network and not from the running scenario network.
         Scenario scNetwork = LoadMyScenarios.loadScenarioFromNetwork(this.initialNetwork);

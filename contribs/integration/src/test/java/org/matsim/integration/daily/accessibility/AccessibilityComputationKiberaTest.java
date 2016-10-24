@@ -64,24 +64,28 @@ public class AccessibilityComputationKiberaTest {
 		// Input and output
 		String folderStructure = "../../";
 		String networkFile = "matsimExamples/countries/ke/kibera/2015-11-05_network_paths_detailed.xml";
+//		String networkFile = "../shared-svn/projects/maxess/data/nairobi/network/2015-11-05_kibera_paths_detailed.xml";
 		// Adapt folder structure that may be different on different machines, in particular on server
 		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
 		networkFile = folderStructure + networkFile ;
 		final String facilitiesFile = folderStructure + "matsimExamples/countries/ke/kibera/2015-11-05_facilities.xml";
+//		final String facilitiesFile = folderStructure + "../shared-svn/projects/maxess/data/nairobi/facilities/03/facilities.xml";
 		final String outputDirectory = utils.getOutputDirectory();
 		
 		// Parameters
 		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
-		final Envelope envelope = new Envelope(251000, 9853000, 256000, 9857000);
-		final String runName = "ke_kibera_" + cellSize.toString().split("\\.")[0];
-		
+		final Envelope envelope = new Envelope(252000, 256000, 9854000, 9856000);
+		final String runId = "ke_kibera_" + PathUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
+		final boolean push2Geoserver = false;
+
 		// QGis parameters
 		boolean createQGisOutput = true;
 		final boolean includeDensityLayer = false;
 		final Double lowerBound = 0.; // (upperBound - lowerBound) is ideally easily divisible by 7
+//		final Double lowerBound = 1.75; // (upperBound - lowerBound) is ideally easily divisible by 7
 		final Double upperBound = 3.5;
 		final Integer range = 9; // in the current implementation, this need always be 9
-		final int symbolSize = 110;
+		final int symbolSize = 10;
 		final int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 		
 		// Config and scenario
@@ -94,9 +98,11 @@ public class AccessibilityComputationKiberaTest {
 		
 		// Choose modes for accessibility computation
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
-			acg.setComputingAccessibilityForMode(mode, true);
-		}
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
 		
 		// Some (otherwise irrelevant) settings to make the vsp check happy
 		config.timeAllocationMutator().setMutationRange(7200.);
@@ -117,8 +123,8 @@ public class AccessibilityComputationKiberaTest {
 		
 		// Network bounds
 		// TODO check if this works more direct
-		BoundingBox networkBounds = BoundingBox.createBoundingBox(scenario.getNetwork());
-		Envelope analysisEnvelope = new Envelope(networkBounds.getXMin(), networkBounds.getXMax(), networkBounds.getYMin(), networkBounds.getYMax());
+//		BoundingBox networkBounds = BoundingBox.createBoundingBox(scenario.getNetwork());
+//		Envelope analysisEnvelope = new Envelope(networkBounds.getXMin(), networkBounds.getXMax(), networkBounds.getYMin(), networkBounds.getYMax());
 		
 		// Collect activity types
 //		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
@@ -135,7 +141,7 @@ public class AccessibilityComputationKiberaTest {
 
 		// Controller
 		final Controler controler = new Controler(scenario);
-		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, runName, analysisEnvelope, cellSize));
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, runId, envelope, cellSize, push2Geoserver));
 		controler.run();
 		
 		// QGis
@@ -145,9 +151,11 @@ public class AccessibilityComputationKiberaTest {
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
-							lowerBound, upperBound, range, symbolSize, populationThreshold);
-					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					if (acg.getIsComputingMode().contains(mode)) {
+						VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
+								lowerBound, upperBound, range, symbolSize, populationThreshold);
+						VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					}
 				}
 			}  
 		}

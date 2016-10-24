@@ -295,7 +295,7 @@ public final class PopulationUtils {
 
 	/**
 	 * The idea of this method is to mirror the concept of Collections.unmodifiableXxx( xxx ) .
-	 * <p/>
+	 * <p></p>
 	 */
 	public static Plan unmodifiablePlan(Plan plan) {
 		return new UnmodifiablePlan(plan);

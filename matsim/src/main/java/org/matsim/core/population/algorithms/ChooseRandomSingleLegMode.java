@@ -22,13 +22,14 @@ package org.matsim.core.population.algorithms;
 
 import java.util.ArrayList;
 import java.util.Random;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * Changes the transportation mode of one leg in a plan to a randomly chosen
@@ -86,6 +87,10 @@ public class ChooseRandomSingleLegMode implements PlanAlgorithm {
 
 	private void setRandomLegMode(final Leg leg, final boolean forbidCar) {
 		leg.setMode(chooseModeOtherThan(leg.getMode(), forbidCar));
+		Route route = leg.getRoute() ;
+		if ( route != null && route instanceof NetworkRoute) {
+			((NetworkRoute)route).setVehicleId(null);
+		}
 	}
 
 	private String chooseModeOtherThan(final String currentMode, final boolean forbidCar) {

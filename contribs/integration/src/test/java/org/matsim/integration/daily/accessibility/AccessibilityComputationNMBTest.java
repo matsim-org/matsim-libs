@@ -57,7 +57,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class AccessibilityComputationNMBTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationNMBTest.class ) ;
 
-	private static final Double cellSize = 500.;
+	private static final Double cellSize = 10000.;
 //	private static final double timeOfDay = 8.*60*60;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
@@ -71,8 +71,8 @@ public class AccessibilityComputationNMBTest {
 		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
 		networkFile = folderStructure + networkFile ;
 		final String facilitiesFile = folderStructure + "matsimExamples/countries/za/nmb/facilities/20121010/facilities.xml.gz";
-//		final String outputDirectory = utils.getOutputDirectory();
-		final String outputDirectory = "../../../shared-svn/projects/maxess/data/nmb/output/46/";
+		final String outputDirectory = utils.getOutputDirectory();
+//		final String outputDirectory = "../../../shared-svn/projects/maxess/data/nmb/output/46/";
 		final String travelTimeMatrixFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/travelTimeMatrix_space.csv";
 		final String travelDistanceMatrixFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/travelDistanceMatrix_space.csv";
 		final String ptStopsFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/ptStops.csv";
@@ -80,7 +80,8 @@ public class AccessibilityComputationNMBTest {
 		// Parameters
 		final String crs = TransformationFactory.WGS84_SA_Albers;
 		final Envelope envelope = new Envelope(115000,161000,-3718000,-3679000);
-		final String name = "za_nmb_" + cellSize.toString().split("\\.")[0];
+		final String runId = "za_nmb_" + PathUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
+		final boolean push2Geoserver = true;
 		
 		// QGis parameters
 		boolean createQGisOutput = true;
@@ -88,7 +89,7 @@ public class AccessibilityComputationNMBTest {
 		final Double lowerBound = -3.5; // (upperBound - lowerBound) is ideally easily divisible by 7
 		final Double upperBound = 3.5;
 		final Integer range = 9; // in the current implementation, this must always be 9
-		final int symbolSize = 510;
+		final int symbolSize = 1000;
 		final int populationThreshold = (int) (120 / (1000/cellSize * 1000/cellSize));
 		
 		// Config and scenario
@@ -100,10 +101,12 @@ public class AccessibilityComputationNMBTest {
 		config.controler().setLastIteration(0);
 		
 		// Choose modes for accessibility computation
-		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
-			accessibilityConfigGroup.setComputingAccessibilityForMode(mode, true);
-		}
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 		
 		// Some (otherwise irrelevant) settings to make the vsp check happy
 		config.timeAllocationMutator().setMutationRange(7200.);
@@ -134,20 +137,20 @@ public class AccessibilityComputationNMBTest {
 		Envelope networkEnvelope = new Envelope(networkBounds.getXMin(), networkBounds.getXMax(), networkBounds.getYMin(), networkBounds.getYMax());
 		
 		// Collect activity types
-//		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
+//		final List<String> activityTypes = AccessibilityUtils.collectAllFacilityOptionTypes(scenario);
 //		log.info("Found activity types: " + activityTypes);
 		final List<String> activityTypes = new ArrayList<>();
-		activityTypes.add("e");
-		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
-		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
+		activityTypes.add("education");
+		activityTypes.add("shopping");
+		activityTypes.add("leisure");
 		
 		// Collect homes
-		String activityFacilityType = "h"; // "h" stands for homes in the given facility file
+		String activityFacilityType = "home";
 		ActivityFacilities densityFacilities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityFacilityType);
 		
 		// Controller
 		final Controler controler = new Controler(scenario);
-		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, name, networkEnvelope, cellSize));
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, runId, networkEnvelope, cellSize, push2Geoserver));
 		controler.addOverridingModule(new MatrixBasedPtModule());
 		controler.run();
 		
@@ -157,10 +160,12 @@ public class AccessibilityComputationNMBTest {
 			String workingDirectory = config.controler().getOutputDirectory();
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
-				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
-							lowerBound, upperBound, range, symbolSize, populationThreshold);
-					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+				for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+					if (acg.getIsComputingMode().contains(mode)) {
+						VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
+								lowerBound, upperBound, range, symbolSize, populationThreshold);
+						VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					}
 				}
 			}  
 		}

@@ -22,6 +22,7 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import playground.ivt.utils.MoreIOUtils;
 import playground.polettif.publicTransitMapping.workbench.Run;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
@@ -41,6 +42,8 @@ public class RunSimpleCliquesSampling {
 		final Config config = ConfigUtils.loadConfig( args[ 0 ] , configGroup , new SocialNetworkSamplingConfigGroup() );
 
 		MoreIOUtils.initOut( config.controler().getOutputDirectory() , config );
+
+		new ConfigWriter( config ).write( config.controler().getOutputDirectory()+"/output_config.xml" );
 
 		try ( final AutocloserModule closer = new AutocloserModule() ){
 			final SocialNetwork socialNetwork =

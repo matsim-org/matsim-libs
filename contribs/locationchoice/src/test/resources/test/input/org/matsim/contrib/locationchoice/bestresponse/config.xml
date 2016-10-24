@@ -12,7 +12,6 @@
 	<!-- ====================================================================== -->
 
 	<module name="controler">
-		<param name="outputDirectory" value="test/output/" />
 		<param name="firstIteration" value="0" />
          <param name="lastIteration" value="1" />		
          <param name="runId" value="fr01" />

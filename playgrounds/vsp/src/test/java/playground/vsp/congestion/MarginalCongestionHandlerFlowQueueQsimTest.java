@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,12 +35,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -53,11 +47,11 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -271,7 +265,11 @@ public class MarginalCongestionHandlerFlowQueueQsimTest {
 	Activity homeActLink1_2 = popFactory.createActivityFromLinkId("home", linkId1);
 	homeActLink1_2.setEndTime(100);
 	plan2.addActivity(homeActLink1_2);
-	plan2.addLeg(leg_1_5);
+	{
+		Leg leg = popFactory.createLeg(leg_1_5.getMode());
+		PopulationUtils.copyFromTo(leg_1_5, leg);
+		plan2.addLeg(leg);
+	}
 	plan2.addActivity(workActLink5);
 	person2.addPlan(plan2);
 	population.addPerson(person2);
@@ -281,12 +279,16 @@ public class MarginalCongestionHandlerFlowQueueQsimTest {
 	Activity homeActLink1_3 = popFactory.createActivityFromLinkId("home", linkId1);
 	homeActLink1_3.setEndTime(100);
 	plan3.addActivity(homeActLink1_3);
-	plan3.addLeg(leg_1_5);
+	{
+		Leg leg = popFactory.createLeg(leg_1_5.getMode());
+		PopulationUtils.copyFromTo(leg_1_5, leg);
+		plan3.addLeg(leg);
+	}
 	plan3.addActivity(workActLink5);
 	person3.addPlan(plan3);
 	population.addPerson(person3);
 }
-	
+
 	private Scenario loadScenario1() {
 		
 		// (0)				(1)				(2)				(3)				(4)				(5)

@@ -29,14 +29,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.util.EnumSet;
 
 public class ReRoutingIT {
@@ -46,6 +46,8 @@ public class ReRoutingIT {
 
 	private Scenario loadScenario() {
 		Config config = utils.loadConfig(IOUtils.newUrl(utils.classInputResourcePath(), "config.xml"));
+		config.network().setInputFile(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString());
+		config.plans().setInputFile(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("berlin"), "plans_hwh_1pct.xml.gz").toString());
 		config.qsim().setTimeStepSize(10.0);
         config.qsim().setStuckTime(100.0);
         config.qsim().setRemoveStuckVehicles(true);
@@ -63,7 +65,7 @@ public class ReRoutingIT {
 	}
 
 	@Test
-	public void testReRoutingDijkstra() {
+	public void testReRoutingDijkstra() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
 		Controler controler = new Controler(scenario);
@@ -74,7 +76,7 @@ public class ReRoutingIT {
 	}
 
 	@Test
-	public void testReRoutingFastDijkstra() {
+	public void testReRoutingFastDijkstra() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastDijkstra);
 		Controler controler = new Controler(scenario);
@@ -88,7 +90,7 @@ public class ReRoutingIT {
 	 * This test seems to have race conditions somewhere (i.e. it fails intermittently without code changes). kai, aug'13
 	 */
 	@Test
-	public void testReRoutingAStarLandmarks() {
+	public void testReRoutingAStarLandmarks() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
 		Controler controler = new Controler(scenario);
@@ -99,7 +101,7 @@ public class ReRoutingIT {
 	}
 
 	@Test
-	public void testReRoutingFastAStarLandmarks() {
+	public void testReRoutingFastAStarLandmarks() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks);
 		Controler controler = new Controler(scenario);
@@ -109,15 +111,14 @@ public class ReRoutingIT {
 		this.evaluate();
 	}
 	
-	private void evaluate() {
+	private void evaluate() throws MalformedURLException {
 		Config config = utils.loadConfig(IOUtils.newUrl(utils.classInputResourcePath(), "config.xml"));
+		config.network().setInputFile(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString());
+		config.plans().setInputFile(IOUtils.newUrl(utils.inputResourcePath(), "1.plans.xml.gz").toString());
+		Scenario referenceScenario = ScenarioUtils.loadScenario(config);
 
-		Scenario referenceScenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(referenceScenario.getNetwork()).parse(config.network().getInputFileURL(config.getContext()));
-		new PopulationReader(referenceScenario).parse(IOUtils.newUrl(utils.inputResourcePath(), "1.plans.xml.gz"));
-
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		new PopulationReader(scenario).readFile(new File(utils.getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz").getAbsolutePath());
+		config.plans().setInputFile(new File(utils.getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz").toURI().toURL().toString());
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		final boolean isEqual = PopulationUtils.equalPopulation(referenceScenario.getPopulation(), scenario.getPopulation());
 		if ( !isEqual ) {

@@ -63,7 +63,13 @@ public class CurrentTotalDemand {
 	}
 	
 	public boolean removeVehicle(Id<Person> personId, Link link, CSVehicle vehicle, String type) {
-		return currentDemand.get(personId).removeVehicle(link, vehicle, type);
+		CarsharingCurrentRentalsInfo personRentals = this.currentDemand.get(personId);
+
+		if (personRentals != null) {
+			return personRentals.removeVehicle(link, vehicle, type);
+		}
+
+		return false;
 	}
 
 	public void reset() {

@@ -20,6 +20,8 @@
 package org.matsim.integration;
 
 import org.apache.log4j.Logger;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -33,6 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
@@ -40,10 +43,17 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.examples.ExamplesUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 import javax.inject.Inject;
+
+import java.net.URL;
+
+import static org.junit.Assert.assertEquals;
+import static org.matsim.testcases.MatsimTestUtils.EPSILON;
 
 /**
  * This test uses the org.matsim.examples equil scenario with two agents
@@ -58,7 +68,10 @@ import javax.inject.Inject;
  * 
  * @author dgrether
  */
-public class EquilTwoAgentsTest extends MatsimTestCase {
+public class EquilTwoAgentsTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	/*package*/ final static Logger log = Logger.getLogger(EquilTwoAgentsTest.class);
 
@@ -75,19 +88,15 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 
 	private TestSingleIterationEventHandler handler;
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
+	@Test
 	public void testSingleIterationPlansV4() {
-		final Config config = this.loadConfig(this.getClassInputDirectory() + "config.xml");
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		ConfigUtils.loadConfig(config, IOUtils.newUrl(utils.classInputResourcePath(), "config.xml"));
+		config.plans().setInputFile(IOUtils.newUrl(utils.classInputResourcePath(), "plans2.xml").toString());
 
 		PlanCalcScoreConfigGroup pcsConfig = config.planCalcScore() ;
 		ActivityParams params = new ActivityParams("h") ;
         params.setTypicalDuration(123456789.0) ; // probably dummy
-//		params.setOpeningTime(0.) ;
-//		params.setClosingTime(0.) ; // cannot access "setScoreAtAll" at this level.
 		params.setScoringThisActivityAtAll(false);
 		pcsConfig.addActivityParams(params) ;
 		

@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.signalsystems.v20;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.XMLConstants;
@@ -28,7 +27,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
@@ -53,8 +51,6 @@ import org.xml.sax.SAXException;
  */
 public class SignalSystemsReader20 implements MatsimReader {
 
-	private static final Logger log = Logger.getLogger(SignalSystemsReader20.class);
-
 	private SignalSystemsData signalSystemsData;
 
 	public SignalSystemsReader20(SignalSystemsData signalSystemData) {
@@ -63,7 +59,11 @@ public class SignalSystemsReader20 implements MatsimReader {
 
 	@Override
 	public void readFile(final String filename) throws UncheckedIOException {
-		XMLSignalSystems xmlssdefs = readXmlSignalSystems(filename);
+		readStream(IOUtils.getInputStream(filename));
+	}
+
+	public void readStream(InputStream stream) {
+		XMLSignalSystems xmlssdefs = getXmlSignalSystems(stream);
 
 		//convert from Jaxb types to MATSim-API conform types
 		SignalSystemsDataFactory builder = this.signalSystemsData.getFactory();
@@ -87,19 +87,16 @@ public class SignalSystemsReader20 implements MatsimReader {
 				}
 			}
 		}
-
 	}
 
-	private XMLSignalSystems readXmlSignalSystems(String filename) {
-		try (InputStream stream = IOUtils.getInputStream(filename)) {
+	private XMLSignalSystems getXmlSignalSystems(InputStream stream) {
+		try {
 			JAXBContext jc = JAXBContext.newInstance(org.matsim.jaxb.signalsystems20.ObjectFactory.class);
 			Unmarshaller u = jc.createUnmarshaller();
 			u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/signalSystems_v2.0.xsd")));
-			log.info("starting unmarshalling " + filename);
 			return (XMLSignalSystems) u.unmarshal(stream);
-		} catch (IOException | JAXBException | SAXException e) {
+		} catch (JAXBException | SAXException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
-
 }

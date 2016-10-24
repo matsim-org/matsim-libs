@@ -21,19 +21,22 @@ package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
-import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
-import playground.thibautd.utils.KDTree;
+import playground.thibautd.utils.spatialcollections.KDTree;
+import playground.thibautd.utils.spatialcollections.SpatialCollectionUtils;
+import playground.thibautd.utils.spatialcollections.SpatialTree;
+import playground.thibautd.utils.spatialcollections.VPTree;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * @author thibautd
@@ -41,7 +44,6 @@ import java.util.function.Consumer;
 @Singleton
 public class SocialNetworkSampler {
 	private static final Logger log = Logger.getLogger( SocialNetworkSampler.class );
-	private final Random random = MatsimRandom.getLocalInstance();
 
 	private final Population population;
 	private final EgoCharacteristicsDistribution egoDistribution;
@@ -70,54 +72,74 @@ public class SocialNetworkSampler {
 	}
 
 	public SocialNetwork sampleSocialNetwork() {
-		final Map<Id<Person>,Ego> egos = new HashMap<>();
+		log.info( "Prepare data for social network sampling" );
+		final Collection<Tuple<Ego, Collection<CliqueStub>>> egos = new ArrayList<>();
 		for ( Person p : population.getPersons().values() ) {
-			final Ego ego = egoDistribution.sampleEgo( p );
-			egos.put( p.getId() , ego );
+			final Tuple<Ego,Collection<CliqueStub>> ego = egoDistribution.sampleEgo( p );
+			egos.add( ego );
 		}
-		final KDTree<Ego> egosWithFreeStubs =
-				new KDTree<>(
-						configGroup.doRebalanceKdTree(),
-						egoLocator.getDimensionality(),
-						egoLocator );
-		egosWithFreeStubs.add( egos.values() );
+		final SpatialTree<double[],CliqueStub> freeStubs = createSpatialTree();
+		freeStubs.add(
+				egos.stream()
+						.map( Tuple::getSecond )
+						.flatMap( Collection::stream )
+						.collect( Collectors.toList() ) );
 
-		log.info( "Start sampling with "+egosWithFreeStubs.size()+" egos with free stubs" );
+		log.info( "Start sampling with "+egos.size()+" egos" );
+		log.info( "Start sampling with "+freeStubs.size()+" free stubs" );
 		final Counter counter = new Counter( "Sample clique # " );
-		while ( egosWithFreeStubs.size() > 1 ) {
+		while ( freeStubs.size() > 1 ) {
 			counter.incCounter();
 
-			final Ego ego = egosWithFreeStubs.get( random.nextInt( egosWithFreeStubs.size() ) );
+			final CliqueStub stub = freeStubs.getAny();
 
-			final Set<Ego> clique = cliquesFiller.sampleClique( ego , egosWithFreeStubs );
-			// cliquesFiller is allowed to choke on a agent, but it is then expected to take care
-			// of updating egosWithFreeStubs itself. Not best design, try to solve that, might get messy!
+			final Set<Ego> clique = cliquesFiller.sampleClique( stub , freeStubs );
 			if ( clique == null ) continue;
-			cliquesListener.accept( clique );
 
-			for ( Ego member : clique ) {
-				if ( cliquesFiller.stopConsidering( member ) ) {
-					egosWithFreeStubs.remove( member );
-				}
-			}
+			cliquesListener.accept( clique );
 		}
 		counter.printCounter();
 
 		// to assess what kind of damage the resolution of "conflicts" did
 		final int sumPlannedDegrees =
-				egos.values().stream()
-					.mapToInt( Ego::getDegree )
-					.sum();
+				egos.stream()
+						.map( Tuple::getFirst )
+						.mapToInt( Ego::getDegree )
+						.sum();
 		final int sumActualDegrees =
-				egos.values().stream()
-						.mapToInt( e -> e.getAlters().size() )
+				egos.stream()
+						.map( Tuple::getFirst )
+						.map( Ego::getAlters )
+						.mapToInt( Collection::size )
 						.sum();
 
 		log.info( "Average planned degree was "+((double) sumPlannedDegrees / egos.size()) );
 		log.info( "Average actual degree is "+((double) sumActualDegrees / egos.size()) );
 		log.info( "Number of excedentary ties: "+(sumActualDegrees - sumPlannedDegrees) );
 
-		return new SampledSocialNetwork( egos );
+		return new SampledSocialNetwork(
+				egos.stream()
+						.map( Tuple::getFirst )
+						.collect(
+							Collectors.toMap(
+									Ego::getId,
+									e -> e ) ) );
+	}
+
+	private SpatialTree<double[],CliqueStub> createSpatialTree() {
+		switch ( configGroup.getSpatialTreeType() ) {
+			case KDTree:
+				return new KDTree<>(
+						configGroup.doRebalanceKdTree(),
+						egoLocator.getDimensionality(),
+						egoLocator );
+			case VPTree:
+				return new VPTree<>(
+						SpatialCollectionUtils::squaredEuclidean,
+						egoLocator );
+			default:
+				throw new RuntimeException( configGroup.getSpatialTreeType()+"?" );
+		}
 	}
 
 }

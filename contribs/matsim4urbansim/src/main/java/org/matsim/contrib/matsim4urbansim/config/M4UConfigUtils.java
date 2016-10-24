@@ -209,7 +209,7 @@ public class M4UConfigUtils {
 	 * 
 	 * NOTE: If the MATSim4UrbanSim network section contains a road network 
 	 * this overwrites a previous network, e.g. from an external MATSim configuration
-	 * <p/>
+	 * <p></p>
 	 * (The above statement is correct.  But irrelevant, since at the end everything is overwritten 
 	 * again from an external MATSim configuration. kai, apr'13)
 	 * 

@@ -25,6 +25,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -43,7 +44,7 @@ public class PopulationReprojectionIOTest {
 		final String testFile = new File(utils.getOutputDirectory() + "/plans.xml.gz").getAbsolutePath();
 
 		// create test file in V4 format
-		Config config = ConfigUtils.createConfig(utils.getTestScenarioURL("berlin"));
+		Config config = ConfigUtils.createConfig(ExamplesUtils.getTestScenarioURL("berlin"));
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		// necessary for v4...
 		new MatsimNetworkReader(scenario.getNetwork()).parse(IOUtils.newUrl(config.getContext(), NET_FILE));
@@ -58,7 +59,7 @@ public class PopulationReprojectionIOTest {
 		final String testFile = new File(utils.getOutputDirectory() + "/plans.xml.gz").getAbsolutePath();
 
 		// create test file in V5 format
-		Config config = ConfigUtils.createConfig(utils.getTestScenarioURL("berlin"));
+		Config config = ConfigUtils.createConfig(ExamplesUtils.getTestScenarioURL("berlin"));
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		// necessary for v4...
 		new MatsimNetworkReader(scenario.getNetwork()).parse(IOUtils.newUrl(config.getContext(), NET_FILE));
@@ -73,7 +74,7 @@ public class PopulationReprojectionIOTest {
 		final String testFile = new File(utils.getOutputDirectory() + "/plans.xml.gz").getAbsolutePath();
 
 		// read test population
-		Config config = ConfigUtils.createConfig(utils.getTestScenarioURL("berlin"));
+		Config config = ConfigUtils.createConfig(ExamplesUtils.getTestScenarioURL("berlin"));
 		final Scenario originalScenario = ScenarioUtils.createScenario(config);
 		// necessary for v4...
 		new MatsimNetworkReader(originalScenario.getNetwork()).parse(IOUtils.newUrl(config.getContext(), NET_FILE));
@@ -99,7 +100,7 @@ public class PopulationReprojectionIOTest {
 		final String testFile = new File(utils.getOutputDirectory() + "/plans.xml.gz").getAbsolutePath();
 
 		// read test population
-		Config config = ConfigUtils.createConfig(utils.getTestScenarioURL("berlin"));
+		Config config = ConfigUtils.createConfig(ExamplesUtils.getTestScenarioURL("berlin"));
 		final Scenario originalScenario = ScenarioUtils.createScenario(config);
 		// necessary for v4...
 		new MatsimNetworkReader(originalScenario.getNetwork()).parse(IOUtils.newUrl(config.getContext(), NET_FILE));
@@ -127,7 +128,7 @@ public class PopulationReprojectionIOTest {
 		final double epsilon = 0.01;
 
 		// read test population
-		URL berlin = utils.getTestScenarioURL("berlin");
+		URL berlin = ExamplesUtils.getTestScenarioURL("berlin");
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig(berlin));
 		// necessary for v4...
 		new MatsimNetworkReader(originalScenario.getNetwork()).parse(IOUtils.newUrl(berlin, NET_FILE));
@@ -228,7 +229,7 @@ public class PopulationReprojectionIOTest {
 		final Scenario reprojectedScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		// necessary for v4...
-		URL network = IOUtils.newUrl(utils.getTestScenarioURL("berlin"), NET_FILE);
+		URL network = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("berlin"), NET_FILE);
 		new MatsimNetworkReader(originalScenario.getNetwork()).parse(network);
 		new MatsimNetworkReader(reprojectedScenario.getNetwork()).parse(network);
 

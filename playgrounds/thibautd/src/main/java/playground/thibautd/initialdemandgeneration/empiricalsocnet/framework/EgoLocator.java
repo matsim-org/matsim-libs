@@ -18,11 +18,11 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
 
-import playground.thibautd.utils.KDTree;
+import playground.thibautd.utils.spatialcollections.SpatialCollectionUtils;
 
 /**
  * @author thibautd
  */
-public interface EgoLocator extends KDTree.Coordinate<Ego> {
+public interface EgoLocator extends SpatialCollectionUtils.Coordinate<CliqueStub> {
 	int getDimensionality();
 }

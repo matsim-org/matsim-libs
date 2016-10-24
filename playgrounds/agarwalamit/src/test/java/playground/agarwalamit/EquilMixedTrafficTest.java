@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import com.google.inject.Inject;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -66,12 +65,12 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTime
 
 public class EquilMixedTrafficTest {
 
-    private static final String EQUIL_DIR = "../../matsim/examples/equil-mixedTraffic/";
+    private static final String EQUIL_DIR = "../../examples/scenarios/equil-mixedTraffic/";
     @Rule
     public MatsimTestUtils helper = new MatsimTestUtils();
 
     @Test
-    public void runSameVehicleAllTrips() {
+    public void runSameVehiclesTypesInTrips() {
         Config config = ConfigUtils.loadConfig(EQUIL_DIR + "/config.xml");
         config.controler().setOutputDirectory(helper.getOutputDirectory());
 
@@ -89,9 +88,6 @@ public class EquilMixedTrafficTest {
 
             @Override
             public void install() {
-//                addTravelTimeBinding("bicycle").to(networkTravelTime());
-//                addTravelDisutilityFactoryBinding("bicycle").to(carTravelDisutilityFactoryKey());
-
                 // add event handler to test...
                 addEventHandlerBinding().toInstance(handler);
                 addEventHandlerBinding().toInstance(speedEventHandler);
@@ -103,7 +99,7 @@ public class EquilMixedTrafficTest {
         final Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicle2link2enterTime = handler.getVehicleId2LinkEnterTime();
         final Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicle2link2leaveTime = handler.getVehicleId2LinkLeaveTime();
 
-        Id<Vehicle> bikeVeh = Id.createVehicleId(9);
+        Id<Vehicle> bikeVeh = Id.createVehicleId("9_bicycle");
         Id<Vehicle> carVeh = Id.createVehicleId(2);
 
         Id<Link> link2 = Id.createLinkId(2);
@@ -141,8 +137,8 @@ public class EquilMixedTrafficTest {
      * For e.g. In initial plans of Munich, person 555524.1#3699 uses bike in all trip modes,
      * however, a vehicle (passenger car) is still created for this person with vehicle id same as person id.
      */
-    @Test@Ignore
-    public void runMultipleVehiclesTypeAllTrips() {
+    @Test
+    public void runDifferentVehiclesTypesInTrips() {
         // TODO: fix and clean it.
         Config config = ConfigUtils.loadConfig(EQUIL_DIR + "/config.xml");
         String outDir = helper.getOutputDirectory();

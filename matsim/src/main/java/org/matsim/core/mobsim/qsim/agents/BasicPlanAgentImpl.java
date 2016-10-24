@@ -146,7 +146,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 		this.setState(MobsimAgent.State.ACTIVITY) ;
 		this.getEvents().processEvent( new ActivityStartEvent(now, this.getId(), this.getCurrentLinkId(), act.getFacilityId(), act.getType()));
 		calculateAndSetDepartureTime(act);
-		getModifiablePlan();
+		getModifiablePlan(); // this is necessary to make the plan modifiable, so that setting the start time (next line) is actually feasible. kai/mz, oct'16
 		((Activity) getCurrentPlanElement()).setStartTime(now);
 	}
 

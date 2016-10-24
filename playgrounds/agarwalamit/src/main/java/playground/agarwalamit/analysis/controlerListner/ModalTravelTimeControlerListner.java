@@ -19,10 +19,7 @@
 
 package playground.agarwalamit.analysis.controlerListner;
 
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 import javax.inject.Inject;
 
@@ -45,8 +42,8 @@ import playground.agarwalamit.utils.ListUtils;
 public class ModalTravelTimeControlerListner implements StartupListener, IterationEndsListener{
 
 	private int firstIteration = 0;
-	private int numberOfIterations = 0;
-	private final SortedMap<String, double []> mode2AvgTripTimes = new TreeMap<>();
+//	private int numberOfIterations = 0;
+	private SortedMap<String, double []> mode2AvgTripTimes = new TreeMap<>();
 
 	@Inject
 	private ModalTripTravelTimeHandler travelTimeHandler;
@@ -57,7 +54,7 @@ public class ModalTravelTimeControlerListner implements StartupListener, Iterati
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.firstIteration = event.getServices().getConfig().controler().getFirstIteration();
-		this.numberOfIterations = event.getServices().getConfig().controler().getLastIteration() - this.firstIteration + 1;
+//		this.numberOfIterations = event.getServices().getConfig().controler().getLastIteration() - this.firstIteration + 1;
 
 		this.events.addHandler(this.travelTimeHandler);
 	}
@@ -70,22 +67,38 @@ public class ModalTravelTimeControlerListner implements StartupListener, Iterati
 		SortedMap<String, Double > mode2AvgTripTime = modalAvgTime();
 		int itNrIndex = event.getIteration() - this.firstIteration;
 
-		if(itNrIndex == 0) {
-			for(String mode : mode2AvgTripTime.keySet()) {
-				if ( ! mode2AvgTripTimes.containsKey(mode)){ // initialize
-					double [] avgTimes = new double [this.numberOfIterations];
-					avgTimes[0] = mode2AvgTripTime.get(mode);
-					mode2AvgTripTimes.put(mode, avgTimes);
-				}
+		for(String mode : mode2AvgTripTime.keySet()) {
+			if ( ! mode2AvgTripTimes.containsKey(mode)){
+				double [] avgTimes = new double [itNrIndex+1];
+				avgTimes[itNrIndex] = mode2AvgTripTime.get(mode);
+				mode2AvgTripTimes.put(mode, avgTimes);
+			} else {
+				double [] avgTimesSoFar = mode2AvgTripTimes.get(mode);
+				double [] avgTimesNew = new double [avgTimesSoFar.length+1];
+				System.arraycopy(avgTimesSoFar, 0, avgTimesNew, 0, avgTimesSoFar.length);
+				avgTimesNew[itNrIndex] = mode2AvgTripTime.get(mode);
+				mode2AvgTripTimes.put(mode, avgTimesNew);
 			}
-			return; // only one data points... so no plotting
 		}
 
-		//storeData 
-		for(String mode : mode2AvgTripTime.keySet()) {
-			double [] avgTimes = this.mode2AvgTripTimes.get(mode);
-			avgTimes[itNrIndex] = mode2AvgTripTime.get(mode);
-		}
+		if(itNrIndex == 0) return;
+
+//		if(itNrIndex == 0) {
+//			for(String mode : mode2AvgTripTime.keySet()) {
+//				if ( ! mode2AvgTripTimes.containsKey(mode)){ // initialize
+//					double [] avgTimes = new double [this.numberOfIterations];
+//					avgTimes[0] = mode2AvgTripTime.get(mode);
+//					mode2AvgTripTimes.put(mode, avgTimes);
+//				}
+//			}
+//			return; // only one data points... so no plotting
+//		}
+//
+//		//storeData
+//		for(String mode : mode2AvgTripTime.keySet()) {
+//			double [] avgTimes = this.mode2AvgTripTimes.get(mode);
+//			avgTimes[itNrIndex] = mode2AvgTripTime.get(mode);
+//		}
 
 		//plot data here...
 		XYLineChart chart = new XYLineChart("Modal Travel Time", "iteration", "travel time [sec]");

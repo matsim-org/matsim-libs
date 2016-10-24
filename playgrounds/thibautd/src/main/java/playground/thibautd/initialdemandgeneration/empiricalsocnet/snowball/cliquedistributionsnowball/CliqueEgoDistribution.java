@@ -23,11 +23,14 @@ import com.google.inject.Singleton;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.core.utils.collections.Tuple;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliqueStub;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoCharacteristicsDistribution;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballCliques;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,53 +59,15 @@ public class CliqueEgoDistribution implements EgoCharacteristicsDistribution {
 	}
 
 	@Override
-	public Ego sampleEgo( final Person person ) {
+	public Tuple<Ego,Collection<CliqueStub>> sampleEgo( final Person person ) {
 		final CliqueStructure structure = cliqueStructures[ random.nextInt( cliqueStructures.length ) ];
-		return new Ego( person , structure.degree , new EgosCliqueStructure( structure ) );
-	}
 
-	public static EgosCliqueStructure getCliqueStructure( final Ego ego ) {
-		return (EgosCliqueStructure) ego.getAdditionalInformation();
-	}
-
-	public static class EgosCliqueStructure {
-		//private int[] sizes;
-
-		private int[] remainingSizes;
-
-		private EgosCliqueStructure( final CliqueStructure s ) {
-			// TODO: copy? should not be modified anyway
-			//this.sizes = s.sizes;
-			this.remainingSizes = Arrays.copyOf( s.sizes , s.sizes.length );
-			Arrays.sort( remainingSizes );
-		}
-
-		public boolean hasSize( final int size ) {
-			final int i = Arrays.binarySearch( remainingSizes , size );
-			return i >= 0;
-		}
-
-		public boolean hasUnassignedCliques() {
-			return remainingSizes.length > 0;
-		}
-
-		public int getRandomSize( final Random random ) {
-			final int size = remainingSizes[ random.nextInt( remainingSizes.length ) ];
-			assert size >= 2 : Arrays.toString( remainingSizes );
-			return size;
-		}
-
-		public void removeSize( final int size ) {
-			final int insertion = Arrays.binarySearch( remainingSizes , size );
-			if ( insertion < 0 ) throw new IllegalArgumentException( "could not find "+size+" in "+Arrays.toString( remainingSizes ) );
-			assert remainingSizes[ insertion ] == size;
-
-			final int[] old = remainingSizes;
-			this.remainingSizes = new int[ old.length - 1 ];
-
-			for ( int i = 0; i < insertion; i++ ) remainingSizes[ i ] = old[ i ];
-			for ( int i = insertion; i < remainingSizes.length; i++ ) remainingSizes[ i ] = old[ i + 1 ];
-		}
+		final Ego ego = new Ego( person , structure.degree );
+		return new Tuple<>(
+				ego,
+				Arrays.stream( structure.sizes )
+						.mapToObj( s -> new CliqueStub( s, ego ) )
+						.collect( Collectors.toList() ) );
 	}
 
 	private static class CliqueStructure {

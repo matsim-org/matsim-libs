@@ -38,37 +38,36 @@ public class BestTimeResponseStrategyProvider implements Provider<PlanStrategy> 
 
 	private final CharyparNagelScoringParametersForPerson scoringParams;
 
-	// private final ExperiencedScoreAnalyzer experiencedScoreAnalyzer;
-
 	private final Provider<TripRouter> tripRouterProvider;
 
-	@Inject
-	private Map<String, TravelTime> mode2travelTime;
-	
-	@Inject
-	private GlobalConfigGroup globalConfigGroup;
-	@Inject
-	private ActivityFacilities facilities;
+	private final Map<String, TravelTime> mode2travelTime;
 
-	private final boolean reRouteBefore = false; // useless anyway
-	private final boolean reRouteAfter = true;
-	private final int maxTrials = 100;
-	private final int maxFailures = 50;
+	private final GlobalConfigGroup globalConfigGroup;
+
+	private final ActivityFacilities facilities;
+
+	private final int maxTrials;
+
+	private final int maxFailures;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	@Inject
 	BestTimeResponseStrategyProvider(final Scenario scenario,
-			final CharyparNagelScoringParametersForPerson scoringParams,
-			// final ExperiencedScoreAnalyzer experiencedScoreAnalyzer,
-			final TimeDiscretizationInjection timeDiscrInj, final Provider<TripRouter> tripRouterProvider) {
+			final CharyparNagelScoringParametersForPerson scoringParams, final TimeDiscretizationInjection timeDiscrInj,
+			final Provider<TripRouter> tripRouterProvider, final Map<String, TravelTime> mode2travelTime,
+			final GlobalConfigGroup globalConfigGroup, final ActivityFacilities facilities) {
 
 		this.randomPlanSelector = new RandomPlanSelector<>();
 		this.timeDiscr = timeDiscrInj.getInstance();
 		this.scenario = scenario;
 		this.scoringParams = scoringParams;
-		// this.experiencedScoreAnalyzer = experiencedScoreAnalyzer;
 		this.tripRouterProvider = tripRouterProvider;
+		this.mode2travelTime = mode2travelTime;
+		this.globalConfigGroup = globalConfigGroup;
+		this.facilities = facilities;
+		this.maxTrials = 10;
+		this.maxFailures = 3;
 	}
 
 	// --------------- IMPLEMENTATION OF Provider<PlanStrategy> ---------------
@@ -77,18 +76,11 @@ public class BestTimeResponseStrategyProvider implements Provider<PlanStrategy> 
 	public PlanStrategy get() {
 		final PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(this.randomPlanSelector);
 		final BestTimeResponseStrategyModule module = new BestTimeResponseStrategyModule(this.scenario,
-				this.scoringParams, this.timeDiscr, // this.experiencedScoreAnalyzer,
-				this.tripRouterProvider.get(), 
-				this.mode2travelTime, this.maxTrials, this.maxFailures);
-		if (this.reRouteBefore) {
-			builder.addStrategyModule(
-					new org.matsim.core.replanning.modules.ReRoute(facilities, tripRouterProvider, globalConfigGroup));
-		}
+				this.scoringParams, this.timeDiscr, this.tripRouterProvider.get(), this.mode2travelTime, this.maxTrials,
+				this.maxFailures);
 		builder.addStrategyModule(module);
-		if (this.reRouteAfter) {
-			builder.addStrategyModule(
-					new org.matsim.core.replanning.modules.ReRoute(facilities, tripRouterProvider, globalConfigGroup));
-		}
+		builder.addStrategyModule(new org.matsim.core.replanning.modules.ReRoute(this.facilities,
+				this.tripRouterProvider, this.globalConfigGroup));
 		return builder.build();
 	}
 }

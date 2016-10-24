@@ -63,14 +63,19 @@ public class AccessibilityComputationNairobiTest {
 		// Input and output
 		String folderStructure = "../../";
 		String networkFile = "matsimExamples/countries/ke/nairobi/2015-10-15_network.xml";
+//		String networkFile = "../shared-svn/projects/maxess/data/nairobi/network/2015-10-15_network_modified_policy.xml";
+//		String networkFile = "../shared-svn/projects/maxess/data/kenya/network/2016-10-19_network_detailed.xml";
 		// Adapt folder structure that may be different on different machines, in particular on server
 		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
-		networkFile = folderStructure + networkFile ;
+		networkFile = folderStructure + networkFile;
+		
 //		final String facilitiesFile = folderStructure + "matsimExamples/countries/ke/nairobi/2015-10-15_facilities.xml";
 //		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/land_use/nairobi_LU_2010/facilities.xml";
-//		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/secondary/facilities.xml";
+//		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/primary_public/facilities.xml";
+//		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/health/hospitals/facilities.xml";
 		final String facilitiesFile = folderStructure + "matsimExamples/countries/ke/nairobi/2016-07-09_facilities_airports.xml"; //airports
 //		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/facilities/04/facilities.xml"; //airports
+		
 		final String outputDirectory = utils.getOutputDirectory();
 //		final String outputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/output/27/";
 //		String travelTimeMatrix = "../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/tt.csv";
@@ -79,9 +84,13 @@ public class AccessibilityComputationNairobiTest {
 		
 		// Parameters
 		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
-		final Envelope envelope = new Envelope(240000, 280000, 9844000, 9874000);
-		String name = "ke_nairobi_" + cellSize.toString().split("\\.")[0];
-		name = name + "_airport_min";
+		final Envelope envelope = new Envelope(240000, 280000, 9844000, 9874000); // whole Nairobi
+//		final Envelope envelope = new Envelope(246000, 271000, 9853000, 9863000); // whole Nairobi // central part
+//		final Envelope envelope = new Envelope(249000, 255000, 9854000, 9858000); // western Nairobi with Kibera
+//		final Envelope envelope = new Envelope(-70000, 800000, 9450000, 10500000); // whole Kenya
+//		final Envelope envelope = new Envelope(-70000, 420000, 9750000, 10100000); // Southwestern half of Kenya
+		final String runId = "ke_nairobi_" + PathUtils.getDate() + "_" + cellSize.toString().split("\\.")[0] + "_kodi_sec_";
+		final boolean push2Geoserver = false;
 		
 		// QGis parameters
 		boolean createQGisOutput = true;
@@ -89,7 +98,7 @@ public class AccessibilityComputationNairobiTest {
 		final Double lowerBound = -7.; // (upperBound - lowerBound) is ideally easily divisible by 7
 		final Double upperBound = 0.0;
 		final Integer range = 9; // In the current implementation, this must always be 9
-		final int symbolSize = 510; // Usually chosen a little bit larger than cellSize
+		final int symbolSize = 500; // Usually chosen a little bit larger than cellSize
 		final int populationThreshold = (int) (1 / (1000/cellSize * 1000/cellSize));
 		
 		// Config and scenario
@@ -102,9 +111,11 @@ public class AccessibilityComputationNairobiTest {
 		config.planCalcScore().setBrainExpBeta(200); // Set to high value to base computation on time to nearest facility only
 		
 		// Choose modes for accessibility computation
-		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.abort);
 
@@ -129,11 +140,13 @@ public class AccessibilityComputationNairobiTest {
 //		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
 //		log.info("Found activity types: " + activityTypes);
 		final List<String> activityTypes = new ArrayList<>();
-		activityTypes.add("airport");
+		activityTypes.add("airport"); // airport anaylis version
+//		activityTypes.add("Educational"); // land-use file version
 //		activityTypes.add("Commercial"); // land-use file version
 //		activityTypes.add("Industrial"); // land-use file version
 //		activityTypes.add("Public Purpose"); // land-use file version
 //		activityTypes.add("Recreational"); // land-use file version
+//		activityTypes.add("Hospital"); // kodi file version
 		
 		// Network density points
 		ActivityFacilities measuringPoints = AccessibilityUtils.createMeasuringPointsFromNetworkBounds(scenario.getNetwork(), cellSize);
@@ -143,7 +156,7 @@ public class AccessibilityComputationNairobiTest {
 
 		// Controller
 		final Controler controler = new Controler(scenario);
-		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, name, envelope, cellSize));
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, runId, envelope, cellSize, push2Geoserver));
 		controler.run();
 
 		// QGis
@@ -153,9 +166,11 @@ public class AccessibilityComputationNairobiTest {
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
-							lowerBound, upperBound, range, symbolSize, populationThreshold);
-					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					if (acg.getIsComputingMode().contains(mode)) {
+						VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
+								lowerBound, upperBound, range, symbolSize, populationThreshold);
+						VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+					}
 				}
 			}  
 		}

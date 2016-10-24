@@ -40,8 +40,8 @@ import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 public class ModalShareControlerListner implements StartupListener, IterationEndsListener{
 
 	private int firstIteration = 0;
-	private int numberOfIterations = 0;
-	private final SortedMap<String, double []> mode2numberofLegs = new TreeMap<>();
+//	private int numberOfIterations = 0;
+	private SortedMap<String, double []> mode2numberofLegs = new TreeMap<>();
 
 	@Inject
 	private ModalShareEventHandler modalShareHandler;
@@ -52,7 +52,7 @@ public class ModalShareControlerListner implements StartupListener, IterationEnd
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.firstIteration = event.getServices().getConfig().controler().getFirstIteration();
-		this.numberOfIterations = event.getServices().getConfig().controler().getLastIteration() - this.firstIteration + 1;
+//		this.numberOfIterations = event.getServices().getConfig().controler().getLastIteration() - this.firstIteration + 1;
 
 		this.events.addHandler(this.modalShareHandler);
 	}
@@ -66,22 +66,38 @@ public class ModalShareControlerListner implements StartupListener, IterationEnd
 		SortedMap<String, Integer > mode2legs = this.modalShareHandler.getMode2numberOflegs();
 		int itNrIndex = event.getIteration() - this.firstIteration;
 
-		if(itNrIndex == 0) {
-			for(String mode : mode2legs.keySet()) {
-				if ( ! mode2numberofLegs.containsKey(mode)){ // initialize
-					double [] legs = new double [this.numberOfIterations];
-					legs[itNrIndex] = mode2legs.get(mode);
-					mode2numberofLegs.put(mode, legs);
-				}
+		for(String mode : mode2legs.keySet()) {
+			if ( ! mode2numberofLegs.containsKey(mode)){ // initialize
+				double [] legs = new double [itNrIndex+1];
+				legs[itNrIndex] = mode2legs.get(mode);
+				mode2numberofLegs.put(mode, legs);
+			} else {
+				double [] legsSoFar = mode2numberofLegs.get(mode);
+				double [] legsNew = new double[legsSoFar.length+1];
+				System.arraycopy(legsSoFar,0,legsNew,0,legsSoFar.length);
+				legsNew[itNrIndex] = mode2legs.get(mode);
+				mode2numberofLegs.put(mode,legsNew);
 			}
-			return; // only one data points... so no plotting
 		}
 
-		//storeData 
-		for(String mode : mode2legs.keySet()) {
-			double [] legs = this.mode2numberofLegs.get(mode);
-			legs[itNrIndex] = mode2legs.get(mode);
-		}
+//		if(itNrIndex == 0) {
+//			for(String mode : mode2legs.keySet()) {
+//				if ( ! mode2numberofLegs.containsKey(mode)){ // initialize
+//					double [] legs = new double [this.numberOfIterations];
+//					legs[itNrIndex] = mode2legs.get(mode);
+//					mode2numberofLegs.put(mode, legs);
+//				}
+//			}
+//			return; // only one data points... so no plotting
+//		}
+//
+//		//storeData
+//		for(String mode : mode2legs.keySet()) {
+//			double [] legs = this.mode2numberofLegs.get(mode);
+//			legs[itNrIndex] = mode2legs.get(mode);
+//		}
+
+		if(itNrIndex == 0) return;
 
 		//plot data here...
 		XYLineChart chart = new XYLineChart("Modal Share", "iteration", "Number of legs");

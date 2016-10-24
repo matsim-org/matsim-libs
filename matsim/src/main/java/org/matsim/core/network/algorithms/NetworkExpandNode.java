@@ -91,6 +91,7 @@ public class NetworkExpandNode {
 	 * offset <code>e</code>.</li>
 	 * </ul>
 	 * <pre>
+	 * {@code
 	 * <-----12------         <----21-------
 	 *
 	 *            x-0 o     o 1-5
@@ -104,10 +105,12 @@ public class NetworkExpandNode {
 	 *               |       |
 	 *               |       |
 	 *               v       |
+	 * }
 	 * </pre>
 	 * </li>
 	 * <li>connects each incident link of the given node with the corresponding <code>new_node</code>
 	 * <pre>
+	 * {@code
 	 * <-----12------ o     o <----21-------
 	 *                   O
 	 * ------11-----> o     o -----22------>
@@ -118,10 +121,12 @@ public class NetworkExpandNode {
 	 *                 |   |
 	 *                 |   |
 	 *                 v   |
+	 * }
 	 * </pre>
 	 * </li>
 	 * <li>removes the given node from the network
 	 * <pre>
+	 * {@code
 	 * <-----12------ o     o <----21-------
 	 *
 	 * ------11-----> o     o -----22------>
@@ -132,6 +137,7 @@ public class NetworkExpandNode {
 	 *                 |   |
 	 *                 |   |
 	 *                 v   |
+	 * }
 	 * </pre>
 	 * </li>
 	 * <li>inter-connects the <code>new_node</code>s with new links as defined in the
@@ -142,6 +148,7 @@ public class NetworkExpandNode {
 	 * <li>freespeed, capacity, permlanes, origId and type are equals to the attributes of the fromLink.</li>
 	 * </ul>
 	 * <pre>
+	 * {@code
 	 * <-----12------ o <--21-0-- o <----21-------
 	 *
 	 * ------11-----> o --11-1--> o -----22------>
@@ -156,6 +163,7 @@ public class NetworkExpandNode {
 	 *                    |   |
 	 *                    |   |
 	 *                    v   |
+	 * }
 	 * </pre>
 	 * </li>
 	 * </ol>

@@ -16,10 +16,16 @@
         </plugins>
     </build>
     <dependencies>
-  	<dependency>
-  		<groupId>org.matsim.contrib</groupId>
-  		<artifactId>otfvis</artifactId>
-  		<version>0.9.0-SNAPSHOT</version>
-  	</dependency>
-  </dependencies>
+        <dependency>
+            <groupId>org.matsim.contrib</groupId>
+            <artifactId>otfvis</artifactId>
+            <version>0.9.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.matsim</groupId>
+            <artifactId>matsim-examples</artifactId>
+            <version>0.9.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

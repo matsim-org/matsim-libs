@@ -343,14 +343,14 @@ public class RunPSim {
 
     /**
      * @author fouriep
-     *         <p/>
+     *         <p></p>
      *         Switches between two mobility simulations, the first being the
      *         expensive one, the second being cheap.
-     *         <p/>
+     *         <p></p>
      *         Switches between the expensive sim and the cheap sim according to the
      *         config parameters used in the constructore. Always executes the
      *         expensive sim at the last iteration.
-     *         <p/>
+     *         <p></p>
      *         Raises a static boolean flag for others to read if it's currently on
      *         an expensive sim; this flag defaults to true if the mobsimswitcher is
      *         not instantiated

@@ -43,10 +43,10 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Compares performance of transit routing with and without A Star.
- * <br/>
+ * <br>
  * Improvement seems to depend on the transit schedule. For C. Dobler's full Switzerland (very heavyweight, lots of transfer links),
  * A Star performs worse. For P. Bösch full Switzerland (somehow much lighter), A Star is 25% faster.
- * <br/>
+ * <br>
  * More details for P. Bösch full switzerland for 1000 random ODs:
  * <ul>
  *     <li>overdo 1, 16 degree landmarks: 25% faster</li>
@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit;
  *     <li>overdo 1.25, 32 degree landmarks:  26% faster</li>
  * </ul>
  *
- * <br/>
+ * <br>
  * More details for P. Bösch full switzerland for 1000 random trips from the Mikrozensus:
  * <ul>
  *     <li>overdo 1, 16 degree landmarks:  0% faster</li>

@@ -89,7 +89,7 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
  * Future plans include: pull the agent counter write methods back into QSim (no big deal, I hope); pull the actstart/end,
  * agent departure/arrival back into QSim+engines; somewhat separate the teleportation engine and the activities engine from the
  * framework part of QSim.
- * <p/>
+ * <p></p>
  * @author dstrippgen
  * @author mrieser
  * @author dgrether

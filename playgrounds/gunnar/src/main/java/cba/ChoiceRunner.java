@@ -1,6 +1,7 @@
 package cba;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,15 @@ class ChoiceRunner implements Runnable {
 
 	private final List<TourSequence> alternatives;
 
-	private final UtilityFunction utilityFunction;
+	// private final UtilityFunction utilityFunction;
+
+	private final Provider<TripRouter> tripRouterProvider;
+
+	private final Map<String, TravelTime> mode2travelTime;
+
+	private final int maxTrials;
+
+	private final int maxFailures;
 
 	private Plan chosenPlan = null;
 
@@ -43,8 +52,10 @@ class ChoiceRunner implements Runnable {
 		this.homeLoc = homeLoc;
 		this.person = person;
 		this.alternatives = tourSeqAlternatives;
-		this.utilityFunction = new UtilityFunction(scenario, tripRouterProvider, mode2travelTime, maxTrials,
-				maxFailures);
+		this.tripRouterProvider = tripRouterProvider;
+		this.mode2travelTime = mode2travelTime;
+		this.maxTrials = maxTrials;
+		this.maxFailures = maxFailures;
 	}
 
 	Plan getChosenPlan() {
@@ -54,6 +65,10 @@ class ChoiceRunner implements Runnable {
 	@Override
 	public void run() {
 
+		// using a copy of mode2travelTime for thread safety
+		final UtilityFunction utilityFunction = new UtilityFunction(this.scenario, this.tripRouterProvider,
+				new LinkedHashMap<>(this.mode2travelTime), this.maxTrials, this.maxFailures);
+
 		final List<Plan> planAlternatives = new ArrayList<>(this.alternatives.size());
 
 		// compute utilities
@@ -62,9 +77,9 @@ class ChoiceRunner implements Runnable {
 		for (TourSequence alternative : this.alternatives) {
 			final Plan plan = alternative.asPlan(this.scenario, homeLoc.getId(), this.person);
 			planAlternatives.add(plan);
-			this.utilityFunction.evaluate(plan);
-			plan.setScore(this.utilityFunction.getMATSimUtility());
-			final double utility = this.utilityFunction.getTotalUtility();
+			utilityFunction.evaluate(plan);
+			plan.setScore(utilityFunction.getMATSimUtility());
+			final double utility = utilityFunction.getTotalUtility();
 			utilities.add(utility);
 			maxUtility = Math.max(maxUtility, utility);
 		}
@@ -75,11 +90,15 @@ class ChoiceRunner implements Runnable {
 			probas.set(i, Math.exp(utilities.get(i) - maxUtility));
 		}
 		probas.makeProbability();
-		final int chosenIndex = MathHelpers.draw(probas, MatsimRandom.getRandom());
+
+		final int chosenIndex = draw(probas);
 
 		this.chosenPlan = planAlternatives.get(chosenIndex);
 
 		System.out.println("replanned person " + this.person.getId());
 	}
 
+	private synchronized static int draw(final Vector probas) {
+		return MathHelpers.draw(probas, MatsimRandom.getRandom());
+	}
 }

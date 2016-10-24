@@ -37,7 +37,7 @@
  * (which might be difficult given their current approach)?
  * </ul>
  * </ul>
- * <p/>
+ * <p></p>
  * How translate into the matsim q model?  Some thoughts:<ul>
  * <li> Vehicles are moved into the buffer when their time is up, without physical queuing constraints.  This means (at least?) the following:<ul>
  * <li> Buffer has infinite size.

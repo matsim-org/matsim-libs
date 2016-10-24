@@ -26,8 +26,6 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoLocator;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.cliquedistributionsnowball.CliqueEgoDistribution;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.cliquedistributionsnowball.CliquesDistributionCliquesFiller;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.degreebased.SimpleCliquesFiller;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.degreebased.SimpleEgoDistribution;
 
 /**
  * @author thibautd
@@ -54,18 +52,7 @@ public class SimpleSnowballModule extends AbstractModule {
 
 		bind( SnowballCliques.class ).toInstance( snowballCliques );
 
-		// this varies with method
-		switch ( configGroup.getSamplingMethod() ) {
-			case degreeBased:
-				bind( EgoCharacteristicsDistribution.class ).to( SimpleEgoDistribution.class );
-				bind( CliquesFiller.class ).to( SimpleCliquesFiller.class );
-				break;
-			case cliqueBased:
-				bind( EgoCharacteristicsDistribution.class ).to( CliqueEgoDistribution.class );
-				bind( CliquesFiller.class ).to( CliquesDistributionCliquesFiller.class );
-				break;
-			default:
-				throw new RuntimeException( configGroup.getSamplingMethod()+" not implemented yet" );
-		}
+		bind( EgoCharacteristicsDistribution.class ).to( CliqueEgoDistribution.class );
+		bind( CliquesFiller.class ).to( CliquesDistributionCliquesFiller.class );
 	}
 }

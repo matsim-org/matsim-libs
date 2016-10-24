@@ -47,6 +47,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -248,7 +249,7 @@ public class CountsControlerListenerTest {
 	
 	@Test
 	public void test_writeCountsInterval() {
-		Config config = this.util.createConfig(util.getTestScenarioURL("triangle"));
+		Config config = this.util.createConfig(ExamplesUtils.getTestScenarioURL("triangle"));
 		CountsConfigGroup cConfig = config.counts();
 		
 		cConfig.setWriteCountsInterval(3);
@@ -284,7 +285,7 @@ public class CountsControlerListenerTest {
 	
 	@Test
 	public void testReset_CorrectlyExecuted() throws IOException {
-		Config config = this.util.createConfig(util.getTestScenarioURL("triangle"));
+		Config config = this.util.createConfig(ExamplesUtils.getTestScenarioURL("triangle"));
 		config.network().setInputFile("network.xml");	// network file which is used by the counts file
 		
 		CountsConfigGroup cConfig = config.counts();
@@ -325,7 +326,7 @@ public class CountsControlerListenerTest {
 	
 	@Test
 	public void testFilterAnalyzedModes() throws IOException {
-		Config config = util.createConfig(util.getTestScenarioURL("triangle"));
+		Config config = util.createConfig(ExamplesUtils.getTestScenarioURL("triangle"));
 		config.network().setInputFile("network.xml");	// network file which is used by the counts file
 		
 		CountsConfigGroup cConfig = config.counts();

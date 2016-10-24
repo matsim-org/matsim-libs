@@ -34,9 +34,9 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * Essentially an interface, but since I do not want the methods public for the time being, it is incarnated as an abstract class.
- * <p/>
+ * <p></p>
  * Contains all the logic for the QLinks which make up the QNetwork.
- * <p/>
+ * <p></p>
  * One can argue that the QNetsimEngine could treat more general links than just "queues".  However, in the end they live with 
  * "(qlane.)addFromUpstream" and "(qlane.)addFromUpstream", which is quite restricted, since it does not pass the velocity.
  * Not passing the velocity means that it cannot be used for more general mobsims.

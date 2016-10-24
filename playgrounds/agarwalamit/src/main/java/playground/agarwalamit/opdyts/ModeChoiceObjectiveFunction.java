@@ -19,10 +19,7 @@
 
 package playground.agarwalamit.opdyts;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import javax.inject.Inject;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
@@ -43,6 +40,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ExperiencedPlansService;
 import org.matsim.core.utils.geometry.CoordUtils;
+import playground.agarwalamit.opdyts.patna.PatnaCMPDistanceDistribution;
 
 /**
  *
@@ -54,6 +52,8 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
     private static final Logger log = Logger.getLogger( ModeChoiceObjectiveFunction.class );
 
     private MainModeIdentifier mainModeIdentifier ;
+    private final OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases;
+    private final PatnaCMPDistanceDistribution distriInfo = new PatnaCMPDistanceDistribution();
 
     @Inject ExperiencedPlansService service ;
     @Inject TripRouter tripRouter ;
@@ -68,87 +68,26 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         tripBeelineDistances
     }
 
-    private final Map<StatType,Databins<String>> statsContainer = new TreeMap<>() ;
+    private final Map<StatType,Databins<String>> simStatsContainer = new TreeMap<>() ;
     private final Map<StatType,DataMap<String>> sumsContainer  = new TreeMap<>() ;
-    private final Map<StatType,Databins<String>> meaContainer = new TreeMap<>() ;
+    private final Map<StatType,Databins<String>> refStatsContainer = new TreeMap<>() ;
 
 
     public ModeChoiceObjectiveFunction(final OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases) {
+        this.opdytsObjectiveFunctionCases = opdytsObjectiveFunctionCases;
         for ( StatType statType : StatType.values() ) {
             // define the bin boundaries:
             switch ( statType ) {
                 case tripBeelineDistances: {
-                    double[] dataBoundariesTmp = getDataBoundaries(opdytsObjectiveFunctionCases);
+                    double[] dataBoundariesTmp = getDataBoundaries();
                     {
-                        this.statsContainer.put( statType, new Databins<>( statType.name(), dataBoundariesTmp )) ;
+                        this.simStatsContainer.put( statType, new Databins<>( statType.name(), dataBoundariesTmp )) ;
                     }
                     {
                         final Databins<String> databins = new Databins<>( statType.name(), dataBoundariesTmp ) ;
 
-                        switch (opdytsObjectiveFunctionCases) {
-                            case EQUIL:
-                                double carVal = 1000. ;
-                                databins.addValue( TransportMode.car, 8, carVal);
-                                databins.addValue( TransportMode.pt, 8, 4000.-carVal);
-                                break;
-                            case EQUIL_MIXEDTRAFFIC:
-                                carVal = 1000.;
-                                databins.addValue( TransportMode.car, 8, carVal);
-                                databins.addValue( "bicycle", 8, 4000.- carVal);
-                                break;
-                            case PATNA:
-                                double totalLegs = 13278.0 * 2.0; // each person make two trips; here trips are counted not persons.
-                                double legsSumAllModes = 0;
-                            {
-                                double [] carVals = {6.0, 17.0, 20.0, 19.0, 26.0, 12.0};
-                                double carLegs = 0.02 * totalLegs;
-                                for (int idx = 0; idx < dataBoundariesTmp.length; idx++) {
-                                    double legs = Math.round( carLegs * carVals[idx] / 100.);
-                                    databins.addValue("car", idx, legs);
-                                    legsSumAllModes += legs;
-                                }
-                            }
-                            {
-                                double [] motorbikeVals = {7.0, 35.0, 19.0, 23.0, 8.0, 8.0};
-                                double motorbikeLegs = 0.14 * totalLegs;
-                                for (int idx = 0; idx < dataBoundariesTmp.length; idx++) {
-                                    double legs = Math.round( motorbikeLegs * motorbikeVals[idx] / 100.);
-                                    databins.addValue("car", idx, legs);
-                                    legsSumAllModes += legs;
-                                }
-                            }
-                            {
-                                double [] bikeVals = {10.0, 51.0, 16.0, 15.0, 1.0, 7.0};
-                                double bikeLegs = 0.33 * totalLegs;
-                                for (int idx = 0; idx < dataBoundariesTmp.length; idx++) {
-                                    double legs = Math.round(bikeLegs * bikeVals[idx] / 100.);
-                                    databins.addValue("car", idx, legs);
-                                    legsSumAllModes += legs;
-                                }
-                            }
-                            {
-                                double [] ptVals = {6.4, 23.9, 34.5, 10.5, 12.7, 12.0};
-                                double ptLegs = 0.22 * totalLegs;
-                                for (int idx = 0; idx < dataBoundariesTmp.length; idx++) {
-                                    double legs = Math.round(ptLegs * ptVals[idx] / 100.);
-                                    databins.addValue("car", idx, legs);
-                                    legsSumAllModes += legs;
-                                }
-                            }
-                            {
-                                double [] walkVals = {70.0, 28.0, 1.0, 1., 0.0, 0.0};
-                                double walkLegs = 0.29 * totalLegs;
-                                for (int idx = 0; idx < dataBoundariesTmp.length; idx++) {
-                                    double legs = Math.round(walkLegs * walkVals[idx] / 100.);
-                                    databins.addValue("car", idx, legs);
-                                    legsSumAllModes += legs;
-                                }
-                            }
-                            System.out.println("Total legs "+totalLegs+" ans sum of all legs "+legsSumAllModes);
-                            break;
-                            default: throw new RuntimeException("not implemented");
-                        }
-                        this.meaContainer.put( statType, databins) ;
+                        fillDatabins(databins, dataBoundariesTmp.length);
+                        this.refStatsContainer.put( statType, databins) ;
                     }
                     break; }
                 default:
@@ -162,7 +101,8 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                 mainModeIdentifier = new TransportPlanningMainModeIdentifier();
                 break;
             case EQUIL_MIXEDTRAFFIC:
-            case PATNA:
+            case PATNA_1Pct:
+            case PATNA_10Pct:
                 mainModeIdentifier = new MainModeIdentifier() {
                     @Override
                     public String identifyMainMode(List<? extends PlanElement> tripElements) {
@@ -177,49 +117,131 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         }
     }
 
-    private double [] getDataBoundaries(final OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases) {
-        switch (opdytsObjectiveFunctionCases){
+    private void fillDatabins(Databins<String> databins, int dataBoundariesLength) {
+        switch (this.opdytsObjectiveFunctionCases) {
             case EQUIL:
+                double carVal = 1000. ;
+                databins.addValue( TransportMode.car, 8, carVal);
+                databins.addValue( TransportMode.pt, 8, 4000.-carVal);
+                break;
             case EQUIL_MIXEDTRAFFIC:
-                return new double[] {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.};
-            case PATNA:
-                return new double[] {0., 2000., 4000., 6000., 8000., 10000.};
+                carVal = 1000.;
+                databins.addValue( TransportMode.car, 8, carVal);
+                databins.addValue( "bicycle", 8, 4000.- carVal);
+                break;
+            case PATNA_1Pct:
+                double totalLegs = 13278.0 * 2.0; // each person make two trips; here trips are counted not persons.
+                patnaModalDistDistribution(totalLegs,databins,dataBoundariesLength);
+            break;
+            case PATNA_10Pct:
+                totalLegs = 13278.0 * 10 * 2.0; // each person make two trips; here trips are counted not persons.
+                patnaModalDistDistribution(totalLegs,databins,dataBoundariesLength);
             default: throw new RuntimeException("not implemented");
         }
     }
 
-    @Override public double value(SimulatorState state) {
+    private void patnaModalDistDistribution(final double totalLegs, final Databins<String> databins, final int dataBoundariesLength){
+        double legsSumAllModes = 0;
+        SortedMap<String, double []> mode2distanceBasedLegs = distriInfo.getMode2DistanceBasedLegs();
+        for (String mode : mode2distanceBasedLegs.keySet()) {
+            double [] distBasedLegs = mode2distanceBasedLegs.get(mode);
+            for (int idx = 0; idx < dataBoundariesLength; idx++) {
+                databins.addValue(mode, idx, distBasedLegs[idx]);
+            }
+        }
+    }
+
+    private double [] getDataBoundaries() {
+        switch (this.opdytsObjectiveFunctionCases){
+            case EQUIL:
+            case EQUIL_MIXEDTRAFFIC:
+                return new double[] {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.};
+            case PATNA_1Pct:
+            case PATNA_10Pct:
+                return distriInfo.getDistClasses();
+            default: throw new RuntimeException("not implemented");
+        }
+    }
+
+    @Override
+    public double value(SimulatorState state) {
 
         resetContainers();
 
-        StatType statType = StatType.tripBeelineDistances ;
+        StatType statType = StatType.tripBeelineDistances;
 
-        for ( Plan plan : service.getExperiencedPlans().values() ) {
-            List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan, tripRouter.getStageActivityTypes() ) ;
-            for ( TripStructureUtils.Trip trip : trips ) {
-                List<String> tripTypes = new ArrayList<>() ;
+        for (Plan plan : service.getExperiencedPlans().values()) {
+            List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan, tripRouter.getStageActivityTypes());
+            for (TripStructureUtils.Trip trip : trips) {
+                List<String> tripTypes = new ArrayList<>();
                 String mode = mainModeIdentifier.identifyMainMode(trip.getLegsOnly());
-                tripTypes.add(mode) ;
-                double item = calcBeelineDistance( trip.getOriginActivity(), trip.getDestinationActivity() ) ;
+                tripTypes.add(mode);
+                double item = calcBeelineDistance(trip.getOriginActivity(), trip.getDestinationActivity());
                 addItemToAllRegisteredTypes(tripTypes, statType, item);
             }
         }
 
+         /*
+          *  From Gunnar,
+          *  The (..)^2 objective function becomes very steep when one is very far away from its minimum.
+          *  Meaning that once one is far off, it becomes difficult to get back because
+          *  then the effects even of very small decision variable variations get strongly amplified in the objective function.
+          */
+        switch (this.opdytsObjectiveFunctionCases) {
+            case EQUIL:
+            case EQUIL_MIXEDTRAFFIC:
+                return getEquilObjectiveFunctionValue();
+            case PATNA_1Pct:
+            case PATNA_10Pct:
+                return getPatnaObjectiveFunctionValue();
+            default:
+                throw new RuntimeException("not implemented yet.");
+        }
+    }
+
+    private double getPatnaObjectiveFunctionValue() {
         double objective = 0. ;
-        double sum = 0.;
-        for ( Map.Entry<StatType, Databins<String>> entry : statsContainer.entrySet() ) {
+        for ( Map.Entry<StatType, Databins<String>> entry : simStatsContainer.entrySet() ) {
             StatType theStatType = entry.getKey() ;  // currently only one type ;
-            log.warn( "statType=" + statType );
+            log.warn( "statType=" + theStatType );
+            if(! theStatType.equals(StatType.tripBeelineDistances)) throw new RuntimeException("not implemented yet.");
+
             Databins<String> databins = entry.getValue() ;
             for ( Map.Entry<String, double[]> theEntry : databins.entrySet() ) {
                 String mode = theEntry.getKey() ;
                 log.warn("mode=" + mode);
-                double[] value = theEntry.getValue() ;
-                double[] reaVal = this.meaContainer.get( theStatType).getValues(mode) ;
-                for ( int ii=0 ; ii<value.length ; ii++ ) {
-                    double diff = value[ii] - reaVal[ii] ;
-                    if ( reaVal[ii]>0.1 || value[ii]>0.1 ) {
-                        log.warn( "distanceBnd=" + databins.getDataBoundaries()[ii] + "; objVal=" + reaVal[ii] + "; simVal=" + value[ii] ) ;
+
+                double[] simValue = theEntry.getValue() ;
+                double[] reaVal = this.refStatsContainer.get( theStatType).getValues(mode) ;
+                for ( int ii=0 ; ii<simValue.length ; ii++ ) {
+                    double diff = Math.abs( simValue[ii] - reaVal[ii] ) ;
+                    if ( reaVal[ii]>0.1 || simValue[ii]>0.1 ) {
+                        log.warn( "distanceBnd=" + databins.getDataBoundaries()[ii] + "; objVal=" + reaVal[ii] + "; simVal=" + simValue[ii] ) ;
+                    }
+                    objective +=  diff ;
+                }
+            }
+        }
+        log.warn( "objective=" + objective );
+        return objective ;
+    }
+
+    private double getEquilObjectiveFunctionValue (){
+        double objective = 0. ;
+        double sum = 0.;
+        for ( Map.Entry<StatType, Databins<String>> entry : simStatsContainer.entrySet() ) {
+            StatType theStatType = entry.getKey() ;  // currently only one type ;
+            log.warn( "statType=" + theStatType );
+            Databins<String> databins = entry.getValue() ;
+            for ( Map.Entry<String, double[]> theEntry : databins.entrySet() ) {
+                String mode = theEntry.getKey() ;
+                log.warn("mode=" + mode);
+                double[] simValue = theEntry.getValue() ;
+                double[] reaVal = this.refStatsContainer.get( theStatType).getValues(mode) ;
+                for ( int ii=0 ; ii<simValue.length ; ii++ ) {
+                    double diff = simValue[ii] - reaVal[ii] ;
+                    if ( reaVal[ii]>0.1 || simValue[ii]>0.1 ) {
+                        log.warn( "distanceBnd=" + databins.getDataBoundaries()[ii] + "; objVal=" + reaVal[ii] + "; simVal=" + simValue[ii] ) ;
                     }
                     objective += diff * diff ;
                     sum += reaVal[ii] ;
@@ -229,12 +251,11 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         objective /= (sum*sum) ;
         log.warn( "objective=" + objective );
         return objective ;
-
     }
 
     private void resetContainers() {
         for ( StatType statType : StatType.values() ) {
-            this.statsContainer.get(statType).clear() ;
+            this.simStatsContainer.get(statType).clear() ;
             if ( this.sumsContainer.get(statType)==null ) {
                 this.sumsContainer.put( statType, new DataMap<>() ) ;
             }
@@ -247,14 +268,15 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         for ( String filter : filters ) {
 
             // ...  add the "item" to the correct bin in the container:
-            int idx = this.statsContainer.get(statType).getIndex(item) ;
-            this.statsContainer.get(statType).inc( filter, idx ) ;
+            int idx = this.simStatsContainer.get(statType).getIndex(item) ;
+            this.simStatsContainer.get(statType).inc( filter, idx ) ;
 
             // also add it to the sums container:
             this.sumsContainer.get(statType).addValue( filter, item ) ;
 
         }
     }
+
     private static int noCoordCnt = 0 ;
     private double calcBeelineDistance(final Activity fromAct, final Activity toAct) {
         double item;
@@ -272,7 +294,4 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         }
         return item;
     }
-
-
-
 }

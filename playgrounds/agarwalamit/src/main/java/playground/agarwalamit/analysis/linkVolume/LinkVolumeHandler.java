@@ -88,6 +88,9 @@ public class LinkVolumeHandler implements LinkLeaveEventHandler, VehicleEntersTr
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		String mode = person2mode.get( this.delegate.getDriverOfVehicle(event.getVehicleId()) );
+		if(mode==null) {
+			throw new RuntimeException("No mode found for person "+ this.delegate.getDriverOfVehicle(event.getVehicleId()) +" while leaving link. Event : "+event.toString()+". Should not happen.");
+		}
 		double pcu = mode2pcu.isEmpty() ? MixedTrafficVehiclesUtils.getPCU(mode) : mode2pcu.get(mode);
 		
 		int slotInt = getSlot(event.getTime());

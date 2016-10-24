@@ -23,14 +23,14 @@ public class TransitScheduleValidatorTest {
 
 	@Test
 	public void testPtTutorial() {
-		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("examples/pt-tutorial/0.config.xml"));
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("test/scenarios/pt-tutorial/0.config.xml"));
 		TransitScheduleValidator.ValidationResult validationResult = TransitScheduleValidator.validateAll(scenario.getTransitSchedule(), scenario.getNetwork());
 		Assert.assertThat(validationResult.getIssues(), empty());
 	}
 
 	@Test
 	public void testPtTutorialWithError() {
-		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("examples/pt-tutorial/0.config.xml"));
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("test/scenarios/pt-tutorial/0.config.xml"));
 		TransitLine transitLine = scenario.getTransitSchedule().getTransitLines().get(Id.create("Blue Line", TransitLine.class));
 		transitLine.getRoutes().get(Id.create("3to1", TransitRoute.class)).getRoute().setLinkIds(Id.createLinkId("33"), Collections.<Id<Link>>emptyList(), Id.createLinkId("11"));
 		TransitScheduleValidator.ValidationResult validationResult = TransitScheduleValidator.validateAll(scenario.getTransitSchedule(), scenario.getNetwork());

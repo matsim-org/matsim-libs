@@ -66,7 +66,7 @@ public interface Route extends MatsimPopulationObject {
 	/** make the clone method public, but do NOT implement Cloneable
 	 * so that implementations can decide on their own if they support
 	 * Cloneable or not.
-	 * <p/>
+	 * <p></p>
 	 * Design comments:<ul>
 	 * <li>Do we really want this?  Martin ("Clean code") argues for the difference between data objects and behavioral objects.  Data objects should
 	 * only be accessed via the interface methods.  I think that "route" is a data object.  In consequence, "copy" and/or "deepCopy" should, in 

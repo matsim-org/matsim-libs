@@ -41,7 +41,7 @@ class TimeStructureOptimizer {
 	private final int maxFailures;
 
 	private final Map<String, TravelTime> mode2travelTime;
-	
+
 	// -------------------- CONSTRUCTION --------------------
 
 	TimeStructureOptimizer(final Scenario scenario, final Provider<TripRouter> tripRouterProvider, final int maxTrials,
@@ -60,8 +60,7 @@ class TimeStructureOptimizer {
 	double computeScore(final Plan plan) {
 
 		final BestTimeResponseTravelTimes travelTimes = new BestTimeResponseTravelTimes(this.scenario.getNetwork(),
-				this.timeDiscretization, this.tripRouterProvider.get(), plan.getPerson(),
-				this.mode2travelTime);
+				this.timeDiscretization, this.tripRouterProvider.get(), plan.getPerson(), this.mode2travelTime);
 
 		final BestTimeResponseStrategyFunctionality initialPlanData = new BestTimeResponseStrategyFunctionality(plan,
 				this.scenario.getNetwork(), this.scoringParams, this.timeDiscretization, travelTimes);
@@ -70,12 +69,10 @@ class TimeStructureOptimizer {
 
 		timeAlloc.optimizeDepartureTimes(initialPlanData.plannedActivities, this.maxTrials, this.maxFailures);
 
-		// >>> TODO NEW >>>
 		for (int i = 0; i < timeAlloc.getResultPoint().length; i++) {
 			final Activity act = (Activity) plan.getPlanElements().get(2 * i);
 			act.setEndTime(timeAlloc.getResultPoint()[i]);
 		}
-		// <<< TODO NEW <<<
 
 		return timeAlloc.getResultValue();
 	}

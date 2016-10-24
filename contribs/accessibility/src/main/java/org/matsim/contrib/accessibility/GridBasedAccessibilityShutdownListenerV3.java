@@ -281,7 +281,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 	/**
 	 * I wanted to plot something like (max(acc)-acc)*population.  For that, I needed "population" at the x/y coordinates.
 	 * This is the mechanics via which I inserted that. (The computation is then done in postprocessing.)
-	 * <p/>
+	 * <p></p>
 	 * You can add arbitrary ActivityFacilities containers here.  They will be aggregated to the grid points, and then written to
 	 * file as additional column.
 	 */

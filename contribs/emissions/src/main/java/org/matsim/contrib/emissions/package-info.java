@@ -85,7 +85,7 @@
  * 
  * <h3>Emissions</h3>
  * The main package contains classes and methods to handle the emission input data and create
- * maps to associate the emissions with corresponding vehicle types, speed, parking time, ... <br/>
+ * maps to associate the emissions with corresponding vehicle types, speed, parking time, ... <br>
  *
  * <h3>Events</h3>
  * This class contains extensions of {@link org.matsim.api.core.v01.events.Event Event}
@@ -106,7 +106,7 @@
  * Instances of {@link org.matsim.contrib.emissions.types.HbefaColdEmissionFactorKey HbefaColdEmissionFactorKey} contain a vehicle category, a cold pollutant, a parking time range,
  * a distance, which is driven after parking and, again, vehicle attributes.
  * The cold/warm emission factor keys are mapped to the values of cold/warm emissions, the cold/warm emission factors.
- * <br/> <br/>
+ * <br> <br>
  * 
  * @author benjamin, julia
  */

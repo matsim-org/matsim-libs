@@ -249,7 +249,7 @@ public final class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersT
 
 	/** Handles the calculation of the area toll. Whenever the agent is seen on
 	 * one of the tolled link, the constant toll amount has to be paid once.
-	 * <br/>
+	 * <br>
 	 * Design comments:
 	 * <ul>
 	 * 		<li> This implementation becomes a problem if someone tries to 

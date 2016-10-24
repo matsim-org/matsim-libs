@@ -28,7 +28,7 @@ import java.util.Set;
 /**
  * Container to store multiple {@link PseudoTransitRoute}. Provides a
  * method to modify an input schedule by creating child StopFacilities.
- * <p/>
+ * <p></p>
  *
  * <ul><li>PseudoSchedule</li>
  *     <ul><li>{@link PseudoTransitRoute}</li>
@@ -36,7 +36,7 @@ import java.util.Set;
  *         </ul>
  *     </ul>
  * </ul>
- * <p/>
+ * <p></p>
  *
  * {@link PseudoGraph} uses PseudoRouteStops as nodes and is used to calculate
  * the best sequence of PseudoRouteStops for a route.

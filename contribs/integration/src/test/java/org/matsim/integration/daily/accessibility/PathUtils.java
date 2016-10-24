@@ -19,6 +19,7 @@
 package org.matsim.integration.daily.accessibility;
 
 import java.io.File;
+import java.util.Calendar;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
@@ -65,5 +66,16 @@ class PathUtils {
 		}
 		return folderStructure ;
 	}
+	
 
+	static String getDate() {
+		Calendar cal = Calendar.getInstance ();
+		int month = cal.get(Calendar.MONTH) + 1;
+		String monthStr = month + "";
+		if (month < 10)
+			monthStr = "0" + month;
+		String date = cal.get(Calendar.YEAR) + "-" 
+				+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);
+		return date;
+	}
 }

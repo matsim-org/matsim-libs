@@ -61,6 +61,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -204,7 +205,7 @@ public class MultiModalControlerListenerTest {
 	void runBerlinScenario(int numberOfThreads) {
 
 		String inputDir = this.utils.getClassInputDirectory();
-		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(utils.getTestScenarioURL("berlin"), "config.xml"));
+		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("berlin"), "config.xml"));
 		ConfigUtils.loadConfig(config, inputDir + "config_berlin_multimodal.xml");
 		config.addModule(new MultiModalConfigGroup());
 		config.controler().setOutputDirectory(this.utils.getOutputDirectory());

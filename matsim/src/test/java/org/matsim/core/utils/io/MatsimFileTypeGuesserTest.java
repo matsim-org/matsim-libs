@@ -81,7 +81,7 @@ public class MatsimFileTypeGuesserTest {
 
 	@Test
 	public void testCountsV1Xsd() throws IOException {
-		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("examples/equil/counts100.xml");
+		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/scenarios/equil/counts100.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.Counts, g.getGuessedFileType());
 		assertNull(g.getPublicId());
 		assertEquals("http://matsim.org/files/dtd/counts_v1.xsd", g.getSystemId());

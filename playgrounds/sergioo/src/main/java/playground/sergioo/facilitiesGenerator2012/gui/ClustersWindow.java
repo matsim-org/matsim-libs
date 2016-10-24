@@ -52,7 +52,7 @@ public class ClustersWindow extends LayersWindow implements ActionListener {
 		ONE;
 	}
 	public enum Options implements LayersWindow.Options {
-		ZOOM("<html>Z<br/>O<br/>O<br/>M</html>");
+		ZOOM("<html>Z<br>O<br>O<br>M</html>");
 		private String caption;
 		private Options(String caption) {
 			this.caption = caption;

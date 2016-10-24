@@ -82,6 +82,7 @@ public class PatnaBikeTrackConnectionControler {
 	private static int numberOfConnectors = 15;
 	private static int updateConnectorsAfterIteration = 10;
 	private static int maxItration = 100;
+	private static double reduceLinkLengthBy = 1.;
 
 	private static final boolean isAllwoingMotorbikeOnBikeTrack = false;
 
@@ -96,6 +97,7 @@ public class PatnaBikeTrackConnectionControler {
 			numberOfConnectors = Integer.valueOf(args[3]);
 			updateConnectorsAfterIteration = Integer.valueOf(args[4]);
 			maxItration = Integer.valueOf(args[5]);
+			reduceLinkLengthBy = Double.valueOf(args[6]);
 		}
 
 		Map<Id<Link>, Link> linkIds = new HashMap<>(); // just to keep information about links
@@ -224,7 +226,7 @@ public class PatnaBikeTrackConnectionControler {
 		Node fromNode = scenario.getNetwork().getNodes().get(l.getFromNode().getId());
 		Node toNode = scenario.getNetwork().getNodes().get(l.getToNode().getId());
 		Link lNew = NetworkUtils.createAndAddLink(scenario.getNetwork(), l.getId(), fromNode, toNode,
-                l.getLength(), l.getFreespeed(), l.getCapacity(), l.getNumberOfLanes());
+                l.getLength()/reduceLinkLengthBy, l.getFreespeed(), l.getCapacity(), l.getNumberOfLanes());
 		lNew.setAllowedModes(new HashSet<>(modes));
 	}
 
@@ -266,7 +268,7 @@ public class PatnaBikeTrackConnectionControler {
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
 		config.vspExperimental().setWritingOutputEvents(true);
 
-		config.travelTimeCalculator().setFilterModes(true);
+		config.travelTimeCalculator().setSeparateModes(true);
 		config.travelTimeCalculator().setAnalyzedModes(String.join(",", PatnaUtils.ALL_MAIN_MODES));
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);

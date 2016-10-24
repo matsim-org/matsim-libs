@@ -61,9 +61,9 @@ import com.google.inject.util.Modules;
  * "Designed for inheritance."
  * Extend this class, overwrite configure, and use the methods of this class to
  * install your module.
- * <p/>
+ * <p></p>
  * See comments in subclasses.
- * <p/>
+ * <p></p>
  * AbstractModule is a custom version of com.google.inject.Module, with the following differences:<ul>
  * <li> AbstractModule is a bit more restrictive.
  * <li> AbstractModule already has the config (as getConfig() ), which is helpful since the config contains material that

@@ -18,11 +18,11 @@
  * *********************************************************************** */
 /**
  * These are pure data classes, with static methods to operate on them.
- * <p/>
+ * <p></p>
  * Methods can be added by local programming: Just add a new static method, e.g. computeDiameter( Shape shape ) ;
- * <p/>
+ * <p></p>
  * In contrast, adding a new Shape means a shotgun approach: every existing static behavioral method needs to be adapted. 
- * <p/>
+ * <p></p>
  * At the level of the MATSim data classes, we probably want this: we have reasonably stable data clases, plus static
  * methods to operate on them.
  * 

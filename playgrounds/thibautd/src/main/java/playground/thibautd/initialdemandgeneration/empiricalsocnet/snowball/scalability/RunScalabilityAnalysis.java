@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
@@ -54,6 +55,8 @@ public class RunScalabilityAnalysis {
 		final ScalabilityConfigGroup scalabilityConfigGroup = new ScalabilityConfigGroup();
 		final Config config = ConfigUtils.loadConfig( args[ 0 ] , scalabilityConfigGroup , new SocialNetworkSamplingConfigGroup() );
 		MoreIOUtils.initOut( config.controler().getOutputDirectory() );
+
+		new ConfigWriter( config ).write( config.controler().getOutputDirectory()+"/output_config.xml" );
 
 		try ( final ScalabilityStatisticsListener statsListenner = new ScalabilityStatisticsListener( config.controler().getOutputDirectory()+"/stats.dat"  )) {
 

@@ -50,7 +50,7 @@ import org.matsim.withinday.mobsim.MobsimDataProvider;
 
 /**
  * Take the plans that the agents have after within-day replanning, and write them to file.
- * <br/>
+ * <br>
  * Not the same as the {@link ExperiencedPlansService}, since that is based on the events.
  * 
  * @author (of documentation) nagel

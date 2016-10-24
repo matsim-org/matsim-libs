@@ -122,24 +122,24 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 
 		//		walkDisutilityMeasuringPoint2Road = walkUtility;
 
-		if ( cnt < 10 ) {
-			cnt ++ ; 
-			log.warn("#############");
-			log.warn("origin.getCoord() = " + origin.getCoord() + " -- destination.getNearestNode() = " + destination.getNearestNode());
-			log.warn("destination.getNumberOfObjects() = " + destination.getNumberOfObjects());
-			log.warn("distance.getDistancePoint2Road() = " + distance.getDistancePoint2Intersection());
-			log.warn("nearestLink.getFromNode().getCoord() = " + nearestLink.getFromNode().getCoord() + 
-					" -- nearestLink.getToNode().getCoord() = " + nearestLink.getToNode().getCoord());
-			log.warn("NEW distance coord - from coord = " + CoordUtils.calcEuclideanDistance(origin.getCoord(), nearestLink.getFromNode().getCoord()) + 
-					" -- NEW distance coord - to coord = " + CoordUtils.calcEuclideanDistance(origin.getCoord(), nearestLink.getToNode().getCoord()));
-			log.warn("projectionCoord = " + projectionCoord);
-			//		System.err.println("NEW walkDisutility = " + walkUtility);
-			log.warn("#############");
-			
-			if ( cnt==10 ) {
-				log.warn( Gbl.FUTURE_SUPPRESSED);
-			}
-		}
+//		if ( cnt < 10 ) {
+//			cnt ++ ; 
+//			log.warn("#############");
+//			log.warn("origin.getCoord() = " + origin.getCoord() + " -- destination.getNearestNode() = " + destination.getNearestNode());
+//			log.warn("destination.getNumberOfObjects() = " + destination.getNumberOfObjects());
+//			log.warn("distance.getDistancePoint2Road() = " + distance.getDistancePoint2Intersection());
+//			log.warn("nearestLink.getFromNode().getCoord() = " + nearestLink.getFromNode().getCoord() + 
+//					" -- nearestLink.getToNode().getCoord() = " + nearestLink.getToNode().getCoord());
+//			log.warn("NEW distance coord - from coord = " + CoordUtils.calcEuclideanDistance(origin.getCoord(), nearestLink.getFromNode().getCoord()) + 
+//					" -- NEW distance coord - to coord = " + CoordUtils.calcEuclideanDistance(origin.getCoord(), nearestLink.getToNode().getCoord()));
+//			log.warn("projectionCoord = " + projectionCoord);
+//			//		System.err.println("NEW walkDisutility = " + walkUtility);
+//			log.warn("#############");
+//			
+//			if ( cnt==10 ) {
+//				log.warn( Gbl.FUTURE_SUPPRESSED);
+//			}
+//		}
 		
 		double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
 		

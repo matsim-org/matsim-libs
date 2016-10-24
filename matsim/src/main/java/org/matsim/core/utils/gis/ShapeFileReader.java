@@ -111,31 +111,31 @@ public class ShapeFileReader implements MatsimSomeReader {
 
 	/**
 	 * <em>VERY IMPORTANT NOTE</em><br>
-	 * <p/>
+	 * <p></p>
 	 * There are many ways to use that class in a wrong way. The safe way is the following:
-	 * <p/>
+	 * <p></p>
 	 * <pre> ShapeFileReader shapeFileReader = new ShapeFileReader();
 	 * shapeFileReader.readFileAndInitialize(zonesShapeFile); </pre>
-	 * <p/>
+	 * <p></p>
 	 * Then, get the features by
-	 * <p/>
+	 * <p></p>
 	 * <pre> Set<{@link Feature}> features = shapeFileReader.getFeatureSet(); </pre>
-	 * <p/>
+	 * <p></p>
 	 * If you need metadata you can use
-	 * <p/>
+	 * <p></p>
 	 * <pre> FeatureSource fs = shapeFileReader.getFeatureSource(); </pre>
-	 * <p/>
+	 * <p></p>
 	 * to get access to the feature source.<br>
 	 * <em>BUT NEVER CALL <code>fs.getFeatures();</code> !!! It can happen that you will read from disk again!!! </em>
-	 * <p/>
+	 * <p></p>
 	 * <p>
 	 * Actually, the whole class must be fixed. But since it is anyway necessary to move to a more recent version of the geotools only this javadoc is added instead.
 	 * </p>
-	 * <p/>
+	 * <p></p>
 	 * <p>
 	 * The following old doc is kept here:
 	 * </p>
-	 * <p/>
+	 * <p></p>
 	 * Provides access to a shape file and returns a <code>FeatureSource</code> containing all features.
 	 * Take care access means on disk access, i.e. the FeatureSource is only a pointer to the information
 	 * stored in the file. This can be horribly slow if invoked many times and throw exceptions if two many read

@@ -19,16 +19,12 @@
 
 package org.matsim.integration.pt;
 
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -51,20 +47,4 @@ public class TransitIntegrationTest {
 		controler.run();
 	}
 
-	@Test
-	public void test_RunTutorial() {
-		Config config = this.utils.loadConfig(IOUtils.newUrl(utils.getTestScenarioURL("pt-tutorial"), "config.xml"));
-		config.planCalcScore().setWriteExperiencedPlans(true);
-		config.controler().setLastIteration(0);
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		config.controler().setCreateGraphs(false);
-		config.plans().setInputFile("population2.xml");
-		Controler controler = new Controler(config);
-        controler.run();
-
-		Scenario s = controler.getScenario();
-		Assert.assertNotNull(s.getTransitSchedule());
-		Assert.assertEquals(4, s.getTransitSchedule().getFacilities().size());
-		Assert.assertEquals(1, s.getTransitSchedule().getTransitLines().size());
-	}
 }

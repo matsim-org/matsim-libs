@@ -54,9 +54,9 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 		DOUBLE;
 	}
 	public enum Options implements LayersWindow.Options {
-		SELECT_LINK("<html>L<br/>I<br/>N<br/>K</html>"),
-		SELECT_NODES("<html>N<br/>O<br/>D<br/>E<br/>S</html>"),
-		ZOOM("<html>Z<br/>O<br/>O<br/>M</html>");
+		SELECT_LINK("<html>L<br>I<br>N<br>K</html>"),
+		SELECT_NODES("<html>N<br>O<br>D<br>E<br>S</html>"),
+		ZOOM("<html>Z<br>O<br>O<br>M</html>");
 		private String caption;
 		private Options(String caption) {
 			this.caption = caption;
