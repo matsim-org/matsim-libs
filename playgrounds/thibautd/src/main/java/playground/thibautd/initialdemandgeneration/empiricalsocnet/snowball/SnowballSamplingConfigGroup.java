@@ -19,6 +19,14 @@
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.utils.collections.CollectionUtils;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author thibautd
@@ -32,6 +40,11 @@ public class SnowballSamplingConfigGroup extends ReflectiveConfigGroup {
 
 	private boolean conditionCliqueSizeOnAge = false;
 	private boolean conditionCliqueSizeOnSex = false;
+
+	private int[] ageCuttingPoints =
+			IntStream.iterate( 3 , i -> i + 5 )
+				.limit( 50 )
+				.toArray();
 
 	private ConflictResolutionMethod conflictResolutionMethod = ConflictResolutionMethod.overload;
 
@@ -77,5 +90,22 @@ public class SnowballSamplingConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter("conflictResolutionMethod")
 	public void setConflictResolutionMethod( final ConflictResolutionMethod conflictResolutionMethod ) {
 		this.conflictResolutionMethod = conflictResolutionMethod;
+	}
+
+	@StringGetter("ageCuttingPoints")
+	public int[] getAgeCuttingPoints() {
+		return ageCuttingPoints;
+	}
+
+	@StringSetter("ageCuttingPoints")
+	private void setAgeCuttingPointsString( final String ageCuttingPoints ) {
+		setAgeCuttingPoints(
+				Arrays.stream( CollectionUtils.stringToArray( ageCuttingPoints ) )
+						.mapToInt( Integer::parseInt )
+						.toArray() );
+	}
+
+	public void setAgeCuttingPoints( final int[] ageCuttingPoints ) {
+		this.ageCuttingPoints = ageCuttingPoints;
 	}
 }

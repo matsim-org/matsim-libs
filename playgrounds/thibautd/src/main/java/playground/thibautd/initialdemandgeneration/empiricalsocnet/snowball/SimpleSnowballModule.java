@@ -34,12 +34,13 @@ import playground.thibautd.utils.spatialcollections.SpatialCollectionUtils;
  */
 public class SimpleSnowballModule extends AbstractModule {
 	private final SnowballCliques snowballCliques;
-	private final SnowballSamplingConfigGroup configGroup;
 
 	// could use matsim module to avoid passing config, but better to read data in constructor (configure might be called
 	// several times)
 	public SimpleSnowballModule( final Config config ) {
-		this.configGroup = (SnowballSamplingConfigGroup) config.getModule( SnowballSamplingConfigGroup.GROUP_NAME );
+		final SnowballSamplingConfigGroup configGroup =
+				(SnowballSamplingConfigGroup) config.getModule(
+					SnowballSamplingConfigGroup.GROUP_NAME );
 		this.snowballCliques = SnowballCliques.readCliques(
 											ConfigGroup.getInputFileURL(
 													config.getContext(),
@@ -52,6 +53,8 @@ public class SimpleSnowballModule extends AbstractModule {
 		bind( EgoLocator.class ).to( SnowballLocator.class );
 		bind( Position.class ).to( SnowballLocator.class );
 		bind( new TypeLiteral<SpatialCollectionUtils.Metric<double[]>>(){} ).to( SnowballLocator.class );
+
+		bind( SocialPositions.class );
 
 		bind( SnowballCliques.class ).toInstance( snowballCliques );
 

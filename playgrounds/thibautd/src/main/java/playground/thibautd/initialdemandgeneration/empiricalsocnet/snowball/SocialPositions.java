@@ -18,12 +18,15 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -33,12 +36,18 @@ import java.util.function.Consumer;
 /**
  * @author thibautd
  */
+@Singleton
 public class SocialPositions {
-	private static final int[] AGE_CUTTING_POINTS = {24, 38, 51, 66, Integer.MAX_VALUE};
+	private final int[] ageCuttingPoints;
 
-	private SocialPositions() {}
+	@Inject
+	private SocialPositions(
+			final SnowballSamplingConfigGroup configGroup ) {
+		this.ageCuttingPoints = Arrays.copyOf( configGroup.getAgeCuttingPoints() , configGroup.getAgeCuttingPoints().length );
+		Arrays.sort( ageCuttingPoints );
+	}
 
-	public static CliquePosition calcPosition( final SnowballCliques.Member ego, final SnowballCliques.Member alter ) {
+	public CliquePosition calcPosition( final SnowballCliques.Member ego, final SnowballCliques.Member alter ) {
 		return new CliquePosition(
 				CoordUtils.calcEuclideanDistance( ego.getCoord() , alter.getCoord() ),
 				calcBearing( ego.getCoord() , alter.getCoord() ),
@@ -65,11 +74,9 @@ public class SocialPositions {
 		return sign * Math.acos( normalizedXDiff );
 	}
 
-	public static int calcAgeClass( final int age ) {
-		for ( int i=0; i < AGE_CUTTING_POINTS.length; i++ ) {
-			if ( age < AGE_CUTTING_POINTS[ i ] ) return i;
-		}
-		throw new RuntimeException( "should not reach this point" );
+	public int calcAgeClass( final int age ) {
+		final int ageClass = Arrays.binarySearch( ageCuttingPoints , age );
+		return ageClass >= 0 ? ageClass : 1 - ageClass;
 	}
 
 	public static int calcDegreeClass( final int degree ) {
@@ -105,37 +112,6 @@ public class SocialPositions {
 				ego.getAlters().add( alter );
 			}
 		}
-	}
-
-	public static EgoClass createEgoClass(
-			final SnowballSamplingConfigGroup configGroup,
-			final Ego ego ) {
-		return createEgoClass(
-				configGroup,
-				PersonUtils.getAge( ego.getPerson() ),
-				getSex( ego ),
-				ego.getDegree() );
-	}
-
-	public static EgoClass createEgoClass(
-			final SnowballSamplingConfigGroup configGroup,
-			final SnowballCliques.Member ego ) {
-		return createEgoClass(
-				configGroup,
-				ego.getAge(),
-				ego.getSex(),
-				ego.getDegree() );
-	}
-
-	public static EgoClass createEgoClass(
-			final SnowballSamplingConfigGroup configGroup,
-			final int age,
-			final SnowballCliques.Sex sex,
-			final int degree ) {
-		final int ageClass = configGroup.isConditionCliqueSizeOnAge() ? calcAgeClass( age ) : -1;
-		final SnowballCliques.Sex theSex = configGroup.isConditionCliqueSizeOnSex() ? sex : null;
-
-		return new EgoClass( ageClass , theSex , degree );
 	}
 
 	public static class CliquePositions implements Iterable<CliquePosition> {

@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
@@ -35,6 +36,13 @@ public class SnowballLocator implements EgoLocator, Position, SpatialCollectionU
 	// a difference in the categorical variables is equivalent to 10'000 km
 	private static final double NON_SPATIAL_FACTOR = 10 * 1000 * 1000;
 	private static final double CLIQUE_SIZE_FACTOR = 100 * NON_SPATIAL_FACTOR;
+
+	private final SocialPositions positions;
+
+	@Inject
+	public SnowballLocator( final SocialPositions positions ) {
+		this.positions = positions;
+	}
 
 	@Override
 	public int getDimensionality() {
@@ -58,7 +66,7 @@ public class SnowballLocator implements EgoLocator, Position, SpatialCollectionU
 		return new double[]{
 				coord.getX() ,
 				coord.getY() ,
-				NON_SPATIAL_FACTOR * SocialPositions.calcAgeClass( PersonUtils.getAge( ego.getPerson() ) ) ,
+				NON_SPATIAL_FACTOR * positions.calcAgeClass( PersonUtils.getAge( ego.getPerson() ) ) ,
 				NON_SPATIAL_FACTOR * SocialPositions.getSex( ego ).ordinal(),
 				stub.getCliqueSize() * CLIQUE_SIZE_FACTOR };
 	}

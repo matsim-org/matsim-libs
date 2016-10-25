@@ -52,6 +52,7 @@ public class CliquesDistributionCliquesFiller implements CliquesFiller {
 	private final CliqueSampler allCliques;
 
 	private final Position position;
+	private final SocialPositions socialPositions;
 
 	private final Counter abortCounter = new Counter( "Incomplete clique # " );
 
@@ -60,8 +61,10 @@ public class CliquesDistributionCliquesFiller implements CliquesFiller {
 			final SnowballCliques snowballCliques,
 			final SnowballSamplingConfigGroup configGroup,
 			final Position position,
-			final AutocloserModule.Closer closer) {
+			final AutocloserModule.Closer closer,
+			final SocialPositions socialPositions ) {
 		this.position = position;
+		this.socialPositions = socialPositions;
 
 		final List<SocialPositions.CliquePositions> allCliquesList = new ArrayList<>();
 		for ( SnowballCliques.Clique snowballClique : snowballCliques.getCliques().values() ) {
@@ -70,7 +73,7 @@ public class CliquesDistributionCliquesFiller implements CliquesFiller {
 			allCliquesList.add( clique );
 
 			for ( SnowballCliques.Member alter : snowballClique.getAlters() ) {
-				clique.positions.add( SocialPositions.calcPosition( snowballClique.getEgo() , alter ) );
+				clique.positions.add( socialPositions.calcPosition( snowballClique.getEgo() , alter ) );
 			}
 		}
 
