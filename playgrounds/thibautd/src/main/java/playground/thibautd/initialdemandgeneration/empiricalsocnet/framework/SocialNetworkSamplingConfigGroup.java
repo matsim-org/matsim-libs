@@ -27,31 +27,8 @@ public class SocialNetworkSamplingConfigGroup extends ReflectiveConfigGroup {
 	private static final String GROUP_NAME = "socialNetworkSampler";
 
 
-	public enum TreeType {KDTree, VPTree}
-	private TreeType spatialTreeType = TreeType.KDTree;
-	private boolean rebalanceKdTree = false;
-
 	public SocialNetworkSamplingConfigGroup( ) {
 		super( GROUP_NAME );
 	}
 
-	@StringGetter("rebalanceKdTree")
-	public boolean doRebalanceKdTree() {
-		return rebalanceKdTree;
-	}
-
-	@StringSetter("rebalanceKdTree")
-	public void setRebalanceKdTree( final boolean rebalanceKdTree ) {
-		this.rebalanceKdTree = rebalanceKdTree;
-	}
-
-	@StringGetter("spatialTreeType")
-	public TreeType getSpatialTreeType() {
-		return spatialTreeType;
-	}
-
-	@StringSetter("spatialTreeType")
-	public void setSpatialTreeType( final TreeType spatialTreeType ) {
-		this.spatialTreeType = spatialTreeType;
-	}
 }

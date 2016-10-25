@@ -127,19 +127,9 @@ public class SocialNetworkSampler {
 	}
 
 	private SpatialTree<double[],CliqueStub> createSpatialTree() {
-		switch ( configGroup.getSpatialTreeType() ) {
-			case KDTree:
-				return new KDTree<>(
-						configGroup.doRebalanceKdTree(),
-						egoLocator.getDimensionality(),
-						egoLocator );
-			case VPTree:
-				return new VPTree<>(
-						SpatialCollectionUtils::squaredEuclidean,
-						egoLocator );
-			default:
-				throw new RuntimeException( configGroup.getSpatialTreeType()+"?" );
-		}
+		return new VPTree<>(
+				SpatialCollectionUtils::squaredEuclidean,
+				egoLocator );
 	}
 
 }
