@@ -86,7 +86,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                     {
                         final Databins<String> databins = new Databins<>( statType.name(), dataBoundariesTmp ) ;
 
-                        fillDatabins(databins, dataBoundariesTmp.length);
+                        fillDatabins(databins);
                         this.refStatsContainer.put( statType, databins) ;
                     }
                     break; }
@@ -117,7 +117,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         }
     }
 
-    private void fillDatabins(Databins<String> databins, int dataBoundariesLength) {
+    private void fillDatabins(Databins<String> databins) {
         switch (this.opdytsObjectiveFunctionCases) {
             case EQUIL:
                 double carVal = 1000. ;
@@ -131,21 +131,21 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                 break;
             case PATNA_1Pct:
                 double totalLegs = 13278.0 * 2.0; // each person make two trips; here trips are counted not persons.
-                patnaModalDistDistribution(totalLegs,databins,dataBoundariesLength);
+                patnaModalDistDistribution(totalLegs,databins);
             break;
             case PATNA_10Pct:
                 totalLegs = 13278.0 * 10 * 2.0; // each person make two trips; here trips are counted not persons.
-                patnaModalDistDistribution(totalLegs,databins,dataBoundariesLength);
+                patnaModalDistDistribution(totalLegs,databins);
             default: throw new RuntimeException("not implemented");
         }
     }
 
-    private void patnaModalDistDistribution(final double totalLegs, final Databins<String> databins, final int dataBoundariesLength){
+    private void patnaModalDistDistribution(final double totalLegs, final Databins<String> databins){
         double legsSumAllModes = 0;
         SortedMap<String, double []> mode2distanceBasedLegs = distriInfo.getMode2DistanceBasedLegs();
         for (String mode : mode2distanceBasedLegs.keySet()) {
             double [] distBasedLegs = mode2distanceBasedLegs.get(mode);
-            for (int idx = 0; idx < dataBoundariesLength; idx++) {
+            for (int idx = 0; idx < databins.getDataBoundaries().length; idx++) {
                 databins.addValue(mode, idx, distBasedLegs[idx]);
             }
         }
