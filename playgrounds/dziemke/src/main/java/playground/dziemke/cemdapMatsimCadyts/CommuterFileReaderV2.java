@@ -19,8 +19,10 @@
 
 package playground.dziemke.cemdapMatsimCadyts;
 
-import java.util.ArrayList;
-import java.util.List;
+//import java.util.ArrayList;
+import java.util.HashMap;
+//import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -33,7 +35,8 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 public class CommuterFileReaderV2 {
 	private static final Logger LOG = Logger.getLogger(CommuterFileReaderV2.class);
 	
-	private List<CommuterRelationV2> commuterRelations = new ArrayList<>();
+//	private List<CommuterRelationV2> commuterRelations = new ArrayList<>();
+	private Map<Integer, Map<Integer, CommuterRelationV2>> relationsMap = new HashMap<>();
 			
 	
 	public CommuterFileReaderV2(String commuterFileOutgoing, String delimiter) {
@@ -63,7 +66,7 @@ public class CommuterFileReaderV2 {
 		            	} else if (row[2].length() == 8) {
 		            		destination = row[2];
 		            		LOG.info("New destination set to: " + destination);
-		            		LOG.info(origin + " -> " + destination + " -- Commuters: " + row[4] + " -- " + row[5] + " -- " + row[6]);
+		            		LOG.info(origin + " -> " + destination + ": Commuters: " + row[4] + "; Males: " + row[5] + "; Females: " + row[6]);
 		            		int tripsMale;
 		            		int tripsFemale;
 		            		
@@ -97,13 +100,26 @@ public class CommuterFileReaderV2 {
 	}
 	
 	
-	private void process(int origin, int destination, int tripsAll, int tripsMale, int tripsFemale) {
+	private void process(Integer origin, Integer destination, int tripsAll, int tripsMale, int tripsFemale) {
 		CommuterRelationV2 commuterRelation = new CommuterRelationV2(origin, destination, tripsAll, tripsMale, tripsFemale);
-		this.commuterRelations.add(commuterRelation);
+		
+		if (!this.relationsMap.containsKey(origin)) {
+			Map<Integer, CommuterRelationV2> originMap = new HashMap<>();
+			this.relationsMap.put(origin, originMap);
+		}
+		Map<Integer, CommuterRelationV2> originMap = this.relationsMap.get(origin);
+		originMap.put(destination, commuterRelation);
+//		this.commuterRelations.add(commuterRelation);
 	}
 	
 
-	public List <CommuterRelationV2> getCommuterRelations() {
-		return this.commuterRelations;
+//	public List <CommuterRelationV2> getCommuterRelations() {
+//		return this.commuterRelations;
+//	}
+	
+	
+	public Map<Integer, Map<Integer, CommuterRelationV2>> getRelationsMap() {
+		return this.relationsMap;
 	}
+	
 }
