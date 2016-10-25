@@ -29,6 +29,9 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 
 
 /**
+ * AmberLogic for a simulation with amber times (i.e. a simulation where isUseAmbertimes in the signals module is enabled).
+ * It uses amber times defined in the amber times file (signal specific or global defaults, respectively).
+ * 
  * @author dgrether
  *
  */
@@ -41,8 +44,7 @@ public class AmberLogicImpl implements AmberLogic {
 	}
 
 	@Override
-	public Set<SignalGroupStateChangeRequest> processDropping(double timeSec, Id<SignalSystem> systemId,
-			Id<SignalGroup> signalGroupId) {
+	public Set<SignalGroupStateChangeRequest> processDropping(double now, Id<SignalSystem> systemId, Id<SignalGroup> signalGroupId) {
 		Set<SignalGroupStateChangeRequest> ret = new HashSet<SignalGroupStateChangeRequest>();
 		AmberTimeData systemData = this.data.getAmberTimeDataBySystemId().get(systemId);
 		Integer amber = null;
@@ -56,25 +58,21 @@ public class AmberLogicImpl implements AmberLogic {
 		}
 		
 		if (amber != null){
-			SignalGroupStateChangeRequest amberRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.YELLOW,
-					timeSec);
+			// process amber signal before red
+			SignalGroupStateChangeRequest amberRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.YELLOW, now);
 			ret.add(amberRequest);
-			SignalGroupStateChangeRequest redRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.RED, 
-					timeSec + amber);
+			SignalGroupStateChangeRequest redRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.RED, now + amber);
 			ret.add(redRequest);
 		}
-		//if no amber times are set use no amber
-		else {
-			SignalGroupStateChangeRequest redRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.RED, 
-					timeSec);
+		else { // no amber times set. directly process red signal
+			SignalGroupStateChangeRequest redRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.RED, now);
 			ret.add(redRequest);
 		}
 		return ret;
 	}
 
 	@Override
-	public Set<SignalGroupStateChangeRequest> processOnsets(double timeSec, Id<SignalSystem> systemId,
-			Id<SignalGroup> signalGroupId) {
+	public Set<SignalGroupStateChangeRequest> processOnsets(double now, Id<SignalSystem> systemId, Id<SignalGroup> signalGroupId) {
 		Set<SignalGroupStateChangeRequest> ret = new HashSet<SignalGroupStateChangeRequest>();
 		AmberTimeData systemData = this.data.getAmberTimeDataBySystemId().get(systemId);
 		Integer redAmber = null;
@@ -88,21 +86,16 @@ public class AmberLogicImpl implements AmberLogic {
 		}
 
 		if (redAmber != null){
-			SignalGroupStateChangeRequest amberRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.REDYELLOW, 
-					timeSec);
+			// process amber signal before green
+			SignalGroupStateChangeRequest amberRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.REDYELLOW, now);
 			ret.add(amberRequest);
-			SignalGroupStateChangeRequest redRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.GREEN, 
-					timeSec + redAmber);
-			ret.add(redRequest);
+			SignalGroupStateChangeRequest greenRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.GREEN, now + redAmber);
+			ret.add(greenRequest);
 		}
-		//if no amber is set 
-		else{
-			SignalGroupStateChangeRequest redRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.GREEN, 
-					timeSec);
-			ret.add(redRequest);
+		else{ // no amber times set. directly process green signal
+			SignalGroupStateChangeRequest greenRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.GREEN, now);
+			ret.add(greenRequest);
 		}
 		return ret;
-	}
-	
-	
+	}	
 }
