@@ -44,8 +44,9 @@ import org.matsim.lanes.data.Lanes;
 /**
  * Class to write the (x,y,t) signals csv file for via. 
  * 
+ * @deprecated use SignalEvents2ViaCSVWriter instead
+ * 
  * @author tthunig
- *
  */
 @Deprecated
 public class SignalsViaCSVWriter {
