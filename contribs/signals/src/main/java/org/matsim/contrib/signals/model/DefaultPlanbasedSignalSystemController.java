@@ -56,7 +56,7 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 			this.checkActivePlan(timeSeconds);
 		}
 		if (this.activePlan != null){
-//		log.error("update state of system: " + this.signalSystem.getId());
+			// process droppings and onsets of the active plan of this second
 			List<Id<SignalGroup>> droppingGroupIds = this.activePlan.getDroppings(timeSeconds);
 			this.processDroppingGroupIds(timeSeconds, droppingGroupIds);
 			
@@ -85,26 +85,33 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 		SignalPlan nextPlan = this.planQueue.peek();
 		if (nextPlan != null && nextPlan.getStartTime() != null 
 				&& nextPlan.getStartTime() <= timeSeconds) {
-			log.info("Disabling signal control plan " + this.activePlan.getId() + " switching to control plan " + nextPlan.getId());
+			/* start time of next signal plan is reached: 
+			 * stop active plan (if it is still running) and start next signal plan */
+			log.info("Disabling active signal control plan. Switching to control plan " + nextPlan.getId());
 			this.activePlan = nextPlan;
 			this.planQueue.poll();
 			
 			//determine next check of active plan
+			Double activeEndTime = this.activePlan.getEndTime();
+			if (activeEndTime != null && activeEndTime.equals(0.0)){
+				// correct end time if 0am is given instead of 24pm
+				activeEndTime = 3600 * 24.0;
+			}
 			nextPlan = this.planQueue.peek();
 			if (nextPlan != null){
-				if (this.activePlan.getEndTime() == null && nextPlan.getStartTime() != null) {
+				if (activeEndTime == null && nextPlan.getStartTime() != null) {
 					this.nextActivePlanCheckTime = nextPlan.getStartTime();
 				}
-				else if (this.activePlan.getEndTime() != null  && nextPlan.getStartTime() == null){
-					this.nextActivePlanCheckTime = this.activePlan.getEndTime();
+				else if (activeEndTime != null  && nextPlan.getStartTime() == null){
+					this.nextActivePlanCheckTime = activeEndTime;
 				}
 				else {
-					this.nextActivePlanCheckTime = Math.min(this.activePlan.getEndTime(), this.planQueue.peek().getStartTime());
+					this.nextActivePlanCheckTime = Math.min(activeEndTime, nextPlan.getStartTime());
 				}
 			}
 			//no next plan
-			else if (this.activePlan.getEndTime() != null){
-				this.nextActivePlanCheckTime = this.activePlan.getEndTime();
+			else if (activeEndTime != null){
+				this.nextActivePlanCheckTime = activeEndTime;
 			}
 			else {
 				this.nextActivePlanCheckTime = Double.POSITIVE_INFINITY;
@@ -112,6 +119,8 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 		}
 		else if (this.activePlan != null && this.activePlan.getEndTime() != null 
 				&&  timeSeconds >= this.activePlan.getEndTime()) {
+			/* no next plan has started but active signal plans end time is reached: 
+			 * stop active signal plan. look for next starting time. */
 			this.activePlan = null;
 			if (nextPlan != null && nextPlan.getStartTime() != null 
 					&& nextPlan.getStartTime() <= (timeSeconds + SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH)){
@@ -128,7 +137,7 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 		this.planQueue = new PriorityBlockingQueue<SignalPlan>(this.plans.size(), new SignalPlanStartTimeComparator());
 		this.planQueue.addAll(this.plans.values());
 		//first check if there is a plan that shall be active all the time (i.e. 0.0 as start and end time)
-		this.activePlan = this.planQueue.poll();
+		this.activePlan = this.planQueue.peek();
 		if ((this.activePlan.getStartTime() == null || this.activePlan.getStartTime() == 0.0) 
 				&& (this.activePlan.getEndTime() == null || this.activePlan.getEndTime() == 0.0)){
 			this.nextActivePlanCheckTime = Double.POSITIVE_INFINITY;
