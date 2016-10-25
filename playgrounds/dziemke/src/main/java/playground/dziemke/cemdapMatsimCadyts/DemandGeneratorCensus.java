@@ -119,7 +119,8 @@ public class DemandGeneratorCensus {
 		int householdCounter = 1;
 		int personCounter = 1;
 		
-		// New
+		
+		// New loop over inhabitant of municipalities
 		for (String municipalityId : municipalitiesList) {
 			int population = (int) municipalities.getAttribute(municipalityId, "population");
 			
@@ -127,11 +128,20 @@ public class DemandGeneratorCensus {
 
 			Map<Integer, CommuterRelationV2> relationsFromMunicipality = relationsMap.get(municipalityId);
 			
+			for (Integer destination : relationsFromMunicipality.keySet()) {
+				int numberOfCommuter = relationsFromMunicipality.get(destination).getTrips();
+			}
 			
 			
+			/*
+			 * there will be mismatches between number of employees from zensus and commuter from commuter file
+			 * - because of socially secured workers (commuter file) vs. all workers (zensus)
+			 * - because not exactly the same year
+			 * Handle by scaling?
+			 */
 			
-//			municipalitiesList.add(municipality);
-//			LOG.info("municipality = " + municipality);
+			
+			// Attributes from zensus that I have available
 //			municipalities.putAttribute(municipality, "populationMale", populationMale);
 //			municipalities.putAttribute(municipality, "populationFemale", populationFemale);
 //			municipalities.putAttribute(municipality, "marriedMale", marriedMale);
@@ -150,35 +160,30 @@ public class DemandGeneratorCensus {
 //			municipalities.putAttribute(municipality, "employedFemale", employedFemale);
 //			municipalities.putAttribute(municipality, "studying", studying);
 			
-			
-			
-			
-			
-			// This is what I will need
-//			householdId
-//			personId
-//			employed
-//			student
-//			driversLicence
-//			locationOfWork
-//			locationOfSchool
-//			female
-//			age
-//			parent
-//
-//
-//			householdId
-//			numberOfAdults
-//			totalNumberOfHouseholdVehicles
-//			homeTSZLocation
-//			numberOfChildren
-//			householdStructure
-			
 
+			
+			// This is what I will need to set up the CEMDAP inputs
+//			householdId -> trivial
+//			personId -> trivial
+//			employed -> zensus
+//			student -> certain share of young adults?
+//			driversLicence -> all? // TODO
+//			locationOfWork -> commuter matrix
+//			locationOfSchool -> ? // TODO
+//			female -> zensus
+//			age -> also in zensus, but not correlated to other attributes; make simple assumption? // TODO
+//			parent -> ignore? // TODO
+//
+//			householdId -> trivial
+//			numberOfAdults -> always 1; no household structure
+//			totalNumberOfHouseholdVehicles -> ? // TODO
+//			homeTSZLocation -> random location in municipality via shapefile and shooting
+//			numberOfChildren -> none, ignore them? // TODO
+//			householdStructure -> always choose value for single-person adult // TODO
 		}
 		
 		
-		
+		// TODO adapt to new loop
 		for (int i = 0; i<commuterRelationList.size(); i++){
 			int quantity = commuterRelationList.get(i).getTripsMale();
 	        	
