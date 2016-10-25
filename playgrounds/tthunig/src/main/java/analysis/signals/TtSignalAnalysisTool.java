@@ -19,7 +19,7 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package scenarios.illustrative.analysis;
+package analysis.signals;
 
 import java.util.HashMap;
 import java.util.Map;

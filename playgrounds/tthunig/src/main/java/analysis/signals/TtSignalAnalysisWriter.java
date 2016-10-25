@@ -19,7 +19,7 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package scenarios.illustrative.analysis;
+package analysis.signals;
 
 import java.io.File;
 import java.io.FileNotFoundException;

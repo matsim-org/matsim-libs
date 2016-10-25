@@ -19,7 +19,7 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package scenarios.illustrative.analysis;
+package analysis.signals;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
