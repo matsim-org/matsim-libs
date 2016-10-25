@@ -27,6 +27,7 @@ public class SocialNetworkSamplingConfigGroup extends ReflectiveConfigGroup {
 	private static final String GROUP_NAME = "socialNetworkSampler";
 
 
+
 	public SocialNetworkSamplingConfigGroup( ) {
 		super( GROUP_NAME );
 	}

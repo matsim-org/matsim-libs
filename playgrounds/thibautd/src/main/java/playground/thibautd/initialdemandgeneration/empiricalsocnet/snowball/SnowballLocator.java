@@ -25,12 +25,13 @@ import org.matsim.core.population.PersonUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliqueStub;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoLocator;
+import playground.thibautd.utils.spatialcollections.SpatialCollectionUtils;
 
 /**
  * @author thibautd
  */
 @Singleton
-public class SnowballLocator implements EgoLocator, Position {
+public class SnowballLocator implements EgoLocator, Position, SpatialCollectionUtils.Metric<double[]> {
 	// a difference in the categorical variables is equivalent to 10'000 km
 	private static final double NON_SPATIAL_FACTOR = 10 * 1000 * 1000;
 	private static final double CLIQUE_SIZE_FACTOR = 100 * NON_SPATIAL_FACTOR;
@@ -81,5 +82,12 @@ public class SnowballLocator implements EgoLocator, Position {
 				egoCoord[ 2 ] + NON_SPATIAL_FACTOR * position.getAgeClassDistance() ,
 				position.isSameSex() ? egoCoord[ 3 ] : NON_SPATIAL_FACTOR - egoCoord[ 3 ],
 				egoCoord[ 4 ] };
+	}
+
+	@Override
+	public double calcDistance( final double[] t1, final double[] t2 ) {
+		double d = Math.sqrt( Math.pow( t1[0] - t2[0] , 2 ) + Math.pow( t1[ 1 ] - t2[ 1 ] , 2 ) );
+		for ( int i=2; i < getDimensionality(); i++ ) d += Math.abs( t1[ i ] - t2[ i ] );
+		return d;
 	}
 }

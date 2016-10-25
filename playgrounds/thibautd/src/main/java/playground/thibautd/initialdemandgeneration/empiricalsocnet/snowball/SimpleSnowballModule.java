@@ -19,6 +19,7 @@
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.TypeLiteral;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesFiller;
@@ -26,6 +27,7 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoLocator;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.cliquedistributionsnowball.CliqueEgoDistribution;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.cliquedistributionsnowball.CliquesDistributionCliquesFiller;
+import playground.thibautd.utils.spatialcollections.SpatialCollectionUtils;
 
 /**
  * @author thibautd
@@ -49,6 +51,7 @@ public class SimpleSnowballModule extends AbstractModule {
 		// this should remain the same between methods
 		bind( EgoLocator.class ).to( SnowballLocator.class );
 		bind( Position.class ).to( SnowballLocator.class );
+		bind( new TypeLiteral<SpatialCollectionUtils.Metric<double[]>>(){} ).to( SnowballLocator.class );
 
 		bind( SnowballCliques.class ).toInstance( snowballCliques );
 
