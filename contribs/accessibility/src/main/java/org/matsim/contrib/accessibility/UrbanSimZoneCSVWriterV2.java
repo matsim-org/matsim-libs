@@ -18,7 +18,7 @@ import org.matsim.facilities.ActivityFacility;
  * @author thomas
  *
  */
-public final class UrbanSimZoneCSVWriterV2 implements FacilityDataExchangeInterface {
+ final class UrbanSimZoneCSVWriterV2 implements FacilityDataExchangeInterface {
 	
 	private static final Logger log 	= Logger.getLogger(UrbanSimZoneCSVWriterV2.class);
 	private BufferedWriter zoneWriter = null;

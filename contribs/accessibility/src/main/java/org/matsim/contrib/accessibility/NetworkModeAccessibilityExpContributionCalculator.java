@@ -27,7 +27,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 /**
  * @author thibautd
  */
-public class NetworkModeAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
+ class NetworkModeAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
 	private static final Logger log = Logger.getLogger( NetworkModeAccessibilityExpContributionCalculator.class );
 
 	private final RoadPricingScheme scheme ;
