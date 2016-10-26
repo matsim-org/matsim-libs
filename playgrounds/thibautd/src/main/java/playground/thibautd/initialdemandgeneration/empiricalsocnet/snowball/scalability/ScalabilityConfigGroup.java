@@ -31,6 +31,7 @@ class ScalabilityConfigGroup extends ReflectiveConfigGroup {
 	private enum Coverage {uniform,powertwo}
 	private Coverage coverage = Coverage.uniform;
 	private int nPoints = 10;
+	private double lastSample = 1;
 
 	public ScalabilityConfigGroup() {
 		super( "scalability" );
@@ -39,18 +40,29 @@ class ScalabilityConfigGroup extends ReflectiveConfigGroup {
 	public double[] getSamples() {
 		switch ( coverage ) {
 			case uniform:
-				final double step = 1d / nPoints;
+				final double step = lastSample / nPoints;
 				return DoubleStream.iterate( step , c -> c + step )
 						.limit( nPoints )
 						.toArray();
 			case powertwo:
-				return DoubleStream.iterate( 1d , c -> c / 2d )
+				return DoubleStream.iterate( lastSample , c -> c / 2d )
 						.limit( nPoints )
 						.sorted() // not necessary, but nicer
 						.toArray();
 			default:
 				throw new RuntimeException( coverage.toString() );
 		}
+	}
+
+	@StringGetter("lastSample")
+	private double getLastSample() {
+		return lastSample;
+	}
+
+	@StringSetter("lastSample")
+	private void setLastSample( final double lastSample ) {
+		if ( lastSample < 0 || lastSample > 1 ) throw new IllegalArgumentException( lastSample+" not in [0,1]" );
+		this.lastSample = lastSample;
 	}
 
 	@StringGetter("coverage")
