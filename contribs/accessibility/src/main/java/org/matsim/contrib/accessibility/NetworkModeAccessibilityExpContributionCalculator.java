@@ -27,8 +27,8 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 /**
  * @author thibautd
  */
-public class NetworkModeAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
-	private static final Logger log = Logger.getLogger( NetworkModeAccessibilityContributionCalculator.class );
+public class NetworkModeAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
+	private static final Logger log = Logger.getLogger( NetworkModeAccessibilityExpContributionCalculator.class );
 
 	private final RoadPricingScheme scheme ;
 
@@ -41,9 +41,6 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 
 	private final Scenario scenario;
 	private final TravelTime travelTime;
-	// new dz
-	private final Coord2CoordTimeDistanceTravelDisutility walkTravelDisutility;
-	//
 
 	private final double betaWalkTT;
 	private final double betaWalkTD;
@@ -53,7 +50,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 	private final LeastCostPathTreeExtended lcpt;
 
 	
-	public NetworkModeAccessibilityContributionCalculator(
+	public NetworkModeAccessibilityExpContributionCalculator(
 			final TravelTime travelTime,
 			final TravelDisutilityFactory travelDisutilityFactory,
 			final Coord2CoordTimeDistanceTravelDisutility walkTravelDisutility,
@@ -65,11 +62,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		this.travelTime = travelTime;		
 
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
-		// new dz
-		System.err.println("travelDisutility = " + travelDisutility);
-		
-		this.walkTravelDisutility = walkTravelDisutility;
-		//
+
 		this.lcpt = new LeastCostPathTreeExtended(travelTime, travelDisutility, this.scheme);
 
 		if ( planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0. ) {
@@ -102,10 +95,9 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 	@Override
 	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
 
-		Link nearestLink = NetworkUtils.getNearestLinkExactly((Network)scenario.getNetwork(), origin.getCoord());
+		Link nearestLink = NetworkUtils.getNearestLinkExactly(scenario.getNetwork(), origin.getCoord());
 
-		// === (1) ORIGIN to LINK to NODE:
-		// captures the distance (as walk time) between the origin via the link to the node:
+		// === (1) ORIGIN to LINK to NODE (captures the distance (as walk time) between the origin via the link to the node):
 		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
 		
 		// TODO: extract this walk part?
@@ -114,47 +106,13 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		// distance to road, and then to node.  (comment by thibaut?)
 		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Intersection() / this.walkSpeedMeterPerHour;
 		
-		// disutilities to get on or off the network
+		// (a) disutilities to get on or off the network
 		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distance.getDistancePoint2Intersection() * betaWalkTD);
-
 		Coord projectionCoord = CoordUtils.orthogonalProjectionOnLineSegment(nearestLink.getFromNode().getCoord(), nearestLink.getToNode().getCoord(), origin.getCoord());
-		//		double walkUtility = -this.walkTravelDisutility.getCoord2CoordTravelDisutility(origin.getCoord(), projectionCoord);
-
-		//		walkDisutilityMeasuringPoint2Road = walkUtility;
-
-//		if ( cnt < 10 ) {
-//			cnt ++ ; 
-//			log.warn("#############");
-//			log.warn("origin.getCoord() = " + origin.getCoord() + " -- destination.getNearestNode() = " + destination.getNearestNode());
-//			log.warn("destination.getNumberOfObjects() = " + destination.getNumberOfObjects());
-//			log.warn("distance.getDistancePoint2Road() = " + distance.getDistancePoint2Intersection());
-//			log.warn("nearestLink.getFromNode().getCoord() = " + nearestLink.getFromNode().getCoord() + 
-//					" -- nearestLink.getToNode().getCoord() = " + nearestLink.getToNode().getCoord());
-//			log.warn("NEW distance coord - from coord = " + CoordUtils.calcEuclideanDistance(origin.getCoord(), nearestLink.getFromNode().getCoord()) + 
-//					" -- NEW distance coord - to coord = " + CoordUtils.calcEuclideanDistance(origin.getCoord(), nearestLink.getToNode().getCoord()));
-//			log.warn("projectionCoord = " + projectionCoord);
-//			//		System.err.println("NEW walkDisutility = " + walkUtility);
-//			log.warn("#############");
-//			
-//			if ( cnt==10 ) {
-//				log.warn( Gbl.FUTURE_SUPPRESSED);
-//			}
-//		}
-		
+		if ( cnt < 10 ) {
+			writeDebuggingOutput(origin, destination, nearestLink, distance, projectionCoord);
+		}
 		double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
-		
-		// =========
-
-//		Link nearestLink = NetworkUtils.getNearestLinkExactly(((Network)scenario.getNetwork()), origin.getCoord());
-//
-//		// === (1) ORIGIN to LINK to NODE:
-//		// captures the distance (as walk time) between the origin via the link to the node:
-//		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
-//
-//		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
-//		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distance.getDistancePoint2Road() * betaWalkTD);
-//		
-//		double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
 		
 		// (b) TRAVEL ON NETWORK to FIRST NODE:
 		double toll_money = getTollMoney(departureTime, nearestLink, distance);
@@ -169,18 +127,6 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		double congestedCarDisutility = - lcpt.getTree().get(destination.getNearestNode().getId()).getCost();	
 		// travel disutility congested car on road network (including toll)
 		
-		// new
-//		// === FIRST NODE TO AGGREGATION OBJECT: ===
-//		
-//		// get stored network node (this is the nearest node next to an aggregated work place)
-//		Node destinationNode = destination.getNearestNode();
-//		
-//		double congestedCarDisutility = - lcpt.getTree().get(destinationNode.getId()).getCost();	// travel disutility congested car on road network (including toll)
-//
-//		final double sumExpVjkWalk = destination.getSum();
-//		return Math.exp(logitScaleParameter * (walkDisutilityMeasuringPoint2Road + congestedCarDisutilityRoad2Node + constCar + congestedCarDisutility) ) * sumExpVjkWalk;
-		// end new
-
 		// === (3) Pre-computed effect of all opportunities reachable from destination network node:
 		double sumExpVjkWalk = destination.getSum();
 		// works because something like exp(A+c1) + exp(A+c2) + ... = exp(A) * [ exp(c1) + exp(c2) + ...]  =: exp(A) * sumExpVjkWalk
@@ -189,6 +135,27 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		// note that exp(a+b+c) = exp(a) * exp(b) * exp(c), so for b and c the exponentiation has already been done.
 		return Math.exp(logitScaleParameter * (constCar + congestedCarDisutilityRoad2Node + congestedCarDisutility) ) *
 				expVhiWalk * sumExpVjkWalk;
+	}
+
+
+	private static void writeDebuggingOutput(ActivityFacility origin, AggregationObject destination, Link nearestLink,
+			Distances distance, Coord projectionCoord) {
+		cnt ++ ; 
+		log.warn("#############");
+		log.warn("origin.getCoord() = " + origin.getCoord() + " -- destination.getNearestNode() = " + destination.getNearestNode());
+		log.warn("destination.getNumberOfObjects() = " + destination.getNumberOfObjects());
+		log.warn("distance.getDistancePoint2Road() = " + distance.getDistancePoint2Intersection());
+		log.warn("nearestLink.getFromNode().getCoord() = " + nearestLink.getFromNode().getCoord() + 
+				" -- nearestLink.getToNode().getCoord() = " + nearestLink.getToNode().getCoord());
+		log.warn("NEW distance coord - from coord = " + CoordUtils.calcEuclideanDistance(origin.getCoord(), nearestLink.getFromNode().getCoord()) + 
+				" -- NEW distance coord - to coord = " + CoordUtils.calcEuclideanDistance(origin.getCoord(), nearestLink.getToNode().getCoord()));
+		log.warn("projectionCoord = " + projectionCoord);
+		//		System.err.println("NEW walkDisutility = " + walkUtility);
+		log.warn("#############");
+		
+		if ( cnt==10 ) {
+			log.warn( Gbl.FUTURE_SUPPRESSED);
+		}
 	}
 
 

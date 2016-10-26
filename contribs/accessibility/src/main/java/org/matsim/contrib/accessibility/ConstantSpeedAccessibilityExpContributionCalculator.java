@@ -19,8 +19,8 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 /**
  * @author thibautd
  */
-public class ConstantSpeedAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
-	private static final Logger log = Logger.getLogger( ConstantSpeedAccessibilityContributionCalculator.class );
+public class ConstantSpeedAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
+	private static final Logger log = Logger.getLogger( ConstantSpeedAccessibilityExpContributionCalculator.class );
 
 	// estimates travel time by a constant speed along network,
 	// considering all links (including highways, which seems to be realistic in south africa,
@@ -43,7 +43,7 @@ public class ConstantSpeedAccessibilityContributionCalculator implements Accessi
 
 	private Node fromNode = null;
 
-	public ConstantSpeedAccessibilityContributionCalculator(
+	public ConstantSpeedAccessibilityExpContributionCalculator(
 			final String mode,
 			final Scenario scenario) {
 		this.scenario = scenario;
