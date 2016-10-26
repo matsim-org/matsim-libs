@@ -59,17 +59,21 @@ public class LegModeBeelineDistanceDistributionFromPlansAnalyzer extends Abstrac
 	private final static Logger LOG = Logger.getLogger(LegModeBeelineDistanceDistributionFromPlansAnalyzer.class);
 
 	private Scenario scenario;
-	private final List<Integer> distanceClasses;
+	private final List<Double> distanceClasses;
 	private final SortedSet<String> usedModes;
 
-	private final SortedMap<String, SortedMap<Integer, Integer>> mode2DistanceClass2LegCount ;
+	private final SortedMap<String, SortedMap<Double, Integer>> mode2DistanceClass2LegCount ;
 	private final SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2dist;
 
 	public LegModeBeelineDistanceDistributionFromPlansAnalyzer(){
+		this (new ArrayList<>());
+	}
+
+	public LegModeBeelineDistanceDistributionFromPlansAnalyzer(final List<Double> distClasses ){
 		super(LegModeBeelineDistanceDistributionFromPlansAnalyzer.class.getSimpleName());
 		LOG.info("enabled");
 
-		this.distanceClasses = new ArrayList<>();
+		this.distanceClasses = distClasses;
 		this.usedModes = new TreeSet<>();
 		this.mode2PersonId2dist = new TreeMap<>();
 		this.mode2DistanceClass2LegCount = new TreeMap<>();
@@ -77,13 +81,17 @@ public class LegModeBeelineDistanceDistributionFromPlansAnalyzer extends Abstrac
 
 	public void init(final Scenario sc){
 		this.scenario = sc;
-		initializeDistanceClasses(this.scenario.getPopulation());
+
+		if (this.distanceClasses.isEmpty() ) { // default distance classes
+			initializeDistanceClasses(this.scenario.getPopulation());
+		}
+
 		initializeUsedModes(this.scenario.getPopulation());
 
 		for(String mode:this.usedModes){
 			this.mode2PersonId2dist.put(mode, new HashMap<>());
-			SortedMap<Integer, Integer> distClass2Legs = new TreeMap<>();
-			for(int i: this.distanceClasses){
+			SortedMap<Double, Integer> distClass2Legs = new TreeMap<>();
+			for(Double i: this.distanceClasses){
 				distClass2Legs.put(i, 0);
 			}
 			this.mode2DistanceClass2LegCount.put(mode, distClass2Legs);
@@ -177,7 +185,7 @@ public class LegModeBeelineDistanceDistributionFromPlansAnalyzer extends Abstrac
 					double distance = route.getDistance();
 					for(int i=0;i<this.distanceClasses.size()-1;i++){
 						if(distance > this.distanceClasses.get(i) && distance <= this.distanceClasses.get(i + 1)){
-							SortedMap<Integer, Integer> distanceClass2NoOfLegs = this.mode2DistanceClass2LegCount.get(leg.getMode());	
+							SortedMap<Double, Integer> distanceClass2NoOfLegs = this.mode2DistanceClass2LegCount.get(leg.getMode());
 							int oldLeg = distanceClass2NoOfLegs.get(this.distanceClasses.get(i+1));
 							int newLeg = oldLeg+1;
 							distanceClass2NoOfLegs.put(this.distanceClasses.get(i+1), newLeg);
@@ -234,12 +242,12 @@ public class LegModeBeelineDistanceDistributionFromPlansAnalyzer extends Abstrac
 
 	private void initializeDistanceClasses(final Population pop) {
 		double longestDistance = getLongestDistance(pop);
-		int endOfDistanceClass = 0;
+		Double endOfDistanceClass = 0.;
 		int classCounter = 0;
 		this.distanceClasses.add(endOfDistanceClass);
 
 		while(endOfDistanceClass <= longestDistance){
-			endOfDistanceClass = 100 * (int) Math.pow(2, classCounter);
+			endOfDistanceClass = 100 * (Double) Math.pow(2, classCounter);
 			classCounter++;
 			this.distanceClasses.add(endOfDistanceClass);
 		}
@@ -258,7 +266,7 @@ public class LegModeBeelineDistanceDistributionFromPlansAnalyzer extends Abstrac
 		LOG.info("The following transport modes are considered: " + this.usedModes);
 	}
 
-	public SortedMap<String, SortedMap<Integer, Integer>> getMode2DistanceClass2LegCount() {
+	public SortedMap<String, SortedMap<Double, Integer>> getMode2DistanceClass2LegCount() {
 		return this.mode2DistanceClass2LegCount;
 	}
 

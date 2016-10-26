@@ -99,4 +99,8 @@ public class LegModeBeelineDistanceDistributionHandler implements PersonDepartur
         }
         return distClass;
     }
+
+    public SortedMap<String, SortedMap<Double, Integer>> getMode2DistanceClass2LegCounts(){
+        return this.mode2DistClass2Count;
+    }
 }

@@ -34,20 +34,21 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.modalShare.FilteredModalShareEventHandler;
+import playground.agarwalamit.opdyts.patna.DistanceDistributionWriter;
 
 /**
  * Created by amit on 20/09/16.
  */
 
-
 public class ModalStatsControlerListner implements StartupListener, IterationEndsListener, ShutdownListener {
 
     private final FilteredModalShareEventHandler modalShareEventHandler = new FilteredModalShareEventHandler();
+    private DistanceDistributionWriter distanceDistributionWriter;
     private BufferedWriter writer;
     private final Set<String> mode2consider;
 
-    public ModalStatsControlerListner(final Set<String> mode2optimize) {
-        this.mode2consider = mode2optimize;
+    public ModalStatsControlerListner(final Set<String> modes2consider) {
+        this.mode2consider = modes2consider;
     }
 
     public ModalStatsControlerListner() {
@@ -77,6 +78,10 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
             throw new RuntimeException("File not found.");
         }
         events.addHandler(modalShareEventHandler);
+
+        // initializing it here,
+        this.distanceDistributionWriter = new DistanceDistributionWriter(event.getServices().getScenario());
+        this.events.addHandler(this.distanceDistributionWriter.getEventHandler());
     }
 
     @Override
@@ -116,6 +121,10 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
             throw new RuntimeException("File not found.");
         }
         modalShareEventHandler.reset(event.getIteration());
+
+        //
+        String outFile = event.getServices().getConfig().controler().getOutputDirectory() + "ITERS/it."+event.getIteration()+"/"+event.getIteration()+".distanceDistri.txt";
+        this.distanceDistributionWriter.writeResults(outFile);
     }
 
     @Override
