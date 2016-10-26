@@ -44,7 +44,7 @@ import javax.inject.Inject;
 /**
  * This Module is used by a CurrentLegReplanner. It calculates the time
  * when an agent should do CurrentLegReplanning.
- * <p/>
+ * <p></p>
  * The time is estimated as following:
  * When a LinkEnterEvent is thrown the Replanning Time is set to
  * the current time + the FreeSpeed Travel Time. This guarantees that
@@ -52,7 +52,7 @@ import javax.inject.Inject;
  * time, the agent might be already in the outgoing queue of a QLink
  * where not all replanning operations are possible anymore (the agent
  * can e.g. not insert an Activity on its current link anymore).
- * <p/>
+ * <p></p>
  * <p>
  * The replanning interval (multiple replannings on the same link when
  * an agent is stuck on a link due to a traffic jam) has been removed

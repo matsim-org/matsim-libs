@@ -39,7 +39,7 @@ import org.apache.log4j.Logger;
  *
  * @deprecated To get a temporary directory for production, use {@link java.nio.file.Files#createTempDirectory(Path, String, FileAttribute[])}}.
  * For tests, use the JUnit4 TemporaryFolder Rule.
- * <br/>
+ * <br>
  * (This class is now using nio.file.Files#..., so maybe it is ok to leave it as it is as a wrapper. kai, aug'15)
  *
  */

@@ -178,11 +178,11 @@ public class CoordTools {
 	}
 
 	/**
-	 * @return whether Coord2 lies<br/>
-	 * [1] North-East<br/>
-	 * [2] South-East<br/>
-	 * [3] South-West<br/>
-	 * [4] North-West<br/>
+	 * @return whether Coord2 lies<br>
+	 * [1] North-East<br>
+	 * [2] South-East<br>
+	 * [3] South-West<br>
+	 * [4] North-West<br>
 	 * of Coord1
 	 */
 	public static int getCompassQuarter(Coord baseCoord, Coord toCoord) {
@@ -214,15 +214,15 @@ public class CoordTools {
 
 	/**
 	 * @return which border of a rectangular area of interest a line fromCoord-toCoord crosses. One coord has to be
-	 * inside area of interest<br/>
-	 * [10] north->inside<br/>
-	 * [17] inside->north<br/>
-	 * [20] east->inside<br/>
-	 * [27] inside->east<br/>
-	 * [30] south->inside<br/>
-	 * [37] inside->south<br/>
-	 * [40] west->inside<br/>
-	 * [47] inside->west<br/>
+	 * inside area of interest<br>
+	 * [10] north->inside<br>
+	 * [17] inside->north<br>
+	 * [20] east->inside<br>
+	 * [27] inside->east<br>
+	 * [30] south->inside<br>
+	 * [37] inside->south<br>
+	 * [40] west->inside<br>
+	 * [47] inside->west<br>
 	 * [0] line does not cross any border
 	 *
 	 * @deprecated not used anywhere

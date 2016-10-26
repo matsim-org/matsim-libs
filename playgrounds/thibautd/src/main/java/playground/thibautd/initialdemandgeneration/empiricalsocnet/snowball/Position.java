@@ -18,11 +18,11 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball;
 
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliqueStub;
 
 /**
  * @author thibautd
  */
 public interface Position {
-	double[] calcPosition( Ego center, SocialPositions.CliquePosition position , double rotation_rad );
+	double[] calcPosition( CliqueStub center, SocialPositions.CliquePosition position , double rotation_rad );
 }

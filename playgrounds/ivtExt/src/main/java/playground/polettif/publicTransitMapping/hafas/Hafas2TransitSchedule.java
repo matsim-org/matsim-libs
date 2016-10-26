@@ -48,11 +48,11 @@ public abstract class Hafas2TransitSchedule {
 	 * Converts all files in <tt>hafasFolder</tt> and writes the output schedule and vehicle file to
 	 * <tt>outputFolder</tt>. Stop Facility coordinates are transformed to <tt>outputCoordinateSystem</tt>.
 	 *
-	 * @param args <br/>
-	 *             [0] hafasFolder<br/>
-	 *             [1] outputCoordinateSystem<br/>
-	 *             [2] outputScheduleFile<br/>
-	 *             [3] outputVehicleFile<br/>
+	 * @param args <br>
+	 *             [0] hafasFolder<br>
+	 *             [1] outputCoordinateSystem<br>
+	 *             [2] outputScheduleFile<br>
+	 *             [3] outputVehicleFile<br>
 	 */
 	public static void main(String[] args) throws IOException {
 		run(args[0], args[1], args[2], args[3]);

@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  * @author illenberger
- *         <p/>
+ *         <p></p>
  *         Used to divide tasks between threads in {@link PSim}. Copied here to
  *         avoid dependence.
  */

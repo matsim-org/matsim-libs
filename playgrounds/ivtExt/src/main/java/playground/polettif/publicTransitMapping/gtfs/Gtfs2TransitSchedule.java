@@ -55,17 +55,17 @@ public class Gtfs2TransitSchedule {
 	 * MATSim Transit Schedule (mts). "Unmapped" means stopFacilities are not
 	 * referenced to links and transit routes do not have routes (link sequences).
 	 * Creates a default vehicles file as well.
-	 * <p/>
+	 * <p></p>
 	 *
-	 * @param args	[0] folder where the gtfs files are located (a single zip file is not supported)<br/>
-	 * 				[1]	which service ids should be used. One of the following:<br/>
+	 * @param args	[0] folder where the gtfs files are located (a single zip file is not supported)<br>
+	 * 				[1]	which service ids should be used. One of the following:<br>
 	 *                  <ul>
 	 *                  <li>dayWithMostServices</li>
 	 *                  <li>date in the format yyyymmdd</li>
 	 *                  <li>dayWithMostTrips</li>
 	 *                  <li>all</li>
 	 *                  </ul>
-	 *              [2] the output coordinate system. Use WGS84 for no transformation.<br/>
+	 *              [2] the output coordinate system. Use WGS84 for no transformation.<br>
 	 *              [3] output transit schedule file
 	 *              [4] output default vehicles file (optional)
 	 *              [5] output converted shape files. Is created based on shapes.txt and
@@ -90,7 +90,7 @@ public class Gtfs2TransitSchedule {
 	 * MATSim Transit Schedule (mts). "Unmapped" means stopFacilities are not
 	 * referenced to links and transit routes do not have routes (link sequences).
 	 * Creates a default vehicles file as well.
-	 * <p/>
+	 * <p></p>
 	 * @param gtfsFolder          		folder where the gtfs files are located (a single zip file is not supported)
 	 * @param serviceIdsParam        	which service ids should be used. One of the following:
 	 *     				             	<ul>

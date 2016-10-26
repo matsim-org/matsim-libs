@@ -28,7 +28,7 @@ import org.matsim.testcases.MatsimTestCase;
 /**
  * Tests that specifically look at the computation of the out-of-vehicle wait time.  There is overlap with the original tests; it is most
  * probably possible to combine/condense them.
- * <p/>
+ * <p></p>
  * Comments:<ul>
  * <li> As far as I can tell, it is not tested if other utility values for the out-of-vehicle wait times influences the results.
  * This should/could be done in org.matsim.examples.simple.PtScoringTest .

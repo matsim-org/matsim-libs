@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 
 /**
  * Parametrised for the Nissan Leaf. All values in SI units.
- * <p/>
+ * <p></p>
  * TODO add reference to the paper (once published). Add (dis-)charging efficiency relative to SOC,
  * temperature, etc...
  */

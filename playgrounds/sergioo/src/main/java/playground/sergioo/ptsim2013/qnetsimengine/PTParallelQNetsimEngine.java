@@ -38,11 +38,11 @@ import playground.sergioo.ptsim2013.QSim;
  * The results of the Simulation stays deterministic but the order
  * of the LinkEvents within a single TimeStep does not. Ordering
  * the Events by Time AND AgentId should produce deterministic results.
- * <br/><br/>
+ * <br><br>
  * Due to the fact that a Random Number generator is used for each
  * simulated Node instead of one in total as the Single CPU
  * QSim does, the Results will slightly vary between the parallel and the sequential version.
- * <br/><br/>
+ * <br><br>
  * The ParallelQNetsimEngine (this class) will fulfill the QSimEngine interface upwards (i.e. against the QSim).
  * The QSimEngineThreads will fulfill the QSimEngine interface downwards (i.e. against nodes and links).
  */

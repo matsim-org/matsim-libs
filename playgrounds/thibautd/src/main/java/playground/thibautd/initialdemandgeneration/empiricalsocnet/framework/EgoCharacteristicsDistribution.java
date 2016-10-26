@@ -19,10 +19,13 @@
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.collections.Tuple;
+
+import java.util.Collection;
 
 /**
  * @author thibautd
  */
 public interface EgoCharacteristicsDistribution {
-	Ego sampleEgo( Person person );
+	Tuple<Ego,Collection<CliqueStub>> sampleEgo( Person person );
 }

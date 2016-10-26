@@ -29,10 +29,10 @@ public interface DriveTask
 
 
     /**
-     * Vehicle changes its path. Can be used for: <br/>
-     * - changing destination (while keepen the current task active) <br/>
-     * - stopping it as soon as possible (i.e. at the end of the current/next link) <br/>
-     * - random walk, roaming/crusing around <br/>
+     * Vehicle changes its path. Can be used for: <br>
+     * - changing destination (while keepen the current task active) <br>
+     * - stopping it as soon as possible (i.e. at the end of the current/next link) <br>
+     * - random walk, roaming/crusing around <br>
      * - ...
      */
     void pathDiverted(DivertedVrpPath divertedPath, double newEndTime);

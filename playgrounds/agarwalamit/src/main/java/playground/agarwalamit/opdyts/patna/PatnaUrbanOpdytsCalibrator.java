@@ -27,7 +27,7 @@ import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
-import opdytsintegration.MATSimSimulator;
+import opdytsintegration.MATSimSimulator2;
 import opdytsintegration.MATSimStateFactoryImpl;
 import opdytsintegration.utils.TimeDiscretization;
 import org.matsim.api.core.v01.Scenario;
@@ -104,13 +104,13 @@ public class PatnaUrbanOpdytsCalibrator {
 		modes2consider.add("car");
 		modes2consider.add("bike");
 		modes2consider.add("motorbike");
-		modes2consider.add("pt");
-		modes2consider.add("walk");
+//		modes2consider.add("pt");
+//		modes2consider.add("walk");
 
 		ModalStatsControlerListner stasControlerListner = new ModalStatsControlerListner(modes2consider);
 
 		// following is the  entry point to start a matsim controler together with opdyts
-		MATSimSimulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization);
+		MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization, modes2consider);
 		simulator.addOverridingModule(new AbstractModule() {
 
 			@Override
@@ -169,7 +169,7 @@ public class PatnaUrbanOpdytsCalibrator {
 
 		// probably, an object which decide about the inertia
 		SelfTuner selfTuner = new SelfTuner(0.95);
-
+		selfTuner.setNoisySystem(true);
 		randomSearch.setLogPath(OUT_DIR);
 
 		// run it, this will eventually call simulator.run() and thus controler.run

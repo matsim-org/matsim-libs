@@ -53,7 +53,7 @@ import java.util.*;
  * finding link sequences for TransitRoutes and referencing
  * TransitStopFacilities to link. Calculates the least cost path
  * from the transit route's first to its last stop with the constraint
- * that the path must contain a link candidate of every stop.<p/>
+ * that the path must contain a link candidate of every stop.<p></p>
  *
  * Additional stop facilities are created if a stop facility has more
  * than one plausible link. Artificial links are added to the network
@@ -94,7 +94,7 @@ public class PTMapperImpl implements PTMapper {
 	 * the stop facilities each transit route. The routes will be newly routed,
 	 * any former routes will be overwritten. Changes are done on the schedule
 	 * network provided here.
-	 * <p/>
+	 * <p></p>
 	 *
 	 * @param config a PublicTransitMapping config that defines all parameters used
 	 *               for mapping.

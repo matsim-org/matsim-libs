@@ -27,6 +27,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.boescpa.analysis.trips.EventsToTrips;
 import playground.boescpa.analysis.trips.Trip;
@@ -46,7 +48,7 @@ public class TestTravelTimesAndDistances {
 	
 	@Test
 	public void testTripProcessing() {
-		final Config config = utils.loadConfig("test/scenarios/pt-tutorial/config.xml");
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "0.config.xml"));
 		ConfigUtils.loadConfig(config, utils.getClassInputDirectory() + "config.xml");
 
 		config.plansCalcRoute().setInsertingAccessEgressWalk(false);

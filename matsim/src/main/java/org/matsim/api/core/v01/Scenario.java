@@ -87,7 +87,7 @@ public interface Scenario {
 	 * Adds the given object to the scenario, such it can be
 	 * retrieved with {@link #getScenarioElement(String)} using
 	 * the name given here as a key.
-	 * <br/><br/>
+	 * <br><br>
 	 * Design issues:<ul>
 	 * <li> This is currently set to deprecated, since the guice injection approach achieves something similar.  However, 
 	 * at this point injection is only possible after {@link Controler} was started, which stands in the way of <i>first</i> constructing

@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data;
 
+import java.io.IOException;
 import java.net.URL;
 
 import org.apache.log4j.Logger;
@@ -31,6 +32,7 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsReader20;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 
 /**
@@ -71,7 +73,11 @@ public class SignalsDataLoader {
 		if (this.signalConfig.getIntergreenTimesFile() != null) {
 			IntergreenTimesReader10 reader = new IntergreenTimesReader10(data.getIntergreenTimesData());
 			URL filename = ConfigGroup.getInputFileURL(config.getContext(), this.signalConfig.getIntergreenTimesFile());
-			reader.readFile(filename.getFile());
+			try {
+				reader.readStream(filename.openStream());
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
 		}
 	}
 
@@ -89,9 +95,13 @@ public class SignalsDataLoader {
 
 	private void loadControl(SignalsData data){
 		if (this.signalConfig.getSignalControlFile() != null){
-			SignalControlReader20 controlReader = new SignalControlReader20(data.getSignalControlData());
+			SignalControlReader20 reader = new SignalControlReader20(data.getSignalControlData());
 			URL filename = ConfigGroup.getInputFileURL(config.getContext(), this.signalConfig.getSignalControlFile());
-			controlReader.readFile(filename.getFile());
+			try {
+				reader.readStream(filename.openStream());
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
 		}
 		else {
 			log.info("Signals: No signal control file set, can't load signal control data!");
@@ -100,9 +110,13 @@ public class SignalsDataLoader {
 
 	private void loadGroups(SignalsData data) {
 		if (this.signalConfig.getSignalGroupsFile() != null){
-			SignalGroupsReader20 groupsReader = new SignalGroupsReader20(data.getSignalGroupsData());
+			SignalGroupsReader20 reader = new SignalGroupsReader20(data.getSignalGroupsData());
 			URL filename = ConfigGroup.getInputFileURL(config.getContext(), this.signalConfig.getSignalGroupsFile());
-			groupsReader.readFile(filename.getFile());
+			try {
+				reader.readStream(filename.openStream());
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
 		}
 		else {
 			log.info("Signals: No signal groups file set, can't load signal groups!");
@@ -111,9 +125,13 @@ public class SignalsDataLoader {
 
 	private void loadSystems(SignalsData data){
 		if (this.signalConfig.getSignalSystemFile() != null){
-			SignalSystemsReader20 systemsReader = new SignalSystemsReader20(data.getSignalSystemsData());
+			SignalSystemsReader20 reader = new SignalSystemsReader20(data.getSignalSystemsData());
 			URL filename = ConfigGroup.getInputFileURL(config.getContext(), this.signalConfig.getSignalSystemFile());
-			systemsReader.readFile(filename.getFile());
+			try {
+				reader.readStream(filename.openStream());
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
 		}
 		else {
 			log.info("Signals: No signal systems file set, can't load signal systems information!");

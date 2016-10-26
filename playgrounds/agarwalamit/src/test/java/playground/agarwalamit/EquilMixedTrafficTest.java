@@ -65,7 +65,7 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTime
 
 public class EquilMixedTrafficTest {
 
-	private static final String EQUIL_DIR = "../../matsim/examples/equil-mixedTraffic/";
+    private static final String EQUIL_DIR = "../../examples/scenarios/equil-mixedTraffic/";
     @Rule
     public MatsimTestUtils helper = new MatsimTestUtils();
 

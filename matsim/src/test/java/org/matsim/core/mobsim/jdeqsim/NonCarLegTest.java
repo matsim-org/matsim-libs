@@ -2,6 +2,7 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import java.util.List;
 
+import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -9,14 +10,17 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+
+import static org.junit.Assert.assertTrue;
 
 public class NonCarLegTest extends AbstractJDEQSimTest {
 
+	@Test
 	public void test_EmptyCarRoute() {
-		Config config = ConfigUtils.loadConfig("test/input/org/matsim/core/mobsim/jdeqsim/config2.xml");
+		Config config = utils.loadConfig(IOUtils.newUrl(utils.packageInputResourcePath(), "config2.xml"));
 		MatsimRandom.reset(config.global().getRandomSeed());
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		ScenarioUtils.loadScenario(scenario);

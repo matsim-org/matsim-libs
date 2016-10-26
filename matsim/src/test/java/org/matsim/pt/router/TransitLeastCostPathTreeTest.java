@@ -42,7 +42,7 @@ public class TransitLeastCostPathTreeTest {
      * Instantiates a new TransitLeastCostPathTree object with a sample transitSchedule and default configuration.
      */
     public void instantiateNetworkAndTravelDisutility() {
-        String transitScheduleFile = "examples/pt-tutorial/transitschedule.xml";
+        String transitScheduleFile = "test/scenarios/pt-tutorial/transitschedule.xml";
 
         Config config = ConfigUtils.createConfig();
         Scenario scenario = ScenarioUtils.loadScenario(config);

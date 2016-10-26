@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
@@ -48,44 +49,48 @@ public class CreateFacilitiiesFileFromKODI {
 
 	public static void main(String[] args) {
 //		String csvFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/primary_public/Public_Primary_School_listed_by_2007.csv";
-		String csvUrl = "https://www.opendata.go.ke/api/views/p452-xb7c/rows.csv"; // Public Schools
-		String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/primary_from_url/facilities.xml";
+		String csvFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/health/hospitals/kenya_hospitals_detail.csv";
+//		String csvUrl = "https://www.opendata.go.ke/api/views/p452-xb7c/rows.csv"; // Public Schools
+//		String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/primary_from_url/facilities.xml";
+		String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/health/hospitals/facilities.xml";
 		
-		String facilitiesFileDescription = "Primary Schools in Kenya";
+//		String facilitiesFileDescription = "Primary Schools in Kenya";
+		String facilitiesFileDescription = "Hospitals in Kenya";
 		String inputCRS = "EPSG:4326";
 		String outputCRS = "EPSG:21037";
 		String headOfCoordColumn = "Geolocation";
 		String separator = ",";
+		String activityType = "Hospital";
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
 
 		// Option 1: Get input data from URL
-		try {
-			BufferedReader reader = getBufferedReaderFromCsvUrl(csvUrl);
-			ActivityFacilities activityFacilities = createActivityFaciltiesFromBufferedReader(reader, facilitiesFileDescription,
-																					headOfCoordColumn, ct, separator);
-			writeFacilitiesFile(activityFacilities, facilitiesFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			BufferedReader reader = getBufferedReaderFromCsvUrl(csvUrl);
+//			ActivityFacilities activityFacilities = createActivityFaciltiesFromBufferedReader(reader, facilitiesFileDescription,
+//																					headOfCoordColumn, ct, separator);
+//			writeFacilitiesFile(activityFacilities, facilitiesFile);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		
-		// Option 2: Get input data from locally stroed CSV file
-//		ActivityFacilities activityFacilities = createActivityFaciltiesFromFile(csvFile, facilitiesFileDescription,
-//				headOfCoordColumn, ct, separator);
-//		writeFacilitiesFile(activityFacilities, facilitiesFile);
+		// Option 2: Get input data from locally stored CSV file
+		ActivityFacilities activityFacilities = createActivityFaciltiesFromFile(csvFile, facilitiesFileDescription,
+				headOfCoordColumn, ct, separator, activityType);
+		writeFacilitiesFile(activityFacilities, facilitiesFile);
 	}
 
-	private static BufferedReader getBufferedReaderFromCsvUrl(String url) throws IOException {
-		InputStream inputStream = getInputStreamFromCsvUrl(url);
-		return new BufferedReader(new InputStreamReader(inputStream));
-	}
+//	private static BufferedReader getBufferedReaderFromCsvUrl(String url) throws IOException {
+//		InputStream inputStream = getInputStreamFromCsvUrl(url);
+//		return new BufferedReader(new InputStreamReader(inputStream));
+//	}
+//
+//	private static InputStream getInputStreamFromCsvUrl(String url) throws IOException {
+//		return new URL(url).openStream();
+//	}
 
-	private static InputStream getInputStreamFromCsvUrl(String url) throws IOException {
-		return new URL(url).openStream();
-	}
-
-	public static ActivityFacilities createActivityFaciltiesFromBufferedReader(BufferedReader bufferedReader, String facilitiesFileDescription,
-			String headOfCoordColumn, CoordinateTransformation ct, String separator) {
+	public static ActivityFacilities createActivityFaciltiesFromFile(BufferedReader bufferedReader, String facilitiesFileDescription,
+			String headOfCoordColumn, CoordinateTransformation ct, String separator, String activityType) {
 		ActivityFacilities activityFacilities = FacilitiesUtils.createActivityFacilities(facilitiesFileDescription);
 		int lineCount = 0;
 		try {
@@ -102,7 +107,7 @@ public class CreateFacilitiiesFileFromKODI {
 				String[] lineEntries = currentLine.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)", -1);
 				lineCount++;
 
-				ActivityFacility activityFacility = createFacility(lineCount, lineEntries, columnHeads, headOfCoordColumn, ct, separator);
+				ActivityFacility activityFacility = createFacility(lineCount, lineEntries, columnHeads, headOfCoordColumn, ct, separator, activityType);
 				activityFacilities.addActivityFacility(activityFacility);
 			}
 		} catch (IOException e) {
@@ -112,14 +117,15 @@ public class CreateFacilitiiesFileFromKODI {
 		return activityFacilities;
 	}
 
-//	public static ActivityFacilities createActivityFaciltiesFromFile(String csvFileName,
-//																	 String facilitiesFileDescription,
-//																	 String headOfCoordColumn,
-//																	 CoordinateTransformation ct,
-//																	 String separator) {
-//		BufferedReader bufferedReader = IOUtils.getBufferedReader(csvFileName);
-//		return createActivityFaciltiesFromFile(bufferedReader, facilitiesFileDescription, headOfCoordColumn, ct, separator);
-//	}
+	public static ActivityFacilities createActivityFaciltiesFromFile(String csvFileName,
+																	 String facilitiesFileDescription,
+																	 String headOfCoordColumn,
+																	 CoordinateTransformation ct,
+																	 String separator,
+																	 String activityType) {
+		BufferedReader bufferedReader = IOUtils.getBufferedReader(csvFileName);
+		return createActivityFaciltiesFromFile(bufferedReader, facilitiesFileDescription, headOfCoordColumn, ct, separator, activityType);
+	}
 
 	private static Map<String,Integer> createColumnHeadsMap(String headLine, String separator) {
 		String[] header = headLine.split(separator);
@@ -133,7 +139,7 @@ public class CreateFacilitiiesFileFromKODI {
 
 
 	private static ActivityFacility createFacility(int lineCount, String[] lineEntries, Map<String,Integer> columnHeads,
-			String headOfCoordColumn, CoordinateTransformation ct, String separator) {
+			String headOfCoordColumn, CoordinateTransformation ct, String separator, String activityType) {
 		Id<ActivityFacility> id = Id.create(lineCount , ActivityFacility.class);
 
 		String location = lineEntries[columnHeads.get(headOfCoordColumn)].replaceAll("[()\"]","");
@@ -143,7 +149,7 @@ public class CreateFacilitiiesFileFromKODI {
 
 		ActivityFacilitiesFactory activityFacilitiesFactory = new ActivityFacilitiesFactoryImpl();
 		ActivityFacility activityFacility = activityFacilitiesFactory.createActivityFacility(id, transformedCoord);
-		ActivityOption activityOption = activityFacilitiesFactory.createActivityOption("Educational");
+		ActivityOption activityOption = activityFacilitiesFactory.createActivityOption(activityType);
 		activityFacility.addActivityOption(activityOption);
 		return activityFacility;
 	}

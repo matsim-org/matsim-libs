@@ -39,7 +39,7 @@ public interface DriverAgent extends Identifiable<Person>, NetworkAgent, Vehicle
 
 	/**
 	 * notifies the agent that it was moved over the node.  
-	 * <p/>
+	 * <p></p>
 	 * Design thoughts:<ul>
 	 * <li> I find it difficult to see how one should do without this.  Somehow the mobsim needs to tell the 
 	 * driver where she is. The mobsim could tell the vehicle, which tells the agent.  The DriverAgent would still 

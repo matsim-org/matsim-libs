@@ -59,10 +59,18 @@ public class IntergreenTimesReader10 implements MatsimReader {
 	
 	@Override
 	public void readFile(final String filename) throws UncheckedIOException {
+		log.info("starting unmarshalling " + filename);
 		try (InputStream stream = IOUtils.getInputStream(filename)){
+			readStream(stream);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	public void readStream(InputStream stream) throws UncheckedIOException {
+		try {
 			Unmarshaller u = JAXBContext.newInstance(org.matsim.jaxb.intergreenTimes10.ObjectFactory.class).createUnmarshaller();
 			u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/intergreenTimes_v1.0.xsd")));
-			log.info("starting unmarshalling " + filename);
 			XMLIntergreenTimes xmlIntergreenTimes = (XMLIntergreenTimes) u.unmarshal(stream);
 			IntergreenTimesDataFactory factory = this.intergreensData.getFactory();
 			for (XMLSignalSystem xmlSignalSystem : xmlIntergreenTimes.getSignalSystem()){
@@ -77,9 +85,8 @@ public class IntergreenTimesReader10 implements MatsimReader {
 					}
 				}
 			}
-		} catch (JAXBException | SAXException | IOException e) {
+		} catch (JAXBException | SAXException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
-
 }

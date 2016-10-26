@@ -17,7 +17,7 @@ import java.util.*;
 
 /**
  * <B>When StopStopTimes are generated externally, e.g. by a regression.</B>
- * <p/>
+ * <p></p>
  * See constructor for input format.
  * </P>
  */
@@ -166,7 +166,7 @@ public class StopStopTimePreCalcSerializable implements StopStopTime, Serializab
 
     /**
      * Retrieves the interpolated travel time for a combination of stops at a particular time, or the first/last variance observation if one cannot be  interpolated.
-     * <p/>
+     * <p></p>
      * Returns the error value of infinity for a compbination that doesn't appear in the map
      *
      * @param stopOId
@@ -224,7 +224,7 @@ public class StopStopTimePreCalcSerializable implements StopStopTime, Serializab
 
     /**
      * Retrieves the interpolated travel time variance for a combination of stops at a particular time, or the first/last variance observation if one cannot be  interpolated.
-     * <p/>
+     * <p></p>
      * Returns the error value of infinity for a compbination that doesn't appear in the map
      *
      * @param stopOId

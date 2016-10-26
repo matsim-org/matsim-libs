@@ -51,7 +51,7 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
  * This runs the normal LeastCostPathTree, with whatever TravelDisutility object it is using (e.g. including distance and/or toll).
  * However, since the normal LeastCostPathTree does not return its contributing cost dimensions, this class here is used to also
  * accumulate distance and toll separately along the route.
- * <p/>
+ * <p></p>
  * To re-iterate: This class does <i>not</i> lead to a different tree than the base class.
  * 
  * @author thomas

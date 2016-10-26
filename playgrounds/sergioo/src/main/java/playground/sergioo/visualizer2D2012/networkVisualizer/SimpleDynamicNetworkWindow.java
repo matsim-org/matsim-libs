@@ -51,11 +51,11 @@ public class SimpleDynamicNetworkWindow extends LayersWindow implements ActionLi
 		ONE;
 	}
 	public enum Options implements LayersWindow.Options {
-		SELECT_LINK("<html>L<br/>I<br/>N<br/>K</html>"),
-		SELECT_NODE("<html>N<br/>O<br/>D<br/>E</html>"),
-		ADD_LINK("<html>L<br/>I<br/>N<br/>K<br/>S</html>"),
-		ADD_NODE("<html>N<br/>O<br/>D<br/>E<br/>S</html>"),
-		ZOOM("<html>Z<br/>O<br/>O<br/>M</html>");
+		SELECT_LINK("<html>L<br>I<br>N<br>K</html>"),
+		SELECT_NODE("<html>N<br>O<br>D<br>E</html>"),
+		ADD_LINK("<html>L<br>I<br>N<br>K<br>S</html>"),
+		ADD_NODE("<html>N<br>O<br>D<br>E<br>S</html>"),
+		ZOOM("<html>Z<br>O<br>O<br>M</html>");
 		private String caption;
 		private Options(String caption) {
 			this.caption = caption;

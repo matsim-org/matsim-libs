@@ -32,6 +32,8 @@ import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
@@ -52,7 +54,7 @@ public class RunSignalSystemsExample {
 
 	static void run(boolean useOTFVis) {
 		// load a config (without signal information)
-		Config config = ConfigUtils.loadConfig(INPUT_DIR + "config.xml") ;
+		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil-extended"), "config.xml"));
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		// use higher values if you want to iterate

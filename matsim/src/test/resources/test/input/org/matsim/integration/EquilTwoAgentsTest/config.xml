@@ -20,7 +20,7 @@
 <!-- ====================================================================== -->
 
 	<module name="network" >
-		<param name="inputNetworkFile" value="../../../../../scenarios/equil/network.xml"/>
+		<param name="inputNetworkFile" value="network.xml"/>
 	</module>
 
 <!-- ====================================================================== -->
@@ -166,12 +166,6 @@
 			<param name="mode" value="other" />
 			<param name="monetaryDistanceRate" value="0.0" />
 		</parameterset>
-	</module>
-
-<!-- ====================================================================== -->
-
-	<module name="plans" >
-		<param name="inputPlansFile" value="plans2.xml" />
 	</module>
 
 <!-- ====================================================================== -->

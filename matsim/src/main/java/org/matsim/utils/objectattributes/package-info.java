@@ -9,13 +9,13 @@
  * additional data than what is available by default in MATSim's data container
  * (like population, network). For example, modules could need information about
  * persons' income, a node's z-coordinate, or a link's curviness.
- * <p/>
+ * <p></p>
  * Important to consider is that the algorithm always has to specify what additional
  * data it needs so it can access it. In the example above, an algorithm that needs
  * a person's income needs to know the name of the attribute containing the income.
  * Typically, it could do so by providing a setter <code>setPersonIncomeAttributeName(String)</code>
  * or even exposing it as a config-parameter.
- * <p/>
+ * <p></p>
  * This implies that modules should always just access a few specific attributes, but
  * they should never have the need to just access all attributes and then maybe figure
  * out what they could do with the available attributes, probably even guessing some 

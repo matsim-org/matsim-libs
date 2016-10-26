@@ -30,7 +30,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 
 /**
  * Identifies agents that need a replanning of their scheduled plan.
- * <p/>
+ * <p></p>
  * Used to be called "Identifier" until approx. mar'15, but was renamed since "Identifier", albeit correct, conflicts with "Id"
  * which also stands for "Identifier".
  * 

@@ -40,9 +40,9 @@ import java.util.zip.GZIPInputStream;
 /**
  * An abstract XML-Parser which can be easily extended for reading custom XML-formats. This class handles all the low level
  * functionality required to parse xml-files. Extending classes have only to implement {@link #startTag} and {@link #endTag}
- * to implement a custom parser.<br/>
+ * to implement a custom parser.<br>
  * The parser implements a custom <code>EntityResolver</code> to look for DTDs in the MATSim world.
- * <p/>
+ * <p></p>
  * Notes:<ul>
  * <li> If implementing classes want to override the final methods, the will have to resort to delegation.   
  * </ul>

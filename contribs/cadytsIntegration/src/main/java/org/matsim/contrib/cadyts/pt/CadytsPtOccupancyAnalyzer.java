@@ -49,7 +49,7 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * Collects occupancy data of transit-line stations
- * <p/>
+ * <p></p>
  * This is probably similar to code elsewhere.  However, it makes some sense to keep this here since the correct workings of cadyts 
  * (obviously) depends on the fact that the counts are actually what it thinks, and so it makes sense to decouple this from the upstream
  * counting method and leave it here. kai, sep'13 

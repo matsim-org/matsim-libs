@@ -29,7 +29,7 @@ import org.matsim.core.api.internal.MatsimExtensionPoint;
  * <li>{@link tutorial.programming.example21tutorialTUBclass.events.RunEventsHandlingExample}
  * </ul>
  *
- * <br/>
+ * <br>
  * Design thoughts:<ul>
  * <li> This is deliberately without a handleEvent( Event ev ) so that derived interfaces and ultimately classes are not
  * forced to implement a handler that deals with <i>all</i> events.  kai, with input from dominik, nov'11

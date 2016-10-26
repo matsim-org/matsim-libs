@@ -25,7 +25,7 @@ import java.util.Map;
 
 /**
  * @author fouriep
- *         <p/>
+ *         <p></p>
  *         performs geometric
  * 
  */

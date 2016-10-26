@@ -162,7 +162,7 @@ public class RndPtRouterLauncher {
 
 		//add analyzer for specific bus line and stop Zone conversion
 		CtrlListener4configurableOcuppAnalysis ctrlListener4configurableOcuppAnalysis = new CtrlListener4configurableOcuppAnalysis(controler);
-		ctrlListener4configurableOcuppAnalysis.setStopZoneConversion(true);
+		ctrlListener4configurableOcuppAnalysis.setStopZoneConversion(false);
 		controler.addControlerListener(ctrlListener4configurableOcuppAnalysis);
 
 

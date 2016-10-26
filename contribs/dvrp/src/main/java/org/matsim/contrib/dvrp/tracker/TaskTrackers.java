@@ -29,9 +29,9 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
  * General assumptions:
- * <p/>
+ * <p></p>
  * An offline tracker knows/uses only the corresponding task and the schedule
- * <p/>
+ * <p></p>
  * An online tracker knows/uses also the corresponding DynAction
  */
 public class TaskTrackers

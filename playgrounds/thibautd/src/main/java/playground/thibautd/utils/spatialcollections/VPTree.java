@@ -36,8 +36,6 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	private final SpatialCollectionUtils.Metric<C> metric;
 	private final SpatialCollectionUtils.GenericCoordinate<C,T> coordinate;
 
-	private int stepsToRemove = 0;
-
 	private Node<C,T> root = new Node<>();
 	private int size = 0;
 	private final Random r = new Random( 123 );
@@ -54,20 +52,52 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 		return size;
 	}
 
+	/**
+	 * O( log( n ) ), gets a random element from the tree, with an approximately uniform distribution if the tree is
+	 * approximately balanced.
+	 *
+	 * @return an element
+	 */
 	@Override
 	public T getAny() {
+		if ( size == 0 ) return null;
+
 		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
 		stack.add( root );
 
-		while ( !stack.isEmpty() ) {
+		// randomize choice, without falling into the O( n ) case: choose random depth, navigate to it, return the
+		// last non-null element encountered.
+		// this has O( log( n ) ) complexity, and thus should not screw complexity of an algorithm if it is done
+		// as often or less as queries, contrary to the naive O( n ) approach.
+		// The O( 1 ) approach of getting root might lead to strange artifacts from not enough randomness.
+		// perform log on random number to give more weight to deep layers to be closer to a uniform distribution
+		int depth = (int) Math.log( 1 + r.nextInt( size ) );
+
+		T val = null;
+
+		while ( (depth > 0 || val == null) && !stack.isEmpty() ) {
 			final Node<C,T> current = stack.poll();
 
-			if ( current.value != null ) return current.value;
-			if ( current.close != null ) stack.add( current.close );
-			if ( current.far != null ) stack.add( current.far );
+			if ( current.value != null ) {
+				val = current.value;
+				depth--;
+			}
+			else if ( val == null && current.close != null && current.close.value != null ) val = current.close.value;
+			else if ( val == null && current.far != null && current.far.value != null ) val = current.far.value;
+
+			if ( r.nextBoolean() ) {
+				if ( current.close != null ) stack.add( current.close );
+				else if ( current.far != null ) stack.add( current.far );
+			}
+			else {
+				if ( current.far != null ) stack.add( current.far );
+				else if ( current.close != null ) stack.add( current.close );
+			}
 		}
 
-		return null;
+		// if invalidation works properly, there should be no branch where all values are null
+		assert val != null;
+		return val;
 	}
 
 	@Override
@@ -100,8 +130,6 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 
 	private void add( final Node<C,T> addRoot , final Collection<T> points ) {
 		size += points.size();
-		// TODO: extract in some other place, not to mix it here
-		stepsToRemove += size / 2;
 
 		final Queue<AddFrame<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
 
@@ -126,7 +154,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 			final AddFrame<C,T> closeFrame =
 					new AddFrame<>(
 							new Node<>(),
-							currentFrame.toAdd );
+							new ArrayList<>( currentFrame.toAdd.size() / 2 + 1 ) );
 			final AddFrame<C,T> farFrame =
 					new AddFrame<>(
 							new Node<>(),
@@ -134,22 +162,25 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 
 			currentFrame.node.cuttoffDistance = medianDistance;
 
-			for ( Iterator<T> it = currentFrame.toAdd.iterator(); it.hasNext(); ) {
-				final T v = it.next();
+			for ( T v : currentFrame.toAdd ) {
 				final double distanceToVP = metric.calcDistance( currentFrame.node.coordinate , coordinate.getCoord( v ) );
 
 				if ( distanceToVP > medianDistance ) {
-					it.remove();
 					farFrame.toAdd.add( v );
+				}
+				else {
+					closeFrame.toAdd.add( v );
 				}
 			}
 
 			if ( !closeFrame.toAdd.isEmpty() ) {
 				currentFrame.node.close = closeFrame.node;
+				closeFrame.node.parent = currentFrame.node;
 				stack.add( closeFrame );
 			}
 			if ( !farFrame.toAdd.isEmpty() ) {
 				currentFrame.node.far = farFrame.node;
+				farFrame.node.parent = currentFrame.node;
 				stack.add( farFrame );
 			}
 		}
@@ -162,10 +193,22 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	 * @param value
 	 */
 	public boolean invalidate( final T value ) {
-		final Node<C,T> node = find( value );
+		Node<C,T> node = find( value );
+
 		if ( node == null ) return false;
 		node.value = null;
 		size--;
+
+		// remove totally invalidated branch ends, to speed up latter queries
+		for( ;
+				node.value == null &&
+						node.far == null &&
+						node.close == null &&
+						node.parent != null;
+				node = node.parent ) {
+			if ( node.parent.close == node ) node.parent.close = null;
+			if ( node.parent.far == node ) node.parent.far = null;
+		}
 		return true;
 	}
 
@@ -188,9 +231,6 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	}
 
 	/**
-	 * Naively optimized remove. Invalidates values, and rebuilds after successfully invalidating 1/2 of the values.
-	 * Not based on any theory.
-	 *
 	 * @param value
 	 * @return
 	 */
@@ -198,10 +238,10 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	public boolean remove( final T value ) {
 		boolean isRemoved = invalidate( value );
 
-		if ( isRemoved && --stepsToRemove == 0 ) {
-			// rebuild updates steps to remove
-			rebuild();
-		}
+		//if ( isRemoved && --stepsToRemove == 0 ) {
+		//	// rebuild updates steps to remove
+		//	rebuild();
+		//}
 
 		return isRemoved;
 	}
@@ -338,6 +378,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 		private double cuttoffDistance = Double.NaN;
 		private Node<C,T> close = null;
 		private Node<C,T> far = null;
+		private Node<C,T> parent = null;
 	}
 
 	private static class AddFrame<C,T> {

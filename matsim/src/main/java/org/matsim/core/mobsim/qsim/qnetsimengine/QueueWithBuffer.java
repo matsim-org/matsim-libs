@@ -59,7 +59,7 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
 /**
  * Separating out the "lane" functionality from the "link" functionality.
- * <p/>
+ * <p></p>
  * Design thoughts:<ul>
  * <li> In fast capacity update, the flows are not accumulated in every time step, 
  * rather updated only if an agent wants to enter the link or an agent is added to buffer. 
@@ -111,7 +111,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	/**
 	 * Stores the accumulated fractional parts of the flow capacity. See also
 	 * flowCapFraction.
-	 * <p/>
+	 * <p></p>
 	 * I changed this into an internal class as a first step to look into acceleration (not having to keep this link active until
 	 * this has accumulated to one).  There is no need to keep it this way; it just seems to make it easier to keep track of
 	 * changes.  kai, sep'14
