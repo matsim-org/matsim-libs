@@ -25,12 +25,9 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
@@ -39,9 +36,7 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Soc
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SimpleSnowballModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballSamplingConfigGroup;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -123,54 +118,4 @@ public class RunScalabilityAnalysis {
 		for ( Id<Person> p : toRemove ) scenario.getPopulation().removePerson( p );
 	}
 
-	private static class ScalabilityConfigGroup extends ReflectiveConfigGroup {
-		private double basisSample = 0.1;
-		private double[] samples = {0.125,0.25,0.5,1};
-		private int nTries = 1;
-
-		public ScalabilityConfigGroup() {
-			super( "scalability" );
-		}
-
-		@StringGetter("samples")
-		private String getSamplesString() {
-			return Arrays.toString( getSamples() );
-		}
-
-		public double[] getSamples() {
-			return samples;
-		}
-
-		@StringSetter("samples")
-		public void setSamples( final String samples ) {
-			setSamples(
-					Arrays.stream( CollectionUtils.stringToArray( samples ) )
-							.mapToDouble( Double::parseDouble )
-							.toArray() );
-		}
-
-		public void setSamples( final double[] samples ) {
-			this.samples = samples;
-		}
-
-		@StringGetter("nTries")
-		public int getnTries() {
-			return nTries;
-		}
-
-		@StringSetter("nTries")
-		public void setnTries( final int nTries ) {
-			this.nTries = nTries;
-		}
-
-		@StringGetter("basisSample")
-		public double getBasisSample() {
-			return basisSample;
-		}
-
-		@StringSetter("basisSample")
-		public void setBasisSample( final double basisSample ) {
-			this.basisSample = basisSample;
-		}
-	}
 }
