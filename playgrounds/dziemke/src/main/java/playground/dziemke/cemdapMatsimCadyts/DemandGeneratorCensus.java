@@ -142,23 +142,23 @@ public class DemandGeneratorCensus {
 			
 			
 			// Attributes from zensus that I have available
-//			municipalities.putAttribute(municipality, "populationMale", populationMale);
-//			municipalities.putAttribute(municipality, "populationFemale", populationFemale);
-//			municipalities.putAttribute(municipality, "marriedMale", marriedMale);
-//			municipalities.putAttribute(municipality, "marriedFemale", marriedFemale);
-//			municipalities.putAttribute(municipality, "infantsMale", infantsMale);
-//			municipalities.putAttribute(municipality, "infantsFemale", infantsFemale);
-//			municipalities.putAttribute(municipality, "childrenMale", childrenMale);
-//			municipalities.putAttribute(municipality, "childrenFemale", childrenFemale);
-//			municipalities.putAttribute(municipality, "adolescentsMale", adolescentsMale);
-//			municipalities.putAttribute(municipality, "adolescentsFemale", adolescentsFemale);
-//			municipalities.putAttribute(municipality, "adultsMale", adultsMale);
-//			municipalities.putAttribute(municipality, "adultsFemale", adultsFemale);
-//			municipalities.putAttribute(municipality, "seniorsMale", seniorsMale);
-//			municipalities.putAttribute(municipality, "seniorsFemale", seniorsFemale);
-//			municipalities.putAttribute(municipality, "employedMale", employedMale);
-//			municipalities.putAttribute(municipality, "employedFemale", employedFemale);
-//			municipalities.putAttribute(municipality, "studying", studying);
+//			"populationMale"
+//			"populationFemale"
+//			"marriedMale"
+//			"marriedFemale"
+//			"infantsMale"
+//			"infantsFemale"
+//			"childrenMale"
+//			"childrenFemale"
+//			"adolescentsMale"
+//			"adolescentsFemale"
+//			"adultsMale"
+//			"adultsFemale"
+//			"seniorsMale"
+//			"seniorsFemale"
+//			"employedMale"
+//			"employedFemale"
+//			"studying"
 			
 
 			
