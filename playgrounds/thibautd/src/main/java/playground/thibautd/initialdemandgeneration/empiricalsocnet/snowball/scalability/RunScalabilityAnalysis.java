@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.scalability;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
@@ -37,9 +36,7 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.Simp
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballSamplingConfigGroup;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
 /**
  * @author thibautd
@@ -47,29 +44,33 @@ import java.util.Set;
 public class RunScalabilityAnalysis {
 
 	public static void main( String[] args ) {
+		final SnowballSamplingConfigGroup configGroup = new SnowballSamplingConfigGroup();
 		final ScalabilityConfigGroup scalabilityConfigGroup = new ScalabilityConfigGroup();
-		final Config config = ConfigUtils.loadConfig( args[ 0 ] , scalabilityConfigGroup , new SocialNetworkSamplingConfigGroup() );
+		final Config config =
+				ConfigUtils.loadConfig(
+						args[ 0 ],
+						configGroup,
+						scalabilityConfigGroup,
+						new SocialNetworkSamplingConfigGroup() );
 		MoreIOUtils.initOut( config.controler().getOutputDirectory() );
 
 		new ConfigWriter( config ).write( config.controler().getOutputDirectory()+"/output_config.xml" );
+		final Scenario scenario = ScenarioUtils.loadScenario( config );
 
-		try ( final ScalabilityStatisticsListener statsListenner = new ScalabilityStatisticsListener( config.controler().getOutputDirectory()+"/stats.dat"  )) {
+		final String outputDir = config.controler().getOutputDirectory();
+		final String tmpDir = outputDir + "/tmp/";
+		config.controler().setOutputDirectory( tmpDir );
 
+		try ( final ScalabilityStatisticsListener statsListenner = new ScalabilityStatisticsListener( outputDir+"/stats.dat"  )) {
 			for ( double sample : scalabilityConfigGroup.getSamples() ) {
 				for ( int tryNr = 0; tryNr < scalabilityConfigGroup.getnTries(); tryNr++ ) {
-					final SnowballSamplingConfigGroup configGroup = new SnowballSamplingConfigGroup();
-					final Config tryConfig = ConfigUtils.loadConfig( args[ 0 ], configGroup , new SocialNetworkSamplingConfigGroup() );
+					MoreIOUtils.deleteDirectoryIfExists( tmpDir );
 
-					final String outputDir = config.controler().getOutputDirectory() + "/tmp/";
-					tryConfig.controler().setOutputDirectory( outputDir );
-					MoreIOUtils.deleteDirectoryIfExists( outputDir );
-
-					final Scenario scenario = ScenarioUtils.loadScenario( tryConfig );
-					samplePopulation( scenario , sample );
+					final Scenario sampledScenario = samplePopulation( scenario , sample );
 
 					statsListenner.startTry( sample , tryNr );
 
-					final SocialNetwork network = runTry( scenario , statsListenner );
+					final SocialNetwork network = runTry( sampledScenario , statsListenner );
 
 					statsListenner.endTry( network );
 				}
@@ -88,7 +89,8 @@ public class RunScalabilityAnalysis {
 			final ScalabilityStatisticsListener statsListenner ) {
 		try ( final AutocloserModule closer = new AutocloserModule() ) {
 			final com.google.inject.Injector injector =
-					Injector.createInjector( scenario.getConfig(),
+					Injector.createInjector(
+							scenario.getConfig(),
 							closer,
 							new SimpleSnowballModule( scenario.getConfig() ),
 							new ScenarioByInstanceModule( scenario ),
@@ -106,16 +108,16 @@ public class RunScalabilityAnalysis {
 	}
 
 	private static final Random random = new Random( 123 );
-	private static void samplePopulation(
+	private static Scenario samplePopulation(
 			final Scenario scenario,
 			final double sample ) {
-		final Set<Id<Person>> toRemove = new HashSet<>();
+		final Scenario sampled = ScenarioUtils.createScenario( scenario.getConfig() );
 
-		for ( Id<Person> p : scenario.getPopulation().getPersons().keySet() ) {
-			if ( random.nextDouble() > sample ) toRemove.add( p );
+		for ( Person p : scenario.getPopulation().getPersons().values() ) {
+			if ( random.nextDouble() <= sample ) sampled.getPopulation().addPerson( p );
 		}
 
-		for ( Id<Person> p : toRemove ) scenario.getPopulation().removePerson( p );
+		return sampled;
 	}
 
 }
