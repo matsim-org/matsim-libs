@@ -79,7 +79,7 @@ public class AccessibilityComputationKiberaTest {
 		final boolean push2Geoserver = false;
 
 		// QGis parameters
-		boolean createQGisOutput = true;
+		boolean createQGisOutput = false;
 		final boolean includeDensityLayer = false;
 		final Double lowerBound = 0.; // (upperBound - lowerBound) is ideally easily divisible by 7
 //		final Double lowerBound = 1.75; // (upperBound - lowerBound) is ideally easily divisible by 7

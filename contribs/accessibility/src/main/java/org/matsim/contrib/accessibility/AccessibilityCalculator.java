@@ -207,14 +207,10 @@ public final class AccessibilityCalculator {
 	
 	public final void computeAccessibilities( Double departureTime, ActivityFacilities opportunities) {
 		aggregateOpportunities(opportunities, scenario.getNetwork());
-//		ExpSum[] expSums = new ExpSum[Modes4Accessibility.values().length] ;
-		// this could just be a double array, or a Map.  Not using a Map for computational speed reasons (untested);
-		// not using a simple double array for type safety in long argument lists. kai, feb'14
-		
+
 		Map<Modes4Accessibility,ExpSum> expSums = new HashMap<>() ;
-		
-		for ( ExpSum expSum : expSums.values() ) {
-			expSum = new ExpSum() ;
+		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+			expSums.put(mode, new ExpSum());
 		}
 
 		// Condense measuring points (origins) that have the same nearest node on the network
@@ -304,7 +300,7 @@ public final class AccessibilityCalculator {
 	}
 
 	
-	private void computeAndAddExpUtilContributions( Map<Modes4Accessibility,ExpSum> gcs, ActivityFacility origin, 
+	private void computeAndAddExpUtilContributions( Map<Modes4Accessibility,ExpSum> expSums, ActivityFacility origin, 
 			final AggregationObject aggregatedFacility, Double departureTime) 
 	{
 		for ( Map.Entry<Modes4Accessibility, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet() ) {
@@ -316,7 +312,7 @@ public final class AccessibilityCalculator {
 
 			final double expVhk = calculatorEntry.getValue().computeContributionOfOpportunity( origin , aggregatedFacility, departureTime );
 
-			gcs.get(mode).addExpUtils( expVhk );
+			expSums.get(mode).addExpUtils( expVhk );
 		}
 	}
 
