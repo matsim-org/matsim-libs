@@ -31,6 +31,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSampler;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplerModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplingConfigGroup;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SimpleSnowballModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballSamplingConfigGroup;
@@ -93,8 +94,7 @@ public class RunScalabilityAnalysis {
 							scenario.getConfig(),
 							closer,
 							new SimpleSnowballModule( scenario.getConfig() ),
-							new ScenarioByInstanceModule( scenario ),
-							b -> b.bind( SocialNetworkSampler.class ),
+							new SocialNetworkSamplerModule( scenario ),
 							b -> b.bind( ScalabilityStatisticsListener.class ).toInstance( statsListenner ) );
 
 			return injector.getInstance( SocialNetworkSampler.class ).sampleSocialNetwork();
