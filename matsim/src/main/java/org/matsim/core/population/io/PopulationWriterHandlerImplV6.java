@@ -113,36 +113,8 @@ import java.util.Map;
 		out.write("\t<person id=\"");
 		out.write(person.getId().toString());
 		out.write("\"");
-
-		if (PersonUtils.getSex(person) != null) {
-			out.write(" sex=\"");
-			out.write(PersonUtils.getSex(person));
-			out.write("\"");
-		}
-		if (PersonUtils.getAge(person) != null) {
-			out.write(" age=\"");
-			out.write(Integer.toString(PersonUtils.getAge(person)));
-			out.write("\"");
-		}
-		if (PersonUtils.getLicense(person) != null) {
-			out.write(" license=\"");
-			out.write(PersonUtils.getLicense(person));
-			out.write("\"");
-		}
-		if (PersonUtils.getCarAvail(person) != null) {
-			out.write(" car_avail=\"");
-			out.write(PersonUtils.getCarAvail(person));
-			out.write("\"");
-		}
-		if (PersonUtils.isEmployed(person) != null) {
-			out.write(" employed=\"");
-			out.write((PersonUtils.isEmployed(person) ? "yes" : "no"));
-			out.write("\"");
-		}
-
 		out.write(">\n");
 		attributesWriter.writeAttributes( "\t\t" , out , person.getAttributes() );
-
 	}
 
 	private static void endPerson(final BufferedWriter out) throws IOException {

@@ -113,7 +113,8 @@ public class VariableAccessTransitRouterWrapper implements RoutingModule {
 		    if (i == 0) {
 			    // (access leg)
 			    Facility firstToFacility;
-			    if (baseTrip.size() > 1) { // at least one pt leg available
+			    if ((baseTrip.size() > 1) &&  (baseTrip.get(1).getRoute() instanceof ExperimentalTransitRoute) ) { // at least one pt leg available
+			    	
 				    ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) baseTrip.get(1).getRoute();
 				    firstToFacility = this.transitSchedule.getFacilities().get(tRoute.getAccessStopId());
 			    } else {
