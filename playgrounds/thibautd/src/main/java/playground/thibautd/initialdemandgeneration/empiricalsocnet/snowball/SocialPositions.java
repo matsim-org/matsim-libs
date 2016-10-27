@@ -104,15 +104,6 @@ public class SocialPositions {
 		members.add( ego );
 	}
 
-	public static void link( final Set<Ego> members ) {
-		for ( Ego ego : members ) {
-			for ( Ego alter : members ) {
-				if ( alter == ego ) break;
-				alter.getAlters().add( ego );
-				ego.getAlters().add( alter );
-			}
-		}
-	}
 
 	public static class CliquePositions implements Iterable<CliquePosition> {
 		public final List<CliquePosition> positions = new ArrayList<>();
@@ -177,42 +168,4 @@ public class SocialPositions {
 		}
 	}
 
-	public static class EgoClass {
-		private final int ageClass;
-		private final SnowballCliques.Sex sex;
-		private final int degreeClass;
-
-		private EgoClass(
-				final int ageClass,
-				final SnowballCliques.Sex sex,
-				final int degree ) {
-			this.ageClass = ageClass;
-			this.sex = sex;
-			this.degreeClass = calcDegreeClass( degree );
-		}
-
-		@Override
-		public boolean equals( final Object o ) {
-			if ( !(o instanceof EgoClass) ) return false;
-			return ( (EgoClass) o ).ageClass == ageClass &&
-					( (EgoClass) o ).sex == sex &&
-					( (EgoClass) o ).degreeClass == degreeClass;
-		}
-
-		@Override
-		public int hashCode() {
-			// unique if less than 99 age classes
-			int hashCode = ageClass;
-			hashCode += 100 * (sex == null ? 0 : sex.ordinal() + 1);
-			hashCode += 1000 * (degreeClass + 1);
-			return hashCode;
-		}
-
-		@Override
-		public String toString() {
-			return "[EgoClass: ageClass="+ageClass+
-					"; sex="+sex+
-					"; degreeClass="+degreeClass+"]";
-		}
-	}
 }

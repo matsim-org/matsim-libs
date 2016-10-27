@@ -25,6 +25,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Injector;
 
 import java.util.Arrays;
+import java.util.Set;
 
 /**
  * @author thibautd
@@ -45,5 +46,7 @@ public class SocialNetworkSamplerUtils {
 
 		return injector.getInstance( SocialNetworkSampler.class ).sampleSocialNetwork();
 	}
+
+
 }
 

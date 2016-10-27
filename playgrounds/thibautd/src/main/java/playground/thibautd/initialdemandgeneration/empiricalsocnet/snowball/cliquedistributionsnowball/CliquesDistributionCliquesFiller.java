@@ -117,7 +117,6 @@ public class CliquesDistributionCliquesFiller implements CliquesFiller {
 				members.stream()
 						.map( CliqueStub::getEgo )
 						.collect( Collectors.toSet() );
-		SocialPositions.link( cliqueMembers );
 
 		return cliqueMembers.size() > 1 ? cliqueMembers : null;
 	}

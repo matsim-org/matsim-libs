@@ -97,6 +97,7 @@ public class SocialNetworkSampler {
 			final Set<Ego> clique = cliquesFiller.sampleClique( stub , freeStubs );
 			if ( clique == null ) continue;
 
+			link( clique );
 			cliquesListener.accept( clique );
 		}
 		counter.printCounter();
@@ -125,6 +126,16 @@ public class SocialNetworkSampler {
 							Collectors.toMap(
 									Ego::getId,
 									e -> e ) ) );
+	}
+
+	private static void link( final Set<Ego> members ) {
+		for ( Ego ego : members ) {
+			for ( Ego alter : members ) {
+				if ( alter == ego ) break;
+				alter.getAlters().add( ego );
+				ego.getAlters().add( alter );
+			}
+		}
 	}
 
 	private SpatialTree<double[],CliqueStub> createSpatialTree() {
