@@ -112,7 +112,9 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Intersection() / this.walkSpeedMeterPerHour;
 		
 		// (a) disutilities to get on or off the network
-		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distance.getDistancePoint2Intersection() * betaWalkTD);
+		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) 
+				+ (distance.getDistancePoint2Intersection() * betaWalkTD);
+
 		Coord projectionCoord = CoordUtils.orthogonalProjectionOnLineSegment(nearestLink.getFromNode().getCoord(), nearestLink.getToNode().getCoord(), origin.getCoord());
 		if ( cnt < 10 ) {
 			writeDebuggingOutput(origin, destination, nearestLink, distance, projectionCoord);
