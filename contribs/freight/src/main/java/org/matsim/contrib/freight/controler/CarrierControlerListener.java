@@ -61,7 +61,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.GenericStrategyManager;
 /**
  * Controls the workflow of the simulation.
- * <p/>
+ * <p></p>
  * <p>Processes the required actions during the matsim simulation workflow (replanning, scoring, sim). For example, it informs agents to
  * score their plans when it is scoring time, and it informs them to re-plan, or it injects carriers into the simulation when it is time
  * to inject them. Currently it is kept to minimum functions, i.e. injecting carrier plans into sim and the possibility

@@ -35,9 +35,9 @@ import playground.benjamin.internalization.EmissionCostModule;
  */
 
 public class EmissionCostsCollector implements WarmEmissionEventHandler, ColdEmissionEventHandler{
-	private EmissionCostModule emissionCostModule;
-	private Map<Id<Person>, Double> personId2ColdEmissCosts = new HashMap<>();
-	private Map<Id<Person>, Double> personId2WarmEmissCosts = new HashMap<>();
+	private final EmissionCostModule emissionCostModule;
+	private final Map<Id<Person>, Double> personId2ColdEmissCosts = new HashMap<>();
+	private final Map<Id<Person>, Double> personId2WarmEmissCosts = new HashMap<>();
 
 	public EmissionCostsCollector(EmissionCostModule emissionCostModule) {
 		this.emissionCostModule = emissionCostModule;

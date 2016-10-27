@@ -20,6 +20,7 @@
 
 package org.matsim.vis.otfvis.handler;
 
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -28,6 +29,7 @@ import java.util.List;
 
 import com.jogamp.opengl.GL2;
 
+import com.jogamp.opengl.util.awt.TextRenderer;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -43,10 +45,9 @@ import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
-import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
-import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
+import org.matsim.vis.otfvis.opengl.gl.GLUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
@@ -147,19 +148,21 @@ public class FacilityDrawer {
 
 	public static class DataDrawer extends OTFGLAbstractDrawableReceiver {
 
-		/*package*/ final List<VisBusStop> stops = new LinkedList<VisBusStop>();
+		/*package*/ final List<VisBusStop> stops = new LinkedList<>();
 
 		@Override
 		public void onDraw(GL2 gl) {
 			if (OTFClientControl.getInstance().getOTFVisConfig().isDrawTransitFacilities()) {
+				TextRenderer textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 32), true, false);
+
 				for (VisBusStop stop : this.stops) {
-					DrawingUtils.drawCircle(gl, (float) stop.x, (float) stop.y, 50.0f);
+					GLUtils.drawCircle(gl, (float) stop.x, (float) stop.y, 50.0f);
 				}
 				for (VisBusStop stop : this.stops) {
 					if ( stop.linkId!=null ) {
-						stop.stopText = new InfoText(stop.buildText(), (float) stop.x - 100.0f, (float) stop.y + 50.0f); 
+						InfoText stopText = new InfoText(stop.buildText(), (float) stop.x - 100.0f, (float) stop.y + 50.0f);
 						OTFOGLDrawer drawer = OTFClientControl.getInstance().getMainOTFDrawer();
-						stop.stopText.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
+						stopText.draw(textRenderer, OTFClientControl.getInstance().getMainOTFDrawer().getCanvas(), drawer.getViewBoundsAsQuadTreeRect());
 					}
 				}
 			}
@@ -181,9 +184,8 @@ public class FacilityDrawer {
 		public String id = null;
 		public String linkId;
 		private int nOfPeople = 0;
-		private InfoText stopText;
 
-		public void setnOfPeople(int nOfPeople) {
+		void setnOfPeople(int nOfPeople) {
 			this.nOfPeople = nOfPeople;
 		}
 

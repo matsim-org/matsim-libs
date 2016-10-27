@@ -39,17 +39,17 @@ import java.util.concurrent.atomic.AtomicReference;
  * real functionality of the strategy module is handled by a PlanAlgorithm.
  * Just overwrite getPlanAlgoInstance() to return an instance of your plan
  * algorithm.
- * <p/>
+ * <p></p>
  * <code>initThreads()</code> creates the threads, but does not yet start them.
- * <p/>
+ * <p></p>
  * <code>handlePlan(Plan)</code> distributes the plans equally to all threads.
- * <p/>
+ * <p></p>
  * <code>finishReplanning()</code> finally starts the threads and waits for all threads to be finished.
- * <p/>
+ * <p></p>
  * While this approach does not lead to optimal performance gains ("slow threads" vs.
  * "fast threads"), it helps building reproducible runs.  Additionally, as the threads are only
  * started after all to-be-handled plans are added, we can use unsynchronized data structures.
- * <p/>
+ * <p></p>
  * Design comments/questions:<ul>
  * <li> As a consequence of the design, the instances that getPlanAlgoInstance() returns, need to be thread-safe.  kai, dec'12
  * For an example with discussions, see {@link tutorial.programming.multiThreadedPlanStrategy.RunWithMultithreadedModule}

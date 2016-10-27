@@ -58,7 +58,13 @@ public class WGS84toCH1903LV03Plus implements CoordinateTransformation {
 		
 		/* Important Note: in the Swiss Grid, y describes easting and x describes 
 		 * northing, contrary to the usual naming conventions!		 */
-		return new Coord((double) Math.round(CH1903Y), (double) Math.round(CH1903X));
+		double elevation;
+		try{
+			elevation = coord.getZ();
+			return new Coord((double) Math.round(CH1903Y), (double) Math.round(CH1903X), elevation);
+		} catch (Exception e){
+			return new Coord((double) Math.round(CH1903Y), (double) Math.round(CH1903X));
+		}
 	}
 
 }

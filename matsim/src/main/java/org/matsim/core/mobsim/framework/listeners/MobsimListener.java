@@ -25,7 +25,7 @@ import org.matsim.core.api.internal.MatsimExtensionPoint;
 
 /**
  * A marker interface that all QueueSimulationListeners must extend.
- * <p/>
+ * <p></p>
  * Example(s):<ul>
  * <li> {@link tutorial.programming.example22MobsimListener.RunMobsimListenerExample}
  * </ul>

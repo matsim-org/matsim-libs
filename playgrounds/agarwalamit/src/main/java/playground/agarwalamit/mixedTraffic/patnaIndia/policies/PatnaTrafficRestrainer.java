@@ -20,8 +20,13 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.policies;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
+
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * Remove certain links on the network so that the traffic along Gandhi setu disappears
@@ -29,19 +34,28 @@ import org.matsim.api.core.v01.network.Network;
  */
 
 public final class PatnaTrafficRestrainer {
-	
-	public PatnaTrafficRestrainer() { }
-	
-	public static void run(Network network){
+
+	public static void main(String[] args) {
+		String networkFile = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/network.xml.gz";
+		Scenario scenario = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
 		
-		{ 
+		String filename = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/networkWithTrafficRestrication.xml.gz";
+
+		PatnaTrafficRestrainer.run(scenario.getNetwork());
+		new NetworkWriter(scenario.getNetwork()).write(filename);
+	}
+
+	PatnaTrafficRestrainer() {}
+
+	public static void run(Network network){
+		{
 			// major problem with the follwoing links
 			Id<Link> linkId = Id.createLinkId("1538010000");
 			Id<Link> reverseLinkId = Id.createLinkId("15380");
 			network.removeLink(linkId);
 			network.removeLink(reverseLinkId);
 		}
-		
+
 		{ 
 			// does not look a major problem but the whole argument is that 
 			//"connect Gandhi Setu with the major arterial and no where in between."

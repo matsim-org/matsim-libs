@@ -21,8 +21,6 @@ package playground.jbischoff.parking.DynAgent.agentLogic;
 
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -30,6 +28,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynActivity;
 import org.matsim.contrib.dynagent.DynAgent;
@@ -38,6 +37,7 @@ import org.matsim.contrib.dynagent.StaticDynActivity;
 import org.matsim.contrib.dynagent.StaticPassengerDynLeg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -46,7 +46,7 @@ import org.matsim.vehicles.Vehicle;
 import playground.jbischoff.parking.ParkingUtils;
 import playground.jbischoff.parking.DynAgent.ParkingDynLeg;
 import playground.jbischoff.parking.choice.ParkingChoiceLogic;
-import playground.jbischoff.parking.manager.ParkingManager;
+import playground.jbischoff.parking.manager.ParkingSearchManager;
 import playground.jbischoff.parking.manager.WalkLegFactory;
 import playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
 import playground.jbischoff.parking.routing.ParkingRouter;
@@ -57,7 +57,7 @@ import playground.jbischoff.parking.routing.ParkingRouter;
  */
 public class ParkingAgentLogic implements DynAgentLogic {
 
-	enum LastParkActionState  {
+	public enum LastParkActionState  {
 			
 			// we have the following cases of ending dynacts:
 			NONCARTRIP,	// non-car trip arrival: start Activity
@@ -68,23 +68,26 @@ public class ParkingAgentLogic implements DynAgentLogic {
 			WALKTOPARK, // walk-leg to car: add unpark activity
 			UNPARKACTIVITY // unpark activity: find the way to the next route & start leg
 	}
-	private LastParkActionState lastParkActionState;
-	private DynAgent agent;
-	private Iterator<PlanElement> planElemIter;
-	private PlanElement currentPlanElement;
-	private ParkingManager parkingManager;
-	private WalkLegFactory walkLegFactory;
-	private ParkingRouter parkingRouter;
-	private MobsimTimer timer;
-	private EventsManager events;
-	private ParkingChoiceLogic parkingLogic;
-	private VehicleTeleportationLogic teleportationLogic;
-	private boolean isinitialLocation = true;
+	protected LastParkActionState lastParkActionState;
+	protected DynAgent agent;
+	protected Iterator<PlanElement> planElemIter;
+	protected PlanElement currentPlanElement;
+	protected ParkingSearchManager parkingManager;
+	protected WalkLegFactory walkLegFactory;
+	protected ParkingRouter parkingRouter;
+	protected MobsimTimer timer;
+	protected EventsManager events;
+	protected ParkingChoiceLogic parkingLogic;
+	protected VehicleTeleportationLogic teleportationLogic;
+	protected boolean isinitialLocation = true;
+	protected Id<Vehicle> currentlyAssignedVehicleId = null;
+	protected String stageInteractionType = null;
+
 	/**
 	 * @param plan
 	 *            (always starts with Activity)
 	 */
-	public ParkingAgentLogic(Plan plan, ParkingManager parkingManager, WalkLegFactory walkLegFactory, ParkingRouter parkingRouter, EventsManager events, ParkingChoiceLogic parkingLogic, MobsimTimer timer, VehicleTeleportationLogic teleportationLogic) {
+	public ParkingAgentLogic(Plan plan, ParkingSearchManager parkingManager, WalkLegFactory walkLegFactory, ParkingRouter parkingRouter, EventsManager events, ParkingChoiceLogic parkingLogic, MobsimTimer timer, VehicleTeleportationLogic teleportationLogic) {
 		planElemIter = plan.getPlanElements().iterator();
 		this.parkingManager = parkingManager;
 		this.walkLegFactory = walkLegFactory;
@@ -147,53 +150,49 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		
 		}
 		throw new RuntimeException("unreachable code");
-		
-		
-		
-		
-		
 
 	}
 
-	private DynAction nextStateAfterUnParkActivity(DynAction oldAction, double now) {
+	protected DynAction nextStateAfterUnParkActivity(DynAction oldAction, double now) {
 		// we have unparked, now we need to get going by car again.
 		
 		Leg currentPlannedLeg = (Leg) currentPlanElement;
-		NetworkRoute plannedRoute = (NetworkRoute) currentPlannedLeg.getRoute();
-		NetworkRoute actualRoute = this.parkingRouter.getRouteFromParkingToDestination(plannedRoute, now, agent.getCurrentLinkId());
-		Id<Vehicle> vehicleId = Id.create(this.agent.getId(), Vehicle.class);
-		
-		if ((this.parkingManager.unParkVehicleHere(vehicleId, agent.getCurrentLinkId(), now))||(isinitialLocation)){
+		Route plannedRoute = currentPlannedLeg.getRoute();
+		NetworkRoute actualRoute = this.parkingRouter.getRouteFromParkingToDestination(plannedRoute.getEndLinkId(), now, agent.getCurrentLinkId());
+		if ((this.parkingManager.unParkVehicleHere(currentlyAssignedVehicleId, agent.getCurrentLinkId(), now))||(isinitialLocation)){
 			this.lastParkActionState = LastParkActionState.CARTRIP;
 			isinitialLocation = false;
-			return new ParkingDynLeg(TransportMode.car, actualRoute, parkingLogic, parkingManager, vehicleId, timer, events);
+			Leg currentLeg = (Leg) this.currentPlanElement;
+			//this could be Car, Carsharing, Motorcylce, or whatever else mode we have, so we want our leg to reflect this.
+			return new ParkingDynLeg(currentLeg.getMode(), actualRoute, parkingLogic, parkingManager, currentlyAssignedVehicleId, timer, events);
 		
 		}
 		else throw new RuntimeException("parking location mismatch");
 		
 	}
 
-	private DynAction nextStateAfterWalkToPark(DynAction oldAction, double now) {
+	protected DynAction nextStateAfterWalkToPark(DynAction oldAction, double now) {
 		//walk2park is complete, we can unpark.
 		this.lastParkActionState = LastParkActionState.UNPARKACTIVITY;
-		return new StaticDynActivity(ParkingUtils.UNPARKACTIVITYTYPE, now + ParkingUtils.UNPARKDURATION);
+		return new StaticDynActivity(this.stageInteractionType, now + ParkingUtils.UNPARKDURATION);
 	}
 
-	private DynAction nextStateAfterWalkFromPark(DynAction oldAction, double now) {
+	protected DynAction nextStateAfterWalkFromPark(DynAction oldAction, double now) {
 		//walkleg complete, time to get the next activity from the plan Elements and start it, this is basically the same as arriving on any other mode
 		return nextStateAfterNonCarTrip(oldAction, now);
 	}
 
-	private DynAction nextStateAfterParkActivity(DynAction oldAction, double now) {
+	protected DynAction nextStateAfterParkActivity(DynAction oldAction, double now) {
 		// add a walk leg after parking
 		Leg currentPlannedLeg = (Leg) currentPlanElement;
 		Id<Link> walkDestination = currentPlannedLeg.getRoute().getEndLinkId();
 		Leg walkLeg = walkLegFactory.createWalkLeg(agent.getCurrentLinkId(), walkDestination, now, TransportMode.egress_walk);
 		this.lastParkActionState = LastParkActionState.WALKFROMPARK;
+		this.stageInteractionType = null;
 		return new StaticPassengerDynLeg(walkLeg.getRoute(), walkLeg.getMode());
 	}
 
-	private DynAction nextStateAfterNonCarTrip(DynAction oldAction, double now) {
+	protected DynAction nextStateAfterNonCarTrip(DynAction oldAction, double now) {
 		// switch back to activity
 		this.currentPlanElement = planElemIter.next();
 		Activity nextPlannedActivity = (Activity) this.currentPlanElement;
@@ -207,15 +206,17 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		
 	}
 
-	private DynAction nextStateAfterCarTrip(DynAction oldAction, double now) {
+	protected DynAction nextStateAfterCarTrip(DynAction oldAction, double now) {
 		// car trip is complete, we have found a parking space (not part of the logic), block it and start to park
 		if (this.parkingManager.parkVehicleHere(Id.create(this.agent.getId(), Vehicle.class), agent.getCurrentLinkId(), now)){
 		this.lastParkActionState = LastParkActionState.PARKACTIVITY;
-		return new StaticDynActivity(ParkingUtils.PARKACTIVITYTYPE,now + ParkingUtils.PARKDURATION);}
+		this.currentlyAssignedVehicleId = null;
+		this.parkingLogic.reset();
+		return new StaticDynActivity(this.stageInteractionType,now + ParkingUtils.PARKDURATION);}
 		else throw new RuntimeException ("No parking possible");
 	}
 
-	private DynAction nextStateAfterActivity(DynAction oldAction, double now) {
+	protected DynAction nextStateAfterActivity(DynAction oldAction, double now) {
 		// we could either depart by car or not next
 		if (planElemIter.hasNext()){
 		this.currentPlanElement = planElemIter.next();
@@ -232,6 +233,8 @@ public class ParkingAgentLogic implements DynAgentLogic {
 			Id<Link> telePortedParkLink = this.teleportationLogic.getVehicleLocation(agent.getCurrentLinkId(), vehicleId, parkLink, now);
 			Leg walkleg = walkLegFactory.createWalkLeg(agent.getCurrentLinkId(), telePortedParkLink, now, TransportMode.access_walk);
 			this.lastParkActionState = LastParkActionState.WALKTOPARK;
+			this.currentlyAssignedVehicleId = vehicleId;
+			this.stageInteractionType = ParkingUtils.PARKACTIVITYTYPE;
 			return new StaticPassengerDynLeg(walkleg.getRoute(), walkleg.getMode());
 		}
 		else if (currentLeg.getMode().equals(TransportMode.pt)) {

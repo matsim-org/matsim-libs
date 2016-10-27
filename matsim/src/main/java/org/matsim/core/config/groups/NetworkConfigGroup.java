@@ -20,9 +20,9 @@
 
 package org.matsim.core.config.groups;
 
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import java.util.Map;
@@ -76,20 +76,22 @@ public final class NetworkConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	public URL getInputFileURL(URL context) {
-		try {
-			return new URL(context, this.inputFile);
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
+		return ConfigGroup.getInputFileURL(context, this.inputFile);
 	}
 
 	@StringSetter( CHANGE_EVENTS_INPUT_FILE )
 	public void setChangeEventsInputFile(final String changeEventsInputFile) {
 		this.changeEventsInputFile = changeEventsInputFile;
 	}
+	
 	@StringGetter( CHANGE_EVENTS_INPUT_FILE )
 	public String getChangeEventsInputFile() {
-		return this.changeEventsInputFile;
+		return changeEventsInputFile;
+	}
+	
+	
+	public URL getChangeEventsInputFileUrl(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.changeEventsInputFile);
 	}
 
 	@StringSetter( TIME_VARIANT_NETWORK )

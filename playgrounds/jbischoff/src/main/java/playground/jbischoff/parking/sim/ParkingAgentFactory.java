@@ -41,7 +41,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import playground.jbischoff.parking.DynAgent.agentLogic.ParkingAgentLogic;
 import playground.jbischoff.parking.choice.ParkingChoiceLogic;
 import playground.jbischoff.parking.choice.RandomParkingChoiceLogic;
-import playground.jbischoff.parking.manager.ParkingManager;
+import playground.jbischoff.parking.manager.ParkingSearchManager;
 import playground.jbischoff.parking.manager.WalkLegFactory;
 import playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
 import playground.jbischoff.parking.routing.ParkingRouter;
@@ -59,7 +59,7 @@ public class ParkingAgentFactory implements AgentFactory {
 	@Inject
 	WalkLegFactory walkLegFactory;
 	@Inject
-	ParkingManager parkingManager;
+	ParkingSearchManager parkingManager;
 
 	@Inject
 	EventsManager events;

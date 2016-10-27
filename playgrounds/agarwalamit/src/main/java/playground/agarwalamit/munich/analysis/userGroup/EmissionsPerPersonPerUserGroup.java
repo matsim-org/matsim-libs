@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -33,11 +32,10 @@ import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
-
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.internalization.EmissionCostFactors;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 
 /**
@@ -49,11 +47,11 @@ public class EmissionsPerPersonPerUserGroup {
 
 	public static final Logger LOG = Logger.getLogger(EmissionsPerPersonPerUserGroup.class);
 	private int lastIteration;
-	private String outputDir;
-	private SortedMap<UserGroup, SortedMap<String, Double>> userGroupToEmissions;
+	private final String outputDir;
+	private SortedMap<MunichUserGroup, SortedMap<String, Double>> userGroupToEmissions;
 	private Scenario scenario;
 	private Map<Id<Person>, SortedMap<String, Double>> emissionsPerPerson;
-	private ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private final MunichPersonFilter pf = new MunichPersonFilter();
 	
 	public EmissionsPerPersonPerUserGroup(String outputDir) {
 
@@ -73,11 +71,11 @@ public class EmissionsPerPersonPerUserGroup {
 		this.scenario = LoadMyScenarios.loadScenarioFromOutputDir(this.outputDir+runCase);
 		this.lastIteration = this.scenario.getConfig().controler().getLastIteration();
 		
-		this.userGroupToEmissions = new TreeMap<UserGroup, SortedMap<String,Double>>();
+		this.userGroupToEmissions = new TreeMap<>();
 		this.emissionsPerPerson = new HashMap<>();
 		
-		for(UserGroup ug:UserGroup.values()){
-			SortedMap<String, Double> pollutantToValue = new TreeMap<String, Double>();
+		for(MunichUserGroup ug:MunichUserGroup.values()){
+			SortedMap<String, Double> pollutantToValue = new TreeMap<>();
 			for(WarmPollutant wm:WarmPollutant.values()){ //because ('warmPollutants' U 'coldPollutants') = 'warmPollutants'
 				pollutantToValue.put(wm.toString(), 0.0);
 			}
@@ -113,7 +111,7 @@ public class EmissionsPerPersonPerUserGroup {
 				writer.write(ecf.toString()+"\t");
 			}
 			writer.write("total \n");
-			for(UserGroup ug:this.userGroupToEmissions.keySet()){
+			for(MunichUserGroup ug:this.userGroupToEmissions.keySet()){
 				double totalEmissionCost =0. ;
 				writer.write(ug+"\t");
 				for(EmissionCostFactors ecf:EmissionCostFactors.values()){
@@ -135,11 +133,11 @@ public class EmissionsPerPersonPerUserGroup {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try{
 			writer.write("userGroup \t");
-			for(String str:this.userGroupToEmissions.get(UserGroup.URBAN).keySet()){
+			for(String str:this.userGroupToEmissions.get(MunichUserGroup.Urban).keySet()){
 				writer.write(str+"\t");
 			}
 			writer.newLine();
-			for(UserGroup ug:this.userGroupToEmissions.keySet()){
+			for(MunichUserGroup ug:this.userGroupToEmissions.keySet()){
 				writer.write(ug+"\t");
 				for(String str:this.userGroupToEmissions.get(ug).keySet()){
 					writer.write(this.userGroupToEmissions.get(ug).get(str)+"\t");
@@ -156,8 +154,8 @@ public class EmissionsPerPersonPerUserGroup {
 	private void getTotalEmissionsPerUserGroup(
 			Map<Id<Person>, SortedMap<String, Double>> emissionsPerPerson) {
 		for(Id<Person> personId: scenario.getPopulation().getPersons().keySet()){
-			UserGroup ug = pf.getUserGroupFromPersonId(personId);
-			SortedMap<String, Double> emissionsNewValue = new TreeMap<String, Double>();
+			MunichUserGroup ug = pf.getMunichUserGroupFromPersonId(personId);
+			SortedMap<String, Double> emissionsNewValue = new TreeMap<>();
 			for(String str: emissionsPerPerson.get(personId).keySet()){
 				double emissionSoFar = this.userGroupToEmissions.get(ug).get(str);
 				double emissionNewValue = emissionSoFar+emissionsPerPerson.get(personId).get(str);

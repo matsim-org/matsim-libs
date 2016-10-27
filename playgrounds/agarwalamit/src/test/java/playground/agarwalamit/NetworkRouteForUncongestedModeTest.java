@@ -50,7 +50,7 @@ public class NetworkRouteForUncongestedModeTest {
 
 	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
 
-	private final static String EQUIL_NETWORK = "../../matsim/examples/equil/network.xml";
+	private final static String EQUIL_NETWORK = "../../examples/scenarios/equil/network.xml";
 
 	/**
 	 * Every link must allow car and ride mode if networkModes are car and ride. 
@@ -124,7 +124,7 @@ public class NetworkRouteForUncongestedModeTest {
 			p.addPlan(plan);
 
 			Activity home = sc.getPopulation().getFactory().createActivityFromLinkId("h", Id.createLinkId("1"));
-			home.setEndTime(06*3600);
+			home.setEndTime(6 *3600);
 			Leg leg ;
 
 			if ( ii%2==0 ) leg = sc.getPopulation().getFactory().createLeg("car");

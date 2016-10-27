@@ -46,7 +46,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
-import org.matsim.lanes.data.v20.Lanes;
+import org.matsim.lanes.data.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 

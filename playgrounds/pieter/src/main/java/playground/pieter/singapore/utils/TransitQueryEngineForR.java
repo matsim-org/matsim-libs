@@ -1279,7 +1279,7 @@ public class TransitQueryEngineForR implements Serializable {
                 Network net = (Network) scenario.getNetwork();
                 Set<Node> nearestNodes = new HashSet<>();
 		final double distance = densityDistance;
-                nearestNodes.addAll(NetworkUtils.getNearestNodes2(net,toNode.getCoord(), distance));
+                nearestNodes.addAll(NetworkUtils.getNearestNodes(net,toNode.getCoord(), distance));
 
                 double intersectionCount = nearestNodes.size();
                 density = intersectionCount / getDensityArea();

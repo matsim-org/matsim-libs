@@ -73,8 +73,8 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 		this.personId2TrackEnterTime = new HashMap<>();
 		this.personId2LinkEnterTime = new HashMap<>();
 		this.personId2LegMode = new HashMap<>();
-		this.bikesPassedByEachCarPerKm = new ArrayList<Double>();
-		this.carsPerKm = new ArrayList<Double>();
+		this.bikesPassedByEachCarPerKm = new ArrayList<>();
+		this.carsPerKm = new ArrayList<>();
 	}
 	public PassingEventsUpdator() {
 		this(new ArrayList<>()); //no seepage

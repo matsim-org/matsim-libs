@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<signalSystems xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalSystems_v2.0.xsd" xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <signalSystem id="2">
+        <signals>
+            <signal linkIdRef="12" id="1">
+                <lane refId="12.l"/>
+            </signal>
+            <signal linkIdRef="12" id="2">
+                <lane refId="12.r"/>
+            </signal>
+            <signal linkIdRef="32" id="3"/>
+            <signal linkIdRef="72" id="4"/>
+        </signals>
+    </signalSystem>
+    <signalSystem id="5">
+        <signals>
+            <signal linkIdRef="65" id="1">
+                <lane refId="65.r"/>
+            </signal>
+            <signal linkIdRef="65" id="2">
+                <lane refId="65.l"/>
+            </signal>
+            <signal linkIdRef="45" id="3"/>
+            <signal linkIdRef="85" id="4"/>
+        </signals>
+    </signalSystem>
+</signalSystems>

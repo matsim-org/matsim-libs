@@ -192,7 +192,7 @@ public class CadytsFreightChainTest {
 //		Assert.assertEquals("different Total_ll", "0.0", outStatData.getTotal_ll() );
 
 		//test link offsets
-		// final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
+		// final TransitSchedule schedule = controler.getTestScenarioURL().getTransitSchedule();
 		final Network network = controler.getScenario().getNetwork();
 		String linkOffsetFile = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml";
 

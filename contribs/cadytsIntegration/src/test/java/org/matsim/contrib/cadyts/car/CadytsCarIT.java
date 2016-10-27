@@ -227,7 +227,7 @@ public class CadytsCarIT {
 		
 		Count count =  occupCounts.getCount(Id.create(19, Link.class));
 		Assert.assertEquals("Occupancy counts description is wrong", occupCounts.getDescription(), "counts values for equil net");
-		Assert.assertEquals("CsId is wrong.", count.getCsId() , "link_19");
+		Assert.assertEquals("CsId is wrong.", count.getCsLabel() , "link_19");
 		Assert.assertEquals("Volume of hour 6 is wrong", count.getVolume(7).getValue(), 5.0 , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Max count volume is wrong.", count.getMaxVolume().getValue(), 5.0 , MatsimTestUtils.EPSILON);
 
@@ -335,7 +335,7 @@ public class CadytsCarIT {
 			config.planCalcScore().addActivityParams(params ) ;
 			params.setTypicalDuration(8*60*60.) ;
 		}
-		config.counts().setCountsFileName(inputDir + "counts5.xml");
+		config.counts().setInputFile(inputDir + "counts5.xml");
 		return config;
 	}
 

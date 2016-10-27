@@ -23,7 +23,7 @@ import org.matsim.core.config.Config;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
- * Interface for Public Transit Mapping algorithm
+ * Interface for a Public Transit Mapping algorithm
  *
  * @author polettif
  */

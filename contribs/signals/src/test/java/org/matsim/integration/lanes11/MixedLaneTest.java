@@ -43,9 +43,9 @@ import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.Lanes;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesToLinkAssignment;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -84,7 +84,7 @@ public class MixedLaneTest {
 		Lanes lanes = this.fixture.sc.getLanes();
 		Assert.assertNotNull(lanes);
 		Assert.assertNotNull(lanes.getLanesToLinkAssignments());
-		LanesToLinkAssignment20 lanesLink1 = lanes.getLanesToLinkAssignments().get(fixture.id1);
+		LanesToLinkAssignment lanesLink1 = lanes.getLanesToLinkAssignments().get(fixture.id1);
 		Assert.assertNotNull(lanesLink1);
 		Assert.assertEquals(2, lanesLink1.getLanes().size());
 		Lane lane1ol = lanesLink1.getLanes().get(fixture.link1FirstLaneId);

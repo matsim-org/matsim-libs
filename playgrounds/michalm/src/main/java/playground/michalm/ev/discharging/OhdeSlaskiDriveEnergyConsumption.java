@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 
 /**
  * Parametrised for the Nissan Leaf. All values in SI units.
- * <p/>
+ * <p></p>
  * TODO add reference to the paper (once published). Add (dis-)charging efficiency relative to SOC,
  * temperature, etc...
  */
@@ -70,6 +70,10 @@ public class OhdeSlaskiDriveEnergyConsumption
     @Override
     public double calcEnergyConsumption(Link link, double travelTime)
     {
+        if (travelTime == 0) {
+            return 0;
+        }
+        
         double avgSpeed = link.getLength() / travelTime;
         int idx = (int)Math.round(avgSpeed * speedStepsPerUnit);
         return power[idx] * travelTime;

@@ -7,7 +7,7 @@ import org.matsim.core.utils.misc.Time;
 /**
  * Q: What happens/should happen if the time window is not sufficient to unload, or
  * the vehicle arrives after the time window?
- * <p/>
+ * <p></p>
  * A: First, I (=sschroeder) interpret time-window as period of time where an
  * (un)loading operation can start (which does not mean that it has to be
  * finished by the end of the time window). This is - I guess - in line with
@@ -29,7 +29,7 @@ import org.matsim.core.utils.misc.Time;
  * immediately. If not, they need to wait for the next available time slot which
  * might be 3hours later. I think both options (2,3) might be (easily)
  * incorporated with WithinDayReplanning(ReScheduling)-Module.
- * <p/> 
+ * <p></p>
  * 
  * @author (of code) sschroeder (of docu) kai based on sschroeder
  */

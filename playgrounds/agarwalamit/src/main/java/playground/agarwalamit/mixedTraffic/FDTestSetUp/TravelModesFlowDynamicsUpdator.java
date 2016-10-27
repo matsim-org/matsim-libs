@@ -61,12 +61,12 @@ class TravelModesFlowDynamicsUpdator {
 	private List<Double> speedTable;
 	private Double flowTime;
 	private List<Double> flowTable900;
-	private List<Double> lastXHourlyFlows;;//recording a number of flows to ensure stability
+	private List<Double> lastXHourlyFlows;//recording a number of flows to ensure stability
 	private boolean speedStability;
 	private boolean flowStability;
-	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
-	private int noOfModes;
+	private final int noOfModes;
 
 	TravelModesFlowDynamicsUpdator(int noOfModes){
 		this.noOfModes = noOfModes;
@@ -194,16 +194,16 @@ class TravelModesFlowDynamicsUpdator {
 	void initDynamicVariables() {
 		//numberOfAgents for each mode should be initialized at this point
 		this.decideSpeedTableSize();
-		this.speedTable = new LinkedList<Double>();
+		this.speedTable = new LinkedList<>();
 		for (int i=0; i<this.speedTableSize; i++){
 			this.speedTable.add(0.);
 		}
 		this.flowTime = 0.;
-		this.flowTable900 = new LinkedList<Double>();
+		this.flowTable900 = new LinkedList<>();
 
 		flowTableReset();
 
-		this.lastXHourlyFlows = new LinkedList<Double>();
+		this.lastXHourlyFlows = new LinkedList<>();
 		for (int i=0; i<NUMBER_OF_MEMORIZED_FLOWS; i++){
 			this.lastXHourlyFlows.add(0.);
 		}

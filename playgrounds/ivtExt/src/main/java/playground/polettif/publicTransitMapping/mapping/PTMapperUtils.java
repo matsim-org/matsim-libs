@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
  *
  * @author polettif
  */
+@Deprecated
 public class PTMapperUtils {
 
 	protected static Logger log = Logger.getLogger(PTMapperUtils.class);

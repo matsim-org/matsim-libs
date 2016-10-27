@@ -404,7 +404,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		
 		/**
 		 * Sets the width of the time-bin. By default it is Integer.MAX_VALUE().
-		 * <p/>
+		 * <p></p>
 		 * <i>Note that this needs to be set to some plausible value to enable any kind of time-dependent network!!!</i>
 		 * In particular if you are using the matsim time dependent network option.
 		 */
@@ -443,7 +443,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 		/**
 		 * Builds the network-based transport costs which are the basis for solving the {@link VehicleRoutingProblem}.
-		 * <p/>
+		 * <p></p>
 		 * Comments:<ul>
 		 * <li> By default this will take free speed travel times.
 		 * <li> yyyy These free speed travel times do <i>not</i> take the time-dependent network into account. kai, jan'14

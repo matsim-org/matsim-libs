@@ -35,7 +35,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import playground.benjamin.internalization.EmissionCostModule;
@@ -54,14 +53,14 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 	 * the old value will be totally overwritten.
 	 */
 	private final double blendFactor = 0.1;
-	private TravelTime timeCalculator;
-	private double marginalUtlOfMoney;
-	private double distanceCostRateCar;
-	private double marginalUtlOfTravelTime;
-	private EmissionModule emissionModule;
-	private EmissionCostModule emissionCostModule;
+	private final TravelTime timeCalculator;
+	private final double marginalUtlOfMoney;
+	private final double distanceCostRateCar;
+	private final double marginalUtlOfTravelTime;
+	private final EmissionModule emissionModule;
+	private final EmissionCostModule emissionCostModule;
 	private final Set<Id<Link>> hotspotLinks;
-	private TollHandler tollHandler;
+	private final TollHandler tollHandler;
 
 
 	public EmissionCongestionTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionCostModule emissionCostModule, Set<Id<Link>> hotspotLinks, TollHandler tollHandler) {
@@ -89,7 +88,7 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 				emissionVehicle = VehicleUtils.getFactory().createVehicle(Id.createVehicleId("defaultVehicle"), VehicleUtils.getDefaultVehicleType());
 			} else {
 				// a person is given -> use the vehicle for that person given in emissionModule
-				emissionVehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(person.getId());
+				emissionVehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(Id.createVehicleId(person.getId()));
 			}
 		}
 		

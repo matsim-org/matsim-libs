@@ -52,11 +52,8 @@ public class EvModule
         addMobsimListenerBinding().to(ChargingHandler.class);
 
         if (EvConfigGroup.get(getConfig()).getTimeProfiles()) {
-            addMobsimListenerBinding().toProvider(AggregatedSocTimeProfileCollectorProvider.class);
-
-            if (evData.getElectricVehicles().size() <= 50) {//for smaller fleets
-                addMobsimListenerBinding().toProvider(IndividualSocTimeProfileCollectorProvider.class);
-            }
+            addMobsimListenerBinding().toProvider(SocHistogramTimeProfileCollectorProvider.class);
+            addMobsimListenerBinding().toProvider(IndividualSocTimeProfileCollectorProvider.class);
             //add more time profiles if necessary
         }
 

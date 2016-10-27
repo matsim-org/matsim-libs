@@ -34,7 +34,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import com.google.inject.Inject;
 
-import playground.jbischoff.parking.manager.ParkingManager;
+import playground.jbischoff.parking.manager.ParkingSearchManager;
 
 /**
  * @author  jbischoff
@@ -46,7 +46,7 @@ import playground.jbischoff.parking.manager.ParkingManager;
 public class ParkingListener implements IterationEndsListener {
 	
 	@Inject
-	ParkingManager manager;
+	ParkingSearchManager manager;
 	@Inject
 	OutputDirectoryHierarchy output;
 

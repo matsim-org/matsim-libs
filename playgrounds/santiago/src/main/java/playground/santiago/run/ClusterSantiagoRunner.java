@@ -71,8 +71,8 @@ public class ClusterSantiagoRunner {
 	private static String caseName;
 	private static String inputPath;  	
 	private static String configFile;
-//	private static int sigma;
-//	private static String cordonFile;
+	private static int sigma;
+	private static String gantriesFile;
 
 	
 	public static void main(String args[]){
@@ -81,18 +81,18 @@ public class ClusterSantiagoRunner {
 		
 			caseName = args[0];
 			inputPath = "/net/ils4/lcamus/runs-svn/santiago/"+caseName+"/";
-			configFile = inputPath + "cluster_randomized_expanded_config.xml";
+			configFile = inputPath + "config_baseCase10pct.xml";
 			
 			policy = args[1]; //0: BASE-CASE, 1: FIRST-BEST, 2: CORDON, 3: SOME OTHER POLICY.
 			
 			doModeChoice = Boolean.parseBoolean(args[2]);
 			mapActs2Links = Boolean.parseBoolean(args[3]);
 
-			//ONLY NECESSARY FOR SIMULATE THE SCENARIO WITH A CORDON TOLL.
-//			if (policy.equals("2")){ 
-//			sigma = Integer.parseInt(args[4]);
-//			cordonFile = inputPath +"input/"+ args[5];
-//			}
+			//ALWAYS NECESSARY
+			if (policy.equals("0")){ 
+			sigma = Integer.parseInt(args[4]);
+			gantriesFile = inputPath +"input/"+ args[5];
+			}
 
 			
 
@@ -120,19 +120,22 @@ public class ClusterSantiagoRunner {
 		
 		case "0":
 			
-			//NOTHING-TO-DO, GO TO controler.run()
+			RoadPricingConfigGroup rpcg = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+			rpcg.setTollLinksFile(gantriesFile);
+			config.plansCalcRoute().setRoutingRandomness(sigma); 
+			controler.setModules(new ControlerDefaultsWithRoadPricingModule());
 			
 			break;
 		
-		case "1": //FIRST-BEST
-			
-			TollHandler tollHandler = new TollHandler(scenario);
-			EventHandler congestionHandler = new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario());
-			controler.addControlerListener(
-					new MarginalCongestionPricingContolerListener(controler.getScenario(),
-							tollHandler, congestionHandler));
-			break;
-			
+//		case "1": //FIRST-BEST
+//			
+//			TollHandler tollHandler = new TollHandler(scenario);
+//			EventHandler congestionHandler = new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario());
+//			controler.addControlerListener(
+//					new MarginalCongestionPricingContolerListener(controler.getScenario(),
+//							tollHandler, congestionHandler));
+//			break;
+//			
 //		case "2": //CORDON-TOLL
 //			
 //			RoadPricingConfigGroup rpcg = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);

@@ -24,6 +24,7 @@ import java.util.Set;
 /**
  * Contains Strings that are used throughout the package
  */
+@Deprecated
 public final class PublicTransitMappingStrings {
 
 	/**

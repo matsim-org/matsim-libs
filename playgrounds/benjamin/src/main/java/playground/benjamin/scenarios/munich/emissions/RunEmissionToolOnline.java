@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich.emissions;
 
+import java.util.HashSet;
+import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
@@ -28,9 +30,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author benjamin
@@ -139,8 +138,9 @@ public class RunEmissionToolOnline {
         EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
         controler.getConfig().addModule(ecg);
         ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
-        ecg.setEmissionVehicleFile(emissionVehicleFile);
-        
+		config.vehicles().setVehiclesFile(emissionVehicleFile);
+		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
+
         ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
         ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
         

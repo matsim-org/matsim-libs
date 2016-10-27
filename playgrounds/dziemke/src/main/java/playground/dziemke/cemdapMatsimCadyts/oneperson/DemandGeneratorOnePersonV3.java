@@ -1,3 +1,21 @@
+/* *********************************************************************** *
+ * project: org.matsim.*												   *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.dziemke.cemdapMatsimCadyts.oneperson;
 
 import java.io.BufferedWriter;
@@ -18,15 +36,17 @@ import playground.dziemke.cemdapMatsimCadyts.CommuterRelation;
 import playground.dziemke.utils.LogToOutputSaver;
 import playground.dziemke.utils.TwoAttributeShapeReader;
 
+/**
+ * @author dziemke
+ */
 public class DemandGeneratorOnePersonV3 {
 	private static final Logger log = Logger.getLogger(DemandGeneratorOnePersonV3.class);
 
 	public static void main(String[] args) {
 		// Parameters
 		double scalingFactor = 0.01;
-		//double carShareInterior = 0.37;
 		double carShareInterior = 1.;
-		//double carShareExterior = xy;
+		double carShareExterior = 1.;
 		double allWorkersToSociallySecuredWorkersRatio = 1.54;
 		double adultsToWorkersRatio = 1.9;
 		// The commuter file contains all commuter relations within the whole Bundesgebiet. We, however, only look
@@ -37,42 +57,34 @@ public class DemandGeneratorOnePersonV3 {
 		// a dummy file that does not produce any relations) this factor has been determined as 1.06.
 		// Calculation: 1,002,809 outward commuters from Berlin accoridng to Penderstatistik 2009 * 0.01 (scale)
 		// * 1.54 (get all workers) * 1.9 (get all adults) = 28961 (SOLL)
-		// If said facot (1.06) is used we get 28916 (IST), which meets the intended number quite well.
+		// If said factor (1.06) is used we get 28916 (IST), which meets the intended number quite well.
 		double factorToBalanceLeftOutRelations = 1.06;
-		double carShareExterior = 1/(allWorkersToSociallySecuredWorkersRatio * adultsToWorkersRatio
-				* factorToBalanceLeftOutRelations);
+		// Scale doen carSHareExterior so that only socially secured workers are considered
+		carShareExterior = carShareExterior/(allWorkersToSociallySecuredWorkersRatio * adultsToWorkersRatio * factorToBalanceLeftOutRelations);
 		double expansionFactor = 1.;
-		//int numberOfPlansPerPerson = 10;
 		int numberOfPlansPerPerson = 3;
 		// Gemeindeschluessel of Berlin is 11000000 (Gemeindeebene) and 11000 (Landkreisebene)
 		Integer planningAreaId = 11000000;
 		
 		// Input and output files
-//		String commuterFileIn = "D:/VSP/CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ge.txt";
 		String commuterFileIn = "../../../../CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ge.txt";
 		// Setting file of incoming commuters to "dummy" means that only interior traffic and traffic from interior
 		// to exterior, but not in the opposite direction will be considered.
 		//String commuterFileIn = "D:/VSP/CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/dummy.txt";
-//		String commuterFileOut = "D:/VSP/CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ga.txt";
 		String commuterFileOut = "../../../../CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ga.txt";
 		
-//		String shapeFileMunicipalities = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/gemeindenBerlin.shp";
 		String shapeFileMunicipalities = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenBerlin.shp";
-//		String shapeFileLors = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Bezirksregion_EPSG_25833.shp";
 		String shapeFileLors = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Bezirksregion_EPSG_25833.shp";
 		
-//		String outputBase = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/20neu/";
 		String outputBase = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/21neu3/";
 		
 		LogToOutputSaver.setOutputDirectory(outputBase);
-		
 		
 		// Create a PendlerMatrixReader and store its output to a list
 		CommuterFileReader commuterFileReader = new CommuterFileReader(shapeFileMunicipalities, commuterFileIn,
 				carShareExterior, commuterFileOut, carShareInterior, scalingFactor * allWorkersToSociallySecuredWorkersRatio
 				* factorToBalanceLeftOutRelations * adultsToWorkersRatio * expansionFactor, planningAreaId);
 		List<CommuterRelation> commuterRelationList = commuterFileReader.getCommuterRelations();
-		
 		
 		// Create storage objects
 		Map<Integer, String> lors = new HashMap<Integer, String>();
@@ -83,14 +95,11 @@ public class DemandGeneratorOnePersonV3 {
 			mapOfPersonMaps.put(i, persons);
 		}
 		
-		
 		// Read in LORs	
 		TwoAttributeShapeReader.readShape(shapeFileLors, lors, "SCHLUESSEL", "LOR");
 		
-		
 		// Create households and persons
 		int householdIdCounter = 1;
-		
 		
 		for (int i = 0; i<commuterRelationList.size(); i++){
 			int quantity = commuterRelationList.get(i).getQuantity();
@@ -111,7 +120,6 @@ public class DemandGeneratorOnePersonV3 {
 				Household household = new Household(householdId, homeTSZLocation);
 				householdMap.put(householdId, household);
 				
-				
 				// Create persons
 				int sex = getSex();
 				int age;
@@ -127,7 +135,6 @@ public class DemandGeneratorOnePersonV3 {
 				int employed;
 				if (source == planningAreaId) {
 					if (age > 65) {
-						// TODO 64 or 65?
 						employed = 0;
 					} else {
 						employed = getEmployedWorkingAge();
@@ -265,9 +272,8 @@ public class DemandGeneratorOnePersonV3 {
 	private static int getStudent() {
 		Random r = new Random();
 		double randomNumber = r.nextDouble();
-		// OLD: Number of  students in Berlin (150000) divided by non-employed population aged 18-29 (266000)
+		// Old (used in V2 until cemdap_berlin/21: No. of  students in Berlin (150000) divided by non-employed population aged 18-29 (266000)
 		// Number of  students in Berlin (150000) divided by non-employed population aged 18-29 (181000)
-		//TODO Correctly it has to be 150/181.
 		if (randomNumber < 150/181.) {
 			return 1;
 		} else {

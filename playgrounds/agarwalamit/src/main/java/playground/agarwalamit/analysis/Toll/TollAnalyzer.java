@@ -37,10 +37,10 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
@@ -50,7 +50,7 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
 public class TollAnalyzer extends AbstractAnalysisModule {
 	private static final Logger LOG = Logger.getLogger(TollAnalyzer.class);
 	private final String eventsFile;
-	private FilteredTollHandler handler;
+	private final FilteredTollHandler handler;
 
 	/**
 	 * No filtering will be used, result will include all links, persons from all user groups.
@@ -85,7 +85,7 @@ public class TollAnalyzer extends AbstractAnalysisModule {
 	}
 
 	public static void main(String[] args) {
-		ExtendedPersonFilter pf = new ExtendedPersonFilter();
+		MunichPersonFilter pf = new MunichPersonFilter();
 
 		String scenario = "ei";
 		String eventsFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/ITERS/it.1500/1500.events.xml.gz";
@@ -105,14 +105,13 @@ public class TollAnalyzer extends AbstractAnalysisModule {
 
 		for(int ii=0; ii<areas.length;ii++) {
 			SortedMap<String, Double> usrGrpToToll = new TreeMap<>();
-			for( UserGroup ug : UserGroup.values() ) {
-				String myUg = pf.getMyUserGroup(ug);
-				if(usrGrpToToll.containsKey(myUg)) continue;
+			for( MunichUserGroup ug : MunichUserGroup.values() ) {
+				if(usrGrpToToll.containsKey(ug.toString())) continue;
 
-				TollAnalyzer ata = new TollAnalyzer(eventsFile, simEndTime, 30, areas[ii], network, myUg);
+				TollAnalyzer ata = new TollAnalyzer(eventsFile, simEndTime, 30, areas[ii], network, ug.toString());
 				ata.preProcessData();
 				ata.postProcessData();
-				usrGrpToToll.put(myUg, MapUtils.doubleValueSum( ata.getTimeBin2Toll() ) );
+				usrGrpToToll.put(ug.toString(), MapUtils.doubleValueSum( ata.getTimeBin2Toll() ) );
 			}
 			usrGrpToToll.put("allPersons", MapUtils.doubleValueSum(usrGrpToToll));
 			area2usrGrp2Toll.put(areasName[ii], usrGrpToToll);
@@ -194,7 +193,7 @@ public class TollAnalyzer extends AbstractAnalysisModule {
 			BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/boxPlot/toll_"+prefix+".txt");
 			try {
 				// sum all the values for different time bins
-				Map<Id<Person>,Double> personToll  = new HashMap<Id<Person>, Double>();
+				Map<Id<Person>,Double> personToll  = new HashMap<>();
 				for (double d : time2person2toll.keySet()){
 					for( Id<Person> person : time2person2toll.get(d).keySet() ) {
 						if(personToll.containsKey(person)) personToll.put(person, personToll.get(person) + time2person2toll.get(d).get(person) );

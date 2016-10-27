@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -38,29 +41,35 @@ import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 import org.matsim.core.mobsim.jdeqsim.util.EventLibrary;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
-public abstract class AbstractJDEQSimTest extends MatsimTestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public abstract class AbstractJDEQSimTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	protected Map<Id<Vehicle>, Id<Person>> vehicleToDriver = null;
 	protected Map<Id<Person>, List<Event>> eventsByPerson = null;
 	public LinkedList<Event> allEvents = null;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public final void setUp() throws Exception {
 		this.eventsByPerson = new HashMap<Id<Person>, List<Event>>();
 		this.vehicleToDriver = new HashMap<>();
 		this.allEvents = new LinkedList<Event>();
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public final void tearDown() throws Exception {
 		this.eventsByPerson = null;
 		this.vehicleToDriver = null;
 		this.allEvents = null;
 		Road.getAllRoads().clear(); // SimulationParameter contains a Map containing Links which refer to the Network, give that free for GC
-		super.tearDown();
 	}
 
 	public void runJDEQSim(Scenario scenario) {

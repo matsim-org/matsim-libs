@@ -43,7 +43,6 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.matsim.core.events.handler.EventHandler;
 
 @Singleton
 final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
@@ -60,6 +59,8 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 	
 	private OutputDirectoryHierarchy controlerIO ;
 
+	private int writeMoreUntilIteration;
+
 	@Inject
 	EventsHandlingImpl(
 			final EventsManager eventsManager,
@@ -69,12 +70,16 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 		this.writeEventsInterval = config.getWriteEventsInterval();
 		this.eventsFileFormats = config.getEventsFileFormats();
 		this.controlerIO = controlerIO;
+		this.writeMoreUntilIteration = config.getWriteEventsUntilIteration() ;
 	}
 
-    @Override
+	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-        eventsManager.resetHandlers(event.getIteration());
-		if ((this.writeEventsInterval > 0) && (event.getIteration() % writeEventsInterval == 0)) {
+		eventsManager.resetHandlers(event.getIteration());
+		final boolean writingEventsAtAll = this.writeEventsInterval > 0;
+		final boolean regularWriteEvents = writingEventsAtAll && (event.getIteration()>0 && event.getIteration() % writeEventsInterval == 0);
+		final boolean earlyIteration = event.getIteration() <= writeMoreUntilIteration ;
+		if (writingEventsAtAll && (regularWriteEvents||earlyIteration) ) {
 			for (EventsFileFormat format : eventsFileFormats) {
 				switch (format) {
 				case xml:

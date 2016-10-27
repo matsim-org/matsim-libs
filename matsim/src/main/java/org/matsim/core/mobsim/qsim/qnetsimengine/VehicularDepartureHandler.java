@@ -87,7 +87,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 				vehicle.setDriver(agent);
 				agent.setVehicle(vehicle) ;
 
-				qlink.letVehicleDepart(vehicle, now);
+				qlink.letVehicleDepart(vehicle);
 				// (since the "teleportVehicle" does not physically move the vehicle, this is finally achieved in the departure
 				// logic.  kai, nov'11)
 			} else if (vehicleBehavior == VehicleBehavior.wait ) {
@@ -99,7 +99,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 		} else {
 			vehicle.setDriver(agent);
 			agent.setVehicle(vehicle) ;
-			qlink.letVehicleDepart(vehicle, now);
+			qlink.letVehicleDepart(vehicle);
 		}
 	}
 

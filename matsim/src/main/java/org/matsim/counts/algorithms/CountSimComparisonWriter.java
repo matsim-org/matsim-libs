@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.matsim.counts.CountSimComparison;
 
-public abstract class CountSimComparisonWriter {
+abstract class CountSimComparisonWriter {
 
 	protected int iterationNumber;
 	

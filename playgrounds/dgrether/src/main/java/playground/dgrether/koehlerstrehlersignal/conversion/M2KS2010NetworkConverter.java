@@ -36,9 +36,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.Lanes;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesToLinkAssignment;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
@@ -187,7 +187,7 @@ public class M2KS2010NetworkConverter {
 				DgCrossingNode inLinkToNode = crossing.getNodes().get(
 						this.idConverter.convertLinkId2ToCrossingNodeId(link
 								.getId()));
-				LanesToLinkAssignment20 l2l = lanes.getLanesToLinkAssignments()
+				LanesToLinkAssignment l2l = lanes.getLanesToLinkAssignments()
 						.get(link.getId());
 				// create crossing layout
 				if (signalizedLinks.contains(link.getId())) {
@@ -522,7 +522,7 @@ public class M2KS2010NetworkConverter {
 	 */
 	private void createCrossing4SignalizedLink(DgCrossing crossing, Link link,
 			DgCrossingNode inLinkToNode, Id<Link> backLinkId,
-			LanesToLinkAssignment20 l2l, SignalSystemData system,
+			LanesToLinkAssignment l2l, SignalSystemData system,
 			SignalsData signalsData) {
 		// //remove default program
 		// if (
@@ -647,7 +647,7 @@ public class M2KS2010NetworkConverter {
 	 */
 	private void createCrossing4NotSignalizedLink(DgCrossing crossing,
 			Link link, DgCrossingNode inLinkToNode, Id<Link> backLinkId,
-			LanesToLinkAssignment20 l2l) {
+			LanesToLinkAssignment l2l) {
 		// DgProgram program = null;
 		// if (crossing.getPrograms().containsKey(this.DEFAULT_PROGRAM_ID)){
 		// program = crossing.getPrograms().get(this.DEFAULT_PROGRAM_ID);

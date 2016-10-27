@@ -90,9 +90,9 @@ public class CountsComposer {
 		double scale = 1.0;
 		if (mode.equals("bus"))  scale = this.scaleFactor;
 						
-		Count<Link> composedCount = this.composedcounts.getCount(countstoadd.getLocId());
+		Count<Link> composedCount = this.composedcounts.getCount(countstoadd.getId());
 		if (composedCount == null) {
-			composedCount = this.composedcounts.createAndAddCount(countstoadd.getLocId(), countstoadd.getCsId());
+			composedCount = this.composedcounts.createAndAddCount(countstoadd.getId(), countstoadd.getCsLabel());
 		}
 		
 		double totalCount = 0;

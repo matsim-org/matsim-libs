@@ -20,21 +20,14 @@
 
 package playground.southafrica.freight.cadyts4freightchains;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import cadyts.demand.Plan;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.cadyts.general.CadytsBuilder;
-import org.matsim.contrib.cadyts.general.CadytsContextI;
-import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
-import org.matsim.contrib.cadyts.general.LookUpItemFromId;
-import org.matsim.contrib.cadyts.general.PlansTranslator;
+import org.matsim.contrib.cadyts.general.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -44,8 +37,10 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 
-import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import cadyts.demand.Plan;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 class Item implements Identifiable<Item>, Comparable<Item> {
 	private final Id<Item> id;
@@ -118,7 +113,7 @@ class CadytsFreightChainsContext implements CadytsContextI<Item>, BeforeMobsimLi
 		}
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
-		this.calibrator = CadytsBuilder.buildCalibratorAndAddMeasurements(config, counts , lookUp , Item.class);
+		this.calibrator = new CadytsBuilderImpl().buildCalibratorAndAddMeasurements(config, counts , lookUp , Item.class);
 		
 		// prepare the sim results container:
 		this.simResults = new SimResultsImpl<Item>( itemContainer.values() ) ;

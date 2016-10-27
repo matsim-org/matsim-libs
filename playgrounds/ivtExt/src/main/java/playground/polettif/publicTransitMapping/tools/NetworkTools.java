@@ -52,6 +52,7 @@ import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getTr
  *
  * @author polettif
  */
+@Deprecated
 public class NetworkTools {
 
 	protected static Logger log = Logger.getLogger(NetworkTools.class);
@@ -85,10 +86,10 @@ public class NetworkTools {
 
 	/**
 	 * Returns the nearest link for the given coordinate.
-	 * Looks for nodes within search radius of coord (using {@link Network#getNearestNodes},
+	 * Looks for nodes within search radius of coord (using,
 	 * fetches all in- and outlinks returns the link with the smallest distance
 	 * to the given coordinate. If there are two opposite links, the link with
-	 * the coordinate on its right side is returned.<p/>
+	 * the coordinate on its right side is returned.<p></p>
 	 *
 	 * @param network (instance of NetworkImpl)
 	 * @param coord   the coordinate
@@ -103,13 +104,13 @@ public class NetworkTools {
 			final Coord coord1 = coord;
 			final double distance = nodeSearchRadius;
 
-			Collection<Node> nearestNodes = NetworkUtils.getNearestNodes2(networkImpl,coord1, distance);
+			Collection<Node> nearestNodes = NetworkUtils.getNearestNodes(networkImpl,coord1, distance);
 
 			while(nearestNodes.size() == 0) {
 				nodeSearchRadius *= 2;
 				final Coord coord2 = coord;
 				final double distance1 = nodeSearchRadius;
-				nearestNodes = NetworkUtils.getNearestNodes2(networkImpl,coord2, distance1);
+				nearestNodes = NetworkUtils.getNearestNodes(networkImpl,coord2, distance1);
 			}
 			// check every in- and outlink of each node
 			for(Node node : nearestNodes) {
@@ -143,14 +144,14 @@ public class NetworkTools {
 	}
 
 	/**
-	 * Looks for nodes within search radius of <tt>coord</tt> (using {@link Network#getNearestNodes},
+	 * Looks for nodes within search radius of <tt>coord</tt>,
 	 * fetches all in- and outlinks and sorts them ascending by their
 	 * distance to the coordiantes given.
-	 * <p/>
+	 * <p></p>
 	 * The method then returns <tt>maxNLinks</tt> or all links within <tt>maxLinkDistance</tt>
 	 * (whichever is reached earlier). Note: This method returns more than N links if two links have the same
 	 * distance to the facility.
-	 * <p/>
+	 * <p></p>
 	 * Distance Link to Coordinate is calculated using {@link org.matsim.core.utils.geometry.CoordUtils#distancePointLinesegment}).
 
 	 * @param network               	The network (must be instance of {@link Network})
@@ -175,7 +176,7 @@ public class NetworkTools {
 		List<Link> closestLinks = new ArrayList<>();
 		final Coord coord1 = coord;
 		final double distance = nodeSearchRadius;
-		Collection<Node> nearestNodes = NetworkUtils.getNearestNodes2(((Network) network),coord1, distance);
+		Collection<Node> nearestNodes = NetworkUtils.getNearestNodes(((Network) network),coord1, distance);
 
 		if(nearestNodes.size() != 0) {
 			// fetch every in- and outlink of each node

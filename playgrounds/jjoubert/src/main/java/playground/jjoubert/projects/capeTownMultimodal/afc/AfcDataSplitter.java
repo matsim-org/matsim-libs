@@ -43,7 +43,11 @@ import playground.southafrica.utilities.Header;
 
 /**
  * Class to split a given Automated Fare Collection (AFC) data set from City of 
- * Cape Town into a day-by-day schedule, and then sorting each file.
+ * Cape Town into a day-by-day schedule, and then sorting each file. 
+ * 
+ * After looking into the details, it turned out that for Cape Town, at least,
+ * a typical day starts at around 02:30 and runs until the next morning at
+ * 02:30-ish. This needs to be incorporated into the splitting by day.
  * 
  * @author jwjoubert
  */
@@ -92,16 +96,16 @@ public class AfcDataSplitter {
 			String line = br.readLine(); /* Header. */
 			HEADER = line;
 			while((line = br.readLine()) != null){
-				String[] sa = line.split(",");
-				String date = sa[8];
-				if(!date.equalsIgnoreCase(currentDate)){
+				String updatedLine = updateLine(line);
+				String inferredDate = updatedLine.split(",")[8];
+				if(!inferredDate.equalsIgnoreCase(currentDate)){
 					if(currentDate != null){
 						bw.close();
 					}
-					bw = IOUtils.getAppendingBufferedWriter(outputFolder + date + ".csv");
-					currentDate = date;
+					bw = IOUtils.getAppendingBufferedWriter(outputFolder + inferredDate + ".csv");
+					currentDate = inferredDate;
 				}
-				bw.write(line);
+				bw.write(updatedLine);
 				bw.newLine();
 				
 				counter.incCounter();
@@ -120,6 +124,30 @@ public class AfcDataSplitter {
 		counter.printCounter();
 		LOG.info("Done splitting the input file.");
 		
+	}
+	
+	/**
+	 * This class considers a day to start at 02:30 on a given date. Any time 
+	 * earlier is considered part of the previous day. 
+	 * @param line
+	 * @return
+	 */
+	private static String updateLine(String line){
+		String[] sa = line.split(",");
+		int year = Integer.parseInt(sa[8].substring(0, 4));
+		int month = Integer.parseInt(sa[8].substring(4, 6));
+		int day = Integer.parseInt(sa[8].substring(6, 8));
+		int hour = Integer.parseInt(sa[9]);
+		int min = Integer.parseInt(sa[12]);
+		if(hour < 2 || (hour == 2 && min < 30)){
+			day--;
+			hour += 24;
+		}
+		
+		return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%d%02d%02d,%d,%s,%s,%d", 
+				sa[0], sa[1], sa[2], sa[3], sa[4], sa[5], sa[6], sa[7], 
+				year, month, day, hour,
+				sa[10], sa[11],	min);
 	}
 	
 	public static void sortAfcData(String outputFolder){
@@ -164,7 +192,7 @@ public class AfcDataSplitter {
 						
 						Integer type1 = getType(sa1[6]);
 						Integer type2 = getType(sa2[6]);
-						
+							
 						return type1.compareTo(type2);
 					}
 					

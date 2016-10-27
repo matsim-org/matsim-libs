@@ -45,7 +45,7 @@ import javax.inject.Provider;
  * compute routes and all registered {@link RoutingModule}s.
  * It provides convenience methods to route an individual trip with
  * a desired mode or to identify trips.
- * <p/>
+ * <p></p>
  *
  * See {@link tutorial.programming.ownMobsimAgentUsingRouter.RunOwnMobsimAgentUsingRouterExample} for an example
  * how to use this API from your own code.
@@ -62,6 +62,11 @@ public final class TripRouter implements MatsimExtensionPoint {
 	private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
 
 	public TripRouter() {}
+	// yyyyyy I guess this is meant as a way to create the trip router without injection, and to set its internals afterwards.  But
+	// is it so sensible to have this in this way?  The injection stuff states that the material is immutable after injection; here we introduce a
+	// way to get around that again, and even to change the injected material later.  
+	// I would expect a Builder instead. 
+	// kai, sep'16
 
 	@Inject
 	TripRouter(Map<String, Provider<RoutingModule>> routingModules, MainModeIdentifier mainModeIdentifier) {
@@ -185,7 +190,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 			return trip;
 		}
 
-		throw new UnknownModeException( "unregistered main mode "+mainMode+": does not pertain to "+routingModules.keySet() );
+		throw new UnknownModeException( "unregistered main mode |"+mainMode+"|: does not pertain to "+routingModules.keySet() );
 	}
 
 	public static class UnknownModeException extends RuntimeException {
@@ -247,7 +252,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 	 * returned by the {@link Plan#getPlanElements()} method of a plan. Note
 	 * that the plan will be modified only if the returned list is the internal
 	 * reference!
-	 * <p/>
+	 * <p></p>
 	 * Note that this methods returns a unique solution because it expects the activity object references as arguments, which are unique.
 	 *
 	 * @param plan the plan to modify
@@ -270,7 +275,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 
 	/**
 	 * Inserts a trip between two activities in a sequence of plan elements.
-	 * <p/>
+	 * <p></p>
 	 * Note that this methods returns a unique solution because it expects the activity object references as arguments, which are unique.
 	 * @param plan the sequence of plan elements to modify
 	 * @param origin the activity to use as origin. It must be a member of the list of plan elements.

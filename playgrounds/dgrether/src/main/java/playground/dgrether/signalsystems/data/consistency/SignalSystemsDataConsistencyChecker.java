@@ -22,12 +22,12 @@ package playground.dgrether.signalsystems.data.consistency;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.lanes.data.v20.Lanes;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesToLinkAssignment;
 
 
 /**
@@ -87,7 +87,7 @@ public class SignalSystemsDataConsistencyChecker {
 							+ " is located at some lanes of Link Id: " + signal.getLinkId() + " but there is no LanesToLinkAssignemt existing in the LaneDefinitions.");
 					}
 					else {
-						LanesToLinkAssignment20 l2l = this.lanes.getLanesToLinkAssignments().get(signal.getLinkId());
+						LanesToLinkAssignment l2l = this.lanes.getLanesToLinkAssignments().get(signal.getLinkId());
 						for (Id laneId : signal.getLaneIds()) {
 							if (! l2l.getLanes().containsKey(laneId)) {
 								log.error("Error: No Lane for Signal: "); 

@@ -27,7 +27,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.contrib.signals.data.SignalsData;
 
@@ -77,8 +77,7 @@ public class ConvertBraessSolution2Matsim {
 				directory + "output_signal_groups_v2.0.xml.gz");
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(
 				directory + "output_signal_control_v2.0.xml.gz");
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(
-				ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
+		SignalsDataLoader signalsLoader = new SignalsDataLoader(config);
 		SignalsData signals = signalsLoader.loadSignalsData();
 		return signals;
 	}

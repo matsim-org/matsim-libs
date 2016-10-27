@@ -54,7 +54,7 @@ public class PopulationGenerator {
 		PopulationFactory populationFactory = population.getFactory();
 
 		int key =1;
-		for(int i=1; i<=20000;i++){
+		for(int i=1; i<=10000;i++){
 			key=i;
 			Person person = populationFactory.createPerson(Id.createPersonId(key));
 			population.addPerson(person);
@@ -71,7 +71,7 @@ public class PopulationGenerator {
 			 */
 			Coord homeCoordinates = new Coord(683474.55573, 4826700.65288);
 			Activity activity1 = populationFactory.createActivityFromCoord("home", homeCoordinates);
-			activity1.setEndTime(21600 + i*0.2); // leave at 6 o'clock, one vehicle entering after other in a short while so that there is no peak at one second. 
+			activity1.setEndTime(21600 + i*0.1); // leave at 6 o'clock, one vehicle entering after other in a short while so that there is no peak at one second. 
 			//activity1.setEndTime(21600);
 			plan.addActivity(activity1); // add the Activity to the Plan
 			
@@ -99,7 +99,7 @@ public class PopulationGenerator {
 		 * Write the population (of 1 Person) to a file.
 		 */
 		MatsimWriter popWriter = new PopulationWriter(population, network);
-		popWriter.write("H:\\Mike Work\\input\\population-4inlinks-gen2.xml");
+		popWriter.write("H:\\Mike Work\\input\\population-4inlinks-gen.xml");
 
 	}
 	public void generatePopulationForTwoJunctionNetwork(){

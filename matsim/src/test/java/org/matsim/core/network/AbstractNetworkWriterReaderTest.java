@@ -21,8 +21,10 @@
 package org.matsim.core.network;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
@@ -73,6 +75,46 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 	public void testAllowedModes_noMode() {
 		doTestAllowedModes(new HashSet<String>(), getOutputDirectory() + "network.xml");
 	}
+	
+	public void testNodes_withoutElevation(){
+		List<Node> nodes = new ArrayList<>(2);
+		Node n1 = NetworkUtils.createNode(
+				Id.create("1", Node.class), 
+				new Coord((double) 0, (double) 0));
+		Node n2 = NetworkUtils.createNode(
+				Id.create("2", Node.class), 
+				new Coord((double) 1000, (double) 0));
+		nodes.add(n1);
+		nodes.add(n2);
+		doTestNodes(nodes, getOutputDirectory() + "network.xml");
+	}
+	
+	public void testNodes_withElevation(){
+		List<Node> nodes = new ArrayList<>(2);
+		Node n1 = NetworkUtils.createNode(
+				Id.create("1", Node.class), 
+				new Coord((double) 0, (double) 0, (double) 0));
+		Node n2 = NetworkUtils.createNode(
+				Id.create("2", Node.class), 
+				new Coord((double) 1000, (double) 0, (double) 0));
+		nodes.add(n1);
+		nodes.add(n2);
+		doTestNodes(nodes, getOutputDirectory() + "network.xml");
+	}
+	
+	public void testNodes_withAndWithoutElevation(){
+		List<Node> nodes = new ArrayList<>(2);
+		Node n1 = NetworkUtils.createNode(
+				Id.create("1", Node.class), 
+				new Coord((double) 0, (double) 0));
+		Node n2 = NetworkUtils.createNode(
+				Id.create("2", Node.class), 
+				new Coord((double) 1000, (double) 0, (double) 0));
+		nodes.add(n1);
+		nodes.add(n2);
+		doTestNodes(nodes, getOutputDirectory() + "network.xml");
+	}
+	
 
 	private void doTestAllowedModes(final Set<String> modes, final String filename) {
 		Network network1 = NetworkUtils.createNetwork();
@@ -106,4 +148,26 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
         Collections.addAll(set, mode);
 		return set;
 	}
+
+	private void doTestNodes(List<Node> nodes, final String filename) {
+		Network network1 = NetworkUtils.createNetwork();
+		for(Node n : nodes){
+			network1.addNode(n);
+		}
+		
+		writeNetwork(network1, filename);
+		
+		File networkFile = new File(filename);
+		assertTrue("written network file doesn't exist.", networkFile.exists());
+		assertTrue("written network file seems to be empty.", networkFile.length() > 0);
+		
+		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Network network2 = scenario2.getNetwork();
+		readNetwork(scenario2, filename);
+
+		for(Node n : nodes){
+			assertEquals("Coordinates are not equal.", n.getCoord(), network2.getNodes().get(n.getId()).getCoord());
+		}
+	}
+	
 }

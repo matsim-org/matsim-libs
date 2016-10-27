@@ -64,8 +64,8 @@ public class KNPopCompare {
 	// statistics types:
 	private static enum StatType { ttime1, ttime2, ttimeDiff, payments1, payments2, paymentsDiff } ;
 	// container that contains the statistics containers:
-	final Map<StatType,DataMap<String>> sumsContainer = new TreeMap<StatType,DataMap<String>>() ;
-	final Map<StatType,DataMap<String>> cntsContainer = new TreeMap<StatType,DataMap<String>>() ;
+	final Map<StatType,DataMap<String>> sumsContainer = new TreeMap<>() ;
+	final Map<StatType,DataMap<String>> cntsContainer = new TreeMap<>() ;
 
 	public static void main(String[] args) {
 		if ( args.length != 4 && args.length != 5 ) {
@@ -126,7 +126,7 @@ public class KNPopCompare {
 		
 		
 		
-		List<SpatialGrid> spatialGrids = new ArrayList<SpatialGrid>() ;
+		List<SpatialGrid> spatialGrids = new ArrayList<>() ;
 		ActivityFacilities homesWithScoreDifferences = FacilitiesUtils.createActivityFacilities("scoreDifferencesAtHome") ;
 		ActivityFacilities homesWithMoneyDifferences = FacilitiesUtils.createActivityFacilities("moneyDifferencesAtHome") ;
 		ActivityFacilities homesWithTtimeDifferences = FacilitiesUtils.createActivityFacilities("ttimeDifferencesAtHome") ;
@@ -150,7 +150,7 @@ public class KNPopCompare {
 					fac.getCustomAttributes().put(GridUtils.WEIGHT, deltaScore ) ;
 					homesWithScoreDifferences.addActivityFacility(fac);
 				}
-				List<String> popTypes = new ArrayList<String>() ;
+				List<String> popTypes = new ArrayList<>() ;
 				{ // process money differences:
 					Double payments1 = (Double) pop1.getPersonAttributes().getAttribute(person1.getId().toString(), KNAnalysisEventsHandler.PAYMENTS ) ;
 					if ( payments1==null ) {
@@ -244,8 +244,8 @@ public class KNPopCompare {
 
 		GridUtils.writeSpatialGrids(spatialGrids, "popcompare_grid.csv");
 
-		try {
-			BufferedWriter writer = IOUtils.getBufferedWriter("popcompare.txt") ; // the "open" trick works only with txt (and tab, I think)
+		try ( BufferedWriter writer = IOUtils.getBufferedWriter("popcompare.txt") ) { 
+			// the excel "open" trick works only with txt (and tab, I think)
 			writer.write( "#subpoptype") ;
 			for ( StatType statType : StatType.values() ) {
 				writer.write( "\t" + statType.toString() + "_sum \t" + statType.toString() + "_cnt \t" + statType.toString() + "_av" ) ;
@@ -270,8 +270,7 @@ public class KNPopCompare {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		try {
-			BufferedWriter writer = IOUtils.getBufferedWriter("personscompare.txt") ;
+		try ( BufferedWriter writer = IOUtils.getBufferedWriter("personscompare.txt") ) {
 
 			boolean first = true ;
 			for ( Person person : pop1.getPersons().values() ) {
@@ -329,12 +328,12 @@ public class KNPopCompare {
 	private void addItemToStatsContainer(StatType statType, List<String> popTypes, Double item) {
 		DataMap<String> sums = sumsContainer.get( statType ) ;
 		if ( sums == null ) {
-			sums = new DataMap<String>() ;
+			sums = new DataMap<>() ;
 			sumsContainer.put( statType, sums ) ;
 		}
 		DataMap<String> cnts = cntsContainer.get( statType ) ;
 		if ( cnts == null ) {
-			cnts = new DataMap<String>() ;
+			cnts = new DataMap<>() ;
 			cntsContainer.put( statType, cnts ) ;
 		}
 		for ( String popType : popTypes ) {

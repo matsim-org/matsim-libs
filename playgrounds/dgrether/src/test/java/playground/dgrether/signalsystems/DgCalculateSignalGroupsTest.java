@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
@@ -53,6 +53,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
@@ -60,8 +62,6 @@ import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.v11.LaneDefinitonsV11ToV20Converter;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
@@ -245,11 +245,8 @@ public class DgCalculateSignalGroupsTest {
 
 		//load the network
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(conf);
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-				new SignalsScenarioLoader(ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class))
-						.loadSignalsData());
-		SignalsData signalsData = (SignalsData) scenario
-				.getScenarioElement(SignalsData.ELEMENT_NAME);
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(conf).loadSignalsData());
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		
 		//calculate the signal groups
 		DgCalculateSignalGroups calcSignalGroups = new DgCalculateSignalGroups(

@@ -48,11 +48,8 @@ public class MatrixToPolygons {
 	private final static double X_MAX=4479483.33;
 	private final static double Y_MIN=5324955.00;
 	private final static double Y_MAX=5345696.81;
-	
-	
-	private final double xWidth = (X_MAX - X_MIN)/X_BINS;
-	private final double yWidth = (Y_MAX - Y_MIN)/Y_BINS;
-	
+
+
 	private final static String OUT_FILE =  "/Users/amit/Downloads/bk/poly_centroid_toll_weight.txt";
 	private final static String INPUT_FILE_TOLL = "/Users/amit/Downloads/bk/pricing.1500-baseCase.1500.absoluteDelta.Routput.AvgUserBenefitsDifferencesNoRefund.txt";
 	private final static String INPUT_FILE_WEIGHT = "/Users/amit/Downloads/bk/baseCase.1500.Routput.UserBenefitsWeights.txt";
@@ -90,10 +87,12 @@ public class MatrixToPolygons {
  				double centroidX = Double.valueOf(xCoords[jj-1]);
  				double centroidY = Double.valueOf(yCoords[ii-1]);
  				Coordinate centroid = new Coordinate(centroidX, centroidY);
- 				Coordinate c1 =  new Coordinate(centroid.x - xWidth/2, centroid.y-yWidth/2);
- 				Coordinate c2 =  new Coordinate(centroid.x + xWidth/2, centroid.y-yWidth/2);
- 				Coordinate c3 =  new Coordinate(centroid.x + xWidth/2, centroid.y+yWidth/2);
- 				Coordinate c4 =  new Coordinate(centroid.x - xWidth/2, centroid.y+yWidth/2);
+                double xWidth = (X_MAX - X_MIN) / X_BINS;
+				double yWidth = (Y_MAX - Y_MIN) / Y_BINS;
+				Coordinate c1 =  new Coordinate(centroid.x - xWidth /2, centroid.y- yWidth /2);
+ 				Coordinate c2 =  new Coordinate(centroid.x + xWidth /2, centroid.y- yWidth /2);
+ 				Coordinate c3 =  new Coordinate(centroid.x + xWidth /2, centroid.y+ yWidth /2);
+ 				Coordinate c4 =  new Coordinate(centroid.x - xWidth /2, centroid.y+ yWidth /2);
  				Polygon poly = gf.createPolygon(new Coordinate[] {c1,c2,c3,c4,c1});
  				poly2Centroid.put(poly, centroid);
  				poly2toll.put(poly, Double.valueOf(arrayToll[ii][jj]));

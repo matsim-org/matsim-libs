@@ -107,8 +107,8 @@ public class EventsFilterAndWriter {
 	VehicleEntersTrafficEventHandler,
 	PersonArrivalEventHandler {
 
-		private List<Event> listOfEvents = new ArrayList<>();
-		private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+		private final List<Event> listOfEvents = new ArrayList<>();
+		private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 		@Override
 		public void reset(int iteration) {

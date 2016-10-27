@@ -110,6 +110,7 @@
 		<module>johannes</module>
 		<module>juliakern</module>
 		<module>kai</module>
+		<module>kairuns</module>
 		<module>kturner</module>
 		<module>lcrociani</module>
 		<module>lkroeger</module>
@@ -181,6 +182,12 @@
 			<artifactId>matsim</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim</groupId>
+			<artifactId>matsim-examples</artifactId>
+			<version>0.9.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

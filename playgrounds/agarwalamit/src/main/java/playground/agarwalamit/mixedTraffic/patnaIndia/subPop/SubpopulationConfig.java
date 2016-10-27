@@ -39,11 +39,11 @@ public class SubpopulationConfig {
 		config = ConfigUtils.createConfig(); 
 	}
 
-	private Config config;
-	private String [] subPopulations = {"slum","nonSlum"}; 
-	private Collection <String> mainModes = Arrays.asList("slum_car","slum_motorbike","slum_bike","nonSlum_car","nonSlum_motorbike","nonSlum_bike");
-	private  String [] allModes = {"slum_car","slum_motorbike","slum_bike","slum_pt","slum_walk","nonSlum_car","nonSlum_motorbike","nonSlum_bike","nonSlum_pt","nonSlum_walk"};
-	private String outputDir = "../../../repos/runs-svn/patnaIndia/run104/c7/";
+	private final Config config;
+	private final String [] subPopulations = {"slum","nonSlum"};
+	private final Collection <String> mainModes = Arrays.asList("slum_car","slum_motorbike","slum_bike","nonSlum_car","nonSlum_motorbike","nonSlum_bike");
+	private final String [] allModes = {"slum_car","slum_motorbike","slum_bike","slum_pt","slum_walk","nonSlum_car","nonSlum_motorbike","nonSlum_bike","nonSlum_pt","nonSlum_walk"};
+	private final String outputDir = "../../../repos/runs-svn/patnaIndia/run104/c7/";
 
 	public static void main(String[] args) {
 
@@ -56,7 +56,7 @@ public class SubpopulationConfig {
 
 		config.plans().setInputFile("../../../repos/runs-svn/patnaIndia/inputs/plansSubPop.xml.gz");
 		config.plans().setInputPersonAttributeFile("../../../repos/runs-svn/patnaIndia/inputs/personsAttributesSubPop.xml.gz");
-		config.counts().setCountsFileName("../../../repos/runs-svn/patnaIndia/inputs/counts/countsCarMotorbikeBike.xml");
+		config.counts().setInputFile("../../../repos/runs-svn/patnaIndia/inputs/counts/countsCarMotorbikeBike.xml");
 		config.counts().setOutputFormat("all");
 		config.counts().setWriteCountsInterval(100);
 		config.counts().setCountsScaleFactor(94.52); 

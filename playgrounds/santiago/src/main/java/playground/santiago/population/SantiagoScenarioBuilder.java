@@ -98,7 +98,7 @@ public class SantiagoScenarioBuilder {
 	
 //	final String pathForMatsim = "../../../runs-svn/santiago/run20/";
 //	final boolean prepareForModeChoice = false;
-	final String pathForMatsim = "../../../runs-svn/santiago/BASE10/";
+	final String pathForMatsim = "../../../runs-svn/santiago/TMP/";
 	final boolean prepareForModeChoice = true;
 	
 	final int writeStuffInterval = 50;
@@ -633,7 +633,7 @@ public class SantiagoScenarioBuilder {
 		counts.setDistanceFilter(null);
 		counts.setDistanceFilterCenterNode(null);
 		counts.setFilterModes(false);
-		counts.setCountsFileName(pathForMatsim + "input/counts_merged_VEH_C01.xml");
+		counts.setInputFile(pathForMatsim + "input/counts_merged_VEH_C01.xml");
 		counts.setOutputFormat("all");
 		counts.setWriteCountsInterval(writeStuffInterval);
 	}

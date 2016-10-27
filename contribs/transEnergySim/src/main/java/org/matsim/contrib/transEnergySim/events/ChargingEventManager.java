@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
@@ -25,7 +26,7 @@ public abstract class ChargingEventManager extends EventManager<EVSimEngineEvent
 	HashMap<Id<Person>, Id<Vehicle>> personToVehicleMapping;
 
 	//TODO: create global method for mapping person to vehicle. it should be able to overwrite it (e.g. one to one mapping of ids).
-	public ChargingEventManager(HashMap<Id<Person>, Id<Vehicle>> personToVehicleMapping, Controler controler,
+	public ChargingEventManager(HashMap<Id<Person>, Id<Vehicle>> personToVehicleMapping, MatsimServices controler,
 			HashSet<String> travelModeFilter) {
 		this.personToVehicleMapping = personToVehicleMapping;
 		delegate = new EventManagerDelegate(this, personToVehicleMapping, travelModeFilter);

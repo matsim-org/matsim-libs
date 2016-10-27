@@ -31,7 +31,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 
-public final class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConfigGroupI {
+public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 
 	@SuppressWarnings("unused")
@@ -112,13 +112,9 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	public enum VehiclesSource { defaultVehicle, modeVehicleTypesFromVehiclesData, fromVehiclesData} ;
 	private VehiclesSource vehiclesSource = VehiclesSource.defaultVehicle ;
 	// ---
-	private static final String SEEP_MODE = "seepMode";
 	private static final String IS_SEEP_MODE_STORAGE_FREE = "isSeepModeStorageFree";
-	private static final String IS_RESTRICTING_SEEPAGE = "isRestrictingSeepage";
 	
-	private Collection<String> seepModes = Arrays.asList(TransportMode.bike);;
 	private boolean isSeepModeStorageFree = false;
-	private boolean isRestrictingSeepage = true;
 
 	private EndtimeInterpretation simEndtimeInterpretation;
 	// ---
@@ -272,7 +268,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		this.startTime = startTime;
 	}
 
-	@Override
 	public double getStartTime() {
 		return this.startTime;
 	}
@@ -281,7 +276,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		this.endTime = endTime;
 	}
 
-	@Override
 	public double getEndTime() {
 		return this.endTime;
 	}
@@ -299,7 +293,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		this.timeStepSize = seconds;
 	}
 
-	@Override
 	public double getTimeStepSize() {
 		return this.timeStepSize;
 	}
@@ -308,7 +301,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		this.snapshotPeriod = snapshotPeriod;
 	}
 
-	@Override
 	public double getSnapshotPeriod() {
 		return this.snapshotPeriod;
 	}
@@ -318,7 +310,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		this.flowCapFactor = flowCapFactor;
 	}
 
-	@Override
 	@StringGetter(FLOW_CAPACITY_FACTOR)
 	public double getFlowCapFactor() {
 		return this.flowCapFactor;
@@ -329,7 +320,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		this.storageCapFactor = val;
 	}
 
-	@Override
 	@StringGetter(STORAGE_CAPACITY_FACTOR)
 	public double getStorageCapFactor() {
 		return this.storageCapFactor;
@@ -340,7 +330,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		this.stuckTime = stuckTime;
 	}
 
-	@Override
 	@StringGetter(STUCK_TIME)
 	public double getStuckTime() {
 		return this.stuckTime;
@@ -351,7 +340,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		this.removeStuckVehicles = removeStuckVehicles;
 	}
 
-	@Override
 	@StringGetter(REMOVE_STUCK_VEHICLES)
 	public boolean isRemoveStuckVehicles() {
 		return this.removeStuckVehicles;
@@ -362,7 +350,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		this.snapshotStyle = style ;
 	}
 
-	@Override
 	@StringGetter(SNAPSHOT_STYLE)
 	public SnapshotStyle getSnapshotStyle() {
 		return this.snapshotStyle;
@@ -509,9 +496,9 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	public void setUseLanes(final boolean useLanes) {
 		this.useLanes = useLanes;
 	}
-
 	// ---
-	
+	private static final String SEEP_MODE = "seepMode";
+	private Collection<String> seepModes = Arrays.asList(TransportMode.bike);
 	@StringGetter(SEEP_MODE)
 	private String getSeepModesAsString() {
 		return CollectionUtils.setToString(new HashSet<>(getSeepModes()));
@@ -520,14 +507,13 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	private void setSeepModes(String value) {
 		setSeepModes(Arrays.asList(value.split(",")));
 	}
-	
 	public Collection<String> getSeepModes() {
 		return seepModes;
 	}
 	public void setSeepModes(Collection<String> seepModes) {
 		this.seepModes = seepModes;
 	}
-	
+	// ---
 	@StringGetter(IS_SEEP_MODE_STORAGE_FREE)
 	public boolean isSeepModeStorageFree() {
 		return isSeepModeStorageFree;
@@ -536,6 +522,9 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	public void setSeepModeStorageFree(boolean isSeepModeStorageFree) {
 		this.isSeepModeStorageFree = isSeepModeStorageFree;
 	}
+	// ---
+	private static final String IS_RESTRICTING_SEEPAGE = "isRestrictingSeepage";
+	private boolean isRestrictingSeepage = true;
 	@StringGetter(IS_RESTRICTING_SEEPAGE)
 	public boolean isRestrictingSeepage() {
 		return isRestrictingSeepage;
@@ -547,9 +536,11 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	// ---
 	private boolean usingTravelTimeCheckInTeleportation = false ;
 	public boolean isUsingTravelTimeCheckInTeleportation() {
+		// yyyyyy this should better become a threshold number!  kai, aug'16
 		return this.usingTravelTimeCheckInTeleportation ;
 	}
 	public boolean setUsingTravelTimeCheckInTeleportation( boolean val ) {
+		// yyyyyy this should better become a threshold number!  kai, aug'16
 		return this.usingTravelTimeCheckInTeleportation = val ;
 	}
 	// ---

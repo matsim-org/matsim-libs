@@ -32,7 +32,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig}
  * this class runs a simulation and calculates emissions online. 
  * Results are written into distinct xml-files including emission event files for some iterations (as specified by the config). 
- * <p/>
+ * <p></p>
  * See <a href="{@docRoot}/src-html/org/matsim/contrib/emissions/example/RunEmissionToolOnlineExample.html#line.39">here</a> for the listing.
 
  *
@@ -46,10 +46,16 @@ public class RunEmissionToolOnlineExample {
 	private final Config config ;
 	
 	public RunEmissionToolOnlineExample( String[] args ) {
+
+		// following is only for backward compatibility in which vehicle description is null;
+		// for the new scenarios, setting vehicle description should be preferred.; Amit, sep 2016.
+		EmissionsConfigGroup emissionsConfigGroup = new EmissionsConfigGroup();
+		emissionsConfigGroup.setUsingVehicleTypeIdAsVehicleDescription(true);
+
 		if ( args==null || args.length==0 ) {
-			config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
+			config = ConfigUtils.loadConfig(configFile, emissionsConfigGroup);
 		} else {
-			config = ConfigUtils.loadConfig( args[0], new EmissionsConfigGroup());
+			config = ConfigUtils.loadConfig( args[0], emissionsConfigGroup);
 		}
 	}	
 	public final void run() {

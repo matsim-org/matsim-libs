@@ -30,7 +30,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.LinkVolumeHandler;
+import playground.agarwalamit.analysis.linkVolume.LinkVolumeHandler;
 
 /**
  * @author amit
@@ -54,7 +54,7 @@ public class PatnaLinkVolumeWriter {
 		events.addHandler(handler);
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
-		this.linkid2Time2Count = handler.getLinkId2TimeSlot2LinkVolume();
+		this.linkid2Time2Count = handler.getLinkId2TimeSlot2LinkCount();
 	}
 	
 	public void writeData (final String outFile){

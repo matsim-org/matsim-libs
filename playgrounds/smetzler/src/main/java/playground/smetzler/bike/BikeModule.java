@@ -2,7 +2,7 @@ package playground.smetzler.bike;
 
 
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.PrepareForSim;
+
 
 
 public class BikeModule extends AbstractModule {
@@ -13,6 +13,7 @@ public class BikeModule extends AbstractModule {
 //		bind(PrepareForSim.class).to(BikePrepareForSimImpl.class);
 		addTravelTimeBinding("bike").to(BikeTravelTime.class);
 		addTravelDisutilityFactoryBinding("bike").to(BikeTravelDisutilityFactory.class);
+
 
 		//analog zu RunMobsimWithMultipleModeVehiclesExample, sorgt momentan lediglich dafuer dass die maxSpeed und PCU eingestellt ist.
 		bindMobsim().toProvider(BikeQSimFactory.class);
@@ -38,7 +39,9 @@ public class BikeModule extends AbstractModule {
 //	// beispiel fuer disutility: SlopeAwareTravelDisutilityFactory
 //    addTravelDisutilityFactoryBinding("bike").toInstance( new RandomizingTimeDistanceTravelDisutility.Builder("bike"));
 ////     addTravelDisutilityFactoryBinding("bike").toInstance( new RandomizingTimeDistanceTravelDisutility.Builder("bike").setSigma(val);
-//    
+//
+//    	    addTravelDisutilityFactoryBinding("bike").to(RandomizingTimeDistanceTravelDisutilityFactory.class);
+
 //
 //    
 //	//analog zu RunMobsimWithMultipleModeVehiclesExample, sorgt momentan lediglich dafür dass die maxV und PCU eingestellt ist.

@@ -123,14 +123,13 @@ public class CAQTransitionLink extends QLinkI{
 	}
 
 	@Override
-	void letVehicleDepart(QVehicle vehicle, double now) {
-		this.ql.letVehicleDepart(vehicle, now);
+	void letVehicleDepart(QVehicle vehicle) {
+		this.ql.letVehicleDepart(vehicle);
 	}
 
 	@Override
-	boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id vehicleId,
-			double now) {
-		return this.ql.insertPassengerIntoVehicle(passenger, vehicleId, now);
+	boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id vehicleId) {
+		return this.ql.insertPassengerIntoVehicle(passenger, vehicleId);
 	}
 
 	@Override

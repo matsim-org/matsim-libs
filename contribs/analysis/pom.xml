@@ -15,16 +15,22 @@
             </plugin>
         </plugins>
     </build>
-  <dependencies>
-  	<dependency>
-  		<groupId>org.matsim.contrib</groupId>
-  		<artifactId>roadpricing</artifactId>
-  		<version>0.9.0-SNAPSHOT</version>
-  	</dependency>
-  	<dependency>
-    	<groupId>org.osgeo</groupId>
-		<artifactId>proj4j</artifactId>
-		<version>0.1.0</version>
-	</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.matsim.contrib</groupId>
+            <artifactId>roadpricing</artifactId>
+            <version>0.9.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.matsim</groupId>
+            <artifactId>matsim-examples</artifactId>
+            <version>0.9.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgeo</groupId>
+            <artifactId>proj4j</artifactId>
+            <version>0.1.0</version>
+	    </dependency>
   </dependencies>
 </project>

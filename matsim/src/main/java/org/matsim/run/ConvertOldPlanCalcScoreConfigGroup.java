@@ -454,7 +454,7 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 	}
 	/**
 	 * @return the marginal utility of distance for mode walk per meter
-	 * <p/>
+	 * <p></p>
 	 * This was discouraged for some time but currently I think this makes sense. kai, mar'12
 	 */
 	public double getMarginalUtlOfDistanceWalk() {
@@ -462,7 +462,7 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 	}
 	/**
 	 * @param marginalUtlOfDistanceWalk the marginal utility of distance for mode walk per meter
-	 * <p/>
+	 * <p></p>
 	 * This was discouraged for some time but currently I think this makes sense. kai, mar'12
 	 */
 	public void setMarginalUtlOfDistanceWalk(final double marginalUtlOfDistanceWalk) {

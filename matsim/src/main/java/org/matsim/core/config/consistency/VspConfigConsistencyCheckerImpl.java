@@ -211,7 +211,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		
 		// added jun'16
 		if ( config.qsim().getUsePersonIdForMissingVehicleId() ) {
-			log.log( lvl, "found usePersonIdForMissingVehicleId==true; this is only for backwards compatibility and should rather be set to false") ;
+			log.log( lvl, "found qsim.usePersonIdForMissingVehicleId==true; this is only for backwards compatibility and should rather be set to false") ;
 		}
 		
 		// added feb'16

@@ -19,7 +19,6 @@
 package tutorial.fixedTimeSignals;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -28,9 +27,7 @@ import org.junit.Test;
  */
 public class RunSignalSystemsExampleTest {
 
-	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public final void test() {
 		boolean usingOTFVis = false ;
 		try {

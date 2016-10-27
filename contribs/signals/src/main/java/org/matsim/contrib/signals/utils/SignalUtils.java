@@ -23,6 +23,9 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsDataImpl;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
@@ -34,7 +37,7 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactor
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
-import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.Lane;
 
 /**
  * @author dgrether
@@ -43,24 +46,28 @@ import org.matsim.lanes.data.v20.Lane;
 public class SignalUtils {
 
 	/**
-	 * Creates a SignalGroupData instance for each SignalData instance of the
-	 * SignalSystemData instance given as parameter and adds it to the
-	 * SignalGroupsData container given as parameter. The SignalGroupData
-	 * instance has the same Id as the SignalData instance.
+	 * Create an empty SignalsData object
+	 * 
+	 * @param signalSystemsConfigGroup
+	 */
+	public static SignalsData createSignalsData(SignalSystemsConfigGroup signalSystemsConfigGroup) {
+		return new SignalsDataImpl(signalSystemsConfigGroup);
+	}
+
+	/**
+	 * Creates a signal group for each single signal of the
+	 * system and adds it to the given SignalGroupsData container. 
+	 * Each created signal group will get the same ID as the signal itself.
 	 * 
 	 * @param groups
-	 *            The container to that the SignalGroupData instances are added.
+	 *            container to that the signal groups are added
 	 * @param system
-	 *            The SignalSystemData instance whose SignalData Ids serve as
-	 *            template for the SignalGroupData
+	 *            contains the signals for which signal groups are created
 	 */
-	public static void createAndAddSignalGroups4Signals(
-			SignalGroupsData groups, SignalSystemData system) {
-		
+	public static void createAndAddSignalGroups4Signals(SignalGroupsData groups, SignalSystemData system) {
 		for (SignalData signal : system.getSignalData().values()) {
-			SignalGroupData group4signal = groups.getFactory()
-					.createSignalGroupData(system.getId(),
-							Id.create(signal.getId(), SignalGroup.class));
+			SignalGroupData group4signal = groups.getFactory().createSignalGroupData(system.getId(), 
+					Id.create(signal.getId(), SignalGroup.class));
 			group4signal.addSignalId(signal.getId());
 			groups.addSignalGroupData(group4signal);
 		}

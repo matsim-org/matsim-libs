@@ -22,6 +22,7 @@
 package org.matsim.contrib.signals.data;
 
 import java.io.BufferedWriter;
+import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -36,10 +37,9 @@ import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerDa
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.Lanes;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
 
 /**
  * Class to write the (x,y,t) signals csv file for via. 
@@ -47,6 +47,7 @@ import org.matsim.lanes.data.v20.Lanes;
  * @author tthunig
  *
  */
+@Deprecated
 public class SignalsViaCSVWriter {
 
 	private static final Logger log = Logger.getLogger(SignalsViaCSVWriter.class);
@@ -122,10 +123,6 @@ public class SignalsViaCSVWriter {
 							// add the signal plan offset to the start time
 							time += signalPlan.getOffset();
 							while (time <= endTime) {
-								Gbl.assertNotNull(signal);
-								Gbl.assertNotNull(signalCoord);
-								Gbl.assertNotNull(time);
-								Gbl.assertNotNull(signalGroupSetting);
 								signalsCSVWriter.write(signal.getId() + ";" + signalCoord.getX() + ";" + signalCoord.getY() + ";" + (time + signalGroupSetting.getOnset()) + ";" + SIGNAL_STATE_GREEN);
 								signalsCSVWriter.newLine();
 								signalsCSVWriter.write(signal.getId() + ";" + signalCoord.getX() + ";" + signalCoord.getY() + ";" + (time + signalGroupSetting.getDropping()) + ";" + SIGNAL_STATE_RED);
@@ -143,7 +140,7 @@ public class SignalsViaCSVWriter {
 			signalsCSVWriter.close();
 			log.info("... done!");
 		}
-		catch(Exception e){ 
+		catch(IOException e){ 
 			e.printStackTrace(); 
 		}
 	}

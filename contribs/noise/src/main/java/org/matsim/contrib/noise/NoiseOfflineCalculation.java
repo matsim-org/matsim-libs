@@ -101,7 +101,7 @@ public class NoiseOfflineCalculation {
 		
 		log.info("Reading events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(this.scenario.getConfig().controler().getOutputDirectory() + "ITERS/it." + this.scenario.getConfig().controler().getLastIteration() + "/" + this.scenario.getConfig().controler().getLastIteration() + ".events.xml.gz");
+		reader.readFile(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + this.scenario.getConfig().controler().getLastIteration() + "/" + this.scenario.getConfig().controler().getLastIteration() + ".events.xml.gz");
 		log.info("Reading events file... Done.");
 		
 		timeTracker.computeFinalTimeIntervals();

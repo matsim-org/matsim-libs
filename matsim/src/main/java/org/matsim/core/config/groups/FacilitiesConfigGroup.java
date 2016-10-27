@@ -20,12 +20,11 @@
 
 package org.matsim.core.config.groups;
 
-import org.matsim.core.config.ReflectiveConfigGroup;
-
-import java.net.MalformedURLException;
 import java.net.URL;
-
 import java.util.Map;
+
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author mrieser / Senozon AG
@@ -69,11 +68,7 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	public URL getInputFileURL(URL context) {
-		try {
-			return new URL(context, this.inputFile);
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
+		return ConfigGroup.getInputFileURL(context, this.inputFile);
 	}
 
 	@StringGetter( INPUT_FACILITY_ATTRIBUTES_FILE )

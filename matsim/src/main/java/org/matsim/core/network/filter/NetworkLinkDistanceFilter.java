@@ -45,7 +45,7 @@ public class NetworkLinkDistanceFilter implements NetworkLinkFilter {
 	/**
 	 *
 	 * @param l
-	 * @return <code>true</true> if the Link is not farther away than the
+	 * @return {@code true} if the Link is not farther away than the
 	 * distance specified by the distance filter from the center node of the filter.
 	 */	
 	@Override

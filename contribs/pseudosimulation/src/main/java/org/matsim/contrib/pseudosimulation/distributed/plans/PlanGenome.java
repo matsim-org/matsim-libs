@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * Created by fouriep on 1/28/15.
- * <p/>
+ * <p></p>
  * Plan class that records the various manipulations it has undergone (for diagnostic purposes), as well as
  * its score in PSim
  */
@@ -245,7 +245,7 @@ public class PlanGenome implements Plan {
 
     /**
      * loads a copy of an existing plan, but keeps the person reference
-     * <p/>
+     * <p></p>
      * Design comments:<ul>
      * <li> In my intuition, this is really a terrible method: (1) Plan is a data object, not a behavioral object, and thus it should be accessed
      * from static, interface-based methods only.

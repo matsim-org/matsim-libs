@@ -19,18 +19,17 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.signalcontrol.v20;
 
-import java.io.IOException;
 import java.io.InputStream;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.signals.MatsimSignalSystemsReader;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
@@ -41,7 +40,6 @@ import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.signalcontrol20.XMLSignalControl;
 import org.matsim.jaxb.signalcontrol20.XMLSignalGroupSettingsType;
@@ -55,64 +53,40 @@ import org.xml.sax.SAXException;
  * @author dgrether
  *
  */
-public class SignalControlReader20 extends MatsimJaxbXmlParser implements MatsimReader {
-
-
-	private static final Logger log = Logger.getLogger(SignalControlReader20.class);
+public class SignalControlReader20 implements MatsimReader {
 
 	private SignalControlData signalControlData;
 
-
 	public SignalControlReader20(SignalControlData signalControlData){
-		super(MatsimSignalSystemsReader.SIGNALCONTROL20);
 		this.signalControlData = signalControlData;
 	}
 
-	public SignalControlReader20(SignalControlData signalControlData, String schemaLocation) {
-		super(schemaLocation);
-		this.signalControlData = signalControlData;
-	}
-
-	public XMLSignalControl readSignalControl20File(String filename) {
-		// create jaxb infrastructure
-		JAXBContext jc;
-		XMLSignalControl xmlSignalControl;
-		InputStream stream = null;
+	private XMLSignalControl readSignalControl20Stream(InputStream stream) {
 		try {
-			jc = JAXBContext.newInstance(org.matsim.jaxb.signalcontrol20.ObjectFactory.class);
+			JAXBContext jc = JAXBContext.newInstance(org.matsim.jaxb.signalcontrol20.ObjectFactory.class);
 			Unmarshaller u = jc.createUnmarshaller();
-			// validate XML file
-			super.validateFile(filename, u);
-			log.info("starting unmarshalling " + filename);
-			//			stream = new FileInputStream(filename);
-			stream = IOUtils.getInputStream(filename);
-			xmlSignalControl = (XMLSignalControl) u.unmarshal(stream);
-			log.info("unmarshalling complete");
-		} catch (IOException e) {
+			u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/signalControl_v2.0.xsd")));
+			return (XMLSignalControl) u.unmarshal(stream);
+		} catch (JAXBException | SAXException e) {
 			throw new UncheckedIOException(e);
-		} catch (JAXBException e) {
-			throw new UncheckedIOException(e);
-		} catch (SAXException e) {
-			throw new UncheckedIOException(e);
-		} catch (ParserConfigurationException e) {
-			throw new UncheckedIOException(e);
-		} finally {
-			try {
-				if (stream != null) { stream.close();	}
-			} catch (IOException e) {
-				log.warn("Could not close stream.", e);
-			}
 		}
-		return xmlSignalControl;
 	}
-
-
 
 	@Override
 	public void readFile(String filename) {
-		SignalControlDataFactory factory = this.signalControlData.getFactory();
+		readStream(IOUtils.getInputStream(filename));
+	}
 
-		XMLSignalControl xmlSignalControl = this.readSignalControl20File(filename);
+	private double getSeconds(XMLGregorianCalendar daytime) {
+		double sec = daytime.getHour() * 3600.0;
+		sec += daytime.getMinute() * 60.0;
+		sec += daytime.getSecond();
+		return sec;
+	}
+
+	public void readStream(InputStream inputStream) {
+		XMLSignalControl xmlSignalControl = this.readSignalControl20Stream(inputStream);
+		SignalControlDataFactory factory = this.signalControlData.getFactory();
 		for (XMLSignalSystemType xmlSystem : xmlSignalControl.getSignalSystem()){
 			SignalSystemControllerData controllerData = factory.createSignalSystemControllerData(Id.create(xmlSystem.getRefId(), SignalSystem.class));
 			this.signalControlData.addSignalSystemControllerData(controllerData);
@@ -142,13 +116,5 @@ public class SignalControlReader20 extends MatsimJaxbXmlParser implements Matsim
 			}
 		}
 	}
-
-	private double getSeconds(XMLGregorianCalendar daytime) {
-		double sec = daytime.getHour() * 3600.0;
-		sec += daytime.getMinute() * 60.0;
-		sec += daytime.getSecond();
-		return sec;
-	}
-
 
 }

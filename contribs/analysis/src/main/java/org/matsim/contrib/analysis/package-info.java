@@ -22,7 +22,7 @@
  * Container to collect matsim analysis tools.  They should fulfill the following conditions:<ul>
  * <li> They should not maven-depend on anything besides the core (everything inside the matsim maven module).
  * <ul>
- * <p/>
+ * <p></p>
  * In order to not too much blow up the maven repository, it is assumed that inside this analysis directory there are multiple 
  * packages maintained by different persons each.
  * 

@@ -38,10 +38,10 @@ public class UserGroupUtilsExtended {
 
 	public SortedMap<String, Double> calculateTravelMode2Mean(Map<String, Map<Id<Person>, Double>> inputMap, Population relavantPop){	
 		this.logger.info("Calculating mean(average) ...");
-		SortedMap<String, Double> mode2Mean = new TreeMap<String, Double>();
-		List<Double> allQty = new ArrayList<Double>();
+		SortedMap<String, Double> mode2Mean = new TreeMap<>();
+		List<Double> allQty = new ArrayList<>();
 		for(String mode : inputMap.keySet()){
-			List<Double> quants = new ArrayList<Double>();
+			List<Double> quants = new ArrayList<>();
 			for(Id<Person> id:inputMap.get(mode).keySet()){
 				if(relavantPop.getPersons().keySet().contains(id)){
 					quants.add(inputMap.get(mode).get(id));
@@ -56,10 +56,10 @@ public class UserGroupUtilsExtended {
 
 	public SortedMap<String, Double> calculateTravelMode2MeanFromLists(Map<String, Map<Id<Person>, List<Double>>> inputMap, Population relavantPop){	
 		this.logger.info("Calculating mean(average) ...");
-		SortedMap<String, Double> mode2Mean = new TreeMap<String, Double>();
-		List<Double> allQty = new ArrayList<Double>();
+		SortedMap<String, Double> mode2Mean = new TreeMap<>();
+		List<Double> allQty = new ArrayList<>();
 		for(String mode : inputMap.keySet()){
-			List<Double> quants = new ArrayList<Double>();
+			List<Double> quants = new ArrayList<>();
 			for(Id<Person> id:inputMap.get(mode).keySet()){
 				if(relavantPop.getPersons().keySet().contains(id)){
 					quants.addAll(inputMap.get(mode).get(id));
@@ -74,10 +74,10 @@ public class UserGroupUtilsExtended {
 
 	public SortedMap<String, Double> calculateTravelMode2Median(Map<String, Map<Id<Person>, Double>> inputMap, Population relavantPop){
 		this.logger.info("Calculating median ...");
-		SortedMap<String, Double> mode2Median = new TreeMap<String, Double>();
-		List<Double> allQty = new ArrayList<Double>();
+		SortedMap<String, Double> mode2Median = new TreeMap<>();
+		List<Double> allQty = new ArrayList<>();
 		for(String mode : inputMap.keySet()){
-			List<Double> quants = new ArrayList<Double>();
+			List<Double> quants = new ArrayList<>();
 			for(Id<Person> id:inputMap.get(mode).keySet()){
 				if(relavantPop.getPersons().keySet().contains(id)){
 					quants.add(inputMap.get(mode).get(id));
@@ -92,10 +92,10 @@ public class UserGroupUtilsExtended {
 
 	public SortedMap<String, Double> calculateTravelMode2MedianFromLists(Map<String, Map<Id<Person>, List<Double>>> inputMap, Population relavantPop){
 		this.logger.info("Calculating median ...");
-		SortedMap<String, Double> mode2Median = new TreeMap<String, Double>();
-		List<Double> allQty = new ArrayList<Double>();
+		SortedMap<String, Double> mode2Median = new TreeMap<>();
+		List<Double> allQty = new ArrayList<>();
 		for(String mode : inputMap.keySet()){
-			List<Double> quants = new ArrayList<Double>();
+			List<Double> quants = new ArrayList<>();
 			for(Id<Person> id:inputMap.get(mode).keySet()){
 				if(relavantPop.getPersons().keySet().contains(id)){
 					quants.addAll(inputMap.get(mode).get(id));
@@ -109,7 +109,7 @@ public class UserGroupUtilsExtended {
 	}
 
 	public List<Double> getTotalStatListForBoxPlot(Map<Id<Person>, Double> inputMap, Population relevantPop){
-		List<Double> data = new ArrayList<Double>();
+		List<Double> data = new ArrayList<>();
 		for(Id<Person> id :inputMap.keySet()){
 			if(relevantPop.getPersons().keySet().contains(id)){
 				data.add(inputMap.get(id));

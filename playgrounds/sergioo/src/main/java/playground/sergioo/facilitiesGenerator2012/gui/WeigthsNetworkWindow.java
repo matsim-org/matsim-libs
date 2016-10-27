@@ -55,7 +55,7 @@ public class WeigthsNetworkWindow extends LayersWindow implements ActionListener
 		ONE;
 	}
 	public enum Option implements LayersWindow.Options {
-		ZOOM("<html>Z<br/>O<br/>O<br/>M</html>");
+		ZOOM("<html>Z<br>O<br>O<br>M</html>");
 		private String caption;
 		private Option(String caption) {
 			this.caption = caption;

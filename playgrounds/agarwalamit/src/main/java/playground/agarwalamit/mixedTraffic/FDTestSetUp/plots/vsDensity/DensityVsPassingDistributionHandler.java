@@ -42,20 +42,20 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
  */
 public class DensityVsPassingDistributionHandler implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 
-	private Map<Id<Person>, String> personId2LegMode;
-	private Map<Double, Double> density2TotalOvertakenBicycles;
-	private Map<Double, Double> density2AverageOvertakenBicycles;
+	private final Map<Id<Person>, String> personId2LegMode;
+	private final Map<Double, Double> density2TotalOvertakenBicycles;
+	private final Map<Double, Double> density2AverageOvertakenBicycles;
 	private double localDensity = 0.;
-	private Map<Id<Person>, Double> personId2LinkEnterTime;
+	private final Map<Id<Person>, Double> personId2LinkEnterTime;
 	private final Id<Link> linkId;
-	private BufferedWriter writer;
-	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	private final BufferedWriter writer;
+	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 	public DensityVsPassingDistributionHandler(Id<Link> linkId, BufferedWriter writer) {
-		this.personId2LegMode = new HashMap<Id<Person>, String>();
-		this.density2TotalOvertakenBicycles = new HashMap<Double, Double>();
-		this.density2AverageOvertakenBicycles=new HashMap<Double, Double>();
-		this.personId2LinkEnterTime = new HashMap<Id<Person>, Double>();
+		this.personId2LegMode = new HashMap<>();
+		this.density2TotalOvertakenBicycles = new HashMap<>();
+		this.density2AverageOvertakenBicycles= new HashMap<>();
+		this.personId2LinkEnterTime = new HashMap<>();
 		this.linkId = linkId;
 		this.writer = writer;
 	}

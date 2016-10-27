@@ -27,7 +27,7 @@ import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 
 /**
  * A module which modifies a single plan.
- * <br/>
+ * <br>
  * Comments:<ul>
  * <li> yyyy Should be renamed, since a strategy module is something else in the config file.  A suggestion would be
  * ReplanningModule.  kai, may'12

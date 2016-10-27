@@ -34,7 +34,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 
-import playground.agarwalamit.analysis.LinkVolumeHandler;
+import playground.agarwalamit.analysis.linkVolume.LinkVolumeHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
@@ -44,8 +44,8 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 public class OuterCountVolumeAnalyzer {
 
-	private LinkVolumeHandler handler = new LinkVolumeHandler();
-	private SortedMap<Id<Link>, Tuple<Integer,Integer>> link2totalCounts = new TreeMap<>();
+	private final LinkVolumeHandler handler = new LinkVolumeHandler();
+	private final SortedMap<Id<Link>, Tuple<Integer,Integer>> link2totalCounts = new TreeMap<>();
 	private static final int COUNT_SCALE_FACTOR = 10;
 	
 	public static void main(String[] args) {
@@ -98,7 +98,7 @@ public class OuterCountVolumeAnalyzer {
 		allCountStationLinks.addAll(OuterCordonUtils.getExternalToInternalCountStationLinkIds( PatnaUtils.PATNA_NETWORK_TYPE  ));
 		allCountStationLinks.addAll(OuterCordonUtils.getInternalToExternalCountStationLinkIds( PatnaUtils.PATNA_NETWORK_TYPE  ));
 		
-		Map<Id<Link>, Map<Integer, Double>> link2time2volume = handler.getLinkId2TimeSlot2LinkVolume();
+		Map<Id<Link>, Map<Integer, Double>> link2time2volume = handler.getLinkId2TimeSlot2LinkCount();
 		try {
 			writer.write("timebin \t");
 			for(Id<Link> linkId : allCountStationLinks){
@@ -136,7 +136,7 @@ public class OuterCountVolumeAnalyzer {
 					}
 				}
 			}
-			link2totalCounts.put(linkId, new Tuple<Integer, Integer>(e2eCount, e2iCount));
+			link2totalCounts.put(linkId, new Tuple<>(e2eCount, e2iCount));
 		}
 	}
 }

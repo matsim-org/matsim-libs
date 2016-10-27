@@ -85,7 +85,7 @@ public class CadytsDistanceBasedExample {
 //		String inputPlansFile = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/plans1000.xml";
 		String inputPlansFile = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/plans1000_routes5.xml";
 		String countsFileName = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/counts100-200_full.xml";
-		String runId = "selectR+hist1000-6";
+		String runId = "selectR+hist1000";
 		String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/output/" + runId + "";
 		
 		// Parameters
@@ -102,7 +102,7 @@ public class CadytsDistanceBasedExample {
 		config.controler().setWritePlansInterval(10);
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(outputDirectory);
-		config.counts().setCountsFileName(countsFileName);
+		config.counts().setInputFile(countsFileName);
 //		config.plans().setInputFile(inputPlansFile);
 //		config.network().setInputFile(inputNetworkFile);
 //		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRate);

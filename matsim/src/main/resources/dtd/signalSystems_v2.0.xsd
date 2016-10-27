@@ -5,7 +5,7 @@
 		<!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
 		<!-- Description of the signal systems to be used in the simulation -->
 
-		<xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd" />
+		<xs:include schemaLocation="matsimCommon.xsd" />
 		
 		<xs:annotation>
 				<xs:documentation>Description of the signal systems to be used in the simulation

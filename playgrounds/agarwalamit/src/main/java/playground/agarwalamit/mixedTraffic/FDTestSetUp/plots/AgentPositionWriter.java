@@ -138,13 +138,13 @@ public class AgentPositionWriter {
 		new MatsimEventsReader(manager).readFile(eventsFile);
 	}
 
-	private BufferedWriter writer ;
+	private final BufferedWriter writer ;
 
-	private Map<Id<Person>,String> person2mode = new HashMap<>();
-	private Map<Id<Person>,Double> prevTime = new HashMap<>();
-	private Map<Id<Person>,Double> prevTrackPositions = new HashMap<>();
-	private Map<Id<Person>,Integer> prevCycle = new HashMap<>();
-	private Map<Id<Person>,Double> prevLink = new HashMap<>();
+	private final Map<Id<Person>,String> person2mode = new HashMap<>();
+	private final Map<Id<Person>,Double> prevTime = new HashMap<>();
+	private final Map<Id<Person>,Double> prevTrackPositions = new HashMap<>();
+	private final Map<Id<Person>,Integer> prevCycle = new HashMap<>();
+	private final Map<Id<Person>,Double> prevLink = new HashMap<>();
 
 	public void readTransimFileAndWriteData(String inputFile)
 	{
@@ -156,7 +156,7 @@ public class AgentPositionWriter {
 		config.setDelimiterTags( new String []{"\t"} );
 		// ---
 		TabularFileHandler handler = new TabularFileHandler(){
-			List<String> labels = new ArrayList<>() ;
+			final List<String> labels = new ArrayList<>() ;
 			@Override
 			public void startRow(String[] row) {
 				List<String> strs = Arrays.asList( row ) ;
@@ -305,6 +305,7 @@ public class AgentPositionWriter {
 		if( Double.isNaN(distFromFromNode) ) { // this is possible, because of minor errors --
 
 			Link nearestLink = NetworkUtils.getNearestLink(sc.getNetwork(), eastinNorthing);
+			assert nearestLink != null;
 			linkId = Double.valueOf(nearestLink.getId().toString());
 			distFromFromNode = NetworkUtils.getEuclideanDistance(eastinNorthing, nearestLink.getFromNode().getCoord());
 
@@ -315,6 +316,6 @@ public class AgentPositionWriter {
 			LOGGER.info("Thus, identified link is "+nearestLink.getId()+" and the distance of the point from from node is "+distFromFromNode);
 			//throw new RuntimeException("Easting, northing ("+ eastinNorthing.getX() +","+eastinNorthing.getY() +") is outside the network.");
 		}
-		return new Tuple<Double, Double>(distFromFromNode, linkId);
+		return new Tuple<>(distFromFromNode, linkId);
 	}
 }

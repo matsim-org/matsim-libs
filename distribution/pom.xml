@@ -93,13 +93,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
-			<artifactId>gtfs2matsimtransitschedule</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
-			<type>zip</type>
-			<classifier>release</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
 			<artifactId>hybridsim</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 			<type>zip</type>
@@ -108,13 +101,6 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>locationchoice</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
-			<type>zip</type>
-			<classifier>release</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>map2mapmatching</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 			<type>zip</type>
 			<classifier>release</classifier>

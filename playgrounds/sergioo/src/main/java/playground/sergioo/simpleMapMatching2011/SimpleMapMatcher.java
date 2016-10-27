@@ -72,7 +72,7 @@ public class SimpleMapMatcher extends Observable implements PointLines {
 				Collection<Node> initialNodes=new ArrayList<Node>();
 				for(double addDistance=0;initialNodes.size()<MIN_NUMBER_START_NODES;addDistance+=SEARCH_RADIUS_INCREMENT) {
 					final Coord coord = point;
-					initialNodes=NetworkUtils.getNearestNodes2(((Network)network),coord, INITIAL_SEARCH_RADIUS+addDistance);
+					initialNodes=NetworkUtils.getNearestNodes(((Network)network),coord, INITIAL_SEARCH_RADIUS+addDistance);
 				}
 				for(Link link:((Network)network).getLinks().values())
 					if(link.getAllowedModes().contains(mode)) {

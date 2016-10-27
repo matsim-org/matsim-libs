@@ -25,7 +25,7 @@ import javax.xml.transform.TransformerConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.scenario.MutableScenario;
-import org.matsim.lanes.data.v20.Lanes;
+import org.matsim.lanes.data.Lanes;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.xml.sax.SAXException;
 

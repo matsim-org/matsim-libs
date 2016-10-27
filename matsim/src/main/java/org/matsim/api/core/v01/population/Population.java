@@ -25,11 +25,12 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * Root class of the population description (previously also called "plans file")
  */
-public interface Population extends MatsimToplevelContainer {
+public interface Population extends MatsimToplevelContainer, Attributable {
 
 	@Override
 	public PopulationFactory getFactory();

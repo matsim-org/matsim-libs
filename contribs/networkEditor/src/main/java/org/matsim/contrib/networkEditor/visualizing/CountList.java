@@ -196,7 +196,7 @@ public class CountList extends javax.swing.JPanel {
         if(evt.getClickCount()==2){
             if(currentCount==null)
                 return;
-            String name = javax.swing.JOptionPane.showInputDialog("Name of counting station", currentCount.getCsId());
+            String name = javax.swing.JOptionPane.showInputDialog("Name of counting station", currentCount.getCsLabel());
             currentCount.setCsId(name);
             updateTable();
         }
@@ -223,7 +223,7 @@ public class CountList extends javax.swing.JPanel {
                 jLabel1.setText("(no existing counts)");
             } else {
                 tableModel = new CountTableModel(currentCount);
-                jLabel1.setText(currentCount.getCsId());
+                jLabel1.setText(currentCount.getCsLabel());
             }
         }
         jTable1.setModel(tableModel);

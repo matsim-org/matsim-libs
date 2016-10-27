@@ -49,8 +49,8 @@ import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.utils.SignalUtils;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.LanesToLinkAssignment;
 
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import scenarios.illustrative.braess.createInput.TtCreateBraessNetworkAndLanes.LaneType;
@@ -192,7 +192,7 @@ public final class TtCreateBraessSignals {
 				// add turning move restrictions and lanes if necessary
 				switch (this.laneType) {
 				case TRIVIAL:
-					LanesToLinkAssignment20 linkLanes = this.scenario.getLanes().getLanesToLinkAssignments().get(inLinkId);
+					LanesToLinkAssignment linkLanes = this.scenario.getLanes().getLanesToLinkAssignments().get(inLinkId);
 					// the link only contains one lane (the trivial lane)
 					signal.addLaneId(linkLanes.getLanes().firstKey());
 				case NONE:
@@ -343,7 +343,7 @@ public final class TtCreateBraessSignals {
 			signalSystemOffset = linkTTSmall;
 			break;
 		case "signal23_3.2":
-		case "signal2_32": // signals for going straight on (upper route) at node 3
+		case "signal2_3.2": // signals for going straight on (upper route) at node 3
 			onset = 30;
 			dropping = 60 - INTERGREEN_TIME;
 			signalSystemOffset = linkTTSmall;
@@ -401,7 +401,7 @@ public final class TtCreateBraessSignals {
 			signalSystemOffset = linkTTSmall;
 			break;
 		case "signal23_3.2":
-		case "signal2_32": // signals for going straight on (upper route) at node 3
+		case "signal2_3.2": // signals for going straight on (upper route) at node 3
 			onset = 0;
 			dropping = 30 - INTERGREEN_TIME;
 			signalSystemOffset = linkTTSmall;

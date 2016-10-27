@@ -283,7 +283,7 @@ public class TaxiScheduler
     /**
      * If diversion is enabled, this method must be called after scheduling in order to make sure
      * that no vehicle is moving aimlessly.
-     * <p/>
+     * <p></p>
      * The reason: the destination/goal had been removed before scheduling (e.g. by calling the
      * {@link #removeAwaitingRequestsFromAllSchedules()} method)
      */
@@ -583,8 +583,8 @@ public class TaxiScheduler
             }
         }
     }
-    
-    
+
+
     //only for planned/started schedule
     private void cleanupScheduleAfterTaskRemoval(Schedule<TaxiTask> schedule)
     {
@@ -594,7 +594,7 @@ public class TaxiScheduler
             return;
         }
         //else: PLANNED, STARTED
-        
+
         TaxiTask lastTask = Schedules.getLastTask(schedule);
         double tBegin = schedule.getEndTime();
         double tEnd = Math.max(tBegin, schedule.getVehicle().getT1());

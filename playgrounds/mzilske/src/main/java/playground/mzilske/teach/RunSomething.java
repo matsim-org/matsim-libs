@@ -25,12 +25,12 @@ package playground.mzilske.teach;
 
 import java.io.IOException;
 
-import tutorial.fixedTimeSignals.VisSimpleTrafficSignalScenario;
+import tutorial.fixedTimeSignals.VisualizeSignalScenario;
 
 public class RunSomething {
 
 	public static void main(String[] args) throws IOException {
-		VisSimpleTrafficSignalScenario.main(args);
+		VisualizeSignalScenario.main(args);
 	}
 
 }

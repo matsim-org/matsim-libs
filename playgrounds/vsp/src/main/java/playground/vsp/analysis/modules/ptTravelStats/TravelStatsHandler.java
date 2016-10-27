@@ -117,19 +117,19 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 		this.transitVehicleId2transportModeMap.put(event.getVehicleId(), mode);
 		
 		if(!this.mode2CountsVehicles.containsKey(mode)){
-			this.mode2CountsVehicles.put(mode, new Counts());
+			this.mode2CountsVehicles.put(mode, new Counts<Link>());
 		}		
 		if(!this.mode2CountsCapacity.containsKey(mode)){
-			this.mode2CountsCapacity.put(mode, new Counts());
+			this.mode2CountsCapacity.put(mode, new Counts<Link>());
 		}
 		if(!this.mode2CountsCapacity_m.containsKey(mode)){
-			this.mode2CountsCapacity_m.put(mode, new Counts());
+			this.mode2CountsCapacity_m.put(mode, new Counts<Link>());
 		}
 		if(!this.mode2CountsPax.containsKey(mode)){
-			this.mode2CountsPax.put(mode, new Counts());
+			this.mode2CountsPax.put(mode, new Counts<Link>());
 		}
 		if(!this.mode2CountsPax_m.containsKey(mode)){
-			this.mode2CountsPax_m.put(mode, new Counts());
+			this.mode2CountsPax_m.put(mode, new Counts<Link>());
 		}
 	}
 
@@ -141,11 +141,11 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 			String mode = this.transitVehicleId2transportModeMap.get(event.getVehicleId());
 			
 			//create the counts if none exist
-			Count countVehicles = this.mode2CountsVehicles.get(mode).createAndAddCount(event.getLinkId(), event.getLinkId().toString());
-			Count countCapacity = this.mode2CountsCapacity.get(mode).createAndAddCount(event.getLinkId(), event.getLinkId().toString());
-			Count countCapacity_m = this.mode2CountsCapacity_m.get(mode).createAndAddCount(event.getLinkId(), event.getLinkId().toString());
-			Count countPax = this.mode2CountsPax.get(mode).createAndAddCount(event.getLinkId(), event.getLinkId().toString());
-			Count countPax_m = this.mode2CountsPax_m.get(mode).createAndAddCount(event.getLinkId(), event.getLinkId().toString());
+			Count<Link> countVehicles = this.mode2CountsVehicles.get(mode).createAndAddCount(event.getLinkId(), event.getLinkId().toString());
+			Count<Link> countCapacity = this.mode2CountsCapacity.get(mode).createAndAddCount(event.getLinkId(), event.getLinkId().toString());
+			Count<Link> countCapacity_m = this.mode2CountsCapacity_m.get(mode).createAndAddCount(event.getLinkId(), event.getLinkId().toString());
+			Count<Link> countPax = this.mode2CountsPax.get(mode).createAndAddCount(event.getLinkId(), event.getLinkId().toString());
+			Count<Link> countPax_m = this.mode2CountsPax_m.get(mode).createAndAddCount(event.getLinkId(), event.getLinkId().toString());
 			
 			if(countVehicles == null){
 				//get existing counts
@@ -201,7 +201,7 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 		}	
 	}
 
-	private void increaseCount(Count count, double time, double amount) {
+	private void increaseCount(Count<Link> count, double time, double amount) {
 		Integer slice = (int) (time / this.interval) + 1;
 		if(slice > this.maxSlice){
 			this.maxSlice = slice;

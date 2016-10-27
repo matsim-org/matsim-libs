@@ -36,7 +36,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.LinkVolumeHandler;
+import playground.agarwalamit.analysis.linkVolume.LinkVolumeHandler;
 import playground.agarwalamit.utils.MapUtils;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
@@ -48,7 +48,7 @@ public class CountData extends AbstractAnalysisModule {
 	private LinkVolumeHandler lvh;
 	private SortedMap<Id<Link>, Double> linkId2Vol;
 	private Map<Id<Link>, Map<Integer, Double>> linkId2TimeSlot2Vol;
-	private double countScaleFactor;
+	private final double countScaleFactor;
 
 	private final String [] linkIds = {
 			"8667___secondary","8668___secondary","4032___secondary","4034___secondary","2842___secondary","3342___secondary","10599___secondary",
@@ -97,8 +97,8 @@ public class CountData extends AbstractAnalysisModule {
 	public void init(){
 		this.lvh = new LinkVolumeHandler();
 		this.lvh.reset(0);
-		this.linkId2Vol = new TreeMap<Id<Link>, Double>();
-		this.linkId2TimeSlot2Vol = new HashMap<Id<Link>, Map<Integer,Double>>();
+		this.linkId2Vol = new TreeMap<>();
+		this.linkId2TimeSlot2Vol = new HashMap<>();
 		for(String str :this.linkIds){
 			Id<Link> id = Id.create(str, Link.class);
 			this.linkId2Vol.put(id, 0.0);
@@ -108,7 +108,7 @@ public class CountData extends AbstractAnalysisModule {
 
 	@Override
 	public List<EventHandler> getEventHandler() {
-		List<EventHandler> eh =	new LinkedList<EventHandler>();
+		List<EventHandler> eh = new LinkedList<>();
 		eh.add(this.lvh);
 		return eh ;
 	}
@@ -120,7 +120,7 @@ public class CountData extends AbstractAnalysisModule {
 
 	@Override
 	public void postProcessData() {
-		this.linkId2TimeSlot2Vol = this.lvh.getLinkId2TimeSlot2LinkVolume();
+		this.linkId2TimeSlot2Vol = this.lvh.getLinkId2TimeSlot2LinkCount();
 		getDesiredLinkVolumes();
 	}
 

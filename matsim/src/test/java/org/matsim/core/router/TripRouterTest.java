@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author thibautd
@@ -233,6 +234,11 @@ public class TripRouterTest {
 		public void setCoord(Coord coord) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public Attributes getAttributes() {
+			return delegate.getAttributes();
 		}
 	}
 }

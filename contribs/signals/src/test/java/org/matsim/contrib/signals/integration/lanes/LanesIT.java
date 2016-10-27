@@ -64,10 +64,7 @@ public class LanesIT {
 		String configFilename = testUtils.getClassInputDirectory() + "config.xml";
 		Config config = ConfigUtils.loadConfig(configFilename);
 		config.network().setInputFile("network.xml");
-		String lanes11 = testUtils.getClassInputDirectory() + "lanes.xml";
-		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
-		new LaneDefinitonsV11ToV20Converter().convert(lanes11, lanes20, config.network().getInputFileURL(config.getContext()).getFile());
-		config.network().setLaneDefinitionsFile(lanes20);
+		config.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 		config.plans().setInputFile("population.xml");
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "output");
 		final int lastIteration = 50;

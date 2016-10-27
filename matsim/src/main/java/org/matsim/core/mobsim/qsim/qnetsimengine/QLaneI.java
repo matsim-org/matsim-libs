@@ -25,14 +25,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
 
 /**
  * Essentially an interface, but since I do not want the methods public for the time being, it is incarnated as an abstract class.
- * <p/>
+ * <p></p>
  * Interface for QLanes, which (can) make up the QLinks.
  * 
  * @author nagel
@@ -60,7 +60,7 @@ abstract class QLaneI implements Identifiable<Lane> {
 
 	/**
 	 * Needs to be added _upstream_ of the regular stop location so that a possible second stop on the link can also be served.
-	 * <p/>
+	 * <p></p>
 	 * Notes:<ul>
 	 * <li> is not only used for transit and should thus be renamed.  kai, nov'14
 	 * </ul>

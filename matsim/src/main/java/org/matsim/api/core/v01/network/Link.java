@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * This interface deliberately does NOT have a back pointer ...
@@ -30,7 +31,7 @@ import org.matsim.core.utils.misc.Time;
  * the context.
  * (This becomes clear if you think about a nodeId/linkId given by person.)
  */
-public interface Link extends BasicLocation<Link> {
+public interface Link extends BasicLocation<Link>, Attributable {
 
 
 	/**

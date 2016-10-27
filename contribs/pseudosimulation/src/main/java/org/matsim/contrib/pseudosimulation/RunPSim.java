@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover;
-import org.matsim.contrib.common.randomizedtransitrouter.RandomizedTransitRouterModule;
+import org.matsim.contrib.common.randomizedtransitrouter.RandomizingTransitRouterModule;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
@@ -230,7 +230,7 @@ public class RunPSim {
                 }
             });
             disutilityFactory.setSigma(0.1);
-            matsimControler.addOverridingModule(new RandomizedTransitRouterModule());
+            matsimControler.addOverridingModule(new RandomizingTransitRouterModule());
         }
 
         if (TrackGenome) {
@@ -343,14 +343,14 @@ public class RunPSim {
 
     /**
      * @author fouriep
-     *         <p/>
+     *         <p></p>
      *         Switches between two mobility simulations, the first being the
      *         expensive one, the second being cheap.
-     *         <p/>
+     *         <p></p>
      *         Switches between the expensive sim and the cheap sim according to the
      *         config parameters used in the constructore. Always executes the
      *         expensive sim at the last iteration.
-     *         <p/>
+     *         <p></p>
      *         Raises a static boolean flag for others to read if it's currently on
      *         an expensive sim; this flag defaults to true if the mobsimswitcher is
      *         not instantiated

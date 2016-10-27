@@ -68,7 +68,7 @@ class IncidentBestRouteMobsimListener implements MobsimBeforeSimStepListener, It
 	private static final Logger log = Logger.getLogger(IncidentBestRouteMobsimListener.class);
 	
 	private final Scenario scenario;
-	private final int withinDayReplanInterval = 60;
+	private final int withinDayReplanInterval = 3600;
 	
 	private Set<Id<Person>> withinDayReplanningAgents = new HashSet<>();
 	private EditRoutes editRoutes;

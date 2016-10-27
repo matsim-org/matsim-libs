@@ -40,6 +40,10 @@ public class Matrix<T> {
 		return new Double(getString(row,column));
 	}
 	
+	public boolean getBoolean(int row, int column){
+		return new Boolean(getString(row,column));
+	}
+	
 	public int getInteger(int row, int column){
 		return new Integer((int) Math.round(new Double(getString(row,column))));
 	}

@@ -14,23 +14,21 @@ public class MovieFileCreator {
 	private final static Logger log = Logger.getLogger(MovieFileCreator.class);
 
 	public static void main(String[] args) {
-		// Parameters
-		String inputOutputRoot = "D:/Workspace/container/stockholm/";
-		String runId = "02";
-		int iteration = 100;
-		
-		// Input and output files				
-		String eventFile = inputOutputRoot + "output/" + runId + "/ITERS/it." + iteration + "/" + runId + "." + iteration + ".events.xml.gz";
-		String networkFile = "../../shared-svn/projects/stockholm/network_cleaned_simplified.xml";
-		String mviFile = inputOutputRoot + "output/" + runId + "/ITERS/it." + iteration + "/" + runId + "." + iteration + ".otfvis.mvi";
+		// Parameter
+		String runOutputRoot = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/output/counts-stations-50";
 		double snapshotPeriod = 60;
 		
-		// Initiating conversion				
+		// Files
+		String eventFile = runOutputRoot + "/output_events.xml.gz";
+		String networkFile = runOutputRoot + "/output_network.xml.gz";
+		String mviFile = runOutputRoot + "/otfvis.mvi";
+
+		// Add network to scenario
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		//scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
-		OTFEvent2MVI.convert(scenario, eventFile, mviFile, snapshotPeriod);
 		
+		// File conversion
+		OTFEvent2MVI.convert(scenario, eventFile, mviFile, snapshotPeriod);
 		log.info("Movie file " + mviFile + " created.");
 	}
 }

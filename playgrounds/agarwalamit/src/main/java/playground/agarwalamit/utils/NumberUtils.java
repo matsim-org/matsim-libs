@@ -19,6 +19,8 @@
 
 package playground.agarwalamit.utils;
 
+import java.util.Arrays;
+
 /**
 * @author amit
 */
@@ -33,6 +35,26 @@ public class NumberUtils {
 		double multiplier = Math.pow(10, decimalPlace);
 		return Math.round(number * multiplier) / multiplier;
 	}
+	
+	/**
+	 * Taken from http://www.java2s.com/Code/Java/Collections-Data-Structure/Retrivethequartilevaluefromanarray.htm
+	 * @param values the array of data
+	 * @param lowerPercent lowerPercent The percent cut off. For the lower quartile use 25,
+     *      for the upper-quartile use 75
+	 * @return the quartile value from an array
+	 */
+	public static double quartile(double[] values, double lowerPercent) {
+        if (values == null || values.length == 0) {
+            throw new IllegalArgumentException("The data array either is null or does not contain any data.");
+        }
+
+        // Rank order the values
+        double[] v = new double[values.length];
+        System.arraycopy(values, 0, v, 0, values.length);
+        Arrays.sort(v);
+        int n = (int) Math.round(v.length * lowerPercent / 100);
+        return v[n];
+    }
 }
 
 

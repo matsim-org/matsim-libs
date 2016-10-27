@@ -42,6 +42,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * Transit router network with travel, transfer, and waiting links
@@ -59,6 +60,11 @@ public final class TransitRouterNetworkWW implements Network {
 
 	private long nextNodeId = 0;
 	protected long nextLinkId = 0;
+
+	@Override
+	public Attributes getAttributes() {
+		return null;
+	}
 
 	public static final class TransitRouterNetworkNode implements Node {
 
@@ -134,6 +140,11 @@ public final class TransitRouterNetworkWW implements Network {
 		public void setCoord(Coord coord) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public Attributes getAttributes() {
+			return null;
 		}
 	}
 
@@ -282,6 +293,10 @@ public final class TransitRouterNetworkWW implements Network {
 			throw new RuntimeException("not implemented") ;
 		}
 
+		@Override
+		public Attributes getAttributes() {
+			return null;
+		}
 	}
 	public TransitRouterNetworkNode createNode(final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
 		Id<Node> id = null;

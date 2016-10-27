@@ -29,6 +29,7 @@ import org.matsim.core.controler.*;
 
 import playground.michalm.ev.*;
 import playground.michalm.ev.data.*;
+import playground.michalm.ev.data.file.ChargerReader;
 import playground.michalm.taxi.data.file.EvrpVehicleReader;
 import playground.michalm.taxi.ev.*;
 
@@ -38,7 +39,7 @@ import playground.michalm.taxi.ev.*;
  * times are deterministic. To simulate this property, we remove (1) all other traffic, and (2) link
  * capacity constraints (e.g. by increasing the capacities by 100+ times), as a result all vehicles
  * move with the free-flow speed (which is the effective speed).
- * <p/>
+ * <p></p>
  * To model the impact of traffic, we can use a time-variant network, where we specify different
  * free-flow speeds for each link over time. The default approach is to specify free-flow speeds in
  * each time interval (usually 15 minutes).
@@ -64,7 +65,7 @@ public class RunETaxiBenchmark
         final TaxiData taxiData = new TaxiData();
         new EvrpVehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
         EvData evData = new EvDataImpl();
-        new ChargerReader(scenario, evData).readFile(evCfg.getChargerFile());
+        new ChargerReader(scenario.getNetwork(), evData).readFile(evCfg.getChargerFile());
         ETaxiUtils.initEvData(taxiData, evData);
 
         Controler controler = RunTaxiBenchmark.createControler(scenario, taxiData, runs);
@@ -75,7 +76,8 @@ public class RunETaxiBenchmark
             @Override
             public void install()
             {
-                addMobsimListenerBinding().toProvider(ETaxiTimeProfileCollectorProvider.class);
+                addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
+                addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyXYDataProvider.class);
                 //override the binding in RunTaxiBenchmark
                 bind(TaxiBenchmarkStats.class).to(ETaxiBenchmarkStats.class).asEagerSingleton();
             }

@@ -49,6 +49,14 @@
 			</plugin>
 		</plugins>
 	</build>
+	<dependencies>
+		<dependency>
+			<groupId>org.matsim</groupId>
+			<artifactId>matsim-examples</artifactId>
+			<version>0.9.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 
 	<properties>
 		<svnRevision>${buildNumber}</svnRevision>

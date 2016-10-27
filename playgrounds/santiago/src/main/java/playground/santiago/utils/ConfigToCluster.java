@@ -26,7 +26,7 @@ public class ConfigToCluster {
 		cc.setOutputDirectory(pathForCluster + "output/" );
 
 		CountsConfigGroup counts = config.counts();
-		counts.setCountsFileName(pathForCluster + "input/counts_merged_VEH_C01.xml" );
+		counts.setInputFile(pathForCluster + "input/counts_merged_VEH_C01.xml" );
 
 		NetworkConfigGroup net = config.network();
 		net.setInputFile(pathForCluster + "input/network_merged_cl.xml.gz" );

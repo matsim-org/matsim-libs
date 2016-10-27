@@ -23,6 +23,7 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 	abstract Coord getCoord();
 	
 	abstract boolean isStationOpen(double time, double duration);
+	abstract boolean isResidentialCharger();
 	
 	abstract void addChargingPoint(ChargingPoint chargingPoint);
 	abstract void addChargingPlug(ChargingPlug plug);
@@ -35,13 +36,14 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 	// charging points
 	abstract ChargingNetworkOperator getChargingNetworkOperator();
 	
-	double getParkingPriceQuote(double time, double duration);
+	double getParkingCost(double time, double duration);
 	
-	double getChargingPriceQuote(double time, double duration, ChargingPlugType plugType);
+	double getChargingCost(double time, double duration, ChargingPlugType plugType, VehicleWithBattery vehicle);
 	
 	ChargingSitePolicy getChargingSitePolicy();
 
-	abstract Collection<ChargingPlugType> getAllAvailableChargingPlugTypes();
+	abstract Collection<ChargingPlugType> getAllAccessibleChargingPlugTypes();
+	abstract Collection<ChargingPlugType> getAllChargingPlugTypes();
 
 	abstract double estimateChargingSessionDuration(ChargingPlug plug);
 
@@ -51,6 +53,7 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 	abstract void setNearestLink(Link link);
 
 	abstract void createFastChargingQueue(int maxQueueLength);
+	boolean isFastChargingQueueAccessible();
 	
 	abstract void handleBeginChargeEvent(ChargingPlug plug,VehicleAgent agent);
 	abstract void handleBeginChargingSession(ChargingPlug plug,VehicleAgent agent);
@@ -64,4 +67,10 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 	void registerPlugUnavailable(ChargingPlug plug);
 
 	abstract void registerVehicleDeparture(VehicleAgent agent);
+
+	abstract int getNumAvailablePlugsOfType(ChargingPlugType plugType);
+
+	abstract void resetAll();
+
+
 }

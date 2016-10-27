@@ -314,40 +314,44 @@ public class NetworkUtils {
     /**
      * Finds the (approx.) nearest link to a given point on the map,
      * such that the point lies on the right side of the directed link,
-     * if such a link exists.<br />
+     * if such a link exists.
+	 *
      * It searches first for the nearest node, and then for the nearest link
      * originating or ending at that node and fulfilling the above constraint.
      * <p>
-     * <b>Special cases:</b> <tt>nodes:o ; links:<-- ; coord:x</tt><br/>
-     * <i>No right entry link exists</i><br/>
-     * <tt>
-     * o<-1--o returning<br/>
-     * | . . ^ nearest left<br/>
-     * |2 . 4| entry link<br/>
-     * v .x. | (link.id=3)<br/>
-     * o--3->o<br/>
-     * </tt>
-     * <br/>
-     * <i>No right entry link exists but more than one nearest left entry link exist</i><br/>
-     * <tt>
-     * o<-1--o returning<br/>
-     * | . . ^ nearest left<br/>
-     * |2 x 4| entry link with the<br/>
-     * v . . | lowest link id<br/>
-     * o--3->o (link.id=1)<br/>
-     * </tt>
-     * <br/>
-     * <i>More than one nearest right entry link exist</i><br/>
-     * <tt>
-     * o--1->o returning<br/>
-     * ^ . . | nearest right<br/>
-     * |2 x 4| entry link with the<br/>
-     * | . . v lowest link id<br/>
-     * o<-3--o (link.id=1)<br/>
-     * <br/>
-     * o<----7&8--x->o (link.id=7)<br/>
-     * </tt>
-     * </p>
+     * <b>Special cases:</b> {@code nodes:o ; links:<-- ; coord:x}
+     * <i>No right entry link exists</i>
+     * <pre>
+	 * {@code
+     * o<-1--o returning
+     * | . . ^ nearest left
+     * |2 . 4| entry link
+     * v .x. | (link.id=3)
+     * o--3->o<br>
+	 * }
+     * </pre>
+     * <i>No right entry link exists but more than one nearest left entry link exist</i>
+	 * <pre>
+	 * {@code
+	 * o<-1--o returning
+     * | . . ^ nearest left
+     * |2 x 4| entry link with the
+     * v . . | lowest link id
+     * o--3->o (link.id=1)
+	 * }
+	 * </pre>
+     * <i>More than one nearest right entry link exist</i>
+	 * <pre>
+	 * {@code
+     * o--1->o returning
+     * ^ . . | nearest right
+     * |2 x 4| entry link with the
+     * | . . v lowest link id
+     * o<-3--o (link.id=1)
+	 *
+     * o<----7&8--x->o (link.id=7)
+	 * }
+	 * </pre>
      *
      * @param coord
      *          the coordinate for which the closest link should be found
@@ -423,7 +427,7 @@ public class NetworkUtils {
     }
 
     /**
-     * Finds the (approx.) nearest link to a given point on the map.<br />
+     * Finds the (approx.) nearest link to a given point on the map.
      * It searches first for the nearest node, and then for the nearest link
      * originating or ending at that node.
      *
@@ -472,11 +476,11 @@ public class NetworkUtils {
 	 * even if there is only one link going to the right.
 	 *
 	 * @param inLink The inLink given
-	 * @return outLink, or null if there is only one outLink back to the inLinks fromNode.
+	 * @return outLink, or null if there is only one outLink back to the inLink's fromNode.
 	 */
-	public static Link getLeftLane(Link inLink){
+	public static Link getLeftmostTurnExcludingU(Link inLink){
 
-		TreeMap<Double, Link> result = getOutLinksSortedByAngle(inLink);
+		TreeMap<Double, Link> result = getOutLinksSortedClockwiseByAngle(inLink);
 
 		if (result.size() == 0){
 			return null;
@@ -485,16 +489,24 @@ public class NetworkUtils {
 	}
 
 	/**
-	 * Calculates the orientation of downstream links (MATSim slang is 'outLinks') for a given 
-	 * upstream link (slang inLink)beginning from the right if the inLink goes 
+	 * Calculates the orientation of outgoing links for a given 
+	 * incoming link beginning from the right if the inLink goes 
 	 * north to south. The most 'left' outLink comes last. The link back to the 
-	 * inLinks upstream Node (slang fromNode) is ignored. 
-	 *
+	 * inLink's upstream Node is ignored.
+	 * <br><br>
+	 * Comments/questions:<ul>
+	 * <li> What does the "north to south" part mean?  Can't we just sort outLinks right to left no matter where we come from?  kai, aug'16
+	 * <li> In fact, a test (NetworkUtilsTest.getOutLinksSortedByAngleTest()) does not confirm the javadoc.  The "north to south"
+	 * is irrelevant.  But instead, it sorts links <i> left to right </i> instead of right to left.
+	 * <br>
+	 * </ul>
+	 * If someone can confirm this, please comment out all these remarks. kai, aug'16
+	 * <br><br>
 	 * @param inLink The inLink given
-	 * @return Collection of outLinks, or an empty collection, if there is only
-	 * one outLink back to the inLinks fromNode.
+	 * @return Collection of outLinks, or an empty collection if there are only
+	 *  outLinks back to the inLink's fromNode.
 	 */
-	public static TreeMap<Double, Link> getOutLinksSortedByAngle(Link inLink){
+	public static TreeMap<Double, Link> getOutLinksSortedClockwiseByAngle(Link inLink){
 		Coord coordInLink = getVector(inLink);
 		double thetaInLink = Math.atan2(coordInLink.getY(), coordInLink.getX());
 		TreeMap<Double, Link> outLinksByOrientation = new TreeMap<>();
@@ -746,7 +758,7 @@ public class NetworkUtils {
 	}
 
 
-	public static Collection<Node> getNearestNodes2(Network network, final Coord coord, final double distance) {
+	public static Collection<Node> getNearestNodes(Network network, final Coord coord, final double distance) {
 		if ( network instanceof SearchableNetwork ) {
 			return ((SearchableNetwork)network).getNearestNodes(coord, distance);
 		} else {
@@ -754,8 +766,9 @@ public class NetworkUtils {
 		}
 	}
 
-
+	@Deprecated // use network.getFactory() instead
 	public static LinkFactoryImpl createLinkFactory() {
+		// yyyyyy Make LinkFactoryImpl invisible outside package.  Does the LinkFactory interface have to be public at all?  kai, aug'16
 		return new LinkFactoryImpl();
 	}
 }

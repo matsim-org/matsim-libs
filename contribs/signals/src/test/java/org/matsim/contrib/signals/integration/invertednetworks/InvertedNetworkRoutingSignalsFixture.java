@@ -83,6 +83,7 @@ public class InvertedNetworkRoutingSignalsFixture extends InvertedNetworkRouting
 		plan.setStartTime(0.0);
 		plan.setEndTime(23 * 3600.0);
 		plan.setCycleTime(100);
+		plan.setOffset(0);
 		controller.addSignalPlanData(plan);
 		SignalGroupSettingsData group = fsc.createSignalGroupSettingsData(Id.create(2, SignalGroup.class));
 		group.setOnset(0);

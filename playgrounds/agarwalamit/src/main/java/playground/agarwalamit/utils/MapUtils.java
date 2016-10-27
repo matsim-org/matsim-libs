@@ -21,6 +21,7 @@ package playground.agarwalamit.utils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -34,23 +35,17 @@ import org.matsim.api.core.v01.Id;
 public final class MapUtils {
 
 	private MapUtils(){}
-
-	public static int intValueSum(final Map<?, Integer> intMap){
+	
+    public static int intValueSum(final Map<?, Integer> intMap){
 		if(intMap==null ) throw new NullPointerException("The map is null. Aborting ...");
-		int sum =0;
-		for(Integer i :intMap.values()){
-			sum+=i;	
-		}
-		return sum;
+
+		return intMap.values().parallelStream().reduce(0, Integer::sum);
 	}
 
 	public static double doubleValueSum(final Map<?, Double> doubleMap){
 		if(doubleMap==null ) throw new NullPointerException("The map is null. Aborting ...");
-		double sum =0;
-		for(Double i :doubleMap.values()){
-			sum+=i;	
-		}
-		return sum;
+
+		return doubleMap.values().parallelStream().reduce(0.0, Double::sum);
 	}
 	/**
 	 * @return m1-m2
@@ -60,7 +55,7 @@ public final class MapUtils {
 		if(m1==null || m2 ==null) throw new NullPointerException("Either of the maps is null. Aborting ...");
 		Set<Id<T>> keys = new HashSet<>(m1.keySet());
 		keys.addAll(m2.keySet());
-		Map<Id<T>, Double> outMap = new HashMap<Id<T>, Double>();
+		Map<Id<T>, Double> outMap = new HashMap<>();
 		for(Id<T> id : keys){
 			double v1 = m1.containsKey(id) ? m1.get(id) : 0;
 			double v2 = m2.containsKey(id) ? m2.get(id) : 0;
@@ -83,24 +78,24 @@ public final class MapUtils {
 		return outMap;
 	}
 
-	public static SortedMap<String, Double> getIntPercentShare(final SortedMap<String, Integer> inMap){
-		SortedMap<String, Double> outMap = new TreeMap<>();
+	public static <T> SortedMap<T, Double> getIntPercentShare(final SortedMap<T, Integer> inMap){
+		SortedMap<T, Double> outMap = new TreeMap<>();
 		double valueSum = (double) MapUtils.intValueSum(inMap);
-		for(String str : inMap.keySet()) {
-			double legs = (double) inMap.get(str);
-			double pctShare = NumberUtils.round( legs*100. / valueSum, 3); 
-			outMap.put(str, pctShare);
+		for(Entry<T,Integer> e : inMap.entrySet()){
+			double legs = (double) e.getValue();
+			double pctShare = NumberUtils.round( legs*100. / valueSum, 3);
+			outMap.put(e.getKey(), pctShare);
 		}
 		return outMap;
 	}
-	
-	public static SortedMap<String, Double> getDoublePercentShare(final SortedMap<String, Double> inMap){
-		SortedMap<String, Double> outMap = new TreeMap<>();
+
+	public static <T> SortedMap<T, Double> getDoublePercentShare(final SortedMap<T, Double> inMap){
+		SortedMap<T, Double> outMap = new TreeMap<>();
 		double valueSum = MapUtils.doubleValueSum(inMap);
-		for(String str : inMap.keySet()) {
-			double legs = (double) inMap.get(str);
-			double pctShare = NumberUtils.round( legs*100. / valueSum, 3); 
-			outMap.put(str, pctShare);
+		for(Entry<T,Double> e : inMap.entrySet()){
+			double legs = (double) e.getValue();
+			double pctShare = NumberUtils.round( legs*100. / valueSum, 3);
+			outMap.put(e.getKey(), pctShare);
 		}
 		return outMap;
 	}

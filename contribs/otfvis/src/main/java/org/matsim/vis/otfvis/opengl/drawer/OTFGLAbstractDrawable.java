@@ -22,7 +22,7 @@ package org.matsim.vis.otfvis.opengl.drawer;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
-
+import com.jogamp.opengl.GLContext;
 
 
 /**
@@ -41,20 +41,8 @@ import com.jogamp.opengl.GLAutoDrawable;
  */
 public abstract class OTFGLAbstractDrawable {
 
-	// We need to statically cache the GL context here. The reason is that OTFDrawable tries to 
-	// be a common interface for things which are drawable by Swing and things which are drawable by OpenGL.
-	// So the context is not passed in with every call to draw (as would usually be the case).
-	// So we have to cache it. In the OpenGL community, it is generally
-	// recommended *not* to store GL contexts anywhere, because the driver may create and pass
-	// a new one at any time.  michaz
-	private static GLAutoDrawable gl;
-
-    public static GLAutoDrawable getDrawable() {
-        return gl;
-    }
-
 	public final void draw() {
-		onDraw(gl.getGL().getGL2());
+		onDraw(GLContext.getCurrentGL().getGL2());
 	}
 	
 	/**
@@ -65,7 +53,7 @@ public abstract class OTFGLAbstractDrawable {
 	 * when the OpenGL context changes.
 	 */
 	public final void glInit() {
-		onInit(gl.getGL().getGL2());
+		onInit(GLContext.getCurrentGL().getGL2());
 	}
 	
 	protected void onInit(GL2 gl) {
@@ -74,12 +62,8 @@ public abstract class OTFGLAbstractDrawable {
 	
 	abstract protected void onDraw( GL2 gl ) ;
 
-	static void setGl(GLAutoDrawable gl) {
-		OTFGLAbstractDrawable.gl = gl;
-	}
-	
 	public final static GL2 getGl() {
-		return gl.getGL().getGL2();
+		return GLContext.getCurrentGL().getGL2();
 	}
 
 }

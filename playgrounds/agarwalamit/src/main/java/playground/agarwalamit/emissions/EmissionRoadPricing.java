@@ -57,15 +57,15 @@ public class EmissionRoadPricing {
 		this.weam = this.emissionModule.getWarmEmissionHandler().getWarmEmissionAnalysisModule();
 	}
 
-	private RoadPricingSchemeImpl scheme;
+	private final RoadPricingSchemeImpl scheme;
 	private final double dayStartTime = 0;
 	private final double dayEndTime = 30*3600;
-	private double timeBinSize;
-	private Scenario sc;
-	private EmissionModule emissionModule;
-	private WarmEmissionAnalysisModule weam;
+	private final double timeBinSize;
+	private final Scenario sc;
+	private final EmissionModule emissionModule;
+	private final WarmEmissionAnalysisModule weam;
 	private final Integer roadType =28;
-	private EmissionCostModule ecm ;
+	private final EmissionCostModule ecm ;
 
 	/**
 	 * Setting initial cost as zero for all links.

@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -38,6 +39,7 @@ import contrib.publicTransitMapping.config.OsmConverterConfigGroup;
 import contrib.publicTransitMapping.osm.lib.*;
 import contrib.publicTransitMapping.tools.NetworkTools;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -103,7 +105,7 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 		readWayParams();
 		parse();
 		convertToNetwork();
-		cleanNetwork();
+		cleanRoadNetwork();
 	}
 
 	/**
@@ -155,9 +157,6 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 	 * Converts the parsed osm data to MATSim nodes and links.
 	 */
 	private void convertToNetwork() {
-		if(this.network instanceof Network) {
-			((Network) this.network).setCapacityPeriod(3600);
-		}
 
 		// store of which relation a way is part of
 		for(OsmParser.OsmRelation relation : this.relations.values()) {
@@ -489,10 +488,8 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				l.setAllowedModes(modes);
-				if(l instanceof Link) {
-					final String id1 = origId;
-					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
-				}
+				NetworkUtils.setOrigId(l, origId );
+
 				network.addLink(l);
 				this.id++;
 			}
@@ -503,10 +500,8 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				l.setAllowedModes(modes);
-				if(l instanceof Link) {
-					final String id1 = origId;
-					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
-				}
+				NetworkUtils.setOrigId(l, origId);
+
 				network.addLink(l);
 				this.id++;
 			}
@@ -516,13 +511,19 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 	/**
 	 * Runs the network cleaner on the street network.
 	 */
-	private void cleanNetwork() {
+	private void cleanRoadNetwork() {
+		String tmpFilename = "tmpNetwork.xml.gz";
 		Set<String> roadModes = CollectionUtils.stringToSet("car,bus");
 		Network roadNetwork = NetworkTools.filterNetworkByLinkMode(network, roadModes);
 		Network restNetwork = NetworkTools.filterNetworkExceptLinkMode(network, roadModes);
+
 		new NetworkCleaner().run(roadNetwork);
-		NetworkTools.integrateNetwork(roadNetwork, restNetwork);
-		this.network = roadNetwork;
+		new NetworkWriter(roadNetwork).write(tmpFilename);
+		Network roadNetworkReadAgain = NetworkTools.readNetwork(tmpFilename);
+		if(!new File(tmpFilename).delete()) { log.info("Could not delete temporary road network file"); }
+		new NetworkCleaner().run(roadNetworkReadAgain);
+		NetworkTools.integrateNetwork(roadNetworkReadAgain, restNetwork);
+		this.network = roadNetworkReadAgain;
 	}
 
 	private void writeNetwork() {

@@ -100,7 +100,7 @@ public class SamplingPlans {
 			if(noOfPersons!=0){
 				double requiredPersons = Math.ceil(this.samplingRatio*noOfPersons);
 				double addedPersons =0;
-				List<Person> persons = new ArrayList<Person>();
+				List<Person> persons = new ArrayList<>();
 				persons.addAll(this.binToPopulation.get(str).getPersons().values());
 				do{
 					Person p = persons.get(MatsimRandom.getRandom().nextInt(persons.size()));
@@ -142,7 +142,7 @@ public class SamplingPlans {
 
 	private void initiateBinsPopulationMap(){
 		this.log.info("Initializing binId2Population Map...");
-		this.binToPopulation = new TreeMap<String, Population>();
+		this.binToPopulation = new TreeMap<>();
 		for(int x=0;x<this.noOfXbins;x++){
 			for(int y =0;y<this.noOfYbins;y++){
 				Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -184,7 +184,7 @@ public class SamplingPlans {
 	}
 
 	private SortedMap<String, Double> calculateModeShare(SortedMap<String, Integer> mode2NoOfLegs) {
-		SortedMap<String, Double> mode2Pct = new TreeMap<String, Double>();
+		SortedMap<String, Double> mode2Pct = new TreeMap<>();
 		int totalNoOfLegs = 0;
 		for(String mode : mode2NoOfLegs.keySet()){
 			int modeLegs = mode2NoOfLegs.get(mode);
@@ -198,7 +198,7 @@ public class SamplingPlans {
 	}
 
 	private SortedMap<String, Integer> calculateMode2LegCount(Population population) {
-		SortedMap<String, Integer> mode2NoOfLegs = new TreeMap<String, Integer>();
+		SortedMap<String, Integer> mode2NoOfLegs = new TreeMap<>();
 
 		for(Person person : population.getPersons().values()){
 			Plan plan = person.getSelectedPlan();

@@ -33,16 +33,4 @@ public class LinkTimePair
         this.link = link;
         this.time = time;
     }
-
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (! (obj instanceof LinkTimePair)) {
-            return false;
-        }
-
-        LinkTimePair pair = (LinkTimePair)obj;
-        return link.equals(pair.link) && time == pair.time;
-    }
 }

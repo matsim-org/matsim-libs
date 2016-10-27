@@ -102,7 +102,7 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalysisModule {
 				for(Volume v: c.getVolumes().values()){
 					total += v.getValue();
 				}
-				temp.put(c.getLocId(), total);
+				temp.put(c.getId(), total);
 			}
 			this.mode2Link2Total.put(e.getKey(), temp);
 		}
@@ -133,9 +133,9 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalysisModule {
 		for(Count c: counts.getCounts().values()){
 			featureAttribs = new Object[2 + this.handler.getMaxTimeSlice() + 1];
 			//create linestring from link
-			Link l = this.sc.getNetwork().getLinks().get(Id.create(c.getCsId(), Link.class));
+			Link l = this.sc.getNetwork().getLinks().get(Id.create(c.getCsLabel(), Link.class));
 			if(l == null){
-				log.debug("can not find link " + c.getLocId());
+				log.debug("can not find link " + c.getId());
 				log.debug("links #" + this.sc.getNetwork().getLinks().size());
 				continue;
 			}
@@ -145,8 +145,8 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalysisModule {
 			LineString ls = new GeometryFactory().createLineString(new CoordinateArraySequence(coord));
 			//###
 			featureAttribs[0] = ls;
-			featureAttribs[1] = c.getLocId().toString();
-			featureAttribs[2] = mode2Total.get(c.getLocId());
+			featureAttribs[1] = c.getId().toString();
+			featureAttribs[2] = mode2Total.get(c.getId());
 			for(int i = 0; i < this.handler.getMaxTimeSlice() ; i++){
 				if(c.getVolume(i+1) == null){
 					featureAttribs[3 + i] = 0.;

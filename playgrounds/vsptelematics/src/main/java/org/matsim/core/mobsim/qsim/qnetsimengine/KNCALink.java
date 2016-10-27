@@ -54,7 +54,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl.LaneFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
-import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;

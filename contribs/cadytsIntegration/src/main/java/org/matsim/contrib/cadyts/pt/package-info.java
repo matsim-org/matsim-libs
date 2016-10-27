@@ -48,7 +48,7 @@
  *
  * </li>
  * <li> There also needs to be a ptCounts entry, something like:
- * <br/>
+ * <br>
  * <pre>
  * 	&lt;module name="ptCounts"&gt;
  *		&lt;param name="inputOccupancyCountsFile" value="path-to-counts-file" /&gt;

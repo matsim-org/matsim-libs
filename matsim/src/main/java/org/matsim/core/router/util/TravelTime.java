@@ -27,7 +27,7 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * A simple interface to retrieve the travel time on links.
- * <br/>
+ * <br>
  * For an example of how to replace this, see {@link tutorial.programming.example20customTravelTime.RunCustomTravelTimeExample }.
  *
  * @author mrieser

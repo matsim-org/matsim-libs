@@ -33,6 +33,7 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import playground.sergioo.passivePlanning2012.core.population.PlacesConnoisseur;
 import playground.sergioo.passivePlanning2012.core.population.PlacesConnoisseur.KnownPlace;
 import playground.sergioo.passivePlanning2012.core.population.PlacesSharer;
@@ -43,6 +44,7 @@ import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning
 //import playground.sergioo.scheduling2013.gui.MainApplet;
 
 public class SchedulingNetwork implements Network {
+
 
 	//Predecessor
 	
@@ -115,6 +117,10 @@ public class SchedulingNetwork implements Network {
 			this.delegateNode.setCoord(coord);
 		}
 
+		@Override
+		public Attributes getAttributes() {
+			return delegateNode.getAttributes();
+		}
 	}
 	
 	public abstract class SchedulingLink implements Link {
@@ -229,7 +235,11 @@ public class SchedulingNetwork implements Network {
 		public Set<String> getAllowedModes() {
 			return null;
 		}
-	
+
+		@Override
+		public Attributes getAttributes() {
+			throw new UnsupportedOperationException();
+		}
 	}
 	
 	public class ActivitySchedulingLink extends SchedulingLink {
@@ -906,5 +916,9 @@ public class SchedulingNetwork implements Network {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
-	
+
+	@Override
+	public Attributes getAttributes() {
+		throw new UnsupportedOperationException();
+	}
 }

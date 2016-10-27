@@ -59,7 +59,7 @@ public class SubPopulationPlans4Patna {
 	}
 
 	private static final Logger LOG = Logger.getLogger(SubPopulationPlans4Patna.class);
-	private Scenario scenario;
+	private final Scenario scenario;
 
 	private Collection<SimpleFeature> features;
 

@@ -65,6 +65,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import com.google.inject.Provider;
@@ -85,15 +87,12 @@ public class ControlerTest {
 	public static Collection<Object> parameterObjects () {
 		Object [] capacityUpdates = new Object [] { false, true };
 		return Arrays.asList(capacityUpdates);
+		// yyyy I am not sure why it is doing this ... it is necessary to do this around the qsim, but why here?  kai, aug'16
 	}
 	
 	@Test
 	public void testScenarioLoading() {
-		// used to use the String[] constructor, but this makes it use the output/equil/ output directory,
-		// which is problematic as we need a "false" run to check if the scenario is initialized after recent changes
-		// td feb 16
-		// Controler controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
-		final Config config = utils.loadConfig( "test/scenarios/equil/config.xml" );
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		Controler controler = new Controler( config );
 
 		// need to run the controler to get Scenario initilized
@@ -110,7 +109,7 @@ public class ControlerTest {
 
 	@Test
 	public void testTerminationCriterion() {
-		Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		Controler controler = new Controler(config);
 		controler.setTerminationCriterion(new TerminationCriterion() {
@@ -124,7 +123,8 @@ public class ControlerTest {
 
 	@Test
 	public void testConstructor_EventsManagerTypeImmutable() {
-		MatsimServices controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		MatsimServices controler = new Controler(config);
 		try {
 			controler.getConfig().setParam("parallelEventHandling", "numberOfThreads", "2");
 			Assert.fail("Expected exception");
@@ -163,7 +163,7 @@ public class ControlerTest {
 		plan1.addActivity(a1);
 		Leg leg1 = factory.createLeg(TransportMode.car);
 		plan1.addLeg(leg1);
-		NetworkRoute route1 = ((PopulationFactory) f.scenario.getPopulation().getFactory()).getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
+		NetworkRoute route1 = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 		leg1.setRoute(route1);
 		ArrayList<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		linkIds.add(f.link2.getId());
@@ -179,7 +179,7 @@ public class ControlerTest {
 		plan2.addActivity(a2);
 		Leg leg2 = factory.createLeg(TransportMode.car);
 		plan2.addLeg(leg2);
-		NetworkRoute route2 = ((PopulationFactory) f.scenario.getPopulation().getFactory()).getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
+		NetworkRoute route2 = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 		leg2.setRoute(route2);
 		route2.setLinkIds(f.link1.getId(), linkIds, f.link3.getId());
 		plan2.addActivity(factory.createActivityFromLinkId("h", f.link3.getId()));
@@ -496,16 +496,18 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testSetWriteEventsInterval() {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(10);
 		config.controler().setWritePlansInterval(0);
 
 		final Controler controler = new Controler(config);
 		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
 				3 == controler.getConfig().controler().getWriteEventsInterval());
+
 		controler.getConfig().controler().setWriteEventsInterval(3);
 		assertEquals(3, controler.getConfig().controler().getWriteEventsInterval());
-        controler.getConfig().controler().setCreateGraphs(false);
+
+		controler.getConfig().controler().setCreateGraphs(false);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -538,7 +540,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testSetWriteEventsIntervalConfig() {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(10);
 		config.controler().setWritePlansInterval(0);
 
@@ -579,7 +581,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testSetWriteEventsNever() {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(1);
 		config.controler().setWritePlansInterval(0);
 
@@ -612,7 +614,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testSetWriteEventsAlways() {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(1);
 		config.controler().setWritePlansInterval(0);
 
@@ -643,7 +645,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testSetWriteEventsXml() {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);
 		config.controler().setWritePlansInterval(0);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
@@ -674,7 +676,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testSetDumpDataAtEnd_true() {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);
 		config.controler().setWritePlansInterval(0);
 
@@ -704,7 +706,7 @@ public class ControlerTest {
 	 */
 	@Test
 	public void testSetDumpDataAtEnd_false() {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);
 		config.controler().setWritePlansInterval(0);
 
@@ -732,7 +734,7 @@ public class ControlerTest {
 
 	@Test(expected = RuntimeException.class)
 	public void testShutdown_UncaughtException() throws InterruptedException {
-		final Config config = ControlerTest.this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(1);
 
 		Controler controler = new Controler(config);
@@ -749,7 +751,7 @@ public class ControlerTest {
 
 	@Test
 	public void test_ExceptionOnMissingPopulationFile() {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
@@ -785,7 +787,7 @@ public class ControlerTest {
 	@Test
 	public void test_ExceptionOnMissingNetworkFile() {
 		try {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
@@ -820,7 +822,7 @@ public class ControlerTest {
 	@Test
 	public void test_ExceptionOnMissingFacilitiesFile() {
 		try {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
@@ -854,7 +856,7 @@ public class ControlerTest {
 
 	@Test
 	public void testKMLSnapshotWriterOnQSim() {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(2);
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
@@ -875,7 +877,7 @@ public class ControlerTest {
 
 	@Test
 	public void testOneSnapshotWriterInConfig() {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
@@ -892,7 +894,7 @@ public class ControlerTest {
 
 	@Test
 	public void testTransimsSnapshotWriterOnQSim() {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(2);
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
@@ -920,7 +922,7 @@ public class ControlerTest {
 	 */
 	@Test( expected = RuntimeException.class )
 	public void testGuiceModulesCannotAddModules() {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration( 0 );
 		final Controler controler = new Controler( config );
 

@@ -70,7 +70,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  * AStarEuclidean does not calculate least-cost paths anymore but tends to deliver distance-minimal
  * paths. The greater the overdo factor, the faster the algorithm but the more the calculated routes
  * diverge from the least-cost ones.<br />
- * A typical invocation then looks like this:<br/>
+ * A typical invocation then looks like this:<br>
  * <code>LeastCostPathCalculator routingAlgo = new AStarEuclidean(network, preProcessData, 2);</code>
  * <br />
  * @see org.matsim.core.router.util.PreProcessEuclidean

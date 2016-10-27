@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -29,6 +30,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 
+import playground.agarwalamit.utils.AreaFilter;
+import playground.agarwalamit.utils.PersonFilter;
 import playground.vsp.congestion.events.CongestionEventsReader;
 
 /**
@@ -39,17 +42,34 @@ import playground.vsp.congestion.events.CongestionEventsReader;
  */
 
 public class CausedDelayAnalyzer {
-	private final CausedDelayHandler handler;
+	
+	private final static Logger LOGGER = Logger.getLogger(CausedDelayAnalyzer.class);
+	
+	private final FilteredCausedDelayHandler handler;
 	private final String eventsFile;
 	
-	public CausedDelayAnalyzer(final String eventsFile, final Scenario scenario, final int noOfTimeBin) {
-		this.eventsFile = eventsFile;
-		this.handler = new CausedDelayHandler(scenario, noOfTimeBin);
+	public CausedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins, 
+			final String userGroup, final PersonFilter personFilter, final AreaFilter areaFilter) {
+		this.eventsFile = eventFile;
+		this.handler = new FilteredCausedDelayHandler(scenario, noOfTimeBins, userGroup, personFilter, areaFilter);
+		LOGGER.info("Area and user group filtering is used, links fall inside the given shape and belongs to the given user group will be considered.");
 	}
-
-	public CausedDelayAnalyzer(final String eventsFile, final Scenario scenario,final  int noOfTimeBin, final boolean sortingForInsideMunich) {
-		this.eventsFile = eventsFile;
-		this.handler = new CausedDelayHandler(scenario, noOfTimeBin, sortingForInsideMunich);
+	
+	public CausedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins, 
+			final String userGroup, final PersonFilter personFilter) {
+		this(eventFile, scenario, noOfTimeBins, userGroup, personFilter, null);
+		LOGGER.info("Usergroup filtering is used, result will include all links but persons from given user group only.");
+	}
+	
+	public CausedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins, 
+			final AreaFilter areaFilter) {
+		this(eventFile, scenario, noOfTimeBins, null, null, areaFilter);
+		LOGGER.info("Area filtering is used, result will include links falls inside the given shape and persons from all user groups.");
+	}
+	
+	public CausedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins) {
+		this(eventFile, scenario, noOfTimeBins, null, null, null);
+		LOGGER.info("No filtering is used, result will include all links, persons from all user groups.");
 	}
 
 	public void run(){

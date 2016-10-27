@@ -66,25 +66,25 @@ public class PatnaCalibrationUtils {
 
 	public static int getIncomeInterval( final String monthlyIncome){
 
-		int inc = Integer.valueOf(monthlyIncome);
+		double inc = Double.valueOf(monthlyIncome);
 
-		if( inc <= 500) return 1;
-		else if (inc <= 1000) return 2;
-		else if (inc <= 3000) return 3;
-		else if (inc <= 5000) return 4;
-		else if (inc <= 7500) return 5;
-		else if (inc <= 1000) return 6;
+		if( inc <= 500.) return 1;
+		else if (inc <= 1000.) return 2;
+		else if (inc <= 3000.) return 3;
+		else if (inc <= 5000.) return 4;
+		else if (inc <= 7500.) return 5;
+		else if (inc <= 1000.) return 6;
 		else  return 7;
 	}
 
 	public static int getDailyExpenditureInterval( final String dailyExpenditure){
 
-		int cost = Integer.valueOf(dailyExpenditure);
+		double cost = Double.valueOf(dailyExpenditure);
 
-		if( cost <= 10) return 1;
-		else if (cost <= 25) return 2;
-		else if (cost <= 50) return 3;
-		else if (cost <= 100) return 4;
+		if( cost <= 10.) return 1;
+		else if (cost <= 25.) return 2;
+		else if (cost <= 50.) return 3;
+		else if (cost <= 100.) return 4;
 		else  return 5;
 	}
 

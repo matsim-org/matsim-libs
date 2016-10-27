@@ -69,11 +69,16 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 				
 				// 1) proportional term
 				toll += this.K_p * averageDelay;
-				
+		
 				// 2) integral term
 				double totalDelay = 0.;
 				if (this.congestionInfo.getlinkInfos().get(linkId).getTime2value().containsKey(intervalNr)) {
-					totalDelay = this.congestionInfo.getlinkInfos().get(linkId).getTime2value().get(intervalNr) + averageDelay;
+					// artificial reset to zero if congestion is eliminated
+					if (averageDelay <= congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
+						totalDelay = 0.0;
+					} else {
+						totalDelay = this.congestionInfo.getlinkInfos().get(linkId).getTime2value().get(intervalNr) + averageDelay;
+					}
 					this.congestionInfo.getlinkInfos().get(linkId).getTime2value().put(intervalNr, totalDelay);
 				} else {
 					totalDelay = averageDelay;

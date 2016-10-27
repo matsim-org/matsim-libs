@@ -22,8 +22,15 @@
  */
 package org.matsim.contrib.accessibility.run;
 
-import junit.framework.Assert;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -45,7 +52,6 @@ import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -60,11 +66,7 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import junit.framework.Assert;
 
 /**
  * @author nagel
@@ -76,6 +78,7 @@ public class AccessibilityIntegrationTest {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
+//	@Ignore
 	@SuppressWarnings("static-method")
 	@Test
 	public void testMainMethod() {
@@ -330,18 +333,30 @@ public class AccessibilityIntegrationTest {
 						
 					} else if(x == 50 && y == 150){
 						
-						expected.accessibilityFreespeed = 2.1555292541877;
-						expected.accessibilityCar = 2.1555292541877;
-						expected.accessibilityBike = 2.20170415738971;
-						expected.accessibilityWalk = 1.88907197432798;
+						// corrected with change in orthogonal projection computation
+//						expected.accessibilityFreespeed = 2.1555292541877;
+//						expected.accessibilityCar = 2.1555292541877;
+//						expected.accessibilityBike = 2.20170415738971;
+//						expected.accessibilityWalk = 1.88907197432798;
+//						expected.accessibilityPt = 0.461863556339195;
+						expected.accessibilityFreespeed = 2.1766435716006005;
+						expected.accessibilityCar = 2.1766435716006005;
+						expected.accessibilityBike = 2.2445468698643367;
+						expected.accessibilityWalk = 1.7719146868026079;
 						expected.accessibilityPt = 0.461863556339195;
 						
 					} else if(x == 150 && y == 150){
 						
-						expected.accessibilityFreespeed = 2.18445595855523;
-						expected.accessibilityCar = 2.18445595855523;
-						expected.accessibilityBike = 2.22089493905874;
-						expected.accessibilityWalk = 1.9683225787191;
+						// corrected with change in orthogonal projection computation
+//						expected.accessibilityFreespeed = 2.18445595855523;
+//						expected.accessibilityCar = 2.18445595855523;
+//						expected.accessibilityBike = 2.22089493905874;
+//						expected.accessibilityWalk = 1.9683225787191;
+//						expected.accessibilityPt = 0.624928280738513;
+						expected.accessibilityFreespeed = 2.2055702759681273;
+						expected.accessibilityCar = 2.2055702759681273;
+						expected.accessibilityBike = 2.2637376515333636;
+						expected.accessibilityWalk = 1.851165291193725;
 						expected.accessibilityPt = 0.624928280738513;
 						
 					}
@@ -453,6 +468,7 @@ public class AccessibilityIntegrationTest {
 		public void install() {
 			addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
 				@Inject Scenario scenario;
+				@Inject Config config;
 				@Inject ActivityFacilities opportunities;
 				@Inject Map<String, TravelTime> travelTimes;
 				@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;

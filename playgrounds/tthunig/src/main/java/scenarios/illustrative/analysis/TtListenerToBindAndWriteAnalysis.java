@@ -31,8 +31,8 @@ import com.google.inject.Inject;
 import playground.dziemke.analysis.GnuplotUtils;
 
 /**
- * Class to bind the analyze tool (given in the constructor) and the writing
- * tool to the simulation. It works for all analyze tools that extend the
+ * Class to bind the analyze and writing tool to the simulation. 
+ * It works for all analyze tools that extend the
  * abstract analyze tool TtAbstractAnalyzeTool.
  * 
  * @author tthunig

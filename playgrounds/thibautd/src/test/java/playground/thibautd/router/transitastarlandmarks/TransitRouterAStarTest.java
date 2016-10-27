@@ -34,7 +34,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.router.FakeFacility;
 import org.matsim.pt.router.MultiNodeDijkstra;
-import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.testcases.MatsimTestUtils;

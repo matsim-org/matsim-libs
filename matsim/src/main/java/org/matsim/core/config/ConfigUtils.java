@@ -20,12 +20,15 @@
 package org.matsim.core.config;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
@@ -67,13 +70,15 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	}
 
 	public static Config loadConfig(final URL url, ConfigGroup... customModules) throws UncheckedIOException {
+		Gbl.assertNotNull(url);
+		
 		Config config = new Config();
 		config.addCoreModules();
 
 		for (ConfigGroup customModule : customModules) {
 			config.addModule(customModule);
 		}
-
+		
 		new ConfigReader(config).parse(url);
 		config.setContext(url);
 		return config;
@@ -144,7 +149,7 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		config.network().setInputFile(getAbsolutePath(prefix, config.network().getInputFile()));
 		config.plans().setInputFile(getAbsolutePath(prefix, config.plans().getInputFile()));
 		config.facilities().setInputFile(getAbsolutePath(prefix, config.facilities().getInputFile()));
-		config.counts().setCountsFileName(getAbsolutePath(prefix, config.counts().getCountsFileName()));
+		config.counts().setInputFile(getAbsolutePath(prefix, config.counts().getCountsFileName()));
 		config.households().setInputFile(getAbsolutePath(prefix, config.households().getInputFile()));
 	}
 

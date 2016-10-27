@@ -44,12 +44,12 @@ public class CreateCrossingsTimetable {
 
 	/**
 	 * Creates a timetable (network change events file)
-	 * @param args [0] inputNetworkFile<br/>
-	 *             [1] inputCrossingsFile<br/>
-	 *             [2] inputEventsFile<br/>
-	 *             [3] outputNetworkChangeEventsFile<br/>
-	 *             [4] preBuffer<br/>
-	 *             [5] postBuffer<br/>
+	 * @param args [0] inputNetworkFile<br>
+	 *             [1] inputCrossingsFile<br>
+	 *             [2] inputEventsFile<br>
+	 *             [3] outputNetworkChangeEventsFile<br>
+	 *             [4] preBuffer<br>
+	 *             [5] postBuffer<br>
 	 */
 	public static void main(String[] args) {
 		double preBuffer = Double.parseDouble(args[4]);

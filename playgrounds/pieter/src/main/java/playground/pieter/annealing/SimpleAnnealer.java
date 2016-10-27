@@ -15,7 +15,7 @@ import org.matsim.core.replanning.StrategyManager;
 
 /**
  * @author fouriep
- *         <p/>
+ *         <p></p>
  *         performs geometric
  * 
  */

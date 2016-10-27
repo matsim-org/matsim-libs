@@ -86,7 +86,7 @@ public class SpatialInterpolation {
 	 * Used to clear the cell weights map.
 	 */
 	public final void reset(){
-		this.cellWeights = new HashMap<Point, Double>();
+		this.cellWeights = new HashMap<>();
 		for(Point p :this.grid.getGrid().values()){
 			if ( isCellIncludedForInterpolation(p) ) this.cellWeights.put(p, 0.);
 		}
@@ -94,7 +94,7 @@ public class SpatialInterpolation {
 	}
 
 	/**
-	 * @return general grid of cells from pre defined bounding box
+	 * general grid of cells from pre defined bounding box
 	 */
 	private void createGridFromBoundingBox (){
 		gf = new GeometryFactory();
@@ -172,9 +172,7 @@ public class SpatialInterpolation {
 	}
 
 	/**
-	 * @param point
-	 * <p> No normalization, simple count in each cell, made specially for population density count.
-	 */
+     */
 	public void processLocationForDensityCount(final Activity act, final double countScaleFactor){
 
 		Coordinate actCoordinate = new Coordinate (act.getCoord().getX(),act.getCoord().getY());

@@ -52,7 +52,7 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 
 	public static Logger log =Logger.getLogger(MyTollAveragerControlerListner.class);
 
-	private Map<Id<Person>, Double> pId2Tolls= new HashMap<>();
+	private final Map<Id<Person>, Double> pId2Tolls= new HashMap<>();
 	private Map<Id<Person>, Double> pId2NowTolls= new HashMap<>();
 	private MutableScenario scenario;
 	private BufferedWriter writer;

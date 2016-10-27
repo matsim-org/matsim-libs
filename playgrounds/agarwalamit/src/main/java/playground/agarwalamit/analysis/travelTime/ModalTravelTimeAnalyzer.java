@@ -33,24 +33,30 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.utils.ListUtils;
+import playground.agarwalamit.utils.PersonFilter;
 
 /**
  * @author amit
  */
 
 public class ModalTravelTimeAnalyzer {
-	private final SortedMap<String, Double> mode2AvgTripTime = new TreeMap<String, Double>();
-	private final SortedMap<String, Integer> mode2NumberOfLegs = new TreeMap<String, Integer>();
-	private final SortedMap<String, Double> mode2TotalTravelTime = new TreeMap<String, Double>();
+	private final SortedMap<String, Double> mode2AvgTripTime = new TreeMap<>();
+	private final SortedMap<String, Integer> mode2NumberOfLegs = new TreeMap<>();
+	private final SortedMap<String, Double> mode2TotalTravelTime = new TreeMap<>();
 	
-	private final SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TotalTravelTime = new TreeMap<String, Map<Id<Person>,Double>>();
-	private final SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2AvgTravelTime = new TreeMap<String, Map<Id<Person>,Double>>();
+	private final SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TotalTravelTime = new TreeMap<>();
+	private final SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2AvgTravelTime = new TreeMap<>();
 	
-	private final ModalTripTravelTimeHandler travelTimeHandler = new ModalTripTravelTimeHandler();
+	private final FilteredModalTripTravelTimeHandler travelTimeHandler ;
 	private final String eventsFile;
 	
 	public ModalTravelTimeAnalyzer(final String inputEventsFile) {
+		this(inputEventsFile,null,null);
+	}
+	
+	public ModalTravelTimeAnalyzer(final String inputEventsFile, final String userGroup, final PersonFilter pf) {
 		this.eventsFile = inputEventsFile;
+		travelTimeHandler = new FilteredModalTripTravelTimeHandler(userGroup, pf);
 	}
 	
 	public static void main(String[] args) {
@@ -109,8 +115,8 @@ public class ModalTravelTimeAnalyzer {
 		SortedMap<String, Map<Id<Person>, List<Double>>> times = travelTimeHandler.getLegMode2PesonId2TripTimes();
 		
 		for(String mode: times.keySet()){
-			Map<Id<Person>, Double> personId2TotalTravelTime = new HashMap<Id<Person>, Double>();
-			Map<Id<Person>, Double> personId2AvgTravelTime = new HashMap<Id<Person>, Double>();
+			Map<Id<Person>, Double> personId2TotalTravelTime = new HashMap<>();
+			Map<Id<Person>, Double> personId2AvgTravelTime = new HashMap<>();
 			
 			for(Id<Person> id: times.get(mode).keySet()){
 				double totalTravelTime = ListUtils.doubleSum(times.get(mode).get(id));

@@ -58,6 +58,10 @@ public class IOUtils {
 	private final static Logger log = Logger.getLogger(IOUtils.class);
 
 	public static URL getUrlFromFileOrResource(String filename) {
+		if (filename.startsWith("~" + File.separator)) {
+		    filename = System.getProperty("user.home") + filename.substring(1);
+		}
+		
 		File file = new File(filename);
 		if (file.exists()) {
 			try {
@@ -66,7 +70,11 @@ public class IOUtils {
 				throw new RuntimeException(e);
 			}
 		}
+		log.info("String " + filename + " does not exist as file on the file system; trying it as a resource ...");
 		URL resourceAsStream = IOUtils.class.getClassLoader().getResource(filename);
+		if ( resourceAsStream==null ) {
+			throw new RuntimeException("Filename |" + filename + "| not found." ) ;
+		}
 		return resourceAsStream;
 	}
 
@@ -133,6 +141,7 @@ public class IOUtils {
 				}
 			}
 		} catch (IOException e) {
+			log.fatal("encountered IOException.  This will most probably be fatal.  Note that for relative path names, the root is no longer the Java root, but the directory where the config file resides.");
 			throw new UncheckedIOException(e);
 		}
 
@@ -316,29 +325,29 @@ public class IOUtils {
 		}
 
 		String parent = toFile2.getParent();
-    if (parent == null)
-      parent = System.getProperty("user.dir");
-    File dir = new File(parent);
+		if (parent == null)
+			parent = System.getProperty("user.dir");
+		File dir = new File(parent);
 
-    if (!dir.exists()) {
-    	// we cannot move a file to an inexistent directory
-    	return false;
-    }
+		if (!dir.exists()) {
+			// we cannot move a file to an inexistent directory
+			return false;
+		}
 
-    if (!dir.canWrite()) {
-    	// we cannot write into the directory
-    	return false;
-    }
+		if (!dir.canWrite()) {
+			// we cannot write into the directory
+			return false;
+		}
 
-    try {
-    	copyFile(fromFile, toFile2);
-    } catch (UncheckedIOException e) {
-    	if (toFile2.exists()) toFile2.delete();
-    	return false;
-    }
+		try {
+			copyFile(fromFile, toFile2);
+		} catch (UncheckedIOException e) {
+			if (toFile2.exists()) toFile2.delete();
+			return false;
+		}
 
-    // okay, at this place we can assume that we successfully copied the data, so remove the old file
-    fromFile.delete();
+		// okay, at this place we can assume that we successfully copied the data, so remove the old file
+		fromFile.delete();
 
 		return true;
 	}
@@ -463,17 +472,17 @@ public class IOUtils {
 	 */
 	private static void deleteDir(final File dir, boolean checkForLinks) {
 		File[] outDirContents = dir.listFiles();
-		for (int i = 0; i < outDirContents.length; i++) {
-			if (checkForLinks && isLink(outDirContents[i])) {
+		for (File outDirContent : outDirContents) {
+			if (checkForLinks && isLink(outDirContent)) {
 				continue;
 			}
-			if (outDirContents[i].isDirectory()) {
-				deleteDir(outDirContents[i], checkForLinks);
+			if (outDirContent.isDirectory()) {
+				deleteDir(outDirContent, checkForLinks);
 			}
-			if (!outDirContents[i].delete() && outDirContents[i].exists()) {
+			if (!outDirContent.delete() && outDirContent.exists()) {
 				// some file systems do not immediately delete directories (because of caches or whatever)
 				// so we do not trust the return value of "delete()" alone, but make additional checks before issuing a warning
-				log.error("Could not delete " + outDirContents[i].getAbsolutePath());
+				log.error("Could not delete " + outDirContent.getAbsolutePath());
 			}
 		}
 		if (!dir.delete()) {
@@ -572,6 +581,18 @@ public class IOUtils {
 				throw new FileNotFoundException(filename);
 			}
 			return new BufferedInputStream(new UnicodeInputStream(inputStream));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	public static InputStream getInputStream(URL url) throws UncheckedIOException {
+		try {
+			if (url.getFile().endsWith(".gz")) {
+				return new GZIPInputStream(url.openStream());
+			} else {
+				return url.openStream();
+			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

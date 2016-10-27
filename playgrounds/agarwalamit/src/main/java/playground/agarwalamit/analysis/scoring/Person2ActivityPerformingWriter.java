@@ -44,6 +44,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
 import playground.agarwalamit.analysis.activity.ActivityType2ActDurationsAnalyzer;
+import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -54,9 +55,9 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 public class Person2ActivityPerformingWriter {
 	private static final Logger LOG = Logger.getLogger(Person2ActivityPerformingWriter.class);
-	private final String outputFilesDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run0/baseCaseCtd/";
+	private static final String outputFilesDir = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/output/1pct/run0/baseCaseCtd/";
 	private final Map<Id<Person>,Map<String, Double>> personId2Act2UtilPerf = new HashMap<>();
-	private final Set<String> actTypes = new HashSet<String>();
+	private final Set<String> actTypes = new HashSet<>();
 	private final UserGroup userGroup = UserGroup.URBAN;
 
 	public static void main(String[] args) {
@@ -77,7 +78,7 @@ public class Person2ActivityPerformingWriter {
 		for(Id<Person> personId : personId2Act2EndTimes.keySet()){
 			
 			Person p = sc.getPopulation().getPersons().get(personId);
-			personId2Act2UtilPerf.put(p.getId(), new HashMap<String, Double>());
+			personId2Act2UtilPerf.put(p.getId(), new HashMap<>());
 
 			List<Tuple<String, Double>> actEndTimes = personId2Act2EndTimes.get(p.getId());
 			List<Tuple<String, Double>> actStartTimes = personId2Act2StartTimes.get(p.getId());
@@ -86,7 +87,7 @@ public class Person2ActivityPerformingWriter {
 			if(actStartTimes.size() != actEndTimes.size()) {
 				int noOfActivities = actStartTimes.size();
 				String lastActType = actStartTimes.get(noOfActivities-1).getFirst();
-				actEndTimes.add(new Tuple<String, Double>(lastActType, 24.*3600.));
+				actEndTimes.add(new Tuple<>(lastActType, 24. * 3600.));
 			} else {
 				LOG.warn("Person "+p.getId()+" do not have any open ended activity and simulation ends."
 						+ "Possible explanation must be stuckAndAbort.");
@@ -135,12 +136,11 @@ public class Person2ActivityPerformingWriter {
 
 	private void storeUtilOfPerforming(final Scenario sc, final Person p, final Activity activity) {
 		ScoringFunctionFactory sfFactory = new ScoringFunctionFactory() {
-			CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(sc, p.getId()).build();
+			final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(sc, p.getId()).build();
 
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				Person2ActivityScoringFunction scrFn = new Person2ActivityScoringFunction(new CharyparNagelActivityScoring(params));
-				return scrFn;
+				return new Person2ActivityScoringFunction(new CharyparNagelActivityScoring(params));
 			}
 		};
 
@@ -200,7 +200,7 @@ public class Person2ActivityPerformingWriter {
 	}
 
 	public class Person2ActivityScoringFunction implements ScoringFunction{
-		private CharyparNagelActivityScoring delegate;
+		private final CharyparNagelActivityScoring delegate;
 		public Person2ActivityScoringFunction(final CharyparNagelActivityScoring delegate) {
 			this.delegate = delegate;
 		}

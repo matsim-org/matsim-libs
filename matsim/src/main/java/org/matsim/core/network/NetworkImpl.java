@@ -37,12 +37,13 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * Design thoughts:<ul>
  * <li> This class is final, since it is sitting behind an interface, and thus delegation can be used for 
  * implementation modifications.  Access to the quad tree might be justified in some cases, but should then be realized
- * by specific methods and not via inheritance of the field (I would think
+ * by specific methods and not via inheritance of the field (I would think).
 
  </ul>
  * 
@@ -84,6 +85,7 @@ import org.matsim.core.utils.collections.QuadTree;
 	private int nextMsg2=1;
 
 	private boolean locked = false ;
+	private final Attributes attributes = new Attributes();
 
 	NetworkImpl() {
 		this.factory = new NetworkFactoryImpl(this);
@@ -262,8 +264,7 @@ import org.matsim.core.utils.collections.QuadTree;
 			// kai, jul'16
 		}
 		for (NetworkChangeEvent event : events) {
-			final NetworkChangeEvent event1 = event;
-			NetworkUtils.addNetworkChangeEvent(this,event1);
+			this.addNetworkChangeEvent(event);
 		}
 	}
 
@@ -302,7 +303,7 @@ import org.matsim.core.utils.collections.QuadTree;
 
 	@Override
 	public Map<Id<Node>, Node> getNodes() {
-		return this.nodes;
+		return Collections.unmodifiableMap(this.nodes);
 	}
 
 	@Override public Link getNearestLinkExactly(final Coord coord) {
@@ -463,5 +464,10 @@ import org.matsim.core.utils.collections.QuadTree;
 		if ( locked ) {
 			throw new RuntimeException( "Network is locked; too late to do this.  See comments in code.") ;
 		}
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
 	}
 }

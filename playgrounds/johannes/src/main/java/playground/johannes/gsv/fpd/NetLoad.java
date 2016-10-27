@@ -156,7 +156,7 @@ public class NetLoad {
 		cwriter.write("obs\tsim");
 		cwriter.newLine();
 		for (Count count : counts.getCounts().values()) {
-			Id<Link> id = count.getLocId();
+			Id<Link> id = count.getId();
 			Link link = network.getLinks().get(id);
 			double simVol = linkVolumes.get(link);
 			double obsVol = count.getVolume(1).getValue() * 24;
@@ -257,7 +257,7 @@ public class NetLoad {
 		List<Feature> obsFeatures = new ArrayList<>(obsCounts.getCounts().size());
 
 		for (Count<Link> count : obsCounts.getCounts().values()) {
-			Id<Link> linkId = count.getLocId();
+			Id<Link> linkId = count.getId();
 			if (!linkId.toString().startsWith(ODCalibrator.VIRTUAL_ID_PREFIX)) {
 				Link link = network.getLinks().get(linkId);
 

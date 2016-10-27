@@ -6,20 +6,11 @@ public class NetworkXML2ShpConverter {
 
 	public static void main(String[] args) {
 
-		String networkFile = "/Users/dominik/Accessibility/Data/Networks/Kenya/2015-11-05_kibera_paths_detailed.xml";
-//		String networkFile = "/Users/dominik/Accessibility/Data/Networks/Kenya/2015-10-15_nairobi_paths.xml";
-//		String networkFile = "../../matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz";
-//		String networkFile = "D:/Workspace/container/demand/input/network/bb_5_v_notscaled.xml";
+		String networkFile = "../../../shared-svn/projects/maxess/data/kenya/network/2016-10-19_network_detailed.xml";
 		
-		String shapeFileLine = "/Users/dominik/Accessibility/Data/Networks/Kenya/2015-11-05_kibera_paths_detailed_line.shp";
-//		String shapeFileLine = "/Users/dominik/Accessibility/Data/Networks/Kenya/2015-10-15_nairobi_paths_line.shp";
-//		String shapeFileLine = "../../data/nmbm/network/network_line.shp";
-//		String shapeFileLine = "D:/Workspace/container/demand/input/network/bb_5_v_notscaled_line_DHDN_GK4.shp";
+		String shapeFileLine = "../../../shared-svn/projects/maxess/data/kenya/network/2016-10-19_network_detailed_line.shp";
 		
-		String shapeFilePoly = "/Users/dominik/Accessibility/Data/Networks/Kenya/2015-11-05_kibera_paths_detailed_poly.shp";
-//		String shapeFilePoly = "/Users/dominik/Accessibility/Data/Networks/Kenya/2015-10-15_nairobi_paths_poly.shp";
-//		String shapeFilePoly = "../../data/nmbm/network/network_poly.shp";
-//		String shapeFilePoly = "D:/Workspace/container/demand/input/network/bb_5_v_notscaled_poly_DHDN_GK4.shp";
+		String shapeFilePoly = "../../../shared-svn/projects/maxess/data/kenya/network/2016-10-19_network_detailed_poly.shp";
 		
 		String crs = "EPSG:21037"; // for Nairobi, Kenya
 //		String crs = TransformationFactory.WGS84_SA_Albers; // for South Africa

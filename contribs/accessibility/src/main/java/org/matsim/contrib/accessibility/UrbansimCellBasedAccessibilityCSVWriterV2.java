@@ -78,7 +78,7 @@ final class UrbansimCellBasedAccessibilityCSVWriterV2 implements FacilityDataExc
 
 	/**
 	 * writing the accessibility measures into csv file.
-	 * <p/>
+	 * <p></p>
 	 * Design thoughts:<ul>
 	 * <li> yyyy I am not sure why it is meaningful to use zones or nodes for the coordinates.  Accessibility refers directly
 	 * to coordinates, and maybe directly to zones (if averaged). --> remove eventually.  kai, jul'13

@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<!-- This is a fairly minimal config file; see console or logfile output for more options. -->
+<config>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="../../../../examples/scenarios/equil/network.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="../../../../examples/scenarios/equil/plans100.xml" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="./output/example" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="0" />
+		<param name="eventsFileFormat" value="xml" />
+		<param name="snapshotFormat" value="googleearth,otfvis" />
+<!-- 		Produces visualiser output in the following formats: -->
+<!-- 		"googleearth": a *.kml file which can be opened into google earth.  Uncomplicated, but VERRYYY slow. -->
+<!-- 		"otfvis": matsim native visualizer format.  Two ways to use it: -->
+<!-- 		          () without hardware acceleration.  Simpler, but slower -->
+<!--                      () with hardware acceleration.  A bit more complicated to set up, but indispensable for larger matsim  -->
+<!--                         scenarios -->
+<!-- 		The visualiser output files are in <outputDirectory>/ITERS/it.0/... -->
+		
+	</module>
+
+
+	<module name="qsim">
+
+		<param name="snapshotperiod" value="00:01:00" />
+
+	</module>
+
+	<module name="planCalcScore" >
+		<param name="activityType_0" value="h" />
+		<param name="activityType_1" value="w" />
+		<param name="activityTypicalDuration_0" value="12:00:00" />
+		<param name="activityTypicalDuration_1" value="08:00:00" />
+	</module>
+
+
+</config>

@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkUtils;
@@ -38,11 +39,12 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.households.HouseholdsReaderV10;
-import org.matsim.lanes.data.v20.LaneDefinitionsReader;
+import org.matsim.lanes.data.LanesReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -58,7 +60,7 @@ import com.google.inject.Inject;
  * other load...() methods only load specific parts
  * of the scenario assuming that required parts are already
  * loaded or created by the user.
- * <p/>
+ * <p></p>
  * Design thoughts:<ul>
  * <li> Given what we have now, does it make sense to leave this class public?  yy kai, mar'11
  * </ul>
@@ -107,7 +109,7 @@ class ScenarioLoaderImpl {
 		this.loadNetwork();
 		this.loadActivityFacilities();
 		this.loadPopulation();
-		this.loadHouseholds();
+		this.loadHouseholds(); // tests internally if the file is there
 		this.loadTransit(); // tests internally if the file is there
 		this.loadTransitVehicles(); // tests internally if the file is there
 		if (this.config.vehicles().getVehiclesFile()!=null ) {
@@ -127,7 +129,9 @@ class ScenarioLoaderImpl {
 			URL networkUrl = this.config.network().getInputFileURL(this.config.getContext());
 			log.info("loading network from " + networkUrl);
 			if ( config.network().getInputCRS() == null ) {
-				new MatsimNetworkReader(this.scenario.getNetwork()).parse(networkUrl);
+				MatsimNetworkReader reader = new MatsimNetworkReader(this.scenario.getNetwork());
+				reader.putAttributeConverters( attributeConverters );
+				reader.parse(networkUrl);
 			}
 			else {
 				log.info( "re-projecting network from "+config.network().getInputCRS()+" to "+config.global().getCoordinateSystem()+" for import" );
@@ -135,15 +139,17 @@ class ScenarioLoaderImpl {
 						TransformationFactory.getCoordinateTransformation(
 								config.network().getInputCRS(),
 								config.global().getCoordinateSystem() );
-				new MatsimNetworkReader( transformation , this.scenario.getNetwork() ).parse(networkUrl);
+				MatsimNetworkReader reader = new MatsimNetworkReader( transformation , this.scenario.getNetwork());
+				reader.putAttributeConverters( attributeConverters );
+				reader.parse(networkUrl);
 			}
 
-			if ((this.config.network().getChangeEventsInputFile() != null) && this.config.network().isTimeVariantNetwork()) {
-				log.info("loading network change events from " + this.config.network().getChangeEventsInputFile());
+			if ((this.config.network().getChangeEventsInputFile()!= null) && this.config.network().isTimeVariantNetwork()) {
+				log.info("loading network change events from " + this.config.network().getChangeEventsInputFileUrl(this.config.getContext()).getFile());
 				Network network = this.scenario.getNetwork();
 				List<NetworkChangeEvent> changeEvents = new ArrayList<>() ;
 				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network,changeEvents);
-				parser.readFile(this.config.network().getChangeEventsInputFile());
+				parser.parse(this.config.network().getChangeEventsInputFileUrl(config.getContext()));
 				NetworkUtils.setNetworkChangeEvents(network,changeEvents);
 			}
 		}
@@ -176,11 +182,11 @@ class ScenarioLoaderImpl {
 			log.info("no facilities file set in config, therefore not loading any facilities.  This is not a problem except if you are using facilities");
 		}
 		if ((this.config.facilities() != null) && (this.config.facilities().getInputFacilitiesAttributesFile() != null)) {
-			String facilitiesAttributesFileName = this.config.facilities().getInputFacilitiesAttributesFile();
-			log.info("loading facility attributes from " + facilitiesAttributesFileName);
+			URL facilitiesAttributesURL = ConfigGroup.getInputFileURL(this.config.getContext(), this.config.facilities().getInputFacilitiesAttributesFile());
+			log.info("loading facility attributes from " + facilitiesAttributesURL);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getActivityFacilities().getFacilityAttributes());
 			reader.putAttributeConverters( attributeConverters );
-			reader.readFile(facilitiesAttributesFileName);
+			reader.parse(facilitiesAttributesURL);
 		}
 		else {
 			log.info("no facility-attributes file set in config, not loading any facility attributes");
@@ -193,7 +199,9 @@ class ScenarioLoaderImpl {
 			log.info("loading population from " + populationFileName);
 
 			if ( config.plans().getInputCRS() == null ) {
-				new PopulationReader(this.scenario).parse(populationFileName);
+				final PopulationReader reader = new PopulationReader(this.scenario);
+				reader.putAttributeConverters( attributeConverters );
+				reader.parse( populationFileName );
 			}
 			else {
 				final String inputCRS = config.plans().getInputCRS();
@@ -206,7 +214,9 @@ class ScenarioLoaderImpl {
 								inputCRS,
 								internalCRS );
 
-				new PopulationReader(transformation , this.scenario).parse(populationFileName);
+				final PopulationReader reader = new PopulationReader(transformation , this.scenario);
+				reader.putAttributeConverters( attributeConverters );
+				reader.parse( populationFileName );
 			}
 
 			PopulationUtils.printPlansCount(this.scenario.getPopulation()) ;
@@ -227,21 +237,22 @@ class ScenarioLoaderImpl {
 	}
 
 	private void loadHouseholds() {
-		final String householdsFile = this.config.households().getInputFile();
-		if ( (this.config.households() != null) && (householdsFile != null) ) {
+		if ( (this.config.households() != null) && (this.config.households().getInputFile() != null) ) {
+			URL householdsFile = this.config.households().getInputFileURL(this.config.getContext());
 			log.info("loading households from " + householdsFile);
-			new HouseholdsReaderV10(this.scenario.getHouseholds()).readFile(householdsFile);
+			new HouseholdsReaderV10(this.scenario.getHouseholds()).parse(householdsFile);
 			log.info("households loaded.");
 		}
 		else {
 			log.info("no households file set in config, not loading households");
 		}
-		if ((this.config.households() != null) && (this.config.households().getInputHouseholdAttributesFile() != null)) {
-			String householdAttributesFileName = this.config.households().getInputHouseholdAttributesFile();
+		final String fn = this.config.households().getInputHouseholdAttributesFile();
+		if ((this.config.households() != null) && ( fn != null)) {
+			URL householdAttributesFileName = ConfigGroup.getInputFileURL(this.config.getContext(), fn ) ;
 			log.info("loading household attributes from " + householdAttributesFileName);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getHouseholds().getHouseholdAttributes());
 			reader.putAttributeConverters( attributeConverters );
-			reader.readFile(householdAttributesFileName);
+			reader.parse(householdAttributesFileName);
 		}
 		else {
 			log.info("no household-attributes file set in config, not loading any household attributes");
@@ -249,9 +260,9 @@ class ScenarioLoaderImpl {
 	}
 
 	private void loadTransit() throws UncheckedIOException {
-		final String transitScheduleFile = this.config.transit().getTransitScheduleFile();
 
-		if ( transitScheduleFile != null ) {
+		if ( this.config.transit().getTransitScheduleFile() != null ) {
+			URL transitScheduleFile = this.config.transit().getTransitScheduleFileURL(this.config.getContext());
 			final String inputCRS = config.transit().getInputScheduleCRS();
 			final String internalCRS = config.global().getCoordinateSystem();
 
@@ -266,7 +277,7 @@ class ScenarioLoaderImpl {
 								inputCRS,
 								internalCRS );
 
-				new TransitScheduleReader( transformation , this.scenario).readFile(transitScheduleFile);
+				new TransitScheduleReader( transformation , this.scenario).readURL(transitScheduleFile);
 			}
 		}
 		else {
@@ -274,19 +285,19 @@ class ScenarioLoaderImpl {
 		}
 
 		if ( this.config.transit().getTransitLinesAttributesFile() != null ) {
-			String transitLinesAttributesFileName = this.config.transit().getTransitLinesAttributesFile();
+			URL transitLinesAttributesFileName = IOUtils.newUrl(this.config.getContext(), this.config.transit().getTransitLinesAttributesFile());
 			log.info("loading transit lines attributes from " + transitLinesAttributesFileName);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitLinesAttributes());
 			reader.putAttributeConverters( attributeConverters );
-			reader.readFile(transitLinesAttributesFileName);
+			reader.parse(transitLinesAttributesFileName);
 		}
 
 		if ( this.config.transit().getTransitStopsAttributesFile() != null ) {
-			String transitStopsAttributesFileName = this.config.transit().getTransitStopsAttributesFile();
-			log.info("loading transit stop facilities attributes from " + transitStopsAttributesFileName);
+			URL transitStopsAttributesURL = IOUtils.newUrl(this.config.getContext(), this.config.transit().getTransitStopsAttributesFile());
+			log.info("loading transit stop facilities attributes from " + transitStopsAttributesURL);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitStopsAttributes());
 			reader.putAttributeConverters( attributeConverters );
-			reader.readFile(transitStopsAttributesFileName);
+			reader.parse(transitStopsAttributesURL);
 		}
 	}
 
@@ -304,7 +315,7 @@ class ScenarioLoaderImpl {
 		final String vehiclesFile = this.config.vehicles().getVehiclesFile();
 		if ( vehiclesFile != null ) {
 			log.info("loading vehicles from " + vehiclesFile );
-			new VehicleReaderV1(this.scenario.getVehicles()).readFile(vehiclesFile);
+			new VehicleReaderV1(this.scenario.getVehicles()).parse(IOUtils.newUrl(this.config.getContext(), vehiclesFile));
 		} 
 		else {
 			log.info("no vehicles file set in config, not loading any vehicles");
@@ -314,18 +325,8 @@ class ScenarioLoaderImpl {
 	private void loadLanes() {
 		String filename = this.config.network().getLaneDefinitionsFile();
 		if (filename != null){
-			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(filename);
-			if (!LaneDefinitionsReader.SCHEMALOCATIONV20.equalsIgnoreCase(fileTypeGuesser
-					.getSystemId())) {
-				log.error("Lanes: Wrong file format. With the 0.5 version of matsim the scenario only accepts lane definitions in the "
-						+ "file format version 2.0, i.e. "
-						+ LaneDefinitionsReader.SCHEMALOCATIONV20
-						+ ". An automatic conversion of the 1.1 file format is no longer provided, please call the "
-						+ "LaneDefinitonsV11ToV20Converter manually in the preprocessing phase.");
-				throw new UncheckedIOException("Wrong lane file format: " + fileTypeGuesser.getSystemId());
-			}
-			LaneDefinitionsReader reader = new LaneDefinitionsReader(this.scenario);
-			reader.readFile(filename);
+			LanesReader reader = new LanesReader(this.scenario);
+			reader.readURL(ConfigGroup.getInputFileURL(this.config.getContext(), filename));
 		}
 		else {
 			log.info("no lanes file set in config, not loading any lanes");

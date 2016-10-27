@@ -46,7 +46,7 @@ import org.matsim.core.utils.io.IOUtils;
 /**
  * Reads node and link DBF files (that have been converted to TAB-delimited 
  * text files) generated from Emme transport models.
- * <p/>
+ * <p></p>
  * Keyword(s): emme/2
  * 
  * @author jjoubert *

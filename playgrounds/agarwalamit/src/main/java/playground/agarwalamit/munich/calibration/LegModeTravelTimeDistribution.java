@@ -46,20 +46,20 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
 public class LegModeTravelTimeDistribution extends AbstractAnalysisModule {
 
 	private final Logger logger = Logger.getLogger(LegModeTravelTimeDistribution.class);
-	private ModalTripTravelTimeHandler lmth;
+	private final ModalTripTravelTimeHandler lmth;
 	private Map<String, Map<Id<Person>, List<Double>>> mode2PersonId2TravelTimes;
-	private List<Integer> travelTimeClasses;
-	private List<String> travelModes;
+	private final List<Integer> travelTimeClasses;
+	private final List<String> travelModes;
 	private SortedMap<String, SortedMap<Integer, Integer>> mode2TravelTimeClasses2LegCount;
-	private String eventsFile;
+	private final String eventsFile;
 	private UserGroup userGroup = null;
 
 	public LegModeTravelTimeDistribution(String eventsFile, UserGroup userGroup) {
 		super(LegModeTravelTimeDistribution.class.getSimpleName());
 
 		this.eventsFile = eventsFile;
-		this.travelTimeClasses=new ArrayList<Integer>();
-		this.travelModes = new ArrayList<String>();
+		this.travelTimeClasses= new ArrayList<>();
+		this.travelModes = new ArrayList<>();
 		this.lmth=new ModalTripTravelTimeHandler();
 		this.lmth.reset(0);
 		this.userGroup = userGroup;
@@ -110,9 +110,9 @@ public class LegModeTravelTimeDistribution extends AbstractAnalysisModule {
 
 	private void calculateMode2TravelTimeClases2LegCount() {
 		PersonFilter pf = new PersonFilter();
-		this.mode2TravelTimeClasses2LegCount= new TreeMap<String, SortedMap<Integer,Integer>>();
+		this.mode2TravelTimeClasses2LegCount= new TreeMap<>();
 		for(String mode:this.travelModes){
-			SortedMap<Integer, Integer> travelTimeClasses2LegCount = new TreeMap<Integer, Integer>();
+			SortedMap<Integer, Integer> travelTimeClasses2LegCount = new TreeMap<>();
 			for(int i=0;i<this.travelTimeClasses.size()-1;i++){
 				int legCount =0;
 				for(Id<Person> id:this.mode2PersonId2TravelTimes.get(mode).keySet()){

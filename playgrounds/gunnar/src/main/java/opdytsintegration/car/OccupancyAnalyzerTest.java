@@ -74,7 +74,7 @@ public class OccupancyAnalyzerTest {
 		analyzer.handleEvent(new LinkLeaveEvent(100.0, null, id1));
 		// time = 100, in = 8, out = 8
 
-		analyzer.advanceToEnd();
+		analyzer.finalizeAndLock();
 
 		for (int bin = 0; bin < binCnt; bin++) {
 			System.out.println("[" + (startTime_s + bin * binSize_s) + ","

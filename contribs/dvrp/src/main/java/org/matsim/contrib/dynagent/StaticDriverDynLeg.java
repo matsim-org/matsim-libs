@@ -24,6 +24,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.vehicles.Vehicle;
 
 
 public class StaticDriverDynLeg
@@ -93,6 +94,13 @@ public class StaticDriverDynLeg
         }
 
         currentLinkIdx = route.getLinkIds().size();
+    }
+    
+    
+    @Override
+    public Id<Vehicle> getPlannedVehicleId()
+    {
+        return route.getVehicleId();
     }
 
 

@@ -8,7 +8,7 @@
 	</module>
 
 	<module name="facilities">
-		<param name="inputFacilitiesFile" value="../../../../../../../scenarios/equil/facilities.xml" />
+		<param name="inputFacilitiesFile" value="facilities.xml" />
 	</module>
 
 	<!-- module name="network">

@@ -48,7 +48,7 @@ public class ShapeFileToNetworkDelhi {
 	private final static String NETWORK_SHAPE_FILE = "./input/sarojini/abc.shp";
 	private final static String MATSIM_NETWORK = "./input/sarojini/matsimNetwork.xml";
 	private final static CoordinateTransformation CT =TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,"EPSG:24378");
-	private static Map<Coord, String> coordId = new HashMap<Coord, String>();
+	private static final Map<Coord, String> coordId = new HashMap<>();
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();

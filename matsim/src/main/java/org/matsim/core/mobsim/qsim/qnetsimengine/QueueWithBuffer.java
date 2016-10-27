@@ -53,13 +53,13 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.PassingVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
 /**
  * Separating out the "lane" functionality from the "link" functionality.
- * <p/>
+ * <p></p>
  * Design thoughts:<ul>
  * <li> In fast capacity update, the flows are not accumulated in every time step, 
  * rather updated only if an agent wants to enter the link or an agent is added to buffer. 
@@ -111,7 +111,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	/**
 	 * Stores the accumulated fractional parts of the flow capacity. See also
 	 * flowCapFraction.
-	 * <p/>
+	 * <p></p>
 	 * I changed this into an internal class as a first step to look into acceleration (not having to keep this link active until
 	 * this has accumulated to one).  There is no need to keep it this way; it just seems to make it easier to keep track of
 	 * changes.  kai, sep'14
@@ -352,8 +352,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			// equal: rho * (vmax + vhole) = vhole * rhojam
 			// rho(qmax) = vhole * rhojam / (vmax + vhole) 
 			// qmax = vmax * rho(qmax) = rhojam / (1/vhole + 1/vmax) ;
-			this.maxFlowFromFdiag = (1/7.5) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getLink().getFreespeed() ) ;
-			log.warn("linkID=" + this.qLink.getLink().getId() + "; setting maxFlowFromFdiag to: " + this.maxFlowFromFdiag ) ;
+			this.maxFlowFromFdiag = (1/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getLink().getFreespeed() ) ;
+//			log.warn("linkID=" + this.qLink.getLink().getId() + "; setting maxFlowFromFdiag to: " + this.maxFlowFromFdiag ) ;
 		}
 	}
 
@@ -537,7 +537,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		qLink.addParkedVehicle(veh);
 		qLink.letVehicleArrive(veh);
-		qLink.makeVehicleAvailableToNextDriver(veh, now);
+		qLink.makeVehicleAvailableToNextDriver(veh);
 		
 		// remove _after_ processing the arrival to keep link active:
 		removeVehicleFromQueue( veh ) ;
@@ -572,13 +572,21 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	@Override
 	 final boolean isAcceptingFromUpstream() {
 		boolean storageOk = usedStorageCapacity < storageCapacity ;
+		
 		if ( ! (context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles) 
 				&& context.qsimConfig.getInflowConstraint()==InflowConstraint.none ) {
 			return storageOk ;
 		}
 		// (continue only if HOLES and/or inflow constraing)
 
-		if ( remainingHolesStorageCapacity <=0 ) { 
+		if( ! (context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles)
+				&& !storageOk) { // irrespective of inflow constrain, storageOk must be respected; amit Aug 2016
+			return storageOk;
+		}
+		
+		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles   
+				&& remainingHolesStorageCapacity <= 0. ) { 
+			// check the holes storage capacity if using holes only (amit, Aug 2016)
 			return false ;
 		} 
 		// remainingHolesStorageCapacity is:
@@ -589,6 +597,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		if ( context.qsimConfig.getInflowConstraint()==InflowConstraint.none ) {
 			return true ;
 		}
+		
 		return this.accumulatedInflowCap >= 1. ; // can maximally be 1.
 		
 	}

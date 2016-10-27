@@ -34,9 +34,9 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * Essentially an interface, but since I do not want the methods public for the time being, it is incarnated as an abstract class.
- * <p/>
+ * <p></p>
  * Contains all the logic for the QLinks which make up the QNetwork.
- * <p/>
+ * <p></p>
  * One can argue that the QNetsimEngine could treat more general links than just "queues".  However, in the end they live with 
  * "(qlane.)addFromUpstream" and "(qlane.)addFromUpstream", which is quite restricted, since it does not pass the velocity.
  * Not passing the velocity means that it cannot be used for more general mobsims.
@@ -95,9 +95,9 @@ abstract class QLinkI implements NetsimLink, TimeVariantLink {
 	 * Agent that ends a leg or an activity is computationally passed to the QSim.  If the next PlanElement is a leg,
 	 * and the leg is treated by _this_ NetsimEngine, then the QSim passes it to the NetsimEngine, which inserts it here.
 	 */
-	abstract void letVehicleDepart(QVehicle vehicle, double now) ;
+	abstract void letVehicleDepart(QVehicle vehicle) ;
 
-	abstract boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id<Vehicle> vehicleId, double now);
+	abstract boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id<Vehicle> vehicleId);
 	
 	abstract QVehicle getVehicle(Id<Vehicle> vehicleId) ;
 	

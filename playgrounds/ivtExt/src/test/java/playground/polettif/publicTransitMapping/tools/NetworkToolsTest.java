@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static playground.polettif.publicTransitMapping.tools.NetworkTools.*;
 
+@Deprecated
 public class NetworkToolsTest {
 
 	private final double testDelta = 1/1000.;

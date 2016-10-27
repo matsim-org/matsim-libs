@@ -35,16 +35,16 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  *
  */
-public class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme {
+public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme {
 	// needs to be public. kai, sep'14
 	
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger( RoadPricingSchemeUsingTollFactor.class ) ;
 
 	private RoadPricingScheme delegate = null ;
-	private final TollFactorI tollFactor ;
+	private final TollFactor tollFactor ;
 	
-	public RoadPricingSchemeUsingTollFactor( String tollLinksFileName, TollFactorI tollFactor ) {
+	public RoadPricingSchemeUsingTollFactor( String tollLinksFileName, TollFactor tollFactor ) {
 		
 		// read the road pricing scheme from file
 		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();

@@ -21,7 +21,7 @@ import org.matsim.contrib.carsharing.config.FreeFloatingConfigGroup;
 import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.control.listeners.CarsharingListener;
-import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactory;
+import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactoryNew;
 import org.matsim.contrib.carsharing.replanning.CarsharingSubtourModeChoiceStrategy;
 import org.matsim.contrib.carsharing.replanning.RandomTripToCarsharingStrategy;
 import org.matsim.contrib.carsharing.router.OneWayCarsharingRoutingModule;
@@ -148,7 +148,7 @@ public class GAPScenarioRunner {
 		
 		config.plans().setInputFile("/home/dhosse/run12/output_plans.xml.gz");
 		// disable counts
-		 config.counts().setCountsFileName(null);
+		 config.counts().setInputFile(null);
 		 
 		 //set random seed
 		 config.global().setRandomSeed(randomSeed);
@@ -886,8 +886,8 @@ public class GAPScenarioRunner {
 			@Override
 			public void install() {
 
-				bindMobsim().toProvider( CarsharingQsimFactory.class );
-				
+				bindMobsim().toProvider( CarsharingQsimFactoryNew.class );
+				addControlerListenerBinding().to(CarsharingListener.class);
 				addRoutingModuleBinding("onewaycarsharing").toInstance(new OneWayCarsharingRoutingModule());
 				
 				bind(MainModeIdentifier.class).toInstance(new MainModeIdentifier() {
@@ -923,10 +923,7 @@ public class GAPScenarioRunner {
 			public void install() {
 				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
 			}
-		});
-
-		controler.addControlerListener(new CarsharingListener(controler,
-				cs.getStatsWriterFrequency() ) ) ;
+		});		
 		
 	}
 

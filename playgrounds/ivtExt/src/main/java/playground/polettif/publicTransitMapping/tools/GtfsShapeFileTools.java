@@ -39,6 +39,7 @@ import java.util.*;
  *
  * @author polettif
  */
+@Deprecated
 public class GtfsShapeFileTools {
 
 	/**

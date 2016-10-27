@@ -66,15 +66,15 @@ public class NetworkThinner {
 			if (counts.getCount(l.getId()) != null) { countsToRemap.add(counts.getCount(l.getId())); }
 		}
 		for (Count c : countsToRemap) {
-			counts.getCounts().remove(c.getLocId());
-			Count newCount = counts.createAndAddCount(newLink.getId(),c.getCsId());
+			counts.getCounts().remove(c.getId());
+			Count newCount = counts.createAndAddCount(newLink.getId(),c.getCsLabel());
 			if (newCount != null) {
 				newCount.setCoord(c.getCoord());
 				newCount.getVolumes().clear();
 				newCount.getVolumes().putAll(c.getVolumes());
 			}
 			else {
-				log.info("    count id="+c.getLocId()+" removed but not replaced by a new one.");
+				log.info("    count id="+c.getId()+" removed but not replaced by a new one.");
 			}
 		}
 	}

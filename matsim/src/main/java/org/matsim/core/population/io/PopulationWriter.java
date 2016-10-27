@@ -23,6 +23,7 @@ package org.matsim.core.population.io;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -40,6 +41,7 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.AbstractMatsimWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public final class PopulationWriter extends AbstractMatsimWriter implements MatsimWriter {
@@ -53,8 +55,9 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 	private Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
 
 	private final static Logger log = Logger.getLogger(PopulationWriter.class);
-	
-	
+	private Map<Class<?>,AttributeConverter<?>> converters = new HashMap<>();
+
+
 	public PopulationWriter(final Population population) {
 		this(population, null, 1.0);
 	}
@@ -103,7 +106,7 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 		this.population = population;
 		this.network = network;
 		this.write_person_fraction = fraction;
-		this.handler = new PopulationWriterHandlerImplV5(coordinateTransformation);
+		this.handler = new PopulationWriterHandlerImplV6( coordinateTransformation );
 	}
 
 	/**
@@ -120,6 +123,10 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 			final Network network,
 			final double fraction) {
 		this( new IdentityTransformation() , population , network , fraction );
+	}
+
+	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
+		this.converters.putAll( converters );
 	}
 
 	/**
@@ -196,6 +203,12 @@ public final class PopulationWriter extends AbstractMatsimWriter implements Mats
 
 	public final void writeV5(final String filename) {
 		this.handler = new PopulationWriterHandlerImplV5(coordinateTransformation);
+		write(filename);
+	}
+
+	public final void writeV6(final String filename) {
+		this.handler = new PopulationWriterHandlerImplV6(coordinateTransformation);
+		((PopulationWriterHandlerImplV6) handler).putAttributeConverters( converters );
 		write(filename);
 	}
 

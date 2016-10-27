@@ -658,6 +658,10 @@ public class GeneralLib {
 		startIntervalTime = projectTimeWithin24Hours(startIntervalTime);
 		endIntervalTime = projectTimeWithin24Hours(endIntervalTime);
 
+		if (startIntervalTime==endIntervalTime){
+			return 0;
+		}
+		
 		if (startIntervalTime < endIntervalTime) {
 			return endIntervalTime - startIntervalTime;
 		} else {
@@ -865,12 +869,16 @@ public class GeneralLib {
 
 				if (delim == null) {
 					tokenizer = new StringTokenizer(line);
+					
+					while (tokenizer.hasMoreTokens()) {
+						row.add(tokenizer.nextToken());
+					}
 				} else {
-					tokenizer = new StringTokenizer(line, delim);
-				}
-
-				while (tokenizer.hasMoreTokens()) {
-					row.add(tokenizer.nextToken());
+					String[] split = line.split(delim,-1);
+					
+					for (String s:split){
+						row.add(s);
+					}
 				}
 
 				if (filter != null && filter.removeLine(line)) {

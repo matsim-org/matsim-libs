@@ -88,7 +88,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 		this.occupancies = occupancies;
 	}
 
-	private int getTimeSlotIndex(final double time) {
+	public int getTimeSlotIndex(final double time) {
 		if (time > this.maxTime) {
 			return this.maxSlotIndex;
 		}

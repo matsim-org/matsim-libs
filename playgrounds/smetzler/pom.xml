@@ -24,5 +24,37 @@
 			<artifactId>multimodal</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
+		
+				<!-- https://mvnrepository.com/artifact/org.openstreetmap.osmosis/osmosis-core -->
+		<dependency>
+		    <groupId>org.openstreetmap.osmosis</groupId>
+		    <artifactId>osmosis-core</artifactId>
+		    <version>0.45</version>
+		</dependency>
+				<!-- https://mvnrepository.com/artifact/org.openstreetmap.osmosis/osmosis-xml -->
+		<dependency>
+		    <groupId>org.openstreetmap.osmosis</groupId>
+		    <artifactId>osmosis-xml</artifactId>
+		    <version>0.45</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.openstreetmap.osmosis/osmosis-replication -->
+		<dependency>
+		    <groupId>org.openstreetmap.osmosis</groupId>
+		    <artifactId>osmosis-replication</artifactId>
+		    <version>0.45</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.openstreetmap.osmosis/osmosis-osm-binary -->
+		<dependency>
+		    <groupId>org.openstreetmap.osmosis</groupId>
+		    <artifactId>osmosis-osm-binary</artifactId>
+		    <version>0.45</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.openstreetmap.osmosis/osmosis-dataset -->
+		<dependency>
+		    <groupId>org.openstreetmap.osmosis</groupId>
+		    <artifactId>osmosis-dataset</artifactId>
+		    <version>0.45</version>
+		</dependency>
+
   </dependencies>
 </project>

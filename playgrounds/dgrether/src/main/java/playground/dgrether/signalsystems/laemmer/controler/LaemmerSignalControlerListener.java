@@ -26,7 +26,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.MutableScenario;
-import org.matsim.lanes.data.v20.Lanes;
+import org.matsim.lanes.data.Lanes;
 import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.controler.SignalsControllerListener;
@@ -53,8 +53,7 @@ public class LaemmerSignalControlerListener implements SignalsControllerListener
 	public void notifyStartup(StartupEvent event) {
 		MutableScenario scenario = (MutableScenario) event.getServices().getScenario();
 		
-		this.sensorManager = new DgSensorManager(event.getServices().getScenario().getNetwork());
-		this.sensorManager.setLaneDefinitions((Lanes) scenario.getScenarioElement(Lanes.ELEMENT_NAME));
+		this.sensorManager = new DgSensorManager(event.getServices().getScenario());
 		event.getServices().getEvents().addHandler(sensorManager);
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 

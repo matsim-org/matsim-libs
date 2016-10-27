@@ -40,7 +40,7 @@
 		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true" />
 		<param name="snapshotStyle" value="queue" />
 	</module>
-	
+
 	<module name="otfvis">
 		<param name="coloringScheme" value="taxicab" />
 		<param name="drawNonMovingItems" value="true" />
@@ -59,10 +59,9 @@
 	</module>
 
 	<module name="strategy">
-		<!-- Either we have only DynAgents, or we want "standard" agents to serve as a background,
-		i.e. not to change their behavior -->
+		<!-- We focus only on DynAgents. "Standard" agents do not change their behaviour -->
 		<param name="maxAgentPlanMemorySize" value="1" />
 		<param name="ModuleProbability_1" value="1.0" />
-		<param name="Module_1" value="BestScore" />
+		<param name="Module_1" value="KeepLastSelected" />
 	</module>
 </config>

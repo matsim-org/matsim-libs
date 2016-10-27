@@ -54,7 +54,7 @@ public class TaxiQSimProvider
 
     protected final TaxiConfigGroup taxiCfg;
     private final VehicleType vehicleType;//TODO resolve this by subclassing (without guice)??
-    private final TaxiOptimizerFactory optimizerFactory;//TODO resolve this subclassing (without guice)??
+    private final TaxiOptimizerFactory optimizerFactory;//TODO resolve this by subclassing (without guice)??
 
 
     @Inject
@@ -78,11 +78,6 @@ public class TaxiQSimProvider
     @Override
     public Mobsim get()
     {
-        //TODO add this to Config checkers
-        if (taxiCfg.isVehicleDiversion() && !taxiCfg.isOnlineVehicleTracker()) {
-            throw new IllegalStateException("Diversion requires online tracking");
-        }
-
         QSim qSim = QSimUtils.createQSim(scenario, eventsManager, plugins);
 
         TaxiOptimizer optimizer = createTaxiOptimizer(qSim);

@@ -56,12 +56,12 @@ public class CreateInputs {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	}
 
-	private Scenario scenario ;
+	private final Scenario scenario ;
 	private Link link1;
 	private Link link2;
 	private Link link3;
-	private String outputDir = SeepageControler.OUTPUT_DIR;
-	private List<String> mainModes = SeepageControler.MAIN_MODES;
+	private final String outputDir = SeepageControler.OUTPUT_DIR;
+	private final List<String> mainModes = SeepageControler.MAIN_MODES;
 	
 	private void createConfig(){
 		Config config = scenario.getConfig();
@@ -108,7 +108,7 @@ public class CreateInputs {
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.createNodeId("3"), new Coord(0.0, 1000.0));
 		Node node4 = NetworkUtils.createAndAddNode(network, Id.createNodeId("4"), new Coord(100.0, 1000.0));
 
-		Set<String> allowedModes = new HashSet<String>(); allowedModes.addAll(Arrays.asList("car","walk"));
+		Set<String> allowedModes = new HashSet<>(); allowedModes.addAll(Arrays.asList("car","walk"));
 		final Node fromNode = node1;
 		final Node toNode = node2;
 

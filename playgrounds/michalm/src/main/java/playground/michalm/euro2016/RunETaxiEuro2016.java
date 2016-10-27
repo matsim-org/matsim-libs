@@ -44,9 +44,9 @@ public class RunETaxiEuro2016
 
     public static void main(String[] args)
     {
-        int iter = 20;
-        String dir = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/";
-        String cfg = dir + "mielec_etaxi_benchmark_config_E_RULE_BASED_plugs-2and2.xml";
+        int iter = 1;
+        String dir = "../../../runs-svn/mielec_taxi/euro2016_etaxi/";
+        String cfg = dir + "mielec_E_AP_benchmark_config.xml";
         run(cfg, iter, "1.0");
         run(cfg, iter, "1.5");
         run(cfg, iter, "2.0");
@@ -55,7 +55,7 @@ public class RunETaxiEuro2016
         run(cfg, iter, "3.5");
         run(cfg, iter, "4.0");
 
-        cfg = dir + "mielec_etaxi_benchmark_config_E_ASSIGNMENT_plugs-2and2.xml";
+        cfg = dir + "mielec_E_RB_benchmark_config.xml";
         run(cfg, iter, "1.0");
         run(cfg, iter, "1.5");
         run(cfg, iter, "2.0");

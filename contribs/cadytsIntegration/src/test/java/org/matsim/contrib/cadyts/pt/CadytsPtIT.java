@@ -151,36 +151,15 @@ public class CadytsPtIT {
 		config.planCalcScore().setBrainExpBeta(beta) ;
 
 		StrategySettings stratSets = new StrategySettings() ;
-				stratSets.setStrategyName("ChangeExpBeta") ;
-//		stratSets.setStrategyName("ccc") ;
+		stratSets.setStrategyName("ChangeExpBeta") ;
 		stratSets.setWeight(1.0) ;
 		config.strategy().addStrategySettings(stratSets) ;
 
 		// ===
 
 		final Controler controler = new Controler(config);
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(true);
+		controler.getConfig().controler().setCreateGraphs(false);
 		controler.addOverridingModule(new CadytsPtModule());
-//		controler.addOverridingModule(new AbstractModule() { // Now using ChangeExpBeta instead of "ccc", which was apparently only added to provide some infrastructure, dz, jul'16
-//			@Override
-//			public void install() {
-//				addPlanStrategyBinding("ccc").toProvider(new javax.inject.Provider<PlanStrategy>() {
-//					@Inject Scenario scenario;
-//					@Inject CadytsPtContext cContext;
-//					@Override
-//					public PlanStrategy get() {
-//						final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(scenario, cContext);
-//						planSelector.setCadytsWeight(0.);
-//						// weight 0 is correct: this is only in order to use getCalibrator().addToDemand.
-//						// would certainly be cleaner (and less confusing) to write a separate method for this.  (But how?)
-//						// kai, may'13
-//						//				final PlanSelector planSelector = new ExpBetaPlanChangerWithCadytsPlanRegistration<TransitStopFacility>(beta, cContext) ;
-//						return new PlanStrategyImpl(planSelector);
-//					}
-//				});
-//			}
-//		});
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Inject CharyparNagelScoringParametersForPerson parameters;
@@ -215,15 +194,15 @@ public class CadytsPtIT {
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
         Assert.assertEquals("Num. of persons in population is wrong.", controler.getScenario().getPopulation().getPersons().size() , 4);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
-		//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
-		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
+		//		Assert.assertEquals("Distance filter is wrong.", controler.getTestScenarioURL().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
+		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getTestScenarioURL().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
 		//counts
 		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
 		Counts occupCounts = new Counts();
 		new MatsimCountsReader(occupCounts).readFile(controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName());
 		Count count =  occupCounts.getCount(Id.create("stop1", Link.class)); // casting id from stop to link, not nice
 		Assert.assertEquals("Occupancy counts description is wrong", occupCounts.getDescription(), "counts values for equil net");
-		Assert.assertEquals("CsId is wrong.", count.getCsId() , "stop1");
+		Assert.assertEquals("CsId is wrong.", count.getCsLabel() , "stop1");
 		Assert.assertEquals("Volume of hour 4 is wrong", count.getVolume(7).getValue(), 4.0 , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Max count volume is wrong.", count.getMaxVolume().getValue(), 4.0 , MatsimTestUtils.EPSILON);
 
@@ -366,15 +345,15 @@ public class CadytsPtIT {
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
         Assert.assertEquals("Num. of persons in population is wrong.", controler.getScenario().getPopulation().getPersons().size() , 4);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
-		//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
-		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
+		//		Assert.assertEquals("Distance filter is wrong.", controler.getTestScenarioURL().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
+		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getTestScenarioURL().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
 		//counts
 		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
 		Counts occupCounts = new Counts();
 		new MatsimCountsReader(occupCounts).readFile(controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName());
 		Count count =  occupCounts.getCount(Id.create("stop1", Link.class)); // casting the id from a stop to a link, not nice..
 		Assert.assertEquals("Occupancy counts description is wrong", occupCounts.getDescription(), "counts values for equil net");
-		Assert.assertEquals("CsId is wrong.", count.getCsId() , "stop1");
+		Assert.assertEquals("CsId is wrong.", count.getCsLabel() , "stop1");
 		Assert.assertEquals("Volume of hour 4 is wrong", count.getVolume(7).getValue(), 4.0 , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Max count volume is wrong.", count.getMaxVolume().getValue(), 4.0 , MatsimTestUtils.EPSILON);
 
@@ -523,15 +502,15 @@ public class CadytsPtIT {
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
         Assert.assertEquals("Num. of persons in population is wrong.", controler.getScenario().getPopulation().getPersons().size() , 4);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
-		//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
-		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
+		//		Assert.assertEquals("Distance filter is wrong.", controler.getTestScenarioURL().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
+		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getTestScenarioURL().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
 		//counts
 		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
 		Counts occupCounts = new Counts();
 		new MatsimCountsReader(occupCounts).readFile(controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName());
 		Count count =  occupCounts.getCount(Id.create("stop1", Link.class));
 		Assert.assertEquals("Occupancy counts description is wrong", occupCounts.getDescription(), "counts values for equil net");
-		Assert.assertEquals("CsId is wrong.", count.getCsId() , "stop1");
+		Assert.assertEquals("CsId is wrong.", count.getCsLabel() , "stop1");
 
 		Assert.assertEquals("Volume of hour 4 is wrong", count.getVolume(7).getValue(), 4.0 , MatsimTestUtils.EPSILON);
 		// yy I don't know why it says "hour 4" but "getVolume(7)". kai, sep'14

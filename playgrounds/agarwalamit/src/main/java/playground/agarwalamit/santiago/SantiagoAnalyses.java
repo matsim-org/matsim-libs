@@ -49,7 +49,8 @@ public class SantiagoAnalyses {
 			String eventsFile = RUN_DIR+rc+"/output_events.xml.gz";
 			String outputFile = RUN_DIR+"/analysis/delay_"+rc+".txt";
 			Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(RUN_DIR+rc+"/output_plans.xml.gz", RUN_DIR+rc+"/output_network.xml.gz");
-			ExperiencedDelayAnalyzer eda = new ExperiencedDelayAnalyzer(eventsFile, sc, 60, 30*3600);//half hour timebin		
+			sc.getConfig().qsim().setEndTime(30*3600.);
+			ExperiencedDelayAnalyzer eda = new ExperiencedDelayAnalyzer(eventsFile, sc, 60);//half hour timebin		
 			eda.run();
 			eda.writeResults(outputFile);
 		}

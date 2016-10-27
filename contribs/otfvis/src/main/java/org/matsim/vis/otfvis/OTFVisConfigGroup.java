@@ -424,7 +424,7 @@ public class OTFVisConfigGroup extends ConfigGroup {
 		return this.renderImages = render;
 	}
 
-	public boolean renderImages() {
+	public boolean getRenderImages() {
 		return this.renderImages;
 	}
 
