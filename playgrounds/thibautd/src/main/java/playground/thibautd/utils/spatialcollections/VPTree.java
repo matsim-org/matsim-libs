@@ -61,42 +61,25 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	public T getAny() {
 		if ( size() == 0 ) return null;
 
-		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
-		stack.add( root );
+		Node<C,T> current = root;
+		int index = r.nextInt( size() );
 
-		// randomize choice, without falling into the O( n ) case: choose random depth, navigate to it, return the
-		// last non-null element encountered.
-		// this has O( log( n ) ) complexity, and thus should not screw complexity of an algorithm if it is done
-		// as often or less as queries, contrary to the naive O( n ) approach.
-		// The O( 1 ) approach of getting root might lead to strange artifacts from not enough randomness.
-		// perform log on random number to give more weight to deep layers to be closer to a uniform distribution
-		int depth = (int) Math.log( 1 + r.nextInt( size() ) );
 
-		T val = null;
+		while ( true ) {
+			if ( index == 0 && current.value != null ) return current.value;
 
-		while ( (depth > 0 || val == null) && !stack.isEmpty() ) {
-			final Node<C,T> current = stack.poll();
+			assert index <= current.size : index +" > "+ current.size;
+			if ( current.value != null ) index--;
 
-			if ( current.value != null ) {
-				val = current.value;
-				depth--;
-			}
-			else if ( val == null && current.close != null && current.close.value != null ) val = current.close.value;
-			else if ( val == null && current.far != null && current.far.value != null ) val = current.far.value;
-
-			if ( r.nextBoolean() ) {
-				if ( current.close != null ) stack.add( current.close );
-				else if ( current.far != null ) stack.add( current.far );
+			if ( current.close != null && current.close.size > index ) {
+				current = current.close;
 			}
 			else {
-				if ( current.far != null ) stack.add( current.far );
-				else if ( current.close != null ) stack.add( current.close );
+				assert current.far != null : "cannot happen if sizes are right";
+				index -= current.close != null ? current.close.size : 0;
+				current = current.far;
 			}
 		}
-
-		// if invalidation works properly, there should be no branch where all values are null
-		assert val != null;
-		return val;
 	}
 
 	@Override

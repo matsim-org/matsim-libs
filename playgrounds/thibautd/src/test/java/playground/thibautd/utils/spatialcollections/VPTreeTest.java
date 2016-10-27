@@ -34,6 +34,15 @@ public class VPTreeTest {
 	private static final int GRID_SIZE = 50;
 
 	@Test
+	public void testGetAny() {
+		final VPTree<double[], Point> tree = createTree();
+
+		// cannot test validity easily, but at least that it does not crashes.
+		// most stupid errors in the function should result in NPE or AssertionError
+		for ( int i=0; i < 100; i++ ) tree.getAny();
+	}
+
+	@Test
 	public void testInvalidate() {
 		final Random random = new Random( 123 );
 		for ( int r = 0; r < 10; r++ ) {
