@@ -22,11 +22,11 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * @author thibautd
@@ -36,8 +36,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	private final SpatialCollectionUtils.Metric<C> metric;
 	private final SpatialCollectionUtils.GenericCoordinate<C,T> coordinate;
 
-	private Node<C,T> root = new Node<>();
-	private int size = 0;
+	private final Node<C,T> root = new Node<>();
 	private final Random r = new Random( 123 );
 
 	public VPTree( final SpatialCollectionUtils.Metric<C> metric,
@@ -49,7 +48,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 
 	@Override
 	public int size() {
-		return size;
+		return root.size;
 	}
 
 	/**
@@ -60,7 +59,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	 */
 	@Override
 	public T getAny() {
-		if ( size == 0 ) return null;
+		if ( size() == 0 ) return null;
 
 		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
 		stack.add( root );
@@ -71,7 +70,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 		// as often or less as queries, contrary to the naive O( n ) approach.
 		// The O( 1 ) approach of getting root might lead to strange artifacts from not enough randomness.
 		// perform log on random number to give more weight to deep layers to be closer to a uniform distribution
-		int depth = (int) Math.log( 1 + r.nextInt( size ) );
+		int depth = (int) Math.log( 1 + r.nextInt( size() ) );
 
 		T val = null;
 
@@ -129,8 +128,6 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	}
 
 	private void add( final Node<C,T> addRoot , final Collection<T> points ) {
-		size += points.size();
-
 		final Queue<AddFrame<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
 
 		// copy parameter list as it is modified in place
@@ -146,7 +143,10 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 			currentFrame.node.value = vantagePoint;
 			currentFrame.node.coordinate = coordinate.getCoord( vantagePoint );
 
-			if ( currentFrame.toAdd.isEmpty() ) continue;
+			if ( currentFrame.toAdd.isEmpty() ) {
+				backtrackSize( currentFrame.node );
+				continue;
+			}
 
 			final double medianDistance = medianDistance( vantagePoint , currentFrame.toAdd );
 
@@ -183,33 +183,18 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 				farFrame.node.parent = currentFrame.node;
 				stack.add( farFrame );
 			}
+
+			// leaf: backtrack size
+			if ( closeFrame.toAdd.isEmpty() && farFrame.toAdd.isEmpty() ) {
+				backtrackSize( currentFrame.node );
+			}
 		}
 	}
 
-	/**
-	 * Fastest version of remove. Does not remove the node, only the point.
-	 * Removal itself is faster, but latter queries are slower.
-	 *
-	 * @param value
-	 */
-	public boolean invalidate( final T value ) {
-		Node<C,T> node = find( value );
-
-		if ( node == null ) return false;
-		node.value = null;
-		size--;
-
-		// remove totally invalidated branch ends, to speed up latter queries
-		for( ;
-				node.value == null &&
-						node.far == null &&
-						node.close == null &&
-						node.parent != null;
-				node = node.parent ) {
-			if ( node.parent.close == node ) node.parent.close = null;
-			if ( node.parent.far == node ) node.parent.far = null;
-		}
-		return true;
+	private void backtrackSize( final Node<C, T> node ) {
+		Stream.iterate( node , n -> n.parent )
+				.peek( Node::recomputeSize )
+				.allMatch( n -> n.parent != null );
 	}
 
 	/**
@@ -225,47 +210,26 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 		root.close = null;
 		root.coordinate = null;
 		root.value = null;
+		root.recomputeSize();
 
-		size = 0;
 		add( toReadd );
 	}
 
-	/**
-	 * @param value
-	 * @return
-	 */
 	@Override
 	public boolean remove( final T value ) {
-		boolean isRemoved = invalidate( value );
-
-		//if ( isRemoved && --stepsToRemove == 0 ) {
-		//	// rebuild updates steps to remove
-		//	rebuild();
-		//}
-
-		return isRemoved;
-	}
-
-	public boolean trueRemove( final T value ) {
-		final Node<C,T> node = find( value );
+		Node<C,T> node = find( value );
 
 		if ( node == null ) return false;
-
-		// get all children
-		final Collection<T> toReadd = new ArrayList<>( getAll( node.close ) );
-		toReadd.addAll( getAll( node.far ) );
-
-		// invalidate node
-		node.cuttoffDistance = -1;
-		node.far = null;
-		node.close = null;
-		node.coordinate = null;
 		node.value = null;
+		backtrackSize( node );
 
-		size -= toReadd.size() + 1;
-		// this part might be expensive. Way to make it faster?
-		add( node , toReadd );
-
+		// remove totally invalidated branch ends, to speed up latter queries
+		for( ; node.size == 0 &&
+						node.parent != null;
+				node = node.parent ) {
+			if ( node.parent.close == node ) node.parent.close = null;
+			if ( node.parent.far == node ) node.parent.far = null;
+		}
 		return true;
 	}
 
@@ -373,12 +337,19 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	}
 
 	private static class Node<C,T> {
+		private int size = 0;
 		private C coordinate;
 		private T value = null;
 		private double cuttoffDistance = Double.NaN;
 		private Node<C,T> close = null;
 		private Node<C,T> far = null;
 		private Node<C,T> parent = null;
+
+		public void recomputeSize() {
+			size = value == null ? 0 : 1;
+			size += close == null ? 0 : close.size;
+			size += far == null ? 0 : far.size;
+		}
 	}
 
 	private static class AddFrame<C,T> {

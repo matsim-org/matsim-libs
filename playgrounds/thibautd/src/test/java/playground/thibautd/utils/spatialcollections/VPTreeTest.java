@@ -34,51 +34,13 @@ public class VPTreeTest {
 	private static final int GRID_SIZE = 50;
 
 	@Test
-	public void testRemove() {
-		final Random random = new Random( 123 );
-		for ( int r = 0; r < 10; r++ ) {
-			final VPTree<double[], Point> tree = createTree();
-
-			final int initialSize = tree.size();
-			tree.trueRemove(
-					new Point(
-							random.nextInt( GRID_SIZE ),
-							random.nextInt( GRID_SIZE ),
-							random.nextInt( GRID_SIZE )) );
-
-			Assert.assertEquals(
-				"unexpected claimed size",
-				tree.size(),
-				tree.getAll().size() );
-
-			Assert.assertEquals( "unexpected size" , initialSize - 1 , tree.size() );
-
-			// check tree is still valid
-			for ( int i = 0; i < 500; i++ ) {
-				final double[] c = new double[ 3 ];
-				for ( int j = 0; j < c.length; j++ ) c[ j ] = random.nextDouble() * ( GRID_SIZE - 1 );
-
-				final Point closest = tree.getClosest( c );
-
-				final int[] expected = new int[ 3 ];
-				for ( int j = 0; j < c.length; j++ ) expected[ j ] = (int) Math.round( c[ j ] );
-
-				Assert.assertArrayEquals(
-						"unexpected closest point " + Arrays.toString( closest.ints ) + " for " + Arrays.toString( c ),
-						expected,
-						closest.ints );
-			}
-		}
-	}
-
-	@Test
 	public void testInvalidate() {
 		final Random random = new Random( 123 );
 		for ( int r = 0; r < 10; r++ ) {
 			final VPTree<double[], Point> tree = createTree();
 
 			final int initialSize = tree.size();
-			tree.invalidate(
+			tree.remove(
 					new Point(
 							random.nextInt( GRID_SIZE ),
 							random.nextInt( GRID_SIZE ),
@@ -116,7 +78,7 @@ public class VPTreeTest {
 			final VPTree<double[], Point> tree = createTree();
 
 			for ( int inv = 0; inv < tree.size() / 2; inv++ ) {
-				tree.invalidate(
+				tree.remove(
 						new Point(
 								random.nextInt( GRID_SIZE ),
 								random.nextInt( GRID_SIZE ),
