@@ -35,5 +35,7 @@ public class ToySocialNetworkModule extends AbstractModule {
 		bind( EgoCharacteristicsDistribution.class ).to( ToyEgoDistribution.class );
 		bind( EgoLocator.class ).to( ToyEgoLocator.class );
 		bind( new TypeLiteral<SpatialCollectionUtils.Metric<double[]>>(){} ).toInstance( SpatialCollectionUtils::squaredEuclidean );
+
+		bind( ActivityJoiningListenner.class ).asEagerSingleton();
 	}
 }
