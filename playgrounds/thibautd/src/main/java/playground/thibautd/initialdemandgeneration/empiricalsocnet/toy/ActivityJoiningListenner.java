@@ -79,6 +79,7 @@ public class ActivityJoiningListenner implements AutoCloseable {
 						.forEach( cliquesPerPerson::remove );
 
 				for ( Ego ego : clique.egos ) {
+					writer.newLine();
 					writer.write( ego.getId()+"\t"+groupId+"\t"+clique.avgDistanceToCenter );
 				}
 			}
