@@ -81,10 +81,10 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 		}
 	}
 	
-	private void checkActivePlan(double timeSeconds){
+	private void checkActivePlan(double now){
 		SignalPlan nextPlan = this.planQueue.peek();
 		if (nextPlan != null && nextPlan.getStartTime() != null 
-				&& nextPlan.getStartTime() <= timeSeconds) {
+				&& nextPlan.getStartTime() <= now) {
 			/* start time of next signal plan is reached: 
 			 * stop active plan (if it is still running) and start next signal plan */
 			log.info("Disabling active signal control plan. Switching to control plan " + nextPlan.getId());
@@ -118,16 +118,19 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 			}
 		}
 		else if (this.activePlan != null && this.activePlan.getEndTime() != null 
-				&&  timeSeconds >= this.activePlan.getEndTime()) {
+				&&  now >= this.activePlan.getEndTime()) {
 			/* no next plan has started but active signal plans end time is reached: 
 			 * stop active signal plan. look for next starting time. */
 			this.activePlan = null;
-			if (nextPlan != null && nextPlan.getStartTime() != null 
-					&& nextPlan.getStartTime() <= (timeSeconds + SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH)){
-				this.nextActivePlanCheckTime = nextPlan.getStartTime();
+			if (nextPlan == null || nextPlan.getStartTime() == null 
+					|| nextPlan.getStartTime() > (now + SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH)){
+				// switch off the signals if next plan is starting in more than 5 seconds
+				this.signalSystem.switchOff(now);
 			}
-			else {
-				this.signalSystem.switchOff(timeSeconds);
+			if (nextPlan != null && nextPlan.getStartTime() != null){
+				this.nextActivePlanCheckTime = nextPlan.getStartTime();
+			} else { // no next start time
+				this.nextActivePlanCheckTime = Double.POSITIVE_INFINITY;
 			}
 		}
 	}
@@ -144,6 +147,7 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 			this.planQueue = null;
 		}
 		else {
+			// there is not only one plan that is active all day
 			this.checkActivePlan(simStartTimeSeconds);
 		}
 	}
