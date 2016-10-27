@@ -28,14 +28,12 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Random;
 
 /**
  * @author thibautd
  */
 @Singleton
 public class ToyEgoDistribution implements EgoCharacteristicsDistribution {
-	private final Random random = new Random( 123 );
 	private final ToySocialNetworkConfigGroup configGroup;
 
 	@Inject
@@ -45,8 +43,7 @@ public class ToyEgoDistribution implements EgoCharacteristicsDistribution {
 
 	@Override
 	public Tuple<Ego, Collection<CliqueStub>> sampleEgo( final Person person ) {
-		final int nCliques = configGroup.getMinNumberOfCliques() +
-					random.nextInt( configGroup.getMaxNumberOfCliques() - configGroup.getMinNumberOfCliques() + 1 );
+		final int nCliques = configGroup.getNumberOfCliques();
 
 		final Ego ego = new Ego( person , nCliques * configGroup.getCliqueSize() );
 		final Collection<CliqueStub> stubs = new ArrayList<>( nCliques );

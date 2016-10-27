@@ -30,8 +30,7 @@ public class ToySocialNetworkConfigGroup extends ReflectiveConfigGroup {
 	private double mean_distance_m = 1000;
 
 	private int cliqueSize = 3;
-	private int minNumberOfCliques = 5;
-	private int maxNumberOfCliques = 5;
+	private int numberOfCliques = 5;
 
 	private int populationSize = 1000;
 	private double width_m = 10000;
@@ -66,7 +65,6 @@ public class ToySocialNetworkConfigGroup extends ReflectiveConfigGroup {
 	protected void checkConsistency() {
 		super.checkConsistency();
 		if ( median_distance_m > mean_distance_m ) throw new IllegalStateException( "median cannot be lower than mean for lognormal" );
-		if ( minNumberOfCliques > maxNumberOfCliques ) throw new IllegalStateException( "min number of cliques greater than max" );
 	}
 
 	public double getLognormalLocation_m() {
@@ -87,26 +85,6 @@ public class ToySocialNetworkConfigGroup extends ReflectiveConfigGroup {
 		this.cliqueSize = cliqueSize;
 	}
 
-	@StringGetter("maxNumberOfCliques")
-	public int getMaxNumberOfCliques() {
-		return maxNumberOfCliques;
-	}
-
-	@StringSetter("maxNumberOfCliques")
-	public void setMaxNumberOfCliques( final int maxNumberOfCliques ) {
-		this.maxNumberOfCliques = maxNumberOfCliques;
-	}
-
-	@StringGetter("minNumberOfCliques")
-	public int getMinNumberOfCliques() {
-		return minNumberOfCliques;
-	}
-
-	@StringSetter("minNumberOfCliques")
-	public void setMinNumberOfCliques( final int minNumberOfCliques ) {
-		this.minNumberOfCliques = minNumberOfCliques;
-	}
-
 	@StringGetter("populationSize")
 	public int getPopulationSize() {
 		return populationSize;
@@ -125,5 +103,15 @@ public class ToySocialNetworkConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter("width_m")
 	public void setWidth_m( final double width_m ) {
 		this.width_m = width_m;
+	}
+
+	@StringGetter("numberOfCliques")
+	public int getNumberOfCliques() {
+		return numberOfCliques;
+	}
+
+	@StringSetter("numberOfCliques")
+	public void setNumberOfCliques( final int numberOfCliques ) {
+		this.numberOfCliques = numberOfCliques;
 	}
 }
