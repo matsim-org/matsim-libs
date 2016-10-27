@@ -45,8 +45,13 @@ public final class AccessibilityCalculator {
 
 	private final ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 
+	@Deprecated // yyyy
 	private boolean useRawSum; //= false;
+	
+	@Deprecated // yyyy
 	private double logitScaleParameter;
+	
+	@Deprecated // yyyy
 	private double inverseOfLogitScaleParameter;
 	
 	// new
@@ -106,6 +111,7 @@ public final class AccessibilityCalculator {
 		initDefaultContributionCalculators(travelTimes, travelDisutilityFactories, scenario);
 	}
 	
+	@Deprecated // yyyy set from "outside"
 	private void initDefaultContributionCalculators(Map<String, TravelTime> travelTimes,
 			Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
 		calculators.put(

@@ -5,14 +5,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.Coord2CoordTimeDistanceTravelDisutility;
 import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
@@ -30,11 +28,16 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
  class NetworkModeAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
 	private static final Logger log = Logger.getLogger( NetworkModeAccessibilityExpContributionCalculator.class );
 
+	@Deprecated // yyyy should be possible to get this from car travel disutility
 	private final RoadPricingScheme scheme ;
 
 	private final double logitScaleParameter;
+
+	@Deprecated // yyyy should be possible to get this from car travel disutility
 	private final double betaCarTT;		// in MATSim this is [utils/h]: cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
+	@Deprecated // yyyy should be possible to get this from car travel disutility
 	private final double betaCarTD;		// in MATSim this is [utils/money * money/meter] = [utils/meter]: cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar()
+	@Deprecated // yyyy should be possible to get this from car travel disutility
 	private final double betaCarTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
 
 	private final double constCar;
@@ -55,6 +58,9 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 			final TravelDisutilityFactory travelDisutilityFactory,
 			final Coord2CoordTimeDistanceTravelDisutility walkTravelDisutility,
 			final Scenario scenario){
+		// yyyy remove special walk travel disutility (I think)
+		
+		
 		this.scenario = scenario;
 
 		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
@@ -85,9 +91,9 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 
 	@Override
-	public void notifyNewOriginNode(Node fromNode, Double departureTime) {
-		this.fromNode = fromNode;
-		this.lcpt.calculateExtended(scenario.getNetwork(), fromNode, departureTime);
+	public void notifyNewOriginNode(Node fromNode1, Double departureTime) {
+		this.fromNode = fromNode1;
+		this.lcpt.calculateExtended(scenario.getNetwork(), fromNode1, departureTime);
 	}
 	
 	private static int cnt = 0 ;
@@ -102,8 +108,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 		
 		// TODO: extract this walk part?
 		// In the state found before modularization (june 15), this was anyway not consistent accross modes
-		// (different for PtMatrix), pointing to the fact that making this mode-specific might make sense.
-		// distance to road, and then to node.  (comment by thibaut?)
+		// (different for PtMatrix), pointing to the fact that making this mode-specific might make sense. (comment by thibaut?)
 		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Intersection() / this.walkSpeedMeterPerHour;
 		
 		// (a) disutilities to get on or off the network
@@ -121,7 +126,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 		
 		double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) 
 				+ (distance.getDistanceIntersection2Node() * betaCarTD) + (toll_money * betaCarTMC);
-//		// dzdzdz: replace the above by link disutility multiplied by fraction of link that is used according to the entry point.  (toll should be in there automatically??)
+//		// yyyyyy dzdzdz: replace the above by link disutility multiplied by fraction of link that is used according to the entry point.  (toll should be in there automatically??)
 
 		// === (2) REMAINING TRAVEL ON NETWORK:
 		double congestedCarDisutility = - lcpt.getTree().get(destination.getNearestNode().getId()).getCost();	
@@ -158,7 +163,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 		}
 	}
 
-
+	@Deprecated // yyyy should be possible to get this from car travel disutility
 	private double getTollMoney(Double departureTime, Link nearestLink, Distances distance) {
 		// yy there should be a way of doing this that is closer to the mobsim (and thus more general/automatic).  kai, jun'16
 		

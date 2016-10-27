@@ -30,6 +30,7 @@ import org.matsim.facilities.ActivityFacility;
 	 * writes the header for zones csv file
 	 */
 	public UrbanSimZoneCSVWriterV2(String matsim4opusTempDirectory, String matsimOutputDirectory){
+		// yyyy move to matsim4urbansim project
 		
 		this.matsim4opusTempDirectory = matsim4opusTempDirectory;
 		this.matsimOutputDirectory = matsimOutputDirectory;

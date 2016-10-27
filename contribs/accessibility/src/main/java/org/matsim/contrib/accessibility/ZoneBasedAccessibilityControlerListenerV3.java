@@ -120,6 +120,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		delegate.computeAccessibilities(moduleAPCM.getTimeOfDay(), opportunities);
 	}
 
+	@Deprecated // set modes from "outside"
 	public void setComputingAccessibilityForMode(Modes4Accessibility mode, boolean val) {
 		delegate.setComputingAccessibilityForMode(mode, val);
 	}

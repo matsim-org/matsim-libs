@@ -37,6 +37,7 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author dziemke
  */
+@Deprecated // yyyy I think that this class can be removed. 
 public final class Coord2CoordTimeDistanceTravelDisutility implements TravelDisutility {
 
 	private static final Logger log = Logger.getLogger(Coord2CoordTimeDistanceTravelDisutility.class);

@@ -4,13 +4,11 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.matsim4urbansim.config.ConfigurationUtils;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
 import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
-import org.matsim.core.config.ConfigUtils;
 
 public class BackupMATSimOutput {
 	
@@ -24,23 +22,10 @@ public class BackupMATSimOutput {
 	public static final String OUTPUT_TRAVELDISTANCESTATS_PNG = "traveldistancestats.png";
 	public static final String OUTPUT_STOPWATCH = "stopwatch.txt";
 	
-	public static void runBackup(Scenario scenario){
-		
-		UrbanSimParameterConfigModuleV3 module = ConfigurationUtils.getUrbanSimParameterConfigModule(scenario);
-		
-		if(module == null)
-			log.error("UrbanSimParameterConfigModule module is null. Can't determine if backup option is activated. No backup will be performed.");
-		else if( module.isBackup() ){
-			// saving results from current run
-			saveRunOutputs(scenario);
-			// cleanUrbanSimOutput(scenario); // tnicolai dec'12 not needed
-		}
-	}
-	
 	/**
 	 * Saving UrbanSim and MATSim results for current run in a backup directory ...
 	 */
-	private static void saveRunOutputs(Scenario scenario) {
+	public static void saveRunOutputs(Scenario scenario) {
 		log.info("Saving UrbanSim and MATSim outputs ...");
 
 //		M4UControlerConfigModuleV3 m4ucModule = M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(scenario.getConfig()) ;

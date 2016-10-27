@@ -85,7 +85,7 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 	@Override
 	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
 		// get the nearest link:
-		Link nearestLink = NetworkUtils.getNearestLinkExactly(((Network)scenario.getNetwork()),origin.getCoord());
+		Link nearestLink = NetworkUtils.getNearestLinkExactly(scenario.getNetwork(),origin.getCoord());
 
 		// captures the distance (as walk time) between the origin via the link to the node:
 		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);

@@ -50,6 +50,7 @@ import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
+import org.matsim.contrib.matsim4urbansim.config.ConfigurationUtils;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4urbansim.config.Matsim4UrbansimConfigGroup;
@@ -592,7 +593,12 @@ class MATSim4UrbanSimParcel{
 	 */
 	void matsim4UrbanSimShutdown(){
 		BackupMATSimOutput.prepareHotStart(scenario);
-		BackupMATSimOutput.runBackup(scenario);
+		UrbanSimParameterConfigModuleV3 module = ConfigurationUtils.getUrbanSimParameterConfigModule(scenario);
+		if(module == null) {
+			log.error("UrbanSimParameterConfigModule module is null. Can't determine if backup option is activated. No backup will be performed.");
+		} else if( module.isBackup() ){
+			BackupMATSimOutput.saveRunOutputs(scenario);
+		}
 	}
 
 	/**
