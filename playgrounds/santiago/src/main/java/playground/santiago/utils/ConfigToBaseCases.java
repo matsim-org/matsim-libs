@@ -12,6 +12,7 @@ import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
 
 public class ConfigToBaseCases {
 
@@ -56,12 +57,15 @@ public class ConfigToBaseCases {
 		transit.setTransitScheduleFile(runsClusterDir + "input/transitschedule_simplified.xml" );
 		transit.setVehiclesFile(runsClusterDir + "input/transitvehicles.xml" );
 		
+		RoadPricingConfigGroup rpcg = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+		rpcg.setTollLinksFile(runsClusterDir + "input/gantries.xml");		
 		
+		/*Values from calibration - v2b*/
 		PlanCalcScoreConfigGroup planCalc = config.planCalcScore();
-		planCalc.getModes().get(TransportMode.car).setConstant((double) 9.5511);
-		planCalc.getModes().get(TransportMode.pt).setConstant((double) -15.3975);
-		planCalc.getModes().get(TransportMode.walk).setConstant((double) 4.4591);
-		
+		planCalc.getModes().get(TransportMode.car).setConstant((double) 0.8383);
+		planCalc.getModes().get(TransportMode.pt).setConstant((double) -1.6764);
+		planCalc.getModes().get(TransportMode.walk).setConstant((double) -0.2536);
+		/**/
 		
 		new ConfigWriter(config).write(localPersonalFolder + "config_" +  baseCase10pct + ".xml" );
 		
@@ -88,10 +92,15 @@ public class ConfigToBaseCases {
 		transit.setTransitScheduleFile(runsLocalDir + "input/transitschedule_simplified.xml" );
 		transit.setVehiclesFile(runsLocalDir + "input/transitvehicles.xml" );
 		
+		RoadPricingConfigGroup rpcg = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+		rpcg.setTollLinksFile(runsLocalDir + "input/gantries.xml");
+		
+		/*Values from calibration - v2a*/
 		PlanCalcScoreConfigGroup planCalc = config.planCalcScore();
-		planCalc.getModes().get(TransportMode.car).setConstant((double) 9.5511);
-		planCalc.getModes().get(TransportMode.pt).setConstant((double) -15.3975);
-		planCalc.getModes().get(TransportMode.walk).setConstant((double) 4.4591);		
+		planCalc.getModes().get(TransportMode.car).setConstant((double) 1.2652);
+		planCalc.getModes().get(TransportMode.pt).setConstant((double) -0.6953);
+		planCalc.getModes().get(TransportMode.walk).setConstant((double) -1.1828);
+		/**/
 		
 		new ConfigWriter(config).write(localPersonalFolder + "config_" + baseCase1pct + ".xml" );
 	}
