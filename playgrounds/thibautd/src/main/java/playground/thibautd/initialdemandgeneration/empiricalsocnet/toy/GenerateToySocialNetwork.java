@@ -41,12 +41,14 @@ public class GenerateToySocialNetwork {
 
 		new ConfigWriter( config ).write( config.controler().getOutputDirectory()+"/output_config.xml" );
 
+		final ActivityJoiningListenner joiningListenner = new ActivityJoiningListenner( config );
 		try ( final AutocloserModule closer = new AutocloserModule() ){
 			final Scenario scenario = ToySocialNetworkUtils.generateRandomScenario( new Random( 8 ) , config );
 
 			SocialNetworkSamplerUtils.sampleSocialNetwork(
 							scenario,
 							closer,
+							joiningListenner::bind,
 							new ToySocialNetworkModule() );
 		}
 		catch ( RuntimeException e ) {

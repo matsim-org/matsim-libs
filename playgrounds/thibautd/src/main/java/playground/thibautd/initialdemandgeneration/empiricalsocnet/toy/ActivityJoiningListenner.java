@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.toy;
 
+import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Coord;
@@ -27,12 +28,15 @@ import org.matsim.core.config.Config;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSampler;
 
 import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -46,31 +50,43 @@ public class ActivityJoiningListenner implements AutoCloseable {
 
 	private final String outputFile;
 
+	public ActivityJoiningListenner( final Config config ) {
+		this.outputFile = config.controler().getOutputDirectory()+"/allocatedFriendsAndDistances.dat";
+
+		try ( final BufferedWriter writer = IOUtils.getBufferedWriter( outputFile ) ) {
+			writer.write( "egoId\tnCliques\tgroupId\tdistanceToCenter" );
+		}
+		catch ( IOException e ) {
+			throw new UncheckedIOException( e );
+		}
+	}
+
 	@Inject
-	public ActivityJoiningListenner(
-			final Config config,
+	public void updateListenners(
 			final SocialNetworkSampler sampler,
 			final AutocloserModule.Closer closer ) {
-		this.outputFile = config.controler().getOutputDirectory()+"/allocatedFriendsAndDistances.dat";
 		sampler.addCliqueListener( this::notifyClique );
 		closer.add( this );
 	}
 
+	public void bind( final Binder binder ) {
+		binder.requestInjection( this );
+	}
+
+	int groupId = 0;
 	@Override
 	public void close() throws Exception {
-		try ( final BufferedWriter writer = IOUtils.getBufferedWriter( outputFile ) ) {
-			writer.write( "egoId\tgroupId\tdistanceToCenter" );
-
+		try ( final BufferedWriter writer = IOUtils.getBufferedWriter( outputFile , Charset.forName("UTF8") , true ) ) {
 			final Counter counter = new Counter( "select joint activity participants # " );
-			int groupId = 0;
 			while ( !cliquesPerPerson.isEmpty() ) {
 				counter.incCounter();
 				groupId++;
-				final Clique clique =
+				final Set<Clique> cliques =
 						cliquesPerPerson.values().stream()
 								.findAny()
-								.get()
-								.stream()
+								.get();
+				final Clique clique =
+						cliques.stream()
 								.min( (c1,c2) -> Double.compare( c1.avgDistanceToCenter ,c2.avgDistanceToCenter ) )
 								.get();
 
@@ -80,7 +96,7 @@ public class ActivityJoiningListenner implements AutoCloseable {
 
 				for ( Ego ego : clique.egos ) {
 					writer.newLine();
-					writer.write( ego.getId()+"\t"+groupId+"\t"+clique.avgDistanceToCenter );
+					writer.write( ego.getId()+"\t"+cliques.size()+"\t"+groupId+"\t"+clique.avgDistanceToCenter );
 				}
 			}
 			counter.printCounter();
