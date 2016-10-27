@@ -42,23 +42,27 @@ public class GenerateToySocialNetwork {
 		new ConfigWriter( config ).write( config.controler().getOutputDirectory()+"/output_config.xml" );
 
 		final ActivityJoiningListenner joiningListenner = new ActivityJoiningListenner( config );
-		try ( final AutocloserModule closer = new AutocloserModule() ){
-			final Scenario scenario = ToySocialNetworkUtils.generateRandomScenario( new Random( 8 ) , config );
+		final int maxNCliques = configGroup.getNumberOfCliques();
+		for ( int i=1; i <= maxNCliques; i++ ) {
+			try ( final AutocloserModule closer = new AutocloserModule() ) {
+				// XXX dirty! to reimplement nicely
+				configGroup.setNumberOfCliques( i );
+				final Scenario scenario = ToySocialNetworkUtils.generateRandomScenario( new Random( 8 ), config );
 
-			SocialNetworkSamplerUtils.sampleSocialNetwork(
-							scenario,
-							closer,
-							joiningListenner::bind,
-							new ToySocialNetworkModule() );
+				SocialNetworkSamplerUtils.sampleSocialNetwork(
+						scenario,
+						closer,
+						joiningListenner::bind,
+						new ToySocialNetworkModule() );
+			}
+			catch ( RuntimeException e ) {
+				throw e;
+			}
+			catch ( Exception e ) {
+				throw new RuntimeException( e );
+			}
 		}
-		catch ( RuntimeException e ) {
-			throw e;
-		}
-		catch ( Exception e ) {
-			throw new RuntimeException( e );
-		}
-		finally {
-			MoreIOUtils.closeOutputDirLogging();
-		}
+
+		MoreIOUtils.closeOutputDirLogging();
 	}
 }
