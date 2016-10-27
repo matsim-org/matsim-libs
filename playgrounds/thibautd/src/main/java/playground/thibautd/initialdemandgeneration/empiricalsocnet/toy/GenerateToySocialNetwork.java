@@ -19,8 +19,6 @@
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.toy;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
-import org.matsim.contrib.socnetsim.framework.population.SocialNetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -46,13 +44,10 @@ public class GenerateToySocialNetwork {
 		try ( final AutocloserModule closer = new AutocloserModule() ){
 			final Scenario scenario = ToySocialNetworkUtils.generateRandomScenario( new Random( 8 ) , config );
 
-			final SocialNetwork socialNetwork =
-					SocialNetworkSamplerUtils.sampleSocialNetwork(
+			SocialNetworkSamplerUtils.sampleSocialNetwork(
 							scenario,
 							closer,
 							new ToySocialNetworkModule() );
-
-			new SocialNetworkWriter( socialNetwork ).write( config.controler().getOutputDirectory() + "/output_socialNetwork.xml.gz" );
 		}
 		catch ( RuntimeException e ) {
 			throw e;
