@@ -54,7 +54,7 @@ public class ActivityJoiningListenner implements AutoCloseable {
 		this.outputFile = config.controler().getOutputDirectory()+"/allocatedFriendsAndDistances.dat";
 
 		try ( final BufferedWriter writer = IOUtils.getBufferedWriter( outputFile ) ) {
-			writer.write( "egoId\tnCliques\tgroupId\tdistanceToCenter" );
+			writer.write( "egoId\tnCliques\tdegree\tgroupId\tdistanceToCenter" );
 		}
 		catch ( IOException e ) {
 			throw new UncheckedIOException( e );
@@ -81,23 +81,25 @@ public class ActivityJoiningListenner implements AutoCloseable {
 			while ( !cliquesPerPerson.isEmpty() ) {
 				counter.incCounter();
 				groupId++;
-				final Set<Clique> cliques =
+				final Clique clique =
 						cliquesPerPerson.values().stream()
 								.findAny()
-								.get();
-				final Clique clique =
-						cliques.stream()
+								.get()
+								.stream()
 								.min( (c1,c2) -> Double.compare( c1.avgDistanceToCenter ,c2.avgDistanceToCenter ) )
 								.get();
+
+
+
+				for ( Ego ego : clique.egos ) {
+					final Set<Clique> cliques = cliquesPerPerson.get( ego.getId() );
+					writer.newLine();
+					writer.write( ego.getId()+"\t"+cliques.size()+"\t"+ego.getAlters().size()+"\t"+groupId+"\t"+clique.avgDistanceToCenter );
+				}
 
 				clique.egos.stream()
 						.map( Ego::getId )
 						.forEach( cliquesPerPerson::remove );
-
-				for ( Ego ego : clique.egos ) {
-					writer.newLine();
-					writer.write( ego.getId()+"\t"+cliques.size()+"\t"+groupId+"\t"+clique.avgDistanceToCenter );
-				}
 			}
 			counter.printCounter();
 		}
