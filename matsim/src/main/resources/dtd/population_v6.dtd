@@ -6,12 +6,7 @@
 
 <!ELEMENT person         (attributes?,plan*)>
 <!ATTLIST person
-          id             CDATA                    #REQUIRED
-          sex            (f|m)                    #IMPLIED
-          age            CDATA                    #IMPLIED
-          license        (yes|no)                 #IMPLIED
-          car_avail      (always|never|sometimes) #IMPLIED
-          employed       (yes|no)                 #IMPLIED>
+          id             CDATA                    #REQUIRED>
 
 <!ELEMENT attributes    (attribute*)>
 
