@@ -20,12 +20,12 @@
 package org.matsim.contrib.signals.model;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.Id;
 /**
  * Implements a Fixed-time control.
  * 
- * @author dgrether
+ * @author dgrether, tthunig
  *
  */
 public class DefaultPlanbasedSignalSystemController implements SignalController {
@@ -42,7 +42,7 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 	private static final Logger log = Logger.getLogger(DefaultPlanbasedSignalSystemController.class);
 	
 	public static final String IDENTIFIER = "DefaultPlanbasedSignalSystemController";
-	private Queue<SignalPlan> planQueue = null;
+	private LinkedList<SignalPlan> planQueue = null;
 	private Map<Id<SignalPlan>, SignalPlan> plans = null;
 	private SignalSystem signalSystem = null;
 	private SignalPlan activePlan = null;
@@ -81,77 +81,193 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 		}
 	}
 	
+	/**
+	 * Method to be called when a check time is reached.
+	 * Checks whether the next signal plan has to start or if not
+	 * whether the active signal plan has to end, though.
+	 * It also sets next check times.
+	 * 
+	 * This method may assume some important facts:
+	 * 1. there is always a next plan (because activated plans are put to the end of the queue again for the next day, see startFirstPlanInQueue)
+	 * 2. start and end times of signal plans always exist (see validateSignalPlans)
+	 * 3. the start time of the next plan is always >= the end time of the active plan (or at the next day) (see validateSignalPlans)
+	 * 
+	 * @param now current time
+	 */
 	private void checkActivePlan(double now){
 		SignalPlan nextPlan = this.planQueue.peek();
-		if (nextPlan != null && nextPlan.getStartTime() != null 
-				&& nextPlan.getStartTime() <= now) {
+		if (nextPlan.getStartTime() == now % (3600*24)) {
 			/* start time of next signal plan is reached: 
 			 * stop active plan (if it is still running) and start next signal plan */
-			log.info("Disabling active signal control plan. Switching to control plan " + nextPlan.getId());
-			this.activePlan = nextPlan;
-			this.planQueue.poll();
-			
-			//determine next check of active plan
-			Double activeEndTime = this.activePlan.getEndTime();
-			if (activeEndTime != null && activeEndTime.equals(0.0)){
-				// correct end time if 0am is given instead of 24pm
-				activeEndTime = 3600 * 24.0;
-			}
-			nextPlan = this.planQueue.peek();
-			if (nextPlan != null){
-				if (activeEndTime == null && nextPlan.getStartTime() != null) {
-					this.nextActivePlanCheckTime = nextPlan.getStartTime();
-				}
-				else if (activeEndTime != null  && nextPlan.getStartTime() == null){
-					this.nextActivePlanCheckTime = activeEndTime;
-				}
-				else {
-					this.nextActivePlanCheckTime = Math.min(activeEndTime, nextPlan.getStartTime());
-				}
-			}
-			//no next plan
-			else if (activeEndTime != null){
-				this.nextActivePlanCheckTime = activeEndTime;
-			}
-			else {
-				this.nextActivePlanCheckTime = Double.POSITIVE_INFINITY;
-			}
+			log.info("Starting signal control plan " + nextPlan.getId());
+			startFirstPlanInQueue(now);
 		}
-		else if (this.activePlan != null && this.activePlan.getEndTime() != null 
-				&&  now >= this.activePlan.getEndTime()) {
+		else if (this.activePlan != null && now % (3600*24) == this.activePlan.getEndTime()) {
 			/* no next plan has started but active signal plans end time is reached: 
 			 * stop active signal plan. look for next starting time. */
-			this.activePlan = null;
-			if (nextPlan == null || nextPlan.getStartTime() == null 
-					|| nextPlan.getStartTime() > (now + SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH)){
+			log.info("Switching off active signal control plan with id " + this.activePlan.getId());
+//			if (nextPlan.getStartTime() > (now % (3600*24) + SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH)){
+			double diff = nextPlan.getStartTime() - this.activePlan.getEndTime() + 24*3600;
+			double mod = diff % (24*3600);
+			if (mod > SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH){
 				// switch off the signals if next plan is starting in more than 5 seconds
 				this.signalSystem.switchOff(now);
 			}
-			if (nextPlan != null && nextPlan.getStartTime() != null){
-				this.nextActivePlanCheckTime = nextPlan.getStartTime();
-			} else { // no next start time
-				this.nextActivePlanCheckTime = Double.POSITIVE_INFINITY;
+			waitForNextPlanInQueue(now);
+		}
+		else { // This case is just for completeness. It should not happen when check times are set correctly.
+			/* no active plan exists and nextPlan has not started yet: determine next check time */
+			waitForNextPlanInQueue(now);
+		}
+	}
+	
+	/**
+	 * Correct next start or end time of a signal plan.
+	 * Needed in case a plan goes over midnight or simulation reaches the next day.
+	 * 
+	 * @param startEndTime start or end time of a signal plan between 00:00:00 and 23:59:59 in seconds
+	 * @param now current time in seconds, giving also the current day of simulation
+	 * @return the next start or end time of the signal plan in seconds corresponding to the current day
+	 */
+	private double adaptTime2Day(double startEndTime, double now) {
+		while (startEndTime <= now) {
+			startEndTime += 3600 * 24.0;
+		}
+		return startEndTime;
+	}
+
+	/**
+	 * Moves plan from the queues first position to the last position.
+	 * Necessary to keep simulating signals when plans go over midnight and/or the simulation lasts for more than 24h.
+	 */
+	private void shiftPlan2QueueEnd() {
+		SignalPlan plan2Shift = planQueue.poll();
+		planQueue.add(plan2Shift);
+	}
+
+	@Override
+	public void simulationInitialized(double simStartTime) {		
+		// store all plans in a queue, sort them according to their end times and validate them
+//		this.planQueue = new PriorityBlockingQueue<SignalPlan>(this.plans.size(), new SignalPlanEndTimeComparator());
+		this.planQueue = new LinkedList<SignalPlan>(this.plans.values());
+		Collections.sort(planQueue, new SignalPlanEndTimeComparator(simStartTime));
+		validateSignalPlans();
+		
+		// check if first plan should already start
+		SignalPlan firstPlan = this.planQueue.peek();
+		if (firstPlan.getStartTime() <= firstPlan.getEndTime()){
+			// plan starts after midnight (i.e. does not go over midnight)
+			if (firstPlan.getStartTime() <= simStartTime && firstPlan.getEndTime() >= simStartTime){
+				startFirstPlanInQueue(simStartTime);
+				/* possible cases:
+				 * 1. simulation starts in between start and end time of the first signal plan [-|*|---|1**!*|--|**|-]
+				 */
+			} else { // startTime > simStartTime or endTime < simStartTime
+				waitForNextPlanInQueue(simStartTime);
+				/* possible cases:
+				 * 1. all signal plans start and end before simStartTime [--|1**|--|**|--!------]
+				 * 2. first signal plan starts after simStartTime [-|*|--!--|1**|--|**|-]
+				 */
+			}
+		} else { // startTime > endTime
+			// plan starts before midnight (i.e. goes over midnight)
+			if (firstPlan.getStartTime() <= simStartTime || firstPlan.getEndTime() >= simStartTime){
+				startFirstPlanInQueue(simStartTime);
+				/* possible cases:
+				 * 1. midnight plan has started this day but before simulation start [**|--|*|---|1*!***]
+				 * 2. midnight plan has already started last day [**!*|--|*|---|1**]
+				 */
+			} else { // startTime > simStartTime && endTime < simStartTime
+				waitForNextPlanInQueue(simStartTime);
+				/* possible cases:
+				 * 1. midnight plan starts later the day [**|--|*|--!--|1***]
+				 */
 			}
 		}
 	}
 
-	@Override
-	public void simulationInitialized(double simStartTimeSeconds) {
-		this.planQueue = new PriorityBlockingQueue<SignalPlan>(this.plans.size(), new SignalPlanStartTimeComparator());
-		this.planQueue.addAll(this.plans.values());
-		//first check if there is a plan that shall be active all the time (i.e. 0.0 as start and end time)
+	/**
+	 * Activate the signal plan that is first in the queue.
+	 * Move it to the end of the queue.
+	 * Determine the time when to check active plans next.
+	 * 
+	 * @param now current time
+	 */
+	private void startFirstPlanInQueue(double now) {
 		this.activePlan = this.planQueue.peek();
-		if ((this.activePlan.getStartTime() == null || this.activePlan.getStartTime() == 0.0) 
-				&& (this.activePlan.getEndTime() == null || this.activePlan.getEndTime() == 0.0)){
-			this.nextActivePlanCheckTime = Double.POSITIVE_INFINITY;
-			this.planQueue = null;
-		}
-		else {
-			// there is not only one plan that is active all day
-			this.checkActivePlan(simStartTimeSeconds);
-		}
+		shiftPlan2QueueEnd();
+		this.nextActivePlanCheckTime = adaptTime2Day(activePlan.getEndTime(), now);
 	}
 	
+	/**
+	 * Reset active plan - no plan is active.
+	 * Determine the time when to check active plans next.
+	 * 
+	 * @param now current time
+	 */
+	private void waitForNextPlanInQueue(double now) {
+		this.activePlan = null;
+		this.nextActivePlanCheckTime = adaptTime2Day(this.planQueue.peek().getStartTime(), now);
+	}
+	
+	/**
+	 * This method checks whether signal plans overlap each other.
+	 * It also throws an exception if start or end times of signal plans are not specified.
+	 * 
+	 * @throws UnsupportedOperationException if signal plans of one signal system overlap
+	 */
+	private void validateSignalPlans() {
+		SignalPlan planI = null;
+		// iterate over all signal plans. check always overlapping between plan i and plan i+1
+		for (SignalPlan planIplus1 : this.planQueue) {
+			if (planIplus1.getStartTime() == null || planIplus1.getEndTime() == null) {
+				throw new UnsupportedOperationException("Signal plan " + planIplus1.getId() + " has no start or end time. " + "Start and end times are needed if multiple signal plans are used!");
+			}
+			if (planI != null) {
+				checkOverlapping(planI, planIplus1);
+			}
+			planI = planIplus1;
+		}
+		// check also overlapping of last and first plan
+		checkOverlapping(planI, this.planQueue.peek());
+	}
+
+	/**
+	 * Assume that no plan covers the hole day.
+	 * Than there are 4 valid cases how plan 1 and 2 can be ordered within the day such that they do not overlap:
+	 * 1. [--|1**|--|2**|--] <=> start1 <= end1 <= start2 <= end2
+	 * 2. [*|---|1**|--|2**] <=> end2 <= start1 <= end1 <= start2
+	 * 3. [--|2**|---|1**|-] <=> start2 <= end2 <= start1 <= end1
+	 * 4. [**|--|2**|---|1*] <=> end1 <= start2 <= end2 <= start1
+	 * This means:
+	 * If no plan covers the hole day it is
+	 * 3 of the 4 inequalities are fulfilled <=> plans do not overlap.
+	 * 
+	 * The method throws an UnsupportedOperationException when less than 3 inequalities are fulfilled, i.e. when the plans overlap.
+	 * 
+	 * @param plan1
+	 * @param plan2
+	 */
+	private void checkOverlapping(SignalPlan plan1, SignalPlan plan2) {
+		if (plan1.getStartTime() == plan1.getEndTime() || plan2.getStartTime() == plan2.getEndTime()){
+			throw new UnsupportedOperationException("Signal system " + signalSystem.getId() + " has multiple plans but at least one of them covers the hole day. "
+					+ "If multiple signal plans are used, they are not allowed to overlap.");
+		}
+		
+		int counter = 0;
+		if (plan1.getStartTime() <= plan1.getEndTime())
+			counter++;
+		if (plan1.getEndTime() <= plan2.getStartTime())
+			counter++;
+		if (plan2.getStartTime() <= plan2.getEndTime())
+			counter++;
+		if (plan2.getEndTime() <= plan1.getStartTime())
+			counter++;
+		if (counter < 3) {
+			throw new UnsupportedOperationException("Signal plans " + plan1.getId() + " and " + plan2.getId() + " of signal system " + signalSystem.getId() + " overlap.");
+		}
+	}
+
 	@Override
 	public void addPlan(SignalPlan plan) {
 //		log.error("addPlan to system : " + this.signalSystem.getId());
@@ -173,23 +289,35 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 	}
 
 	
-	private static class SignalPlanStartTimeComparator implements Comparator<SignalPlan>, Serializable {
+	/**
+	 * Sorts Signal Plans according to their end times.
+	 * The plan with the end time coming first after (not at!) simulation start gets the first position.
+	 * The simulation start time is given in the constructor. 
+	 */
+	private static class SignalPlanEndTimeComparator implements Comparator<SignalPlan>, Serializable {
 
 		private static final long serialVersionUID = 1L;
+		private final double simStartTime;
+
+		public SignalPlanEndTimeComparator(double simulationStart) {
+			this.simStartTime = simulationStart;
+		}
 
 		@Override
 		public int compare(SignalPlan p1, SignalPlan p2) {
-			if (p1.getStartTime() != null && p2.getStartTime() != null) {
-				return p1.getStartTime().compareTo(p2.getStartTime());
-			}
-			else if (p1.getStartTime() != null && p2.getStartTime() == null){
-				return -1;
-			}
-			else if (p1.getStartTime() == null && p2.getStartTime() != null){
-				return 1;
-			}
-			else {
-				return 0;
+			if (p1.getEndTime() != null && p2.getEndTime() != null) {
+				if (p1.getEndTime() <= simStartTime && p2.getEndTime() > simStartTime){
+					// first end time before and second after simulationStart
+					return 1;
+				} else if (p1.getEndTime() > simStartTime && p2.getEndTime() <= simStartTime){
+					// first end time after and second before simulationStart
+					return -1;					
+				} else{
+					// both before (incl. at) or both after simulationStart
+					return p1.getEndTime().compareTo(p2.getEndTime());					
+				}
+			} else {
+				throw new UnsupportedOperationException("Multiple signal plans for a signal system exist but no end times are set. Start and end times are needed if multiple signal plans are used.");
 			}
 		}
 		
