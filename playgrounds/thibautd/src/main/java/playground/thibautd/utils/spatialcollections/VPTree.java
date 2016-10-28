@@ -34,6 +34,9 @@ import java.util.stream.Stream;
  * @author thibautd
  */
 public class VPTree<C,T> implements SpatialTree<C, T> {
+	// do not try to much VPs, as this quickly gets expensive.
+	private static final int SUBLIST_SIZE_VPS = 10;
+	// not too shy: cutoff distance should be pretty accurate
 	private static final int SUBLIST_SIZE_MEDIAN = 100;
 	private final SpatialCollectionUtils.Metric<C> metric;
 	private final SpatialCollectionUtils.GenericCoordinate<C,T> coordinate;
@@ -124,18 +127,17 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 			if ( currentFrame.toAdd.isEmpty() ) continue;
 			counter.incCounter();
 
-			final T vantagePoint = removeVantagePoint( currentFrame.toAdd );
-
-			assert vantagePoint != null;
-			currentFrame.node.value = vantagePoint;
-			currentFrame.node.coordinate = coordinate.getCoord( vantagePoint );
-
-			if ( currentFrame.toAdd.isEmpty() ) {
+			if ( currentFrame.toAdd.size() == 1 ) {
+				currentFrame.node.value = currentFrame.toAdd.get( 0 );
+				currentFrame.node.coordinate = coordinate.getCoord( currentFrame.toAdd.get( 0 ) );
 				backtrackSize( currentFrame.node );
 				continue;
 			}
 
-			final double medianDistance = medianDistance( vantagePoint , currentFrame.toAdd );
+			selectAndSetVantagePoint( currentFrame );
+
+			final T vantagePoint = currentFrame.node.value;
+			final double medianDistance = currentFrame.node.cuttoffDistance;
 
 			final AddFrame<C,T> closeFrame =
 					new AddFrame<>(
@@ -146,9 +148,8 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 							new Node<>(),
 							new ArrayList<>( currentFrame.toAdd.size() / 2 + 1 ) );
 
-			currentFrame.node.cuttoffDistance = medianDistance;
-
 			for ( T v : currentFrame.toAdd ) {
+				if ( vantagePoint == v ) continue;
 				final double distanceToVP = metric.calcDistance( currentFrame.node.coordinate , coordinate.getCoord( v ) );
 
 				if ( distanceToVP > medianDistance ) {
@@ -176,6 +177,23 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 			}
 		}
 		counter.printCounter();
+	}
+
+	private void selectAndSetVantagePoint( final AddFrame<C, T> currentFrame ) {
+		final List<T> vantagePoints = sublist( currentFrame.toAdd , SUBLIST_SIZE_VPS );
+
+		// select the VP with the HIGHEST median (highest spread) is supposed to give better query times
+		currentFrame.node.cuttoffDistance = Double.NEGATIVE_INFINITY;
+		assert !vantagePoints.isEmpty();
+		for ( T vantagePoint : vantagePoints ) {
+			final double medianDistance = medianDistance( vantagePoint , currentFrame.toAdd );
+
+			if ( medianDistance > currentFrame.node.cuttoffDistance ) {
+				currentFrame.node.value = vantagePoint;
+				currentFrame.node.coordinate = coordinate.getCoord( vantagePoint );
+				currentFrame.node.cuttoffDistance = medianDistance;
+			}
+		}
 	}
 
 	private void backtrackSize( final Node<C, T> node ) {
@@ -296,7 +314,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 
 	private double medianDistance( final T vp, final List<T> l ) {
 		// very simple approximation: take median of a sublist, using standard sort algorithm
-		final List<T> sublist = sublist( l );
+		final List<T> sublist = sublist( l , SUBLIST_SIZE_MEDIAN );
 		Collections.sort(
 				sublist ,
 				(t1,t2) -> Double.compare(
@@ -305,21 +323,20 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 		return calcDistance( sublist.get( sublist.size() / 2 ), vp );
 	}
 
-	private <E> List<E> sublist( final List<E> l ) {
-		if ( l.size() < SUBLIST_SIZE_MEDIAN ) return l;
+	private <E> List<E> sublist( final List<E> l , final int size ) {
+		if ( l.size() <= size ) return new ArrayList<>( l );
 
-		final List<E> sublist = new ArrayList<>( (int) (SUBLIST_SIZE_MEDIAN * 1.5) );
-		final double prob = ((double) SUBLIST_SIZE_MEDIAN) / l.size();
-
-		for ( E e : l ) {
-			if ( r.nextDouble() < prob ) sublist.add( e );
+		final List<E> sublist = new ArrayList<>( size );
+		for ( int i=0; i < size; i++ ) {
+			final int j = i + r.nextInt( size - i );
+			final E elemJ = l.get( j );
+			l.set( j , l.get( i ) );
+			l.set( i , elemJ );
+			// build the list in parallel to avoid the intermediary step of building a sublist.
+			sublist.add( elemJ );
 		}
 
 		return sublist;
-	}
-
-	private T removeVantagePoint( final List<T> toAdd ) {
-		return toAdd.remove( r.nextInt( toAdd.size() ) );
 	}
 
 	private static class Node<C,T> {
