@@ -75,9 +75,9 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author tthunig
  *
  */
-public class MultipleSignalPlansTest {
+public class SignalPlansTest {
 
-	private static final Logger log = Logger.getLogger(MultipleSignalPlansTest.class);
+	private static final Logger log = Logger.getLogger(SignalPlansTest.class);
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
