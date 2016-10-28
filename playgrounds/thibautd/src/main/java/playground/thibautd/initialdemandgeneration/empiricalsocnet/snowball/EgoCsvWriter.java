@@ -20,6 +20,7 @@ package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -71,14 +72,16 @@ public class EgoCsvWriter implements AutoCloseable {
 
 	@Override
 	public void close() throws IOException {
-		writer.write( "egoId\tnCliques\tnAlters\tplannedDegree\tE_age\tE_sex" );
+		writer.write( "egoId\tnCliques\tnAlters\tplannedDegree\tE_age\tE_sex\tE_X\tE_Y" );
 
 		for ( EgoRecord record : records.values() ) {
 			writer.newLine();
+			final Coord c = SnowballLocator.calcCoord( record.ego );
 			writer.write( record.ego.getId() +"\t"+ record.nCliques +"\t"+
 					record.ego.getAlters().size() +"\t"+ record.ego.getDegree() +"\t"+
 					PersonUtils.getAge( record.ego.getPerson() ) +"\t"+
-					SocialPositions.getSex( record.ego ) );
+					SocialPositions.getSex( record.ego ) +"\t"+
+					c.getX() +"\t"+ c.getY() );
 		}
 		writer.close();
 	}
