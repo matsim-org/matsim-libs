@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.thibautd.utils.spatialcollections;
 
+import org.matsim.core.utils.misc.Counter;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -116,9 +118,11 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 		// copy parameter list as it is modified in place
 		stack.add( new AddFrame<>( addRoot , new ArrayList<>( points ) ) );
 
+		final Counter counter = new Counter( "add VP Tree Node # " , " / "+points.size() );
 		while ( !stack.isEmpty() ) {
 			final AddFrame<C,T> currentFrame = stack.poll();
 			if ( currentFrame.toAdd.isEmpty() ) continue;
+			counter.incCounter();
 
 			final T vantagePoint = removeVantagePoint( currentFrame.toAdd );
 
@@ -172,6 +176,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 				backtrackSize( currentFrame.node );
 			}
 		}
+		counter.printCounter();
 	}
 
 	private void backtrackSize( final Node<C, T> node ) {
