@@ -137,7 +137,6 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 
 			final double medianDistance = medianDistance( vantagePoint , currentFrame.toAdd );
 
-			// avoid wasting memory by reusing toAdd list
 			final AddFrame<C,T> closeFrame =
 					new AddFrame<>(
 							new Node<>(),
