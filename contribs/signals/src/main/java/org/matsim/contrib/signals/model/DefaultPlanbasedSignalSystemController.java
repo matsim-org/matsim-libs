@@ -228,8 +228,10 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 			}
 			planI = planIplus1;
 		}
-		// check also overlapping of last and first plan
-		checkOverlapping(planI, this.planQueue.peek());
+		if (this.planQueue.size() > 1) {
+			// check also overlapping of last and first plan
+			checkOverlapping(planI, this.planQueue.peek());
+		}
 	}
 
 	/**
