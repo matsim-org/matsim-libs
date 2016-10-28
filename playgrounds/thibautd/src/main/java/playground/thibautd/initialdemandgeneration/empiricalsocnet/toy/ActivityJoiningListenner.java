@@ -21,6 +21,7 @@ package playground.thibautd.initialdemandgeneration.empiricalsocnet.toy;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -37,15 +38,20 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Soc
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
 
 /**
  * @author thibautd
  */
 @Singleton
 public class ActivityJoiningListenner implements AutoCloseable {
+	private static final Logger log = Logger.getLogger( ActivityJoiningListenner.class );
 	private final Map<Id<Person>, Set<Clique>> cliquesPerPerson = new HashMap<>();
 
 	private final String outputFile;
@@ -73,7 +79,7 @@ public class ActivityJoiningListenner implements AutoCloseable {
 		binder.requestInjection( this );
 	}
 
-	int groupId = 0;
+	private int groupId = 0;
 	@Override
 	public void close() throws Exception {
 		try ( final BufferedWriter writer = IOUtils.getBufferedWriter( outputFile , Charset.forName("UTF8") , true ) ) {
@@ -89,20 +95,36 @@ public class ActivityJoiningListenner implements AutoCloseable {
 								.min( (c1,c2) -> Double.compare( c1.avgDistanceToCenter ,c2.avgDistanceToCenter ) )
 								.get();
 
-
-
 				for ( Ego ego : clique.egos ) {
 					final Set<Clique> cliques = cliquesPerPerson.get( ego.getId() );
 					writer.newLine();
 					writer.write( ego.getId()+"\t"+cliques.size()+"\t"+ego.getAlters().size()+"\t"+groupId+"\t"+clique.avgDistanceToCenter );
 				}
 
-				clique.egos.stream()
-						.map( Ego::getId )
-						.forEach( cliquesPerPerson::remove );
+				clique.egos.forEach( this::removeEgo );
 			}
 			counter.printCounter();
 		}
+	}
+
+	private void removeEgo( final Ego ego ) {
+		// recursively remove cliques, and egos that have no cliques from this operation
+		final Collection<Clique> cliquesToRemove = cliquesPerPerson.get( ego.getId() );
+		if ( cliquesToRemove == null ) return;
+
+		for ( Clique clique : cliquesToRemove ) {
+			for ( Ego member : clique.getEgos() ) {
+				if ( member == ego ) continue;
+				final Set<Clique> cliquesOfMember =
+						cliquesPerPerson
+								.getOrDefault( member.getId(), Collections.emptySet() );
+				cliquesOfMember.remove( clique );
+				if ( cliquesOfMember.isEmpty() ) {
+					removeEgo( member );
+				}
+			}
+		}
+		cliquesPerPerson.remove( ego.getId() );
 	}
 
 	public void notifyClique( final Set<Ego> egos ) {
@@ -132,6 +154,14 @@ public class ActivityJoiningListenner implements AutoCloseable {
 							.mapToDouble( c -> CoordUtils.calcEuclideanDistance( c , center ) )
 							.average()
 							.getAsDouble();
+		}
+
+		public Set<Ego> getEgos() {
+			return egos;
+		}
+
+		public double getAvgDistanceToCenter() {
+			return avgDistanceToCenter;
 		}
 	}
 }

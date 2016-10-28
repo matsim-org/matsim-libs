@@ -27,7 +27,7 @@ public class ToySocialNetworkConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "toySocialNetwork";
 
 	private double median_distance_m = 1000;
-	private double mean_distance_m = 1000;
+	private double mean_distance_m = 3000;
 
 	private int cliqueSize = 3;
 	private int numberOfCliques = 5;
@@ -64,7 +64,7 @@ public class ToySocialNetworkConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	protected void checkConsistency() {
 		super.checkConsistency();
-		if ( median_distance_m > mean_distance_m ) throw new IllegalStateException( "median cannot be lower than mean for lognormal" );
+		if ( median_distance_m > mean_distance_m ) throw new IllegalStateException( "median cannot be higher than mean for lognormal" );
 	}
 
 	public double getLognormalLocation_m() {
@@ -72,7 +72,8 @@ public class ToySocialNetworkConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	public double getLognormalScale_m() {
-		return Math.sqrt( 2 * (Math.log( mean_distance_m ) - Math.log( median_distance_m )) );
+		if ( mean_distance_m <= median_distance_m ) throw new IllegalStateException( "median cannot be higher than mean for lognormal" );
+		return Math.sqrt( 2 * Math.log( mean_distance_m / median_distance_m ) );
 	}
 
 	@StringGetter("cliqueSize")
