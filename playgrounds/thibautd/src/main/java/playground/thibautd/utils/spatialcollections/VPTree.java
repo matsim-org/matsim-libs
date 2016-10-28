@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 import java.util.function.Predicate;
+import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
 /**
@@ -183,6 +184,10 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 		final List<T> vantagePoints = sublist( currentFrame.toAdd , SUBLIST_SIZE_VPS );
 
 		// select the VP with the HIGHEST median (highest spread) is supposed to give better query times
+		// the intuition is that high spread corresponds to the corners of the space, where the length of the border
+		// between close and far is minimized. The length of the border is proportional to the probability that no pruning
+		// occurs, which decreases performance.
+		// the paper uses the second moment, that is, the sum of square difference with median.
 		currentFrame.node.cuttoffDistance = Double.NEGATIVE_INFINITY;
 		assert !vantagePoints.isEmpty();
 		for ( T vantagePoint : vantagePoints ) {
