@@ -84,8 +84,8 @@ public class SignalPlansTest {
 
 	@Test
 	public void test2SequentialPlansCompleteDay(){
-		ScenarioRunner runner = new ScenarioRunner(0, 3600*1, 3600*1, 3600*24);
-		runner.setNoPersons(3600);
+		ScenarioRunner runner = new ScenarioRunner(0.0, 3600*1.0, 3600*1.0, 3600*24.0);
+		runner.setNoSimHours(1);
 		SignalEventAnalyzer signalAnalyzer = runner.run();
 		
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
@@ -104,7 +104,7 @@ public class SignalPlansTest {
 	
 	@Test
 	public void test2SequentialPlansUncompleteDayEnd(){
-		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(0, 3600*1, 3600*1, 3600*2)).run();
+		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(0.0, 3600*1.0, 3600*1.0, 3600*2.0)).run();
 		
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
 		log.info("Last signal off event at time " + signalAnalyzer.getLastSignalOffEventTime());
@@ -128,7 +128,7 @@ public class SignalPlansTest {
 	
 	@Test
 	public void test2SequentialPlansUncompleteDayStart(){
-		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600*1, 3600*2, 3600*2, 3600*24)).run();
+		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600*1.0, 3600*2.0, 3600*2.0, 3600*24.0)).run();
 		
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
 		log.info("Last signal off event at time " + signalAnalyzer.getLastSignalOffEventTime());
@@ -152,8 +152,8 @@ public class SignalPlansTest {
 	
 	@Test
 	public void test2SequentialPlans1SecGap(){
-		ScenarioRunner runner = new ScenarioRunner(0, 3600*1, 3600*1+1, 3600*24);
-		runner.setNoPersons(3600);
+		ScenarioRunner runner = new ScenarioRunner(0.0, 3600*1.0, 3600*1.0+1, 3600*24.0);
+		runner.setNoSimHours(1);
 		SignalEventAnalyzer signalAnalyzer = runner.run();
 		
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
@@ -172,7 +172,7 @@ public class SignalPlansTest {
 	
 	@Test
 	public void test2SequentialPlans1HourGap(){
-		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600*0, 3600*1, 3600*2, 3600*24)).run();
+		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600*0.0, 3600*1.0, 3600*2.0, 3600*24.0)).run();
 		
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
 		log.info("Last signal off event at time " + signalAnalyzer.getLastSignalOffEventTime());
@@ -197,8 +197,8 @@ public class SignalPlansTest {
 	
 	@Test
 	public void test2SequentialPlans1HourGap2TimesOff(){
-		ScenarioRunner runner = new ScenarioRunner(3600*0, 3600*1, 3600*2, 3600*3);
-		runner.setNoPersons(3*3600);
+		ScenarioRunner runner = new ScenarioRunner(3600*0.0, 3600*1.0, 3600*2.0, 3600*3.0);
+		runner.setNoSimHours(3);
 		SignalEventAnalyzer signalAnalyzer = runner.run();
 		
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
@@ -228,7 +228,7 @@ public class SignalPlansTest {
 	
 	@Test
 	public void test2SequentialPlansOverMidnight(){
-		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600*22, 3600*1, 3600*1, 3600*22)).run();
+		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600*22.0, 3600*1.0, 3600*1.0, 3600*22.0)).run();
 		
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
 		log.info("Last signal off event at time " + signalAnalyzer.getLastSignalOffEventTime());
@@ -244,34 +244,132 @@ public class SignalPlansTest {
 		Assert.assertEquals("Cycle time of second signal plan wrong.", 60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON);
 	}
 	
-	// TODO test simulation that lasts for more than 24h
+	@Test
+	public void test1SignalPlanUncompleteDay(){
+		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600*1.0, 3600*2.0, null, null)).run();
+		
+		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
+		log.info("Last signal off event at time " + signalAnalyzer.getLastSignalOffEventTime());
+		log.info("Number of signal off events " + signalAnalyzer.getNumberOfOffEvents());
+		log.info("First cycle time after 0am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(0));
+		log.info("First cycle time after 1am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(1));
+		log.info("First cycle time after 2am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(2));
+		log.info("Number of signal events between 0am and 1am " + signalAnalyzer.getNumberOfSignalEventsInHour(0));
+		log.info("Number of signal events after 2am " + signalAnalyzer.getNumberOfSignalEventsInHour(2));
+		// test time when signal plan is switched on and off
+		Assert.assertEquals("First signal state event unexpected.", 3600.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Time when signals are finally switched off is wrong.", 3600*2, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON); 
+		Assert.assertEquals("Number of signal off events is wrong.", 1, signalAnalyzer.getNumberOfOffEvents());
+		Assert.assertEquals("Signals where unexpectedly switched on before 1am.", 0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON);
+		Assert.assertTrue("Signals where unexpectedly switched on before 1am.", 1 > signalAnalyzer.getNumberOfSignalEventsInHour(0));
+		/* "1 > " because the first signal event should be at 1am, i.e. outside (after) this count interval */
+		Assert.assertEquals("Signal plan is not active between 1am and 2am.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Signals where unexpectedly switched on after 2am.", 0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(2), MatsimTestUtils.EPSILON);
+		Assert.assertTrue("Signals where unexpectedly switched on after 2am.", 3 > signalAnalyzer.getNumberOfSignalEventsInHour(2));
+		/* "3 >" because last signal switches of the first plan are allowed at 2am and switch off is only after 5 seconds (in 2:00:05 am) */
+	}
 	
-	// TODO test simulation starts after end of first day plan
+	@Test
+	public void test1AllDayGreenSignalPlanFor25h(){
+		ScenarioRunner runner = new ScenarioRunner(3600*0.0, 3600*0.0, null, null);
+		runner.setNoSimHours(25);
+		SignalEventAnalyzer signalAnalyzer = runner.run();
+		
+		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
+		log.info("Last signal off event at time " + signalAnalyzer.getLastSignalOffEventTime());
+		log.info("Number of signal off events " + signalAnalyzer.getNumberOfOffEvents());
+		log.info("First cycle time after 0am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(0));
+		log.info("First cycle time after 0am next day " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(24));
+		// test time when signal plan is switched on and off
+		Assert.assertEquals("First signal state event unexpected.", 0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON);
+		Assert.assertNull("There was an unexpected event that switches off signals.", signalAnalyzer.getLastSignalOffEventTime());
+		Assert.assertEquals("Number of signal off events is wrong.", 0, signalAnalyzer.getNumberOfOffEvents());
+		// test if signal plan is running for more than 24h
+		Assert.assertEquals("Signal plan is not active between 0am and 1am.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Signal plan is not active anymore after 0am next day.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(24), MatsimTestUtils.EPSILON);
+	}
 	
-	// TODO rename test (delete multiple) and check all day green plan
-	// TODO test only one plan, but not all day
+	@Test
+	public void test2SignalPlanFor25h(){
+		ScenarioRunner runner = new ScenarioRunner(3600*0.0, 3600*12.0, 3600*12.0, 3600*24.0);
+		runner.setNoSimHours(25);
+		SignalEventAnalyzer signalAnalyzer = runner.run();
+		
+		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
+		log.info("Last signal off event at time " + signalAnalyzer.getLastSignalOffEventTime());
+		log.info("Number of signal off events " + signalAnalyzer.getNumberOfOffEvents());
+		log.info("First cycle time after 0am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(0));
+		log.info("First cycle time after 12am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(12));
+		log.info("First cycle time after 0am next day " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(24));
+		// test time when signal plans are switched on and off
+		Assert.assertEquals("First signal state event unexpected.", 0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON);
+		Assert.assertNull("There was an unexpected event that switches off signals.", signalAnalyzer.getLastSignalOffEventTime());
+		Assert.assertEquals("Number of signal off events is wrong.", 0, signalAnalyzer.getNumberOfOffEvents());
+		// test if signal plans are correctly running for more than 24h
+		Assert.assertEquals("First signal plan is not active between 0am and 1am.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Second signal plan is not active between 12am and 1pm.", 60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(12), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("First signal plan is not active again after 0am next day.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(24), MatsimTestUtils.EPSILON);
+	}
 	
-	// TODO test cases when exceptions should be thrown: overlapping signal plans, no start/end times. overlapping auch: 2 pläne von 0 bis 0
+	@Test
+	public void testSimStartAfterFirstDayPlan(){
+		ScenarioRunner runner = new ScenarioRunner(3600*0.0, 3600*1.0, 3600*23.0, 3600*24.0);
+		runner.setSimStart_h(23);
+		runner.setNoSimHours(3);
+		SignalEventAnalyzer signalAnalyzer = runner.run();
+		
+		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
+		log.info("Last signal off event at time " + signalAnalyzer.getLastSignalOffEventTime());
+		log.info("Number of signal off events " + signalAnalyzer.getNumberOfOffEvents());
+		log.info("First cycle time after 10pm " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(22));
+		log.info("First cycle time after 11pm " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(23));
+		log.info("First cycle time after 0am next day " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(24));
+		log.info("First cycle time after 1am next day " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(25));
+		log.info("Number of signal events before 11pm " + signalAnalyzer.getNumberOfSignalEventsInHour(22));
+		log.info("Number of signal events after 1am next day " + signalAnalyzer.getNumberOfSignalEventsInHour(25));
+		// test time when signal plans are switched on and off
+		Assert.assertEquals("First signal state event unexpected.", 23*3600, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Time when signals are finally switched off is wrong.", 3600*25, signalAnalyzer.getLastSignalOffEventTime(), 5 + MatsimTestUtils.EPSILON); 
+		Assert.assertEquals("Number of signal off events is wrong.", 1, signalAnalyzer.getNumberOfOffEvents());
+		Assert.assertEquals("Signals where unexpectedly switched on before 11pm.", 0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(22), MatsimTestUtils.EPSILON);
+		Assert.assertTrue("Signals where unexpectedly switched on before 11pm.", 1 > signalAnalyzer.getNumberOfSignalEventsInHour(22));
+		Assert.assertEquals("Signals where unexpectedly switched on after 1am next day.", 0, signalAnalyzer.getCycleTimeOfFirstCycleInHour(25), MatsimTestUtils.EPSILON);
+		Assert.assertTrue("Signals where unexpectedly switched on after 1am next day.", 3 > signalAnalyzer.getNumberOfSignalEventsInHour(25));
+		// test if signal plans are correctly running
+		Assert.assertEquals("Second signal plan is not active between 11pm and 12pm.", 60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(23), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("First signal plan is not active between 0am and 1pm next day.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(24), MatsimTestUtils.EPSILON);
+	}
+	
+	// TODO test cases when exceptions should be thrown: overlapping signal plans, no start/end times. also: 2 plans from 0 to 0 each
 	
 	private class ScenarioRunner{
 		
-		private double plan1StartTime;
-		private double plan1EndTime;
-		private double plan2StartTime;
-		private double plan2EndTime;
-		private int noPersons = 2*3600;
+		private Double plan1StartTime;
+		private Double plan1EndTime;
+		private Double plan2StartTime;
+		private Double plan2EndTime;
+		private int noSimHours = 2;
+		private int simStart_h= 0;
 		
 		private Scenario scenario;
 		
-		/* package */ ScenarioRunner(double plan1StartTime, double plan1EndTime, double plan2StartTime, double plan2EndTime) {
+		/**
+		 * Create a scenario with two signal plans with given start end end times. 
+		 * If start and end times of second signal plan are null, only one signal plan is created.
+		 */
+		/* package */ ScenarioRunner(Double plan1StartTime, Double plan1EndTime, Double plan2StartTime, Double plan2EndTime) {
 			this.plan1StartTime = plan1StartTime;
 			this.plan1EndTime = plan1EndTime;
 			this.plan2StartTime = plan2StartTime;
 			this.plan2EndTime = plan2EndTime;
 		}
 		
-		/* package */ void setNoPersons(int noPersons) {
-			this.noPersons = noPersons;
+		/* package */ void setNoSimHours(int hours) {
+			this.noSimHours = hours;
+		}
+		
+		/* package */ void setSimStart_h(int simStart_h) {
+			this.simStart_h = simStart_h;
 		}
 		
 		/* package */ SignalEventAnalyzer run() {
@@ -344,7 +442,8 @@ public class SignalPlansTest {
 		private void createPopulation() {
 			Population pop = scenario.getPopulation();
 			
-			for (int i = 0; i < noPersons; i++) {
+			// one person every half an hour
+			for (int i = simStart_h*3600; i <= simStart_h*3600 + noSimHours*3600; i+=1800) {
 				// create a person
 				Person person = pop.getFactory().createPerson(Id.createPersonId("1_2-4_5-" + i));
 				pop.addPerson(person);
@@ -395,7 +494,7 @@ public class SignalPlansTest {
 			signalSystemControl.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
 			signalControl.addSignalSystemControllerData(signalSystemControl);
 			
-			// create a first plan for the signal system (with cycle time 120) valid from 0am to 1am
+			// create a first plan for the signal system (with cycle time 120)
 			SignalPlanData signalPlan1 = SignalUtils.createSignalPlan(conFac, 120, 0, Id.create("SignalPlan1", SignalPlan.class));
 			signalPlan1.setStartTime(plan1StartTime);
 			signalPlan1.setEndTime(plan1EndTime);
@@ -403,13 +502,15 @@ public class SignalPlansTest {
 			signalPlan1.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId1, 0, 60));
 			signalPlan1.setOffset(0);
 			
-			// create a second plan for the signal system (with cycle time 60) valid from 1am to 24pm
-			SignalPlanData signalPlan2 = SignalUtils.createSignalPlan(conFac, 60, 0, Id.create("SignalPlan2", SignalPlan.class));
-			signalPlan2.setStartTime(plan2StartTime);
-			signalPlan2.setEndTime(plan2EndTime);
-			signalSystemControl.addSignalPlanData(signalPlan2);
-			signalPlan2.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId1, 0, 30));
-			signalPlan2.setOffset(0);
+			if (plan2StartTime != null && plan2EndTime != null) {
+				// create a second plan for the signal system (with cycle time 60) if start and end times are not null
+				SignalPlanData signalPlan2 = SignalUtils.createSignalPlan(conFac, 60, 0, Id.create("SignalPlan2", SignalPlan.class));
+				signalPlan2.setStartTime(plan2StartTime);
+				signalPlan2.setEndTime(plan2EndTime);
+				signalSystemControl.addSignalPlanData(signalPlan2);
+				signalPlan2.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId1, 0, 30));
+				signalPlan2.setOffset(0);
+			}
 		}
 
 		private Config defineConfig() {
@@ -418,6 +519,8 @@ public class SignalPlansTest {
 			
 			// set number of iterations
 			config.controler().setLastIteration(0);
+			
+			config.qsim().setStartTime(simStart_h*3600);
 		
 			// able or enable signals and lanes
 			SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
