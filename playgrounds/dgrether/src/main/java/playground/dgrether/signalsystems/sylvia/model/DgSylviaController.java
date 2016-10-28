@@ -46,7 +46,7 @@ import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 
 
 /**
- * @author dgrether
+ * @author dgrether, tthunig
  *
  */
 public class DgSylviaController extends DgAbstractSignalController implements SignalController {
