@@ -113,7 +113,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	}
 
 	private void add( final Node<C,T> addRoot , final Collection<T> points ) {
-		final Queue<AddFrame<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
+		final Queue<AddFrame<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>( 1 + (int) Math.log( 1 + points.size() ) ) );
 
 		// copy parameter list as it is modified in place
 		stack.add( new AddFrame<>( addRoot , new ArrayList<>( points ) ) );
@@ -226,22 +226,21 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	}
 
 	private Node<C,T> find( final T value ) {
-		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
 
 		// copy parameter list as it is modified in place
-		stack.add( root );
+		Node<C,T> current = root;
 
 		final C coord = coordinate.getCoord( value );
-		while ( !stack.isEmpty() ) {
-			final Node<C,T> current = stack.poll();
-
+		while ( current != null ) {
 			if ( value.equals( current.value ) ) return current;
 
 			final double distanceToVp = metric.calcDistance( current.coordinate , coord );
 			if ( distanceToVp <= current.cuttoffDistance ) {
-				if ( current.close != null ) stack.add( current.close );
+				if ( current.close != null ) current = current.close;
+				else current = null;
 			}
-			else if ( current.far != null ) stack.add( current.far );
+			else if ( current.far != null ) current = current.far;
+			else current = null;
 		}
 
 		return null;
@@ -256,7 +255,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	public T getClosest(
 			final C coord,
 			final Predicate<T> predicate ) {
-		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
+		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>( 1 + (int) Math.log( 1 + size() )) );
 		stack.add( root );
 
 		T closest = null;
@@ -325,7 +324,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 
 	private static class Node<C,T> {
 		private int size = 0;
-		private C coordinate;
+		private C coordinate = null;
 		private T value = null;
 		private double cuttoffDistance = Double.NaN;
 		private Node<C,T> close = null;
