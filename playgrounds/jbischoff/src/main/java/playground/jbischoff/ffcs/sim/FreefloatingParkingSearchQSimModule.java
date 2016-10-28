@@ -12,7 +12,6 @@ import org.matsim.core.mobsim.qsim.ActivityEnginePlugin;
 import org.matsim.core.mobsim.qsim.QSimProvider;
 import org.matsim.core.mobsim.qsim.TeleportationPlugin;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
 import org.matsim.core.mobsim.qsim.pt.TransitEnginePlugin;
@@ -21,6 +20,8 @@ import org.matsim.pt.config.TransitConfigGroup;
 
 import com.google.inject.Module;
 import com.google.inject.Provides;
+
+import playground.jbischoff.parking.sim.ParkingPopulationAgentSource;
 
 
 class FreefloatingParkingSearchQSimModule extends com.google.inject.AbstractModule {
@@ -60,7 +61,7 @@ class FreefloatingParkingSearchQSimModule extends com.google.inject.AbstractModu
 						bind(AgentFactory.class).to(FreefloatingParkingAgentFactory.class).asEagerSingleton(); // (**)
 					}
 					bind(FFCSVehicleAgentSource.class).asEagerSingleton();
-					bind(FreefloatingPopulationAgentSource.class).asEagerSingleton();
+					bind(ParkingPopulationAgentSource.class).asEagerSingleton();
 				}
 			});
 			return result;
@@ -68,7 +69,7 @@ class FreefloatingParkingSearchQSimModule extends com.google.inject.AbstractModu
 		@Override 
 		public Collection<Class<? extends AgentSource>> agentSources() {
 			Collection<Class<? extends AgentSource>> result = new ArrayList<>();
-			result.add(FreefloatingPopulationAgentSource.class);
+			result.add(ParkingPopulationAgentSource.class);
 			result.add(FFCSVehicleAgentSource.class);
 			return result;
 		}

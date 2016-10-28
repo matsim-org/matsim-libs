@@ -54,12 +54,13 @@ class ParkingSearchQSimModule extends com.google.inject.AbstractModule {
 			result.add(new com.google.inject.AbstractModule() {
 				@Override
 				protected void configure() {
-					bind(PopulationAgentSource.class).asEagerSingleton();
 					if (getConfig().transit().isUseTransit()) {
 						throw new RuntimeException("parking search together with transit is not implemented (should not be difficult)") ;
 					} else {
 						bind(AgentFactory.class).to(ParkingAgentFactory.class).asEagerSingleton(); // (**)
 					}
+					bind(ParkingPopulationAgentSource.class).asEagerSingleton();
+
 				}
 			});
 			return result;
@@ -67,7 +68,8 @@ class ParkingSearchQSimModule extends com.google.inject.AbstractModule {
 		@Override 
 		public Collection<Class<? extends AgentSource>> agentSources() {
 			Collection<Class<? extends AgentSource>> result = new ArrayList<>();
-			result.add(PopulationAgentSource.class);
+			
+			result.add(ParkingPopulationAgentSource.class);
 			return result;
 		}
 	}
