@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!ELEMENT av (param*, timing?, operator*)>
-<!ELEMENT operator (param*, timing?, generator, dispatcher)>
+<!ELEMENT operator (param*, timing?, generator, dispatcher, pricing)>
 <!ELEMENT timing (param*)>
 <!ELEMENT param EMPTY>
 <!ELEMENT dispatcher (param*)>
 <!ELEMENT generator (param*)>
+<!ELEMENT pricing (param*)>
 
 <!ATTLIST param
         name    CDATA   #REQUIRED
@@ -17,5 +18,9 @@
         >
 
 <!ATTLIST dispatcher
-        name      CDATA #REQUIRED
+        strategy      CDATA #REQUIRED
+        >
+
+<!ATTLIST generator
+        strategy      CDATA #REQUIRED
         >

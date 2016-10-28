@@ -14,29 +14,18 @@ public class AVTimingParameters extends ReflectiveConfigGroup {
     final static String DROPOFF_DURATION_PER_STOP = "dropoffDurationPerStop";
     final static String DROPOFF_DURATION_PER_PASSENGER = "dropoffDurationPerPassenger";
 
-    final private AVTimingParameters parent;
-
     protected Double pickupDurationPerStop = null;
     protected Double pickupDurationPerPassenger = null;
 
     protected Double dropoffDurationPerStop = null;
     protected Double dropoffDurationPerPassenger = null;
 
-    public AVTimingParameters(AVTimingParameters parent) {
-        super(TIMING);
-        this.parent = parent;
-    }
-
     public AVTimingParameters() {
-        this(null);
+        super(TIMING);
     }
 
     @StringGetter(PICKUP_DURATION_PER_STOP)
     public double getPickupDurationPerStop() {
-        if (pickupDurationPerStop == null && parent != null) {
-            return parent.getPickupDurationPerStop();
-        }
-
         return pickupDurationPerStop;
     }
 
@@ -47,10 +36,6 @@ public class AVTimingParameters extends ReflectiveConfigGroup {
 
     @StringGetter(PICKUP_DURATION_PER_PASSENGER)
     public double getPickupDurationPerPassenger() {
-        if (pickupDurationPerPassenger == null && parent != null) {
-            return parent.getPickupDurationPerPassenger();
-        }
-
         return pickupDurationPerPassenger;
     }
 
@@ -61,10 +46,6 @@ public class AVTimingParameters extends ReflectiveConfigGroup {
 
     @StringGetter(DROPOFF_DURATION_PER_STOP)
     public double getDropoffDurationPerStop() {
-        if (dropoffDurationPerStop == null && parent != null) {
-            return parent.getDropoffDurationPerStop();
-        }
-
         return dropoffDurationPerStop;
     }
 
@@ -75,10 +56,6 @@ public class AVTimingParameters extends ReflectiveConfigGroup {
 
     @StringGetter(DROPOFF_DURATION_PER_PASSENGER)
     public double getDropoffDurationPerPassenger() {
-        if (dropoffDurationPerPassenger == null && parent != null) {
-            return parent.getDropoffDurationPerPassenger();
-        }
-
         return dropoffDurationPerPassenger;
     }
 

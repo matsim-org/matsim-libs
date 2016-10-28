@@ -23,14 +23,16 @@ import java.util.Map;
 
 @Singleton
 public class AVRoutingModule implements RoutingModule {
-    @Inject private AVData data;
     @Inject private Map<Id<AVOperator>, AVOperator> operators;
+    @Inject private AVRouteFactory routeFactory;
 
     Id<AVOperator> chooseRandomOperator() {
-        int index = MatsimRandom.getRandom().nextInt(operators.size());
-
+        int draw = MatsimRandom.getRandom().nextInt(operators.size());
         Iterator<Id<AVOperator>> iterator = operators.keySet().iterator();
-        for (int i = 0; i < index; i++) iterator.next();
+
+        for (int i = 0; i < draw; i++) {
+            iterator.next();
+        }
 
         return iterator.next();
     }
@@ -39,7 +41,7 @@ public class AVRoutingModule implements RoutingModule {
     public List<? extends PlanElement> calcRoute(Facility<?> fromFacility, Facility<?> toFacility, double departureTime, Person person) {
         Id<AVOperator> operator = chooseRandomOperator();
 
-        AVRoute route = new AVRoute(fromFacility.getLinkId(), toFacility.getLinkId(), operator);
+        AVRoute route = routeFactory.createRoute(fromFacility.getLinkId(), toFacility.getLinkId(), operator);
         route.setDistance(Double.NaN);
         route.setTravelTime(Double.NaN);
 

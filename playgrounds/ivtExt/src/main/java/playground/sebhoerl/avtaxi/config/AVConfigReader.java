@@ -19,9 +19,11 @@ public class AVConfigReader extends MatsimXmlParser {
     final static String OPERATOR = "operator";
     final static String TIMING = "timing";
     final static String DISPATCHER = "dispatcher";
+    final static String GENERATOR = "generator";
+    final static String PRICING = "pricing";
 
     enum State {
-        MAIN, OPERATOR, TIMING, DISPATCHER
+        MAIN, OPERATOR, TIMING, DISPATCHER, GENERATOR, PRICING
     }
 
     private Stack<State> state = new Stack<State>();
@@ -42,7 +44,7 @@ public class AVConfigReader extends MatsimXmlParser {
         if (state.peek().equals(State.MAIN)) {
             switch (name) {
                 case OPERATOR:
-                    operatorConfig = new AVOperatorConfig(atts.getValue("id"), config);
+                    operatorConfig = config.createOperatorConfig(atts.getValue("id"));
                     state.push(State.OPERATOR);
                     configs.push(operatorConfig);
                     break;
@@ -57,11 +59,19 @@ public class AVConfigReader extends MatsimXmlParser {
             switch (name) {
                 case TIMING:
                     state.push(State.TIMING);
-                    configs.push(operatorConfig.getTimingParameters());
+                    configs.push(operatorConfig.createTimingParameters());
                     break;
                 case DISPATCHER:
                     state.push(State.DISPATCHER);
-                    configs.push(operatorConfig.createDispatcherConfig(atts.getValue("name")));
+                    configs.push(operatorConfig.createDispatcherConfig(atts.getValue("strategy")));
+                    break;
+                case GENERATOR:
+                    state.push(State.GENERATOR);
+                    configs.push(operatorConfig.createGeneratorConfig(atts.getValue("strategy")));
+                    break;
+                case PRICING:
+                    state.push(State.PRICING);
+                    configs.push(operatorConfig.createPriceStructureConfig());
                     break;
             }
         }

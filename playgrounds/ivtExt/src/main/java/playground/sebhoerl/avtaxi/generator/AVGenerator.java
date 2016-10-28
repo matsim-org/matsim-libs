@@ -11,6 +11,6 @@ import java.util.Iterator;
 
 public interface AVGenerator extends Iterator<AVVehicle> {
     interface AVGeneratorFactory {
-        AVGenerator createGenerator(AVOperator operator, ConfigGroup config);
+        AVGenerator createGenerator(AVGeneratorConfig generatorConfig);
     }
 }

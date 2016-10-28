@@ -15,6 +15,6 @@ public interface AVDispatcher {
     void addVehicle(AVVehicle vehicle);
 
     interface AVDispatcherFactory {
-        AVDispatcher createDispatcher(ConfigGroup config);
+        AVDispatcher createDispatcher(AVDispatcherConfig config);
     }
 }

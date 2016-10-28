@@ -32,14 +32,16 @@ public class AVRequestCreator implements PassengerRequestCreator {
 
         PlanAgent agent = (PlanAgent) passenger;
         Leg leg = (Leg) agent.getCurrentPlanElement();
+
         AVRoute route = (AVRoute) leg.getRoute();
+        route.setDistance(0.0);
 
         AVOperator operator = operators.get(route.getOperatorId());
 
         if (operator == null) {
-            throw new IllegalStateException("Routed operator '" + route.getOperatorId().toString() + "' does not exist.");
+            throw new IllegalStateException("Operator '" + route.getOperatorId().toString() + "' does not exist.");
         }
 
-        return new AVRequest(id, passenger, pickupLink, dropoffLink, t1, now, operator);
+        return new AVRequest(id, passenger, pickupLink, dropoffLink, t1, now, route, operator);
     }
 }

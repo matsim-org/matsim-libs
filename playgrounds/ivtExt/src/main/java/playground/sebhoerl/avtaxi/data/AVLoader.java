@@ -13,35 +13,16 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import playground.sebhoerl.avtaxi.config.AVConfig;
+import playground.sebhoerl.avtaxi.config.AVOperatorConfig;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
-import playground.sebhoerl.avtaxi.utils.AVVehicleGeneratorByDensity;
 
 import java.util.Map;
 
 @Singleton
-public class AVLoader implements StartupListener, BeforeMobsimListener {
-    @Inject
-    private AVConfig config;
-
+public class AVLoader implements BeforeMobsimListener {
     @Inject
     private AVData data;
-
-    @Inject
-    private Map<Id<AVOperator>, AVOperator> operators;
-
-    @Inject
-    private Network network;
-
-    @Inject
-    private Population population;
-
-    @Override
-    public void notifyStartup(StartupEvent event) {
-        AVOperator operator = operators.get(Id.create("op1", AVOperator.class));
-        AVVehicleGeneratorByDensity generator = new AVVehicleGeneratorByDensity(data, network, population, operator);
-        generator.generate(config.getNumberOfVehicles());
-    }
 
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {

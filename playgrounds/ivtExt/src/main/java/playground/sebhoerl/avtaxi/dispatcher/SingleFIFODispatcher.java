@@ -25,19 +25,20 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class SingleFIFODispatcher implements AVDispatcher {
-    @Inject
-    private AVConfig config;
-
-    @Inject @Named(AVModule.AV_MODE)
-    private LeastCostPathCalculator router;
-
-    @Inject @Named(AVModule.AV_MODE)
-    private TravelTime travelTime;
+    final private AVDispatcherConfig config;
+    final private LeastCostPathCalculator router;
+    final private TravelTime travelTime;
 
     private Queue<AVVehicle> availableVehicles = new LinkedList<>();
     private Queue<AVRequest> pendingRequests = new LinkedList<>();
 
     private boolean reoptimize = false;
+
+    public SingleFIFODispatcher(AVDispatcherConfig config, LeastCostPathCalculator router, TravelTime travelTime) {
+        this.config = config;
+        this.router = router;
+        this.travelTime = travelTime;
+    }
 
     @Override
     public void onRequestSubmitted(AVRequest request) {
@@ -68,7 +69,7 @@ public class SingleFIFODispatcher implements AVDispatcher {
     }
 
     void performAssignment(AVVehicle vehicle, AVRequest request, double now) {
-        AVTimingParameters timing = config.getTimingParameters();
+        AVTimingParameters timing = config.getParent().getTimingParameters();
 
         Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicle.getSchedule();
         AVStayTask stayTask = (AVStayTask) Schedules.getLastTask(schedule);
@@ -108,6 +109,12 @@ public class SingleFIFODispatcher implements AVDispatcher {
         schedule.addTask(dropoffDriveTask);
         schedule.addTask(dropoffTask);
 
+        double distance = 0.0;
+        for (int i = 0; i < dropoffPath.getLinkCount(); i++) {
+            distance += dropoffPath.getLink(i).getLength();
+        }
+        request.getRoute().setDistance(distance);
+
         if (dropoffTask.getEndTime() < scheduleEndTime) {
             schedule.addTask(new AVStayTask(dropoffTask.getEndTime(), scheduleEndTime, dropoffTask.getLink()));
         }
@@ -119,9 +126,15 @@ public class SingleFIFODispatcher implements AVDispatcher {
     }
 
     static public class Factory implements AVDispatcherFactory {
+        @Inject @Named(AVModule.AV_MODE)
+        private LeastCostPathCalculator router;
+
+        @Inject @Named(AVModule.AV_MODE)
+        private TravelTime travelTime;
+
         @Override
-        public AVDispatcher createDispatcher(ConfigGroup config) {
-            return new SingleFIFODispatcher();
+        public AVDispatcher createDispatcher(AVDispatcherConfig config) {
+            return new SingleFIFODispatcher(config, router, travelTime);
         }
     }
 }

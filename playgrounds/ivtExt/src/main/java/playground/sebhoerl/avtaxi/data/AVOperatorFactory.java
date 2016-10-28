@@ -15,15 +15,7 @@ import java.util.Map;
 
 @Singleton
 public class AVOperatorFactory {
-    @Inject
-    Injector injector;
-
-    @Inject
-    Map<String, Class<? extends AVDispatcher.AVDispatcherFactory>> dispatcherStrategies;
-
-    public AVOperator createOperator(Id<AVOperator> id, AVOperatorConfig config) {
-        return new AVOperatorImpl(
-                id,
-                injector.getInstance(dispatcherStrategies.get(config.getDispatcherConfig().getStrategyName())).createDispatcher(config.getDispatcherConfig()));
+    public AVOperator createOperator(Id<AVOperator> id, AVOperatorConfig config, AVDispatcher dispatcher) {
+        return new AVOperatorImpl(id, dispatcher);
     }
 }
