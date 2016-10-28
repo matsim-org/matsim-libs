@@ -34,14 +34,18 @@ import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.contrib.taxi.run.TaxiQSimProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import com.google.inject.Binder;
 
 import playground.jbischoff.analysis.TripHistogramModule;
 import playground.jbischoff.pt.VariableAccessConfigGroup;
 import playground.jbischoff.pt.VariableAccessModeConfigGroup;
 import playground.jbischoff.pt.VariableAccessTransitRouterModule;
+import playground.jbischoff.pt.taxi.DistanceBasedTaxiFare;
 
 /**
  * @author  jbischoff
@@ -90,6 +94,14 @@ public static void main(String[] args) {
        Controler controler = new Controler(scenario);
        controler.addOverridingModule(new TaxiModule(taxiData));
        double expAveragingAlpha = 0.05;//from the AV flow paper 
+       
+       controler.addOverridingModule(new AbstractModule() {
+		@Override
+		public void install() {
+			addEventHandlerBinding().to(DistanceBasedTaxiFare.class).asEagerSingleton();	
+		}
+	});
+       
        controler.addOverridingModule(
                VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
        controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
