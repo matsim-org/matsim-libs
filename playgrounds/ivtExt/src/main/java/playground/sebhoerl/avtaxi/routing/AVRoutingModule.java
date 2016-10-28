@@ -15,6 +15,7 @@ import org.matsim.facilities.Facility;
 import playground.sebhoerl.avtaxi.data.AVData;
 import playground.sebhoerl.avtaxi.data.AVOperator;
 import playground.sebhoerl.avtaxi.framework.AVModule;
+import playground.sebhoerl.avtaxi.replanning.AVOperatorChoiceStrategy;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -23,23 +24,12 @@ import java.util.Map;
 
 @Singleton
 public class AVRoutingModule implements RoutingModule {
-    @Inject private Map<Id<AVOperator>, AVOperator> operators;
+    @Inject private AVOperatorChoiceStrategy choiceStrategy;
     @Inject private AVRouteFactory routeFactory;
-
-    Id<AVOperator> chooseRandomOperator() {
-        int draw = MatsimRandom.getRandom().nextInt(operators.size());
-        Iterator<Id<AVOperator>> iterator = operators.keySet().iterator();
-
-        for (int i = 0; i < draw; i++) {
-            iterator.next();
-        }
-
-        return iterator.next();
-    }
 
     @Override
     public List<? extends PlanElement> calcRoute(Facility<?> fromFacility, Facility<?> toFacility, double departureTime, Person person) {
-        Id<AVOperator> operator = chooseRandomOperator();
+        Id<AVOperator> operator = choiceStrategy.chooseRandomOperator();
 
         AVRoute route = routeFactory.createRoute(fromFacility.getLinkId(), toFacility.getLinkId(), operator);
         route.setDistance(Double.NaN);

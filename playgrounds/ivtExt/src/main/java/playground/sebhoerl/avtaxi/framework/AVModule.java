@@ -28,6 +28,7 @@ import playground.sebhoerl.avtaxi.dispatcher.SingleFIFODispatcher;
 import playground.sebhoerl.avtaxi.generator.AVGenerator;
 import playground.sebhoerl.avtaxi.generator.PopulationDensityGenerator;
 import playground.sebhoerl.avtaxi.passenger.AVRequestCreator;
+import playground.sebhoerl.avtaxi.replanning.AVOperatorChoiceStrategy;
 import playground.sebhoerl.avtaxi.routing.AVRoute;
 import playground.sebhoerl.avtaxi.routing.AVRouteFactory;
 import playground.sebhoerl.avtaxi.routing.AVRoutingModule;
@@ -49,6 +50,9 @@ public class AVModule extends AbstractModule {
         addRoutingModuleBinding(AV_MODE).to(AVRoutingModule.class);
         bind(ScoringFunctionFactory.class).to(AVScoringFunctionFactory.class).asEagerSingleton();
         addControlerListenerBinding().to(AVLoader.class);
+
+        bind(AVOperatorChoiceStrategy.class);
+        addPlanStrategyBinding("AVOperatorChoice").to(AVOperatorChoiceStrategy.class);
 
         // Bind the AV travel time to the DVRP estimated travel time
         bind(TravelTime.class).annotatedWith(Names.named(AVModule.AV_MODE))
