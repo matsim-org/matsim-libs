@@ -23,7 +23,6 @@ package org.matsim.contrib.signals.data.signalcontrol.v20;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -128,8 +127,6 @@ public class MultipleSignalPlansTest {
 	}
 	
 	@Test
-	@Ignore
-	// TODO debug why first signal plan starts at time 0
 	public void test2SequentialPlansUncompleteDayStart(){
 		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600*1, 3600*2, 3600*2, 3600*24)).run();
 		
@@ -230,8 +227,6 @@ public class MultipleSignalPlansTest {
 	}
 	
 	@Test
-	@Ignore
-	// TODO debug: first signal plan is ignored (or only would be switched on at 10pm); instead second plan is switched on to early
 	public void test2SequentialPlansOverMidnight(){
 		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(3600*22, 3600*1, 3600*1, 3600*22)).run();
 		
@@ -248,6 +243,15 @@ public class MultipleSignalPlansTest {
 		Assert.assertEquals("Cycle time of first signal plan wrong.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Cycle time of second signal plan wrong.", 60, signalAnalyzer.getCycleTimeOfFirstCycleInHour(1), MatsimTestUtils.EPSILON);
 	}
+	
+	// TODO test simulation that lasts for more than 24h
+	
+	// TODO test simulation starts after end of first day plan
+	
+	// TODO rename test (delete multiple) and check all day green plan
+	// TODO test only one plan, but not all day
+	
+	// TODO test cases when exceptions should be thrown: overlapping signal plans, no start/end times. overlapping auch: 2 pläne von 0 bis 0
 	
 	private class ScenarioRunner{
 		
@@ -455,8 +459,8 @@ public class MultipleSignalPlansTest {
 		Double lastSignalOffEventTime = null;
 		int noOffEvents;
 		Double firstSignalEventTime = null;
-		double[] cycleTimesOfFirstCyclePerHour = new double[24];
-		int[] noSignalEventsPerHour = new int[24];
+		double[] cycleTimesOfFirstCyclePerHour = new double[30];
+		int[] noSignalEventsPerHour = new int[30];
 		
 		Double lastGreenSwitchOfThisCycle = null;
 		
