@@ -157,22 +157,45 @@ public class CreateSignalInputExample {
 			control.addSignalSystemControllerData(controller);
 			// declare the control as a fixed time control
 			controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
+			
 			/* create a first signal plan for the system control (a signal system control (i.e. an intersection) 
-			 * could have different plans for different times of the day) */
-			SignalPlanData plan = control.getFactory().createSignalPlanData(Id.create("1", SignalPlan.class));
+			 * can have different (non-overlapping) plans for different times of the day) */
+			SignalPlanData plan1 = control.getFactory().createSignalPlanData(Id.create("1", SignalPlan.class));
 			// add the (first) plan to the system control
-			controller.addSignalPlanData(plan);
+			controller.addSignalPlanData(plan1);
 			// fill the plan with information: cycle time, offset, signal settings
-			plan.setCycleTime(cycle);
-			plan.setOffset(0);
+			plan1.setStartTime(0.0);
+			/* note: use start and end time as 0.0 if you want to define a signal plan that is valid all day. */
+			plan1.setEndTime(6.0*3600);
+			plan1.setCycleTime(cycle);
+			plan1.setOffset(0);
 			SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(Id.create("1", SignalGroup.class));
-			plan.addSignalGroupSettings(settings1);
+			plan1.addSignalGroupSettings(settings1);
 			settings1.setOnset(0);
 			settings1.setDropping(55);
 			SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(Id.create("2", SignalGroup.class));
-			plan.addSignalGroupSettings(settings2);
+			plan1.addSignalGroupSettings(settings2);
 			settings2.setOnset(0);
 			settings2.setDropping(55);
+			
+			// create another signal plan for the system control
+			SignalPlanData plan2 = control.getFactory().createSignalPlanData(Id.create("2", SignalPlan.class));
+			controller.addSignalPlanData(plan2);
+			/* note: end and start time of the two signal plans may be equal but not overlapping */
+			plan2.setStartTime(6.0*3600);
+			/* note: signal plans of a group do not have to cover the hole day.
+			 * when no signal plan is defined for a time period, signals are switched off */
+			plan2.setEndTime(18.0 * 3600);
+			plan2.setCycleTime(cycle/2);
+			plan2.setOffset(0);
+			SignalGroupSettingsData settings1_2 = control.getFactory().createSignalGroupSettingsData(Id.create("1", SignalGroup.class));
+			plan2.addSignalGroupSettings(settings1_2);
+			settings1_2.setOnset(0);
+			settings1_2.setDropping(25);
+			SignalGroupSettingsData settings2_2 = control.getFactory().createSignalGroupSettingsData(Id.create("2", SignalGroup.class));
+			plan2.addSignalGroupSettings(settings2_2);
+			settings2_2.setOnset(0);
+			settings2_2.setDropping(25);
 		}
 	}
 	
