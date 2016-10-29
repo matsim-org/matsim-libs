@@ -269,9 +269,14 @@ public class SignalPlansTest {
 		/* "3 >" because last signal switches of the first plan are allowed at 2am and switch off is only after 5 seconds (in 2:00:05 am) */
 	}
 	
+	/**
+	 * test
+	 * 1. one signal plan with default start and end times. should give all day green
+	 * 2. simulation lasts for more than 24h
+	 */
 	@Test
 	public void test1AllDayGreenSignalPlanFor25h(){
-		ScenarioRunner runner = new ScenarioRunner(3600*0.0, 3600*0.0, null, null);
+		ScenarioRunner runner = new ScenarioRunner(null, null, null, null); // i.e. new ScenarioRunner(3600*0.0, 3600*0.0, null, null);
 		runner.setNoSimHours(25);
 		SignalEventAnalyzer signalAnalyzer = runner.run();
 		
@@ -340,7 +345,54 @@ public class SignalPlansTest {
 		Assert.assertEquals("First signal plan is not active between 0am and 1pm next day.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(24), MatsimTestUtils.EPSILON);
 	}
 	
-	// TODO test cases when exceptions should be thrown: overlapping signal plans, no start/end times. also: 2 plans from 0 to 0 each
+	/**
+	 * tests:
+	 * 1. overlapping signal plans (uncomplete day) result in an exception
+	 */
+	@Test
+	public void test2PlansSameTimesUncompleteDay(){
+		final String exceptionMessageOverlapping21 = "Signal plans SignalPlan2 and SignalPlan1 of signal system SignalSystem-3 overlap.";
+		
+		try{
+			(new ScenarioRunner(0.0, 1.0, 0.0, 1.0)).run();
+			Assert.fail("The simulation has not stopped with an exception although the signal plans overlap.");
+		} catch (UnsupportedOperationException e) {
+			log.info("Exception message: " + e.getMessage());
+			Assert.assertEquals("Wrong exception message.", exceptionMessageOverlapping21, e.getMessage());
+		}
+	}
+	
+	/**
+	 * tests:
+	 * 1. overlapping signal plans (complete day) result in an exception
+	 */
+	@Test
+	public void test2PlansSameTimesCompleteDay(){
+		final String exceptionMessageHoleDay = "Signal system SignalSystem-3 has multiple plans but at least one of them covers the hole day. "
+				+ "If multiple signal plans are used, they are not allowed to overlap.";
+		
+		try{
+			(new ScenarioRunner(0.0, 0.0, 0.0, 0.0)).run();
+//			(new ScenarioRunner(1.0, 1.0, 1.0, 1.0)).run(); // alternativ. produces same results
+			Assert.fail("The simulation has not stopped with an exception although multiple signal plans exist and at least one of them covers the hole day (i.e. they overlap).");
+		} catch (UnsupportedOperationException e) {
+			log.info("Exception message: " + e.getMessage());
+			Assert.assertEquals("Wrong exception message.", exceptionMessageHoleDay, e.getMessage());
+		}
+	}
+	
+	@Test
+	public void test2OverlappingPlans(){
+		final String exceptionMessageOverlapping12 = "Signal plans SignalPlan1 and SignalPlan2 of signal system SignalSystem-3 overlap.";
+		
+		try{
+			(new ScenarioRunner(0.0, 2.0, 1.0, 3.0)).run();
+			Assert.fail("The simulation has not stopped with an exception although the signal plans overlap.");
+		} catch (UnsupportedOperationException e) {
+			log.info("Exception message: " + e.getMessage());
+			Assert.assertEquals("Wrong exception message.", exceptionMessageOverlapping12, e.getMessage());
+		}
+	}
 	
 	private class ScenarioRunner{
 		
@@ -496,8 +548,8 @@ public class SignalPlansTest {
 			
 			// create a first plan for the signal system (with cycle time 120)
 			SignalPlanData signalPlan1 = SignalUtils.createSignalPlan(conFac, 120, 0, Id.create("SignalPlan1", SignalPlan.class));
-			signalPlan1.setStartTime(plan1StartTime);
-			signalPlan1.setEndTime(plan1EndTime);
+			if (plan1StartTime != null) signalPlan1.setStartTime(plan1StartTime);
+			if (plan1EndTime != null) signalPlan1.setEndTime(plan1EndTime);
 			signalSystemControl.addSignalPlanData(signalPlan1);
 			signalPlan1.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId1, 0, 60));
 			signalPlan1.setOffset(0);
