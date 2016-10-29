@@ -84,16 +84,12 @@ public class SignalControlWriter20 extends MatsimJaxbXmlWriter {
 					XMLSignalPlanType xmlPd = fac.createXMLSignalPlanType();
 					xmlCd.getSignalPlan().add(xmlPd);
 					xmlPd.setId(planData.getId().toString());
-					if (planData.getStartTime() != null){
-						XMLStart xmlStart = fac.createXMLSignalPlanTypeXMLStart();
-						xmlPd.setStart(xmlStart);
-						xmlStart.setDaytime(this.getXmlGregorianCalendar(planData.getStartTime()));
-					}
-					if (planData.getEndTime() != null){
-						XMLStop xmlStop = fac.createXMLSignalPlanTypeXMLStop();
-						xmlPd.setStop(xmlStop);
-						xmlStop.setDaytime(this.getXmlGregorianCalendar(planData.getEndTime()));
-					}
+					XMLStart xmlStart = fac.createXMLSignalPlanTypeXMLStart();
+					xmlPd.setStart(xmlStart);
+					xmlStart.setDaytime(this.getXmlGregorianCalendar(planData.getStartTime()));
+					XMLStop xmlStop = fac.createXMLSignalPlanTypeXMLStop();
+					xmlPd.setStop(xmlStop);
+					xmlStop.setDaytime(this.getXmlGregorianCalendar(planData.getEndTime()));
 					if (planData.getCycleTime() != null){
 						XMLCycleTime xmlCycleTime = fac.createXMLSignalPlanTypeXMLCycleTime();
 						xmlPd.setCycleTime(xmlCycleTime);

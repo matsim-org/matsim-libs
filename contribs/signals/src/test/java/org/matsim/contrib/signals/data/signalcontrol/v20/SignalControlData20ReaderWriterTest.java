@@ -108,12 +108,10 @@ public class SignalControlData20ReaderWriterTest {
 		Assert.assertNotNull(systemController.getSignalPlanData());
 		SignalPlanData plan = systemController.getSignalPlanData().get(signalPlanId8);
 		Assert.assertNotNull(plan);
-		Double startTime = plan.getStartTime();
-		Assert.assertNotNull(startTime);
-		Assert.assertEquals(Double.valueOf(0.0), startTime);
-		Double stopTime = plan.getEndTime();
-		Assert.assertNotNull(stopTime);
-		Assert.assertEquals(Double.valueOf(0.0), stopTime);
+		double startTime = plan.getStartTime();
+		Assert.assertEquals(0.0, startTime, MatsimTestUtils.EPSILON);
+		double stopTime = plan.getEndTime();
+		Assert.assertEquals(0.0, stopTime, MatsimTestUtils.EPSILON);
 		Integer cycleTime = plan.getCycleTime();
 		Assert.assertNotNull(cycleTime);
 		Assert.assertEquals(Integer.valueOf(60), cycleTime);

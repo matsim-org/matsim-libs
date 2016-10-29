@@ -220,9 +220,6 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 		SignalPlan planI = null;
 		// iterate over all signal plans. check always overlapping between plan i and plan i+1
 		for (SignalPlan planIplus1 : this.planQueue) {
-			if (planIplus1.getStartTime() == null || planIplus1.getEndTime() == null) {
-				throw new UnsupportedOperationException("Signal plan " + planIplus1.getId() + " has no start or end time. " + "Start and end times are needed if multiple signal plans are used!");
-			}
 			if (planI != null) {
 				checkOverlapping(planI, planIplus1);
 			}
@@ -307,19 +304,15 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 
 		@Override
 		public int compare(SignalPlan p1, SignalPlan p2) {
-			if (p1.getEndTime() != null && p2.getEndTime() != null) {
-				if (p1.getEndTime() <= simStartTime && p2.getEndTime() > simStartTime){
-					// first end time before and second after simulationStart
-					return 1;
-				} else if (p1.getEndTime() > simStartTime && p2.getEndTime() <= simStartTime){
-					// first end time after and second before simulationStart
-					return -1;					
-				} else{
-					// both before (incl. at) or both after simulationStart
-					return p1.getEndTime().compareTo(p2.getEndTime());					
-				}
+			if (p1.getEndTime() <= simStartTime && p2.getEndTime() > simStartTime) {
+				// first end time before and second after simulationStart
+				return 1;
+			} else if (p1.getEndTime() > simStartTime && p2.getEndTime() <= simStartTime) {
+				// first end time after and second before simulationStart
+				return -1;
 			} else {
-				throw new UnsupportedOperationException("Multiple signal plans for a signal system exist but no end times are set. Start and end times are needed if multiple signal plans are used.");
+				// both before (incl. at) or both after simulationStart
+				return Double.compare(p1.getEndTime(), p2.getEndTime());
 			}
 		}
 		

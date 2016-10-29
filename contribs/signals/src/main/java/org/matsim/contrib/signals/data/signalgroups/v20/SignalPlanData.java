@@ -32,23 +32,22 @@ public interface SignalPlanData {
 
 	public Id<SignalPlan> getId();
 
-	public void addSignalGroupSettings(
-			SignalGroupSettingsData signalGroupSettings);
+	public void addSignalGroupSettings(SignalGroupSettingsData signalGroupSettings);
 
 	public SortedMap<Id<SignalGroup>, SignalGroupSettingsData> getSignalGroupSettingsDataByGroupId();
 
 	/**
-	 * @return null if not set
+	 * @return 0.0 if not set
 	 */
-	public Double getStartTime();
+	public double getStartTime();
 	/**
 	 * Set the time of day the  plan should be activated. Set start and end to 0.0 if the plan should be active all day.
 	 */
 	public void setStartTime(Double seconds);
 	/**
-	 * @return null if not set
+	 * @return 0.0 if not set
 	 */
-	public Double getEndTime();
+	public double getEndTime();
 	/**
 	 * Set the time of day the  plan should be activated. Set start and end to 0.0 if the plan should be active all day.
 	 */
