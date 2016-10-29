@@ -96,7 +96,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		if (ptMatrix != null) {
 			AccessibilityCalculator r = this.accessibilityCalculator;
 			r.putAccessibilityCalculator(
-			Modes4Accessibility.pt,
+			Modes4Accessibility.pt.name(),
 			PtMatrixAccessibilityContributionCalculator.create(
 					ptMatrix,
 					scenario.getConfig()));	// this could be zero if no input files for pseudo pt are given ...

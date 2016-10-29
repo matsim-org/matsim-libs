@@ -41,7 +41,7 @@ public final class AccessibilityCalculator {
 	// destinations, opportunities like jobs etc ...
 	private AggregationObject[] aggregatedOpportunities;
 
-	private final Map<Modes4Accessibility, AccessibilityContributionCalculator> calculators = new HashMap<>();
+	private final Map<String, AccessibilityContributionCalculator> calculators = new HashMap<>();
 
 	private final ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 
@@ -115,26 +115,26 @@ public final class AccessibilityCalculator {
 	private void initDefaultContributionCalculators(Map<String, TravelTime> travelTimes,
 			Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
 		calculators.put(
-				Modes4Accessibility.car,
+				Modes4Accessibility.car.name(),
 				new NetworkModeAccessibilityExpContributionCalculator(
 						travelTimes.get(TransportMode.car),
 						travelDisutilityFactories.get(TransportMode.car),
 						null,
 						scenario));
 		calculators.put(
-				Modes4Accessibility.freeSpeed,
+				Modes4Accessibility.freeSpeed.name(),
 				new NetworkModeAccessibilityExpContributionCalculator(
 						new FreeSpeedTravelTime(),
 						travelDisutilityFactories.get(TransportMode.car),
 						null,
 						scenario));
 		calculators.put(
-				Modes4Accessibility.walk,
+				Modes4Accessibility.walk.name(),
 				new ConstantSpeedAccessibilityExpContributionCalculator(
 						TransportMode.walk,
 						scenario));
 		calculators.put(
-				Modes4Accessibility.bike,
+				Modes4Accessibility.bike.name(),
 				new ConstantSpeedAccessibilityExpContributionCalculator(
 						TransportMode.bike,
 						scenario));
@@ -295,10 +295,10 @@ public final class AccessibilityCalculator {
 	private void computeAndAddExpUtilContributions( Map<Modes4Accessibility,ExpSum> expSums, ActivityFacility origin, 
 			final AggregationObject aggregatedFacility, Double departureTime) 
 	{
-		for ( Map.Entry<Modes4Accessibility, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet() ) {
-			final Modes4Accessibility mode = calculatorEntry.getKey();
-
-			if ( !this.acg.getIsComputingMode().contains(mode) ) {
+		for ( Map.Entry<String, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet() ) {
+			final String mode = calculatorEntry.getKey();
+			
+			if ( !this.acg.getIsComputingMode().contains(Modes4Accessibility.valueOf(mode)) ) {
 				continue; // XXX yyyyyy should be configured by adding only the relevant calculators
 			}
 
@@ -314,7 +314,7 @@ public final class AccessibilityCalculator {
 		this.acg.setComputingAccessibilityForMode(mode, val);
 	}
 	
-	public final void putAccessibilityCalculator( Modes4Accessibility mode, AccessibilityContributionCalculator calc ) {
+	public final void putAccessibilityCalculator( String mode, AccessibilityContributionCalculator calc ) {
 		this.calculators.put( mode , calc ) ;
 	}
 	

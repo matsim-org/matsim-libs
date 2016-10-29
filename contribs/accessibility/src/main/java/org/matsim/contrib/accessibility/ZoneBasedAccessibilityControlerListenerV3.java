@@ -74,7 +74,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		assert(matsim4opusTempDirectory != null);
 		if (ptMatrix != null) {
 			delegate.putAccessibilityCalculator(
-			Modes4Accessibility.pt,
+			Modes4Accessibility.pt.name(),
 			PtMatrixAccessibilityContributionCalculator.create(
 					ptMatrix,
 					scenario.getConfig())); // this could be zero of no input files for pseudo pt are given ...
