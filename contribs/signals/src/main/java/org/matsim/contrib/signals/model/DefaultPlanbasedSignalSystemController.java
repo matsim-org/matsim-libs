@@ -251,7 +251,7 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 	 * @param plan2
 	 */
 	private void checkOverlapping(SignalPlan plan1, SignalPlan plan2) {
-		if (plan1.getStartTime() == plan1.getEndTime() || plan2.getStartTime() == plan2.getEndTime()){
+		if (plan1.getStartTime() % (24*3600) == plan1.getEndTime() % (24*3600) || plan2.getStartTime() % (24*3600) == plan2.getEndTime() % (24*3600)){
 			throw new UnsupportedOperationException("Signal system " + signalSystem.getId() + " has multiple plans but at least one of them covers the hole day. "
 					+ "If multiple signal plans are used, they are not allowed to overlap.");
 		}
