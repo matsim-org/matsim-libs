@@ -62,8 +62,8 @@ public class FixCottbusResultsIT {
 	
 	@Test
 	@Ignore //takes to long
-	public void testBC(){
-		fixResults(ScenarioType.BaseCase, SignalType.MS, 0.0);
+	public void testBC(){		
+		fixResults(ScenarioType.BaseCase, SignalType.MS, 125289192.0);
 	}
 
 	@Test
@@ -81,8 +81,6 @@ public class FixCottbusResultsIT {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);	
 		// add missing scenario elements
-		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
-				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
 				new SignalsDataLoader(config).loadSignalsData());
 		
@@ -156,7 +154,7 @@ public class FixCottbusResultsIT {
 
 		// set travelTimeBinSize (only has effect if reRoute is used)
 		config.travelTimeCalculator().setTraveltimeBinSize( 10 );
-
+		
 		config.travelTimeCalculator().setTravelTimeCalculatorType(TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
 		// hash map and array produce same results. only difference: memory and time.
 		// for small time bins and sparse values hash map is better. theresa, may'15
@@ -196,7 +194,9 @@ public class FixCottbusResultsIT {
 			// use default: 1.0 (i.e. as it is in the BTU network)
 		}
 		
+		// set start and end time to shorten simulation run time
 		config.qsim().setStartTime(3600 * 5); 
+		config.qsim().setEndTime(3600 * 24);
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
