@@ -24,8 +24,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacilities;
 
-import com.vividsolutions.jts.geom.Envelope;
-
 /**
  * @author thomas, dziemke
  */
@@ -96,7 +94,12 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		this.accessibilityCalculator.addFacilityDataExchangeListener(spatialGridAggregator);
 
 		if (ptMatrix != null) {
-			this.accessibilityCalculator.setPtMatrix(ptMatrix);	// this could be zero if no input files for pseudo pt are given ...
+			AccessibilityCalculator r = this.accessibilityCalculator;
+			r.putAccessibilityCalculator(
+			Modes4Accessibility.pt,
+			PtMatrixAccessibilityContributionCalculator.create(
+					ptMatrix,
+					scenario.getConfig()));	// this could be zero if no input files for pseudo pt are given ...
 		}
 		
 		log.info(".. done initializing CellBasedAccessibilityControlerListenerV3");
@@ -232,7 +235,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		// yy for time being, have to assume that this is always there
 
 		for (Modes4Accessibility mode : accessibilityCalculator.getIsComputingMode()) {
-			List<Double> valueList = new ArrayList<Double>();
+			List<Double> valueList = new ArrayList<>();
 
 			for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution()) {
 				for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {

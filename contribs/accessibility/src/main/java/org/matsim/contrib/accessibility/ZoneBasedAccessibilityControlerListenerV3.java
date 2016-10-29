@@ -73,7 +73,11 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		delegate.setMeasuringPoints(measuringPoints);
 		assert(matsim4opusTempDirectory != null);
 		if (ptMatrix != null) {
-			delegate.setPtMatrix(ptMatrix); // this could be zero of no input files for pseudo pt are given ...
+			delegate.putAccessibilityCalculator(
+			Modes4Accessibility.pt,
+			PtMatrixAccessibilityContributionCalculator.create(
+					ptMatrix,
+					scenario.getConfig())); // this could be zero of no input files for pseudo pt are given ...
 		}
 		assert(scenario != null);
 

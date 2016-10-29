@@ -111,7 +111,7 @@ public final class AccessibilityCalculator {
 		initDefaultContributionCalculators(travelTimes, travelDisutilityFactories, scenario);
 	}
 	
-	@Deprecated // yyyy set from "outside"
+	@Deprecated // yyyyyy set from "outside"
 	private void initDefaultContributionCalculators(Map<String, TravelTime> travelTimes,
 			Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
 		calculators.put(
@@ -119,22 +119,14 @@ public final class AccessibilityCalculator {
 				new NetworkModeAccessibilityExpContributionCalculator(
 						travelTimes.get(TransportMode.car),
 						travelDisutilityFactories.get(TransportMode.car),
-						// new
-//						walkTravelDisutility,
-						// ===
 						null,
-						// new
 						scenario));
 		calculators.put(
 				Modes4Accessibility.freeSpeed,
 				new NetworkModeAccessibilityExpContributionCalculator(
 						new FreeSpeedTravelTime(),
 						travelDisutilityFactories.get(TransportMode.car),
-						// new
-//						walkTravelDisutility,
-						// ===
 						null,
-						// new
 						scenario));
 		calculators.put(
 				Modes4Accessibility.walk,
@@ -179,19 +171,13 @@ public final class AccessibilityCalculator {
 		for ( ActivityFacility opportunity : opportunities.getFacilities().values() ) {
 			bar.update();
 
-			Node nearestNode = NetworkUtils.getNearestNode(((Network)network),opportunity.getCoord());
+			Node nearestNode = NetworkUtils.getNearestNode(network,opportunity.getCoord());
 			
-			// new
-//			double walkUtility = -this.walkTravelDisutility.getCoord2CoordTravelDisutility(opportunity.getCoord(), nearestNode.getCoord());
-//			double expVjk = Math.exp(this.logitScaleParameter * walkUtility);
-			// ===
 			// get Euclidian distance to nearest node
 			double distance_meter 	= NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
 			double VjkWalkTravelTime	= this.betaWalkTT * (distance_meter / this.walkSpeedMeterPerHour);
 			double VjkWalkDistance 		= this.betaWalkTD * distance_meter;
-
 			double expVjk				= Math.exp(this.logitScaleParameter * (VjkWalkTravelTime + VjkWalkDistance ) );
-			// end new
 			
 			// add Vjk to sum
 			AggregationObject jco = opportunityClusterMap.get( nearestNode.getId() ) ;
@@ -247,7 +233,7 @@ public final class AccessibilityCalculator {
 				// goes through all opportunities, e.g. jobs, (nearest network node) and calculate/add their exp(U) contributions:
 				for (final AggregationObject aggregatedFacility : this.aggregatedOpportunities) {
 					computeAndAddExpUtilContributions( expSums, origin, aggregatedFacility, departureTime );
-					// yyyy might be nicer to not pass gcs into the method. kai, oct'16
+					// yyyy might be nicer to not pass expSums into the method. kai, oct'16
 				}
 				// --------------------------------------------------------------------------------------------------------------
 				// What does the aggregation of the starting locations save if we do the just ended loop for all starting
@@ -313,7 +299,7 @@ public final class AccessibilityCalculator {
 			final Modes4Accessibility mode = calculatorEntry.getKey();
 
 			if ( !this.acg.getIsComputingMode().contains(mode) ) {
-				continue; // XXX should be configured by adding only the relevant calculators
+				continue; // XXX yyyyyy should be configured by adding only the relevant calculators
 			}
 
 			final double expVhk = calculatorEntry.getValue().computeContributionOfOpportunity( origin , aggregatedFacility, departureTime );
@@ -358,15 +344,6 @@ public final class AccessibilityCalculator {
 		double getSum(){
 			return this.sum;
 		}
-	}
-
-	
-	public final void setPtMatrix(PtMatrix ptMatrix) {
-		calculators.put(
-				Modes4Accessibility.pt,
-				PtMatrixAccessibilityContributionCalculator.create(
-						ptMatrix,
-						scenario.getConfig()));
 	}
 
 	
