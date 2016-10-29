@@ -136,26 +136,16 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 		return startEndTime;
 	}
 
-	/**
-	 * Moves plan from the queues first position to the last position.
-	 * Necessary to keep simulating signals when plans go over midnight and/or the simulation lasts for more than 24h.
-	 */
-	private void shiftPlan2QueueEnd() {
-		SignalPlan plan2Shift = planQueue.poll();
-		planQueue.add(plan2Shift);
-	}
-
 	@Override
 	public void simulationInitialized(double simStartTime) {		
 		// store all plans in a queue, sort them according to their end times and validate them
-//		this.planQueue = new PriorityBlockingQueue<SignalPlan>(this.plans.size(), new SignalPlanEndTimeComparator());
 		this.planQueue = new LinkedList<SignalPlan>(this.plans.values());
 		Collections.sort(planQueue, new SignalPlanEndTimeComparator(simStartTime));
 		validateSignalPlans();
 		
 		// check if first plan should already start
 		SignalPlan firstPlan = this.planQueue.peek();
-		if (firstPlan.getStartTime() <= firstPlan.getEndTime()){
+		if (firstPlan.getStartTime() < firstPlan.getEndTime()){
 			// plan starts after midnight (i.e. does not go over midnight)
 			if (firstPlan.getStartTime() <= simStartTime && firstPlan.getEndTime() >= simStartTime){
 				startFirstPlanInQueue(simStartTime);
@@ -169,7 +159,7 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 				 * 2. first signal plan starts after simStartTime [-|*|--!--|1**|--|**|-]
 				 */
 			}
-		} else { // startTime > endTime
+		} else { // startTime >= endTime
 			// plan starts before midnight (i.e. goes over midnight)
 			if (firstPlan.getStartTime() <= simStartTime || firstPlan.getEndTime() >= simStartTime){
 				startFirstPlanInQueue(simStartTime);
@@ -187,18 +177,20 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 	}
 
 	/**
-	 * Activate the signal plan that is first in the queue.
-	 * Move it to the end of the queue.
+	 * Activate the signal plan that is first in the queue. 
+	 * Moves plan from the queues first position to the last position.
+	 * (Necessary to keep simulating signals when plans go over midnight and/or the simulation lasts for more than 24h.)
 	 * Determine the time when to check active plans next.
 	 * 
 	 * @param now current time
 	 */
 	private void startFirstPlanInQueue(double now) {
-		this.activePlan = this.planQueue.peek();
-		shiftPlan2QueueEnd();
+		this.activePlan = this.planQueue.poll();
+		// shift plan to queue end (
+		planQueue.add(activePlan);
 		this.nextActivePlanCheckTime = adaptTime2Day(activePlan.getEndTime(), now);
 	}
-	
+
 	/**
 	 * Reset active plan - no plan is active.
 	 * Determine the time when to check active plans next.

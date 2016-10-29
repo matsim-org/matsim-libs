@@ -271,27 +271,48 @@ public class SignalPlansTest {
 	
 	/**
 	 * test
-	 * 1. one signal plan with default start and end times. should give all day green
-	 * 2. simulation lasts for more than 24h
+	 * 1. one signal plan with default start and end times. should give all day signal plan
+	 * 2. all day signal plan starts again/ is still active, when simulation time exceeds 12pm
 	 */
 	@Test
-	public void test1AllDayGreenSignalPlanFor25h(){
-		ScenarioRunner runner = new ScenarioRunner(null, null, null, null); // i.e. new ScenarioRunner(3600*0.0, 3600*0.0, null, null);
-		runner.setNoSimHours(25);
+	public void test1AllDaySignalPlanOverMidnightLateStart(){
+		ScenarioRunner runner = new ScenarioRunner(null, null, null, null); // i.e. new ScenarioRunner(0.0, 0.0, null, null);
+		runner.setSimStart_h(23);
 		SignalEventAnalyzer signalAnalyzer = runner.run();
 		
 		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
 		log.info("Last signal off event at time " + signalAnalyzer.getLastSignalOffEventTime());
 		log.info("Number of signal off events " + signalAnalyzer.getNumberOfOffEvents());
-		log.info("First cycle time after 0am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(0));
+		log.info("First cycle time after 0am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(23));
 		log.info("First cycle time after 0am next day " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(24));
+		// test time when signal plan is switched on and off
+		Assert.assertEquals("First signal state event unexpected.", 82800.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON);
+		Assert.assertNull("There was an unexpected event that switches off signals.", signalAnalyzer.getLastSignalOffEventTime());
+		Assert.assertEquals("Number of signal off events is wrong.", 0, signalAnalyzer.getNumberOfOffEvents());
+		// test if signal plan is running for more than 24h
+		Assert.assertEquals("Signal plan is not active between 11pmam and 12pm.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(23), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Signal plan is not active anymore after 0am next day.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(24), MatsimTestUtils.EPSILON);
+	}
+	
+	/**
+	 * test
+	 * 1. one signal plan with default start and end times. should give all day signal plan
+	 * 2. should directly start at time 0.0
+	 */
+	@Test
+	public void test1AllDaySignalPlanMidnightStart(){
+		SignalEventAnalyzer signalAnalyzer = (new ScenarioRunner(null, null, null, null)).run(); // i.e. new ScenarioRunner(0.0, 0.0, null, null);
+		
+		log.info("First signal event at time " + signalAnalyzer.getFirstSignalEventTime());
+		log.info("Last signal off event at time " + signalAnalyzer.getLastSignalOffEventTime());
+		log.info("Number of signal off events " + signalAnalyzer.getNumberOfOffEvents());
+		log.info("First cycle time after 0am " + signalAnalyzer.getCycleTimeOfFirstCycleInHour(0));
 		// test time when signal plan is switched on and off
 		Assert.assertEquals("First signal state event unexpected.", 0.0, signalAnalyzer.getFirstSignalEventTime(), MatsimTestUtils.EPSILON);
 		Assert.assertNull("There was an unexpected event that switches off signals.", signalAnalyzer.getLastSignalOffEventTime());
 		Assert.assertEquals("Number of signal off events is wrong.", 0, signalAnalyzer.getNumberOfOffEvents());
 		// test if signal plan is running for more than 24h
 		Assert.assertEquals("Signal plan is not active between 0am and 1am.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(0), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Signal plan is not active anymore after 0am next day.", 120, signalAnalyzer.getCycleTimeOfFirstCycleInHour(24), MatsimTestUtils.EPSILON);
 	}
 	
 	@Test
