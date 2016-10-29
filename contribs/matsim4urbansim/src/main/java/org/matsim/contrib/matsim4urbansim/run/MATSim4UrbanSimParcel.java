@@ -436,7 +436,8 @@ class MATSim4UrbanSimParcel{
 								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, travelTimes, travelDisutilityFactories, xMin, xMax, yMin, yMax, cellSizeInMeter);
 								accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSizeInMeter));
 
-								gbacl.setUrbansimMode(true);
+//								gbacl.setUrbansimMode(true);
+								// this wasn't doing anything when I looked at it.  kai, oct'16
 
 								for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 									accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
@@ -452,7 +453,8 @@ class MATSim4UrbanSimParcel{
 
 								log.info("Using custom bounding box to determine the area for accessibility computation.");
 								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, travelTimes, travelDisutilityFactories, nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
-								gbacl.setUrbansimMode(true);
+//								gbacl.setUrbansimMode(true);
+								// this wasn't doing anything when I looked at it.  kai, oct'16
 
 								for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 									accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
@@ -472,7 +474,9 @@ class MATSim4UrbanSimParcel{
 									throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
 								}
 								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, travelTimes, travelDisutilityFactories,nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
-								gbacl.setUrbansimMode(true);
+
+//								gbacl.setUrbansimMode(true);
+								// this wasn't doing anything when I looked at it.  kai, oct'16
 
 								for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 									accessibilityCalculator.setComputingAccessibilityForMode(mode, true);

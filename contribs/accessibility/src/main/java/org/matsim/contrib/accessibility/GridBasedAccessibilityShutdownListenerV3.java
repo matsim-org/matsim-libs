@@ -42,14 +42,10 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 	// for consideration of different activity types or different modes (or both) subdirectories are
 	// required in order not to confuse the output
 	private String outputSubdirectory;
-	private boolean urbanSimMode;
 	
-	
-	//
 	private boolean	calculateAggregateValues;
 	private Map<Modes4Accessibility, Double> accessibilitySums = new HashMap<Modes4Accessibility, Double>();
 	private Map<Modes4Accessibility, Double> accessibilityGiniCoefficients = new HashMap<Modes4Accessibility, Double>();
-	//
 	
 	final double xMin, yMin, xMax, yMax, cellSize;
 	
@@ -313,11 +309,6 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 	
 	public void addFacilityDataExchangeListener( FacilityDataExchangeInterface facilityDataExchangeListener ) {
 		this.accessibilityCalculator.addFacilityDataExchangeListener(facilityDataExchangeListener);
-	}
-	
-	
-	public void setUrbansimMode(boolean urbansimMode) {
-		this.urbanSimMode = urbansimMode;
 	}
 	
 	
