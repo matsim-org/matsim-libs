@@ -296,9 +296,9 @@ public final class AccessibilityCalculator {
 			final AggregationObject aggregatedFacility, Double departureTime) 
 	{
 		for ( Map.Entry<String, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet() ) {
-			final String mode = calculatorEntry.getKey();
+			final Modes4Accessibility mode = Modes4Accessibility.valueOf(calculatorEntry.getKey());
 			
-			if ( !this.acg.getIsComputingMode().contains(Modes4Accessibility.valueOf(mode)) ) {
+			if ( !this.acg.getIsComputingMode().contains(mode) ) {
 				continue; // XXX yyyyyy should be configured by adding only the relevant calculators
 			}
 
