@@ -125,7 +125,7 @@ public final class AccessibilityCalculator {
 		}{
 			final String mode = TransportMode.car;
 			putAccessibilityCalculator(
-					mode,
+					Modes4Accessibility.freeSpeed.name(),
 					new NetworkModeAccessibilityExpContributionCalculator(
 							new FreeSpeedTravelTime(),
 							travelDisutilityFactories.get(mode),
