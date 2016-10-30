@@ -17,7 +17,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
-import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
@@ -47,41 +46,41 @@ public final class AccessibilityCalculator {
 
 	@Deprecated // yyyy
 	private boolean useRawSum; //= false;
-	
+
 	@Deprecated // yyyy
 	private double logitScaleParameter;
-	
+
 	@Deprecated // yyyy
 	private double inverseOfLogitScaleParameter;
-	
+
 	// new
 	private double betaWalkTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
 	private double betaWalkTD;	// in MATSim this is 0 !!! since getMonetaryDistanceCostRateWalk doesn't exist: 
-//	private double betaWalkTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
+	//	private double betaWalkTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
 	// ===
-//	private Coord2CoordTimeDistanceTravelDisutility walkTravelDisutility;
+	//	private Coord2CoordTimeDistanceTravelDisutility walkTravelDisutility;
 	// end new
-	
+
 	private double walkSpeedMeterPerHour = -1;
 
 	// counter for warning that capacities are not used so far ... in order not to give the same warning multiple times; dz, apr'14
 	private static int cnt = 0;
-	
+
 	private Scenario scenario;
 	private AccessibilityConfigGroup acg;
-	
-	
+
+
 	@Inject
 	public AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
 		this.scenario = scenario;
 		this.acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
-		
+
 		useRawSum = acg.isUsingRawSumsWithoutLn();
 		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
 		inverseOfLogitScaleParameter = 1 / (logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
-		
+
 		// new
 		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0.) {
 			log.error("marginal utility of distance for car different from zero but not used in accessibility computations");
@@ -95,57 +94,66 @@ public final class AccessibilityCalculator {
 		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.walk).getMonetaryDistanceRate() != 0.) {
 			log.error("monetary distance cost rate for walk different from zero but not used in accessibility computations");
 		}
-		
+
 		walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
 
 		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaWalkTD = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
-//		betaWalkTMC = -planCalcScoreConfigGroup.getMarginalUtilityOfMoney();
+		//		betaWalkTMC = -planCalcScoreConfigGroup.getMarginalUtilityOfMoney();
 		// ===
-//		TravelTime walkTravelTime = travelTimes.get(TransportMode.walk);
-//		this.walkTravelDisutility = (Coord2CoordTimeDistanceTravelDisutility) travelDisutilityFactories.get(TransportMode.walk).createTravelDisutility(
-////				travelTimes.get(TransportMode.walk));
-//				walkTravelTime);
+		//		TravelTime walkTravelTime = travelTimes.get(TransportMode.walk);
+		//		this.walkTravelDisutility = (Coord2CoordTimeDistanceTravelDisutility) travelDisutilityFactories.get(TransportMode.walk).createTravelDisutility(
+		////				travelTimes.get(TransportMode.walk));
+		//				walkTravelTime);
 		// end new
-		
+
 		initDefaultContributionCalculators(travelTimes, travelDisutilityFactories, scenario);
 	}
-	
+
 	@Deprecated // yyyyyy set from "outside"
 	private void initDefaultContributionCalculators(Map<String, TravelTime> travelTimes,
 			Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
-		calculators.put(
-				Modes4Accessibility.car.name(),
-				new NetworkModeAccessibilityExpContributionCalculator(
-						travelTimes.get(TransportMode.car),
-						travelDisutilityFactories.get(TransportMode.car),
-						null,
-						scenario));
-		calculators.put(
-				Modes4Accessibility.freeSpeed.name(),
-				new NetworkModeAccessibilityExpContributionCalculator(
-						new FreeSpeedTravelTime(),
-						travelDisutilityFactories.get(TransportMode.car),
-						null,
-						scenario));
-		calculators.put(
-				Modes4Accessibility.walk.name(),
-				new ConstantSpeedAccessibilityExpContributionCalculator(
-						TransportMode.walk,
-						scenario));
-		calculators.put(
-				Modes4Accessibility.bike.name(),
-				new ConstantSpeedAccessibilityExpContributionCalculator(
-						TransportMode.bike,
-						scenario));
+		{
+			final String mode = TransportMode.car;
+			putAccessibilityCalculator(
+					mode,
+					new NetworkModeAccessibilityExpContributionCalculator(
+							travelTimes.get(mode),
+							travelDisutilityFactories.get(mode),
+							null,
+							scenario));
+		}{
+			final String mode = TransportMode.car;
+			putAccessibilityCalculator(
+					mode,
+					new NetworkModeAccessibilityExpContributionCalculator(
+							new FreeSpeedTravelTime(),
+							travelDisutilityFactories.get(mode),
+							null,
+							scenario));
+		}{
+			final String mode = TransportMode.walk;
+			putAccessibilityCalculator(
+					mode,
+					new ConstantSpeedAccessibilityExpContributionCalculator(
+							mode,
+							scenario));
+		}{
+			final String mode = TransportMode.bike;
+			putAccessibilityCalculator(
+					mode,
+					new ConstantSpeedAccessibilityExpContributionCalculator(
+							mode,
+							scenario));
+		}
 	}
 
-	
+
 	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface l){
 		this.zoneDataExchangeListeners.add(l);
 	}
-	
-	
+
+
 	/**
 	 * This aggregates the disutilities Vjk to get from node j to all k that are attached to j.
 	 * Finally the sum(Vjk) is assigned to node j, which is done in this method.
@@ -172,13 +180,13 @@ public final class AccessibilityCalculator {
 			bar.update();
 
 			Node nearestNode = NetworkUtils.getNearestNode(network,opportunity.getCoord());
-			
+
 			// get Euclidian distance to nearest node
 			double distance_meter 	= NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
 			double VjkWalkTravelTime	= this.betaWalkTT * (distance_meter / this.walkSpeedMeterPerHour);
 			double VjkWalkDistance 		= this.betaWalkTD * distance_meter;
 			double expVjk				= Math.exp(this.logitScaleParameter * (VjkWalkTravelTime + VjkWalkDistance ) );
-			
+
 			// add Vjk to sum
 			AggregationObject jco = opportunityClusterMap.get( nearestNode.getId() ) ;
 			if ( jco == null ) {
@@ -196,7 +204,7 @@ public final class AccessibilityCalculator {
 		this.aggregatedOpportunities = opportunityClusterMap.values().toArray(new AggregationObject[opportunityClusterMap.size()]);
 	}
 
-	
+
 	public final void computeAccessibilities( Double departureTime, ActivityFacilities opportunities) {
 		aggregateOpportunities(opportunities, scenario.getNetwork());
 
@@ -207,10 +215,10 @@ public final class AccessibilityCalculator {
 
 		// Condense measuring points (origins) that have the same nearest node on the network
 		Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins = aggregateMeasurePointsWithSameNearestNode();
-		
+
 		log.info("Now going through all origins:");
 		ProgressBar bar = new ProgressBar(aggregatedOrigins.size());
-		
+
 		// go through all nodes (keys) that have a measuring point (origin) assigned
 		for (Id<Node> nodeId : aggregatedOrigins.keySet()) {
 			bar.update();
@@ -224,7 +232,7 @@ public final class AccessibilityCalculator {
 			// get list with origins that are assigned to "fromNode"
 			for ( ActivityFacility origin : aggregatedOrigins.get( nodeId ) ) {
 				assert( origin.getCoord() != null );
-				
+
 				for ( ExpSum expSum : expSums.values() ) {
 					expSum.reset();
 				}
@@ -263,13 +271,13 @@ public final class AccessibilityCalculator {
 		}
 	}
 
-	
+
 	/**
 	 * This method condenses measuring points (origins) that have the same nearest node on the network
 	 */
 	private Map<Id<Node>, ArrayList<ActivityFacility>> aggregateMeasurePointsWithSameNearestNode() {
 		Map<Id<Node>,ArrayList<ActivityFacility>> aggregatedOrigins = new ConcurrentHashMap<>();
-		
+
 		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values()) {
 
 			// determine nearest network node (from- or toNode) based on the link
@@ -291,13 +299,13 @@ public final class AccessibilityCalculator {
 		return aggregatedOrigins;
 	}
 
-	
+
 	private void computeAndAddExpUtilContributions( Map<Modes4Accessibility,ExpSum> expSums, ActivityFacility origin, 
 			final AggregationObject aggregatedFacility, Double departureTime) 
 	{
 		for ( Map.Entry<String, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet() ) {
 			final Modes4Accessibility mode = Modes4Accessibility.valueOf(calculatorEntry.getKey());
-			
+
 			if ( !this.acg.getIsComputingMode().contains(mode) ) {
 				continue; // XXX yyyyyy should be configured by adding only the relevant calculators
 			}
@@ -308,22 +316,22 @@ public final class AccessibilityCalculator {
 		}
 	}
 
-	
+
 	@Deprecated // should be replaced by something like what follows after 
 	public final void setComputingAccessibilityForMode( Modes4Accessibility mode, boolean val ) {
 		this.acg.setComputingAccessibilityForMode(mode, val);
 	}
-	
+
 	public final void putAccessibilityCalculator( String mode, AccessibilityContributionCalculator calc ) {
 		this.calculators.put( mode , calc ) ;
 	}
-	
-	
+
+
 	public Set<Modes4Accessibility> getIsComputingMode() {
 		return this.acg.getIsComputingMode();
 	}
 
-	
+
 	/**
 	 * stores travel disutilities for different modes
 	 */
@@ -346,7 +354,7 @@ public final class AccessibilityCalculator {
 		}
 	}
 
-	
+
 	public void setMeasuringPoints(ActivityFacilitiesImpl measuringPoints) {
 		this.measuringPoints = measuringPoints;
 	}
