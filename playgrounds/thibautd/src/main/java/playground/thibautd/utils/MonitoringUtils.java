@@ -79,7 +79,7 @@ public class MonitoringUtils {
 		}
 	}
 
-	public AutoCloseable notifyPeakUsageOnClose( final LongConsumer callback ) {
+	public static AutoCloseable notifyPeakUsageOnClose( final LongConsumer callback ) {
 		List<GarbageCollectorMXBean> gcbeans = ManagementFactory.getGarbageCollectorMXBeans();
 
 		final AtomicLong peak = new AtomicLong( -1 );
@@ -113,5 +113,31 @@ public class MonitoringUtils {
 				emitter.removeNotificationListener( notificationListener );
 			}
 		};
+	}
+
+	public static void listenBytesUsageOnGC( final LongConsumer callback ) {
+		List<GarbageCollectorMXBean> gcbeans = ManagementFactory.getGarbageCollectorMXBeans();
+
+		final NotificationListener notificationListener = ( notification, handback ) -> {
+			//we only handle GARBAGE_COLLECTION_NOTIFICATION notifications here
+			if ( !notification.getType().equals( GARBAGE_COLLECTION_NOTIFICATION ) ) {
+				return;
+			}
+			//get the information associated with this notification
+			GarbageCollectionNotificationInfo info = GarbageCollectionNotificationInfo.from( (CompositeData) notification.getUserData() );
+
+			final long totalUsedBytes =
+					info.getGcInfo().getMemoryUsageAfterGc().values().stream()
+						.mapToLong( MemoryUsage::getUsed )
+						.sum();
+
+			callback.accept( totalUsedBytes );
+		};
+
+		//Install a notification handler for each bean
+		for ( GarbageCollectorMXBean gcbean : gcbeans ) {
+			NotificationBroadcaster emitter = (NotificationBroadcaster) gcbean;
+			emitter.addNotificationListener( notificationListener, null, null );
+		}
 	}
 }
