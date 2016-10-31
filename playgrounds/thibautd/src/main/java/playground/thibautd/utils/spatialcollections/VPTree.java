@@ -36,7 +36,8 @@ import java.util.stream.Stream;
  */
 public class VPTree<C,T> implements SpatialTree<C, T> {
 	// do not try to much VPs, as this quickly gets expensive.
-	private static final int SUBLIST_SIZE_VPS = 10;
+	// no real improvement noticed.
+	private static final int SUBLIST_SIZE_VPS = 1;
 	// not too shy: cutoff distance should be pretty accurate
 	private static final int SUBLIST_SIZE_MEDIAN = 100;
 	private final SpatialCollectionUtils.Metric<C> metric;
@@ -284,6 +285,29 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 		T closest = null;
 		double bestDist = Double.POSITIVE_INFINITY;
 
+		// first estimate: go directly to insertion point. O( log( n ) ) for balanced tree.
+		// Increases the probability of pruning in the second stage, by having a tight bound on best distance.
+		while ( !stack.isEmpty() ) {
+			final Node<C,T> current = stack.poll();
+
+			final double distanceToVp = metric.calcDistance( current.coordinate , coord );
+
+			// check if current VP closest than closest known
+			if ( current.value != null &&
+					distanceToVp < bestDist &&
+					predicate.test( current.value ) ) {
+				closest = current.value;
+				bestDist = distanceToVp;
+			}
+
+			if ( distanceToVp <= current.cuttoffDistance ) {
+				if ( current.close != null ) stack.add( current.close );
+			}
+			else if ( current.far != null ) stack.add( current.far );
+		}
+
+		// full search
+		stack.add( root );
 		while( !stack.isEmpty() ) {
 			final Node<C,T> current = stack.poll();
 
