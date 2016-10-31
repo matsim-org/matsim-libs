@@ -51,6 +51,7 @@ public class MonitoringUtils {
 				if ( !notification.getType().equals( GARBAGE_COLLECTION_NOTIFICATION ) ) {
 					return;
 				}
+				if ( !log.isTraceEnabled() ) return;
 
 				//get the information associated with this notification
 				GarbageCollectionNotificationInfo info = GarbageCollectionNotificationInfo.from( (CompositeData) notification.getUserData() );
@@ -64,8 +65,8 @@ public class MonitoringUtils {
 				else if ( "end of major GC".equals( gctype ) ) {
 					gctype = "Old Gen GC";
 				}
-				log.info( gctype + ": - " + info.getGcInfo().getId() + " " + info.getGcName() + " (from " + info.getGcCause() + ") " + duration + " milliseconds; start-end times " + info.getGcInfo().getStartTime() + "-" + info.getGcInfo().getEndTime() );
-				log.info("GcInfo MemoryUsageAfterGc: " + info.getGcInfo().getMemoryUsageAfterGc());
+				log.debug( gctype + ": - " + info.getGcInfo().getId() + " " + info.getGcName() + " (from " + info.getGcCause() + ") " + duration + " milliseconds; start-end times " + info.getGcInfo().getStartTime() + "-" + info.getGcInfo().getEndTime() );
+				log.debug("GcInfo MemoryUsageAfterGc: " + info.getGcInfo().getMemoryUsageAfterGc());
 			}, null, null );
 		}
 	}
