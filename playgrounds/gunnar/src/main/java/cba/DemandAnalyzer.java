@@ -18,11 +18,15 @@ class DemandAnalyzer {
 
 	private final Map<List<String>, Double> actSeq2cnt = new LinkedHashMap<>();
 
-	private final Map<List<String>, Double> actSeq2score = new LinkedHashMap<>();
+	private final Map<List<String>, Double> actSeq2matsimScore = new LinkedHashMap<>();
+
+	private final Map<List<String>, Double> actSeq2sampersUtility = new LinkedHashMap<>();
 
 	private final Map<String, Double> mode2cnt = new LinkedHashMap<>();
 
-	private final Map<String, Double> mode2score = new LinkedHashMap<>();
+	private final Map<String, Double> mode2matsimScore = new LinkedHashMap<>();
+
+	private final Map<String, Double> mode2sampersUtility = new LinkedHashMap<>();
 
 	private int personCnt = 0;
 
@@ -41,7 +45,7 @@ class DemandAnalyzer {
 
 	}
 
-	void registerChoice(final Plan plan) {
+	void registerChoice(final Plan plan, final double sampersUtility) {
 
 		this.personCnt++;
 
@@ -51,12 +55,14 @@ class DemandAnalyzer {
 			actTypes.add(act.getType());
 		}
 		this.add(actTypes, 1.0, this.actSeq2cnt);
-		this.add(actTypes, plan.getScore(), this.actSeq2score);
+		this.add(actTypes, plan.getScore(), this.actSeq2matsimScore);
+		this.add(actTypes, sampersUtility, this.actSeq2sampersUtility);
 
 		for (int i = 1; i < plan.getPlanElements().size(); i += 2) {
 			final Leg leg = (Leg) (plan.getPlanElements().get(i));
 			this.add(leg.getMode(), 1.0, this.mode2cnt);
-			this.add(leg.getMode(), plan.getScore(), this.mode2score);
+			this.add(leg.getMode(), plan.getScore(), this.mode2matsimScore);
+			this.add(leg.getMode(), sampersUtility, this.mode2sampersUtility);
 			this.legCnt++;
 		}
 	}
@@ -71,7 +77,8 @@ class DemandAnalyzer {
 			result.append("\t[");
 			result.append(100.0 * (double) entry.getValue() / this.personCnt);
 			result.append("%]\t");
-			result.append("avg.score = " + this.actSeq2score.get(entry.getKey()) / entry.getValue() + "\n");
+			result.append("avg.score = " + this.actSeq2matsimScore.get(entry.getKey()) / entry.getValue()
+					+ ", avg.utility = " + this.actSeq2sampersUtility.get(entry.getKey()) / entry.getValue() + "\n");
 		}
 
 		result.append("MODES\n");
@@ -80,7 +87,8 @@ class DemandAnalyzer {
 			result.append("\t[");
 			result.append(100.0 * (double) entry.getValue() / this.legCnt);
 			result.append("%]\t");
-			result.append("avg.score = " + this.mode2score.get(entry.getKey()) / entry.getValue() + "\n");
+			result.append("avg.score = " + this.mode2matsimScore.get(entry.getKey()) / entry.getValue()
+					+ ", avg.utility = " + this.mode2sampersUtility.get(entry.getKey()) / entry.getValue() + "\n");
 		}
 
 		return result.toString();

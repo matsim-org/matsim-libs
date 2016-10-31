@@ -153,9 +153,9 @@ class UtilityFunction {
 		 */
 
 		this.tourActSeq2asc.put(new ArrayList<Tour.Act>(0), 0.0);
-		this.tourActSeq2asc.put(Arrays.asList(Tour.Act.work), 0.0);
+		this.tourActSeq2asc.put(Arrays.asList(Tour.Act.work), +22.0);
 		this.tourActSeq2asc.put(Arrays.asList(Tour.Act.other), 0.0);
-		this.tourActSeq2asc.put(Arrays.asList(Tour.Act.work, Tour.Act.other), -4.0);
+		this.tourActSeq2asc.put(Arrays.asList(Tour.Act.work, Tour.Act.other), -85.0);
 
 		this.mode2asc.put(Tour.Mode.car, 0.0);
 		this.mode2asc.put(Tour.Mode.pt, 0.0);

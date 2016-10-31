@@ -179,7 +179,7 @@ class DemandModel {
 			plan.setPerson(person);
 			person.setSelectedPlan(plan);
 			expectationWriter.println(person.getId() + "\t" + plan.getScore());
-			demandAnalyzer.registerChoice(plan);
+			demandAnalyzer.registerChoice(plan, entry.getValue().getSampersUtility());
 		}
 		expectationWriter.flush();
 		expectationWriter.close();

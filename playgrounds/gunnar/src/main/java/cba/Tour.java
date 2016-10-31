@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.network.Link;
 class Tour {
 
 	static enum Act {
-		home, work, other
+		home, work, other, home2
 	};
 
 	static enum Mode {
