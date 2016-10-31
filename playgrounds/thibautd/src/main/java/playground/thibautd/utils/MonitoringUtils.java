@@ -22,12 +22,20 @@ import com.sun.management.GarbageCollectionNotificationInfo;
 import org.apache.log4j.Logger;
 
 import javax.management.NotificationBroadcaster;
+import javax.management.NotificationListener;
 import javax.management.openmbean.CompositeData;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryUsage;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
+import java.util.function.IntConsumer;
+import java.util.function.LongConsumer;
 
 import static com.sun.management.GarbageCollectionNotificationInfo.GARBAGE_COLLECTION_NOTIFICATION;
+import static org.osgeo.proj4j.parser.Proj4Keyword.b;
 
 /**
  * @author thibautd
@@ -69,5 +77,41 @@ public class MonitoringUtils {
 				log.debug("GcInfo MemoryUsageAfterGc: " + info.getGcInfo().getMemoryUsageAfterGc());
 			}, null, null );
 		}
+	}
+
+	public AutoCloseable notifyPeakUsageOnClose( final LongConsumer callback ) {
+		List<GarbageCollectorMXBean> gcbeans = ManagementFactory.getGarbageCollectorMXBeans();
+
+		final AtomicLong peak = new AtomicLong( -1 );
+
+		final NotificationListener notificationListener = ( notification, handback ) -> {
+			//we only handle GARBAGE_COLLECTION_NOTIFICATION notifications here
+			if ( !notification.getType().equals( GARBAGE_COLLECTION_NOTIFICATION ) ) {
+				return;
+			}
+			//get the information associated with this notification
+			GarbageCollectionNotificationInfo info = GarbageCollectionNotificationInfo.from( (CompositeData) notification.getUserData() );
+
+			final long totalUsedBytes =
+					info.getGcInfo().getMemoryUsageAfterGc().values().stream()
+						.mapToLong( MemoryUsage::getUsed )
+						.sum();
+
+			peak.getAndUpdate( p -> totalUsedBytes > p ? totalUsedBytes : p );
+		};
+
+		//Install a notification handler for each bean
+		for ( GarbageCollectorMXBean gcbean : gcbeans ) {
+			NotificationBroadcaster emitter = (NotificationBroadcaster) gcbean;
+			emitter.addNotificationListener( notificationListener, null, null );
+		}
+
+		return () -> {
+			callback.accept( peak.get() );
+			for ( GarbageCollectorMXBean gcbean : gcbeans ) {
+				NotificationBroadcaster emitter = (NotificationBroadcaster) gcbean;
+				emitter.removeNotificationListener( notificationListener );
+			}
+		};
 	}
 }
