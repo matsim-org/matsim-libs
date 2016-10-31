@@ -35,6 +35,7 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Soc
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplingConfigGroup;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SimpleSnowballModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballSamplingConfigGroup;
+import playground.thibautd.utils.MonitoringUtils;
 
 import java.io.IOException;
 import java.util.Random;
@@ -45,6 +46,7 @@ import java.util.Random;
 public class RunScalabilityAnalysis {
 
 	public static void main( String[] args ) {
+		MonitoringUtils.setMemoryLoggingOnGC();
 		final SnowballSamplingConfigGroup configGroup = new SnowballSamplingConfigGroup();
 		final ScalabilityConfigGroup scalabilityConfigGroup = new ScalabilityConfigGroup();
 		final Config config =
