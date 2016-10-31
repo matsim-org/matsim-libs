@@ -28,10 +28,11 @@ import java.util.stream.DoubleStream;
 class ScalabilityConfigGroup extends ReflectiveConfigGroup {
 	private int nTries = 1;
 
-	private enum Coverage {uniform,powertwo}
+	private enum Coverage {uniform,power}
 	private Coverage coverage = Coverage.uniform;
 	private int nPoints = 10;
 	private double lastSample = 1;
+	private double powerBase = 2;
 
 	public ScalabilityConfigGroup() {
 		super( "scalability" );
@@ -44,8 +45,8 @@ class ScalabilityConfigGroup extends ReflectiveConfigGroup {
 				return DoubleStream.iterate( step , c -> c + step )
 						.limit( nPoints )
 						.toArray();
-			case powertwo:
-				return DoubleStream.iterate( lastSample , c -> c / 2d )
+			case power:
+				return DoubleStream.iterate( lastSample , c -> c / powerBase )
 						.limit( nPoints )
 						.sorted() // not necessary, but nicer
 						.toArray();
@@ -95,4 +96,14 @@ class ScalabilityConfigGroup extends ReflectiveConfigGroup {
 		this.nTries = nTries;
 	}
 
+	@StringGetter("powerBase")
+	private double getPowerBase() {
+		return powerBase;
+	}
+
+	@StringSetter("powerBase")
+	private void setPowerBase( final double powerBase ) {
+		if ( powerBase <= 1 ) throw new IllegalArgumentException( "power base "+powerBase+" < 1" );
+		this.powerBase = powerBase;
+	}
 }
