@@ -59,6 +59,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.LanesWriter;
 
+import analysis.signals.TtSignalAnalysisListener;
+import analysis.signals.TtSignalAnalysisTool;
+import analysis.signals.TtSignalAnalysisWriter;
 //import matsimConnector.congestionpricing.MSACongestionHandler;
 //import matsimConnector.congestionpricing.MSAMarginalCongestionPricingContolerListener;
 //import matsimConnector.congestionpricing.MSATollDisutilityCalculatorFactory;
@@ -80,9 +83,6 @@ import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutil
 import scenarios.illustrative.analysis.TtAbstractAnalysisTool;
 import scenarios.illustrative.analysis.TtAnalyzedResultsWriter;
 import scenarios.illustrative.analysis.TtListenerToBindAndWriteAnalysis;
-import scenarios.illustrative.analysis.TtSignalAnalysisListener;
-import scenarios.illustrative.analysis.TtSignalAnalysisTool;
-import scenarios.illustrative.analysis.TtSignalAnalysisWriter;
 import scenarios.illustrative.braess.analysis.TtAnalyzeBraess;
 import scenarios.illustrative.braess.createInput.TtCreateBraessNetworkAndLanes;
 import scenarios.illustrative.braess.createInput.TtCreateBraessNetworkAndLanes.LaneType;
@@ -110,12 +110,12 @@ public final class RunBraessSimulation {
 	private static final int SIMULATION_PERIOD = 1; // in hours
 	private static final double SIMULATION_START_TIME = 0.0; // seconds from midnight
 	
-	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.ONLY_MIDDLE;
+	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.ALL;
 	// initial score for all initial plans
 	private static final Double INIT_PLAN_SCORE = null;
 
 	// defines which kind of signals should be used
-	private static final SignalControlType SIGNAL_TYPE = SignalControlType.SIGNAL4_SYLVIA_Z2V;
+	private static final SignalControlType SIGNAL_TYPE = SignalControlType.SIGNAL4_X_SECOND_Z;
 	// if SignalControlType SIGNAL4_X_Seconds_Z or SIGNAL4_RESPONSIVE is used, SECONDS_Z_GREEN gives the green time for Z
 	private static final int SECONDS_Z_GREEN = 5;
 	
@@ -277,8 +277,7 @@ public final class RunBraessSimulation {
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		if (signalsConfigGroup.isUseSignalSystems()) {
-			scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-					new SignalsDataLoader(config).loadSignalsData());
+			scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 			createSignals(scenario);
 		}
 		
