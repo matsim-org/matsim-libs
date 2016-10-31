@@ -72,7 +72,7 @@ public class SnowballTiesCsvWriter extends AbstractCsvWriter {
 				// only write in one direction?
 				if ( alter == ego ) continue;
 
-				final Coord alterCoord = SnowballLocator.calcCoord( ego );
+				final Coord alterCoord = SnowballLocator.calcCoord( alter );
 				lines.add( egoPart +"\t"+
 						alter.getId() +"\t"+ alter.getDegree() + "\t" +
 						PersonUtils.getAge( alter.getPerson() ) + "\t" +
