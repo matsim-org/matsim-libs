@@ -34,7 +34,6 @@ import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
-import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -55,7 +54,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class AccessibilityComputationKiberaTest {
 	public static final Logger log = Logger.getLogger(AccessibilityComputationKiberaTest.class);
 
-	private static final Double cellSize = 10.;
+	private static final Double cellSize = 1000.;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
@@ -121,18 +120,12 @@ public class AccessibilityComputationKiberaTest {
 		
 		assertNotNull(config);
 		
-		// Network bounds
-		// TODO check if this works more direct
-//		BoundingBox networkBounds = BoundingBox.createBoundingBox(scenario.getNetwork());
-//		Envelope analysisEnvelope = new Envelope(networkBounds.getXMin(), networkBounds.getXMax(), networkBounds.getYMin(), networkBounds.getYMax());
-		
 		// Collect activity types
 //		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
 //		log.info("Found activity types: " + activityTypes);
 		final List<String> activityTypes = new ArrayList<>();
 		activityTypes.add(FacilityTypes.DRINKING_WATER);
-//		activityTypes.add(FacilityTypes.TOILETS);
-		
+
 		// Network density points
 		ActivityFacilities measuringPoints = AccessibilityUtils.createMeasuringPointsFromNetworkBounds(scenario.getNetwork(), cellSize);
 		double maximumAllowedDistance = 0.5 * cellSize;

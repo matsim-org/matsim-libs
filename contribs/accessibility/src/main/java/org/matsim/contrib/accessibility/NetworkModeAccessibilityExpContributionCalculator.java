@@ -1,23 +1,19 @@
 package org.matsim.contrib.accessibility;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
-import org.matsim.contrib.accessibility.utils.Coord2CoordTimeDistanceTravelDisutility;
 import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
@@ -25,7 +21,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 /**
  * @author thibautd
  */
- class NetworkModeAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
+ public class NetworkModeAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
 	private static final Logger log = Logger.getLogger( NetworkModeAccessibilityExpContributionCalculator.class );
 
 	@Deprecated // yyyy should be possible to get this from car travel disutility
@@ -56,10 +52,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 	public NetworkModeAccessibilityExpContributionCalculator(
 			final TravelTime travelTime,
 			final TravelDisutilityFactory travelDisutilityFactory,
-			final Coord2CoordTimeDistanceTravelDisutility walkTravelDisutility,
-			final Scenario scenario){
-		// yyyy remove special walk travel disutility (I think)
-		
+			final Scenario scenario){		
 		
 		this.scenario = scenario;
 
@@ -96,7 +89,6 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 		this.lcpt.calculateExtended(scenario.getNetwork(), fromNode1, departureTime);
 	}
 	
-	private static int cnt = 0 ;
 	
 	@Override
 	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
@@ -114,11 +106,6 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 		// (a) disutilities to get on or off the network
 		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) 
 				+ (distance.getDistancePoint2Intersection() * betaWalkTD);
-
-		Coord projectionCoord = CoordUtils.orthogonalProjectionOnLineSegment(nearestLink.getFromNode().getCoord(), nearestLink.getToNode().getCoord(), origin.getCoord());
-		if ( cnt < 10 ) {
-			writeDebuggingOutput(origin, destination, nearestLink, distance, projectionCoord);
-		}
 		double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
 		
 		// (b) TRAVEL ON NETWORK to FIRST NODE:
@@ -144,26 +131,6 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 				expVhiWalk * sumExpVjkWalk;
 	}
 
-
-	private static void writeDebuggingOutput(ActivityFacility origin, AggregationObject destination, Link nearestLink,
-			Distances distance, Coord projectionCoord) {
-		cnt ++ ; 
-		log.warn("#############");
-		log.warn("origin.getCoord() = " + origin.getCoord() + " -- destination.getNearestNode() = " + destination.getNearestNode());
-		log.warn("destination.getNumberOfObjects() = " + destination.getNumberOfObjects());
-		log.warn("distance.getDistancePoint2Road() = " + distance.getDistancePoint2Intersection());
-		log.warn("nearestLink.getFromNode().getCoord() = " + nearestLink.getFromNode().getCoord() + 
-				" -- nearestLink.getToNode().getCoord() = " + nearestLink.getToNode().getCoord());
-		log.warn("NEW distance coord - from coord = " + CoordUtils.calcEuclideanDistance(origin.getCoord(), nearestLink.getFromNode().getCoord()) + 
-				" -- NEW distance coord - to coord = " + CoordUtils.calcEuclideanDistance(origin.getCoord(), nearestLink.getToNode().getCoord()));
-		log.warn("projectionCoord = " + projectionCoord);
-		//		System.err.println("NEW walkDisutility = " + walkUtility);
-		log.warn("#############");
-		
-		if ( cnt==10 ) {
-			log.warn( Gbl.FUTURE_SUPPRESSED);
-		}
-	}
 
 	@Deprecated // yyyy should be possible to get this from car travel disutility
 	private double getTollMoney(Double departureTime, Link nearestLink, Distances distance) {

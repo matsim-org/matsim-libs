@@ -53,13 +53,8 @@ public final class AccessibilityCalculator {
 	@Deprecated // yyyy
 	private double inverseOfLogitScaleParameter;
 
-	// new
 	private double betaWalkTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
 	private double betaWalkTD;	// in MATSim this is 0 !!! since getMonetaryDistanceCostRateWalk doesn't exist: 
-	//	private double betaWalkTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
-	// ===
-	//	private Coord2CoordTimeDistanceTravelDisutility walkTravelDisutility;
-	// end new
 
 	private double walkSpeedMeterPerHour = -1;
 
@@ -81,7 +76,6 @@ public final class AccessibilityCalculator {
 		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
 		inverseOfLogitScaleParameter = 1 / (logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
 
-		// new
 		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0.) {
 			log.error("marginal utility of distance for car different from zero but not used in accessibility computations");
 		}
@@ -99,13 +93,6 @@ public final class AccessibilityCalculator {
 
 		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaWalkTD = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
-		//		betaWalkTMC = -planCalcScoreConfigGroup.getMarginalUtilityOfMoney();
-		// ===
-		//		TravelTime walkTravelTime = travelTimes.get(TransportMode.walk);
-		//		this.walkTravelDisutility = (Coord2CoordTimeDistanceTravelDisutility) travelDisutilityFactories.get(TransportMode.walk).createTravelDisutility(
-		////				travelTimes.get(TransportMode.walk));
-		//				walkTravelTime);
-		// end new
 
 		initDefaultContributionCalculators(travelTimes, travelDisutilityFactories, scenario);
 	}
@@ -120,7 +107,6 @@ public final class AccessibilityCalculator {
 					new NetworkModeAccessibilityExpContributionCalculator(
 							travelTimes.get(mode),
 							travelDisutilityFactories.get(mode),
-							null,
 							scenario));
 		}{
 			final String mode = TransportMode.car;
@@ -129,7 +115,6 @@ public final class AccessibilityCalculator {
 					new NetworkModeAccessibilityExpContributionCalculator(
 							new FreeSpeedTravelTime(),
 							travelDisutilityFactories.get(mode),
-							null,
 							scenario));
 		}{
 			final String mode = TransportMode.walk;
