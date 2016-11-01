@@ -65,22 +65,25 @@ public class CreateFacilitiiesFileFromKODI {
 		}
 	}
 
-	// pattern: Option -> { input, output, facilitiesFileDescription}
+	// pattern: Option -> { input, output, facilitiesFileDescription, activityType}
 	private static final Map<Option, String[]> OPTION_MAP = ImmutableMap.<Option, String[]>builder()
 		.put(Option.HOSPITALS_FROM_FILE, new String[] {
 			"../../../shared-svn/projects/maxess/data/nairobi/kodi/health/hospitals/kenya_hospitals_detail.csv",
 			"../../../shared-svn/projects/maxess/data/nairobi/kodi/health/hospitals/facilities.xml",
-			"Hospitals in Kenya"
+			"Hospitals in Kenya",
+			"Hospital"
 		})
 		.put(Option.SCHOOLS_FROM_URL, new String[] {
 			"https://www.opendata.go.ke/api/views/p452-xb7c/rows.csv",
 			"../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/primary_from_url/facilities.xml",
-			"Primary Schools in Kenya"
+			"Primary Schools in Kenya",
+			"School"
 		}) // Public Schools
 		.put(Option.SCHOOLS_FROM_FILE, new String[] {
 			"../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/primary_public/Public_Primary_School_listed_by_2007.csv",
 			"../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/primary_from_file/facilities.xml",
-			"Primary Schools in Kenya"
+			"Primary Schools in Kenya",
+			"School"
 		}) // not sure about output
 		.build();
 
@@ -91,8 +94,7 @@ public class CreateFacilitiiesFileFromKODI {
 		String outputCRS = "EPSG:21037";
 		String headOfCoordColumn = "Geolocation";
 		String separator = ",";
-		String activityType = "Hospital";
-		
+
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
 
 		if (option.isInGroup(Option.Group.FROM_URL)) {
@@ -101,7 +103,7 @@ public class CreateFacilitiiesFileFromKODI {
 				BufferedReader reader = getBufferedReaderFromCsvUrl(OPTION_MAP.get(option)[0]);
 				ActivityFacilities activityFacilities =
 						createActivityFaciltiesFromBufferedReader(reader, OPTION_MAP.get(option)[2], headOfCoordColumn, ct,
-								separator, activityType);
+								separator, OPTION_MAP.get(option)[3]);
 				writeFacilitiesFile(activityFacilities, OPTION_MAP.get(option)[1]);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -109,8 +111,8 @@ public class CreateFacilitiiesFileFromKODI {
 		} else {
 			// Option 2: Get input data from locally stored CSV file
 			ActivityFacilities activityFacilities = createActivityFaciltiesFromFile(OPTION_MAP.get(option)[0],
-					OPTION_MAP.get(option)[2], headOfCoordColumn, ct, separator, activityType);
-			writeFacilitiesFile(activityFacilities, OPTION_MAP.get(option)[1]);
+					OPTION_MAP.get(option)[2], headOfCoordColumn, ct, separator, OPTION_MAP.get(option)[3]);
+			//writeFacilitiesFile(activityFacilities, OPTION_MAP.get(option)[1]);
 		}
 	}
 
