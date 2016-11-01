@@ -61,12 +61,12 @@ public class CreateFacilitiiesFileFromKODI {
 
 		public enum Group {
 			FROM_FILE,
-			FROM_URL;
+			FROM_URL
 		}
 	}
 
 	// pattern: Option -> { input, output, facilitiesFileDescription}
-	static final Map<Option, String[]> OPTION_MAP = ImmutableMap.<Option, String[]>builder()
+	private static final Map<Option, String[]> OPTION_MAP = ImmutableMap.<Option, String[]>builder()
 		.put(Option.HOSPITALS_FROM_FILE, new String[] {
 			"../../../shared-svn/projects/maxess/data/nairobi/kodi/health/hospitals/kenya_hospitals_detail.csv",
 			"../../../shared-svn/projects/maxess/data/nairobi/kodi/health/hospitals/facilities.xml",
@@ -123,7 +123,7 @@ public class CreateFacilitiiesFileFromKODI {
 		return new URL(url).openStream();
 	}
 
-	public static ActivityFacilities createActivityFaciltiesFromBufferedReader(BufferedReader bufferedReader, String facilitiesFileDescription,
+	private static ActivityFacilities createActivityFaciltiesFromBufferedReader(BufferedReader bufferedReader, String facilitiesFileDescription,
 			String headOfCoordColumn, CoordinateTransformation ct, String separator, String activityType) {
 		ActivityFacilities activityFacilities = FacilitiesUtils.createActivityFacilities(facilitiesFileDescription);
 		int lineCount = 0;
@@ -151,7 +151,7 @@ public class CreateFacilitiiesFileFromKODI {
 		return activityFacilities;
 	}
 
-	public static ActivityFacilities createActivityFaciltiesFromFile(String csvFileName,
+	private static ActivityFacilities createActivityFaciltiesFromFile(String csvFileName,
 																	 String facilitiesFileDescription,
 																	 String headOfCoordColumn,
 																	 CoordinateTransformation ct,
