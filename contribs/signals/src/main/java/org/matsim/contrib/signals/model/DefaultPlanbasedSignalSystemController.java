@@ -188,6 +188,7 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 		this.activePlan = this.planQueue.poll();
 		// shift plan to queue end
 		planQueue.add(activePlan);
+		this.signalSystem.startPlan(now);
 		this.nextActivePlanCheckTime = adaptTime2Day(activePlan.getEndTime(), now);
 	}
 
