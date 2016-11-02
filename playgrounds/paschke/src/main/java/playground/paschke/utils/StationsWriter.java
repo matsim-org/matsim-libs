@@ -39,7 +39,7 @@ public class StationsWriter extends MatsimXmlWriter {
 						createTuple("id", station.getKey().getVehicleId().toString()),
 						createTuple("x", Math.floor(station.getValue().getX())),
 						createTuple("y", Math.floor(station.getValue().getY())),
-						createTuple("type", station.getKey().getCsType())
+						createTuple("type", "car")
 				), true);
 			}
 
