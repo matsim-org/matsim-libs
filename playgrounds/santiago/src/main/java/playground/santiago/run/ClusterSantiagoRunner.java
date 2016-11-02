@@ -83,7 +83,7 @@ public class ClusterSantiagoRunner {
 			inputPath = "/net/ils4/lcamus/runs-svn/santiago/"+caseName+"/";
 			configFile = inputPath + "config_baseCase10pct.xml";
 			
-			policy = args[1]; //0: BASE-CASE, 1: FIRST-BEST, 2: CORDON, 3: SOME OTHER POLICY.
+			policy = args[1]; //0: BASE-CASE, 1: CORDON
 			
 			doModeChoice = Boolean.parseBoolean(args[2]);
 			mapActs2Links = Boolean.parseBoolean(args[3]);

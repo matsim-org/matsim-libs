@@ -22,9 +22,9 @@ package org.matsim.utils.gis.matsim2esri.plans;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.zip.GZIPInputStream;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -40,18 +40,16 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 
 	public void testSelectedPlansActsShape() throws IOException {
-		String populationFilename = "./test/scenarios/berlin/plans_hwh_1pct.xml.gz";
-		String networkFilename = "./test/scenarios/berlin/network.xml.gz";
 		String outputDir = getOutputDirectory();
 
 		String outShp = getOutputDirectory() + "acts.shp";
 
 		Scenario scenario = ScenarioUtils.createScenario(super.loadConfig(null));
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
+		new MatsimNetworkReader(scenario.getNetwork()).parse(new GZIPInputStream(getClass().getResourceAsStream("/test/scenarios/berlin/network.xml.gz")));
 
 		Population population = scenario.getPopulation();
-		new PopulationReader(scenario).readFile(populationFilename);
+		new PopulationReader(scenario).parse(new GZIPInputStream(getClass().getResourceAsStream("/test/scenarios/berlin/plans_hwh_1pct.xml.gz")));
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population, network, crs, outputDir);
@@ -66,18 +64,16 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 	}
 
 	public void testSelectedPlansLegsShape() throws IOException {
-		String populationFilename = "./test/scenarios/berlin/plans_hwh_1pct.xml.gz";
-		String networkFilename = "./test/scenarios/berlin/network.xml.gz";
 		String outputDir = getOutputDirectory();
 
 		String outShp = getOutputDirectory() + "legs.shp";
 
 		Scenario scenario = ScenarioUtils.createScenario(super.loadConfig(null));
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
+		new MatsimNetworkReader(scenario.getNetwork()).parse(new GZIPInputStream(getClass().getResourceAsStream("/test/scenarios/berlin/network.xml.gz")));
 
 		Population population = scenario.getPopulation();
-		new PopulationReader(scenario).readFile(populationFilename);
+		new PopulationReader(scenario).parse(new GZIPInputStream(getClass().getResourceAsStream("/test/scenarios/berlin/plans_hwh_1pct.xml.gz")));
 
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
 		SelectedPlans2ESRIShape sp = new SelectedPlans2ESRIShape(population, network, crs, outputDir);

@@ -47,7 +47,7 @@ public interface MobsimAgent extends NetworkAgent, Identifiable<Person> {
      * The method through which the agent announces state changes.  For example, when a leg ends, the agent is "in limbo".  When it sets its
      * state to "ACTIVITY", then when returning to the main engine, that engine will ask the agent about its state and then insert it into
      * the correct queue.
-     * <p/>
+     * <p></p>
      * Design comments/questions:<ul>
      * <li> Should this be renamed into "get<i>CurrentOrNext</i>State"?
      * </ul>
@@ -58,7 +58,7 @@ public interface MobsimAgent extends NetworkAgent, Identifiable<Person> {
      * The time the agent wants to depart from an Activity. If the agent is currently driving,
      * the return value cannot be interpreted (e.g. it is not defined if it is the departure time
      * from the previous activity, or from the next one).
-     * <p/>
+     * <p></p>
      * There is no corresponding setter, as the implementation should set the corresponding time internally, e.g. in endLegAndComputeNextState() .
      *
      * @return the time when the agent wants to depart from an activity.
@@ -83,7 +83,7 @@ public interface MobsimAgent extends NetworkAgent, Identifiable<Person> {
      * This is another method besides endLeg... and endActivity... .  Seems to be necessary to abort agents
      * in states where they should not be.  They should then either set their internal state to abort, or try to recover
      * if possible.  If neither is done, an infinite loop may result.  kai, feb'12
-     * <p/>
+     * <p></p>
      * With respect to "recovery": Possible states (may'14) are LEG and ACTIVITY.  I cannot say what the consistency requirements here are
      * (e.g. if the agent can only start an activity on the link from where the abort is called).
      */

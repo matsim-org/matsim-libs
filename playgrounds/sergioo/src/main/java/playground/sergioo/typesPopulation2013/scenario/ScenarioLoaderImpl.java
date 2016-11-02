@@ -56,7 +56,7 @@ import playground.sergioo.typesPopulation2013.population.PopulationReader;
  * other load...() methods only load specific parts
  * of the scenario assuming that required parts are already
  * loaded or created by the user.
- * <p/>
+ * <p></p>
  * Design thoughts:<ul>
  * <li> Given what we have now, does it make sense to leave this class public?  yy kai, mar'11
  * </ul> 

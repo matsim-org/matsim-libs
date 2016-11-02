@@ -131,9 +131,6 @@ public class AccessibilityBasedLocationOptimizer {
 
 								listener.writeToSubdirectoryWithName(addedFacilityId.toString());
 
-								listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
-
-								//
 								listener.setCalculateAggregateValues(true);
 								listenerMap.put(measuringPointId, listener);
 								return listener;

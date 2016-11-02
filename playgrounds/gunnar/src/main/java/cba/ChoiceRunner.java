@@ -45,6 +45,8 @@ class ChoiceRunner implements Runnable {
 
 	private Plan chosenPlan = null;
 
+	private Double sampersUtility = null;
+
 	ChoiceRunner(final Scenario scenario, final Provider<TripRouter> tripRouterProvider,
 			final Map<String, TravelTime> mode2travelTime, final Link homeLoc, final Person person,
 			final List<TourSequence> tourSeqAlternatives, final int maxTrials, final int maxFailures) {
@@ -60,6 +62,10 @@ class ChoiceRunner implements Runnable {
 
 	Plan getChosenPlan() {
 		return this.chosenPlan;
+	}
+
+	Double getSampersUtility() {
+		return this.sampersUtility;
 	}
 
 	@Override
@@ -94,6 +100,7 @@ class ChoiceRunner implements Runnable {
 		final int chosenIndex = draw(probas);
 
 		this.chosenPlan = planAlternatives.get(chosenIndex);
+		this.sampersUtility = utilities.get(chosenIndex);
 
 		System.out.println("replanned person " + this.person.getId());
 	}

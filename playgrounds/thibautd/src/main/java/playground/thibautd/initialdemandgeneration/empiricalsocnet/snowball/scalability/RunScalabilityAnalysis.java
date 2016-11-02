@@ -18,32 +18,27 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.scalability;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSampler;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplerModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplingConfigGroup;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SimpleSnowballModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballSamplingConfigGroup;
+import playground.thibautd.utils.MonitoringUtils;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
 /**
  * @author thibautd
@@ -51,27 +46,34 @@ import java.util.Set;
 public class RunScalabilityAnalysis {
 
 	public static void main( String[] args ) {
+		MonitoringUtils.setMemoryLoggingOnGC();
+		final SnowballSamplingConfigGroup configGroup = new SnowballSamplingConfigGroup();
 		final ScalabilityConfigGroup scalabilityConfigGroup = new ScalabilityConfigGroup();
-		final Config config = ConfigUtils.loadConfig( args[ 0 ] , scalabilityConfigGroup , new SocialNetworkSamplingConfigGroup() );
+		final Config config =
+				ConfigUtils.loadConfig(
+						args[ 0 ],
+						configGroup,
+						scalabilityConfigGroup,
+						new SocialNetworkSamplingConfigGroup() );
 		MoreIOUtils.initOut( config.controler().getOutputDirectory() );
 
-		try ( final ScalabilityStatisticsListener statsListenner = new ScalabilityStatisticsListener( config.controler().getOutputDirectory()+"/stats.dat"  )) {
+		new ConfigWriter( config ).write( config.controler().getOutputDirectory()+"/output_config.xml" );
+		final Scenario scenario = ScenarioUtils.loadScenario( config );
 
+		final String outputDir = config.controler().getOutputDirectory();
+		final String tmpDir = outputDir + "/tmp/";
+		config.controler().setOutputDirectory( tmpDir );
+
+		try ( final ScalabilityStatisticsListener statsListenner = new ScalabilityStatisticsListener( outputDir+"/stats.dat"  )) {
 			for ( double sample : scalabilityConfigGroup.getSamples() ) {
 				for ( int tryNr = 0; tryNr < scalabilityConfigGroup.getnTries(); tryNr++ ) {
-					final SnowballSamplingConfigGroup configGroup = new SnowballSamplingConfigGroup();
-					final Config tryConfig = ConfigUtils.loadConfig( args[ 0 ], configGroup , new SocialNetworkSamplingConfigGroup() );
+					MoreIOUtils.deleteDirectoryIfExists( tmpDir );
 
-					final String outputDir = config.controler().getOutputDirectory() + "/tmp/";
-					tryConfig.controler().setOutputDirectory( outputDir );
-					MoreIOUtils.deleteDirectoryIfExists( outputDir );
-
-					final Scenario scenario = ScenarioUtils.loadScenario( tryConfig );
-					samplePopulation( scenario , sample );
+					final Scenario sampledScenario = samplePopulation( scenario , sample );
 
 					statsListenner.startTry( sample , tryNr );
 
-					final SocialNetwork network = runTry( scenario , statsListenner );
+					final SocialNetwork network = runTry( sampledScenario , statsListenner );
 
 					statsListenner.endTry( network );
 				}
@@ -90,11 +92,11 @@ public class RunScalabilityAnalysis {
 			final ScalabilityStatisticsListener statsListenner ) {
 		try ( final AutocloserModule closer = new AutocloserModule() ) {
 			final com.google.inject.Injector injector =
-					Injector.createInjector( scenario.getConfig(),
+					Injector.createInjector(
+							scenario.getConfig(),
 							closer,
 							new SimpleSnowballModule( scenario.getConfig() ),
-							new ScenarioByInstanceModule( scenario ),
-							b -> b.bind( SocialNetworkSampler.class ),
+							new SocialNetworkSamplerModule( scenario ),
 							b -> b.bind( ScalabilityStatisticsListener.class ).toInstance( statsListenner ) );
 
 			return injector.getInstance( SocialNetworkSampler.class ).sampleSocialNetwork();
@@ -108,66 +110,16 @@ public class RunScalabilityAnalysis {
 	}
 
 	private static final Random random = new Random( 123 );
-	private static void samplePopulation(
+	private static Scenario samplePopulation(
 			final Scenario scenario,
 			final double sample ) {
-		final Set<Id<Person>> toRemove = new HashSet<>();
+		final Scenario sampled = ScenarioUtils.createScenario( scenario.getConfig() );
 
-		for ( Id<Person> p : scenario.getPopulation().getPersons().keySet() ) {
-			if ( random.nextDouble() > sample ) toRemove.add( p );
+		for ( Person p : scenario.getPopulation().getPersons().values() ) {
+			if ( random.nextDouble() <= sample ) sampled.getPopulation().addPerson( p );
 		}
 
-		for ( Id<Person> p : toRemove ) scenario.getPopulation().removePerson( p );
+		return sampled;
 	}
 
-	private static class ScalabilityConfigGroup extends ReflectiveConfigGroup {
-		private double basisSample = 0.1;
-		private double[] samples = {0.125,0.25,0.5,1};
-		private int nTries = 1;
-
-		public ScalabilityConfigGroup() {
-			super( "scalability" );
-		}
-
-		@StringGetter("samples")
-		private String getSamplesString() {
-			return Arrays.toString( getSamples() );
-		}
-
-		public double[] getSamples() {
-			return samples;
-		}
-
-		@StringSetter("samples")
-		public void setSamples( final String samples ) {
-			setSamples(
-					Arrays.stream( CollectionUtils.stringToArray( samples ) )
-							.mapToDouble( Double::parseDouble )
-							.toArray() );
-		}
-
-		public void setSamples( final double[] samples ) {
-			this.samples = samples;
-		}
-
-		@StringGetter("nTries")
-		public int getnTries() {
-			return nTries;
-		}
-
-		@StringSetter("nTries")
-		public void setnTries( final int nTries ) {
-			this.nTries = nTries;
-		}
-
-		@StringGetter("basisSample")
-		public double getBasisSample() {
-			return basisSample;
-		}
-
-		@StringSetter("basisSample")
-		public void setBasisSample( final double basisSample ) {
-			this.basisSample = basisSample;
-		}
-	}
 }

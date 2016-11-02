@@ -34,7 +34,6 @@ import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListn
 import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
-import playground.agarwalamit.opdyts.ModalStatsControlerListner;
 
 /**
  * @author amit
@@ -62,8 +61,6 @@ public class PatnaPlansRelaxor {
 		modes2consider.add("pt");
 		modes2consider.add("walk");
 
-		ModalStatsControlerListner stasControlerListner = new ModalStatsControlerListner(modes2consider);
-
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -72,7 +69,6 @@ public class PatnaPlansRelaxor {
 
 				// some stats
 				addControlerListenerBinding().to(KaiAnalysisListener.class);
-				addControlerListenerBinding().toInstance(stasControlerListner);
 
 				this.bind(ModalShareEventHandler.class);
 				this.addControlerListenerBinding().to(ModalShareControlerListner.class);

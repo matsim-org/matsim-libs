@@ -90,7 +90,8 @@ public class ControlerWSPreCalcTimes {
         ConfigUtils.loadConfig(config, args[0]);
 
         final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
-        final StopStopTime preloadedStopStopTimes = new StopStopTimePreCalcSerializable(args[1], controler.getScenario(), true);
+        final Scenario scenario = controler.getScenario();
+        final StopStopTime preloadedStopStopTimes = new StopStopTimePreCalcSerializable(args[1], scenario, true);
 
 //        final TravelTimeAndDistanceBasedTravelDisutilityFactory disutilityFactory =
 //                new TravelTimeAndDistanceBasedTravelDisutilityFactory();
@@ -103,13 +104,13 @@ public class ControlerWSPreCalcTimes {
 //        disutilityFactory.setSigma(0.3);
 //        controler.addOverridingModule(new RandomizedTransitRouterModule());
 
-        final WaitTimeStuckCalculator waitTimeStuckCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(),
-                controler.getScenario().getTransitSchedule(),
-                controler.getScenario().getConfig());
+        final WaitTimeStuckCalculator waitTimeStuckCalculator = new WaitTimeStuckCalculator(scenario.getPopulation(),
+                scenario.getTransitSchedule(),
+                scenario.getConfig());
 
         final StopStopTimeCalculator stopStopTimeCalculatorSerializable = new StopStopTimeCalculator(
-                controler.getScenario().getTransitSchedule(),
-                controler.getScenario().getConfig());
+                scenario.getTransitSchedule(),
+                scenario.getConfig());
 
 
         final MyAfterMobsimAnalyses analyses = new MyAfterMobsimAnalyses(controler);
@@ -126,7 +127,7 @@ public class ControlerWSPreCalcTimes {
         );
 
         //need to make MRT slower, so identify the links with this mode with a hotfix
-        for (Link l : controler.getScenario().getNetwork().getLinks().values()) {
+        for (Link l : scenario.getNetwork().getLinks().values()) {
             Link l1 = (Link) l;
             String[] parts = l.getId().toString().split(TransitSheduleToNetwork.SEPARATOR);
             if (parts[0].matches("[A-Z]+[0-9]*[_a-z]*")) {
@@ -143,7 +144,7 @@ public class ControlerWSPreCalcTimes {
             @Override
 
             public void install() {
-                bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(controler.getScenario(),
+                bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(scenario,
                         waitTimeStuckCalculator.getWaitTimes(), stopStopTimeCalculatorSerializable.getStopStopTimes()));
 
                 bindMobsim().toProvider(new Provider<Mobsim>() {
@@ -157,21 +158,21 @@ public class ControlerWSPreCalcTimes {
                                     "Please add the module 'qsim' to your config file.");
                         }
 
-                        QSim qSim = new QSim(controler.getScenario(), controler.getEvents());
+                        QSim qSim = new QSim(scenario, controler.getEvents());
 
                         ActivityEngine activityEngine = new ActivityEngine(controler.getEvents(), qSim.getAgentCounter());
 
                         qSim.addMobsimEngine(activityEngine);
                         qSim.addActivityHandler(activityEngine);
                         //
-                        ConfigurableQNetworkFactory netsimEngineFactory = new ConfigurableQNetworkFactory(controler.getEvents(), controler.getScenario() ) ;
+                        ConfigurableQNetworkFactory netsimEngineFactory = new ConfigurableQNetworkFactory(controler.getEvents(), scenario) ;
                         netsimEngineFactory.setLinkSpeedCalculator(linkSpeedCalculatorWithPreCalcTimes);
 				//
                         QNetsimEngine netsimEngine = new QNetsimEngine(qSim, netsimEngineFactory );
                         qSim.addMobsimEngine(netsimEngine);
                         qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
                         //
-                        TeleportationEngine teleportationEngine = new TeleportationEngine(controler.getScenario(), controler.getEvents());
+                        TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, controler.getEvents());
                         qSim.addMobsimEngine(teleportationEngine);
                         AgentFactory agentFactory;
 
@@ -190,7 +191,7 @@ public class ControlerWSPreCalcTimes {
                             qSim.addMobsimEngine(new NetworkChangeEventsEngine());
                         }
 
-                        PopulationAgentSource agentSource = new PopulationAgentSource(controler.getScenario().getPopulation(), agentFactory, qSim);
+                        PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
                         qSim.addAgentSource(agentSource);
 
                         return qSim;

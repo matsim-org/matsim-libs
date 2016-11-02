@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Leg;
  * activities start and end as well as when legs start and end.<br>
  * Note that one ScoringFunction calculates the score for exactly one agent.
  * Thus every agents must have its own instance of a scoring function!
- * <p/>
+ * <p></p>
  * See {@link tutorial.programming.example16customscoring.RunCustomScoringExample} for an example.
  *
  * @author mrieser

@@ -10,6 +10,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 public final class NetworkUtil {
 	private NetworkUtil(){} // do not instantiate
 
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(NetworkUtil.class);
 	
 	/**

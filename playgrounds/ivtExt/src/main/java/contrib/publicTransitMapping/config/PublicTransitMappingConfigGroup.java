@@ -200,8 +200,8 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 
 	/**
 	 * References transportModes from the schedule (key) and the
-	 * allowed modeRouting of a link from the network (value). <p/>
-	 * <p/>
+	 * allowed modeRouting of a link from the network (value). <p></p>
+	 * <p></p>
 	 * Schedule transport modeRouting should be in gtfs categories:
 	 * <ul>
 	 * <li>0 - Tram, Streetcar, Light rail. Any light rail or street level system within a metropolitan area.</li>
@@ -664,7 +664,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 
 	/**
 	 * Parameterset that define which network transport modes the router
-	 * can use for each schedule transport mode.<p/>
+	 * can use for each schedule transport mode.<p></p>
 	 *
 	 * Network transport modes are the ones in {@link Link#getAllowedModes()}, schedule
 	 * transport modes are from {@link TransitRoute#getTransportMode()}.

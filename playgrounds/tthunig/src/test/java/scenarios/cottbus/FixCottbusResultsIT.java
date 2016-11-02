@@ -62,16 +62,18 @@ public class FixCottbusResultsIT {
 	
 	@Test
 	@Ignore //takes to long
-	public void testBC(){
-		fixResults(ScenarioType.BaseCase, SignalType.MS, 0.0);
+	public void testBC(){		
+		fixResults(ScenarioType.BaseCase, SignalType.MS, 125289192.0);
 	}
 
 	@Test
+	@Ignore // TODO debug. UncheckedIOException while reading lanes: "SAXParseException; lineNumber 1; columnNumber 1; Content is not allowed in prolog"
 	public void testBCContinuedFreeRouteChoice(){
 		fixResults(ScenarioType.BaseCaseContinued_MatsimRoutes, SignalType.BTU_OPT, 1133616.0);
 	}
 	
 	@Test
+	@Ignore // TODO debug. UncheckedIOException while reading lanes: "SAXParseException; lineNumber 1; columnNumber 1; Content is not allowed in prolog"
 	public void testBCContinuedFixedRouteSet(){
 		fixResults(ScenarioType.BaseCaseContinued_BtuRoutes, SignalType.BTU_OPT, 1091221.0);
 	}	
@@ -81,8 +83,6 @@ public class FixCottbusResultsIT {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);	
 		// add missing scenario elements
-		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
-				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
 				new SignalsDataLoader(config).loadSignalsData());
 		
@@ -114,7 +114,7 @@ public class FixCottbusResultsIT {
 		if (scenarioType.equals(ScenarioType.BaseCase)){
 			config.network().setInputFile(testUtils.getClassInputDirectory() + "matsimData/network_wgs84_utm33n.xml.gz");
 			config.network().setLaneDefinitionsFile(testUtils.getClassInputDirectory() + "matsimData/lanes.xml");
-			config.plans().setInputFile(testUtils.getClassInputDirectory() + "matsimData/cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only.xml.gz");
+			config.plans().setInputFile(testUtils.getClassInputDirectory() + "matsimData/commuter_population_wgs84_utm33n_car_only.xml.gz");
 		} else { // BaseCaseContinued
 			config.network().setInputFile(testUtils.getClassInputDirectory() + "btuOpt/network_small_simplified.xml.gz");
 			config.network().setLaneDefinitionsFile(testUtils.getClassInputDirectory() + "btuOpt/lanes_network_small.xml.gz");
@@ -156,7 +156,7 @@ public class FixCottbusResultsIT {
 
 		// set travelTimeBinSize (only has effect if reRoute is used)
 		config.travelTimeCalculator().setTraveltimeBinSize( 10 );
-
+		
 		config.travelTimeCalculator().setTravelTimeCalculatorType(TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
 		// hash map and array produce same results. only difference: memory and time.
 		// for small time bins and sparse values hash map is better. theresa, may'15
@@ -196,7 +196,9 @@ public class FixCottbusResultsIT {
 			// use default: 1.0 (i.e. as it is in the BTU network)
 		}
 		
+		// set start and end time to shorten simulation run time
 		config.qsim().setStartTime(3600 * 5); 
+		config.qsim().setEndTime(3600 * 24);
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 

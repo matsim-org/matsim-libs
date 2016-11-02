@@ -24,7 +24,8 @@ public class CreateNetwork {
 //		String osmFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/otp/2015-05-26_berlin.osm";
 		
 //		String osmFile = "../../../../SVN/shared-svn/projects/tum-with-moeckel/data/mstm/siloMatsim/network/md_dc.osm";
-		String osmFile = "../../../../LandUseTransport/Data/OSM/md_and_surroundings.osm";
+//		String osmFile = "../../../../LandUseTransport/Data/OSM/md_and_surroundings.osm";
+		String osmFile = "../../../shared-svn/projects/maxess/data/kenya/osm/kenya-latest.osm";
 		
 //		String networkFile = "/Users/dominik/Accessibility/Data/Networks/Kenya/2015-10-15_nairobi_paths.xml";
 //		String networkFile = "/Users/dominik/Accessibility/Data/Networks/Kenya/2015-11-05_kibera_paths_detailed.xml";
@@ -33,16 +34,17 @@ public class CreateNetwork {
 //		String outputBase = "../../../../Workspace/shared-svn/projects/accessibility_berlin/otp/2015-05-26/";
 		
 //		String outputBase = "../../../../SVN/shared-svn/projects/tum-with-moeckel/data/mstm/siloMatsim/network/";
-		String outputBase = "../../../../LandUseTransport/Data/OSM/network_04";
+//		String outputBase = "../../../../LandUseTransport/Data/OSM/network_04";
+		String outputBase = "../../../shared-svn/projects/maxess/data/kenya/network";
 		
-		String networkFile = outputBase + "/network.xml";
+		String networkFile = outputBase + "/2016-10-19_network_detailed.xml";
 		
 		LogToOutputSaver.setOutputDirectory(outputBase);
 		
 		
 		// Parameters
 		String inputCRS = "EPSG:4326";
-		String outputCRS = "EPSG:26918";
+		String outputCRS = "EPSG:21037";
 //		String outputCRS = TransformationFactory.WGS84_SA_Albers;
 		// EPSG:4326 = WGS84
 		// EPSG:31468 = DHDN GK4, for Berlin; DE
@@ -51,8 +53,8 @@ public class CreateNetwork {
 		log.info("Input CRS is " + inputCRS + "; output CRS is " + outputBase);
 		
 		boolean keepPaths = false;
-		boolean includeLowHierarchyWays = false;
-		boolean onlyBiggerRoads = true; // "thinner" network; do not use this together with "includeLowHierarchyWays"
+		boolean includeLowHierarchyWays = true;
+		boolean onlyBiggerRoads = false; // "thinner" network; do not use this together with "includeLowHierarchyWays"
 		log.info("Settings: includeLowHierarchyWays = " + includeLowHierarchyWays + "; keepPaths = " + keepPaths);
 
 		
@@ -91,9 +93,6 @@ public class CreateNetwork {
 			//
 			// onr.setHighwayDefaults(hierarchy, highwayType, lanes, freespeed, freespeedFactor, laneCapacity_vehPerHour);
 			//
-			osmNetworkReader.setHighwayDefaults(4, "secondary_link", 1, 60.0/3.6, 1.0, 1000); // same values as "secondary"
-			osmNetworkReader.setHighwayDefaults(5, "tertiary_link", 1, 45.0/3.6, 1.0,  600); // same values as "tertiary"
-			//
 			// lowest hierarchy contained in defaults: 6, "living_street", 1,  15.0/3.6, 1.0,  300);
 			//
 			osmNetworkReader.setHighwayDefaults(7, "pedestrian", 1, 15/3.6, 1.0, 0);
@@ -120,13 +119,10 @@ public class CreateNetwork {
 			osmNetworkReader.setHighwayDefaults(2, "trunk_link",    1,  50.0/3.6, 1.0, 1500);
 			osmNetworkReader.setHighwayDefaults(3, "primary",       1,  80.0/3.6, 1.0, 1500);
 			osmNetworkReader.setHighwayDefaults(3, "primary_link",  1,  60.0/3.6, 1.0, 1500);
-			osmNetworkReader.setHighwayDefaults(4, "secondary",     1,  60.0/3.6, 1.0, 1000);
-			osmNetworkReader.setHighwayDefaults(5, "tertiary",      1,  45.0/3.6, 1.0,  600);
-			// minor, unclassified, residential, living_street" are left out here, whereas they are used by defaults.
-			
-			// additional to defaults
-			osmNetworkReader.setHighwayDefaults(4, "secondary_link", 1, 60.0/3.6, 1.0, 1000); // same values as "secondary"
-			osmNetworkReader.setHighwayDefaults(5, "tertiary_link", 1, 45.0/3.6, 1.0,  600); // same values as "tertiary"
+			osmNetworkReader.setHighwayDefaults(4, "secondary",     1,  30.0/3.6, 1.0, 1000);
+			osmNetworkReader.setHighwayDefaults(4, "secondary_link",     1,  30.0/3.6, 1.0, 1000);
+			osmNetworkReader.setHighwayDefaults(5, "tertiary",      1,  25.0/3.6, 1.0,  600);
+			osmNetworkReader.setHighwayDefaults(5, "tertiary_link",      1,  25.0/3.6, 1.0,  600);
 		}
 
 		

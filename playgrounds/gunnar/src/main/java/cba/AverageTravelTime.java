@@ -48,10 +48,11 @@ class AverageTravelTime implements TravelTime {
 
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		double sum = this.myTravelTimes.get(0).getLinkTravelTime(link, time, person, vehicle);
-		for (int i = 1; i < this.myTravelTimes.size(); i++) {
+		final int startIndex = this.myTravelTimes.size() / 2;
+		double sum = 0;
+		for (int i = startIndex; i < this.myTravelTimes.size(); i++) {
 			sum += this.myTravelTimes.get(i).getLinkTravelTime(link, time, person, vehicle);
 		}
-		return (sum /this.myTravelTimes.size());		
+		return (sum / (this.myTravelTimes.size() - startIndex));		
 	}
 }

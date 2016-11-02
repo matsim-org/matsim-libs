@@ -49,14 +49,16 @@ class TourSequence {
 		final int dptTimeInc_s = (int) (Units.S_PER_D / (2 * this.tours.size()));
 		int dptTime_s = dptTimeInc_s / 2;
 
-		for (Tour tour : this.tours) {
+		// first home activity
+		final Activity home = scenario.getPopulation().getFactory().createActivityFromLinkId(Tour.Act.home.toString(),
+				homeLinkId);
+		home.setEndTime(dptTime_s);
+		result.addActivity(home);
+		dptTime_s += dptTimeInc_s;
 
-			final Activity home = scenario.getPopulation().getFactory()
-					.createActivityFromLinkId(Tour.Act.home.toString(), homeLinkId);
-			home.setEndTime(dptTime_s);
-			// home.setEndTime(dptTimes_s.removeFirst());
-			result.addActivity(home);
-			dptTime_s += dptTimeInc_s;
+		// tours, with *intermediate* home2 stops
+		for (int i = 0; i < this.tours.size(); i++) {
+			final Tour tour = this.tours.get(i);
 
 			result.addLeg(scenario.getPopulation().getFactory().createLeg(tour.mode.toString()));
 
@@ -67,11 +69,50 @@ class TourSequence {
 			dptTime_s += dptTimeInc_s;
 
 			result.addLeg(scenario.getPopulation().getFactory().createLeg(tour.mode.toString()));
+
+			if (i < this.tours.size() - 1) {
+				final Activity home2 = scenario.getPopulation().getFactory()
+						.createActivityFromLinkId(Tour.Act.home2.toString(), homeLinkId);
+				home2.setEndTime(dptTime_s);
+				result.addActivity(home2);
+				dptTime_s += dptTimeInc_s;
+			}
 		}
 
+		// last home activity
 		result.addActivity(
 				scenario.getPopulation().getFactory().createActivityFromLinkId(Tour.Act.home.toString(), homeLinkId));
 		result.setPerson(person);
+
+		// >>>>>>>>>> TODO working original >>>>>>>>>>
+		//
+		// for (Tour tour : this.tours) {
+		//
+		// final Activity home = scenario.getPopulation().getFactory()
+		// .createActivityFromLinkId(Tour.Act.home.toString(), homeLinkId);
+		// home.setEndTime(dptTime_s);
+		// // home.setEndTime(dptTimes_s.removeFirst());
+		// result.addActivity(home);
+		// dptTime_s += dptTimeInc_s;
+		//
+		// result.addLeg(scenario.getPopulation().getFactory().createLeg(tour.mode.toString()));
+		//
+		// final Activity tourAct =
+		// scenario.getPopulation().getFactory().createActivityFromLinkId(tour.act.toString(),
+		// tour.destination.getId());
+		// tourAct.setEndTime(dptTime_s);
+		// result.addActivity(tourAct);
+		// dptTime_s += dptTimeInc_s;
+		//
+		// result.addLeg(scenario.getPopulation().getFactory().createLeg(tour.mode.toString()));
+		// }
+		//
+		// result.addActivity(
+		// scenario.getPopulation().getFactory().createActivityFromLinkId(Tour.Act.home.toString(),
+		// homeLinkId));
+		// result.setPerson(person);
+		//
+		// <<<<<<<<<< TODO working original <<<<<<<<<<
 
 		return result;
 	}

@@ -13,7 +13,7 @@
  * </ul>
  * 
  * Look into {@link org.matsim.contrib.minibus.RunMinibus} to get started.
- * <p/>
+ * <p></p>
  * 
  * Quickstart from command line (without eclipse):<ol>
  * <li> Create an empty directory and cd into it.

@@ -27,35 +27,29 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 
 
 /**
+ * Default AmberLogic that switches to green or red without any amber signal in between.
+ * 
  * @author dgrether
  *
  */
 public class EmptyAmberLogicImpl implements AmberLogic {
 
-	/**
-	 * 
-	 */
 	public EmptyAmberLogicImpl() {
 	}
 
 	@Override
-	public Set<SignalGroupStateChangeRequest> processDropping(double timeSec, Id<SignalSystem> systemId,
-			Id<SignalGroup> signalGroupId) {
+	public Set<SignalGroupStateChangeRequest> processDropping(double now, Id<SignalSystem> systemId, Id<SignalGroup> signalGroupId) {
 		Set<SignalGroupStateChangeRequest> ret = new HashSet<SignalGroupStateChangeRequest>();
-		SignalGroupStateChangeRequest redRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.RED,
-				timeSec);
+		SignalGroupStateChangeRequest redRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.RED, now);
 		ret.add(redRequest);
 		return ret;
 	}
 
 	@Override
-	public Set<SignalGroupStateChangeRequest> processOnsets(double timeSeconds, Id<SignalSystem> systemId,
-			Id<SignalGroup> signalGroupId) {
+	public Set<SignalGroupStateChangeRequest> processOnsets(double now, Id<SignalSystem> systemId, Id<SignalGroup> signalGroupId) {
 		Set<SignalGroupStateChangeRequest> ret = new HashSet<SignalGroupStateChangeRequest>();
-		SignalGroupStateChangeRequest redRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.GREEN, 
-				timeSeconds);
+		SignalGroupStateChangeRequest redRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.GREEN, now);
 		ret.add(redRequest);
 		return ret;
 	}
-
 }

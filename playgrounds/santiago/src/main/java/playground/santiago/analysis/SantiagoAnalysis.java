@@ -22,11 +22,10 @@ public class SantiagoAnalysis {
 //	private static final String OUTPUT_TEMP = "../../../runs-svn/santiago/baseCase10pct/OLD/outputSim1/";
 //	private static final String ANALYSIS_DIR_TEMP = OUTPUT_TEMP + "analysis/";
 	
-	private static final String IT_NUMBER = "100";
+	private static final String IT_NUMBER = "0";
 	private static final String IT_FOLDER = OUTPUT_FOLDER + "ITERS/it." + IT_NUMBER + "/";	
 	
 //	private static final String IT_FOLDER_TEMP = OUTPUT_TEMP + "ITERS/it." + IT_NUMBER + "/";
-	
 	
 	
 	private static final String EVENTS = IT_FOLDER + IT_NUMBER +".events.xml.gz";

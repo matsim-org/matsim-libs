@@ -19,11 +19,13 @@
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
 
 import com.google.inject.Module;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Injector;
 
 import java.util.Arrays;
+import java.util.Set;
 
 /**
  * @author thibautd
@@ -36,5 +38,15 @@ public class SocialNetworkSamplerUtils {
 
 		return injector.getInstance( SocialNetworkSampler.class ).sampleSocialNetwork();
 	}
+
+	public static SocialNetwork sampleSocialNetwork( final Scenario scenario, final Module... modules ) {
+		final Module[] allModules = Arrays.copyOf( modules , modules.length + 1 );
+		allModules[ allModules.length - 1 ] = new SocialNetworkSamplerModule( scenario );
+		final com.google.inject.Injector injector = Injector.createInjector( scenario.getConfig() , allModules );
+
+		return injector.getInstance( SocialNetworkSampler.class ).sampleSocialNetwork();
+	}
+
+
 }
 

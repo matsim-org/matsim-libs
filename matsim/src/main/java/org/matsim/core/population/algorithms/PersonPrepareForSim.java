@@ -40,7 +40,7 @@ import org.matsim.core.population.routes.RouteUtils;
  * Performs several checks that persons are ready for a mobility simulation.
  * It is intended to run only once after the initial plans are read from file,
  * as we expect that no "damage" happens to the plans during the iterations.
- * <br/>
+ * <br>
  * Currently, this only checks that in all plans the act's have a link assigned
  * and that all plans have valid routes, calculating missing links and
  * routes if required. Additionally, it will output a warning to the

@@ -67,93 +67,74 @@ import javax.inject.Provider;
  *
  */
 public class SantiagoScenarioRunner {
+		
 	
-	
+	private static String configFile;
+	private static String policy;
+	private static int sigma;	
+	private static boolean doModeChoice; 
+	private static boolean mapActs2Links;
+
 	private static String caseName = "baseCase1pct";
 	private static String inputPath = "../../../runs-svn/santiago/"+caseName+"/";
-	private static boolean doModeChoice = true;
-	private static boolean mapActs2Links = false;
-	
-	private static String policy = "0"; //0: BASE-CASE, 1: FIRST-BEST, 2: CORDON, 3: SOME OTHER POLICY.
-	private static String configFile;
-	
-	//ALWAYS NECESSARY
-	private static double sigma=3;	
-	private static String gantriesFile = inputPath + "input/gantries.xml";
-	
-	//ONLY POLICY CASE NUMBER 2. CORDON FILE = GANTRIES + CORDON LINKS
-	private static String cordonFile = inputPath + "input/outerCordon.xml";
 	
 	
-	public static void main(String args[]){
+	
+	public static void main(String args[]){		
 
-
-		configFile = inputPath + "config_baseCase1pct.xml";		
-		Config config = ConfigUtils.loadConfig(configFile);
-//		config.controler().setOutputDirectory(outputDirectory);
-//		config.qsim().setNumberOfThreads(1);
-//		config.parallelEventHandling().setNumberOfThreads(1);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-//		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
-		Controler controler = new Controler(scenario);
+		if (args.length==5){ 
+			
+			configFile = args[0]; //COMPLETE PATH TO CONFIG.
+			policy = args[1]; //POLICY? - 0: BASE CASE, 1: CORDON.
+			sigma = Integer.parseInt(args[2]); //SIGMA. 
+			doModeChoice = Boolean.parseBoolean(args[3]); //DOMODECHOICE?
+			mapActs2Links = Boolean.parseBoolean(args[4]); //MAPACTS2LINKS?
+			
+		}
 		
-		// adding other network modes than car requires some router; here, the same values as for car are used
-		setNetworkModeRouting(controler);
-		
-		// adding pt fare
-		controler.getEvents().addHandler(new PTFareHandler(controler, doModeChoice, scenario.getPopulation()));
-		
-		// adding basic strategies for car and non-car users
-		setBasicStrategiesForSubpopulations(controler);
-		
-		// adding subtour mode choice strategies for car and non-car users
-		if(doModeChoice) setModeChoiceForSubpopulations(controler);
-		
-		// mapping agents' activities to links on the road network to avoid being stuck on the transit network
-		if(mapActs2Links) mapActivities2properLinks(scenario);
+			configFile=inputPath + "config_" + caseName + ".xml" ; 
+			policy="0" ;    
+			sigma=3 ;    
+			doModeChoice=true ; 
+			mapActs2Links=false; 
 		
 		
-		switch (policy){
-		
-		case "0":
-			RoadPricingConfigGroup gantriesPricing = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-			gantriesPricing.setTollLinksFile(gantriesFile);
+			
+			if(policy.equals("1")){
+				//TODO: CHANGE THE TollLinksFile IN THE CONFIG.
+			}
+			
+			Config config = ConfigUtils.loadConfig(configFile);
+			Scenario scenario = ScenarioUtils.loadScenario(config);
+			config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
+			Controler controler = new Controler(scenario);
+			
+			// adding other network modes than car requires some router; here, the same values as for car are used
+			setNetworkModeRouting(controler);
+			
+			// adding pt fare
+			controler.getEvents().addHandler(new PTFareHandler(controler, doModeChoice, scenario.getPopulation()));
+			
+			// adding basic strategies for car and non-car users
+			setBasicStrategiesForSubpopulations(controler);
+			
+			// adding subtour mode choice strategies for car and non-car users			
+			if(doModeChoice) setModeChoiceForSubpopulations(controler);
+			
+			// mapping agents' activities to links on the road network to avoid being stuck on the transit network
+			if(mapActs2Links) mapActivities2properLinks(scenario);
+			
+			//Adding randomness to the router
 			config.plansCalcRoute().setRoutingRandomness(sigma); 
 			controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+	
+			//Run!
+			controler.run();		
 			
 			
-			break;
-		
-//		case "1": //FIRST-BEST
-//			
-//			TollHandler tollHandler = new TollHandler(scenario);
-//			EventHandler congestionHandler = new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario());
-//			controler.addControlerListener(
-//					new MarginalCongestionPricingContolerListener(controler.getScenario(),
-//							tollHandler, congestionHandler));
-//			break;
-//			
-//		case "2": //CORDON-TOLL
-//			
-//			RoadPricingConfigGroup rpcg = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-//			rpcg.setTollLinksFile(cordonFile);
-//			config.plansCalcRoute().setRoutingRandomness(sigma); 
-//			controler.setModules(new ControlerDefaultsWithRoadPricingModule());
-//			
-//			break;
-//			
-//		case "3": //SOME-OTHER-POLICY
-//			
-//			break;
-		
-		}
-
-		
-		controler.run();
 	}
-
+	
+	
 
 	
 	private static void mapActivities2properLinks(Scenario scenario) {

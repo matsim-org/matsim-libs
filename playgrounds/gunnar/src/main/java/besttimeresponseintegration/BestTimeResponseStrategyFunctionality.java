@@ -45,9 +45,9 @@ public class BestTimeResponseStrategyFunctionality {
 
 	private final boolean repairTimeStructure = true;
 
-	private final boolean randomSmoothing = false;
+	private final boolean randomSmoothing = true;
 
-	private final boolean interpolate = false;
+	private final boolean interpolate = true;
 
 	// -------------------- CONSTRUCTION --------------------
 

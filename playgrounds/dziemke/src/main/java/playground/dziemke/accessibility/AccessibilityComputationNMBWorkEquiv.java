@@ -124,7 +124,6 @@ public class AccessibilityComputationNMBWorkEquiv {
 						accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 						listener.addAdditionalFacilityData(homes) ;
 						listener.writeToSubdirectoryWithName("w-eq");
-						listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 						return listener;
 					}
 				});

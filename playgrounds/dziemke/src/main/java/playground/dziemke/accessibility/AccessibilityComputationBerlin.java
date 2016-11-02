@@ -173,7 +173,6 @@ public class AccessibilityComputationBerlin {
 //							listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
 							// Boundaries of Berlin are approx.: 4570000, 4613000, 5836000, 5806000
 							listener.writeToSubdirectoryWithName(actType);
-							listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 							return listener;
 						}
 					});

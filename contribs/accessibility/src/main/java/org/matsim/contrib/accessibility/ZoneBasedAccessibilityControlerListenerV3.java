@@ -1,5 +1,7 @@
 package org.matsim.contrib.accessibility;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
@@ -11,8 +13,6 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.ActivityFacilitiesImpl;
-
-import java.util.Map;
 
 /**
  *  improvements feb'12
@@ -53,7 +53,6 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 	
 	private static final Logger log = Logger.getLogger(ZoneBasedAccessibilityControlerListenerV3.class);
 	private final AccessibilityCalculator delegate;
-	private UrbanSimZoneCSVWriterV2 urbanSimZoneCSVWriterV2;
 	private ActivityFacilitiesImpl opportunities;
 	
 
@@ -74,16 +73,14 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		delegate.setMeasuringPoints(measuringPoints);
 		assert(matsim4opusTempDirectory != null);
 		if (ptMatrix != null) {
-			delegate.setPtMatrix(ptMatrix); // this could be zero of no input files for pseudo pt are given ...
+			delegate.putAccessibilityCalculator(
+			Modes4Accessibility.pt.name(),
+			PtMatrixAccessibilityContributionCalculator.create(
+					ptMatrix,
+					scenario.getConfig())); // this could be zero of no input files for pseudo pt are given ...
 		}
 		assert(scenario != null);
 
-		// writing accessibility measures continuously into "zone.csv"-file. Naming of this 
-		// files is given by the UrbanSim convention importing a csv file into a identically named 
-		// data set table. THIS PRODUCES URBANSIM INPUT
-		String matsimOutputDirectory = scenario.getConfig().controler().getOutputDirectory();
-		urbanSimZoneCSVWriterV2 = new UrbanSimZoneCSVWriterV2(matsim4opusTempDirectory, matsimOutputDirectory);
-		delegate.addFacilityDataExchangeListener(urbanSimZoneCSVWriterV2);
 		this.opportunities = opportunities;
 		// yyyy ignores the "capacities" of the facilities. kai, mar'14
 		
@@ -120,11 +117,12 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		delegate.computeAccessibilities(moduleAPCM.getTimeOfDay(), opportunities);
 	}
 
+	@Deprecated // set modes from "outside"
 	public void setComputingAccessibilityForMode(Modes4Accessibility mode, boolean val) {
 		delegate.setComputingAccessibilityForMode(mode, val);
 	}
 
-	public void addZoneDataExchangeListener(FacilityDataExchangeInterface l) {
+	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface l) {
 		delegate.addFacilityDataExchangeListener(l);
 	}
 

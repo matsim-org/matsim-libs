@@ -73,12 +73,18 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.Default
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import analysis.signals.TtSignalAnalysisTool;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
-import scenarios.illustrative.analysis.TtSignalAnalysisTool;
 
 /**
+ * Test sylvia logic at an intersection with four incoming links and one signal each.
+ * No lanes are used.
+ * 
+ * It is tested whether sylvia expands signal phases correctly when more vehicles want to pass
+ * and whether cycle times are kept.
+ * 
  * @author tthunig
  *
  */
@@ -89,6 +95,9 @@ public class SylviaTest {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
+	/**
+	 * test sylvia with conflicting streams
+	 */
 	@Test
 	public void testDemandAB(){
 		double[] noPersons = {3600, 3600};
@@ -105,12 +114,16 @@ public class SylviaTest {
 		log.info("total signal green times: " + totalSignalGreenTimes.get(signalGroupId1) + ", " + totalSignalGreenTimes.get(signalGroupId2));
 		log.info("avg signal green times per cycle: " + avgSignalGreenTimePerCycle.get(signalGroupId1) + ", " + avgSignalGreenTimePerCycle.get(signalGroupId2));
 		log.info("avg cycle time per system: " + avgCycleTimePerSystem.get(signalSystemId));
-		Assert.assertEquals("total signal green times of both groups are not similiar enough", 0.0, totalSignalGreenTimes.get(signalGroupId1)-totalSignalGreenTimes.get(signalGroupId2), totalSignalGreenTimes.get(signalGroupId1)/3); // may differ by 1/3
+		Assert.assertEquals("total signal green times of both groups are not similiar enough", 0.0, 
+				totalSignalGreenTimes.get(signalGroupId1)-totalSignalGreenTimes.get(signalGroupId2), totalSignalGreenTimes.get(signalGroupId1)/3); // may differ by 1/3
 		Assert.assertEquals("avg green time per cycle of signal group 1 is wrong", 25, avgSignalGreenTimePerCycle.get(signalGroupId1), 5);
 		Assert.assertEquals("avg green time per cycle of signal group 2 is wrong", 25, avgSignalGreenTimePerCycle.get(signalGroupId2), 5);
 		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), MatsimTestUtils.EPSILON);	
 	}
 
+	/**
+	 * test sylvia with demand crossing only in east-west direction
+	 */
 	@Test
 	public void testDemandA(){
 		double[] noPersons = {3600, 0};
@@ -133,6 +146,9 @@ public class SylviaTest {
 		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), MatsimTestUtils.EPSILON);	
 	}
 	
+	/**
+	 * test sylvia with demand crossing only in south-north direction
+	 */
 	@Test
 	public void testDemandB(){
 		double[] noPersons = {0, 3600};
@@ -217,7 +233,7 @@ public class SylviaTest {
 	 * 					 v
 	 * 					 9 
 	 * 
-	 * @param scenario
+	 * @param net the object where the network should be stored
 	 */
 	private static void createNetwork(Network net) {
 		NetworkFactory fac = net.getFactory();
@@ -261,8 +277,7 @@ public class SylviaTest {
 				Person person = population.getFactory().createPerson(Id.createPersonId(od + "-" + i));
 				population.addPerson(person);
 	
-				// create a plan for the person that contains all this
-				// information
+				// create a plan for the person that contains all this information
 				Plan plan = population.getFactory().createPlan();
 				person.addPlan(plan);
 	
@@ -398,8 +413,6 @@ public class SylviaTest {
 		{
 			ActivityParams dummyAct = new ActivityParams("dummy");
 			dummyAct.setTypicalDuration(12 * 3600);
-			dummyAct.setOpeningTime(5 * 3600);
-			dummyAct.setLatestStartTime(10 * 3600);
 			config.planCalcScore().addActivityParams(dummyAct);
 		}
 		

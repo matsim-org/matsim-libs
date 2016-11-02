@@ -18,28 +18,32 @@
  * *********************************************************************** */
 package playground.thibautd.utils.spatialcollections;
 
+import org.matsim.core.utils.misc.Counter;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 import java.util.function.Predicate;
+import java.util.stream.DoubleStream;
+import java.util.stream.Stream;
 
 /**
  * @author thibautd
  */
 public class VPTree<C,T> implements SpatialTree<C, T> {
+	// do not try to much VPs, as this quickly gets expensive.
+	// no real improvement noticed.
+	private static final int SUBLIST_SIZE_VPS = 1;
+	// not too shy: cutoff distance should be pretty accurate
 	private static final int SUBLIST_SIZE_MEDIAN = 100;
 	private final SpatialCollectionUtils.Metric<C> metric;
 	private final SpatialCollectionUtils.GenericCoordinate<C,T> coordinate;
 
-	private int stepsToRemove = 0;
-
-	private Node<C,T> root = new Node<>();
-	private int size = 0;
+	private final Node<C,T> root = new Node<>();
 	private final Random r = new Random( 123 );
 
 	public VPTree( final SpatialCollectionUtils.Metric<C> metric,
@@ -51,23 +55,38 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 
 	@Override
 	public int size() {
-		return size;
+		return root.size;
 	}
 
+	/**
+	 * O( log( n ) ), gets a random element from the tree, with an approximately uniform distribution if the tree is
+	 * approximately balanced.
+	 *
+	 * @return an element
+	 */
 	@Override
 	public T getAny() {
-		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
-		stack.add( root );
+		if ( size() == 0 ) return null;
 
-		while ( !stack.isEmpty() ) {
-			final Node<C,T> current = stack.poll();
+		Node<C,T> current = root;
+		int index = r.nextInt( size() );
 
-			if ( current.value != null ) return current.value;
-			if ( current.close != null ) stack.add( current.close );
-			if ( current.far != null ) stack.add( current.far );
+
+		while ( true ) {
+			if ( index == 0 && current.value != null ) return current.value;
+
+			assert index <= current.size : index +" > "+ current.size;
+			if ( current.value != null ) index--;
+
+			if ( current.close != null && current.close.size > index ) {
+				current = current.close;
+			}
+			else {
+				assert current.far != null : "cannot happen if sizes are right";
+				index -= current.close != null ? current.close.size : 0;
+				current = current.far;
+			}
 		}
-
-		return null;
 	}
 
 	@Override
@@ -99,74 +118,94 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	}
 
 	private void add( final Node<C,T> addRoot , final Collection<T> points ) {
-		size += points.size();
-		// TODO: extract in some other place, not to mix it here
-		stepsToRemove += size / 2;
-
-		final Queue<AddFrame<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
+		final Queue<AddFrame<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>( 1 + (int) Math.log( 1 + points.size() ) ) );
 
 		// copy parameter list as it is modified in place
 		stack.add( new AddFrame<>( addRoot , new ArrayList<>( points ) ) );
 
+		final Counter counter = new Counter( "add VP Tree Node # " , " / "+points.size() );
 		while ( !stack.isEmpty() ) {
 			final AddFrame<C,T> currentFrame = stack.poll();
 			if ( currentFrame.toAdd.isEmpty() ) continue;
+			counter.incCounter();
 
-			final T vantagePoint = removeVantagePoint( currentFrame.toAdd );
+			if ( currentFrame.toAdd.size() == 1 ) {
+				currentFrame.node.value = currentFrame.toAdd.get( 0 );
+				currentFrame.node.coordinate = coordinate.getCoord( currentFrame.toAdd.get( 0 ) );
+				backtrackSize( currentFrame.node );
+				continue;
+			}
 
-			assert vantagePoint != null;
-			currentFrame.node.value = vantagePoint;
-			currentFrame.node.coordinate = coordinate.getCoord( vantagePoint );
+			selectAndSetVantagePoint( currentFrame );
 
-			if ( currentFrame.toAdd.isEmpty() ) continue;
+			final T vantagePoint = currentFrame.node.value;
+			final double medianDistance = currentFrame.node.cuttoffDistance;
 
-			final double medianDistance = medianDistance( vantagePoint , currentFrame.toAdd );
-
-			// avoid wasting memory by reusing toAdd list
 			final AddFrame<C,T> closeFrame =
 					new AddFrame<>(
 							new Node<>(),
-							currentFrame.toAdd );
+							new ArrayList<>( currentFrame.toAdd.size() / 2 + 1 ) );
 			final AddFrame<C,T> farFrame =
 					new AddFrame<>(
 							new Node<>(),
 							new ArrayList<>( currentFrame.toAdd.size() / 2 + 1 ) );
 
-			currentFrame.node.cuttoffDistance = medianDistance;
-
-			for ( Iterator<T> it = currentFrame.toAdd.iterator(); it.hasNext(); ) {
-				final T v = it.next();
+			for ( T v : currentFrame.toAdd ) {
+				if ( vantagePoint == v ) continue;
 				final double distanceToVP = metric.calcDistance( currentFrame.node.coordinate , coordinate.getCoord( v ) );
 
 				if ( distanceToVP > medianDistance ) {
-					it.remove();
 					farFrame.toAdd.add( v );
+				}
+				else {
+					closeFrame.toAdd.add( v );
 				}
 			}
 
 			if ( !closeFrame.toAdd.isEmpty() ) {
 				currentFrame.node.close = closeFrame.node;
+				closeFrame.node.parent = currentFrame.node;
 				stack.add( closeFrame );
 			}
 			if ( !farFrame.toAdd.isEmpty() ) {
 				currentFrame.node.far = farFrame.node;
+				farFrame.node.parent = currentFrame.node;
 				stack.add( farFrame );
+			}
+
+			// leaf: backtrack size
+			if ( closeFrame.toAdd.isEmpty() && farFrame.toAdd.isEmpty() ) {
+				backtrackSize( currentFrame.node );
+			}
+		}
+		counter.printCounter();
+	}
+
+	private void selectAndSetVantagePoint( final AddFrame<C, T> currentFrame ) {
+		final List<T> vantagePoints = sublist( currentFrame.toAdd , SUBLIST_SIZE_VPS );
+
+		// select the VP with the HIGHEST median (highest spread) is supposed to give better query times
+		// the intuition is that high spread corresponds to the corners of the space, where the length of the border
+		// between close and far is minimized. The length of the border is proportional to the probability that no pruning
+		// occurs, which decreases performance.
+		// the paper uses the second moment, that is, the sum of square difference with median.
+		currentFrame.node.cuttoffDistance = Double.NEGATIVE_INFINITY;
+		assert !vantagePoints.isEmpty();
+		for ( T vantagePoint : vantagePoints ) {
+			final double medianDistance = medianDistance( vantagePoint , currentFrame.toAdd );
+
+			if ( medianDistance > currentFrame.node.cuttoffDistance ) {
+				currentFrame.node.value = vantagePoint;
+				currentFrame.node.coordinate = coordinate.getCoord( vantagePoint );
+				currentFrame.node.cuttoffDistance = medianDistance;
 			}
 		}
 	}
 
-	/**
-	 * Fastest version of remove. Does not remove the node, only the point.
-	 * Removal itself is faster, but latter queries are slower.
-	 *
-	 * @param value
-	 */
-	public boolean invalidate( final T value ) {
-		final Node<C,T> node = find( value );
-		if ( node == null ) return false;
-		node.value = null;
-		size--;
-		return true;
+	private void backtrackSize( final Node<C, T> node ) {
+		Stream.iterate( node , n -> n.parent )
+				.peek( Node::recomputeSize )
+				.allMatch( n -> n.parent != null );
 	}
 
 	/**
@@ -182,50 +221,26 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 		root.close = null;
 		root.coordinate = null;
 		root.value = null;
+		root.recomputeSize();
 
-		size = 0;
 		add( toReadd );
 	}
 
-	/**
-	 * Naively optimized remove. Invalidates values, and rebuilds after successfully invalidating 1/2 of the values.
-	 * Not based on any theory.
-	 *
-	 * @param value
-	 * @return
-	 */
 	@Override
 	public boolean remove( final T value ) {
-		boolean isRemoved = invalidate( value );
-
-		if ( isRemoved && --stepsToRemove == 0 ) {
-			// rebuild updates steps to remove
-			rebuild();
-		}
-
-		return isRemoved;
-	}
-
-	public boolean trueRemove( final T value ) {
-		final Node<C,T> node = find( value );
+		Node<C,T> node = find( value );
 
 		if ( node == null ) return false;
-
-		// get all children
-		final Collection<T> toReadd = new ArrayList<>( getAll( node.close ) );
-		toReadd.addAll( getAll( node.far ) );
-
-		// invalidate node
-		node.cuttoffDistance = -1;
-		node.far = null;
-		node.close = null;
-		node.coordinate = null;
 		node.value = null;
+		backtrackSize( node );
 
-		size -= toReadd.size() + 1;
-		// this part might be expensive. Way to make it faster?
-		add( node , toReadd );
-
+		// remove totally invalidated branch ends, to speed up latter queries
+		for( ; node.size == 0 &&
+						node.parent != null;
+				node = node.parent ) {
+			if ( node.parent.close == node ) node.parent.close = null;
+			if ( node.parent.far == node ) node.parent.far = null;
+		}
 		return true;
 	}
 
@@ -235,22 +250,21 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	}
 
 	private Node<C,T> find( final T value ) {
-		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
 
 		// copy parameter list as it is modified in place
-		stack.add( root );
+		Node<C,T> current = root;
 
 		final C coord = coordinate.getCoord( value );
-		while ( !stack.isEmpty() ) {
-			final Node<C,T> current = stack.poll();
-
+		while ( current != null ) {
 			if ( value.equals( current.value ) ) return current;
 
 			final double distanceToVp = metric.calcDistance( current.coordinate , coord );
 			if ( distanceToVp <= current.cuttoffDistance ) {
-				if ( current.close != null ) stack.add( current.close );
+				if ( current.close != null ) current = current.close;
+				else current = null;
 			}
-			else if ( current.far != null ) stack.add( current.far );
+			else if ( current.far != null ) current = current.far;
+			else current = null;
 		}
 
 		return null;
@@ -265,12 +279,35 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	public T getClosest(
 			final C coord,
 			final Predicate<T> predicate ) {
-		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
+		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>( 1 + (int) Math.log( 1 + size() )) );
 		stack.add( root );
 
 		T closest = null;
 		double bestDist = Double.POSITIVE_INFINITY;
 
+		// first estimate: go directly to insertion point. O( log( n ) ) for balanced tree.
+		// Increases the probability of pruning in the second stage, by having a tight bound on best distance.
+		while ( !stack.isEmpty() ) {
+			final Node<C,T> current = stack.poll();
+
+			final double distanceToVp = metric.calcDistance( current.coordinate , coord );
+
+			// check if current VP closest than closest known
+			if ( current.value != null &&
+					distanceToVp < bestDist &&
+					predicate.test( current.value ) ) {
+				closest = current.value;
+				bestDist = distanceToVp;
+			}
+
+			if ( distanceToVp <= current.cuttoffDistance ) {
+				if ( current.close != null ) stack.add( current.close );
+			}
+			else if ( current.far != null ) stack.add( current.far );
+		}
+
+		// full search
+		stack.add( root );
 		while( !stack.isEmpty() ) {
 			final Node<C,T> current = stack.poll();
 
@@ -306,7 +343,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 
 	private double medianDistance( final T vp, final List<T> l ) {
 		// very simple approximation: take median of a sublist, using standard sort algorithm
-		final List<T> sublist = sublist( l );
+		final List<T> sublist = sublist( l , SUBLIST_SIZE_MEDIAN );
 		Collections.sort(
 				sublist ,
 				(t1,t2) -> Double.compare(
@@ -315,29 +352,36 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 		return calcDistance( sublist.get( sublist.size() / 2 ), vp );
 	}
 
-	private <E> List<E> sublist( final List<E> l ) {
-		if ( l.size() < SUBLIST_SIZE_MEDIAN ) return l;
+	private <E> List<E> sublist( final List<E> l , final int size ) {
+		if ( l.size() <= size ) return new ArrayList<>( l );
 
-		final List<E> sublist = new ArrayList<>( (int) (SUBLIST_SIZE_MEDIAN * 1.5) );
-		final double prob = ((double) SUBLIST_SIZE_MEDIAN) / l.size();
-
-		for ( E e : l ) {
-			if ( r.nextDouble() < prob ) sublist.add( e );
+		final List<E> sublist = new ArrayList<>( size );
+		for ( int i=0; i < size; i++ ) {
+			final int j = i + r.nextInt( size - i );
+			final E elemJ = l.get( j );
+			l.set( j , l.get( i ) );
+			l.set( i , elemJ );
+			// build the list in parallel to avoid the intermediary step of building a sublist.
+			sublist.add( elemJ );
 		}
 
 		return sublist;
 	}
 
-	private T removeVantagePoint( final List<T> toAdd ) {
-		return toAdd.remove( r.nextInt( toAdd.size() ) );
-	}
-
 	private static class Node<C,T> {
-		private C coordinate;
+		private int size = 0;
+		private C coordinate = null;
 		private T value = null;
 		private double cuttoffDistance = Double.NaN;
 		private Node<C,T> close = null;
 		private Node<C,T> far = null;
+		private Node<C,T> parent = null;
+
+		public void recomputeSize() {
+			size = value == null ? 0 : 1;
+			size += close == null ? 0 : close.size;
+			size += far == null ? 0 : far.size;
+		}
 	}
 
 	private static class AddFrame<C,T> {

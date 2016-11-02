@@ -44,7 +44,7 @@ public class TransitLoadIntegrationTest {
 
 	@Test
 	public void testIntegration() {
-		final Config cfg = this.util.loadConfig("test/scenarios/pt-tutorial/config.xml");
+		final Config cfg = this.util.loadConfig("test/scenarios/pt-tutorial/0.config.xml");
 		cfg.controler().setLastIteration(0);
 		final Scenario s = ScenarioUtils.loadScenario(cfg);
 		final Controler c = new Controler(s);

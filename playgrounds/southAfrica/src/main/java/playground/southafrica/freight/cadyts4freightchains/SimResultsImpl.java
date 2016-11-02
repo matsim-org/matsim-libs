@@ -16,7 +16,7 @@ import cadyts.supply.SimResults;
  * Often, this is just a wrapper around some other observational class which exists anyways in MATSim, e.g. 
  * flow counts on links, or occupancy counts between pt stations.  In case there is no such observational
  * class, then this class here can be used.  If it is not powerful enough, it can be extended.
- * <p/>
+ * <p></p>
  * yy For the time being, it does not deal with the time periods.  Thus, it cannot be published in its current form. 
  * 
  * @author nagel

@@ -42,7 +42,7 @@ public abstract class Osm2MultimodalNetwork {
 	 * as conversion parameters are defined in this file. Run {@link CreateDefaultOsmConfig}
 	 * to create a default config.
 	 *
-	 * @param args [0] the config.xml file<br/>
+	 * @param args [0] the config.xml file<br>
 	 */
 	public static void main(String[] args) {
 		if(args.length == 1) {

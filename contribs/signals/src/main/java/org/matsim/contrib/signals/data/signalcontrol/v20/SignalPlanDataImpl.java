@@ -37,10 +37,10 @@ public class SignalPlanDataImpl implements SignalPlanData {
 
 	private Id<SignalPlan> id;
 	private Integer cycletime;
-	private Double endtime;
+	private double endtime = 0.0;
 	private Integer offset;
 	private SortedMap<Id<SignalGroup>, SignalGroupSettingsData> signalGroupSettingsBySignalGroupId;
-	private Double starttime;
+	private double starttime = 0.0;
 
 	public SignalPlanDataImpl(Id<SignalPlan> id) {
 		this.id = id;
@@ -60,7 +60,7 @@ public class SignalPlanDataImpl implements SignalPlanData {
 	}
 
 	@Override
-	public Double getEndTime() {
+	public double getEndTime() {
 		return this.endtime;
 	}
 
@@ -80,7 +80,7 @@ public class SignalPlanDataImpl implements SignalPlanData {
 	}
 
 	@Override
-	public Double getStartTime() {
+	public double getStartTime() {
 		return this.starttime;
 	}
 

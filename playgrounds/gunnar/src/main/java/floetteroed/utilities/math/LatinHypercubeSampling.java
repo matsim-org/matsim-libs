@@ -84,12 +84,13 @@ public class LatinHypercubeSampling {
 		
 		Random rnd = new Random();
 		LatinHypercubeSampling sampler = new LatinHypercubeSampling(rnd);
-		sampler.addDimension(0, 10);
-		sampler.addDimension(50, 60);
+		sampler.addDimension(0, 1);
+		sampler.addDimension(0, 1);
 		
-		int sampleSize = 100;
+		int sampleSize = 10;
 		double[][] result = sampler.draw(sampleSize);
 		for (int sample = 0; sample < sampleSize; sample++) {
+			// System.out.println(rnd.nextDouble() + "\t" + rnd.nextDouble());
 			System.out.println(result[sample][0] + "\t" + result[sample][1]);
 		}		
 

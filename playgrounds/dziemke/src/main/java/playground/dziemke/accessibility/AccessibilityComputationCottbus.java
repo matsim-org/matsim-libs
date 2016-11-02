@@ -139,7 +139,6 @@ public class AccessibilityComputationCottbus {
 							listener.addAdditionalFacilityData(homes);
 //							listener.generateGridsAndMeasuringPointsByCustomBoundary(447000., 5729000., 461000., 5740000., cellSize);
 							listener.writeToSubdirectoryWithName(actType);
-							listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 							return listener;
 						}
 					});

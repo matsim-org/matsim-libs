@@ -35,7 +35,7 @@ public class ScheduleBasedMatrixInjectionTest {
 
 	@Test
 	public void testInstanciation() {
-		final Config config = utils.loadConfig( "test/scenarios/pt-simple/config.xml" );
+		final Config config = utils.loadConfig( "../../examples/scenarios/pt-simple/config.xml" );
 
 		config.controler().setLastIteration( 0 );
 

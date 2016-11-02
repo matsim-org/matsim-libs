@@ -66,11 +66,6 @@ import java.util.Stack;
 
 	private final static String ATTR_POPULATION_DESC = "desc";
 	private final static String ATTR_PERSON_ID = "id";
-	private final static String ATTR_PERSON_SEX = "sex";
-	private final static String ATTR_PERSON_AGE = "age";
-	private final static String ATTR_PERSON_LICENSE = "license";
-	private final static String ATTR_PERSON_CARAVAIL = "car_avail";
-	private final static String ATTR_PERSON_EMPLOYED = "employed";
 	private final static String ATTR_PLAN_SCORE = "score";
 	private final static String ATTR_PLAN_TYPE = "type";
 	private final static String ATTR_PLAN_SELECTED = "selected";
@@ -210,22 +205,7 @@ import java.util.Stack;
 	}
 
 	private void startPerson(final Attributes atts) {
-		String ageString = atts.getValue(ATTR_PERSON_AGE);
-//		int age = Integer.MIN_VALUE;
-		Integer age = null ;
-		if (ageString != null)
-			age = Integer.parseInt(ageString);
 		this.currperson = PopulationUtils.getFactory().createPerson(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
-		PersonUtils.setSex(this.currperson, atts.getValue(ATTR_PERSON_SEX));
-		PersonUtils.setAge(this.currperson, age);
-		PersonUtils.setLicence(this.currperson, atts.getValue(ATTR_PERSON_LICENSE));
-		PersonUtils.setCarAvail(this.currperson, atts.getValue(ATTR_PERSON_CARAVAIL));
-		String employed = atts.getValue(ATTR_PERSON_EMPLOYED);
-		if (employed == null) {
-			PersonUtils.setEmployed(this.currperson, null);
-		} else {
-			PersonUtils.setEmployed(this.currperson, VALUE_YES.equals(employed));
-		}
 	}
 
 	private void startPlan(final Attributes atts) {

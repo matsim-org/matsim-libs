@@ -223,15 +223,6 @@ public final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 				l.setAllowedModes(modes);
 			}
 		}
-		if (atts.getValue("volume") != null) {
-			log.info("Attribute volume for element link is deprecated.");
-		}
-		if (atts.getValue("nt_category") != null) {
-			log.info("Attribute nt_category for element link is deprecated.");
-		}
-		if (atts.getValue("nt_type") != null) {
-			log.info("Attribute nt_type for element link is deprecated.");
-		}
 
 		currentAttributes = l.getAttributes();
 	}

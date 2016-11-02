@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
+import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
@@ -22,8 +23,6 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacilities;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * @author thomas, dziemke
@@ -41,14 +40,10 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 	// for consideration of different activity types or different modes (or both) subdirectories are
 	// required in order not to confuse the output
 	private String outputSubdirectory;
-	private boolean urbanSimMode;
 	
-	
-	//
 	private boolean	calculateAggregateValues;
 	private Map<Modes4Accessibility, Double> accessibilitySums = new HashMap<Modes4Accessibility, Double>();
 	private Map<Modes4Accessibility, Double> accessibilityGiniCoefficients = new HashMap<Modes4Accessibility, Double>();
-	//
 	
 	final double xMin, yMin, xMax, yMax, cellSize;
 	
@@ -99,7 +94,12 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		this.accessibilityCalculator.addFacilityDataExchangeListener(spatialGridAggregator);
 
 		if (ptMatrix != null) {
-			this.accessibilityCalculator.setPtMatrix(ptMatrix);	// this could be zero if no input files for pseudo pt are given ...
+			AccessibilityCalculator r = this.accessibilityCalculator;
+			r.putAccessibilityCalculator(
+			Modes4Accessibility.pt.name(),
+			PtMatrixAccessibilityContributionCalculator.create(
+					ptMatrix,
+					scenario.getConfig()));	// this could be zero if no input files for pseudo pt are given ...
 		}
 		
 		log.info(".. done initializing CellBasedAccessibilityControlerListenerV3");
@@ -122,18 +122,6 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 			file.mkdirs();
 		}
 		
-		UrbansimCellBasedAccessibilityCSVWriterV2 urbansimAccessibilityWriter = null;
-		if (urbanSimMode) {
-			if ( outputSubdirectory != null ) {
-				throw new RuntimeException("output subdirectory not null stems from separate accessibility computation per activity type.  "
-						+ "This is, however, not supported on the urbansim side, so using it in the urbansim mode does not make sense.  "
-						+ "Thus aborting ..." ) ;
-			}
-			log.warn("here0");
-			urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(scenario.getConfig().controler().getOutputDirectory());
-			accessibilityCalculator.addFacilityDataExchangeListener(urbansimAccessibilityWriter);
-		}
-
 		// prepare the additional columns:
 		for ( ActivityFacilities facilities : this.additionalFacilityData ) {
 			Tuple<SpatialGrid,SpatialGrid> spatialGrids = this.additionalSpatialGrids.get( facilities.getName() ) ;
@@ -247,7 +235,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		// yy for time being, have to assume that this is always there
 
 		for (Modes4Accessibility mode : accessibilityCalculator.getIsComputingMode()) {
-			List<Double> valueList = new ArrayList<Double>();
+			List<Double> valueList = new ArrayList<>();
 
 			for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution()) {
 				for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
@@ -281,7 +269,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 	/**
 	 * I wanted to plot something like (max(acc)-acc)*population.  For that, I needed "population" at the x/y coordinates.
 	 * This is the mechanics via which I inserted that. (The computation is then done in postprocessing.)
-	 * <p/>
+	 * <p></p>
 	 * You can add arbitrary ActivityFacilities containers here.  They will be aggregated to the grid points, and then written to
 	 * file as additional column.
 	 */
@@ -322,9 +310,8 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		this.spatialGridDataExchangeListener.add(l);
 	}
 	
-	
-	public void setUrbansimMode(boolean urbansimMode) {
-		this.urbanSimMode = urbansimMode;
+	public void addFacilityDataExchangeListener( FacilityDataExchangeInterface facilityDataExchangeListener ) {
+		this.accessibilityCalculator.addFacilityDataExchangeListener(facilityDataExchangeListener);
 	}
 	
 	

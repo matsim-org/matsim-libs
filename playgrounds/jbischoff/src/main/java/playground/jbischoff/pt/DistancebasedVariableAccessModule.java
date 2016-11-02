@@ -116,9 +116,15 @@ public class DistancebasedVariableAccessModule implements VariableAccessEgressTr
 			
 						
 		} else {
-			Path path = this.lcpPerNonTeleportedMode.get(mode).calcLeastCostPath(startLink.getFromNode(), endLink.getToNode(), 0, person, null);
-			route.setDistance(path.travelCost);
-			route.setTravelTime(path.travelTime);
+			double distance = egressDistance*1.3;
+			double travelTime = distance / 7.25;
+			leg.setTravelTime(travelTime);
+			route.setDistance(distance);
+			
+//			too expensive
+//			Path path = this.lcpPerNonTeleportedMode.get(mode).calcLeastCostPath(startLink.getFromNode(), endLink.getToNode(), 0, person, null);
+//			route.setDistance(path.travelCost);
+//			route.setTravelTime(path.travelTime);
 		}
 		return leg;
 	}
@@ -130,6 +136,7 @@ public class DistancebasedVariableAccessModule implements VariableAccessEgressTr
 	private String getModeForDistance(double egressDistance) {
 		for (Entry<Integer, String> e : this.distanceMode.entrySet()){
 			if (e.getKey()>=egressDistance){
+//				System.out.println("Mode" + e.getValue()+" "+egressDistance);
 				return e.getValue();
 			}
 		}

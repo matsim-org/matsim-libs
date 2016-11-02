@@ -36,7 +36,7 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * @author dgrether, nagel
- * <p/>
+ * <p></p>
  * I think this class is reasonable in terms of what is public and/or final and what not.
  */
 public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent {

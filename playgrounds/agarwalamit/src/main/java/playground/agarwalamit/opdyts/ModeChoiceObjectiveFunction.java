@@ -19,10 +19,7 @@
 
 package playground.agarwalamit.opdyts;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import javax.inject.Inject;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
@@ -43,6 +40,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ExperiencedPlansService;
 import org.matsim.core.utils.geometry.CoordUtils;
+import playground.agarwalamit.opdyts.patna.PatnaCMPDistanceDistribution;
 
 /**
  *
@@ -55,6 +53,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 
     private MainModeIdentifier mainModeIdentifier ;
     private final OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases;
+    private final PatnaCMPDistanceDistribution distriInfo ;
 
     @Inject ExperiencedPlansService service ;
     @Inject TripRouter tripRouter ;
@@ -76,6 +75,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 
     public ModeChoiceObjectiveFunction(final OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases) {
         this.opdytsObjectiveFunctionCases = opdytsObjectiveFunctionCases;
+        this.distriInfo = new PatnaCMPDistanceDistribution(opdytsObjectiveFunctionCases);
         for ( StatType statType : StatType.values() ) {
             // define the bin boundaries:
             switch ( statType ) {
@@ -87,7 +87,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                     {
                         final Databins<String> databins = new Databins<>( statType.name(), dataBoundariesTmp ) ;
 
-                        fillDatabins(databins, dataBoundariesTmp.length);
+                        fillDatabins(databins);
                         this.refStatsContainer.put( statType, databins) ;
                     }
                     break; }
@@ -118,7 +118,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         }
     }
 
-    private void fillDatabins(Databins<String> databins, int dataBoundariesLength) {
+    private void fillDatabins(Databins<String> databins) {
         switch (this.opdytsObjectiveFunctionCases) {
             case EQUIL:
                 double carVal = 1000. ;
@@ -132,69 +132,23 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                 break;
             case PATNA_1Pct:
                 double totalLegs = 13278.0 * 2.0; // each person make two trips; here trips are counted not persons.
-                patnaModalDistDistribution(totalLegs,databins,dataBoundariesLength);
+                patnaModalDistDistribution(totalLegs,databins);
             break;
             case PATNA_10Pct:
                 totalLegs = 13278.0 * 10 * 2.0; // each person make two trips; here trips are counted not persons.
-                patnaModalDistDistribution(totalLegs,databins,dataBoundariesLength);
+                patnaModalDistDistribution(totalLegs,databins);
             default: throw new RuntimeException("not implemented");
         }
     }
 
-    private void patnaModalDistDistribution(final double totalLegs, final Databins<String> databins, final int dataBoundariesLength){
+    private void patnaModalDistDistribution(final double totalLegs, final Databins<String> databins){
         double legsSumAllModes = 0;
-        {
-            double [] carVals = {6.0, 17.0, 20.0, 19.0, 26.0, 12.0};
-            double carLegs = 0.02 * totalLegs;
-            for (int idx = 0; idx < dataBoundariesLength; idx++) {
-                double legs = Math.round( carLegs * carVals[idx] / 100.);
-                databins.addValue("car", idx, legs);
-                legsSumAllModes += legs;
+        SortedMap<String, double []> mode2distanceBasedLegs = distriInfo.getMode2DistanceBasedLegs();
+        for (String mode : mode2distanceBasedLegs.keySet()) {
+            double [] distBasedLegs = mode2distanceBasedLegs.get(mode);
+            for (int idx = 0; idx < databins.getDataBoundaries().length; idx++) {
+                databins.addValue(mode, idx, distBasedLegs[idx]);
             }
-        }
-        {
-            double [] motorbikeVals = {7.0, 35.0, 19.0, 23.0, 8.0, 8.0};
-            double motorbikeLegs = 0.14 * totalLegs;
-            for (int idx = 0; idx < dataBoundariesLength; idx++) {
-                double legs = Math.round( motorbikeLegs * motorbikeVals[idx] / 100.);
-                databins.addValue("motorbike", idx, legs);
-                legsSumAllModes += legs;
-            }
-        }
-        {
-            double [] bikeVals = {10.0, 51.0, 16.0, 15.0, 1.0, 7.0};
-            double bikeLegs = 0.33 * totalLegs;
-            for (int idx = 0; idx < dataBoundariesLength; idx++) {
-                double legs = Math.round(bikeLegs * bikeVals[idx] / 100.);
-                databins.addValue("bike", idx, legs);
-                legsSumAllModes += legs;
-            }
-        }
-        {
-            double [] ptVals = {6.4, 23.9, 34.5, 10.5, 12.7, 12.0};
-            double ptLegs = 0.22 * totalLegs;
-            for (int idx = 0; idx < dataBoundariesLength; idx++) {
-                double legs = Math.round(ptLegs * ptVals[idx] / 100.);
-                databins.addValue("pt", idx, legs);
-                legsSumAllModes += legs;
-            }
-        }
-        {
-            double [] walkVals = {70.0, 28.0, 1.0, 1., 0.0, 0.0};
-            double walkLegs = 0.29 * totalLegs;
-            for (int idx = 0; idx < dataBoundariesLength; idx++) {
-                double legs = Math.round(walkLegs * walkVals[idx] / 100.);
-                databins.addValue("walk", idx, legs);
-                legsSumAllModes += legs;
-            }
-        }
-        System.out.println("Total legs "+totalLegs+" ans sum of all legs "+legsSumAllModes);
-
-        // check if difference is not greaater than 1%, due to rounding.
-        if( legsSumAllModes >= 0.99*totalLegs && legsSumAllModes <= 1.01 * totalLegs) {
-            // everything is fine
-        }  else {
-            throw new RuntimeException("sum of legs is wrong.");
         }
     }
 
@@ -205,7 +159,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                 return new double[] {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.};
             case PATNA_1Pct:
             case PATNA_10Pct:
-                return new double[] {0., 2000., 4000., 6000., 8000., 10000.};
+                return distriInfo.getDistClasses();
             default: throw new RuntimeException("not implemented");
         }
     }
@@ -245,37 +199,6 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                 throw new RuntimeException("not implemented yet.");
         }
     }
-
-    // this and the method below it return same value.
-//    private double getPatnaObjectiveFunctionValue() {
-//        double objective = 0.;
-//        int dataBoundariesLength = getDataBoundaries().length;
-//        for (int ii = 0; ii<dataBoundariesLength ; ii ++) {
-//            for ( Map.Entry<StatType, Databins<String>> entry : simStatsContainer.entrySet() ) {
-//
-//                StatType theStatType = entry.getKey();  // currently only one type ;
-//                log.warn( "statType=" + theStatType );
-//                if(! theStatType.equals(StatType.tripBeelineDistances)) throw new RuntimeException("not implemented yet.");
-//
-//                Databins<String> databins = entry.getValue() ;
-//                double diff = 0.;
-//                for ( Map.Entry<String, double[]> theEntry : databins.entrySet() ) {
-//                    String mode = theEntry.getKey();
-//                    log.warn("mode=" + mode);
-//
-//                    double simValue = theEntry.getValue()[ii];
-//                    double realValue = this.refStatsContainer.get(theStatType).getValues(mode)[ii];
-//                    diff += Math.abs(simValue - realValue);
-//                }
-//                // since sum of legs from all modes for index ii will be same, keep it outside mode for loop
-//                objective  += diff ;
-//            }
-//        }
-//        log.warn( "objective=" + objective );
-//        return objective ;
-//    }
-
-
 
     private double getPatnaObjectiveFunctionValue() {
         double objective = 0. ;

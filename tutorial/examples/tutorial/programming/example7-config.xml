@@ -1,0 +1,80 @@
+<?xml version="1.0" ?>
+<!--
+  ~ /* *********************************************************************** *
+  ~  * project: org.matsim.*
+  ~  * example7-config.xml
+  ~  *                                                                         *
+  ~  * *********************************************************************** *
+  ~  *                                                                         *
+  ~  * copyright       : (C) 2014 by the members listed in the COPYING, *
+  ~  *                   LICENSE and WARRANTY file.                            *
+  ~  * email           : info at matsim dot org                                *
+  ~  *                                                                         *
+  ~  * *********************************************************************** *
+  ~  *                                                                         *
+  ~  *   This program is free software; you can redistribute it and/or modify  *
+  ~  *   it under the terms of the GNU General Public License as published by  *
+  ~  *   the Free Software Foundation; either version 2 of the License, or     *
+  ~  *   (at your option) any later version.                                   *
+  ~  *   See also COPYING, LICENSE and WARRANTY file                           *
+  ~  *                                                                         *
+  ~  * *********************************************************************** */
+  -->
+
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<!-- This is a fairly minimal config file; see console or logfile output for more options. -->
+<config>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="../../../../examples/scenarios/equil/network.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="../../../../examples/scenarios/equil/plans100.xml" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="./output/example7" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="10" />
+		<param name="eventsFileFormat" value="xml" />
+	</module>
+
+
+	<module name="qsim">
+		<param name="snapshotperiod" value="00:01:00" />
+
+	</module>
+
+	<module name="planCalcScore" >
+		<param name="lateArrival" value="-18" />
+		<param name="earlyDeparture" value="-0" />
+		<param name="performing" value="+6" />
+		<param name="traveling" value="-6" />
+		<param name="waiting" value="-0" />
+		
+		<param name="activityType_0"            value="h" /> <!-- home -->
+		<param name="activityTypicalDuration_0" value="12:00:00" />
+	
+		<param name="activityType_1"            value="w" /> <!-- work -->
+		<param name="activityTypicalDuration_1" value="08:00:00" />
+		<param name="activityOpeningTime_1"     value="07:00:00" />
+		<param name="activityLatestStartTime_1" value="09:00:00" />
+		<param name="activityClosingTime_1"     value="18:00:00" />
+	</module>
+
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
+
+		<param name="ModuleProbability_1" value="0.9" />
+		<param name="Module_1" value="ChangeExpBeta" />
+
+		<param name="ModuleProbability_2" value="0.1" />
+		<param name="Module_2" value="ReRoute" />
+
+		<param name="ModuleProbability_3" value="0.1" />
+		<param name="Module_3" value="TimeAllocationMutator" />
+	</module>
+
+
+</config>

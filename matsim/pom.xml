@@ -7,7 +7,7 @@
 	<name>MATSim</name>
 	<version>0.9.0-SNAPSHOT</version>
 	<description>Multi-Agent Transport Simulation</description>
-	<url>matsim.org</url>
+	<url>http://ci.matsim.org:8080/job/MATSim_M2/ws/matsim/target/site</url>
 	<inceptionYear>2005</inceptionYear>
 	<licenses>
 		<license>
@@ -119,6 +119,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -181,11 +182,15 @@
 								<title>vis</title>
 								<packages>org.matsim.vis:org.matsim.vis.*</packages>
 							</group>
-							<group>
-								<title>tutorial</title>
-								<packages>tutorial:tutorial.*</packages>
-							</group>
 						</groups>
+						<additionalDependencies>
+							<additionalDependency>
+								<groupId>org.matsim</groupId>
+								<artifactId>matsim-tutorial</artifactId>
+								<version>0.9.0-SNAPSHOT</version>
+							</additionalDependency>
+						</additionalDependencies>
+						<detectLinks>true</detectLinks>
 					</configuration>
 				</plugin>
 			</plugins>
@@ -348,36 +353,6 @@
 				</pluginManagement>
 			</build>
 		</profile>
-		<profile>
-			<id>benchmark</id>
-			<build>
-				<defaultGoal>assembly:assembly</defaultGoal>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<artifactId>maven-jar-plugin</artifactId>
-							<configuration>
-								<archive>
-									<manifest>
-										<addClasspath>true</addClasspath>
-										<classpathPrefix>libs/</classpathPrefix>
-										<mainClass>org.matsim.run.Benchmark</mainClass>
-									</manifest>
-								</archive>
-							</configuration>
-						</plugin>
-						<plugin>
-							<artifactId>maven-assembly-plugin</artifactId>
-							<configuration>
-								<descriptors>
-									<descriptor>src/main/assembly/benchmark.xml</descriptor>
-								</descriptors>
-							</configuration>
-						</plugin>
-					</plugins>
-				</pluginManagement>
-			</build>
-		</profile>
         <profile>
             <id>bintray</id>
             <distributionManagement>
@@ -468,6 +443,12 @@
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-library</artifactId>
 			<version>1.3</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim</groupId>
+			<artifactId>matsim-examples</artifactId>
+			<version>0.9.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

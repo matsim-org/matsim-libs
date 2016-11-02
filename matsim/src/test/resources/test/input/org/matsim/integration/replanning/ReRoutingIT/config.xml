@@ -7,14 +7,6 @@
 		<param name="numberOfThreads" value="0" />
 	</module>
 
-	<module name="network">
-		<param name="inputNetworkFile" value="../../../../../../../scenarios/berlin/network.xml.gz" />
-	</module>
-
-	<module name="plans">
-		 <param name="inputPlansFile" value="../../../../../../../scenarios/berlin/plans_hwh_1pct.xml.gz" />
-	</module>
-
 	<module name="controler">
 		<param name="outputDirectory" value="test/output/rerouting/" />
 		<param name="firstIteration" value="0" />

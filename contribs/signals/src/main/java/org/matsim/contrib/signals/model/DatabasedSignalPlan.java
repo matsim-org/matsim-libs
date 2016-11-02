@@ -103,12 +103,12 @@ public class DatabasedSignalPlan implements SignalPlan {
 
 	
 	@Override
-	public Double getEndTime() {
+	public double getEndTime() {
 		return this.data.getEndTime();
 	}
 
 	@Override
-	public Double getStartTime() {
+	public double getStartTime() {
 		return this.data.getStartTime();
 	}
 

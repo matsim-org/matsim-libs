@@ -40,7 +40,7 @@ import javax.inject.Inject;
 
 /**
  * Integrates the RoadPricing functionality into the MATSim Controler.  Does the following:
- * <p/>
+ * <p></p>
  * Initialization:<ul>
  * <li> Reads the road pricing scheme and adds it as a scenario element.
  * <li> Adds the CalcPaidToll events listener (to calculate the toll per agent).

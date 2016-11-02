@@ -43,6 +43,7 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -57,7 +58,7 @@ public class PlanRouterTest {
 
     @Test
     public void passesVehicleFromOldPlan() {
-        final Config config = ConfigUtils.loadConfig(IOUtils.newUrl(utils.getTestScenarioURL("equil"), "config.xml"));
+        final Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
         config.plans().setInputFile("plans1.xml");
         final Scenario scenario = ScenarioUtils.loadScenario(config);
         com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
@@ -86,7 +87,7 @@ public class PlanRouterTest {
 
     @Test
     public void keepsVehicleIfTripRouterUsesOneAlready() {
-        final Config config = ConfigUtils.loadConfig(IOUtils.newUrl(utils.getTestScenarioURL("equil"), "config.xml"));
+        final Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
         config.plans().setInputFile("plans1.xml");
         final Scenario scenario = ScenarioUtils.loadScenario(config);
         final DijkstraFactory leastCostAlgoFactory = new DijkstraFactory();

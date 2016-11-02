@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * A PseudoRouteStop is used as node in the PseudoGraph. It is a container
  * for a {@link TransitRouteStop} with a {@link LinkCandidate}
- * <p/>
+ * <p></p>
  * LinkCandidates are made for each stop facility. Since one
  * StopFacility might be accessed twice in the same TransitRoute,
  * unique LinkCandidates for each TransitRouteStop are needed. This

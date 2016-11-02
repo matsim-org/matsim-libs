@@ -20,6 +20,7 @@ package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -50,7 +51,9 @@ public class SnowballTiesCsvWriter extends AbstractCsvWriter {
 	@Override
 	protected String titleLine() {
 		return "egoId\tegoPlannedDegree\tegoAge\tegoSex" +
+				"\tegoX\tegoY" +
 				"\talterId\talterPlannedDegree\talterAge\talterSex" +
+				"\talterX\talterY" +
 				"\tdistance_m";
 	}
 
@@ -59,19 +62,23 @@ public class SnowballTiesCsvWriter extends AbstractCsvWriter {
 		final List<String> lines = new ArrayList<>();
 
 		for ( Ego ego : clique ) {
+			final Coord egoCoord = SnowballLocator.calcCoord( ego );
+			final String egoPart =
+					ego.getId() +"\t"+ ego.getDegree() + "\t" +
+							PersonUtils.getAge( ego.getPerson() ) + "\t" +
+							SocialPositions.getSex( ego ) + "\t" +
+							egoCoord.getX()+"\t"+egoCoord.getY();
 			for ( Ego alter : clique ) {
 				// only write in one direction?
 				if ( alter == ego ) continue;
 
-				lines.add( ego.getId() +"\t"+ ego.getDegree() + "\t" +
-						PersonUtils.getAge( ego.getPerson() ) + "\t" +
-						SocialPositions.getSex( ego ) + "\t" +
+				final Coord alterCoord = SnowballLocator.calcCoord( alter );
+				lines.add( egoPart +"\t"+
 						alter.getId() +"\t"+ alter.getDegree() + "\t" +
 						PersonUtils.getAge( alter.getPerson() ) + "\t" +
 						SocialPositions.getSex( alter ) + "\t" +
-						CoordUtils.calcEuclideanDistance(
-								SnowballLocator.calcCoord( ego ),
-								SnowballLocator.calcCoord( alter ) ) );
+						alterCoord.getX()+"\t"+alterCoord.getY() +"\t"+
+						CoordUtils.calcEuclideanDistance( egoCoord , alterCoord ) );
 			}
 		}
 

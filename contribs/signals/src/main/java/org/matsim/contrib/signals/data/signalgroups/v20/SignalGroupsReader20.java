@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data.signalgroups.v20;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.XMLConstants;
@@ -28,7 +27,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
@@ -50,7 +48,6 @@ public class SignalGroupsReader20 implements MatsimReader {
 
 	private SignalGroupsData signalGroupsData;
 	private SignalGroupsDataFactory factory;
-	private static final Logger log = Logger.getLogger(SignalGroupsReader20.class);
 
 	public SignalGroupsReader20(SignalGroupsData signalGroupsData) {
 		this.signalGroupsData = signalGroupsData;
@@ -60,7 +57,15 @@ public class SignalGroupsReader20 implements MatsimReader {
 	@Override
 	public void readFile(String filename) {
 		XMLSignalGroups xmlsgdefs = readXmlSignalGroups(filename);
+		fillStuff(xmlsgdefs);
+	}
 
+	public void readStream(InputStream stream) {
+		XMLSignalGroups xmlsgdefs = readXmlSignalGroups(stream);
+		fillStuff(xmlsgdefs);
+	}
+
+	private void fillStuff(XMLSignalGroups xmlsgdefs) {
 		for (XMLSignalSystemSignalGroupType xsssgt : xmlsgdefs.getSignalSystem()) {
 			// SigSys
 			for (XMLSignalGroupType xsgt : xsssgt.getSignalGroup()) {
@@ -75,15 +80,16 @@ public class SignalGroupsReader20 implements MatsimReader {
 	}
 
 	private XMLSignalGroups readXmlSignalGroups(String filename) {
-		try (InputStream stream = IOUtils.getInputStream(filename)) {
+		return readXmlSignalGroups(IOUtils.getInputStream(filename));
+	}
+
+	private XMLSignalGroups readXmlSignalGroups(InputStream stream) {
+		try {
 			JAXBContext jc = JAXBContext.newInstance(org.matsim.jaxb.signalgroups20.ObjectFactory.class);
 			Unmarshaller u = jc.createUnmarshaller();
-			// validate XML file
-			log.info("starting to validate " + filename);
 			u.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(getClass().getResource("/dtd/signalGroups_v2.0.xsd")));
-			log.info("starting unmarshalling " + filename);
 			return (XMLSignalGroups) u.unmarshal(stream);
-		} catch (IOException | JAXBException | SAXException e) {
+		} catch (SAXException | JAXBException e) {
 			throw new UncheckedIOException(e);
 		}
 	}

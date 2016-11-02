@@ -19,6 +19,10 @@
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.utils.collections.CollectionUtils;
+
+import java.util.Arrays;
+import java.util.stream.IntStream;
 
 /**
  * @author thibautd
@@ -28,13 +32,16 @@ public class SnowballSamplingConfigGroup extends ReflectiveConfigGroup {
 
 	private String inputCliquesCsv = null;
 
-	public enum SamplingMethod { degreeBased, cliqueBased }
 	public enum ConflictResolutionMethod {overload,resample}
 
 	private boolean conditionCliqueSizeOnAge = false;
 	private boolean conditionCliqueSizeOnSex = false;
 
-	private SamplingMethod samplingMethod = SamplingMethod.degreeBased;
+	private int[] ageCuttingPoints =
+			IntStream.iterate( 3 , i -> i + 5 )
+				.limit( 50 )
+				.toArray();
+
 	private ConflictResolutionMethod conflictResolutionMethod = ConflictResolutionMethod.overload;
 
 	public SnowballSamplingConfigGroup( ) {
@@ -71,16 +78,6 @@ public class SnowballSamplingConfigGroup extends ReflectiveConfigGroup {
 		this.conditionCliqueSizeOnSex = conditionCliqueSizeOnSex;
 	}
 
-	@StringGetter("samplingMethod")
-	public SamplingMethod getSamplingMethod() {
-		return samplingMethod;
-	}
-
-	@StringSetter("samplingMethod")
-	public void setSamplingMethod( final SamplingMethod samplingMethod ) {
-		this.samplingMethod = samplingMethod;
-	}
-
 	@StringGetter("conflictResolutionMethod")
 	public ConflictResolutionMethod getConflictResolutionMethod() {
 		return conflictResolutionMethod;
@@ -89,5 +86,22 @@ public class SnowballSamplingConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter("conflictResolutionMethod")
 	public void setConflictResolutionMethod( final ConflictResolutionMethod conflictResolutionMethod ) {
 		this.conflictResolutionMethod = conflictResolutionMethod;
+	}
+
+	@StringGetter("ageCuttingPoints")
+	public int[] getAgeCuttingPoints() {
+		return ageCuttingPoints;
+	}
+
+	@StringSetter("ageCuttingPoints")
+	private void setAgeCuttingPointsString( final String ageCuttingPoints ) {
+		setAgeCuttingPoints(
+				Arrays.stream( CollectionUtils.stringToArray( ageCuttingPoints ) )
+						.mapToInt( Integer::parseInt )
+						.toArray() );
+	}
+
+	public void setAgeCuttingPoints( final int[] ageCuttingPoints ) {
+		this.ageCuttingPoints = ageCuttingPoints;
 	}
 }

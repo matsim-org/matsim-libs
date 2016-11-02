@@ -283,7 +283,7 @@ public class TaxiScheduler
     /**
      * If diversion is enabled, this method must be called after scheduling in order to make sure
      * that no vehicle is moving aimlessly.
-     * <p/>
+     * <p></p>
      * The reason: the destination/goal had been removed before scheduling (e.g. by calling the
      * {@link #removeAwaitingRequestsFromAllSchedules()} method)
      */

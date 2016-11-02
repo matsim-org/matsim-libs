@@ -44,7 +44,7 @@ import java.util.Map.Entry;
 
 /**
  * Reads GTFS files and converts them to an unmapped MATSim Transit Schedule
- * <p/>
+ * <p></p>
  * Based on GTFS2MATSimTransitSchedule by Sergio Ordonez
  *
  * @author polettif
@@ -284,9 +284,9 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 
 	/**
 	 * Reads all stops and puts them in {@link #gtfsStops}
-	 * <p/>
-	 * <br/><br/>
-	 * stops.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br/>
+	 * <p></p>
+	 * <br><br>
+	 * stops.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br>
 	 * Individual locations where vehicles pick up or drop off passengers.
 	 *
 	 * @throws IOException
@@ -312,9 +312,9 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 
 	/**
 	 * Reads all services and puts them in {@link #services}
-	 * <p/>
-	 * <br/><br/>
-	 * calendar.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br/>
+	 * <p></p>
+	 * <br><br>
+	 * calendar.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br>
 	 * Dates for service IDs using a weekly schedule. Specify when service starts and ends,
 	 * as well as days of the week where service is available.
 	 *
@@ -353,9 +353,9 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 
 	/**
 	 * Adds service exceptions to {@link #services}
-	 * <p/>
-	 * <br/><br/>
-	 * calendar_dates.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br/>
+	 * <p></p>
+	 * <br><br>
+	 * calendar_dates.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br>
 	 * Exceptions for the service IDs defined in the calendar.txt file. If calendar_dates.txt includes ALL
 	 * dates of service, this file may be specified instead of calendar.txt.
 	 *
@@ -387,9 +387,9 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 
 	/**
 	 * Loads shapes (if available) and puts them in {@link #shapes}. A shape is a sequence of points, i.e. a line.
-	 * <p/>
-	 * <br/><br/>
-	 * shapes.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br/>
+	 * <p></p>
+	 * <br><br>
+	 * shapes.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br>
 	 * Rules for drawing lines on a map to represent a transit organization's routes.
 	 */
 	private void loadShapes() {
@@ -425,9 +425,9 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 
 	/**
 	 * Basically just reads all routeIds and their corresponding names and types and puts them in {@link #gtfsRoutes}.
-	 * <p/>
-	 * <br/><br/>
-	 * routes.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br/>
+	 * <p></p>
+	 * <br><br>
+	 * routes.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br>
 	 * Transit routes. A route is a group of trips that are displayed to riders as a single service.
 	 *
 	 * @throws IOException
@@ -452,9 +452,9 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 	/**
 	 * Generates a trip with trip_id and adds it to the corresponding route (referenced by route_id) in {@link #gtfsRoutes}.
 	 * Adds the shape_id as well (if shapes are used). Each trip uses one service_id, the serviceIds statistics are increased accordingly
-	 * <p/>
-	 * <br/><br/>
-	 * trips.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br/>
+	 * <p></p>
+	 * <br><br>
+	 * trips.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br>
 	 * Trips for each route. A trip is a sequence of two or more gtfsStops that occurs at specific time.
 	 *
 	 * @throws IOException
@@ -489,9 +489,9 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 
 	/**
 	 * Stop times are added to their respective trip (which are stored in {@link #gtfsRoutes}).
-	 * <p/>
-	 * <br/><br/>
-	 * stop_times.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br/>
+	 * <p></p>
+	 * <br><br>
+	 * stop_times.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br>
 	 * Times that a vehicle arrives at and departs from individual gtfsStops for each trip.
 	 *
 	 * @throws IOException
@@ -535,9 +535,9 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 
 	/**
 	 * Loads the frequencies (if available) and adds them to their respective trips in {@link #gtfsRoutes}.
-	 * <p/>
-	 * <br/><br/>
-	 * frequencies.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br/>
+	 * <p></p>
+	 * <br><br>
+	 * frequencies.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br>
 	 * Headway (time between trips) for gtfsRoutes with variable frequency of service.
 	 */
 	private void loadFrequencies() {

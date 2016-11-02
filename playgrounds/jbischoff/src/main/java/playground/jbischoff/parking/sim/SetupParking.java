@@ -67,7 +67,7 @@ public class SetupParking {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addRoutingModuleBinding(FFCSUtils.FREEFLOATINGMODE).toInstance(routingModuleCar);
+				addRoutingModuleBinding(TransportMode.car).toInstance(routingModuleCar);
 				bind(ParkingSearchManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();
 				bind(WalkLegFactory.class).asEagerSingleton();
 				this.install(new ParkingSearchQSimModule());

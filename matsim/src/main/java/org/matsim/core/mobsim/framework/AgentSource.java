@@ -22,7 +22,7 @@ package org.matsim.core.mobsim.framework;
 
 /**
  * If you add an AgentSource into the QSim, the method insertAgentsIntoMobsim() will be called during the initialization phase.
- * <p/>
+ * <p></p>
  * For an example see {@link tutorial.programming.ownMobsimAgent.RunAgentSourceExample}
  */
 public interface AgentSource {

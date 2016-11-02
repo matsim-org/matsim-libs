@@ -22,6 +22,9 @@
 
 package org.matsim.contrib.locationchoice.bestresponse;
 
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -30,23 +33,28 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class SamplerTest extends MatsimTestCase {
+import static org.junit.Assert.assertTrue;
+
+public class SamplerTest {
+
+    @Rule
+    public MatsimTestUtils utils = new MatsimTestUtils();
 
     private DestinationChoiceBestResponseContext context;
     private Scenario scenario;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         Config config = ConfigUtils.loadConfig("test/scenarios/chessboard/config.xml", new DestinationChoiceConfigGroup());
-        ConfigUtils.loadConfig(config, this.getPackageInputDirectory() + "/config.xml");
+        ConfigUtils.loadConfig(config, utils.getPackageInputDirectory() + "/config.xml");
         scenario = ScenarioUtils.loadScenario(config);
         this.context = new DestinationChoiceBestResponseContext(this.scenario);
         this.context.init();
     }
 
+    @Test
     public void testSampler() {
         DestinationSampler sampler = new DestinationSampler(
                 context.getPersonsKValuesArray(), context.getFacilitiesKValuesArray(),

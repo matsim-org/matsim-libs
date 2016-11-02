@@ -59,6 +59,15 @@ public class CensusReader {
         			municipalitiesList.add(municipality);
         			LOG.info("municipality = " + municipality);
         			
+        			Integer population = 0;
+        			if (!row[9].equals("-")) {
+        				population = simplifyAndParseInteger(row[10]);
+        			} else {
+        				population = 0;
+        			}
+        			LOG.info("population = " + population);
+        			municipalities.putAttribute(municipality, "population", population);
+        			
         			Integer populationMale = 0;
         			if (!row[10].equals("-")) {
         				populationMale = simplifyAndParseInteger(row[10]);
@@ -211,6 +220,8 @@ public class CensusReader {
         			}
         			LOG.info("studying = " + studying);
         			municipalities.putAttribute(municipality, "studying", studying);
+        			
+        			LOG.info("----------");
         		}
         	}
         });

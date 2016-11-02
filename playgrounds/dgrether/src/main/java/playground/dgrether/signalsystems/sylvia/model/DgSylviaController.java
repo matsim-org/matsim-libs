@@ -46,7 +46,7 @@ import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 
 
 /**
- * @author dgrether
+ * @author dgrether, tthunig
  *
  */
 public class DgSylviaController extends DgAbstractSignalController implements SignalController {
@@ -373,7 +373,11 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 			//calculate max green time
 			SignalGroupSettingsData fixedTimeSettings = ((DatabasedSignalPlan)fixedTime).getPlanData().getSignalGroupSettingsDataByGroupId().get(settings.getSignalGroupId());
 			int fixedTimeGreen = DgSignalsUtils.calculateGreenTimeSeconds(fixedTimeSettings, fixedTime.getCycleTime());
-			int maxGreen = (int) (fixedTimeGreen * this.sylviaConfig.getSignalGroupMaxGreenScale());
+			int maxGreen = Integer.MAX_VALUE;
+			if (this.sylviaConfig.getSignalGroupMaxGreenScale() != Double.MAX_VALUE){
+				// signal group max scale is not unbounded
+				maxGreen = (int) (fixedTimeGreen * this.sylviaConfig.getSignalGroupMaxGreenScale());
+			}
 //			// comment this out because isExtensionTimeLeft() already checks whether cycle time is exceeded. tt, oct'16
 //			if (maxGreen >= fixedTime.getCycleTime()){
 //				maxGreen = fixedTimeGreen;

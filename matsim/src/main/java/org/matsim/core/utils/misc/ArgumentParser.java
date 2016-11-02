@@ -35,7 +35,7 @@ import java.util.List;
  * options. In that case, options starting with one hyphen can only be one
  * character long. If more than one character follow a single hyphen, each
  * character will be interpreted as an option. The iterator returns every
- * option on its own in that case.<br/>
+ * option on its own in that case.<br>
  *
  * Example: <code>tar -xzvf file</code><br />
  * If shortOptions are enabled, the above argument list would be translated into

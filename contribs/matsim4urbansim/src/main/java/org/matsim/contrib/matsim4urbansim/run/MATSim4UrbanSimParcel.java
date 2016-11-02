@@ -24,6 +24,11 @@
 package org.matsim.contrib.matsim4urbansim.run;
 
 
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -33,23 +38,21 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.accessibility.AccessibilityCalculator;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
-import org.matsim.contrib.accessibility.gis.GridUtils;
-import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtModule;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
-import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
+import org.matsim.contrib.matsim4urbansim.config.ConfigurationUtils;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4urbansim.config.Matsim4UrbansimConfigGroup;
@@ -65,7 +68,11 @@ import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimParcelCSVWrite
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.*;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -80,10 +87,6 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.Map;
 
 
 /**
@@ -379,10 +382,11 @@ class MATSim4UrbanSimParcel{
 						@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 						@Override
 						public ControlerListener get() {
+							final String matsim4opusTempDirectory = ((UrbanSimParameterConfigModuleV3) getConfig().getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME)).getMATSim4OpusTemp();
 							ZoneBasedAccessibilityControlerListenerV3 zbacl = new ZoneBasedAccessibilityControlerListenerV3( zones,
 									opportunities,
 									ptMatrix,
-									((UrbanSimParameterConfigModuleV3) getConfig().getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME)).getMATSim4OpusTemp(),
+									matsim4opusTempDirectory,
 									scenario, travelTimes, travelDisutilityFactories);
 							for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 								zbacl.setComputingAccessibilityForMode(mode, true);
@@ -391,6 +395,15 @@ class MATSim4UrbanSimParcel{
 								zbacl.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
 								// somewhat stupid fix. kai, jan'2015
 							}
+
+							// writing accessibility measures continuously into "zone.csv"-file. Naming of this 
+							// files is given by the UrbanSim convention importing a csv file into a identically named 
+							// data set table. THIS PRODUCES URBANSIM INPUT
+							String matsimOutputDirectory = scenario.getConfig().controler().getOutputDirectory();
+
+							UrbanSimZoneCSVWriterV2 urbanSimZoneCSVWriterV2 = new UrbanSimZoneCSVWriterV2(matsim4opusTempDirectory, matsimOutputDirectory);
+							zbacl.addFacilityDataExchangeListener(urbanSimZoneCSVWriterV2);
+
 							return zbacl;
 						}
 					});
@@ -423,7 +436,8 @@ class MATSim4UrbanSimParcel{
 								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, travelTimes, travelDisutilityFactories, xMin, xMax, yMin, yMax, cellSizeInMeter);
 								accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSizeInMeter));
 
-								gbacl.setUrbansimMode(true);
+//								gbacl.setUrbansimMode(true);
+								// this wasn't doing anything when I looked at it.  kai, oct'16
 
 								for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 									accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
@@ -439,7 +453,8 @@ class MATSim4UrbanSimParcel{
 
 								log.info("Using custom bounding box to determine the area for accessibility computation.");
 								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, travelTimes, travelDisutilityFactories, nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
-								gbacl.setUrbansimMode(true);
+//								gbacl.setUrbansimMode(true);
+								// this wasn't doing anything when I looked at it.  kai, oct'16
 
 								for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 									accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
@@ -459,7 +474,9 @@ class MATSim4UrbanSimParcel{
 									throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
 								}
 								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, travelTimes, travelDisutilityFactories,nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
-								gbacl.setUrbansimMode(true);
+
+//								gbacl.setUrbansimMode(true);
+								// this wasn't doing anything when I looked at it.  kai, oct'16
 
 								for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 									accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
@@ -477,6 +494,10 @@ class MATSim4UrbanSimParcel{
 								// (adding such a listener is optional, here its done to be compatible with UrbanSim)
 								gbacl.addSpatialGridDataExchangeListener(csvParcelWiterListener);
 							}
+							
+							UrbansimCellBasedAccessibilityCSVWriterV2 urbansimAccessibilityWriter = null;
+								urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(scenario.getConfig().controler().getOutputDirectory());
+								gbacl.addFacilityDataExchangeListener(urbansimAccessibilityWriter);
 
 							// accessibility calculations will be triggered when mobsim finished
 							return gbacl;
@@ -592,7 +613,12 @@ class MATSim4UrbanSimParcel{
 	 */
 	void matsim4UrbanSimShutdown(){
 		BackupMATSimOutput.prepareHotStart(scenario);
-		BackupMATSimOutput.runBackup(scenario);
+		UrbanSimParameterConfigModuleV3 module = ConfigurationUtils.getUrbanSimParameterConfigModule(scenario);
+		if(module == null) {
+			log.error("UrbanSimParameterConfigModule module is null. Can't determine if backup option is activated. No backup will be performed.");
+		} else if( module.isBackup() ){
+			BackupMATSimOutput.saveRunOutputs(scenario);
+		}
 	}
 
 	/**

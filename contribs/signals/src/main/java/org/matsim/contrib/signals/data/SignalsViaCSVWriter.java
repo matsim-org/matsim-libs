@@ -44,8 +44,9 @@ import org.matsim.lanes.data.Lanes;
 /**
  * Class to write the (x,y,t) signals csv file for via. 
  * 
+ * @deprecated use SignalEvents2ViaCSVWriter instead
+ * 
  * @author tthunig
- *
  */
 @Deprecated
 public class SignalsViaCSVWriter {
@@ -102,21 +103,12 @@ public class SignalsViaCSVWriter {
 							SignalData signal = signalSystem.getSignalData().get(signalId);
 							Coord signalCoord = calculateSignalCoordinate(signalSystem.getId(), signal.getId());
 
-							// create lines for every signal state switch during
-							// the qsim running time
-							Double time = signalPlan.getStartTime();
-							if (time == null) {
-								// use start time of the simulation
-								time = scenario.getConfig().qsim().getStartTime();
-							}
-//							log.info("Writing signal states for signal " + signal.getId() + " for the whole simulation time ...");
-							Double endTime = signalPlan.getEndTime();
-							if (endTime == null) {
-								// use end time of the simulation
-								endTime = scenario.getConfig().qsim().getEndTime();
-							}
+							log.info("Writing signal states for signal " + signal.getId() + " for the whole signal plan time ...");
+							// create lines for every signal state switch inside the signal plan time
+							double time = signalPlan.getStartTime();
+							double endTime = signalPlan.getEndTime();
 							// handle case start time = end time
-							if (time.equals(endTime)){
+							if (time == endTime){
 								// a whole day is meant
 								endTime += 24*3600;
 							}

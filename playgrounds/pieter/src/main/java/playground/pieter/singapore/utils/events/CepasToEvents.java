@@ -673,7 +673,7 @@ public class CepasToEvents {
          * are visited in order. If dwell event n is at a stop out of the route
          * order, it first checks if the dwell event n+1 is in order, in which
          * case the bad dwell event n is erased.
-         * <p/>
+         * <p></p>
          * If dwell event n+1 also visits a stop out of order, it then resets
          * the iterator for stops, and creates a new cluster of dwell events.
          */
@@ -1511,7 +1511,7 @@ public class CepasToEvents {
      * When transactions are evaluated for each stop, this constant is used as
      * the minimum time between two consecutive transactions that tells us that
      * they belong to separate dwell events.
-     * <p/>
+     * <p></p>
      * So, if a route starts and ends at the same stop, this is the minimum rest
      * time between two runs of the route by the same vehicle.
      */
@@ -1825,7 +1825,7 @@ public class CepasToEvents {
      * Cepas lines on the fly from whatever records are contained in the Cepas
      * transaction table. Each vehicle is put in a map, distinguished by
      * line_route_busRegNum.
-     * <p/>
+     * <p></p>
      * This method is recursive: if the supporting table doesn't exist, it
      * creates it and call itself again, to make future calls faster.
      *

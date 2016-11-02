@@ -70,7 +70,7 @@ public class IOUtils {
 				throw new RuntimeException(e);
 			}
 		}
-		log.info("String " + filename + " does not exist as file on the file system; trying it as URL resource ..."); 
+		log.info("String " + filename + " does not exist as file on the file system; trying it as a resource ...");
 		URL resourceAsStream = IOUtils.class.getClassLoader().getResource(filename);
 		if ( resourceAsStream==null ) {
 			throw new RuntimeException("Filename |" + filename + "| not found." ) ;

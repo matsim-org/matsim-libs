@@ -62,15 +62,15 @@ import com.vividsolutions.jts.geom.Coordinate;
  * This class has been used for the 2010 model and is therefore outdated! To be removed in the future.
  * 
  * Translates emme2 networks into matsim networks.
- * <p/>
+ * <p></p>
  * The network data is preprocessed by Shlomo Bekhor in an Excel file. The tables
  * are exported to csv/txt files and parsed.
- * <p/>
+ * <p></p>
  * The provided Shape Files use WGS84 Coordinates but MATSim need an euclidian System.
  * Therefore two Network files are created:
  * - network_WGS84.xml with WGS84 coordinates
  * - network.xml with ITM coordinates (Israeli Transverse Mercator)
- * <p/>
+ * <p></p>
  * Nodes:
  * index / column / data example: 
  * 0	/	NODE_ID	/	100
@@ -79,7 +79,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * 3	/	Car_assign?	/	1	(boolean 1/0)
  * 4	/	longitude	/	34.8706600
  * 5	/	latitude	/	32.3254460
- * <p/>
+ * <p></p>
  * Links:
  * index / column / data example:  
  * 0	/	From_node	/	103
@@ -100,7 +100,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * 15	/	cap_mod	/	999000
  * 16	/	speed(m/s)	/	4.17
  * 17	/	speed(km/h)	/	15
- * <p/>
+ * <p></p>
  * Keyword(s): emme/2
  * 
  * @author cdobler

@@ -31,5 +31,9 @@ public class CommuterFileReaderV2Starter {
 		String delimiter = "\t";
 		
 		CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing, delimiter);
+		
+		int origin = 12051000; // "Brandenburg an der Havel, St."
+		int destination = 11000000; // "Berlin, Stadt"
+		LOG.info("Test: 1513 = " + commuterFileReader.getRelationsMap().get(origin).get(destination).getTrips());
 	}
 }

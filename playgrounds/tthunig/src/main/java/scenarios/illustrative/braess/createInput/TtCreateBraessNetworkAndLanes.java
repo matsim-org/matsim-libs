@@ -226,7 +226,6 @@ public final class TtCreateBraessNetworkAndLanes {
 					net.getNodes().get(Id.createNodeId(2)),
 					net.getNodes().get(Id.createNodeId(4)));
 			setLinkAttributes(l, capSlow, linkLengthBig, linkTTBig);
-//			setLinkAttributes(l, capMain, linkLengthSmall, linkTTBig); // TODO check
 			net.addLink(l);
 		}
 		
@@ -242,7 +241,6 @@ public final class TtCreateBraessNetworkAndLanes {
 				net.getNodes().get(Id.createNodeId(3)),
 				net.getNodes().get(Id.createNodeId(5)));
 		setLinkAttributes(l, capSlow, linkLengthBig, linkTTBig);
-//		setLinkAttributes(l, capMain, linkLengthSmall, linkTTBig); // TODO check
 		net.addLink(l);
 		
 		if (simulateInflowCap){
@@ -295,16 +293,11 @@ public final class TtCreateBraessNetworkAndLanes {
 			// create a trivial lane for every link that has outgoing links
 			if (link.getToNode().getOutLinks() != null && !link.getToNode().getOutLinks().isEmpty()) {
 				LanesToLinkAssignment linkAssignment = fac.createLanesToLinkAssignment(link.getId());
-
-				// create to link list
-				List<Id<Link>> toLinkList = new ArrayList<>();
-				for (Id<Link> toLink : link.getToNode().getOutLinks().keySet()) {
-					toLinkList.add(toLink);
-				}
+				// add all outgoing links as toLinks
+				List<Id<Link>> toLinkList = new ArrayList<>(link.getToNode().getOutLinks().keySet());
 				LanesUtils.createAndAddLane(linkAssignment, fac,
 						Id.create(link.getId() + ".ol", Lane.class), link.getCapacity(),
 						link.getLength(), 0, 1, toLinkList, null);
-
 				laneDef20.addLanesToLinkAssignment(linkAssignment);
 			}
 		}

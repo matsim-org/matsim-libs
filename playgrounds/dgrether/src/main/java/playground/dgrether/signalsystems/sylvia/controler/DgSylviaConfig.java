@@ -37,8 +37,9 @@ public class DgSylviaConfig {
 	/**
 	 * The maximal green time for each signal group is determined by multiplying this parameter with the green
 	 * time of the signal group in the fixed-time signal plan that belongs to the sylvia signal plan.
+	 * The default scale is unbounded.
 	 */
-	private double signalGroupMaxGreenScale = 1.5;
+	private double signalGroupMaxGreenScale = Double.MAX_VALUE;
 
 	/**
 	 * currently not used

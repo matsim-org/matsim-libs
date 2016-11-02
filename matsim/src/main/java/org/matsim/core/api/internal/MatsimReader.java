@@ -21,7 +21,7 @@ package org.matsim.core.api.internal;
 /**
  * There seems to be some tentative decision (https://matsim.atlassian.net/browse/MATSIM-182) to use read(filename).  Interface marking
  * those readers which adhere to this convention.
- * <p/>
+ * <p></p>
  * --> now decided to use readFile( filename ) 
  * 
  * @author nagel

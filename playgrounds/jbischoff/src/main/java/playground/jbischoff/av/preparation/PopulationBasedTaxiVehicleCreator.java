@@ -26,6 +26,7 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Vehicle;
@@ -62,9 +63,9 @@ public class PopulationBasedTaxiVehicleCreator
 //	private String populationData = "../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/pop.csv";
 //	
     
-	private String networkFile = "../../../shared-svn/projects/audi_av/scenario/networkc.xml.gz";
+	private String networkFile = "../../../shared-svn/studies/jbischoff/multimodal/berlin/input/10pct/network.final10pct_car.xml.gz";
 	private String shapeFile = "../../../shared-svn/projects/audi_av/shp/Planungsraum.shp";
-	private String vehiclesFilePrefix = "../../../shared-svn/projects/audi_av/scenario/flowpaper/vehicles/taxi_vehicles_";
+	private String vehiclesFilePrefix = "../../../shared-svn/studies/jbischoff/multimodal/berlin/input/10pct/vehicles/v";
 	private String populationData = "../../../shared-svn/projects/audi_av/shp/bevoelkerung.txt";
 	
 	
@@ -115,9 +116,11 @@ public class PopulationBasedTaxiVehicleCreator
 	private void run(int amount) {
 	    
 		for (int i = 0 ; i< amount; i++){
+			Link link ;
 		Point p = TaxiDemandWriter.getRandomPointInFeature(random, geometry.get(wrs.select()));
-		Link link = NetworkUtils.getNearestLinkExactly(((Network) scenario.getNetwork()),MGC.point2Coord(p));
-        Vehicle v = new VehicleImpl(Id.create("rt"+i, Vehicle.class), link, 5, Math.round(1), Math.round(25*3600));
+		link = NetworkUtils.getNearestLinkExactly(((Network) scenario.getNetwork()),MGC.point2Coord(p));
+		
+        Vehicle v = new VehicleImpl(Id.create("rt"+i, Vehicle.class), link, 5, Math.round(1), Math.round(36*3600));
         vehicles.add(v);
 
 		}

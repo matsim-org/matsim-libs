@@ -335,7 +335,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 
 	/**
 	 * Makes sure that the travel times "make sense".
-	 * <p/>
+	 * <p></p>
 	 * Imagine short bin sizes (e.g. 5min), small links (e.g. 300 veh/hour)
 	 * and small sample sizes (e.g. 2%). This would mean that effectively
 	 * in the simulation only 6 vehicles can pass the link in one hour,
@@ -345,7 +345,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 	 * still be >=5 minutes (10min - binSize), and not freespeedTraveltime,
 	 * because actually every car entering the link in this bin will be behind
 	 * the car entered before, which still needs >=5min until it can leave.
-	 * <p/>
+	 * <p></p>
 	 * This method ensures that the travel time in a time bin
 	 * cannot be smaller than the travel time in the bin before minus the
 	 * bin size.

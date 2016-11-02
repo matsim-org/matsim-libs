@@ -42,7 +42,7 @@ import javax.inject.Inject;
 
 /**
  * Script-in-java to include cadyts into a matsim run.
- * <p/>
+ * <p></p>
  * For the listing click on the class name above.
  * 
  * @author nagel

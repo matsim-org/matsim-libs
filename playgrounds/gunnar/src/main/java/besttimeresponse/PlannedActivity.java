@@ -18,7 +18,7 @@ public class PlannedActivity<L, M> {
 	// -------------------- CONSTANTS --------------------
 
 	// For numerical reasons, to avoid computing the log of a number near zero.
-	static final double MINACTDUR_S = 1.0;
+	static final double MINACTDUR_S = 0.1;
 
 	final L location;
 

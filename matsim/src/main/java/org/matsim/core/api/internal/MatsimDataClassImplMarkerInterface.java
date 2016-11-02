@@ -24,7 +24,7 @@ import org.matsim.facilities.ActivityFacilityImpl;
 
 /**
  * Marker interface for data class implementations such as {@link Person}, {@link Activity}, or {@link ActivityFacilityImpl}.
- * <p/>
+ * <p></p>
  * Currently (feb'16) we think that<ul>
  * <li> methods in these implementations should be final
  * <li> the implementation classes themselves need not be final

@@ -37,11 +37,11 @@ public class RunPublicTransitMapper {
 
 	/**
 	 * Routes the unmapped MATSim Transit Schedule to the network using the file
-	 * paths specified in the config. Writes the resulting schedule and network to xml files.<p/>
+	 * paths specified in the config. Writes the resulting schedule and network to xml files.<p></p>
 	 *
 	 * @see CreateDefaultConfig
 	 *
-	 * @param args <br/>[0] PublicTransitMapping config file<br/>
+	 * @param args <br>[0] PublicTransitMapping config file<br>
 	 */
 	public static void main(String[] args) {
 		if(args.length == 1) {
@@ -53,7 +53,7 @@ public class RunPublicTransitMapper {
 
 	/**
 	 * Routes the unmapped MATSim Transit Schedule to the network using the file
-	 * paths specified in the config. Writes the resulting schedule and network to xml files.<p/>
+	 * paths specified in the config. Writes the resulting schedule and network to xml files.<p></p>
 	 *
 	 * @see CreateDefaultConfig
 	 *

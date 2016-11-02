@@ -18,17 +18,35 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.scenario.ScenarioByConfigModule;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 /**
  * @author thibautd
  */
 public class SocialNetworkSamplerModule extends AbstractModule {
+	private final Scenario scenario;
+
+	public SocialNetworkSamplerModule() {
+		this( null );
+	}
+
+	public SocialNetworkSamplerModule( final Scenario scenario ) {
+		this.scenario = scenario;
+	}
+
 	@Override
 	public void install() {
-		// assumes the Injector is created the MATSim way.
-		install( new ScenarioByConfigModule() );
+		if ( scenario == null ) {
+			// assumes the Injector is created the MATSim way (to get config).
+			// scenario is then loaded from files.
+			install( new ScenarioByConfigModule() );
+		}
+		else {
+			install( new ScenarioByInstanceModule( scenario ) );
+		}
 		bind( SocialNetworkSampler.class );
 	}
 }

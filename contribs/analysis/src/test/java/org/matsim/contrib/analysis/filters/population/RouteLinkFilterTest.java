@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
@@ -40,6 +39,8 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 public class RouteLinkFilterTest extends MatsimTestCase {
@@ -62,7 +63,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 	private Population getTestPopulation() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).parse(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "network.xml"));
 
 		Link link1 = network.getLinks().get(Id.create(1, Link.class));
 		Link link20 = network.getLinks().get(Id.create(20, Link.class));

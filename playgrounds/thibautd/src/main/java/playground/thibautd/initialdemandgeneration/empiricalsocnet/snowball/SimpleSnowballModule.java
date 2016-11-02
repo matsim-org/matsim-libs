@@ -19,6 +19,7 @@
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.TypeLiteral;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesFiller;
@@ -26,20 +27,20 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.EgoLocator;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.cliquedistributionsnowball.CliqueEgoDistribution;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.cliquedistributionsnowball.CliquesDistributionCliquesFiller;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.degreebased.SimpleCliquesFiller;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.degreebased.SimpleEgoDistribution;
+import playground.thibautd.utils.spatialcollections.SpatialCollectionUtils;
 
 /**
  * @author thibautd
  */
 public class SimpleSnowballModule extends AbstractModule {
 	private final SnowballCliques snowballCliques;
-	private final SnowballSamplingConfigGroup configGroup;
 
 	// could use matsim module to avoid passing config, but better to read data in constructor (configure might be called
 	// several times)
 	public SimpleSnowballModule( final Config config ) {
-		this.configGroup = (SnowballSamplingConfigGroup) config.getModule( SnowballSamplingConfigGroup.GROUP_NAME );
+		final SnowballSamplingConfigGroup configGroup =
+				(SnowballSamplingConfigGroup) config.getModule(
+					SnowballSamplingConfigGroup.GROUP_NAME );
 		this.snowballCliques = SnowballCliques.readCliques(
 											ConfigGroup.getInputFileURL(
 													config.getContext(),
@@ -51,21 +52,13 @@ public class SimpleSnowballModule extends AbstractModule {
 		// this should remain the same between methods
 		bind( EgoLocator.class ).to( SnowballLocator.class );
 		bind( Position.class ).to( SnowballLocator.class );
+		bind( new TypeLiteral<SpatialCollectionUtils.Metric<double[]>>(){} ).to( SnowballLocator.class );
+
+		bind( SocialPositions.class );
 
 		bind( SnowballCliques.class ).toInstance( snowballCliques );
 
-		// this varies with method
-		switch ( configGroup.getSamplingMethod() ) {
-			case degreeBased:
-				bind( EgoCharacteristicsDistribution.class ).to( SimpleEgoDistribution.class );
-				bind( CliquesFiller.class ).to( SimpleCliquesFiller.class );
-				break;
-			case cliqueBased:
-				bind( EgoCharacteristicsDistribution.class ).to( CliqueEgoDistribution.class );
-				bind( CliquesFiller.class ).to( CliquesDistributionCliquesFiller.class );
-				break;
-			default:
-				throw new RuntimeException( configGroup.getSamplingMethod()+" not implemented yet" );
-		}
+		bind( EgoCharacteristicsDistribution.class ).to( CliqueEgoDistribution.class );
+		bind( CliquesFiller.class ).to( CliquesDistributionCliquesFiller.class );
 	}
 }

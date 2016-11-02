@@ -32,7 +32,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig}
  * this class runs a simulation and calculates emissions online. 
  * Results are written into distinct xml-files including emission event files for some iterations (as specified by the config). 
- * <p/>
+ * <p></p>
  * See <a href="{@docRoot}/src-html/org/matsim/contrib/emissions/example/RunEmissionToolOnlineExample.html#line.39">here</a> for the listing.
 
  *

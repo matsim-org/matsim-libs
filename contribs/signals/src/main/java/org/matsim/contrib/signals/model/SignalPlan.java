@@ -34,9 +34,9 @@ public interface SignalPlan {
 
 	public List<Id<SignalGroup>> getOnsets(double timeSeconds);
 
-	public Double getEndTime();
+	public double getEndTime();
 	
-	public Double getStartTime();
+	public double getStartTime();
 
 	public Id<SignalPlan> getId();
 	

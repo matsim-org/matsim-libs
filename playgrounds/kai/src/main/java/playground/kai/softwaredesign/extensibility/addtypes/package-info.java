@@ -19,11 +19,11 @@
 /**
  * 
  * These are behavioral classes, behind an interface.
- * <p/>
+ * <p></p>
  * Additional types can be added by local programming: Just add Xxx implements Shape, implement it, and there you are.
- * <p/>
+ * <p></p>
  * In contrast, adding new methods needs a shotgun approach: changes in every class which implements the interface.
- * <p/>
+ * <p></p>
  * In MATSim, at agent level (e.g. DriverAgent), we probably want to be able to create additional behavioral types.
  * 
  * 

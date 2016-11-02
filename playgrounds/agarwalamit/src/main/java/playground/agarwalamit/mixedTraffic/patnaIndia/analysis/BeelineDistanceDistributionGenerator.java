@@ -36,7 +36,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.legMode.distributions.LegModeBeelineDistanceDistributionHandler;
+import playground.agarwalamit.analysis.legMode.distributions.LegModeBeelineDistanceDistributionFromPlansAnalyzer;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.MapUtils;
@@ -69,7 +69,7 @@ public class BeelineDistanceDistributionGenerator {
 		distanceClass2Labels.put(10000.0, "8-10");
 		distanceClass2Labels.put(Double.MAX_VALUE, "10+");
 		
-		LegModeBeelineDistanceDistributionHandler beelineCalculator = new LegModeBeelineDistanceDistributionHandler();
+		LegModeBeelineDistanceDistributionFromPlansAnalyzer beelineCalculator = new LegModeBeelineDistanceDistributionFromPlansAnalyzer();
 
 		Config config = ConfigUtils.createConfig();
 		config.plans().setInputFile(plansFile);

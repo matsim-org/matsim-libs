@@ -56,12 +56,12 @@ public class DgSylviaSignalPlan implements SignalPlan {
 	}
 
 	@Override
-	public Double getEndTime() {
+	public double getEndTime() {
 		return delegate.getEndTime();
 	}
 
 	@Override
-	public Double getStartTime() {
+	public double getStartTime() {
 		return delegate.getStartTime();
 	}
 

@@ -52,7 +52,7 @@ import org.matsim.vehicles.Vehicle;
  * Based on CharyparNagelScoringFunctionFactoryTest from 25/04/2015
  * Test the correct working of the HeterogeneuosCharyparNagelScoringFunction
  * TODO dg march 09: when walk mode is tested add a walk mode leg and modify at least testMarginalUtilityOfDistance
- * <p/>
+ * <p></p>
  * TODO [MR] split this into multiple test classes for the specific parts, according to the newer, more modular scoring function
  *
  * @author mrieser, artemc

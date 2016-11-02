@@ -16,25 +16,25 @@ import java.util.Map;
 
 /**
  * @author fouriep
- *         <p/>
+ *         <p></p>
  *         Essentially a lookup used in config translation. Also registers
  *         extended strategies with the controler.
- *         <p/>
+ *         <p></p>
  *         If a mutating strategy is sent for pseudo-simulation, it needs to be
  *         marked as such, and registered with the {@link RunPSim}.
  *         Non-mutating strategies, e.g. selector strategies, should be disabled
  *         during PSim iterations, and only run during QSim iterations.
- *         <p/>
- *         <p/>
+ *         <p></p>
+ *         <p></p>
  *         This class records strategies that should work with PSim. It creates staretgy delegate instances
  *         and adds mutated strategies to PSim.
  *         Each factory is registered during controler
  *         construction, and the config entries are changed to refer to their
  *         PSim equivalents in the controler's substituteStrategies() method.
- *         <p/>
- *         <p/>
- *         <p/>
- *         <p/>
+ *         <p></p>
+ *         <p></p>
+ *         <p></p>
+ *         <p></p>
  *         <B>NOTE:</B> to save processing overhead, selector strategies are set
  *         up to always return the person's current selected plan during
  *         non-QSim iterations.

@@ -691,7 +691,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 
 	/**
 	 * Creates the CountsSimReal24Graph for all the data. AWTV = average weekday traffic volumes.
-	 * <br/><br/>
+	 * <br><br>
 	 * Notes:<ul>
 	 * <li> I think that "weekday" means "day-of-week", i.e. the method does not care when it is sunday. kai, sep'16
 	 * </ul>

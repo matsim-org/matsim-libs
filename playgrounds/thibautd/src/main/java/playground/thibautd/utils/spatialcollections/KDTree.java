@@ -39,7 +39,6 @@ import java.util.function.ToDoubleBiFunction;
  * @author thibautd
  */
 public class KDTree<T> implements SpatialTree<double[],T> {
-	// used only to balance the tree
 	private final Random random = MatsimRandom.getLocalInstance();
 	private static final int SUBLIST_SIZE_MEDIAN = 100;
 
@@ -137,7 +136,37 @@ public class KDTree<T> implements SpatialTree<double[],T> {
 	}
 
 	public T getAny() {
-		return root.value;
+		if ( size == 0 ) return null;
+
+		final Queue<Node<T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
+		stack.add( root );
+
+		// randomize choice, without falling into the O( n ) case: choose random depth, navigate to it, return the
+		// last non-null element encountered.
+		int depth = (int) Math.log( 1 + random.nextInt( size ) );
+
+		T val = null;
+
+		while ( depth > 0 && !stack.isEmpty() ) {
+			final Node<T> current = stack.poll();
+
+			if ( current.value != null ) {
+				val = current.value;
+				depth--;
+			}
+
+			if ( random.nextBoolean() ) {
+				if ( current.left != null ) stack.add( current.left );
+				else if ( current.right != null ) stack.add( current.right );
+			}
+			else {
+				if ( current.right != null ) stack.add( current.right );
+				else if ( current.left != null ) stack.add( current.left );
+			}
+		}
+
+		assert val != null;
+		return val;
 	}
 
 	public boolean isEmpty() {

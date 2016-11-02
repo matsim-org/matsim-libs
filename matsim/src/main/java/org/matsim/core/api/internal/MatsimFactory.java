@@ -22,7 +22,7 @@ package org.matsim.core.api.internal;
 
 /**
  * marker interface
- * <p/>
+ * <p></p>
  * Design comments:<ul>
  * <li>For the time being, factories should try to have as little state as possible.  Optimally, they have no state at all, i.e. everything
  * is done in the "create" method.

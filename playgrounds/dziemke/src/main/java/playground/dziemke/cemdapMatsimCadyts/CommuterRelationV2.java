@@ -32,7 +32,7 @@ public class CommuterRelationV2 {
 	private int tripsFemale;
 
 		
-	public CommuterRelationV2(int origin, int destination, int TripsAll, int tripsMale, int tripsFemale) {
+	public CommuterRelationV2(int origin, int destination, int tripsAll, int tripsMale, int tripsFemale) {
 		this.origin = origin;
 		this.destination = destination;
 		this.tripsAll = tripsAll;
@@ -47,12 +47,16 @@ public class CommuterRelationV2 {
 	public int getTo() {
 		return this.destination;
 	}
+	
+	public int getTrips() {
+		return this.tripsAll;
+	}
 
 	public int getTripsMale() {
 		return this.tripsMale;
 	}
 
-	public int getTripsFeale() {
+	public int getTripsFemale() {
 		return this.tripsFemale;
 	}
 }

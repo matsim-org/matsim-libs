@@ -14,6 +14,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -31,7 +32,7 @@ public class TransitScheduleReprojectionIOTest {
 
 	@Test
 	public void testInput() {
-		URL transitSchedule = IOUtils.newUrl(utils.getTestScenarioURL("pt-tutorial"), "transitschedule.xml");
+		URL transitSchedule = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "transitschedule.xml");
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReaderV1( originalScenario ).parse(transitSchedule);
 
@@ -43,7 +44,7 @@ public class TransitScheduleReprojectionIOTest {
 
 	@Test
 	public void testOutput() {
-		URL transitSchedule = IOUtils.newUrl(utils.getTestScenarioURL("pt-tutorial"), "transitschedule.xml");
+		URL transitSchedule = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "transitschedule.xml");
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReaderV1( originalScenario ).parse(transitSchedule);
 
@@ -64,7 +65,7 @@ public class TransitScheduleReprojectionIOTest {
 		// It is thus OK to use a reasonably "high" tolerance compared to usual double comparisons.
 		final double epsilon = 0.01;
 
-		final Config config = ConfigUtils.createConfig(utils.getTestScenarioURL("pt-tutorial"));
+		final Config config = ConfigUtils.createConfig(ExamplesUtils.getTestScenarioURL("pt-tutorial"));
 
 		final Scenario originalScenario = ScenarioUtils.createScenario(config);
 		new TransitScheduleReader( originalScenario ).readURL(ConfigGroup.getInputFileURL(config.getContext(), "transitschedule.xml"));

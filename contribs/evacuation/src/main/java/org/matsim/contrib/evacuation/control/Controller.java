@@ -649,7 +649,7 @@ public class Controller {
 
 	/**
 	 * Add a shape. Since no specific layer is given:
-	 * <p/>
+	 * <p></p>
 	 * - scans for shapes - creates a new shape, if no shape found or replaces
 	 * the old shape with the same id
 	 *

@@ -225,7 +225,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 						listener.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
 						// don't know why this is not activated as a test. kai, feb'14
 
-						listener.addZoneDataExchangeListener(AccessibilityTest.this);
+						listener.addFacilityDataExchangeListener(AccessibilityTest.this);
 
 						//add grid based accessibility services listener to the services and run the simulation
 						return listener;
