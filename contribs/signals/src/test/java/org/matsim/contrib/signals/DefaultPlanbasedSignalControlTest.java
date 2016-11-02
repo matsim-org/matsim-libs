@@ -19,8 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -126,6 +125,7 @@ public class DefaultPlanbasedSignalControlTest {
 					Assert.assertEquals(SignalGroupState.GREEN, e.getNewState());
 				}
 			}
+			// TODO following times are wrong. if clauses are never fulfilled. nothing gets tested!
 			else if (e.getTime() == 165.0){
 				if (e.getSignalGroupId().equals(Id.create("4", SignalGroup.class))){
 					Assert.assertEquals(SignalGroupState.GREEN, e.getNewState());
