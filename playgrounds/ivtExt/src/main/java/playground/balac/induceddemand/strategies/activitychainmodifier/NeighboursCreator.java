@@ -1,8 +1,11 @@
 package playground.balac.induceddemand.strategies.activitychainmodifier;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -38,6 +41,8 @@ import org.matsim.facilities.ActivityFacility;
  */
 
 public class NeighboursCreator {
+	private final static Set<String> priamryActivities = new HashSet<String>(Arrays.asList("work_sector2", "work_sector3",
+			"home", "education_primary", "education_secondary", "education_kindergarten", "education_higher"));
 	private final StageActivityTypes stageActivityTypes;
 	private QuadTree<ActivityFacility> shopFacilityQuadTree;
 	private QuadTree<ActivityFacility> leisureFacilityQuadTree;
@@ -212,15 +217,19 @@ public class NeighboursCreator {
 				
 				//don't swap if the activities are the same or if it would lead to 
 				//having same consecutive activities
-				if (!act1.getType().equals(act2.getType()) && 
-						!act1.getType().equals(tNew.get(innerIndex + 1).getType()) &&
-						!act1.getType().equals(tNew.get(innerIndex - 1).getType()) && 
-						!act2.getType().equals(tNew.get(outerIndex + 1).getType()) && 
-						!act2.getType().equals(tNew.get(outerIndex - 1).getType())) {
 				
-					double time = 0.0;
-					
-					
+				
+				if (!act1.getType().equals(act2.getType()) &&  
+						!( act1.getType().equals( tNew.get(innerIndex + 1).getType() ) &&
+								NeighboursCreator.priamryActivities.contains( act1.getType() ) ) &&
+						!( act1.getType().equals( tNew.get(innerIndex - 1).getType() ) &&
+								NeighboursCreator.priamryActivities.contains(act1.getType() ) ) && 
+						!( act2.getType().equals( tNew.get(outerIndex + 1).getType() )  &&
+								NeighboursCreator.priamryActivities.contains(act2.getType() ) ) && 
+						!( act2.getType().equals( tNew.get(outerIndex - 1).getType() ) &&
+								NeighboursCreator.priamryActivities.contains(act2.getType() ) ) ) {
+				
+					double time = 0.0;				
 					
 					int index1 = newPlan.getPlanElements().indexOf(act1);
 					int index2 = newPlan.getPlanElements().indexOf(act2);
@@ -310,21 +319,7 @@ public class NeighboursCreator {
 					if (nextLeg.getRoute() != null) 
 						nextLeg.getRoute().setTravelTime(travelTime);
 					time += travelTime;
-					
-					//update the end times of the activities following the higher index of
-					//the swapped operation
-				/*	for (int i = innerIndex + 1; i < numberOfActivities - 1; i ++) {
-						Activity currentActivity = tNew.get(i);
-						double durationCurrent = currentActivity.getEndTime() - currentActivity.getStartTime();
-						
-						currentActivity.setEndTime(time + durationCurrent);
-						time += durationCurrent;
-						
-						Leg leg = (Leg) newPlan.getPlanElements().get(newPlan.getPlanElements().indexOf(currentActivity) + 1);
-						double ttLeg = leg.getTravelTime();
-						time += ttLeg;
-						
-					}	*/
+				
 					newPlans.add(newPlan);
 				}				
 			}			
@@ -352,9 +347,16 @@ public class NeighboursCreator {
 			int actIndex = plan.getPlanElements().indexOf(t.get(index));
 
 			for (String actType:allActTypes) {
-				if (t.get(index - 1).getType().equals(actType) ||
-						t.get(index).getType().equals(actType))
+				
+				//===no point to insert a mandatory activity next to another mandatory activity===
+				
+				if ( (t.get(index - 1).getType().equals(actType) && 
+						NeighboursCreator.priamryActivities.contains(actType) ) ||
+						(t.get(index).getType().equals(actType) && 
+						NeighboursCreator.priamryActivities.contains(actType) ) )
 					continue;
+				
+				
 				Plan newPlan = PlanUtils.createCopy(plan);
 				newPlan.setPerson(plan.getPerson());
 				
@@ -472,14 +474,16 @@ public class NeighboursCreator {
 			
 			newPlan.setPerson(plan.getPerson());
 			
-			if ((t.get(index).getType().startsWith("work") || t.get(index).getType().startsWith("education")))
-				//don't remove mandatory activities
+			if (NeighboursCreator.priamryActivities.contains(t.get(index).getType()))
+				//===don't remove primary activities
 				continue;
+			
 			int actIndex = plan.getPlanElements().indexOf(t.get(index));
 			double durationRemovedActivity = 0.0;
 			//if (t.get(index).getMaximumDuration() != Time.UNDEFINED_TIME)
 			//	durationRemovedActivity = t.get(index).getMaximumDuration();
 			//else
+			
 			durationRemovedActivity = t.get(index).getEndTime() - t.get(index - 1).getEndTime();
 			if (durationRemovedActivity < 0.0)
 				durationRemovedActivity = 0.0;
@@ -512,9 +516,11 @@ public class NeighboursCreator {
 				
 			}		
 			
-			//check if after removing we have two same activities next to each other
+			/*check if after removing we have two same activities next to each other
+			 * that are of type work, education or home
+			 */
 			if (t.get(index - 1).getType().equals(t.get(index + 1).getType()) 
-					) {
+					 && (NeighboursCreator.priamryActivities.contains(t.get(index - 1).getType()))) {
 				
 				double initialEndTime = t.get(index + 1).getEndTime();
 				newPlan.getPlanElements().remove(actIndex);
