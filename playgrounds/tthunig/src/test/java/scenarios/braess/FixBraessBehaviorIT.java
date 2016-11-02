@@ -204,7 +204,10 @@ public final class FixBraessBehaviorIT{
 
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-
+		
+		config.vspExperimental().setWritingOutputEvents(false);
+		config.planCalcScore().setWriteExperiencedPlans(false);
+		config.controler().setDumpDataAtEnd(false);
 		config.controler().setWriteEventsInterval(config.controler().getLastIteration());
 		config.controler().setWritePlansInterval(config.controler().getLastIteration());
 
