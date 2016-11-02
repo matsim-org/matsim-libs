@@ -47,9 +47,9 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class ScrapTransitSchedule {
 public static void main(String[] args) {
 	
-	String path = "C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/";
+	String path = "C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/10pct/";
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	new TransitScheduleReader(scenario).readFile(path+"transitSchedule.xml");
+	new TransitScheduleReader(scenario).readFile(path+"transitSchedule.xml.gz");
 	System.out.println(scenario.getTransitSchedule().getTransitLines().size() + " lines ");
 	System.out.println(scenario.getTransitSchedule().getFacilities().size() + " stops");
 	Set<TransitLine> removedLines = new HashSet<>(); 

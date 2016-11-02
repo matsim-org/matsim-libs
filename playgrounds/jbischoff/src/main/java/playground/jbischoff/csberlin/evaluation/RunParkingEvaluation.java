@@ -39,6 +39,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import playground.jbischoff.parking.evaluation.ParkedVechiclesVisualiser;
 import playground.jbischoff.parking.evaluation.ParkingSearchAndEgressTimeEvaluator;
 import playground.jbischoff.parking.evaluation.ParkingSearchEvaluator;
+import playground.jbischoff.utils.JbUtils;
 
 /**
  * @author  jbischoff
@@ -58,14 +59,19 @@ public static void main(String[] args) {
 	WalkLegPlotterVIA wlpFF = new WalkLegPlotterVIA(network,"freefloating");
 	ParkedVechiclesVisualiser pvv = new ParkedVechiclesVisualiser(network);
 	ParkingSearchEvaluator pwde = new ParkingSearchEvaluator();
-	events.addHandler(pwde);
-	events.addHandler(pvv);
-	events.addHandler(wlp);
-	events.addHandler(wlpFF);
-	events.addHandler(mierendorffEval);
-	events.addHandler(klausEval);
-	String dir = "D:/runs-svn/bmw_carsharing/run23/";
-	new ParkingSearchEventsReader(events).readFile(dir+"run23.output_events.xml.gz");
+	DisagModalSplitAnalysis das = new DisagModalSplitAnalysis(network);
+	das.addZone("klausner", JbUtils.readShapeFileAndExtractGeometry("../../../shared-svn/projects/bmw_carsharing/data/gis/klaus.shp", "id").get("0"));
+	das.addZone("mierendorff", JbUtils.readShapeFileAndExtractGeometry("../../../shared-svn/projects/bmw_carsharing/data/gis/mierendorffkiez.shp", "id").get("1"));
+	
+	events.addHandler(das);
+//	events.addHandler(pwde);
+//	events.addHandler(pvv);
+//	events.addHandler(wlp);
+//	events.addHandler(wlpFF);
+//	events.addHandler(mierendorffEval);
+//	events.addHandler(klausEval);
+	String dir = "D:/runs-svn/bmw_carsharing/run21/";
+	new ParkingSearchEventsReader(events).readFile(dir+"run21.output_events.xml.gz");
 	pwde.writeEgressWalkStatistics(dir);
 	mierendorffEval.writeStats(dir+"mierendorffParkAndEgressStats.csv");
 	mierendorffEval.writeCoordTimeStamps(dir+"/mierendorffParkStamps.csv");
@@ -75,6 +81,7 @@ public static void main(String[] args) {
 	wlpFF.plotWalkLegs(dir+"walkLegs_freefloating.csv");
 	pvv.finishDay();
 	pvv.plotCarPositions(dir+"carPositions.csv");
+	das.writeStats(dir+"modalSplit.csv");
 }
 
 static Set<Id<Link>> readLinks(String filename){

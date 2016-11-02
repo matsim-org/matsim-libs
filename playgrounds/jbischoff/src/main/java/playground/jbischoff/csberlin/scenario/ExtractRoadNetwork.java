@@ -45,7 +45,7 @@ public class ExtractRoadNetwork {
 	 */
 	public static void main(String[] args) {
 		Network network = NetworkUtils.createNetwork();
-		new MatsimNetworkReader(network).readFile("C:/Users/Joschka/Documents/shared-svn/projects/bmw_carsharing/data/scenario/network.xml.gz");
+		new MatsimNetworkReader(network).readFile("../../../shared-svn/studies/jbischoff/multimodal/berlin/input/10pct/network.final10pct.xml.gz");
 		NetworkFilterManager m = new NetworkFilterManager(network);
 		m.addLinkFilter(new NetworkLinkFilter() {
 			
@@ -56,7 +56,7 @@ public class ExtractRoadNetwork {
 			}
 		});
 		Network network2 = m.applyFilters();
-		new NetworkWriter(network2).write("C:/Users/Joschka/Documents/shared-svn/projects/bmw_carsharing/data/scenario/network-car.xml.gz");
+		new NetworkWriter(network2).write("../../../shared-svn/studies/jbischoff/multimodal/berlin/input/10pct/network.final10pct_car.xml.gz");
 
 	}
 

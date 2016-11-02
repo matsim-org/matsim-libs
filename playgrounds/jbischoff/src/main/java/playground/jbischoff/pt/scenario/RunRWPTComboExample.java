@@ -56,7 +56,7 @@ import playground.jbischoff.pt.taxi.DistanceBasedTaxiFare;
  */
 public class RunRWPTComboExample {
 public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/config.xml", new TaxiConfigGroup());
+		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/10pct/config.xml", new TaxiConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		VariableAccessModeConfigGroup walk = new VariableAccessModeConfigGroup();
 		walk.setDistance(1000);
