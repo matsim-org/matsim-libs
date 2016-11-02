@@ -72,12 +72,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
+ * Tests fixed-time control, especially for multiple fixed-time plans over a day.
+ * 
  * @author tthunig
  *
  */
-public class SignalPlansTest {
+public class DefaultPlanbasedSignalSystemControllerTest {
 
-	private static final Logger log = Logger.getLogger(SignalPlansTest.class);
+	private static final Logger log = Logger.getLogger(DefaultPlanbasedSignalSystemControllerTest.class);
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
