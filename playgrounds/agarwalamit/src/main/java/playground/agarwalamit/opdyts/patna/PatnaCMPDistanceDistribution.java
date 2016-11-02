@@ -34,7 +34,7 @@ public final class PatnaCMPDistanceDistribution {
     private final double [] distClasses = new double[] {0., 2000., 4000., 6000., 8000., 10000.};
     private double legsSumAllModes = 0;
 
-    void getMode2Legs(final OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases){
+    public PatnaCMPDistanceDistribution (final OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases){
         double totalLegs = 0 ;
         switch (opdytsObjectiveFunctionCases) {
             case EQUIL:

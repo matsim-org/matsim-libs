@@ -53,7 +53,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 
     private MainModeIdentifier mainModeIdentifier ;
     private final OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases;
-    private final PatnaCMPDistanceDistribution distriInfo = new PatnaCMPDistanceDistribution();
+    private final PatnaCMPDistanceDistribution distriInfo ;
 
     @Inject ExperiencedPlansService service ;
     @Inject TripRouter tripRouter ;
@@ -75,6 +75,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 
     public ModeChoiceObjectiveFunction(final OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases) {
         this.opdytsObjectiveFunctionCases = opdytsObjectiveFunctionCases;
+        this.distriInfo = new PatnaCMPDistanceDistribution(opdytsObjectiveFunctionCases);
         for ( StatType statType : StatType.values() ) {
             // define the bin boundaries:
             switch ( statType ) {

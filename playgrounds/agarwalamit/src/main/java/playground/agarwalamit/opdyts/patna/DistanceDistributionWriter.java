@@ -31,6 +31,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.legMode.distributions.LegModeBeelineDistanceDistributionFromPlansAnalyzer;
 import playground.agarwalamit.analysis.legMode.distributions.LegModeBeelineDistanceDistributionHandler;
+import playground.agarwalamit.opdyts.OpdytsObjectiveFunctionCases;
 
 /**
  * Created by amit on 20/10/16.
@@ -44,8 +45,8 @@ public class DistanceDistributionWriter {
     private final LegModeBeelineDistanceDistributionHandler handler ;
     private final SortedMap<String, SortedMap<Double, Integer>> mode2DistanceClass2LegCount = new TreeMap<>();
 
-    public DistanceDistributionWriter(final Scenario scenario) {
-        referenceStudyDistri = new PatnaCMPDistanceDistribution();
+    public DistanceDistributionWriter(final Scenario scenario, final OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases) {
+        referenceStudyDistri = new PatnaCMPDistanceDistribution(opdytsObjectiveFunctionCases);
         this.scenario = scenario;
         List<Double> dists = Arrays.stream(this.referenceStudyDistri.getDistClasses()).boxed().collect(Collectors.toList());
         this.handler = new LegModeBeelineDistanceDistributionHandler(dists, scenario.getNetwork());

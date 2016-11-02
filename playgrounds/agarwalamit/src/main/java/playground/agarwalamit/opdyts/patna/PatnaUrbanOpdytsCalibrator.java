@@ -80,7 +80,7 @@ public class PatnaUrbanOpdytsCalibrator {
 
 		// relax the plans first.
 		PatnaPlansRelaxor relaxor = new PatnaPlansRelaxor();
-		relaxor.run(new String[]{configFile, OUT_DIR+"/initialPlans2RelaxedPlans/"});
+//		relaxor.run(new String[]{configFile, OUT_DIR+"/initialPlans2RelaxedPlans/"});
 
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.plans().setInputFile(OUT_DIR+"/initialPlans2RelaxedPlans/output_plans.xml.gz");
@@ -107,7 +107,7 @@ public class PatnaUrbanOpdytsCalibrator {
 //		modes2consider.add("pt");
 //		modes2consider.add("walk");
 
-		ModalStatsControlerListner stasControlerListner = new ModalStatsControlerListner(modes2consider);
+		ModalStatsControlerListner stasControlerListner = new ModalStatsControlerListner(modes2consider,PATNA_1_PCT);
 
 		// following is the  entry point to start a matsim controler together with opdyts
 		MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization, modes2consider);

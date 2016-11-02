@@ -46,9 +46,11 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
     private DistanceDistributionWriter distanceDistributionWriter;
     private BufferedWriter writer;
     private final Set<String> mode2consider;
+    private OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases;
 
-    public ModalStatsControlerListner(final Set<String> modes2consider) {
+    public ModalStatsControlerListner(final Set<String> modes2consider, final OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases) {
         this.mode2consider = modes2consider;
+        this.opdytsObjectiveFunctionCases = opdytsObjectiveFunctionCases;
     }
 
     public ModalStatsControlerListner() {
@@ -80,7 +82,7 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
         events.addHandler(modalShareEventHandler);
 
         // initializing it here,
-        this.distanceDistributionWriter = new DistanceDistributionWriter(event.getServices().getScenario());
+        this.distanceDistributionWriter = new DistanceDistributionWriter(event.getServices().getScenario(), this.opdytsObjectiveFunctionCases);
         this.events.addHandler(this.distanceDistributionWriter.getEventHandler());
     }
 
