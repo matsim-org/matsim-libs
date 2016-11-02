@@ -110,6 +110,7 @@
 
 	<modules>
 		<module>accessibility</module>
+		<module>av</module>
 		<module>evacuation</module>
 		<module>analysis</module>
 		<module>cadytsIntegration</module>
