@@ -58,6 +58,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.agarwalamit.InternalizationEmissionAndCongestion.EmissionCongestionTravelDisutilityCalculatorFactory;
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
 import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
@@ -77,13 +78,11 @@ import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutil
 
 /**
  * 
- * A controler to start a simultaneous congestion, noise and air pollution pricing run.
+ * A controler to start a simultaneous congestion, noise and air pollution pricing run or other joint pricing runs.
  * 
  * TODO: add switch / add different congestion pricing approaches
  * 
  * TODO: add switch / add exhaust emission pricing approaches
- * 
- * TODO: add switch for 
  * 
  * TODO: test: money event for each effect + consideration in travel disutility for each effect
  * 
@@ -250,6 +249,8 @@ public class CNEControler {
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
 		
+		Set<Id<Link>> hotSpotLinks = null;
+		
 		// ########################## Pricing setup ##########################
 				
 		if (congestionPricing && noisePricing == false && airPollutionPricing == false) {
@@ -335,11 +336,18 @@ public class CNEControler {
 			final EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 
 			if (useTripAndAgentSpecificVTTSForRouting) {
-				throw new RuntimeException("Not yet implemented. Aborting...");
+				throw new RuntimeException("Not yet implemented. Aborting..."); // TODO
 
 			} else {				
+				
+				if (sigma != 0.) {
+					throw new RuntimeException("The following travel disutility doesn't allow for randomness. Aborting...");
+				}
+				
+				// TODO: doesn't account for randomness, doesn't account for marginal utility of distance, ... 
 				final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, 
 						emissionCostModule, config.planCalcScore());
+				emissionTducf.setHotspotLinks(hotSpotLinks);
 				controler.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {
@@ -374,7 +382,22 @@ public class CNEControler {
 					}
 				}); 
 			} else {
-				throw new RuntimeException("Not yet implemented. Aborting...");
+				final CNETimeDistanceTravelDisutilityFactory factory = new CNETimeDistanceTravelDisutilityFactory(
+						new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config.planCalcScore()),
+						emissionModule, emissionCostModule,
+						noiseContext,
+						congestionTollHandlerQBP,
+						config.planCalcScore()
+					);
+				factory.setSigma(sigma);
+				factory.setHotspotLinks(hotSpotLinks);
+				
+				controler.addOverridingModule(new AbstractModule(){
+					@Override
+					public void install() {
+						this.bindCarTravelDisutilityFactory().toInstance( factory );
+					}
+				}); 				
 			}
 				
 			// computation of congestion events + consideration in scoring
@@ -425,9 +448,39 @@ public class CNEControler {
 			controler.addControlerListener(new EmissionControlerListener());
 			
 		} else if (congestionPricing && noisePricing == false && airPollutionPricing) {
-			// congestion + air pollution pricing
-			throw new RuntimeException("Not yet implemented. Aborting..."); // TODO?!
 			
+			// congestion + air pollution pricing
+
+			final TollHandler congestionTollHandlerQBP = new TollHandler(scenario);
+			
+			final EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
+			
+			if (useTripAndAgentSpecificVTTSForRouting) {
+				throw new RuntimeException("Not yet implemented. Aborting..."); // TODO?!
+
+			} else {
+				
+				if (sigma != 0.) {
+					throw new RuntimeException("The following travel disutility doesn't allow for randomness. Aborting...");
+				}
+				
+				// TODO: doesn't account for randomness, doesn't account for marginal utility of distance, ... 
+				final EmissionCongestionTravelDisutilityCalculatorFactory emissionCongestionTravelDisutilityCalculatorFactory = 
+						new EmissionCongestionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, congestionTollHandlerQBP, config.planCalcScore());
+				controler.addOverridingModule(new AbstractModule() {
+					@Override
+					public void install() {
+						bindCarTravelDisutilityFactory().toInstance(emissionCongestionTravelDisutilityCalculatorFactory);
+					}
+				});
+				
+				// air pollution computation
+				controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
+				
+				// computation of congestion events + consideration in scoring
+				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(scenario, congestionTollHandlerQBP, new CongestionHandlerImplV3(controler.getEvents(), scenario)));
+			}
+					
 		} else if (congestionPricing == false && noisePricing == false && airPollutionPricing == false) {
 			// no pricing
 			
