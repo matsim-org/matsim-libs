@@ -23,13 +23,14 @@
 package org.matsim.contrib.noise;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.data.NoiseReceiverPoint;
 import org.matsim.contrib.noise.handler.LinkSpeedCalculation;
 import org.matsim.contrib.noise.handler.NoisePricingHandler;
 import org.matsim.contrib.noise.handler.NoiseTimeTracker;
 import org.matsim.contrib.noise.handler.PersonActivityTracker;
-import org.matsim.contrib.noise.routing.NoiseTollDisutilityCalculatorFactory;
+import org.matsim.contrib.noise.routing.NoiseTollTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -38,6 +39,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 
 
 /**
@@ -83,7 +85,9 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 			
 			log.info("Internalizing noise damages. The default travel disutility will be replaced by a travel distuility which accounts for noise tolls...");
 			
-			final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(this.noiseContext, controler.getConfig().planCalcScore());
+			final NoiseTollTimeDistanceTravelDisutilityFactory tollDisutilityCalculatorFactory = new NoiseTollTimeDistanceTravelDisutilityFactory(
+					new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
+					this.noiseContext, controler.getConfig().planCalcScore());
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {

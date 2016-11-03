@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.noise.NoiseCalculationOnline;
 import org.matsim.contrib.noise.NoiseConfigGroup;
@@ -40,6 +41,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
@@ -101,7 +103,7 @@ public class CNControler {
 	}
 
 	public void run(String outputDirectory, String configFile, boolean congestionPricing, boolean noisePricing, double sigma) {
-				
+						
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
 		if (outputDirectory == null) {
 			if (config.controler().getOutputDirectory() == null || config.controler().getOutputDirectory() == "") {
@@ -119,7 +121,8 @@ public class CNControler {
 			config.controler().setOutputDirectory(outputDirectory);
 		}
 		
-		Controler controler = new Controler(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
 		final VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
 
 		// noise

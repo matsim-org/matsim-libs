@@ -40,6 +40,7 @@ public class NoiseTollDisutilityCalculatorFactory implements TravelDisutilityFac
 	private NoiseContext noiseContext;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
+	@Deprecated
 	public NoiseTollDisutilityCalculatorFactory(NoiseContext noiseContext, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.noiseContext = noiseContext;
 		this.cnScoringGroup = cnScoringGroup;

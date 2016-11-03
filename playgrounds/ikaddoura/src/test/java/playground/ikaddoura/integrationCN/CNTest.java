@@ -48,6 +48,7 @@ import playground.vsp.congestion.controler.MarginalCongestionPricingContolerList
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
+import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
 /**
  * @author ikaddoura
@@ -62,32 +63,48 @@ public class CNTest {
 	@Ignore
 	@Test
 	public final void test1(){
-		
-		// baseCase
+
 		String configFile1 = testUtils.getPackageInputDirectory() + "CNTest/config1.xml";
+
+		// baseCase
 		CNControler cnControler1 = new CNControler();
-		cnControler1.run(null, configFile1, false, false, 0.);
+		String outputDirectory1 = testUtils.getOutputDirectory() + "bc";
+		cnControler1.run(outputDirectory1, configFile1, false, false, 0.);
 	
 		// c
-		String configFile2 = testUtils.getPackageInputDirectory() + "CNTest/config2.xml";
 		CNControler cnControler2 = new CNControler();
-		cnControler2.run(null, configFile2, true, false, 0.);
+		String outputDirectory2 = testUtils.getOutputDirectory() + "c";
+		cnControler2.run(outputDirectory2, configFile1, true, false, 0.);
 			
 		// n
-		String configFile3 = testUtils.getPackageInputDirectory() + "CNTest/config3.xml";
 		CNControler cnControler3 = new CNControler();
-		cnControler3.run(null, configFile3, false, true, 0.);
+		String outputDirectory3 = testUtils.getOutputDirectory() + "n";
+		cnControler3.run(outputDirectory3, configFile1, false, true, 0.);
 		
 		// cn
-		String configFile4 = testUtils.getPackageInputDirectory() + "CNTest/config4.xml";
 		CNControler cnControler4 = new CNControler();
-		cnControler4.run(null, configFile4, true, true, 0.);
+		String outputDirectory4 = testUtils.getOutputDirectory() + "cn";
+		cnControler4.run(outputDirectory4, configFile1, true, true, 0.);
 		
 		// analyze output events file
-		LinkDemandEventHandler handler1 = analyzeEvents(configFile1); // base case
-		LinkDemandEventHandler handler2 = analyzeEvents(configFile2); // c
-		LinkDemandEventHandler handler3 = analyzeEvents(configFile3); // n
-		LinkDemandEventHandler handler4 = analyzeEvents(configFile4); // cn	
+		LinkDemandEventHandler handler1 = analyzeEvents(outputDirectory1, configFile1); // base case
+		LinkDemandEventHandler handler2 = analyzeEvents(outputDirectory2, configFile1); // c
+		LinkDemandEventHandler handler3 = analyzeEvents(outputDirectory3, configFile1); // n
+		LinkDemandEventHandler handler4 = analyzeEvents(outputDirectory4, configFile1); // cn	
+		
+		// no zero demand
+		Assert.assertEquals(true,
+				getBottleneckDemand(handler1) != 0 &&
+				getBottleneckDemand(handler2) != 0 &&
+				getBottleneckDemand(handler3) != 0 &&
+				getBottleneckDemand(handler4) != 0);
+		
+		// no zero demand
+		Assert.assertEquals(true,
+				getNoiseSensitiveRouteDemand(handler1) != 0 &&
+				getNoiseSensitiveRouteDemand(handler2) != 0 &&
+				getNoiseSensitiveRouteDemand(handler3) != 0 &&
+				getNoiseSensitiveRouteDemand(handler4) != 0);
 		
 		// test the direct elasticity
 		
@@ -149,6 +166,82 @@ public class CNTest {
 		controler.run();
 		
 	}
+	
+	/*
+	 * Tests if different travel disutility factories result in the same outcome.
+	 * 
+	 */
+	@Ignore
+	@Test
+	public final void test3() {
+		
+		String configFile1 = testUtils.getPackageInputDirectory() + "CNTest/config1.xml";		
+		
+		// 1:
+		
+		Config config1 = ConfigUtils.loadConfig(configFile1);
+		String outputDirectory1 = testUtils.getOutputDirectory() + "a";
+		config1.controler().setOutputDirectory(outputDirectory1);
+
+		Scenario scenario1 = ScenarioUtils.loadScenario(config1);
+		Controler controler1 = new Controler(scenario1);
+		
+		TollHandler tollHandler1 = new TollHandler(scenario1);
+
+		final CongestionTollTimeDistanceTravelDisutilityFactory factory1 = new CongestionTollTimeDistanceTravelDisutilityFactory(
+				new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config1.planCalcScore() ),
+				tollHandler1, config1.planCalcScore()
+			) ;
+		factory1.setSigma(0.);
+		factory1.setBlendFactor(0.1);
+		
+		controler1.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+				this.bindCarTravelDisutilityFactory().toInstance( factory1 );
+			}
+		}); 		
+		
+		controler1.addControlerListener(new MarginalCongestionPricingContolerListener(controler1.getScenario(), tollHandler1, new CongestionHandlerImplV3(controler1.getEvents(), controler1.getScenario())));
+		controler1.addOverridingModule(new OTFVisFileWriterModule());
+		controler1.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler1.run();
+
+		// 2: "deprecated way"
+		
+		Config config2 = ConfigUtils.loadConfig(configFile1);
+		String outputDirectory2 = testUtils.getOutputDirectory() + "b";
+		config2.controler().setOutputDirectory(outputDirectory2);
+
+		Scenario scenario2 = ScenarioUtils.loadScenario(config2);
+		Controler controler2 = new Controler(scenario2);
+		
+		TollHandler tollHandler2 = new TollHandler(scenario2);
+
+		final TollDisutilityCalculatorFactory factory2 = new TollDisutilityCalculatorFactory(tollHandler2, config2.planCalcScore());
+		controler2.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindCarTravelDisutilityFactory().toInstance(factory2);
+			}
+		});
+			
+		controler2.addControlerListener(new MarginalCongestionPricingContolerListener(controler2.getScenario(), tollHandler2, new CongestionHandlerImplV3(controler2.getEvents(), controler2.getScenario())));
+		controler2.addOverridingModule(new OTFVisFileWriterModule());
+		controler2.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler2.run();
+
+		// compare
+				
+		LinkDemandEventHandler handler1 = analyzeEvents(outputDirectory1, configFile1); // a
+		System.out.println("Bottleneck demand - (a): " + getBottleneckDemand(handler1)); // a
+		
+		LinkDemandEventHandler handler2 = analyzeEvents(outputDirectory2, configFile1); // b
+		System.out.println("Bottleneck demand - (b): " + getBottleneckDemand(handler2)); // b
+		
+		Assert.assertEquals("run a and b should result in the exact same outcome (without accounting for randomness!)", true, getBottleneckDemand(handler1) == getBottleneckDemand(handler2));
+
+	}
 
 	private int getNoiseSensitiveRouteDemand(LinkDemandEventHandler handler) {
 		int noiseSensitiveRouteDemand = 0;
@@ -174,7 +267,7 @@ public class CNTest {
 		return longUncongestedRouteDemand;
 	}
 
-	private LinkDemandEventHandler analyzeEvents(String configFile) {
+	private LinkDemandEventHandler analyzeEvents(String outputDirectory, String configFile) {
 
 		Config config = ConfigUtils.loadConfig(configFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -185,7 +278,7 @@ public class CNTest {
 		eventsManager.addHandler(handler);
 		
 		MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
-		reader.readFile(scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it.10/10.events.xml.gz");
+		reader.readFile(outputDirectory + "/ITERS/it.10/10.events.xml.gz");
 		
 		return handler;
 	}
