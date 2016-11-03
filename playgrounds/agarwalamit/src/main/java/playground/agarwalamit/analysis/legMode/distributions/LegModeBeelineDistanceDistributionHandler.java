@@ -91,13 +91,13 @@ public class LegModeBeelineDistanceDistributionHandler implements PersonDepartur
     }
 
     private double getDistanceBin(final double dist){ // dist = 1500
-        double distClass = 0.;
         for( int i = 0; i < this.distClasses.size() ; i++   ) {
-            if (i == this.distClasses.size() ) distClass = this.distClasses.get(i);
-            else if (dist > this.distClasses.get(i) && dist < this.distClasses.get(i+1) ) distClass = this.distClasses.get(i);
-            else throw new RuntimeException("Dist class for distance "+ dist+ "is not found.");
+            if (i == this.distClasses.size()-1 ) return this.distClasses.get(i);
+            else if (dist >= this.distClasses.get(i) && dist < this.distClasses.get(i+1) ) {
+                return this.distClasses.get(i);
+            }
         }
-        return distClass;
+        throw new RuntimeException("Dist class for distance "+ dist+ "is not found.");
     }
 
     public SortedMap<String, SortedMap<Double, Integer>> getMode2DistanceClass2LegCounts(){

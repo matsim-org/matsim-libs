@@ -125,7 +125,7 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
         modalShareEventHandler.reset(event.getIteration());
 
         //
-        String outFile = event.getServices().getConfig().controler().getOutputDirectory() + "ITERS/it."+event.getIteration()+"/"+event.getIteration()+".distanceDistri.txt";
+        String outFile = event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/it."+event.getIteration()+"/"+event.getIteration()+".distanceDistri.txt";
         this.distanceDistributionWriter.writeResults(outFile);
     }
 
