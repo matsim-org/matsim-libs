@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,55 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.synpop.data;
+package playground.johannes.synpop.processing;
+
+import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
- *
  */
-public interface CommonKeys {
-	
-	String PERSON_WEIGHT = "weight"; //TODO: rename to "weight" only
+public interface SegmentTask {
 
-	String LEG_START_TIME = "startTime";
-	
-	String LEG_END_TIME = "endTime";
-	
-	String LEG_PURPOSE = "purpose";
-
-	@Deprecated
-	String LEG_ROUNDTRIP = "roundTrip";
-	
-	String LEG_ROUTE_DISTANCE = "routeDistance";
-
-	String LEG_GEO_DISTANCE = "geoDistance";
-
-	String LEG_MODE = "mode";
-
-	String LEG_ROUTE = "route";
-
-	String ACTIVITY_TYPE = "type";
-	
-	String ACTIVITY_START_TIME = "startTime";
-	
-	String ACTIVITY_END_TIME = "endTime";
-	
-	String ACTIVITY_FACILITY = "activityFacility";
-	
-	String DELETE = "delete";
-	
-	String DAY = "day";
-
-	String DATA_SOURCE = "datasource";
-	
-	String HH_INCOME = "hhincome";
-	
-	String HH_MEMBERS = "hhmembers";
-	
-	String PERSON_AGE = "age";
-
-	String PERSON_SEX = "sex";
-
-	String PERSON_CARAVAIL = "caravail";
+    void apply(Segment segment);
 
 }
