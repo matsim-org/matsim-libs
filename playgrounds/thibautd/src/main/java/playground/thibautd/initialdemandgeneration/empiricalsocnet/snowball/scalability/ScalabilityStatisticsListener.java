@@ -32,7 +32,7 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSampler;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballLocator;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
-import playground.thibautd.utils.MonitoringUtils;
+import playground.ivt.utils.MonitoringUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

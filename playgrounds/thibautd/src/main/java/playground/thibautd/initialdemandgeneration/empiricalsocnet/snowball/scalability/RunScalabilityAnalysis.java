@@ -34,7 +34,7 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Soc
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplingConfigGroup;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SimpleSnowballModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballSamplingConfigGroup;
-import playground.thibautd.utils.MonitoringUtils;
+import playground.ivt.utils.MonitoringUtils;
 
 import java.io.IOException;
 import java.util.Random;

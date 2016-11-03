@@ -29,7 +29,7 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Cli
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplerUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplingConfigGroup;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.StopwatchCsvWriter;
-import playground.thibautd.utils.MonitoringUtils;
+import playground.ivt.utils.MonitoringUtils;
 
 /**
  * @author thibautd

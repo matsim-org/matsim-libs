@@ -16,38 +16,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.utils;
+package playground.ivt.utils;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import com.sun.management.GarbageCollectionNotificationInfo;
 import org.apache.log4j.Logger;
-import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.gbl.Gbl;
 
 import javax.management.NotificationBroadcaster;
 import javax.management.NotificationListener;
 import javax.management.openmbean.CompositeData;
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
-import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
 
 import static com.sun.management.GarbageCollectionNotificationInfo.GARBAGE_COLLECTION_NOTIFICATION;
-import static org.openstreetmap.osmosis.core.Osmosis.run;
-import static org.osgeo.proj4j.parser.Proj4Keyword.b;
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
 
 /**
  * @author thibautd
