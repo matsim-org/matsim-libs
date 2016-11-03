@@ -1,4 +1,4 @@
-package playground.paschke.relocation.controler;
+package playground.paschke.serviceAreas.controler;
 
 import java.util.Set;
 
