@@ -17,49 +17,75 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ikaddoura.decongestion.routing;
+package playground.ikaddoura.integrationCNE;
 
+import java.util.Set;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.emissions.EmissionModule;
+import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.benjamin.internalization.EmissionCostModule;
 import playground.vsp.congestion.handlers.TollHandler;
-import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutility;
 
 
 /**
+ * 
+ * Accounts for Congestion, Noise and Exhaust Emissions.
+ * 
  * @author ikaddoura
  *
  */
-public final class DecongestionTollTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
+public final class CNETimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
 
 	private double sigma = 0. ;
-	private TollTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory;
+	private RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;
+	private final EmissionModule emissionModule;
+	private final EmissionCostModule emissionCostModule;
+	private final NoiseContext noiseContext;
 	private final TollHandler tollHandler;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
+	private Set<Id<Link>> hotspotLinks = null;
 
-	public DecongestionTollTimeDistanceTravelDisutilityFactory(TollTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory, 
-			TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public CNETimeDistanceTravelDisutilityFactory(RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory, 
+			EmissionModule emissionModule, EmissionCostModule emissionCostModule, NoiseContext noiseContext, TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
+		this.randomizedTimeDistanceTravelDisutilityFactory = randomizedTimeDistanceTravelDisutilityFactory;
+		this.emissionModule = emissionModule;
+		this.emissionCostModule = emissionCostModule;
+		this.noiseContext = noiseContext;
 		this.tollHandler = tollHandler;
-		this.vttsTimeDistanceTravelDisutilityFactory = vttsTimeDistanceTravelDisutilityFactory;
 		this.cnScoringGroup = cnScoringGroup;
 	}
 
 	@Override
 	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		
-		vttsTimeDistanceTravelDisutilityFactory.setSigma(sigma);
+		randomizedTimeDistanceTravelDisutilityFactory.setSigma(sigma);
 		
-		return new CongestionTollTimeDistanceTravelDisutility(
-				vttsTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator),
+		return new CNETollTimeDistanceTravelDisutility(
+				randomizedTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator),
+				timeCalculator,
+				this.emissionModule,
+				this.emissionCostModule,
+				this.noiseContext,
 				this.tollHandler,
 				cnScoringGroup.getMarginalUtilityOfMoney(),
-				this.sigma
+				this.sigma,
+				this.hotspotLinks
 			);
 	}
 	
 	public void setSigma ( double val ) {
 		this.sigma = val;
+	}
+	
+	public void setHotspotLinks(Set<Id<Link>> hotspotLinks) {
+		this.hotspotLinks = hotspotLinks;
 	}
 }

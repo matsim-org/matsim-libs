@@ -46,12 +46,12 @@ public class OSMLanduseBasedDemancGenerator {
 	 * SCALEFACTOR of 1.5 * SCALEFACTOR 1.5 = 100%-Szenario SCALEFACTOR 0.15 =
 	 * 10%-Szenario SCALEFACTOR 0.015 = 1%-Szenario
 	 */
-	private static double SCALEFACTOR = 0.15;
+	private static double SCALEFACTOR = 0.375;
 
 	/*
 	 * adds some additional activities
 	 */
-	private static final boolean ENRICHPLANS = true;
+	private static final boolean ENRICHPLANS = false;
 
 	// ------ FIELDS NOT TO BE MODIFIED
 	// ------------------------------------------------------------------------------------//

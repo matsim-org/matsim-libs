@@ -16,10 +16,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.utils;
+package playground.ivt.utils;
 
 import com.sun.management.GarbageCollectionNotificationInfo;
 import org.apache.log4j.Logger;
+import org.matsim.core.gbl.Gbl;
 
 import javax.management.NotificationBroadcaster;
 import javax.management.NotificationListener;
@@ -29,13 +30,10 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
-import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
 
 import static com.sun.management.GarbageCollectionNotificationInfo.GARBAGE_COLLECTION_NOTIFICATION;
-import static org.osgeo.proj4j.parser.Proj4Keyword.b;
 
 /**
  * @author thibautd
@@ -79,6 +77,39 @@ public class MonitoringUtils {
 		}
 	}
 
+	public static AutoCloseable monitorAndLogOnClose() {
+		Gbl.printBuildInfo();
+		Gbl.printSystemInfo();
+
+		return closeable(
+				() -> log.info( "Summary Garbage Collector Statistics:" ),
+				notifyPeakUsageOnClose( p -> log.info( "Peak used memory after GC: "+formatMemory( p ) ) ),
+				notifyPeakCommitedOnClose( p -> log.info( "Peak commited memory after GC: "+formatMemory( p ) ) ),
+				notifyGCOverheadOnClose( o -> log.info( "GC Time Overhead: "+o+"%" ) ) );
+	}
+
+	private static AutoCloseable closeable( AutoCloseable... cs ) {
+		return () -> {
+			for ( AutoCloseable c : cs ) c.close();
+		};
+	}
+
+	private static String formatMemory( final long p ) {
+		return ((p/1048576)+1)+"MB";
+	}
+
+	public static void monitorAndLogAtEnd( final Call call ) {
+		try ( AutoCloseable monitorAndLogOnClose = monitorAndLogOnClose() ) {
+			call.call();
+		}
+		catch ( RuntimeException | Error e ) {
+			throw e;
+		}
+		catch ( Exception e ) {
+			throw new RuntimeException( e );
+		}
+	}
+
 	public static AutoCloseable notifyPeakUsageOnClose( final LongConsumer callback ) {
 		List<GarbageCollectorMXBean> gcbeans = ManagementFactory.getGarbageCollectorMXBeans();
 
@@ -115,6 +146,75 @@ public class MonitoringUtils {
 		};
 	}
 
+	public static AutoCloseable notifyPeakCommitedOnClose( final LongConsumer callback ) {
+		List<GarbageCollectorMXBean> gcbeans = ManagementFactory.getGarbageCollectorMXBeans();
+
+		final AtomicLong peak = new AtomicLong( -1 );
+
+		final NotificationListener notificationListener = ( notification, handback ) -> {
+			//we only handle GARBAGE_COLLECTION_NOTIFICATION notifications here
+			if ( !notification.getType().equals( GARBAGE_COLLECTION_NOTIFICATION ) ) {
+				return;
+			}
+			//get the information associated with this notification
+			GarbageCollectionNotificationInfo info = GarbageCollectionNotificationInfo.from( (CompositeData) notification.getUserData() );
+
+			final long totalAllocatedBytes =
+					info.getGcInfo().getMemoryUsageAfterGc().values().stream()
+						.mapToLong( MemoryUsage::getCommitted )
+						.sum();
+
+			peak.getAndUpdate( p -> totalAllocatedBytes > p ? totalAllocatedBytes : p );
+		};
+
+		//Install a notification handler for each bean
+		for ( GarbageCollectorMXBean gcbean : gcbeans ) {
+			NotificationBroadcaster emitter = (NotificationBroadcaster) gcbean;
+			emitter.addNotificationListener( notificationListener, null, null );
+		}
+
+		return () -> {
+			callback.accept( peak.get() );
+			for ( GarbageCollectorMXBean gcbean : gcbeans ) {
+				NotificationBroadcaster emitter = (NotificationBroadcaster) gcbean;
+				emitter.removeNotificationListener( notificationListener );
+			}
+		};
+	}
+
+	public static AutoCloseable notifyGCOverheadOnClose( final DoubleConsumer callback ) {
+		List<GarbageCollectorMXBean> gcbeans = ManagementFactory.getGarbageCollectorMXBeans();
+
+		final long startTime = System.currentTimeMillis();
+		final AtomicLong totalGcTime = new AtomicLong( 0 );
+
+		final NotificationListener notificationListener = ( notification, handback ) -> {
+			//we only handle GARBAGE_COLLECTION_NOTIFICATION notifications here
+			if ( !notification.getType().equals( GARBAGE_COLLECTION_NOTIFICATION ) ) {
+				return;
+			}
+			//get the information associated with this notification
+			GarbageCollectionNotificationInfo info = GarbageCollectionNotificationInfo.from( (CompositeData) notification.getUserData() );
+
+			totalGcTime.addAndGet( info.getGcInfo().getDuration() );
+		};
+
+		//Install a notification handler for each bean
+		for ( GarbageCollectorMXBean gcbean : gcbeans ) {
+			NotificationBroadcaster emitter = (NotificationBroadcaster) gcbean;
+			emitter.addNotificationListener( notificationListener, null, null );
+		}
+
+		return () -> {
+			final long endTime = System.currentTimeMillis();
+			callback.accept( totalGcTime.get() * 100d / (endTime - startTime) );
+			for ( GarbageCollectorMXBean gcbean : gcbeans ) {
+				NotificationBroadcaster emitter = (NotificationBroadcaster) gcbean;
+				emitter.removeNotificationListener( notificationListener );
+			}
+		};
+	}
+
 	public static void listenBytesUsageOnGC( final LongConsumer callback ) {
 		List<GarbageCollectorMXBean> gcbeans = ManagementFactory.getGarbageCollectorMXBeans();
 
@@ -140,4 +240,7 @@ public class MonitoringUtils {
 			emitter.addNotificationListener( notificationListener, null, null );
 		}
 	}
+
+	@FunctionalInterface
+	public interface Call { void call(); }
 }

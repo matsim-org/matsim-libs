@@ -59,6 +59,7 @@ public class TollTravelDisutilityCalculator implements TravelDisutility{
 		this.timeCalculator = timeCalculator;
 		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
 		this.distanceCostRateCar = cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate();
+		// ignores cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfDistance();
 		this.marginalUtlOfTravelTime = (-cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
 		this.tollHandler = tollHandler;
 		

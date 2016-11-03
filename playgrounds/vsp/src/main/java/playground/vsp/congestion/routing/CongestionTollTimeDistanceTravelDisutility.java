@@ -22,11 +22,8 @@ package playground.vsp.congestion.routing;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.vehicles.Vehicle;
-
-import com.google.inject.Inject;
 
 import playground.vsp.congestion.handlers.TollHandler;
 
@@ -46,13 +43,15 @@ public class CongestionTollTimeDistanceTravelDisutility implements TravelDisutil
 	 * 0.0 and 1.0 are valid. 0.0 means the old value will be kept, 1.0 means
 	 * the old value will be totally overwritten.
 	 */
-	private final double blendFactor = 1.0;
+	private final double blendFactor;
 	
 	public CongestionTollTimeDistanceTravelDisutility(TravelDisutility randomizedTimeDistanceTravelDisutility,
 			TollHandler tollHandler,
 			double marginalUtilityOfMoney,
-			double sigma) {
+			double sigma,
+			double blendFactor) {
 
+		this.blendFactor = blendFactor;
 		this.randomizedTimeDistanceTravelDisutility = randomizedTimeDistanceTravelDisutility;
 		this.tollHandler = tollHandler;
 		this.marginalUtilityOfMoney = marginalUtilityOfMoney;

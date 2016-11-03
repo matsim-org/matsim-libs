@@ -35,6 +35,10 @@ import org.matsim.core.utils.io.UncheckedIOException;
 /**
  * @author mrieser
  */
+/**
+ * @author nagel
+ *
+ */
 public abstract class ConfigUtils implements MatsimExtensionPoint {
 
 	public static Config createConfig(final String filename) {
@@ -176,6 +180,24 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 			maxStrategyId = Math.max(maxStrategyId, Long.parseLong(iterator.next().getId().toString()));
 		}
 		return Id.create(maxStrategyId + 1, StrategySettings.class);
+	}
+	
+	
+	/** 
+	 * Convenience method to all addOrGetModule with only two arguments.  
+	 * 
+	 * @param config
+	 * @param moduleClass
+	 * @return instance of moduleClass inside config
+	 */
+	public static <T extends ConfigGroup> T addOrGetModule( Config config, Class<T> moduleClass ) {
+		String groupName;
+		try {
+			groupName = moduleClass.newInstance().getName();
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new RuntimeException(e) ;
+		}
+		return addOrGetModule( config, groupName, moduleClass ) ;
 	}
 
 	/**

@@ -24,14 +24,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import playground.ivt.utils.MoreIOUtils;
-import playground.polettif.publicTransitMapping.workbench.Run;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesCsvWriter;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplerUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplingConfigGroup;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.StopwatchCsvWriter;
-
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
+import playground.ivt.utils.MonitoringUtils;
 
 /**
  * @author thibautd
@@ -45,7 +43,8 @@ public class RunSimpleCliquesSampling {
 
 		new ConfigWriter( config ).write( config.controler().getOutputDirectory()+"/output_config.xml" );
 
-		try ( final AutocloserModule closer = new AutocloserModule() ){
+		try ( final AutocloserModule closer = new AutocloserModule();
+				final AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose() ){
 			final SocialNetwork socialNetwork =
 					SocialNetworkSamplerUtils.sampleSocialNetwork(
 							config,
