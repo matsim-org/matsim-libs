@@ -24,8 +24,6 @@ import playground.ivt.utils.MonitoringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static sun.misc.PostVMInitHook.run;
-
 /**
  * @author thibautd
  */
