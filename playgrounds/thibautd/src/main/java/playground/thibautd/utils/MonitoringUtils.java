@@ -222,40 +222,6 @@ public class MonitoringUtils {
 		}
 	}
 
-	public static abstract class MonitoredMain {
-		public static void main( final String... args ) throws Exception {
-			Class<?> c = new Object() { }.getClass().getEnclosingClass();
-
-			Call main = null;
-
-			for (Method m : c.getDeclaredMethods()) {
-				final Main annotation = m.getAnnotation( Main.class );
-				if ( annotation != null ) {
-					if ( main != null ) throw new RuntimeException( "several main methods" );
-					if ( !Arrays.equals( m.getParameterTypes() ,
-							new Class[]{ String[].class } ) ) throw new RuntimeException( "Wrong main signature" );
-					main = () -> {
-						try {
-							m.invoke( null , (Object) args );
-						}
-						catch ( IllegalAccessException | InvocationTargetException e ) {
-							throw new RuntimeException( e );
-						}
-					};
-				}
-			}
-
-			monitorAndLogAtEnd( main );
-		}
-
-		/**
-		 * Annotate the "real" main method.
-		 */
-		@Documented
-		@Retention( RetentionPolicy.RUNTIME )
-		public @interface Main {}
-	}
-
 	@FunctionalInterface
 	public interface Call { void call(); }
 }
