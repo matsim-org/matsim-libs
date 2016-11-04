@@ -100,15 +100,17 @@ public final class AccessibilityCalculator {
 	@Deprecated // yyyyyy set from "outside"
 	private void initDefaultContributionCalculators(Map<String, TravelTime> travelTimes,
 			Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
+		// when done the following can be fully removed
+//		{
+//			final String mode = TransportMode.car;
+//			putAccessibilityCalculator(
+//					mode,
+//					new NetworkModeAccessibilityExpContributionCalculator(
+//							travelTimes.get(mode),
+//							travelDisutilityFactories.get(mode),
+//							scenario));
+//		}
 		{
-			final String mode = TransportMode.car;
-			putAccessibilityCalculator(
-					mode,
-					new NetworkModeAccessibilityExpContributionCalculator(
-							travelTimes.get(mode),
-							travelDisutilityFactories.get(mode),
-							scenario));
-		}{
 			final String mode = TransportMode.car;
 			putAccessibilityCalculator(
 					Modes4Accessibility.freeSpeed.name(),

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.GeoserverUpdater;
@@ -18,6 +19,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import com.vividsolutions.jts.geom.Envelope;
 
 public final class AccessibilityStartupListener implements StartupListener {
@@ -27,6 +29,12 @@ public final class AccessibilityStartupListener implements StartupListener {
 		@Inject Map<String, TravelTime> travelTimes;
 		@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 		@Inject ControlerListenerManager controlerListenerManager;
+		
+		// new
+		@Inject @Named(TransportMode.car) AccessibilityContributionCalculator carAccessibilityCalculator;
+//		@Inject @Named(TransportMode.bike) AccessibilityContributionCalculator bikeAccessibilityCalculator;
+		// TODO other modes
+		// end new
 		
 		final List<String> activityTypes;
 		final ActivityFacilities densityFacilities;
@@ -56,6 +64,10 @@ public final class AccessibilityStartupListener implements StartupListener {
 				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
 				ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(), cellSize);
 				accessibilityCalculator.setMeasuringPoints(measuringPoints);
+				// new
+				 accessibilityCalculator.putAccessibilityCalculator(TransportMode.car, carAccessibilityCalculator);
+				 // TODO other modes
+				// end new
 				ActivityFacilities activityFacilities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType);
 				GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, activityFacilities, 
 						ptMatrix, config, scenario, travelTimes, travelDisutilityFactories, envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(), cellSize);
