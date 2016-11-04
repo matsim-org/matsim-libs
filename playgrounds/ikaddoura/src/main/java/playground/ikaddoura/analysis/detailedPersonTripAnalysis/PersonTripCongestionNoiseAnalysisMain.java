@@ -112,6 +112,7 @@ public class PersonTripCongestionNoiseAnalysisMain {
 		config.network().setInputFile(networkFile);
 		log.info("network file: " + config.network().getInputFile());
 		config.network().setChangeEventsInputFile(null);
+		config.vehicles().setVehiclesFile(null);
 		
 		int finalIteration = config.controler().getLastIteration();
 		String eventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
