@@ -22,8 +22,8 @@
  */
 package playground.ikaddoura.integrationCNE;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -39,7 +39,6 @@ import org.matsim.contrib.emissions.example.EmissionControlerListener;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.noise.NoiseCalculationOnline;
 import org.matsim.contrib.noise.NoiseConfigGroup;
-import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.routing.NoiseTollTimeDistanceTravelDisutilityFactory;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
@@ -57,8 +56,13 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.InternalizationEmissionAndCongestion.EmissionCongestionTravelDisutilityCalculatorFactory;
+import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.joint.JointCalibrationControler;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
 import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
@@ -148,14 +152,14 @@ public class CNEControler {
 			
 		} else {
 			
-			configFile = "../../../runs-svn/decongestion/input/config.xml";
+			configFile = "../../../runs-svn/cne_test/input/config.xml";
 			sigma = 0.;
 			
-			congestionPricing = true;
-			noisePricing = true;
-			airPollutionPricing = true;
+			congestionPricing = false;
+			noisePricing = false;
+			airPollutionPricing = false;
 			
-			useTripAndAgentSpecificVTTSForRouting = true;
+			useTripAndAgentSpecificVTTSForRouting = false;
 			caseStudy = CaseStudy.Test;
 			
 //			airPollutionPricingApproach = AirPollutionPricingApproach.Emission;
@@ -167,9 +171,10 @@ public class CNEControler {
 	}
 
 	public void run() {
-		
+				
 		Config config = ConfigUtils.loadConfig(configFile);
-		Scenario scenario = ScenarioUtils.createScenario(config);
+		
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 
 		final VTTSHandler vttsHandler;
@@ -186,26 +191,6 @@ public class CNEControler {
 		
 		NoiseConfigGroup ncg = new NoiseConfigGroup();
 		controler.getConfig().addModule(ncg);
-				
-		// write the following information into the config file (noise module)...
-		
-		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"}; // TODO: move to config file
-		ncg.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
-				
-		ncg.setReceiverPointGap(100.);
-			
-		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"}; // TODO: move to config file
-		ncg.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForDamages);
-						
-		ncg.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
-				
-		ncg.setScaleFactor(10.); // TODO: move to config file
-		
-		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>(); // TODO: move to config file
-		tunnelLinkIDs.add(Id.create("108041", Link.class));
-		ncg.setTunnelLinkIDsSet(tunnelLinkIDs);
-		
-		ncg.setWriteOutputIteration(10);
 		
 		if (noisePricing) {	
 			ncg.setInternalizeNoiseDamages(true);
@@ -218,32 +203,43 @@ public class CNEControler {
 		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 		
 		// ########################## Air pollution ##########################
+				
+		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
+		controler.getConfig().addModule(ecg);
+		
+		ecg.setAverageColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_ColdStart_vehcat_2005average.txt");
+		ecg.setAverageWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_HOT_vehcat_2005average.txt");
+		ecg.setDetailedColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_ColdStart_SubSegm_2005detailed.txt");
+		ecg.setDetailedWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_HOT_SubSegm_2005detailed.txt");
+		
+		if (caseStudy.toString().equals(CaseStudy.Munich.toString())) {
+			
+			// Please move as much as possible scenario-specific setting to the config... We can then get rid of these lines of code.
+						
+			ecg.setEmissionRoadTypeMappingFile("../../../runs-svn/detEval/emissionCongestionInternalization/iatbr/input/roadTypeMapping.txt");
+			config.vehicles().setVehiclesFile("../../../runs-svn/detEval/emissionCongestionInternalization/iatbr/input/emissionVehicles_1pct.xml.gz");
+		
+			ecg.setUsingDetailedEmissionCalculation(true); 
+
+		} else if (caseStudy.toString().equals(CaseStudy.Berlin.toString())) {
+			
+			throw new RuntimeException("Not yet implemented. Aborting...");
+			// TODO: Use default factors, generate vehicles and roadtypes for berlin
+			
+		} else if (caseStudy.toString().equals(CaseStudy.Test.toString())) {
+			
+			ecg.setEmissionRoadTypeMappingFile("../../../runs-svn/cne_test/input/roadTypeMapping.txt");
+			ecg.setUsingDetailedEmissionCalculation(false); // ???
+			ecg.setUsingVehicleTypeIdAsVehicleDescription(false);
+
+		} else {
+			throw new RuntimeException("Unknown case study. Aborting...");
+		}
 		
 		String emissionEfficiencyFactor ="1.0";
 		String considerCO2Costs = "true";
 		String emissionCostFactor = "1.0";
 		
-		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		controler.getConfig().addModule(ecg);
-
-		ecg.setAverageColdEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_ColdStart_vehcat_2005average.txt");
-		ecg.setAverageWarmEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_HOT_vehcat_2005average.txt");
-		ecg.setDetailedColdEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_ColdStart_SubSegm_2005detailed.txt");
-		ecg.setDetailedWarmEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_HOT_SubSegm_2005detailed.txt");
-		
-		if (caseStudy.toString().equals(CaseStudy.Munich.toString())) {
-			
-			// Please move as much as possible scenario-specific setting to the config... We can then get rid of these lines of code.
-			
-			ecg.setEmissionRoadTypeMappingFile("../../munich/input/roadTypeMapping.txt"); // for Berlin: without this line of code
-			config.vehicles().setVehiclesFile("../../munich/input/emissionVehicles_1pct.xml.gz"); // for Berlin: without this line of code
-		
-		} else {
-			// use default vehicles
-		}
-		
-		ecg.setUsingDetailedEmissionCalculation(true); 
-
 		EmissionModule emissionModule = new EmissionModule(scenario);
 		emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
 		emissionModule.createLookupTables();
@@ -553,6 +549,36 @@ public class CNEControler {
 
 		PersonTripCongestionNoiseAnalysisMain analysis = new PersonTripCongestionNoiseAnalysisMain(controler.getConfig().controler().getOutputDirectory());
 		analysis.run();
+		
+		// delete unnecessary iterations folder here.
+		int firstIt = controler.getConfig().controler().getFirstIteration();
+		int lastIt = controler.getConfig().controler().getLastIteration();
+		String OUTPUT_DIR = config.controler().getOutputDirectory();
+		for (int index =firstIt+1; index <lastIt; index ++){
+			String dirToDel = OUTPUT_DIR+"/ITERS/it."+index;
+			Logger.getLogger(JointCalibrationControler.class).info("Deleting the directory "+dirToDel);
+			IOUtils.deleteDirectory(new File(dirToDel),false);
+		}
+		
+		// scenario-specific analysis
+		
+		if (caseStudy.toString().equals(CaseStudy.Munich.toString())) {
+			new File(OUTPUT_DIR+"/user-group-analysis/").mkdir();
+			String outputEventsFile = OUTPUT_DIR+"/output_events.xml.gz";
+			
+			{
+				String userGroup = MunichUserGroup.Urban.toString();
+				ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new MunichPersonFilter());
+				msc.run();
+				msc.writeResults(OUTPUT_DIR+"/user-group-analysis/modalShareFromEvents_"+userGroup+".txt");	
+			}
+			{
+				String userGroup = MunichUserGroup.Rev_Commuter.toString();
+				ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new MunichPersonFilter());
+				msc.run();
+				msc.writeResults(OUTPUT_DIR+"/user-group-analysis/modalShareFromEvents_"+userGroup+".txt");
+			}
+		}
 	}
 	
 }
