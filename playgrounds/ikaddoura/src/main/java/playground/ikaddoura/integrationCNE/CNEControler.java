@@ -102,6 +102,7 @@ public class CNEControler {
 	private static final Logger log = Logger.getLogger(CNEControler.class);
 
 	private static String configFile;
+	private static String outputDirectory;
 	private static double sigma;
 		
 	private static boolean congestionPricing;	
@@ -122,7 +123,7 @@ public class CNEControler {
 //		Emission, Exposure
 //	}
 
-	private enum CaseStudy {
+	protected enum CaseStudy {
 		Berlin, Munich, Test
 	}
 	
@@ -153,7 +154,6 @@ public class CNEControler {
 		} else {
 			
 			configFile = "../../../runs-svn/cne_test/input/config.xml";
-			sigma = 0.;
 			
 			congestionPricing = false;
 			noisePricing = false;
@@ -161,22 +161,40 @@ public class CNEControler {
 			
 			useTripAndAgentSpecificVTTSForRouting = false;
 			caseStudy = CaseStudy.Test;
+			outputDirectory = null;
+			
+			sigma = 0.;
 			
 //			airPollutionPricingApproach = AirPollutionPricingApproach.Emission;
 //			congestionPricingApproach = CongestionPricingApproach.Decongestion;
 		}
 				
 		CNEControler cnControler = new CNEControler();
-		cnControler.run();
+		cnControler.run(configFile, outputDirectory, congestionPricing, noisePricing, airPollutionPricing, caseStudy);
 	}
 
-	public void run() {
+	public void run(String configFile, String outputDirectory, boolean congestionPricing, boolean noisePricing, boolean airPollutionPricing, CaseStudy caseStudy) {
 				
 		Config config = ConfigUtils.loadConfig(configFile);
+		if (outputDirectory == null) {
+			if (config.controler().getOutputDirectory() == null || config.controler().getOutputDirectory() == "") {
+				throw new RuntimeException("Either provide an output directory in the config file or the controler. Aborting...");
+			} else {
+				log.info("Using the output directory given in the config file...");
+			}
+			
+		} else {
+			if (config.controler().getOutputDirectory() == null || config.controler().getOutputDirectory() == "") {
+				log.info("Using the output directory provided in the controler.");
+			} else {
+				log.warn("The output directory in the config file will overwritten by the directory provided in the controler.");
+			}
+			config.controler().setOutputDirectory(outputDirectory);
+		}
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-
+		
 		final VTTSHandler vttsHandler;
 		if (useTripAndAgentSpecificVTTSForRouting) {
 			log.info("Using the agent- and trip-specific VTTS for routing.");
@@ -186,7 +204,7 @@ public class CNEControler {
 			log.info("Using the approximate and uniform VTTS for routing: (-beta_traveling + beta_performing) / beta_money");
 			vttsHandler = null;
 		}
-				
+						
 		// ########################## Noise ##########################
 		
 		NoiseConfigGroup ncg = new NoiseConfigGroup();
@@ -207,15 +225,15 @@ public class CNEControler {
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		controler.getConfig().addModule(ecg);
 		
-		ecg.setAverageColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_ColdStart_vehcat_2005average.txt");
-		ecg.setAverageWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_HOT_vehcat_2005average.txt");
-		ecg.setDetailedColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_ColdStart_SubSegm_2005detailed.txt");
-		ecg.setDetailedWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_HOT_SubSegm_2005detailed.txt");
-		
 		if (caseStudy.toString().equals(CaseStudy.Munich.toString())) {
 			
 			// Please move as much as possible scenario-specific setting to the config... We can then get rid of these lines of code.
 						
+			ecg.setAverageColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_ColdStart_vehcat_2005average.txt");
+			ecg.setAverageWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_HOT_vehcat_2005average.txt");
+			ecg.setDetailedColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_ColdStart_SubSegm_2005detailed.txt");
+			ecg.setDetailedWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_HOT_SubSegm_2005detailed.txt");
+			
 			ecg.setEmissionRoadTypeMappingFile("../../../runs-svn/detEval/emissionCongestionInternalization/iatbr/input/roadTypeMapping.txt");
 			config.vehicles().setVehiclesFile("../../../runs-svn/detEval/emissionCongestionInternalization/iatbr/input/emissionVehicles_1pct.xml.gz");
 		
@@ -228,10 +246,8 @@ public class CNEControler {
 			
 		} else if (caseStudy.toString().equals(CaseStudy.Test.toString())) {
 			
-			ecg.setEmissionRoadTypeMappingFile("../../../runs-svn/cne_test/input/roadTypeMapping.txt");
-			ecg.setUsingDetailedEmissionCalculation(false); // ???
-			ecg.setUsingVehicleTypeIdAsVehicleDescription(false);
-
+			// everything specified in config
+			
 		} else {
 			throw new RuntimeException("Unknown case study. Aborting...");
 		}
