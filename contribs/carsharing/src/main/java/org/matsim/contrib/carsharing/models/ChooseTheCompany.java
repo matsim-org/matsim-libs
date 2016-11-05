@@ -7,6 +7,6 @@ import org.matsim.api.core.v01.population.Plan;
  */
 public interface ChooseTheCompany {
 	
-	public String pickACompany(Plan plan, Leg leg);
+	public String pickACompany(Plan plan, Leg leg, double now);
 
 }
