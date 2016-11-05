@@ -100,7 +100,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 			//=== here he chooses the company, type of vehicle and in the end vehicle ===
 			//=== possibly this could be moved to one method which decides based on the supply which vehicle to take
 			
-			String companyId = chooseCompany.pickACompany(plan, legToBeRouted);
+			String companyId = chooseCompany.pickACompany(plan, legToBeRouted, time);
 			String typeOfVehicle = chooseVehicleType.getPreferredVehicleType(plan, legToBeRouted);
 			vehicle = this.carsharingSupplyContainer.findClosestAvailableVehicle(startLink,
 					carsharingType, typeOfVehicle, companyId, searchDistance);
