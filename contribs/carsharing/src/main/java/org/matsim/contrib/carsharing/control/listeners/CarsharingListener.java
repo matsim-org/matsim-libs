@@ -42,9 +42,9 @@ public class CarsharingListener implements IterationEndsListener{
 			outLink.newLine();		
 		
 		for (Id<Person> personId: agentRentalsMap.keySet()) {
-			outLink.write(personId + ",");
+			//outLink.write(personId + ",");
 			for (RentalInfo i : agentRentalsMap.get(personId).getArr()) {
-				outLink.write(i.toString());
+				outLink.write(personId + "," + i.toString());
 				outLink.newLine();
 			}
 			
