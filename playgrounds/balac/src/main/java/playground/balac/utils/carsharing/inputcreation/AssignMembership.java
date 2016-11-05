@@ -27,9 +27,9 @@ public class AssignMembership extends MatsimXmlWriter {
 		
 		writeXmlHead();
 		
-		writeStartTag("membership", null);
+		writeStartTag("memberships", null);
 		writeMembership();
-		writeEndTag("membership");
+		writeEndTag("memberships");
 
 		close();
 	}
@@ -55,16 +55,21 @@ public class AssignMembership extends MatsimXmlWriter {
 		attsC2.add(new Tuple<>("id", "Mobility"));
 
 		List<Tuple<String, String>> attsF = new ArrayList<Tuple<String, String>>();
+		List<Tuple<String, String>> attsTW = new ArrayList<Tuple<String, String>>();
 
 		attsF.add(new Tuple<>("name", "freefloating"));
-		attsF.add(new Tuple<>("name", "twoway"));
+		attsTW.add(new Tuple<>("name", "twoway"));
 
 		writeStartTag("person", attsP);
 		writeStartTag("company", attsC);
 		writeStartTag("carsharing", attsF, true);
+		writeStartTag("carsharing", attsTW, true);
+
 		writeEndTag("company");
 		writeStartTag("company", attsC2);
 		writeStartTag("carsharing", attsF, true);
+		writeStartTag("carsharing", attsTW, true);
+
 		writeEndTag("company");
 		writeEndTag("person");
 
