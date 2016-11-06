@@ -1,6 +1,7 @@
 package playground.balac.contribs.carsharing.models;
 
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -15,6 +16,7 @@ import org.matsim.contrib.carsharing.manager.demand.RentalInfo;
 import org.matsim.contrib.carsharing.manager.demand.membership.MembershipContainer;
 import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContainer;
 import org.matsim.contrib.carsharing.models.ChooseTheCompany;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -56,10 +58,14 @@ public class ChooseTheCompanyPriceBased implements ChooseTheCompany {
 		rentalInfo.setEndTime(now + time); 
 		String chosenCompany = "";
 		double price = 0.0;
+		Random random = MatsimRandom.getRandom();
 		for(String companyName : availableCompanies) {
 			//estimate the rental price for each company
-			if (price == 0.0 || costCalculator.getCost(companyName, carsharingType, rentalInfo) < price)
+			if (price == 0.0 || costCalculator.getCost(companyName, carsharingType, rentalInfo) +
+					(random.nextDouble() - 0.5) / 1000.0 < price) {
 				chosenCompany = companyName;
+				price = costCalculator.getCost(companyName, carsharingType, rentalInfo);
+			}
 			
 		}
 		
