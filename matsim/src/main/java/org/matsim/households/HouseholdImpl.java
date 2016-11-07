@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -34,6 +35,8 @@ public class HouseholdImpl implements Household {
 	private List<Id<Person>> memberIds = null;
 	private List<Id<Vehicle>> vehicleDefinitionIds = null;
 	private Income income;
+	
+	private final Attributes attributes = new Attributes();
 	
 	public HouseholdImpl(Id<Household> id) {
 		this.id = id;
@@ -72,4 +75,9 @@ public class HouseholdImpl implements Household {
 		this.vehicleDefinitionIds = vehicleIds;
 	}
 
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
+	
 }
