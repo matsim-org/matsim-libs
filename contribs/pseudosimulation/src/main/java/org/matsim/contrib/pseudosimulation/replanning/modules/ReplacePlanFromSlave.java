@@ -19,7 +19,9 @@ public class ReplacePlanFromSlave implements PlanStrategy {
 
 	@Override
 	public void run(HasPlansAndId<Plan,Person> person) {
-		person.removePlan(person.getSelectedPlan());
+//		leave removing of plans to the plans remover. Thsi was initially so that the master always only had one plan in memory
+//		however, this doesn't have to be the case for all scenarios.
+//		person.removePlan(person.getSelectedPlan());
 		Plan plan = plans.get(person.getId().toString());
 		person.addPlan(plan);	
 		person.setSelectedPlan(plan);

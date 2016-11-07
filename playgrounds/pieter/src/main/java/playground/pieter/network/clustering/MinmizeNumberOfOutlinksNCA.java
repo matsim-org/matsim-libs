@@ -1,29 +1,29 @@
 package playground.pieter.network.clustering;
 
-import java.util.HashSet;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkReaderMatsimV2;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import java.util.HashSet;
+import java.util.TreeMap;
 
-public class IntraMaxNCA extends NodeClusteringAlgorithm {
-	private static final String ALGORITHMNAME = "IntraMAX";
+
+public class MinmizeNumberOfOutlinksNCA extends NodeClusteringAlgorithm {
+	private static final String ALGORITHMNAME = "MinimizeNumberOfOutlinks";
 	public static int NUMTHREADS=4;
-	public IntraMaxNCA(Network network, String linkMethodName,
-					   String[] argTypes, Object[] args){
+	public MinmizeNumberOfOutlinksNCA(Network network, String linkMethodName,
+									 String[] argTypes, Object[] args){
 		super(ALGORITHMNAME,network,linkMethodName,argTypes,args);
 	}
-	private IntraMaxNCA(Network network){
+	private MinmizeNumberOfOutlinksNCA(Network network){
 		super(ALGORITHMNAME, network);
 	}
 	@Override
 	protected NodeCluster findSingleInLinkClusters(
 			TreeMap<Integer, NodeCluster> clusters) {
-		double maxFlow = 0;
+		int minOutLinks = Integer.MAX_VALUE;
 		NodeCluster outCluster = null;
 		for (int i : clusters.keySet()) {
 			NodeCluster nc = clusters.get(i);
@@ -33,8 +33,9 @@ public class IntraMaxNCA extends NodeClusteringAlgorithm {
 					newCluster = new NodeCluster(cl.getFromCluster(), nc,
 							internalFlowMethod, internalFlowMethodParameters,
 							clusterSteps, cl.getFromCluster().getId());
-					if (newCluster.getDeltaFlow() > maxFlow) {
-						maxFlow = newCluster.getDeltaFlow();
+					int outLinkSize = newCluster.getOutLinkSize();
+					if (outLinkSize < minOutLinks) {
+						minOutLinks = outLinkSize;
 						outCluster = newCluster;
 					}
 				}
@@ -47,7 +48,7 @@ public class IntraMaxNCA extends NodeClusteringAlgorithm {
 	protected NodeCluster findNextCluster(
 			TreeMap<Integer, NodeCluster> currentNodeClusters, int clusterStep) {
 		NodeCluster bestCluster = null;
-		double bestValue = 0;
+		int bestValue = Integer.MAX_VALUE;
 		HashSet<ClusterCombo> viableClusterCombos = getViableClusterCombos(currentNodeClusters);
 		for (ClusterCombo cc : viableClusterCombos) {
 			String[] ccs = cc.getComboId().split("z");
@@ -57,12 +58,10 @@ public class IntraMaxNCA extends NodeClusteringAlgorithm {
 			NodeCluster nc = new NodeCluster(currentNodeClusters.get(i),
 					currentNodeClusters.get(j), this.internalFlowMethod,
 					internalFlowMethodParameters, clusterStep, 0);
-			double flowChange = nc.getInternalFlow()
-					- nc.getChild1().getInternalFlow()
-					- nc.getChild2().getInternalFlow();
+			int outLinkSize = nc.getOutLinkSize();
 
-			if (flowChange > bestValue) {
-				bestValue = flowChange;
+			if (outLinkSize < bestValue) {
+				bestValue = outLinkSize;
 				bestCluster = nc;
 			}
 
@@ -82,18 +81,18 @@ public class IntraMaxNCA extends NodeClusteringAlgorithm {
 		String fileName = args[1];
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
 				.createConfig());
-		MatsimNetworkReader nwr = new MatsimNetworkReader(scenario.getNetwork());
+		NetworkReaderMatsimV2 nwr = new NetworkReaderMatsimV2(scenario.getNetwork());
 		// nwr.readFile(args[0]);
 //		 nwr.readFile("F:/TEMP/smallnet.xml");
 		nwr.readFile(args[0]);
 //		 nwr.readFile("data/singaporev1/network/planningNetwork_CLEAN.xml");
-		IntraMaxNCA nca = new IntraMaxNCA(scenario.getNetwork(),
+		MinmizeNumberOfOutlinksNCA nca = new MinmizeNumberOfOutlinksNCA(scenario.getNetwork(),
 				"getCapacityTimesSpeed", null, null);
 		// ncr.run("getCapacity", new String[] { "java.lang.Double" },
 		// new Object[] { new Double(3600) });
 		nca.run();
 		new ClusterWriter().writeClusters(fileName,nca);
-		IntraMaxNCA nca2 = new IntraMaxNCA(scenario.getNetwork());
+		MinmizeNumberOfOutlinksNCA nca2 = new MinmizeNumberOfOutlinksNCA(scenario.getNetwork());
 		
 		new ClusterReader().readClusters(fileName, scenario.getNetwork(), nca2);
 		for(int i=0; i<=nca.getClusterSteps();i++){

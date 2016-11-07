@@ -97,7 +97,7 @@ public class NodeCluster {
 		newInterlinks = findInterLInks(nc1, nc2);
 		setInternalFlow(nc1, nc2, linkMethod, args, newInterlinks);
 		setDeltaFlow();
-		// setInFlowSum(linkMethod, args);
+//		 setInFlowSum(linkMethod, args);
 		// setOutFlowSum(linkMethod, args);
 		setInvocations(getInvocations() + 1);
 	}
@@ -450,13 +450,11 @@ public class NodeCluster {
 
 		@Override
 		public int compare(NodeCluster o1, NodeCluster o2) {
-			throw new RuntimeException("Commented out non-compiling code. Please check your code. mrieser/14dec2012");
-//			if (o1.getClusterStepFormed() == o2.getClusterStepFormed()) {
-//				return Integer.compare(o1.getId(), o2.getId());
-//			} else
-//
-//				return Integer.compare(o1.getClusterStepFormed(),
-//						o2.getClusterStepFormed());
+			if (o1.getClusterStepFormed() == o2.getClusterStepFormed()) {
+				return Integer.compare(o1.getId(), o2.getId());
+			} else
+				return Integer.compare(o1.getClusterStepFormed(),
+						o2.getClusterStepFormed());
 		}
 
 	}

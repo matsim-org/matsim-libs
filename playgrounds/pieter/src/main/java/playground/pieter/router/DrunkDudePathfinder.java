@@ -1,33 +1,40 @@
 package playground.pieter.router;
 
-import java.util.*;
-
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.network.io.NetworkReaderMatsimV2;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.vehicles.Vehicle;
+import playground.pieter.network.SimpleNetworkPainter;
 import playground.pieter.singapore.utils.Sample;
 
-public class StochasticRouter implements LeastCostPathCalculator {
+import java.util.*;
+
+public class DrunkDudePathfinder implements LeastCostPathCalculator {
     private final Network network;
     private final TravelDisutility travelCosts;
     private final TravelTime travelTimes;
-    // sensitivity parameter
+    // sensitivity parameter, making it smaller makes it less sensitive to distance
     private final double beta;
+    private SimpleNetworkPainter networkPainter;
 
-    public StochasticRouter(Network network, TravelDisutility travelCosts,
-                            TravelTime travelTimes, double beta) {
+    public DrunkDudePathfinder(Network network, TravelDisutility travelCosts,
+                               TravelTime travelTimes, double beta) {
         super();
         this.network = network;
         this.travelCosts = travelCosts;
@@ -39,85 +46,52 @@ public class StochasticRouter implements LeastCostPathCalculator {
     public Path calcLeastCostPath(Node fromNode, Node toNode, double starttime,
                                   Person person, Vehicle vehicle) {
 
-        // we are going to tag attributes to links and nodes
-        HashMap<Link, Double> linkCosts = new HashMap<>();
-        HashMap<Node, Double> nodeCosts = new HashMap<>();
-        ArrayList<Node> nodesToVisit = new ArrayList<>();
-        int nodeIndex = -1;
 
-        // iterate through the list of nodes
-        double nodeCost = 0;
-        Node currentNode = toNode;
-        while (nodeIndex < nodesToVisit.size()) {
-            if (nodeIndex >= 0) {
-                currentNode = nodesToVisit.get(nodeIndex);
-                nodeCost = nodeCosts.get(currentNode);
-            }
-            Collection<? extends Link> inLinks = currentNode.getInLinks()
-                    .values();
-            // post the cost to the node on the other side of the link
-            for (Link link : inLinks) {
-                if (!linkCosts.containsKey(link)) {
-                    double linkCost = travelCosts.getLinkTravelDisutility(link,
-                            0, person, vehicle);
-                    linkCosts.put(link, nodeCost + linkCost);
-
-                    Node nextNode = link.getFromNode();
-                    if (nodeCosts.containsKey(nextNode)) {
-                        if (nodeCosts.get(nextNode) > nodeCost + linkCost) {
-                            nodeCosts.put(nextNode, nodeCost + linkCost);
-                            nodesToVisit.add(nextNode);
-                        }
-                    } else {
-                        nodeCosts.put(nextNode, nodeCost + linkCost);
-                        nodesToVisit.add(nextNode);
-                    }
-                }
-            }
-            nodeIndex++;
-        }
-
-        // do the actual routing
         List<Node> nodes = new ArrayList<>();
         List<Link> links = new ArrayList<>();
         double travelTime = starttime;
         double travelCost = 0;
-        currentNode = fromNode;
-        double linkCost = 0;
+        Node currentNode = fromNode;
+        if (networkPainter != null) {
+            networkPainter.addForegroundPixel(fromNode.getId());
+            networkPainter.addForegroundPixel(toNode.getId());
+        }
         while (currentNode != toNode) {
-            List<Link> outLinks = new ArrayList<>();
-            outLinks.addAll(currentNode.getOutLinks().values());
-            double[] utils = new double[outLinks.size()];
-            // double[] probs = new double[outLinks.size()];
-            double total = 0;
-            nodeCost = nodeCosts.get(currentNode);
-            for (int i = 0; i < outLinks.size(); i++) {
-                utils[i] = -1;
-                // probs[i] = -1;
-                Link link = outLinks.get(i);
-                // never go upstream
-                linkCost = linkCosts.get(link);
-                double contribution = linkCost <= nodeCost ? Math.pow(linkCost, -1 * beta) : Math.pow(linkCost, -2 * beta);
-//				if (linkCost <= nodeCost) {
-////					double contribution = Math.exp(-1 * beta * linkCost);
-////					total += contribution;
-////					utils[i] = contribution;
-//					double contribution = Math.pow(linkCost,beta);
-//				}else{
-//					
-//				}
-                total += contribution;
-                utils[i] = contribution;
-            }
-            // convert utils>0 to probabilities
-            double sampleProb = MatsimRandom.getRandom().nextDouble() * total;
-            double currentCumulativeProb = 0;
+            Object[] outLinks = currentNode.getOutLinks().values().toArray();
+            //come up witha set of costs based on how much nearer (eucl) the link brings you to your destination,
+            // use them as probabilities of selecting the link
+            double[] cumulativeWeights = new double[outLinks.length];
+            double[] weights = new double[outLinks.length];
+            double[] dists = new double[outLinks.length];
+            double minCost = Double.POSITIVE_INFINITY;
+            double maxCost = 0;
             Link selection = null;
-            for (int i = 0; i < outLinks.size(); i++) {
-                if (utils[i] > 0) {
-                    currentCumulativeProb += utils[i];
-                    if (currentCumulativeProb >= sampleProb) {
-                        selection = outLinks.get(i);
+            for (int i = 0; i < outLinks.length; i++) {
+                double linkCost = CoordUtils.calcEuclideanDistance(toNode.getCoord(), ((Link) outLinks[i]).getToNode().getCoord());
+                if (((Link) outLinks[i]).getToNode().equals(toNode)) { //found destination, stop mucking about
+                    selection = (Link) outLinks[i];
+                    break;
+                }
+                dists[i] = linkCost;
+                minCost = Math.min(minCost, linkCost);
+                maxCost = Math.max(maxCost, linkCost);
+            }
+            for (int i = 0; i < outLinks.length; i++) {
+                double linkCost = dists[i] - minCost;
+                if (links.contains(outLinks[i]) || nodes.contains(((Link) outLinks[i]).getToNode())) {
+                    linkCost = 1e6 * (maxCost - minCost);
+                }
+                linkCost = Math.exp(-beta * linkCost);
+                linkCost = linkCost == 1 ? 2 : linkCost;
+                cumulativeWeights[i] = i > 0 ? cumulativeWeights[i - 1] + linkCost : linkCost;
+                weights[i] = linkCost;
+            }
+            if (selection == null) {
+                //sample if the destination has not been found
+                double sampleProb = MatsimRandom.getRandom().nextDouble() * cumulativeWeights[cumulativeWeights.length - 1];
+                for (int i = 0; i < outLinks.length; i++) {
+                    if (cumulativeWeights[i] >= sampleProb) {
+                        selection = (Link) outLinks[i];
                         links.add(selection);
                         nodes.add(currentNode);
                         travelCost += travelCosts.getLinkTravelDisutility(
@@ -125,26 +99,46 @@ public class StochasticRouter implements LeastCostPathCalculator {
                         travelTime += travelTimes.getLinkTravelTime(selection,
                                 travelTime, person, vehicle);
                         break;
-
-                        // ((Link)network.getLinks().get(selection.getId())).setCapacity(1000000000);
                     }
                 }
             }
+            if (networkPainter != null) {
+                networkPainter.addForegroundLine(selection.getId());
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             currentNode = selection.getToNode();
+
+
         }
-        // new NetworkWriter(network).write("data/testRouter.xml");
+        if (networkPainter != null) {
+            try {
+                Thread.sleep(500);
+                networkPainter.clearForeground();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         return new Path(nodes, links, travelTime, travelCost);
-        // return null;
+
     }
 
     public static void main(String[] args) {
         Scenario scenario;
-        MatsimRandom.reset(123);
         scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new NetworkReaderMatsimV2(scenario.getNetwork())
-                .readFile("/Users/fouriep/IdeaProjects/matsim/matsim/examples/siouxfalls-2014/Siouxfalls_network_PT.xml");
+                .readFile(args[0]);
         Network network = scenario.getNetwork();
-        StochasticRouter stochasticRouter = new StochasticRouter(network,
+        Network net = NetworkUtils.createNetwork();
+        Set<String> modes = new HashSet<>();
+        modes.add(TransportMode.car);
+        new TransportModeNetworkFilter(network).filter(net, modes);
+        new NetworkCleaner().run(net);
+        MatsimRandom.reset(123);
+        DrunkDudePathfinder stochasticRouter = new DrunkDudePathfinder(net,
                 new TravelDisutility() {
 
                     @Override
@@ -163,20 +157,26 @@ public class StochasticRouter implements LeastCostPathCalculator {
             public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
                 return link.getLength() / link.getFreespeed();
             }
-        }, 0.99);
+        }, 0.5);
+        SimpleNetworkPainter networkPainter = new SimpleNetworkPainter(400, 400);
+        networkPainter.setNetworkTransformation(network);
+        stochasticRouter.setNetworkPainter(networkPainter);
+//        stochasticRouter.calcLeastCostPath(network.getNodes().get(Id.createNodeId("11_311")),
+//                network.getNodes().get(Id.createNodeId("18_566")), 3600, null, null);
         Set<Node> nodeSet = new HashSet<>();
-        nodeSet.addAll(network.getNodes().values());
+        nodeSet.addAll(net.getNodes().values());
         Node[] nodesArray = nodeSet.toArray(new Node[nodeSet.size()]);
 
         long currentTimeMillis = -System.currentTimeMillis();
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 1e3; i++) {
             int[] ints = Sample.sampleMfromN(2, nodesArray.length);
+            System.out.println(nodesArray[ints[0]] + " " + nodesArray[ints[1]]);
             stochasticRouter.calcLeastCostPath(nodesArray[ints[0]], nodesArray[ints[1]], 3600, null, null);
         }
         currentTimeMillis += System.currentTimeMillis();
         System.out.println(currentTimeMillis);
 
-        Dijkstra dijkstra = new Dijkstra(network,
+        Dijkstra dijkstra = new Dijkstra(net,
                 new TravelDisutility() {
 
                     @Override
@@ -197,11 +197,15 @@ public class StochasticRouter implements LeastCostPathCalculator {
             }
         }, null);
         currentTimeMillis = -System.currentTimeMillis();
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 1e3; i++) {
             int[] ints = Sample.sampleMfromN(2, nodesArray.length);
             dijkstra.calcLeastCostPath(nodesArray[ints[0]], nodesArray[ints[1]], 3600, null, null);
         }
         currentTimeMillis += System.currentTimeMillis();
         System.out.println(currentTimeMillis);
+    }
+
+    public void setNetworkPainter(SimpleNetworkPainter networkPainter) {
+        this.networkPainter = networkPainter;
     }
 }

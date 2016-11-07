@@ -60,7 +60,7 @@ public class SwitchingMobsimProvider implements Provider<Mobsim> {
                 return QSimUtils.createDefaultQSim(scenario, eventsManager);
             }
         } else {
-            return new PSimFactory().createMobsim(scenario, eventsManager);
+            return mobSimSwitcher.getpSimFactory().get();
         }
     }
 

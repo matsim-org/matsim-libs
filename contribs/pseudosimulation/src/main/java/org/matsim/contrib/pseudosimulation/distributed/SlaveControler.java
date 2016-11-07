@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover;
-import org.matsim.contrib.common.randomizedtransitrouter.RandomizingTransitRouterModule;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
@@ -18,30 +17,22 @@ import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculatorSerial
 import org.matsim.contrib.pseudosimulation.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
 import org.matsim.contrib.pseudosimulation.mobsim.PSimFactory;
+import org.matsim.contrib.pseudosimulation.mobsim.SwitchingMobsimProvider;
 import org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
+import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.DefaultMobsimModule;
-import org.matsim.core.replanning.StrategyManagerModule;
-import org.matsim.core.router.TripRouterModule;
+import org.matsim.core.controler.events.*;
+import org.matsim.core.controler.listener.*;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
-import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.router.TransitRouter;
@@ -56,7 +47,7 @@ import java.util.*;
 
 //IMPORTANT: PSim produces events that are not in chronological order. This controler
 // will require serious overhaul if chronological order is enforced in all event manager implementations
-public class SlaveControler implements IterationStartsListener, StartupListener, BeforeMobsimListener, IterationEndsListener, Runnable {
+public class SlaveControler implements IterationStartsListener, StartupListener, BeforeMobsimListener, IterationEndsListener, ShutdownListener, Runnable {
     public static int numberOfPSimIterationsPerCycle;
     private final Scenario scenario;
     private final MemoryUsageCalculator memoryUsageCalculator;
@@ -65,6 +56,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private final boolean IntelligentRouters;
     private final Logger slaveLogger;
     private final PlanCatcher plancatcher;
+    private static double slaveMutationRate;
+    private final int numberOfPlansOnSlave;
     private boolean initialRouting;
     private int numberOfIterations = -1;
     private int executedPlanCount;
@@ -85,12 +78,15 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private boolean isOkForNextIter = true;
     private Map<Id<Person>, Double> selectedPlanScoreMemory;
     private TransitPerformance transitPerformance;
-    private void printHelp(Options options){
+    private TransitRouterEventsWSFactory transitRouterEventsWSFactory;
+
+    private void printHelp(Options options) {
         String header = "The MasterControler takes the following options:\n\n";
         String footer = "";
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("MasterControler", header, options, footer, true);
     }
+
     public SlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
         lastIterationStartTime = System.currentTimeMillis();
         System.setProperty("matsim.preferLocalDtds", "true");
@@ -101,9 +97,9 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 .withArgName("CONFIG.XML")
                 .isRequired(true)
                 .create("c"));
-        options.addOption("h","host", true, "Host name or IP");
+        options.addOption("h", "host", true, "Host name or IP");
         options.addOption("p", "port", true, "Port number of MasterControler");
-        options.addOption("t","threads", true, "Number of threads for parallel events handling.");
+        options.addOption("t", "threads", true, "Number of threads for parallel events handling.");
         CommandLineParser parser = new BasicParser();
         CommandLine commandLine = parser.parse(options, args);
 
@@ -179,12 +175,13 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         slaveLogger = Logger.getLogger(("SLAVE_" + myNumber));
 
         numberOfPSimIterationsPerCycle = reader.readInt();
+        numberOfPlansOnSlave = reader.readInt();
+        slaveMutationRate = reader.readDouble();
         slaveLogger.warn("Running " + numberOfPSimIterationsPerCycle + " PSim iterations for every QSim iter");
         config.controler().setLastIteration(reader.readInt());
         initialRouting = reader.readBoolean();
         boolean quickReplannning = reader.readBoolean();
         fullTransitPerformanceTransmission = reader.readBoolean();
-        boolean singaporeScenario = reader.readBoolean();
         boolean trackGenome = reader.readBoolean();
         IntelligentRouters = reader.readBoolean();
         boolean diversityGeneratingPlanSelection = reader.readBoolean();
@@ -201,53 +198,45 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         //limit IO
         config.linkStats().setWriteLinkStatsInterval(0);
         config.controler().setCreateGraphs(false);
-        config.controler().setWriteEventsInterval(1);
+        config.controler().setWriteEventsInterval(0);
         config.controler().setWritePlansInterval(0);
         config.controler().setWriteSnapshotsInterval(0);
+//        Important, otherwise Psim breaks
+        config.parallelEventHandling().setSynchronizeOnSimSteps(false);
+        config.parallelEventHandling().setNumberOfThreads(1);
+        if (slaveMutationRate > 0)
+            setReplanningWeights(config, slaveMutationRate);
+
         scenario = ScenarioUtils.loadScenario(config);
+
+        //experimental, not to be used
         DistributedPlanStrategyTranslationAndRegistration.TrackGenome = trackGenome;
+//        strategy substitution: mainly to register whether the option for quick replanning is to be used,
+//        as its original function is to mark plans for execution by PSim. But here, all plans are executed by PSim
+//        should rather be that PSim marks activities for execution in some other way
         DistributedPlanStrategyTranslationAndRegistration.substituteStrategies(config, quickReplannning, numberOfPSimIterationsPerCycle);
         matsimControler = new Controler(scenario);
         plancatcher = new PlanCatcher();
         DistributedPlanStrategyTranslationAndRegistration.registerStrategiesWithControler(this.matsimControler, plancatcher, quickReplannning, numberOfPSimIterationsPerCycle);
         matsimControler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+                true ?
+                        OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+                        OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
         matsimControler.addControlerListener(this);
-        linkTravelTimes = new FreeSpeedTravelTime();
+
+//        init traveltime for when non yet has been received from master
         travelTime = new ReplaceableTravelTime();
+        linkTravelTimes = new FreeSpeedTravelTime();
         travelTime.setTravelTime(linkTravelTimes);
-        pSimFactory = new PSimFactory();
-        matsimControler.setModules(new AbstractModule() {
+
+        pSimFactory = new PSimFactory(scenario, matsimControler.getEvents());
+        matsimControler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-//                include(new ScoreStatsModule());
-                install(new DefaultMobsimModule());
-                install(new TripRouterModule());
-                install(new CharyparNagelScoringFunctionModule());
-                install(new StrategyManagerModule());
-                if (IntelligentRouters)
-                    install(new TravelDisutilityModule());
-                else{
-                    final RandomizingTimeDistanceTravelDisutilityFactory disutilityFactory =
-                            new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
-                    matsimControler.addOverridingModule(new AbstractModule() {
-                        @Override
-                        public void install() {
-                            bindCarTravelDisutilityFactory().toInstance(disutilityFactory);
-                        }
-                    });
-                    disutilityFactory.setSigma(0.1);
-
-                }
-                bind(TravelTime.class).toInstance(travelTime);
-                if (getConfig().strategy().getPlanSelectorForRemoval().equals("DiversityGeneratingPlansRemover")) {
-                    bindPlanSelectorForRemoval().toProvider(DiversityGeneratingPlansRemover.Builder.class);
-                }
+                bindMobsim().toProvider(pSimFactory);
             }
         });
-//        new Thread(new TimesReceiver()).start();
+
         if (config.transit().isUseTransit()) {
 
             stopStopTimes = new StopStopTimeCalculatorSerializable(scenario.getTransitSchedule(),
@@ -258,22 +247,24 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                     config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config
                     .qsim().getEndTime() - config.qsim().getStartTime())).getWaitTimes();
 
-            //tell PlanSerializable to record transit routes
+            // tell PlanSerializable to record transit routes
             PlanSerializable.isUseTransit = true;
 
         }
-
-
-        if (IntelligentRouters) {
+        if (IntelligentRouters)
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
-                    bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(scenario, waitTimes, stopStopTimes));
+                    transitRouterEventsWSFactory = new TransitRouterEventsWSFactory(matsimControler.getScenario(),
+                            waitTimes,
+                            stopStopTimes);
+                    bind(TransitRouter.class).toProvider(transitRouterEventsWSFactory);
                 }
             });
-        } else {
+
+        else {
             final RandomizingTimeDistanceTravelDisutilityFactory disutilityFactory =
-                    new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
+                    new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config.planCalcScore());
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
@@ -281,31 +272,43 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 }
             });
             disutilityFactory.setSigma(0.1);
-            matsimControler.addOverridingModule(new RandomizingTransitRouterModule());
+
         }
+        matsimControler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bind(TravelTime.class).toInstance(travelTime);
+                if (scenario.getConfig().strategy().getPlanSelectorForRemoval().equals("DiversityGeneratingPlansRemover")) {
+                    bindPlanSelectorForRemoval().toProvider(DiversityGeneratingPlansRemover.Builder.class);
+                }
+            }
+        });
+
+
         if (trackGenome) {
 
         }
-        if(diversityGeneratingPlanSelection)
+        if (diversityGeneratingPlanSelection)
             matsimControler.getConfig().strategy().setPlanSelectorForRemoval("DiversityGeneratingPlansRemover");
         //no use for this, if you don't exactly know the communicationsMode of population when something goes wrong.
         // better to have plans written out every n successful iterations, specified in the config
         matsimControler.getConfig().controler().setDumpDataAtEnd(false);
+        matsimControler.getConfig().strategy().setMaxAgentPlanMemorySize(numberOfPlansOnSlave);
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
         SlaveControler slave = new SlaveControler(args);
         new Thread(slave).start();
-        System.out.printf("Enter KILL to kill the slave: ");
-        Scanner in = new Scanner(System.in);
-        String s;
-        boolean running = true;
-        do {
-            s = in.nextLine();
-            if (s.equals("KILL"))
-                running = false;
-        } while (running);
-        slave.requestShutDown();
+//        System.out.printf("Enter KILL to kill the slave: ");
+//        Scanner in = new Scanner(System.in);
+//        String s;
+//        boolean running = true;
+//        do {
+//            s = in.nextLine();
+//            if (s.equals("KILL"))
+//                running = false;
+//        } while (running);
+//        slave.requestShutDown();
     }
 
     public Config getConfig() {
@@ -342,7 +345,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     public void notifyIterationStarts(IterationStartsEvent event) {
         if (numberOfIterations >= 0 || initialRouting)
             iterationTimes.add(System.currentTimeMillis() - lastIterationStartTime);
-
+// send plans only after the previous iteration has completed
         if (initialRouting || (numberOfIterations > 0 && numberOfIterations % numberOfPSimIterationsPerCycle == 0)) {
             this.totalIterationTime = getTotalIterationTime();
             communications();
@@ -357,11 +360,10 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             pSimFactory.setStopStopTime(stopStopTimes);
             pSimFactory.setWaitTime(waitTimes);
             pSimFactory.setTransitPerformance(transitPerformance);
-//            if (matsimControler.getTransitRouterFactory() instanceof TransitRouterEventsWSFactory) {
-//                ((TransitRouterEventsWSFactory) matsimControler.getTransitRouterFactory()).setStopStopTime(stopStopTimes);
-//                ((TransitRouterEventsWSFactory) matsimControler.getTransitRouterFactory()).setWaitTime(waitTimes);
-//            }
-            throw new RuntimeException();
+            if (transitRouterEventsWSFactory != null) {
+                transitRouterEventsWSFactory.setStopStopTime(stopStopTimes);
+                transitRouterEventsWSFactory.setWaitTime(waitTimes);
+            }
         }
         plancatcher.init();
         numberOfIterations++;
@@ -528,9 +530,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                         slaveLogger.error("Got the kill signal from MASTER. Bye.");
                         Runtime.getRuntime().halt(0);
                         break;
-                    case DUMP_PLANS:
-                        dumpPlans();
-                        break;
+
                 }
                 // sending a boolean forces the thread on the master to wait
                 writer.writeBoolean(true);
@@ -550,13 +550,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         writer.writeObject(new SlaveScoreStatsCalculator().calculateScoreStats(scenario.getPopulation()));
     }
 
-    private void dumpPlans() throws IOException {
-        List<PersonSerializable> temp = new ArrayList<>();
-        for (Person p : scenario.getPopulation().getPersons().values())
-            temp.add(new PersonSerializable(p));
-        writer.writeObject(temp);
-    }
-
     private void slaveIsOKForNextIter() throws IOException {
         writer.writeBoolean(isOkForNextIter);
     }
@@ -566,9 +559,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         communications();
     }
 
-    public MatsimServices getMATSimControler() {
-        return matsimControler;
-    }
 
     public void addPlansForPsim(Plan plan) {
 
@@ -607,17 +597,47 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             scenario.getPopulation().getPersons().get(entry.getKey()).getSelectedPlan().setScore(entry.getValue());
         }
     }
-}
 
-class ReplaceableTravelTime implements TravelTime {
-    private TravelTime delegate;
+    private void setReplanningWeights(Config config, double mutationRate) {
+        if (mutationRate > 1)
+            mutationRate = 0.9999;
+        List<StrategyConfigGroup.StrategySettings> strategySettings = new ArrayList<>();
+        strategySettings.addAll(config.strategy().getStrategySettings());
+        Map<Integer, Double> selectors = new HashMap<>();
+        Map<Integer, Double> mutators = new HashMap<>();
+        for (int i = 0; i < strategySettings.size(); i++) {
+            StrategyConfigGroup.StrategySettings setting = strategySettings.get(i);
+            if (DistributedPlanStrategyTranslationAndRegistration.SupportedSelectors.keySet().contains(setting.getStrategyName()))
+                selectors.put(i, setting.getWeight());
+            else {
+                mutators.put(i, setting.getWeight());
+            }
+        }
+
+        double mutatorSum = CollectionUtils.sumElements(mutators.values());
+        double selectorSum = CollectionUtils.sumElements(selectors.values());
+        // set to new weight
+        for (Map.Entry<Integer, Double> entry : selectors.entrySet()) {
+            strategySettings.get(entry.getKey()).setWeight((1 - mutationRate) * entry.getValue() / selectorSum);
+        }
+        for (Map.Entry<Integer, Double> entry : mutators.entrySet()) {
+            strategySettings.get(entry.getKey()).setWeight(mutationRate * entry.getValue() / mutatorSum);
+        }
+        //put it back in the config
+        config.strategy().clearStrategySettings();
+        for (StrategyConfigGroup.StrategySettings strategySetting : strategySettings) {
+            config.strategy().addStrategySettings(strategySetting);
+        }
+    }
+
 
     @Override
-    public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-        return this.delegate.getLinkTravelTime(link, time, person, vehicle);
-    }
-
-    public void setTravelTime(TravelTime linkTravelTimes) {
-        this.delegate = linkTravelTimes;
+    public void notifyShutdown(ShutdownEvent event) {
+        //send the last iteratin's plans
+        this.totalIterationTime = getTotalIterationTime();
+        communications();
+        //wait for the kill signal from master
+        communications();
     }
 }
+
