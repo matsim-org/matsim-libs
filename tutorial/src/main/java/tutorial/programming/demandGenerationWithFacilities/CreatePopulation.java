@@ -87,12 +87,14 @@ class CreatePopulation {
 				 */
 				Person person = populationFactory.createPerson(Id.create(parts[index_personId], Person.class));
 
-				person.getCustomAttributes().put(PersonUtils.AGE, Integer.parseInt(parts[index_age]));
+//				person.getCustomAttributes().put(PersonUtils.AGE, Integer.parseInt(parts[index_age]));
+				PersonUtils.setAge(person, Integer.parseInt(parts[index_age]) );
 				
 				boolean employed = true;
 				if (parts[index_workLocation].equals("-1")) employed = false;
 				final Boolean employed1 = employed; 
-				person.getCustomAttributes().put(PersonUtils.EMPLOYED, employed1);
+//				person.getCustomAttributes().put(PersonUtils.EMPLOYED, employed1);
+				PersonUtils.setEmployed(person, employed1);
 				
 				population.addPerson(person);
 
