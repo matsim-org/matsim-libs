@@ -19,14 +19,14 @@
 
 package playground.dziemke.cemdapMatsimCadyts;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author dziemke
@@ -48,18 +48,18 @@ public class CensusReader {
 				
 		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName(filename);
-		tabFileParserConfig.setDelimiterRegex(";");
+		tabFileParserConfig.setDelimiterRegex(delimiter);
         new TabularFileParser().parse(tabFileParserConfig, new TabularFileHandler() {
-        	
+
             public void startRow(String[] row) {
-        		
+
         		// Municipalities have this pattern; counties etc. are not considered
         		if (row[1].length() == 2 && row[2].length() == 1 && row[3].length() == 2 && row[5].length() == 3) {
         			String municipality = row[1] + row[2] + row[3]+ row[5];
         			municipalitiesList.add(municipality);
         			LOG.info("municipality = " + municipality);
-        			
-        			Integer population = 0;
+
+        			Integer population;
         			if (!row[9].equals("-")) {
         				population = simplifyAndParseInteger(row[10]);
         			} else {
@@ -67,8 +67,8 @@ public class CensusReader {
         			}
         			LOG.info("population = " + population);
         			municipalities.putAttribute(municipality, "population", population);
-        			
-        			Integer populationMale = 0;
+
+        			Integer populationMale;
         			if (!row[10].equals("-")) {
         				populationMale = simplifyAndParseInteger(row[10]);
         			} else {
@@ -76,8 +76,8 @@ public class CensusReader {
         			}
         			LOG.info("populationMale = " + populationMale);
         			municipalities.putAttribute(municipality, "populationMale", populationMale);
-        			
-        			Integer populationFemale = 0;
+
+        			Integer populationFemale;
         			if (!row[11].equals("-")) {
         				populationFemale = simplifyAndParseInteger(row[11]);
         			} else {
@@ -86,7 +86,7 @@ public class CensusReader {
         			LOG.info("populationFemale = " + populationFemale);
         			municipalities.putAttribute(municipality, "populationFemale", populationFemale);
 
-        			Integer marriedMale = 0;
+        			Integer marriedMale;
         			if (!row[19].equals("-")) {
         				marriedMale = simplifyAndParseInteger(row[19]);
         			} else {
@@ -95,7 +95,7 @@ public class CensusReader {
         			LOG.info("marriedMale = " + marriedMale);
         			municipalities.putAttribute(municipality, "marriedMale", marriedMale);
 
-        			Integer marriedFemale = 0;
+        			Integer marriedFemale;
         			if (!row[20].equals("-")) {
         				marriedFemale = simplifyAndParseInteger(row[20]);
         			} else {
@@ -103,40 +103,338 @@ public class CensusReader {
         			}
         			LOG.info("marriedFemale = " + marriedFemale);
         			municipalities.putAttribute(municipality, "marriedFemale", marriedFemale);
-        			
+
         			// ##############
-        			
-        			Integer pop0_2 = 0;
+					// 0-2
+
+        			Integer pop0_2;
         			if (!row[72].equals("-")) {
-        				pop0_2 = simplifyAndParseInteger(row[73]) + simplifyAndParseInteger(row[76]);
+        				pop0_2 = simplifyAndParseInteger(row[72]);
         			} else {
         				pop0_2 = 0;
         			}
         			LOG.info("pop0_2 = " + pop0_2);
         			municipalities.putAttribute(municipality, "pop0-2", pop0_2);
-        			
-        			Integer pop0_2Male = 0;
+
+        			Integer pop0_2Male;
         			if (!row[73].equals("-")) {
-        				pop0_2Male = simplifyAndParseInteger(row[73]) + simplifyAndParseInteger(row[76]);
+        				pop0_2Male = simplifyAndParseInteger(row[73]);
         			} else {
         				pop0_2Male = 0;
         			}
         			LOG.info("pop0_2Male = " + pop0_2Male);
         			municipalities.putAttribute(municipality, "pop0_2Male", pop0_2Male);
-        			
-        			Integer pop0_2Female = 0;
+
+        			Integer pop0_2Female;
         			if (!row[74].equals("-")) {
-        				pop0_2Female = simplifyAndParseInteger(row[73]) + simplifyAndParseInteger(row[76]);
+        				pop0_2Female = simplifyAndParseInteger(row[74]);
         			} else {
         				pop0_2Female = 0;
         			}
         			LOG.info("pop0_2Female = " + pop0_2Female);
         			municipalities.putAttribute(municipality, "pop0_2Female", pop0_2Female);
-        			
-        			// ###############
-        			
-        			// TODO do the above also for other age groups in "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/zensus_2011/bevoelkerung/xlsx_Bevoelkerung.xlsx";
-        			// i.e. 3-5, 6-14, 15-17, ...
+
+					// ###############
+					// 3-5
+
+					Integer pop3_5;
+					if (!row[75].equals("-")) {
+						pop3_5 = simplifyAndParseInteger(row[75]);
+					} else {
+						pop3_5 = 0;
+					}
+					LOG.info("pop3_5 = " + pop3_5);
+					municipalities.putAttribute(municipality, "pop3_5", pop3_5);
+
+					Integer pop3_5Male;
+					if (!row[76].equals("-")) {
+						pop3_5Male = simplifyAndParseInteger(row[76]);
+					} else {
+						pop3_5Male = 0;
+					}
+					LOG.info("pop3_5Male = " + pop3_5Male);
+					municipalities.putAttribute(municipality, "pop3_5Male", pop3_5Male);
+
+					Integer pop3_5Female;
+					if (!row[77].equals("-")) {
+						pop3_5Female = simplifyAndParseInteger(row[77]);
+					} else {
+						pop3_5Female = 0;
+					}
+					LOG.info("pop3_5Female = " + pop3_5Female);
+					municipalities.putAttribute(municipality, "pop3_5Female", pop3_5Female);
+
+					// ###############
+					// 6-14
+
+					Integer pop6_14;
+					if (!row[78].equals("-")) {
+						pop6_14 = simplifyAndParseInteger(row[78]);
+					} else {
+						pop6_14 = 0;
+					}
+					LOG.info("pop6_14 = " + pop6_14);
+					municipalities.putAttribute(municipality, "pop6_14", pop6_14);
+
+					Integer pop6_14Male;
+					if (!row[79].equals("-")) {
+						pop6_14Male = simplifyAndParseInteger(row[79]);
+					} else {
+						pop6_14Male = 0;
+					}
+					LOG.info("pop6_14Male = " + pop6_14Male);
+					municipalities.putAttribute(municipality, "pop6_14Male", pop6_14Male);
+
+					Integer pop6_14Female;
+					if (!row[80].equals("-")) {
+						pop6_14Female = simplifyAndParseInteger(row[80]);
+					} else {
+						pop6_14Female = 0;
+					}
+					LOG.info("pop6_14Female = " + pop6_14Female);
+					municipalities.putAttribute(municipality, "pop6_14Female", pop6_14Female);
+
+					// ###############
+					// 15-17
+
+					Integer pop15_17;
+					if (!row[81].equals("-")) {
+						pop15_17 = simplifyAndParseInteger(row[81]);
+					} else {
+						pop15_17 = 0;
+					}
+					LOG.info("pop15_17 = " + pop15_17);
+					municipalities.putAttribute(municipality, "pop15_17", pop15_17);
+
+					Integer pop15_17Male;
+					if (!row[82].equals("-")) {
+						pop15_17Male = simplifyAndParseInteger(row[82]);
+					} else {
+						pop15_17Male = 0;
+					}
+					LOG.info("pop15_17Male = " + pop15_17Male);
+					municipalities.putAttribute(municipality, "pop15_17Male", pop15_17Male);
+
+					Integer pop15_17Female;
+					if (!row[83].equals("-")) {
+						pop15_17Female = simplifyAndParseInteger(row[83]);
+					} else {
+						pop15_17Female = 0;
+					}
+					LOG.info("pop15_17Female = " + pop15_17Female);
+					municipalities.putAttribute(municipality, "pop15_17Female", pop15_17Female);
+
+					// ###############
+					// 18-24
+
+					Integer pop18_24;
+					if (!row[84].equals("-")) {
+						pop18_24 = simplifyAndParseInteger(row[84]);
+					} else {
+						pop18_24 = 0;
+					}
+					LOG.info("pop18_24 = " + pop18_24);
+					municipalities.putAttribute(municipality, "pop18_24", pop18_24);
+
+					Integer pop18_24Male;
+					if (!row[85].equals("-")) {
+						pop18_24Male = simplifyAndParseInteger(row[85]);
+					} else {
+						pop18_24Male = 0;
+					}
+					LOG.info("pop18_24Male = " + pop18_24Male);
+					municipalities.putAttribute(municipality, "pop18_24Male", pop18_24Male);
+
+					Integer pop18_24Female;
+					if (!row[86].equals("-")) {
+						pop18_24Female = simplifyAndParseInteger(row[86]);
+					} else {
+						pop18_24Female = 0;
+					}
+					LOG.info("pop18_24Female = " + pop18_24Female);
+					municipalities.putAttribute(municipality, "pop18_24Female", pop18_24Female);
+
+					// ###############
+					// 25-29
+
+					Integer pop25_29;
+					if (!row[87].equals("-")) {
+						pop25_29 = simplifyAndParseInteger(row[87]);
+					} else {
+						pop25_29 = 0;
+					}
+					LOG.info("pop25_29 = " + pop25_29);
+					municipalities.putAttribute(municipality, "pop25_29", pop25_29);
+
+					Integer pop25_29Male;
+					if (!row[88].equals("-")) {
+						pop25_29Male = simplifyAndParseInteger(row[88]);
+					} else {
+						pop25_29Male = 0;
+					}
+					LOG.info("pop25_29Male = " + pop25_29Male);
+					municipalities.putAttribute(municipality, "pop25_29Male", pop25_29Male);
+
+					Integer pop25_29Female;
+					if (!row[89].equals("-")) {
+						pop25_29Female = simplifyAndParseInteger(row[89]);
+					} else {
+						pop25_29Female = 0;
+					}
+					LOG.info("pop25_29Female = " + pop25_29Female);
+					municipalities.putAttribute(municipality, "pop25_29Female", pop25_29Female);
+
+					// ###############
+					// 30-39
+
+					Integer pop30_39;
+					if (!row[90].equals("-")) {
+						pop30_39 = simplifyAndParseInteger(row[90]);
+					} else {
+						pop30_39 = 0;
+					}
+					LOG.info("pop30_39 = " + pop30_39);
+					municipalities.putAttribute(municipality, "pop30_39", pop30_39);
+
+					Integer pop30_39Male;
+					if (!row[91].equals("-")) {
+						pop30_39Male = simplifyAndParseInteger(row[91]);
+					} else {
+						pop30_39Male = 0;
+					}
+					LOG.info("pop30_39Male = " + pop30_39Male);
+					municipalities.putAttribute(municipality, "pop30_39Male", pop30_39Male);
+
+					Integer pop30_39Female;
+					if (!row[92].equals("-")) {
+						pop30_39Female = simplifyAndParseInteger(row[92]);
+					} else {
+						pop30_39Female = 0;
+					}
+					LOG.info("pop30_39Female = " + pop30_39Female);
+					municipalities.putAttribute(municipality, "pop30_39Female", pop30_39Female);
+
+					// ###############
+					// 40-49
+
+					Integer pop40_49;
+					if (!row[93].equals("-")) {
+						pop40_49 = simplifyAndParseInteger(row[93]);
+					} else {
+						pop40_49 = 0;
+					}
+					LOG.info("pop40_49 = " + pop40_49);
+					municipalities.putAttribute(municipality, "pop40_49", pop40_49);
+
+					Integer pop40_49Male;
+					if (!row[94].equals("-")) {
+						pop40_49Male = simplifyAndParseInteger(row[94]);
+					} else {
+						pop40_49Male = 0;
+					}
+					LOG.info("pop40_49Male = " + pop40_49Male);
+					municipalities.putAttribute(municipality, "pop40_49Male", pop40_49Male);
+
+					Integer pop40_49Female;
+					if (!row[95].equals("-")) {
+						pop40_49Female = simplifyAndParseInteger(row[95]);
+					} else {
+						pop40_49Female = 0;
+					}
+					LOG.info("pop40_49Female = " + pop40_49Female);
+					municipalities.putAttribute(municipality, "pop40_49Female", pop40_49Female);
+
+					// ###############
+					// 50-64
+
+					Integer pop50_64;
+					if (!row[96].equals("-")) {
+						pop50_64 = simplifyAndParseInteger(row[96]);
+					} else {
+						pop50_64 = 0;
+					}
+					LOG.info("pop50_64 = " + pop50_64);
+					municipalities.putAttribute(municipality, "pop50_64", pop50_64);
+
+					Integer pop50_64Male;
+					if (!row[97].equals("-")) {
+						pop50_64Male = simplifyAndParseInteger(row[97]);
+					} else {
+						pop50_64Male = 0;
+					}
+					LOG.info("pop50_64Male = " + pop50_64Male);
+					municipalities.putAttribute(municipality, "pop50_64Male", pop50_64Male);
+
+					Integer pop50_64Female;
+					if (!row[98].equals("-")) {
+						pop50_64Female = simplifyAndParseInteger(row[98]);
+					} else {
+						pop50_64Female = 0;
+					}
+					LOG.info("pop50_64Female = " + pop50_64Female);
+					municipalities.putAttribute(municipality, "pop50_64Female", pop50_64Female);
+
+					// ###############
+					// 65-74
+
+					Integer pop65_74;
+					if (!row[99].equals("-")) {
+						pop65_74 = simplifyAndParseInteger(row[99]);
+					} else {
+						pop65_74 = 0;
+					}
+					LOG.info("pop65_74 = " + pop65_74);
+					municipalities.putAttribute(municipality, "pop65_74", pop65_74);
+
+					Integer pop65_74Male;
+					if (!row[100].equals("-")) {
+						pop65_74Male = simplifyAndParseInteger(row[100]);
+					} else {
+						pop65_74Male = 0;
+					}
+					LOG.info("pop65_74Male = " + pop65_74Male);
+					municipalities.putAttribute(municipality, "pop65_74Male", pop65_74Male);
+
+					Integer pop65_74Female;
+					if (!row[101].equals("-")) {
+						pop65_74Female = simplifyAndParseInteger(row[101]);
+					} else {
+						pop65_74Female = 0;
+					}
+					LOG.info("pop65_74Female = " + pop65_74Female);
+					municipalities.putAttribute(municipality, "pop65_74Female", pop65_74Female);
+
+					// ###############
+					// 75Plus
+
+					Integer pop75Plus;
+					if (!row[102].equals("-")) {
+						pop75Plus = simplifyAndParseInteger(row[102]);
+					} else {
+						pop75Plus = 0;
+					}
+					LOG.info("pop75Plus = " + pop75Plus);
+					municipalities.putAttribute(municipality, "pop75Plus", pop75Plus);
+
+					Integer pop75PlusMale;
+					if (!row[103].equals("-")) {
+						pop75PlusMale = simplifyAndParseInteger(row[103]);
+					} else {
+						pop75PlusMale = 0;
+					}
+					LOG.info("pop75PlusMale = " + pop75PlusMale);
+					municipalities.putAttribute(municipality, "pop75PlusMale", pop75PlusMale);
+
+					Integer pop75PlusFemale;
+					if (!row[104].equals("-")) {
+						pop75PlusFemale = simplifyAndParseInteger(row[104]);
+					} else {
+						pop75PlusFemale = 0;
+					}
+					LOG.info("pop75PlusFemale = " + pop75PlusFemale);
+					municipalities.putAttribute(municipality, "pop75PlusFemale", pop75PlusFemale);
+
+					// ###############
 
 //        			Integer infantsMale = 0;
 //        			if (!row[73].equals("-") && !row[76].equals("-")) {
@@ -237,7 +535,7 @@ public class CensusReader {
         			LOG.info("employedMale = " + employedMale);
         			municipalities.putAttribute(municipality, "employedMale", employedMale);
 
-        			Integer employedFemale = 0;
+        			Integer employedFemale;
         			if (row.length > 123) { // Note: Length o row has to be considered here
         				employedFemale = simplifyAndParseInteger(row[155]);
         			} else {
@@ -246,7 +544,7 @@ public class CensusReader {
         			LOG.info("employedFemale = " + employedFemale);
         			municipalities.putAttribute(municipality, "employedFemale", employedFemale);
 
-        			Integer studying = 0;
+        			Integer studying;
         			if (row.length > 123) { // Note: Length o row has to be considered here
         				studying = simplifyAndParseInteger(row[194]);
         			} else {
@@ -254,7 +552,7 @@ public class CensusReader {
         			}
         			LOG.info("studying = " + studying);
         			municipalities.putAttribute(municipality, "studying", studying);
-        			
+
         			LOG.info("----------");
         		}
         	}
