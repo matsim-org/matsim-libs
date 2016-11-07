@@ -54,24 +54,23 @@
 
 <links capperiod="1:00:00">
 
+	<link id="link_3_1" from="3" to="1" length="2000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43"/>
+	<link id="link_1_2" from="1" to="2" length="10000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43"/>
+	<link id="link_2_6" from="2" to="6" length="2000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43"/>
+
+	<link id="link_3_6" from="3" to="6" length="16000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="86"/> <!-- low cost -->
+	
+	<link id="link_3_7" from="3" to="7" length="2000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="86"/> <!-- low cost -->
+	<link id="link_7_8" from="7" to="8" length="11000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="86"/> <!-- low cost -->
+	<link id="link_8_6" from="8" to="6" length="2000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="86"/> <!-- low cost -->
+
 	<link id="link_0_3" from="0" to="3" length="1000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43" />
 	<link id="link_3_0" from="3" to="0" length="1000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43"/>
-	
-	<link id="link_1_2" from="1" to="2" length="10000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43"/>
 	<link id="link_2_1" from="2" to="1" length="10000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43"/>
 	<link id="link_1_3" from="1" to="3" length="2000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43"/>
-	<link id="link_3_1" from="3" to="1" length="2000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43"/>
-	<link id="link_2_6" from="2" to="6" length="2000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43"/>
 	<link id="link_6_2" from="6" to="2" length="2000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43"/>
-
-	<link id="link_3_6" from="3" to="6" length="14000.00" capacity="7200" freespeed="2.778" modes="car" permlanes="1" type="86"/> <!-- low cost -->
-	<link id="link_3_7" from="3" to="7" length="2000.00" capacity="7200" freespeed="8.33" modes="car" permlanes="1" type="86"/> <!-- low cost -->
-	<link id="link_7_8" from="7" to="8" length="10000.00" capacity="7200" freespeed="8.33" modes="car" permlanes="1" type="86"/> <!-- low cost -->
-	<link id="link_8_6" from="8" to="6" length="2000.00" capacity="7200" freespeed="8.33" modes="car" permlanes="1" type="86"/> <!-- low cost -->
-	
 	<link id="link_6_9" from="6" to="9" length="1000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43"/>
 	<link id="link_9_6" from="9" to="6" length="1000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43"/>
-
 	<link id="link_10_11" from="10" to="11" length="5000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43"/>
 	<link id="link_11_12" from="11" to="12" length="5000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43"/>
 	<link id="link_12_11" from="12" to="11" length="5000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43"/>
