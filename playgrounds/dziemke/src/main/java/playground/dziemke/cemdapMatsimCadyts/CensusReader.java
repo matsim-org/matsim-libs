@@ -103,96 +103,130 @@ public class CensusReader {
         			}
         			LOG.info("marriedFemale = " + marriedFemale);
         			municipalities.putAttribute(municipality, "marriedFemale", marriedFemale);
-
-        			Integer infantsMale = 0;
-        			if (!row[73].equals("-") && !row[76].equals("-")) {
-        				infantsMale = simplifyAndParseInteger(row[73]) + simplifyAndParseInteger(row[76]);
+        			
+        			// ##############
+        			
+        			Integer pop0_2 = 0;
+        			if (!row[72].equals("-")) {
+        				pop0_2 = simplifyAndParseInteger(row[73]) + simplifyAndParseInteger(row[76]);
         			} else {
-        				infantsMale = 0;
+        				pop0_2 = 0;
         			}
-        			LOG.info("infantsMale = " + infantsMale);
-        			municipalities.putAttribute(municipality, "infantsMale", infantsMale);
-
-        			Integer infantsFemale;
-        			if (!row[74].equals("-") && !row[77].equals("-")) {
-        				infantsFemale = simplifyAndParseInteger(row[74]) + simplifyAndParseInteger(row[77]);
+        			LOG.info("pop0_2 = " + pop0_2);
+        			municipalities.putAttribute(municipality, "pop0-2", pop0_2);
+        			
+        			Integer pop0_2Male = 0;
+        			if (!row[73].equals("-")) {
+        				pop0_2Male = simplifyAndParseInteger(row[73]) + simplifyAndParseInteger(row[76]);
         			} else {
-        				infantsFemale = 0;
+        				pop0_2Male = 0;
         			}
-        			LOG.info("infantsFemale = " + infantsFemale);
-        			municipalities.putAttribute(municipality, "infantsFemale", infantsFemale);
-
-        			Integer childrenMale;
-        			if (!row[79].equals("-")) {
-        				childrenMale = simplifyAndParseInteger(row[79]);
+        			LOG.info("pop0_2Male = " + pop0_2Male);
+        			municipalities.putAttribute(municipality, "pop0_2Male", pop0_2Male);
+        			
+        			Integer pop0_2Female = 0;
+        			if (!row[74].equals("-")) {
+        				pop0_2Female = simplifyAndParseInteger(row[73]) + simplifyAndParseInteger(row[76]);
         			} else {
-        				childrenMale = 0;
+        				pop0_2Female = 0;
         			}
-        			LOG.info("childrenMale = " + childrenMale);
-        			municipalities.putAttribute(municipality, "childrenMale", childrenMale);
+        			LOG.info("pop0_2Female = " + pop0_2Female);
+        			municipalities.putAttribute(municipality, "pop0_2Female", pop0_2Female);
+        			
+        			// ###############
+        			
+        			// TODO do the above also for other age groups in "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/zensus_2011/bevoelkerung/xlsx_Bevoelkerung.xlsx";
+        			// i.e. 3-5, 6-14, 15-17, ...
 
-        			Integer childrenFemale;
-        			if (!row[80].equals("-")) {
-        				childrenFemale = simplifyAndParseInteger(row[80]);
-        			} else {
-        				childrenFemale = 0;
-        			}
-        			LOG.info("childrenFemale = " + childrenFemale);
-        			municipalities.putAttribute(municipality, "childrenFemale", childrenFemale);
-
-        			Integer adolescentsMale = 0;
-        			if (!row[82].equals("-") && !row[85].equals("-")) {
-        				adolescentsMale = simplifyAndParseInteger(row[82]) + simplifyAndParseInteger(row[85]);
-        			} else {
-        				adolescentsMale = 0;
-        			}
-        			LOG.info("adolescentsMale = " + adolescentsMale);
-        			municipalities.putAttribute(municipality, "adolescentsMale", adolescentsMale);
-
-        			Integer adolescentsFemale = 0;
-        			if (!row[83].equals("-") && !row[86].equals("-")) {
-        				adolescentsFemale = simplifyAndParseInteger(row[83]) + simplifyAndParseInteger(row[86]);
-        			} else {
-        				adolescentsFemale = 0;
-        			}
-        			LOG.info("adolescentsFemale = " + adolescentsFemale);
-        			municipalities.putAttribute(municipality, "adolescentsFemale", adolescentsFemale);
-
-        			Integer adultsMale = 0;
-        			if (!row[88].equals("-") && !row[91].equals("-") && !row[94].equals("-") && !row[97].equals("-")) {
-        				adultsMale = simplifyAndParseInteger(row[88]) + simplifyAndParseInteger(row[91]) + simplifyAndParseInteger(row[94]) + simplifyAndParseInteger(row[97]);
-        			} else {
-        				adultsMale = 0;
-        			}
-        			LOG.info("adultsMale = " + adultsMale);
-        			municipalities.putAttribute(municipality, "adultsMale", adultsMale);
-
-        			Integer adultsFemale = 0;
-        			if (!row[89].equals("-") && !row[92].equals("-") && !row[95].equals("-") && !row[98].equals("-")) {
-        				adultsFemale = simplifyAndParseInteger(row[89]) + simplifyAndParseInteger(row[92]) + simplifyAndParseInteger(row[95]) + simplifyAndParseInteger(row[98]);
-        			} else {
-        				adultsFemale = 0;
-        			}
-        			LOG.info("adultsFemale = " + adultsFemale);
-        			municipalities.putAttribute(municipality, "adultsFemale", adultsFemale);
-
-        			Integer seniorsMale = 0;
-        			if (!row[100].equals("-") && !row[103].equals("-")) {
-        				seniorsMale = simplifyAndParseInteger(row[100]) + simplifyAndParseInteger(row[103]);
-        			} else {
-        				seniorsMale = 0;
-        			}
-        			LOG.info("seniorsMale = " + seniorsMale);
-        			municipalities.putAttribute(municipality, "seniorsMale", seniorsMale);
-
-        			Integer seniorsFemale = 0;
-        			if (!row[101].equals("-") && !row[104].equals("-")) {
-        				seniorsFemale = simplifyAndParseInteger(row[101]) + simplifyAndParseInteger(row[104]);
-        			} else {
-        				seniorsFemale = 0;
-        			}
-        			LOG.info("seniorsFemale = " + seniorsFemale);
-        			municipalities.putAttribute(municipality, "seniorsFemale", seniorsFemale);
+//        			Integer infantsMale = 0;
+//        			if (!row[73].equals("-") && !row[76].equals("-")) {
+//        				infantsMale = simplifyAndParseInteger(row[73]) + simplifyAndParseInteger(row[76]);
+//        			} else {
+//        				infantsMale = 0;
+//        			}
+//        			LOG.info("infantsMale = " + infantsMale);
+//        			municipalities.putAttribute(municipality, "infantsMale", infantsMale);
+//
+//        			Integer infantsFemale;
+//        			if (!row[74].equals("-") && !row[77].equals("-")) {
+//        				infantsFemale = simplifyAndParseInteger(row[74]) + simplifyAndParseInteger(row[77]);
+//        			} else {
+//        				infantsFemale = 0;
+//        			}
+//        			LOG.info("infantsFemale = " + infantsFemale);
+//        			municipalities.putAttribute(municipality, "infantsFemale", infantsFemale);
+//
+//        			Integer childrenMale;
+//        			if (!row[79].equals("-")) {
+//        				childrenMale = simplifyAndParseInteger(row[79]);
+//        			} else {
+//        				childrenMale = 0;
+//        			}
+//        			LOG.info("childrenMale = " + childrenMale);
+//        			municipalities.putAttribute(municipality, "childrenMale", childrenMale);
+//
+//        			Integer childrenFemale;
+//        			if (!row[80].equals("-")) {
+//        				childrenFemale = simplifyAndParseInteger(row[80]);
+//        			} else {
+//        				childrenFemale = 0;
+//        			}
+//        			LOG.info("childrenFemale = " + childrenFemale);
+//        			municipalities.putAttribute(municipality, "childrenFemale", childrenFemale);
+//
+//        			Integer adolescentsMale = 0;
+//        			if (!row[82].equals("-") && !row[85].equals("-")) {
+//        				adolescentsMale = simplifyAndParseInteger(row[82]) + simplifyAndParseInteger(row[85]);
+//        			} else {
+//        				adolescentsMale = 0;
+//        			}
+//        			LOG.info("adolescentsMale = " + adolescentsMale);
+//        			municipalities.putAttribute(municipality, "adolescentsMale", adolescentsMale);
+//
+//        			Integer adolescentsFemale = 0;
+//        			if (!row[83].equals("-") && !row[86].equals("-")) {
+//        				adolescentsFemale = simplifyAndParseInteger(row[83]) + simplifyAndParseInteger(row[86]);
+//        			} else {
+//        				adolescentsFemale = 0;
+//        			}
+//        			LOG.info("adolescentsFemale = " + adolescentsFemale);
+//        			municipalities.putAttribute(municipality, "adolescentsFemale", adolescentsFemale);
+//
+//        			Integer adultsMale = 0;
+//        			if (!row[88].equals("-") && !row[91].equals("-") && !row[94].equals("-") && !row[97].equals("-")) {
+//        				adultsMale = simplifyAndParseInteger(row[88]) + simplifyAndParseInteger(row[91]) + simplifyAndParseInteger(row[94]) + simplifyAndParseInteger(row[97]);
+//        			} else {
+//        				adultsMale = 0;
+//        			}
+//        			LOG.info("adultsMale = " + adultsMale);
+//        			municipalities.putAttribute(municipality, "adultsMale", adultsMale);
+//
+//        			Integer adultsFemale = 0;
+//        			if (!row[89].equals("-") && !row[92].equals("-") && !row[95].equals("-") && !row[98].equals("-")) {
+//        				adultsFemale = simplifyAndParseInteger(row[89]) + simplifyAndParseInteger(row[92]) + simplifyAndParseInteger(row[95]) + simplifyAndParseInteger(row[98]);
+//        			} else {
+//        				adultsFemale = 0;
+//        			}
+//        			LOG.info("adultsFemale = " + adultsFemale);
+//        			municipalities.putAttribute(municipality, "adultsFemale", adultsFemale);
+//
+//        			Integer seniorsMale = 0;
+//        			if (!row[100].equals("-") && !row[103].equals("-")) {
+//        				seniorsMale = simplifyAndParseInteger(row[100]) + simplifyAndParseInteger(row[103]);
+//        			} else {
+//        				seniorsMale = 0;
+//        			}
+//        			LOG.info("seniorsMale = " + seniorsMale);
+//        			municipalities.putAttribute(municipality, "seniorsMale", seniorsMale);
+//
+//        			Integer seniorsFemale = 0;
+//        			if (!row[101].equals("-") && !row[104].equals("-")) {
+//        				seniorsFemale = simplifyAndParseInteger(row[101]) + simplifyAndParseInteger(row[104]);
+//        			} else {
+//        				seniorsFemale = 0;
+//        			}
+//        			LOG.info("seniorsFemale = " + seniorsFemale);
+//        			municipalities.putAttribute(municipality, "seniorsFemale", seniorsFemale);
 
         			Integer employedMale;
         			if (row.length > 123) { // Note: Length o row has to be considered here
