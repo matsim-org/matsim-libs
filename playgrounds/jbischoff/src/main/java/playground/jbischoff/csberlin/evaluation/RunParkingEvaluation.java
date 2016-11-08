@@ -64,14 +64,14 @@ public static void main(String[] args) {
 	das.addZone("mierendorff", JbUtils.readShapeFileAndExtractGeometry("../../../shared-svn/projects/bmw_carsharing/data/gis/mierendorffkiez.shp", "id").get("1"));
 	
 	events.addHandler(das);
-//	events.addHandler(pwde);
-//	events.addHandler(pvv);
-//	events.addHandler(wlp);
-//	events.addHandler(wlpFF);
-//	events.addHandler(mierendorffEval);
-//	events.addHandler(klausEval);
-	String dir = "D:/runs-svn/bmw_carsharing/run21/";
-	new ParkingSearchEventsReader(events).readFile(dir+"run21.output_events.xml.gz");
+	events.addHandler(pwde);
+	events.addHandler(pvv);
+	events.addHandler(wlp);
+	events.addHandler(wlpFF);
+	events.addHandler(mierendorffEval);
+	events.addHandler(klausEval);
+	String dir = "D:/runs-svn/bmw_carsharing/run22/";
+	new ParkingSearchEventsReader(events).readFile(dir+"run22.output_events.xml.gz");
 	pwde.writeEgressWalkStatistics(dir);
 	mierendorffEval.writeStats(dir+"mierendorffParkAndEgressStats.csv");
 	mierendorffEval.writeCoordTimeStamps(dir+"/mierendorffParkStamps.csv");

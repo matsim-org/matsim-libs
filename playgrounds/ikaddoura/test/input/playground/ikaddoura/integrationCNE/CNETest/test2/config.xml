@@ -23,7 +23,7 @@
 		<param name="snapshotFormat" value="otfvis" />
 		<param name="writeSnapshotsInterval" value="0" />
 		<param name="writeEventsInterval" value="10" />
-		<param name="writePlansInterval" value="1" />
+		<param name="writePlansInterval" value="10" />
 	</module>
 	
 	<module name="noise" >
@@ -44,7 +44,7 @@
 		<param name="receiverPointsGridMinX" value="0.0" />
 		<param name="receiverPointsGridMinY" value="0.0" />
 		<param name="relevantRadius" value="500.0" />
-		<param name="scaleFactor" value="1.0" />
+		<param name="scaleFactor" value="100.0" />
 		<param name="throwNoiseEventsAffected" value="true" />
 		<param name="throwNoiseEventsCaused" value="true" />
 		<param name="timeBinSizeNoiseComputation" value="3600.0" />
@@ -56,7 +56,7 @@
 	
 	<module name="emissions" >
 		<param name="averageFleetColdEmissionFactorsFile" value="../../../../../../../../contribs/emissions/test/input/org/matsim/contrib/emissions/sample_EFA_ColdStart_vehcat_2005average.txt" />
-		<param name="averageFleetWarmEmissionFactorsFile" value="sample_EFA_HOT_vehcat_2005average.txt" />
+		<param name="averageFleetWarmEmissionFactorsFile" value="test_EFA_HOT_vehcat_2005average.txt" />
 		<param name="detailedColdEmissionFactorsFile" value="" />
 		<param name="detailedWarmEmissionFactorsFile" value="" />
 		<param name="emissionRoadTypeMappingFile" value="roadTypeMapping.txt" />

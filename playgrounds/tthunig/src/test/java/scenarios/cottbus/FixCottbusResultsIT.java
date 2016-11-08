@@ -205,7 +205,7 @@ public class FixCottbusResultsIT {
 		config.vspExperimental().setWritingOutputEvents(false);
 		config.planCalcScore().setWriteExperiencedPlans(false);
 		config.controler().setCreateGraphs(false);
-
+		config.controler().setDumpDataAtEnd(false);
 		config.controler().setWriteEventsInterval(config.controler().getLastIteration());
 		config.controler().setWritePlansInterval(config.controler().getLastIteration());
 

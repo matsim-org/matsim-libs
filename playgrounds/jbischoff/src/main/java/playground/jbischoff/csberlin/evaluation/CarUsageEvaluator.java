@@ -50,18 +50,20 @@ import playground.jbischoff.utils.JbUtils;
  */
 public class CarUsageEvaluator {
 public static void main(String[] args) {
-	Geometry klaus = JbUtils.readShapeFileAndExtractGeometry("C:/Users/Joschka/Documents/shared-svn/projects/bmw_carsharing/data/gis/klaus.shp","id").get("0");
+//	Geometry geo = JbUtils.readShapeFileAndExtractGeometry("C:/Users/Joschka/Documents/shared-svn/projects/bmw_carsharing/data/gis/klaus.shp","id").get("0");
+	Geometry geo = JbUtils.readShapeFileAndExtractGeometry("C:/Users/Joschka/Documents/shared-svn/projects/bmw_carsharing/data/gis/mierendorffkiez.shp","id").get("1");
 	
 	Set<Id<Person>> firstCarUsers = new HashSet<>();
 	Set<Id<Person>> secondCarUsers = new HashSet<>();
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	new PopulationReader(scenario).readFile("D:/runs-svn/bmw_carsharing/run23/ITERS/it.0/run23.0.plans.xml.gz");
+	
+	new PopulationReader(scenario).readFile("D:/runs-svn/bmw_carsharing/run22/ITERS/it.0/run22.0.plans.xml.gz");
 	int persons = 0;
 	for (Person p : scenario.getPopulation().getPersons().values()){
 		
 		Plan plan = p.getSelectedPlan();
 		Activity hAct = (Activity) plan.getPlanElements().get(0);
-		if (!klaus.contains(MGC.coord2Point(hAct.getCoord()))){
+		if (!geo.contains(MGC.coord2Point(hAct.getCoord()))){
 			continue;
 		}
 		persons++;
@@ -76,11 +78,11 @@ public static void main(String[] args) {
 	}
 	
 	Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	new PopulationReader(scenario2).readFile("D:/runs-svn/bmw_carsharing/run23/ITERS/it.150/run23.150.plans.xml.gz");
+	new PopulationReader(scenario2).readFile("D:/runs-svn/bmw_carsharing/run22/ITERS/it.150/run22.150.plans.xml.gz");
 	for (Person p : scenario2.getPopulation().getPersons().values()){
 		Plan plan = p.getSelectedPlan();
 		Activity hAct = (Activity) plan.getPlanElements().get(0);
-		if (!klaus.contains(MGC.coord2Point(hAct.getCoord()))){
+		if (!geo.contains(MGC.coord2Point(hAct.getCoord()))){
 			continue;
 		}
 		for (PlanElement pe : plan.getPlanElements()){
