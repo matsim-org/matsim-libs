@@ -51,12 +51,12 @@ public class TripAnalyzerSrVNew {
 	private static final String INPUT_NETWORK_FILE = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 //	private static finalString shapeFile = "/Users/dominik/Workspace/data/srv/input/RBS_OD_STG_1412/RBS_OD_STG_1412.shp";
 
-	private static String OUTPUT_DIRECTORY = "../../../shared-svn/projects/cemdapMatsimCadyts/analysis/srv/output/wd_new";
+	private static final String OUTPUT_DIRECTORY = "../../../shared-svn/projects/cemdapMatsimCadyts/analysis/srv/output/wd_new";
 
 	/* Variables to store information */
 	private static double aggregatedWeightOfConsideredTrips = 0;
-	private static int numberOfInIncompleteTrips = 0;
-    
+//	private static int numberOfInIncompleteTrips = 0;
+
 	private static Map<String, Double> otherInformationMap = new TreeMap<>();
 
 	
@@ -65,11 +65,11 @@ public class TripAnalyzerSrVNew {
 	}
 
 	public static void analyze(String inputTripsFile, String inputPersonsFile, String inputNetworkFile, String outputDirectory) {
-		double aggregatedWeightOfTripsWithNonNegativeTimesAndDurations = 0;
-		double aggregatedWeightOfTripsWithNonNegativeDistanceBeelineSurvey = 0.;
-		double aggregatedWeightOfTripsWithNonNegativeDistanceRoutedSurvey = 0.;
-		double aggregatedWeightOfTripsWithCalculableSpeedBeelineSurvey = 0;
-		double aggregatedWeightOfTripsWithCalculableSpeedRoutedSurvey = 0;
+		double aggregatedWeightOfTripsWithNonNegativeTimesAndDurations;
+		double aggregatedWeightOfTripsWithNonNegativeDistanceBeelineSurvey;
+		double aggregatedWeightOfTripsWithNonNegativeDistanceRoutedSurvey;
+		double aggregatedWeightOfTripsWithCalculableSpeedBeelineSurvey;
+		double aggregatedWeightOfTripsWithCalculableSpeedRoutedSurvey;
 
 		//
 		String fromCRS = "EPSG:31468"; // GK4
@@ -133,15 +133,15 @@ public class TripAnalyzerSrVNew {
 
 		// reliant on variable "V_LAENGE": -9 = no data, -10 = implausible
 		aggregatedWeightOfTripsWithCalculableSpeedBeelineSurvey = countTripsWithCalculableSpeedBeelineInSurvey(trips); // SrV-specific, distances given by survey
-		Map<Integer, Double> averageTripSpeedBeelineMap = createAverageTripSpeedBeelineMap(trips, binWidthSpeed_km_h, network); // SrV-specific, distances given by survey
-		double averageOfAverageTripSpeedsBeeline_km_h = calculateAverageOfAverageTripSpeedsBeeline_km_h(trips, network); // SrV-specific, distances given by survey
+		Map<Integer, Double> averageTripSpeedBeelineMap = createAverageTripSpeedBeelineMap(trips, binWidthSpeed_km_h); // SrV-specific, distances given by survey
+		double averageOfAverageTripSpeedsBeeline_km_h = calculateAverageOfAverageTripSpeedsBeeline_km_h(trips); // SrV-specific, distances given by survey
 		writer.writeToFileIntegerKey(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeeline.txt", binWidthSpeed_km_h, aggregatedWeightOfTripsWithCalculableSpeedBeelineSurvey, averageOfAverageTripSpeedsBeeline_km_h);
 		writer.writeToFileIntegerKeyCumulative(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeelineCumulative.txt", binWidthSpeed_km_h, aggregatedWeightOfTripsWithCalculableSpeedBeelineSurvey, averageOfAverageTripSpeedsBeeline_km_h);
 
 		// reliant to SrV variable variable "E_LAENGE_KUERZEST"; -7 = calculation not possible
 		aggregatedWeightOfTripsWithCalculableSpeedRoutedSurvey = countTripsWithCalculableSpeedRoutedInSurvey(trips); // SrV-specific, distances given by survey
-		Map<Integer, Double> averageTripSpeedRoutedMap = createAverageTripSpeedRoutedMap(trips, binWidthSpeed_km_h, network); // SrV-specific, distances given by survey
-		double averageOfAverageTripSpeedsRouted_km_h = calculateAverageOfAverageTripSpeedsRouted_km_h(trips, network); // SrV-specific, distances given by survey
+		Map<Integer, Double> averageTripSpeedRoutedMap = createAverageTripSpeedRoutedMap(trips, binWidthSpeed_km_h); // SrV-specific, distances given by survey
+		double averageOfAverageTripSpeedsRouted_km_h = calculateAverageOfAverageTripSpeedsRouted_km_h(trips); // SrV-specific, distances given by survey
 		writer.writeToFileIntegerKey(averageTripSpeedRoutedMap, outputDirectory + "/averageTripSpeedRouted.txt", binWidthSpeed_km_h, aggregatedWeightOfTripsWithCalculableSpeedRoutedSurvey, averageOfAverageTripSpeedsRouted_km_h);
 
 		/* Other information */
@@ -151,11 +151,11 @@ public class TripAnalyzerSrVNew {
 		otherInformationMap.put("Aggregated weight of trips that have negative distance (routed, from survey)", aggregatedWeightOfConsideredTrips - aggregatedWeightOfTripsWithNonNegativeDistanceRoutedSurvey);
 		otherInformationMap.put("Aggregated weight of trips that have no calculable speed (beeline)", aggregatedWeightOfConsideredTrips - aggregatedWeightOfTripsWithCalculableSpeedBeelineSurvey);
 		otherInformationMap.put("Aggregated weight of trips that have no calculable speed (routed)", aggregatedWeightOfConsideredTrips - aggregatedWeightOfTripsWithCalculableSpeedRoutedSurvey);
-		otherInformationMap.put("Number of incomplete trips (i.e. number of removed agents)", (double) numberOfInIncompleteTrips);
+//		otherInformationMap.put("Number of incomplete trips (i.e. number of removed agents)", (double) numberOfInIncompleteTrips);
 		otherInformationMap.put("Aggregated weight of (complete) trips", aggregatedWeightOfConsideredTrips);
 		writer.writeToFileOther(otherInformationMap, outputDirectory + "/otherInformation.txt");
 
-		log.info(numberOfInIncompleteTrips + " trips are incomplete.");
+//		log.info(numberOfInIncompleteTrips + " trips are incomplete.");
 
 	    /* Create plans and events */
 		TreeMap<Id<Person>, TreeMap<Double, Trip>> personTripsMap = createPersonTripsMap(trips);
@@ -163,7 +163,7 @@ public class TripAnalyzerSrVNew {
 	}
 	
 	/* SrV-specific calculations using distances given by survey instead of own calculated distances */
-	static double countTripsWithNonnegativeDistanceBeelineInSurvey(List<Trip> trips) {
+	private static double countTripsWithNonnegativeDistanceBeelineInSurvey(List<Trip> trips) {
 		double counter = 0.;
 		for (Trip trip : trips) {
 			if (trip.getDistanceBeelineFromSurvey_m() >= 0) {
@@ -173,7 +173,7 @@ public class TripAnalyzerSrVNew {
 		return counter;
 	}	
 	
-	static Map<Integer, Double> createTripDistanceBeelineMap(List<Trip> trips, int binWidthDistance_km) {
+	private static Map<Integer, Double> createTripDistanceBeelineMap(List<Trip> trips, int binWidthDistance_km) {
 		Map<Integer, Double> tripDistanceBeelineMap = new TreeMap<>();
 		for (Trip trip : trips) {
 			if (trip.getDistanceBeelineFromSurvey_m() >= 0) {
@@ -184,7 +184,7 @@ public class TripAnalyzerSrVNew {
 		return tripDistanceBeelineMap;
 	}
 
-	static double calculateAverageTripDistanceBeeline_km(List<Trip> trips) {
+	private static double calculateAverageTripDistanceBeeline_km(List<Trip> trips) {
 		double sumOfAllDistancesBeeline_km = 0.;
 		double sumOfAllWeights = 0.;
 		for (Trip trip : trips) {
@@ -196,7 +196,7 @@ public class TripAnalyzerSrVNew {
 		return sumOfAllDistancesBeeline_km / sumOfAllWeights;
 	}
 	
-	static double countTripsWithNonnegativeDistanceRoutedInSurvey(List<Trip> trips) {
+	private static double countTripsWithNonnegativeDistanceRoutedInSurvey(List<Trip> trips) {
 		double counter = 0.;
 		for (Trip trip : trips) {
 			if (trip.getDistanceRoutedShortestFromSurvey_m() >= 0) {
@@ -206,7 +206,7 @@ public class TripAnalyzerSrVNew {
 		return counter;
 	}
 	
-	static Map<Integer, Double> createTripDistanceRoutedMap(List<Trip> trips, int binWidthDistance_km) {
+	private static Map<Integer, Double> createTripDistanceRoutedMap(List<Trip> trips, int binWidthDistance_km) {
     	Map<Integer, Double> tripDistanceRoutedMap = new TreeMap<>();
     	for (Trip trip : trips) {
     		if (trip.getDistanceRoutedShortestFromSurvey_m() >= 0) {
@@ -217,7 +217,7 @@ public class TripAnalyzerSrVNew {
     	return tripDistanceRoutedMap;
     }
 	
-	static double calculateAverageTripDistanceRouted_km(List<Trip> trips) {
+	private static double calculateAverageTripDistanceRouted_km(List<Trip> trips) {
 		double sumOfAllDistancesRouted_km = 0.;
 		double sumOfAllWeights = 0.;
 		for (Trip trip : trips) {
@@ -229,7 +229,7 @@ public class TripAnalyzerSrVNew {
 		return sumOfAllDistancesRouted_km / sumOfAllWeights;
 	}
 	
-	static double countTripsWithCalculableSpeedBeelineInSurvey(List<Trip> trips) {
+	private static double countTripsWithCalculableSpeedBeelineInSurvey(List<Trip> trips) {
 		double counter = 0.;
 		for (Trip trip : trips) {
 			double tripDuration_h = (trip.getDurationByCalculation_s() / 3600.);
@@ -240,8 +240,8 @@ public class TripAnalyzerSrVNew {
 		}
 		return counter;
 	}
-	
-	static Map<Integer, Double> createAverageTripSpeedBeelineMap(List<Trip> trips, int binWidthSpeed_km_h, Network network) {
+
+	private static Map<Integer, Double> createAverageTripSpeedBeelineMap(List<Trip> trips, int binWidthSpeed_km_h) {
 		Map<Integer, Double> averageTripSpeedBeelineMap = new TreeMap<>();
 		for (Trip trip : trips) {
 			double tripDuration_h = (trip.getDurationByCalculation_s() / 3600.);
@@ -253,7 +253,7 @@ public class TripAnalyzerSrVNew {
 		return averageTripSpeedBeelineMap;
 	}
 
-	static double calculateAverageOfAverageTripSpeedsBeeline_km_h(List<Trip> trips, Network network) {
+	private static double calculateAverageOfAverageTripSpeedsBeeline_km_h(List<Trip> trips) {
 		double sumOfAllAverageSpeedsBeeline_km_h = 0.;
 		double sumOfAllWeights = 0.;
 		for (Trip trip : trips) {
@@ -267,7 +267,7 @@ public class TripAnalyzerSrVNew {
 		return sumOfAllAverageSpeedsBeeline_km_h / sumOfAllWeights;
 	}
 
-	static double countTripsWithCalculableSpeedRoutedInSurvey(List<Trip> trips) {
+	private static double countTripsWithCalculableSpeedRoutedInSurvey(List<Trip> trips) {
 		double counter = 0.;
 		for (Trip trip : trips) {
 			double tripDuration_h = (trip.getDurationByCalculation_s() / 3600.);
@@ -278,8 +278,8 @@ public class TripAnalyzerSrVNew {
 		}
 		return counter;
 	}
-	
-	static Map<Integer, Double> createAverageTripSpeedRoutedMap(List<Trip> trips, int binWidthSpeed_km_h, Network network) {
+
+	private static Map<Integer, Double> createAverageTripSpeedRoutedMap(List<Trip> trips, int binWidthSpeed_km_h) {
     	Map<Integer, Double> averageTripSpeedRoutedMap = new TreeMap<>();
     	for (Trip trip : trips) {
     		double tripDuration_h = (trip.getDurationByCalculation_s() / 3600.);
@@ -290,8 +290,8 @@ public class TripAnalyzerSrVNew {
     	}
     	return averageTripSpeedRoutedMap;
     }
-	
-	static double calculateAverageOfAverageTripSpeedsRouted_km_h(List<Trip> trips, Network network) {
+
+	private static double calculateAverageOfAverageTripSpeedsRouted_km_h(List<Trip> trips) {
 		double sumOfAllAverageSpeedsRouted_km_h = 0.;
 		double sumOfAllWeights = 0.;
 		for (Trip trip : trips) {
@@ -304,22 +304,21 @@ public class TripAnalyzerSrVNew {
     	}
 		return sumOfAllAverageSpeedsRouted_km_h / sumOfAllWeights;
 	}
-	
-	static TreeMap<Id<Person>, TreeMap<Double, Trip>> createPersonTripsMap(List<Trip> trips) {
-		TreeMap<Id<Person>, TreeMap<Double, Trip>> personTripsMap = new TreeMap<Id<Person>, TreeMap<Double, Trip>>();
+
+	private static TreeMap<Id<Person>, TreeMap<Double, Trip>> createPersonTripsMap(List<Trip> trips) {
+		TreeMap<Id<Person>, TreeMap<Double, Trip>> personTripsMap = new TreeMap<>();
 		
 		for (Trip trip : trips) {
 			String personId = trip.getPersonId().toString();
 			Id<Person> idPerson = Id.create(personId, Person.class);
 			
 			if (!personTripsMap.containsKey(idPerson)) {
-				TreeMap<Double, Trip> tripsMap = new TreeMap<Double, Trip>();
-				personTripsMap.put(idPerson, tripsMap);
+				personTripsMap.put(idPerson, new TreeMap<>());
 			}
 		
 			double departureTime_s = trip.getDepartureTime_s();
 			if (personTripsMap.get(idPerson).containsKey(departureTime_s)) {
-				new RuntimeException("Person may not have two activites ending at the exact same time.");
+				throw new RuntimeException("Person may not have two activites ending at the exact same time.");
 			} else {
 				personTripsMap.get(idPerson).put(departureTime_s, trip);
 			}
