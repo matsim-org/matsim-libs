@@ -75,16 +75,17 @@ public class NoiseOfflineCalculationIK {
 			
 		} else {
 			
-			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/";
-			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/";
-			receiverPointGap = 25.;
+			runDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
+			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_detailed/";
+			receiverPointGap = 50.;
 			lastIteration = 100;
-			timeBinSize = 900.;
+			timeBinSize = 3600.;
 		}
 		
 		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
 		config.network().setInputFile(runDirectory + "output_network.xml.gz");
-		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
+//		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
+		config.plans().setInputFile(null);
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(lastIteration);		
 						
@@ -94,11 +95,11 @@ public class NoiseOfflineCalculationIK {
 		
 		noiseParameters.setReceiverPointGap(receiverPointGap);
 		
-		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
-		double xMin = 4590855.;
-		double yMin = 5819679.;
-		double xMax = 4594202.;
-		double yMax = 5821736.;
+//		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
+//		double xMin = 4590855.;
+//		double yMin = 5819679.;
+//		double xMax = 4594202.;
+//		double yMax = 5821736.;
 		
 //		// Berlin Coordinates: Area around the Tempelhofer Feld 4591900,5813265 : 4600279,5818768
 //		double xMin = 4591900.;
@@ -112,11 +113,11 @@ public class NoiseOfflineCalculationIK {
 //		double xMax = 4620323.;
 //		double yMax = 5839639.;
 
-//      // Berlin Coordinates: Berlin area
-//		double xMin = 4575415.;
-//		double yMin = 5809450.;
-//		double xMax = 4615918.;
-//		double yMax = 5832532.;
+      // Berlin Coordinates: Berlin area
+		double xMin = 4575415.;
+		double yMin = 5809450.;
+		double xMax = 4615918.;
+		double yMax = 5832532.;
 		
 //      // Berlin Coordinates: Hundekopf
 //		double xMin = 4583187.;
@@ -150,11 +151,11 @@ public class NoiseOfflineCalculationIK {
 		
 		// ################################
 		
-		noiseParameters.setUseActualSpeedLevel(true);
+		noiseParameters.setUseActualSpeedLevel(false);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(false);
 		noiseParameters.setScaleFactor(10.);
-		noiseParameters.setComputePopulationUnits(true);
-		noiseParameters.setComputeNoiseDamages(true);
+		noiseParameters.setComputePopulationUnits(false);
+		noiseParameters.setComputeNoiseDamages(false);
 		noiseParameters.setInternalizeNoiseDamages(false);
 		noiseParameters.setComputeCausingAgents(false);
 		noiseParameters.setThrowNoiseEventsAffected(false);
