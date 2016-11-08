@@ -61,7 +61,7 @@ public class CensusReader {
 
         			Integer population;
         			if (!row[9].equals("-")) {
-        				population = simplifyAndParseInteger(row[10]);
+        				population = simplifyAndParseInteger(row[9]);
         			} else {
         				population = 0;
         			}
