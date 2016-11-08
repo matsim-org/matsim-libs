@@ -89,7 +89,7 @@ public class PersonUtils {
 	 */
 	public static void setSex(Person person, final String sex) {
 		person.getCustomAttributes().put(SEX_ATTRIBUTE, sex);
-		person.getAttributes().putAttribute( SEX_ATTRIBUTE, sex ) ;
+//		person.getAttributes().putAttribute( SEX_ATTRIBUTE, sex ) ;
 	}
 
 	/**
