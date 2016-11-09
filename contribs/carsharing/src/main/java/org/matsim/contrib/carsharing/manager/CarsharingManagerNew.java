@@ -61,7 +61,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 		
 		boolean keepTheCar = keepTheCarModel.keepTheCarDuringNextActivity(0.0, plan.getPerson(), carsharingType);	
 		//TODO: create a method for getting the search distance
-		double searchDistance = 5000.0;
+		double searchDistance = 1000.0;
 		if (vehicle != null) {
 			
 			if (willHaveATripFromLocation && keepTheCar) {
@@ -101,38 +101,42 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 			//=== possibly this could be moved to one method which decides based on the supply which vehicle to take
 			
 			String companyId = chooseCompany.pickACompany(plan, legToBeRouted, time);
-			String typeOfVehicle = chooseVehicleType.getPreferredVehicleType(plan, legToBeRouted);
-			vehicle = this.carsharingSupplyContainer.findClosestAvailableVehicle(startLink,
-					carsharingType, typeOfVehicle, companyId, searchDistance);
-			if (vehicle == null)
-				return null;			
-			CompanyContainer companyContainer = this.carsharingSupplyContainer.getCompany(companyId);
-			
-			VehiclesContainer vehiclesContainer = companyContainer.getVehicleContainer(carsharingType);
-			Link stationLink = vehiclesContainer.getVehicleLocation(vehicle);
-			companyContainer.reserveVehicle(vehicle);
-			
-			eventsManager.processEvent(new StartRentalEvent(time, carsharingType, startLink, stationLink, person.getId(), vehicle.getVehicleId()));
-			
-			if (willHaveATripFromLocation && keepTheCar) {
-				return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, carsharingType, vehicle,
-						stationLink, destinationLink, true, false);
-			}
-			else {
-				if (carsharingType.equals("oneway")) {
-					Link parkingStationLink = this.carsharingSupplyContainer.findClosestAvailableParkingSpace(
-							destinationLink, carsharingType, companyId, searchDistance);
-					if (parkingStationLink == null)
-						return null;
-					
-					vehiclesContainer.reserveParking(parkingStationLink);
-					
-					destinationLink = parkingStationLink;
+			if (!companyId.equals("")) {
+				String typeOfVehicle = chooseVehicleType.getPreferredVehicleType(plan, legToBeRouted);
+				vehicle = this.carsharingSupplyContainer.findClosestAvailableVehicle(startLink,
+						carsharingType, typeOfVehicle, companyId, searchDistance);
+				if (vehicle == null)
+					return null;			
+				CompanyContainer companyContainer = this.carsharingSupplyContainer.getCompany(companyId);
+				
+				VehiclesContainer vehiclesContainer = companyContainer.getVehicleContainer(carsharingType);
+				Link stationLink = vehiclesContainer.getVehicleLocation(vehicle);
+				companyContainer.reserveVehicle(vehicle);
+				
+				eventsManager.processEvent(new StartRentalEvent(time, carsharingType, startLink, stationLink, person.getId(), vehicle.getVehicleId()));
+				
+				if (willHaveATripFromLocation && keepTheCar) {
+					return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, carsharingType, vehicle,
+							stationLink, destinationLink, true, false);
 				}
-
-				return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, carsharingType, vehicle,
-						stationLink, destinationLink, false, false);				
-			}			
+				else {
+					if (carsharingType.equals("oneway")) {
+						Link parkingStationLink = this.carsharingSupplyContainer.findClosestAvailableParkingSpace(
+								destinationLink, carsharingType, companyId, searchDistance);
+						if (parkingStationLink == null)
+							return null;
+						
+						vehiclesContainer.reserveParking(parkingStationLink);
+						
+						destinationLink = parkingStationLink;
+					}
+	
+					return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, carsharingType, vehicle,
+							stationLink, destinationLink, false, false);				
+				}	
+			}
+			else
+				return null;
 		}					
 	}
 	
