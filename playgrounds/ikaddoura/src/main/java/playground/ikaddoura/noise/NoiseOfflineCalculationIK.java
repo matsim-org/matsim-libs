@@ -76,16 +76,15 @@ public class NoiseOfflineCalculationIK {
 		} else {
 			
 			runDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
-			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_detailed/";
-			receiverPointGap = 50.;
+			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_2016-11-09_rpGap100/";
+			receiverPointGap = 100.;
 			lastIteration = 100;
 			timeBinSize = 3600.;
 		}
 		
 		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
 		config.network().setInputFile(runDirectory + "output_network.xml.gz");
-//		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
-		config.plans().setInputFile(null);
+		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(lastIteration);		
 						
@@ -137,13 +136,13 @@ public class NoiseOfflineCalculationIK {
 		noiseParameters.setReceiverPointsGridMaxY(yMax);
 		
 //		 Berlin Activity Types
-		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+//		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 //		String[] consideredActivitiesForDamages = {"home"};
 //		String[] consideredActivitiesForDamages = {"work"};
 //		String[] consideredActivitiesForDamages = {"educ_primary", "educ_secondary", "educ_higher", "kiga"};
 //		String[] consideredActivitiesForDamages = {"leisure"};
 //		String[] consideredActivitiesForDamages = {"home", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForDamages);
+//		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForDamages);
 		
 //		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 //		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga", "leisure"};
