@@ -70,7 +70,7 @@ public class SantiagoScenarioRunner {
 		
 	
 	private static String configFile;
-	private static String policy;
+	private static int policy;
 	private static int sigma;	
 	private static boolean doModeChoice; 
 	private static boolean mapActs2Links;
@@ -82,10 +82,10 @@ public class SantiagoScenarioRunner {
 	
 	public static void main(String args[]){		
 
-		if (args.length==5){ 
+		if (args.length==5){ //ONLY FOR CMD CASES
 			
 			configFile = args[0]; //COMPLETE PATH TO CONFIG.
-			policy = args[1]; //POLICY? - 0: BASE CASE, 1: CORDON.
+			policy = Integer.parseInt(args[1]) ; //POLICY? - 0: BASE CASE, 1: CORDON.
 			sigma = Integer.parseInt(args[2]); //SIGMA. 
 			doModeChoice = Boolean.parseBoolean(args[3]); //DOMODECHOICE?
 			mapActs2Links = Boolean.parseBoolean(args[4]); //MAPACTS2LINKS?
@@ -93,14 +93,14 @@ public class SantiagoScenarioRunner {
 		}
 		
 			configFile=inputPath + "config_" + caseName + ".xml" ; 
-			policy="0" ;    
+			policy=0;    
 			sigma=3 ;    
 			doModeChoice=true ; 
 			mapActs2Links=false; 
 		
 		
 			
-			if(policy.equals("1")){
+			if(policy == 1){
 				//TODO: CHANGE THE TollLinksFile IN THE CONFIG.
 			}
 			
