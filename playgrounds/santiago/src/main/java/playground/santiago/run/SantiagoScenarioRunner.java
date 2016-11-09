@@ -92,7 +92,7 @@ public class SantiagoScenarioRunner {
 			doModeChoice = Boolean.parseBoolean(args[4]); //DOMODECHOICE?
 			mapActs2Links = Boolean.parseBoolean(args[5]); //MAPACTS2LINKS?
 			
-		}
+		} else {
 		
 			configFile=inputPath + "config_" + caseName + ".xml" ; 
 			gantriesFile = inputPath + "input/gantries.xml";
@@ -101,7 +101,7 @@ public class SantiagoScenarioRunner {
 			doModeChoice=true ; 
 			mapActs2Links=false; 
 		
-		
+		}	
 			
 			if(policy == 1){
 				//TODO: CHANGE THE TollLinksFile IN THE CONFIG.
