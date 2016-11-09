@@ -19,14 +19,17 @@
 
 package playground.ikaddoura.noise;
 
+import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -43,10 +46,10 @@ public class NoiseValidation {
 
 	// input
 	private final String validationFile = "../../../shared-svn/studies/countries/de/berlin_noise/Fassadenpegel/FP_gesamt_Atom_repaired.txt";	
-	private final String processedImmissionFile = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_detailed/analysis_it.100/immissions/immission_processed.csv";
+	private final String processedImmissionFile = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_2016-11-09_rpGap100/analysis_it.100/immissions/immission_processed.csv";
 	
 	// output
-	private final String validationOutput = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_detailed/analysis_it.100/immissions/validation.csv";
+	private final String outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_2016-11-09_rpGap100/analysis_it.100/immissions/";
 
 	public static void main(String[] args) throws IOException {
 		NoiseValidation noiseValidation = new NoiseValidation();
@@ -54,6 +57,13 @@ public class NoiseValidation {
 	}
 
 	private void run() throws IOException {
+		
+		OutputDirectoryLogging.catchLogEntries();
+		try {
+			OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		
 		// read file
 		final Map<String, Tuple<Coord, Double>> validationPoints = readCSVFile(validationFile, ",", -1, 0, 1, 4);
@@ -107,22 +117,32 @@ public class NoiseValidation {
 		log.info("Mapping receiver points to nearest validation point... Done.");
 		
 		log.info("Writing output...");
-							
-		try ( BufferedWriter bw = IOUtils.getBufferedWriter(validationOutput) ) {
-			bw.write("Receiver Point Id (Sim) ; x (Sim) ; y (Sim) ; L_den (Sim) ; Closest Validation Point Id (Val) ; x (Val) ; y (Val) ; L_den (Val)");
+			
+		String fileName = this.outputDirectory + "validation.csv";
+		
+		File file = new File(outputDirectory);
+		file.mkdirs();
+		
+		try ( BufferedWriter bw = IOUtils.getBufferedWriter(fileName) ) {
+			bw.write("Receiver Point Id (Sim) ; x (Sim) ; y (Sim) ; L_den (Sim) ; Closest Validation Point Id (Val) ; x (Val) ; y (Val) ; L_den (Val) ; Error (Sim-Val) ; Distance (Sim-Val)");
 			bw.newLine();
 			
 			for (String simPointId : simulationPoints.keySet()) {
 				String valPointId = simPointId2valPointId.get(simPointId);
 				
+				Point p1 = new Point((int) simulationPoints.get(simPointId).getFirst().getX(), (int) simulationPoints.get(simPointId).getFirst().getY());
+				Point p2 = new Point((int) validationPoints.get(valPointId).getFirst().getX(), (int) validationPoints.get(valPointId).getFirst().getY());
+				double distance = p1.distance(p2);
+
 				bw.write(simPointId + " ; " + simulationPoints.get(simPointId).getFirst().getX() + " ; " + simulationPoints.get(simPointId).getFirst().getY() + " ; " + simulationPoints.get(simPointId).getSecond()
-						+ " ; " + valPointId + " ; " + validationPoints.get(valPointId).getFirst().getX() + " ; " + validationPoints.get(valPointId).getFirst().getY() + " ; " + validationPoints.get(valPointId).getSecond());
+						+ " ; " + valPointId + " ; " + validationPoints.get(valPointId).getFirst().getX() + " ; " + validationPoints.get(valPointId).getFirst().getY() + " ; " + validationPoints.get(valPointId).getSecond()
+						+ " ; " + (simulationPoints.get(simPointId).getSecond() - validationPoints.get(valPointId).getSecond()) + " ; " + distance);
 				bw.newLine();
 			}
 				
 			bw.close();
 			
-			log.info("Writing output... Done. Output written to " + validationOutput);
+			log.info("Writing output... Done. Output written to " + outputDirectory);
 
 		} catch (IOException e) {
 			e.printStackTrace();
