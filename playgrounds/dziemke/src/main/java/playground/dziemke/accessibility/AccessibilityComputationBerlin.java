@@ -2,23 +2,20 @@ package playground.dziemke.accessibility;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import com.vividsolutions.jts.geom.Envelope;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.accessibility.AccessibilityCalculator;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
+import org.matsim.contrib.accessibility.AccessibilityStartupListener;
+import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
 import org.matsim.contrib.accessibility.FacilityTypes;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
-import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.gis.GridUtils;
+import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
+import org.matsim.contrib.accessibility.NetworkModeProvider;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
-import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -26,54 +23,53 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
 
-import playground.dziemke.utils.LogToOutputSaver;
+import com.google.inject.Key;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.name.Names;
+import com.vividsolutions.jts.geom.Envelope;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import playground.dziemke.utils.LogToOutputSaver;
 
 public class AccessibilityComputationBerlin {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationBerlin.class ) ;
 	
-//	private static final double cellSize = 1000.;
-//	private static final double cellSize = 200.;
-	private static final double cellSize = 500.;
+	private static final Double cellSize = 500.;
 
 	public static void main(String[] args) {
 		// Input and output
 //		String networkFile = "../../shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.all.xml";
 //		String networkFile = "../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 		// same network at alternate location
-		String networkFile = "../../../../SVN/shared-svn/projects/accessibility_berlin/iv_counts/network.xml";
+//		String networkFile = "../../../../SVN/shared-svn/projects/accessibility_berlin/iv_counts/network.xml";
+		String networkFile = "../../../shared-svn/projects/accessibility_berlin/iv_counts/network.xml";
 		
 //		String facilitiesFile = "../../shared-svn/projects/accessibility_berlin/osm/facilities_amenities_modified.xml";
 		// now using work facilities
-		String facilitiesFile = "../../../../SVN/shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/facilities.xml";
-		
-		String outputDirectory = "../../../../SVN/shared-svn/projects/accessibility_berlin/output/08_test/";
+//		String facilitiesFile = "../../../../SVN/shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/facilities.xml";
+		String facilitiesFile = "../../../shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/facilities.xml";
+
+//		String outputDirectory = "../../../../SVN/shared-svn/projects/accessibility_berlin/output/08_test/";
+		String outputDirectory = "../../../shared-svn/projects/accessibility_berlin/output/08_test_2016-11-09/";
 //		String travelTimeMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelDistanceMatrix.csv.gz";
 //		String ptStops = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/stops.csv.gz";
-		
-		String travelTimeMatrixFilePT = "../../matsimExamples/countries/za/nmb/regular-pt/travelTimeMatrix_space.csv";
-		String travelDistanceMatrixFilePT = "../../matsimExamples/countries/za/nmb/regular-pt/travelDistanceMatrix_space.csv";
-		String ptStopsFilePT = "../../matsimExamples/countries/za/nmb/regular-pt/ptStops.csv";
 		
 		LogToOutputSaver.setOutputDirectory(outputDirectory);
 		
 		// Parameters
 		String crs = TransformationFactory.DHDN_GK4;
-//		String crs = "EPSG:31468"; // = DHDN GK4		
+//		String crs = "EPSG:31468"; // = DHDN GK4
+		Envelope envelope = new Envelope(4574000-1000, 5802000-1000, 4620000+1000, 5839000+1000);
+//		final String runId = "de_berlin_" + PathUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
+		final String runId = "de_berlin_" + "106-11-10" + "_" + cellSize.toString().split("\\.")[0];
+		final boolean push2Geoserver = false;
 		
-		// QGis
+		// QGis parameters
 		boolean createQGisOutput = true;
-//		boolean includeDensityLayer = true;
 		boolean includeDensityLayer = false;
 //		Double lowerBound = 1.75;
 //		Double upperBound = 7.;
@@ -86,9 +82,10 @@ public class AccessibilityComputationBerlin {
 //		int symbolSize = 210;
 		int symbolSize = 510;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
+		
+		// Storage objects
+		final List<String> modes = new ArrayList<>();
 
-		Envelope envelope = new Envelope(4574000-1000, 5802000-1000, 4620000+1000, 5839000+1000);
-				
 		// Config and scenario
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup()) ;
 		config.network().setInputFile(networkFile);
@@ -99,12 +96,12 @@ public class AccessibilityComputationBerlin {
 
 		final Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 
-		// Matrix-based pt
-		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
-		mbpcg.setPtStopsInputFile(ptStopsFilePT);
-		mbpcg.setUsingTravelTimesAndDistances(true);
-		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrixFilePT);
-		mbpcg.setPtTravelTimesInputFile(travelTimeMatrixFilePT);
+		// ##### Matrix-based pt
+//		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
+//		mbpcg.setPtStopsInputFile(ptStopsFilePT);
+//		mbpcg.setUsingTravelTimesAndDistances(true);
+//		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrixFilePT);
+//		mbpcg.setPtTravelTimesInputFile(travelTimeMatrixFilePT);
 
 		// plansClacRoute parameters
 		PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
@@ -129,11 +126,12 @@ public class AccessibilityComputationBerlin {
 		plansCalcRoute.addModeRoutingParams(bikeParameters );
 
 		// pt matrix
-		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
-		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
+//		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
+//		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
+		
+		// ##### end of PT block
 
-
-		// collect activity types
+		// Collect activity types
 //		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityTypes(scenario);
 //		log.warn( "found activity types: " + activityTypes );
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
@@ -142,59 +140,54 @@ public class AccessibilityComputationBerlin {
 		activityTypes.add("s");
 		log.error("Only using s as activity type to speed up for testing");
 
-		// collect homes
+		// Collect homes for density layer
 		String activityFacilityType = FacilityTypes.HOME;
-		final ActivityFacilities homes = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityFacilityType);
+		final ActivityFacilities densityFacilities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityFacilityType);
 
+		// Controller
 		final Controler controler = new Controler(scenario);
+		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, runId, envelope, cellSize, push2Geoserver));
+		
+		// Add calculators
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				// Loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each
-				for ( final String actType : activityTypes ) {
-					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
-						@Inject Scenario scenario;
-						@Inject Map<String, TravelTime> travelTimes;
-						@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
-
-						@Override
-						public ControlerListener get() {
-							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator((Scenario) scenario);
-							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2((double) 4574000, (double) 5802000, (double) 4620000, (double) 5839000, cellSize));
-							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, (ActivityFacilities) AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType), ptMatrix, config, scenario, 4574000,
-							5802000, 4620000, 5839000, cellSize);
-							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
-							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-
-							listener.addAdditionalFacilityData(homes) ;
-//							listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
-							// Boundaries of Berlin are approx.: 4570000, 4613000, 5836000, 5806000
-							listener.writeToSubdirectoryWithName(actType);
-							return listener;
-						}
-					});
+				MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
+				{
+					String mode = "freeSpeed";
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new FreeSpeedNetworkModeProvider(TransportMode.car));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					modes.add(mode);
+				}
+				{
+					String mode = TransportMode.car;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					modes.add(mode);
+				}
+				{ 
+					String mode = TransportMode.bike;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					modes.add(mode);
+				}
+				{
+					final String mode = TransportMode.walk;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					modes.add(mode);
 				}
 			}
 		});
-		
 		controler.run();
-			
-		/* Write QGis output */
+
+		// QGis
 		if (createQGisOutput == true) {
 			String osName = System.getProperty("os.name");
 			String workingDirectory = config.controler().getOutputDirectory();
-
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
-
-				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					if ( !actType.equals("w") ) {
-						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-						continue ;
-					}
+				for (String mode : modes) {
 					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
