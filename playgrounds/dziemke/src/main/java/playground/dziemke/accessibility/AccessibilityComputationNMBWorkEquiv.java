@@ -138,7 +138,8 @@ public class AccessibilityComputationNMBWorkEquiv {
 //		for (String actType : activityTypes) {
 			String actSpecificWorkingDirectory =  workingDirectory + typeWEQ + "/";
 
-			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
+			for ( Modes4Accessibility modeOld : Modes4Accessibility.values()) {
+				String mode = modeOld.toString();
 //				VisualizationUtils.createQGisOutput(typeWEQ, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer);
 				VisualizationUtils.createQGisOutput(typeWEQ, mode, envelope, workingDirectory, crs, includeDensityLayer,
 						lowerBound, upperBound, range, symbolSize, populationThreshold);
