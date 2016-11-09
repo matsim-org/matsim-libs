@@ -2,9 +2,9 @@ package org.matsim.contrib.accessibility;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.GeoserverUpdater;
@@ -13,28 +13,22 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import com.vividsolutions.jts.geom.Envelope;
 
 public final class AccessibilityStartupListener implements StartupListener {
 	
 		@Inject Scenario scenario;
 		@Inject(optional = true) PtMatrix ptMatrix = null; // Downstream code knows how to handle a null PtMatrix
-		@Inject Map<String, TravelTime> travelTimes;
-		@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 		@Inject ControlerListenerManager controlerListenerManager;
 		
-		// new
-		@Inject @Named(TransportMode.car) AccessibilityContributionCalculator carAccessibilityCalculator;
-//		@Inject @Named(TransportMode.bike) AccessibilityContributionCalculator bikeAccessibilityCalculator;
-		// TODO other modes
-		// end new
+		@Inject Map<String, AccessibilityContributionCalculator> calculators ;
+		
+		@Inject Map<String,TravelTime> travelTimes ;
 		
 		final List<String> activityTypes;
 		final ActivityFacilities densityFacilities;
@@ -52,6 +46,7 @@ public final class AccessibilityStartupListener implements StartupListener {
 			this.envelope = envelope;
 			this.cellSize = cellSize;
 			this.push2Geoserver = push2Geoserver;
+
 		}
 		
 		@Override
@@ -61,16 +56,20 @@ public final class AccessibilityStartupListener implements StartupListener {
 				if (cellSize <= 0) {
 					throw new IllegalArgumentException("Cell Size needs to be assigned a value greater than zero.");
 				}
-				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
+				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario);
 				ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(), cellSize);
 				accessibilityCalculator.setMeasuringPoints(measuringPoints);
 				// new
-				 accessibilityCalculator.putAccessibilityCalculator(TransportMode.car, carAccessibilityCalculator);
-				 // TODO other modes
-				// end new
+				for ( Entry<String,TravelTime> entry : travelTimes.entrySet() ) {
+					System.err.println( entry.toString() );
+				}
+				for ( Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet() ) {
+					System.err.println( entry.toString() ) ;
+					accessibilityCalculator.putAccessibilityCalculator( entry.getKey(), entry.getValue() ) ;
+				}
 				ActivityFacilities activityFacilities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType);
 				GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, activityFacilities, 
-						ptMatrix, config, scenario, travelTimes, travelDisutilityFactories, envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(), cellSize);
+						ptMatrix, config, scenario, envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(), cellSize);
 				listener.addAdditionalFacilityData(densityFacilities);
 				listener.writeToSubdirectoryWithName(activityType);
 				// Geoserver

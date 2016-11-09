@@ -19,8 +19,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacilities;
 
@@ -62,7 +60,10 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 	 * @param config MATSim Config object
 	 * @param scenario MATSim scenario
 	 */
-	public GridBasedAccessibilityShutdownListenerV3(AccessibilityCalculator accessibilityCalculator, ActivityFacilities opportunities, PtMatrix ptMatrix, Config config, Scenario scenario, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, double xMin, double yMin, double xMax, double yMax, double cellSize) {
+	public GridBasedAccessibilityShutdownListenerV3(AccessibilityCalculator accessibilityCalculator, ActivityFacilities opportunities, 
+			PtMatrix ptMatrix, Config config, Scenario scenario, 
+			double xMin, double yMin, 
+			double xMax, double yMax, double cellSize) {
 		this.xMin = xMin;
 		this.yMin = yMin;
 		this.xMax = xMax;

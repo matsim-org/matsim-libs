@@ -127,14 +127,14 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 						@Override
 						public ControlerListener get() {
 							//initialize new grid based accessibility controler listener and grids for the modes we want to analyze here
-							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
+							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario);
 							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution));
 							for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 								accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
 							}
 							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
 
-							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, travelTimes, travelDisutilityFactories, minX, minY, maxX, maxY, resolution);
+							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, minX, minY, maxX, maxY, resolution);
 
 							//add grid data exchange listener to get accessibilities
 							listener.addSpatialGridDataExchangeListener(AccessibilityTest.this);

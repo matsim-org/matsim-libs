@@ -99,9 +99,9 @@ public class AccessibilityComputationCottbus {
 
 						@Override
 						public ControlerListener get() {
-							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, (Scenario) scenario);
+							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator((Scenario) scenario);
 							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(447759., 5729049., 460617., 5740192., cellSize));
-							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, (ActivityFacilities) AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType), null, config, scenario, travelTimes, travelDisutilityFactories, 447759., 5729049., 460617., 5740192., cellSize);
+							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, (ActivityFacilities) AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType), null, config, scenario, 447759., 5729049., 460617., 5740192., cellSize);
 							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.car, false);
 							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);

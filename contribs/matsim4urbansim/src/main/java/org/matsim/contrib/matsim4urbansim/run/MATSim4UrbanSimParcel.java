@@ -430,10 +430,10 @@ class MATSim4UrbanSimParcel{
 								double yMin = env.getMinY();
 								double yMax = env.getMaxY();
 								Config config = scenario.getConfig();
-								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
+								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario);
 								log.info("Using custom bounding box to determine the area for accessibility computation.");
 
-								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, travelTimes, travelDisutilityFactories, xMin, xMax, yMin, yMax, cellSizeInMeter);
+								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, xMin, xMax, yMin, yMax, cellSizeInMeter);
 								accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSizeInMeter));
 
 //								gbacl.setUrbansimMode(true);
@@ -448,11 +448,11 @@ class MATSim4UrbanSimParcel{
 								}
 							} else if(computeGridBasedAccessibilityUsingBoundingBox) {
 								Config config = scenario.getConfig();
-								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
+								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario);
 								accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter));
 
 								log.info("Using custom bounding box to determine the area for accessibility computation.");
-								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, travelTimes, travelDisutilityFactories, nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
+								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
 //								gbacl.setUrbansimMode(true);
 								// this wasn't doing anything when I looked at it.  kai, oct'16
 
@@ -465,7 +465,7 @@ class MATSim4UrbanSimParcel{
 								}
 							} else {
 								Config config = scenario.getConfig();
-								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
+								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario);
 								accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter));
 
 								log.info("Using the boundary of the network file to determine the area for accessibility computation.");
@@ -473,7 +473,7 @@ class MATSim4UrbanSimParcel{
 								if (cellSizeInMeter <= 0) {
 									throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
 								}
-								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, travelTimes, travelDisutilityFactories,nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
+								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(),nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
 
 //								gbacl.setUrbansimMode(true);
 								// this wasn't doing anything when I looked at it.  kai, oct'16

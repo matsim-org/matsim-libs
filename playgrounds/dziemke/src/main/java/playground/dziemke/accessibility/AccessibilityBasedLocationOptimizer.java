@@ -116,9 +116,9 @@ public class AccessibilityBasedLocationOptimizer {
 							@Override
 							public ControlerListener get() {
 								BoundingBox bb = BoundingBox.createBoundingBox(((Scenario) scenario).getNetwork());
-								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
+								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario);
 								accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize));
-								GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, (ActivityFacilities) activityFacilites, null, config, scenario, travelTimes, travelDisutilityFactories,bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize);
+								GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, (ActivityFacilities) activityFacilites, null, config, scenario, bb.getXMin(), bb.getYMin(),bb.getXMax(), bb.getYMax(), cellSize);
 //				log.warn("listener = " + listener);
 
 								accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);

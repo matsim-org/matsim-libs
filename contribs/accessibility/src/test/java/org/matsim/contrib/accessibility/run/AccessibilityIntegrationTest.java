@@ -476,9 +476,9 @@ public class AccessibilityIntegrationTest {
 				@Override
 				public ControlerListener get() {
 					BoundingBox bb = BoundingBox.createBoundingBox(scenario.getNetwork());
-					AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
+					AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario);
 					accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize));
-					GridBasedAccessibilityShutdownListenerV3 gacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario.getConfig(), scenario, travelTimes, travelDisutilityFactories,bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize);
+					GridBasedAccessibilityShutdownListenerV3 gacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario.getConfig(), scenario, bb.getXMin(), bb.getYMin(),bb.getXMax(), bb.getYMax(), cellSize);
 					// activating transport modes of interest
 					for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 						accessibilityCalculator.setComputingAccessibilityForMode(mode, true);

@@ -21,8 +21,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -65,8 +63,7 @@ public final class AccessibilityCalculator {
 	private AccessibilityConfigGroup acg;
 
 
-	@Inject
-	public AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
+	public AccessibilityCalculator(Scenario scenario) {
 		this.scenario = scenario;
 		this.acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 
@@ -94,48 +91,7 @@ public final class AccessibilityCalculator {
 		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaWalkTD = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
 
-		initDefaultContributionCalculators(travelTimes, travelDisutilityFactories, scenario);
 	}
-
-	@Deprecated // yyyyyy set from "outside"
-	private void initDefaultContributionCalculators(Map<String, TravelTime> travelTimes,
-			Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
-		// when done the following can be fully removed
-//		{
-//			final String mode = TransportMode.car;
-//			putAccessibilityCalculator(
-//					mode,
-//					new NetworkModeAccessibilityExpContributionCalculator(
-//							travelTimes.get(mode),
-//							travelDisutilityFactories.get(mode),
-//							scenario));
-//		}
-		{
-			final String mode = TransportMode.car;
-			putAccessibilityCalculator(
-					Modes4Accessibility.freeSpeed.name(),
-					new NetworkModeAccessibilityExpContributionCalculator(
-							new FreeSpeedTravelTime(),
-							travelDisutilityFactories.get(mode),
-							scenario));
-		}{
-			final String mode = TransportMode.walk;
-			putAccessibilityCalculator(
-					mode,
-					new ConstantSpeedAccessibilityExpContributionCalculator(
-							mode,
-							scenario));
-		}{
-			final String mode = TransportMode.bike;
-			putAccessibilityCalculator(
-					mode,
-					new ConstantSpeedAccessibilityExpContributionCalculator(
-							mode,
-							scenario));
-		}
-	}
-
-
 	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface l){
 		this.zoneDataExchangeListeners.add(l);
 	}
