@@ -27,6 +27,9 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
+/**
+ * @author dziemke
+ */
 public class NetworkModeProvider implements Provider<AccessibilityContributionCalculator>{
 
     private String mode;

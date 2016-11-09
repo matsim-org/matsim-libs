@@ -23,6 +23,9 @@ import org.matsim.api.core.v01.Scenario;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
+/**
+ * @author dziemke
+ */
 public class ConstantSpeedModeProvider implements Provider<AccessibilityContributionCalculator>{
 
     private String mode;

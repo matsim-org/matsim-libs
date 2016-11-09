@@ -27,6 +27,9 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
+/**
+ * @author dziemke
+ */
 public class FreeSpeedNetworkModeProvider implements Provider<AccessibilityContributionCalculator>{
 
     private String mode;

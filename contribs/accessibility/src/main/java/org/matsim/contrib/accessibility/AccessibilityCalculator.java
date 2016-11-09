@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.inject.Inject;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -21,7 +19,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -90,8 +87,9 @@ public final class AccessibilityCalculator {
 
 		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaWalkTD = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
-
 	}
+	
+	
 	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface l){
 		this.zoneDataExchangeListeners.add(l);
 	}
@@ -243,9 +241,8 @@ public final class AccessibilityCalculator {
 	}
 
 
-	private void computeAndAddExpUtilContributions( Map<Modes4Accessibility,ExpSum> expSums, ActivityFacility origin, 
-			final AggregationObject aggregatedFacility, Double departureTime) 
-	{
+	private void computeAndAddExpUtilContributions(Map<Modes4Accessibility,ExpSum> expSums, ActivityFacility origin, 
+			final AggregationObject aggregatedFacility, Double departureTime) {
 		for ( Map.Entry<String, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet() ) {
 			final Modes4Accessibility mode = Modes4Accessibility.valueOf(calculatorEntry.getKey());
 
@@ -265,6 +262,7 @@ public final class AccessibilityCalculator {
 		this.acg.setComputingAccessibilityForMode(mode, val);
 	}
 
+	
 	public final void putAccessibilityCalculator( String mode, AccessibilityContributionCalculator calc ) {
 		this.calculators.put( mode , calc ) ;
 	}
