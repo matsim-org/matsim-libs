@@ -29,11 +29,13 @@ import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.PopulationIO;
 import playground.johannes.synpop.gis.*;
 import playground.johannes.synpop.processing.CalculateGeoDistance;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.processing.LegAttributeRemover;
 import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.sim.SetActivityFacilities;
 import playground.johannes.synpop.sim.SetHomeFacilities;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
+import playground.johannes.synpop.util.Executor;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -90,7 +92,12 @@ public class SimPopulationBuilder {
             setHomeFacilities.apply(simPersons);
 
             logger.info("Assigning random activity locations...");
-            TaskRunner.run(new SetActivityFacilities((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
+//            TaskRunner.run(new SetActivityFacilities((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
+            EpisodeTask initActs = new SetActivityFacilities(
+                    (FacilityData) dataPool.get(FacilityDataLoader.KEY),
+                    0.1,
+                    engine.getRandom());
+            TaskRunner.run(initActs, simPersons, Executor.getFreePoolSize(), true);
         } else {
             logger.info("Loading sim population from file...");
             simPersons = PopulationIO.loadFromXML(simPopFile, new PlainFactory());

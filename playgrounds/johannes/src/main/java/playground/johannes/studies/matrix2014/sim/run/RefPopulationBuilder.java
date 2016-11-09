@@ -63,6 +63,7 @@ public class RefPopulationBuilder {
         TaskRunner.run(new ReplaceLegPurposes(), refPersons);
         TaskRunner.run(new GuessMissingPurposes(refPersons, engine.getLegPredicate(), engine.getRandom()), refPersons);
 
+        TaskRunner.run(new SetNonHomeActTypes(), refPersons);
         TaskRunner.run(new ReplaceActTypes(), refPersons);
         new GuessMissingActTypes(engine.getRandom()).apply(refPersons);
         TaskRunner.run(new Route2GeoDistance(new playground.johannes.studies.matrix2014.sim.Simulator.Route2GeoDistFunction()), refPersons);
@@ -222,6 +223,20 @@ public class RefPopulationBuilder {
                 }
 
                 return true;
+            }
+        }
+    }
+
+    private static class SetNonHomeActTypes implements EpisodeTask {
+
+        @Override
+        public void apply(Episode episode) {
+            for(int i = 1; i < episode.getActivities().size(); i++) {
+                Segment act = episode.getActivities().get(i);
+                if(!ActivityTypes.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+                    String purpose = act.previous().getAttribute(CommonKeys.LEG_PURPOSE);
+                    act.setAttribute(CommonKeys.ACTIVITY_TYPE, purpose);
+                }
             }
         }
     }

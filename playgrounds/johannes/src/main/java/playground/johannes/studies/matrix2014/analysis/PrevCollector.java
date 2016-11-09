@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,       *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,37 +16,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.synpop.analysis;
 
+package playground.johannes.studies.matrix2014.analysis;
+
+import playground.johannes.synpop.analysis.AbstractCollector;
+import playground.johannes.synpop.analysis.ValueProvider;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 /**
- * @author jillenberger
+ * @author johannes
  */
-/*
-Rename to AttributePredicate?
- */
-public class LegAttributePredicate implements Predicate<Segment> {
+public class PrevCollector<T> extends AbstractCollector<T, Segment, Segment> {
 
-    private final String key;
-
-    private final String value;
-
-    public LegAttributePredicate(String key, String value) {
-        this.key = key;
-        this.value = value;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public String getValue() {
-        return value;
+    public PrevCollector(ValueProvider<T, Segment> provider) {
+        super(provider);
     }
 
     @Override
-    public boolean test(Segment segment) {
-        return value.equals(segment.getAttribute(key));
+    public List<T> collect(Collection<? extends Person> persons) {
+        ArrayList<T> values = new ArrayList<>(persons.size() * 10);
+
+        for (Person p : persons) {
+            for (Episode e : p.getEpisodes()) {
+                for (Segment leg : e.getLegs()) {
+                    if (predicate == null || predicate.test(leg)) {
+                        values.add(provider.get(leg.previous()));
+                    }
+                }
+            }
+        }
+
+        values.trimToSize();
+
+        return values;
     }
 }
