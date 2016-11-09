@@ -49,6 +49,10 @@ public class DistributedPlanStrategyTranslationAndRegistration {
     private DistributedPlanStrategyTranslationAndRegistration() {
     }
 
+    static {
+        initMaps();
+    }
+
     static void initMaps() {
         SupportedSelectors.put("KeepLastSelected", KeepLastSelected.class);
         SupportedSelectors.put("BestScore", SelectBest.class);
@@ -82,6 +86,7 @@ public class DistributedPlanStrategyTranslationAndRegistration {
             controler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
+                    addPlanStrategyBinding(e.getKey()).toProvider(e.getValue());
                     addPlanStrategyBinding(e.getKey() + SUFFIX).toProvider(new DistributedPlanSelectorStrategyFactory(slave, quickReplanning, selectionInflationFactor, controler, e.getKey()));
                 }
             });
@@ -92,6 +97,7 @@ public class DistributedPlanStrategyTranslationAndRegistration {
             controler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
+                    addPlanStrategyBinding(e.getKey()).toProvider(e.getValue());
                     addPlanStrategyBinding(e.getKey() + SUFFIX).toProvider(new DistributedPlanMutatorStrategyFactory(slave, SupportedMutatorGenes.get(e.getKey()), TrackGenome, controler, e.getKey()));
                 }
             });

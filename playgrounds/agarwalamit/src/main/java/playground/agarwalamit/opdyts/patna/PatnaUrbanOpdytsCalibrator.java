@@ -80,7 +80,7 @@ public class PatnaUrbanOpdytsCalibrator {
 
 		// relax the plans first.
 		PatnaPlansRelaxor relaxor = new PatnaPlansRelaxor();
-//		relaxor.run(new String[]{configFile, OUT_DIR+"/initialPlans2RelaxedPlans/"});
+		relaxor.run(new String[]{configFile, OUT_DIR+"/initialPlans2RelaxedPlans/"});
 
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.plans().setInputFile(OUT_DIR+"/initialPlans2RelaxedPlans/output_plans.xml.gz");

@@ -1,7 +1,7 @@
 package playground.dziemke.cemdapMatsimCadyts.oneperson;
 
 
-public class Household {
+public class SimpleHousehold {
 
 	private int householdId;
 	private int numberOfAdults = 1;
@@ -11,7 +11,7 @@ public class Household {
 	private int householdStructure = 1;
 			
 	
-	public Household(int householdId, int homeTSZLocation) {
+	public SimpleHousehold(int householdId, int homeTSZLocation) {
 		this.householdId = householdId;
 		this.homeTSZLocation = homeTSZLocation;
 	}

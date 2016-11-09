@@ -2,6 +2,7 @@ package org.matsim.contrib.pseudosimulation.replanning;
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -40,10 +41,7 @@ public class DistributedPlanMutatorStrategy implements PlanStrategy {
     @Override
     public void init(ReplanningContext replanningContext) {
         if (delegate == null) {
-            delegate = controler.getInjector().getInstance(Key.get(
-                    new TypeLiteral<Map<String, PlanStrategy>>() {
-                    }
-            )).get(delegateName);
+            delegate =  controler.getInjector().getBinding(Key.get(PlanStrategy.class, Names.named(delegateName))).getProvider().get();
         }
         delegate.init(replanningContext);
     }

@@ -1,7 +1,6 @@
 package playground.balac.utils.carsharing.inputcreation;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
@@ -14,9 +13,6 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-
-
-
 
 public class AssignMembership extends MatsimXmlWriter {
 	
@@ -31,9 +27,9 @@ public class AssignMembership extends MatsimXmlWriter {
 		
 		writeXmlHead();
 		
-		writeStartTag("membership", null);
+		writeStartTag("memberships", null);
 		writeMembership();
-		writeEndTag("membership");
+		writeEndTag("memberships");
 
 		close();
 	}
@@ -53,16 +49,27 @@ public class AssignMembership extends MatsimXmlWriter {
 		attsP.add(new Tuple<>("id", person.getId().toString()));
 		
 		List<Tuple<String, String>> attsC = new ArrayList<Tuple<String, String>>();
-		
+		List<Tuple<String, String>> attsC2 = new ArrayList<Tuple<String, String>>();
+
 		attsC.add(new Tuple<>("id", "Catchacar"));
-		
+		attsC2.add(new Tuple<>("id", "Mobility"));
+
 		List<Tuple<String, String>> attsF = new ArrayList<Tuple<String, String>>();
+		List<Tuple<String, String>> attsTW = new ArrayList<Tuple<String, String>>();
 
 		attsF.add(new Tuple<>("name", "freefloating"));
+		attsTW.add(new Tuple<>("name", "twoway"));
 
 		writeStartTag("person", attsP);
 		writeStartTag("company", attsC);
 		writeStartTag("carsharing", attsF, true);
+		writeStartTag("carsharing", attsTW, true);
+
+		writeEndTag("company");
+		writeStartTag("company", attsC2);
+		writeStartTag("carsharing", attsF, true);
+		writeStartTag("carsharing", attsTW, true);
+
 		writeEndTag("company");
 		writeEndTag("person");
 

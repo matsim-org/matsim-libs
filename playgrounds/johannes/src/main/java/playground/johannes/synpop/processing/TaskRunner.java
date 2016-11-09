@@ -20,12 +20,14 @@
 package playground.johannes.synpop.processing;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.common.collections.CollectionUtils;
 import org.matsim.contrib.common.util.LoggerUtils;
 import org.matsim.contrib.common.util.ProgressLogger;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.CommonValues;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.util.Executor;
 
 import java.util.*;
 
@@ -59,6 +61,49 @@ public class TaskRunner {
 
         if (verbose)
             ProgressLogger.terminate();
+    }
+
+    public static void run(EpisodeTask task, Collection<? extends Person> persons, int nThreads, boolean verbose) {
+        if (verbose) {
+            ProgressLogger.init(persons.size(), 2, 10);
+        }
+
+        List<? extends Person>[] segments = CollectionUtils.split(persons, nThreads);
+        List<Runnable> threads = new ArrayList<>(nThreads);
+        for(int i = 0; i < nThreads; i++) {
+            threads.add(new RunThread(segments[i], task, verbose));
+        }
+
+        Executor.submitAndWait(threads);
+
+        if (verbose)
+            ProgressLogger.terminate();
+    }
+
+    private static final class RunThread implements Runnable {
+
+        private final List<? extends Person> persons;
+
+        private final EpisodeTask task;
+
+        private final boolean verbose;
+
+        public RunThread(List<? extends Person> persons, EpisodeTask task, boolean verbose) {
+            this.persons = persons;
+            this.task = task;
+            this.verbose = verbose;
+        }
+
+        @Override
+        public void run() {
+            for (Person person : persons) {
+                for (Episode plan : person.getEpisodes())
+                    task.apply(plan);
+
+                if (verbose)
+                    ProgressLogger.step();
+            }
+        }
     }
 
     public static void validatePersons(PersonTask task, Collection<? extends Person> persons) {

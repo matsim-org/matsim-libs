@@ -24,18 +24,27 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.households.Household;
+import org.matsim.households.HouseholdImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.opengis.feature.simple.SimpleFeature;
 
-import playground.dziemke.cemdapMatsimCadyts.oneperson.Household;
+import playground.dziemke.cemdapMatsimCadyts.oneperson.SimpleHousehold;
 import playground.dziemke.cemdapMatsimCadyts.oneperson.SimplePerson;
 import playground.dziemke.utils.LogToOutputSaver;
-import playground.dziemke.utils.TwoAttributeShapeReader;
 
 /**
  * This class is derived from "playground.dziemke.cemdapMatsimCadyts.oneperson.DemandGeneratorOnePersonV2.java"
@@ -46,66 +55,76 @@ import playground.dziemke.utils.TwoAttributeShapeReader;
  */
 public class DemandGeneratorCensus {
 	private static final Logger log = Logger.getLogger(DemandGeneratorCensus.class);
+	
+	
+	
+	/*
+	 * there will be mismatches between number of employees from zensus and commuter from commuter file
+	 * - because of socially secured workers (commuter file) vs. all workers (zensus)
+	 * - because not exactly the same year
+	 * Handle by scaling?
+	 */
 
 	public static void main(String[] args) {
 		// Parameters
 //		double scalingFactor = 1.;
-//		double carShareInterior = 1.;
-//		double carShareExterior = 1.;
-//		double allWorkersToSociallySecuredWorkersRatio = 1.;
-//		double adultsToWorkersRatio = 1.;
-//		double expansionFactor = 1.;
 		int numberOfPlansPerPerson = 3;
 		// Gemeindeschluessel of Berlin is 11000000 (Gemeindeebene) and 11000 (Landkreisebene)
 		Integer planningAreaId = 11000000;
 		
 		// Input and output files
-//		String commuterFileIn = "../../../../CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ge.txt";
-//		String commuterFileOut = "../../../../CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ga.txt";
-		String commuterFileOutgoing1 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/B2009Ga.txt";
-		String commuterFileOutgoing2 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil1BR2009Ga.txt";
-		String commuterFileOutgoing3 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil2BR2009Ga.txt";
-		String commuterFileOutgoing4 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil3BR2009Ga.txt";
-
+//		String commuterFileOutgoing1 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Berlin_2009/B2009Ga.txt";
+//		String commuterFileOutgoing2 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil1BR2009Ga.txt";
+//		String commuterFileOutgoing3 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil2BR2009Ga.txt";
+//		String commuterFileOutgoing4 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil3BR2009Ga.txt";
+		String commuterFileOutgoingTest = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil1BR2009Ga_Test.txt";
 		
-		String censusFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/zensus_2011/bevoelkerung/csv_Bevoelkerung/Zensus11_Datensatz_Bevoelkerung.csv";
+//		String censusFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/zensus_2011/bevoelkerung/csv_Bevoelkerung/Zensus11_Datensatz_Bevoelkerung.csv";
+		String censusFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/zensus_2011/bevoelkerung/csv_Bevoelkerung/Zensus11_Datensatz_Bevoelkerung_BE_BB.csv";
 		
-		String shapeFileMunicipalities = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenBerlin.shp";
+//		String shapeFileMunicipalities = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenBerlin.shp";
 		String shapeFileLors = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Bezirksregion_EPSG_25833.shp";
 		
 		String outputBase = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/census-based_test1/"; // TODO ...
+
 		
+		// Infrastructure
+		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
+		Map<Id<Household>, Household> households = new HashMap<>();
 		LogToOutputSaver.setOutputDirectory(outputBase);
 		
 		// Create a CensusReader
 		CensusReader censusReader = new CensusReader(censusFile, ";");
 		ObjectAttributes municipalities = censusReader.getMunicipalities();
-		List<String> municipalitiesList = censusReader.getMunicipalitiesList();
-		Map<Integer, Map<Integer, CommuterRelationV2>> relationsMap = null;
+//		List<String> municipalitiesList = censusReader.getMunicipalitiesList();
+		Map<Integer, Map<Integer, CommuterRelationV2>> relationsMap = new HashMap<>();
 		
 		// Read in commuter relations
-		List<CommuterRelationV2> commuterRelationList = new ArrayList<>();
+//		{
+//			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing1, "\t");
+//			Map<Integer, Map<Integer, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
+//			relationsMap.putAll(currentRelationMap);
+//		}{
+//			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing2, "\t");
+//			Map<Integer, Map<Integer, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
+//			relationsMap.putAll(currentRelationMap);
+//		}{
+//			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing3, "\t");
+//			Map<Integer, Map<Integer, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
+//			relationsMap.putAll(currentRelationMap);
+//		}{
+//			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing4, "\t");
+//			Map<Integer, Map<Integer, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
+//			relationsMap.putAll(currentRelationMap);
+//		}
 		{
-			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing1, "\t");
-			Map<Integer, Map<Integer, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
-			relationsMap.putAll(currentRelationMap);
-		}{
-			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing2, "\t");
-			Map<Integer, Map<Integer, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
-			relationsMap.putAll(currentRelationMap);
-		}{
-			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing3, "\t");
-			Map<Integer, Map<Integer, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
-			relationsMap.putAll(currentRelationMap);
-		}{
-			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing4, "\t");
+			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoingTest, "\t");
 			Map<Integer, Map<Integer, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
 			relationsMap.putAll(currentRelationMap);
 		}
 		
 		// Create storage objects
-		Map<Integer, String> lors = new HashMap<Integer, String>();
-		Map<Integer, Household> householdMap = new HashMap<Integer, Household>();
+//		Map<Integer, SimpleHousehold> householdMap = new HashMap<Integer, SimpleHousehold>();
 		Map<Integer, Map<String, SimplePerson>> mapOfPersonMaps = new HashMap<Integer, Map<String, SimplePerson>>();
 		for (int i=1; i<=numberOfPlansPerPerson; i++) {
 			Map<String, SimplePerson> persons = new HashMap<String, SimplePerson>();
@@ -113,76 +132,241 @@ public class DemandGeneratorCensus {
 		}
 		
 		// Read in LORs	
-		TwoAttributeShapeReader.readShape(shapeFileLors, lors, "SCHLUESSEL", "LOR");
+//		Map<Integer, String> lors = new HashMap<Integer, String>();
+		List<Integer> lors = readShape(shapeFileLors, "SCHLUESSEL", "LOR");
 		
 		// Create households and persons
-		int householdCounter = 1;
-		int personCounter = 1;
+//		int householdCounter = 1;
+//		int personCounter = 1;
 		
 		
 		// New loop over inhabitant of municipalities
-		for (String municipalityId : municipalitiesList) {
-			int population = (int) municipalities.getAttribute(municipalityId, "population");
+//		for (String municipalityId : municipalitiesList) { // wrong this goes over all German municipalities from Zensus
+		for (Integer municipalityIdInt : relationsMap.keySet()) {
+			System.out.println("municipalityId = " + municipalityIdInt);
+			Map<Integer, CommuterRelationV2> relationsFromMunicipality = relationsMap.get(municipalityIdInt);
+			System.out.println("relationsFromMunicipality = " + relationsFromMunicipality.toString());
 			
-			int allSociallySecuredEmployees = (int) municipalities.getAttribute(municipalityId, "employedMale") + (int) municipalities.getAttribute(municipalityId, "employedFemale");
+			// Employees from Zensus seems to be all employees, not only socially-secured employees
+			String municipalityId = municipalityIdInt.toString();
+			int employeesMale = (int) municipalities.getAttribute(municipalityId, "employedMale");
+			int employeesFemale = (int) municipalities.getAttribute(municipalityId, "employedFemale");
+						
+			scaleRelations(relationsFromMunicipality, employeesMale, employeesFemale);
+			List<Integer> commuterRelationListMale = createRelationList(relationsFromMunicipality, "male");
+			List<Integer> commuterRelationListFemale = createRelationList(relationsFromMunicipality, "female");
+			
+//			int population = (int) municipalities.getAttribute(municipalityId, "population");
+			
+			int pop18_24Male = (int) municipalities.getAttribute(municipalityId, "pop18_24Male");
+			int pop25_29Male = (int) municipalities.getAttribute(municipalityId, "pop25_29Male");
+			int pop30_39Male = (int) municipalities.getAttribute(municipalityId, "pop30_39Male");
+			int pop40_49Male = (int) municipalities.getAttribute(municipalityId, "pop40_49Male");
+			int pop50_64Male = (int) municipalities.getAttribute(municipalityId, "pop50_64Male");
+			int pop65_74Male = (int) municipalities.getAttribute(municipalityId, "pop65_74Male");
+			int pop75PlusMale = (int) municipalities.getAttribute(municipalityId, "pop75PlusMale");
+			
+			int pop18_24Female = (int) municipalities.getAttribute(municipalityId, "pop18_24Female");
+			int pop25_29Female = (int) municipalities.getAttribute(municipalityId, "pop25_29Female");
+			int pop30_39Female = (int) municipalities.getAttribute(municipalityId, "pop30_39Female");
+			int pop40_49Female = (int) municipalities.getAttribute(municipalityId, "pop40_49Female");
+			int pop50_64Female = (int) municipalities.getAttribute(municipalityId, "pop50_64Female");
+			int pop65_74Female = (int) municipalities.getAttribute(municipalityId, "pop65_74Female");
+			int pop75PlusFemale = (int) municipalities.getAttribute(municipalityId, "pop75PlusFemale");
+			
+			int adultsMale = pop18_24Male + pop25_29Male + pop30_39Male + pop40_49Male + pop50_64Male;
+			int adultsFemale = pop18_24Female + pop25_29Female + pop30_39Female + pop40_49Female + pop50_64Female;
+			
+			
+			
+			double adultsToEmployeesMaleRatio = 0.;
+			double adultsToEmployeesFemaleRatio = 0.;
+			if (employeesMale != 0) { // Avoid dividing by zero
+				adultsToEmployeesMaleRatio = adultsMale / employeesMale;
+			} else {
+				adultsToEmployeesMaleRatio = 2.; // TODO This is an assumption; maybe improve later!
+			}
+			if (employeesFemale != 0) { // Avoid dividing by zero
+				adultsToEmployeesFemaleRatio = adultsFemale / employeesFemale;
+			} else {
+				adultsToEmployeesFemaleRatio = 2.; // TODO This is an assumption; maybe improve later!
+			}
+				
+			
+			int seniorsMale = pop65_74Male + pop75PlusMale;
+			int seniorsFemale = pop65_74Female + pop75PlusFemale;
+			
+			int counter = 1;
+			createHouseholdsAndPersons(population, households, counter, municipalityIdInt, planningAreaId, lors, pop18_24Male, 0, 18, 29, adultsToEmployeesMaleRatio, commuterRelationListMale);
+			counter = counter + pop18_24Male;
+			
+			
 
-			Map<Integer, CommuterRelationV2> relationsFromMunicipality = relationsMap.get(municipalityId);
+//			if (commuterRelationList.size() > 100) {
+//				throw new RuntimeException("More than 100 commuter relations from minucipality with ID " + municipalityId + " remain unassigned.");
+//			}
 			
-			for (Integer destination : relationsFromMunicipality.keySet()) {
-				int numberOfCommuter = relationsFromMunicipality.get(destination).getTrips();
+			writePersonsFile(population, outputBase + "persons.dat");
+		}
+	}
+
+
+	private static void createHouseholdsAndPersons(Population population, Map<Id<Household>, Household> households, int counter,
+			Integer municipalityId, Integer planningAreaId, List<Integer> lors, int numberOfPersons, int gender, int lowerAgeBound,
+			int upperAgeBound, double adultsToEmployeesRatio, List<Integer> commuterRelationList) {
+		for (int i = 0; i < numberOfPersons; i++) {
+			Id<Household> householdId = Id.create(municipalityId + "_" + (counter + i), Household.class);
+			HouseholdImpl household = new HouseholdImpl(householdId); // TODO Or use factory?
+			household.getAttributes().putAttribute("numberOfAdults", 1); // always 1; no household structure
+			household.getAttributes().putAttribute("totalNumberOfHouseholdVehicles", 1);
+			household.getAttributes().putAttribute("homeTSZLocation", getHomeLocation(municipalityId, planningAreaId, lors));
+			household.getAttributes().putAttribute("numberOfChildren", 0); // none, ignore them in this version
+			household.getAttributes().putAttribute("householdStructure", true); // TODO always choose value for single-person adult
+			
+			Id<Person> personId = Id.create(householdId + "_1", Person.class);
+			Person person = population.getFactory().createPerson(personId);
+			// attribute names inspired by "PersonUtils.java": "sex", "hasLicense", "carAvail", "employed", "age", "travelcards"
+			person.getAttributes().putAttribute("householdId", householdId);
+			boolean employed = getEmployed(adultsToEmployeesRatio);
+			person.getAttributes().putAttribute("employed", employed);
+			person.getAttributes().putAttribute("student", false); // TODO certain share of young adults?
+			person.getAttributes().putAttribute("hasLicense", true); // for CEMDAP's "driversLicence" variable
+			if (employed == true) {
+				person.getAttributes().putAttribute("locationOfWork", getRandomWorkLocation(commuterRelationList));
+			} else {
+				person.getAttributes().putAttribute("locationOfWork", -99);
 			}
 			
+			person.getAttributes().putAttribute("locationOfSchool", -99); // TODO ?
+			person.getAttributes().putAttribute("gender", gender); // for CEMDAP's "female" variable
+			person.getAttributes().putAttribute("age", getAgeInBounds(lowerAgeBound, upperAgeBound));
+			person.getAttributes().putAttribute("parent", false);
 			
-			/*
-			 * there will be mismatches between number of employees from zensus and commuter from commuter file
-			 * - because of socially secured workers (commuter file) vs. all workers (zensus)
-			 * - because not exactly the same year
-			 * Handle by scaling?
-			 */
+			population.addPerson(person);
 			
+			List<Id<Person>> personIds = new ArrayList<>();
+			personIds.add(personId);
+			household.setMemberIds(personIds);
+			households.put(householdId, household);
+		}
+	}	
+	
 			
-			// Attributes from zensus that I have available
-//			"populationMale"
-//			"populationFemale"
-//			"marriedMale"
-//			"marriedFemale"
-//			"infantsMale"
-//			"infantsFemale"
-//			"childrenMale"
-//			"childrenFemale"
-//			"adolescentsMale"
-//			"adolescentsFemale"
-//			"adultsMale"
-//			"adultsFemale"
-//			"seniorsMale"
-//			"seniorsFemale"
-//			"employedMale"
-//			"employedFemale"
-//			"studying"
-			
-
-			
-			// This is what I will need to set up the CEMDAP inputs
-//			householdId -> trivial
-//			personId -> trivial
-//			employed -> zensus
-//			student -> certain share of young adults?
-//			driversLicence -> all? // TODO
-//			locationOfWork -> commuter matrix
-//			locationOfSchool -> ? // TODO
-//			female -> zensus
-//			age -> also in zensus, but not correlated to other attributes; make simple assumption? // TODO
-//			parent -> ignore? // TODO
-//
-//			householdId -> trivial
-//			numberOfAdults -> always 1; no household structure
-//			totalNumberOfHouseholdVehicles -> ? // TODO
-//			homeTSZLocation -> random location in municipality via shapefile and shooting
-//			numberOfChildren -> none, ignore them? // TODO
-//			householdStructure -> always choose value for single-person adult // TODO
+	private static void scaleRelations(Map<Integer, CommuterRelationV2> relationsFromMunicipality, int employeesMale, int employeesFemale) {
+		// Count all commuters starting in the given municipality
+		int commutersMale = 0;
+		for (CommuterRelationV2 relation : relationsFromMunicipality.values()) {
+			if (relation.getTripsMale() == null) { // This is the case when there are very few people travelling on that relation
+				relation.setTripsMale((int) (relation.getTrips() / 2));
+			}
+				commutersMale += relation.getTripsMale();
+		}
+		int commutersFemale = 0;
+		for (CommuterRelationV2 relation : relationsFromMunicipality.values()) {
+			if (relation.getTripsFemale() == null) { // This is the case when there are very few people travelling on that relation
+				relation.setTripsFemale((int) (relation.getTrips() / 2));
+			}
+				commutersFemale += relation.getTripsFemale();
 		}
 		
+		// Compute ratios
+		double employeesToCommutersMaleRatio = 0.;
+		double employeesToCommutersFemaleRatio = 0.;
+		if (employeesMale != 0) { // Avoid dividing by zero
+			employeesToCommutersMaleRatio = employeesMale / commutersMale;
+		} else {
+			employeesToCommutersMaleRatio = 2.; // TODO This is an assumption; maybe improve later!
+		}
+		if (employeesFemale != 0) { // Avoid dividing by zero
+			employeesToCommutersFemaleRatio = commutersFemale / employeesFemale;
+		} else {
+			employeesToCommutersFemaleRatio = 2.; // TODO This is an assumption; maybe improve later!
+		}
 		
+		// Scale
+		for (CommuterRelationV2 relation : relationsFromMunicipality.values()) {
+			relation.setTripsMale((int) (relation.getTripsMale() * employeesToCommutersMaleRatio)); 
+		}
+		for (CommuterRelationV2 relation : relationsFromMunicipality.values()) {
+			relation.setTripsFemale((int) (relation.getTripsFemale() * employeesToCommutersFemaleRatio)); 
+		}
+	}
+
+
+	private static List<Integer> createRelationList(Map<Integer, CommuterRelationV2> relationsFromMunicipality, String gender) {
+		List<Integer> commuterRealtionsList = new ArrayList<>();
+		for (Integer destination : relationsFromMunicipality.keySet()) {
+			int trips = 0;
+			if (gender.equals("male")) {
+				trips = relationsFromMunicipality.get(destination).getTripsMale();
+			} else if (gender.equals("female")) {
+				trips = relationsFromMunicipality.get(destination).getTripsFemale();
+			} else {
+				throw new IllegalArgumentException("Must either be male or female.");
+			}
+			for (int i = 0; i < trips ; i++) {
+				commuterRealtionsList.add(destination);
+			}
+		}
+		return commuterRealtionsList;
+	}
+
+
+	private static Integer getRandomWorkLocation(List<Integer> commuterRelationList) {
+		Random random = new Random();
+		int position = random.nextInt(commuterRelationList.size());
+		Integer workLocation = commuterRelationList.get(position);
+		commuterRelationList.remove(position);
+		return workLocation;
+	}
+
+
+	private static Integer getHomeLocation(Integer municipalityId, Integer planningAreaId, List<Integer> lors) {
+		Integer locationId;
+		if (municipalityId == planningAreaId){
+			locationId = getRandomLor(lors);
+		} else {
+			locationId = municipalityId;
+		}
+		return locationId;
+	}
+
+
+	private static boolean getEmployed(double adultsToEmployeesRatio) {
+		if (Math.random() * adultsToEmployeesRatio < 1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	
+	private static int getAgeInBounds(int lowerBound, int upperBound) {
+		return (int) (lowerBound + Math.random() * (upperBound - lowerBound + 1));
+	}
+			
+	
+	private static Integer getRandomLor(List<Integer> lors) {
+		Random random = new Random();
+		Integer randomLor = lors.get(random.nextInt(lors.size()));
+		return randomLor;
+	}
+
+
+	private static List<Integer> readShape(String shapeFile, String attributeKey, String attributeName) {
+		List<Integer> lors = new ArrayList<>();
+		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(shapeFile);
+
+		for (SimpleFeature feature : features) {
+			Integer key = Integer.parseInt((String) feature.getAttribute(attributeKey));
+			lors.add(key);
+		}
+		return lors;
+	}
+	
+	
+
+		/*
 		// TODO adapt to new loop
 		for (int i = 0; i<commuterRelationList.size(); i++){
 			int quantity = commuterRelationList.get(i).getTripsMale();
@@ -260,101 +444,10 @@ public class DemandGeneratorCensus {
 				writePersonsFile(mapOfPersonMaps.get(i), outputBase + "persons" + i + ".dat");
 			}
 		}
-		
-	
-	private static int getSex() {
-		Random r = new Random();
-		double randomNumber = r.nextDouble();
-		// assume that both sexes are equally frequent for every age, work status etc.
-		// TODO this can clearly be improved, IPF etc.
-		if (randomNumber < 0.5) {
-			return 1;
-		} else {
-			return 0;
-		}
-	}
+*/
 	
 	
-	private static int getAge() {
-		int ageRange = getAgeRange();
-        switch (ageRange) {
-            case 1:	return getAgeInRange(18, 19);
-            case 2:	return getAgeInRange(20, 24);
-            case 3:	return getAgeInRange(25, 29);
-            case 4:	return getAgeInRange(30, 34);
-            case 5:	return getAgeInRange(35, 39);
-            case 6:	return getAgeInRange(40, 44);
-            case 7:	return getAgeInRange(45, 59);
-            case 8:	return getAgeInRange(60, 64);
-            case 9:	return getAgeInRange(65, 90);
-            default: 
-            	throw new RuntimeException("No age range met.");
-        }
-	}
-	
-	
-	private static int getAgeRange() {
-		Random r = new Random();
-		// cf. p. 11 of statistic of 2012
-		int populationInWorkingAge = 2932167;
-		double randomNumber = r.nextDouble() * populationInWorkingAge;
-		if (randomNumber < 54469) {return 1;}
-		if (randomNumber < 54469+222434) {return 2;}
-		if (randomNumber < 54469+222434+284440) {return 3;}
-		if (randomNumber < 54469+222434+284440+277166) {return 4;}
-		if (randomNumber < 54469+222434+284440+277166+228143) {return 5;}
-		if (randomNumber < 54469+222434+284440+277166+228143+256192) {return 6;}
-		if (randomNumber < 54469+222434+284440+277166+228143+256192+755482) {return 7;}
-		if (randomNumber < 54469+222434+284440+277166+228143+256192+755482+198908) {return 8;}
-		if (randomNumber < 54469+222434+284440+277166+228143+256192+755482+198908+654933) {return 9;}
-		else {
-			throw new RuntimeException("No age selected.");
-		}
-	}
-	
-	
-	private static int getAgeInRange(int rangeMin, int rangeMax) {
-		Random r = new Random();
-		int randomAge = (int) (rangeMin + (rangeMax - rangeMin) * r.nextDouble());
-		return randomAge;
-	}
-	
-	
-	private static int getEmployedWorkingAge() {
-		Random r = new Random();
-		double randomNumber = r.nextDouble();
-		// Population aged 18 through 65 (2277234) is 1.48 times as high as number of Erwerbstaetige (1543825)
-		// 100 out of 148 are determined to be employed
-		if (randomNumber < 1/1.48) {
-			return 1;
-		} else {
-			return 0;
-		}
-	}
-	
-	
-	private static int getStudent() {
-		Random r = new Random();
-		double randomNumber = r.nextDouble();
-		// Old (used in V2 until cemdap_berlin/21: No. of  students in Berlin (150000) divided by non-employed population aged 18-29 (266000)
-		// Number of  students in Berlin (150000) divided by non-employed population aged 18-29 (181000)
-		if (randomNumber < 150/181.) {
-			return 1;
-		} else {
-			return 0;
-		}
-	}
-	
-	
-	private static Integer getRandomLor(Map<Integer, String> lors) {
-		List <Integer> keys = new ArrayList<Integer>(lors.keySet());
-		Random	random = new Random();
-		Integer randomLor = keys.get(random.nextInt(keys.size()));
-		return randomLor;
-	}
-	
-		
-	public static void writePersonsFile(Map <String, SimplePerson> persons, String fileName) {
+	public static void writePersonsFile(Population population, String fileName) {
 		BufferedWriter bufferedWriterPersons = null;
 		
 		try {
@@ -362,20 +455,47 @@ public class DemandGeneratorCensus {
     		FileWriter fileWriterPersons = new FileWriter(personFile);
     		bufferedWriterPersons = new BufferedWriter(fileWriterPersons);
     		    		    		
-    		for (SimplePerson person : persons.values()) {
-    			int householdId = person.getHouseholdId();
-    			String personId = person.getpersonId();
-    			int employed = person.getEmployed();
-    			int student = person.getStudent();
-    			int driversLicence = person.getDriversLicence();
-    			int locationOfWork = person.getLocationOfWork();
-    			int locationOfSchool = person.getLocationOfSchool();
-    			int female = person.getSex();
-    			int age = person.getAge();
-    			int parent = person.getParent();
+    		for (Person person : population.getPersons().values()) {
     			
-    			// altogether this creates 59 columns = number in query file
-    			// TODO check if column position is correct, especially for "age" and "parent"
+    			
+    			Id<Household> householdId = (Id<Household>) person.getAttributes().getAttribute("householdId");
+    			Id<Person> personId = person.getId();
+    			
+    			int employed;
+    			if ((boolean) person.getAttributes().getAttribute("employed") == true) {
+    				employed = 1;
+    			} else {
+    				employed = 0;
+    			}
+    			
+    			int student;
+    			if ((boolean) person.getAttributes().getAttribute("student") == true) {
+    				student = 1;
+    			} else {
+    				student = 0;
+    			}
+    			
+    			int driversLicence;
+    			if ((boolean) person.getAttributes().getAttribute("hasLicense") == true) {
+    				driversLicence = 1;
+    			} else {
+    				driversLicence = 0;
+    			}
+    			
+    			int locationOfWork = (Integer) person.getAttributes().getAttribute("locationOfWork");
+    			int locationOfSchool = (Integer) person.getAttributes().getAttribute("locationOfSchool");
+    			
+    			int female = (Integer) person.getAttributes().getAttribute("gender"); // assumes that female = 1
+    			int age = (Integer) person.getAttributes().getAttribute("age");
+    			
+    			int parent;
+    			if ((boolean) person.getAttributes().getAttribute("parent") == true) {
+    				parent = 1;
+    			} else {
+    				parent = 0;
+    			}
+    			
+    			// Altogether this creates 59 columns = number in query file
     			bufferedWriterPersons.write(householdId + "\t" + personId + "\t" + employed  + "\t" + student
     					+ "\t" + driversLicence + "\t" + locationOfWork + "\t" + locationOfSchool
     					+ "\t" + female + "\t" + age + "\t" + parent + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0 
@@ -406,7 +526,7 @@ public class DemandGeneratorCensus {
     }
 	
 
-	public static void writeHouseholdsFile(Map <String, SimplePerson> persons, Map<Integer, Household> households,
+	public static void writeHouseholdsFile(Map <String, SimplePerson> persons, Map<Integer, SimpleHousehold> households,
 			String fileName) {
 		BufferedWriter bufferedWriterHouseholds = null;
 		

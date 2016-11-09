@@ -331,23 +331,24 @@ public class FacilitiesToSQL {
 
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException, NoConnectionException {
 //		DataBaseAdmin dba = new DataBaseAdmin(new File("data/matsim2.properties"));
-		DataBaseAdmin dba = new DataBaseAdmin(new File("data/matsim2postgres.properties"));
+		DataBaseAdmin dba = new DataBaseAdmin(new File("matsim2postgres.properties"));
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimFacilitiesReader fcr = new MatsimFacilitiesReader(scenario);
-		fcr.readFile(args[0]);
+//		fcr.readFile(args[0]);
 		FacilitiesToSQL f2sql = new FacilitiesToSQL(dba, scenario);
+		f2sql.loadFacilitiesFromSQL(args[0]);
 //		f2sql.stripDescription();
 //		f2sql.createCompleteFacilityAndActivityTable("full_facility_list");
 //		f2sql.createShortSQLFacilityListPostgres(args[1]+"_short");
-		f2sql.createCompleteFacilityAndActivityTablePostgres(args[1]);
+//		f2sql.createCompleteFacilityAndActivityTablePostgres(args[1]);
 //		f2sql.createShortSQLFacilityList("full_facility_list");
 
 //		ResultSet rs = dba.executeQuery("select distinct id, starttime, endtime, acttype,day from u_fouriep.edu_facility_detail_08112012");
 //		f2sql.mapTimesFromSQLtoXML(rs);
 //
-//		FacilitiesWriter fcw =  new FacilitiesWriter(f2sql.scenario.getActivityFacilities());
-//		String completeFacilitiesXMLFile = args[2];
-//		fcw.write(completeFacilitiesXMLFile);
+		FacilitiesWriter fcw =  new FacilitiesWriter(f2sql.scenario.getActivityFacilities());
+		String completeFacilitiesXMLFile = args[1];
+		fcw.write(completeFacilitiesXMLFile);
 	}
 
 

@@ -67,17 +67,17 @@ public class CommuterFileReaderV2 {
 		            		destination = row[2];
 		            		LOG.info("New destination set to: " + destination);
 		            		LOG.info(origin + " -> " + destination + ": Commuters: " + row[4] + "; Males: " + row[5] + "; Females: " + row[6]);
-		            		int tripsMale;
-		            		int tripsFemale;
+		            		Integer tripsMale;
+		            		Integer tripsFemale;
 		            		
 		            		if (row[5].equals("X")) {
-		            			tripsMale = -1; // TODO ...
+		            			tripsMale = null;
 		            		} else {
 		            			tripsMale = Integer.parseInt(row[5]);
 		            		}
 		            		
 		            		if (row[5].equals("X")) {
-		            			tripsFemale = -1; // TODO ...
+		            			tripsFemale = null;
 		            		} else {
 		            			tripsFemale = Integer.parseInt(row[6]);
 		            		}

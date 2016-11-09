@@ -21,6 +21,7 @@ package org.matsim.contrib.pseudosimulation.replanning.selectors;
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -55,10 +56,8 @@ public class DistributedPlanSelector implements PlanSelector<Plan, Person> {
     @Override
     public Plan selectPlan(HasPlansAndId<Plan, Person> person) {
         if (delegate == null) {
-            delegate = (PlanSelector) ((GenericPlanStrategyImpl) controler.getInjector().getInstance(Key.get(
-                    new TypeLiteral<Map<String, PlanStrategy>>() {
-                    }
-            )).get(delegateName)).getPlanSelector();
+
+            delegate = (PlanSelector) ((GenericPlanStrategyImpl) controler.getInjector().getBinding(Key.get(PlanStrategy.class, Names.named(delegateName))).getProvider().get()).getPlanSelector();
         }
 
         if (MatsimRandom.getLocalInstance().nextDouble() <= this.selectionFrequency) {

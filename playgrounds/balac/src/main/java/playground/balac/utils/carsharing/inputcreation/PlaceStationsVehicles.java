@@ -18,7 +18,7 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 public class PlaceStationsVehicles extends MatsimXmlWriter {
 	
 	private Scenario scenario;
-	
+	private static int counter = 0;
 	public PlaceStationsVehicles(Scenario scenario) {
 		
 		this.scenario = scenario;
@@ -35,8 +35,18 @@ public class PlaceStationsVehicles extends MatsimXmlWriter {
 		writeStartTag("company", attsC);
 
 		writeVehicles();
+		writeEndTag("company");
+		List<Tuple<String, String>> attsC2 = new ArrayList<Tuple<String, String>>();
+		attsC2.add(new Tuple<>("name", "Mobility"));
+
+		writeStartTag("company", attsC2);
+
+		writeVehicles();
+		writeEndTag("company");
+
 		writeEndTag("companies");
 
+		
 		close();
 	}
 	
@@ -49,12 +59,13 @@ public class PlaceStationsVehicles extends MatsimXmlWriter {
 		Object[] array = network.getLinks().values().toArray();
 		
 		int numberLinks = array.length;
-		Random r = new Random();
+		Random r = new Random(456);
 		
 		for (int i = 0; i < cars; i++) {
 			
 			Link link = (Link) array[r.nextInt(numberLinks)];
-			writeVehicle(link, i);
+			writeVehicle(link, counter);
+			counter++;
 		}		
 	}
 
@@ -62,7 +73,7 @@ public class PlaceStationsVehicles extends MatsimXmlWriter {
 
 		List<Tuple<String, String>> attsV = new ArrayList<Tuple<String, String>>();
 		
-		attsV.add(new Tuple<>("id", Integer.toString(id)));
+		attsV.add(new Tuple<>("id", "FF_" + Integer.toString(id)));
 		attsV.add(new Tuple<>("x", Double.toString(link.getCoord().getX())));
 		attsV.add(new Tuple<>("y", Double.toString(link.getCoord().getY())));
 		attsV.add(new Tuple<>("type", "car"));

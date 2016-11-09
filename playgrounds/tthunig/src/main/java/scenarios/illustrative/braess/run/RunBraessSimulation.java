@@ -237,6 +237,7 @@ public final class RunBraessSimulation {
 		config.strategy().setMaxAgentPlanMemorySize(5);
 
 		config.qsim().setStuckTime(3600 * 10.);
+//		config.qsim().setRemoveStuckVehicles(true);
 
 		config.qsim().setStartTime(3600 * SIMULATION_START_TIME);
 		// set end time to shorten simulation run time: 2 hours after the last agent departs

@@ -113,14 +113,16 @@ public class ControlerWSPreCalcTimes {
         }
         final PTLinkSpeedCalculatorWithPreCalcTimes linkSpeedCalculatorWithPreCalcTimes = new PTLinkSpeedCalculatorWithPreCalcTimes(preloadedStopStopTimes, true);
         controler.addControlerListener(linkSpeedCalculatorWithPreCalcTimes);
+        TransitRouterEventsWSFactory transitRouterEventsWSFactory = new TransitRouterEventsWSFactory(controler.getScenario(),
+                waitTimeStuckCalculator.getWaitTimes(), stopStopTimeCalculatorSerializable.getStopStopTimes());
         //
         controler.addOverridingModule(new AbstractModule() {
 
             @Override
 
             public void install() {
-                bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(controler.getScenario(),
-                        waitTimeStuckCalculator.getWaitTimes(), stopStopTimeCalculatorSerializable.getStopStopTimes()));
+
+                bind(TransitRouter.class).toProvider(transitRouterEventsWSFactory);
 
                 bindMobsim().toProvider(new Provider<Mobsim>() {
 

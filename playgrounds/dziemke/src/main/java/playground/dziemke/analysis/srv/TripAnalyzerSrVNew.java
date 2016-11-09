@@ -1,11 +1,5 @@
 package playground.dziemke.analysis.srv;
 
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -14,11 +8,16 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-
 import playground.dziemke.analysis.AnalysisFileWriter;
 import playground.dziemke.analysis.AnalysisUtils;
 import playground.dziemke.analysis.Trip;
 import playground.dziemke.analysis.TripAnalyzerBasic;
+
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author dziemke
@@ -46,122 +45,125 @@ public class TripAnalyzerSrVNew {
 	private static final int binWidthSpeed_km_h = 1;
 
 	/* Input and output */
-	private static final String inputFileTrips = "../../../shared-svn/projects/cemdapMatsimCadyts/analysis/srv/input/W2008_Berlin_Weekday.dat";
-	private static final String inputFilePersons = "../../../shared-svn/projects/cemdapMatsimCadyts/analysis/srv/input/P2008_Berlin2.dat";
-	
-	private static final String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+	private static final String INPUT_TRIPS_FILE = "../../../shared-svn/projects/cemdapMatsimCadyts/analysis/srv/input/W2008_Berlin_Weekday.dat";
+	private static final String INPUT_PERSONS_FILE = "../../../shared-svn/projects/cemdapMatsimCadyts/analysis/srv/input/P2008_Berlin2.dat";
+
+	private static final String INPUT_NETWORK_FILE = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 //	private static finalString shapeFile = "/Users/dominik/Workspace/data/srv/input/RBS_OD_STG_1412/RBS_OD_STG_1412.shp";
-			
-	private static String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/analysis/srv/output/wd_new";
+
+	private static final String OUTPUT_DIRECTORY = "../../../shared-svn/projects/cemdapMatsimCadyts/analysis/srv/output/wd_new";
 
 	/* Variables to store information */
 	private static double aggregatedWeightOfConsideredTrips = 0;
-	private static int numberOfInIncompleteTrips = 0;
-    
+//	private static int numberOfInIncompleteTrips = 0;
+
 	private static Map<String, Double> otherInformationMap = new TreeMap<>();
 
 	
 	public static void main(String[] args) {
-		double aggregatedWeightOfTripsWithNonNegativeTimesAndDurations = 0;
-		double aggregatedWeightOfTripsWithNonNegativeDistanceBeelineSurvey = 0.;
-		double aggregatedWeightOfTripsWithNonNegativeDistanceRoutedSurvey = 0.;
-		double aggregatedWeightOfTripsWithCalculableSpeedBeelineSurvey = 0;
-		double aggregatedWeightOfTripsWithCalculableSpeedRoutedSurvey = 0;
-		
+		analyze(INPUT_TRIPS_FILE, INPUT_PERSONS_FILE, INPUT_NETWORK_FILE, OUTPUT_DIRECTORY);
+	}
+
+	public static void analyze(String inputTripsFile, String inputPersonsFile, String inputNetworkFile, String outputDirectory) {
+		double aggregatedWeightOfTripsWithNonNegativeTimesAndDurations;
+		double aggregatedWeightOfTripsWithNonNegativeDistanceBeelineSurvey;
+		double aggregatedWeightOfTripsWithNonNegativeDistanceRoutedSurvey;
+		double aggregatedWeightOfTripsWithCalculableSpeedBeelineSurvey;
+		double aggregatedWeightOfTripsWithCalculableSpeedRoutedSurvey;
+
 		//
 		String fromCRS = "EPSG:31468"; // GK4
 		String toCRS = "EPSG:31468"; // GK4
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(fromCRS, toCRS);
 		//
-		
-		adaptOutputDirectory();
-	    
+
+		outputDirectory = adaptOutputDirectory(outputDirectory);
+
 		/* Get network, which is needed to calculate distances */
-	    Network network = NetworkUtils.createNetwork();
-	    MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
-	    networkReader.readFile(networkFile);
-		
+		Network network = NetworkUtils.createNetwork();
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
+		networkReader.readFile(inputNetworkFile);
+
 	    /* Parse trip file */
-		log.info("Parsing " + inputFileTrips + ".");		
+		log.info("Parsing " + inputTripsFile + ".");
 		SrV2008TripParser tripParser = new SrV2008TripParser();
-		tripParser.parse(inputFileTrips);
+		tripParser.parse(inputTripsFile);
 		log.info("Finished parsing trips.");
 
 		/* Parse person file */
-		log.info("Parsing " + inputFilePersons + ".");		
+		log.info("Parsing " + inputPersonsFile + ".");
 		SrV2008PersonParser personParser = new SrV2008PersonParser();
-		personParser.parse(inputFilePersons);
+		personParser.parse(inputPersonsFile);
 		log.info("Finished parsing persons.");
-		 
+
 		AnalysisFileWriter writer = new AnalysisFileWriter();
 
-	    List<Trip> trips = createListOfValidTrip(tripParser.getTrips(), network, personParser);
-	    
-	    /* Do calculations and write-out*/
-	    // reliant on variable "V_ANKUNFT": -9 = no data, -10 = implausible
-		// and on variable "V_BEGINN": -9 = no data, -10 = implausible
-	    aggregatedWeightOfTripsWithNonNegativeTimesAndDurations = TripAnalyzerBasic.countTripsWithNonNegativeTimesAndDurations(trips);
-	    Map <Integer, Double> tripDurationMap = TripAnalyzerBasic.createTripDurationMap(trips, binWidthDuration_min);
-	    double averageTripDuration = TripAnalyzerBasic.calculateAverageTripDuration_min(trips);
-	    writer.writeToFileIntegerKey(tripDurationMap, outputDirectory + "/tripDuration.txt", binWidthDuration_min, aggregatedWeightOfTripsWithNonNegativeTimesAndDurations, averageTripDuration);
-	    writer.writeToFileIntegerKeyCumulative(tripDurationMap, outputDirectory + "/tripDurationCumulative.txt", binWidthDuration_min, aggregatedWeightOfTripsWithNonNegativeTimesAndDurations, averageTripDuration);
-	    
-	    Map <Integer, Double> departureTimeMap = TripAnalyzerBasic.createDepartureTimeMap(trips, binWidthTime_h);
-	    writer.writeToFileIntegerKey(departureTimeMap, outputDirectory + "/departureTime.txt", binWidthTime_h, aggregatedWeightOfTripsWithNonNegativeTimesAndDurations, Double.NaN);
-	   
-	    // reliant on variable "V_ZWECK": -9 = no data
-		// "V_ZWECK" - end of trip = start of activity
-	    Map<String, Double> activityTypeMap = TripAnalyzerBasic.createActivityTypeMap(trips);
-	    writer.writeToFileStringKey(activityTypeMap, outputDirectory + "/activityTypes.txt", aggregatedWeightOfConsideredTrips);
+		List<Trip> trips = createListOfValidTrip(tripParser.getTrips(), network, personParser);
 
-	    // reliant on variable "V_LAENGE": -9 = no data, -10 = implausible
-	    aggregatedWeightOfTripsWithNonNegativeDistanceBeelineSurvey = countTripsWithNonnegativeDistanceBeelineInSurvey(trips);
+	    /* Do calculations and write-out*/
+		// reliant on variable "V_ANKUNFT": -9 = no data, -10 = implausible
+		// and on variable "V_BEGINN": -9 = no data, -10 = implausible
+		aggregatedWeightOfTripsWithNonNegativeTimesAndDurations = TripAnalyzerBasic.countTripsWithNonNegativeTimesAndDurations(trips);
+		Map <Integer, Double> tripDurationMap = TripAnalyzerBasic.createTripDurationMap(trips, binWidthDuration_min);
+		double averageTripDuration = TripAnalyzerBasic.calculateAverageTripDuration_min(trips);
+		writer.writeToFileIntegerKey(tripDurationMap, outputDirectory + "/tripDuration.txt", binWidthDuration_min, aggregatedWeightOfTripsWithNonNegativeTimesAndDurations, averageTripDuration);
+		writer.writeToFileIntegerKeyCumulative(tripDurationMap, outputDirectory + "/tripDurationCumulative.txt", binWidthDuration_min, aggregatedWeightOfTripsWithNonNegativeTimesAndDurations, averageTripDuration);
+
+		Map <Integer, Double> departureTimeMap = TripAnalyzerBasic.createDepartureTimeMap(trips, binWidthTime_h);
+		writer.writeToFileIntegerKey(departureTimeMap, outputDirectory + "/departureTime.txt", binWidthTime_h, aggregatedWeightOfTripsWithNonNegativeTimesAndDurations, Double.NaN);
+
+		// reliant on variable "V_ZWECK": -9 = no data
+		// "V_ZWECK" - end of trip = start of activity
+		Map<String, Double> activityTypeMap = TripAnalyzerBasic.createActivityTypeMap(trips);
+		writer.writeToFileStringKey(activityTypeMap, outputDirectory + "/activityTypes.txt", aggregatedWeightOfConsideredTrips);
+
+		// reliant on variable "V_LAENGE": -9 = no data, -10 = implausible
+		aggregatedWeightOfTripsWithNonNegativeDistanceBeelineSurvey = countTripsWithNonnegativeDistanceBeelineInSurvey(trips);
 		Map<Integer, Double> tripDistanceBeelineMap = createTripDistanceBeelineMap(trips, binWidthDistance_km); // SrV-specific, distances given by survey
 		double averageTripDistanceBeeline_km = calculateAverageTripDistanceBeeline_km(trips); // SrV-specific, distances given by survey
 		writer.writeToFileIntegerKey(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeeline.txt", binWidthDistance_km, aggregatedWeightOfTripsWithNonNegativeDistanceBeelineSurvey, averageTripDistanceBeeline_km);
 		writer.writeToFileIntegerKeyCumulative(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeelineCumulative.txt", binWidthDistance_km, aggregatedWeightOfTripsWithNonNegativeDistanceBeelineSurvey, averageTripDistanceBeeline_km);
-	    
+
 		// In SrV, a routed distance (according to some software) is already given
 		// reliant on SrV variable "E_LAENGE_KUERZEST"; -7 = calculation not possible
 		aggregatedWeightOfTripsWithNonNegativeDistanceRoutedSurvey = countTripsWithNonnegativeDistanceRoutedInSurvey(trips);
-	    Map<Integer, Double> tripDistanceRoutedMap = createTripDistanceRoutedMap(trips, binWidthDistance_km); // SrV-specific, distances given by survey
-	    double averageTripDistanceRouted_km = calculateAverageTripDistanceRouted_km(trips); // SrV-specific, distances given by survey
-	    writer.writeToFileIntegerKey(tripDistanceRoutedMap, outputDirectory + "/tripDistanceRouted.txt", binWidthDistance_km, aggregatedWeightOfTripsWithNonNegativeDistanceRoutedSurvey, averageTripDistanceRouted_km);
-	    
-	    // reliant on variable "V_LAENGE": -9 = no data, -10 = implausible
-	    aggregatedWeightOfTripsWithCalculableSpeedBeelineSurvey = countTripsWithCalculableSpeedBeelineInSurvey(trips); // SrV-specific, distances given by survey
-		Map<Integer, Double> averageTripSpeedBeelineMap = createAverageTripSpeedBeelineMap(trips, binWidthSpeed_km_h, network); // SrV-specific, distances given by survey
-		double averageOfAverageTripSpeedsBeeline_km_h = calculateAverageOfAverageTripSpeedsBeeline_km_h(trips, network); // SrV-specific, distances given by survey
+		Map<Integer, Double> tripDistanceRoutedMap = createTripDistanceRoutedMap(trips, binWidthDistance_km); // SrV-specific, distances given by survey
+		double averageTripDistanceRouted_km = calculateAverageTripDistanceRouted_km(trips); // SrV-specific, distances given by survey
+		writer.writeToFileIntegerKey(tripDistanceRoutedMap, outputDirectory + "/tripDistanceRouted.txt", binWidthDistance_km, aggregatedWeightOfTripsWithNonNegativeDistanceRoutedSurvey, averageTripDistanceRouted_km);
+
+		// reliant on variable "V_LAENGE": -9 = no data, -10 = implausible
+		aggregatedWeightOfTripsWithCalculableSpeedBeelineSurvey = countTripsWithCalculableSpeedBeelineInSurvey(trips); // SrV-specific, distances given by survey
+		Map<Integer, Double> averageTripSpeedBeelineMap = createAverageTripSpeedBeelineMap(trips, binWidthSpeed_km_h); // SrV-specific, distances given by survey
+		double averageOfAverageTripSpeedsBeeline_km_h = calculateAverageOfAverageTripSpeedsBeeline_km_h(trips); // SrV-specific, distances given by survey
 		writer.writeToFileIntegerKey(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeeline.txt", binWidthSpeed_km_h, aggregatedWeightOfTripsWithCalculableSpeedBeelineSurvey, averageOfAverageTripSpeedsBeeline_km_h);
 		writer.writeToFileIntegerKeyCumulative(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeelineCumulative.txt", binWidthSpeed_km_h, aggregatedWeightOfTripsWithCalculableSpeedBeelineSurvey, averageOfAverageTripSpeedsBeeline_km_h);
-		
+
 		// reliant to SrV variable variable "E_LAENGE_KUERZEST"; -7 = calculation not possible
-	    aggregatedWeightOfTripsWithCalculableSpeedRoutedSurvey = countTripsWithCalculableSpeedRoutedInSurvey(trips); // SrV-specific, distances given by survey
-		Map<Integer, Double> averageTripSpeedRoutedMap = createAverageTripSpeedRoutedMap(trips, binWidthSpeed_km_h, network); // SrV-specific, distances given by survey
-		double averageOfAverageTripSpeedsRouted_km_h = calculateAverageOfAverageTripSpeedsRouted_km_h(trips, network); // SrV-specific, distances given by survey
+		aggregatedWeightOfTripsWithCalculableSpeedRoutedSurvey = countTripsWithCalculableSpeedRoutedInSurvey(trips); // SrV-specific, distances given by survey
+		Map<Integer, Double> averageTripSpeedRoutedMap = createAverageTripSpeedRoutedMap(trips, binWidthSpeed_km_h); // SrV-specific, distances given by survey
+		double averageOfAverageTripSpeedsRouted_km_h = calculateAverageOfAverageTripSpeedsRouted_km_h(trips); // SrV-specific, distances given by survey
 		writer.writeToFileIntegerKey(averageTripSpeedRoutedMap, outputDirectory + "/averageTripSpeedRouted.txt", binWidthSpeed_km_h, aggregatedWeightOfTripsWithCalculableSpeedRoutedSurvey, averageOfAverageTripSpeedsRouted_km_h);
 
 		/* Other information */
 //	    otherInformationMap.put("Number of trips that have no previous activity", tripHandler.getNoPreviousEndOfActivityCounter()); // TODO reactivate
-		otherInformationMap.put("Aggregated weight of trips that have negative times or durations", aggregatedWeightOfConsideredTrips - aggregatedWeightOfTripsWithNonNegativeTimesAndDurations);		
+		otherInformationMap.put("Aggregated weight of trips that have negative times or durations", aggregatedWeightOfConsideredTrips - aggregatedWeightOfTripsWithNonNegativeTimesAndDurations);
 		otherInformationMap.put("Aggregated weight of trips that have negative distance (beeline, from survey)", aggregatedWeightOfConsideredTrips - aggregatedWeightOfTripsWithNonNegativeDistanceBeelineSurvey);
 		otherInformationMap.put("Aggregated weight of trips that have negative distance (routed, from survey)", aggregatedWeightOfConsideredTrips - aggregatedWeightOfTripsWithNonNegativeDistanceRoutedSurvey);
 		otherInformationMap.put("Aggregated weight of trips that have no calculable speed (beeline)", aggregatedWeightOfConsideredTrips - aggregatedWeightOfTripsWithCalculableSpeedBeelineSurvey);
 		otherInformationMap.put("Aggregated weight of trips that have no calculable speed (routed)", aggregatedWeightOfConsideredTrips - aggregatedWeightOfTripsWithCalculableSpeedRoutedSurvey);
-	    otherInformationMap.put("Number of incomplete trips (i.e. number of removed agents)", (double) numberOfInIncompleteTrips);
-	    otherInformationMap.put("Aggregated weight of (complete) trips", aggregatedWeightOfConsideredTrips);
-	    writer.writeToFileOther(otherInformationMap, outputDirectory + "/otherInformation.txt");
-	    
-	    log.info(numberOfInIncompleteTrips + " trips are incomplete.");
-	    
+//		otherInformationMap.put("Number of incomplete trips (i.e. number of removed agents)", (double) numberOfInIncompleteTrips);
+		otherInformationMap.put("Aggregated weight of (complete) trips", aggregatedWeightOfConsideredTrips);
+		writer.writeToFileOther(otherInformationMap, outputDirectory + "/otherInformation.txt");
+
+//		log.info(numberOfInIncompleteTrips + " trips are incomplete.");
+
 	    /* Create plans and events */
-	    TreeMap<Id<Person>, TreeMap<Double, Trip>> personTripsMap = createPersonTripsMap(trips);
-	    SrV2PlansAndEventsConverter.convert(personTripsMap, network, ct, outputDirectory + "/");
+		TreeMap<Id<Person>, TreeMap<Double, Trip>> personTripsMap = createPersonTripsMap(trips);
+		SrV2PlansAndEventsConverter.convert(personTripsMap, network, ct, outputDirectory + "/");
 	}
 	
-	
 	/* SrV-specific calculations using distances given by survey instead of own calculated distances */
-	static double countTripsWithNonnegativeDistanceBeelineInSurvey(List<Trip> trips) {
+	private static double countTripsWithNonnegativeDistanceBeelineInSurvey(List<Trip> trips) {
 		double counter = 0.;
 		for (Trip trip : trips) {
 			if (trip.getDistanceBeelineFromSurvey_m() >= 0) {
@@ -171,7 +173,7 @@ public class TripAnalyzerSrVNew {
 		return counter;
 	}	
 	
-	static Map<Integer, Double> createTripDistanceBeelineMap(List<Trip> trips, int binWidthDistance_km) {
+	private static Map<Integer, Double> createTripDistanceBeelineMap(List<Trip> trips, int binWidthDistance_km) {
 		Map<Integer, Double> tripDistanceBeelineMap = new TreeMap<>();
 		for (Trip trip : trips) {
 			if (trip.getDistanceBeelineFromSurvey_m() >= 0) {
@@ -182,7 +184,7 @@ public class TripAnalyzerSrVNew {
 		return tripDistanceBeelineMap;
 	}
 
-	static double calculateAverageTripDistanceBeeline_km(List<Trip> trips) {
+	private static double calculateAverageTripDistanceBeeline_km(List<Trip> trips) {
 		double sumOfAllDistancesBeeline_km = 0.;
 		double sumOfAllWeights = 0.;
 		for (Trip trip : trips) {
@@ -194,7 +196,7 @@ public class TripAnalyzerSrVNew {
 		return sumOfAllDistancesBeeline_km / sumOfAllWeights;
 	}
 	
-	static double countTripsWithNonnegativeDistanceRoutedInSurvey(List<Trip> trips) {
+	private static double countTripsWithNonnegativeDistanceRoutedInSurvey(List<Trip> trips) {
 		double counter = 0.;
 		for (Trip trip : trips) {
 			if (trip.getDistanceRoutedShortestFromSurvey_m() >= 0) {
@@ -204,7 +206,7 @@ public class TripAnalyzerSrVNew {
 		return counter;
 	}
 	
-	static Map<Integer, Double> createTripDistanceRoutedMap(List<Trip> trips, int binWidthDistance_km) {
+	private static Map<Integer, Double> createTripDistanceRoutedMap(List<Trip> trips, int binWidthDistance_km) {
     	Map<Integer, Double> tripDistanceRoutedMap = new TreeMap<>();
     	for (Trip trip : trips) {
     		if (trip.getDistanceRoutedShortestFromSurvey_m() >= 0) {
@@ -215,7 +217,7 @@ public class TripAnalyzerSrVNew {
     	return tripDistanceRoutedMap;
     }
 	
-	static double calculateAverageTripDistanceRouted_km(List<Trip> trips) {
+	private static double calculateAverageTripDistanceRouted_km(List<Trip> trips) {
 		double sumOfAllDistancesRouted_km = 0.;
 		double sumOfAllWeights = 0.;
 		for (Trip trip : trips) {
@@ -227,7 +229,7 @@ public class TripAnalyzerSrVNew {
 		return sumOfAllDistancesRouted_km / sumOfAllWeights;
 	}
 	
-	static double countTripsWithCalculableSpeedBeelineInSurvey(List<Trip> trips) {
+	private static double countTripsWithCalculableSpeedBeelineInSurvey(List<Trip> trips) {
 		double counter = 0.;
 		for (Trip trip : trips) {
 			double tripDuration_h = (trip.getDurationByCalculation_s() / 3600.);
@@ -238,8 +240,8 @@ public class TripAnalyzerSrVNew {
 		}
 		return counter;
 	}
-	
-	static Map<Integer, Double> createAverageTripSpeedBeelineMap(List<Trip> trips, int binWidthSpeed_km_h, Network network) {
+
+	private static Map<Integer, Double> createAverageTripSpeedBeelineMap(List<Trip> trips, int binWidthSpeed_km_h) {
 		Map<Integer, Double> averageTripSpeedBeelineMap = new TreeMap<>();
 		for (Trip trip : trips) {
 			double tripDuration_h = (trip.getDurationByCalculation_s() / 3600.);
@@ -251,7 +253,7 @@ public class TripAnalyzerSrVNew {
 		return averageTripSpeedBeelineMap;
 	}
 
-	static double calculateAverageOfAverageTripSpeedsBeeline_km_h(List<Trip> trips, Network network) {
+	private static double calculateAverageOfAverageTripSpeedsBeeline_km_h(List<Trip> trips) {
 		double sumOfAllAverageSpeedsBeeline_km_h = 0.;
 		double sumOfAllWeights = 0.;
 		for (Trip trip : trips) {
@@ -265,7 +267,7 @@ public class TripAnalyzerSrVNew {
 		return sumOfAllAverageSpeedsBeeline_km_h / sumOfAllWeights;
 	}
 
-	static double countTripsWithCalculableSpeedRoutedInSurvey(List<Trip> trips) {
+	private static double countTripsWithCalculableSpeedRoutedInSurvey(List<Trip> trips) {
 		double counter = 0.;
 		for (Trip trip : trips) {
 			double tripDuration_h = (trip.getDurationByCalculation_s() / 3600.);
@@ -276,8 +278,8 @@ public class TripAnalyzerSrVNew {
 		}
 		return counter;
 	}
-	
-	static Map<Integer, Double> createAverageTripSpeedRoutedMap(List<Trip> trips, int binWidthSpeed_km_h, Network network) {
+
+	private static Map<Integer, Double> createAverageTripSpeedRoutedMap(List<Trip> trips, int binWidthSpeed_km_h) {
     	Map<Integer, Double> averageTripSpeedRoutedMap = new TreeMap<>();
     	for (Trip trip : trips) {
     		double tripDuration_h = (trip.getDurationByCalculation_s() / 3600.);
@@ -288,8 +290,8 @@ public class TripAnalyzerSrVNew {
     	}
     	return averageTripSpeedRoutedMap;
     }
-	
-	static double calculateAverageOfAverageTripSpeedsRouted_km_h(List<Trip> trips, Network network) {
+
+	private static double calculateAverageOfAverageTripSpeedsRouted_km_h(List<Trip> trips) {
 		double sumOfAllAverageSpeedsRouted_km_h = 0.;
 		double sumOfAllWeights = 0.;
 		for (Trip trip : trips) {
@@ -302,22 +304,21 @@ public class TripAnalyzerSrVNew {
     	}
 		return sumOfAllAverageSpeedsRouted_km_h / sumOfAllWeights;
 	}
-	
-	static TreeMap<Id<Person>, TreeMap<Double, Trip>> createPersonTripsMap(List<Trip> trips) {
-		TreeMap<Id<Person>, TreeMap<Double, Trip>> personTripsMap = new TreeMap<Id<Person>, TreeMap<Double, Trip>>();
+
+	private static TreeMap<Id<Person>, TreeMap<Double, Trip>> createPersonTripsMap(List<Trip> trips) {
+		TreeMap<Id<Person>, TreeMap<Double, Trip>> personTripsMap = new TreeMap<>();
 		
 		for (Trip trip : trips) {
 			String personId = trip.getPersonId().toString();
 			Id<Person> idPerson = Id.create(personId, Person.class);
 			
 			if (!personTripsMap.containsKey(idPerson)) {
-				TreeMap<Double, Trip> tripsMap = new TreeMap<Double, Trip>();
-				personTripsMap.put(idPerson, tripsMap);
+				personTripsMap.put(idPerson, new TreeMap<>());
 			}
 		
 			double departureTime_s = trip.getDepartureTime_s();
 			if (personTripsMap.get(idPerson).containsKey(departureTime_s)) {
-				new RuntimeException("Person may not have two activites ending at the exact same time.");
+				throw new RuntimeException("Person may not have two activites ending at the exact same time.");
 			} else {
 				personTripsMap.get(idPerson).put(departureTime_s, trip);
 			}
@@ -327,7 +328,7 @@ public class TripAnalyzerSrVNew {
 	/* SrV-specific calculations -- End */
 	
 	@SuppressWarnings("all")
-	private static void adaptOutputDirectory() {
+	private static String adaptOutputDirectory(String outputDirectory) {
 		if (useWeights == true) {
 			outputDirectory = outputDirectory + "_wt";
 		}
@@ -353,6 +354,7 @@ public class TripAnalyzerSrVNew {
 
 		/* Create directory */
 		new File(outputDirectory).mkdir();
+		return outputDirectory;
 	}
 	
 	@SuppressWarnings("all")

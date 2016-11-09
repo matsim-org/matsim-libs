@@ -95,6 +95,17 @@
 		<param name="activityClosingTime_1" value="18:00:00" />
 		<param name="scoringThisActivityAtAll_1" value="true" />
 		
+		<param name="activityType_2" value="noise_sensitive" />
+
+		<param name="activityPriority_2" value="1.0" />
+		<param name="activityTypicalDuration_2" value="08:00:00" />
+		<param name="activityMinimalDuration_2" value="undefined" />
+		<param name="activityOpeningTime_2" value="07:00:00" />
+		<param name="activityLatestStartTime_2" value="undefined" />
+		<param name="activityEarliestEndTime_2" value="undefined" />
+		<param name="activityClosingTime_2" value="18:00:00" />
+		<param name="scoringThisActivityAtAll_2" value="true" />
+		
 	</module>
 	
 	<module name="global">

@@ -91,7 +91,7 @@ public abstract class NodeClusteringAlgorithm {
 	 * @param level
 	 * @return an arraylist of clusters
 	 */
-    ArrayList<NodeCluster> getClustersAtLevel(int level) {
+	public ArrayList<NodeCluster> getClustersAtLevel(int level) {
 		// if(this.pointersToClusterLevels == null)
 		// initializePointers();
 
@@ -175,7 +175,7 @@ public abstract class NodeClusteringAlgorithm {
 	protected abstract NodeCluster findSingleInLinkClusters(
 			TreeMap<Integer, NodeCluster> clusters);
 
-	void run() {
+	public void run() {
 		logger.info("Starting clustering algo, using the link method "
 				+ internalFlowMethod.toString());
 		clusterSteps = 1;
@@ -331,7 +331,7 @@ public abstract class NodeClusteringAlgorithm {
 	}
 	
 
-	int getClusterSteps() {
+	public int getClusterSteps() {
 		return clusterSteps;
 	}
 
@@ -417,7 +417,7 @@ public abstract class NodeClusteringAlgorithm {
 				rootClusters.values()));
 	}
 
-	NodeCluster getLargestCluster(ArrayList<NodeCluster> clustersAtLevel) {
+	public NodeCluster getLargestCluster(ArrayList<NodeCluster> clustersAtLevel) {
 		double largest = 0;
 		NodeCluster outCluster = null;
 		for (NodeCluster nc : clustersAtLevel) {
