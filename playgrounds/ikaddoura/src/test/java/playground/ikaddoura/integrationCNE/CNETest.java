@@ -137,7 +137,90 @@ public class CNETest {
 	@Ignore
 	@Test
 	public final void test2(){
+		String configFile = testUtils.getPackageInputDirectory() + "CNETest/test2/config.xml";
 		
+		// baseCase
+		CNEIntegration cneIntegration1 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "bc");
+		Controler controler1 = cneIntegration1.prepareControler();		
+		LinkDemandEventHandler handler1 = new LinkDemandEventHandler(controler1.getScenario().getNetwork());
+		controler1.getEvents().addHandler(handler1);
+		controler1.getConfig().controler().setCreateGraphs(false);
+		controler1.run();
+
+		// air pollution pricing
+		CNEIntegration cneIntegration2 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "e");
+		cneIntegration2.setAirPollutionPricing(true);
+		Controler controler2 = cneIntegration2.prepareControler();
+		LinkDemandEventHandler handler2 = new LinkDemandEventHandler(controler2.getScenario().getNetwork());
+		controler2.getEvents().addHandler(handler2);
+		controler2.getConfig().controler().setCreateGraphs(false);
+		controler2.run();
+
+		// noise pricing
+		CNEIntegration cneIntegration3 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "n");
+		cneIntegration3.setNoisePricing(true);
+		Controler controler3 = cneIntegration3.prepareControler();
+		LinkDemandEventHandler handler3 = new LinkDemandEventHandler(controler3.getScenario().getNetwork());
+		controler3.getEvents().addHandler(handler3);
+		controler3.getConfig().controler().setCreateGraphs(false);
+		controler3.run();
+						
+		// air pollution + noise pricing
+		CNEIntegration cneIntegration4 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "cn");
+		cneIntegration4.setAirPollutionPricing(true);
+		cneIntegration4.setNoisePricing(true);
+		Controler controler4 = cneIntegration4.prepareControler();
+		LinkDemandEventHandler handler4 = new LinkDemandEventHandler(controler4.getScenario().getNetwork());
+		controler4.getEvents().addHandler(handler4);
+		controler4.getConfig().controler().setCreateGraphs(false);
+		controler4.run();
+		
+		System.out.println("----------------------------------");
+		System.out.println("Base case:");
+		printResults(handler1);
+		
+		System.out.println("----------------------------------");
+		System.out.println("Air pollution pricing:");
+		printResults(handler2);
+		
+		System.out.println("----------------------------------");
+		System.out.println("Noise pricing:");
+		printResults(handler3);
+		
+		System.out.println("----------------------------------");
+		System.out.println("Air pollution + noise pricing:");
+		printResults(handler4);
+		
+		// no zero demand on bottleneck link
+		Assert.assertEquals(true,
+				getBottleneckDemand(handler1) != 0 &&
+				getBottleneckDemand(handler2) != 0 &&
+				getBottleneckDemand(handler3) != 0 &&
+				getBottleneckDemand(handler4) != 0);
+				
+		// the demand on the bottleneck link should go down in case of congestion pricing (c)
+		Assert.assertEquals(true, getBottleneckDemand(handler2) < getBottleneckDemand(handler1));		
+		
+		// the demand on the noise sensitive route should go up in case of congestion pricing (c)
+		Assert.assertEquals(true, getNoiseSensitiveRouteDemand(handler2) > getNoiseSensitiveRouteDemand(handler1));
+		
+		// the demand on the noise sensitive route should go down in case of noise pricing (n)
+		Assert.assertEquals(true, getNoiseSensitiveRouteDemand(handler3) < getNoiseSensitiveRouteDemand(handler1));
+		
+		// the demand on the long and uncongested route should go up in case of noise pricing (n)
+		Assert.assertEquals(true, getLongUncongestedDemand(handler3) > getLongUncongestedDemand(handler1));	
+
+		// the demand on the bottleneck link should go down in case of congestion + noise pricing (cn)
+		Assert.assertEquals(true, getBottleneckDemand(handler4) < getBottleneckDemand(handler1));
+		
+		// the demand on the noise sensitive route should go down in case of congestion + noise pricing (cn)
+		Assert.assertEquals(true, getNoiseSensitiveRouteDemand(handler4) < getNoiseSensitiveRouteDemand(handler1));
+	
+		// the demand on the long and uncongested route should go up in case of congestion and noise pricing (cn)
+		Assert.assertEquals(true, getLongUncongestedDemand(handler4) > getLongUncongestedDemand(handler1));	
+		
+		// the demand on the bottleneck link should go down in case of congestion and noise pricing (cn) compared to noise pricing (n)
+		Assert.assertEquals(true, getBottleneckDemand(handler4) < getBottleneckDemand(handler3));	
 		
 	}
 	

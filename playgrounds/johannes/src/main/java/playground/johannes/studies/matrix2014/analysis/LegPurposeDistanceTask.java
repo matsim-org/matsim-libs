@@ -82,13 +82,17 @@ public class LegPurposeDistanceTask implements AnalyzerTask<Collection<? extends
 
         if(ioContext != null) {
             try {
-                writeHistograms(histograms, String.format("%s/purposeGeoDistance.txt", ioContext.getPath()));
+                SortedSet<Double> keySet = new TreeSet<>();
+                for(TDoubleDoubleMap hist : histograms.values()) {
+                    double keys[] = hist.keys();
+                    for(int i = 0; i < keys.length; i++) {
+                        keySet.add(keys[i]);
+                    }
+                }
 
-                TDoubleDoubleMap hist = histograms.values().iterator().next();
-                double keys[] = hist.keys();
-                Arrays.sort(keys);
+                writeHistograms(histograms, keySet, String.format("%s/purposeGeoDistance.txt", ioContext.getPath()));
 
-                for(double key : keys) {
+                for(double key : keySet) {
                     double sum = 0;
                     for(TDoubleDoubleMap h : histograms.values()) {
                         sum += h.get(key);
@@ -99,7 +103,7 @@ public class LegPurposeDistanceTask implements AnalyzerTask<Collection<? extends
                     }
                 }
 
-                writeHistograms(histograms, String.format("%s/purposeGeoDistance.norm.txt", ioContext.getPath()));
+                writeHistograms(histograms, keySet, String.format("%s/purposeGeoDistance.norm.txt", ioContext.getPath()));
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -107,34 +111,23 @@ public class LegPurposeDistanceTask implements AnalyzerTask<Collection<? extends
         }
     }
 
-    public void writeHistograms(Map<String, TDoubleDoubleMap> histograms, String file) throws IOException {
+    public void writeHistograms(Map<String, TDoubleDoubleMap> histograms, Set<Double> keys, String file) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 
-        boolean headerWritten = false;
+        writer.write("purpose");
+
+        for(double key : keys) {
+            writer.write(SEPARATOR);
+            writer.write(String.valueOf(key));
+        }
+
+        writer.newLine();
 
         for(Map.Entry<String, TDoubleDoubleMap> entry : histograms.entrySet()) {
             String type = entry.getKey();
             TDoubleDoubleMap hist = entry.getValue();
 
-            if(!headerWritten) {
-                writer.write("purpose");
-
-                double keys[] = hist.keys();
-                Arrays.sort(keys);
-
-                for(double key : keys) {
-                    writer.write(SEPARATOR);
-                    writer.write(String.valueOf(key));
-                }
-
-                writer.newLine();
-                headerWritten = true;
-            }
-
             writer.write(type);
-
-            double keys[] = hist.keys();
-            Arrays.sort(keys);
 
             for(double key : keys) {
                 writer.write(SEPARATOR);

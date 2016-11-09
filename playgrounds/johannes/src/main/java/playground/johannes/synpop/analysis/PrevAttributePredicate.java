@@ -23,16 +23,13 @@ import playground.johannes.synpop.data.Segment;
 /**
  * @author jillenberger
  */
-/*
-Rename to AttributePredicate?
- */
-public class LegAttributePredicate implements Predicate<Segment> {
+public class PrevAttributePredicate implements Predicate<Segment> {
 
     private final String key;
 
     private final String value;
 
-    public LegAttributePredicate(String key, String value) {
+    public PrevAttributePredicate(String key, String value) {
         this.key = key;
         this.value = value;
     }
@@ -47,6 +44,6 @@ public class LegAttributePredicate implements Predicate<Segment> {
 
     @Override
     public boolean test(Segment segment) {
-        return value.equals(segment.getAttribute(key));
+        return value.equals(segment.previous().getAttribute(key));
     }
 }
