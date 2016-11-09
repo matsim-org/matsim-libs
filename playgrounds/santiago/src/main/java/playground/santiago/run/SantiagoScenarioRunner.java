@@ -83,7 +83,7 @@ public class SantiagoScenarioRunner {
 	
 	public static void main(String args[]){		
 
-		if (args.length==5){ //ONLY FOR CMD CASES
+		if (args.length==6){ //ONLY FOR CMD CASES
 			
 			configFile = args[0]; //COMPLETE PATH TO CONFIG.
 			gantriesFile = args[1]; //COMPLETE PATH TO TOLL LINKS FILE
