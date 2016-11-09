@@ -74,6 +74,7 @@ public class SantiagoScenarioRunner {
 	private static int sigma;	
 	private static boolean doModeChoice; 
 	private static boolean mapActs2Links;
+	private static String gantriesFile;
 
 	private static String caseName = "baseCase1pct";
 	private static String inputPath = "../../../runs-svn/santiago/"+caseName+"/";
@@ -85,14 +86,16 @@ public class SantiagoScenarioRunner {
 		if (args.length==5){ //ONLY FOR CMD CASES
 			
 			configFile = args[0]; //COMPLETE PATH TO CONFIG.
-			policy = Integer.parseInt(args[1]) ; //POLICY? - 0: BASE CASE, 1: CORDON.
-			sigma = Integer.parseInt(args[2]); //SIGMA. 
-			doModeChoice = Boolean.parseBoolean(args[3]); //DOMODECHOICE?
-			mapActs2Links = Boolean.parseBoolean(args[4]); //MAPACTS2LINKS?
+			gantriesFile = args[1]; //COMPLETE PATH TO TOLL LINKS FILE
+			policy = Integer.parseInt(args[2]) ; //POLICY? - 0: BASE CASE, 1: CORDON.
+			sigma = Integer.parseInt(args[3]); //SIGMA. 
+			doModeChoice = Boolean.parseBoolean(args[4]); //DOMODECHOICE?
+			mapActs2Links = Boolean.parseBoolean(args[5]); //MAPACTS2LINKS?
 			
 		}
 		
 			configFile=inputPath + "config_" + caseName + ".xml" ; 
+			gantriesFile = inputPath + "input/gantries.xml";
 			policy=0;    
 			sigma=3 ;    
 			doModeChoice=true ; 
@@ -123,6 +126,10 @@ public class SantiagoScenarioRunner {
 			
 			// mapping agents' activities to links on the road network to avoid being stuck on the transit network
 			if(mapActs2Links) mapActivities2properLinks(scenario);
+			
+			//Adding the toll links file
+			RoadPricingConfigGroup rpcg = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+			rpcg.setTollLinksFile(gantriesFile);
 			
 			//Adding randomness to the router
 			config.plansCalcRoute().setRoutingRandomness(sigma); 
