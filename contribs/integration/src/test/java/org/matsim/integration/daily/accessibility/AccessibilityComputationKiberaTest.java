@@ -148,37 +148,30 @@ public class AccessibilityComputationKiberaTest {
 		// Controller
 		final Controler controler = new Controler(scenario);
 		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, runId, envelope, cellSize, push2Geoserver));
-
+		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder( this.binder(), String.class, AccessibilityContributionCalculator.class ) ;
 				{ 
 					String mode = TransportMode.bike ;
-					final AnnotatedBindingBuilder<AccessibilityContributionCalculator> bind = this.binder().bind(AccessibilityContributionCalculator.class);
-					bind.annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
 					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
 				}
 				{
 					String mode = "freeSpeed" ;
-					final AnnotatedBindingBuilder<AccessibilityContributionCalculator> bind = this.binder().bind(AccessibilityContributionCalculator.class) ;
 					FreeSpeedNetworkModeProvider freeSpeedNetworkModeProvider = new FreeSpeedNetworkModeProvider(TransportMode.car) ;
-					Gbl.assertNotNull(freeSpeedNetworkModeProvider);
-					final LinkedBindingBuilder<AccessibilityContributionCalculator> annotatedWith = bind.annotatedWith(Names.named(mode));
-					Gbl.assertNotNull(annotatedWith);
-					annotatedWith.toProvider(freeSpeedNetworkModeProvider);
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(freeSpeedNetworkModeProvider);
 					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
 				}
 				{
 					final String mode = TransportMode.walk;
-					final AnnotatedBindingBuilder<AccessibilityContributionCalculator> bind = this.binder().bind(AccessibilityContributionCalculator.class);
-					bind.annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
 					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
 				}
 				{
 					String mode = TransportMode.car ;
-					final AnnotatedBindingBuilder<AccessibilityContributionCalculator> bind = this.binder().bind(AccessibilityContributionCalculator.class);
-					bind.annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
 					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
 				}
 			}
