@@ -178,7 +178,6 @@ public class ScalabilityStatisticsListener implements AutoCloseable {
 	private <T> void writeBoxPlotFlat( final Collection<T> objs, final Function<T,DoubleStream> stat ) throws IOException {
 		final double[] arr = objs.stream().flatMapToDouble( stat ).toArray();
 
-		// could sort a random subset only if collection very long, for efficiency (only if really too long)
 		Arrays.sort( arr );
 
 		final int last = arr.length - 1;
