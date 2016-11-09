@@ -90,6 +90,9 @@ public class AccessibilityComputationKiberaTest {
 		final Integer range = 9; // in the current implementation, this need always be 9
 		final int symbolSize = 10;
 		final int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
+		
+		// Storage objects
+		final List<String> modes = new ArrayList<>();
 
 		// Config and scenario
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
@@ -100,15 +103,13 @@ public class AccessibilityComputationKiberaTest {
 		config.controler().setLastIteration(0);
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		
+				
 		// Collect activity types
 //		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
 //		log.info("Found activity types: " + activityTypes);
 		final List<String> activityTypes = new ArrayList<>();
 		activityTypes.add(FacilityTypes.DRINKING_WATER);
 		
-		final List<String> modes = new ArrayList<>();
-
 		// Settings for VSP check
 		config.timeAllocationMutator().setMutationRange(7200.);
 		config.timeAllocationMutator().setAffectingDuration(false);
