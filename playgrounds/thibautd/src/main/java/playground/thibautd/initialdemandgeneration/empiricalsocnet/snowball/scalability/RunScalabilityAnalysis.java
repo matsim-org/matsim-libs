@@ -45,9 +45,10 @@ import java.util.Random;
 public class RunScalabilityAnalysis {
 
 	public static void main( String[] args ) throws Exception {
-		MonitoringUtils.setMemoryLoggingOnGC();
+		//MonitoringUtils.setMemoryLoggingOnGC();
 
-		try ( AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose() ) {
+		//try ( AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose() ) {
+		try {
 			final SnowballSamplingConfigGroup configGroup = new SnowballSamplingConfigGroup();
 			final ScalabilityConfigGroup scalabilityConfigGroup = new ScalabilityConfigGroup();
 			final Config config =
