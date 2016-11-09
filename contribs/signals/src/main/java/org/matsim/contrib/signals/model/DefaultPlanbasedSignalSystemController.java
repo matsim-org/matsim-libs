@@ -265,7 +265,7 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 //		log.error("addPlan to system : " + this.signalSystem.getId());
 		if (this.plans == null){
 			this.plans = new HashMap<>();
-			this.activePlan = plan;
+//			this.activePlan = plan;
 		}
 		this.plans.put(plan.getId(), plan);
 	}
