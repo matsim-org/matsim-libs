@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.noise;
+package playground.ikaddoura.analysis.shapes;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,13 +36,13 @@ import org.opengis.feature.simple.SimpleFeatureType;
 * @author ikaddoura
 */
 
-public class NoiseShapefileComparison {
+public class ShapeFileReader {
 	
-	private final String shapeFile1 = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/berlin_laermdaten_SenStadt/Gesamtlaerm_FP/Gesamtlaerm_FP_West_Soldner.shp";	
+	private final String shapeFile1 = "../../../shared-svn/studies/ihab/berlin_laermdaten_SenStadt/Gesamtlaerm_FP/Gesamtlaerm_FP_West_Soldner.shp";	
 
 	public static void main(String[] args) throws IOException {
-		NoiseShapefileComparison shpComparison = new NoiseShapefileComparison();
-		shpComparison.run();
+		ShapeFileReader shpReader = new ShapeFileReader();
+		shpReader.run();
 	}
 
 	private void run() throws IOException {
@@ -64,7 +64,8 @@ public class NoiseShapefileComparison {
 	    FeatureCollection<SimpleFeatureType, SimpleFeature> collection = source.getFeatures(query);
 	    
 	    try (FeatureIterator<SimpleFeature> features = collection.features()) {
-	        while (features.hasNext()) {
+	        
+	    	while (features.hasNext()) {
 	            SimpleFeature feature = features.next();
 	            System.out.println(feature.getID() + ": ");
 	            for (Property attribute : feature.getProperties()) {
@@ -72,18 +73,6 @@ public class NoiseShapefileComparison {
 	            }
 	        }
 	    }
-		
-		
-//		
-//		Map<Integer, Geometry> geometries = new HashMap<>();
-//		Collection<SimpleFeature> features;
-//		features = ShapeFileReader.getAllFeatures(shapeFile);
-//		int featureCounter = 0;
-//		for (SimpleFeature feature : features) {
-//			geometries.put(featureCounter, (Geometry) feature.getDefaultGeometry());
-//			featureCounter++;
-//		}
 	}
-
 }
 
