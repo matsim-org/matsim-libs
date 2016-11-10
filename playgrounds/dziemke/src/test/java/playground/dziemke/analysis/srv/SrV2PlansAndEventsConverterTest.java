@@ -2,6 +2,7 @@ package playground.dziemke.analysis.srv;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -31,10 +32,11 @@ public class SrV2PlansAndEventsConverterTest {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
-
-	private static final String NETWORK_FILE = "../../../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+	
+//	private static final String NETWORK_FILE = "../../../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 	private static final String TRIPS_FILENAME = "W2008_Berlin_Weekday_Sample.dat";
 
+	@Ignore
 	@Test
 	public void TestConvert() {
 
@@ -43,12 +45,13 @@ public class SrV2PlansAndEventsConverterTest {
 
 		List<Trip> trips = readTrips(utils.getInputDirectory() + TRIPS_FILENAME);
 
-		Network network = readNetwork(NETWORK_FILE);
+//		Network network = readNetwork(NETWORK_FILE);
 
 		CoordinateTransformation ct = new IdentityTransformation();
 
 		TreeMap<Id<Person>, TreeMap<Double, Trip>> personTripsMap = createPersonTripsMap(trips);
-		SrV2PlansAndEventsConverter.convert(personTripsMap, network, ct, utils.getOutputDirectory() );
+		SrV2PlansAndEventsConverter.convert(personTripsMap, //network, 
+				ct, utils.getOutputDirectory() );
 
 		long checksum_ref = CRCChecksum.getCRCFromFile( utils.getInputDirectory() + "correctPlans.xml");
 		long checksum_run = CRCChecksum.getCRCFromFile( utils.getOutputDirectory() + "plans.xml");

@@ -389,6 +389,7 @@ public class TripAnalyzerSrVOld {
 	    // return number of trips that have no calculable speed
 	    log.warn("Number of trips that have no calculable speed is: " + numberOfTripsWithNoCalculableSpeed);
 	    
-	    SrV2PlansAndEventsConverter.convert(personTripsMap, network, ct, outputDirectory);
+	    SrV2PlansAndEventsConverter.convert(personTripsMap, //network, 
+	    		ct, outputDirectory);
 	}
 }

@@ -159,7 +159,8 @@ public class TripAnalyzerSrVNew {
 
 	    /* Create plans and events */
 		TreeMap<Id<Person>, TreeMap<Double, Trip>> personTripsMap = createPersonTripsMap(trips);
-		SrV2PlansAndEventsConverter.convert(personTripsMap, network, ct, outputDirectory + "/");
+		SrV2PlansAndEventsConverter.convert(personTripsMap, //network, 
+				ct, outputDirectory + "/");
 	}
 	
 	/* SrV-specific calculations using distances given by survey instead of own calculated distances */
