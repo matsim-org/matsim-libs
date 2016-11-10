@@ -76,8 +76,8 @@ public class NoiseOfflineCalculationIK {
 		} else {
 			
 			runDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
-			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_2016-11-09_rpGap100/";
-			receiverPointGap = 100.;
+			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_2016-11-09_rpGap50/";
+			receiverPointGap = 50.;
 			lastIteration = 100;
 			timeBinSize = 3600.;
 		}
