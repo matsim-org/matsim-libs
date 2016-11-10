@@ -2,6 +2,7 @@ package playground.dziemke.analysis.srv;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -21,6 +22,7 @@ public class TripAnalyzerSrVNewTest {
 	private static final String INPUT_PERSONS_FILENAME = "P2008_Berlin2_Sample.dat";
 	private static final String INPUT_NETWORK_FILE = "../../../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 
+	@Ignore
 	@Test
 	public void TestAnalyze() {
 
