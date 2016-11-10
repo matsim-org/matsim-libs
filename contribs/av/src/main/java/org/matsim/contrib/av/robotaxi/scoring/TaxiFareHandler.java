@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.jbischoff.pt.taxi;
+package org.matsim.contrib.av.robotaxi.scoring;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,34 +40,54 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
 
 /**
  * @author  jbischoff
- *
+ *	A simple implementation for taxi fares.
+ *  Note that these fares are scored in excess to anything set in the modeparams in the config file.
  */
 /**
  *
  */
 
-public class DistanceBasedTaxiFare implements LinkEnterEventHandler, PersonEntersVehicleEventHandler,
+public class TaxiFareHandler implements LinkEnterEventHandler, PersonEntersVehicleEventHandler,
 		PersonDepartureEventHandler, PersonArrivalEventHandler {
 	
 	
-	@Inject
-	EventsManager events;
-	@Inject
-	Network network;
+	private final EventsManager events;
+	private final Network network;
 	
-	private double distanceFare_Meter = 0.25 / 1000.0;
-	private double baseFare = 0;
+	private final double distanceFare_Meter;
+	private final double baseFare;
+	private final double timeFare_hour;
+	private final double dailyFee;
 	
 	Map<Id<Vehicle>,MutableDouble> currentRideDistance = new HashMap<>();
 	Map<Id<Person>,Id<Vehicle>> currentVehicle = new HashMap<>();
 	Set<Id<Person>> waitingPax = new HashSet<>();
+	Map<Id<Person>, Double> vehicleEnterTime = new HashMap<>();
+	Set<Id<Person>> dailyFeeCharged = new HashSet<>();
+	
+	/**
+	 *  @params config: A Matsim config that contains a TaxiFareConfigGroup
+	 */
+	@Inject
+	public TaxiFareHandler(Config config, EventsManager events, Network network) {
+		TaxiFareConfigGroup taxiFareConfigGroup = (TaxiFareConfigGroup) config.getModule(TaxiFareConfigGroup.GROUP_NAME);
+		this.events= events;
+		this.network = network;
+		this.distanceFare_Meter = taxiFareConfigGroup.getDistanceFare_m();
+		this.baseFare = taxiFareConfigGroup.getBasefare();
+		this.dailyFee = taxiFareConfigGroup.getDailySubscriptionFee();
+		this.timeFare_hour = taxiFareConfigGroup.getTimeFare_h();
+	}
+	
 	
 
 	/* (non-Javadoc)
@@ -78,6 +98,8 @@ public class DistanceBasedTaxiFare implements LinkEnterEventHandler, PersonEnter
 		waitingPax.clear();
 		currentVehicle.clear();
 		currentRideDistance.clear();
+		dailyFeeCharged.clear();
+		vehicleEnterTime.clear();
 	}
 
 	/* (non-Javadoc)
@@ -88,7 +110,8 @@ public class DistanceBasedTaxiFare implements LinkEnterEventHandler, PersonEnter
 		if (currentVehicle.containsKey(event.getPersonId())){
 			Id<Vehicle> vid = currentVehicle.remove(event.getPersonId());
 			double distance = currentRideDistance.remove(vid).doubleValue();
-			double fare = -(baseFare + distance*distanceFare_Meter);
+			double rideTime = (event.getTime() - vehicleEnterTime.remove(event.getPersonId()))/3600.0 ;
+			double fare = -(baseFare + distance*distanceFare_Meter + rideTime*timeFare_hour);
 			events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), fare));
 		}
 	}
@@ -98,8 +121,12 @@ public class DistanceBasedTaxiFare implements LinkEnterEventHandler, PersonEnter
 	 */
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().equals("taxi")){
+		if (event.getLegMode().equals(TaxiModule.TAXI_MODE)){
 			waitingPax.add(event.getPersonId());
+			if (!dailyFeeCharged.contains(event.getPersonId())){
+				dailyFeeCharged.add(event.getPersonId());
+				events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -dailyFee));
+			}
 		}
 	}
 
@@ -112,6 +139,7 @@ public class DistanceBasedTaxiFare implements LinkEnterEventHandler, PersonEnter
 			currentVehicle.put(event.getPersonId(), event.getVehicleId());
 			currentRideDistance.put(event.getVehicleId(), new MutableDouble(0.0));
 			waitingPax.remove(event.getPersonId());
+			vehicleEnterTime.put(event.getPersonId(), event.getTime());
 		}
 	}
 
