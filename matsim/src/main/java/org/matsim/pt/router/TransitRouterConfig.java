@@ -93,6 +93,8 @@ public class TransitRouterConfig implements MatsimParameters {
 
 	private Double beelineDistanceFactor;
 
+	private double directWalkFactor = 1 ;
+
 	public TransitRouterConfig(final Config config) {
 		this(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 	}
@@ -234,5 +236,17 @@ public class TransitRouterConfig implements MatsimParameters {
 	public final Double getBeelineDistanceFactor() {
 		return this.beelineDistanceFactor;
 	}
+
+	public double getDirectWalkFactor() {
+		return this.directWalkFactor ;
+	}
+	/**
+	 * Factor with which direct walk generalized cost is multiplied before it is compared to the pt generalized cost.
+	 * Set to a very high value to reduce direct walk results.
+	 */
+	public final void setDirectWalkFactor(double directWalkFactor) {
+		this.directWalkFactor = directWalkFactor;
+	}
+
 
 }
