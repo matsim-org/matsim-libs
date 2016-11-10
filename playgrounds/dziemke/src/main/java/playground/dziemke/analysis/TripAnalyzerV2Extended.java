@@ -26,8 +26,8 @@ import playground.dziemke.utils.ShapeReader;
 /**
  * @author dziemke
  */
-public class TripAnalyzerExtended {
-	public static final Logger log = Logger.getLogger(TripAnalyzerExtended.class);
+public class TripAnalyzerV2Extended {
+	public static final Logger log = Logger.getLogger(TripAnalyzerV2Extended.class);
 	
 	/* Parameters */
 	private static final String runId = "run_200";	// <----------
@@ -116,37 +116,37 @@ public class TripAnalyzerExtended {
 	    List<Trip> trips = createListOfValidTrip(tripHandler.getTrips(), network);
 	    
 	    /* Do calculations and write-out*/
-	    aggregateWeightOfTripsWithNonNegativeTimesAndDurations = TripAnalyzerBasic.countTripsWithNonNegativeTimesAndDurations(trips);
+	    aggregateWeightOfTripsWithNonNegativeTimesAndDurations = TripAnalyzerV2Basic.countTripsWithNonNegativeTimesAndDurations(trips);
 	    
-	    Map <Integer, Double> tripDurationMap = TripAnalyzerBasic.createTripDurationMap(trips, binWidthDuration_min);
-	    double averageTripDuration = TripAnalyzerBasic.calculateAverageTripDuration_min(trips);
+	    Map <Integer, Double> tripDurationMap = TripAnalyzerV2Basic.createTripDurationMap(trips, binWidthDuration_min);
+	    double averageTripDuration = TripAnalyzerV2Basic.calculateAverageTripDuration_min(trips);
 	    writer.writeToFileIntegerKey(tripDurationMap, outputDirectory + "/tripDuration.txt", binWidthDuration_min, aggregateWeightOfConsideredTrips, averageTripDuration);
 	    writer.writeToFileIntegerKeyCumulative(tripDurationMap, outputDirectory + "/tripDurationCumulative.txt", binWidthDuration_min, aggregateWeightOfConsideredTrips, averageTripDuration);
 
-	    Map <Integer, Double> departureTimeMap = TripAnalyzerBasic.createDepartureTimeMap(trips, binWidthTime_h);
+	    Map <Integer, Double> departureTimeMap = TripAnalyzerV2Basic.createDepartureTimeMap(trips, binWidthTime_h);
 	    writer.writeToFileIntegerKey(departureTimeMap, outputDirectory + "/departureTime.txt", binWidthTime_h, aggregateWeightOfConsideredTrips, Double.NaN);
 	    	    
-	    Map<String, Double> activityTypeMap = TripAnalyzerBasic.createActivityTypeMap(trips);
+	    Map<String, Double> activityTypeMap = TripAnalyzerV2Basic.createActivityTypeMap(trips);
 	    writer.writeToFileStringKey(activityTypeMap, outputDirectory + "/activityTypes.txt", aggregateWeightOfConsideredTrips);
 	    
-	    Map<Integer, Double> tripDistanceBeelineMap = TripAnalyzerBasic.createTripDistanceBeelineMap(trips, binWidthDistance_km, network);
-		double averageTripDistanceBeeline_km = TripAnalyzerBasic.calculateAverageTripDistanceBeeline_km(trips, network);
+	    Map<Integer, Double> tripDistanceBeelineMap = TripAnalyzerV2Basic.createTripDistanceBeelineMap(trips, binWidthDistance_km, network);
+		double averageTripDistanceBeeline_km = TripAnalyzerV2Basic.calculateAverageTripDistanceBeeline_km(trips, network);
 		writer.writeToFileIntegerKey(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeeline.txt", binWidthDistance_km, aggregateWeightOfConsideredTrips, averageTripDistanceBeeline_km);
 		writer.writeToFileIntegerKeyCumulative(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeelineCumulative.txt", binWidthDistance_km, aggregateWeightOfConsideredTrips, averageTripDistanceBeeline_km);
 	    
-	    Map<Integer, Double> tripDistanceRoutedMap = TripAnalyzerBasic.createTripDistanceRoutedMap(trips, binWidthDistance_km, network);
-	    double averageTripDistanceRouted_km = TripAnalyzerBasic.calculateAverageTripDistanceRouted_km(trips, network);
+	    Map<Integer, Double> tripDistanceRoutedMap = TripAnalyzerV2Basic.createTripDistanceRoutedMap(trips, binWidthDistance_km, network);
+	    double averageTripDistanceRouted_km = TripAnalyzerV2Basic.calculateAverageTripDistanceRouted_km(trips, network);
 	    writer.writeToFileIntegerKey(tripDistanceRoutedMap, outputDirectory + "/tripDistanceRouted.txt", binWidthDistance_km, aggregateWeightOfConsideredTrips, averageTripDistanceRouted_km);
 	    
-	    numberOfTripsWithCalculableSpeedBeeline = TripAnalyzerBasic.countTripsWithCalculableSpeedBeeline(trips, network);
-	    Map<Integer, Double> averageTripSpeedBeelineMap = TripAnalyzerBasic.createAverageTripSpeedBeelineMap(trips, binWidthSpeed_km_h, network);
-		double averageOfAverageTripSpeedsBeeline_km_h = TripAnalyzerBasic.calculateAverageOfAverageTripSpeedsBeeline_km_h(trips, network);
+	    numberOfTripsWithCalculableSpeedBeeline = TripAnalyzerV2Basic.countTripsWithCalculableSpeedBeeline(trips, network);
+	    Map<Integer, Double> averageTripSpeedBeelineMap = TripAnalyzerV2Basic.createAverageTripSpeedBeelineMap(trips, binWidthSpeed_km_h, network);
+		double averageOfAverageTripSpeedsBeeline_km_h = TripAnalyzerV2Basic.calculateAverageOfAverageTripSpeedsBeeline_km_h(trips, network);
 		writer.writeToFileIntegerKey(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeeline.txt", binWidthSpeed_km_h, numberOfTripsWithCalculableSpeedBeeline, averageOfAverageTripSpeedsBeeline_km_h);
 		writer.writeToFileIntegerKeyCumulative(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeelineCumulative.txt", binWidthSpeed_km_h, numberOfTripsWithCalculableSpeedBeeline, averageOfAverageTripSpeedsBeeline_km_h);
 		
-		numberOfTripsWithCalculableSpeedRouted = TripAnalyzerBasic.countTripsWithCalculableSpeedRouted(trips, network);
-		Map<Integer, Double> averageTripSpeedRoutedMap = TripAnalyzerBasic.createAverageTripSpeedRoutedMap(trips, binWidthSpeed_km_h, network);
-		double averageOfAverageTripSpeedsRouted_km_h = TripAnalyzerBasic.calculateAverageOfAverageTripSpeedsRouted_km_h(trips, network);
+		numberOfTripsWithCalculableSpeedRouted = TripAnalyzerV2Basic.countTripsWithCalculableSpeedRouted(trips, network);
+		Map<Integer, Double> averageTripSpeedRoutedMap = TripAnalyzerV2Basic.createAverageTripSpeedRoutedMap(trips, binWidthSpeed_km_h, network);
+		double averageOfAverageTripSpeedsRouted_km_h = TripAnalyzerV2Basic.calculateAverageOfAverageTripSpeedsRouted_km_h(trips, network);
 		writer.writeToFileIntegerKey(averageTripSpeedRoutedMap, outputDirectory + "/averageTripSpeedRouted.txt", binWidthSpeed_km_h, numberOfTripsWithCalculableSpeedRouted, averageOfAverageTripSpeedsRouted_km_h);
 
 		/* Other information */

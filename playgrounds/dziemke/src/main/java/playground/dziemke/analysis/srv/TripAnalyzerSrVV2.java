@@ -11,7 +11,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import playground.dziemke.analysis.AnalysisFileWriter;
 import playground.dziemke.analysis.AnalysisUtils;
 import playground.dziemke.analysis.Trip;
-import playground.dziemke.analysis.TripAnalyzerBasic;
+import playground.dziemke.analysis.TripAnalyzerV2Basic;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -22,8 +22,8 @@ import java.util.TreeMap;
 /**
  * @author dziemke
  */
-public class TripAnalyzerSrVNew {
-	public static final Logger log = Logger.getLogger(TripAnalyzerSrVNew.class);
+public class TripAnalyzerSrVV2 {
+	public static final Logger log = Logger.getLogger(TripAnalyzerSrVV2.class);
 	
 	/* Parameters */
 	private static final boolean useWeights = true;			//wt
@@ -103,18 +103,18 @@ public class TripAnalyzerSrVNew {
 	    /* Do calculations and write-out*/
 		// reliant on variable "V_ANKUNFT": -9 = no data, -10 = implausible
 		// and on variable "V_BEGINN": -9 = no data, -10 = implausible
-		aggregatedWeightOfTripsWithNonNegativeTimesAndDurations = TripAnalyzerBasic.countTripsWithNonNegativeTimesAndDurations(trips);
-		Map <Integer, Double> tripDurationMap = TripAnalyzerBasic.createTripDurationMap(trips, binWidthDuration_min);
-		double averageTripDuration = TripAnalyzerBasic.calculateAverageTripDuration_min(trips);
+		aggregatedWeightOfTripsWithNonNegativeTimesAndDurations = TripAnalyzerV2Basic.countTripsWithNonNegativeTimesAndDurations(trips);
+		Map <Integer, Double> tripDurationMap = TripAnalyzerV2Basic.createTripDurationMap(trips, binWidthDuration_min);
+		double averageTripDuration = TripAnalyzerV2Basic.calculateAverageTripDuration_min(trips);
 		writer.writeToFileIntegerKey(tripDurationMap, outputDirectory + "/tripDuration.txt", binWidthDuration_min, aggregatedWeightOfTripsWithNonNegativeTimesAndDurations, averageTripDuration);
 		writer.writeToFileIntegerKeyCumulative(tripDurationMap, outputDirectory + "/tripDurationCumulative.txt", binWidthDuration_min, aggregatedWeightOfTripsWithNonNegativeTimesAndDurations, averageTripDuration);
 
-		Map <Integer, Double> departureTimeMap = TripAnalyzerBasic.createDepartureTimeMap(trips, binWidthTime_h);
+		Map <Integer, Double> departureTimeMap = TripAnalyzerV2Basic.createDepartureTimeMap(trips, binWidthTime_h);
 		writer.writeToFileIntegerKey(departureTimeMap, outputDirectory + "/departureTime.txt", binWidthTime_h, aggregatedWeightOfTripsWithNonNegativeTimesAndDurations, Double.NaN);
 
 		// reliant on variable "V_ZWECK": -9 = no data
 		// "V_ZWECK" - end of trip = start of activity
-		Map<String, Double> activityTypeMap = TripAnalyzerBasic.createActivityTypeMap(trips);
+		Map<String, Double> activityTypeMap = TripAnalyzerV2Basic.createActivityTypeMap(trips);
 		writer.writeToFileStringKey(activityTypeMap, outputDirectory + "/activityTypes.txt", aggregatedWeightOfConsideredTrips);
 
 		// reliant on variable "V_LAENGE": -9 = no data, -10 = implausible

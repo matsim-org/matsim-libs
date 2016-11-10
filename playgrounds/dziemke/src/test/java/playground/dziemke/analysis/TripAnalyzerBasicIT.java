@@ -30,7 +30,7 @@ public class TripAnalyzerBasicIT {
         }
         args[1] = utils.getInputDirectory() + "10.events.xml";
         args[2] = utils.getOutputDirectory();
-        TripAnalyzerBasic.main(args);
+        TripAnalyzerV2Basic.main(args);
 
         //Check average values
         String activityTypes = args[2] + "activityTypes.txt";

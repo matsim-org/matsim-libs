@@ -28,7 +28,7 @@ import java.util.TreeMap;
  */
 public class SrV2PlansAndEventsConverterTest {
 
-	private static final Logger LOG = Logger.getLogger(TripAnalyzerSrVNew.class);
+	private static final Logger LOG = Logger.getLogger(TripAnalyzerSrVV2.class);
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();

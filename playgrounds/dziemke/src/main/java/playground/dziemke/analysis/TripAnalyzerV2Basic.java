@@ -18,8 +18,8 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 /**
  * @author dziemke
  */
-public class TripAnalyzerBasic {
-	public static final Logger log = Logger.getLogger(TripAnalyzerBasic.class);
+public class TripAnalyzerV2Basic {
+	public static final Logger log = Logger.getLogger(TripAnalyzerV2Basic.class);
 	
 	/* Parameters */
 	private static final String RUN_ID = "run_168a";
@@ -96,13 +96,13 @@ public class TripAnalyzerBasic {
 	    double averageTripDistanceRouted_km = calculateAverageTripDistanceRouted_km(trips, network);
 	    writer.writeToFileIntegerKey(tripDistanceRoutedMap, outputDirectory + "/tripDistanceRouted.txt", binWidthDistance_km, aggregateWeightOfConsideredTrips, averageTripDistanceRouted_km);
 	    
-	    numberOfTripsWithCalculableSpeedBeeline = TripAnalyzerBasic.countTripsWithCalculableSpeedBeeline(trips, network);
+	    numberOfTripsWithCalculableSpeedBeeline = TripAnalyzerV2Basic.countTripsWithCalculableSpeedBeeline(trips, network);
 	    Map<Integer, Double> averageTripSpeedBeelineMap = createAverageTripSpeedBeelineMap(trips, binWidthSpeed_km_h, network);
 		double averageOfAverageTripSpeedsBeeline_km_h = calculateAverageOfAverageTripSpeedsBeeline_km_h(trips, network);
 		writer.writeToFileIntegerKey(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeeline.txt", binWidthSpeed_km_h, numberOfTripsWithCalculableSpeedBeeline, averageOfAverageTripSpeedsBeeline_km_h);
 		writer.writeToFileIntegerKeyCumulative(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeelineCumulative.txt", binWidthSpeed_km_h, numberOfTripsWithCalculableSpeedBeeline, averageOfAverageTripSpeedsBeeline_km_h);
 		
-		numberOfTripsWithCalculableSpeedRouted = TripAnalyzerBasic.countTripsWithCalculableSpeedRouted(trips, network);
+		numberOfTripsWithCalculableSpeedRouted = TripAnalyzerV2Basic.countTripsWithCalculableSpeedRouted(trips, network);
 		Map<Integer, Double> averageTripSpeedRoutedMap = createAverageTripSpeedRoutedMap(trips, binWidthSpeed_km_h, network);
 		double averageOfAverageTripSpeedsRouted_km_h = calculateAverageOfAverageTripSpeedsRouted_km_h(trips, network);
 		writer.writeToFileIntegerKey(averageTripSpeedRoutedMap, outputDirectory + "/averageTripSpeedRouted.txt", binWidthSpeed_km_h, numberOfTripsWithCalculableSpeedRouted, averageOfAverageTripSpeedsRouted_km_h);

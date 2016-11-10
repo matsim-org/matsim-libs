@@ -41,8 +41,8 @@ import playground.dziemke.analysis.Trip;
 /**
  * @author dziemke
  */
-public class TripAnalyzerSrVOld {
-	private final static Logger log = Logger.getLogger(TripAnalyzerSrVOld.class);
+public class TripAnalyzerSrVV1 {
+	private final static Logger log = Logger.getLogger(TripAnalyzerSrVV1.class);
 
 	public static void main(String[] args) throws IOException {
 		// Parameters

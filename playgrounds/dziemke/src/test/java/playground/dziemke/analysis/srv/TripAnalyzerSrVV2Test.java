@@ -11,9 +11,9 @@ import org.matsim.testcases.MatsimTestUtils;
 /**
  * @author GabrielT on 08.11.2016.
  */
-public class TripAnalyzerSrVNewTest {
+public class TripAnalyzerSrVV2Test {
 
-	private static final Logger LOG = Logger.getLogger(TripAnalyzerSrVNew.class);
+	private static final Logger LOG = Logger.getLogger(TripAnalyzerSrVV2.class);
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -29,7 +29,7 @@ public class TripAnalyzerSrVNewTest {
 		final String inputTripsFile = utils.getInputDirectory() + INPUT_TRIPS_FILENAME;
 		final String inputPersonsFile = utils.getInputDirectory() + INPUT_PERSONS_FILENAME;
 		LOG.info("Start analyzing");
-		TripAnalyzerSrVNew.analyze(inputTripsFile, inputPersonsFile, INPUT_NETWORK_FILE, utils.getOutputDirectory());
+		TripAnalyzerSrVV2.analyze(inputTripsFile, inputPersonsFile, INPUT_NETWORK_FILE, utils.getOutputDirectory());
 		LOG.info("Finished analyzing");
 
 		LOG.info("Start checking checksums");

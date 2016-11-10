@@ -25,8 +25,8 @@ import playground.dziemke.utils.ShapeReader;
 /**
  * @author dziemke
  */
-public class TripAnalyzerOld {
-	public static final Logger log = Logger.getLogger(TripAnalyzerOld.class) ;
+public class TripAnalyzerV1 {
+	public static final Logger log = Logger.getLogger(TripAnalyzerV1.class) ;
 
 	
 	/* Parameters */
