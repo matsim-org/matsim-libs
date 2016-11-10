@@ -23,6 +23,9 @@ import playground.johannes.synpop.data.Segment;
 /**
  * @author jillenberger
  */
+/*
+Rename to AttributePredicate?
+ */
 public class LegAttributePredicate implements Predicate<Segment> {
 
     private final String key;

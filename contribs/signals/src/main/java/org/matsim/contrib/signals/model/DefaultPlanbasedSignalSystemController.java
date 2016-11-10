@@ -186,8 +186,9 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 	 */
 	private void startFirstPlanInQueue(double now) {
 		this.activePlan = this.planQueue.poll();
-		// shift plan to queue end (
+		// shift plan to queue end
 		planQueue.add(activePlan);
+//		this.signalSystem.startPlan(now);
 		this.nextActivePlanCheckTime = adaptTime2Day(activePlan.getEndTime(), now);
 	}
 
@@ -264,7 +265,7 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 //		log.error("addPlan to system : " + this.signalSystem.getId());
 		if (this.plans == null){
 			this.plans = new HashMap<>();
-			this.activePlan = plan;
+//			this.activePlan = plan;
 		}
 		this.plans.put(plan.getId(), plan);
 	}

@@ -267,7 +267,7 @@ public class ChoiceGenerationWithCrowdingControler implements BeforeMobsimListen
 			controler.getEvents().addHandler(marginalCostPricingPtPsimHandler);
 		}
 
-		pSimFactory = new PSimFactory();
+		pSimFactory = new PSimFactory(controler.getScenario(),eventsManager);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

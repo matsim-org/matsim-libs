@@ -1,5 +1,7 @@
 package playground.pieter.singapore.utils;
 
+import org.matsim.core.gbl.MatsimRandom;
+
 /*************************************************************************
  *  Compilation:  javac Sample.java
  *  Execution:    java Sample M N
@@ -28,7 +30,7 @@ public class Sample {
         for (int i = 0; i < M; i++)  {
 
             // random integer between i and N-1
-            int r = i + (int) (Math.random() * (N-i));
+            int r = i + (int) (MatsimRandom.getRandom().nextDouble() * (N-i));
 
             // swap elements at indices i and r
             int t = perm[r];

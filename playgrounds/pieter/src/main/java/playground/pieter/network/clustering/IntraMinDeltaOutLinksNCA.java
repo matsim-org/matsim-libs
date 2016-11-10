@@ -38,7 +38,7 @@ public class IntraMinDeltaOutLinksNCA extends NodeClusteringAlgorithm {
 
     }
 
-	private IntraMinDeltaOutLinksNCA(Network network) {
+	public IntraMinDeltaOutLinksNCA(Network network) {
 		super(ALGORITHMNAME, network);
 	}
 
@@ -100,14 +100,14 @@ public class IntraMinDeltaOutLinksNCA extends NodeClusteringAlgorithm {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String fileName = "f:/TEMP/singmindeltaoutlinks.txt";
+		String fileName = "/Users/fouriep/singmindeltaoutlinks.txt";
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
 				.createConfig());
 		MatsimNetworkReader nwr = new MatsimNetworkReader(scenario.getNetwork());
 		// nwr.readFile(args[0]);
 //		 nwr.readFile("f:/matsimWorkspace/playgrounds/pieter/data/zurich/horni/network.xml.gz");
 //		nwr.readFile("f:/matsimWorkspace/matsim/examples/siouxfalls/network-wo-dummy-node.xml");
-		 nwr.readFile("data/singaporev1/network/planningNetwork_CLEAN.xml");
+		 nwr.readFile(args[0]);
 		 IntraMinDeltaOutLinksNCA nca = new IntraMinDeltaOutLinksNCA(scenario.getNetwork(),
 				"getCapacity", null, null);
 		// ncr.run("getCapacity", new String[] { "java.lang.Double" },
@@ -122,10 +122,6 @@ public class IntraMinDeltaOutLinksNCA extends NodeClusteringAlgorithm {
 			nca.logger.info(nca.getClustersAtLevel(i).size()
 					+ ": largest = "
 					+ nca.getLargestCluster(nca.getClustersAtLevel(i))
-							.getOutLinks().size());
-			nca2.logger.info(nca2.getClustersAtLevel(i).size()
-					+ ": largest = "
-					+ nca2.getLargestCluster(nca2.getClustersAtLevel(i))
 							.getOutLinks().size());
 		}
 

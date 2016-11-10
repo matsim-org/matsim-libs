@@ -56,8 +56,8 @@ public class RunIVTBaselineCalibration {
 		final String configFile = args[0];
 		final String pathToPTLinksMonitorList = args[1];
 		final String pathToPTStationsMonitorList = args[2];
-		/*final String pathToStreetLinksDailyToMonitor = args[3];
-		final String pathToStreetLinksHourlyToMonitor = args[4];*/
+		final String pathToStreetLinksDailyToMonitor = args[3];
+		final String pathToStreetLinksHourlyToMonitor = args[4];
 
 		// This allows to get a log file containing the log messages happening
 		// before controler init.
@@ -105,14 +105,14 @@ public class RunIVTBaselineCalibration {
 				bind(String.class)
 						.annotatedWith(Names.named("pathToPTStationsToMonitor"))
 						.toInstance(pathToPTStationsMonitorList);
-				/*this.bind(StreetLinkDailyCountsEventHandler.class);
+				this.bind(StreetLinkDailyCountsEventHandler.class);
 				bind(String.class)
 						.annotatedWith(Names.named("pathToStreetLinksDailyToMonitor"))
 						.toInstance(pathToStreetLinksDailyToMonitor);
 				this.bind(StreetLinkHourlyCountsEventHandler.class);
 				bind(String.class)
 						.annotatedWith(Names.named("pathToStreetLinksHourlyToMonitor"))
-						.toInstance(pathToStreetLinksHourlyToMonitor);*/
+						.toInstance(pathToStreetLinksHourlyToMonitor);
 			}
 		});
 

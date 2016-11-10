@@ -110,6 +110,11 @@ public class NoiseContext {
 	}
 	
 	private void checkConsistency() {
+		
+		if (this.scenario.getPopulation() == null || this.scenario.getPopulation().getPersons().isEmpty()) {
+			throw new RuntimeException("The noise computation requires a loaded population to identify passenger cars."
+					+ " Please provide a scenario which contains a loaded population. Aborting...");
+		}
 		List<String> consideredActivitiesForDamagesList = new ArrayList<String>();
 		List<String> consideredActivitiesForReceiverPointGridList = new ArrayList<String>();
 

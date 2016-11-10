@@ -1,7 +1,7 @@
 /**
  * A package which provides some tools to compute...
  * <ul>
- * <li> noise (emissions) levels on network links (based on traffic volume, share of heavy goods vehicles, speed level)
+ * <li> noise (emission) levels on network links (based on traffic volume, share of heavy goods vehicles, speed level)
  * <li> noise (immission) levels at receiver points (based on the surrounding links' emissions and distances)
  * <li> population units (= population densities) at receiver points (mapping agents to the nearest receiver point) 
  * <li> noise damages (= noise exposure costs) at receiver points (based on population units and noise levels)
@@ -22,9 +22,9 @@
  * <p>
  * Related publications (list not regularly updated):
  * <ul>
- * <li> I. Kaddoura, L. Kroeger, and K. Nagel. User-specific and dynamic internalization of road traffic noise exposures. Networks and Spatial Economics, 2016.
+ * <li> I. Kaddoura, L. Kroeger, and K. Nagel. User-specific and dynamic internalization of road traffic noise exposures. Networks and Spatial Economics, 2016. DOI: 10.1007/s11067-016-9321-2.
  * Preprint available from <a href="https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2015/15-12/"> </a>
- * <li> I. Kaddoura and K. Nagel. Activity-based computation of marginal noise exposure costs: Impacts for traffic management. Annual Meeting Preprint 16-3437, Transportation Research Board, Washington D.C., January 2016.
+ * <li> I. Kaddoura and K. Nagel. Activity-based computation of marginal noise exposure costs: Implications for traffic management. Transportation Research Record 2597, 2016. DOI: 10.3141/2597-15.
  * Preprint available from <a href="https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2015/15-13/"> </a>
  * </ul>
  * 

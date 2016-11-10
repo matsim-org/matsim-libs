@@ -51,6 +51,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
@@ -70,15 +71,14 @@ import java.util.Map;
 
 /**
  * @author pieterfourie
- *
- * A controler that alternates between the QSim and PSim for the mobility simulation.
- * Run this class with no arguments to get printed help listing current command line options.
+ *         <p>
+ *         A controler that alternates between the QSim and PSim for the mobility simulation.
+ *         Run this class with no arguments to get printed help listing current command line options.
  */
 public class RunPSim {
     private final Config config;
     private final Scenario scenario;
     private final boolean Diversity;
-    private Map<Id<Person>, Double> selectedPlanScoreMemory;
     private TransitPerformanceRecorder transitPerformanceRecorder;
     private MobSimSwitcher mobSimSwitcher;
     private Controler matsimControler;
@@ -91,6 +91,7 @@ public class RunPSim {
     private StopStopTimeCalculatorSerializable stopStopTimeCalculator;
     private PSimTravelTimeCalculator carTravelTimeCalculator;
     private PlanCatcher plancatcher;
+
     private RunPSim(String[] args) throws ParseException {
         System.setProperty("matsim.preferLocalDtds", "true");
         Options options = new Options();
@@ -214,7 +215,7 @@ public class RunPSim {
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
-                    bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(matsimControler.getScenario(),
+                    bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(scenario,
                             waitTimeCalculator.getWaitTimes(),
                             stopStopTimeCalculator.getStopStopTimes()));
                 }
@@ -222,7 +223,7 @@ public class RunPSim {
         } else {
             //randomized routing for car and transit
             final RandomizingTimeDistanceTravelDisutilityFactory disutilityFactory =
-                    new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
+                    new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config.planCalcScore());
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
@@ -231,10 +232,11 @@ public class RunPSim {
             });
             disutilityFactory.setSigma(0.1);
             matsimControler.addOverridingModule(new RandomizingTransitRouterModule());
+
         }
 
         if (TrackGenome) {
-            matsimControler.addControlerListener(new GenomeAnalysis(true, false, false));
+            matsimControler.addControlerListener(new GenomeAnalysis(true, false, true));
         }
 
         matsimControler.addOverridingModule(new AbstractModule() {
@@ -256,10 +258,7 @@ public class RunPSim {
                 (Diversity ? "_D" : "") +
                 appendString;
         config.controler().setOutputDirectory(outputDirectory);
-        matsimControler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+        matsimControler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
     }
 
     public static void main(String args[]) throws ParseException {
@@ -329,16 +328,10 @@ public class RunPSim {
                     mobSimSwitcher);
             matsimControler.getEvents().addHandler(stopStopTimeCalculator);
         }
-        config.linkStats().setWriteLinkStatsInterval(config.linkStats().getWriteLinkStatsInterval() * IterationsPerCycle);
+
         config.controler().setCreateGraphs(false);
-        config.controler().setWriteEventsInterval(config.controler().getWriteEventsInterval() * IterationsPerCycle);
-        config.controler().setWritePlansInterval(config.controler().getWritePlansInterval() * IterationsPerCycle);
-        config.controler().setWriteSnapshotsInterval(config.controler().getWriteSnapshotsInterval() * IterationsPerCycle);
-        Logger.getLogger(this.getClass()).warn("Please note: this script violates the matsim convention that the config output should be useable "
-        		+ "as input to another run.   Instead, the write invervals would be multiplied every time this is done.  kai, may'15");
+
     }
-
-
 
 
     /**
@@ -374,11 +367,16 @@ public class RunPSim {
         private int startIter;
         private int endIter;
         private Map<Id<Person>, Double> selectedPlanScoreMemory;
+
+        public PSimFactory getpSimFactory() {
+            return pSimFactory;
+        }
+
         private PSimFactory pSimFactory;
 
 
         public MobSimSwitcher(int overridingRate) {
-            pSimFactory = new PSimFactory();
+            pSimFactory = new PSimFactory(scenario, matsimControler.getEvents());
             currentRate = overridingRate;
             endRate = overridingRate;
             endIter = matsimControler.getConfig().controler().getLastIteration();
@@ -387,7 +385,7 @@ public class RunPSim {
 
         //TODO: add a config group to enable all this stuff again
         private MobSimSwitcher() {
-            pSimFactory = new PSimFactory();
+            pSimFactory = new PSimFactory(scenario, matsimControler.getEvents());
             int startRate = 0;
             if (matsimControler.getConfig().getParam("MobSimSwitcher", START_RATE) != null)
                 startRate = Math.max(
@@ -482,7 +480,7 @@ public class RunPSim {
         @Override
         public void notifyBeforeMobsim(BeforeMobsimEvent event) {
             //only for psim iterations
-            if(mobSimSwitcher.isQSimIteration())
+            if (mobSimSwitcher.isQSimIteration())
                 return;
 
             Scenario scenario = matsimControler.getScenario();
@@ -495,20 +493,20 @@ public class RunPSim {
                 selectedPlanScoreMemory.remove(plan.getPerson().getId());
             }
             pSimFactory.setPlans(plancatcher.getPlansForPSim());
-            if (matsimControler.getConfig().transit().isUseTransit() ) {
-                if(FullTransitPerformanceTransmission)
+            if (matsimControler.getConfig().transit().isUseTransit()) {
+                if (FullTransitPerformanceTransmission)
                     pSimFactory.setTransitPerformance(transitPerformanceRecorder.getTransitPerformance());
-                else{
-                    pSimFactory.setStopStopTime(stopStopTimeCalculator.getStopStopTimes());
-                    pSimFactory.setWaitTime(waitTimeCalculator.getWaitTimes());
-                }
+//                else{
+                pSimFactory.setStopStopTime(stopStopTimeCalculator.getStopStopTimes());
+                pSimFactory.setWaitTime(waitTimeCalculator.getWaitTimes());
+//                }
             }
             pSimFactory.setTravelTime(carTravelTimeCalculator.getLinkTravelTimes());
         }
 
         @Override
         public void notifyIterationEnds(IterationEndsEvent event) {
-            if(mobSimSwitcher.isQSimIteration())
+            if (mobSimSwitcher.isQSimIteration())
                 return;
             Iterator<Map.Entry<Id<Person>, Double>> iterator = selectedPlanScoreMemory.entrySet().iterator();
             while (iterator.hasNext()) {

@@ -335,6 +335,56 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 		return closest;
 	}
 
+	public Collection<T> getBall(
+			final C coord,
+			final double maxDist,
+			final Predicate<T> predicate ) {
+		return getBallsIntersection( Collections.singleton( coord ) , maxDist , predicate );
+	}
+
+	public Collection<T> getBallsIntersection(
+			final Collection<C> coords,
+			final double maxDist,
+			final Predicate<T> predicate ) {
+		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>( 1 + (int) Math.log( 1 + size() )) );
+		stack.add( root );
+
+		final Collection<T> ball = new ArrayList<>();
+
+		while( !stack.isEmpty() ) {
+			final Node<C,T> current = stack.poll();
+
+			if ( current.value == null &&
+					current.close == null &&
+					current.far == null ) {
+				continue;
+			}
+
+			final double[] distsToVp = coords.stream()
+					.mapToDouble( c -> metric.calcDistance( c , current.coordinate ) )
+					.toArray();
+
+			// check if current VP in ball
+			if ( current.value != null &&
+					DoubleStream.of( distsToVp ).allMatch( d -> d < maxDist ) &&
+					predicate.test( current.value ) ) {
+				ball.add( current.value );
+			}
+
+			// test intersection of disc with the children
+			if ( current.close != null &&
+					DoubleStream.of( distsToVp ).allMatch( d -> d - maxDist <= current.cuttoffDistance ) ) {
+				stack.add( current.close );
+			}
+			if ( current.far != null &&
+					DoubleStream.of( distsToVp ).allMatch( d -> d + maxDist >= current.cuttoffDistance ) ) {
+				stack.add( current.far );
+			}
+		}
+
+		return ball;
+	}
+
 	private double calcDistance( final T vantagePoint, final T v ) {
 		return metric.calcDistance(
 				coordinate.getCoord( v ) ,

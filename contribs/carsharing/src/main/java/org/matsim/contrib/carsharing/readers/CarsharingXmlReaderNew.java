@@ -150,8 +150,8 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 			
 			twvehicleIdMap = new HashMap<String, CSVehicle>();
 			twvehiclesMap = new HashMap<CSVehicle, Link>();
-			allVehicles = new HashMap<String, CSVehicle>();
-			companies = new HashMap<String, CompanyContainer>();
+			//allVehicles = new HashMap<String, CSVehicle>();
+			//companies = new HashMap<String, CompanyContainer>();
 		}
 		
 		else if (name.equals("twoway") || name.equals("oneway")) {

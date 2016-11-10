@@ -15,7 +15,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.io.IOUtils;
 
-class ClusterReader {
+public class ClusterReader {
 
     public void readClusters(String fileName, Network network,
 			NodeClusteringAlgorithm nca) {

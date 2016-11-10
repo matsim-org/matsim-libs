@@ -44,42 +44,43 @@ import java.util.Random;
  */
 public class RunScalabilityAnalysis {
 
-	public static void main( String[] args ) {
-		MonitoringUtils.setMemoryLoggingOnGC();
-		final SnowballSamplingConfigGroup configGroup = new SnowballSamplingConfigGroup();
-		final ScalabilityConfigGroup scalabilityConfigGroup = new ScalabilityConfigGroup();
-		final Config config =
-				ConfigUtils.loadConfig(
-						args[ 0 ],
-						configGroup,
-						scalabilityConfigGroup,
-						new SocialNetworkSamplingConfigGroup() );
-		MoreIOUtils.initOut( config.controler().getOutputDirectory() );
+	public static void main( String[] args ) throws Exception {
+		//MonitoringUtils.setMemoryLoggingOnGC();
 
-		new ConfigWriter( config ).write( config.controler().getOutputDirectory()+"/output_config.xml" );
-		final Scenario scenario = ScenarioUtils.loadScenario( config );
+		//try ( AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose() ) {
+		try {
+			final SnowballSamplingConfigGroup configGroup = new SnowballSamplingConfigGroup();
+			final ScalabilityConfigGroup scalabilityConfigGroup = new ScalabilityConfigGroup();
+			final Config config =
+					ConfigUtils.loadConfig(
+							args[ 0 ],
+							configGroup,
+							scalabilityConfigGroup,
+							new SocialNetworkSamplingConfigGroup() );
+			MoreIOUtils.initOut( config.controler().getOutputDirectory() );
 
-		final String outputDir = config.controler().getOutputDirectory();
-		final String tmpDir = outputDir + "/tmp/";
-		config.controler().setOutputDirectory( tmpDir );
+			new ConfigWriter( config ).write( config.controler().getOutputDirectory() + "/output_config.xml" );
+			final Scenario scenario = ScenarioUtils.loadScenario( config );
 
-		try ( final ScalabilityStatisticsListener statsListenner = new ScalabilityStatisticsListener( outputDir+"/stats.dat"  )) {
-			for ( double sample : scalabilityConfigGroup.getSamples() ) {
-				for ( int tryNr = 0; tryNr < scalabilityConfigGroup.getnTries(); tryNr++ ) {
-					MoreIOUtils.deleteDirectoryIfExists( tmpDir );
+			final String outputDir = config.controler().getOutputDirectory();
+			final String tmpDir = outputDir + "/tmp/";
+			config.controler().setOutputDirectory( tmpDir );
 
-					final Scenario sampledScenario = samplePopulation( scenario , sample );
+			try ( final ScalabilityStatisticsListener statsListenner = new ScalabilityStatisticsListener( outputDir + "/stats.dat" ) ) {
+				for ( double sample : scalabilityConfigGroup.getSamples() ) {
+					for ( int tryNr = 0; tryNr < scalabilityConfigGroup.getnTries(); tryNr++ ) {
+						MoreIOUtils.deleteDirectoryIfExists( tmpDir );
 
-					statsListenner.startTry( sample , tryNr );
+						final Scenario sampledScenario = samplePopulation( scenario, sample );
 
-					final SocialNetwork network = runTry( sampledScenario , statsListenner );
+						statsListenner.startTry( sample, tryNr );
 
-					statsListenner.endTry( network );
+						final SocialNetwork network = runTry( sampledScenario, statsListenner );
+
+						statsListenner.endTry( network );
+					}
 				}
 			}
-		}
-		catch ( IOException e ) {
-			throw new UncheckedIOException( e );
 		}
 		finally {
 			MoreIOUtils.closeOutputDirLogging();

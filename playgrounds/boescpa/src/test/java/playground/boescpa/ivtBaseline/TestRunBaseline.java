@@ -43,8 +43,6 @@ import org.matsim.facilities.*;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-import playground.boescpa.ivtBaseline.preparation.IVTConfigCreator;
-import playground.boescpa.ivtBaseline.preparation.PrefsCreator;
 import playground.boescpa.lib.tools.fileCreation.F2LConfigGroup;
 import playground.boescpa.lib.tools.fileCreation.F2LCreator;
 
@@ -84,7 +82,7 @@ public class TestRunBaseline {
 
 		// create config
 		String[] argsConfig = {pathToConfig, "100"};
-		IVTConfigCreator.main(argsConfig);
+		contrib.baseline.preparation.IVTConfigCreator.main(argsConfig);
 		Config config = ConfigUtils.loadConfig(pathToConfig, new F2LConfigGroup(), new DestinationChoiceConfigGroup());
 		config.setParam("controler", "outputDirectory", utils.getOutputDirectory() + "output/");
 		// Reduce iterations
@@ -120,7 +118,7 @@ public class TestRunBaseline {
 	}
 
 	public static void createPrefs(Scenario tempScenario, String pathToPrefsFile) {
-		ObjectAttributes prefs = PrefsCreator.createPrefsBasedOnPlans(tempScenario.getPopulation());
+		ObjectAttributes prefs = contrib.baseline.preparation.PrefsCreator.createPrefsBasedOnPlans(tempScenario.getPopulation());
 		ObjectAttributesXmlWriter attributesXmlWriterWriter = new ObjectAttributesXmlWriter(prefs);
 		attributesXmlWriterWriter.writeFile(pathToPrefsFile);
 	}

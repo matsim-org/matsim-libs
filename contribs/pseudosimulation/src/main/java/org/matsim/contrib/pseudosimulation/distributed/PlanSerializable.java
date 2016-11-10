@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -40,6 +39,7 @@ class PlanSerializable implements Serializable {
     private final String type;
     double pSimScore;
     private String genome = "";
+
     public PlanSerializable(Plan plan) {
         planElements = new ArrayList<>();
         for (PlanElement planElement : plan.getPlanElements())
@@ -140,9 +140,14 @@ class PlanSerializable implements Serializable {
             departureTime = leg.getDepartureTime();
             mode = leg.getMode();
             travelTime = leg.getTravelTime();
-            if (mode.equals(TransportMode.pt))
-                System.out.print("");
-            route = new GenericRouteSerializable(leg.getRoute());
+
+            if (leg.getRoute() != null) {
+                if (leg.getMode().equals(TransportMode.car))
+                    route = new NetworkRouteSerializable((NetworkRoute) leg.getRoute());
+                else
+                    route = new GenericRouteSerializable(leg.getRoute());
+
+            }
 
 
         }
@@ -171,7 +176,7 @@ class PlanSerializable implements Serializable {
         }
     }
 
-    class LinkNetworkRouteSerializable implements RouteSerializable {
+    class NetworkRouteSerializable implements RouteSerializable {
 
         private final double distance;
         private final String endLinkIdString;
@@ -181,7 +186,7 @@ class PlanSerializable implements Serializable {
         private final String vehicleIdString;
         private final List<String> linkIdStrings;
 
-        public LinkNetworkRouteSerializable(NetworkRoute route) {
+        public NetworkRouteSerializable(NetworkRoute route) {
             distance = route.getDistance();
             endLinkIdString = route.getEndLinkId().toString();
             startLinkIdString = route.getStartLinkId().toString();

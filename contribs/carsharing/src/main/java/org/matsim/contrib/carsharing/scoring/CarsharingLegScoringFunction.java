@@ -15,6 +15,7 @@ import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContainer;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import com.google.common.collect.ImmutableSet;
@@ -61,10 +62,12 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 		AgentRentals agentRentals = this.demandHandler.getAgentRentalsMap().get(personId);
 		
 		if (agentRentals != null) {
-			
+			double marginalUtilityOfMoney = ((PlanCalcScoreConfigGroup)this.config.getModule("planCalcScore")).getMarginalUtilityOfMoney();
 			for(RentalInfo rentalInfo : agentRentals.getArr()) {
 				CSVehicle vehicle = this.carsharingSupplyContainer.getAllVehicles().get(rentalInfo.getVehId().toString());
-				score += this.costsCalculatorContainer.getCost(vehicle.getCompanyId(), rentalInfo.getCarsharingType(), rentalInfo);
+				if (marginalUtilityOfMoney != 0.0)
+					score += -1 * this.costsCalculatorContainer.getCost(vehicle.getCompanyId(), 
+							rentalInfo.getCarsharingType(), rentalInfo) * marginalUtilityOfMoney;
 			}			
 		}				
 	}	

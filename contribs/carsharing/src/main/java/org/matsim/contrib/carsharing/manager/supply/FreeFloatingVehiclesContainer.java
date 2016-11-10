@@ -1,5 +1,6 @@
 package org.matsim.contrib.carsharing.manager.supply;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
@@ -78,19 +79,23 @@ public class FreeFloatingVehiclesContainer implements VehiclesContainer{
 
 	@Override
 	public CSVehicle findClosestAvailableVehicle(Link startLink, String typeOfVehicle, double searchDistance) {
-		CSVehicle vehicle = this.availableFFVehicleLocationQuadTree
-				.getClosest(startLink.getCoord().getX(), startLink.getCoord().getY());		
+		Collection<CSVehicle> location = 
+				availableFFVehicleLocationQuadTree.getDisk(startLink.getCoord().getX(), 
+						startLink.getCoord().getY(), searchDistance);
+		if (location.isEmpty()) return null;
 
-		if (vehicle != null) {
-			Coord vehicleLocation = this.getVehicleLocation(vehicle).getCoord();
-			double distance = CoordUtils.calcEuclideanDistance(vehicleLocation, startLink.getCoord());
-
-			if (distance > searchDistance) {
-				return null;
+		CSVehicle closest = null;
+		double closestFound = searchDistance;
+		for(CSVehicle vehicle: location) {
+			
+			Coord coord = this.availableFFvehiclesMap.get(vehicle).getCoord();
+			
+			if (CoordUtils.calcEuclideanDistance(startLink.getCoord(), coord) < closestFound ) {
+				closest = vehicle;
+				closestFound = CoordUtils.calcEuclideanDistance(startLink.getCoord(), coord);
 			}
-		}
-
-		return vehicle;
+		}		
+		return closest;
 	}
 
 	@Override

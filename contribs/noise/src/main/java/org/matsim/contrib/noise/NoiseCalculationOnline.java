@@ -57,7 +57,7 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 	private NoisePricingHandler pricing;
 		
 	/**
-	 * Use this constructor if the default travel disutility was previously replaced in your own controler. 
+	 * Use this constructor if the default travel disutility is replaced in your own controler. 
 	 *
 	 */
 	public NoiseCalculationOnline(NoiseContext noiseContext) {

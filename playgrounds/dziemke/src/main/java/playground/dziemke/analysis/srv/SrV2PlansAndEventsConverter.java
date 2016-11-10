@@ -58,7 +58,8 @@ import playground.dziemke.analysis.Trip;
 public class SrV2PlansAndEventsConverter {
 //	private final static Logger log = Logger.getLogger(SrV2PlansAndEventsConverter.class);
 
-	public static void convert(TreeMap<Id<Person>, TreeMap<Double, Trip>> personTripsMap, Network network, CoordinateTransformation ct, String outputDirectory) {
+	public static void convert(TreeMap<Id<Person>, TreeMap<Double, Trip>> personTripsMap, //Network network, 
+			CoordinateTransformation ct, String outputDirectory) {
 		
 		Config config = ConfigUtils.createConfig();
 		Population population = PopulationUtils.createPopulation(config);
@@ -141,14 +142,17 @@ public class SrV2PlansAndEventsConverter {
 	    }	    
 	    System.out.println("tripMapEntryCounter = " + tripMapEntryCounter);
 	    
-	    writePlansFile(outputDirectory, network, population);
+	    writePlansFile(outputDirectory, //network, 
+	    		population);
 
 	    events.sort(new EventsComparatorByTime());
 	    writeEventsFile(outputDirectory, events);
 	}
 
-	private static void writePlansFile(String outputDirectory, Network network, Population population) {
-	    MatsimWriter popWriter = new PopulationWriter(population, network);
+	private static void writePlansFile(String outputDirectory, //Network network, 
+			Population population) {
+//		MatsimWriter popWriter = new PopulationWriter(population, network);
+	    MatsimWriter popWriter = new PopulationWriter(population);
 	    popWriter.write(outputDirectory + "plans.xml");
 	}
 

@@ -71,11 +71,10 @@ public class Fixture {
 		conf.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 		conf.plans().setInputFile("plans1Agent.xml");
 		conf.qsim().setUseLanes(true);
-		ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
-		//as signals are configured below we don't need signals on
 		conf.qsim().setStuckTime(1000);
 		conf.qsim().setStartTime(0.0);
 		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+		signalsConfig.setUseSignalSystems(true);
 		
 		if (useIntergreens) {
 			signalsConfig.setIntergreenTimesFile("testIntergreenTimes_v1.0.xml");

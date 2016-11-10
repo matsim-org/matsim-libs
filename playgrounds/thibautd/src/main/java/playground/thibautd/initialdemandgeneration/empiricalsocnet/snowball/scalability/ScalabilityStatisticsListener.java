@@ -46,6 +46,8 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 
+import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
+
 /**
  * @author thibautd
  */
@@ -121,7 +123,13 @@ public class ScalabilityStatisticsListener implements AutoCloseable {
 			writer.write( "\t" );
 
 			log.info( "write clique size statistics..." );
-			writeBoxPlot( cliques , Set::size );
+			writeBoxPlot(
+					// count each clique once per ego.
+					cliques.stream()
+							.flatMap( c -> c.stream().map( e -> c ) )
+							.collect( Collectors.toList() ) ,
+					Set::size );
+
 			writer.write( "\t" );
 
 			log.info( "write degree statistics..." );
@@ -170,7 +178,6 @@ public class ScalabilityStatisticsListener implements AutoCloseable {
 	private <T> void writeBoxPlotFlat( final Collection<T> objs, final Function<T,DoubleStream> stat ) throws IOException {
 		final double[] arr = objs.stream().flatMapToDouble( stat ).toArray();
 
-		// could sort a random subset only if collection very long, for efficiency (only if really too long)
 		Arrays.sort( arr );
 
 		final int last = arr.length - 1;

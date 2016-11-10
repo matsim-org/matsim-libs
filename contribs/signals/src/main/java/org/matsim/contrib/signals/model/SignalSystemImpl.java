@@ -146,4 +146,13 @@ public class SignalSystemImpl implements SignalSystem {
 		return this.controller;
 	}
 
+	@Override
+	public void startPlan(double now) {
+		Set<SignalGroupStateChangeRequest> req = new HashSet<SignalGroupStateChangeRequest>();
+		for (Id<SignalGroup> sgId : this.getSignalGroups().keySet()){
+			req.add(new SignalGroupStateChangeRequestImpl(sgId, SignalGroupState.START_PLAN, now));
+		}
+		this.sortedRequests.addAll(req);
+	}
+
 }

@@ -11,8 +11,8 @@ public class PersonUtils {
 	private final static String SEX_ATTRIBUTE="sex";
 	private final static String HAS_LICENSE= "hasLicense";
 	private static final String CAR_AVAIL = "carAvail";
-	public static final String EMPLOYED = "employed";
-	public static final String AGE = "age";
+	private static final String EMPLOYED = "employed";
+	private static final String AGE = "age";
 	private static final String TRAVELCARDS = "travelcards";
 	private final static Logger log = Logger.getLogger(Person.class);
 
@@ -35,62 +35,100 @@ public class PersonUtils {
 		}
 	}
 
-	@Deprecated // use PersonAttributes
+	/**
+	 * convenience method for often used demographic attribute
+	 */
 	public static String getSex(Person person) {
-		return (String) person.getCustomAttributes().get(SEX_ATTRIBUTE);
+		return (String) person.getAttributes().getAttribute(SEX_ATTRIBUTE);
 	}
 
-	@Deprecated // use PersonAttributes
+	/**
+	 * convenience method for often used demographic attribute
+	 */
 	public static Integer getAge(Person person) {
-		return (Integer) person.getCustomAttributes().get(AGE);
+		return (Integer) person.getAttributes().getAttribute(AGE);
 	}
 
-	@Deprecated // use PersonAttributes
+	/**
+	 * convenience method for often used demographic attribute
+	 */
 	public static String getLicense(Person person) {
-		return (String) person.getCustomAttributes().get(HAS_LICENSE);
+		return (String) person.getAttributes().getAttribute(HAS_LICENSE);
+
 	}
 
-	@Deprecated // use PersonAttributes
+	/**
+	 * convenience method for often used demographic attribute
+	 */
 	public static boolean hasLicense(Person person) {
 		return ("yes".equals(getLicense(person))) || ("true".equals(getLicense(person)));
 	}
 
-	@Deprecated // use PersonAttributes
+	/**
+	 * convenience method for often used demographic attribute
+	 */
 	public static String getCarAvail(Person person) {
-		return (String) person.getCustomAttributes().get(CAR_AVAIL);
-	}
+		return (String) person.getAttributes().getAttribute(CAR_AVAIL);
+		}
 
-	@Deprecated // use PersonAttributes
+	/**
+	 * convenience method for often used demographic attribute
+	 */
 	public static Boolean isEmployed(Person person) {
-		return (Boolean) person.getCustomAttributes().get(EMPLOYED);
-	}
+		return (Boolean) person.getAttributes().getAttribute(EMPLOYED);	}
 
-	@Deprecated // use PersonAttributes
+	/**
+	 * convenience method for often used demographic attribute
+	 */
 	public static void setAge(Person person, final Integer age) {
+		if (age!=null){
 		person.getCustomAttributes().put(AGE, age);
+		person.getAttributes().putAttribute(AGE,age ) ;
+		}
 	}
 
-	@Deprecated // use PersonAttributes
+	/**
+	 * convenience method for often used demographic attribute
+	 */
 	public static void setSex(Person person, final String sex) {
+		if (sex!=null){
 		person.getCustomAttributes().put(SEX_ATTRIBUTE, sex);
+		person.getAttributes().putAttribute( SEX_ATTRIBUTE, sex ) ;
+		}
 	}
 
-	@Deprecated // use PersonAttributes
+	/**
+	 * convenience method for often used demographic attribute
+	 */
 	public static void setLicence(Person person, final String licence) {
+		if (licence!=null){
+
 		person.getCustomAttributes().put(HAS_LICENSE, licence);
+		person.getAttributes().putAttribute(HAS_LICENSE, licence ) ;
+		}
 	}
 
-	@Deprecated // use PersonAttributes
+	/**
+	 * convenience method for often used demographic attribute
+	 */
 	public static void setCarAvail(Person person, final String carAvail) {
+		if (carAvail!=null){
 		person.getCustomAttributes().put(CAR_AVAIL, carAvail);
+		person.getAttributes().putAttribute(CAR_AVAIL,carAvail ) ;
+		}
 	}
 
-	@Deprecated // use PersonAttributes
+	/**
+	 * convenience method for often used demographic attribute
+	 */
 	public static void setEmployed(Person person, final Boolean employed) {
+		if (employed!=null){
 		person.getCustomAttributes().put(EMPLOYED, employed);
+		person.getAttributes().putAttribute(EMPLOYED,employed ) ;
+		}
 	}
 
-	@Deprecated // use PersonAttributes
+	@Deprecated // yyyy is there a way to use person.getAttributes instead??  kai, nov'16
 	public static void addTravelcard(Person person, final String type) {
 		if (getTravelcards(person) == null) {
 			person.getCustomAttributes().put(TRAVELCARDS, new TreeSet<String>());

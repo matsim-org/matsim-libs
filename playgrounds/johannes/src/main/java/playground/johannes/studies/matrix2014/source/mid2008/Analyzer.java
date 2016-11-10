@@ -21,25 +21,20 @@ package playground.johannes.studies.matrix2014.source.mid2008;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.common.util.XORShiftRandom;
-import playground.johannes.gsv.synPop.analysis.LegGeoDistanceTask;
-import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
-import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
-import playground.johannes.studies.matrix2014.analysis.ActTypeDistanceTask;
 import playground.johannes.studies.matrix2014.analysis.NumericLegAnalyzer;
 import playground.johannes.studies.matrix2014.sim.Simulator;
 import playground.johannes.studies.matrix2014.sim.ValidatePersonWeight;
 import playground.johannes.synpop.analysis.*;
-import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.CommonValues;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.io.PopulationIO;
-import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.processing.ValidateMissingAttribute;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Random;
 import java.util.Set;
 
 /**

@@ -88,7 +88,7 @@ public class DemandGeneratorOnePersonV3 {
 		
 		// Create storage objects
 		Map<Integer, String> lors = new HashMap<Integer, String>();
-		Map<Integer, Household> householdMap = new HashMap<Integer, Household>();
+		Map<Integer, SimpleHousehold> householdMap = new HashMap<Integer, SimpleHousehold>();
 		Map<Integer, Map<String, SimplePerson>> mapOfPersonMaps = new HashMap<Integer, Map<String, SimplePerson>>();
 		for (int i=1; i<=numberOfPlansPerPerson; i++) {
 			Map<String, SimplePerson> persons = new HashMap<String, SimplePerson>();
@@ -117,7 +117,7 @@ public class DemandGeneratorOnePersonV3 {
 				} else {
 					homeTSZLocation = source;
 				}
-				Household household = new Household(householdId, homeTSZLocation);
+				SimpleHousehold household = new SimpleHousehold(householdId, homeTSZLocation);
 				householdMap.put(householdId, household);
 				
 				// Create persons
@@ -342,7 +342,7 @@ public class DemandGeneratorOnePersonV3 {
     }
 	
 
-	public static void writeToHouseholdsFile(Map <String, SimplePerson> persons, Map<Integer, Household> households,
+	public static void writeToHouseholdsFile(Map <String, SimplePerson> persons, Map<Integer, SimpleHousehold> households,
 			String fileName) {
 		BufferedWriter bufferedWriterHouseholds = null;
 		

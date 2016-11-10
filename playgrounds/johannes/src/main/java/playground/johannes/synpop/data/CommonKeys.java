@@ -42,6 +42,8 @@ public interface CommonKeys {
 
 	String LEG_MODE = "mode";
 
+	String LEG_ROUTE = "route";
+
 	String ACTIVITY_TYPE = "type";
 	
 	String ACTIVITY_START_TIME = "startTime";

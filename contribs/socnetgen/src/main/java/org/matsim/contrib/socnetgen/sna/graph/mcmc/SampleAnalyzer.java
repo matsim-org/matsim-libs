@@ -98,6 +98,8 @@ public class SampleAnalyzer<G extends Graph, E extends Edge, V extends Vertex> i
 			logger.info(String.format(Locale.US, "m=%1$s, <k>=%2$.4f, <c_local>=%3$.4f, <c_global>=%4$.4f.", m, k_mean, c_local, c_global));
 		}
 		
+		// yyyy the following feels a bit weird: I think it gives the responsibility to end the sampling to a class that
+		// otherwise is purely observing.  kai, nov'16
 		if(iteration > maxIteration)
 			return false;
 		else
