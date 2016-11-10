@@ -93,7 +93,7 @@ public class TransitRouterConfig implements MatsimParameters {
 
 	private Double beelineDistanceFactor;
 
-	private double directWalkFactor = 1 ;
+	private final double directWalkFactor ;
 
 	public TransitRouterConfig(final Config config) {
 		this(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
@@ -128,6 +128,7 @@ public class TransitRouterConfig implements MatsimParameters {
 		this.setExtensionRadius(trConfig.getExtensionRadius());
 		this.setBeelineWalkConnectionDistance(trConfig.getMaxBeelineWalkConnectionDistance());
 		this.setAdditionalTransferTime(trConfig.getAdditionalTransferTime());
+		this.directWalkFactor = trConfig.getDirectWalkFactor() ;
 	}
 
 	public void setUtilityOfLineSwitch_utl(final double utilityOfLineSwitch_utl_sec) {
@@ -239,13 +240,6 @@ public class TransitRouterConfig implements MatsimParameters {
 
 	public double getDirectWalkFactor() {
 		return this.directWalkFactor ;
-	}
-	/**
-	 * Factor with which direct walk generalized cost is multiplied before it is compared to the pt generalized cost.
-	 * Set to a very high value to reduce direct walk results.
-	 */
-	public final void setDirectWalkFactor(double directWalkFactor) {
-		this.directWalkFactor = directWalkFactor;
 	}
 
 

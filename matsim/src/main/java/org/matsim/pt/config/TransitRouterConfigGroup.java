@@ -37,6 +37,8 @@ public class TransitRouterConfigGroup extends ReflectiveConfigGroup {
 	private double maxBeelineWalkConnectionDistance = 100.0;
 	private double additionalTransferTime = 0.0;
 
+	private double directWalkFactor;
+
 	public TransitRouterConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -93,5 +95,16 @@ public class TransitRouterConfigGroup extends ReflectiveConfigGroup {
 	@StringGetter( ADDITIONAL_TRANSFER_TIME )
 	public double getAdditionalTransferTime() {
 		return this.additionalTransferTime;
+	}
+
+	public double getDirectWalkFactor() {
+		return this.directWalkFactor ;
+	}
+	/**
+	 * Factor with which direct walk generalized cost is multiplied before it is compared to the pt generalized cost.
+	 * Set to a very high value to reduce direct walk results.
+	 */
+	public final void setDirectWalkFactor(double directWalkFactor) {
+		this.directWalkFactor = directWalkFactor;
 	}
 }
