@@ -14,8 +14,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.carsharing.manager.demand.RentalInfo;
 import org.matsim.contrib.carsharing.manager.demand.membership.MembershipContainer;
+import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContainer;
 import org.matsim.contrib.carsharing.models.ChooseTheCompany;
+import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -29,7 +31,7 @@ import com.google.inject.Inject;
 
 public class ChooseTheCompanyPriceBased implements ChooseTheCompany {
 	@Inject private MembershipContainer memberships;
-	//@Inject private CarsharingSupplyContainer carsharingSupply;
+	@Inject private CarsharingSupplyInterface carsharingSupply;
 	@Inject private CostsCalculatorContainer costCalculator;
 	@Inject private Scenario scenario;
 	
@@ -43,7 +45,7 @@ public class ChooseTheCompanyPriceBased implements ChooseTheCompany {
 
 		//=== pick a company based on a logit model 
 		//=== that takes the potential price into account
-		
+		Network network = scenario.getNetwork();
 		String carsharingType = leg.getMode();
 		
 		Person person = plan.getPerson();
@@ -63,8 +65,12 @@ public class ChooseTheCompanyPriceBased implements ChooseTheCompany {
 			//estimate the rental price for each company
 			if (price == 0.0 || costCalculator.getCost(companyName, carsharingType, rentalInfo) +
 					(random.nextDouble() - 0.5) / 1000.0 < price) {
-				chosenCompany = companyName;
-				price = costCalculator.getCost(companyName, carsharingType, rentalInfo);
+				CSVehicle vehicle = this.carsharingSupply.findClosestAvailableVehicle(network.getLinks().get(leg.getRoute().getStartLinkId()),
+						mode, "car", companyName, 1000.0);
+				if (vehicle != null) {
+					chosenCompany = companyName;
+					price = costCalculator.getCost(companyName, carsharingType, rentalInfo);
+				}
 			}
 			
 		}
