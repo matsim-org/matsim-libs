@@ -43,6 +43,9 @@ public class TransitRouterConfigGroup extends ReflectiveConfigGroup {
 		super(GROUP_NAME);
 	}
 
+	private static final String DIRECT_WALK_FACTOR="directWalkFactor" ;
+	static final String DIRECT_WALK_FACTOR_CMT = "Factor with which direct walk generalized cost is multiplied before it is compared "
+			+ "to the pt generalized cost.  Set to a very high value to reduce direct walk results." ;
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
@@ -50,6 +53,7 @@ public class TransitRouterConfigGroup extends ReflectiveConfigGroup {
 		comments.put(EXTENSION_RADIUS, "step size to increase searchRadius if no stops are found");
 		comments.put(MAX_BEELINE_WALK_CONNECTION_DISTANCE, "maximum beeline distance between stops that agents could transfer to by walking");
 		comments.put(ADDITIONAL_TRANSFER_TIME, "additional time the router allocates when a line switch happens. Can be interpreted as a 'safety' time that agents need to safely transfer from one line to another");
+		comments.put(DIRECT_WALK_FACTOR, DIRECT_WALK_FACTOR_CMT);
 		return comments;
 	}
 
@@ -97,13 +101,17 @@ public class TransitRouterConfigGroup extends ReflectiveConfigGroup {
 		return this.additionalTransferTime;
 	}
 
+	/**
+	 * {@value #DIRECT_WALK_FACTOR_CMT}
+	 */
+	@StringGetter(DIRECT_WALK_FACTOR)
 	public double getDirectWalkFactor() {
 		return this.directWalkFactor ;
 	}
 	/**
-	 * Factor with which direct walk generalized cost is multiplied before it is compared to the pt generalized cost.
-	 * Set to a very high value to reduce direct walk results.
+	 * {@value #DIRECT_WALK_FACTOR_CMT}
 	 */
+	@StringSetter(DIRECT_WALK_FACTOR)
 	public final void setDirectWalkFactor(double directWalkFactor) {
 		this.directWalkFactor = directWalkFactor;
 	}
