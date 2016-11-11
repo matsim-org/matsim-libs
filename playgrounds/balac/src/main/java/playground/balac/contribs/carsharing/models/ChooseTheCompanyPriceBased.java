@@ -53,32 +53,42 @@ public class ChooseTheCompanyPriceBased implements ChooseTheCompany {
 		String mode = leg.getMode();
 		Set<String> availableCompanies = this.memberships.getPerPersonMemberships().get(personId).getMembershipsPerCSType().get(mode);
 		
-		RentalInfo rentalInfo = new RentalInfo();
-		double time = estimatetravelTime(leg, person, now);
-		rentalInfo.setInVehicleTime(time);
-		rentalInfo.setStartTime(now);
-		rentalInfo.setEndTime(now + time); 
+		
 		String chosenCompany = "";
 		double price = 0.0;
 		Random random = MatsimRandom.getRandom();
+		
+		Link startLink = network.getLinks().get(leg.getRoute().getStartLinkId());
+		
 		for(String companyName : availableCompanies) {
 			//estimate the rental price for each company
-			if (price == 0.0 || costCalculator.getCost(companyName, carsharingType, rentalInfo) +
-					(random.nextDouble() - 0.5) / 1000.0 < price) {
-				CSVehicle vehicle = this.carsharingSupply.findClosestAvailableVehicle(network.getLinks().get(leg.getRoute().getStartLinkId()),
-						mode, "car", companyName, 1000.0);
-				if (vehicle != null) {
-					chosenCompany = companyName;
-					price = costCalculator.getCost(companyName, carsharingType, rentalInfo);
-				}
-			}
 			
+			CSVehicle vehicle = this.carsharingSupply.findClosestAvailableVehicle(network.getLinks().get(leg.getRoute().getStartLinkId()),
+					mode, "car", companyName, 1000.0);
+			if (vehicle != null) {
+				Link vehicleLocation = this.carsharingSupply.getAllVehicleLocations().get(vehicle);
+				
+				double walkTravelTime = estimateWalkTravelTime(startLink, vehicleLocation);
+				
+				RentalInfo rentalInfo = new RentalInfo();
+				double time = estimatetravelTime(leg, vehicleLocation, person, now);
+				rentalInfo.setInVehicleTime(time);
+				rentalInfo.setStartTime(now);
+				rentalInfo.setEndTime(now + walkTravelTime + time); 
+				
+				if (price == 0.0 || costCalculator.getCost(companyName, carsharingType, rentalInfo) +
+						(random.nextDouble() - 0.5) / 1000.0 < price) {
+					
+						chosenCompany = companyName;
+						price = costCalculator.getCost(companyName, carsharingType, rentalInfo);					
+				}			
+			}
 		}
 		
 		return chosenCompany;
 	}
 
-	private double estimatetravelTime(Leg leg, Person person, double now) {	
+	private double estimatetravelTime(Leg leg, Link vehicleLocation, Person person, double now) {	
 		
 		Network network = scenario.getNetwork();
 		TravelTime travelTime = travelTimes.get( TransportMode.car ) ;
@@ -86,13 +96,18 @@ public class ChooseTheCompanyPriceBased implements ChooseTheCompany {
 		TravelDisutility travelDisutility = travelDisutilityFactories.get( TransportMode.car ).createTravelDisutility(travelTime) ;
 		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(scenario.getNetwork(),
 				travelDisutility, travelTime ) ;
-		Link startLink = network.getLinks().get(leg.getRoute().getStartLinkId());
 		Link endLink  = network.getLinks().get(leg.getRoute().getStartLinkId());
 		Vehicle vehicle = null ;
-		Path path = pathCalculator.calcLeastCostPath(startLink.getToNode(), endLink.getFromNode(), 
+		Path path = pathCalculator.calcLeastCostPath(vehicleLocation.getToNode(), endLink.getFromNode(), 
 				now, person, vehicle ) ;
 		
 		return path.travelTime;
+		
+	}
+	
+	private double estimateWalkTravelTime(Link startLink, Link endLink) {	
+		
+		return 0.0;
 		
 	}
 

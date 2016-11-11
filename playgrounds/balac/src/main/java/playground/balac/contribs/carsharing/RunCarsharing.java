@@ -24,10 +24,8 @@ import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyContainer;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.manager.supply.costs.CompanyCosts;
 import org.matsim.contrib.carsharing.manager.supply.costs.CostCalculation;
-import org.matsim.contrib.carsharing.manager.supply.costs.CostCalculationExample;
 import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContainer;
 import org.matsim.contrib.carsharing.models.ChooseTheCompany;
-import org.matsim.contrib.carsharing.models.ChooseTheCompanyExample;
 import org.matsim.contrib.carsharing.models.ChooseVehicleType;
 import org.matsim.contrib.carsharing.models.ChooseVehicleTypeExample;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModel;
@@ -47,6 +45,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.balac.contribs.carsharing.coststructures.CostStructure1;
 import playground.balac.contribs.carsharing.coststructures.CostStructure2;
 import playground.balac.contribs.carsharing.models.ChooseTheCompanyPriceBased;
+import playground.balac.contribs.carsharing.models.KeepTheVehicleModel;
 
 public class RunCarsharing {
 
@@ -93,7 +92,7 @@ public class RunCarsharing {
 		final CarsharingListener carsharingListener = new CarsharingListener();
 		final CarsharingSupplyInterface carsharingSupplyContainer = new CarsharingSupplyContainer(controler.getScenario());
 		carsharingSupplyContainer.populateSupply();
-		final KeepingTheCarModel keepingCarModel = new KeepingTheCarModelExample();
+		final KeepingTheCarModel keepingCarModel = new KeepTheVehicleModel();
 		final ChooseTheCompany chooseCompany = new ChooseTheCompanyPriceBased();
 		final ChooseVehicleType chooseCehicleType = new ChooseVehicleTypeExample();
 		final RouterProvider routerProvider = new RouterProviderImpl();
