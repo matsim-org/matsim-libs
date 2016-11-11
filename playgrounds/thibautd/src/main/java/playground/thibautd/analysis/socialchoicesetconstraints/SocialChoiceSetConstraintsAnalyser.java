@@ -37,6 +37,7 @@ import playground.thibautd.utils.spatialcollections.VPTree;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -103,16 +104,22 @@ public class SocialChoiceSetConstraintsAnalyser {
 							" / "+cliquesOfSize.size() );
 			for ( Set<Id<Person>> clique : cliquesOfSize ) {
 				counter.incCounter();
+				final List<Coord> coords = clique.stream()
+						.map( id -> population.getPersons().get( id ) )
+						.map( SocialChoiceSetConstraintsAnalyser::calcCoord )
+						.collect( Collectors.toList() );
+
+				final VPTree<Coord,ActivityFacility> tree =
+						facilities.getSubtreeContainingBalls(
+								coords,
+								configGroup.getMaxDistanceKm() * 1000 );
+
 				final Collection<FacilitiesPerDistance> fpd = new ArrayList<>();
-				for ( double distance : configGroup.getDistances() ) {
+				for ( double distance : configGroup.getDistances_m() ) {
 					final int sizeOfIntersection =
-							facilities.getBallsIntersection(
-									clique.stream()
-											.map( id -> population.getPersons().get( id ) )
-											.map( SocialChoiceSetConstraintsAnalyser::calcCoord )
-											.collect( Collectors.toList() ),
-									distance,
-									v -> true ).size();
+							tree.getSizeOfBallsIntersection(
+									coords,
+									distance );
 					fpd.add( new FacilitiesPerDistance( sizeOfIntersection , distance ) );
 				}
 				callback.accept( new IndividualResultRecord( size , fpd ) );

@@ -39,32 +39,32 @@ public class SocialChoiceSetConstraintsConfigGroup extends ReflectiveConfigGroup
 	}
 
 	@StringGetter("minDistanceKm")
-	private double getMinDistanceKm() {
+	public double getMinDistanceKm() {
 		return minDistanceKm;
 	}
 
 	@StringSetter("minDistanceKm")
-	private void setMinDistanceKm( final double minDistanceKm ) {
+	public void setMinDistanceKm( final double minDistanceKm ) {
 		this.minDistanceKm = minDistanceKm;
 	}
 
 	@StringGetter("maxDistanceKm")
-	private double getMaxDistanceKm() {
+	public double getMaxDistanceKm() {
 		return maxDistanceKm;
 	}
 
 	@StringSetter("maxDistanceKm")
-	private void setMaxDistanceKm( final double maxDistanceKm ) {
+	public void setMaxDistanceKm( final double maxDistanceKm ) {
 		this.maxDistanceKm = maxDistanceKm;
 	}
 
 	@StringGetter("nDistances")
-	private int getNDistances() {
+	public int getNDistances() {
 		return nDistances;
 	}
 
 	@StringSetter("nDistances")
-	private void setNDistances( final int nDistances ) {
+	public void setNDistances( final int nDistances ) {
 		this.nDistances = nDistances;
 	}
 
@@ -78,9 +78,10 @@ public class SocialChoiceSetConstraintsConfigGroup extends ReflectiveConfigGroup
 		this.inputCliquesCsvFile = inputCliquesCsvFile;
 	}
 
-	public double[] getDistances() {
+	public double[] getDistances_m() {
 		return DoubleStream
 				.iterate( minDistanceKm , d -> d + (maxDistanceKm - minDistanceKm) / nDistances )
+				.map( d -> d * 1000 )
 				.limit( nDistances )
 				.toArray();
 	}
