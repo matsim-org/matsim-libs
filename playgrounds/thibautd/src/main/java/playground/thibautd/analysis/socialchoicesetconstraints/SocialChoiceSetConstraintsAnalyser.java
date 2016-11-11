@@ -23,15 +23,21 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import playground.thibautd.utils.CsvUtils;
+import playground.thibautd.utils.CsvWriter;
 import playground.thibautd.utils.spatialcollections.VPTree;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.w;
 
 /**
  * @author thibautd
@@ -49,6 +55,26 @@ public class SocialChoiceSetConstraintsAnalyser {
 		this.facilities = Utils.createTree( facilities );
 		this.cliques = Utils.readMaximalCliques( configGroup.getInputCliquesCsvFile() );
 		this.population = population;
+	}
+
+	public void analyzeToFile( final String path ) {
+		try ( final CsvWriter writer =
+					  new CsvWriter(
+					  		'\t' , '"' ,
+							  new CsvUtils.TitleLine( "cliqueSize" , "distance" , "nFacilities" ) ,
+							  path ) ) {
+			analyze( r -> {
+				for ( FacilitiesPerDistance fs : r.nFacilitiesPerDistance ) {
+					writer.nextLine();
+					writer.setField( "cliqueSize" , ""+r.cliqueSize );
+					writer.setField( "distance" , ""+fs.distance );
+					writer.setField( "nFacilities" , ""+fs.nFacilities );
+				}
+			} );
+		}
+		catch ( IOException e ) {
+			throw new UncheckedIOException( e );
+		}
 	}
 
 	public void analyze( final Consumer<IndividualResultRecord> callback ) {
