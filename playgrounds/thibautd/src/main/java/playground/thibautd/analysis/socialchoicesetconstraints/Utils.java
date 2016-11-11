@@ -82,14 +82,16 @@ class Utils {
 
 	public static class AllCliques {
 		private final Collection<Set<Id<Person>>> maximalCliques = new ArrayList<>();
-		private int maxSize = 0;
 
 		public Collection<Set<Id<Person>>> getMaximalCliques() {
 			return maximalCliques;
 		}
 
 		public int getMaxSize() {
-			return maxSize;
+			return maximalCliques.stream()
+					.mapToInt( Set::size )
+					.max()
+					.orElseGet( () -> 0 );
 		}
 
 		public Collection<Set<Id<Person>>> getCliquesOfSize( final int size ) {
@@ -125,7 +127,6 @@ class Utils {
 
 		public void addClique( Set<Id<Person>> c ) {
 			maximalCliques.add( c );
-			maxSize = Math.max( c.size() , maxSize );
 		}
 	}
 }
