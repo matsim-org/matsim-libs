@@ -95,6 +95,8 @@ public class SocialChoiceSetConstraintsAnalyser {
 		for ( int size = 1; size < cliques.getMaxSize(); size++ ) {
 			final Collection<Set<Id<Person>>> cliquesOfSize = cliques.getCliquesOfSize( size );
 
+			log.info( "look at size "+size+": "+cliquesOfSize.size()+" cliques" );
+
 			final Counter counter =
 					new Counter(
 							"analyse clique size "+size+" / "+cliques.getMaxSize()+": clique # ",

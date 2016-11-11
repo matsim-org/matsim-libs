@@ -20,7 +20,6 @@ package playground.thibautd.analysis.socialchoicesetconstraints;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -107,15 +106,18 @@ class Utils {
 				final int size,
 				final List<Id<Person>> clique ) {
 			if ( clique.size() < size ) return Collections.emptyList();
+			if ( size == 0 ) return Collections.singleton( new HashSet<>() );
 			if ( clique.size() == size ) return Collections.singleton( new HashSet<>( clique ) );
 
 			final Collection<Set<Id<Person>>> combs = new ArrayList<>();
 
-			for ( int i=0; i < clique.size() - size; i++ ) {
+			assert clique.size() > 1 : size +" in "+ clique.size();
+			for ( int i=0; i <= clique.size() - size; i++ ) {
 				final Id<Person> p = clique.get( i );
-				final Collection<Set<Id<Person>>> subsets = allCombinations( size - 1 , clique.subList( i , clique.size() ) );
+				final Collection<Set<Id<Person>>> subsets = allCombinations( size - 1 , clique.subList( i+1 , clique.size() ) );
 
 				subsets.stream().peek( s -> s.add( p ) ).forEach( combs::add );
+				combs.addAll( subsets );
 			}
 
 			return combs;
