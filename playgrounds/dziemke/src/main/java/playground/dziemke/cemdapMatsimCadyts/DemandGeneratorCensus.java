@@ -197,7 +197,14 @@ public class DemandGeneratorCensus {
 			int seniorsFemale = pop65_74Female + pop75PlusFemale;
 			
 			int counter = 1;
-			createHouseholdsAndPersons(population, households, counter, municipalityIdInt, planningAreaId, lors, pop18_24Male, 0, 18, 29, adultsToEmployeesMaleRatio, commuterRelationListMale);
+			
+			{
+				int gender = 0;
+				int lowerAgeBound = 18;
+				int upperAgeBound = 24;
+				createHouseholdsAndPersons(population, households, counter, municipalityIdInt, planningAreaId, lors, pop18_24Male, 
+						gender, lowerAgeBound, upperAgeBound, adultsToEmployeesMaleRatio, commuterRelationListMale);
+			}
 			counter = counter + pop18_24Male;
 			
 			
@@ -206,6 +213,8 @@ public class DemandGeneratorCensus {
 //				throw new RuntimeException("More than 100 commuter relations from minucipality with ID " + municipalityId + " remain unassigned.");
 //			}
 			
+			
+			// TODO householdsFile
 			writePersonsFile(population, outputBase + "persons.dat");
 		}
 	}
@@ -214,6 +223,7 @@ public class DemandGeneratorCensus {
 	private static void createHouseholdsAndPersons(Population population, Map<Id<Household>, Household> households, int counter,
 			Integer municipalityId, Integer planningAreaId, List<Integer> lors, int numberOfPersons, int gender, int lowerAgeBound,
 			int upperAgeBound, double adultsToEmployeesRatio, List<Integer> commuterRelationList) {
+		
 		for (int i = 0; i < numberOfPersons; i++) {
 			Id<Household> householdId = Id.create(municipalityId + "_" + (counter + i), Household.class);
 			HouseholdImpl household = new HouseholdImpl(householdId); // TODO Or use factory?
@@ -221,7 +231,7 @@ public class DemandGeneratorCensus {
 			household.getAttributes().putAttribute("totalNumberOfHouseholdVehicles", 1);
 			household.getAttributes().putAttribute("homeTSZLocation", getHomeLocation(municipalityId, planningAreaId, lors));
 			household.getAttributes().putAttribute("numberOfChildren", 0); // none, ignore them in this version
-			household.getAttributes().putAttribute("householdStructure", true); // TODO always choose value for single-person adult
+			household.getAttributes().putAttribute("householdStructure", 1); // 1 = single, no children
 			
 			Id<Person> personId = Id.create(householdId + "_1", Person.class);
 			Person person = population.getFactory().createPerson(personId);
@@ -231,6 +241,7 @@ public class DemandGeneratorCensus {
 			person.getAttributes().putAttribute("employed", employed);
 			person.getAttributes().putAttribute("student", false); // TODO certain share of young adults?
 			person.getAttributes().putAttribute("hasLicense", true); // for CEMDAP's "driversLicence" variable
+			
 			if (employed == true) {
 				person.getAttributes().putAttribute("locationOfWork", getRandomWorkLocation(commuterRelationList));
 			} else {
@@ -244,7 +255,7 @@ public class DemandGeneratorCensus {
 			
 			population.addPerson(person);
 			
-			List<Id<Person>> personIds = new ArrayList<>();
+			List<Id<Person>> personIds = new ArrayList<>(); // does in current implementation (only 1 p/hh) not make much sense
 			personIds.add(personId);
 			household.setMemberIds(personIds);
 			households.put(householdId, household);
@@ -256,15 +267,23 @@ public class DemandGeneratorCensus {
 		// Count all commuters starting in the given municipality
 		int commutersMale = 0;
 		for (CommuterRelationV2 relation : relationsFromMunicipality.values()) {
-			if (relation.getTripsMale() == null) { // This is the case when there are very few people travelling on that relation
-				relation.setTripsMale((int) (relation.getTrips() / 2));
+			if (relation.getTripsMale() == null) { // This is the case when there are very few people traveling on that relation
+				if (relation.getTrips() == 0) {
+					throw new RuntimeException("No travellers at all on this relation! This should not happen.");
+				} else {
+					relation.setTripsMale((int) (relation.getTrips() / 2));
+				}
 			}
 				commutersMale += relation.getTripsMale();
 		}
 		int commutersFemale = 0;
 		for (CommuterRelationV2 relation : relationsFromMunicipality.values()) {
-			if (relation.getTripsFemale() == null) { // This is the case when there are very few people travelling on that relation
-				relation.setTripsFemale((int) (relation.getTrips() / 2));
+			if (relation.getTripsFemale() == null) { // This is the case when there are very few people traveling on that relation
+				if (relation.getTrips() == 0) {
+					throw new RuntimeException("No travellers at all on this relation! This should not happen.");
+				} else {
+					relation.setTripsFemale((int) (relation.getTrips() / 2));
+				}
 			}
 				commutersFemale += relation.getTripsFemale();
 		}

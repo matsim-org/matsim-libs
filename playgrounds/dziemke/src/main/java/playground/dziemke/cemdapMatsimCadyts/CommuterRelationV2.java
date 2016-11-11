@@ -32,7 +32,7 @@ public class CommuterRelationV2 {
 	private Integer tripsFemale;
 
 		
-	public CommuterRelationV2(int origin, int destination, int tripsAll, int tripsMale, int tripsFemale) {
+	public CommuterRelationV2(int origin, int destination, Integer tripsAll, Integer tripsMale, Integer tripsFemale) {
 		this.origin = origin;
 		this.destination = destination;
 		this.tripsAll = tripsAll;
