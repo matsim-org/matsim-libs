@@ -91,6 +91,7 @@ public class SocialChoiceSetConstraintsAnalyser {
 	}
 
 	public void analyze( final Consumer<IndividualResultRecord> callback ) {
+		log.info( "analyse for clique sizes in [1;"+cliques.getMaxSize()+"]" );
 		for ( int size = 1; size < cliques.getMaxSize(); size++ ) {
 			final Collection<Set<Id<Person>>> cliquesOfSize = cliques.getCliquesOfSize( size );
 
