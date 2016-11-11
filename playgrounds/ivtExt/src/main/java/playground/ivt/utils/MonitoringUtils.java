@@ -95,7 +95,7 @@ public class MonitoringUtils {
 	}
 
 	private static String formatMemory( final long p ) {
-		return ((p/1048576)+1)+"MB";
+		return ((p/1048576)+1)+"MiB ("+((p / 1073741824) + 1)+"GiB)";
 	}
 
 	public static void monitorAndLogAtEnd( final Call call ) {

@@ -46,7 +46,7 @@ public class CsvParser implements AutoCloseable {
 		this.quote = quote;
 		this.reader = IOUtils.getBufferedReader( file );
 		this.titleLine = CsvUtils.parseTitleLine( sep , quote , reader.readLine() );
-		this.counter = new Counter( "read line # " , "of file "+file );
+		this.counter = new Counter( "read line # " , " of file "+file );
 	}
 
 	public CsvUtils.TitleLine getTitleLine() {
