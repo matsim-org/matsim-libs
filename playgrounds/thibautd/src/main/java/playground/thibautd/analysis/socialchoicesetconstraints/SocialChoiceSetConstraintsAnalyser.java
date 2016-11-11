@@ -19,6 +19,7 @@
 package playground.thibautd.analysis.socialchoicesetconstraints;
 
 import com.google.inject.Inject;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -26,6 +27,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import playground.thibautd.utils.CsvUtils;
@@ -43,6 +45,8 @@ import java.util.stream.Collectors;
  * @author thibautd
  */
 public class SocialChoiceSetConstraintsAnalyser {
+	private static final Logger log = Logger.getLogger( SocialChoiceSetConstraintsAnalyser.class );
+
 	private final VPTree<Coord,ActivityFacility> facilities;
 	private final Utils.AllCliques cliques;
 	private final SocialChoiceSetConstraintsConfigGroup configGroup;
@@ -66,6 +70,7 @@ public class SocialChoiceSetConstraintsAnalyser {
 	}
 
 	public void analyzeToFile( final String path ) {
+		log.info( "analyse social constraints on choice set to file "+path );
 		try ( final CsvWriter writer =
 					  new CsvWriter(
 					  		'\t' , '"' ,
@@ -89,7 +94,12 @@ public class SocialChoiceSetConstraintsAnalyser {
 		for ( int size = 1; size < cliques.getMaxSize(); size++ ) {
 			final Collection<Set<Id<Person>>> cliquesOfSize = cliques.getCliquesOfSize( size );
 
+			final Counter counter =
+					new Counter(
+							"analyse clique size "+size+" / "+cliques.getMaxSize()+": clique # ",
+							" / "+cliquesOfSize.size() );
 			for ( Set<Id<Person>> clique : cliquesOfSize ) {
+				counter.incCounter();
 				final Collection<FacilitiesPerDistance> fpd = new ArrayList<>();
 				for ( double distance : configGroup.getDistances() ) {
 					final int sizeOfIntersection =
@@ -104,6 +114,7 @@ public class SocialChoiceSetConstraintsAnalyser {
 				}
 				callback.accept( new IndividualResultRecord( size , fpd ) );
 			}
+			counter.printCounter();
 		}
 	}
 

@@ -45,6 +45,7 @@ class Utils {
 	public static VPTree<Coord,ActivityFacility> createTree( final ActivityFacilities activityFacilities ) {
 		final Collection<ActivityFacility> facilities =
 				activityFacilities.getFacilities().values().stream()
+						// TODO: make predicate configurable
 						.filter( a -> a.getActivityOptions().keySet().contains( "leisure" ) )
 						.collect( Collectors.toList() );
 
