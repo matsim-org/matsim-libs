@@ -1,5 +1,4 @@
-package org.matsim.contrib.carsharing.runExample;
-
+package playground.paschke.serviceAreas.controler;
 
 import java.util.Set;
 
@@ -32,61 +31,52 @@ import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactoryNew;
 import org.matsim.contrib.carsharing.readers.CarsharingXmlReaderNew;
 import org.matsim.contrib.carsharing.replanning.CarsharingSubtourModeChoiceStrategy;
 import org.matsim.contrib.carsharing.replanning.RandomTripToCarsharingStrategy;
+import org.matsim.contrib.carsharing.runExample.CarsharingUtils;
 import org.matsim.contrib.carsharing.scoring.CarsharingScoringFunctionFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
-/** 
- * @author balac
- */
+import playground.paschke.utils.ExampleCarsharingUtils;
 
-public class RunCarsharing {
 
-	public static void main(String[] args) {
+public class ServiceAreasControler {
+	public static void main(final String[] args) {
 		Logger.getLogger( "org.matsim.core.controler.Injector" ).setLevel(Level.OFF);
 
 		final Config config = ConfigUtils.loadConfig(args[0]);
-		
-		if(Integer.parseInt(config.getModule("qsim").getValue("numberOfThreads")) > 1)
-			Logger.getLogger( "org.matsim.core.controler" ).warn("Carsharing contrib is not stable for parallel qsim!! If the error occures please use 1 as the number of threads.");
-		
+
 		CarsharingUtils.addConfigModules(config);
 
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 
-		final Controler controler = new Controler( sc );
-		
-		installCarSharing(controler);
-		
-		controler.run();
+		final Controler controler = new Controler(sc);
 
+		installCarSharing(controler);
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.run();
 	}
 
-	public static void installCarSharing(final Controler controler) {		
-		
+	public static void installCarSharing(final Controler controler) {
 		final Scenario scenario = controler.getScenario();
 		CarsharingXmlReaderNew reader = new CarsharingXmlReaderNew(scenario.getNetwork());
-		
-		final CarsharingConfigGroup configGroup = (CarsharingConfigGroup)
-				scenario.getConfig().getModule( CarsharingConfigGroup.GROUP_NAME );
 
+		final CarsharingConfigGroup configGroup = (CarsharingConfigGroup) scenario.getConfig().getModule( CarsharingConfigGroup.GROUP_NAME );
+
+		// this is necessary to populate the companies list
 		reader.readFile(configGroup.getvehiclelocations());
-		
 		Set<String> carsharingCompanies = reader.getCompanies().keySet();
-		
-		MembershipReader membershipReader = new MembershipReader();
-		
-		membershipReader.readFile(configGroup.getmembership());
 
+		MembershipReader membershipReader = new MembershipReader();
+		membershipReader.readFile(configGroup.getmembership());
 		final MembershipContainer memberships = membershipReader.getMembershipContainer();
-		
-		final CostsCalculatorContainer costsCalculatorContainer = CarsharingUtils.createCompanyCostsStructure(carsharingCompanies);
-		
+
+		final CostsCalculatorContainer costsCalculatorContainer = ExampleCarsharingUtils.createCompanyCostsStructure(carsharingCompanies);
 		final CarsharingListener carsharingListener = new CarsharingListener();
-		final CarsharingSupplyInterface carsharingSupplyContainer = new CarsharingSupplyContainer(controler.getScenario());
+		final CarsharingSupplyContainer carsharingSupplyContainer = new CarsharingSupplyContainer(controler.getScenario());
 		carsharingSupplyContainer.populateSupply();
 		final KeepingTheCarModel keepingCarModel = new KeepingTheCarModelExample();
 		final ChooseTheCompany chooseCompany = new ChooseTheCompanyExample();
@@ -95,11 +85,9 @@ public class RunCarsharing {
 		final CurrentTotalDemand currentTotalDemand = new CurrentTotalDemand(controler.getScenario().getNetwork());
 		final CarsharingManagerInterface carsharingManager = new CarsharingManagerNew();
 		final RouteCarsharingTrip routeCarsharingTrip = new RouteCarsharingTripImpl();
-		
-		//===adding carsharing objects on supply and demand infrastructure ===
-		
-		controler.addOverridingModule(new AbstractModule() {
 
+		//===adding carsharing objects on supply and demand infrastructure ===
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(KeepingTheCarModel.class).toInstance(keepingCarModel);
@@ -112,12 +100,11 @@ public class RunCarsharing {
 				bind(MembershipContainer.class).toInstance(memberships);
 			    bind(CarsharingSupplyInterface.class).toInstance(carsharingSupplyContainer);
 			    bind(CarsharingManagerInterface.class).toInstance(carsharingManager);
-			    bind(DemandHandler.class).asEagerSingleton();
-			}			
-		});		
-		
+				bind(DemandHandler.class).asEagerSingleton();
+			}
+		});
+
 		//=== carsharing specific replanning strategies ===
-		
 		controler.addOverridingModule( new AbstractModule() {
 			@Override
 			public void install() {
@@ -125,32 +112,22 @@ public class RunCarsharing {
 				this.addPlanStrategyBinding("CarsharingSubtourModeChoiceStrategy").to( CarsharingSubtourModeChoiceStrategy.class ) ;
 			}
 		});
-		
+
 		//=== adding qsimfactory, controller listeners and event handlers
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bindMobsim().toProvider(CarsharingQsimFactoryNew.class);
-		        addControlerListenerBinding().toInstance(carsharingListener);
-		        addControlerListenerBinding().to(CarsharingManagerNew.class);		        
-				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);		      
-		        addEventHandlerBinding().to(PersonArrivalDepartureHandler.class);
-		        addEventHandlerBinding().to(DemandHandler.class);
-			}
-		});
-		//=== adding carsharing specific scoring factory ===
-		controler.addOverridingModule(new AbstractModule() {
-			
-			@Override
-			public void install() {
-				        
-				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);	
+				// this is now the only MobsimListenerBinding. Should it be handled differently?
+				addControlerListenerBinding().toInstance(carsharingListener);
+				addControlerListenerBinding().to(CarsharingManagerNew.class);
+				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
+				addEventHandlerBinding().to(PersonArrivalDepartureHandler.class);
+				addEventHandlerBinding().to(DemandHandler.class);
 			}
 		});
 
 		//=== routing moduels for carsharing trips ===
-
-		controler.addOverridingModule(CarsharingUtils.createRoutingModule());			
+		controler.addOverridingModule(CarsharingUtils.createRoutingModule());
 	}
-
 }

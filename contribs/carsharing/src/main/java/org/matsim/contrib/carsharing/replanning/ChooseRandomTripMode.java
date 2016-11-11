@@ -48,11 +48,14 @@ public final class ChooseRandomTripMode implements PlanAlgorithm {
 		if (cnt == 0) {
 			return;
 		}
+
 		int rndIdx = this.rng.nextInt(cnt);
 		
-		for(Leg l:t.get(rndIdx).getLegsOnly()) 
-			if (l.getMode().equals( "car" ) || l.getMode().equals( "bike" ) || l.getMode().equals("twoway"))
+		for (Leg l:t.get(rndIdx).getLegsOnly()) {
+			if (l.getMode().equals( "car" ) || l.getMode().equals( "bike" ) || l.getMode().equals("twoway")) {
 				return;
+			}
+		}
 		
 		PersonMembership personMemmbership = this.memberships.getPerPersonMemberships().get(personId);
 		

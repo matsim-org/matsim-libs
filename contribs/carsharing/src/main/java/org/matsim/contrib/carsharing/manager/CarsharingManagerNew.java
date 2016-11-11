@@ -108,26 +108,26 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 				if (vehicle == null)
 					return null;			
 				CompanyContainer companyContainer = this.carsharingSupplyContainer.getCompany(companyId);
-				
+
 				VehiclesContainer vehiclesContainer = companyContainer.getVehicleContainer(carsharingType);
 				Link stationLink = vehiclesContainer.getVehicleLocation(vehicle);
 				companyContainer.reserveVehicle(vehicle);
-				
+			
 				eventsManager.processEvent(new StartRentalEvent(time, carsharingType, startLink, stationLink, person.getId(), vehicle.getVehicleId()));
-				
+			
 				if (willHaveATripFromLocation && keepTheCar) {
 					return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, carsharingType, vehicle,
 							stationLink, destinationLink, true, false);
 				}
 				else {
-					if (carsharingType.equals("oneway")) {
+					if ((carsharingType.equals("oneway")) || (carsharingType.equals("freefloating"))) {
 						Link parkingStationLink = this.carsharingSupplyContainer.findClosestAvailableParkingSpace(
 								destinationLink, carsharingType, companyId, searchDistance);
 						if (parkingStationLink == null)
 							return null;
-						
+					
 						vehiclesContainer.reserveParking(parkingStationLink);
-						
+					
 						destinationLink = parkingStationLink;
 					}
 	
