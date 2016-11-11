@@ -24,14 +24,13 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.ivt.utils.MonitoringUtils;
 import playground.ivt.utils.MoreIOUtils;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplingConfigGroup;
 
 /**
  * @author thibautd
  */
 public class AnalyzeSocialChoiceSet {
 	public static void main( final String... args ) throws Exception {
-		final Config config = ConfigUtils.loadConfig( args[ 0 ] , new SocialNetworkSamplingConfigGroup() );
+		final Config config = ConfigUtils.loadConfig( args[ 0 ] , new SocialChoiceSetConstraintsConfigGroup() );
 
 		try ( AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose();
 				AutoCloseable logCloseable = MoreIOUtils.initOut( config ) ) {
