@@ -37,7 +37,7 @@ public class TransitRouterConfigGroup extends ReflectiveConfigGroup {
 	private double maxBeelineWalkConnectionDistance = 100.0;
 	private double additionalTransferTime = 0.0;
 
-	private double directWalkFactor;
+	private double directWalkFactor = 1. ;
 
 	public TransitRouterConfigGroup() {
 		super(GROUP_NAME);
