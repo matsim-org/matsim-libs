@@ -18,8 +18,10 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.socialchoicesetconstraints;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -37,8 +39,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.w;
-
 /**
  * @author thibautd
  */
@@ -48,13 +48,21 @@ public class SocialChoiceSetConstraintsAnalyser {
 	private final SocialChoiceSetConstraintsConfigGroup configGroup;
 	private final Population population;
 
+	@Inject
 	public SocialChoiceSetConstraintsAnalyser(
 			final SocialChoiceSetConstraintsConfigGroup configGroup,
-			final ActivityFacilities facilities, final Population population ) {
+			final ActivityFacilities facilities,
+			final Population population ) {
 		this.configGroup = configGroup;
 		this.facilities = Utils.createTree( facilities );
 		this.cliques = Utils.readMaximalCliques( configGroup.getInputCliquesCsvFile() );
 		this.population = population;
+	}
+
+	public SocialChoiceSetConstraintsAnalyser( final Scenario scenario ) {
+		this( (SocialChoiceSetConstraintsConfigGroup) scenario.getConfig().getModule( SocialChoiceSetConstraintsConfigGroup.GROUP_NAME ),
+				scenario.getActivityFacilities(),
+				scenario.getPopulation() );
 	}
 
 	public void analyzeToFile( final String path ) {
