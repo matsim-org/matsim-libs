@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE areas SYSTEM "freefloating_areas_v1.dtd">
+<!DOCTYPE areas SYSTEM "src/main/resources/dtd/freefloating_areas_v1.dtd">
 
 <areas>
     <company name="Mobility">

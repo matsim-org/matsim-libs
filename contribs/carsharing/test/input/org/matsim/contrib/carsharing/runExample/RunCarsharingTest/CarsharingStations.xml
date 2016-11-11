@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE companies SYSTEM "CarsharingStations.dtd">
+<!DOCTYPE companies SYSTEM "src/main/resources/dtd/CarsharingStations.dtd">
 <companies>
 	<company name="Mobility">
 		<twoway id="1" x="-375" y="0" >

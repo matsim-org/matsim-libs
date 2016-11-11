@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd"
 	[
-		<!ENTITY OUTBASE "C:/Users/balacm/Documents/TestScenario/out">
-		<!ENTITY INBASE  "C:/Users/balacm/Documents/TestScenario">
+		<!ENTITY OUTBASE "test/output/org/matsim/contrib/carsharing/runExample/RunCarsharingTest/">
+		<!ENTITY INBASE  "test/input/org/matsim/contrib/carsharing/runExample/RunCarsharingTest/">
 	]
 >
 
@@ -39,8 +39,8 @@
 
     <module name="Carsharing" >
 		<param name="statsWriterFrequency" value="1" />
-			<param name="vehiclelocations" value="&INBASE;/CarsharingStations.xml" />
-			<param name="membership" value="&INBASE;/CSMembership.xml" />
+			<param name="vehiclelocations" value="&INBASE;CarsharingStations.xml" />
+			<param name="membership" value="&INBASE;CSMembership.xml" />
 	</module>
 
 
@@ -60,7 +60,7 @@
 	<module name="OneWayCarsharing" >
 	    <param name="timeParkingFeeOneWayCarsharing" value="-0.005" />
 
-		<param name="vehiclelocationsOneWayCarsharing" value="&INBASE;/Stations.txt" />
+		<param name="vehiclelocationsOneWayCarsharing" value="&INBASE;Stations.txt" />
 		<param name="travelingOneWayCarsharing" value="-10.0" />
 		<param name="constantOneWayCarsharing" value="-0.4" />
         <param name="timeFeeOneWayCarsharing" value="-0.0" />
@@ -70,7 +70,7 @@
 	</module>
 
 	<module name="TwoWayCarsharing" >
-		<param name="vehiclelocationsTwoWayCarsharing" value="&INBASE;/CarsharingStations.xml" />
+		<param name="vehiclelocationsTwoWayCarsharing" value="&INBASE;CarsharingStations.xml" />
 		<param name="travelingTwoWayCarsharing" value="-6.0" />
 		<param name="constantTwoWayCarsharing" value="-0.4" />
         <param name="timeFeeTwoWayCarsharing" value="-0.0" />
@@ -83,7 +83,7 @@
 <!-- ====================================================================== -->
 
 	<module name="facilities" >
-		<param name="inputFacilitiesFile" value="&INBASE;/facilities.xml" />
+		<param name="inputFacilitiesFile" value="&INBASE;facilities.xml" />
 	</module>
 
 <!-- ====================================================================== -->
@@ -98,14 +98,14 @@
 <!-- ====================================================================== -->
 
 	<module name="network" >
-		<param name="inputNetworkFile" value="&INBASE;/network.xml" />
+		<param name="inputNetworkFile" value="&INBASE;network.xml" />
 	</module>
 
 <!-- ====================================================================== -->
 
 	<module name="plans" >
-		<param name="inputPersonAttributesFile" value="&INBASE;/1000desiresAttributes.xml" />
-		<param name="inputPlansFile" value="&INBASE;/10persons.xml" />
+		<param name="inputPersonAttributesFile" value="&INBASE;1000desiresAttributes.xml" />
+		<param name="inputPlansFile" value="&INBASE;10persons.xml" />
 	</module>
 
 

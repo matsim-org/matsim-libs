@@ -40,6 +40,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.paschke.utils.ExampleCarsharingUtils;
+
 
 public class ServiceAreasControler {
 	public static void main(final String[] args) {
@@ -72,7 +74,7 @@ public class ServiceAreasControler {
 		membershipReader.readFile(configGroup.getmembership());
 		final MembershipContainer memberships = membershipReader.getMembershipContainer();
 
-		final CostsCalculatorContainer costsCalculatorContainer = CarsharingUtils.createCompanyCostsStructure(carsharingCompanies);
+		final CostsCalculatorContainer costsCalculatorContainer = ExampleCarsharingUtils.createCompanyCostsStructure(carsharingCompanies);
 		final CarsharingListener carsharingListener = new CarsharingListener();
 		final CarsharingSupplyContainer carsharingSupplyContainer = new CarsharingSupplyContainer(controler.getScenario());
 		carsharingSupplyContainer.populateSupply();
