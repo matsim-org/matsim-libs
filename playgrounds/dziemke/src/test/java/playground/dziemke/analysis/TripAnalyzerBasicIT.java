@@ -3,7 +3,9 @@ package playground.dziemke.analysis;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.dziemke.accessibility.OTPMatrix.CSVReader;
 
@@ -15,13 +17,16 @@ import java.io.IOException;
  */
 public class TripAnalyzerBasicIT {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+    @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
     @Test
     public final void testTripAnalyzerBasic() {
         String[] args = new String[3];
         args[0] = "../../examples/scenarios/equil/network.xml";
+
+//        args[0] = IOUtils.newUrl( ExamplesUtils.getTestScenarioURL("equil") , "/network.xml"  ) ;
+        // does not work (presumably needs a string, not a URL). kai, nov'16
+
         File network = new File(args[0]);
         try {
             System.out.println(network.getCanonicalPath());
