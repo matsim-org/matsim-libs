@@ -15,7 +15,7 @@ import java.io.IOException;
 /**
  * @author gthunig
  */
-public class TripAnalyzerBasicIT {
+public class TripAnalyzerV2BasicIT {
 
     @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
