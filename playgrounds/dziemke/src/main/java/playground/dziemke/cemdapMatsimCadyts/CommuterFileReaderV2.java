@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*                                                   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -56,15 +56,15 @@ public class CommuterFileReaderV2 {
             @Override
             public void startRow(String[] row) {
             	if (row.length > 2) {
-            		if (row[0].length() == 8) {
+            		if (row[0].length() == 8) { // new origin
             			origin = row[0];
             			LOG.info("New origin set to: " + origin);
             			return;
             			// Next check for destinations
-            		} else if (row[2].length() == 8) {
+            		} else if (row[2].length() == 8) { // new destiantion
             			destination = row[2];
             			LOG.info("New destination set to: " + destination);
-            			LOG.info(origin + " -> " + destination + ": Commuters: " + row[4] + "; Males: " + row[5] + "; Females: " + row[6]);
+            			LOG.info(origin + " -> " + destination + ": All commuters: " + row[4] + "; males: " + row[5] + "; females: " + row[6]);
             			Integer tripsMale;
             			Integer tripsFemale;
 
@@ -74,19 +74,15 @@ public class CommuterFileReaderV2 {
             				tripsMale = Integer.parseInt(row[5]);
             			}
 
-            			if (row[5].equals("X")) {
+            			if (row[6].equals("X")) {
             				tripsFemale = null;
             			} else {
             				tripsFemale = Integer.parseInt(row[6]);
             			}
 
-            			process(Integer.parseInt(origin),
-            					Integer.parseInt(destination),
-            					Integer.parseInt(row[4]),
-            					tripsMale,
-            					tripsFemale);
+            			process(Integer.parseInt(origin), Integer.parseInt(destination), Integer.parseInt(row[4]), tripsMale, tripsFemale);
             			return;
-            		} else {
+            		} else { // line that is neither new origin nor new destination
             			return;
             		}
             	}
