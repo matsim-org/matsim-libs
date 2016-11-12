@@ -85,7 +85,7 @@ public class DemandGeneratorCensus {
 //		String shapeFileMunicipalities = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenBerlin.shp";
 		String shapeFileLors = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Bezirksregion_EPSG_25833.shp";
 		
-		String outputBase = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/census-based_test1/"; // TODO ...
+		String outputBase = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/census-based_test2/"; // TODO ...
 
 		
 		// Infrastructure
@@ -143,9 +143,7 @@ public class DemandGeneratorCensus {
 		// New loop over inhabitant of municipalities
 //		for (String municipalityId : municipalitiesList) { // wrong this goes over all German municipalities from Zensus
 		for (Integer municipalityIdInt : relationsMap.keySet()) {
-			System.out.println("municipalityId = " + municipalityIdInt);
 			Map<Integer, CommuterRelationV2> relationsFromMunicipality = relationsMap.get(municipalityIdInt);
-			System.out.println("relationsFromMunicipality = " + relationsFromMunicipality.toString());
 			
 			// Employees from Zensus seems to be all employees, not only socially-secured employees
 			String municipalityId = municipalityIdInt.toString();
@@ -205,7 +203,16 @@ public class DemandGeneratorCensus {
 				createHouseholdsAndPersons(population, households, counter, municipalityIdInt, planningAreaId, lors, pop18_24Male, 
 						gender, lowerAgeBound, upperAgeBound, adultsToEmployeesMaleRatio, commuterRelationListMale);
 			}
-			counter = counter + pop18_24Male;
+			counter += pop18_24Male;
+			{
+				int gender = 1;
+				int lowerAgeBound = 18;
+				int upperAgeBound = 24;
+				createHouseholdsAndPersons(population, households, counter, municipalityIdInt, planningAreaId, lors, pop18_24Female, 
+						gender, lowerAgeBound, upperAgeBound, adultsToEmployeesFemaleRatio, commuterRelationListFemale);
+			}
+			counter += pop18_24Female;
+			
 			
 			
 
@@ -214,9 +221,10 @@ public class DemandGeneratorCensus {
 //			}
 			
 			
-			// TODO householdsFile
-			writePersonsFile(population, outputBase + "persons.dat");
+			
 		}
+		// TODO householdsFile
+		writePersonsFile(population, outputBase + "persons.dat");
 	}
 
 
@@ -268,24 +276,24 @@ public class DemandGeneratorCensus {
 		int commutersMale = 0;
 		for (CommuterRelationV2 relation : relationsFromMunicipality.values()) {
 			if (relation.getTripsMale() == null) { // This is the case when there are very few people traveling on that relation
-				if (relation.getTrips() == 0) {
+				if (relation.getTrips() == 0 || relation.getTrips() == null) {
 					throw new RuntimeException("No travellers at all on this relation! This should not happen.");
 				} else {
 					relation.setTripsMale((int) (relation.getTrips() / 2));
 				}
 			}
-				commutersMale += relation.getTripsMale();
+			commutersMale += relation.getTripsMale();
 		}
 		int commutersFemale = 0;
 		for (CommuterRelationV2 relation : relationsFromMunicipality.values()) {
 			if (relation.getTripsFemale() == null) { // This is the case when there are very few people traveling on that relation
-				if (relation.getTrips() == 0) {
+				if (relation.getTrips() == 0 || relation.getTrips() == null) {
 					throw new RuntimeException("No travellers at all on this relation! This should not happen.");
 				} else {
 					relation.setTripsFemale((int) (relation.getTrips() / 2));
 				}
 			}
-				commutersFemale += relation.getTripsFemale();
+			commutersFemale += relation.getTripsFemale();
 		}
 		
 		// Compute ratios
@@ -297,7 +305,7 @@ public class DemandGeneratorCensus {
 			employeesToCommutersMaleRatio = 2.; // TODO This is an assumption; maybe improve later!
 		}
 		if (employeesFemale != 0) { // Avoid dividing by zero
-			employeesToCommutersFemaleRatio = commutersFemale / employeesFemale;
+			employeesToCommutersFemaleRatio = employeesFemale / commutersFemale;
 		} else {
 			employeesToCommutersFemaleRatio = 2.; // TODO This is an assumption; maybe improve later!
 		}
@@ -307,7 +315,7 @@ public class DemandGeneratorCensus {
 			relation.setTripsMale((int) (relation.getTripsMale() * employeesToCommutersMaleRatio)); 
 		}
 		for (CommuterRelationV2 relation : relationsFromMunicipality.values()) {
-			relation.setTripsFemale((int) (relation.getTripsFemale() * employeesToCommutersFemaleRatio)); 
+			relation.setTripsFemale((int) (relation.getTripsFemale() * employeesToCommutersFemaleRatio));
 		}
 	}
 
