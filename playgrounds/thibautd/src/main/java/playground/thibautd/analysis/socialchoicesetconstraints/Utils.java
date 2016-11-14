@@ -94,8 +94,8 @@ class Utils {
 					.orElseGet( () -> 0 );
 		}
 
-		public Collection<Set<Id<Person>>> getCliquesOfSize( final int size ) {
-			final Collection<Set<Id<Person>>> cliques = new HashSet<>();
+		public List<Set<Id<Person>>> getCliquesOfSize( final int size ) {
+			final List<Set<Id<Person>>> cliques = new ArrayList<>();
 
 			for ( Set<Id<Person>> clique : maximalCliques ) {
 				cliques.addAll( allCombinations( size , new ArrayList<>( clique ) ) );
