@@ -77,27 +77,33 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 			}
 		};
 
-		@Inject
-		final void setNetwork(Network network) {
+		@Inject final Builder setNetwork(Network network) {
 			this.network = network;
+			return this ;
 		}
-		public final void setActTypeWeight ( double val ) {
+		public final Builder setActTypeWeight ( double val ) {
 			this.actTypeWeight = val ;
+			return this ;
 		}
-		public final void setLocationWeight( double val ) {
+		public final Builder setLocationWeight( double val ) {
 			this.locationWeight = val ;
+			return this ;
 		}
-		public final void setActTimeParameter( double val) {
+		public final Builder setActTimeParameter( double val) {
 			this.actTimeParameter = val ;
+			return this ;
 		}
-		public final void setSameRoutePenalty( double val) {
+		public final Builder setSameRoutePenalty( double val) {
 			this.sameRoutePenalty = val;
+			return this ;
 		}
-		public final void setSameModePenalty( double val) {
+		public final Builder setSameModePenalty( double val) {
 			this.sameModePenalty = val;
+			return this ;
 		}
-		public final void setStageActivityTypes( StageActivityTypes val) {
+		public final Builder setStageActivityTypes( StageActivityTypes val) {
 			this.stageActivities = val;
+			return this ;
 		}
 		@Override
 		public final DiversityGeneratingPlansRemover get() {
