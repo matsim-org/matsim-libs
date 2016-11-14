@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -36,13 +37,13 @@ public class PlaceStationsVehicles extends MatsimXmlWriter {
 
 		writeVehicles();
 		writeEndTag("company");
-		List<Tuple<String, String>> attsC2 = new ArrayList<Tuple<String, String>>();
+		/*List<Tuple<String, String>> attsC2 = new ArrayList<Tuple<String, String>>();
 		attsC2.add(new Tuple<>("name", "Mobility"));
 
 		writeStartTag("company", attsC2);
 
 		writeVehicles();
-		writeEndTag("company");
+		writeEndTag("company");*/
 
 		writeEndTag("companies");
 
@@ -71,12 +72,20 @@ public class PlaceStationsVehicles extends MatsimXmlWriter {
 
 	private void writeVehicle(Link link, int id) {
 
+		Random random = MatsimRandom.getRandom();
+		
 		List<Tuple<String, String>> attsV = new ArrayList<Tuple<String, String>>();
 		
 		attsV.add(new Tuple<>("id", "FF_" + Integer.toString(id)));
 		attsV.add(new Tuple<>("x", Double.toString(link.getCoord().getX())));
 		attsV.add(new Tuple<>("y", Double.toString(link.getCoord().getY())));
-		attsV.add(new Tuple<>("type", "car"));
+		
+		if (random.nextDouble() < 0.9)
+		
+			attsV.add(new Tuple<>("type", "car"));
+		else
+			attsV.add(new Tuple<>("type", "transporter"));
+
 		writeStartTag("freefloating", attsV, true);		
 	}
 

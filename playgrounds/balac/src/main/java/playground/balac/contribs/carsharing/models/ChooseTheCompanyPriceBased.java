@@ -25,6 +25,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -40,8 +41,9 @@ public class ChooseTheCompanyPriceBased implements ChooseTheCompany {
 	@Inject private Map<String, TravelTime> travelTimes ;
 	@Inject private Map<String, TravelDisutilityFactory> travelDisutilityFactories ;
 	
+	
 	@Override
-	public String pickACompany(Plan plan, Leg leg, double now) {
+	public String pickACompany(Plan plan, Leg leg, double now, String vehicleType) {
 
 		//=== pick a company based on a logit model 
 		//=== that takes the potential price into account
@@ -64,7 +66,7 @@ public class ChooseTheCompanyPriceBased implements ChooseTheCompany {
 			//estimate the rental price for each company
 			
 			CSVehicle vehicle = this.carsharingSupply.findClosestAvailableVehicle(network.getLinks().get(leg.getRoute().getStartLinkId()),
-					mode, "car", companyName, 1000.0);
+					mode, vehicleType, companyName, 1000.0);
 			if (vehicle != null) {
 				Link vehicleLocation = this.carsharingSupply.getAllVehicleLocations().get(vehicle);
 				
@@ -107,7 +109,7 @@ public class ChooseTheCompanyPriceBased implements ChooseTheCompany {
 	
 	private double estimateWalkTravelTime(Link startLink, Link endLink) {	
 		
-		return 0.0;
+		return  CoordUtils.calcEuclideanDistance(startLink.getCoord(), endLink.getCoord()) * 1.3 / 1.0;
 		
 	}
 

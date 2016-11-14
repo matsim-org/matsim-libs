@@ -46,6 +46,7 @@ import playground.balac.contribs.carsharing.coststructures.CostStructure1;
 import playground.balac.contribs.carsharing.coststructures.CostStructure2;
 import playground.balac.contribs.carsharing.models.ChooseTheCompanyPriceBased;
 import playground.balac.contribs.carsharing.models.KeepTheVehicleModel;
+import playground.balac.contribs.carsharing.models.VehicleTypeChoice;
 
 public class RunCarsharing {
 
@@ -94,7 +95,7 @@ public class RunCarsharing {
 		carsharingSupplyContainer.populateSupply();
 		final KeepingTheCarModel keepingCarModel = new KeepTheVehicleModel();
 		final ChooseTheCompany chooseCompany = new ChooseTheCompanyPriceBased();
-		final ChooseVehicleType chooseCehicleType = new ChooseVehicleTypeExample();
+		final ChooseVehicleType chooseCehicleType = new VehicleTypeChoice();
 		final RouterProvider routerProvider = new RouterProviderImpl();
 		final CurrentTotalDemand currentTotalDemand = new CurrentTotalDemand(controler.getScenario().getNetwork());
 		final CarsharingManagerInterface carsharingManager = new CarsharingManagerNew();
