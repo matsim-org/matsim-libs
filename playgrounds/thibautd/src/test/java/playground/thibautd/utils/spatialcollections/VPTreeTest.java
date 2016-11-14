@@ -177,35 +177,6 @@ public class VPTreeTest {
 	}
 
 	@Test
-	public void testSizeOfBalls() {
-		final VPTree<double[],Point> tree = createTree();
-
-		final Random random = new Random( 123 );
-
-		final Counter counter = new Counter( "test # " );
-		for ( int i=0; i < 50; i++ ) {
-			counter.incCounter();
-			final Collection<double[]> coords = new ArrayList<>();
-			for ( int ci=0; ci < 3; ci++ ) {
-				final double[] c = new double[ 3 ];
-				for ( int j = 0; j < c.length; j++ ) c[ j ] = random.nextDouble() * ( GRID_SIZE - 1 );
-				coords.add( c );
-			}
-
-			final double dist = random.nextDouble() * GRID_SIZE;
-
-			final int size = tree.getSizeOfBallsIntersection( coords , dist );
-			final Collection<Point> ball = tree.getBallsIntersection( coords , dist , v -> true );
-
-			Assert.assertEquals(
-					"unexpected size",
-					ball.size(),
-					size );
-		}
-		counter.printCounter();
-	}
-
-	@Test
 	public void testTreeSize() {
 		final VPTree<double[],Point> tree = createTree();
 
