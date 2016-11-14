@@ -19,6 +19,7 @@
 package playground.thibautd.utils.spatialcollections;
 
 import org.matsim.core.utils.misc.Counter;
+import playground.thibautd.utils.RandomUtils;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -189,7 +190,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	}
 
 	private void selectAndSetVantagePoint( final AddFrame<C, T> currentFrame ) {
-		final List<T> vantagePoints = sublist( currentFrame.toAdd , SUBLIST_SIZE_VPS );
+		final List<T> vantagePoints = RandomUtils.sublist_withSideEffect( r, currentFrame.toAdd, SUBLIST_SIZE_VPS );
 
 		// select the VP with the HIGHEST median (highest spread) is supposed to give better query times
 		// the intuition is that high spread corresponds to the corners of the space, where the length of the border
@@ -485,29 +486,13 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 
 	private double medianDistance( final T vp, final List<T> l ) {
 		// very simple approximation: take median of a sublist, using standard sort algorithm
-		final List<T> sublist = sublist( l , SUBLIST_SIZE_MEDIAN );
+		final List<T> sublist = RandomUtils.sublist_withSideEffect( r, l, SUBLIST_SIZE_MEDIAN );
 		Collections.sort(
 				sublist ,
 				(t1,t2) -> Double.compare(
 						calcDistance( vp, t1 ),
 						calcDistance( t2, vp ) ));
 		return calcDistance( sublist.get( sublist.size() / 2 ), vp );
-	}
-
-	private <E> List<E> sublist( final List<E> l , final int size ) {
-		if ( l.size() <= size ) return new ArrayList<>( l );
-
-		final List<E> sublist = new ArrayList<>( size );
-		for ( int i=0; i < size; i++ ) {
-			final int j = i + r.nextInt( size - i );
-			final E elemJ = l.get( j );
-			l.set( j , l.get( i ) );
-			l.set( i , elemJ );
-			// build the list in parallel to avoid the intermediary step of building a sublist.
-			sublist.add( elemJ );
-		}
-
-		return sublist;
 	}
 
 	private static class Node<C,T> {
