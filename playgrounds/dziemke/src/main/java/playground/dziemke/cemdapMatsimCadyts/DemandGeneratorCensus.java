@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -55,7 +54,7 @@ import playground.dziemke.utils.LogToOutputSaver;
  * @author dziemke
  */
 public class DemandGeneratorCensus {
-	private static final Logger log = Logger.getLogger(DemandGeneratorCensus.class);
+	private static final Logger LOG = Logger.getLogger(DemandGeneratorCensus.class);
 	
 	
 	
@@ -69,7 +68,7 @@ public class DemandGeneratorCensus {
 	public static void main(String[] args) {
 		// Parameters
 //		double scalingFactor = 1.;
-		int numberOfPlansPerPerson = 1;
+		int numberOfPlansPerPerson = 2;
 		// Gemeindeschluessel of Berlin is 11000000 (Gemeindeebene) and 11000 (Landkreisebene)
 		String planningAreaId = "11000000";
 		
@@ -86,7 +85,7 @@ public class DemandGeneratorCensus {
 //		String shapeFileMunicipalities = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenBerlin.shp";
 		String shapeFileLors = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Bezirksregion_EPSG_25833.shp";
 		
-		String outputBase = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/census-based_test3/"; // TODO ...
+		String outputBase = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/census-based_test_1/"; // TODO ...
 
 		
 		// Infrastructure
@@ -94,13 +93,12 @@ public class DemandGeneratorCensus {
 		Map<Id<Household>, Household> households = new HashMap<>();
 		LogToOutputSaver.setOutputDirectory(outputBase);
 		
-		// Create a CensusReader
+		// Read census
 		CensusReader censusReader = new CensusReader(censusFile, ";");
 		ObjectAttributes municipalities = censusReader.getMunicipalities();
-//		List<String> municipalitiesList = censusReader.getMunicipalitiesList();
 		Map<String, Map<String, CommuterRelationV2>> relationsMap = new HashMap<>();
 		
-		// Read in commuter relations
+		// Read commuter relations
 //		{
 //			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing1, "\t");
 //			Map<Integer, Map<Integer, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
@@ -124,20 +122,8 @@ public class DemandGeneratorCensus {
 			relationsMap.putAll(currentRelationMap);
 		}
 		
-		// Create storage objects
-//		Map<Integer, SimpleHousehold> householdMap = new HashMap<Integer, SimpleHousehold>();
-//		Map<Integer, Map<String, SimplePerson>> mapOfPersonMaps = new HashMap<Integer, Map<String, SimplePerson>>();
-//		for (int i=1; i<=numberOfPlansPerPerson; i++) {
-//			Map<String, SimplePerson> persons = new HashMap<String, SimplePerson>();
-//			mapOfPersonMaps.put(i, persons);
-//		}
-		
-		// Read in LORs	
-//		Map<Integer, String> lors = new HashMap<Integer, String>();
+		// Read LORs
 		List<String> lors = readShape(shapeFileLors, "SCHLUESSEL", "LOR");
-		// Create households and persons
-//		int householdCounter = 1;
-//		int personCounter = 1;
 		
 		
 		// Loop over  municipalities
@@ -212,12 +198,10 @@ public class DemandGeneratorCensus {
 			counter += pop18_24Female;
 			
 			
-			
-
+			// TODO complete this check
 //			if (commuterRelationList.size() > 100) {
 //				throw new RuntimeException("More than 100 commuter relations from minucipality with ID " + municipalityId + " remain unassigned.");
 //			}
-			
 			
 			
 		}
@@ -232,15 +216,20 @@ public class DemandGeneratorCensus {
 				if ((boolean) person.getAttributes().getAttribute("employed") == true) {
 					String locationOfWork = (String) person.getAttributes().getAttribute("locationOfWork");
 					if (locationOfWork.equals("-99")) {
-						throw new RuntimeException("This combination of attribute values is unplaubible.");
+						throw new RuntimeException("This combination of attribute values is implaubible.");
 					} else {
-//						if (locationOfWork.
-//						person.getAttributes().putAttribute("locationOfWork", -99); // TODO
+						if (locationOfWork.length() == 6) { // An LOR, i.e. a location inside Berlin
+							person.getAttributes().putAttribute("locationOfWork", getRandomLor(lors));
+						} else if (locationOfWork.length() == 8) { // An "Amtliche Gemeindeschlüssel (AGS)", i.e. a location outside Berlin
+							// Do nothing; leave it as it was
+						} else {
+							throw new RuntimeException("The identifier of the work location cannot have a length other than 6 or 8.");
+						}
 					}
 				}
 				population2.addPerson(person);
 			}
-			Log.info("New population generated.");
+			writePersonsFile(population2, outputBase + "persons" + (i+1) + ".dat");
 		}
 	}
 
@@ -254,13 +243,13 @@ public class DemandGeneratorCensus {
 			HouseholdImpl household = new HouseholdImpl(householdId); // TODO Or use factory?
 			household.getAttributes().putAttribute("numberOfAdults", 1); // always 1; no household structure
 			household.getAttributes().putAttribute("totalNumberOfHouseholdVehicles", 1);
-			household.getAttributes().putAttribute("homeTSZLocation", getHomeLocation(municipalityId, planningAreaId, lors));
+			household.getAttributes().putAttribute("homeTSZLocation", getLocation(municipalityId, planningAreaId, lors));
 			household.getAttributes().putAttribute("numberOfChildren", 0); // none, ignore them in this version
 			household.getAttributes().putAttribute("householdStructure", 1); // 1 = single, no children
 			
 			Id<Person> personId = Id.create(householdId + "_1", Person.class);
 			Person person = population.getFactory().createPerson(personId);
-			// attribute names inspired by "PersonUtils.java": "sex", "hasLicense", "carAvail", "employed", "age", "travelcards"
+			// Following attribute names inspired by "PersonUtils.java": "sex", "hasLicense", "carAvail", "employed", "age", "travelcards"
 			person.getAttributes().putAttribute("householdId", householdId);
 			boolean employed = getEmployed(adultsToEmployeesRatio);
 			person.getAttributes().putAttribute("employed", employed);
@@ -268,7 +257,7 @@ public class DemandGeneratorCensus {
 			person.getAttributes().putAttribute("hasLicense", true); // for CEMDAP's "driversLicence" variable
 			
 			if (employed == true) {
-				person.getAttributes().putAttribute("locationOfWork", getRandomWorkLocation(commuterRelationList));
+				person.getAttributes().putAttribute("locationOfWork", getRandomWorkLocation(commuterRelationList, planningAreaId, lors));
 			} else {
 				person.getAttributes().putAttribute("locationOfWork", "-99");
 			}
@@ -356,23 +345,29 @@ public class DemandGeneratorCensus {
 	}
 
 
-	private static String getRandomWorkLocation(List<String> commuterRelationList) {
+	private static String getRandomWorkLocation(List<String> commuterRelationList, String planningAreaId, List<String> lors) {
 		Random random = new Random();
 		int position = random.nextInt(commuterRelationList.size());
-		String workLocation = commuterRelationList.get(position);
+		String workMunicipalityId = commuterRelationList.get(position);
 		commuterRelationList.remove(position);
-		return workLocation;
+		return getLocation(workMunicipalityId, planningAreaId, lors);
 	}
 
 
-	private static String getHomeLocation(String municipalityId, String planningAreaId, List<String> lors) {
+	private static String getLocation(String municipalityId, String planningAreaId, List<String> lors) {
 		String locationId;
-		if (municipalityId == planningAreaId){
+		if (municipalityId.equals(planningAreaId)){ // Berlin
 			locationId = getRandomLor(lors);
-		} else {
+		} else { // Other municipalities
 			locationId = municipalityId;
 		}
 		return locationId;
+	}
+
+
+	private static String getRandomLor(List<String> lors) {
+		Random random = new Random();
+		return lors.get(random.nextInt(lors.size()));
 	}
 
 
@@ -388,13 +383,6 @@ public class DemandGeneratorCensus {
 	private static int getAgeInBounds(int lowerBound, int upperBound) {
 		return (int) (lowerBound + Math.random() * (upperBound - lowerBound + 1));
 	}
-			
-	
-	private static String getRandomLor(List<String> lors) {
-		Random random = new Random();
-		String randomLor = lors.get(random.nextInt(lors.size()));
-		return randomLor;
-	}
 
 
 	private static List<String> readShape(String shapeFile, String attributeKey, String attributeName) {
@@ -407,88 +395,6 @@ public class DemandGeneratorCensus {
 		}
 		return lors;
 	}
-	
-	
-
-		/*
-		// TODO adapt to new loop
-		for (int i = 0; i<commuterRelationList.size(); i++){
-			int quantity = commuterRelationList.get(i).getTripsMale();
-	        	
-	       	int source = commuterRelationList.get(i).getFrom();
-			int sink = commuterRelationList.get(i).getTo();
-	        	
-			for (int j = 0; j<quantity; j++){
-				// Create households
-				int householdId = householdCounter;
-				int homeTSZLocation;
-					
-				if (source == planningAreaId){
-					homeTSZLocation = getRandomLor(lors);
-				} else {
-					homeTSZLocation = source;
-				}
-				Household household = new Household(householdId, homeTSZLocation);
-				householdMap.put(householdId, household);
-				
-				// Create persons
-				int sex = getSex();			
-				int age = getAge();
-				String personId = householdId + "01";
-
-				int employed;
-				if (age > 65) {
-					employed = 0;
-				} else {
-					employed = getEmployedWorkingAge();
-				}
-				
-				int student;
-				// We make the assumption that students are not employed at the same time and that students are
-				// aged less than 30 years
-				if (employed == 0 && age < 30) {
-					student = getStudent();
-				} else {
-					student = 0;
-				}
-				
-				for (int k=1; k<=numberOfPlansPerPerson; k++) {
-					int locationOfWork;
-					if (sink == planningAreaId){
-						locationOfWork = getRandomLor(lors);
-					} else {
-						locationOfWork = sink;
-					}
-					
-					if (employed == 0) {
-						locationOfWork = -99;
-					}
-					
-					int locationOfSchool;
-					if (sink == planningAreaId){
-						locationOfSchool = getRandomLor(lors);
-					} else {
-						locationOfSchool = sink;
-					}
-					
-					if (student == 0) {
-						locationOfSchool = -99;
-					}
-
-					SimplePerson person = new SimplePerson(personId, householdId, employed, student, locationOfWork,
-							locationOfSchool, sex, age);
-					mapOfPersonMaps.get(k).put(personId, person);
-				}	
-				householdCounter++;
-				}
-			}
-		
-			writeHouseholdsFile(mapOfPersonMaps.get(1), householdMap, outputBase + "households.dat");
-			for (int i=1; i<=numberOfPlansPerPerson; i++) {
-				writePersonsFile(mapOfPersonMaps.get(i), outputBase + "persons" + i + ".dat");
-			}
-		}
-*/
 	
 	
 	public static void writePersonsFile(Population population, String fileName) {
@@ -566,7 +472,7 @@ public class DemandGeneratorCensus {
                 ex.printStackTrace();
             }
         }
-		log.info("Persons file " + fileName + " written.");
+		LOG.info("Persons file " + fileName + " written.");
     }
 	
 
@@ -620,6 +526,6 @@ public class DemandGeneratorCensus {
                 ex.printStackTrace();
             }
         }
-		log.info("Households file " + fileName + " written.");
+		LOG.info("Households file " + fileName + " written.");
     }
 }
