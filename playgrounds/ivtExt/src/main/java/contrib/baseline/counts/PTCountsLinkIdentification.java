@@ -36,10 +36,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static contrib.baseline.counts.CountsIVTBaseline.COUNTS_DELIMITER;
 
@@ -60,21 +57,22 @@ public class PTCountsLinkIdentification {
 		final String pathToCountsOutput = args[2];
 
 		Network network = NetworkUtils.readNetwork(pathToNetwork);
-		Set<CountInput> countInputs = readCountInputs(pathToCountsInput);
-		Map<Id<Link>, CountInput> identifiedLinks = identifyLinks(network, countInputs);
+		List<CountInput> countInputs = readCountInputs(pathToCountsInput);
+		Map<CountInput, Id<Link>> identifiedLinks = identifyLinks(network, countInputs);
 		writePTCounts(pathToCountsOutput, identifiedLinks);
 	}
 
-	private static void writePTCounts(String pathToCountsOutput, Map<Id<Link>, CountInput> identifiedLinks) {
-		BufferedWriter writer = IOUtils.getBufferedWriter(pathToCountsOutput);
+	private static void writePTCounts(String pathToCountsOutput, Map<CountInput, Id<Link>> identifiedLinks) {
+		BufferedWriter writer = IOUtils.getBufferedWriter(pathToCountsOutput, Charset.forName("UTF-8"));
 		try {
 			String header = "linkId" + COUNTS_DELIMITER + "countStationDescr" + COUNTS_DELIMITER + "countVolumes";
 			writer.write(header);
 			writer.newLine();
-			for (Id<Link> linkId : identifiedLinks.keySet()) {
-				writer.write(linkId.toString() + COUNTS_DELIMITER);
-				writer.write(identifiedLinks.get(linkId).descr + COUNTS_DELIMITER);
-				writer.write(Double.toString(identifiedLinks.get(linkId).counts));
+			//for (Id<Link> linkId : identifiedLinks.keySet()) {
+			for (CountInput countInput : identifiedLinks.keySet()) {
+				writer.write(identifiedLinks.get(countInput).toString() + COUNTS_DELIMITER);
+				writer.write(countInput.descr + COUNTS_DELIMITER);
+				writer.write(Double.toString(countInput.counts));
 				writer.newLine();
 			}
 			writer.close();
@@ -83,15 +81,16 @@ public class PTCountsLinkIdentification {
 		}
 	}
 
-	private static Map<Id<Link>, CountInput> identifyLinks(Network network, Set<CountInput> countInputs) {
-		Map<Id<Link>, CountInput> identifiedLinks = new HashMap<>();
+	private static Map<CountInput, Id<Link>> identifyLinks(Network network, List<CountInput> countInputs) {
+		Map<CountInput, Id<Link>> identifiedLinks = new LinkedHashMap<>();
 		counter.reset();
 		for (CountInput countInput : countInputs) {
 			double distFromNode, distToNode;
 			double totalMinDist = Double.MAX_VALUE, absMinDifferenceStation = Double.MAX_VALUE;
 			Id<Link> currentMinLink = null;
 			for (Link link : network.getLinks().values()) {
-				if (link.getAllowedModes().contains(TransportMode.pt) && link.getId().toString().contains("pt")) {
+				//if (link.getAllowedModes().contains(TransportMode.pt) && link.getId().toString().contains("pt")) {
+				if (link.getAllowedModes().contains("rail")) {
 					distFromNode = CoordUtils.calcEuclideanDistance(countInput.fromCoord, link.getFromNode().getCoord());
 					distToNode = CoordUtils.calcEuclideanDistance(countInput.toCoord, link.getToNode().getCoord());
 					if (distFromNode + distToNode <= (totalMinDist)){//*ALLOWED_DISTANCE_FACTOR_IF_MORE_EQUAL_STATION_DISTANCE)
@@ -103,7 +102,7 @@ public class PTCountsLinkIdentification {
 				}
 			}
 			if (currentMinLink != null) {
-				identifiedLinks.put(currentMinLink, countInput);
+				identifiedLinks.put(countInput, currentMinLink);
 			} else {
 				log.error("For count input " + countInput.descr + " no matching link was found.");
 			}
@@ -112,8 +111,8 @@ public class PTCountsLinkIdentification {
 		return identifiedLinks;
 	}
 
-	private static Set<CountInput> readCountInputs(String pathToCountsInput) {
-		Set<CountInput> countInputs = new HashSet<>();
+	private static List<CountInput> readCountInputs(String pathToCountsInput) {
+		List<CountInput> countInputs = new ArrayList<>();
 		BufferedReader reader = IOUtils.getBufferedReader(pathToCountsInput, Charset.forName("UTF-8"));
 		try {
 			reader.readLine(); // read header: VON; VON_X; VON_Y; NACH; NACH_X; NACH_Y; ANZAHL
