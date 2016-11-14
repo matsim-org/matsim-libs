@@ -40,12 +40,7 @@ import playground.ikaddoura.integrationCNE.CNEIntegration;
 
 public class BerlinControler {
 	
-// 	base case
-	final static String configFile = "../../../runs-svn/berlin_car-traffic-only-1pct-2014-08-01/baseCase/input/config.xml";
-
-	// only reroute - base case continued / pricing 
-//	final private String configFile = "../../../runs-svn/berlin_car-traffic-only-1pct-2014-08-01/onlyReRoute/input/config_test.xml";
-//	final private String outputDirectory = "../../../runs-svn/berlin_car-traffic-only-1pct-2014-08-01/onlyReRoute/output_QBPV3/";
+	final static String configFile = "../../../runs-svn/berlin_car-traffic-only-1pct-2014-08-01/baseCase/input/config_detailed-network.xml";
 	
 	final private int activityDurationHRS = 1;
 	final private boolean pricing = false;
