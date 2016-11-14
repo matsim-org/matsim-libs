@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -66,7 +66,7 @@ class Utils {
 
 				if ( !cliqueId.equals( currentCliqueId ) ) {
 					currentCliqueId = cliqueId;
-					currentClique = new HashSet<>();
+					currentClique = new LinkedHashSet<>();
 					cliques.addClique( currentClique );
 				}
 
@@ -108,8 +108,8 @@ class Utils {
 				final int size,
 				final List<Id<Person>> clique ) {
 			if ( clique.size() < size ) return Collections.emptyList();
-			if ( size == 0 ) return Collections.singleton( new HashSet<>() );
-			if ( clique.size() == size ) return Collections.singleton( new HashSet<>( clique ) );
+			if ( size == 0 ) return Collections.singleton( new LinkedHashSet<>() );
+			if ( clique.size() == size ) return Collections.singleton( new LinkedHashSet<>( clique ) );
 
 			final Collection<Set<Id<Person>>> combs = new ArrayList<>();
 
