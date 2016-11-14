@@ -65,7 +65,9 @@ public class ScalabilityStatisticsListener implements AutoCloseable {
 	private long start_ms = -1;
 	private final AtomicLong peakMemory_bytes = new AtomicLong( -1 );
 
-	public ScalabilityStatisticsListener( final String file ) {
+	public ScalabilityStatisticsListener(
+			final String file,
+			final boolean monitorMemory ) {
 		this.writer = IOUtils.getBufferedWriter( file );
 		try {
 			writer.write( "currSample\ttryNr\t" +
@@ -81,7 +83,7 @@ public class ScalabilityStatisticsListener implements AutoCloseable {
 		catch ( IOException e ) {
 			throw new UncheckedIOException( e );
 		}
-		MonitoringUtils.listenBytesUsageOnGC( usage -> peakMemory_bytes.updateAndGet( peak -> usage > peak ? usage : peak ) );
+		if ( monitorMemory ) MonitoringUtils.listenBytesUsageOnGC( usage -> peakMemory_bytes.updateAndGet( peak -> usage > peak ? usage : peak ) );
 	}
 
 	@Inject

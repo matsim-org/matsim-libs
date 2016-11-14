@@ -66,7 +66,7 @@ public class RunScalabilityAnalysis {
 			final String tmpDir = outputDir + "/tmp/";
 			config.controler().setOutputDirectory( tmpDir );
 
-			try ( final ScalabilityStatisticsListener statsListenner = new ScalabilityStatisticsListener( outputDir + "/stats.dat" ) ) {
+			try ( final ScalabilityStatisticsListener statsListenner = new ScalabilityStatisticsListener( outputDir + "/stats.dat" , false ) ) {
 				for ( double sample : scalabilityConfigGroup.getSamples() ) {
 					for ( int tryNr = 0; tryNr < scalabilityConfigGroup.getnTries(); tryNr++ ) {
 						MoreIOUtils.deleteDirectoryIfExists( tmpDir );
