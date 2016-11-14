@@ -47,16 +47,15 @@ public class PopulationActivitySplitter {
 
 	// input
 	final private String inputPopulatlionFile = "../../../public-svn/matsim/scenarios/countries/de/berlin/car-traffic-only-1pct-2014-08-01/run_160.150.plans_selected.xml.gz";
-//	final private String inputPopulatlionFile = "../../../runs-svn/berlin_car-traffic-only-1pct-2014-08-01/run0/output_plans.xml.gz";
 	
 	// output
 	final private String outputDirectory = "../../../runs-svn/berlin_car-traffic-only-1pct-2014-08-01/baseCase/input/";
-	final private String outputPopulationFile = "run_160.150.plans_selected_splitActivityTypes.xml.gz";
+	final private String outputPopulationFile = "run_160.150.plans_selected_splitActivityTypes_noRoutes.xml.gz";
 	
 	// settings
 	final private double timeCategorySize = 3600.;
-	final private boolean onlySelectedPlans = false;
-	final private boolean removeRoute = false;
+	final private boolean onlySelectedPlans = true;
+	final private boolean removeRoute = true;
 		
 	public static void main(String[] args) {
 		PopulationActivitySplitter b = new PopulationActivitySplitter();
@@ -74,6 +73,7 @@ public class PopulationActivitySplitter {
 		
 		log.info("Input Population: " + inputPopulatlionFile);
 		log.info("Write out a population which only contains selected plans: " + onlySelectedPlans);
+		log.info("Removing routes: " + removeRoute);
 
 		
 		Config config = ConfigUtils.createConfig();
@@ -100,9 +100,15 @@ public class PopulationActivitySplitter {
 					}
 					
 					if (removeRoute) {
+						
+						if (pE instanceof Activity) {
+							Activity act = (Activity) pE;
+							act.setLinkId(null);
+						}
+						
 						if (pE instanceof Leg) {
 							Leg leg = (Leg) pE;
-							leg.setRoute(null);
+							leg.setRoute(null);							
 						}
 					}
 				}
