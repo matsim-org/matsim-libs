@@ -57,7 +57,7 @@ public class RandomUtils {
 	public static <E> List<E> sublist_withSideEffect( final Random random , final List<E> l , final int size ) {
 		if ( l.size() <= size ) return new ArrayList<>( l );
 
-		final List<E> sublist = new ArrayList<>( l.subList( 0 , size ) );
+		final List<E> sublist = new ArrayList<>( size );
 		for ( int i=0; i < size; i++ ) {
 			final int j = i + random.nextInt( size - i );
 			final E elemJ = l.get( j );
