@@ -25,14 +25,14 @@ package playground.dziemke.cemdapMatsimCadyts;
  */
 public class CommuterRelationV2 {
 
-	private int origin;
-	private int destination;
+	private String origin;
+	private String destination;
 	private Integer tripsAll;
 	private Integer tripsMale;
 	private Integer tripsFemale;
 
 		
-	public CommuterRelationV2(int origin, int destination, Integer tripsAll, Integer tripsMale, Integer tripsFemale) {
+	public CommuterRelationV2(String origin, String destination, Integer tripsAll, Integer tripsMale, Integer tripsFemale) {
 		this.origin = origin;
 		this.destination = destination;
 		this.tripsAll = tripsAll;
@@ -40,11 +40,11 @@ public class CommuterRelationV2 {
 		this.tripsFemale = tripsFemale;
 	}
 
-	public int getFrom() {
+	public String getFrom() {
 		return this.origin;
 	}
 
-	public int getTo() {
+	public String getTo() {
 		return this.destination;
 	}
 	

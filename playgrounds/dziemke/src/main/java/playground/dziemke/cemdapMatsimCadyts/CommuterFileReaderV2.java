@@ -35,7 +35,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 public class CommuterFileReaderV2 {
 	private static final Logger LOG = Logger.getLogger(CommuterFileReaderV2.class);
 	
-	private Map<Integer, Map<Integer, CommuterRelationV2>> relationsMap = new HashMap<>();
+	private Map<String, Map<String, CommuterRelationV2>> relationsMap = new HashMap<>();
 			
 	
 	public CommuterFileReaderV2(String commuterFileOutgoing, String delimiter) {
@@ -80,7 +80,7 @@ public class CommuterFileReaderV2 {
             				tripsFemale = Integer.parseInt(row[6]);
             			}
 
-            			process(Integer.parseInt(origin), Integer.parseInt(destination), Integer.parseInt(row[4]), tripsMale, tripsFemale);
+            			process(origin, destination, Integer.parseInt(row[4]), tripsMale, tripsFemale);
             			return;
             		} else { // line that is neither new origin nor new destination
             			return;
@@ -91,19 +91,19 @@ public class CommuterFileReaderV2 {
 	}
 	
 	
-	private void process(Integer origin, Integer destination, Integer tripsAll, Integer tripsMale, Integer tripsFemale) {
+	private void process(String origin, String destination, Integer tripsAll, Integer tripsMale, Integer tripsFemale) {
 		CommuterRelationV2 commuterRelation = new CommuterRelationV2(origin, destination, tripsAll, tripsMale, tripsFemale);
 		
 		if (!this.relationsMap.containsKey(origin)) {
-			Map<Integer, CommuterRelationV2> originMap = new HashMap<>();
+			Map<String, CommuterRelationV2> originMap = new HashMap<>();
 			this.relationsMap.put(origin, originMap);
 		}
-		Map<Integer, CommuterRelationV2> originMap = this.relationsMap.get(origin);
+		Map<String, CommuterRelationV2> originMap = this.relationsMap.get(origin);
 		originMap.put(destination, commuterRelation);
 	}
 	
 	
-	public Map<Integer, Map<Integer, CommuterRelationV2>> getRelationsMap() {
+	public Map<String, Map<String, CommuterRelationV2>> getRelationsMap() {
 		return this.relationsMap;
 	}
 }
