@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.stations.CarsharingStation;
 import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
-import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 /** 
@@ -45,7 +44,7 @@ public class TwoWayContainer implements VehiclesContainer{
 		twvehiclesMap.put(vehicle, link);
 			
 		CarsharingStation station = twvehicleLocationQuadTree.getClosest(coord.getX(), coord.getY());
-		((TwoWayCarsharingStation)station).addCar(((StationBasedVehicle)vehicle).getVehicleType(),  vehicle);		
+		((TwoWayCarsharingStation)station).addCar(vehicle.getType(),  vehicle);		
 	}
 
 	public Map<String, CarsharingStation> getTwowaycarsharingstationsMap() {

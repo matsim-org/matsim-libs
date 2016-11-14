@@ -7,7 +7,7 @@ public class FFVehicleImpl implements CSVehicle{
 	private String type;
 	private String vehicleId;
 	private String companyId;
-	private String csType= "freefloating";
+	private final static String csType= "freefloating";
 	
 	public FFVehicleImpl(String type, String vehicleId, String companyId) {
 		
@@ -15,6 +15,8 @@ public class FFVehicleImpl implements CSVehicle{
 		this.vehicleId = vehicleId;
 		this.companyId = companyId;
 	}
+
+	@Override
 	public String getType() {
 		return type;
 	}
