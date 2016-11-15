@@ -19,15 +19,16 @@ public class TripAnalyzerSrVNewTest {
 
 	private static final String INPUT_TRIPS_FILENAME = "W2008_Berlin_Weekday_Sample.dat";
 	private static final String INPUT_PERSONS_FILENAME = "P2008_Berlin2_Sample.dat";
-	private static final String INPUT_NETWORK_FILE = "../../../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+	private static final String INPUT_NETWORK_FILE = "emptyNetwork.xml";
 
 	@Test
 	public void TestAnalyze() {
 
 		final String inputTripsFile = utils.getInputDirectory() + INPUT_TRIPS_FILENAME;
 		final String inputPersonsFile = utils.getInputDirectory() + INPUT_PERSONS_FILENAME;
+		final String inputNetworkFile = utils.getInputDirectory() + INPUT_NETWORK_FILE;
 		LOG.info("Start analyzing");
-		TripAnalyzerSrVNew.analyze(inputTripsFile, inputPersonsFile, INPUT_NETWORK_FILE, utils.getOutputDirectory());
+		TripAnalyzerSrVNew.analyze(inputTripsFile, inputPersonsFile, inputNetworkFile, utils.getOutputDirectory());
 		LOG.info("Finished analyzing");
 
 		LOG.info("Start checking checksums");
