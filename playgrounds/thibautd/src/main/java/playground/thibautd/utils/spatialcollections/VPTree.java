@@ -429,7 +429,8 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 			if ( intersectFar ) stack.add( current.far );
 		}
 
-		return null;
+		// empty tree
+		return new VPTree<>( metric, coordinate );
 	}
 
 	private double calcDistance( final T vantagePoint, final T v ) {
