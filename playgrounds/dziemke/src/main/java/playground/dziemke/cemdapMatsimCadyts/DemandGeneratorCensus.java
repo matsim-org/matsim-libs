@@ -55,8 +55,8 @@ import playground.dziemke.utils.LogToOutputSaver;
  */
 public class DemandGeneratorCensus {
 	private static final Logger LOG = Logger.getLogger(DemandGeneratorCensus.class);
-	
-	
+	private static Integer counterMissingComRel = 0;
+
 	
 	/*
 	 * there will be mismatches between number of employees from zensus and commuter from commuter file
@@ -67,29 +67,24 @@ public class DemandGeneratorCensus {
 
 	public static void main(String[] args) {
 		// Parameters
-//		double scalingFactor = 1.;
-		int numberOfPlansPerPerson = 2;
-		// Gemeindeschluessel of Berlin is 11000000 (Gemeindeebene) and 11000 (Landkreisebene)
-		String planningAreaId = "11000000";
+		int numberOfPlansPerPerson = 1;
+		String planningAreaId = "11000000"; // "Amtliche Gemeindeschlüssel (AGS)" of Berlin is "11000000"
+		double defaultAdultsToEmployeesMaleRatio = 1.3;  // This is an assumption, oriented on observed values.
+		double defaultEmployeesToCommutersRatio = 3.0;  // This is an assumption, oriented on observed values, deliberately chosen slightly too high.
 		
 		// Input and output files
-//		String commuterFileOutgoing1 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Berlin_2009/B2009Ga.txt";
-//		String commuterFileOutgoing2 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil1BR2009Ga.txt";
-//		String commuterFileOutgoing3 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil2BR2009Ga.txt";
-//		String commuterFileOutgoing4 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil3BR2009Ga.txt";
-		String commuterFileOutgoingTest = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil1BR2009Ga_Test.txt";
-		
+		String commuterFileOutgoing1 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Berlin_2009/B2009Ga.txt";
+		String commuterFileOutgoing2 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil1BR2009Ga.txt";
+		String commuterFileOutgoing3 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil2BR2009Ga.txt";
+		String commuterFileOutgoing4 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil3BR2009Ga.txt";
+//		String commuterFileOutgoingTest = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil1BR2009Ga_Test.txt";
 //		String censusFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/zensus_2011/bevoelkerung/csv_Bevoelkerung/Zensus11_Datensatz_Bevoelkerung.csv";
 		String censusFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/zensus_2011/bevoelkerung/csv_Bevoelkerung/Zensus11_Datensatz_Bevoelkerung_BE_BB.csv";
-		
-//		String shapeFileMunicipalities = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenBerlin.shp";
 		String shapeFileLors = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Bezirksregion_EPSG_25833.shp";
-		
-		String outputBase = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/census-based_test_1/"; // TODO ...
+		String outputBase = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/census-based_test_4/"; // TODO ...
 
-		
 		// Infrastructure
-		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
+		Population pop = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		Map<Id<Household>, Household> households = new HashMap<>();
 		LogToOutputSaver.setOutputDirectory(outputBase);
 		
@@ -99,120 +94,227 @@ public class DemandGeneratorCensus {
 		Map<String, Map<String, CommuterRelationV2>> relationsMap = new HashMap<>();
 		
 		// Read commuter relations
-//		{
-//			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing1, "\t");
-//			Map<Integer, Map<Integer, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
-//			relationsMap.putAll(currentRelationMap);
-//		}{
-//			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing2, "\t");
-//			Map<Integer, Map<Integer, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
-//			relationsMap.putAll(currentRelationMap);
-//		}{
-//			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing3, "\t");
-//			Map<Integer, Map<Integer, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
-//			relationsMap.putAll(currentRelationMap);
-//		}{
-//			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing4, "\t");
-//			Map<Integer, Map<Integer, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
-//			relationsMap.putAll(currentRelationMap);
-//		}
 		{
-			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoingTest, "\t");
+			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing1, "\t");
+			Map<String, Map<String, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
+			relationsMap.putAll(currentRelationMap);
+		}{
+			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing2, "\t");
+			Map<String, Map<String, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
+			relationsMap.putAll(currentRelationMap);
+		}{
+			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing3, "\t");
+			Map<String, Map<String, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
+			relationsMap.putAll(currentRelationMap);
+		}{
+			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing4, "\t");
 			Map<String, Map<String, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
 			relationsMap.putAll(currentRelationMap);
 		}
+//		{
+//			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoingTest, "\t");
+//			Map<String, Map<String, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
+//			relationsMap.putAll(currentRelationMap);
+//		}
 		
 		// Read LORs
 		List<String> lors = readShape(shapeFileLors, "SCHLUESSEL", "LOR");
 		
+		// Other
+//		Integer counterMissingComRel = 0;
 		
 		// Loop over  municipalities
-		for (String municipalityId : relationsMap.keySet()) {
-			Map<String, CommuterRelationV2> relationsFromMunicipality = relationsMap.get(municipalityId);
+		for (String munId : relationsMap.keySet()) {
+			Map<String, CommuterRelationV2> relationsFromMunicipality = relationsMap.get(munId);
 			
 			// Employees from Zensus seems to be all employees, not only socially-secured employees
-			int employeesMale = (int) municipalities.getAttribute(municipalityId, "employedMale");
-			int employeesFemale = (int) municipalities.getAttribute(municipalityId, "employedFemale");
+			int employeesMale = (int) municipalities.getAttribute(munId, "employedMale");
+			int employeesFemale = (int) municipalities.getAttribute(munId, "employedFemale");
 						
-			scaleRelations(relationsFromMunicipality, employeesMale, employeesFemale);
+			scaleRelations(relationsFromMunicipality, employeesMale, employeesFemale, defaultEmployeesToCommutersRatio);
 			List<String> commuterRelationListMale = createRelationList(relationsFromMunicipality, "male");
 			List<String> commuterRelationListFemale = createRelationList(relationsFromMunicipality, "female");
 			
-//			int population = (int) municipalities.getAttribute(municipalityId, "population");
+			int pop18_24Male = (int) municipalities.getAttribute(munId, "pop18_24Male");
+			int pop25_29Male = (int) municipalities.getAttribute(munId, "pop25_29Male");
+			int pop30_39Male = (int) municipalities.getAttribute(munId, "pop30_39Male");
+			int pop40_49Male = (int) municipalities.getAttribute(munId, "pop40_49Male");
+			int pop50_64Male = (int) municipalities.getAttribute(munId, "pop50_64Male");
+			int pop65_74Male = (int) municipalities.getAttribute(munId, "pop65_74Male");
+			int pop75PlusMale = (int) municipalities.getAttribute(munId, "pop75PlusMale");
 			
-			int pop18_24Male = (int) municipalities.getAttribute(municipalityId, "pop18_24Male");
-			int pop25_29Male = (int) municipalities.getAttribute(municipalityId, "pop25_29Male");
-			int pop30_39Male = (int) municipalities.getAttribute(municipalityId, "pop30_39Male");
-			int pop40_49Male = (int) municipalities.getAttribute(municipalityId, "pop40_49Male");
-			int pop50_64Male = (int) municipalities.getAttribute(municipalityId, "pop50_64Male");
-			int pop65_74Male = (int) municipalities.getAttribute(municipalityId, "pop65_74Male");
-			int pop75PlusMale = (int) municipalities.getAttribute(municipalityId, "pop75PlusMale");
-			
-			int pop18_24Female = (int) municipalities.getAttribute(municipalityId, "pop18_24Female");
-			int pop25_29Female = (int) municipalities.getAttribute(municipalityId, "pop25_29Female");
-			int pop30_39Female = (int) municipalities.getAttribute(municipalityId, "pop30_39Female");
-			int pop40_49Female = (int) municipalities.getAttribute(municipalityId, "pop40_49Female");
-			int pop50_64Female = (int) municipalities.getAttribute(municipalityId, "pop50_64Female");
-			int pop65_74Female = (int) municipalities.getAttribute(municipalityId, "pop65_74Female");
-			int pop75PlusFemale = (int) municipalities.getAttribute(municipalityId, "pop75PlusFemale");
+			int pop18_24Female = (int) municipalities.getAttribute(munId, "pop18_24Female");
+			int pop25_29Female = (int) municipalities.getAttribute(munId, "pop25_29Female");
+			int pop30_39Female = (int) municipalities.getAttribute(munId, "pop30_39Female");
+			int pop40_49Female = (int) municipalities.getAttribute(munId, "pop40_49Female");
+			int pop50_64Female = (int) municipalities.getAttribute(munId, "pop50_64Female");
+			int pop65_74Female = (int) municipalities.getAttribute(munId, "pop65_74Female");
+			int pop75PlusFemale = (int) municipalities.getAttribute(munId, "pop75PlusFemale");
 			
 			int adultsMale = pop18_24Male + pop25_29Male + pop30_39Male + pop40_49Male + pop50_64Male;
 			int adultsFemale = pop18_24Female + pop25_29Female + pop30_39Female + pop40_49Female + pop50_64Female;
 			
 			
-			
+			// The adults-to-employees ratio is needed to determine if a given person has a job
 			double adultsToEmployeesMaleRatio = 0.;
 			double adultsToEmployeesFemaleRatio = 0.;
 			if (employeesMale != 0) { // Avoid dividing by zero
-				adultsToEmployeesMaleRatio = adultsMale / employeesMale;
+				adultsToEmployeesMaleRatio = (double) adultsMale / (double) employeesMale;
 			} else {
-				adultsToEmployeesMaleRatio = 2.; // TODO This is an assumption; maybe improve later!
+				adultsToEmployeesMaleRatio = defaultAdultsToEmployeesMaleRatio;
 			}
 			if (employeesFemale != 0) { // Avoid dividing by zero
-				adultsToEmployeesFemaleRatio = adultsFemale / employeesFemale;
+				adultsToEmployeesFemaleRatio = (double) adultsFemale / (double) employeesFemale;
 			} else {
-				adultsToEmployeesFemaleRatio = 2.; // TODO This is an assumption; maybe improve later!
+				adultsToEmployeesFemaleRatio = defaultAdultsToEmployeesMaleRatio;
 			}
-				
-			
-			int seniorsMale = pop65_74Male + pop75PlusMale;
-			int seniorsFemale = pop65_74Female + pop75PlusFemale;
+//			System.out.println("municipality = " + municipalityId + " -- adultsToEmployeesMaleRatio = " + adultsToEmployeesMaleRatio);
+//			System.out.println("municipality = " + municipalityId + " -- adultsToEmployeesFemaleRatio = " + adultsToEmployeesFemaleRatio);
 			
 			int counter = 1;
 			
+			
+			// 18-24
 			{
 				int gender = 0;
 				int lowerAgeBound = 18;
 				int upperAgeBound = 24;
-				createHouseholdsAndPersons(population, households, counter, municipalityId, planningAreaId, lors, pop18_24Male, 
+				createHouseholdsAndPersons(pop, households, counter, munId, planningAreaId, lors, pop18_24Male, 
 						gender, lowerAgeBound, upperAgeBound, adultsToEmployeesMaleRatio, commuterRelationListMale);
+				counter += pop18_24Male;
 			}
-			counter += pop18_24Male;
-//			{
-//				int gender = 1;
-//				int lowerAgeBound = 18;
-//				int upperAgeBound = 24;
-//				createHouseholdsAndPersons(population, households, counter, municipalityIdInt, planningAreaId, lors, pop18_24Female, 
-//						gender, lowerAgeBound, upperAgeBound, adultsToEmployeesFemaleRatio, commuterRelationListFemale);
-//			}
-			counter += pop18_24Female;
+			{
+				int gender = 1;
+				int lowerAgeBound = 18;
+				int upperAgeBound = 24;
+				createHouseholdsAndPersons(pop, households, counter, munId, planningAreaId, lors, pop18_24Female, 
+						gender, lowerAgeBound, upperAgeBound, adultsToEmployeesFemaleRatio, commuterRelationListFemale);
+				counter += pop18_24Female;
+			}
+			// 25-29
+			{
+				int gender = 0;
+				int lowerAgeBound = 25;
+				int upperAgeBound = 29;
+				createHouseholdsAndPersons(pop, households, counter, munId, planningAreaId, lors, pop25_29Male, 
+						gender, lowerAgeBound, upperAgeBound, adultsToEmployeesMaleRatio, commuterRelationListMale);
+				counter += pop25_29Male;
+			}
+			{
+				int gender = 1;
+				int lowerAgeBound = 25;
+				int upperAgeBound = 29;
+				createHouseholdsAndPersons(pop, households, counter, munId, planningAreaId, lors, pop25_29Female, 
+						gender, lowerAgeBound, upperAgeBound, adultsToEmployeesFemaleRatio, commuterRelationListFemale);
+				counter += pop25_29Female;
+			}
+			// 30-39
+			{
+				int gender = 0;
+				int lowerAgeBound = 30;
+				int upperAgeBound = 39;
+				createHouseholdsAndPersons(pop, households, counter, munId, planningAreaId, lors, pop30_39Male, 
+						gender, lowerAgeBound, upperAgeBound, adultsToEmployeesMaleRatio, commuterRelationListMale);
+				counter += pop30_39Male;
+			}
+			{
+				int gender = 1;
+				int lowerAgeBound = 30;
+				int upperAgeBound = 39;
+				createHouseholdsAndPersons(pop, households, counter, munId, planningAreaId, lors, pop30_39Female, 
+						gender, lowerAgeBound, upperAgeBound, adultsToEmployeesFemaleRatio, commuterRelationListFemale);
+				counter += pop30_39Female;
+			}
+			// 40-49
+			{
+				int gender = 0;
+				int lowerAgeBound = 40;
+				int upperAgeBound = 49;
+				createHouseholdsAndPersons(pop, households, counter, munId, planningAreaId, lors, pop40_49Male, 
+						gender, lowerAgeBound, upperAgeBound, adultsToEmployeesMaleRatio, commuterRelationListMale);
+				counter += pop40_49Male;
+			}
+			{
+				int gender = 1;
+				int lowerAgeBound = 40;
+				int upperAgeBound = 49;
+				createHouseholdsAndPersons(pop, households, counter, munId, planningAreaId, lors, pop40_49Female, 
+						gender, lowerAgeBound, upperAgeBound, adultsToEmployeesFemaleRatio, commuterRelationListFemale);
+				counter += pop40_49Female;
+			}
+			// 50-64
+			{
+				int gender = 0;
+				int lowerAgeBound = 50;
+				int upperAgeBound = 64;
+				createHouseholdsAndPersons(pop, households, counter, munId, planningAreaId, lors, pop50_64Male, 
+						gender, lowerAgeBound, upperAgeBound, adultsToEmployeesMaleRatio, commuterRelationListMale);
+				counter += pop50_64Male;
+			}
+			{
+				int gender = 1;
+				int lowerAgeBound = 50;
+				int upperAgeBound = 64;
+				createHouseholdsAndPersons(pop, households, counter, munId, planningAreaId, lors, pop50_64Female, 
+						gender, lowerAgeBound, upperAgeBound, adultsToEmployeesFemaleRatio, commuterRelationListFemale);
+				counter += pop50_64Female;
+			}
+			// 65-74
+			{
+				int gender = 0;
+				int lowerAgeBound = 65;
+				int upperAgeBound = 74;
+				createHouseholdsAndPersons(pop, households, counter, munId, planningAreaId, lors, pop65_74Male, 
+						gender, lowerAgeBound, upperAgeBound, adultsToEmployeesMaleRatio, commuterRelationListMale);
+				counter += pop65_74Male;
+			}
+			{
+				int gender = 1;
+				int lowerAgeBound = 65;
+				int upperAgeBound = 74;
+				createHouseholdsAndPersons(pop, households, counter, munId, planningAreaId, lors, pop65_74Female, 
+						gender, lowerAgeBound, upperAgeBound, adultsToEmployeesFemaleRatio, commuterRelationListFemale);
+				counter += pop65_74Female;
+			}
+			// 75+
+			{
+				int gender = 0;
+				int lowerAgeBound = 75;
+				int upperAgeBound = 90; // Assumption!
+				createHouseholdsAndPersons(pop, households, counter, munId, planningAreaId, lors, pop75PlusMale, 
+						gender, lowerAgeBound, upperAgeBound, adultsToEmployeesMaleRatio, commuterRelationListMale);
+				counter += pop75PlusMale;
+			}
+			{
+				int gender = 1;
+				int lowerAgeBound = 75;
+				int upperAgeBound = 90; // Assumption!
+				createHouseholdsAndPersons(pop, households, counter, munId, planningAreaId, lors, pop75PlusFemale, 
+						gender, lowerAgeBound, upperAgeBound, adultsToEmployeesFemaleRatio, commuterRelationListFemale);
+				counter += pop75PlusFemale;
+			}
 			
 			
-			// TODO complete this check
-//			if (commuterRelationList.size() > 100) {
-//				throw new RuntimeException("More than 100 commuter relations from minucipality with ID " + municipalityId + " remain unassigned.");
-//			}
+			// Information on unassigned commuter relations
+			if (commuterRelationListMale.size() > 100) {
+				LOG.info(commuterRelationListMale.size() + " male commuter relations from " + munId + 
+						" remain unassigned; based on census, there are " + employeesMale + " male employees.");
+			}
+			if (commuterRelationListFemale.size() > 100) {
+				LOG.info(commuterRelationListFemale.size() + " female commuter relations from " + munId + 
+						" remain unassigned; based on census, there are " + employeesFemale + " female employees.");
+			}
 			
 			
 		}
 		// TODO householdsFile
-		writePersonsFile(population, outputBase + "persons.dat");
+		writePersonsFile(pop, outputBase + "persons.dat");
 		
-		// Create population with different locations
+		// Create copies of population, but with different work locations
 		for (int i = 1; i < numberOfPlansPerPerson; i++) { // "less than" because the plan consists already in the original
 			Population population2 = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 			
-			for (Person person : population.getPersons().values()) {
+			for (Person person : pop.getPersons().values()) {
 				if ((boolean) person.getAttributes().getAttribute("employed") == true) {
 					String locationOfWork = (String) person.getAttributes().getAttribute("locationOfWork");
 					if (locationOfWork.equals("-99")) {
@@ -221,7 +323,7 @@ public class DemandGeneratorCensus {
 						if (locationOfWork.length() == 6) { // An LOR, i.e. a location inside Berlin
 							person.getAttributes().putAttribute("locationOfWork", getRandomLor(lors));
 						} else if (locationOfWork.length() == 8) { // An "Amtliche Gemeindeschlüssel (AGS)", i.e. a location outside Berlin
-							// Do nothing; leave it as it was
+							// Do nothing; leave it as it is
 						} else {
 							throw new RuntimeException("The identifier of the work location cannot have a length other than 6 or 8.");
 						}
@@ -231,12 +333,14 @@ public class DemandGeneratorCensus {
 			}
 			writePersonsFile(population2, outputBase + "persons" + (i+1) + ".dat");
 		}
+		
+		LOG.warn("counterMissingComRel = " + counterMissingComRel);
 	}
 
 
 	private static void createHouseholdsAndPersons(Population population, Map<Id<Household>, Household> households, int counter,
-			String municipalityId, String planningAreaId, List<String> lors, int numberOfPersons, int gender, int lowerAgeBound,
-			int upperAgeBound, double adultsToEmployeesRatio, List<String> commuterRelationList) {
+			String municipalityId, String planningAreaId, List<String> lors, int numberOfPersons, int gender,
+			int lowerAgeBound, int upperAgeBound, double adultsToEmployeesRatio, List<String> commuterRelationList) {
 		
 		for (int i = 0; i < numberOfPersons; i++) {
 			Id<Household> householdId = Id.create(municipalityId + "_" + (counter + i), Household.class);
@@ -251,13 +355,21 @@ public class DemandGeneratorCensus {
 			Person person = population.getFactory().createPerson(personId);
 			// Following attribute names inspired by "PersonUtils.java": "sex", "hasLicense", "carAvail", "employed", "age", "travelcards"
 			person.getAttributes().putAttribute("householdId", householdId);
-			boolean employed = getEmployed(adultsToEmployeesRatio);
+			boolean employed = false;
+			if (lowerAgeBound < 65 && upperAgeBound > 17) { // younger and older people are never employed
+				employed = getEmployed(adultsToEmployeesRatio);
+			}
 			person.getAttributes().putAttribute("employed", employed);
 			person.getAttributes().putAttribute("student", false); // TODO certain share of young adults?
 			person.getAttributes().putAttribute("hasLicense", true); // for CEMDAP's "driversLicence" variable
 			
 			if (employed == true) {
-				person.getAttributes().putAttribute("locationOfWork", getRandomWorkLocation(commuterRelationList, planningAreaId, lors));
+				if (commuterRelationList.size() == 0) { // No relations left in list, which employee could choose from
+					counterMissingComRel++;
+					person.getAttributes().putAttribute("locationOfWork", "empty");
+				} else {
+					person.getAttributes().putAttribute("locationOfWork", getRandomWorkLocation(commuterRelationList, planningAreaId, lors));
+				}
 			} else {
 				person.getAttributes().putAttribute("locationOfWork", "-99");
 			}
@@ -277,12 +389,13 @@ public class DemandGeneratorCensus {
 	}	
 	
 			
-	private static void scaleRelations(Map<String, CommuterRelationV2> relationsFromMunicipality, int employeesMale, int employeesFemale) {
+	private static void scaleRelations(Map<String, CommuterRelationV2> relationsFromMunicipality, int employeesMale,
+			int employeesFemale, double defaultEmployeesToCommutersRatio) {
 		// Count all commuters starting in the given municipality
 		int commutersMale = 0;
 		for (CommuterRelationV2 relation : relationsFromMunicipality.values()) {
 			if (relation.getTripsMale() == null) { // This is the case when there are very few people traveling on that relation
-				if (relation.getTrips() == 0 || relation.getTrips() == null) {
+				if (relation.getTrips() == null || relation.getTrips() == 0) {
 					throw new RuntimeException("No travellers at all on this relation! This should not happen.");
 				} else {
 					relation.setTripsMale((int) (relation.getTrips() / 2));
@@ -293,7 +406,7 @@ public class DemandGeneratorCensus {
 		int commutersFemale = 0;
 		for (CommuterRelationV2 relation : relationsFromMunicipality.values()) {
 			if (relation.getTripsFemale() == null) { // This is the case when there are very few people traveling on that relation
-				if (relation.getTrips() == 0 || relation.getTrips() == null) {
+				if (relation.getTrips() == null || relation.getTrips() == 0) {
 					throw new RuntimeException("No travellers at all on this relation! This should not happen.");
 				} else {
 					relation.setTripsFemale((int) (relation.getTrips() / 2));
@@ -305,23 +418,31 @@ public class DemandGeneratorCensus {
 		// Compute ratios
 		double employeesToCommutersMaleRatio = 0.;
 		double employeesToCommutersFemaleRatio = 0.;
-		if (employeesMale != 0) { // Avoid dividing by zero
-			employeesToCommutersMaleRatio = employeesMale / commutersMale;
+		if (employeesMale != 0) {
+			employeesToCommutersMaleRatio = (double) employeesMale / (double) commutersMale;
 		} else {
-			employeesToCommutersMaleRatio = 2.; // TODO This is an assumption; maybe improve later!
+			employeesToCommutersMaleRatio = defaultEmployeesToCommutersRatio;
 		}
-		if (employeesFemale != 0) { // Avoid dividing by zero
-			employeesToCommutersFemaleRatio = employeesFemale / commutersFemale;
+//		System.out.println("employeesToCommutersMaleRatio = " + employeesToCommutersMaleRatio);
+		if (employeesFemale != 0) {
+			employeesToCommutersFemaleRatio = (double) employeesFemale / (double) commutersFemale;
 		} else {
-			employeesToCommutersFemaleRatio = 2.; // TODO This is an assumption; maybe improve later!
+			employeesToCommutersFemaleRatio = defaultEmployeesToCommutersRatio;
 		}
+//		System.out.println("employeesToCommutersFemaleRatio = " + employeesToCommutersFemaleRatio);
+
+		
 		
 		// Scale
 		for (CommuterRelationV2 relation : relationsFromMunicipality.values()) {
-			relation.setTripsMale((int) (relation.getTripsMale() * employeesToCommutersMaleRatio)); 
+//			System.out.println("scaled trips male " + (int) (relation.getTripsMale() * employeesToCommutersMaleRatio));
+//			relation.setTripsMale((int) (relation.getTripsMale() * employeesToCommutersMaleRatio));
+			relation.setTripsMale((int) Math.ceil(relation.getTripsMale() * employeesToCommutersMaleRatio));
+//			relation.setTripsMale((int) (relation.getTripsMale() * employeesToCommutersMaleRatio + 1));
 		}
 		for (CommuterRelationV2 relation : relationsFromMunicipality.values()) {
-			relation.setTripsFemale((int) (relation.getTripsFemale() * employeesToCommutersFemaleRatio));
+			relation.setTripsFemale((int) Math.ceil(relation.getTripsFemale() * employeesToCommutersFemaleRatio));
+//			relation.setTripsFemale((int) (relation.getTripsFemale() * employeesToCommutersFemaleRatio + 1));
 		}
 	}
 
@@ -397,7 +518,7 @@ public class DemandGeneratorCensus {
 	}
 	
 	
-	public static void writePersonsFile(Population population, String fileName) {
+	private static void writePersonsFile(Population population, String fileName) {
 		BufferedWriter bufferedWriterPersons = null;
 		
 		try {
@@ -476,7 +597,7 @@ public class DemandGeneratorCensus {
     }
 	
 
-	public static void writeHouseholdsFile(Map <String, SimplePerson> persons, Map<Integer, SimpleHousehold> households,
+	private static void writeHouseholdsFile(Map <String, SimplePerson> persons, Map<Integer, SimpleHousehold> households,
 			String fileName) {
 		BufferedWriter bufferedWriterHouseholds = null;
 		
