@@ -33,7 +33,8 @@ public class AnalyzeSocialChoiceSet {
 		final Config config = ConfigUtils.loadConfig( args[ 0 ] , new SocialChoiceSetConstraintsConfigGroup() );
 
 		try ( AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose();
-				AutoCloseable logCloseable = MoreIOUtils.initOut( config ) ) {
+				AutoCloseable logCloseable = MoreIOUtils.initOut( config );
+				AutoCloseable gcTracker = MonitoringUtils.writeGCFigure( config.controler().getOutputDirectory()+"/gc.dat" ) ) {
 			final Scenario scenario = ScenarioUtils.loadScenario( config );
 			final SocialChoiceSetConstraintsAnalyser analyser = new SocialChoiceSetConstraintsAnalyser( scenario );
 
