@@ -15,6 +15,7 @@ import org.matsim.contrib.carsharing.manager.supply.FreeFloatingVehiclesContaine
 import org.matsim.contrib.carsharing.manager.supply.OneWayContainer;
 import org.matsim.contrib.carsharing.manager.supply.TwoWayContainer;
 import org.matsim.contrib.carsharing.manager.supply.VehiclesContainer;
+import org.matsim.contrib.carsharing.qsim.FreefloatingAreas;
 import org.matsim.contrib.carsharing.stations.CarsharingStation;
 import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
 import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
@@ -22,6 +23,7 @@ import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.contrib.carsharing.vehicles.FFVehicleImpl;
 import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.SearchableNetwork;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -30,7 +32,6 @@ import org.xml.sax.Attributes;
  * @author balac
  */
 public class CarsharingXmlReaderNew extends MatsimXmlParser {
-
 	private Network network;
 	private String id;	
 	private int avaialbleParkingSpots;
@@ -43,10 +44,16 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 	private boolean hasTW = false;
 	private Map<String, CompanyContainer> companies = new HashMap<String, CompanyContainer>();
 	private Set<String> companyNames = new TreeSet<String>();
+	private Map<String, FreefloatingAreas> freefloatingAreas;
+
+	public void setFreefloatingAreas(Map<String, FreefloatingAreas> areas) {
+		this.freefloatingAreas = areas;
+	}
+
 	public Set<String> getCompanyNames() {
-		
 		return this.companyNames;
 	}
+
 	public Map<String, CompanyContainer> getCompanies() {
 		return companies;
 	}
@@ -143,8 +150,8 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 			
 			twvehicleIdMap = new HashMap<String, CSVehicle>();
 			twvehiclesMap = new HashMap<CSVehicle, Link>();
-			allVehicles = new HashMap<String, CSVehicle>();
-			companies = new HashMap<String, CompanyContainer>();
+			//allVehicles = new HashMap<String, CSVehicle>();
+			//companies = new HashMap<String, CompanyContainer>();
 		}
 		
 		else if (name.equals("twoway") || name.equals("oneway")) {
@@ -195,8 +202,14 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 			CompanyContainer companyContainer = new CompanyContainer(this.companyName);
 
 			if (hasFF) {
-				VehiclesContainer ffvehiclesContainer = new FreeFloatingVehiclesContainer(ffVehicleLocationQuadTree,
+				FreeFloatingVehiclesContainer ffvehiclesContainer = new FreeFloatingVehiclesContainer(ffVehicleLocationQuadTree,
 					ffvehicleIdMap, ffvehiclesMap);
+
+				if (this.freefloatingAreas != null) {
+					ffvehiclesContainer.setNetwork((SearchableNetwork) this.network);
+					ffvehiclesContainer.setFreefloatingAreas(this.freefloatingAreas.get(this.companyName));
+				}
+
 				companyContainer.addCarsharingType("freefloating", ffvehiclesContainer);
 			hasFF = false;
 			}

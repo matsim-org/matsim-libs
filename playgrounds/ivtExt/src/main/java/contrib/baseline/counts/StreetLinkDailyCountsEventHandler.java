@@ -21,12 +21,16 @@
 
 package contrib.baseline.counts;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.core.config.Config;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,30 +46,30 @@ import static contrib.baseline.counts.CountsIVTBaseline.COUNTS_DELIMITER;
  */
 public class StreetLinkDailyCountsEventHandler implements LinkEnterEventHandler{
 
-	//private final Config config;
+	private final Config config;
 
 	private final Map<String, Tuple<String, Double>> linksToMonitor = new HashMap<>();
 	private final Set<String> linksToMonitorCache = new HashSet<>();
 
 	private final HashMap<String, Integer> linkCounts = new HashMap<>();
 
-	/*@Inject
+	@Inject
 	private StreetLinkDailyCountsEventHandler(@Named("pathToStreetLinksDailyToMonitor") final String pathToLinksList, Config config) {
 		setLinksToMonitor(pathToLinksList);
 		this.config = config;
-	}*/
+	}
 
 	private void setLinksToMonitor(final String pathToLinksList) {
 		this.linksToMonitor.clear();
 		BufferedReader linkReader = IOUtils.getBufferedReader(pathToLinksList);
 		try {
-			linkReader.readLine(); // read header: linkId; countStationDescr; countVolume
+			linkReader.readLine(); // read header: countStationId; direction; linkId; dailyCountVolume
 			String line = linkReader.readLine();
 			while (line != null) {
 				String[] lineElements = line.split(COUNTS_DELIMITER);
-				String linkToMonitor = lineElements[0].trim();
-				String countStationDescr = lineElements[1].trim();
-				double countVolume = Double.parseDouble(lineElements[2]);
+				String linkToMonitor = lineElements[2].trim();
+				String countStationDescr = lineElements[0].trim() + "_dir_" + lineElements[1].trim();
+				double countVolume = Double.parseDouble(lineElements[3]);
 				this.linksToMonitor.put(linkToMonitor, new Tuple<>(countStationDescr, countVolume));
 				this.linksToMonitorCache.add(linkToMonitor);
 				line = linkReader.readLine();
@@ -95,7 +99,7 @@ public class StreetLinkDailyCountsEventHandler implements LinkEnterEventHandler{
 	}
 
 	public void write(String filename) {
-		/*try {
+		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
 			// write file head
 			writer.write("linkId"+ COUNTS_DELIMITER + "countStationDescr" + COUNTS_DELIMITER + "countVolume" + COUNTS_DELIMITER + "matsimVolume" + COUNTS_DELIMITER + "relativeVolume");
@@ -115,6 +119,6 @@ public class StreetLinkDailyCountsEventHandler implements LinkEnterEventHandler{
 			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}*/
+		}
 	}
 }

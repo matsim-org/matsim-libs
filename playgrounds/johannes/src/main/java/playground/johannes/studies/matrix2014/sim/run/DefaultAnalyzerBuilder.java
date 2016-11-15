@@ -162,6 +162,19 @@ public class DefaultAnalyzerBuilder {
         lpdTask.setIoContext(engine.getIOContext());
         lpdTask.setDiscretizer(discretizer);
         task.addComponent(lpdTask);
+
+        ActTypeDistanceTask atdTask = new ActTypeDistanceTask();
+        atdTask.setPredicate(engine.getLegPredicate());
+        atdTask.setIoContext(engine.getIOContext());
+        atdTask.setDiscretizer(discretizer);
+        task.addComponent(atdTask);
+
+        ActTypeDistanceTask atdTask2 = new ActTypeDistanceTask();
+        atdTask2.setPrevActMode(true);
+        atdTask2.setPredicate(engine.getLegPredicate());
+        atdTask2.setIoContext(engine.getIOContext());
+        atdTask2.setDiscretizer(discretizer);
+        task.addComponent(atdTask2);
         /*
 
          */

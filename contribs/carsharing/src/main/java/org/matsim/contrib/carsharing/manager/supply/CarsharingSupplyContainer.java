@@ -8,6 +8,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
+import org.matsim.contrib.carsharing.config.FreeFloatingConfigGroup;
+import org.matsim.contrib.carsharing.config.FreefloatingAreasReader;
 import org.matsim.contrib.carsharing.readers.CarsharingXmlReaderNew;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 /** 
@@ -87,13 +89,22 @@ public class CarsharingSupplyContainer implements CarsharingSupplyInterface {
 	 */
 	@Override
 	public void populateSupply() {
-
 		Network network = this.scenario.getNetwork();
-		
-		CarsharingXmlReaderNew reader = new CarsharingXmlReaderNew(network);
-		
+
 		final CarsharingConfigGroup configGroup = (CarsharingConfigGroup)
 				scenario.getConfig().getModule( CarsharingConfigGroup.GROUP_NAME );
+
+		final FreeFloatingConfigGroup ffConfigGroup = (FreeFloatingConfigGroup)
+				this.scenario.getConfig().getModule(FreeFloatingConfigGroup.GROUP_NAME);
+
+		CarsharingXmlReaderNew reader = new CarsharingXmlReaderNew(network);
+
+		String areasFile = ffConfigGroup.getAreas();
+		if (areasFile != null) {
+			FreefloatingAreasReader ffAreasReader = new FreefloatingAreasReader();
+			ffAreasReader.readFile(areasFile);
+			reader.setFreefloatingAreas(ffAreasReader.getFreefloatingAreas());
+		}
 
 		reader.readFile(configGroup.getvehiclelocations());
 		this.companies = reader.getCompanies();

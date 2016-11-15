@@ -93,6 +93,8 @@ public class TransitRouterConfig implements MatsimParameters {
 
 	private Double beelineDistanceFactor;
 
+	private final double directWalkFactor ;
+
 	public TransitRouterConfig(final Config config) {
 		this(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 	}
@@ -126,6 +128,7 @@ public class TransitRouterConfig implements MatsimParameters {
 		this.setExtensionRadius(trConfig.getExtensionRadius());
 		this.setBeelineWalkConnectionDistance(trConfig.getMaxBeelineWalkConnectionDistance());
 		this.setAdditionalTransferTime(trConfig.getAdditionalTransferTime());
+		this.directWalkFactor = trConfig.getDirectWalkFactor() ;
 	}
 
 	public void setUtilityOfLineSwitch_utl(final double utilityOfLineSwitch_utl_sec) {
@@ -234,5 +237,10 @@ public class TransitRouterConfig implements MatsimParameters {
 	public final Double getBeelineDistanceFactor() {
 		return this.beelineDistanceFactor;
 	}
+
+	public double getDirectWalkFactor() {
+		return this.directWalkFactor ;
+	}
+
 
 }

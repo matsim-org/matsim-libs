@@ -1,27 +1,68 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
+	<module name="taxifare">
+
+		<!-- Basefare per Trip (fare = positive value) -->
+		<param name="basefare" value="0.5" />
+
+		<!-- Daily subscription fee (fee = positive value) -->
+		<param name="dailySubscriptionFee" value="0.0" />
+
+		<!-- taxi fare per meter (fee = positive value) -->
+		<param name="distanceFare_m" value="0.0002" />
+
+		<!-- taxi fare per hour (fee = positive value) -->
+		<param name="timeFare_h" value="3.6" />
+	</module>
 	<module name="taxi">
+
+		<!-- Used in AStarEuclidean for shortest path search for occupied drives. 
+			Values above 1.0 (typically, 1.5 to 3.0) speed up the search, but at the 
+			cost of obtaining longer paths -->
+		<param name="AStarEuclideanOverdoFactor" value="1.0" />
+
+		<!-- If false, the drop-off location remains unknown to the optimizer and 
+			scheduler until the end of pickup -->
 		<param name="destinationKnown" value="false" />
-		<param name="vehicleDiversion" value="false" />
-		<param name="pickupDuration" value="120" />
-		<param name="dropoffDuration" value="60" />
-		<param name="onlineVehicleTracker" value="false" />
 
-		<param name="taxisFile" value="taxis_2000.xml" />
-
-		<param name="timeProfiles" value="true" />
+		<!-- If true, detailed hourly taxi stats are dumped after each iteration. -->
 		<param name="detailedStats" value="true" />
 
+		<!-- Typically, 60 seconds -->
+		<param name="dropoffDuration" value="60.0" />
+
+		<!-- If true, vehicles are (GPS-like) monitored while moving. This helps 
+			in getting more accurate estimates on the time of arrival. Online tracking 
+			is necessary for vehicle diversion. -->
+		<param name="onlineVehicleTracker" value="false" />
+
+		<!-- Typically, 120 seconds -->
+		<param name="pickupDuration" value="120.0" />
+
+		<!-- An XML file specifying the taxi fleet. The file format according to 
+			dvrp_vehicles_v1.dtd -->
+		<param name="taxisFile" value="taxis_2000.xml" />
+
+		<!-- If true, time profiles of vehicle statuses (i.e. current task type) 
+			and the number of unplanned requests -->
+		<param name="timeProfiles" value="true" />
+
+		<!-- If true, vehicles can be diverted during empty trips. Requires online 
+			tracking. -->
+		<param name="vehicleDiversion" value="false" />
+
 		<parameterset type="optimizer">
-			<param name="type" value="RULE_BASED" />
-			<param name="id" value="example" />
+			<param name="cellSize" value="1000" />
 			<param name="goal" value="DEMAND_SUPPLY_EQUIL" />
+			<param name="id" value="example" />
 			<param name="nearestRequestsLimit" value="99999" />
 			<param name="nearestVehiclesLimit" value="99999" />
-			<param name="cellSize" value="1000" />
+			<param name="type" value="RULE_BASED" />
 		</parameterset>
 	</module>
+
+
 
 	<module name="network">
 		<param name="inputNetworkFile" value="network.xml.gz" />
@@ -35,10 +76,11 @@
 
 	<module name="qsim">
 		<param name="simStarttimeInterpretation" value="onlyUseStarttime" />
-		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true" />
+		<param name="insertingWaitingVehiclesBeforeDrivingVehicles"
+			value="true" />
 		<param name="snapshotStyle" value="queue" />
 	</module>
-	
+
 	<module name="otfvis">
 		<param name="coloringScheme" value="taxicab" />
 		<param name="drawNonMovingItems" value="true" />
@@ -52,40 +94,40 @@
 	</module>
 
 	<module name="planCalcScore">
-		<parameterset type="activityParams" >
-				<param name="activityType"      value="work" />
-				<param name="typicalDuration"       value="08:00:00" />
-				<param name="openingTime"           value="06:00:00" />
-				<param name="latestStartTime"       value="09:00:00" />
-				<param name="closingTime"           value="17:00:00" />
+		<parameterset type="activityParams">
+			<param name="activityType" value="work" />
+			<param name="typicalDuration" value="08:00:00" />
+			<param name="openingTime" value="06:00:00" />
+			<param name="latestStartTime" value="09:00:00" />
+			<param name="closingTime" value="17:00:00" />
 
 		</parameterset>
 
-		<parameterset type="activityParams" > 
-				<param name="activityType" value="home" />
-				<param name="typicalDuration"         value="12:00:00" />
+		<parameterset type="activityParams">
+			<param name="activityType" value="home" />
+			<param name="typicalDuration" value="12:00:00" />
 		</parameterset>
-		
-		<parameterset type="modeParams" >
-				<param name="constant" value="0.0" />
-				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
-				<param name="marginalUtilityOfTraveling_util_hr" value="0.0" />
-				<param name="mode" value="taxi" />
-				<param name="monetaryDistanceRate" value="0.0" />
-			</parameterset>
-			
+
+		<parameterset type="modeParams">
+			<param name="constant" value="0.0" />
+			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="0.0" />
+			<param name="mode" value="taxi" />
+			<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+
 	</module>
 
 	<module name="strategy">
-			<param name="fractionOfIterationsToDisableInnovation" value="0.8" />
-	
-		<parameterset type="strategysettings" >
+		<param name="fractionOfIterationsToDisableInnovation" value="0.8" />
+
+		<parameterset type="strategysettings">
 			<param name="strategyName" value="TimeAllocationMutator" />
 			<param name="weight" value="0.1" />
 		</parameterset>
 	</module>
-		<module name="TimeAllocationMutator">
-				<param name="mutationRange" value="900.0" />
+	<module name="TimeAllocationMutator">
+		<param name="mutationRange" value="900.0" />
 
 	</module>
 </config>

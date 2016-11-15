@@ -34,6 +34,12 @@ import contrib.publicTransitMapping.tools.ScheduleTools;
 
 import java.util.List;
 
+/**
+ * Takes the siouxfalls example schedule and network, removes the mapping and runs the PTMapper on the unmapped schedule.
+ * The results are compared and given the simplicity of the network, in- and output should be the same
+ *
+ * @author polettif
+ */
 public class RunPublicTransitMapperTest {
 
 	private Network network;

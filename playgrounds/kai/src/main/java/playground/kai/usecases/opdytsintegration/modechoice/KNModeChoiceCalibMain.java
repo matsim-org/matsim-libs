@@ -35,6 +35,8 @@ class KNModeChoiceCalibMain {
 
 		final Config config = KNBerlinControler.prepareConfig(args, assignment, equil) ;
 		
+		config.transitRouter().setDirectWalkFactor(1.e7);
+		
 		String outputDirectory = "" ;
 		if ( calib ) {
 			if ( equil ) {

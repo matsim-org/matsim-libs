@@ -60,20 +60,20 @@ public class TransitRouterImpl implements TransitRouter {
 
 	private final TransitRouterNetwork transitNetwork;
 
-	private final TransitRouterConfig config;
+	private final TransitRouterConfig trConfig;
 	private final TransitTravelDisutility travelDisutility;
 	private final TravelTime travelTime;
 
 
 	private final PreparedTransitSchedule preparedTransitSchedule;
 
-	public TransitRouterImpl(final TransitRouterConfig config, final TransitSchedule schedule) {
+	public TransitRouterImpl(final TransitRouterConfig trConfig, final TransitSchedule schedule) {
 		this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
-		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(config, preparedTransitSchedule);
+		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(trConfig, preparedTransitSchedule);
 		this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
-		this.config = config;
+		this.trConfig = trConfig;
 		this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
-		this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule, config.getBeelineWalkConnectionDistance());
+		this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule, trConfig.getBeelineWalkConnectionDistance());
 	}
 
 	public TransitRouterImpl(
@@ -82,7 +82,7 @@ public class TransitRouterImpl implements TransitRouter {
 			final TransitRouterNetwork routerNetwork,
 			final TravelTime travelTime,
 			final TransitTravelDisutility travelDisutility) {
-		this.config = config;
+		this.trConfig = config;
 		this.transitNetwork = routerNetwork;
 		this.travelTime = travelTime;
 		this.travelDisutility = travelDisutility;
@@ -90,12 +90,12 @@ public class TransitRouterImpl implements TransitRouter {
 	}
 
 	private Map<Node, InitialNode> locateWrappedNearestTransitNodes(Person person, Coord coord, double departureTime) {
-		Collection<TransitRouterNetworkNode> nearestNodes = this.transitNetwork.getNearestNodes(coord, this.config.getSearchRadius());
+		Collection<TransitRouterNetworkNode> nearestNodes = this.transitNetwork.getNearestNodes(coord, this.trConfig.getSearchRadius());
 		if (nearestNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
 			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(coord);
 			double distance = CoordUtils.calcEuclideanDistance(coord, nearestNode.stop.getStopFacility().getCoord());
-			nearestNodes = this.transitNetwork.getNearestNodes(coord, distance + this.config.getExtensionRadius());
+			nearestNodes = this.transitNetwork.getNearestNodes(coord, distance + this.trConfig.getExtensionRadius());
 		}
 		Map<Node, InitialNode> wrappedNearestNodes = new LinkedHashMap<>();
 		for (TransitRouterNetworkNode node : nearestNodes) {
@@ -112,7 +112,7 @@ public class TransitRouterImpl implements TransitRouter {
 	}
 
 	private double getTransferTime(Person person, Coord coord, Coord toCoord) {
-		return travelDisutility.getTravelTime(person, coord, toCoord) + this.config.getAdditionalTransferTime();
+		return travelDisutility.getTravelTime(person, coord, toCoord) + this.trConfig.getAdditionalTransferTime();
 	}
 
 	private double getWalkDisutility(Person person, Coord coord, Coord toCoord) {
@@ -128,6 +128,7 @@ public class TransitRouterImpl implements TransitRouter {
 
 		TransitLeastCostPathTree tree = new TransitLeastCostPathTree(transitNetwork, travelDisutility, travelTime,
 				wrappedFromNodes, wrappedToNodes, person);
+		// This sounds like it is doing the full tree.  But I think it is not. Kai, nov'16
 
 		// find routes between start and end stop
 		Path p = tree.getPath(wrappedToNodes);
@@ -139,7 +140,7 @@ public class TransitRouterImpl implements TransitRouter {
 		double directWalkCost = getWalkDisutility(person, fromFacility.getCoord(), toFacility.getCoord());
 		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 
-		if (directWalkCost < pathCost) {
+		if (directWalkCost * trConfig.getDirectWalkFactor() < pathCost ) {
 			return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
 		}
 		return convertPathToLegList(departureTime, p, fromFacility.getCoord(), toFacility.getCoord(), person);
@@ -219,7 +220,7 @@ public class TransitRouterImpl implements TransitRouter {
 								walkRoute.setTravelTime(transferTime);
 								
 //								walkRoute.setDistance( currentDistance );
-								walkRoute.setDistance( config.getBeelineDistanceFactor() * 
+								walkRoute.setDistance( trConfig.getBeelineDistanceFactor() * 
 										NetworkUtils.getEuclideanDistance(accessStop.getCoord(), egressStop.getCoord()) );
 								// (see MATSIM-556)
 
@@ -236,7 +237,7 @@ public class TransitRouterImpl implements TransitRouter {
 								walkRoute.setTravelTime(walkTime);
 								
 //								walkRoute.setDistance( currentDistance );
-								walkRoute.setDistance(config.getBeelineDistanceFactor() * 
+								walkRoute.setDistance(trConfig.getBeelineDistanceFactor() * 
 										NetworkUtils.getEuclideanDistance(fromCoord, egressStop.getCoord()) );
 								// (see MATSIM-556)
 
@@ -261,7 +262,7 @@ public class TransitRouterImpl implements TransitRouter {
 			TransitStopFacility egressStop = prevLink.toNode.stop.getStopFacility();
 			ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
 //			ptRoute.setDistance( currentDistance );
-			ptRoute.setDistance( config.getBeelineDistanceFactor() * NetworkUtils.getEuclideanDistance(accessStop.getCoord(), egressStop.getCoord() ) );
+			ptRoute.setDistance( trConfig.getBeelineDistanceFactor() * NetworkUtils.getEuclideanDistance(accessStop.getCoord(), egressStop.getCoord() ) );
 			// (see MATSIM-556)
 			leg.setRoute(ptRoute);
 			double arrivalOffset = ((prevLink).toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ?
@@ -305,7 +306,7 @@ public class TransitRouterImpl implements TransitRouter {
 	}
 
 	protected TransitRouterConfig getConfig() {
-		return config;
+		return trConfig;
 	}
 
 }

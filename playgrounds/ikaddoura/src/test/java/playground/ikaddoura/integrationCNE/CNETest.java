@@ -23,7 +23,6 @@
 package playground.ikaddoura.integrationCNE;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -88,19 +87,19 @@ public class CNETest {
 		
 		System.out.println("----------------------------------");
 		System.out.println("Base case:");
-		printResults(handler1);
+		printResults1(handler1);
 		
 		System.out.println("----------------------------------");
 		System.out.println("Congestion pricing:");
-		printResults(handler2);
+		printResults1(handler2);
 		
 		System.out.println("----------------------------------");
 		System.out.println("Noise pricing:");
-		printResults(handler3);
+		printResults1(handler3);
 		
 		System.out.println("----------------------------------");
 		System.out.println("Congestion + noise pricing:");
-		printResults(handler4);
+		printResults1(handler4);
 		
 		// no zero demand on bottleneck link
 		Assert.assertEquals(true,
@@ -134,14 +133,7 @@ public class CNETest {
 		Assert.assertEquals(true, getBottleneckDemand(handler4) < getBottleneckDemand(handler3));	
 	}
 	
-	@Ignore
-	@Test
-	public final void test2(){
-		
-		
-	}
-	
-	private void printResults(LinkDemandEventHandler handler) {
+	private void printResults1(LinkDemandEventHandler handler) {
 		System.out.println("long but uncongested, low noise cost: " + getLongUncongestedDemand(handler));
 		System.out.println("bottleneck, low noise cost: " + getBottleneckDemand(handler));
 		System.out.println("high noise cost: " + (getNoiseSensitiveRouteDemand(handler)));
@@ -170,35 +162,98 @@ public class CNETest {
 		}
 		return longUncongestedRouteDemand;
 	}
+	
+	@Test
+	public final void test2(){
+		String configFile = testUtils.getPackageInputDirectory() + "CNETest/test2/config.xml";
+		
+		// baseCase
+		CNEIntegration cneIntegration1 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "bc");
+		Controler controler1 = cneIntegration1.prepareControler();		
+		LinkDemandEventHandler handler1 = new LinkDemandEventHandler(controler1.getScenario().getNetwork());
+		controler1.getEvents().addHandler(handler1);
+		controler1.getConfig().controler().setCreateGraphs(false);
+		controler1.run();
 
-//	private void printResults(LinkDemandEventHandler handler) {
-//		System.out.println("high speed + low N costs + high E costs: " + demand_highSpeed_lowN_highE(handler));
-//		System.out.println("low speed + low N costs + low E costs: " + demand_lowSpeed_lowN_lowE(handler));
-//		System.out.println("medium speed + high N costs + low E costs: " + demand_mediumSpeed_highN_lowE(handler));
-//	}
-//
-//	private int demand_mediumSpeed_highN_lowE(LinkDemandEventHandler handler) {
-//		int demand = 0;
-//		if (handler.getLinkId2demand().containsKey(Id.createLinkId("link_7_8"))) {
-//			demand = handler.getLinkId2demand().get(Id.createLinkId("link_7_8"));
-//		}
-//		return demand;
-//	}
-//
-//	private int demand_lowSpeed_lowN_lowE(LinkDemandEventHandler handler) {
-//		int demand = 0;
-//		if (handler.getLinkId2demand().containsKey(Id.createLinkId("link_3_6"))) {
-//			demand = handler.getLinkId2demand().get(Id.createLinkId("link_3_6"));
-//		}
-//		return demand;
-//	}
-//
-//	private int demand_highSpeed_lowN_highE(LinkDemandEventHandler handler) {
-//		int demand = 0;
-//		if (handler.getLinkId2demand().containsKey(Id.createLinkId("link_1_2"))) {
-//			demand = handler.getLinkId2demand().get(Id.createLinkId("link_1_2"));
-//		}
-//		return demand;
-//	}
+		// air pollution pricing
+		CNEIntegration cneIntegration2 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "e");
+		cneIntegration2.setAirPollutionPricing(true);
+		Controler controler2 = cneIntegration2.prepareControler();
+		LinkDemandEventHandler handler2 = new LinkDemandEventHandler(controler2.getScenario().getNetwork());
+		controler2.getEvents().addHandler(handler2);
+		controler2.getConfig().controler().setCreateGraphs(false);
+		controler2.run();
+
+		// noise pricing
+		CNEIntegration cneIntegration3 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "n");
+		cneIntegration3.setNoisePricing(true);
+		Controler controler3 = cneIntegration3.prepareControler();
+		LinkDemandEventHandler handler3 = new LinkDemandEventHandler(controler3.getScenario().getNetwork());
+		controler3.getEvents().addHandler(handler3);
+		controler3.getConfig().controler().setCreateGraphs(false);
+		controler3.run();
+						
+		// air pollution + noise pricing
+		CNEIntegration cneIntegration4 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "cn");
+		cneIntegration4.setAirPollutionPricing(true);
+		cneIntegration4.setNoisePricing(true);
+		cneIntegration4.setCongestionPricing(true); // there is no congestion...
+		Controler controler4 = cneIntegration4.prepareControler();
+		LinkDemandEventHandler handler4 = new LinkDemandEventHandler(controler4.getScenario().getNetwork());
+		controler4.getEvents().addHandler(handler4);
+		controler4.getConfig().controler().setCreateGraphs(false);
+		controler4.run();
+		
+		System.out.println("----------------------------------");
+		System.out.println("Base case:");
+		printResults2(handler1);
+		
+		System.out.println("----------------------------------");
+		System.out.println("Air pollution pricing:");
+		printResults2(handler2);
+		
+		System.out.println("----------------------------------");
+		System.out.println("Noise pricing:");
+		printResults2(handler3);
+		
+		System.out.println("----------------------------------");
+		System.out.println("Simultaneous pricing:");
+		printResults2(handler4);
+						
+		Assert.assertEquals("BC: all agents should use the high speed route.", 11, demand_highSpeed_lowN_highE(handler1));		
+		Assert.assertEquals("E: all agents should use the medium speed + low e cost route.", 11, demand_mediumSpeed_highN_lowE(handler2));		
+		Assert.assertEquals("N: all agents should use the high speed + low n cost route.", 11, demand_highSpeed_lowN_highE(handler3));		
+		Assert.assertEquals("N+E: most agents should use the low speed + low n cost  + low e cost route.", true, demand_lowSpeed_lowN_lowE(handler4) > (demand_mediumSpeed_highN_lowE(handler4) + demand_highSpeed_lowN_highE(handler4)) );		
+	}
+
+	private void printResults2(LinkDemandEventHandler handler) {
+		System.out.println("high speed + low N costs + high E costs: " + demand_highSpeed_lowN_highE(handler));
+		System.out.println("low speed + low N costs + low E costs: " + demand_lowSpeed_lowN_lowE(handler));
+		System.out.println("medium speed + high N costs + low E costs: " + demand_mediumSpeed_highN_lowE(handler));
+	}
+
+	private int demand_mediumSpeed_highN_lowE(LinkDemandEventHandler handler) {
+		int demand = 0;
+		if (handler.getLinkId2demand().containsKey(Id.createLinkId("link_7_8"))) {
+			demand = handler.getLinkId2demand().get(Id.createLinkId("link_7_8"));
+		}
+		return demand;
+	}
+
+	private int demand_lowSpeed_lowN_lowE(LinkDemandEventHandler handler) {
+		int demand = 0;
+		if (handler.getLinkId2demand().containsKey(Id.createLinkId("link_3_6"))) {
+			demand = handler.getLinkId2demand().get(Id.createLinkId("link_3_6"));
+		}
+		return demand;
+	}
+
+	private int demand_highSpeed_lowN_highE(LinkDemandEventHandler handler) {
+		int demand = 0;
+		if (handler.getLinkId2demand().containsKey(Id.createLinkId("link_1_2"))) {
+			demand = handler.getLinkId2demand().get(Id.createLinkId("link_1_2"));
+		}
+		return demand;
+	}
 		
 }

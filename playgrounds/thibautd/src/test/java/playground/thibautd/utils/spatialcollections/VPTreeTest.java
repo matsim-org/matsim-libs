@@ -20,12 +20,15 @@ package playground.thibautd.utils.spatialcollections;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Counter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 /**
  * @author thibautd
@@ -147,6 +150,62 @@ public class VPTreeTest {
 	}
 
 	@Test
+	public void testGetBalls() {
+		final VPTree<double[],Point> tree = createTree();
+
+		final double[] point1 = {0,0,0};
+		final double[] point2 = {2,2,0};
+
+		final Collection<Point> distNull =
+				tree.getBallsIntersection(
+						Arrays.asList( point1 , point2 ),
+						0,
+						c -> true );
+
+		Assert.assertTrue( "unexpected size of "+distNull, distNull.isEmpty() );
+
+		final Collection<Point> distNonNull =
+			tree.getBallsIntersection(
+					Arrays.asList( point1 , point2 ),
+					2.1,
+					c -> true );
+
+		Assert.assertEquals(
+				"unexpected intersection of balls",
+				new HashSet<>( Arrays.asList( new Point( 0 , 2 , 0 ) , new Point( 1 , 1 , 0 ) , new Point( 2 , 0 , 0 ) ) ),
+				new HashSet<>( distNonNull ) );
+	}
+
+	@Test
+	public void testSizeOfBalls() {
+		final VPTree<double[],Point> tree = createTree();
+
+		final Random random = new Random( 123 );
+
+		final Counter counter = new Counter( "test # " );
+		for ( int i=0; i < 50; i++ ) {
+			counter.incCounter();
+			final Collection<double[]> coords = new ArrayList<>();
+			for ( int ci=0; ci < 3; ci++ ) {
+				final double[] c = new double[ 3 ];
+				for ( int j = 0; j < c.length; j++ ) c[ j ] = random.nextDouble() * ( GRID_SIZE - 1 );
+				coords.add( c );
+			}
+
+			final double dist = random.nextDouble() * GRID_SIZE;
+
+			final int size = tree.getSizeOfBallsIntersection( coords , dist );
+			final Collection<Point> ball = tree.getBallsIntersection( coords , dist , v -> true );
+
+			Assert.assertEquals(
+					"unexpected size",
+					ball.size(),
+					size );
+		}
+		counter.printCounter();
+	}
+
+	@Test
 	public void testTreeSize() {
 		final VPTree<double[],Point> tree = createTree();
 
@@ -205,6 +264,15 @@ public class VPTreeTest {
 		public boolean equals( final Object other ) {
 			return other instanceof Point &&
 					Arrays.equals( ints, ( (Point) other ).ints );
+		}
+
+		@Override
+		public String toString() {
+			final StringBuilder b = new StringBuilder( "Point( " );
+			IntStream.of( ints )
+					.mapToObj( i -> i+" " )
+					.forEachOrdered( b::append );
+			return b +")";
 		}
 	}
 }

@@ -66,7 +66,7 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 			for(RentalInfo rentalInfo : agentRentals.getArr()) {
 				CSVehicle vehicle = this.carsharingSupplyContainer.getAllVehicles().get(rentalInfo.getVehId().toString());
 				if (marginalUtilityOfMoney != 0.0)
-					score += this.costsCalculatorContainer.getCost(vehicle.getCompanyId(), 
+					score += -1 * this.costsCalculatorContainer.getCost(vehicle.getCompanyId(), 
 							rentalInfo.getCarsharingType(), rentalInfo) * marginalUtilityOfMoney;
 			}			
 		}				

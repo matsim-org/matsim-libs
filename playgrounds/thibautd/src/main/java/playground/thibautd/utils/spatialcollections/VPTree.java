@@ -43,15 +43,22 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	private final SpatialCollectionUtils.Metric<C> metric;
 	private final SpatialCollectionUtils.GenericCoordinate<C,T> coordinate;
 
-	private final Node<C,T> root = new Node<>();
+	private final Node<C,T> root;
 	private final Random r = new Random( 123 );
 
 	public VPTree( final SpatialCollectionUtils.Metric<C> metric,
 			final SpatialCollectionUtils.GenericCoordinate<C,T> coordinate ) {
+		this( new Node<>(), metric , coordinate );
+	}
+
+	private VPTree(
+			final Node<C,T> root,
+			final SpatialCollectionUtils.Metric<C> metric,
+			final SpatialCollectionUtils.GenericCoordinate<C,T> coordinate ) {
+		this.root = root;
 		this.metric = metric;
 		this.coordinate = coordinate;
 	}
-
 
 	@Override
 	public int size() {
@@ -333,6 +340,141 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 		}
 
 		return closest;
+	}
+
+	public Collection<T> getBall(
+			final C coord,
+			final double maxDist,
+			final Predicate<T> predicate ) {
+		return getBallsIntersection( Collections.singleton( coord ) , maxDist , predicate );
+	}
+
+	public Collection<T> getBallsIntersection(
+			final Collection<C> coords,
+			final double maxDist,
+			final Predicate<T> predicate ) {
+		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>( 1 + (int) Math.log( 1 + size() )) );
+		stack.add( root );
+
+		final Collection<T> ball = new ArrayList<>();
+
+		while( !stack.isEmpty() ) {
+			final Node<C,T> current = stack.poll();
+
+			if ( current.value == null &&
+					current.close == null &&
+					current.far == null ) {
+				continue;
+			}
+
+			final double[] distsToVp = coords.stream()
+					.mapToDouble( c -> metric.calcDistance( c , current.coordinate ) )
+					.toArray();
+
+			// check if current VP in ball
+			if ( current.value != null &&
+					DoubleStream.of( distsToVp ).allMatch( d -> d < maxDist ) &&
+					predicate.test( current.value ) ) {
+				ball.add( current.value );
+			}
+
+			// test intersection of disc with the children
+			if ( current.close != null &&
+					DoubleStream.of( distsToVp ).allMatch( d -> d - maxDist <= current.cuttoffDistance ) ) {
+				stack.add( current.close );
+			}
+			if ( current.far != null &&
+					DoubleStream.of( distsToVp ).allMatch( d -> d + maxDist >= current.cuttoffDistance ) ) {
+				stack.add( current.far );
+			}
+		}
+
+		return ball;
+	}
+
+	public int getSizeOfBallsIntersection(
+			final Collection<C> coords,
+			final double maxDist ) {
+		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>( 1 + (int) Math.log( 1 + size() )) );
+		stack.add( root );
+
+		int size = 0;
+
+		while( !stack.isEmpty() ) {
+			final Node<C,T> current = stack.poll();
+
+			if ( current.value == null &&
+					current.close == null &&
+					current.far == null ) {
+				continue;
+			}
+
+			final double[] distsToVp = coords.stream()
+					.mapToDouble( c -> metric.calcDistance( c , current.coordinate ) )
+					.toArray();
+
+			// check if current VP in ball
+			if ( current.value != null &&
+					DoubleStream.of( distsToVp ).allMatch( d -> d < maxDist ) ) {
+				size++;
+			}
+
+			// test intersection of disc with the children
+			if ( current.close != null ) {
+				if ( DoubleStream.of( distsToVp ).allMatch( d -> d + current.cuttoffDistance < maxDist ) ) {
+					// early pruning if the whole close node is in the required zone
+					size += current.close.size;
+				}
+				else if ( DoubleStream.of( distsToVp ).allMatch( d -> d - maxDist <= current.cuttoffDistance ) ) {
+					stack.add( current.close );
+				}
+			}
+			if ( current.far != null &&
+					DoubleStream.of( distsToVp ).allMatch( d -> d + maxDist >= current.cuttoffDistance ) ) {
+				stack.add( current.far );
+			}
+		}
+
+		return size;
+	}
+
+	public VPTree<C,T> getSubtreeContainingBalls(
+			final Collection<C> coords,
+			final double maxDist ) {
+		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>( 1 + (int) Math.log( 1 + size() )) );
+		stack.add( root );
+
+		while( !stack.isEmpty() ) {
+			final Node<C,T> current = stack.poll();
+
+			if ( current.value == null &&
+					current.close == null &&
+					current.far == null ) {
+				continue;
+			}
+
+			final double[] distsToVp = coords.stream()
+					.mapToDouble( c -> metric.calcDistance( c , current.coordinate ) )
+					.toArray();
+
+			// check if current VP in balls
+			if ( current.value != null &&
+					DoubleStream.of( distsToVp ).allMatch( d -> d < maxDist ) ) {
+				return new VPTree<>( current, metric, coordinate );
+			}
+
+			// test intersection of disc with the children
+			final boolean intersectClose = current.close != null &&
+					DoubleStream.of( distsToVp ).allMatch( d -> d - maxDist <= current.cuttoffDistance );
+			final boolean intersectFar = current.far != null &&
+					DoubleStream.of( distsToVp ).allMatch( d -> d + maxDist >= current.cuttoffDistance );
+
+			if ( intersectClose && intersectFar ) return new VPTree<>( current, metric, coordinate );
+			if ( intersectClose ) stack.add( current.close );
+			if ( intersectFar ) stack.add( current.far );
+		}
+
+		return null;
 	}
 
 	private double calcDistance( final T vantagePoint, final T v ) {

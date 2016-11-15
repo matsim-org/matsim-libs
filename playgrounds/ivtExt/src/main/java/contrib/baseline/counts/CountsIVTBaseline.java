@@ -44,22 +44,24 @@ public class CountsIVTBaseline implements StartupListener, IterationEndsListener
 
 	private final PTLinkCountsEventHandler ptLinkCountsEventHandler;
 	private final PTStationCountsEventHandler ptStationCountsEventHandler;
-	/*private final StreetLinkDailyCountsEventHandler streetLinkDailyCountsEventHandler;
-	private final StreetLinkHourlyCountsEventHandler streetLinkHourlyCountsEventHandler;*/
+	private final StreetLinkDailyCountsEventHandler streetLinkDailyCountsEventHandler;
+	private final StreetLinkHourlyCountsEventHandler streetLinkHourlyCountsEventHandler;
 	private final EventsManager events;
 	private final OutputDirectoryHierarchy controlerIO;
 	private final Config config;
 
-	private boolean recordCounts;
+	private boolean recordPtCounts, recordStreetCounts;
 
 	@Inject
-	private CountsIVTBaseline(PTLinkCountsEventHandler ptLinkCountsEventHandler, PTStationCountsEventHandler ptStationCountsEventHandler,
-							  //StreetLinkDailyCountsEventHandler streetLinkDailyCountsEventHandler, StreetLinkHourlyCountsEventHandler streetLinkHourlyCountsEventHandler,
+	private CountsIVTBaseline(PTLinkCountsEventHandler ptLinkCountsEventHandler,
+							  PTStationCountsEventHandler ptStationCountsEventHandler,
+							  StreetLinkDailyCountsEventHandler streetLinkDailyCountsEventHandler,
+							  StreetLinkHourlyCountsEventHandler streetLinkHourlyCountsEventHandler,
 							  EventsManager events, OutputDirectoryHierarchy controlerIO, Config config) {
 		this.ptLinkCountsEventHandler = ptLinkCountsEventHandler;
 		this.ptStationCountsEventHandler = ptStationCountsEventHandler;
-		/*this.streetLinkDailyCountsEventHandler = streetLinkDailyCountsEventHandler;
-		this.streetLinkHourlyCountsEventHandler = streetLinkHourlyCountsEventHandler;*/
+		this.streetLinkDailyCountsEventHandler = streetLinkDailyCountsEventHandler;
+		this.streetLinkHourlyCountsEventHandler = streetLinkHourlyCountsEventHandler;
 		this.events = events;
 		this.controlerIO = controlerIO;
 		this.config = config;
@@ -67,37 +69,45 @@ public class CountsIVTBaseline implements StartupListener, IterationEndsListener
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.recordCounts = true;
+		this.recordPtCounts = true;
+		this.recordStreetCounts = true;
 	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		int countsInterval = this.config.ptCounts().getPtCountsInterval();
 		if (event.getIteration() % countsInterval == 0) {
-			this.recordCounts = true;
+			this.recordPtCounts = true;
 			this.events.addHandler(this.ptLinkCountsEventHandler);
 			this.ptLinkCountsEventHandler.reset(event.getIteration());
 			this.events.addHandler(this.ptStationCountsEventHandler);
 			this.ptStationCountsEventHandler.reset(event.getIteration());
-			/*this.events.addHandler(this.streetLinkDailyCountsEventHandler);
+		}
+		countsInterval = this.config.counts().getWriteCountsInterval();
+		if (event.getIteration() % countsInterval == 0) {
+			this.recordStreetCounts = true;
+			this.events.addHandler(this.streetLinkDailyCountsEventHandler);
 			this.streetLinkDailyCountsEventHandler.reset(event.getIteration());
 			this.events.addHandler(this.streetLinkHourlyCountsEventHandler);
-			this.streetLinkHourlyCountsEventHandler.reset(event.getIteration());*/
+			this.streetLinkHourlyCountsEventHandler.reset(event.getIteration());
 		}
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		if (this.recordCounts) {
+		if (this.recordPtCounts) {
 			this.ptLinkCountsEventHandler.write(this.controlerIO.getIterationFilename(event.getIteration(), "ptLinkCounts.csv"));
 			this.events.removeHandler(this.ptLinkCountsEventHandler);
 			this.ptStationCountsEventHandler.write(this.controlerIO.getIterationFilename(event.getIteration(), "ptStationCounts.csv"));
 			this.events.removeHandler(this.ptStationCountsEventHandler);
-			/*this.streetLinkDailyCountsEventHandler.write(this.controlerIO.getIterationFilename(event.getIteration(), "streetDailyCounts.csv"));
+		}
+		this.recordPtCounts = false;
+		if (this.recordStreetCounts) {
+			this.streetLinkDailyCountsEventHandler.write(this.controlerIO.getIterationFilename(event.getIteration(), "streetDailyCounts.csv"));
 			this.events.removeHandler(this.streetLinkDailyCountsEventHandler);
 			this.streetLinkHourlyCountsEventHandler.write(this.controlerIO.getIterationFilename(event.getIteration(), "streetHourlyCounts.csv"));
-			this.events.removeHandler(this.streetLinkHourlyCountsEventHandler);*/
+			this.events.removeHandler(this.streetLinkHourlyCountsEventHandler);
 		}
-		this.recordCounts = false;
+		this.recordStreetCounts = false;
 	}
 }

@@ -21,18 +21,19 @@ package playground.johannes.synpop.processing;
 
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import org.apache.log4j.Logger;
 import org.matsim.contrib.common.collections.ChoiceSet;
 import playground.johannes.synpop.data.*;
 
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 /**
  * @author johannes
  */
 public class GuessMissingActTypes implements PersonsTask {
+
+    private final static Logger logger = Logger.getLogger(GuessMissingActTypes.class);
 
     private final Random random;
 
@@ -43,14 +44,12 @@ public class GuessMissingActTypes implements PersonsTask {
     @Override
     public void apply(Collection<? extends Person> persons) {
         TObjectIntHashMap<String> counts = new TObjectIntHashMap<>();
-//        List<Segment> activities = new LinkedList<>();
 
         for (Person p : persons) {
             for (Episode e : p.getEpisodes()) {
                 for (Segment s : e.getActivities()) {
                     String type = s.getAttribute(CommonKeys.ACTIVITY_TYPE);
                     if (type != null) counts.adjustOrPutValue(type, 1, 1);
-//                    else activities.add(s);
                 }
             }
         }
@@ -62,6 +61,10 @@ public class GuessMissingActTypes implements PersonsTask {
             it.advance();
             set.addOption(it.key(), it.value());
         }
+        set.removeOption(ActivityTypes.HOME);
+
+        int countHome = 0;
+        int countNonHome = 0;
 
         for (Person p : persons) {
             for (Episode e : p.getEpisodes()) {
@@ -69,13 +72,20 @@ public class GuessMissingActTypes implements PersonsTask {
                     Segment act = e.getActivities().get(i);
                     String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
                     if (type == null) {
-                        if(i == 0) type = ActivityTypes.HOME;
-                        else type = set.randomWeightedChoice();
+                        if(i == 0 || i == e.getActivities().size() - 1) {
+                            type = ActivityTypes.HOME;
+                            countHome++;
+                        } else {
+                            type = set.randomWeightedChoice();
+                            countNonHome++;
+                        }
                         act.setAttribute(CommonKeys.ACTIVITY_TYPE, type);
                     }
-
                 }
             }
         }
+
+        logger.info(String.format("Inserted %s home activity types.", countHome));
+        logger.info(String.format("Inserted %s non-home activity types.", countNonHome));
     }
 }

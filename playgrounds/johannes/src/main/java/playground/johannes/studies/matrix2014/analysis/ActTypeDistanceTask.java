@@ -19,94 +19,141 @@
 
 package playground.johannes.studies.matrix2014.analysis;
 
-import gnu.trove.map.hash.TDoubleDoubleHashMap;
-import gnu.trove.map.hash.TObjectDoubleHashMap;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import gnu.trove.map.TDoubleDoubleMap;
+import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
-import playground.johannes.studies.matrix2014.stats.Histogram;
 import playground.johannes.synpop.analysis.*;
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.CommonValues;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.sim.LegAttributeHistogramBuilder;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author johannes
  */
-public class ActTypeDistanceTask extends AnalyzerTask {
+public class ActTypeDistanceTask implements AnalyzerTask<Collection<? extends Person>> {
 
-    private Map<Double, TObjectDoubleHashMap<String>> histograms;
+    private Predicate<Segment> legPredicate;
 
-    @Override
-    public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
-        Map<String, Predicate<Segment>> actTypePredicates = Predicates.actTypePredicates(persons, true);
-        Predicate<Segment> modePredicate = new LegAttributePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR);
-        LegCollector distColletor = new LegCollector(new NumericAttributeProvider(CommonKeys.LEG_GEO_DISTANCE));
+    private Discretizer discretizer;
 
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(getOutputDirectory() + "/acttypedist.txt"));
+    private FileIOContext ioContext;
 
-            writer.write("type");
-            for (double key = 0; key <= 1000000; key += 100000) {
-                writer.write("\t");
-                writer.write(String.valueOf(key));
-            }
-            writer.newLine();
+    private static final String SEPARATOR = "\t";
 
-            histograms = new HashMap<>();
+    private boolean prevActMode;
 
-            for (Map.Entry<String, Predicate<Segment>> entry : actTypePredicates.entrySet()) {
-                LegPurposePredicate purposePredicate = new LegPurposePredicate(entry.getValue());
-                PredicateAndComposite<Segment> pred = new PredicateAndComposite<>();
-                pred.addComponent(modePredicate);
-                pred.addComponent(purposePredicate);
-
-                distColletor.setPredicate(pred);
-
-                List<Double> dists = distColletor.collect(persons);
-                double[] distArray = org.matsim.contrib.common.collections.CollectionUtils.toNativeArray(dists);
-                TDoubleDoubleHashMap hist = org.matsim.contrib.common.stats.Histogram.createHistogram(distArray, new LinearDiscretizer(100000), false);
-
-                String purpose = entry.getKey();
-                writer.write(purpose);
-
-                for (double key = 0; key <= 1000000; key += 100000) {
-                    double val = hist.get(key);
-
-                    TObjectDoubleHashMap<String> purposeHist = histograms.get(key);
-                    if(purposeHist == null) {
-                        purposeHist = new TObjectDoubleHashMap<>();
-                        histograms.put(key, purposeHist);
-                    }
-                    purposeHist.put(purpose, val);
-
-                    writer.write("\t");
-                    writer.write(String.valueOf(val));
-                }
-                writer.newLine();
-            }
-            writer.close();
-
-            for(TObjectDoubleHashMap<String> hist : histograms.values()) {
-                Histogram.normalize(hist);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+    public ActTypeDistanceTask() {
+        discretizer = new LinearDiscretizer(50000);
+        prevActMode = false;
     }
 
-    public Map<Double, TObjectDoubleHashMap<String>> getHistrograms() {
-        return histograms;
+    public void setPredicate(Predicate<Segment> predicate) {
+        this.legPredicate = predicate;
+    }
+
+    public void setDiscretizer(Discretizer discretizer) {
+        this.discretizer = discretizer;
+    }
+
+    public void setIoContext(FileIOContext ioContext) {
+        this.ioContext = ioContext;
+    }
+
+    public void setPrevActMode(boolean mode) {
+        this.prevActMode = mode;
+    }
+
+    @Override
+    public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
+        Collector<String> collector;
+        if(prevActMode) collector = new PrevCollector<>(new AttributeProvider<>(CommonKeys.ACTIVITY_TYPE));
+        else collector = new LegNextCollector<>(new AttributeProvider<>(CommonKeys.ACTIVITY_TYPE));
+
+        Set<String> types = new HashSet<>(collector.collect(persons));
+        types.remove(null);
+
+        LegAttributeHistogramBuilder builder = new LegAttributeHistogramBuilder(CommonKeys.LEG_GEO_DISTANCE, discretizer);
+
+        Map<String, TDoubleDoubleMap> histograms = new HashMap<>();
+        for(String type : types) {
+            Predicate<Segment> predicate;
+            if(prevActMode) predicate = new PrevAttributePredicate(CommonKeys.ACTIVITY_TYPE, type);
+            else predicate = new NextAttributePredicate(CommonKeys.ACTIVITY_TYPE, type);
+
+            if(legPredicate != null) predicate = PredicateAndComposite.create(predicate, legPredicate);
+            builder.setPredicate(predicate);
+
+            TDoubleDoubleMap hist = builder.build(persons);
+            histograms.put(type, hist);
+        }
+
+        if(ioContext != null) {
+            try {
+                String suffix = "next";
+                if(prevActMode) suffix = "prev";
+
+                SortedSet<Double> keySet = new TreeSet<>();
+                for(TDoubleDoubleMap hist : histograms.values()) {
+                    double keys[] = hist.keys();
+                    for(int i = 0; i < keys.length; i++) {
+                        keySet.add(keys[i]);
+                    }
+                }
+
+                writeHistograms(histograms, keySet, String.format("%s/actTypeGeoDistance.%s.txt", ioContext.getPath(), suffix));
+
+                for(double key : keySet) {
+                    double sum = 0;
+                    for(TDoubleDoubleMap h : histograms.values()) {
+                        sum += h.get(key);
+                    }
+
+                    for(TDoubleDoubleMap h : histograms.values()) {
+                        h.put(key, h.get(key) / sum);
+                    }
+                }
+
+                writeHistograms(histograms, keySet, String.format("%s/actTypeGeoDistance.%s.norm.txt", ioContext.getPath(), suffix));
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // TODO: Consolidate with LegPurposeDistanceTask
+    public void writeHistograms(Map<String, TDoubleDoubleMap> histograms, Set<Double> keys, String file) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+
+        writer.write("purpose");
+
+        for(double key : keys) {
+            writer.write(SEPARATOR);
+            writer.write(String.valueOf(key));
+        }
+
+        writer.newLine();
+
+        for(Map.Entry<String, TDoubleDoubleMap> entry : histograms.entrySet()) {
+            String type = entry.getKey();
+            TDoubleDoubleMap hist = entry.getValue();
+
+            writer.write(type);
+
+            for(double key : keys) {
+                writer.write(SEPARATOR);
+                writer.write(String.valueOf(hist.get(key)));
+            }
+
+            writer.newLine();
+        }
+
+        writer.close();
     }
 }

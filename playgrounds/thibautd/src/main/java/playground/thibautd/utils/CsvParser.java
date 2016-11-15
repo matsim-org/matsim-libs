@@ -20,6 +20,7 @@ package playground.thibautd.utils;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,6 +36,8 @@ public class CsvParser implements AutoCloseable {
 
 	private String[] currentLine = null;
 
+	private final Counter counter;
+
 	public CsvParser(
 			final char sep,
 			final char quote,
@@ -43,6 +46,7 @@ public class CsvParser implements AutoCloseable {
 		this.quote = quote;
 		this.reader = IOUtils.getBufferedReader( file );
 		this.titleLine = CsvUtils.parseTitleLine( sep , quote , reader.readLine() );
+		this.counter = new Counter( "read line # " , " of file "+file );
 	}
 
 	public CsvUtils.TitleLine getTitleLine() {
@@ -50,6 +54,7 @@ public class CsvParser implements AutoCloseable {
 	}
 
 	public boolean nextLine() throws IOException {
+		counter.incCounter();
 		final String l = reader.readLine();
 		if ( l == null ) return false;
 		currentLine = CsvUtils.parseCsvLine( sep , quote , l );
@@ -79,6 +84,7 @@ public class CsvParser implements AutoCloseable {
 
 	@Override
 	public void close() throws IOException {
+		counter.printCounter();
 		reader.close();
 	}
 }
