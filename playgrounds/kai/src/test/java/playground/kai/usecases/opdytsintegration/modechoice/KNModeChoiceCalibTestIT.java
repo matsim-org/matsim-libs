@@ -70,8 +70,10 @@ public class KNModeChoiceCalibTestIT {
 		
 		String outputDirectory = utils.getOutputDirectory() ;
 		config.controler().setOutputDirectory(outputDirectory);
+		
+		config.controler().setLastIteration(1);
 
-		KNModeChoiceCalibMain.run(config, equil, calib, assignment, outputDirectory) ;
+		KNModeChoiceCalibMain.run(config, equil, calib, assignment, outputDirectory, true) ;
 
 	}
 
