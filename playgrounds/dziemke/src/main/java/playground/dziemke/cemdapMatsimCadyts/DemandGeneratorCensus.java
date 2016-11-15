@@ -135,6 +135,8 @@ public class DemandGeneratorCensus {
 			List<String> commuterRelationListMale = createRelationList(relationsFromMunicipality, "male");
 			List<String> commuterRelationListFemale = createRelationList(relationsFromMunicipality, "female");
 			
+			int counter = 1;
+			
 			int pop18_24Male = (int) municipalities.getAttribute(munId, "pop18_24Male");
 			int pop25_29Male = (int) municipalities.getAttribute(munId, "pop25_29Male");
 			int pop30_39Male = (int) municipalities.getAttribute(munId, "pop30_39Male");
@@ -154,7 +156,6 @@ public class DemandGeneratorCensus {
 			int adultsMale = pop18_24Male + pop25_29Male + pop30_39Male + pop40_49Male + pop50_64Male;
 			int adultsFemale = pop18_24Female + pop25_29Female + pop30_39Female + pop40_49Female + pop50_64Female;
 			
-			
 			// The adults-to-employees ratio is needed to determine if a given person has a job
 			double adultsToEmployeesMaleRatio = 0.;
 			double adultsToEmployeesFemaleRatio = 0.;
@@ -167,12 +168,7 @@ public class DemandGeneratorCensus {
 				adultsToEmployeesFemaleRatio = (double) adultsFemale / (double) employeesFemale;
 			} else {
 				adultsToEmployeesFemaleRatio = defaultAdultsToEmployeesMaleRatio;
-			}
-//			System.out.println("municipality = " + municipalityId + " -- adultsToEmployeesMaleRatio = " + adultsToEmployeesMaleRatio);
-//			System.out.println("municipality = " + municipalityId + " -- adultsToEmployeesFemaleRatio = " + adultsToEmployeesFemaleRatio);
-			
-			int counter = 1;
-			
+			}			
 			
 			// 18-24
 			{
@@ -334,7 +330,7 @@ public class DemandGeneratorCensus {
 			writePersonsFile(population2, outputBase + "persons" + (i+1) + ".dat");
 		}
 		
-		LOG.warn("counterMissingComRel = " + counterMissingComRel);
+		LOG.warn("There are " + counterMissingComRel + " employees who have been set to unemployed since no commuter relation could be assigned to them.");
 	}
 
 
@@ -366,7 +362,8 @@ public class DemandGeneratorCensus {
 			if (employed == true) {
 				if (commuterRelationList.size() == 0) { // No relations left in list, which employee could choose from
 					counterMissingComRel++;
-					person.getAttributes().putAttribute("locationOfWork", "empty");
+					person.getAttributes().putAttribute("locationOfWork", "-99");
+					person.getAttributes().putAttribute("employed", false);
 				} else {
 					person.getAttributes().putAttribute("locationOfWork", getRandomWorkLocation(commuterRelationList, planningAreaId, lors));
 				}
@@ -423,26 +420,18 @@ public class DemandGeneratorCensus {
 		} else {
 			employeesToCommutersMaleRatio = defaultEmployeesToCommutersRatio;
 		}
-//		System.out.println("employeesToCommutersMaleRatio = " + employeesToCommutersMaleRatio);
 		if (employeesFemale != 0) {
 			employeesToCommutersFemaleRatio = (double) employeesFemale / (double) commutersFemale;
 		} else {
 			employeesToCommutersFemaleRatio = defaultEmployeesToCommutersRatio;
 		}
-//		System.out.println("employeesToCommutersFemaleRatio = " + employeesToCommutersFemaleRatio);
-
-		
 		
 		// Scale
 		for (CommuterRelationV2 relation : relationsFromMunicipality.values()) {
-//			System.out.println("scaled trips male " + (int) (relation.getTripsMale() * employeesToCommutersMaleRatio));
-//			relation.setTripsMale((int) (relation.getTripsMale() * employeesToCommutersMaleRatio));
 			relation.setTripsMale((int) Math.ceil(relation.getTripsMale() * employeesToCommutersMaleRatio));
-//			relation.setTripsMale((int) (relation.getTripsMale() * employeesToCommutersMaleRatio + 1));
 		}
 		for (CommuterRelationV2 relation : relationsFromMunicipality.values()) {
 			relation.setTripsFemale((int) Math.ceil(relation.getTripsFemale() * employeesToCommutersFemaleRatio));
-//			relation.setTripsFemale((int) (relation.getTripsFemale() * employeesToCommutersFemaleRatio + 1));
 		}
 	}
 
