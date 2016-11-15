@@ -87,7 +87,7 @@ public class ReadColectivoShape {
 		int countHigh =0;
 		int countLow = 0;
 		double longestDistance=0.0;
-		double shortestDistance=1000000.0;
+		double shortestDistance=100000.0;
 		double totalDistance = 0.0;
 		String shortestLine= "";
 		String longestLine="";
