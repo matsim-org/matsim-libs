@@ -98,11 +98,13 @@ public class SocialChoiceSetConstraintsAnalyser {
 	public void analyze( final Consumer<IndividualResultRecord> callback ) {
 		log.info( "analyse for clique sizes in [1;"+cliques.getMaxSize()+"]" );
 		for ( int size = 1; size < cliques.getMaxSize(); size++ ) {
+			log.info( "look at size "+size+"..." );
+
 			final Collection<Set<Id<Person>>> cliquesOfSize =
-					RandomUtils.sublist_withSideEffect(
+					cliques.getNCliquesOfSize(
 							random,
-							cliques.getCliquesOfSize( size ),
-							configGroup.getSampleSize() );
+							configGroup.getSampleSize(),
+							size );
 
 			log.info( "look at size "+size+": "+cliquesOfSize.size()+" cliques" );
 
@@ -122,7 +124,7 @@ public class SocialChoiceSetConstraintsAnalyser {
 								coords,
 								configGroup.getMaxDistanceKm() * 1000 );
 
-				final Collection<FacilitiesPerDistance> fpd = new ArrayList<>();
+				final Collection<FacilitiesPerDistance> fpd = new ArrayList<>( configGroup.getNDistances() );
 				boolean intersectionEmpty = false;
 				for ( double distance : configGroup.getDecreasingDistances_m() ) {
 					final int sizeOfIntersection =
