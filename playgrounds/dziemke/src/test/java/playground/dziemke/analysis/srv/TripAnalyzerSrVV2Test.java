@@ -12,7 +12,7 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class TripAnalyzerSrVV2Test {
 
-	private static final Logger LOG = Logger.getLogger(TripAnalyzerSrVV2.class);
+	private static final Logger LOG = Logger.getLogger(TripAnalyzerSrVV2Test.class);
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
