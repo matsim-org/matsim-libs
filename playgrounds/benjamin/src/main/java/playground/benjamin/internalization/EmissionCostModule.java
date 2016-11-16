@@ -37,13 +37,14 @@ public class EmissionCostModule {
 	private boolean considerCO2Costs = false;
 	
 	/*Values taken from IMPACT (Maibach et al.(2008))*/
-	private final double EURO_PER_GRAMM_NOX = 9600. / (1000. * 1000.);
-	private final double EURO_PER_GRAMM_NMVOC = 1700. / (1000. * 1000.);
-	private final double EURO_PER_GRAMM_SO2 = 11000. / (1000. * 1000.);
-	private final double EURO_PER_GRAMM_PM2_5_EXHAUST = 384500. / (1000. * 1000.);
-	private final double EURO_PER_GRAMM_CO2 = 70. / (1000. * 1000.);
+	// following is not required any more, using EmissionCostFactors instead, amit Nov 16.
+//	private final double EURO_PER_GRAMM_NOX = 9600. / (1000. * 1000.);
+//	private final double EURO_PER_GRAMM_NMVOC = 1700. / (1000. * 1000.);
+//	private final double EURO_PER_GRAMM_SO2 = 11000. / (1000. * 1000.);
+//	private final double EURO_PER_GRAMM_PM2_5_EXHAUST = 384500. / (1000. * 1000.);
+//	private final double EURO_PER_GRAMM_CO2 = 70. / (1000. * 1000.);
 
-	
+
 	public EmissionCostModule(double emissionCostFactor, boolean considerCO2Costs) {
 		this.emissionCostFactor = emissionCostFactor;
 		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostFactor);
