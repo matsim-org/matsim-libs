@@ -26,6 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -40,7 +41,8 @@ import playground.ikaddoura.integrationCNE.CNEIntegration;
 
 public class BerlinControler {
 	
-	final static String configFile = "../../../runs-svn/berlin_car-traffic-only-1pct-2014-08-01/baseCase/input/config_detailed-network.xml";
+//	final static String configFile = "../../../runs-svn/berlin_car-traffic-only-1pct-2014-08-01/baseCase/input/config_detailed-network.xml";
+	final static String configFile = "../../../runs-svn/berlin_car-traffic-only-1pct-2014-08-01/baseCase/input/config_test.xml";
 	
 	final private int activityDurationHRS = 1;
 	final private boolean pricing = false;
@@ -68,8 +70,6 @@ public class BerlinControler {
 		for (int n = 1; n <= 24 ; n = n + this.activityDurationHRS) {
 			ActivityParams params = new ActivityParams("work_" + n);
 			params.setTypicalDuration(n * 3600.);
-			params.setOpeningTime(6 * 3600.);
-			params.setClosingTime(20 * 3600.);
 			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
 			config.planCalcScore().addActivityParams(params);
 		}
@@ -78,8 +78,6 @@ public class BerlinControler {
 		for (int n = 1; n <= 24 ; n = n + this.activityDurationHRS) {
 			ActivityParams params = new ActivityParams("shop_" + n);
 			params.setTypicalDuration(n * 3600.);
-			params.setOpeningTime(8 * 3600.);
-			params.setClosingTime(20 * 3600.);
 			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
 			config.planCalcScore().addActivityParams(params);
 		}
@@ -110,6 +108,22 @@ public class BerlinControler {
 		}
 		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+		
+		// adjusted scoring
+		controler.addOverridingModule( new AbstractModule() {
+			
+			@Override
+			public void install() {
+				
+				CountActEventHandler actCount = new CountActEventHandler();
+								
+				this.addEventHandlerBinding().toInstance(actCount);
+				this.bindScoringFunctionFactory().toInstance(new IKScoringFunctionFactory(scenario, actCount));
+				// TODO: see if there are nicer ways to plug this together...
+
+			}
+		});
+			
 		controler.run();
 		
 		// analysis

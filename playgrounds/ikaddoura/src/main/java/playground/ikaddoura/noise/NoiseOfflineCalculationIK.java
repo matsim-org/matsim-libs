@@ -73,8 +73,8 @@ public class NoiseOfflineCalculationIK {
 		} else {
 			
 			runDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
-			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_2016-11-09_rpGap50/";
-			receiverPointGap = 50.;
+			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_2016-11-14_rpGap10_tiergarten/";
+			receiverPointGap = 10.;
 			lastIteration = 100;
 			timeBinSize = 3600.;
 		}
@@ -91,11 +91,11 @@ public class NoiseOfflineCalculationIK {
 		
 		noiseParameters.setReceiverPointGap(receiverPointGap);
 		
-//		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
-//		double xMin = 4590855.;
-//		double yMin = 5819679.;
-//		double xMax = 4594202.;
-//		double yMax = 5821736.;
+		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
+		double xMin = 4590855.;
+		double yMin = 5819679.;
+		double xMax = 4594202.;
+		double yMax = 5821736.;
 		
 //		// Berlin Coordinates: Area around the Tempelhofer Feld 4591900,5813265 : 4600279,5818768
 //		double xMin = 4591900.;
@@ -109,11 +109,11 @@ public class NoiseOfflineCalculationIK {
 //		double xMax = 4620323.;
 //		double yMax = 5839639.;
 
-      // Berlin Coordinates: Berlin area
-		double xMin = 4575415.;
-		double yMin = 5809450.;
-		double xMax = 4615918.;
-		double yMax = 5832532.;
+//      // Berlin Coordinates: Berlin area
+//		double xMin = 4575415.;
+//		double yMin = 5809450.;
+//		double xMax = 4615918.;
+//		double yMax = 5832532.;
 		
 //      // Berlin Coordinates: Hundekopf
 //		double xMin = 4583187.;
