@@ -46,9 +46,10 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import playground.benjamin.scenarios.munich.exposure.*;
 import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
+import playground.vsp.airPollution.exposure.GridTools;
+import playground.vsp.airPollution.exposure.InternalizeEmissionResponsibilityControlerListener;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
 import java.util.HashSet;

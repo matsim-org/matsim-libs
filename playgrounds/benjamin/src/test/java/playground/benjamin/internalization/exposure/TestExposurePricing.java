@@ -59,8 +59,8 @@ import org.matsim.testcases.MatsimTestUtils;
 import playground.benjamin.internalization.EquilTestSetUp;
 import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
-import playground.benjamin.scenarios.munich.exposure.GridTools;
-import playground.benjamin.scenarios.munich.exposure.InternalizeEmissionResponsibilityControlerListener;
+import playground.vsp.airPollution.exposure.GridTools;
+import playground.vsp.airPollution.exposure.InternalizeEmissionResponsibilityControlerListener;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
 

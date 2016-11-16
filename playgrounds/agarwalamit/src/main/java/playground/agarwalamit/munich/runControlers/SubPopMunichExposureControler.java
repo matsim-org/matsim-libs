@@ -42,8 +42,8 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.agarwalamit.munich.controlerListner.MyTollAveragerControlerListner;
 import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
-import playground.benjamin.scenarios.munich.exposure.GridTools;
-import playground.benjamin.scenarios.munich.exposure.InternalizeEmissionResponsibilityControlerListener;
+import playground.vsp.airPollution.exposure.GridTools;
+import playground.vsp.airPollution.exposure.InternalizeEmissionResponsibilityControlerListener;
 import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
