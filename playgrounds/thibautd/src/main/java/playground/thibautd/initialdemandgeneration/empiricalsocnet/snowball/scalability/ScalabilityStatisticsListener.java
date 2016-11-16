@@ -28,11 +28,11 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import playground.ivt.utils.MonitoringUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSampler;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballLocator;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
-import playground.ivt.utils.MonitoringUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -45,8 +45,6 @@ import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
-
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
 
 /**
  * @author thibautd

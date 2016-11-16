@@ -32,7 +32,6 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import playground.thibautd.utils.CsvUtils;
 import playground.thibautd.utils.CsvWriter;
-import playground.thibautd.utils.RandomUtils;
 import playground.thibautd.utils.spatialcollections.VPTree;
 
 import java.io.IOException;

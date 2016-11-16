@@ -20,7 +20,6 @@ package playground.thibautd.utils.spatialcollections;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Counter;
 
 import java.util.ArrayList;
