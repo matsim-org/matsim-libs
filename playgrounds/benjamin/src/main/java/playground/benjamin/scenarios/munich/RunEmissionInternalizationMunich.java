@@ -31,7 +31,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
-import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
+import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
 
 /**
  * @author benjamin

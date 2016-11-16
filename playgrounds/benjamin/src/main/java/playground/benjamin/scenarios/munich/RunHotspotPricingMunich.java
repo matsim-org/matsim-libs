@@ -46,7 +46,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
-import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
+import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
 
 /**
  * @author benjamin

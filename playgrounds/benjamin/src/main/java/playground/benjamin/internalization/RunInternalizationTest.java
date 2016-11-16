@@ -59,6 +59,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
+import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
 
 
 /**
