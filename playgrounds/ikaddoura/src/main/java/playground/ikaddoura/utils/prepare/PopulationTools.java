@@ -43,9 +43,7 @@ public class PopulationTools {
 	public static Population setActivityTypesAccordingToDuration(Population population, double timeCategorySize) {
 		
 		log.info("Setting activity types according to duration (time bin size: " + timeCategorySize + ")");
-		
-		// TODO: What about overnight activity... not considered here...
-		
+				
 		for (Person person : population.getPersons().values()) {
 			
 			for (Plan plan : person.getPlans()) {
@@ -86,6 +84,13 @@ public class PopulationTools {
 				}
 			}
 		}
+		
+		return population;
+	}
+	
+	public static Population mergeEveningAndMorningActivityIfSameBaseType(Population population) {
+		
+		// TODO
 		
 		return population;
 	}
