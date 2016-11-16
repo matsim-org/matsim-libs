@@ -48,6 +48,8 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import playground.benjamin.scenarios.munich.exposure.*;
+import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
+import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
 import java.util.HashSet;
 import java.util.Map;

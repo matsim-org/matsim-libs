@@ -22,14 +22,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import javax.inject.Provider;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
@@ -44,13 +40,12 @@ import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.agarwalamit.munich.controlerListner.MyTollAveragerControlerListner;
-import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityCostModule;
 import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
 import playground.benjamin.scenarios.munich.exposure.GridTools;
 import playground.benjamin.scenarios.munich.exposure.InternalizeEmissionResponsibilityControlerListener;
-import playground.benjamin.scenarios.munich.exposure.ResponsibilityGridTools;
+import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
+import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
 /**
  * @author amit

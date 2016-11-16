@@ -34,11 +34,11 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityCostModule;
+import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
 import playground.benjamin.scenarios.munich.exposure.GridTools;
 import playground.benjamin.scenarios.munich.exposure.InternalizeEmissionResponsibilityControlerListener;
-import playground.benjamin.scenarios.munich.exposure.ResponsibilityGridTools;
+import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
 /**
  * @author benjamin
