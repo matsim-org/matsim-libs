@@ -38,6 +38,8 @@
 		  facility		CDATA		#IMPLIED
 		  link			CDATA		#IMPLIED>
 <!ELEMENT trace						(position)*>
+<!ATTLIST trace
+		  crs			CDATA		#REQUIRED>
 
 <!ELEMENT position					    EMPTY>
 <!ATTLIST position
