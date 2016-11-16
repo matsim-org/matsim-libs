@@ -89,7 +89,7 @@ public class SocialChoiceSetConstraintsConfigGroup extends ReflectiveConfigGroup
 	public double[] getDecreasingDistances_m() {
 		if ( recomputeDistances ) {
 			distances_m = DoubleStream
-					.iterate( maxDistanceKm, d -> d - ( maxDistanceKm - minDistanceKm ) / nDistances )
+					.iterate( maxDistanceKm, d -> d - ( maxDistanceKm - minDistanceKm ) / (nDistances - 1) )
 					.map( d -> d * 1000 )
 					.limit( nDistances )
 					.toArray();
