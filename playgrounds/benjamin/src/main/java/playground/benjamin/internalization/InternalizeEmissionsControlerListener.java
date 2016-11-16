@@ -36,6 +36,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 
 
 /**

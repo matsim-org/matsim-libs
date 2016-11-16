@@ -32,7 +32,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.agarwalamit.InternalizationEmissionAndCongestion.EmissionCongestionTravelDisutilityCalculatorFactory;
 import playground.agarwalamit.InternalizationEmissionAndCongestion.InternalizeEmissionsCongestionControlerListener;
-import playground.benjamin.internalization.EmissionCostModule;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
 import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;

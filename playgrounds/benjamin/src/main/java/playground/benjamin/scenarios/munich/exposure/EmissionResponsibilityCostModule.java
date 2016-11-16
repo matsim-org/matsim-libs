@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 
-import playground.benjamin.internalization.EmissionCostFactors;
+import playground.vsp.airPollution.flatEmissions.EmissionCostFactors;
 
 
 /**

@@ -32,6 +32,7 @@ import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 
 
 /**

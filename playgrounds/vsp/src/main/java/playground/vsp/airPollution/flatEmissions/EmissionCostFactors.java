@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.internalization;
+package playground.vsp.airPollution.flatEmissions;
 /**
  * @author amit
  * These values are taken from Maibach et al. (2008)

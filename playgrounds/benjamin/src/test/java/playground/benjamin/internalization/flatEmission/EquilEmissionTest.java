@@ -53,8 +53,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.benjamin.internalization.EmissionCostFactors;
-import playground.benjamin.internalization.EmissionCostModule;
+import playground.vsp.airPollution.flatEmissions.EmissionCostFactors;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
 import playground.benjamin.internalization.EquilTestSetUp;
 import playground.benjamin.internalization.InternalizeEmissionsControlerListener;

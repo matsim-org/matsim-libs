@@ -35,7 +35,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
-import playground.benjamin.internalization.EmissionCostModule;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.benjamin.scenarios.munich.exposure.Cell;
 
 public class ResDisCalculator implements TravelDisutility{
