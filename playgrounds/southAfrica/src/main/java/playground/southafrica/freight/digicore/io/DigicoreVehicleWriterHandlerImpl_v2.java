@@ -30,7 +30,7 @@ import playground.southafrica.freight.digicore.containers.DigicorePosition;
 import playground.southafrica.freight.digicore.containers.DigicoreTrace;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 
-public class DigicoreVehicleWriterHandlerImpl_v1 implements
+public class DigicoreVehicleWriterHandlerImpl_v2 implements
 		DigicoreVehicleWriterHandler {
 
 	@Override
@@ -101,6 +101,32 @@ public class DigicoreVehicleWriterHandlerImpl_v1 implements
 		/* Don't think a separator will make the file more readable. */
 	}
 	
+	@Override
+	public void startTrace(DigicoreTrace trace, BufferedWriter out) throws IOException {
+		out.write("\t\t<trace crs=\"" + trace.getCrs() + "\" >\n");
+	}
+
+	@Override
+	public void endTrace(BufferedWriter out) throws IOException {
+		out.write("\t\t</trace>\n");
+	}
+
+	@Override
+	public void startPosition(DigicorePosition pos, BufferedWriter out) throws IOException {
+		out.write("\t\t\t<position");
+		out.write(" time=\"" + getDateString(pos.getTimeAsGregorianCalendar()) + "\"");
+		out.write(" x=\"" + String.format("%.6f", pos.getCoord().getX()) + "\"");
+		out.write(" y=\"" + String.format("%.6f", pos.getCoord().getY()) + "\"");
+		if(pos.getCoord().hasZ()){
+			out.write(" z=\"" + String.format("%.1f", pos.getCoord().getZ()) + "\"");
+		}
+	}
+
+	@Override
+	public void endPosition(BufferedWriter out) throws IOException {
+		out.write(" />\n");
+	}
+
 	private String getDateString(GregorianCalendar cal){
 		String s = "";
 		int year = cal.get(Calendar.YEAR);
@@ -109,32 +135,12 @@ public class DigicoreVehicleWriterHandlerImpl_v1 implements
 		int hour = cal.get(Calendar.HOUR_OF_DAY);
 		int minute = cal.get(Calendar.MINUTE);
 		int second = cal.get(Calendar.SECOND);
-			
+		
 		s = String.format("%04d%02d%02d %02d:%02d:%02d", 
 				year, month, day, hour, minute, second);
 		
 		return s;
 	}
-
-	@Override
-	public void startTrace(DigicoreTrace trace, BufferedWriter out) throws IOException {
-		/* Do nothing: implemented from v2 */
-	}
-
-	@Override
-	public void endTrace(BufferedWriter out) throws IOException {
-		/* Do nothing: implemented from v2 */
-	}
-
-	@Override
-	public void startPosition(DigicorePosition pos, BufferedWriter out) throws IOException {
-		/* Do nothing: implemented from v2 */
-	}
-
-	@Override
-	public void endPosition(BufferedWriter out) throws IOException {
-		/* Do nothing: implemented from v2 */
-	}
-
+	
 }
 

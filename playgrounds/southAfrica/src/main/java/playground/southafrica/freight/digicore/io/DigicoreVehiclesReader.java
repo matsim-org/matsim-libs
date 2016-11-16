@@ -30,6 +30,7 @@ import playground.southafrica.freight.digicore.containers.DigicoreVehicles;
 
 public class DigicoreVehiclesReader extends MatsimXmlParser {
 	private final static String DIGICORE_VEHICLES_V1 = "digicoreVehicles_v1.dtd";
+	private final static String DIGICORE_VEHICLES_V2 = "digicoreVehicles_v2.dtd";
 	private final static Logger LOG = Logger.getLogger(DigicoreVehiclesReader.class);
 	private MatsimXmlParser delegate = null;
 	private DigicoreVehicles vehicles;
@@ -61,7 +62,10 @@ public class DigicoreVehiclesReader extends MatsimXmlParser {
 		// Currently the only digicoreVehicles-type is v1
 		if (DIGICORE_VEHICLES_V1.equals(doctype)) {
 			this.delegate = new DigicoreVehiclesReader_v1(this.vehicles);
-			LOG.info("using digicoreVehicle_v1 reader.");
+			LOG.info("Using digicoreVehicle_v1 reader.");
+		} else if(DIGICORE_VEHICLES_V2.equals(doctype)) {
+			this.delegate = new DigicoreVehiclesReader_v2(this.vehicles);
+			LOG.info("Using digicoreVehicle_v2 reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
 		}

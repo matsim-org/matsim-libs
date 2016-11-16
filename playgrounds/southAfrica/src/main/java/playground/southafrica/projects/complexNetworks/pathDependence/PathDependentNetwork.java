@@ -106,29 +106,32 @@ public class PathDependentNetwork {
 	
 	
 	public void processActivityChain(DigicoreChain chain){
+		List<DigicoreActivity> activities = chain.getAllActivities();
+
 		/* Elements of the chain that we want to retain with the specific 
 		 * source node. This is usable when we sample an activity chain later
 		 * from the path-dependent complex network. */
-		DigicoreActivity firstMajor = chain.get(0);
+		DigicoreActivity firstMajor = activities.get(0);
 		int startHour = firstMajor.getEndTimeGregorianCalendar().get(Calendar.HOUR_OF_DAY);
-		int numberOfActivities = chain.getNumberOfMinorActivities();
+		int numberOfActivities = chain.getMinorActivities().size();
+		
 		
 		/* Process the first activity pair, but only if both activities are 
 		 * associated with a facility. */
 		Id<Node> previousNodeId = Id.createNodeId("source");
-		Id<Node> currentNodeId = Id.createNodeId(chain.get(0).getFacilityId());
-		Id<Node> nextNodeId = Id.createNodeId(chain.get(1).getFacilityId());
+		Id<Node> currentNodeId = Id.createNodeId(activities.get(0).getFacilityId());
+		Id<Node> nextNodeId = Id.createNodeId(activities.get(1).getFacilityId());
 		
 		if(currentNodeId != null && nextNodeId != null){
 			/* Add the current node to the network if it doesn't already exist. */
 			if(!this.network.containsKey(currentNodeId)){
-				this.network.put(currentNodeId, new PathDependentNode(currentNodeId, chain.get(0).getCoord()));
+				this.network.put(currentNodeId, new PathDependentNode(currentNodeId, activities.get(0).getCoord()));
 			} 
 			PathDependentNode currentNode = this.network.get(currentNodeId);
 			
 			/* Add the next node to the network if it doesn't already exist. */
 			if(!this.network.containsKey(nextNodeId)){
-				this.network.put(nextNodeId, new PathDependentNode(nextNodeId, chain.get(1).getCoord()));
+				this.network.put(nextNodeId, new PathDependentNode(nextNodeId, activities.get(1).getCoord()));
 			} 
 			
 			/* Add the first path-dependent link to the network. */
@@ -142,19 +145,19 @@ public class PathDependentNetwork {
 
 		/* Process the remainder of the (minor) activity pairs. */
 		for(int i = 1; i < chain.size()-1; i++){
-			currentNodeId = Id.create(chain.get(i).getFacilityId(), Node.class);
-			nextNodeId = Id.create(chain.get(i+1).getFacilityId(), Node.class);
+			currentNodeId = Id.create(activities.get(i).getFacilityId(), Node.class);
+			nextNodeId = Id.create(activities.get(i+1).getFacilityId(), Node.class);
 
 			if(currentNodeId != null && nextNodeId != null){
 				/* Add the current node to the network if it doesn't already exist. */
 				if(!this.network.containsKey(currentNodeId)){
-					this.network.put(currentNodeId, new PathDependentNode(currentNodeId, chain.get(i).getCoord() ) );
+					this.network.put(currentNodeId, new PathDependentNode(currentNodeId, activities.get(i).getCoord() ) );
 				} 
 				PathDependentNode currentNode = this.network.get(currentNodeId);
 				
 				/* Add the next node to the network if it doesn't already exist. */
 				if(!this.network.containsKey(nextNodeId)){
-					this.network.put(nextNodeId, new PathDependentNode(nextNodeId, chain.get(i+1).getCoord() ) );
+					this.network.put(nextNodeId, new PathDependentNode(nextNodeId, activities.get(i+1).getCoord() ) );
 				} 
 				PathDependentNode nextNode = this.network.get(nextNodeId);
 
@@ -172,7 +175,7 @@ public class PathDependentNetwork {
 		 * just have to make sure it is indicated as sink. This is only 
 		 * necessary if the node already exists in the network. If not, it means
 		 * it was never part of a link that was added to the network anyway. */
-		currentNodeId = Id.create(chain.get(chain.size()-1).getFacilityId(), Node.class);
+		currentNodeId = Id.create(activities.get(chain.size()-1).getFacilityId(), Node.class);
 		if(currentNodeId != null && this.network.containsKey(currentNodeId)){
 			this.network.get(currentNodeId).setAsSink(previousNodeId);
 		}

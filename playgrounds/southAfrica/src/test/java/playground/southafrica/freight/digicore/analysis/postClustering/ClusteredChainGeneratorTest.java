@@ -60,7 +60,11 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-
+/**
+ * TODO Update to V2 vehicles.
+ *
+ * @author jwjoubert
+ */
 public class ClusteredChainGeneratorTest{
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
@@ -279,8 +283,8 @@ public class ClusteredChainGeneratorTest{
 		
 		/* Write vehicle to file. First create the folder  */
 		
-		DigicoreVehicleWriter vw = new DigicoreVehicleWriter();
-		vw.write(utils.getOutputDirectory() + "xml/vehicle.xml.gz", vehicle);
+		DigicoreVehicleWriter vw = new DigicoreVehicleWriter(vehicle);
+		vw.writeV1(utils.getOutputDirectory() + "xml/vehicle.xml.gz");
 		
 		/* Write facilities. */
 		FacilitiesWriter fw = new FacilitiesWriter(facilities);
