@@ -27,9 +27,7 @@ import org.matsim.contrib.carsharing.manager.supply.costs.CostCalculation;
 import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContainer;
 import org.matsim.contrib.carsharing.models.ChooseTheCompany;
 import org.matsim.contrib.carsharing.models.ChooseVehicleType;
-import org.matsim.contrib.carsharing.models.ChooseVehicleTypeExample;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModel;
-import org.matsim.contrib.carsharing.models.KeepingTheCarModelExample;
 import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactoryNew;
 import org.matsim.contrib.carsharing.readers.CarsharingXmlReaderNew;
 import org.matsim.contrib.carsharing.replanning.CarsharingSubtourModeChoiceStrategy;
@@ -44,6 +42,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.balac.contribs.carsharing.coststructures.CostStructure1;
 import playground.balac.contribs.carsharing.coststructures.CostStructure2;
+import playground.balac.contribs.carsharing.coststructures.CostStructureTwoWay;
 import playground.balac.contribs.carsharing.models.ChooseTheCompanyPriceBased;
 import playground.balac.contribs.carsharing.models.KeepTheVehicleModel;
 import playground.balac.contribs.carsharing.models.VehicleTypeChoice;
@@ -171,8 +170,11 @@ public class RunCarsharing {
 			//===what follows is just an example!! and should be modified according to the study at hand===
 			if (s.equals("Mobility"))
 				costCalculations.put("freefloating", new CostStructure1());		
-			else
-				costCalculations.put("freefloating", new CostStructure1());	
+			else {
+				costCalculations.put("freefloating", new CostStructure1());
+				costCalculations.put("twoway", new CostStructureTwoWay());
+
+			}
 			CompanyCosts companyCosts = new CompanyCosts(costCalculations);
 			
 			companyCostsContainer.getCompanyCostsMap().put(s, companyCosts);

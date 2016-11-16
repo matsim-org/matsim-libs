@@ -13,6 +13,7 @@ public class VehicleTypeChoice implements ChooseVehicleType {
 	@Override
 	public String getPreferredVehicleType(Plan plan, Leg currentLeg) {
 
+		
 		int index = plan.getPlanElements().indexOf(currentLeg);
 		
 		Activity a = (Activity) plan.getPlanElements().get(index + 1);
@@ -20,7 +21,7 @@ public class VehicleTypeChoice implements ChooseVehicleType {
 		String type = a.getType();
 		
 		Random random = MatsimRandom.getRandom();
-		if (type.startsWith("secondary")) {
+		if (type.startsWith("secondary") && currentLeg.getMode().equals("freefloating")) {
 			if (random.nextDouble() < 0.1)
 				return "transporter";
 			else
@@ -28,7 +29,6 @@ public class VehicleTypeChoice implements ChooseVehicleType {
 						
 		}
 		else
-			return
-					"car";		
+			return "car";		
 	}
 }

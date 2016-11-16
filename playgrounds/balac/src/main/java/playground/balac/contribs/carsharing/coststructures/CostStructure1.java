@@ -21,7 +21,7 @@ public class CostStructure1 implements CostCalculation{
 		double rentalTIme = rentalInfo.getEndTime() - startTime;
 		double inVehicleTime = rentalInfo.getInVehicleTime();
 		
-		double reduction = 1.0;
+		double reduction = 1.00;
 		if ((startTime < end1 && startTime >= start1) )
 			reduction = 0.5;
 		
