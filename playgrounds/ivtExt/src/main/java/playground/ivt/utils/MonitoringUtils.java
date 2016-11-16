@@ -86,7 +86,7 @@ public class MonitoringUtils {
 
 		writer.write( "time\twhen\tcause\ttotalOverhead\tduration\tcommited\tused\tmax" );
 
-		final long startTime = System.currentTimeMillis();
+		final long startTime = ManagementFactory.getRuntimeMXBean().getStartTime();
 		final AtomicLong totalGcTime = new AtomicLong( 0 );
 
 		final NotificationListener notificationListener = ( notification, handback ) -> {
