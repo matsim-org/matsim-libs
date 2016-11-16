@@ -265,6 +265,20 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 			if (name.equals("twoway")) {
 				TwoWayCarsharingStation station = new TwoWayCarsharingStation(id, link, numberOfVehiclesPerType, vehiclesPerType);
 				
+				//TODO: check if the station already exists on the link
+				
+				/*if (twvehicleLocationQuadTree.getDisk(link.getCoord().getX(), link.getCoord().getY(), 0.0).size() != 0) {
+					TwoWayCarsharingStation stationOld = (TwoWayCarsharingStation) twvehicleLocationQuadTree.getClosest(link.getCoord().getX(), link.getCoord().getY());
+					for (String type : vehiclesPerType.keySet()) {
+						
+						if (stationOld.getVehiclesPerType().containsKey(type)) {
+							
+							
+						}
+					}
+					stationOld.
+				}*/
+				
 				twvehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), station);
 				this.twowaycarsharingstationsMap.put(id, station);
 				twStations.add(station);

@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.stations.CarsharingStation;
 import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
+import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 /** 
@@ -31,19 +32,20 @@ public class TwoWayContainer implements VehiclesContainer{
 	
 	
 	public void reserveVehicle(CSVehicle vehicle) {		
-		Link link = this.twvehiclesMap.get(vehicle);
-		Coord coord = link.getCoord();
-		this.twvehiclesMap.remove(vehicle);			
-		CarsharingStation station = twvehicleLocationQuadTree.getClosest(coord.getX(), coord.getY());			
-		((TwoWayCarsharingStation)station).removeCar(vehicle);
-				
+		System.out.println("Reserve: we are here: " + vehicle.getVehicleId());
+		String stationId = ((StationBasedVehicle)vehicle).getStationId();
+		this.twvehiclesMap.remove(vehicle);		
+		
+		CarsharingStation station = twowaycarsharingstationsMap.get(stationId);			
+		((TwoWayCarsharingStation)station).removeCar(vehicle);				
 	}
 
 	public void parkVehicle(CSVehicle vehicle, Link link) {
-		Coord coord = link.getCoord();			
+		System.out.println("we are here: " + vehicle.getVehicleId());
 		twvehiclesMap.put(vehicle, link);
-			
-		CarsharingStation station = twvehicleLocationQuadTree.getClosest(coord.getX(), coord.getY());
+		String stationId = ((StationBasedVehicle)vehicle).getStationId();
+		CarsharingStation station = twowaycarsharingstationsMap.get(stationId);			
+
 		((TwoWayCarsharingStation)station).addCar(vehicle.getType(),  vehicle);		
 	}
 

@@ -67,7 +67,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 		double searchDistance = 1000.0;
 		if (vehicle != null) {
 			
-			if (willHaveATripFromLocation && keepTheCar) {
+			if ((willHaveATripFromLocation && keepTheCar) || (willHaveATripFromLocation && carsharingType.equals("twoway"))) {
 			return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, carsharingType, vehicle,
 					startLink, destinationLink, true, true);
 			}
@@ -118,7 +118,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 			
 				eventsManager.processEvent(new StartRentalEvent(time, carsharingType, startLink, stationLink, person.getId(), vehicle.getVehicleId()));
 			
-				if (willHaveATripFromLocation && keepTheCar) {
+				if ((willHaveATripFromLocation && keepTheCar) || (willHaveATripFromLocation && carsharingType.equals("twoway"))) {
 					return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, carsharingType, vehicle,
 							stationLink, destinationLink, true, false);
 				}
