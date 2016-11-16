@@ -280,7 +280,13 @@ public class TestExposurePricing {
 					}
 				}
 			} else {
-				// TODO: this is completely wrong. Include flat CO2 costs not distributive costs.
+				//flat co2 costs = 0.084623
+				// exposure costs from other pollutants = 0.19278
+				for(PersonMoneyEvent e : personMoneyEventHandler.events) {
+					if(e.getTime() == personMoneyEventHandler.link39LeaveTime) {
+						Assert.assertEquals( "Exposure toll on link 39 from Manual calculation does not match from money event.", df.format( -0.19278 - 0.084623 ), df.format( e.getAmount() ) );
+					}
+				}
 			}
 		} else if(this.noOfTimeBins == 24 ) {
 			/*
@@ -297,11 +303,17 @@ public class TestExposurePricing {
 
 				for (PersonMoneyEvent e : personMoneyEventHandler.events){
 					if (e.getTime() == personMoneyEventHandler.link39LeaveTime) {
-						Assert.assertEquals( "Exposure toll on link 39 from manual calculation does not match from money event.", df.format( -0.193609 ), df.format( e.getAmount() ) );
+						Assert.assertEquals( "Exposure toll on link 39 from manual calculation does not match from money event.", df.format( -0.194013 ), df.format( e.getAmount() ) );
 					}
 				}
 			} else {
-				// TODO: this is completely wrong. Include flat CO2 costs not distributive costs.
+				//flat co2 costs = 0.084623
+				// exposure costs from other pollutants = 0.194013
+				for(PersonMoneyEvent e : personMoneyEventHandler.events) {
+					if(e.getTime() == personMoneyEventHandler.link39LeaveTime) {
+						Assert.assertEquals( "Exposure toll on link 39 from Manual calculation does not match from money event.", df.format( -0.194013 - 0.084623 ), df.format( e.getAmount() ) );
+					}
+				}
 			}
 		}
 	}
