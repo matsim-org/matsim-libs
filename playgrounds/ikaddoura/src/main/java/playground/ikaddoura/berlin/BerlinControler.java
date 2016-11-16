@@ -49,6 +49,7 @@ public class BerlinControler {
 	private static String configFile;
 	private static boolean addModifiedActivities;
 	private static int activityDurationHRS;
+	private static int hrs;
 	private static boolean pricing;
 	
 	public static void main(String[] args) throws IOException {
@@ -63,8 +64,11 @@ public class BerlinControler {
 
 			activityDurationHRS = Integer.parseInt(args[2]);
 			log.info("activityDurationHRS: "+ activityDurationHRS);
+			
+			hrs = Integer.parseInt(args[3]);
+			log.info("hrs: "+ hrs);
 
-			pricing = Boolean.parseBoolean(args[3]);			
+			pricing = Boolean.parseBoolean(args[4]);			
 			log.info("pricing: "+ pricing);
 
 		} else {
@@ -74,6 +78,7 @@ public class BerlinControler {
 			
 			addModifiedActivities = true;
 			activityDurationHRS = 1;
+			hrs = 25;
 			
 			pricing = false;
 			
@@ -102,7 +107,7 @@ public class BerlinControler {
 					
 					log.info("Splitting activity " + activityType + " in duration-specific activities.");
 
-					for (int n = 1; n <= 24 ; n = n + activityDurationHRS) {
+					for (int n = 1; n <= hrs ; n = n + activityDurationHRS) {
 						ActivityParams params = new ActivityParams(activityType + "_" + n);
 						params.setTypicalDuration(n * 3600.);
 						params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
@@ -130,19 +135,20 @@ public class BerlinControler {
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		
 		// adjusted scoring
-		controler.addOverridingModule( new AbstractModule() {
-			
-			@Override
-			public void install() {
+		if (addModifiedActivities) {
+			controler.addOverridingModule( new AbstractModule() {
 				
-				CountActEventHandler actCount = new CountActEventHandler();
-								
-				this.addEventHandlerBinding().toInstance(actCount);
-				this.bindScoringFunctionFactory().toInstance(new IKScoringFunctionFactory(scenario, actCount));
-				// TODO: see if there are nicer ways to plug this together...
-
-			}
-		});
+				@Override
+				public void install() {
+					
+					CountActEventHandler actCount = new CountActEventHandler();
+									
+					this.addEventHandlerBinding().toInstance(actCount);
+					this.bindScoringFunctionFactory().toInstance(new IKScoringFunctionFactory(scenario, actCount));
+					// TODO: see if there are nicer ways to plug this together...
+				}
+			});
+		}
 			
 		controler.run();
 		
