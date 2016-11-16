@@ -6,6 +6,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.counts.Counts;
@@ -43,10 +44,11 @@ public class CadytsCarModule extends AbstractModule {
 
 	private static class CalibrationCountsProvider implements Provider<Counts<Link>> {
 		@Inject CountsConfigGroup config;
+		@Inject Config matsimConfig;
 		@Override
 		public Counts<Link> get() {
 			Counts<Link> calibrationCounts = new Counts<>();
-			String occupancyCountsFilename = config.getCountsFileName();
+			String occupancyCountsFilename = config.getCountsFileURL(matsimConfig.getContext()).getFile();
 			new MatsimCountsReader(calibrationCounts).readFile(occupancyCountsFilename);
 			return calibrationCounts;
 		}
