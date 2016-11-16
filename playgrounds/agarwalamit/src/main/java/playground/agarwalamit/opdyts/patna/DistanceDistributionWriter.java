@@ -52,7 +52,7 @@ public class DistanceDistributionWriter {
         this.handler = new LegModeBeelineDistanceDistributionHandler(dists, scenario.getNetwork());
 
         // following is done in pre-process because, it should remain unchanged afterwards
-        LegModeBeelineDistanceDistributionFromPlansAnalyzer distributionFromPlansAnalyzer = new LegModeBeelineDistanceDistributionFromPlansAnalyzer();
+        LegModeBeelineDistanceDistributionFromPlansAnalyzer distributionFromPlansAnalyzer = new LegModeBeelineDistanceDistributionFromPlansAnalyzer(dists);
         distributionFromPlansAnalyzer.init(this.scenario);
         distributionFromPlansAnalyzer.preProcessData();
         distributionFromPlansAnalyzer.postProcessData();

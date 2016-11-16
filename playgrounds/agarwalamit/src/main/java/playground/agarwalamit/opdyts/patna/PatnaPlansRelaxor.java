@@ -48,9 +48,6 @@ public class PatnaPlansRelaxor {
 
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
 
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(200);
-
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
@@ -58,8 +55,8 @@ public class PatnaPlansRelaxor {
 		modes2consider.add("car");
 		modes2consider.add("bike");
 		modes2consider.add("motorbike");
-		modes2consider.add("pt");
-		modes2consider.add("walk");
+//		modes2consider.add("pt");
+//		modes2consider.add("walk");
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {

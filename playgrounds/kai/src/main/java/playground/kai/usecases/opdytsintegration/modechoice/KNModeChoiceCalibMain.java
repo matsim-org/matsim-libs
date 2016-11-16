@@ -55,10 +55,10 @@ class KNModeChoiceCalibMain {
 		}
 		config.controler().setOutputDirectory(outputDirectory);
 
-		run(config, equil, calib, assignment, outputDirectory) ;
+		run(config, equil, calib, assignment, outputDirectory, false) ;
 	}
 	
-	public static void run( Config config, boolean equil, boolean calib, boolean assignment, String outputDirectory ) {
+	public static void run( Config config, boolean equil, boolean calib, boolean assignment, String outputDirectory, boolean testcase ) {
 
 		OutputDirectoryLogging.catchLogEntries();
 
@@ -121,10 +121,16 @@ class KNModeChoiceCalibMain {
 			boolean interpolate = true ;
 			boolean includeCurrentBest = false ;
 			final ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable( scenario.getConfig().planCalcScore(), scenario );
+			final FixedIterationNumberConvergenceCriterion convergenceCriterion ;
+			if ( testcase ) {
+				convergenceCriterion= new FixedIterationNumberConvergenceCriterion(2, 1 );
+			} else {
+				convergenceCriterion= new FixedIterationNumberConvergenceCriterion(100, 10 );
+			}
 			RandomSearch<ModeChoiceDecisionVariable> randomSearch = new RandomSearch<>( simulator,
 					new ModeChoiceRandomizer(scenario) ,
 					initialDecisionVariable ,
-					new FixedIterationNumberConvergenceCriterion(100, 10 ) ,
+					convergenceCriterion ,
 					maxIterations, maxTransitions, populationSize, 
 					MatsimRandom.getRandom(),
 					interpolate,

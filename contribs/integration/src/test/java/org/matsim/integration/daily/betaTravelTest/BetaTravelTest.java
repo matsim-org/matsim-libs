@@ -122,7 +122,7 @@ public class BetaTravelTest extends MatsimTestCase {
 	 *  @author mrieser
 	 */
 	public void testBetaTravel_6() {
-		Config config = loadConfig("test/scenarios/equil/config.xml");
+		Config config = loadConfig("../../examples/scenarios/equil/config.xml");
 		ConfigUtils.loadConfig(config, getInputDirectory() + "config.xml");
 		config.controler().setWritePlansInterval(0);	
 		config.plans().setActivityDurationInterpretation( ActivityDurationInterpretation.tryEndTimeThenDuration );
@@ -153,7 +153,7 @@ public class BetaTravelTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testBetaTravel_66() {
-		Config config = loadConfig("test/scenarios/equil/config.xml");
+		Config config = loadConfig("../../examples/scenarios/equil/config.xml");
 		ConfigUtils.loadConfig(config, getInputDirectory() + "config.xml");
 		config.controler().setWritePlansInterval(0);
 		// ---

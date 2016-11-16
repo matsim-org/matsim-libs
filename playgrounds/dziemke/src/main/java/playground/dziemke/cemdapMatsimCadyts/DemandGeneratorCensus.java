@@ -18,18 +18,6 @@
  * *********************************************************************** */
 package playground.dziemke.cemdapMatsimCadyts;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -41,10 +29,12 @@ import org.matsim.households.Household;
 import org.matsim.households.HouseholdImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.opengis.feature.simple.SimpleFeature;
-
 import playground.dziemke.cemdapMatsimCadyts.oneperson.SimpleHousehold;
 import playground.dziemke.cemdapMatsimCadyts.oneperson.SimplePerson;
 import playground.dziemke.utils.LogToOutputSaver;
+
+import java.io.*;
+import java.util.*;
 
 /**
  * This class is derived from "playground.dziemke.cemdapMatsimCadyts.oneperson.DemandGeneratorOnePersonV2.java"
@@ -65,13 +55,14 @@ public class DemandGeneratorCensus {
 	 * Handle by scaling?
 	 */
 
+	// Parameters
+	static final int NUMBER_OF_PLANS_PER_PERSON = 1;
+	static final String PLANNING_AREA_ID = "11000000"; // "Amtliche Gemeindeschlüssel (AGS)" of Berlin is "11000000"
+	static double DEFAULT_ADULTS_TO_EMPLOYEES_MALE_RATIO = 1.3;  // This is an assumption, oriented on observed values.
+	static double DEFAULT_EMPLOYEES_TO_COMMUTERS_RATIO = 3.0;  // This is an assumption, oriented on observed values, deliberately chosen slightly too high.
+
 	public static void main(String[] args) {
-		// Parameters
-		int numberOfPlansPerPerson = 1;
-		String planningAreaId = "11000000"; // "Amtliche Gemeindeschlüssel (AGS)" of Berlin is "11000000"
-		double defaultAdultsToEmployeesMaleRatio = 1.3;  // This is an assumption, oriented on observed values.
-		double defaultEmployeesToCommutersRatio = 3.0;  // This is an assumption, oriented on observed values, deliberately chosen slightly too high.
-		
+
 		// Input and output files
 		String commuterFileOutgoing1 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Berlin_2009/B2009Ga.txt";
 		String commuterFileOutgoing2 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil1BR2009Ga.txt";
@@ -82,6 +73,17 @@ public class DemandGeneratorCensus {
 		String censusFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/zensus_2011/bevoelkerung/csv_Bevoelkerung/Zensus11_Datensatz_Bevoelkerung_BE_BB.csv";
 		String shapeFileLors = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Bezirksregion_EPSG_25833.shp";
 		String outputBase = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/census-based_test_4/"; // TODO ...
+
+		String[] commuterFilesOutgoing = {commuterFileOutgoing1, commuterFileOutgoing2, commuterFileOutgoing3, commuterFileOutgoing4};
+
+		generateDemand(NUMBER_OF_PLANS_PER_PERSON, PLANNING_AREA_ID, DEFAULT_ADULTS_TO_EMPLOYEES_MALE_RATIO,
+				DEFAULT_EMPLOYEES_TO_COMMUTERS_RATIO, commuterFilesOutgoing, censusFile, shapeFileLors, outputBase);
+	}
+
+	public static void generateDemand(int numberOfPlansPerPerson, String planningAreaId,
+									  double defaultAdultsToEmployeesMaleRatio, double defaultEmployeesToCommutersRatio,
+									  String[] commuterFilesOutgoing, String censusFile, String shapeFileLors,
+									  String outputBase) {
 
 		// Infrastructure
 		Population pop = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
@@ -94,23 +96,30 @@ public class DemandGeneratorCensus {
 		Map<String, Map<String, CommuterRelationV2>> relationsMap = new HashMap<>();
 		
 		// Read commuter relations
-		{
-			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing1, "\t");
-			Map<String, Map<String, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
-			relationsMap.putAll(currentRelationMap);
-		}{
-			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing2, "\t");
-			Map<String, Map<String, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
-			relationsMap.putAll(currentRelationMap);
-		}{
-			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing3, "\t");
-			Map<String, Map<String, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
-			relationsMap.putAll(currentRelationMap);
-		}{
-			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing4, "\t");
+
+		for (String commuterFileOutgoing : commuterFilesOutgoing) {
+			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing, "\t");
 			Map<String, Map<String, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
 			relationsMap.putAll(currentRelationMap);
 		}
+
+//		{
+//			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing1, "\t");
+//			Map<String, Map<String, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
+//			relationsMap.putAll(currentRelationMap);
+//		}{
+//			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing2, "\t");
+//			Map<String, Map<String, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
+//			relationsMap.putAll(currentRelationMap);
+//		}{
+//			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing3, "\t");
+//			Map<String, Map<String, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
+//			relationsMap.putAll(currentRelationMap);
+//		}{
+//			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing4, "\t");
+//			Map<String, Map<String, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
+//			relationsMap.putAll(currentRelationMap);
+//		}
 //		{
 //			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoingTest, "\t");
 //			Map<String, Map<String, CommuterRelationV2>> currentRelationMap = commuterFileReader.getRelationsMap();
@@ -118,8 +127,9 @@ public class DemandGeneratorCensus {
 //		}
 		
 		// Read LORs
-		List<String> lors = readShape(shapeFileLors, "SCHLUESSEL", "LOR");
-		
+//		List<String> lors = readShape(shapeFileLors, "SCHLUESSEL", "LOR");
+		List<String> lors = readShape(shapeFileLors, "SCHLUESSEL");
+
 		// Other
 //		Integer counterMissingComRel = 0;
 		
@@ -157,8 +167,8 @@ public class DemandGeneratorCensus {
 			int adultsFemale = pop18_24Female + pop25_29Female + pop30_39Female + pop40_49Female + pop50_64Female;
 			
 			// The adults-to-employees ratio is needed to determine if a given person has a job
-			double adultsToEmployeesMaleRatio = 0.;
-			double adultsToEmployeesFemaleRatio = 0.;
+			double adultsToEmployeesMaleRatio;
+			double adultsToEmployeesFemaleRatio;
 			if (employeesMale != 0) { // Avoid dividing by zero
 				adultsToEmployeesMaleRatio = (double) adultsMale / (double) employeesMale;
 			} else {
@@ -287,7 +297,7 @@ public class DemandGeneratorCensus {
 				int upperAgeBound = 90; // Assumption!
 				createHouseholdsAndPersons(pop, households, counter, munId, planningAreaId, lors, pop75PlusFemale, 
 						gender, lowerAgeBound, upperAgeBound, adultsToEmployeesFemaleRatio, commuterRelationListFemale);
-				counter += pop75PlusFemale;
+//				counter += pop75PlusFemale;
 			}
 			
 			
@@ -311,7 +321,7 @@ public class DemandGeneratorCensus {
 			Population population2 = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 			
 			for (Person person : pop.getPersons().values()) {
-				if ((boolean) person.getAttributes().getAttribute("employed") == true) {
+				if ((boolean) person.getAttributes().getAttribute("employed")) {
 					String locationOfWork = (String) person.getAttributes().getAttribute("locationOfWork");
 					if (locationOfWork.equals("-99")) {
 						throw new RuntimeException("This combination of attribute values is implaubible.");
@@ -359,7 +369,7 @@ public class DemandGeneratorCensus {
 			person.getAttributes().putAttribute("student", false); // TODO certain share of young adults?
 			person.getAttributes().putAttribute("hasLicense", true); // for CEMDAP's "driversLicence" variable
 			
-			if (employed == true) {
+			if (employed) {
 				if (commuterRelationList.size() == 0) { // No relations left in list, which employee could choose from
 					counterMissingComRel++;
 					person.getAttributes().putAttribute("locationOfWork", "-99");
@@ -395,7 +405,7 @@ public class DemandGeneratorCensus {
 				if (relation.getTrips() == null || relation.getTrips() == 0) {
 					throw new RuntimeException("No travellers at all on this relation! This should not happen.");
 				} else {
-					relation.setTripsMale((int) (relation.getTrips() / 2));
+					relation.setTripsMale((relation.getTrips() / 2));
 				}
 			}
 			commutersMale += relation.getTripsMale();
@@ -406,15 +416,15 @@ public class DemandGeneratorCensus {
 				if (relation.getTrips() == null || relation.getTrips() == 0) {
 					throw new RuntimeException("No travellers at all on this relation! This should not happen.");
 				} else {
-					relation.setTripsFemale((int) (relation.getTrips() / 2));
+					relation.setTripsFemale((relation.getTrips() / 2));
 				}
 			}
 			commutersFemale += relation.getTripsFemale();
 		}
 		
 		// Compute ratios
-		double employeesToCommutersMaleRatio = 0.;
-		double employeesToCommutersFemaleRatio = 0.;
+		double employeesToCommutersMaleRatio;
+		double employeesToCommutersFemaleRatio;
 		if (employeesMale != 0) {
 			employeesToCommutersMaleRatio = (double) employeesMale / (double) commutersMale;
 		} else {
@@ -439,13 +449,16 @@ public class DemandGeneratorCensus {
 	private static List<String> createRelationList(Map<String, CommuterRelationV2> relationsFromMunicipality, String gender) {
 		List<String> commuterRealtionsList = new ArrayList<>();
 		for (String destination : relationsFromMunicipality.keySet()) {
-			int trips = 0;
-			if (gender.equals("male")) {
-				trips = relationsFromMunicipality.get(destination).getTripsMale();
-			} else if (gender.equals("female")) {
-				trips = relationsFromMunicipality.get(destination).getTripsFemale();
-			} else {
-				throw new IllegalArgumentException("Must either be male or female.");
+			int trips;
+			switch (gender) {
+				case "male":
+					trips = relationsFromMunicipality.get(destination).getTripsMale();
+					break;
+				case "female":
+					trips = relationsFromMunicipality.get(destination).getTripsFemale();
+					break;
+				default:
+					throw new IllegalArgumentException("Must either be male or female.");
 			}
 			for (int i = 0; i < trips ; i++) {
 				commuterRealtionsList.add(destination);
@@ -482,11 +495,7 @@ public class DemandGeneratorCensus {
 
 
 	private static boolean getEmployed(double adultsToEmployeesRatio) {
-		if (Math.random() * adultsToEmployeesRatio < 1) {
-			return true;
-		} else {
-			return false;
-		}
+		return Math.random() * adultsToEmployeesRatio < 1;
 	}
 	
 	
@@ -495,7 +504,7 @@ public class DemandGeneratorCensus {
 	}
 
 
-	private static List<String> readShape(String shapeFile, String attributeKey, String attributeName) {
+	private static List<String> readShape(String shapeFile, String attributeKey) {
 		List<String> lors = new ArrayList<>();
 		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(shapeFile);
 
@@ -522,21 +531,21 @@ public class DemandGeneratorCensus {
     			Id<Person> personId = person.getId();
     			
     			int employed;
-    			if ((boolean) person.getAttributes().getAttribute("employed") == true) {
+    			if ((boolean) person.getAttributes().getAttribute("employed")) {
     				employed = 1;
     			} else {
     				employed = 0;
     			}
     			
     			int student;
-    			if ((boolean) person.getAttributes().getAttribute("student") == true) {
+    			if ((boolean) person.getAttributes().getAttribute("student")) {
     				student = 1;
     			} else {
     				student = 0;
     			}
     			
     			int driversLicence;
-    			if ((boolean) person.getAttributes().getAttribute("hasLicense") == true) {
+    			if ((boolean) person.getAttributes().getAttribute("hasLicense")) {
     				driversLicence = 1;
     			} else {
     				driversLicence = 0;
@@ -549,7 +558,7 @@ public class DemandGeneratorCensus {
     			int age = (Integer) person.getAttributes().getAttribute("age");
     			
     			int parent;
-    			if ((boolean) person.getAttributes().getAttribute("parent") == true) {
+    			if ((boolean) person.getAttributes().getAttribute("parent")) {
     				parent = 1;
     			} else {
     				parent = 0;
@@ -567,9 +576,7 @@ public class DemandGeneratorCensus {
     					+ "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0  + "\t" + 0 );
     			bufferedWriterPersons.newLine();
     		}
-		} catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-        } catch (IOException ex) {
+		} catch (IOException ex) {
             ex.printStackTrace();
         } finally {
             //Close the BufferedWriter
@@ -621,9 +628,7 @@ public class DemandGeneratorCensus {
 	    			householdIdFromPersonBefore = householdId;
     			}
     		}
-    	} catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-        } catch (IOException ex) {
+    	} catch (IOException ex) {
             ex.printStackTrace();
         } finally {
             //Close the BufferedWriter

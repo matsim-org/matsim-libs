@@ -229,7 +229,7 @@ public class LegModeBeelineDistanceDistributionFromPlansAnalyzer extends Abstrac
 			for(PlanElement pe : planElements){
 				if(pe instanceof Leg ){
 					Route route = ((Route)((Leg)pe).getRoute());
-					double distance = route.getDistance();
+					double distance = route!=null ? route.getDistance() : 0.;
 					if(distance > longestDistance){
 						longestDistance = distance;
 					}

@@ -32,6 +32,11 @@ public class SocialChoiceSetConstraintsConfigGroup extends ReflectiveConfigGroup
 	private double maxDistanceKm = 50;
 	private int nDistances = 10;
 
+	private int sampleSize = 1000;
+
+	private boolean recomputeDistances = true;
+	private double[] distances_m = null;
+
 	private String inputCliquesCsvFile = null;
 
 	public SocialChoiceSetConstraintsConfigGroup() {
@@ -45,6 +50,7 @@ public class SocialChoiceSetConstraintsConfigGroup extends ReflectiveConfigGroup
 
 	@StringSetter("minDistanceKm")
 	public void setMinDistanceKm( final double minDistanceKm ) {
+		this.recomputeDistances = true;
 		this.minDistanceKm = minDistanceKm;
 	}
 
@@ -55,6 +61,7 @@ public class SocialChoiceSetConstraintsConfigGroup extends ReflectiveConfigGroup
 
 	@StringSetter("maxDistanceKm")
 	public void setMaxDistanceKm( final double maxDistanceKm ) {
+		this.recomputeDistances = true;
 		this.maxDistanceKm = maxDistanceKm;
 	}
 
@@ -65,6 +72,7 @@ public class SocialChoiceSetConstraintsConfigGroup extends ReflectiveConfigGroup
 
 	@StringSetter("nDistances")
 	public void setNDistances( final int nDistances ) {
+		this.recomputeDistances = true;
 		this.nDistances = nDistances;
 	}
 
@@ -78,11 +86,25 @@ public class SocialChoiceSetConstraintsConfigGroup extends ReflectiveConfigGroup
 		this.inputCliquesCsvFile = inputCliquesCsvFile;
 	}
 
-	public double[] getDistances_m() {
-		return DoubleStream
-				.iterate( minDistanceKm , d -> d + (maxDistanceKm - minDistanceKm) / nDistances )
-				.map( d -> d * 1000 )
-				.limit( nDistances )
-				.toArray();
+	public double[] getDecreasingDistances_m() {
+		if ( recomputeDistances ) {
+			distances_m = DoubleStream
+					.iterate( maxDistanceKm, d -> d - ( maxDistanceKm - minDistanceKm ) / (nDistances - 1) )
+					.map( d -> d * 1000 )
+					.limit( nDistances )
+					.toArray();
+			recomputeDistances = false;
+		}
+		return distances_m;
+	}
+
+	@StringGetter("sampleSize")
+	public int getSampleSize() {
+		return sampleSize;
+	}
+
+	@StringSetter("sampleSize")
+	public void setSampleSize( final int sampleSize ) {
+		this.sampleSize = sampleSize;
 	}
 }

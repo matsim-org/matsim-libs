@@ -98,7 +98,7 @@ public class TripAnalyzerSrVV2 {
 
 		AnalysisFileWriter writer = new AnalysisFileWriter();
 
-		List<Trip> trips = createListOfValidTrip(tripParser.getTrips(), network, personParser);
+		List<Trip> trips = createListOfValidTrip(tripParser.getTrips(), personParser);
 
 	    /* Do calculations and write-out*/
 		// reliant on variable "V_ANKUNFT": -9 = no data, -10 = implausible
@@ -359,7 +359,7 @@ public class TripAnalyzerSrVV2 {
 	}
 	
 	@SuppressWarnings("all")
-	private static List<Trip> createListOfValidTrip(Map<Id<Trip>, Trip> tripMap, Network network, SrV2008PersonParser personParser) {
+	private static List<Trip> createListOfValidTrip(Map<Id<Trip>, Trip> tripMap, SrV2008PersonParser personParser) {
 		List<Trip> trips = new LinkedList<>();
 		for (Trip trip : tripMap.values()) {
 	    	// mode of transport and activity type

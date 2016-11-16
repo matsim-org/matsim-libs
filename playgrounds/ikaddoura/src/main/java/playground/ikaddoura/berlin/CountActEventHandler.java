@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,30 +16,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.analysis.socialchoicesetconstraints;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
-import playground.ivt.utils.MonitoringUtils;
-import playground.ivt.utils.MoreIOUtils;
+package playground.ikaddoura.berlin;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.population.Person;
 
 /**
- * @author thibautd
- */
-public class AnalyzeSocialChoiceSet {
-	public static void main( final String... args ) throws Exception {
-		final Config config = ConfigUtils.loadConfig( args[ 0 ] , new SocialChoiceSetConstraintsConfigGroup() );
+* @author ikaddoura
+*/
 
-		try ( AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose();
-				AutoCloseable logCloseable = MoreIOUtils.initOut( config );
-				AutoCloseable gcTracker = MonitoringUtils.writeGCFigure( config.controler().getOutputDirectory()+"/gc.dat" ) ) {
-			final Scenario scenario = ScenarioUtils.loadScenario( config );
-			final SocialChoiceSetConstraintsAnalyser analyser = new SocialChoiceSetConstraintsAnalyser( scenario );
-
-			analyser.analyzeToFile( config.controler().getOutputDirectory() +"/constrainedChoiceSetSizes.dat" );
-		}
+public class CountActEventHandler implements ActivityStartEventHandler {
+	
+	private Map<Id<Person>, Integer> personId2activityCounter = new HashMap<>();
+	
+	@Override
+	public void reset(int iteration) {
+		this.personId2activityCounter.clear();
 	}
+
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
+				
+		if (personId2activityCounter.containsKey(event.getPersonId())) {
+			personId2activityCounter.put(event.getPersonId(), personId2activityCounter.get(event.getPersonId()) + 1);
+		} else {
+			personId2activityCounter.put(event.getPersonId(), 1); // whenever an activity start event is thrown, it is already the second (#1) activity
+		}			
+	}
+
+	public int getActivityCounter(Id<Person> personId) {
+		return personId2activityCounter.get(personId);
+	}
+
+	public Map<Id<Person>, Integer> getActivityCounter() {
+		return personId2activityCounter;
+	}
+
 }
 

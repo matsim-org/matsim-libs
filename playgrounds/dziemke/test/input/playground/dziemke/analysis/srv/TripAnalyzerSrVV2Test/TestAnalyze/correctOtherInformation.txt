@@ -1,0 +1,6 @@
+Aggregated weight of (complete) trips	8.253247396287614
+Aggregated weight of trips that have negative distance (beeline, from survey)	0.0
+Aggregated weight of trips that have negative distance (routed, from survey)	0.0
+Aggregated weight of trips that have negative times or durations	0.0
+Aggregated weight of trips that have no calculable speed (beeline)	0.0
+Aggregated weight of trips that have no calculable speed (routed)	0.0

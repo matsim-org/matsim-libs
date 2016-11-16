@@ -20,12 +20,16 @@
 package playground.ikaddoura.berlin;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -40,69 +44,78 @@ import playground.ikaddoura.integrationCNE.CNEIntegration;
 
 public class BerlinControler {
 	
-// 	base case
-	final static String configFile = "../../../runs-svn/berlin_car-traffic-only-1pct-2014-08-01/baseCase/input/config.xml";
-
-	// only reroute - base case continued / pricing 
-//	final private String configFile = "../../../runs-svn/berlin_car-traffic-only-1pct-2014-08-01/onlyReRoute/input/config_test.xml";
-//	final private String outputDirectory = "../../../runs-svn/berlin_car-traffic-only-1pct-2014-08-01/onlyReRoute/output_QBPV3/";
+	private static final Logger log = Logger.getLogger(BerlinControler.class);
 	
-	final private int activityDurationHRS = 1;
-	final private boolean pricing = false;
+	private static String configFile;
+	private static boolean addModifiedActivities;
+	private static int activityDurationHRS;
+	private static boolean pricing;
 	
 	public static void main(String[] args) throws IOException {
 
+		if (args.length > 0) {
+		
+			configFile = args[0];		
+			log.info("configFile: "+ configFile);
+			
+			addModifiedActivities = Boolean.parseBoolean(args[1]);
+			log.info("addModifiedActivities: "+ addModifiedActivities);
+
+			activityDurationHRS = Integer.parseInt(args[2]);
+			log.info("activityDurationHRS: "+ activityDurationHRS);
+
+			pricing = Boolean.parseBoolean(args[3]);			
+			log.info("pricing: "+ pricing);
+
+		} else {
+			
+//			configFile = "../../../runs-svn/berlin_car-traffic-only-1pct-2014-08-01/baseCase/input/config_detailed-network.xml";
+			configFile = "../../../runs-svn/berlin_car-traffic-only-1pct-2014-08-01/baseCase/input/config_test.xml";
+			
+			addModifiedActivities = true;
+			activityDurationHRS = 1;
+			
+			pricing = false;
+			
+		}
+		
 		BerlinControler berlin = new BerlinControler();
-		berlin.run();		
+		berlin.run();
 	}
 
 	private void run() throws IOException {
 		
 		Config config = ConfigUtils.loadConfig(configFile);
 		final String outputDirectory = config.controler().getOutputDirectory();
-		
-		// home
-		for (int n = 1; n <= 24 ; n = n + this.activityDurationHRS) {
-			ActivityParams params = new ActivityParams("home_" + n);
-			params.setTypicalDuration(n * 3600.);
-			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
-			config.planCalcScore().addActivityParams(params);
-		}
-		
-		// work
-		for (int n = 1; n <= 24 ; n = n + this.activityDurationHRS) {
-			ActivityParams params = new ActivityParams("work_" + n);
-			params.setTypicalDuration(n * 3600.);
-			params.setOpeningTime(6 * 3600.);
-			params.setClosingTime(20 * 3600.);
-			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
-			config.planCalcScore().addActivityParams(params);
-		}
-		
-		// shop
-		for (int n = 1; n <= 24 ; n = n + this.activityDurationHRS) {
-			ActivityParams params = new ActivityParams("shop_" + n);
-			params.setTypicalDuration(n * 3600.);
-			params.setOpeningTime(8 * 3600.);
-			params.setClosingTime(20 * 3600.);
-			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
-			config.planCalcScore().addActivityParams(params);
-		}
-		
-		// leis
-		for (int n = 1; n <= 24 ; n = n + this.activityDurationHRS) {
-			ActivityParams params = new ActivityParams("leis_" + n);
-			params.setTypicalDuration(n * 3600.);
-			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
-			config.planCalcScore().addActivityParams(params);
-		}
-		
-		// other
-		for (int n = 1; n <= 24 ; n = n + this.activityDurationHRS) {
-			ActivityParams params = new ActivityParams("other_" + n);
-			params.setTypicalDuration(n * 3600.);
-			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
-			config.planCalcScore().addActivityParams(params);
+				
+		if (addModifiedActivities) {
+			
+			List<ActivityParams> newActivityParams = new ArrayList<>();
+
+			for (ActivityParams actParams : config.planCalcScore().getActivityParams()) {
+				String activityType = actParams.getActivityType();
+				
+				if (activityType.contains("interaction")) {
+					log.info("Skipping activity " + activityType + "...");
+					
+				} else {
+					
+					log.info("Splitting activity " + activityType + " in duration-specific activities.");
+
+					for (int n = 1; n <= 24 ; n = n + activityDurationHRS) {
+						ActivityParams params = new ActivityParams(activityType + "_" + n);
+						params.setTypicalDuration(n * 3600.);
+						params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
+						newActivityParams.add(params);
+					}
+				}
+			}
+			
+			// add new activity parameters to config
+			
+			for (ActivityParams actParams : newActivityParams) {
+				config.planCalcScore().addActivityParams(actParams);
+			}				
 		}
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -114,7 +127,23 @@ public class BerlinControler {
 			controler = cne.prepareControler();
 		}
 		
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		
+		// adjusted scoring
+		controler.addOverridingModule( new AbstractModule() {
+			
+			@Override
+			public void install() {
+				
+				CountActEventHandler actCount = new CountActEventHandler();
+								
+				this.addEventHandlerBinding().toInstance(actCount);
+				this.bindScoringFunctionFactory().toInstance(new IKScoringFunctionFactory(scenario, actCount));
+				// TODO: see if there are nicer ways to plug this together...
+
+			}
+		});
+			
 		controler.run();
 		
 		// analysis

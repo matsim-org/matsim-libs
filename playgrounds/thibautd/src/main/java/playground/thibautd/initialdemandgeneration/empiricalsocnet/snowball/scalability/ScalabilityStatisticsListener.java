@@ -28,11 +28,11 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import playground.ivt.utils.MonitoringUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSampler;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballLocator;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
-import playground.ivt.utils.MonitoringUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -45,8 +45,6 @@ import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
-
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
 
 /**
  * @author thibautd
@@ -65,7 +63,9 @@ public class ScalabilityStatisticsListener implements AutoCloseable {
 	private long start_ms = -1;
 	private final AtomicLong peakMemory_bytes = new AtomicLong( -1 );
 
-	public ScalabilityStatisticsListener( final String file ) {
+	public ScalabilityStatisticsListener(
+			final String file,
+			final boolean monitorMemory ) {
 		this.writer = IOUtils.getBufferedWriter( file );
 		try {
 			writer.write( "currSample\ttryNr\t" +
@@ -81,7 +81,7 @@ public class ScalabilityStatisticsListener implements AutoCloseable {
 		catch ( IOException e ) {
 			throw new UncheckedIOException( e );
 		}
-		MonitoringUtils.listenBytesUsageOnGC( usage -> peakMemory_bytes.updateAndGet( peak -> usage > peak ? usage : peak ) );
+		if ( monitorMemory ) MonitoringUtils.listenBytesUsageOnGC( usage -> peakMemory_bytes.updateAndGet( peak -> usage > peak ? usage : peak ) );
 	}
 
 	@Inject
