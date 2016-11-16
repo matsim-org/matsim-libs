@@ -96,10 +96,7 @@ public class MultiThreadChainExtractor {
 			e.printStackTrace();
 		}
 		
-		/* Get coordinate reference system transformation. */
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", crs);
-		
-		//set up counter
+		/* Set up counter. */
 		Counter threadCounter = new Counter("Vehicles processed: ");
 		
 		/* Create extractor, and assign each vehicle file to the thread pool. */
@@ -112,7 +109,7 @@ public class MultiThreadChainExtractor {
 					Double.parseDouble(thresholdActivity), 
 					dsr.getStartSignals(), 
 					dsr.getStopSignals(), 
-					ct, 
+					crs, 
 					threadCounter);
 			extractorExecutor.threadExecutor.execute(dce);
 		}

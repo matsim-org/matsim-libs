@@ -32,6 +32,7 @@ import java.util.TimeZone;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
@@ -53,6 +54,7 @@ public class DigicoreChainExtractor implements Runnable {
 	private final double thresholdActivityDuration;
 	private final List<String> ignitionOn;
 	private final List<String> ignitionOff;
+	private final String crs;
 	private CoordinateTransformation ct;
 	private DigicoreVehicle vehicle;
 	
@@ -171,7 +173,7 @@ public class DigicoreChainExtractor implements Runnable {
 					} else {
 						if(lineBuffer == null && tripBuffer != null){
 							/* Vehicle has just stopped. Finish trip.*/
-							DigicoreTrace trace = convertBufferToTrace(tripBuffer, "WGS84");
+							DigicoreTrace trace = convertBufferToTrace(tripBuffer, this.crs);
 							chain.add(trace);
 							tripBuffer = null;
 							
@@ -223,7 +225,9 @@ public class DigicoreChainExtractor implements Runnable {
 			double lon = Double.parseDouble(sa[2]);
 			double lat = Double.parseDouble(sa[3]);
 			
-			DigicorePosition dp = new DigicorePosition(time, lon, lat);
+			Coord c = this.ct.transform(CoordUtils.createCoord(lon, lat));
+			
+			DigicorePosition dp = new DigicorePosition(time, c.getX(), c.getY());
 			dt.add(dp);
 		}
 		return dt;
@@ -249,7 +253,7 @@ public class DigicoreChainExtractor implements Runnable {
 	 * @param ignitionOff
 	 * @param threadCounter 
 	 */
-	public DigicoreChainExtractor(File file, File outputFolder, double thresholdMinor, double thresholdActivity, List<String> ignitionOn, List<String> ignitionOff, CoordinateTransformation ct, Counter threadCounter) {
+	public DigicoreChainExtractor(File file, File outputFolder, double thresholdMinor, double thresholdActivity, List<String> ignitionOn, List<String> ignitionOff, String crs, Counter threadCounter) {
 		this.vehicleFile = file;
 		this.outputFolder = outputFolder;
 		this.thresholdMinorMajor = thresholdMinor;
@@ -257,10 +261,12 @@ public class DigicoreChainExtractor implements Runnable {
 		this.ignitionOn = ignitionOn;
 		this.ignitionOff = ignitionOff;
 		this.threadCounter = threadCounter;
-		if(ct == null){
+		this.crs = crs;
+		if(crs == null){
+			crs = "Atlantis";
 			this.ct = TransformationFactory.getCoordinateTransformation("Atlantis", "Atlantis");
 		} else{
-			this.ct = ct;
+			this.ct = TransformationFactory.getCoordinateTransformation("WGS84", crs);
 		}
 	}
 		
