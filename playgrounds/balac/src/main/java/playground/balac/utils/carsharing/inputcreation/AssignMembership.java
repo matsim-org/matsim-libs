@@ -66,11 +66,11 @@ public class AssignMembership extends MatsimXmlWriter {
 		writeStartTag("carsharing", attsTW, true);
 
 		writeEndTag("company");
-		writeStartTag("company", attsC2);
+		/*writeStartTag("company", attsC2);
 		writeStartTag("carsharing", attsF, true);
 		writeStartTag("carsharing", attsTW, true);
 
-		writeEndTag("company");
+		writeEndTag("company");*/
 		writeEndTag("person");
 
 	}

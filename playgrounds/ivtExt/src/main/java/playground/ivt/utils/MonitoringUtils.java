@@ -21,10 +21,14 @@ package playground.ivt.utils;
 import com.sun.management.GarbageCollectionNotificationInfo;
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 import javax.management.NotificationBroadcaster;
 import javax.management.NotificationListener;
 import javax.management.openmbean.CompositeData;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
@@ -75,6 +79,97 @@ public class MonitoringUtils {
 				log.debug("GcInfo MemoryUsageAfterGc: " + info.getGcInfo().getMemoryUsageAfterGc());
 			}, null, null );
 		}
+	}
+
+	public static AutoCloseable writeGCFigure( final String path ) throws IOException {
+		final BufferedWriter writer = IOUtils.getBufferedWriter( path );
+
+		writer.write( "time\twhen\tcause\ttotalOverhead\tduration\tcommited\tused\tmax" );
+
+		final long startTime = ManagementFactory.getRuntimeMXBean().getStartTime();
+		final AtomicLong totalGcTime = new AtomicLong( 0 );
+
+		final NotificationListener notificationListener = ( notification, handback ) -> {
+			//we only handle GARBAGE_COLLECTION_NOTIFICATION notifications here
+			if ( !notification.getType().equals( GARBAGE_COLLECTION_NOTIFICATION ) ) {
+				return;
+			}
+			//get the information associated with this notification
+			GarbageCollectionNotificationInfo info = GarbageCollectionNotificationInfo.from( (CompositeData) notification.getUserData() );
+
+			final long totalAllocatedBeforeBytes =
+					info.getGcInfo().getMemoryUsageBeforeGc().values().stream()
+						.mapToLong( MemoryUsage::getCommitted )
+						.sum();
+
+			final long totalAllocatedAfterBytes =
+					info.getGcInfo().getMemoryUsageAfterGc().values().stream()
+						.mapToLong( MemoryUsage::getCommitted )
+						.sum();
+
+			final long totalUsedBeforeBytes =
+					info.getGcInfo().getMemoryUsageBeforeGc().values().stream()
+						.mapToLong( MemoryUsage::getUsed )
+						.sum();
+
+			final long totalUsedAfterBytes =
+					info.getGcInfo().getMemoryUsageAfterGc().values().stream()
+						.mapToLong( MemoryUsage::getUsed )
+						.sum();
+
+			final long totalMaxBeforeBytes =
+					info.getGcInfo().getMemoryUsageBeforeGc().values().stream()
+						.mapToLong( MemoryUsage::getMax )
+						.sum();
+
+			final long totalMaxAfterBytes =
+					info.getGcInfo().getMemoryUsageAfterGc().values().stream()
+							.mapToLong( MemoryUsage::getMax )
+							.sum();
+
+			totalGcTime.addAndGet( info.getGcInfo().getDuration() );
+
+			final double totalOverhead = ((double) totalGcTime.get()) /
+					(info.getGcInfo().getEndTime() - startTime);
+
+			try {
+				writer.newLine();
+				writer.write( info.getGcInfo().getStartTime()+"\tbefore\t"+
+						info.getGcCause()+"\t"+
+						totalOverhead+"\t"+
+						info.getGcInfo().getDuration()+"\t"+
+						totalAllocatedBeforeBytes+"\t" +
+						totalUsedBeforeBytes+"\t"+
+						totalMaxBeforeBytes );
+				writer.newLine();
+				writer.write( info.getGcInfo().getEndTime()+"\tafter\t"+
+						info.getGcCause()+"\t"+
+						totalOverhead+"\t"+
+						info.getGcInfo().getDuration()+"\t"+
+						totalAllocatedAfterBytes+"\t" +
+						totalUsedAfterBytes+"\t"+
+						totalMaxAfterBytes );
+				writer.flush();
+			}
+			catch ( IOException e ) {
+				throw new UncheckedIOException( e );
+			}
+		};
+
+		//Install a notification handler for each bean
+		final List<GarbageCollectorMXBean> gcbeans = ManagementFactory.getGarbageCollectorMXBeans();
+		for ( GarbageCollectorMXBean gcbean : gcbeans ) {
+			NotificationBroadcaster emitter = (NotificationBroadcaster) gcbean;
+			emitter.addNotificationListener( notificationListener, null, null );
+		}
+
+		return () -> {
+			for ( GarbageCollectorMXBean gcbean : gcbeans ) {
+				NotificationBroadcaster emitter = (NotificationBroadcaster) gcbean;
+				emitter.removeNotificationListener( notificationListener );
+			}
+			writer.close();
+		};
 	}
 
 	public static AutoCloseable monitorAndLogOnClose() {

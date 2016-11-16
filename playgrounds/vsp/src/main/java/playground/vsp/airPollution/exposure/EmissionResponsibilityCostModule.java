@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.scenarios.munich.exposure;
+package playground.vsp.airPollution.exposure;
 
 import java.util.Map;
 
@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 
-import playground.benjamin.internalization.EmissionCostFactors;
+import playground.vsp.airPollution.flatEmissions.EmissionCostFactors;
 
 
 /**
@@ -69,9 +69,7 @@ public class EmissionResponsibilityCostModule {
 		double warmEmissionCosts = 0.0;
 		
 		for(WarmPollutant wp : warmEmissions.keySet()){
-			if(wp.equals(WarmPollutant.CO2_TOTAL) && ! considerCO2Costs) {
-				// do nothing
-			} else {
+			if( ! wp.equals(WarmPollutant.CO2_TOTAL) ) {
 				double costFactor = EmissionCostFactors.getCostFactor(wp.toString());
 				warmEmissionCosts += warmEmissions.get(wp) * costFactor ;
 			}
@@ -84,19 +82,21 @@ public class EmissionResponsibilityCostModule {
 //		logger.info("relative density" + relativeDensity 
 //				+ " on link " + linkId.toString() 
 //				+ "resulting costs " + (this.emissionCostFactor*warmEmissionCosts*relativeDensity));
-		return this.emissionCostMultiplicationFactor * warmEmissionCosts * relativeDensity;
+		if(this.considerCO2Costs) {
+			WarmPollutant co2Total = WarmPollutant.CO2_TOTAL;
+			return this.emissionCostMultiplicationFactor * warmEmissionCosts * relativeDensity
+					+ warmEmissions.get(co2Total) * EmissionCostFactors.getCostFactor(co2Total.toString());
+		} else {
+			return this.emissionCostMultiplicationFactor * warmEmissionCosts * relativeDensity;
+		}
 	}
 	
 	public double calculateColdEmissionCosts(Map<ColdPollutant, Double> coldEmissions, Id<Link> linkId, double time) {
 		double coldEmissionCosts = 0.0;
 		
 		for(ColdPollutant cp : coldEmissions.keySet()){
-			if(cp.equals(WarmPollutant.CO2_TOTAL) && ! considerCO2Costs) {
-				// do nothing
-			} else {
-				double costFactor = EmissionCostFactors.getCostFactor(cp.toString());
-				coldEmissionCosts += coldEmissions.get(cp) * costFactor ;
-			}
+			double costFactor = EmissionCostFactors.getCostFactor(cp.toString());
+			coldEmissionCosts += coldEmissions.get(cp) * costFactor ;
 		}
 		// relative density = person minutes of resp. cell and time bin / average person minutes of all cells from this time bin
 		Double relativeDensity = responsibilityGridTools.getFactorForLink(linkId, time);

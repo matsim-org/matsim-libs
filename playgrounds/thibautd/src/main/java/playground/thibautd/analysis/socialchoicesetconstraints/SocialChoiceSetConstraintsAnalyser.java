@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -47,6 +48,8 @@ import java.util.stream.Collectors;
  */
 public class SocialChoiceSetConstraintsAnalyser {
 	private static final Logger log = Logger.getLogger( SocialChoiceSetConstraintsAnalyser.class );
+
+	private final Random random = new Random( 123 );
 
 	private final VPTree<Coord,ActivityFacility> facilities;
 	private final Utils.AllCliques cliques;
@@ -94,7 +97,13 @@ public class SocialChoiceSetConstraintsAnalyser {
 	public void analyze( final Consumer<IndividualResultRecord> callback ) {
 		log.info( "analyse for clique sizes in [1;"+cliques.getMaxSize()+"]" );
 		for ( int size = 1; size < cliques.getMaxSize(); size++ ) {
-			final Collection<Set<Id<Person>>> cliquesOfSize = cliques.getCliquesOfSize( size );
+			log.info( "look at size "+size+"..." );
+
+			final Collection<Set<Id<Person>>> cliquesOfSize =
+					cliques.getNCliquesOfSize(
+							random,
+							configGroup.getSampleSize(),
+							size );
 
 			log.info( "look at size "+size+": "+cliquesOfSize.size()+" cliques" );
 
@@ -114,13 +123,17 @@ public class SocialChoiceSetConstraintsAnalyser {
 								coords,
 								configGroup.getMaxDistanceKm() * 1000 );
 
-				final Collection<FacilitiesPerDistance> fpd = new ArrayList<>();
-				for ( double distance : configGroup.getDistances_m() ) {
+				final Collection<FacilitiesPerDistance> fpd = new ArrayList<>( configGroup.getNDistances() );
+				boolean intersectionEmpty = false;
+				for ( double distance : configGroup.getDecreasingDistances_m() ) {
 					final int sizeOfIntersection =
-							tree.getSizeOfBallsIntersection(
+							intersectionEmpty ? 0 :
+							tree.getBallsIntersection(
 									coords,
-									distance );
+									distance,
+									v -> true ).size();
 					fpd.add( new FacilitiesPerDistance( sizeOfIntersection , distance ) );
+					if ( sizeOfIntersection == 0 ) intersectionEmpty = true;
 				}
 				callback.accept( new IndividualResultRecord( size , fpd ) );
 			}

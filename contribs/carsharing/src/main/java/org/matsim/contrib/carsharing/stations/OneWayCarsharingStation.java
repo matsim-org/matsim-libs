@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
-import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
 /** 
  * @author balac
  */
@@ -90,7 +89,7 @@ public class OneWayCarsharingStation implements CarsharingStation{
 	}
 
 	public void removeCar(CSVehicle vehicle) {
-		String type = ((StationBasedVehicle)vehicle).getVehicleType();
+		String type = vehicle.getType();
 		ArrayList<CSVehicle> currentVehicles = this.vehiclesPerType.get(type);		
 		currentVehicles.remove(vehicle);
 		int currentNumberOfVehicles = this.numberOfvehiclesPerType.get(type);

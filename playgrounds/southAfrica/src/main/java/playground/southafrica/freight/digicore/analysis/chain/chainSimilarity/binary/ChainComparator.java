@@ -114,7 +114,7 @@ public class ChainComparator {
 		int index = 0;
 		boolean found = false;
 		while(!found & index < chain.size()){
-			DigicoreActivity activity = chain.get(index);
+			DigicoreActivity activity = chain.getAllActivities().get(index);
 			if(activity.getFacilityId() != null){
 				if( activity.getFacilityId().toString().equalsIgnoreCase(facilityId.toString()) ){
 					found = true;

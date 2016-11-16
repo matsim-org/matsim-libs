@@ -155,9 +155,12 @@ public class ConsecutiveActivityFacilityReporter {
 			/* Process each chain. */
 			CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "WGS84");
 			for(DigicoreChain chain : dv.getChains()){
-				for(int i = 1; i < chain.size(); i++){
-					DigicoreActivity previous = chain.get(i-1);
-					DigicoreActivity current = chain.get(i);
+				int chainDay = chain.getChainStartDay(abnormalDays);
+				List<DigicoreActivity> activities = chain.getAllActivities();
+
+				for(int i = 1; i < activities.size(); i++){
+					DigicoreActivity previous = activities.get(i-1);
+					DigicoreActivity current = activities.get(i);
 					if(previous.getFacilityId() != null & current.getFacilityId() != null){
 						/* Right, now get all the statistics together. */
 						String vehicleId = dv.getId().toString();
@@ -168,8 +171,7 @@ public class ConsecutiveActivityFacilityReporter {
 							facilityId = id.toString();
 						}
 						int position = i+1;
-						int chainLength = chain.size();
-						int chainDay = chain.getChainStartDay(abnormalDays);
+						int chainLength = activities.size();
 						Coord c = current.getCoord();
 						Coord cWgs = ct.transform(c);
 						String dateTime = DigicoreUtils.getShortDateAndTime(current.getStartTimeGregorianCalendar());

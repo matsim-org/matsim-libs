@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin.scenarios.munich.exposure;
+package playground.vsp.airPollution.exposure;
 
 import java.util.ArrayList;
 import java.util.List;

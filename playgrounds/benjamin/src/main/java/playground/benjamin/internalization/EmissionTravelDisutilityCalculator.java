@@ -35,8 +35,8 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 
 
 /**

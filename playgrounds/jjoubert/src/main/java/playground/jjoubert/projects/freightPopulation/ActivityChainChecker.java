@@ -326,7 +326,7 @@ public class ActivityChainChecker {
 			
 			/* Check each chain start date. */
 			for(DigicoreChain chain : dv.getChains()){
-				GregorianCalendar chainStart = chain.get(0).getEndTimeGregorianCalendar();
+				GregorianCalendar chainStart = chain.getAllActivities().get(0).getEndTimeGregorianCalendar();
 				
 				/* Get the day of the week, with '8' denoting an abnormal day. */
 				int dayOfWeek = getDayType(chainStart);
@@ -335,7 +335,7 @@ public class ActivityChainChecker {
 				int hour = chainStart.get(Calendar.HOUR_OF_DAY);
 				
 				/* Get number of minor activities. */
-				int numberOfActivities = chain.getNumberOfMinorActivities();
+				int numberOfActivities = chain.getMinorActivities().size();
 				
 				/* Evaluate the chain's geographic extent. */
 				String extent = evaluateExtent(chain);
@@ -353,9 +353,9 @@ public class ActivityChainChecker {
 
 		private double estimateVkt(DigicoreChain chain){
 			double distance = 0.0;
-			Coord c1 = chain.get(0).getCoord();
+			Coord c1 = chain.getAllActivities().get(0).getCoord();
 			for(int i = 1; i < chain.size(); i++){
-				Coord c2 =chain.get(i).getCoord();
+				Coord c2 =chain.getAllActivities().get(i).getCoord();
 				distance += CoordUtils.calcEuclideanDistance(c1, c2)*distanceMultiplier;
 				c1 = c2;
 			}

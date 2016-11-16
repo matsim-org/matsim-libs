@@ -185,6 +185,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		private FloatBuffer vert;
 		private List<ActivityInfo> acts = new ArrayList<>();
 		private ByteBuffer cols;
+		private TextRenderer textRenderer;
 
 		public Result() {
 		}
@@ -284,6 +285,10 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 		@Override
 		public void draw(OTFOGLDrawer drawer) {
+			if (textRenderer == null) {
+				textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 32), true, false);
+				textRenderer.setColor(new Color(50, 50, 128, 255));
+			}
 			GL2 gl = OTFGLAbstractDrawable.getGl();
 			if (vert != null) {
 				drawPlanPolyLine(gl);
@@ -291,7 +296,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			drawActivityTexts();
 			Point2D.Double agentCoords = drawer.getCurrentSceneGraph().getAgentPointLayer().getAgentCoords(this.agentId.toCharArray());
 			if (agentCoords != null) {
-				// We know where the agent is, so we draw stuff around them.
+//				 We know where the agent is, so we draw stuff around them.
 				drawArrowFromAgentToTextLabel(agentCoords, gl);
 				drawCircleAroundAgent(agentCoords, gl);
 				drawLabelText(drawer, agentCoords);
@@ -332,8 +337,6 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 		private void drawActivityTexts() {
 			GLAutoDrawable drawable = OTFClientControl.getInstance().getMainOTFDrawer().getCanvas();
-			TextRenderer textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 32), true, false);
-			textRenderer.setColor(new Color(50, 50, 128, 255));
 			for (ActivityInfo activityEntry : this.acts ) {
 				drawTextBox(drawable, textRenderer, activityEntry);
 			}
@@ -418,7 +421,6 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		}
 
 		private void drawLabelText(OTFOGLDrawer drawer, Point2D.Double pos) {
-			TextRenderer textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 32), true, false);
 			InfoText agentText = new InfoText(this.agentId, (float) pos.x + 250, (float) pos.y + 250);
 			agentText.setAlpha(0.7f);
 			agentText.draw(textRenderer, OTFClientControl.getInstance().getMainOTFDrawer().getCanvas(), drawer.getViewBoundsAsQuadTreeRect());

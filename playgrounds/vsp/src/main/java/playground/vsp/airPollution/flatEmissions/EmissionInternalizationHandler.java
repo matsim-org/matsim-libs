@@ -17,11 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.scenarios.munich.exposure;
+package playground.vsp.airPollution.flatEmissions;
+
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
@@ -29,20 +32,23 @@ import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 
 
 /**
  * @author benjamin
  *
  */
-public class EmissionResponsibilityInternalizationHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler {
+public class EmissionInternalizationHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler {
 
 	EventsManager eventsManager;
-	EmissionResponsibilityCostModule emissionResponsibilityCostModule;
+	EmissionCostModule emissionCostModule;
+	Set<Id<Link>> hotspotLinks;
 
-	public EmissionResponsibilityInternalizationHandler(MatsimServices controler, EmissionResponsibilityCostModule emissionCostModule) {
+	public EmissionInternalizationHandler(MatsimServices controler, EmissionCostModule emissionCostModule, Set<Id<Link>> hotspotLinks) {
 		this.eventsManager = controler.getEvents();
-		this.emissionResponsibilityCostModule = emissionCostModule;
+		this.emissionCostModule = emissionCostModule;
+		this.hotspotLinks = hotspotLinks;
 	}
 
 	@Override
@@ -52,18 +58,40 @@ public class EmissionResponsibilityInternalizationHandler implements WarmEmissio
 
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
-		calculateWarmEmissionCostsAndThrowEvent(event);
+		Id<Link> linkId = event.getLinkId();
+		if(hotspotLinks == null){
+			// pricing applies for all links
+			calculateWarmEmissionCostsAndThrowEvent(event);
+		} else {
+			// pricing applies for the current link
+			if(hotspotLinks.contains(linkId)){
+				calculateWarmEmissionCostsAndThrowEvent(event);
+			}
+			// pricing applies not for the current link
+			else ;
+		}
 	}
 
 	@Override
 	public void handleEvent(ColdEmissionEvent event) {
+		Id<Link> linkId = event.getLinkId();
+		if(hotspotLinks == null){
+			// pricing applies for all links
 			calculateColdEmissionCostsAndThrowEvent(event);
+		} else {
+			// pricing applies for the current link
+			if(hotspotLinks.contains(linkId)){
+				calculateColdEmissionCostsAndThrowEvent(event);
+			}
+			// pricing applies not for the current link
+			else ;
+		}
 	}
 
 	private void calculateColdEmissionCostsAndThrowEvent(ColdEmissionEvent event) {
-		Id<Person> personId = Id.createPersonId(event.getVehicleId());
+		Id<Person> personId = Id.create(event.getVehicleId(), Person.class);
 		double time = event.getTime();
-		double coldEmissionCosts = emissionResponsibilityCostModule.calculateColdEmissionCosts(event.getColdEmissions(), event.getLinkId(), time);
+		double coldEmissionCosts = emissionCostModule.calculateColdEmissionCosts(event.getColdEmissions());
 		double amount2Pay = - coldEmissionCosts;
 		
 		Event moneyEvent = new PersonMoneyEvent(time, personId, amount2Pay);
@@ -72,9 +100,9 @@ public class EmissionResponsibilityInternalizationHandler implements WarmEmissio
 	}
 
 	private void calculateWarmEmissionCostsAndThrowEvent(WarmEmissionEvent event) {
-		Id<Person> personId = Id.createPersonId(event.getVehicleId());
+		Id<Person> personId = Id.create(event.getVehicleId(), Person.class);
 		double time = event.getTime();
-		double warmEmissionCosts = emissionResponsibilityCostModule.calculateWarmEmissionCosts(event.getWarmEmissions(), event.getLinkId(), time);
+		double warmEmissionCosts = emissionCostModule.calculateWarmEmissionCosts(event.getWarmEmissions());
 		double amount2Pay = - warmEmissionCosts;
 		
 		Event moneyEvent = new PersonMoneyEvent(time, personId, amount2Pay);

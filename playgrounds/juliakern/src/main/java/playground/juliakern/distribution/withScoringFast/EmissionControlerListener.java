@@ -39,8 +39,8 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
-import playground.benjamin.scenarios.munich.exposure.GridTools;
-import playground.benjamin.scenarios.munich.exposure.IntervalHandler;
+import playground.vsp.airPollution.exposure.GridTools;
+import playground.vsp.airPollution.exposure.IntervalHandler;
 import playground.juliakern.distribution.EmActivity;
 import playground.juliakern.distribution.EmPerCell;
 import playground.juliakern.responsibilityOffline.EmCarTrip;

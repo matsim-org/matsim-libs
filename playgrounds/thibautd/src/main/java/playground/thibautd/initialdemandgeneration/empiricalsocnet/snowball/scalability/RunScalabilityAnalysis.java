@@ -26,7 +26,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSampler;
@@ -34,9 +33,7 @@ import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Soc
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplingConfigGroup;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SimpleSnowballModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballSamplingConfigGroup;
-import playground.ivt.utils.MonitoringUtils;
 
-import java.io.IOException;
 import java.util.Random;
 
 /**
@@ -66,7 +63,7 @@ public class RunScalabilityAnalysis {
 			final String tmpDir = outputDir + "/tmp/";
 			config.controler().setOutputDirectory( tmpDir );
 
-			try ( final ScalabilityStatisticsListener statsListenner = new ScalabilityStatisticsListener( outputDir + "/stats.dat" ) ) {
+			try ( final ScalabilityStatisticsListener statsListenner = new ScalabilityStatisticsListener( outputDir + "/stats.dat" , false ) ) {
 				for ( double sample : scalabilityConfigGroup.getSamples() ) {
 					for ( int tryNr = 0; tryNr < scalabilityConfigGroup.getnTries(); tryNr++ ) {
 						MoreIOUtils.deleteDirectoryIfExists( tmpDir );

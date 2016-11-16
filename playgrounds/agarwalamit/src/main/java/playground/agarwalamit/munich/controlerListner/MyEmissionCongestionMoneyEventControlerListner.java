@@ -35,7 +35,7 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayHandler;
-import playground.benjamin.internalization.EmissionCostModule;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
 
 /**

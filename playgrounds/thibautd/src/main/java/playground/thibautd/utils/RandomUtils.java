@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -45,6 +47,27 @@ public class RandomUtils {
 		double sum = 0;
 		for ( int i=0; i < n; i++ ) sum += random.nextDouble();
 		return sum - n;
+	}
+
+	/**
+	 * Gets a random sublist of the required size. The input list is modified in place, such that the random sublist
+	 * corresponds to the <tt>size</tt> first elements of the modified list.
+	 * This is done for efficiency reasons.
+	 */
+	public static <E> List<E> sublist_withSideEffect( final Random random , final List<E> l , final int size ) {
+		if ( l.size() <= size ) return new ArrayList<>( l );
+
+		final List<E> sublist = new ArrayList<>( size );
+		for ( int i=0; i < size; i++ ) {
+			final int j = i + random.nextInt( size - i );
+			final E elemJ = l.get( j );
+			l.set( j , l.get( i ) );
+			l.set( i , elemJ );
+			// build the list in parallel to avoid the intermediary step of building a sublist.
+			sublist.add( elemJ );
+		}
+
+		return sublist;
 	}
 }
 

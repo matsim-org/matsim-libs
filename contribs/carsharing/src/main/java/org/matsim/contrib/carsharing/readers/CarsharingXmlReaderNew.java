@@ -235,7 +235,7 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 			Map<String, Integer> numberOfVehiclesPerType = new HashMap<String, Integer>();
 			Map<String, ArrayList<CSVehicle>> vehiclesPerType = new HashMap<String, ArrayList<CSVehicle>>();
 			
-			for (StationBasedVehicle vehicle : vehicles) {
+			for (CSVehicle vehicle : vehicles) {
 				if (name.equals("oneway")) {
 					this.owvehicleIdMap.put(vehicle.getVehicleId(), vehicle);
 					this.owvehiclesMap.put(vehicle, link);
@@ -244,26 +244,40 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 					this.twvehicleIdMap.put(vehicle.getVehicleId(), vehicle);
 					this.twvehiclesMap.put(vehicle, link);
 				}
-				if (numberOfVehiclesPerType.containsKey(vehicle.getVehicleType())) {
+				if (numberOfVehiclesPerType.containsKey(vehicle.getType())) {
 					
-					int number = numberOfVehiclesPerType.get(vehicle.getVehicleType());
-					ArrayList<CSVehicle> oldArray = vehiclesPerType.get(vehicle.getVehicleType());
+					int number = numberOfVehiclesPerType.get(vehicle.getType());
+					ArrayList<CSVehicle> oldArray = vehiclesPerType.get(vehicle.getType());
 					number++;
 					oldArray.add(vehicle);
-					numberOfVehiclesPerType.put(vehicle.getVehicleType(), number);
-					vehiclesPerType.put(vehicle.getVehicleType(), oldArray);
+					numberOfVehiclesPerType.put(vehicle.getType(), number);
+					vehiclesPerType.put(vehicle.getType(), oldArray);
 					
 				}
 				else {
 					
-					numberOfVehiclesPerType.put(vehicle.getVehicleType(), 1);
+					numberOfVehiclesPerType.put(vehicle.getType(), 1);
 					ArrayList<CSVehicle> newArray = new ArrayList<CSVehicle>();
 					newArray.add(vehicle);
-					vehiclesPerType.put(vehicle.getVehicleType(), newArray);
+					vehiclesPerType.put(vehicle.getType(), newArray);
 				}
 			}
 			if (name.equals("twoway")) {
 				TwoWayCarsharingStation station = new TwoWayCarsharingStation(id, link, numberOfVehiclesPerType, vehiclesPerType);
+				
+				//TODO: check if the station already exists on the link
+				
+				/*if (twvehicleLocationQuadTree.getDisk(link.getCoord().getX(), link.getCoord().getY(), 0.0).size() != 0) {
+					TwoWayCarsharingStation stationOld = (TwoWayCarsharingStation) twvehicleLocationQuadTree.getClosest(link.getCoord().getX(), link.getCoord().getY());
+					for (String type : vehiclesPerType.keySet()) {
+						
+						if (stationOld.getVehiclesPerType().containsKey(type)) {
+							
+							
+						}
+					}
+					stationOld.
+				}*/
 				
 				twvehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), station);
 				this.twowaycarsharingstationsMap.put(id, station);

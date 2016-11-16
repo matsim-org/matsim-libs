@@ -58,7 +58,7 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 	private final static Double dist3factor = 0.002;	
 	
 	/*
-	 * see playground.benjamin.internalization.EmissionCostModule
+	 * see playground.vsp.airPollution.flatEmissions.EmissionCostModule
 	 * 
 	 * Values taken from IMPACT (Maibach et al.(2008)) 
 	 * */

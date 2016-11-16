@@ -24,6 +24,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
+import playground.southafrica.freight.digicore.containers.DigicorePosition;
+import playground.southafrica.freight.digicore.containers.DigicoreTrace;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicles;
 
@@ -44,6 +46,16 @@ public interface DigicoreVehiclesWriterHandler {
 	/* <activity> ... </activity> */
 	public void startActivity(final DigicoreActivity activity, final BufferedWriter out) throws IOException;
 	public void endActivity(final BufferedWriter out) throws IOException;
+	
+	/* <trace> ... </trace> */
+	public void startTrace(final DigicoreTrace trace, final BufferedWriter out) throws IOException;
+	public void endTrace(final BufferedWriter out) throws IOException;
+	
+	/* <position ... /> */
+	public void startPosition(final DigicorePosition pos, final BufferedWriter out) throws IOException;
+	public void endPosition(final BufferedWriter out) throws IOException;
+	
+	/*TODO <route ... > */
 	
 	public void writeSeparator(final BufferedWriter out) throws IOException;
 	

@@ -27,13 +27,13 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import playground.nmviljoen.grain.GrainUtils;
-import playground.southafrica.freight.digicore.extract.step3_extract.MyMultiThreadChainExtractor;
+import playground.southafrica.freight.digicore.extract.step3_extract.MultiThreadChainExtractor;
 import playground.southafrica.utilities.Header;
 
 /**
  * Extracting the activity chains for a set of available and sorted monthly 
  * vehicle files, applying the extraction procedures of 
- * {@link MyMultiThreadChainExtractor} to each folder.
+ * {@link MultiThreadChainExtractor} to each folder.
  * 
  * @author jwjoubert
  */
@@ -78,7 +78,7 @@ public class MonthlyFileExtractor {
 						"WGS84_SA_Albers"
 				};
 				
-				MyMultiThreadChainExtractor.main(sa);
+				MultiThreadChainExtractor.main(sa);
 				LOG.info("====> Done processing month.");
 			}
 		}

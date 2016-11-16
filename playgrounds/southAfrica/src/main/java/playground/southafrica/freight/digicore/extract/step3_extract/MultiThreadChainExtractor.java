@@ -35,8 +35,8 @@ import org.matsim.core.utils.misc.Counter;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
-public class MyMultiThreadChainExtractor {
-	private final static Logger log = Logger.getLogger(MyMultiThreadChainExtractor.class);
+public class MultiThreadChainExtractor {
+	private final static Logger log = Logger.getLogger(MultiThreadChainExtractor.class);
 	private final ExecutorService threadExecutor;
 
 	/**
@@ -55,21 +55,29 @@ public class MyMultiThreadChainExtractor {
 	 * </ol>
 	 */
 	public static void main(String[] args) {
-		Header.printHeader(MyMultiThreadChainExtractor.class.toString(), args);
+		Header.printHeader(MultiThreadChainExtractor.class.toString(), args);
 		
 		log.info("===============================================================================");
 		log.info(" Extracting activity chains from sorted Digicore vehicle files.");
 		log.info("-------------------------------------------------------------------------------");
 
+		String inputFolderName = args[0];
+		String statusFilename = args[1];
+		String outputFolderName = args[2];
+		String threads = args[3];
+		String thresholdMinorMajor = args[4];
+		String thresholdActivity = args[5];
+		String crs = args[6];
+
 		/* Check that file folder exists and is readable. */
-		File folder = new File(args[0]);
+		File folder = new File(inputFolderName);
 		if(!folder.canRead() || !folder.isDirectory()){
 			throw new RuntimeException("Cannot read from " + folder.getAbsolutePath());
 		}
 		log.info("      Vehicle file folder: " + folder.getAbsolutePath());
 		
 		/* Check that output folder exists and is writable. */
-		File outputFolder = new File(args[2]);
+		File outputFolder = new File(outputFolderName);
 		if(!outputFolder.canWrite() || !outputFolder.isDirectory()){
 			throw new RuntimeException("Cannot write to " + outputFolder.getAbsolutePath());			
 		}
@@ -77,27 +85,32 @@ public class MyMultiThreadChainExtractor {
 		/* Sample all sorted files from given folder. */
 		List<File> fileList = FileUtils.sampleFiles(folder, Integer.MAX_VALUE, FileUtils.getFileFilter(".txt.gz"));
 		log.info("          Number of files: " + fileList.size());
-		log.info(" Number of threads to use: " + args[3]);
+		log.info(" Number of threads to use: " + threads);
 		log.info("-------------------------------------------------------------------------------");
 		
 		/* Read the ignition-ON and -OFF statuses from file */
 		DigicoreStatusReader dsr = null;
 		try {
-			dsr = new DigicoreStatusReader(args[1]);
+			dsr = new DigicoreStatusReader(statusFilename);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 		
-		/* Get coordinate reference system transformation. */
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", args[6]);
-		
-		//set up counter
+		/* Set up counter. */
 		Counter threadCounter = new Counter("Vehicles processed: ");
 		
 		/* Create extractor, and assign each vehicle file to the thread pool. */
-		MyMultiThreadChainExtractor extractorExecutor = new MyMultiThreadChainExtractor(Integer.parseInt(args[3]));
+		MultiThreadChainExtractor extractorExecutor = new MultiThreadChainExtractor(Integer.parseInt(threads));
 		for(File file : fileList){
-			DigicoreChainExtractor dce = new DigicoreChainExtractor(file, outputFolder, Double.parseDouble(args[4]), Double.parseDouble(args[5]), dsr.getStartSignals(), dsr.getStopSignals(), ct, threadCounter);
+			DigicoreChainExtractor dce = new DigicoreChainExtractor(
+					file, 
+					outputFolder, 
+					Double.parseDouble(thresholdMinorMajor), 
+					Double.parseDouble(thresholdActivity), 
+					dsr.getStartSignals(), 
+					dsr.getStopSignals(), 
+					crs, 
+					threadCounter);
 			extractorExecutor.threadExecutor.execute(dce);
 		}
 		extractorExecutor.threadExecutor.shutdown();
@@ -107,7 +120,7 @@ public class MyMultiThreadChainExtractor {
 		Header.printFooter();
 	}
 	
-	public MyMultiThreadChainExtractor(int nThreads){
+	public MultiThreadChainExtractor(int nThreads){
 		threadExecutor = Executors.newFixedThreadPool(nThreads);
 		
 	}
