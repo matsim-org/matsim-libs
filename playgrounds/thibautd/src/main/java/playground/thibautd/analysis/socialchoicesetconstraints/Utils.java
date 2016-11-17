@@ -190,7 +190,11 @@ class Utils {
 	 * @return k random indices lower than n, or [0..n - 1] if n lower than k.
 	 */
 	private static TLongSet permutations( final RandomDataGenerator random , final int k , final long n ) {
-		if ( n <= k ) return new TLongHashSet( LongStream.iterate( 0 , i -> i + 1 ).limit( n ).toArray() );
+		if ( n <= k ) {
+			final TLongHashSet set = new TLongHashSet( (int) n , .5f , -1L );
+			set.addAll( LongStream.iterate( 0 , i -> i + 1 ).limit( n ).toArray() );
+			return set;
+		}
 
 		final SparseLongVector vect = new SparseLongVector();
 		// do not iterate more than necessary (apache math seems to shuffle the whole array)
@@ -200,7 +204,7 @@ class Utils {
 			vect.swap( i , j );
 		}
 
-		// set no_entry_value to -1: default of 0 causes problems
+		// set no_entry_value to -1: default of 0 might cause problems
 		final TLongHashSet set = new TLongHashSet( k , .5f , -1L );
 		final long[] vals = vect.toArray( k );
 		assert vals.length == k;
