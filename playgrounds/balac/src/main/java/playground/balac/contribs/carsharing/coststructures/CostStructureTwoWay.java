@@ -5,7 +5,7 @@ import org.matsim.contrib.carsharing.manager.supply.costs.CostCalculation;
 
 public class CostStructureTwoWay implements CostCalculation {
 
-	private final static double scaleTOMatchCar = 4.0;
+	private final static double scaleTOMatchCar = 1.0;
 
 	@Override
 	public double getCost(RentalInfo rentalInfo) {
