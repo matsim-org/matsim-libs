@@ -20,15 +20,28 @@ import matsimintegration.TimeDiscretizationInjection;
 public class RunCottbusScenarioWithDifferentStrategies {
 	
 	public static void main (String[] args){
-//		runSeparateTimeAllocationMutatorAndReRoute();
-//		runCombinedTimeAllocationMutatorReRoute();
+		runSeparateTimeAllocationMutatorAndReRoute();
+		runCombinedTimeAllocationMutatorReRoute();
 		runBestTimeResponse();
 	}
 	
 	static void runSeparateTimeAllocationMutatorAndReRoute(){
-		String configFile = "C:/Users/gleich/ArbeitWorkspace5/Input-data/cottbus-with-pt/config_timeAllocAndReRoute.xml" ;
+		String configFile = "C:/Users/gleich/ArbeitWorkspace5/Input-data/cottbus-with-pt/config_withoutStrategySet.xml" ;
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.controler().setOutputDirectory("output/bestTimeIntegration/SeparateTimeAllocationMutatorAndReRoute");
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		StrategySettings timeAlloc = new StrategySettings();
+		timeAlloc.setStrategyName("TimeAllocationMutator");
+		timeAlloc.setWeight(0.1);
+		config.strategy().addStrategySettings(timeAlloc);
+		StrategySettings reRoute = new StrategySettings();
+		reRoute.setStrategyName("ReRoute");
+		reRoute.setWeight(0.1);
+		config.strategy().addStrategySettings(reRoute);
+		StrategySettings changeExpBeta = new StrategySettings();
+		changeExpBeta.setStrategyName("ChangeExpBeta");
+		changeExpBeta.setWeight(0.8);
+		config.strategy().addStrategySettings(changeExpBeta);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
@@ -40,6 +53,7 @@ public class RunCottbusScenarioWithDifferentStrategies {
 		String configFile = "C:/Users/gleich/ArbeitWorkspace5/Input-data/cottbus-with-pt/config_withoutStrategySet.xml" ;
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.controler().setOutputDirectory("output/bestTimeIntegration/CombinedTimeAllocationMutatorReRoute");
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		StrategySettings timeAllocReRoute = new StrategySettings();
 		timeAllocReRoute.setStrategyName("TimeAllocationMutator_ReRoute");
 		timeAllocReRoute.setWeight(0.2);
@@ -63,7 +77,7 @@ public class RunCottbusScenarioWithDifferentStrategies {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		StrategySettings stratSets = new StrategySettings();
 		stratSets.setStrategyName(STRATEGY_NAME);
-		stratSets.setWeight(0.1);
+		stratSets.setWeight(0.2);
 		config.strategy().addStrategySettings(stratSets);
 		
 		final Controler controler = new Controler(config);
