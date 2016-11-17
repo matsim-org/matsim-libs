@@ -32,7 +32,6 @@ public class TwoWayContainer implements VehiclesContainer{
 	
 	
 	public void reserveVehicle(CSVehicle vehicle) {		
-		System.out.println("Reserve: we are here: " + vehicle.getVehicleId());
 		String stationId = ((StationBasedVehicle)vehicle).getStationId();
 		this.twvehiclesMap.remove(vehicle);		
 		
@@ -41,7 +40,6 @@ public class TwoWayContainer implements VehiclesContainer{
 	}
 
 	public void parkVehicle(CSVehicle vehicle, Link link) {
-		System.out.println("we are here: " + vehicle.getVehicleId());
 		twvehiclesMap.put(vehicle, link);
 		String stationId = ((StationBasedVehicle)vehicle).getStationId();
 		CarsharingStation station = twowaycarsharingstationsMap.get(stationId);			
