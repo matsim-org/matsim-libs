@@ -29,6 +29,7 @@ import org.matsim.contrib.accessibility.AccessibilityStartupListener;
 import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
+import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.core.config.Config;
@@ -49,7 +50,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import playground.dziemke.utils.LogToOutputSaver;
 
 /**
- * @author dziemke
+ * @author dziemke, ikaddoura
  */
 public class AccessibilityComputationCottbus {
 	public static final Logger log = Logger.getLogger(AccessibilityComputationCottbus.class);
@@ -89,7 +90,11 @@ public class AccessibilityComputationCottbus {
 		config.plans().setInputFile(plansFile);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(accessibilityOutputDirectory);
-		config.controler().setLastIteration(0);		
+		config.controler().setLastIteration(0);
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true); // if this is not set to true, output CSV will give NaN values
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 		
 		// Create facilities from plans

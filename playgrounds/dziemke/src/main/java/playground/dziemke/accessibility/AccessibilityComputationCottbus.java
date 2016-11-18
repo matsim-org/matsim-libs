@@ -29,6 +29,7 @@ import org.matsim.contrib.accessibility.AccessibilityStartupListener;
 import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
+import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.NetworkModeProvider;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
@@ -89,6 +90,10 @@ public class AccessibilityComputationCottbus {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(accessibilityOutputDirectory);
 		config.controler().setLastIteration(0);
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true); // if this is not set to true, output CSV will give NaN values
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 //		config.transit().setTransitScheduleFile(runOutputFolder + "output_transitSchedule.xml.gz");
 //		config.transit().setVehiclesFile(runOutputFolder + "output_transitVehicles.xml.gz");
