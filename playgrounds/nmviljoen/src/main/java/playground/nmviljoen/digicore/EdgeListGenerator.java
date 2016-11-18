@@ -119,9 +119,10 @@ public class EdgeListGenerator {
 		Counter counter = new Counter("   vehicles # ");
 		for(DigicoreVehicle vehicle : vehicles.getVehicles().values()){
 			for(DigicoreChain chain : vehicle.getChains()){
-				for(int i = 0; i < chain.size()-1; i++){
-					DigicoreActivity o = chain.get(i);
-					DigicoreActivity d = chain.get(i+1);
+				List<DigicoreActivity> activities = chain.getAllActivities();
+				for(int i = 0; i < activities.size()-1; i++){
+					DigicoreActivity o = activities.get(i);
+					DigicoreActivity d = activities.get(i+1);
 					if(o.getFacilityId() != null && d.getFacilityId() != null){
 						/* Check if either of the two facilities are in the 
 						 * study area. */
