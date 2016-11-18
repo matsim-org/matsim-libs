@@ -49,10 +49,11 @@ import com.vividsolutions.jts.geom.Envelope;
 
 import playground.dziemke.utils.LogToOutputSaver;
 
+/**
+ * @author dziemke
+ */
 public class AccessibilityComputationCottbus {
 	public static final Logger log = Logger.getLogger(AccessibilityComputationCottbus.class);
-	
-	private static final Double cellSize = 200.;
 	
 	public static void main(String[] args) {
 		// Input and output	
@@ -63,6 +64,7 @@ public class AccessibilityComputationCottbus {
 		String plansFile = "commuter_population_wgs84_utm33n_car_only.xml.gz";
 		
 		// Parameters
+		final Double cellSize = 200.;
 		String crs = TransformationFactory.WGS84_UTM33N; // EPSG:32633 -- UTM33N
 		Envelope envelope = new Envelope(447000,5729000,461000,5740000);
 		final String runId = "de_cottbus_" + "2106-11-10" + "_" + cellSize.toString().split("\\.")[0];
@@ -78,7 +80,7 @@ public class AccessibilityComputationCottbus {
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 		
 		// Storage objects
-		final List<String> modes = new ArrayList<>();	
+		final List<String> modes = new ArrayList<>();
 		
 		// Config and scenario
 		Config config = ConfigUtils.loadConfig(runOutputFolder + "config.xml", new AccessibilityConfigGroup());

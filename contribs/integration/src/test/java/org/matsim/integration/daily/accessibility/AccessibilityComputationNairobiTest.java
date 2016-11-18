@@ -91,7 +91,7 @@ public class AccessibilityComputationNairobiTest {
 //		final Envelope envelope = new Envelope(249000, 255000, 9854000, 9858000); // western Nairobi with Kibera
 //		final Envelope envelope = new Envelope(-70000, 800000, 9450000, 10500000); // whole Kenya
 //		final Envelope envelope = new Envelope(-70000, 420000, 9750000, 10100000); // Southwestern half of Kenya
-		final String runId = "ke_nairobi_" + PathUtils.getDate() + "_" + cellSize.toString().split("\\.")[0] + "_kodi_sec_";
+		final String runId = "ke_nairobi_" + AccessibilityUtils.getDate() + "_" + cellSize.toString().split("\\.")[0] + "_kodi_sec_";
 		final boolean push2Geoserver = false;
 		
 		// QGis parameters

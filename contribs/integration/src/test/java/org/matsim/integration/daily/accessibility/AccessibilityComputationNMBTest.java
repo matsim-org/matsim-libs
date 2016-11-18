@@ -89,7 +89,7 @@ public class AccessibilityComputationNMBTest {
 		// Parameters
 		final String crs = TransformationFactory.WGS84_SA_Albers;
 		final Envelope envelope = new Envelope(115000,161000,-3718000,-3679000);
-		final String runId = "za_nmb_" + PathUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
+		final String runId = "za_nmb_" + AccessibilityUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
 		final boolean push2Geoserver = true;
 		
 		// QGis parameters

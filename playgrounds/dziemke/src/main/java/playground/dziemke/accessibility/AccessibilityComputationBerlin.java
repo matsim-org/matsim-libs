@@ -37,13 +37,10 @@ import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
 
 import com.google.inject.Key;
@@ -53,26 +50,31 @@ import com.vividsolutions.jts.geom.Envelope;
 
 import playground.dziemke.utils.LogToOutputSaver;
 
+/**
+ * @author dziemke
+ */
 public class AccessibilityComputationBerlin {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationBerlin.class ) ;
 	
-	private static final Double cellSize = 500.;
+	private static final Double cellSize = 5000.;
 
 	public static void main(String[] args) {
 		// Input and output
 //		String networkFile = "../../shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.all.xml";
 //		String networkFile = "../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 		// same network at alternate location
-//		String networkFile = "../../../../SVN/shared-svn/projects/accessibility_berlin/iv_counts/network.xml";
-		String networkFile = "../../../shared-svn/projects/accessibility_berlin/iv_counts/network.xml";
+//		String networkFile = "../../../shared-svn/projects/accessibility_berlin/iv_counts/network.xml";
+		String networkFile = "../../../shared-svn/projects/accessibility_berlin/network/2015-05-26/network.xml";
 		
 //		String facilitiesFile = "../../shared-svn/projects/accessibility_berlin/osm/facilities_amenities_modified.xml";
 		// now using work facilities
 //		String facilitiesFile = "../../../../SVN/shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/facilities.xml";
-		String facilitiesFile = "../../../shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/facilities.xml";
+//		String facilitiesFile = "../../../shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/facilities.xml";
+		String facilitiesFile = "../../../shared-svn/projects/accessibility_berlin/refugee/initiativen.xml";
 
 //		String outputDirectory = "../../../../SVN/shared-svn/projects/accessibility_berlin/output/08_test/";
-		String outputDirectory = "../../../shared-svn/projects/accessibility_berlin/output/08_test_2016-11-09/";
+//		String outputDirectory = "../../../shared-svn/projects/accessibility_berlin/output/08_test_2016-11-09/";
+		String outputDirectory = "../../../shared-svn/projects/accessibility_berlin/output/refugee/";
 //		String travelTimeMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelDistanceMatrix.csv.gz";
 //		String ptStops = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/stops.csv.gz";
@@ -80,26 +82,21 @@ public class AccessibilityComputationBerlin {
 		LogToOutputSaver.setOutputDirectory(outputDirectory);
 		
 		// Parameters
-		String crs = TransformationFactory.DHDN_GK4;
-//		String crs = "EPSG:31468"; // = DHDN GK4
-		Envelope envelope = new Envelope(4574000-1000, 5802000-1000, 4620000+1000, 5839000+1000);
+//		String crs = TransformationFactory.DHDN_GK4;
+		String crs = "EPSG:31468"; // = DHDN GK4
+		Envelope envelope = new Envelope(4581000, 4612000, 5810000, 5833000); // smaller Berlin
+//		Envelope envelope = new Envelope(4574000-1000, 4620000+1000, 5802000-1000, 5839000+1000);
 //		final String runId = "de_berlin_" + PathUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
-		final String runId = "de_berlin_" + "106-11-10" + "_" + cellSize.toString().split("\\.")[0];
+		final String runId = "de_berlin_" + AccessibilityUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
 		final boolean push2Geoserver = false;
 		
 		// QGis parameters
 		boolean createQGisOutput = true;
 		boolean includeDensityLayer = false;
-//		Double lowerBound = 1.75;
-//		Double upperBound = 7.;
-//		Double lowerBound = 0.;
-//		Double upperBound = 9.;
-		Double lowerBound = 2.25;
-		Double upperBound = 7.5;
+		Double lowerBound = -2.;
+		Double upperBound = 3.25;
 		Integer range = 9;
-//		int symbolSize = 1010;
-//		int symbolSize = 210;
-		int symbolSize = 510;
+		int symbolSize = 5000;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 		
 		// Storage objects
@@ -126,7 +123,7 @@ public class AccessibilityComputationBerlin {
 //		mbpcg.setPtTravelTimesInputFile(travelTimeMatrixFilePT);
 
 		// plansClacRoute parameters
-		PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
+//		PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
 
 		// if no travel matrix (distances and times) is provided, the teleported mode speed for pt needs to be set
 		// teleported mode speed for pt also required, see PtMatrix:120
@@ -138,14 +135,14 @@ public class AccessibilityComputationBerlin {
 		// the walk and bike parameters are needed, however. This is why they have to be set here again
 
 		// teleported mode speed for walking also required, see PtMatrix:141
-		ModeRoutingParams walkParameters = new ModeRoutingParams(TransportMode.walk);
-		walkParameters.setTeleportedModeSpeed(3./3.6);
-		plansCalcRoute.addModeRoutingParams(walkParameters );
-
-		// teleported mode speed for bike also required, see AccessibilityControlerListenerImpl:168
-		ModeRoutingParams bikeParameters = new ModeRoutingParams(TransportMode.bike);
-		bikeParameters.setTeleportedModeSpeed(15./3.6);
-		plansCalcRoute.addModeRoutingParams(bikeParameters );
+//		ModeRoutingParams walkParameters = new ModeRoutingParams(TransportMode.walk);
+//		walkParameters.setTeleportedModeSpeed(3./3.6);
+//		plansCalcRoute.addModeRoutingParams(walkParameters );
+//
+//		// teleported mode speed for bike also required, see AccessibilityControlerListenerImpl:168
+//		ModeRoutingParams bikeParameters = new ModeRoutingParams(TransportMode.bike);
+//		bikeParameters.setTeleportedModeSpeed(15./3.6);
+//		plansCalcRoute.addModeRoutingParams(bikeParameters );
 
 		// pt matrix
 //		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
@@ -159,7 +156,8 @@ public class AccessibilityComputationBerlin {
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
 		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
 		List<String> activityTypes = new ArrayList<String>();
-		activityTypes.add("s");
+//		activityTypes.add("s");
+		activityTypes.add("Refugee_Initiative");
 		log.error("Only using s as activity type to speed up for testing");
 
 		// Collect homes for density layer
