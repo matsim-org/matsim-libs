@@ -31,7 +31,6 @@ public class SocialNetworkModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		// TODO Auto-generated method stub
 		bind( GroupIdentifier.class ).to( DynamicGroupIdentifier.class );
 	}
 }

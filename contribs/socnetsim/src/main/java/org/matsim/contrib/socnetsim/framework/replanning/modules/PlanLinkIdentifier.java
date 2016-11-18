@@ -32,13 +32,13 @@ public interface PlanLinkIdentifier {
 	@Retention( RetentionPolicy.RUNTIME )
 	@BindingAnnotation
 	@Target( { ElementType.FIELD, ElementType.LOCAL_VARIABLE, ElementType.PARAMETER } )
-	public @interface Strong {}
+	@interface Strong {}
 
 	@Retention( RetentionPolicy.RUNTIME )
 	@BindingAnnotation
 	@Target( { ElementType.FIELD, ElementType.LOCAL_VARIABLE, ElementType.PARAMETER } )
-	public @interface Weak {}
+	@interface Weak {}
 
 
-	public boolean areLinked(Plan p1, Plan p2);
+	boolean areLinked( Plan p1, Plan p2 );
 }
