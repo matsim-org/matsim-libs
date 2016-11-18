@@ -77,7 +77,7 @@ public final class AccessibilityStartupListener implements StartupListener {
 			ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(), cellSize);
 			accessibilityCalculator.setMeasuringPoints(measuringPoints);
 			for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
-				accessibilityCalculator.putAccessibilityCalculator(entry.getKey(), entry.getValue());
+				accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 			}
 			ActivityFacilities activityFacilities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType);
 			GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, activityFacilities, 

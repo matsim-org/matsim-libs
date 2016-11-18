@@ -73,7 +73,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		delegate.setMeasuringPoints(measuringPoints);
 		assert(matsim4opusTempDirectory != null);
 		if (ptMatrix != null) {
-			delegate.putAccessibilityCalculator(
+			delegate.putAccessibilityContributionCalculator(
 			Modes4Accessibility.pt.name(),
 			PtMatrixAccessibilityContributionCalculator.create(
 					ptMatrix,

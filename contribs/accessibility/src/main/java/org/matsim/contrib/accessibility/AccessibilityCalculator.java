@@ -7,11 +7,13 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+//import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
@@ -149,8 +151,12 @@ public final class AccessibilityCalculator {
 	public final void computeAccessibilities( Double departureTime, ActivityFacilities opportunities) {
 		aggregateOpportunities(opportunities, scenario.getNetwork());
 
-		Map<Modes4Accessibility,ExpSum> expSums = new HashMap<>() ;
-		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+//		Map<Modes4Accessibility,ExpSum> expSums = new HashMap<>() ;
+		Map<String,ExpSum> expSums = new HashMap<>() ;
+		// new
+		for (String mode : calculators.keySet()) {
+//		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+		// end new
 			expSums.put(mode, new ExpSum());
 		}
 
@@ -189,11 +195,16 @@ public final class AccessibilityCalculator {
 				// points separately anyways?  Answer: The trees need to be computed only once.  (But one could save more.) kai, feb'14
 
 				// aggregated value
-				Map< Modes4Accessibility, Double> accessibilities  = new HashMap<>() ;
-
-				for ( Modes4Accessibility mode : acg.getIsComputingMode() ) {
+				Map<String, Double> accessibilities  = new HashMap<>();
+				
+				// new
+				for (String mode : calculators.keySet()) {
+//					System.out.println("mode = " + mode);
+				// end new
+//				for ( Modes4Accessibility mode : acg.getIsComputingMode() ) {
 					// TODO introduce here a config parameter "computation mode" that can be set to "rawSum", "minimum" or "exponential/logsum/hansen", dz, sept'16
 					if(!useRawSum){
+//						System.out.println("expSums.get(mode).getSum() = " + expSums.get(mode).getSum());
 						accessibilities.put( mode, inverseOfLogitScaleParameter * Math.log( expSums.get(mode).getSum() ) ) ;
 					} else {
 						// this was used by IVT within SustainCity.  Not sure if we should maintain this; they could, after all, just exp the log results. kai, may'15
@@ -241,14 +252,17 @@ public final class AccessibilityCalculator {
 	}
 
 
-	private void computeAndAddExpUtilContributions(Map<Modes4Accessibility,ExpSum> expSums, ActivityFacility origin, 
-			final AggregationObject aggregatedFacility, Double departureTime) {
+//	private void computeAndAddExpUtilContributions(Map<Modes4Accessibility,ExpSum> expSums, ActivityFacility origin, final AggregationObject aggregatedFacility, Double departureTime) {
+	private void computeAndAddExpUtilContributions(Map<String, ExpSum> expSums, ActivityFacility origin, final AggregationObject aggregatedFacility, Double departureTime) {
 		for ( Map.Entry<String, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet() ) {
-			final Modes4Accessibility mode = Modes4Accessibility.valueOf(calculatorEntry.getKey());
+//			final Modes4Accessibility mode = Modes4Accessibility.valueOf(calculatorEntry.getKey());
+			String mode = calculatorEntry.getKey();
 
-			if ( !this.acg.getIsComputingMode().contains(mode) ) {
-				continue; // XXX yyyyyy should be configured by adding only the relevant calculators
-			}
+			// new
+//			if ( !this.acg.getIsComputingMode().contains(mode) ) {
+//				continue; // XXX yyyyyy should be configured by adding only the relevant calculators
+//			}
+			// end new
 
 			final double expVhk = calculatorEntry.getValue().computeContributionOfOpportunity( origin , aggregatedFacility, departureTime );
 
@@ -263,14 +277,22 @@ public final class AccessibilityCalculator {
 	}
 
 	
-	public final void putAccessibilityCalculator( String mode, AccessibilityContributionCalculator calc ) {
-		this.calculators.put( mode , calc ) ;
+	public final void putAccessibilityContributionCalculator(String mode, AccessibilityContributionCalculator calc) {
+		this.calculators.put(mode , calc) ;
 	}
 
 
+	@Deprecated
 	public Set<Modes4Accessibility> getIsComputingMode() {
 		return this.acg.getIsComputingMode();
 	}
+	
+	
+	// new
+	public Map<String, AccessibilityContributionCalculator> getAccessibilityContributionCalculators() {
+		return this.calculators;
+	}
+	// end new
 
 
 	/**

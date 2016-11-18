@@ -41,11 +41,10 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 		this.name = name;
 	}
 
-	private Map<Tuple<ActivityFacility, Double>, Map<Modes4Accessibility,Double>> accessibilitiesMap = new HashMap<>() ;
+	private Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = new HashMap<>() ;
 
 	@Override
-	public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay,
-			Map<Modes4Accessibility, Double> accessibilities) {
+	public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay,	Map<String, Double> accessibilities) {
 		accessibilitiesMap.put( new Tuple<>(measurePoint, timeOfDay), accessibilities ) ;
 	}
 
@@ -84,7 +83,7 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 		// yy for time being, have to assume that this is always there
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(this.crs, TransformationFactory.WGS84);
 
-		for (Entry<Tuple<ActivityFacility, Double>, Map<Modes4Accessibility, Double>> entry : accessibilitiesMap.entrySet()) {
+		for (Entry<Tuple<ActivityFacility, Double>, Map<String, Double>> entry : accessibilitiesMap.entrySet()) {
 			ActivityFacility facility = entry.getKey().getFirst();
 			Double timeOfDay = entry.getKey().getSecond();
 			Coord coord = facility.getCoord() ;
@@ -94,7 +93,7 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 			featureBuilder.add(coord.getY());
 //			featureBuilder.add(timeOfDay);
 
-			Map<Modes4Accessibility, Double> accessibilities = entry.getValue();
+			Map<String, Double> accessibilities = entry.getValue();
 			for (Modes4Accessibility mode : Modes4Accessibility.values()) {
 				Double accessibility = accessibilities.get(mode);
 				if (accessibility != null && !Double.isNaN(accessibility)) {

@@ -54,7 +54,7 @@ import playground.dziemke.utils.LogToOutputSaver;
  * @author dziemke
  */
 public class AccessibilityComputationCottbus {
-	public static final Logger log = Logger.getLogger(AccessibilityComputationCottbus.class);
+	public static final Logger LOG = Logger.getLogger(AccessibilityComputationCottbus.class);
 	
 	public static void main(String[] args) {
 		// Input and output	

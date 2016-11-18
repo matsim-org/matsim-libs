@@ -54,9 +54,7 @@ import playground.dziemke.utils.LogToOutputSaver;
  * @author dziemke
  */
 public class AccessibilityComputationBerlin {
-	public static final Logger log = Logger.getLogger( AccessibilityComputationBerlin.class ) ;
-	
-	private static final Double cellSize = 5000.;
+	public static final Logger LOG = Logger.getLogger( AccessibilityComputationBerlin.class ) ;
 
 	public static void main(String[] args) {
 		// Input and output
@@ -82,6 +80,7 @@ public class AccessibilityComputationBerlin {
 		LogToOutputSaver.setOutputDirectory(outputDirectory);
 		
 		// Parameters
+		final Double cellSize = 1000.;
 //		String crs = TransformationFactory.DHDN_GK4;
 		String crs = "EPSG:31468"; // = DHDN GK4
 		Envelope envelope = new Envelope(4581000, 4612000, 5810000, 5833000); // smaller Berlin
@@ -91,7 +90,7 @@ public class AccessibilityComputationBerlin {
 		final boolean push2Geoserver = false;
 		
 		// QGis parameters
-		boolean createQGisOutput = true;
+		boolean createQGisOutput = false;
 		boolean includeDensityLayer = false;
 		Double lowerBound = -2.;
 		Double upperBound = 3.25;
@@ -110,9 +109,9 @@ public class AccessibilityComputationBerlin {
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true); // if this is not set to true, output CSV will give NaN values
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+//		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true); // if this is not set to true, output CSV will give NaN values
+//		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+//		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 		final Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 
 		// ##### Matrix-based pt
@@ -158,7 +157,7 @@ public class AccessibilityComputationBerlin {
 		List<String> activityTypes = new ArrayList<String>();
 //		activityTypes.add("s");
 		activityTypes.add("Refugee_Initiative");
-		log.error("Only using s as activity type to speed up for testing");
+		LOG.error("Only using s as activity type to speed up for testing");
 
 		// Collect homes for density layer
 		String activityFacilityType = FacilityTypes.HOME;
