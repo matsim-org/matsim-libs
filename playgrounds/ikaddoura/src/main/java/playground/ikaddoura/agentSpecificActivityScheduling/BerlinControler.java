@@ -56,7 +56,7 @@ public class BerlinControler {
 			addModifiedActivities = Boolean.parseBoolean(args[1]);
 			log.info("addModifiedActivities: "+ addModifiedActivities);
 
-			activityDurationBin = Integer.parseInt(args[2]);
+			activityDurationBin = Double.parseDouble(args[2]);
 			log.info("activityDurationBin: "+ activityDurationBin);
 
 			pricing = Boolean.parseBoolean(args[3]);			
