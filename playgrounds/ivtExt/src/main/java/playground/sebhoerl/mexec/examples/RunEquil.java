@@ -1,14 +1,23 @@
 package playground.sebhoerl.mexec.examples;
 
+import org.apache.commons.lang3.event.EventUtils;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsUtils;
 import playground.sebhoerl.mexec.*;
 import playground.sebhoerl.mexec.local.LocalEnvironment;
 import playground.sebhoerl.mexec.placeholders.PlaceholderUtils;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public class RunEquil {
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         String localControllerPath = "/home/sebastian/Downloads/matsim";
         String localScenarioPath = "/home/sebastian/Downloads/matsim/examples/equil";
 
@@ -28,7 +37,22 @@ public class RunEquil {
             controller = environment.getController("standard");
         }
 
-        if (environment.hasSimulation("sim1")) {
+        Simulation simulation = environment.getSimulaiton("sim1");
+
+        EventsManager eventsManager = new EventsManagerImpl();
+        eventsManager.addHandler(new PersonDepartureEventHandler() {
+            @Override
+            public void handleEvent(PersonDepartureEvent event) {
+                System.out.println("DEPARTURE");
+            }
+
+            @Override
+            public void reset(int iteration) {}
+        });
+
+        SimulationUtils.processEvents(eventsManager, simulation);
+
+        /*if (environment.hasSimulation("sim1")) {
             Simulation simulation = environment.getSimulaiton("sim1");
 
             if (simulation.isActive()) {
@@ -62,6 +86,6 @@ public class RunEquil {
             } else {
                 System.out.println("Iteration: " + iteration);
             }
-        }
+        }*/
     }
 }
