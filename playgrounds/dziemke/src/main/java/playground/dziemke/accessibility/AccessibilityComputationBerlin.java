@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
@@ -30,7 +31,6 @@ import org.matsim.contrib.accessibility.AccessibilityStartupListener;
 import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
-import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.NetworkModeProvider;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
@@ -80,7 +80,7 @@ public class AccessibilityComputationBerlin {
 		LogToOutputSaver.setOutputDirectory(outputDirectory);
 		
 		// Parameters
-		final Double cellSize = 1000.;
+		final Double cellSize = 5000.;
 //		String crs = TransformationFactory.DHDN_GK4;
 		String crs = "EPSG:31468"; // = DHDN GK4
 		Envelope envelope = new Envelope(4581000, 4612000, 5810000, 5833000); // smaller Berlin
@@ -90,10 +90,10 @@ public class AccessibilityComputationBerlin {
 		final boolean push2Geoserver = false;
 		
 		// QGis parameters
-		boolean createQGisOutput = false;
+		boolean createQGisOutput = true;
 		boolean includeDensityLayer = false;
-		Double lowerBound = -2.;
-		Double upperBound = 3.25;
+		Double lowerBound = -3.5;
+		Double upperBound = 3.5;
 		Integer range = 9;
 		int symbolSize = 5000;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
@@ -108,10 +108,6 @@ public class AccessibilityComputationBerlin {
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
-		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-//		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true); // if this is not set to true, output CSV will give NaN values
-//		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-//		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 		final Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 
 		// ##### Matrix-based pt
@@ -155,9 +151,7 @@ public class AccessibilityComputationBerlin {
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
 		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
 		List<String> activityTypes = new ArrayList<String>();
-//		activityTypes.add("s");
 		activityTypes.add("Refugee_Initiative");
-		LOG.error("Only using s as activity type to speed up for testing");
 
 		// Collect homes for density layer
 		String activityFacilityType = FacilityTypes.HOME;
