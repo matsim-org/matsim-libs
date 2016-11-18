@@ -99,11 +99,13 @@ public class DigicoreVehicleCollator {
 		
 		/* Parse the individual vehicle files. */
 		List<File> files = FileUtils.sampleFiles(new File(inputFolder), Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
+		DigicoreVehicleReader dvr = null; 
 		for(File file : files){
-			DigicoreVehicleReader dvr = new DigicoreVehicleReader();
+			dvr = new DigicoreVehicleReader();
 			dvr.readFile(file.getAbsolutePath());
 			DigicoreVehicle dv = dvr.getVehicle();
 			vehicles.addDigicoreVehicle(dv);
+			dvr = null;
 		}
 		LOG.info("Done collating the file.");
 
