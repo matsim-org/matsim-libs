@@ -29,14 +29,14 @@ import org.matsim.core.scoring.functions.OpeningIntervalCalculator;
 * @author ikaddoura
 */
 
-public class IKOpeningIntervalCalculator implements OpeningIntervalCalculator {
+public class AgentSpecificOpeningIntervalCalculator implements OpeningIntervalCalculator {
 
 	private final Person person;
 	private final CharyparNagelScoringParameters params;	
 	private final CountActEventHandler actCounter;
 	private final double tolerance = 900.;
 	
-	public IKOpeningIntervalCalculator(CharyparNagelScoringParameters parameters, Person person, CountActEventHandler actCount) {
+	public AgentSpecificOpeningIntervalCalculator(CharyparNagelScoringParameters parameters, Person person, CountActEventHandler actCount) {
 		this.person = person;
 		this.params = parameters;
 		this.actCounter = actCount;

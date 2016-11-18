@@ -38,18 +38,18 @@ import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParame
 * @author ikaddoura
 */
 
-public class IKScoringFunctionFactory implements ScoringFunctionFactory {
+public class AgentSpecificScoringFunctionFactory implements ScoringFunctionFactory {
 	
 	protected Network network;
 	private final CharyparNagelScoringParametersForPerson params;
 	private final CountActEventHandler actCount;
 		
 	@Inject
-	public IKScoringFunctionFactory( final Scenario sc, final CountActEventHandler actCount ) {
+	public AgentSpecificScoringFunctionFactory( final Scenario sc, final CountActEventHandler actCount ) {
 		this( new SubpopulationCharyparNagelScoringParameters( sc ) , sc.getNetwork() , actCount );
 	}
 	
-	IKScoringFunctionFactory(final CharyparNagelScoringParametersForPerson params, Network network, CountActEventHandler actCount) {
+	AgentSpecificScoringFunctionFactory(final CharyparNagelScoringParametersForPerson params, Network network, CountActEventHandler actCount) {
 		this.params = params;
 		this.network = network;
 		this.actCount = actCount;
@@ -61,7 +61,7 @@ public class IKScoringFunctionFactory implements ScoringFunctionFactory {
 		final CharyparNagelScoringParameters parameters = params.getScoringParameters( person );
 				
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
-		sumScoringFunction.addScoringFunction(new IKActivityScoring(parameters, person, actCount));
+		sumScoringFunction.addScoringFunction(new AgentSpecificActivityScoring(parameters, person, actCount));
 		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring( parameters , this.network));
 		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring( parameters ));
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring( parameters ));

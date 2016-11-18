@@ -28,14 +28,14 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 * @author ikaddoura
 */
 
-public class IKActivityScoring implements org.matsim.core.scoring.SumScoringFunction.ActivityScoring {
+public class AgentSpecificActivityScoring implements org.matsim.core.scoring.SumScoringFunction.ActivityScoring {
 		
 	private final CharyparNagelActivityScoring delegate;
 	
-	private final IKOpeningIntervalCalculator openingIntervalCalculator;
+	private final AgentSpecificOpeningIntervalCalculator openingIntervalCalculator;
 	
-	public IKActivityScoring(CharyparNagelScoringParameters parameters, Person person, CountActEventHandler actCount) {
-		openingIntervalCalculator = new IKOpeningIntervalCalculator(parameters, person, actCount);
+	public AgentSpecificActivityScoring(CharyparNagelScoringParameters parameters, Person person, CountActEventHandler actCount) {
+		openingIntervalCalculator = new AgentSpecificOpeningIntervalCalculator(parameters, person, actCount);
 		this.delegate = new CharyparNagelActivityScoring(parameters, openingIntervalCalculator);
 	}
 

@@ -78,10 +78,9 @@ public class PopulationActivitySplitter {
 		
 		Population population = null;
 		population = PopulationTools.getPopulationWithOnlySelectedPlans(scenario.getPopulation());
-		population = PopulationTools.setActivityTypesAccordingToDuration(population, timeCategorySize);
-		population = PopulationTools.addPersonAttributes(population);
+		population = PopulationTools.setActivityTypesAccordingToDurationAndMergeOvernightActivities(population, timeCategorySize);
+		population = PopulationTools.addActivityTimesOfSelectedPlanToPersonAttributes(population);
 //		population = PopulationTools.removeNetworkSpecificInformation(population);
-		population = PopulationTools.mergeEveningAndMorningActivityIfSameBaseType(population);
 		PopulationTools.analyze(population);
 	
 		PopulationWriter pw = new PopulationWriter(population);

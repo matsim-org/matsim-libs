@@ -20,16 +20,11 @@
 package playground.ikaddoura.berlin;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -48,8 +43,7 @@ public class BerlinControler {
 	
 	private static String configFile;
 	private static boolean addModifiedActivities;
-	private static int activityDurationHRS;
-	private static int hrs;
+	private static double activityDurationBin;
 	private static boolean pricing;
 	
 	public static void main(String[] args) throws IOException {
@@ -62,23 +56,18 @@ public class BerlinControler {
 			addModifiedActivities = Boolean.parseBoolean(args[1]);
 			log.info("addModifiedActivities: "+ addModifiedActivities);
 
-			activityDurationHRS = Integer.parseInt(args[2]);
-			log.info("activityDurationHRS: "+ activityDurationHRS);
-			
-			hrs = Integer.parseInt(args[3]);
-			log.info("hrs: "+ hrs);
+			activityDurationBin = Integer.parseInt(args[2]);
+			log.info("activityDurationBin: "+ activityDurationBin);
 
-			pricing = Boolean.parseBoolean(args[4]);			
+			pricing = Boolean.parseBoolean(args[3]);			
 			log.info("pricing: "+ pricing);
 
 		} else {
 			
-//			configFile = "../../../runs-svn/berlin_car-traffic-only-1pct-2014-08-01/baseCase/input/config_detailed-network.xml";
-			configFile = "../../../runs-svn/berlin_car-traffic-only-1pct-2014-08-01/baseCase/input/config_test.xml";
+			configFile = "../../../runs-svn/berlin-dz-time/input/config_test.xml";
 			
 			addModifiedActivities = true;
-			activityDurationHRS = 1;
-			hrs = 25;
+			activityDurationBin = 3600.;
 			
 			pricing = false;
 			
@@ -91,65 +80,22 @@ public class BerlinControler {
 	private void run() throws IOException {
 		
 		Config config = ConfigUtils.loadConfig(configFile);
-		final String outputDirectory = config.controler().getOutputDirectory();
-				
-		if (addModifiedActivities) {
-			
-			List<ActivityParams> newActivityParams = new ArrayList<>();
-
-			for (ActivityParams actParams : config.planCalcScore().getActivityParams()) {
-				String activityType = actParams.getActivityType();
-				
-				if (activityType.contains("interaction")) {
-					log.info("Skipping activity " + activityType + "...");
-					
-				} else {
-					
-					log.info("Splitting activity " + activityType + " in duration-specific activities.");
-
-					for (int n = 1; n <= hrs ; n = n + activityDurationHRS) {
-						ActivityParams params = new ActivityParams(activityType + "_" + n);
-						params.setTypicalDuration(n * 3600.);
-						params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
-						newActivityParams.add(params);
-					}
-				}
-			}
-			
-			// add new activity parameters to config
-			
-			for (ActivityParams actParams : newActivityParams) {
-				config.planCalcScore().addActivityParams(actParams);
-			}				
-		}
-		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
+				
+		if (addModifiedActivities) {		
+			AgentSpecificActivityScheduling aa = new AgentSpecificActivityScheduling(controler);
+			aa.setActivityDurationBin(activityDurationBin);
+			controler = aa.prepareControler();			
+		}
 				
 		if (pricing) {
 			CNEIntegration cne = new CNEIntegration(controler);
 			cne.setCongestionPricing(true);
 			controler = cne.prepareControler();
 		}
-		
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-		
-		// adjusted scoring
-		if (addModifiedActivities) {
-			controler.addOverridingModule( new AbstractModule() {
-				
-				@Override
-				public void install() {
-					
-					CountActEventHandler actCount = new CountActEventHandler();
-									
-					this.addEventHandlerBinding().toInstance(actCount);
-					this.bindScoringFunctionFactory().toInstance(new IKScoringFunctionFactory(scenario, actCount));
-					// TODO: see if there are nicer ways to plug this together...
-				}
-			});
-		}
 			
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 		
 		// analysis
@@ -157,7 +103,7 @@ public class BerlinControler {
 		PersonTripCongestionNoiseAnalysisMain analysis = new PersonTripCongestionNoiseAnalysisMain(controler.getConfig().controler().getOutputDirectory());
 		analysis.run();
 		
-		MATSimVideoUtils.createLegHistogramVideo(outputDirectory);
+		MATSimVideoUtils.createLegHistogramVideo(controler.getConfig().controler().getOutputDirectory());
 	}
 
 }
