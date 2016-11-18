@@ -363,9 +363,6 @@ public class OTFOGLDrawer implements GLEventListener {
 		if (this.currentSceneGraph != null) {
 			this.currentSceneGraph.draw();
 		}
-		if (this.queryHandler != null) {
-			this.queryHandler.drawQueries(this);
-		}
 
 		if (otfVisConfig.drawTime()) {
 			drawFrameRate(drawable, now);
@@ -558,6 +555,7 @@ public class OTFOGLDrawer implements GLEventListener {
 
 	public void setQueryHandler(OTFQueryControl queryHandler) {
 		this.queryHandler = queryHandler;
+		((GLAutoDrawable) canvas).addGLEventListener(((GLAutoDrawable) canvas).getGLEventListenerCount()-2, queryHandler);
 	}
 
 	public void setScale(double scale) {

@@ -56,9 +56,9 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 import playground.agarwalamit.emissions.EmissionModalTravelDisutilityCalculatorFactory;
-import playground.benjamin.internalization.EmissionCostFactors;
-import playground.benjamin.internalization.EmissionCostModule;
-import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
+import playground.vsp.airPollution.flatEmissions.EmissionCostFactors;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
+import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
 
 /**
  * Just setting up the equil scenario to get emissions for a mixed traffic conditions.

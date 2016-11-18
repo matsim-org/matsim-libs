@@ -44,8 +44,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.e;
-
 /**
  * @author thibautd
  */

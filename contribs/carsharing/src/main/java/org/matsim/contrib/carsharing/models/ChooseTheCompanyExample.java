@@ -15,7 +15,7 @@ public class ChooseTheCompanyExample implements ChooseTheCompany {
 	@Inject private MembershipContainer memberships;
 
 	@Override
-	public String pickACompany(Plan plan, Leg leg, double now) {
+	public String pickACompany(Plan plan, Leg leg, double now, String type) {
 
 		Person person = plan.getPerson();
 		Id<Person>  personId = person.getId();

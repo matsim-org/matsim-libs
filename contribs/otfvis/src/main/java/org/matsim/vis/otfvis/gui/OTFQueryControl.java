@@ -33,6 +33,8 @@ import java.util.Vector;
 
 import javax.swing.JTextField;
 
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLEventListener;
 import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
@@ -61,7 +63,7 @@ import org.matsim.vis.otfvis.opengl.queries.QuerySpinne;
  * @author dstrippgen
  * 
  */
-public class OTFQueryControl {
+public class OTFQueryControl implements GLEventListener {
 
 	private static final Logger log = Logger.getLogger(OTFQueryControl.class);
 
@@ -92,6 +94,16 @@ public class OTFQueryControl {
 		this.server = server;
 	}
 
+	@Override
+	public void init(GLAutoDrawable glAutoDrawable) {
+
+	}
+
+	@Override
+	public void reshape(GLAutoDrawable glAutoDrawable, int i, int i1, int i2, int i3) {
+
+	}
+
 	synchronized void handleIdQuery(String id, String queryName) {
 		AbstractQuery query = createQuery(queryName);
 		query.setId(id);
@@ -118,9 +130,10 @@ public class OTFQueryControl {
 		((Component) OTFClientControl.getInstance().getMainOTFDrawer().getCanvas()).repaint();
 	}
 
-	synchronized public void drawQueries(OTFOGLDrawer drawer) {
+	@Override
+	public void display(GLAutoDrawable glAutoDrawable) {
 		for (OTFQueryResult queryResult : this.queryEntries.values()) {
-			queryResult.draw(drawer);
+			queryResult.draw(OTFClientControl.getInstance().getMainOTFDrawer());
 		}
 	}
 
@@ -220,6 +233,11 @@ public class OTFQueryControl {
 
 	public void setQueryTextField(JTextField textField2) {
 		this.textField = textField2;
+	}
+
+	@Override
+	public void dispose(GLAutoDrawable glAutoDrawable) {
+
 	}
 
 }

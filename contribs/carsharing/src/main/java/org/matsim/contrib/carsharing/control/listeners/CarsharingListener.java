@@ -11,6 +11,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.carsharing.manager.demand.AgentRentals;
 import org.matsim.contrib.carsharing.manager.demand.DemandHandler;
 import org.matsim.contrib.carsharing.manager.demand.RentalInfo;
+import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
+import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -24,6 +26,7 @@ public class CarsharingListener implements IterationEndsListener{
 
 	@Inject private MatsimServices controler;
 	@Inject private DemandHandler demandHandler;
+	@Inject private CarsharingSupplyInterface carsharingSupply;
 	int frequency = 1;
 	
 	public CarsharingListener() {		
@@ -43,8 +46,10 @@ public class CarsharingListener implements IterationEndsListener{
 		
 		for (Id<Person> personId: agentRentalsMap.keySet()) {
 			//outLink.write(personId + ",");
+			
 			for (RentalInfo i : agentRentalsMap.get(personId).getArr()) {
-				outLink.write(personId + "," + i.toString());
+				CSVehicle vehicle = this.carsharingSupply.getAllVehicles().get(i.getVehId().toString());
+				outLink.write(personId + "," + i.toString() + "," + vehicle.getCompanyId() + "," + vehicle.getType());
 				outLink.newLine();
 			}
 			

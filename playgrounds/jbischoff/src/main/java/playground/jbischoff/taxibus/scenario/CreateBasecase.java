@@ -60,6 +60,8 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.utils.collections.CollectionUtils;
 
+import playground.jbischoff.analysis.TripHistogramModule;
+
 import javax.inject.Inject;
 
 /**
@@ -73,7 +75,7 @@ public class CreateBasecase {
 		final Config config;
 		final Scenario scenario;
 		if (args.length>0){
-			config = ConfigUtils.loadConfig(args[0] );
+			config = ConfigUtils.loadConfig(args[0], new CadytsConfigGroup() );
 			boolean useCadytsConf= Boolean.parseBoolean(args[1]);
 			useCadyts=useCadytsConf;
 			System.out.println("using cadyts: "+useCadyts);
@@ -91,6 +93,8 @@ public class CreateBasecase {
 
 		
 		final	Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new TripHistogramModule());
+
 		if (useCadyts){
 		// create the cadyts context and add it to the control(l)er:
 

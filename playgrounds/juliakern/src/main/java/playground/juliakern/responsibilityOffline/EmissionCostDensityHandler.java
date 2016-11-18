@@ -28,7 +28,7 @@ import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 
-import playground.benjamin.scenarios.munich.exposure.Cell;
+import playground.vsp.airPollution.exposure.Cell;
 
 public class EmissionCostDensityHandler implements WarmEmissionEventHandler {
 

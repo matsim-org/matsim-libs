@@ -44,13 +44,13 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 	private RoadPricingScheme delegate = null ;
 	private final TollFactor tollFactor ;
 	
-	public RoadPricingSchemeUsingTollFactor( String tollLinksFileName, TollFactor tollFactor ) {
+	public RoadPricingSchemeUsingTollFactor( String pricingSchemeFileName, TollFactor tollFactor ) {
 		
 		// read the road pricing scheme from file
 		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 		try {
-			rpReader.readFile( tollLinksFileName  );
+			rpReader.readFile( pricingSchemeFileName  );
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

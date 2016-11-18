@@ -527,7 +527,7 @@ public class CensusReader {
 //        			municipalities.putAttribute(municipality, "seniorsFemale", seniorsFemale);
 
         			Integer employedMale;
-        			if (row.length > 123) { // Note: Length o row has to be considered here
+        			if (row.length > 123) { // Note: Length of row has to be considered here
         				employedMale = simplifyAndParseInteger(row[154]);
         			} else {
         				employedMale = 0;
@@ -536,7 +536,7 @@ public class CensusReader {
         			municipalities.putAttribute(municipality, "employedMale", employedMale);
 
         			Integer employedFemale;
-        			if (row.length > 123) { // Note: Length o row has to be considered here
+        			if (row.length > 123) { // Note: Length of row has to be considered here
         				employedFemale = simplifyAndParseInteger(row[155]);
         			} else {
         				employedFemale = 0;
@@ -545,7 +545,7 @@ public class CensusReader {
         			municipalities.putAttribute(municipality, "employedFemale", employedFemale);
 
         			Integer studying;
-        			if (row.length > 123) { // Note: Length o row has to be considered here
+        			if (row.length > 123) { // Note: Length of row has to be considered here
         				studying = simplifyAndParseInteger(row[194]);
         			} else {
         				studying = 0;
@@ -567,10 +567,5 @@ public class CensusReader {
     
 	public ObjectAttributes getMunicipalities() {
 		return this.municipalities;
-	}
-	
-	
-	public List<String> getMunicipalitiesList() {
-		return this.municipalitiesList;
 	}
 }

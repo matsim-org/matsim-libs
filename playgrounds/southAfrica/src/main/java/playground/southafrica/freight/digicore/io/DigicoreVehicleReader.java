@@ -30,6 +30,7 @@ import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 
 public class DigicoreVehicleReader extends MatsimXmlParser {
 	private final static String DIGICORE_VEHICLE_V1 = "digicoreVehicle_v1.dtd";
+	private final static String DIGICORE_VEHICLE_V2 = "digicoreVehicle_v2.dtd";
 	private final static Logger LOG = Logger.getLogger(DigicoreVehicleReader.class);
 	private MatsimXmlParser delegate = null;
 	private DigicoreVehicle vehicle = null;
@@ -72,6 +73,9 @@ public class DigicoreVehicleReader extends MatsimXmlParser {
 		if (DIGICORE_VEHICLE_V1.equals(doctype)) {
 			this.delegate = new DigicoreVehicleReader_v1();
 			LOG.info("using digicoreVehicle_v1 reader.");
+		} else if(DIGICORE_VEHICLE_V2.equals(doctype)){
+			this.delegate = new DigicoreVehicleReader_v2();
+			LOG.info("using digicoreVehicle_v2 reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
 		}
@@ -82,7 +86,13 @@ public class DigicoreVehicleReader extends MatsimXmlParser {
 	 * @return the parsed {@link DigicoreVehicle} from the reader.
 	 */
 	public DigicoreVehicle getVehicle(){
-		return ((DigicoreVehicleReader_v1)this.delegate).getVehicle();
+		if(this.delegate instanceof DigicoreVehicleReader_v1){
+			return ((DigicoreVehicleReader_v1)this.delegate).getVehicle();			
+		} else if(this.delegate instanceof DigicoreVehicleReader_v2){
+			return ((DigicoreVehicleReader_v2)this.delegate).getVehicle();			
+		} else{
+			throw new RuntimeException("Unknown instance type: " + this.delegate.getClass().toString());
+		}
 	}
 
 }

@@ -23,6 +23,7 @@
 package playground.jbischoff.pt.scenario;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
@@ -45,7 +46,6 @@ import playground.jbischoff.analysis.TripHistogramModule;
 import playground.jbischoff.pt.VariableAccessConfigGroup;
 import playground.jbischoff.pt.VariableAccessModeConfigGroup;
 import playground.jbischoff.pt.VariableAccessTransitRouterModule;
-import playground.jbischoff.pt.taxi.DistanceBasedTaxiFare;
 
 /**
  * @author  jbischoff
@@ -98,7 +98,7 @@ public static void main(String[] args) {
        controler.addOverridingModule(new AbstractModule() {
 		@Override
 		public void install() {
-			addEventHandlerBinding().to(DistanceBasedTaxiFare.class).asEagerSingleton();	
+			addEventHandlerBinding().to(TaxiFareHandler.class).asEagerSingleton();	
 		}
 	});
        

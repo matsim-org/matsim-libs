@@ -61,22 +61,23 @@ public class StreetCountsLinkIdentification {
 
 		Network network = NetworkUtils.readNetwork(pathToNetwork);
 		List<CountInput> countInputs = readCountInputs(pathToCountsInput);
-		Map<Id<Link>, CountInput> identifiedLinks = identifyLinks(network, countInputs);
+		Map<CountInput, Id<Link>> identifiedLinks = identifyLinks(network, countInputs);
 		writeStreetCounts(pathToCountsOutput, identifiedLinks);
 	}
 
-	private static void writeStreetCounts(String pathToCountsOutput, Map<Id<Link>, CountInput> identifiedLinks) {
-		BufferedWriter writer = IOUtils.getBufferedWriter(pathToCountsOutput);
+	private static void writeStreetCounts(String pathToCountsOutput, Map<CountInput, Id<Link>> identifiedLinks) {
+		BufferedWriter writer = IOUtils.getBufferedWriter(pathToCountsOutput, Charset.forName("UTF-8"));
 		try {
 			String header = "countStationId" + COUNTS_DELIMITER +
 					"direction" + COUNTS_DELIMITER +
 					"linkId";
 			writer.write(header);
 			writer.newLine();
-			for (Id<Link> linkId : identifiedLinks.keySet()) {
-				writer.write(identifiedLinks.get(linkId).id + COUNTS_DELIMITER);
-				writer.write(identifiedLinks.get(linkId).directionDescr + COUNTS_DELIMITER);
-				writer.write(linkId.toString());
+			//for (Id<Link> linkId : identifiedLinks.keySet()) {
+			for (CountInput countInput : identifiedLinks.keySet()) {
+				writer.write(countInput.id + COUNTS_DELIMITER);
+				writer.write(countInput.directionDescr + COUNTS_DELIMITER);
+				writer.write(identifiedLinks.get(countInput).toString());
 				writer.newLine();
 			}
 			writer.close();
@@ -85,8 +86,8 @@ public class StreetCountsLinkIdentification {
 		}
 	}
 
-	private static Map<Id<Link>, CountInput> identifyLinks(Network network, List<CountInput> countInputs) {
-		Map<Id<Link>, CountInput> identifiedLinks = new LinkedHashMap<>();
+	private static Map<CountInput, Id<Link>> identifyLinks(Network network, List<CountInput> countInputs) {
+		Map<CountInput, Id<Link>> identifiedLinks = new LinkedHashMap<>();
 		counter.reset();
 		for (CountInput countInput : countInputs) {
 			Link nearestLink = org.matsim.core.network.NetworkUtils.getNearestLinkExactly(network, countInput.stationCoord);
@@ -109,7 +110,7 @@ public class StreetCountsLinkIdentification {
 					}
 				}
 			}
-			identifiedLinks.put(nearestLink.getId(), countInput);
+			identifiedLinks.put(countInput, nearestLink.getId());
 			counter.incCounter();
 		}
 		return identifiedLinks;

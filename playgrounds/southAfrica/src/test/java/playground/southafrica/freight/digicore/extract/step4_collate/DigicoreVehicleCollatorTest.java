@@ -21,7 +21,6 @@
 package playground.southafrica.freight.digicore.extract.step4_collate;
 
 import java.io.File;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -38,6 +37,11 @@ import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.io.DigicoreVehicleWriter;
 
+/**
+ * TODO Update to use V2.
+ *
+ * @author jwjoubert
+ */
 public class DigicoreVehicleCollatorTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -56,7 +60,7 @@ public class DigicoreVehicleCollatorTest {
 		/* Test without deleting the input folder. */
 		String folder = utils.getOutputDirectory() + "xml/";
 		String filename = utils.getOutputDirectory() + "output.xml";
-		String[] args = {folder, filename, "Atlantis", "false"};
+		String[] args = {folder, filename, "Atlantis", "Test", "false"};
 		DigicoreVehicleCollator.main(args);
 		Assert.assertTrue("XML folder should exist.", new File(utils.getOutputDirectory() + "xml/").exists());
 		Assert.assertTrue("First vehicle should still exist.", new File(utils.getOutputDirectory() + "xml/1.xml.gz").exists());
@@ -72,7 +76,7 @@ public class DigicoreVehicleCollatorTest {
 		/* Test with deleting the input folder. */
 		String folder = utils.getOutputDirectory() + "xml/";
 		String filename = utils.getOutputDirectory() + "output.xml";
-		String[] args = {folder, filename, "Atlantis", "true"};
+		String[] args = {folder, filename, "Atlantis", "Test", "true"};
 		DigicoreVehicleCollator.main(args);
 		Assert.assertFalse("XML folder should NOT exist.", new File(utils.getOutputDirectory() + "xml/").exists());
 		Assert.assertTrue("Output file should exist.", new File(utils.getOutputDirectory() + "output.xml").exists());
@@ -97,11 +101,11 @@ public class DigicoreVehicleCollatorTest {
 		/* Vehicle 1 */
 		DigicoreVehicle dv1 = new DigicoreVehicle(Id.createVehicleId("1"));
 		dv1.getChains().add(chain);
-		new DigicoreVehicleWriter().write(folder + "1.xml.gz", dv1);
+		new DigicoreVehicleWriter(dv1).writeV1(folder + "1.xml.gz");
 		
 		/* Vehicle 2 */
 		DigicoreVehicle dv2 = new DigicoreVehicle(Id.createVehicleId("2"));
 		dv2.getChains().add(chain);
-		new DigicoreVehicleWriter().write(folder + "2.xml.gz", dv2);
+		new DigicoreVehicleWriter(dv2).writeV1(folder + "2.xml.gz");
 	}
 }

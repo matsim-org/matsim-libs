@@ -1,5 +1,7 @@
 package playground.balac.contribs.carsharing;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Level;
@@ -20,13 +22,12 @@ import org.matsim.contrib.carsharing.manager.routers.RouterProvider;
 import org.matsim.contrib.carsharing.manager.routers.RouterProviderImpl;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyContainer;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
+import org.matsim.contrib.carsharing.manager.supply.costs.CompanyCosts;
+import org.matsim.contrib.carsharing.manager.supply.costs.CostCalculation;
 import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContainer;
 import org.matsim.contrib.carsharing.models.ChooseTheCompany;
-import org.matsim.contrib.carsharing.models.ChooseTheCompanyExample;
 import org.matsim.contrib.carsharing.models.ChooseVehicleType;
-import org.matsim.contrib.carsharing.models.ChooseVehicleTypeExample;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModel;
-import org.matsim.contrib.carsharing.models.KeepingTheCarModelExample;
 import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactoryNew;
 import org.matsim.contrib.carsharing.readers.CarsharingXmlReaderNew;
 import org.matsim.contrib.carsharing.replanning.CarsharingSubtourModeChoiceStrategy;
@@ -39,7 +40,12 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.balac.contribs.carsharing.coststructures.CostStructure1;
+import playground.balac.contribs.carsharing.coststructures.CostStructure2;
+import playground.balac.contribs.carsharing.coststructures.CostStructureTwoWay;
 import playground.balac.contribs.carsharing.models.ChooseTheCompanyPriceBased;
+import playground.balac.contribs.carsharing.models.KeepTheVehicleModel;
+import playground.balac.contribs.carsharing.models.VehicleTypeChoice;
 
 public class RunCarsharing {
 
@@ -81,14 +87,14 @@ public class RunCarsharing {
 
 		final MembershipContainer memberships = membershipReader.getMembershipContainer();
 		
-		final CostsCalculatorContainer costsCalculatorContainer = CarsharingUtils.createCompanyCostsStructure(carsharingCompanies);
+		final CostsCalculatorContainer costsCalculatorContainer = createCompanyCostsStructure(carsharingCompanies);
 		
 		final CarsharingListener carsharingListener = new CarsharingListener();
 		final CarsharingSupplyInterface carsharingSupplyContainer = new CarsharingSupplyContainer(controler.getScenario());
 		carsharingSupplyContainer.populateSupply();
-		final KeepingTheCarModel keepingCarModel = new KeepingTheCarModelExample();
+		final KeepingTheCarModel keepingCarModel = new KeepTheVehicleModel();
 		final ChooseTheCompany chooseCompany = new ChooseTheCompanyPriceBased();
-		final ChooseVehicleType chooseCehicleType = new ChooseVehicleTypeExample();
+		final ChooseVehicleType chooseCehicleType = new VehicleTypeChoice();
 		final RouterProvider routerProvider = new RouterProviderImpl();
 		final CurrentTotalDemand currentTotalDemand = new CurrentTotalDemand(controler.getScenario().getNetwork());
 		final CarsharingManagerInterface carsharingManager = new CarsharingManagerNew();
@@ -150,6 +156,32 @@ public class RunCarsharing {
 		//=== routing moduels for carsharing trips ===
 
 		controler.addOverridingModule(CarsharingUtils.createRoutingModule());			
+	}
+	
+ public static CostsCalculatorContainer createCompanyCostsStructure(Set<String> companies) {
+		
+		CostsCalculatorContainer companyCostsContainer = new CostsCalculatorContainer();
+		
+		for (String s : companies) {
+			
+			Map<String, CostCalculation> costCalculations = new HashMap<String, CostCalculation>();
+			
+			//=== here customizable cost structures come in ===
+			//===what follows is just an example!! and should be modified according to the study at hand===
+			if (s.equals("Mobility"))
+				costCalculations.put("freefloating", new CostStructure1());		
+			else {
+				costCalculations.put("freefloating", new CostStructure1());
+				costCalculations.put("twoway", new CostStructureTwoWay());
+
+			}
+			CompanyCosts companyCosts = new CompanyCosts(costCalculations);
+			
+			companyCostsContainer.getCompanyCostsMap().put(s, companyCosts);
+		}
+		
+		return companyCostsContainer;
+		
 	}
 
 }

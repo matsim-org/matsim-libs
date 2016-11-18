@@ -33,8 +33,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.benjamin.internalization.EquilTestSetUp;
-import playground.benjamin.scenarios.munich.exposure.GridTools;
-import playground.benjamin.scenarios.munich.exposure.IntervalHandler;
+import playground.vsp.airPollution.exposure.GridTools;
+import playground.vsp.airPollution.exposure.IntervalHandler;
 
 /**
  * @author amit

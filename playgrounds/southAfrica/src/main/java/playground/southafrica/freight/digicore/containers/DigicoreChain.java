@@ -11,7 +11,7 @@ import org.matsim.facilities.ActivityFacility;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
-public class DigicoreChain extends ArrayList<DigicoreActivity>{
+public class DigicoreChain extends ArrayList<DigicoreChainElement>{
 	
 	private static final long serialVersionUID = 1L;
 
@@ -43,13 +43,16 @@ public class DigicoreChain extends ArrayList<DigicoreActivity>{
 	 * Returns only the minor activities.
 	 */
 	public List<DigicoreActivity> getMinorActivities(){
-		List<DigicoreActivity> minor = new ArrayList<DigicoreActivity>();
-		for(DigicoreActivity a : this){
-			if(a.getType().equalsIgnoreCase("minor")){
-				minor.add(a);
+		List<DigicoreActivity> minors = new ArrayList<DigicoreActivity>();
+		for(DigicoreChainElement dce : this){
+			if(dce instanceof DigicoreActivity){
+				DigicoreActivity a = (DigicoreActivity)dce;
+				if(a.getType().equalsIgnoreCase("minor")){
+					minors.add(a);
+				}
 			}
 		}
-		return minor;
+		return minors;
 	}
 	
 	
@@ -62,8 +65,11 @@ public class DigicoreChain extends ArrayList<DigicoreActivity>{
 	 */
 	public Double getDistance(){
 		double distance = 0.0;
-		for(int i = 0; i < this.size()-1; i++){
-			distance += CoordUtils.calcEuclideanDistance(this.get(i).getCoord(), this.get(i+1).getCoord());
+		List<DigicoreActivity> allActivities = getAllActivities();
+		for(int i = 0; i < allActivities.size()-1; i++){
+			distance += CoordUtils.calcEuclideanDistance(
+					allActivities.get(i).getCoord(), 
+					allActivities.get(i+1).getCoord());
 		}
 		return distance;
 	}
@@ -99,13 +105,39 @@ public class DigicoreChain extends ArrayList<DigicoreActivity>{
 	 * and both the first and last {@link DigicoreActivity} is of type "major".
 	 */
 	public boolean isComplete(){
-		if(this.size() > 1 &&
-				this.get(0).getType().equalsIgnoreCase("major") &&
-				this.get(this.size()-1).getType().equalsIgnoreCase("major")){
-			return true;
-		} else{
-			return false;
+		List<DigicoreActivity> activities = getAllActivities();
+		boolean isComplete = false;
+		
+		/* Check that the sequence of activities starts and ends with a 'major'
+		 * activity. */
+		boolean startsAndEndsWithMajor = false;
+		if(activities.size() > 1 &&
+				activities.get(0).getType().equalsIgnoreCase("major") &&
+				activities.get(activities.size()-1).getType().equalsIgnoreCase("major")){
+			startsAndEndsWithMajor =  true;
 		}
+		
+		/* Check that the chain starts and ends with an activity, and is 
+		 * alternating between activities and traces. */
+		boolean alternatesActivitiesAndTraces = true;
+		for(int i = 0; i < this.size(); i++){
+			DigicoreChainElement dce = this.get(i);
+			if((i % 2) == 0){ /* Even should be an activity. */ 
+				if(!(dce instanceof DigicoreActivity)){
+					alternatesActivitiesAndTraces = false;
+				}
+			} else{ /* Odd, should be a trace. */
+				if(!(dce instanceof DigicoreTrace)){
+					alternatesActivitiesAndTraces = false;
+				}
+			}
+		}
+
+		/* All conditions must be met for the chain to be considered 'complete' */
+		if(startsAndEndsWithMajor && alternatesActivitiesAndTraces){
+			isComplete = true;
+		}
+		return isComplete;
 	}
 	
 	
@@ -115,7 +147,8 @@ public class DigicoreChain extends ArrayList<DigicoreActivity>{
 	 * are none.
 	 */
 	public DigicoreActivity getFirstMajorActivity(){
-		return this.size() > 0 ? this.get(0) : null;
+		List<DigicoreActivity> activities = getAllActivities();
+		return activities.size() > 0 ? activities.get(0) : null;
 	}
 
 	
@@ -125,12 +158,19 @@ public class DigicoreChain extends ArrayList<DigicoreActivity>{
 	 * are none.
 	 */
 	public DigicoreActivity getLastMajorActivity(){
-		return this.size() > 0 ? this.get(this.size()-1) : null;
+		List<DigicoreActivity> activities = getAllActivities();
+		return activities.size() > 0 ? activities.get(this.size()-1) : null;
 	}
 	
 	
 	public List<DigicoreActivity> getAllActivities(){
-		return this;
+		List<DigicoreActivity> activities = new ArrayList<>();
+		for(DigicoreChainElement dce : this){
+			if(dce instanceof DigicoreActivity){
+				activities.add((DigicoreActivity)dce);
+			}
+		}
+		return activities;
 	}
 	
 	
@@ -172,13 +212,15 @@ public class DigicoreChain extends ArrayList<DigicoreActivity>{
 	 * 		at the given facility, false otherwise.
 	 */
 	public boolean containsFacility(Id<ActivityFacility> id){
+		List<DigicoreActivity> activities = getAllActivities();
 		boolean answer = false;
 		int i = 0;
-		while(!answer && i < this.size()){
-			if(id == null && this.get(i).getFacilityId() == null){
+		while(!answer && i < activities.size()){
+			DigicoreActivity thisActivity = activities.get(i);
+			if(id == null && thisActivity.getFacilityId() == null){
 				answer = true;
-			} else if( id != null && this.get(i).getFacilityId() != null){
-				answer = this.get(i).getFacilityId().compareTo(id) == 0 ? true : false;				
+			} else if( id != null && thisActivity.getFacilityId() != null){
+				answer = thisActivity.getFacilityId().compareTo(id) == 0 ? true : false;				
 			}
 			i++;
 		}
@@ -250,7 +292,8 @@ public class DigicoreChain extends ArrayList<DigicoreActivity>{
 	 * This method takes an inter-provincial vehicle's chain and determines 
 	 * whether the chain is an in-out chain, i.e. is the first activity an entry 
 	 * and last activity an exit. * NB: This check will only work if chains are 
-	 * considered from XML3 vehicle files obtained from running the {@link DigicoreChainCleaner2}.
+	 * considered from XML3 vehicle files obtained from running the 
+	 * {@link DigicoreChainCleaner2}.
 	 * @return a boolean value
 	 */
 	public boolean isInterInOutChain(){
@@ -275,7 +318,8 @@ public class DigicoreChain extends ArrayList<DigicoreActivity>{
 	}
 	
 	public String toString(){
-		GregorianCalendar startCalendar = this.get(0).getEndTimeGregorianCalendar();
+		DigicoreActivity firstActivity = getFirstMajorActivity();
+		GregorianCalendar startCalendar = firstActivity.getEndTimeGregorianCalendar();
 		String startDateTime = String.format("%4d%02d%02d, Day %d, %02d:%02d", 
 				startCalendar.get(Calendar.YEAR), 
 				startCalendar.get(Calendar.MONTH)+1,
@@ -283,6 +327,6 @@ public class DigicoreChain extends ArrayList<DigicoreActivity>{
 				startCalendar.get(Calendar.DAY_OF_WEEK),
 				startCalendar.get(Calendar.HOUR_OF_DAY),
 				startCalendar.get(Calendar.MINUTE));
-		return "Start time: " + startDateTime + "; Number of (minor) activities: " + this.getNumberOfMinorActivities(); 
+		return "Start time: " + startDateTime + "; Number of (minor) activities: " + this.getMinorActivities().size(); 
 	}
 }

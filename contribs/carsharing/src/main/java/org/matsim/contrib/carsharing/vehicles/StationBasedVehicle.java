@@ -4,7 +4,7 @@ package org.matsim.contrib.carsharing.vehicles;
  */
 public class StationBasedVehicle implements CSVehicle{
 	
-	private String vehicleType;
+	private String type;
 	private String vehicleId;
 	private String stationId;
 	private String csType;
@@ -13,7 +13,7 @@ public class StationBasedVehicle implements CSVehicle{
 	public StationBasedVehicle(String vehicleType, String vehicleId, 
 			String stationId, String csType, String companyId) {
 		
-		this.vehicleType = vehicleType;
+		this.type = vehicleType;
 		this.vehicleId = vehicleId;
 		this.stationId = stationId;
 		this.csType = csType;
@@ -28,8 +28,9 @@ public class StationBasedVehicle implements CSVehicle{
 	public String getStationId() {
 		return stationId;
 	}
-	public String getVehicleType() {
-		return vehicleType;
+	@Override
+	public String getType() {
+		return type;
 	}
 	@Override
 	public String getCsType() {

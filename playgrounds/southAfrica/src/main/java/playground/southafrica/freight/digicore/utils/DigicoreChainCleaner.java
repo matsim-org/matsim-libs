@@ -129,8 +129,11 @@ public class DigicoreChainCleaner {
 			
 			/* Write the vehicle to file, if it has at least one chain. */
 			if(dv.getChains().size() > 0){
-				DigicoreVehicleWriter dvw = new DigicoreVehicleWriter();
-				dvw.write(outputFolder + "/" + dv.getId() + ".xml.gz",  dv);
+				DigicoreVehicleWriter dvw = new DigicoreVehicleWriter(dv);
+				
+				/*TODO Need to check if this will work with newer versions of
+				 * vehicle type definitions. */
+				dvw.writeV1(outputFolder + "/" + dv.getId() + ".xml.gz");
 
 				/*TODO Remove after debugging. */
 				LOG.info("   ==> " + dv.getId().toString() + " -> " + numberOfActivitiesChanged);
@@ -141,9 +144,10 @@ public class DigicoreChainCleaner {
 		
 		public DigicoreChain cleanChain(DigicoreChain chain){
 			int activityIndex = 0;
-			while(activityIndex < chain.getAllActivities().size()-1){
-				DigicoreActivity thisActivity = chain.get(activityIndex);
-				DigicoreActivity nextActivity = chain.get(activityIndex+1);
+			List<DigicoreActivity> activities = chain.getAllActivities();
+			while(activityIndex < activities.size()-1){
+				DigicoreActivity thisActivity = activities.get(activityIndex);
+				DigicoreActivity nextActivity = activities.get(activityIndex+1);
 				
 				if( thisActivity.getFacilityId() != null &&
 						nextActivity.getFacilityId() != null &&

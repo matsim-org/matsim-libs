@@ -51,6 +51,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
@@ -78,7 +79,6 @@ public class RunPSim {
     private final Config config;
     private final Scenario scenario;
     private final boolean Diversity;
-    private Map<Id<Person>, Double> selectedPlanScoreMemory;
     private TransitPerformanceRecorder transitPerformanceRecorder;
     private MobSimSwitcher mobSimSwitcher;
     private Controler matsimControler;
@@ -258,10 +258,7 @@ public class RunPSim {
                 (Diversity ? "_D" : "") +
                 appendString;
         config.controler().setOutputDirectory(outputDirectory);
-        matsimControler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+        matsimControler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
     }
 
     public static void main(String args[]) throws ParseException {

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- $Id$ -->
+
+<!-- ============================================================ -->
+<!-- Date: 2016-11-15 -->
+<!-- A concise format to hold multiple Digicore vehicles.
+	 
+	 References:
+	 Joubert, J.W., Axhausen, K.W. (2011). Inferring commercial
+	 vehicle activities in Gauteng, South Africa. Journal of
+	 Transport Geography, 19(1), 115-124.						  -->
+
+<!-- For further information or questions, please contact
+     Johan Joubert, johan dot joubert at up dot ac dot za         -->
+
+<!-- ============================================================ -->
+
+<!ELEMENT digicoreVehicles			(digicoreVehicle)+>
+<!ATTLIST digicoreVehicles
+		  crs			CDATA		#REQUIRED
+		  desc			CDATA		#IMPLIED>
+
+<!ELEMENT digicoreVehicle			(chain)+>
+<!ATTLIST digicoreVehicle
+		  id			CDATA		#REQUIRED
+		  timezone		CDATA		#REQUIRED
+		  locale		CDATA		#REQUIRED
+		  type			CDATA		#IMPLIED>
+
+<!ELEMENT chain						(activity|trace|route)+>
+
+<!ELEMENT activity						EMPTY>
+<!ATTLIST activity
+		  type			CDATA		#REQUIRED
+		  x				CDATA		#REQUIRED
+		  y				CDATA		#REQUIRED
+		  start			CDATA		#REQUIRED
+		  end			CDATA		#REQUIRED
+		  facility		CDATA		#IMPLIED
+		  link			CDATA		#IMPLIED>
+
+<!ELEMENT trace						(position)*>
+
+<!ELEMENT position					    EMPTY>
+<!ATTLIST position
+		  time			CDATA		#REQUIRED
+		  x				CDATA		#REQUIRED
+		  y				CDATA		#REQUIRED>
+		  
+<!ELEMENT route						(#PCDATA)>
+
+<!-- ============================================================ -->
+
+<!-- ROOT ELEMENT digicoreVehicles:
+     In here all individual vehicles are stored including their 
+     observed activity chains. -->
+
+<!-- ATTRIBUTE crs:
+	 The coordinate reference system used for the activity 
+	 locations. -->
+
+<!-- ATTRIBUTE desc:
+     It is always a good idea to give a container file a description
+     for better identification.
+     Normally it should describe the year/period of the input data, 
+     and what specific modifications were made, for example the 
+     clustering parameters used to identify the facilities. -->
+
+<!-- ============================================================ -->

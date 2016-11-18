@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.stations.CarsharingStation;
 import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
-import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -39,7 +38,7 @@ public class OneWayContainer implements VehiclesContainer{
 		Coord coord = link.getCoord();			
 		owvehiclesMap.put(vehicle, link);			
 		CarsharingStation station = owvehicleLocationQuadTree.getClosest(coord.getX(), coord.getY());
-		((OneWayCarsharingStation)station).addCar(((StationBasedVehicle)vehicle).getVehicleType(),  vehicle);	
+		((OneWayCarsharingStation)station).addCar(vehicle.getType(),  vehicle);	
 		
 	}	
 	

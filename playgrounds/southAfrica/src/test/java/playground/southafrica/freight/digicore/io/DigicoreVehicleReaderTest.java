@@ -21,10 +21,13 @@
 package playground.southafrica.freight.digicore.io;
 
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -34,41 +37,69 @@ import org.matsim.vehicles.Vehicle;
 
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
+import playground.southafrica.freight.digicore.containers.DigicoreTrace;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 
 public class DigicoreVehicleReaderTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testReadVehicle(){
+	public void testReadVehicleV1(){
 		DigicoreVehicle v1 = createVehicle();
-		DigicoreVehicleWriter dvw = new DigicoreVehicleWriter();
+		DigicoreVehicleWriter dvw = new DigicoreVehicleWriter(v1);
 		try{
-			dvw.write(utils.getOutputDirectory() + "tmp.xml");
-			Assert.fail();
-		} catch(IllegalArgumentException e){
-			/* Pass. */
+			dvw.writeV1(utils.getOutputDirectory() + "tmp.xml");
+		} catch(Exception e){
+			fail("Should write without exception.");
 		}
-		dvw.write(utils.getOutputDirectory() + "tmp.xml", v1);
 		
 		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
 		dvr.readFile(utils.getOutputDirectory() + "tmp.xml");
 		DigicoreVehicle v2 = dvr.getVehicle();
 		
-		Assert.assertEquals("Wrong id.", true, v1.getId().toString().equalsIgnoreCase(v2.getId().toString()));
-		Assert.assertEquals("Wrong number of chains.", 1, v2.getChains().size());
-		Assert.assertEquals("Wrong number of activities in chain.", 3, v2.getChains().get(0).getAllActivities().size());
+		assertEquals("Wrong id.", true, v1.getId().toString().equalsIgnoreCase(v2.getId().toString()));
+		assertEquals("Wrong number of chains.", 1, v2.getChains().size());
+		assertEquals("Wrong number of activities in chain.", 3, v2.getChains().get(0).getAllActivities().size());
 
-		Assert.assertTrue("Wrong activity type.", "minor".equalsIgnoreCase(v2.getChains().get(0).getAllActivities().get(1).getType()));
-		Assert.assertTrue("Wrong coordinate.", v2.getChains().get(0).getAllActivities().get(1).getCoord().equals(new Coord((double) 5, (double) 5)));
-		Assert.assertEquals("Wrong start time.", 
+		assertTrue("Wrong activity type.", "minor".equalsIgnoreCase(v2.getChains().get(0).getAllActivities().get(1).getType()));
+		assertTrue("Wrong coordinate.", v2.getChains().get(0).getAllActivities().get(1).getCoord().equals(new Coord((double) 5, (double) 5)));
+		assertEquals("Wrong start time.", 
 				v1.getChains().get(0).getAllActivities().get(1).getStartTime(), 
 				v2.getChains().get(0).getAllActivities().get(1).getStartTime(),
 				MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong end time.", 
+		assertEquals("Wrong end time.", 
 				v1.getChains().get(0).getAllActivities().get(1).getEndTime(), 
 				v2.getChains().get(0).getAllActivities().get(1).getEndTime(),
 				MatsimTestUtils.EPSILON);
+	}
+	
+	@Test
+	public void testReadVehicleV2(){
+		DigicoreVehicleReader dvr = new DigicoreVehicleReader();
+		try{
+			dvr.readFile(utils.getClassInputDirectory() + "testV2.xml.gz");
+		} catch (Exception e){
+			e.printStackTrace();
+			fail("Should read without exception.");
+		}
+		DigicoreVehicle vehicle = dvr.getVehicle();
+		
+		assertTrue("Wrong id", vehicle.getId().toString().equalsIgnoreCase("1"));
+		assertEquals("Wrong number of chains", 1, vehicle.getChains().size());
+		DigicoreChain chain = vehicle.getChains().get(0);
+		assertEquals("Wrong number of chain elements.", 5, chain.size());
+		assertTrue("Chain should be complete.", chain.isComplete());
+		
+		/* Check chain element types. */
+		assertTrue("First element should be activity.", chain.get(0) instanceof DigicoreActivity);
+		assertTrue("Second element should be trace.", chain.get(1) instanceof DigicoreTrace);
+		assertTrue("Third element should be activity.", chain.get(2) instanceof DigicoreActivity);
+		assertTrue("Fourth element should be trace.", chain.get(3) instanceof DigicoreTrace);
+		assertTrue("Fifth element should be activity.", chain.get(4) instanceof DigicoreActivity);
+
+		/* Check that all positions are read. */
+		assertEquals("Wrong number of positions.", 5, ((DigicoreTrace) chain.get(1)).size());
+		assertEquals("Wrong number of positions.", 5, ((DigicoreTrace) chain.get(3)).size());
 	}
 
 	

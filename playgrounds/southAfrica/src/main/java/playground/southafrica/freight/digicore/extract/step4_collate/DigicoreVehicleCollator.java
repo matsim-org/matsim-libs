@@ -55,18 +55,20 @@ public class DigicoreVehicleCollator {
 		String inputFolder = args[0];
 		String outputFile = args[1];
 		String CRS = args[2];
+		String descr = args[3];
+		
 		
 		/* Only delete the original files if it is explicitly instructed. */
 		boolean deleteOriginal = false;
-		if(args.length == 4){
+		if(args.length == 5){
 			try{
-				deleteOriginal = Boolean.parseBoolean(args[3]);
+				deleteOriginal = Boolean.parseBoolean(args[4]);
 			} catch (Exception e){
 				throw new RuntimeException("Could not parse 'delete' argument. Input folder will NOT be deleted.");
 			}
 		}
 		
-		collate(inputFolder, outputFile, CRS);
+		collate(inputFolder, outputFile, CRS, descr);
 		
 		if(deleteOriginal){
 			FileUtils.delete(new File(inputFolder));
@@ -90,17 +92,20 @@ public class DigicoreVehicleCollator {
 	 * @param outputFile
 	 * @param crs
 	 */
-	private static void collate(String inputFolder, String outputFile, String crs){
+	private static void collate(String inputFolder, String outputFile, String crs, String descr){
 		LOG.info("Collating the Digicore vehicle files in folder " + inputFolder);
 		DigicoreVehicles vehicles = new DigicoreVehicles(crs);
+		vehicles.setDescription(descr);
 		
 		/* Parse the individual vehicle files. */
 		List<File> files = FileUtils.sampleFiles(new File(inputFolder), Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
+		DigicoreVehicleReader dvr = null; 
 		for(File file : files){
-			DigicoreVehicleReader dvr = new DigicoreVehicleReader();
+			dvr = new DigicoreVehicleReader();
 			dvr.readFile(file.getAbsolutePath());
 			DigicoreVehicle dv = dvr.getVehicle();
 			vehicles.addDigicoreVehicle(dv);
+			dvr = null;
 		}
 		LOG.info("Done collating the file.");
 

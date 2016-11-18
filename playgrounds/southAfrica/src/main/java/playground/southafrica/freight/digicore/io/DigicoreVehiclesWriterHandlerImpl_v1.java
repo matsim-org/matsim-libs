@@ -26,6 +26,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
+import playground.southafrica.freight.digicore.containers.DigicorePosition;
+import playground.southafrica.freight.digicore.containers.DigicoreTrace;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicles;
 
@@ -116,6 +118,26 @@ public class DigicoreVehiclesWriterHandlerImpl_v1 implements
 				year, month, day, hour, minute, second);
 		
 		return s;
+	}
+
+	@Override
+	public void startTrace(DigicoreTrace trace, BufferedWriter out) throws IOException {
+		/* Do nothing: implemented from v2 */
+	}
+
+	@Override
+	public void endTrace(BufferedWriter out) throws IOException {
+		/* Do nothing: implemented from v2 */
+	}
+
+	@Override
+	public void startPosition(DigicorePosition pos, BufferedWriter out) throws IOException {
+		/* Do nothing: implemented from v2 */
+	}
+
+	@Override
+	public void endPosition(BufferedWriter out) throws IOException {
+		/* Do nothing: implemented from v2 */
 	}
 }
 

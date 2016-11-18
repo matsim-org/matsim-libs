@@ -37,8 +37,8 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.MutableScenario;
 
-import playground.benjamin.internalization.EmissionCostModule;
-import playground.benjamin.internalization.EmissionInternalizationHandler;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
+import playground.vsp.airPollution.flatEmissions.EmissionInternalizationHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.MarginalCongestionPricingHandler;
 import playground.vsp.congestion.handlers.TollHandler;

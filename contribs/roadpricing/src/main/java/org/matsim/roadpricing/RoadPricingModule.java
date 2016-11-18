@@ -10,15 +10,15 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule.TravelDisut
 
 import com.google.inject.Singleton;
 
-final class RoadPricingModule extends AbstractModule {
+public final class RoadPricingModule extends AbstractModule {
 	
 	private RoadPricingScheme scheme;
 
-	RoadPricingModule() {
+	public RoadPricingModule() {
 		
 	}
 	
-	RoadPricingModule( RoadPricingScheme scheme ) {
+	public RoadPricingModule( RoadPricingScheme scheme ) {
 		this.scheme = scheme;
 		
 	}

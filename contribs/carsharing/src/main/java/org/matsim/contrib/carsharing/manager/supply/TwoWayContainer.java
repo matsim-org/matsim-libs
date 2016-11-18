@@ -32,20 +32,19 @@ public class TwoWayContainer implements VehiclesContainer{
 	
 	
 	public void reserveVehicle(CSVehicle vehicle) {		
-		Link link = this.twvehiclesMap.get(vehicle);
-		Coord coord = link.getCoord();
-		this.twvehiclesMap.remove(vehicle);			
-		CarsharingStation station = twvehicleLocationQuadTree.getClosest(coord.getX(), coord.getY());			
-		((TwoWayCarsharingStation)station).removeCar(vehicle);
-				
+		String stationId = ((StationBasedVehicle)vehicle).getStationId();
+		this.twvehiclesMap.remove(vehicle);		
+		
+		CarsharingStation station = twowaycarsharingstationsMap.get(stationId);			
+		((TwoWayCarsharingStation)station).removeCar(vehicle);				
 	}
 
 	public void parkVehicle(CSVehicle vehicle, Link link) {
-		Coord coord = link.getCoord();			
 		twvehiclesMap.put(vehicle, link);
-			
-		CarsharingStation station = twvehicleLocationQuadTree.getClosest(coord.getX(), coord.getY());
-		((TwoWayCarsharingStation)station).addCar(((StationBasedVehicle)vehicle).getVehicleType(),  vehicle);		
+		String stationId = ((StationBasedVehicle)vehicle).getStationId();
+		CarsharingStation station = twowaycarsharingstationsMap.get(stationId);			
+
+		((TwoWayCarsharingStation)station).addCar(vehicle.getType(),  vehicle);		
 	}
 
 	public Map<String, CarsharingStation> getTwowaycarsharingstationsMap() {

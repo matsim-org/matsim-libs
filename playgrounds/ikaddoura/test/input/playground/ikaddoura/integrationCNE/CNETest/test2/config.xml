@@ -28,13 +28,13 @@
 	
 	<module name="noise" >
 		<param name="allowForSpeedsOutsideTheValidRange" value="false" />
-		<param name="annualCostRate" value="10" />
+		<param name="annualCostRate" value="9999999.9" />
 		<param name="busIdIdentifier" value="" />
 		<param name="computeCausingAgents" value="true" />
 		<param name="computeNoiseDamages" value="true" />
 		<param name="computePopulationUnits" value="true" />
-		<param name="consideredActivitiesForDamageCalculation" value="home,work" />
-		<param name="consideredActivitiesForReceiverPointGrid" value="home,work" />
+		<param name="consideredActivitiesForDamageCalculation" value="noise_sensitive" />
+		<param name="consideredActivitiesForReceiverPointGrid" value="home,work,noise_sensitive" />
 		<param name="hgvIdPrefixes" value="lkw" />
 		<param name="internalizeNoiseDamages" value="true" />
 		<param name="noiseAllocationApproach" value="MarginalCost" />
@@ -55,7 +55,7 @@
 	</module>
 	
 	<module name="emissions" >
-		<param name="averageFleetColdEmissionFactorsFile" value="../../../../../../../../contribs/emissions/test/input/org/matsim/contrib/emissions/sample_EFA_ColdStart_vehcat_2005average.txt" />
+		<param name="averageFleetColdEmissionFactorsFile" value="../../../../../../../../../contribs/emissions/test/input/org/matsim/contrib/emissions/sample_EFA_ColdStart_vehcat_2005average.txt" />
 		<param name="averageFleetWarmEmissionFactorsFile" value="test_EFA_HOT_vehcat_2005average.txt" />
 		<param name="detailedColdEmissionFactorsFile" value="" />
 		<param name="detailedWarmEmissionFactorsFile" value="" />
@@ -65,8 +65,8 @@
 	</module>
 
 	<module name="qsim">
-		<param name="startTime" value="00:00:00" />
-		<param name="endTime" value="30:00:00" />
+		<param name="startTime" value="06:00:00" />
+		<param name="endTime" value="12:00:00" />
 		
 		<param name="snapshotStyle" value="queue" />	
 		<param name="snapshotperiod" value = "00:00:01"/>

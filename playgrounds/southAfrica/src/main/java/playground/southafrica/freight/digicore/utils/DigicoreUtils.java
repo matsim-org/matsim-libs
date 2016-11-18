@@ -195,7 +195,18 @@ public class DigicoreUtils {
 		return String.format("%d/%02d/%02d %02d:%02d", year, month, day, hour, min);
 	}
 	
-
-
-
+	/**
+	 * Converts the time stamp given in the raw Digicore data files into a 
+	 * Gregorian calendar. 
+	 * @param time
+	 * @param zone
+	 * @param locale
+	 * @return
+	 */
+	public static GregorianCalendar convertTimestampToGregorianCalendar(
+			long time, TimeZone zone, Locale locale){
+		GregorianCalendar gc = new GregorianCalendar(zone, locale);
+		gc.setTimeInMillis(time);
+		return gc;
+	}
 }

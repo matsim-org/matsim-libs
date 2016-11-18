@@ -25,10 +25,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.benjamin.scenarios.munich.exposure.Cell;
-import playground.juliakern.distribution.EmActivity;
+import playground.vsp.airPollution.exposure.Cell;
 import playground.juliakern.distribution.EmPerCell;
-import playground.juliakern.distribution.ResponsibilityEvent;
 
 public class ResponsibilityUtils {
 

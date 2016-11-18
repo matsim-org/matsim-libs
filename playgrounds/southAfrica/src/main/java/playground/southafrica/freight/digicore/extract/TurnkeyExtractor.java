@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 
 import playground.southafrica.freight.digicore.extract.step1_split.DigicoreFileSplitter;
 import playground.southafrica.freight.digicore.extract.step2_sort.DigicoreFilesSorter;
-import playground.southafrica.freight.digicore.extract.step3_extract.MyMultiThreadChainExtractor;
+import playground.southafrica.freight.digicore.extract.step3_extract.MultiThreadChainExtractor;
 import playground.southafrica.freight.digicore.extract.step4_collate.DigicoreVehicleCollator;
 import playground.southafrica.utilities.Header;
 
@@ -56,8 +56,9 @@ public class TurnkeyExtractor {
 		String inputFile = args[0];
 		String outputFolder = args[1];
 		outputFolder += outputFolder.endsWith("/") ? "" : "/";
+		String descr = args[2];
 		
-		TurnkeyExtractor.extract(inputFile, outputFolder);
+		TurnkeyExtractor.extract(inputFile, outputFolder, descr);
 		
 		Header.printFooter();
 	}
@@ -66,12 +67,12 @@ public class TurnkeyExtractor {
 		/* Hide constructor. */
 	}
 	
-	private static void extract(String inputFile, String outputFolder){
+	private static void extract(String inputFile, String outputFolder, String descr){
 		LOG.info("Executing the turnkey extraction... this may take some time.");
 
 		/* Splitting */
 		String[] splitArgs = {inputFile, outputFolder, "2", "5", "0", "1", "2", "4", "3"};
-		DigicoreFileSplitter.main(splitArgs );
+		DigicoreFileSplitter.main(splitArgs);
 		
 		/* Sorting */
 		String[] sortArgs = {outputFolder + "Vehicles/"};
@@ -90,10 +91,10 @@ public class TurnkeyExtractor {
 				"18000",
 				"60",
 				"WGS84_SA_Albers"};
-		MyMultiThreadChainExtractor.main(extractArgs);
+		MultiThreadChainExtractor.main(extractArgs);
 		
 		/* Collating */
-		String[] collateArgs = {outputFolder + "xml/", outputFolder + "digicoreVehicles.xml.gz", "WGS84_SA_Albers", "true"};
+		String[] collateArgs = {outputFolder + "xml/", outputFolder + "digicoreVehicles.xml.gz", "WGS84_SA_Albers", descr, "true"};
 		DigicoreVehicleCollator.main(collateArgs);
 		
 		LOG.info("Done with the turnkey extraction.");

@@ -1,6 +1,7 @@
 package playground.balac.contribs.carsharing.models;
 
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -13,21 +14,25 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.carsharing.manager.demand.RentalInfo;
 import org.matsim.contrib.carsharing.manager.demand.membership.MembershipContainer;
+import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContainer;
 import org.matsim.contrib.carsharing.models.ChooseTheCompany;
+import org.matsim.contrib.carsharing.vehicles.CSVehicle;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
 
 public class ChooseTheCompanyPriceBased implements ChooseTheCompany {
 	@Inject private MembershipContainer memberships;
-	//@Inject private CarsharingSupplyContainer carsharingSupply;
+	@Inject private CarsharingSupplyInterface carsharingSupply;
 	@Inject private CostsCalculatorContainer costCalculator;
 	@Inject private Scenario scenario;
 	
@@ -36,12 +41,13 @@ public class ChooseTheCompanyPriceBased implements ChooseTheCompany {
 	@Inject private Map<String, TravelTime> travelTimes ;
 	@Inject private Map<String, TravelDisutilityFactory> travelDisutilityFactories ;
 	
+	
 	@Override
-	public String pickACompany(Plan plan, Leg leg, double now) {
+	public String pickACompany(Plan plan, Leg leg, double now, String vehicleType) {
 
 		//=== pick a company based on a logit model 
 		//=== that takes the potential price into account
-		
+		Network network = scenario.getNetwork();
 		String carsharingType = leg.getMode();
 		
 		Person person = plan.getPerson();
@@ -49,24 +55,42 @@ public class ChooseTheCompanyPriceBased implements ChooseTheCompany {
 		String mode = leg.getMode();
 		Set<String> availableCompanies = this.memberships.getPerPersonMemberships().get(personId).getMembershipsPerCSType().get(mode);
 		
-		RentalInfo rentalInfo = new RentalInfo();
-		double time = estimatetravelTime(leg, person, now);
-		rentalInfo.setInVehicleTime(time);
-		rentalInfo.setStartTime(now);
-		rentalInfo.setEndTime(now + time); 
+		
 		String chosenCompany = "";
 		double price = 0.0;
+		Random random = MatsimRandom.getRandom();
+		
+		Link startLink = network.getLinks().get(leg.getRoute().getStartLinkId());
+		
 		for(String companyName : availableCompanies) {
 			//estimate the rental price for each company
-			if (price == 0.0 || costCalculator.getCost(companyName, carsharingType, rentalInfo) < price)
-				chosenCompany = companyName;
 			
+			CSVehicle vehicle = this.carsharingSupply.findClosestAvailableVehicle(network.getLinks().get(leg.getRoute().getStartLinkId()),
+					mode, vehicleType, companyName, 1000.0);
+			if (vehicle != null) {
+				Link vehicleLocation = this.carsharingSupply.getAllVehicleLocations().get(vehicle);
+				
+				double walkTravelTime = estimateWalkTravelTime(startLink, vehicleLocation);
+				
+				RentalInfo rentalInfo = new RentalInfo();
+				double time = estimatetravelTime(leg, vehicleLocation, person, now);
+				rentalInfo.setInVehicleTime(time);
+				rentalInfo.setStartTime(now);
+				rentalInfo.setEndTime(now + walkTravelTime + time); 
+				
+				if (price == 0.0 || costCalculator.getCost(companyName, carsharingType, rentalInfo) +
+						(random.nextDouble() - 0.5) / 1000.0 < price) {
+					
+						chosenCompany = companyName;
+						price = costCalculator.getCost(companyName, carsharingType, rentalInfo);					
+				}			
+			}
 		}
 		
 		return chosenCompany;
 	}
 
-	private double estimatetravelTime(Leg leg, Person person, double now) {	
+	private double estimatetravelTime(Leg leg, Link vehicleLocation, Person person, double now) {	
 		
 		Network network = scenario.getNetwork();
 		TravelTime travelTime = travelTimes.get( TransportMode.car ) ;
@@ -74,13 +98,18 @@ public class ChooseTheCompanyPriceBased implements ChooseTheCompany {
 		TravelDisutility travelDisutility = travelDisutilityFactories.get( TransportMode.car ).createTravelDisutility(travelTime) ;
 		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(scenario.getNetwork(),
 				travelDisutility, travelTime ) ;
-		Link startLink = network.getLinks().get(leg.getRoute().getStartLinkId());
 		Link endLink  = network.getLinks().get(leg.getRoute().getStartLinkId());
 		Vehicle vehicle = null ;
-		Path path = pathCalculator.calcLeastCostPath(startLink.getToNode(), endLink.getFromNode(), 
+		Path path = pathCalculator.calcLeastCostPath(vehicleLocation.getToNode(), endLink.getFromNode(), 
 				now, person, vehicle ) ;
 		
 		return path.travelTime;
+		
+	}
+	
+	private double estimateWalkTravelTime(Link startLink, Link endLink) {	
+		
+		return  CoordUtils.calcEuclideanDistance(startLink.getCoord(), endLink.getCoord()) * 1.3 / 1.0;
 		
 	}
 

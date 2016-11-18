@@ -19,6 +19,7 @@
 package playground.thibautd.utils.spatialcollections;
 
 import org.matsim.core.utils.misc.Counter;
+import playground.thibautd.utils.RandomUtils;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -43,15 +44,22 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	private final SpatialCollectionUtils.Metric<C> metric;
 	private final SpatialCollectionUtils.GenericCoordinate<C,T> coordinate;
 
-	private final Node<C,T> root = new Node<>();
+	private final Node<C,T> root;
 	private final Random r = new Random( 123 );
 
 	public VPTree( final SpatialCollectionUtils.Metric<C> metric,
 			final SpatialCollectionUtils.GenericCoordinate<C,T> coordinate ) {
+		this( new Node<>(), metric , coordinate );
+	}
+
+	private VPTree(
+			final Node<C,T> root,
+			final SpatialCollectionUtils.Metric<C> metric,
+			final SpatialCollectionUtils.GenericCoordinate<C,T> coordinate ) {
+		this.root = root;
 		this.metric = metric;
 		this.coordinate = coordinate;
 	}
-
 
 	@Override
 	public int size() {
@@ -182,7 +190,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	}
 
 	private void selectAndSetVantagePoint( final AddFrame<C, T> currentFrame ) {
-		final List<T> vantagePoints = sublist( currentFrame.toAdd , SUBLIST_SIZE_VPS );
+		final List<T> vantagePoints = RandomUtils.sublist_withSideEffect( r, currentFrame.toAdd, SUBLIST_SIZE_VPS );
 
 		// select the VP with the HIGHEST median (highest spread) is supposed to give better query times
 		// the intuition is that high spread corresponds to the corners of the space, where the length of the border
@@ -335,6 +343,96 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 		return closest;
 	}
 
+	public Collection<T> getBall(
+			final C coord,
+			final double maxDist,
+			final Predicate<T> predicate ) {
+		return getBallsIntersection( Collections.singleton( coord ) , maxDist , predicate );
+	}
+
+	public Collection<T> getBallsIntersection(
+			final Collection<C> coords,
+			final double maxDist,
+			final Predicate<T> predicate ) {
+		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>( 1 + (int) Math.log( 1 + size() )) );
+		stack.add( root );
+
+		final Collection<T> ball = new ArrayList<>();
+
+		while( !stack.isEmpty() ) {
+			final Node<C,T> current = stack.poll();
+
+			if ( current.value == null &&
+					current.close == null &&
+					current.far == null ) {
+				continue;
+			}
+
+			final double[] distsToVp = coords.stream()
+					.mapToDouble( c -> metric.calcDistance( c , current.coordinate ) )
+					.toArray();
+
+			// check if current VP in ball
+			if ( current.value != null &&
+					DoubleStream.of( distsToVp ).allMatch( d -> d < maxDist ) &&
+					predicate.test( current.value ) ) {
+				ball.add( current.value );
+			}
+
+			// test intersection of disc with the children
+			if ( current.close != null &&
+					DoubleStream.of( distsToVp ).allMatch( d -> d - maxDist <= current.cuttoffDistance ) ) {
+				stack.add( current.close );
+			}
+			if ( current.far != null &&
+					DoubleStream.of( distsToVp ).allMatch( d -> d + maxDist >= current.cuttoffDistance ) ) {
+				stack.add( current.far );
+			}
+		}
+
+		return ball;
+	}
+
+	public VPTree<C,T> getSubtreeContainingBalls(
+			final Collection<C> coords,
+			final double maxDist ) {
+		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>( 1 + (int) Math.log( 1 + size() )) );
+		stack.add( root );
+
+		while( !stack.isEmpty() ) {
+			final Node<C,T> current = stack.poll();
+
+			if ( current.value == null &&
+					current.close == null &&
+					current.far == null ) {
+				continue;
+			}
+
+			final double[] distsToVp = coords.stream()
+					.mapToDouble( c -> metric.calcDistance( c , current.coordinate ) )
+					.toArray();
+
+			// check if current VP in balls
+			if ( current.value != null &&
+					DoubleStream.of( distsToVp ).allMatch( d -> d < maxDist ) ) {
+				return new VPTree<>( current, metric, coordinate );
+			}
+
+			// test intersection of disc with the children
+			final boolean intersectClose = current.close != null &&
+					DoubleStream.of( distsToVp ).allMatch( d -> d - maxDist <= current.cuttoffDistance );
+			final boolean intersectFar = current.far != null &&
+					DoubleStream.of( distsToVp ).allMatch( d -> d + maxDist >= current.cuttoffDistance );
+
+			if ( intersectClose && intersectFar ) return new VPTree<>( current, metric, coordinate );
+			if ( intersectClose ) stack.add( current.close );
+			if ( intersectFar ) stack.add( current.far );
+		}
+
+		// empty tree
+		return new VPTree<>( metric, coordinate );
+	}
+
 	private double calcDistance( final T vantagePoint, final T v ) {
 		return metric.calcDistance(
 				coordinate.getCoord( v ) ,
@@ -343,29 +441,13 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 
 	private double medianDistance( final T vp, final List<T> l ) {
 		// very simple approximation: take median of a sublist, using standard sort algorithm
-		final List<T> sublist = sublist( l , SUBLIST_SIZE_MEDIAN );
+		final List<T> sublist = RandomUtils.sublist_withSideEffect( r, l, SUBLIST_SIZE_MEDIAN );
 		Collections.sort(
 				sublist ,
 				(t1,t2) -> Double.compare(
 						calcDistance( vp, t1 ),
 						calcDistance( t2, vp ) ));
 		return calcDistance( sublist.get( sublist.size() / 2 ), vp );
-	}
-
-	private <E> List<E> sublist( final List<E> l , final int size ) {
-		if ( l.size() <= size ) return new ArrayList<>( l );
-
-		final List<E> sublist = new ArrayList<>( size );
-		for ( int i=0; i < size; i++ ) {
-			final int j = i + r.nextInt( size - i );
-			final E elemJ = l.get( j );
-			l.set( j , l.get( i ) );
-			l.set( i , elemJ );
-			// build the list in parallel to avoid the intermediary step of building a sublist.
-			sublist.add( elemJ );
-		}
-
-		return sublist;
 	}
 
 	private static class Node<C,T> {

@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*                                                   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,7 +19,7 @@
 
 package playground.dziemke.cemdapMatsimCadyts;
 
-//import java.util.ArrayList;
+
 import java.util.HashMap;
 //import java.util.List;
 import java.util.Map;
@@ -35,8 +35,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 public class CommuterFileReaderV2 {
 	private static final Logger LOG = Logger.getLogger(CommuterFileReaderV2.class);
 	
-//	private List<CommuterRelationV2> commuterRelations = new ArrayList<>();
-	private Map<Integer, Map<Integer, CommuterRelationV2>> relationsMap = new HashMap<>();
+	private Map<String, Map<String, CommuterRelationV2>> relationsMap = new HashMap<>();
 			
 	
 	public CommuterFileReaderV2(String commuterFileOutgoing, String delimiter) {
@@ -57,69 +56,54 @@ public class CommuterFileReaderV2 {
             @Override
             public void startRow(String[] row) {
             	if (row.length > 2) {
-	            	try {
-		            	if (row[0].length() == 8) {
-		            		origin = row[0];
-		            		LOG.info("New origin set to: " + origin);
-		            		return;
-		            	// Next check for destinations
-		            	} else if (row[2].length() == 8) {
-		            		destination = row[2];
-		            		LOG.info("New destination set to: " + destination);
-		            		LOG.info(origin + " -> " + destination + ": Commuters: " + row[4] + "; Males: " + row[5] + "; Females: " + row[6]);
-		            		Integer tripsMale;
-		            		Integer tripsFemale;
-		            		
-		            		if (row[5].equals("X")) {
-		            			tripsMale = null;
-		            		} else {
-		            			tripsMale = Integer.parseInt(row[5]);
-		            		}
-		            		
-		            		if (row[5].equals("X")) {
-		            			tripsFemale = null;
-		            		} else {
-		            			tripsFemale = Integer.parseInt(row[6]);
-		            		}
-		            		
-		            		process(Integer.parseInt(origin), 
-		            				Integer.parseInt(destination), 
-		            				Integer.parseInt(row[4]), 
-		            				tripsMale, 
-		            				tripsFemale);
-		            		return;
-		            	} else {
-		            		return;
-		            	}
-	            	} catch (Exception e) {
-	            		System.err.println("Caught Exception: " + e.getMessage());
-	                }
+            		if (row[0].length() == 8) { // new origin
+            			origin = row[0];
+            			LOG.info("New origin set to: " + origin);
+            			return;
+            			// Next check for destinations
+            		} else if (row[2].length() == 8) { // new destiantion
+            			destination = row[2];
+            			LOG.info("New destination set to: " + destination);
+            			LOG.info(origin + " -> " + destination + ": All commuters: " + row[4] + "; males: " + row[5] + "; females: " + row[6]);
+            			Integer tripsMale;
+            			Integer tripsFemale;
+
+            			if (row[5].equals("X")) {
+            				tripsMale = null;
+            			} else {
+            				tripsMale = Integer.parseInt(row[5]);
+            			}
+
+            			if (row[6].equals("X")) {
+            				tripsFemale = null;
+            			} else {
+            				tripsFemale = Integer.parseInt(row[6]);
+            			}
+
+            			process(origin, destination, Integer.parseInt(row[4]), tripsMale, tripsFemale);
+            			return;
+            		} else { // line that is neither new origin nor new destination
+            			return;
+            		}
             	}
             };
 		});
 	}
 	
 	
-	private void process(Integer origin, Integer destination, int tripsAll, int tripsMale, int tripsFemale) {
+	private void process(String origin, String destination, Integer tripsAll, Integer tripsMale, Integer tripsFemale) {
 		CommuterRelationV2 commuterRelation = new CommuterRelationV2(origin, destination, tripsAll, tripsMale, tripsFemale);
 		
 		if (!this.relationsMap.containsKey(origin)) {
-			Map<Integer, CommuterRelationV2> originMap = new HashMap<>();
+			Map<String, CommuterRelationV2> originMap = new HashMap<>();
 			this.relationsMap.put(origin, originMap);
 		}
-		Map<Integer, CommuterRelationV2> originMap = this.relationsMap.get(origin);
+		Map<String, CommuterRelationV2> originMap = this.relationsMap.get(origin);
 		originMap.put(destination, commuterRelation);
-//		this.commuterRelations.add(commuterRelation);
 	}
 	
-
-//	public List <CommuterRelationV2> getCommuterRelations() {
-//		return this.commuterRelations;
-//	}
 	
-	
-	public Map<Integer, Map<Integer, CommuterRelationV2>> getRelationsMap() {
+	public Map<String, Map<String, CommuterRelationV2>> getRelationsMap() {
 		return this.relationsMap;
 	}
-	
 }

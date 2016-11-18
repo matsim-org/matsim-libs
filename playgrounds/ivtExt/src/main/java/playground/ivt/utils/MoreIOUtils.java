@@ -91,11 +91,15 @@ public class MoreIOUtils {
 	/**
 	 * creates an output directory if it does not exists, and creates a logfile.
 	 */
-	public static void initOut( final String outputDir ) {
-		initOut( outputDir , null );
+	public static AutoCloseable initOut( final String outputDir ) {
+		return initOut( outputDir , null );
 	}
 
-	public static void initOut( final String outputDir , final Config config ) {
+	public static AutoCloseable initOut( final Config config ) {
+		return initOut( config.controler().getOutputDirectory() , config );
+	}
+
+	public static AutoCloseable initOut( final String outputDir , final Config config ) {
 		try {
 			createDirectory( outputDir );
 
@@ -109,6 +113,7 @@ public class MoreIOUtils {
 
 			if ( config != null ) new ConfigWriter( config ).write( outputDir+"/output_config.xml" );
 
+			return MoreIOUtils::closeOutputDirLogging;
 		} catch (IOException e) {
 			// do NOT continue without proper logging!
 			throw new RuntimeException("error while creating log file",e);
