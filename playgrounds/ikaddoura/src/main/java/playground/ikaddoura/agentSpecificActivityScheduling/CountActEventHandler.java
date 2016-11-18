@@ -22,6 +22,7 @@ package playground.ikaddoura.agentSpecificActivityScheduling;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
@@ -32,6 +33,8 @@ import org.matsim.api.core.v01.population.Person;
 */
 
 public class CountActEventHandler implements ActivityStartEventHandler {
+	
+	private static final Logger log = Logger.getLogger(CountActEventHandler.class);
 	
 	private Map<Id<Person>, Integer> personId2activityCounter = new HashMap<>();
 	
@@ -51,7 +54,13 @@ public class CountActEventHandler implements ActivityStartEventHandler {
 	}
 
 	public int getActivityCounter(Id<Person> personId) {
-		return personId2activityCounter.get(personId);
+		
+		if (personId2activityCounter.containsKey(personId)) {
+			return personId2activityCounter.get(personId);
+		} else {
+			log.warn("No activity start event for " + personId + ". Probably an agent with only one activity.");
+			return 0;
+		}
 	}
 
 	public Map<Id<Person>, Integer> getActivityCounter() {
