@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.berlin;
+package playground.ikaddoura.agentSpecificActivityScheduling;
 
 import javax.inject.Inject;
 
