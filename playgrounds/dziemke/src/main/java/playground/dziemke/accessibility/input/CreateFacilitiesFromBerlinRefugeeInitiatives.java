@@ -51,7 +51,7 @@ public class CreateFacilitiesFromBerlinRefugeeInitiatives {
     public static void main(String[] args) {
     	
     	String urlString = "https://www.berlin.de/fluechtlinge/berlin-engagiert-sich/berliner-initiativen/";
-        String facilitiesFile = "../../../shared-svn/projects/accessibility_berlin/refugee/initiativen.xml";
+        String facilitiesFile = "../../../shared-svn/projects/accessibility_berlin/refugee/initiatives.xml";
         String facilitiesFileDescription = "Refugee-relevant facilities in Berlin";
     	
     	String inputCRS = "EPSG:4326"; // WGS84

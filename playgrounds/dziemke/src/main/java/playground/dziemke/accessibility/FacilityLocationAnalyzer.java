@@ -12,7 +12,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.facilities.ActivityFacility;
@@ -26,13 +25,10 @@ import org.opengis.feature.simple.SimpleFeature;
  */
 public class FacilityLocationAnalyzer {
 	// Input file and output directory
-//	private static String inputOutputDirectory = "../../../../Workspace/shared-svn/projects/maxess/data/nairobi/facilities/02/";
 	private static String inputOutputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/secondary/";
-	
 	
 	private static String facilitiesFile = inputOutputDirectory + "facilities.xml";
 	private static String outputFileName = inputOutputDirectory + "facilities.shp";
-	
 	
 	// Parameters
 //	private static String[] attributeLabel = {"FacilityId", "Type", "Name"};
@@ -40,7 +36,6 @@ public class FacilityLocationAnalyzer {
 //	static String crs = "EPSG:31468"; // = DHDN GK4, for Berlin
 	static String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 //	static String crs = TransformationFactory.WGS84_SA_Albers;
-	
 	
 	private static PointFeatureFactory pointFeatureFactory;
 	

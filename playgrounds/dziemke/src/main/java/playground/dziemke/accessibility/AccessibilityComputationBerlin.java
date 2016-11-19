@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
@@ -60,19 +59,19 @@ public class AccessibilityComputationBerlin {
 		// Input and output
 //		String networkFile = "../../shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.all.xml";
 //		String networkFile = "../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
-		// same network at alternate location
-//		String networkFile = "../../../shared-svn/projects/accessibility_berlin/iv_counts/network.xml";
+//		String networkFile = "../../../shared-svn/projects/accessibility_berlin/iv_counts/network.xml"; // same network at alternate location
 		String networkFile = "../../../shared-svn/projects/accessibility_berlin/network/2015-05-26/network.xml";
 		
 //		String facilitiesFile = "../../shared-svn/projects/accessibility_berlin/osm/facilities_amenities_modified.xml";
 		// now using work facilities
 //		String facilitiesFile = "../../../../SVN/shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/facilities.xml";
 //		String facilitiesFile = "../../../shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/facilities.xml";
-		String facilitiesFile = "../../../shared-svn/projects/accessibility_berlin/refugee/initiativen.xml";
+		String facilitiesFile = "../../../shared-svn/projects/accessibility_berlin/refugee/initiatives.xml";
 
 //		String outputDirectory = "../../../../SVN/shared-svn/projects/accessibility_berlin/output/08_test/";
 //		String outputDirectory = "../../../shared-svn/projects/accessibility_berlin/output/08_test_2016-11-09/";
 		String outputDirectory = "../../../shared-svn/projects/accessibility_berlin/output/refugee/";
+		
 //		String travelTimeMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelDistanceMatrix.csv.gz";
 //		String ptStops = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/stops.csv.gz";
@@ -80,22 +79,20 @@ public class AccessibilityComputationBerlin {
 		LogToOutputSaver.setOutputDirectory(outputDirectory);
 		
 		// Parameters
-		final Double cellSize = 5000.;
-//		String crs = TransformationFactory.DHDN_GK4;
+		final Double cellSize = 1000.;
 		String crs = "EPSG:31468"; // = DHDN GK4
-		Envelope envelope = new Envelope(4581000, 4612000, 5810000, 5833000); // smaller Berlin
-//		Envelope envelope = new Envelope(4574000-1000, 4620000+1000, 5802000-1000, 5839000+1000);
-//		final String runId = "de_berlin_" + PathUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
+//		Envelope envelope = new Envelope(4574000, 4620000, 5802000, 5839000); // all Berlin
+		Envelope envelope = new Envelope(4574000, 4615000, 5803000, 5835000); // inner part envelope
 		final String runId = "de_berlin_" + AccessibilityUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
 		final boolean push2Geoserver = false;
 		
 		// QGis parameters
 		boolean createQGisOutput = true;
 		boolean includeDensityLayer = false;
-		Double lowerBound = -3.5;
+		Double lowerBound = -3.5; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
 		Double upperBound = 3.5;
 		Integer range = 9;
-		int symbolSize = 5000;
+		Integer symbolSize = 1010; // Choose slightly higher than cell size
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 		
 		// Storage objects
