@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.facilities.ActivityFacility;
 
-public class ActivityEndEvent extends Event implements HasPersonId {
+public final class ActivityEndEvent extends Event implements HasPersonId {
 
 	public static final String ATTRIBUTE_PERSON = "person";
 	public static final String EVENT_TYPE = "actend";
