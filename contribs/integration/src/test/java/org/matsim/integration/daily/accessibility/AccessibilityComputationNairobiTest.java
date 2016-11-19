@@ -154,25 +154,25 @@ public class AccessibilityComputationNairobiTest {
 					String mode = "freeSpeed";
 					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new FreeSpeedNetworkModeProvider(TransportMode.car));
 					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-					modes.add(mode);
+					if (!modes.contains(mode)) modes.add(mode); // This install method is called four times, but each new mode should only be added once
 				}
 				{
 					String mode = TransportMode.car;
 					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
 					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-					modes.add(mode);
+					if (!modes.contains(mode)) modes.add(mode); // This install method is called four times, but each new mode should only be added once
 				}
 				{ 
 					String mode = TransportMode.bike;
 					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
 					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-					modes.add(mode);
+					if (!modes.contains(mode)) modes.add(mode); // This install method is called four times, but each new mode should only be added once
 				}
 				{
 					final String mode = TransportMode.walk;
 					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
 					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-					modes.add(mode);
+					if (!modes.contains(mode)) modes.add(mode); // This install method is called four times, but each new mode should only be added once
 				}
 			}
 		});
