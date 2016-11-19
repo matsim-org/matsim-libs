@@ -48,44 +48,44 @@ import org.matsim.core.population.routes.RouteUtils;
  *
  * @author mrieser
  */
-public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
+public final class PersonPrepareForSimMultimodal extends AbstractPersonAlgorithm {
 
 	private final PlanAlgorithm router;
 	private final XY2Links xy2links;
 	private final Network network;
 
-	private static final Logger log = Logger.getLogger(PersonPrepareForSim.class);
+	private static final Logger log = Logger.getLogger(PersonPrepareForSimMultimodal.class);
 
 	/*
 	 * To be used by the controller which creates multiple instances of this class which would
 	 * create multiple copies of a car-only-network. Instead, we can create that network once in
 	 * the Controller and re-use it for each new instance. cdobler, sep'15
 	 */
-	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario, final Network carOnlyNetwork) {
+	public PersonPrepareForSimMultimodal(final PlanAlgorithm router, final Scenario scenario, final Network carNetwork) {
 		super();
 		this.router = router;
 		this.network = scenario.getNetwork();
-		if (NetworkUtils.isMultimodal(carOnlyNetwork)) {
+		if (NetworkUtils.isMultimodal(carNetwork)) {
 			throw new RuntimeException("Expected carOnlyNetwork not to be multi-modal. Aborting!");
 		}
-		this.xy2links = new XY2Links(carOnlyNetwork, scenario.getActivityFacilities());
+		this.xy2links = new XY2Links(carNetwork, scenario.getActivityFacilities());
 	}
 	
-	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario) {
-		super();
-		this.router = router;
-		this.network = scenario.getNetwork();
-		Network net = this.network;
-		if (NetworkUtils.isMultimodal(network)) {
-			log.info("Network seems to be multimodal. XY2Links will only use car links.");
-			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-			net = NetworkUtils.createNetwork();
-			HashSet<String> modes = new HashSet<String>();
-			modes.add(TransportMode.car);
-			filter.filter(net, modes);
-		}
-		this.xy2links = new XY2Links(net, scenario.getActivityFacilities());
-	}
+//	public PersonPrepareForSimMultimodal(final PlanAlgorithm router, final Scenario scenario) {
+//		super();
+//		this.router = router;
+//		this.network = scenario.getNetwork();
+//		Network carNetwork = this.network;
+//		if (NetworkUtils.isMultimodal(network)) {
+//			log.info("Network seems to be multimodal. XY2Links will only use car links.");
+//			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+//			carNetwork = NetworkUtils.createNetwork();
+//			HashSet<String> modes = new HashSet<>();
+//			modes.add(TransportMode.car);
+//			filter.filter(carNetwork, modes);
+//		}
+//		this.xy2links = new XY2Links(carNetwork, scenario.getActivityFacilities());
+//	}
 
 	@Override
 	public void run(final Person person) {
@@ -104,7 +104,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					Activity act = (Activity) pe;
-					if (act.getLinkId() == null) {
+					if (act.getLinkId() == null) { // = no street address
 						needsXY2Links = true;
 						needsReRoute = true;
 						break;
@@ -117,12 +117,15 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 					else if (Double.isNaN(leg.getRoute().getDistance())){
 						Double dist = null;
 						if (leg.getRoute() instanceof NetworkRoute){
+							// (presumably, this is a case where a network route exists, but the distance was not included. kai, nov'16)
+							
 							/* So far, 1.0 is always used as relative position on start and end link. 
 							 * This means that the end link is considered in route distance and the start link not.
 							 * tt feb'16
 							 */
 							double relativePositionStartLink = 1.0;
 							double relativePositionEndLink  = 1.0;
+
 							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), relativePositionStartLink, relativePositionEndLink, this.network);
 						}
 						if (dist != null){

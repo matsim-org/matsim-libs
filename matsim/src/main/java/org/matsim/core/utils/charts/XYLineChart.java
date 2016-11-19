@@ -20,6 +20,9 @@
 
 package org.matsim.core.utils.charts;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.LogarithmicAxis;
@@ -84,7 +87,7 @@ public class XYLineChart extends ChartUtil {
 	 * @param xs The x values.
 	 * @param ys The y values.
 	 */
-	public void addSeries(final String title, final double[] xs, final double[] ys) {
+	public final void addSeries(final String title, final double[] xs, final double[] ys) {
 		XYSeries series = new XYSeries(title, false, true);
 		for (int i = 0, n = Math.min(xs.length, ys.length); i < n; i++) {
 			series.add(xs[i], ys[i]);
@@ -92,4 +95,12 @@ public class XYLineChart extends ChartUtil {
 		this.dataset.addSeries(series);
 	}
 
+	public final void addSeries(String title, Map<Integer, Double> map) {
+		XYSeries series = new XYSeries(title, false, true);
+		for ( Entry<Integer,Double> entry : map.entrySet() ) {
+			series.add(entry.getKey(), entry.getValue() );
+		}
+		this.dataset.addSeries(series);
+	}
+	
 }

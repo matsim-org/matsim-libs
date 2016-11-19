@@ -56,14 +56,16 @@ public class KNModeChoiceCalibTestIT {
 		boolean equil = true ;
 		boolean calib = true ;
 		boolean assignment = false ;
+		boolean modeChoice = false ;
 		
 		Gbl.assertIf(equil); // test case not prepared for other setting
 		Gbl.assertIf(calib); // test case not prepared for other setting
 		Gbl.assertIf(!assignment); // test case not prepared for other setting
+		Gbl.assertIf(!modeChoice); // test case not prepared for other setting
 		
 		String[] args = new String[]{ utils.getPackageInputDirectory() + "/config.xml"  } ;
 
-		final Config config = KNBerlinControler.prepareConfig(args, assignment, equil) ;
+		final Config config = KNBerlinControler.prepareConfig(args, assignment, equil, modeChoice) ;
 		
 		config.plans().setInputFile("relaxed_plans.xml.gz");
 		config.network().setInputFile("network.xml.gz");

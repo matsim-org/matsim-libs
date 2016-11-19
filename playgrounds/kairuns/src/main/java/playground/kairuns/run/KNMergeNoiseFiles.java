@@ -29,7 +29,7 @@ public class KNMergeNoiseFiles {
 	 */
 	public static void main(String[] args) {
 		String outputFilePath = "/Users/nagel/kairuns/a100/output/analysis_it.0/" ;
-		KNBerlinControler.mergeNoiseFiles(outputFilePath);
+		BerlinUtils.mergeNoiseFiles(outputFilePath);
 	}
 
 }

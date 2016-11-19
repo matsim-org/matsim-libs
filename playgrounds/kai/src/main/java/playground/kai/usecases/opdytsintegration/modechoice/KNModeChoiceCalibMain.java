@@ -30,10 +30,10 @@ class KNModeChoiceCalibMain {
 	public static void main(String[] args) {
 		boolean equil = true ;
 		boolean calib = true ;
-
+		boolean modeChoice = false ;
 		boolean assignment = false ;
 
-		final Config config = KNBerlinControler.prepareConfig(args, assignment, equil) ;
+		final Config config = KNBerlinControler.prepareConfig(args, assignment, equil, modeChoice) ;
 		
 		config.transitRouter().setDirectWalkFactor(1.e7);
 		
@@ -95,7 +95,8 @@ class KNModeChoiceCalibMain {
 
 		// ===
 
-		final Scenario scenario = KNBerlinControler.prepareScenario(equil, config) ;
+		boolean unterLindenQuiet = false ;
+		final Scenario scenario = KNBerlinControler.prepareScenario(equil, unterLindenQuiet, config) ;
 
 		// ===
 

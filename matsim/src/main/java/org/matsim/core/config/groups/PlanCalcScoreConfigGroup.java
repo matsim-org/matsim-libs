@@ -84,6 +84,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.addActivityParams(params);
 		}
 		{
+			ActivityParams params = new ActivityParams("pt interaction") ; // need this for self-programmed pseudo pt.  kai, nov'16
+			params.setScoringThisActivityAtAll(false);
+			this.addActivityParams(params);
+		}
+		{
 			ActivityParams params = new ActivityParams("bike interaction") ;
 			params.setScoringThisActivityAtAll(false);
 			this.addActivityParams(params);

@@ -141,11 +141,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		if ( leg instanceof Leg ) {
-			Leg r = (leg);
-			r.setTravelTime( depTime + travTime - r.getDepartureTime() ); 
-			// (not in interface!)
-		}
+
 		return travTime;
 	}
 

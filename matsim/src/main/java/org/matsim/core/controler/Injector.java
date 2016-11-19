@@ -22,14 +22,13 @@
 
 package org.matsim.core.controler;
 
-import com.google.inject.*;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.name.Names;
-import com.google.inject.spi.DefaultElementVisitor;
-import com.google.inject.spi.Element;
-import com.google.inject.spi.Elements;
-import com.google.inject.util.Modules;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
@@ -37,10 +36,20 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 
-import java.lang.annotation.Annotation;
-import java.util.*;
+import com.google.inject.Binder;
+import com.google.inject.Binding;
+import com.google.inject.Guice;
+import com.google.inject.Key;
+import com.google.inject.Module;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.name.Names;
+import com.google.inject.spi.DefaultElementVisitor;
+import com.google.inject.spi.Element;
+import com.google.inject.spi.Elements;
+import com.google.inject.util.Modules;
 
-public abstract class Injector {
+public final class Injector {
+	private Injector(){} // namespace only, do not instantiate
 
     private static Logger logger = Logger.getLogger(Injector.class);
 

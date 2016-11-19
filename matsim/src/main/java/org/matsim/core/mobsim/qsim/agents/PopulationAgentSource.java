@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -72,6 +73,7 @@ public final class PopulationAgentSource implements AgentSource {
 		case modeVehicleTypesFromVehiclesData:
 			for (String mode : mainModes) {
 				VehicleType vehicleType = vehicles.getVehicleTypes().get( Id.create(mode, VehicleType.class) ) ;
+				Gbl.assertNotNull(vehicleType);
 				modeVehicleTypes.put(mode, vehicleType );
 			}
 			break;

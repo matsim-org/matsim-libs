@@ -111,7 +111,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		config.qsim().setUsingFastCapacityUpdate(true);
 		//==
 
-		Scenario scenario = KNBerlinControler.prepareScenario(true, config);
+		Scenario scenario = KNBerlinControler.prepareScenario(true, false, config);
 		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		double time = 6*3600. ;

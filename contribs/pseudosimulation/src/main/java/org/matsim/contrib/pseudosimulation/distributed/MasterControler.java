@@ -940,7 +940,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     public double[][] getSlaveScoreHistory() {
 
-        return this.slaveScoreStats.getHistory();
+        return this.slaveScoreStats.getScoreHistoryAsArray();
     }
 
     public Config getConfig() {

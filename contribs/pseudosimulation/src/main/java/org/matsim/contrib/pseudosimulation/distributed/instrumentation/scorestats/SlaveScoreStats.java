@@ -1,12 +1,16 @@
 package org.matsim.contrib.pseudosimulation.distributed.instrumentation.scorestats;
 
+import java.util.Map;
+
 import org.matsim.analysis.ScoreStats;
+import org.matsim.analysis.ScoreStatsControlerListener.ScoreItem;
 import org.matsim.core.config.Config;
 
 /**
  * Created by fouriep on 11/28/14.
  */
 public class SlaveScoreStats implements ScoreStats {
+
     final public static int INDEX_WORST = 0;
     final public static int INDEX_BEST = 1;
     final public static int INDEX_AVERAGE = 2;
@@ -28,8 +32,16 @@ public class SlaveScoreStats implements ScoreStats {
         history[INDEX_EXECUTED][iterationNumber - firstIter] += weight * entry[INDEX_EXECUTED];
     }
 
-    @Override
-    public double[][] getHistory() {
+    public double[][] getScoreHistoryAsArray() {
+	    // yyyy retrofitting to old interface. kai, nov'16
         return this.history;
     }
+
+@Override
+public Map<ScoreItem, Map<Integer, Double>> getScoreHistory() {
+	// TODO Auto-generated method stub
+	throw new RuntimeException("not implemented") ;
+}
+    
+    
 }

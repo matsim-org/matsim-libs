@@ -35,6 +35,7 @@ import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculatorSerializable;
+import org.matsim.contrib.pseudosimulation.distributed.instrumentation.scorestats.SlaveScoreStats;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.controler.GenomeAnalysis;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformanceRecorder;
@@ -564,7 +565,8 @@ public class RunPSim {
             }
             ArrayList<Integer> expensiveIters = mobSimSwitcher.getQSimIters();
             int index = expensiveIters.size();
-            double[][] history = controler.getScoreStats().getHistory();
+            double[][] history = ((SlaveScoreStats)controler.getScoreStats()).getScoreHistoryAsArray(); 	    // yyyy retrofitting to old interface. kai, nov'16
+
             int idx = event.getIteration() - controler.getConfig().controler().getFirstIteration();
             try {
                 out.write(event.getIteration() + "\t"
