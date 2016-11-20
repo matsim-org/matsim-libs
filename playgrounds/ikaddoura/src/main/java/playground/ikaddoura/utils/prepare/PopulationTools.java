@@ -195,6 +195,8 @@ public class PopulationTools {
 			Leg previousLeg = null;
 			double previousActEndTime = Double.NEGATIVE_INFINITY;
 			
+			int pECounter = 0;
+			
 			for (PlanElement pE : selectedPlan.getPlanElements()) {
 				
 				if (pE instanceof Leg) {
@@ -242,6 +244,27 @@ public class PopulationTools {
 						endTime = Double.NEGATIVE_INFINITY;
 					}
 					
+					// set opening and closing time for overnight activity to -Infinity
+					
+					if (pECounter == 0) {
+						endTime = Double.NEGATIVE_INFINITY;
+						
+						if (startTime >= 0.) {
+							log.warn("Start time should already be -Infinity. Setting start time to -Infinity.");
+							startTime = Double.NEGATIVE_INFINITY;
+						}
+					}
+					
+					if (pECounter == selectedPlan.getPlanElements().size() - 1) {
+						startTime = Double.NEGATIVE_INFINITY;
+						
+						if (endTime >= 0.) {
+							log.warn("End time should already be -Infinity. Setting end time to -Infinity.");
+							endTime = Double.NEGATIVE_INFINITY;
+						}
+					}
+
+					
 					if (actStartEndTimes == null) {
 						actStartEndTimes = startTime + ";" + endTime;
 					} else {
@@ -250,9 +273,11 @@ public class PopulationTools {
 
 					previousActEndTime = endTime;
 				}
+				
+				pECounter++;
 			}
 			
-			person.getAttributes().putAttribute("InitialActivityTimes", actStartEndTimes);					
+			person.getAttributes().putAttribute("OpeningClosingTimes", actStartEndTimes);					
 
 		}	
 		

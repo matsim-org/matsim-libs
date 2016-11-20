@@ -43,6 +43,7 @@ public class AgentSpecificActivityScheduling {
 	private static final Logger log = Logger.getLogger(AgentSpecificActivityScheduling.class);
 	
 	private double activityDurationBin = 3600.;
+	private double tolerance = 900.;
 	
 	private boolean preparePopulation = true;
 	private boolean removeNetworkSpecificInformation = false;
@@ -126,7 +127,7 @@ public class AgentSpecificActivityScheduling {
 		log.info("Replacing the default activity scoring by an agent-specific opening / closing time consideration...");
 		
 		final CountActEventHandler activityCounter = new CountActEventHandler();
-		final AgentSpecificScoringFunctionFactory scoringFunctionFactory = new AgentSpecificScoringFunctionFactory(controler.getScenario(), activityCounter);
+		final AgentSpecificScoringFunctionFactory scoringFunctionFactory = new AgentSpecificScoringFunctionFactory(controler.getScenario(), activityCounter, tolerance);
 		
 		controler.addOverridingModule( new AbstractModule() {
 			
@@ -157,6 +158,10 @@ public class AgentSpecificActivityScheduling {
 
 	public void setKeepOnlySelectedPlans(boolean keepOnlySelectedPlans) {
 		this.keepOnlySelectedPlans = keepOnlySelectedPlans;
+	}
+
+	public void setTolerance(double tolerance) {
+		this.tolerance = tolerance;
 	}
 
 }

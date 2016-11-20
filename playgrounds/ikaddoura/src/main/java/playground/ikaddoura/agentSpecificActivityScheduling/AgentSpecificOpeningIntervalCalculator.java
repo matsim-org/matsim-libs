@@ -21,8 +21,6 @@ package playground.ikaddoura.agentSpecificActivityScheduling;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.scoring.functions.ActivityUtilityParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.OpeningIntervalCalculator;
 
 /**
@@ -32,38 +30,28 @@ import org.matsim.core.scoring.functions.OpeningIntervalCalculator;
 public class AgentSpecificOpeningIntervalCalculator implements OpeningIntervalCalculator {
 
 	private final Person person;
-	private final CharyparNagelScoringParameters params;	
 	private final CountActEventHandler actCounter;
-	private final double tolerance = 900.;
+	private double tolerance;
 	
-	public AgentSpecificOpeningIntervalCalculator(CharyparNagelScoringParameters parameters, Person person, CountActEventHandler actCount) {
+	public AgentSpecificOpeningIntervalCalculator(Person person, CountActEventHandler actCount, double tolerance) {
 		this.person = person;
-		this.params = parameters;
 		this.actCounter = actCount;
+		this.tolerance = tolerance;
 	}
 
 	@Override
 	public double[] getOpeningInterval(Activity act) {
 		
-		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
-		if (actParams == null) {
-			throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in utility parameters " +
-					"(module name=\"planCalcScore\" in the config file).");
-		}
-		
 		// identify the correct activity position in the plan
 		int activityCounter = this.actCounter.getActivityCounter(person.getId());
 		
 		// get the original start/end times from survey / initial demand which is written in the person attributes
-		String activityOpeningIntervals = (String) person.getAttributes().getAttribute("InitialActivityTimes");	
+		String activityOpeningIntervals = (String) person.getAttributes().getAttribute("OpeningClosingTimes");	
 		String activityOpeningTimes[] = activityOpeningIntervals.split(";");
 	
 		double openingTime = Double.valueOf(activityOpeningTimes[activityCounter * 2]) - tolerance;
-		if (openingTime < 0) {
-			openingTime = 0.;
-		}
 		double closingTime = Double.valueOf(activityOpeningTimes[(activityCounter * 2) + 1]) + tolerance;
-				
+
 		return new double[]{openingTime, closingTime};
 	}
 

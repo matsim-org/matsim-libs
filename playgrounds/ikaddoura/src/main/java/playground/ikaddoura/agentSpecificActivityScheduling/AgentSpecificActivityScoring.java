@@ -34,8 +34,8 @@ public class AgentSpecificActivityScoring implements org.matsim.core.scoring.Sum
 	
 	private final AgentSpecificOpeningIntervalCalculator openingIntervalCalculator;
 	
-	public AgentSpecificActivityScoring(CharyparNagelScoringParameters parameters, Person person, CountActEventHandler actCount) {
-		openingIntervalCalculator = new AgentSpecificOpeningIntervalCalculator(parameters, person, actCount);
+	public AgentSpecificActivityScoring(CharyparNagelScoringParameters parameters, Person person, CountActEventHandler actCount, double tolerance) {
+		openingIntervalCalculator = new AgentSpecificOpeningIntervalCalculator(person, actCount, tolerance);
 		this.delegate = new CharyparNagelActivityScoring(parameters, openingIntervalCalculator);
 	}
 

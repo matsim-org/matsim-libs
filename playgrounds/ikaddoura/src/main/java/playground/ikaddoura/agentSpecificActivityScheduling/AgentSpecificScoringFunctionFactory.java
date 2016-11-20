@@ -43,16 +43,18 @@ public class AgentSpecificScoringFunctionFactory implements ScoringFunctionFacto
 	protected Network network;
 	private final CharyparNagelScoringParametersForPerson params;
 	private final CountActEventHandler actCount;
+	private double tolerance;
 		
 	@Inject
-	public AgentSpecificScoringFunctionFactory( final Scenario sc, final CountActEventHandler actCount ) {
-		this( new SubpopulationCharyparNagelScoringParameters( sc ) , sc.getNetwork() , actCount );
+	public AgentSpecificScoringFunctionFactory( final Scenario sc, final CountActEventHandler actCount, double tolerance) {
+		this( new SubpopulationCharyparNagelScoringParameters( sc ) , sc.getNetwork() , actCount , tolerance);
 	}
 	
-	AgentSpecificScoringFunctionFactory(final CharyparNagelScoringParametersForPerson params, Network network, CountActEventHandler actCount) {
+	AgentSpecificScoringFunctionFactory(final CharyparNagelScoringParametersForPerson params, Network network, CountActEventHandler actCount, double tolerance) {
 		this.params = params;
 		this.network = network;
 		this.actCount = actCount;
+		this.tolerance = tolerance;
 	}
 	
 	@Override
@@ -61,7 +63,7 @@ public class AgentSpecificScoringFunctionFactory implements ScoringFunctionFacto
 		final CharyparNagelScoringParameters parameters = params.getScoringParameters( person );
 				
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
-		sumScoringFunction.addScoringFunction(new AgentSpecificActivityScoring(parameters, person, actCount));
+		sumScoringFunction.addScoringFunction(new AgentSpecificActivityScoring(parameters, person, actCount, tolerance));
 		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring( parameters , this.network));
 		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring( parameters ));
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring( parameters ));

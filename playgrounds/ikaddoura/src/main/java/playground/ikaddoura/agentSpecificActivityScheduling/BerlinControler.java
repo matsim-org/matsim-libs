@@ -44,6 +44,7 @@ public class BerlinControler {
 	private static String configFile;
 	private static boolean addModifiedActivities;
 	private static double activityDurationBin;
+	private static double tolerance;
 	private static boolean pricing;
 	
 	public static void main(String[] args) throws IOException {
@@ -58,17 +59,21 @@ public class BerlinControler {
 
 			activityDurationBin = Double.parseDouble(args[2]);
 			log.info("activityDurationBin: "+ activityDurationBin);
+			
+			tolerance = Double.parseDouble(args[3]);
+			log.info("tolerance: "+ tolerance);
 
-			pricing = Boolean.parseBoolean(args[3]);			
+			pricing = Boolean.parseBoolean(args[4]);			
 			log.info("pricing: "+ pricing);
 
 		} else {
 			
-//			configFile = "../../../runs-svn/berlin-dz-time/input/config_test.xml";
-			configFile = "../../../runs-svn/berlin-an-time/input/config_test.xml";
+			configFile = "../../../runs-svn/berlin-dz-time/input/config_test.xml";
+//			configFile = "../../../runs-svn/berlin-an-time/input/config_test.xml";
 			
 			addModifiedActivities = true;
 			activityDurationBin = 3600.;
+			tolerance = 900.;
 			
 			pricing = false;
 			
@@ -87,6 +92,7 @@ public class BerlinControler {
 		if (addModifiedActivities) {		
 			AgentSpecificActivityScheduling aa = new AgentSpecificActivityScheduling(controler);
 			aa.setActivityDurationBin(activityDurationBin);
+			aa.setTolerance(tolerance);
 			controler = aa.prepareControler();			
 		}
 				
