@@ -199,9 +199,8 @@ public final class AccessibilityCalculator {
 				
 				// new
 				for (String mode : calculators.keySet()) {
-//					System.out.println("mode = " + mode);
-				// end new
 //				for ( Modes4Accessibility mode : acg.getIsComputingMode() ) {
+				// end new
 					// TODO introduce here a config parameter "computation mode" that can be set to "rawSum", "minimum" or "exponential/logsum/hansen", dz, sept'16
 					if(!useRawSum){
 //						System.out.println("expSums.get(mode).getSum() = " + expSums.get(mode).getSum());

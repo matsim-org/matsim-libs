@@ -79,12 +79,11 @@ public class AccessibilityComputationBerlin {
 		LogToOutputSaver.setOutputDirectory(outputDirectory);
 		
 		// Parameters
-		final Double cellSize = 1000.;
+		final Double cellSize = 5000.;
 		String crs = "EPSG:31468"; // = DHDN GK4
-//		Envelope envelope = new Envelope(4574000, 4620000, 5802000, 5839000); // all Berlin
-		Envelope envelope = new Envelope(4574000, 4615000, 5803000, 5835000); // inner part envelope
-		final String runId = "de_berlin_" + AccessibilityUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
-		final boolean push2Geoserver = false;
+		Envelope envelope = new Envelope(4574000, 4620000, 5802000, 5839000); // all Berlin
+		final String runId = "de_berlin_" + AccessibilityUtils.getDate() + "_" + cellSize.toString().split("\\.")[0] + "_refugee_initiatives_";
+		final boolean push2Geoserver = true;
 		
 		// QGis parameters
 		boolean createQGisOutput = true;
@@ -92,7 +91,7 @@ public class AccessibilityComputationBerlin {
 		Double lowerBound = -3.5; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
 		Double upperBound = 3.5;
 		Integer range = 9;
-		Integer symbolSize = 1010; // Choose slightly higher than cell size
+		Integer symbolSize = 260; // Choose slightly higher than cell size
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 		
 		// Storage objects
