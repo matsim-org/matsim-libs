@@ -24,7 +24,7 @@ public class WindowsDriver implements OSDriver {
         command.add(new File(simulationPath, "run_config.xml").toString());
         command.add(">");
         command.add(outputPath.toString());
-        command.add("2^>");
+        command.add("2>");
         command.add(errorPath.toString());
         String javaCommand = String.join(" ", command);
 
