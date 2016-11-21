@@ -24,7 +24,6 @@ package playground.ikaddoura.integrationCNE;
 
 import java.io.IOException;
 import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,11 +44,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.agarwalamit.InternalizationEmissionAndCongestion.EmissionCongestionTravelDisutilityCalculatorFactory;
-import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
-import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
-import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
 import playground.ikaddoura.integrationCN.TollTimeDistanceTravelDisutilityFactory;
@@ -57,6 +52,8 @@ import playground.ikaddoura.integrationCN.VTTSNoiseTollTimeDistanceTravelDisutil
 import playground.ikaddoura.integrationCN.VTTSTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
+import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.controler.CongestionAnalysisControlerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -307,7 +304,7 @@ public class CNEIntegration {
 				}
 				
 				// TODO: doesn't account for randomness, doesn't account for marginal utility of distance, ... 
-				final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, 
+				final playground.vsp.airPollution.flatEmissions.EmissionTravelDisutilityCalculatorFactory emissionTducf = new playground.vsp.airPollution.flatEmissions.EmissionTravelDisutilityCalculatorFactory(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),emissionModule,
 						emissionCostModule, controler.getConfig().planCalcScore());
 				emissionTducf.setHotspotLinks(hotSpotLinks);
 				controler.addOverridingModule(new AbstractModule() {
