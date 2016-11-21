@@ -51,10 +51,7 @@ import playground.ikaddoura.integrationCN.VTTSNoiseTollTimeDistanceTravelDisutil
 import playground.ikaddoura.integrationCN.VTTSTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
-import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
-import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
-import playground.vsp.airPollution.flatEmissions.EmissionTravelDisutilityCalculatorFactory;
-import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
+import playground.vsp.airPollution.exposure.*;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.controler.CongestionAnalysisControlerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -95,25 +92,28 @@ public class CNEIntegration {
 	
 	private boolean useTripAndAgentSpecificVTTSForRouting = false;
 
+	private final GridTools gridTools;
 	private final ResponsibilityGridTools responsibilityGridTools ;
 
 	public CNEIntegration(String configFile, String outputDirectory) {
 		this.configFile = configFile;
 		this.outputDirectory = outputDirectory;
 		this.responsibilityGridTools = null;
+		this.gridTools = null;
 	}
 
 	public CNEIntegration(String configFile) {
 		this (configFile, null);
 	}
 	
-	public CNEIntegration(Controler controler, ResponsibilityGridTools responsibilityGridTools) {
+	public CNEIntegration(Controler controler, GridTools gridTools, ResponsibilityGridTools responsibilityGridTools) {
 		this.controler = controler;
+		this.gridTools = gridTools;
 		this.responsibilityGridTools = responsibilityGridTools;
 	}
 
 	public CNEIntegration(Controler controler) {
-		this(controler, null);
+		this(controler, null, null);
 	}
 	
 	public static void main(String[] args) throws IOException {
@@ -169,6 +169,11 @@ public class CNEIntegration {
 			}
 			controler.getConfig().controler().setOutputDirectory(outputDirectory);
 		}
+
+		if( airPollutionPricing && (this.gridTools == null || this.responsibilityGridTools == null) ) {
+			throw new RuntimeException("To internalize air pollution exposure, grid tools " +
+					"and responsibility grid tools must be passed to the constructor.");
+		}
 		
 		final VTTSHandler vttsHandler;
 		if (useTripAndAgentSpecificVTTSForRouting) {
@@ -201,9 +206,9 @@ public class CNEIntegration {
 		
 		// ########################## Air pollution ##########################
 				
-		final String emissionEfficiencyFactor ="1.0";
-		final String considerCO2Costs = "true";
-		final String emissionCostFactor = "1.0";
+		final double emissionEfficiencyFactor = 1.0;
+		final boolean considerCO2Costs = true;
+		final double emissionCostFactor = 1.0;
 		final Set<Id<Link>> hotSpotLinks = null;
 		
 		EmissionModule emissionModule = null;
@@ -214,7 +219,7 @@ public class CNEIntegration {
 		if (this.airPollutionPricing == true || this.airPollutionAnalysis == true) {
 			
 			emissionModule = new EmissionModule(controler.getScenario());
-			emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
+			emissionModule.setEmissionEfficiencyFactor(emissionEfficiencyFactor);
 			emissionModule.createLookupTables();
 			emissionModule.createEmissionHandler();			
 		}
@@ -293,8 +298,7 @@ public class CNEIntegration {
 
 		} else if (congestionPricing == false && noisePricing == false && airPollutionPricing) {
 			// only air pollution pricing
-			
-			final EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
+			final EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( emissionCostFactor, considerCO2Costs, this.responsibilityGridTools, this.gridTools);
 
 			if (useTripAndAgentSpecificVTTSForRouting) {
 				throw new RuntimeException("Not yet implemented. Aborting...");
@@ -304,24 +308,26 @@ public class CNEIntegration {
 				if (sigma != 0.) {
 					throw new RuntimeException("The following travel disutility doesn't allow for randomness. Aborting...");
 				}
-				
-				final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),emissionModule,
-						emissionCostModule, controler.getConfig().planCalcScore());
-				emissionTducf.setHotspotLinks(hotSpotLinks);
+				EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(
+						new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
+						emissionModule,
+						emissionCostModule,
+						controler.getConfig().planCalcScore()
+				);
 				controler.addOverridingModule(new AbstractModule() {
+
 					@Override
 					public void install() {
-						bindCarTravelDisutilityFactory().toInstance(emissionTducf);
+						bindCarTravelDisutilityFactory().toInstance(emfac);
 					}
 				});
 			}
-			
-			controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
-			
+			controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, this.responsibilityGridTools, this.gridTools));
+
 		} else if (congestionPricing && noisePricing && airPollutionPricing) {
 			// congestion + noise + airPollution pricing
-			
-			final EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
+
+			final EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( emissionCostFactor, considerCO2Costs, this.responsibilityGridTools, this.gridTools);
 			final TollHandler congestionTollHandlerQBP = new TollHandler(controler.getScenario());
 			
 			if (useTripAndAgentSpecificVTTSForRouting) {
@@ -362,7 +368,7 @@ public class CNEIntegration {
 				
 			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandlerQBP, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));						
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
-			controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
+			controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, this.responsibilityGridTools, this.gridTools));
 			
 		} else if (congestionPricing && noisePricing && airPollutionPricing == false) {
 			// congestion + noise pricing

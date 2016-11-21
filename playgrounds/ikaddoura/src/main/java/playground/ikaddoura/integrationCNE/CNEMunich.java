@@ -83,11 +83,9 @@ public class CNEMunich {
 		Controler controler = new Controler(scenario);
 
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
-//		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
-//		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
 
-		CNEIntegration cneIntegration = new CNEIntegration(controler, rgt);
+		CNEIntegration cneIntegration = new CNEIntegration(controler, gt, rgt);
 		controler = cneIntegration.prepareControler();
 
 		// scenario-specific settings
