@@ -34,7 +34,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.agarwalamit.InternalizationEmissionAndCongestion.EmissionCongestionTravelDisutilityCalculatorFactory;
 import playground.agarwalamit.InternalizationEmissionAndCongestion.InternalizeEmissionsCongestionControlerListener;
 import playground.agarwalamit.munich.controlerListner.MyEmissionCongestionMoneyEventControlerListner;
-import playground.agarwalamit.munich.controlerListner.MyTollAveragerControlerListner;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
@@ -178,9 +177,6 @@ public class MunichControler {
 		}
 
 		if(Boolean.valueOf(args [6])){
-			controler.addControlerListener(new MyTollAveragerControlerListner());
-		}
-		if(Boolean.valueOf(args [7])){
 			// not sure for true functionality yet
 			EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 			controler.addControlerListener(new MyEmissionCongestionMoneyEventControlerListner(emissionCostModule,emissionModule));
