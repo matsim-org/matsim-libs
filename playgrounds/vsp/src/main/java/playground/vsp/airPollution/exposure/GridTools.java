@@ -32,31 +32,37 @@ public class GridTools {
 	private Double xMax;
 	private Double yMin;
 	private Double yMax;
+	private final Integer noOfXCells;
+	private final Integer noOfYCells;
+	private Map<Id<Link>, Integer> link2ybin;
+	private Map<Id<Link>, Integer> link2xbin;
 
 	public GridTools(Map<Id<Link>, ? extends Link> links, Double xMin, Double xMax,
-			Double yMin, Double yMax) {
+			Double yMin, Double yMax, Integer noOfXCells, Integer noOfYCells) {
 		this.links=links;
 		this.xMin=xMin;
 		this.xMax=xMax;
 		this.yMin=yMin;
 		this.yMax=yMax;
+		this.noOfXCells = noOfXCells;
+		this.noOfYCells = noOfYCells;
+		mapLinks2Xcells();
+		mapLinks2Ycells();
 	}
 
 	// TODO maybe store x and y values only if in area of interest now x might be null but y not
-	public Map<Id<Link>, Integer> mapLinks2Xcells(Integer noOfXCells) {
-		Map<Id<Link>, Integer> link2xbin = new HashMap<>();
+	private void mapLinks2Xcells() {
+		this.link2xbin = new HashMap<>();
 		for(Id<Link> linkId: this.links.keySet()){
 			link2xbin.put(linkId, mapXCoordToBin(this.links.get(linkId).getCoord().getX(), noOfXCells));
 		}
-		return link2xbin;
 	}
 
-	public Map<Id<Link>, Integer> mapLinks2Ycells(Integer noOfYCells) {
-		Map<Id<Link>, Integer> link2ybin = new HashMap<Id<Link>, Integer>();
+	public void mapLinks2Ycells() {
+		this.link2ybin = new HashMap<Id<Link>, Integer>();
 		for(Id<Link> linkId: this.links.keySet()){
 			link2ybin.put(linkId, mapYCoordToBin(this.links.get(linkId).getCoord().getY(), noOfYCells));
 		}
-		return link2ybin;
 	}
 	
 	private Integer mapXCoordToBin(double xCoord, Integer noOfXCells) {
@@ -71,6 +77,22 @@ public class GridTools {
 		if (yCoord <= yMin  || yCoord >= yMax) return null; // xCorrd is not in area of interest
 		double relativePositionY = ((yCoord - yMin) / (yMax - yMin) * noOfYCells); // gives the relative position along the x-range
 		return (int) relativePositionY; // returns the number of the bin [0..n-1]
-	}	
+	}
+
+	public Map<Id<Link>, Integer> getLink2XBins(){
+		return this.link2xbin;
+	}
+
+	public Map<Id<Link>, Integer> getLink2YBins(){
+		return this.link2ybin;
+	}
+
+	public Integer getNoOfXCells(){
+		return this.noOfXCells;
+	}
+
+	public Integer getNoOfYCells(){
+		return this.noOfYCells;
+	}
 }
 

@@ -26,8 +26,8 @@ public class ResponsibilityGridTools {
 	private int noOfYCells;
 	
 	public ResponsibilityGridTools(Double timeBinSize, int noOfTimeBins,
-			Map<Id<Link>, Integer> links2xCells, Map<Id<Link>, Integer> links2yCells, int noOfXCells, int noOfYCells) {
-		this.init(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);		
+			GridTools gridTools) {
+		this.init(timeBinSize, noOfTimeBins, gridTools.getLink2XBins(), gridTools.getLink2YBins(), gridTools.getNoOfXCells(), gridTools.getNoOfYCells());
 	}
 	
 	public Double getFactorForLink(Id<Link> linkId, double time) {

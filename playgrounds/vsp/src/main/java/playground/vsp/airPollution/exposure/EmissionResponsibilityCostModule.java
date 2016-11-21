@@ -43,7 +43,7 @@ public class EmissionResponsibilityCostModule {
 	private ResponsibilityGridTools responsibilityGridTools;
 
 	
-	public EmissionResponsibilityCostModule(double emissionCostMultiplicationFactor, boolean considerCO2Costs, ResponsibilityGridTools rgt, Map<Id<Link>, Integer> links2xCells, Map<Id<Link>, Integer> links2yCells) {
+	public EmissionResponsibilityCostModule(double emissionCostMultiplicationFactor, boolean considerCO2Costs, ResponsibilityGridTools rgt, GridTools gridTools) {
 		this.emissionCostMultiplicationFactor = emissionCostMultiplicationFactor;
 		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostMultiplicationFactor);
 		
@@ -58,7 +58,7 @@ public class EmissionResponsibilityCostModule {
 		
 	}
 	
-	public EmissionResponsibilityCostModule(double emissionCostMultiplicationFactor, ResponsibilityGridTools rgt, Map<Id<Link>, Integer> links2xCells, Map<Id<Link>, Integer> links2yCells) {
+	public EmissionResponsibilityCostModule(double emissionCostMultiplicationFactor, ResponsibilityGridTools rgt, GridTools gridTools) {
 		this.emissionCostMultiplicationFactor = emissionCostMultiplicationFactor;
 		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostMultiplicationFactor);
 		logger.info("CO2 emission costs will NOT be calculated... ");

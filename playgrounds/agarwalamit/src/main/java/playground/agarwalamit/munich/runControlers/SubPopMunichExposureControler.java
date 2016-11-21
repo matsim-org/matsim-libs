@@ -20,10 +20,8 @@ package playground.agarwalamit.munich.runControlers;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import javax.inject.Provider;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -42,9 +40,9 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.agarwalamit.munich.controlerListner.MyTollAveragerControlerListner;
 import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
+import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 import playground.vsp.airPollution.exposure.GridTools;
 import playground.vsp.airPollution.exposure.InternalizeEmissionResponsibilityControlerListener;
-import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
 /**
@@ -149,12 +147,12 @@ public class SubPopMunichExposureControler {
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
 
-		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
-		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
-		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
+		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
+//		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
+//		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
 		
-		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
-		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostMultiplicationFactor),	Boolean.parseBoolean(considerCO2Costs), rgt, links2xCells, links2yCells);
+		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
+		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostMultiplicationFactor),	Boolean.parseBoolean(considerCO2Costs), rgt, gt);
 		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, 
 				emissionCostModule, config.planCalcScore());
 		
@@ -166,7 +164,7 @@ public class SubPopMunichExposureControler {
 			}
 		});
 		
-		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, links2xCells, links2yCells));
+		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
 		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		
 		if(isAveragingTollAfterRePlanning){

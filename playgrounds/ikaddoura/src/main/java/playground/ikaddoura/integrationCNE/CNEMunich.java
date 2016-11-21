@@ -24,13 +24,10 @@ package playground.ikaddoura.integrationCNE;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
@@ -85,10 +82,10 @@ public class CNEMunich {
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 		Controler controler = new Controler(scenario);
 
-		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
-		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
-		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
-		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
+		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
+//		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
+//		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
+		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
 
 		CNEIntegration cneIntegration = new CNEIntegration(controler, rgt);
 		controler = cneIntegration.prepareControler();

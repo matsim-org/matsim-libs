@@ -89,13 +89,13 @@ public class RunExposureInternalizationMunich {
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
 
-		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
-		links2xCells = gt.mapLinks2Xcells(noOfXCells);
-		links2yCells = gt.mapLinks2Ycells(noOfYCells);
+		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
+//		links2xCells = gt.mapLinks2Xcells(noOfXCells);
+//		links2yCells = gt.mapLinks2Ycells(noOfYCells);
 		
-		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
+		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
 		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostFactor),	
-				Boolean.parseBoolean(considerCO2Costs), rgt, links2xCells, links2yCells);
+				Boolean.parseBoolean(considerCO2Costs), rgt, gt);
 		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, 
 				emissionCostModule, config.planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
@@ -104,7 +104,7 @@ public class RunExposureInternalizationMunich {
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 			}
 		});
-		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, links2xCells, links2yCells));
+		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.addOverridingModule(new OTFVisFileWriterModule());

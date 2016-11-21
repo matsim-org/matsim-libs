@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -55,10 +53,9 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
 import playground.benjamin.internalization.EquilTestSetUp;
-import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
+import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 import playground.vsp.airPollution.exposure.GridTools;
 import playground.vsp.airPollution.exposure.InternalizeEmissionResponsibilityControlerListener;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
@@ -166,14 +163,14 @@ public class TestExposurePricing {
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
 
-		GridTools gt = new GridTools(sc.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
-		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
-		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
+		GridTools gt = new GridTools(sc.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
+//		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
+//		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
 
 		Double timeBinSize = new Double (controler.getScenario().getConfig().qsim().getEndTime() / this.noOfTimeBins );
 
-		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
-		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( 1.0, isConsideringCO2Costs, rgt, links2xCells, links2yCells);
+		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
+		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( 1.0, isConsideringCO2Costs, rgt, gt);
 		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule,sc.getConfig().planCalcScore());
 
 		controler.addOverridingModule(new AbstractModule() {
@@ -184,7 +181,7 @@ public class TestExposurePricing {
 			}
 		});
 
-		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, links2xCells, links2yCells));
+		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
 
 		MyPersonMoneyEventHandler personMoneyEventHandler = new MyPersonMoneyEventHandler();
 		controler.getEvents().addHandler(personMoneyEventHandler);
@@ -229,14 +226,14 @@ public class TestExposurePricing {
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
 
-		GridTools gt = new GridTools(sc.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
-		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
-		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
+		GridTools gt = new GridTools(sc.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
+//		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
+//		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
 
 		Double timeBinSize = new Double (controler.getScenario().getConfig().qsim().getEndTime() / this.noOfTimeBins );
 
-		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
-		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( 1.0, isConsideringCO2Costs, rgt, links2xCells, links2yCells);
+		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
+		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( 1.0, isConsideringCO2Costs, rgt, gt);
 //		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, sc.getConfig().planCalcScore());
         final playground.vsp.airPollution.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new playground.vsp.airPollution.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory(
                 new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
@@ -252,7 +249,7 @@ public class TestExposurePricing {
 			}
 		});
 
-		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, links2xCells, links2yCells));
+		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
 
 		MyPersonMoneyEventHandler personMoneyEventHandler = new MyPersonMoneyEventHandler();
 		controler.getEvents().addHandler(personMoneyEventHandler);

@@ -26,14 +26,13 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 	private Set<Id<Person>> recognisedPersons;
 
 
-	public IntervalHandler(Double timeBinSize, Double simulationEndTime, int noOfxCells, int noOfyCells, 
-			Map<Id<Link>,Integer> link2xbins, Map<Id<Link>,Integer> link2ybins){
+	public IntervalHandler(Double timeBinSize, Double simulationEndTime, GridTools gridTools){
 		this.timeBinSize=timeBinSize;
 		this.simulationEndTime = simulationEndTime;
-		this.noOfxCells = noOfxCells;
-		this.noOfyCells = noOfyCells;
-		this.link2xbins = link2xbins;
-		this.link2ybins = link2ybins;
+		this.noOfxCells = gridTools.getNoOfXCells();
+		this.noOfyCells = gridTools.getNoOfYCells();
+		this.link2xbins = gridTools.getLink2XBins();
+		this.link2ybins = gridTools.getLink2YBins();
 		recognisedPersons = new HashSet<Id<Person>>();
 		this.reset(0);
 	}
