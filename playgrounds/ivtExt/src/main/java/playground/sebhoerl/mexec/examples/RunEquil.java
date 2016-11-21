@@ -9,6 +9,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
 import playground.sebhoerl.mexec.*;
 import playground.sebhoerl.mexec.local.LocalEnvironment;
+import playground.sebhoerl.mexec.local.os.LinuxDriver;
 import playground.sebhoerl.mexec.ssh.SSHEnvironment;
 import playground.sebhoerl.mexec.ssh.utils.SSHUtils;
 
@@ -16,12 +17,12 @@ import java.io.IOException;
 
 public class RunEquil {
     public static void main(String[] args) {
-        //runLocally();
-        runRemotely();
+        runLocally();
+        //runRemotely();
     }
 
     private static void runLocally() {
-        runInEnvironment(new LocalEnvironment("/home/sebastian/mexecenv"));
+        runInEnvironment(new LocalEnvironment("/home/sebastian/mexecenv", new LinuxDriver()));
     }
 
     private static void runRemotely() {

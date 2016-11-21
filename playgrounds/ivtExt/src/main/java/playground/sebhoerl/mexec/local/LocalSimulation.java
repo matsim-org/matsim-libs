@@ -8,6 +8,7 @@ import playground.sebhoerl.mexec.Simulation;
 import playground.sebhoerl.mexec.data.ControllerData;
 import playground.sebhoerl.mexec.generic.AbstractSimulation;
 import playground.sebhoerl.mexec.local.data.LocalSimulationData;
+import playground.sebhoerl.mexec.local.os.OSDriver;
 import playground.sebhoerl.mexec.placeholders.PlaceholderUtils;
 
 import java.io.*;
@@ -26,9 +27,11 @@ public class LocalSimulation extends AbstractSimulation<LocalSimulationData> imp
 
     final private ControllerData controllerData;
 
+    final private OSDriver driver;
+
     private Config config = null;
 
-    public LocalSimulation(LocalEnvironment environment, LocalSimulationData data, File path, File scenarioPath, File controllerPath, ControllerData controllerData) {
+    public LocalSimulation(LocalEnvironment environment, LocalSimulationData data, File path, File scenarioPath, File controllerPath, ControllerData controllerData, OSDriver driver) {
         super(data);
 
         this.environment = environment;
@@ -37,6 +40,7 @@ public class LocalSimulation extends AbstractSimulation<LocalSimulationData> imp
         this.controllerPath = controllerPath;
         this.controllerData = controllerData;
         this.outputPath = new File(path, "output");
+        this.driver = driver;
     }
 
     @Override
@@ -60,17 +64,8 @@ public class LocalSimulation extends AbstractSimulation<LocalSimulationData> imp
 
     @Override
     public boolean isActive() {
-        try {
-            Process process = Runtime.getRuntime().exec("ps " + data.pid);
-            process.waitFor();
-
-            if (process.exitValue() == 0) {
-                return true;
-            }
-        } catch (InterruptedException e) {
-        } catch (IOException e) {}
-
-        return false;
+        if (data.pid == null) return false;
+        return driver.isProcessActive(data.pid);
     }
 
     @Override
@@ -98,56 +93,7 @@ public class LocalSimulation extends AbstractSimulation<LocalSimulationData> imp
         Config transformed = PlaceholderUtils.transformConfig(config, placeholders);
         ConfigUtils.saveConfig(new File(path, "run_config.xml"), transformed);
 
-        // Build Java Command
-        List<String> command = new LinkedList<>();
-        command.add("java");
-        if (getMemory() != null) command.add("-Xmx" + getMemory());
-        command.add("-cp");
-        command.add(new File(controllerPath, controllerData.classPath).toString());
-        command.add(controllerData.className);
-        command.add(new File(path, "run_config.xml").toString());
-        command.add("1>");
-        command.add(new File(path, "o.log").toString());
-        command.add("2>");
-        command.add(new File(path, "e.log").toString());
-        command.add("&");
-        String javaCommand = String.join(" ", command);
-
-        // Build Run Script
-        String runScript = "cd " + path + "\n" + javaCommand + "\necho $! > " + pidPath;
-
-        try {
-            OutputStream outputStream = new FileOutputStream(runScriptPath);
-            OutputStreamWriter streamWriter = new OutputStreamWriter(outputStream);
-            streamWriter.write(runScript);
-            streamWriter.flush();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("Error while creating the run file.");
-        } catch (IOException e) {
-            throw new RuntimeException("Error while writing the run file.");
-        }
-
-        // Start.
-        try {
-            Runtime.getRuntime().exec("sh " + runScriptPath);
-        } catch (IOException e) {
-            throw new RuntimeException("Error while running the run script.");
-        }
-
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {}
-
-        try {
-            InputStream inputStream = new FileInputStream(pidPath);
-            BufferedReader streamReader = new BufferedReader(new InputStreamReader(inputStream));
-            data.pid = Long.parseLong(streamReader.readLine());
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("No PID file found.");
-        } catch (IOException e) {
-            throw new RuntimeException("Error while reading PID.");
-        }
-
+        data.pid = driver.startProcess(data, path, controllerData, controllerPath, outputLogPath, errorLogPath);
         save();
     }
 
@@ -157,11 +103,7 @@ public class LocalSimulation extends AbstractSimulation<LocalSimulationData> imp
             throw new RuntimeException("Cannot start an inactive simulation.");
         }
 
-        try {
-            Runtime.getRuntime().exec("kill " + data.pid);
-        } catch (IOException e) {
-            throw new RuntimeException("Error while killing process.");
-        }
+        driver.stopProcess(data.pid);
 
         while (isActive()) {
             try {

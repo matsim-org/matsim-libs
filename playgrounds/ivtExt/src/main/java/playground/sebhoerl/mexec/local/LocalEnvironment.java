@@ -12,6 +12,7 @@ import playground.sebhoerl.mexec.data.ScenarioData;
 import playground.sebhoerl.mexec.data.SimulationData;
 import playground.sebhoerl.mexec.local.data.LocalEnvironmentData;
 import playground.sebhoerl.mexec.local.data.LocalSimulationData;
+import playground.sebhoerl.mexec.local.os.OSDriver;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,8 +31,11 @@ public class LocalEnvironment implements Environment {
     final private ObjectMapper mapper = new ObjectMapper();
     final private LocalEnvironmentData data;
 
-    public LocalEnvironment(String environmentPath) {
+    final private OSDriver driver;
+
+    public LocalEnvironment(String environmentPath, OSDriver driver) {
         this.environmentPath = new File(environmentPath).getAbsoluteFile();
+        this.driver = driver;
 
         if (this.environmentPath.exists()) {
             if (!this.environmentPath.isDirectory()) {
@@ -225,7 +229,8 @@ public class LocalEnvironment implements Environment {
                 getSimulationPath(simulationId),
                 getScenarioPath(simulationData.scenarioId),
                 getControllerPath(simulationData.controllerId),
-                controllerData
+                controllerData,
+                driver
         );
     }
 
