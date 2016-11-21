@@ -11,12 +11,12 @@ import java.util.Set;
 
 public class WindowsDriver implements OSDriver {
 
-    // WINDOWS DRIVER IS UNTESTED!!!
+    // WINDOWS WORKS in PRINCIPLE, BUT PROBABLY NOT THE BEST WAY TO DO THAT ...
 
     @Override
     public long startProcess(SimulationData simulation, File simulationPath, ControllerData controller, File controllerPath, File outputPath, File errorPath) {
         List<String> command = new LinkedList<>();
-        command.add("java");
+        command.add("javaw");
         if (simulation.memory != null) command.add("-Xmx" + simulation.memory);
         command.add("-cp");
         command.add(new File(controllerPath, controller.classPath).toString());
@@ -24,15 +24,12 @@ public class WindowsDriver implements OSDriver {
         command.add(new File(simulationPath, "run_config.xml").toString());
         command.add(">");
         command.add(outputPath.toString());
-        command.add("2>");
+        command.add("2^>");
         command.add(errorPath.toString());
-        command.add("&");
         String javaCommand = String.join(" ", command);
 
-        File pidPath = new File(simulationPath, "matsim.pid");
         File runScriptPath = new File(simulationPath, "runscript.bat");
-
-        String runScript = "cd " + simulationPath + "\nstart " + javaCommand + "\neexit";
+        String runScript = "cd " + simulationPath + "\r\n" + javaCommand + "\r\nexit\n";
 
         try {
             OutputStream outputStream = new FileOutputStream(runScriptPath);
@@ -45,13 +42,28 @@ public class WindowsDriver implements OSDriver {
             throw new RuntimeException("Error while writing the run file.");
         }
 
+        File starterScriptPath = new File(simulationPath, "starter.bat");
+        String starterScript = "start " + runScriptPath + "\r\nexit\r\n";
+
+        try {
+            OutputStream outputStream = new FileOutputStream(starterScriptPath);
+            OutputStreamWriter streamWriter = new OutputStreamWriter(outputStream);
+            streamWriter.write(starterScript);
+            streamWriter.flush();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("Error while creating the starter file.");
+        } catch (IOException e) {
+            throw new RuntimeException("Error while writing the starter file.");
+        }
+
         // PID can only be inferred by comparing before and after
         Set<Long> beforePIDList = getJavaPIDList();
 
         // Start.
         try {
-            Runtime.getRuntime().exec("cmd /c " + runScriptPath);
+            Runtime.getRuntime().exec("cmd /C " + starterScriptPath);
         } catch (IOException e) {
+            e.printStackTrace();
             throw new RuntimeException("Error while running the run script.");
         }
 
@@ -76,24 +88,19 @@ public class WindowsDriver implements OSDriver {
         // https://www.windows-commandline.com/tasklist-command/
         Set<Long> pids = new HashSet<>();
 
+        System.out.println("PIDS");
+
         try {
-            Process process = Runtime.getRuntime().exec("tasklist java");
+            Process process = Runtime.getRuntime().exec("tasklist /FO TABLE /NH");
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
             String line = null;
-            boolean content = false;
 
             while ((line = reader.readLine()) != null) {
-                if (content) {
+                if (line.startsWith("javaw.exe")) {
                     String[] parts = line.split("\\s+");
-
-                    if (parts.length > 1) {
-                        pids.add(Long.parseLong(parts[1]));
-                    }
-                }
-
-                if (line.startsWith("=")) {
-                    content = true;
+                    pids.add(Long.parseLong(parts[1]));
+                    System.out.println(parts[1]);
                 }
             }
         } catch (IOException e) {
