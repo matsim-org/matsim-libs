@@ -41,7 +41,7 @@ public class TravelTimeStatistics   {
 
 	public static void main(String[] args) {
 
-		String run = "VW79BC";
+		String run = "run101";
 //		String folder = "D:/runs-svn/vw_rufbus/" + run + "/";
 		String folder = "D:/runs-svn/vw_rufbus/" + run + "/";
 		String inputFile = folder + run + ".output_events.xml.gz";
@@ -92,7 +92,7 @@ public class TravelTimeStatistics   {
 		events.addHandler(ptTT);
 		events.addHandler(tbTT);
 		events.addHandler(allTT);
-		events.addHandler(analyser);
+//		events.addHandler(analyser);
 		
 		events.addHandler(a);
 		new MatsimEventsReader(events).readFile(inputFile);
