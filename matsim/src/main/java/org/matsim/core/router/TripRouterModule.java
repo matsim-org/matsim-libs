@@ -50,10 +50,10 @@ public class TripRouterModule extends AbstractModule {
                 // better solve this on the config level eventually.
                 continue;
             }
-            addRoutingModuleBinding(mode).toProvider(new PseudoTransit(getConfig().plansCalcRoute().getModeRoutingParams().get(mode)));
+            addRoutingModuleBinding(mode).toProvider(new FreespeedFactorRouting(getConfig().plansCalcRoute().getModeRoutingParams().get(mode)));
         }
         for (String mode : routeConfigGroup.getTeleportedModeSpeeds().keySet()) {
-            addRoutingModuleBinding(mode).toProvider(new Teleportation(getConfig().plansCalcRoute().getModeRoutingParams().get(mode)));
+            addRoutingModuleBinding(mode).toProvider(new BeelineTeleportationRouting(getConfig().plansCalcRoute().getModeRoutingParams().get(mode)));
         }
         for (String mode : routeConfigGroup.getNetworkModes()) {
             addRoutingModuleBinding(mode).toProvider(new NetworkRouting(mode));

@@ -81,10 +81,22 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		public static final String SET_TYPE = "teleportedModeParameters";
 
 		private String mode = null;
-		private Double teleportedModeSpeed = null;
-		private Double teleportedModeFreespeedFactor = null;
 
+		// beeline teleportation:
+		private Double teleportedModeSpeed = null;
 		private Double beelineDistanceFactorForMode = null ;
+		
+		// route computed on network:
+		private Double teleportedModeFreespeedFactor = null;
+		private Double teleportedModeFreespeedLimit = Double.POSITIVE_INFINITY ;
+
+		private static final String TELEPORTED_MODE_FREESPEED_FACTOR_CMT = "Free-speed factor for a teleported mode. " +
+		"Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. " +
+		"Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +" +
+		"teleportedModeFreespeedFactor wins over teleportedModeSpeed.";
+		
+		static final String TELEPORTED_MODE_FREESPEED_LIMIT_CMT = "When using freespeed factor, a speed limit on the free speed. "
+				+ "Link travel time will be $= factor * [ min( link_freespeed, freespeed_limit) ]" ;
 
 		public ModeRoutingParams(final String mode) {
 			super( SET_TYPE );
@@ -116,13 +128,27 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			map.put( "teleportedModeSpeed" ,
 					"Speed for a teleported mode. " +
 					"Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode.");
-			map.put( "teleportedModeFreespeedFactor",
-					"Free-speed factor for a teleported mode. " +
-					"Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. " +
-					"Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +" +
-					"teleportedModeFreespeedFactor wins over teleportedModeSpeed.");
+			map.put( "teleportedModeFreespeedFactor", TELEPORTED_MODE_FREESPEED_FACTOR_CMT);
 
 			return map;
+		}
+
+		/**
+		 * Currently not in xml interface.
+		 * 
+		 * @return teleportedModeFreespeedLimit -- {@value #TELEPORTED_MODE_FREESPEED_LIMIT_CMT}
+		 */
+		public final Double getTeleportedModeFreespeedLimit() {
+			return this.teleportedModeFreespeedLimit;
+		}
+
+		/**
+		 * Currently not in xml interface.
+		 * 
+		 * @param teleportedModeFreespeedLimit -- {@value #TELEPORTED_MODE_FREESPEED_LIMIT_CMT}
+		 */
+		public final void setTeleportedModeFreespeedLimit(Double teleportedModeFreespeedLimit) {
+			this.teleportedModeFreespeedLimit = teleportedModeFreespeedLimit;
 		}
 
 		@StringGetter( "mode" )

@@ -56,23 +56,24 @@ import org.matsim.vehicles.Vehicles;
  *
  */
 final class BerlinUtils {
-	static class PtTravelTime implements TravelTime {
-		@Override public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-			return 2. * link.getLength() / link.getFreespeed(time) ; // pt as 2 x car free speed
-		}
-	}
+//	static class PtTravelTime implements TravelTime {
+//		@Override public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+//			return 1.8 * link.getLength() / link.getFreespeed(time) ; // pt as 2 x car free speed.  Reducing this because it comes out too high.
+//		}
+//	}
 
 	static class BikeTravelTime implements TravelTime {
 		@Override public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-			return link.getLength() / Math.min( link.getFreespeed(time) , 12.3/3.6 ) ; // google maps assumes an average speed of 15km/h but I think that's unrealistic
+			return link.getLength() / Math.min( link.getFreespeed(time) , 15./3.6 ) ; // google maps assumes an average speed of 15km/h but I think that's unrealistic
 			// 12.3 see http://www.urbanist-magazin.de/2015/06/das-konzept-der-effektiven-geschwindigkeit/
 			// which points to http://www.stadtentwicklung.berlin.de/verkehr/politik_planung/zahlen_fakten/download/Mobilitaet_dt_komplett.pdf
+			// Setting this to 15 after all since we are stuck in car congestion.
 		}
 	}
 
 	static class WalkTravelTime implements TravelTime {
 		@Override public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-			return link.getLength() / Math.min( link.getFreespeed(time) , 4./3.6 ) ;
+			return link.getLength() / Math.min( link.getFreespeed(time) , 4.3/3.6 ) ;
 		}
 	}
 
@@ -351,36 +352,46 @@ final class BerlinUtils {
 		config.plansCalcRoute().setNetworkModes(networkModes);
 		
 		// network modes for qsim:
-		Collection<String> mainModes = Arrays.asList( new String[] { TransportMode.car, TransportMode.bike } ) ;
+		Collection<String> mainModes = Arrays.asList( new String[] { TransportMode.car } ) ;
 		// (not including walk here since otherwise walk would be stuck between congested cars)
 		config.qsim().setMainModes(mainModes);
 	
 		{
 			String mode = TransportMode.walk ;
 
-			networkModes.add(mode) ;
-	
+			ModeRoutingParams pars = new ModeRoutingParams(mode) ;
+			pars.setTeleportedModeFreespeedFactor(1.); 
+			pars.setTeleportedModeFreespeedLimit(5./3.6);
+			config.plansCalcRoute().addModeRoutingParams(pars);
+
 			// scoring:
 			ModeParams params = new ModeParams( mode ) ;
 			params.setConstant(0);
-			params.setMarginalUtilityOfTraveling(0.);
+			params.setMarginalUtilityOfTraveling(-1.); // this should be by distance, but with const spd does not matter
 			config.planCalcScore().addModeParams(params);
 		}
 		{
 			String mode = TransportMode.bike ;
 
-			networkModes.add(mode) ;
-			
+			ModeRoutingParams pars = new ModeRoutingParams(mode) ;
+			pars.setTeleportedModeFreespeedFactor(1.); 
+			pars.setTeleportedModeFreespeedLimit(14.5/3.6);
+			config.plansCalcRoute().addModeRoutingParams(pars);
+
 			// scoring:
 			ModeParams params = new ModeParams( mode ) ;
-			params.setConstant(-1); // some initiation costs compared to walk
-			params.setMarginalUtilityOfTraveling(0.);
+			params.setConstant(-1.); // maybe some initiation costs compared to walk
+			params.setMarginalUtilityOfTraveling(-2.);
 			config.planCalcScore().addModeParams(params);
 		}
 		{
 			String mode = TransportMode.pt ;
+			
+			ModeRoutingParams pars = new ModeRoutingParams(mode) ;
+			pars.setTeleportedModeFreespeedFactor(2.1); 
+			config.plansCalcRoute().addModeRoutingParams(pars);
 
-			networkModes.add(mode) ;
+//			networkModes.add(mode) ;
 
 			// scoring:
 			ModeParams params = new ModeParams(mode) ;
@@ -395,8 +406,9 @@ final class BerlinUtils {
 			
 			// scoring:
 			ModeParams params = new ModeParams(mode) ;
-			params.setConstant(-2.); // worse than bike but better than pt
+			params.setConstant(-1.); // worse than bike but better than pt.  But may include some fixed cost ...
 			params.setMarginalUtilityOfTraveling(0.);
+			params.setMonetaryDistanceRate(-0.10/1000.); // recall that this is Eu/m (!)
 			config.planCalcScore().addModeParams(params);
 		}
 		{

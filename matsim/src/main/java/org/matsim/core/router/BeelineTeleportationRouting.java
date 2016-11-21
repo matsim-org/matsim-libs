@@ -6,11 +6,11 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-class Teleportation implements Provider<RoutingModule> {
+class BeelineTeleportationRouting implements Provider<RoutingModule> {
 
 	private final PlansCalcRouteConfigGroup.ModeRoutingParams params;
 
-	public Teleportation(PlansCalcRouteConfigGroup.ModeRoutingParams params) {
+	public BeelineTeleportationRouting(PlansCalcRouteConfigGroup.ModeRoutingParams params) {
 		this.params = params;
 	}
 

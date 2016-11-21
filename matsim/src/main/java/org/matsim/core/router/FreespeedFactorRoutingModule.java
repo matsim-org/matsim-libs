@@ -32,33 +32,31 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 
-public final class PseudoTransitRoutingModule implements RoutingModule {
+public final class FreespeedFactorRoutingModule implements RoutingModule {
 
 	private final String mode;
 	private final PopulationFactory populationFactory;
 
 	private final Network network;
 	private final LeastCostPathCalculator routeAlgo;
-	private final double speedFactor;
-	private final double beelineDistanceFactor;
+	private final ModeRoutingParams params;
 
-	public PseudoTransitRoutingModule(
+	FreespeedFactorRoutingModule(
 			final String mode,
 			final PopulationFactory populationFactory,
             final Network network,
 			final LeastCostPathCalculator routeAlgo,
-			final double speedFactor,
-			double beelineDistanceFactor) {
+			ModeRoutingParams params) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
-		this.speedFactor = speedFactor;
-		this.beelineDistanceFactor = beelineDistanceFactor;
+		this.params = params;
 		this.mode = mode;
 		this.populationFactory = populationFactory;
 	}
@@ -95,7 +93,7 @@ public final class PseudoTransitRoutingModule implements RoutingModule {
 		return "[LegRouterWrapper: mode="+this.mode+"]";
 	}
 
-	public double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
+	/* package (for tests) */ final double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
 		int travTime = 0;
 		final Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
 		final Link toLink = this.network.getLinks().get(toAct.getLinkId());
@@ -107,20 +105,36 @@ public final class PseudoTransitRoutingModule implements RoutingModule {
 			// do not drive/walk around, if we stay on the same link
 			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-			Link r1 = ((Link) toLink);
+
 			// we're still missing the time on the final link, which the agent has to drive on in the java mobsim
 			// so let's calculate the final part.
-			double travelTimeLastLink = NetworkUtils.getFreespeedTravelTime(r1, depTime + path.travelTime);
-			travTime = (int) (((int) path.travelTime + travelTimeLastLink) * this.speedFactor);
+			
+			// get freespeed travel time:
+			double travelTimeLastLink = NetworkUtils.getFreespeedTravelTime(toLink, depTime + path.travelTime);
+			
+			// re-engineer the speed:
+			double speed = toLink.getLength() / travelTimeLastLink ;
+			
+			// correct by speed limit:
+			if ( speed > params.getTeleportedModeFreespeedLimit() ) {
+				speed = params.getTeleportedModeFreespeedLimit() ;
+			}
+			
+			// now correct the travel time:
+			travelTimeLastLink = toLink.getLength() / speed ;
+			
+			travTime = (int) (((int) path.travelTime + travelTimeLastLink) * this.params.getTeleportedModeFreespeedFactor());
 			Route route = this.populationFactory.getRouteFactories().createRoute(Route.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(travTime);
+			
+			// yyyyyy the following should actually rather come from the route!  There is a RouteUtils.calcDistance( route ) .  kai, nov'16
 			double dist = 0;
 			if ((fromAct.getCoord() != null) && (toAct.getCoord() != null)) {
 				dist = CoordUtils.calcEuclideanDistance(fromAct.getCoord(), toAct.getCoord());
 			} else {
 				dist = CoordUtils.calcEuclideanDistance(fromLink.getCoord(), toLink.getCoord());
 			}
-			route.setDistance(dist * this.beelineDistanceFactor);
+			route.setDistance(dist * this.params.getBeelineDistanceFactor());
 			leg.setRoute(route);
 		} else {
 			// create an empty route == staying on place if toLink == endLink

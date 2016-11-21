@@ -19,6 +19,9 @@
 
 package org.matsim.core.router;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -32,21 +35,35 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.NewControlerModule;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.Facility;
+
+import com.google.inject.Binding;
 
 public class PseudoTransitRoutingModuleTest {
 
+	@SuppressWarnings("static-method")
 	@Test
 	public void testRouteLeg() {
-		Fixture f = new Fixture();
+		final Fixture f = new Fixture();
 		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
 		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
-
+		
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Leg leg = PopulationUtils.createLeg(TransportMode.pt);
 		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 0));
@@ -54,25 +71,68 @@ public class PseudoTransitRoutingModuleTest {
 		Activity toAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 3000));
 		toAct.setLinkId(Id.create("3", Link.class));
 
-		double tt = new PseudoTransitRoutingModule(
-				"mode", f.s.getPopulation().getFactory(),
-				f.s.getNetwork(), routeAlgo, 2.0, 1.0).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
-		Assert.assertEquals(400.0, tt, 1e-8);
-		Assert.assertEquals(400.0, leg.getTravelTime(), 1e-8);
-		Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
-		Assert.assertEquals(3000.0, leg.getRoute().getDistance(), 1e-8);
-		tt = new PseudoTransitRoutingModule(
-				"mode", f.s.getPopulation().getFactory(),
-				f.s.getNetwork(), routeAlgo, 3.0, 2.0).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
-		Assert.assertEquals(600.0, tt, 1e-8);
-		Assert.assertEquals(600.0, leg.getTravelTime(), 1e-8);
-		Assert.assertEquals(6000.0, leg.getRoute().getDistance(), 1e-8);
+		{
+			ModeRoutingParams params = new ModeRoutingParams("mode") ;
+			params.setTeleportedModeFreespeedFactor(2.);
+			params.setBeelineDistanceFactor(1.);
+			double tt = new FreespeedFactorRoutingModule(
+					"mode", f.s.getPopulation().getFactory(),
+					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
+			Assert.assertEquals(400.0, tt, 1e-8);
+			Assert.assertEquals(400.0, leg.getTravelTime(), 1e-8);
+			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
+			Assert.assertEquals(3000.0, leg.getRoute().getDistance(), 1e-8);
+		}{
+			ModeRoutingParams params = new ModeRoutingParams("mode") ;
+			params.setTeleportedModeFreespeedFactor(3.);
+			params.setBeelineDistanceFactor(2.);
+			double tt = new FreespeedFactorRoutingModule(
+					"mode", f.s.getPopulation().getFactory(),
+					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
+			Assert.assertEquals(600.0, tt, 1e-8);
+			Assert.assertEquals(600.0, leg.getTravelTime(), 1e-8);
+			Assert.assertEquals(6000.0, leg.getRoute().getDistance(), 1e-8);
+		}{
+			// the following test is newer than the ones above.  I wanted to test the freespeed limit.  But could not do it in the same way
+			// above since it is not in FreespeedTravelTimeAndDisutility.  Could have modified that disutility.  But preferred to test in context.
+			// Thus the more complicated injector thing.  kai, nov'16
+			
+			ModeRoutingParams params = new ModeRoutingParams("mode") ;
+			params.setTeleportedModeFreespeedFactor(2.);
+			params.setBeelineDistanceFactor(1.);
+			params.setTeleportedModeFreespeedLimit(5.);
+			f.s.getConfig().plansCalcRoute().addModeRoutingParams(params);
+			
+			com.google.inject.Injector injector = Injector.createInjector(f.s.getConfig(), new AbstractModule() {
+				@Override public void install() {
+					install(new NewControlerModule());
+					install(new ControlerDefaultCoreListenersModule());
+					install(new ControlerDefaultsModule()) ;
+					install(new ScenarioByInstanceModule(f.s));
+				}
+			});
+			
+			TripRouter tripRouter = injector.getInstance(TripRouter.class) ;
+			
+			Facility<?> fromFacility = new ActivityWrapperFacility(fromAct) ;
+			Facility<?> toFacility = new ActivityWrapperFacility(toAct) ;
+			
+			List<? extends PlanElement> result = tripRouter.calcRoute("mode", fromFacility, toFacility, 7.0*3600., person) ;
+			Gbl.assertIf( result.size()==1);
+			Leg newLeg = (Leg) result.get(0) ;
+			
+			Assert.assertEquals(800.0, newLeg.getTravelTime(), 1e-8);
+			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
+			Assert.assertEquals(3000.0, newLeg.getRoute().getDistance(), 1e-8);
+		}
 	}
 
 	private static class Fixture {
 		public final Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		public Fixture() {
+			s.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			
 			Network net = this.s.getNetwork();
 			NetworkFactory nf = net.getFactory();
 			Node n1 = nf.createNode(Id.create("1", Node.class), new Coord(0, 0));

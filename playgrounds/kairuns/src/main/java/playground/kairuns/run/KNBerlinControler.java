@@ -79,7 +79,7 @@ public final class KNBerlinControler {
 				}
 				addTravelTimeBinding(TransportMode.bike).to(BerlinUtils.BikeTravelTime.class);
 				addTravelTimeBinding(TransportMode.walk).to(BerlinUtils.WalkTravelTime.class);
-				addTravelTimeBinding(TransportMode.pt).to(BerlinUtils.PtTravelTime.class);
+//				addTravelTimeBinding(TransportMode.pt).to(BerlinUtils.PtTravelTime.class);
 				
 				this.bind( PrepareForSim.class ).to( PrepareForSimMultimodalImpl.class ) ;
 			}
@@ -95,7 +95,7 @@ public final class KNBerlinControler {
 			for ( Link link : scenario.getNetwork().getLinks().values() ) {
 				if ( link.getFreespeed() < 77/3.6 ) {
 					if ( link.getCapacity() >= 1001. ) { // cap >= 1000 is nearly everything 
-						link.setFreespeed( 0.8 * link.getFreespeed() );
+						link.setFreespeed( 1. * link.getFreespeed() );
 					}else {
 						link.setFreespeed( 0.5 * link.getFreespeed() );
 					}
@@ -221,8 +221,13 @@ public final class KNBerlinControler {
 
 		config.controler().setMobsim( MobsimType.qsim.toString() );
 		config.qsim().setFlowCapFactor( sampleFactor );
-		//		config.qsim().setStorageCapFactor( Math.pow( sampleFactor, -0.25 ) ); // this version certainly is completely wrong.
-		config.qsim().setStorageCapFactor(0.03);
+		if ( equil ) {
+			config.qsim().setStorageCapFactor( Math.pow( sampleFactor, 0.75 ) ); // <== this would be the correct version.
+		} else {
+			config.qsim().setStorageCapFactor(0.03);
+			// leaving this at 0.03 for "berlin" since this was used for all the experiments.  And probably having it a it smaller than usual
+			// is good since it spatially extends the jams.  kai, nov'16
+		}
 		
 		
 		if ( assignment ) {

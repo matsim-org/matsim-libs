@@ -20,11 +20,24 @@
 
 package org.matsim.analysis;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
+
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -42,17 +55,6 @@ import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import javax.inject.Inject;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-
 /**
  * Calculates at the end of each iteration the following statistics:
  * <ul>
@@ -68,6 +70,7 @@ import java.util.TreeMap;
  * @author mrieser
  */
 public class ScoreStatsControlerListener implements StartupListener, IterationEndsListener, ShutdownListener, ScoreStats {
+	// yy might make sense to either divide this into ScoreStats and ModeStats.  Or rename into IterationStats.  kai, nov'16
 
 	public static final String FILENAME_SCORESTATS = "scorestats";
 	public static final String FILENAME_MODESTATS = "modestats";
@@ -89,12 +92,15 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 	private StageActivityTypes stageActivities;
 	private MainModeIdentifier mainModeIdentifier;
 	private Map<String,Double> modeCnt = new TreeMap<>() ;
+	
+	private boolean ini = true ;
+	private final Set<String> modes;
 
 	private final static Logger log = Logger.getLogger(ScoreStatsControlerListener.class);
 
 	@Inject
 	ScoreStatsControlerListener(ControlerConfigGroup controlerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,
-			TripRouter tripRouter ) {
+			TripRouter tripRouter, PlanCalcScoreConfigGroup scoreConfig ) {
 		this.controlerConfigGroup = controlerConfigGroup;
 		this.population = population1;
 		this.fileName = controlerIO.getOutputFilename(FILENAME_SCORESTATS);
@@ -104,6 +110,12 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 		this.modeOut = IOUtils.getBufferedWriter(this.modeFileName + ".txt");
 		try {
 			this.out.write("ITERATION\tavg. EXECUTED\tavg. WORST\tavg. AVG\tavg. BEST\n");
+			this.modeOut.write("Iteration");
+			this.modes = scoreConfig.getModes().keySet();
+			for ( String mode : modes ) {
+				this.modeOut.write("\t" + mode);
+			}
+			this.modeOut.write("\n"); ;
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -151,13 +163,15 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 		}
 		
 		try {
-			this.out.write(event.getIteration() ) ;
-			for ( Entry<String, Double> entry : this.modeCnt.entrySet() ) {
-				String mode = entry.getKey() ;
-				Double cnt = entry.getValue() ;
-				final double share = cnt/sum;
+			this.modeOut.write( event.getIteration() ) ;
+			for ( String mode : modes ) {
+				Double cnt = this.modeCnt.get(mode) ;
+				double share = 0. ;
+				if ( cnt!=null ) {
+					share = cnt/sum;
+				}
 				log.info("-- mode share of mode " + mode + " = " + share );
-				this.modeOut.write( share + "\t" ) ;
+				this.modeOut.write( "\t" + share ) ;
 				
 				Map<Integer, Double> modeHistory = this.modeHistories.get(mode) ;
 				if ( modeHistory == null ) {
@@ -179,6 +193,10 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 			for ( Entry<String, Map<Integer, Double>> entry : this.modeHistories.entrySet() ) {
 				String mode = entry.getKey() ;
 				Map<Integer, Double> history = entry.getValue() ;
+				log.warn( "about to add the following series:" ) ;
+				for ( Entry<Integer, Double> item : history.entrySet() ) {
+					log.warn( item.getKey() + " -- " + item.getValue() );
+				}
 				chart.addSeries(mode, history ) ;
 			}
 			chart.addMatsimLogo();
