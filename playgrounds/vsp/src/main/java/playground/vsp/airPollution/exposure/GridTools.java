@@ -58,7 +58,7 @@ public class GridTools {
 		}
 	}
 
-	public void mapLinks2Ycells() {
+	private void mapLinks2Ycells() {
 		this.link2ybin = new HashMap<Id<Link>, Integer>();
 		for(Id<Link> linkId: this.links.keySet()){
 			link2ybin.put(linkId, mapYCoordToBin(this.links.get(linkId).getCoord().getY(), noOfYCells));
