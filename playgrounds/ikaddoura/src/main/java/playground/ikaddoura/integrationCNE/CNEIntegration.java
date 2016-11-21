@@ -111,6 +111,10 @@ public class CNEIntegration {
 		this.controler = controler;
 		this.responsibilityGridTools = responsibilityGridTools;
 	}
+
+	public CNEIntegration(Controler controler) {
+		this(controler, null);
+	}
 	
 	public static void main(String[] args) throws IOException {
 		
