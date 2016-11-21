@@ -53,6 +53,7 @@ import playground.ikaddoura.integrationCN.VTTSTollTimeDistanceTravelDisutilityFa
 import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
+import playground.vsp.airPollution.flatEmissions.EmissionTravelDisutilityCalculatorFactory;
 import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.controler.CongestionAnalysisControlerListener;
@@ -295,7 +296,7 @@ public class CNEIntegration {
 			final EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 
 			if (useTripAndAgentSpecificVTTSForRouting) {
-				throw new RuntimeException("Not yet implemented. Aborting..."); // TODO
+				throw new RuntimeException("Not yet implemented. Aborting...");
 
 			} else {				
 				
@@ -303,8 +304,7 @@ public class CNEIntegration {
 					throw new RuntimeException("The following travel disutility doesn't allow for randomness. Aborting...");
 				}
 				
-				// TODO: doesn't account for randomness, doesn't account for marginal utility of distance, ... 
-				final playground.vsp.airPollution.flatEmissions.EmissionTravelDisutilityCalculatorFactory emissionTducf = new playground.vsp.airPollution.flatEmissions.EmissionTravelDisutilityCalculatorFactory(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),emissionModule,
+				final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),emissionModule,
 						emissionCostModule, controler.getConfig().planCalcScore());
 				emissionTducf.setHotspotLinks(hotSpotLinks);
 				controler.addOverridingModule(new AbstractModule() {
@@ -403,32 +403,12 @@ public class CNEIntegration {
 
 		} else if (congestionPricing && noisePricing == false && airPollutionPricing) {
 			// congestion + air pollution pricing
-
-			final TollHandler congestionTollHandlerQBP = new TollHandler(controler.getScenario());
-			
-			final EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 			
 			if (useTripAndAgentSpecificVTTSForRouting) {
-				throw new RuntimeException("Not yet implemented. Aborting..."); // TODO?!
+				throw new RuntimeException("Not yet implemented. Aborting...");
 
 			} else {
-				
-				if (sigma != 0.) {
-					throw new RuntimeException("The following travel disutility doesn't allow for randomness. Aborting...");
-				}
-				
-				// TODO: doesn't account for randomness, doesn't account for marginal utility of distance, ... 
-				final EmissionCongestionTravelDisutilityCalculatorFactory emissionCongestionTravelDisutilityCalculatorFactory = 
-						new EmissionCongestionTravelDisutilityCalculatorFactory(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()), emissionCostModule, emissionModule, controler.getConfig().planCalcScore(), congestionTollHandlerQBP);
-				controler.addOverridingModule(new AbstractModule() {
-					@Override
-					public void install() {
-						bindCarTravelDisutilityFactory().toInstance(emissionCongestionTravelDisutilityCalculatorFactory);
-					}
-				});
-				
-				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandlerQBP, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
-				controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
+				throw new RuntimeException("Not yet implemented. Aborting...");
 			}
 					
 		} else if (congestionPricing == false && noisePricing == false && airPollutionPricing == false) {
