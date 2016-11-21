@@ -422,7 +422,7 @@ public class CNEIntegration {
 				
 				// TODO: doesn't account for randomness, doesn't account for marginal utility of distance, ... 
 				final EmissionCongestionTravelDisutilityCalculatorFactory emissionCongestionTravelDisutilityCalculatorFactory = 
-						new EmissionCongestionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, congestionTollHandlerQBP, controler.getConfig().planCalcScore());
+						new EmissionCongestionTravelDisutilityCalculatorFactory(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()), emissionCostModule, emissionModule, controler.getConfig().planCalcScore(), congestionTollHandlerQBP);
 				controler.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {

@@ -36,7 +36,7 @@ import org.matsim.core.router.util.TravelTime;
 public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutilityFactory {
 
     private double sigma = 0. ;
-    private RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;
+    private final RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;
     private final EmissionModule emissionModule;
     private final EmissionCostModule emissionCostModule;
     private final PlanCalcScoreConfigGroup cnScoringGroup;
