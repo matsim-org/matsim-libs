@@ -103,9 +103,6 @@ public class PatnaBikeTrackConnectionControler {
 		Map<Id<Link>, Link> linkIds = new HashMap<>(); // just to keep information about links
 		SortedMap<Id<Link>,Double> linkId2Count = new TreeMap<>(); // need to update the counts after every run.
 
-		// add all possible connectors to it
-		LOG.info("========================== Adding all possible connectors to bike track...");
-
 		BikeTrackConnectionIdentifier connectionIdentifier = new BikeTrackConnectionIdentifier(initialNetwork,bikeTrack);
 		connectionIdentifier.run();
 
@@ -127,22 +124,22 @@ public class PatnaBikeTrackConnectionControler {
 			}
 
 			for(Link l : connectionIdentifier.getBikeTrackNetwork().getLinks().values()){
-				if (scenario.getNetwork().getLinks().containsKey(l.getId()) ) {
-                }
-				else{
-					// link must be re-created so that node objects are same.
+				if (scenario.getNetwork().getLinks().containsKey(l.getId()) ) continue;
+				else{// link must be re-created so that node objects are same.
 					addLinkToScenario(scenario, l);
 				}
 			}
 
 			if(index==1) {
+				// add all possible connectors to it
+				LOG.info("========================== Adding all possible connectors to bike track...");
+
 				for (Id<Link> lId : linkIds.keySet()) {
 					Link l = linkIds.get(lId);
 					// link must be re-created so that node objects are same.
 					addLinkToScenario(scenario, l);
 				}
-			}
-			else {
+			} else {
 				LOG.info("========================== Adding new connectors links based on the count...");
 				// take only pre-decided number of links.
 				Iterator<Map.Entry<Id<Link>, Double>> iterator = linkId2Count.entrySet().stream().sorted(byValue.reversed()).limit(numberOfConnectors).iterator();
