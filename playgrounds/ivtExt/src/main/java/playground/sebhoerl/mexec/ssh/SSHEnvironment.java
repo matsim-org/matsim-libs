@@ -1,82 +1,89 @@
-package playground.sebhoerl.mexec.local;
+package playground.sebhoerl.mexec.ssh;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.io.FileUtils;
 import playground.sebhoerl.mexec.Controller;
 import playground.sebhoerl.mexec.Environment;
 import playground.sebhoerl.mexec.Scenario;
 import playground.sebhoerl.mexec.Simulation;
 import playground.sebhoerl.mexec.data.ControllerData;
-import playground.sebhoerl.mexec.data.EnvironmentData;
 import playground.sebhoerl.mexec.data.ScenarioData;
-import playground.sebhoerl.mexec.data.SimulationData;
-import playground.sebhoerl.mexec.local.data.LocalEnvironmentData;
-import playground.sebhoerl.mexec.local.data.LocalSimulationData;
+import playground.sebhoerl.mexec.ssh.data.SSHEnvironmentData;
+import playground.sebhoerl.mexec.ssh.data.SSHSimulationData;
+import playground.sebhoerl.mexec.ssh.utils.SSHFile;
+import playground.sebhoerl.mexec.ssh.utils.SSHUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-public class LocalEnvironment implements Environment {
-    final private File environmentPath;
-    final private File scenariosPath;
-    final private File controllersPath;
-    final private File simulationsPath;
-    final private File registryPath;
+public class SSHEnvironment implements Environment {
+    private SSHFile environmentPath;
+    final private SSHFile scenariosPath;
+    final private SSHFile controllersPath;
+    final private SSHFile simulationsPath;
+    final private SSHFile registryPath;
+
+    final private SSHUtils ssh;
 
     final private ObjectMapper mapper = new ObjectMapper();
-    final private LocalEnvironmentData data;
+    final private SSHEnvironmentData data;
 
-    public LocalEnvironment(String environmentPath) {
-        this.environmentPath = new File(environmentPath).getAbsoluteFile();
+    public SSHEnvironment(String environmentPath, SSHUtils ssh) {
+        this.ssh = ssh;
+        this.environmentPath = new SSHFile(environmentPath);
 
-        if (this.environmentPath.exists()) {
-            if (!this.environmentPath.isDirectory()) {
+        if (ssh.exists(this.environmentPath)) {
+            if (!ssh.isDirectory(this.environmentPath)) {
                 throw new RuntimeException("Not a directory: " + environmentPath);
             }
         } else {
-            if (!this.environmentPath.mkdirs()) {
+            if (!(ssh.mkdirs(this.environmentPath))) {
                 throw new RuntimeException("Could not set up directory: " + environmentPath);
             }
         }
 
-        scenariosPath = new File(this.environmentPath, "scenarios");
-        controllersPath = new File(this.environmentPath, "controllers");
-        simulationsPath = new File(this.environmentPath, "simulations");
-        registryPath = new File(this.environmentPath, "registry.json");
+        this.environmentPath = ssh.getAbsoluteFile(this.environmentPath);
 
-        if (registryPath.exists()) {
+        scenariosPath = new SSHFile(this.environmentPath, "scenarios");
+        controllersPath = new SSHFile(this.environmentPath, "controllers");
+        simulationsPath = new SSHFile(this.environmentPath, "simulations");
+        registryPath = new SSHFile(this.environmentPath, "registry.json");
+
+        if (ssh.exists(registryPath)) {
             try {
-                data = mapper.readValue(registryPath, LocalEnvironmentData.class);
+                data = mapper.readValue(ssh.read(registryPath), SSHEnvironmentData.class);
             } catch (IOException e) {
-                throw new RuntimeException("Could not load local registry file from " + registryPath);
+                throw new RuntimeException("Could not load sftp registry file from " + registryPath);
             }
         } else {
-            data = new LocalEnvironmentData();
+            data = new SSHEnvironmentData();
         }
     }
 
     public void save() {
         try {
-            mapper.writeValue(registryPath, data);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            mapper.writeValue(stream, data);
+            ssh.write(registryPath, new ByteArrayInputStream(stream.toByteArray()));
         } catch (IOException e) {
             throw new RuntimeException("Could not save local registry file to " + registryPath);
         }
     }
 
-    private File getControllerPath(String controllerId) {
-        return new File(controllersPath, controllerId);
+    private SSHFile getControllerPath(String controllerId) {
+        return new SSHFile(controllersPath, controllerId);
     }
 
-    private File getScenarioPath(String scenarioId) {
-        return new File(scenariosPath, scenarioId);
+    private SSHFile getScenarioPath(String scenarioId) {
+        return new SSHFile(scenariosPath, scenarioId);
     }
 
-    private File getSimulationPath(String simulationId) {
-        return new File(simulationsPath, simulationId);
+    private SSHFile getSimulationPath(String simulationId) {
+        return new SSHFile(simulationsPath, simulationId);
     }
 
     @Override
@@ -96,11 +103,11 @@ public class LocalEnvironment implements Environment {
         data.classPath = classPath;
         data.id = controllerId;
 
-        File localTarget = getControllerPath(controllerId);
-        localTarget.mkdir();
+        SSHFile remoteTarget = getControllerPath(controllerId);
+        ssh.mkdirs(remoteTarget);
 
         try {
-            FileUtils.copyDirectory(localSource, localTarget);
+            ssh.copyDirectory(localSource, remoteTarget);
         } catch (IOException e) {
             throw new RuntimeException("Error while copying from " + localSource);
         }
@@ -108,7 +115,7 @@ public class LocalEnvironment implements Environment {
         this.data.controllers.put(controllerId, data);
         save();
 
-        return new LocalController(this, data);
+        return new SSHController(this, data);
     }
 
     @Override
@@ -117,7 +124,7 @@ public class LocalEnvironment implements Environment {
             throw new RuntimeException("Controller '" + controllerId + "' does not exist");
         }
 
-        return new LocalController(this, data.controllers.get(controllerId));
+        return new SSHController(this, data.controllers.get(controllerId));
     }
 
     @Override
@@ -125,7 +132,7 @@ public class LocalEnvironment implements Environment {
         List<Controller> controllers = new LinkedList<>();
 
         for (ControllerData controllerData : data.controllers.values()) {
-            controllers.add(new LocalController(this, controllerData));
+            controllers.add(new SSHController(this, controllerData));
         }
 
         return controllers;
@@ -145,7 +152,7 @@ public class LocalEnvironment implements Environment {
         data.controllers.remove(controller.getId());
         save();
 
-        FileUtils.deleteQuietly(getControllerPath(controller.getId()));
+        ssh.deleteQuietly(getControllerPath(controller.getId()));
     }
 
     @Override
@@ -163,11 +170,11 @@ public class LocalEnvironment implements Environment {
         ScenarioData data = new ScenarioData();
         data.id = scenarioId;
 
-        File localTarget = getScenarioPath(scenarioId);
-        localTarget.mkdir();
+        SSHFile remoteTarget = getScenarioPath(scenarioId);
+        ssh.mkdirs(remoteTarget);
 
         try {
-            FileUtils.copyDirectory(localSource, localTarget);
+            ssh.copyDirectory(localSource, remoteTarget);
         } catch (IOException e) {
             throw new RuntimeException("Error while copying from " + localSource);
         }
@@ -175,7 +182,7 @@ public class LocalEnvironment implements Environment {
         this.data.scenarios.put(scenarioId, data);
         save();
 
-        return new LocalScenario(this, data, getScenarioPath(scenarioId));
+        return new SSHScenario(this, data, getScenarioPath(scenarioId), ssh);
     }
 
     @Override
@@ -184,7 +191,7 @@ public class LocalEnvironment implements Environment {
             throw new RuntimeException("Scenario '" + scenarioId + "' does not exist");
         }
 
-        return new LocalScenario(this, data.scenarios.get(scenarioId), getScenarioPath(scenarioId));
+        return new SSHScenario(this, data.scenarios.get(scenarioId), getScenarioPath(scenarioId), ssh);
     }
 
     @Override
@@ -192,7 +199,7 @@ public class LocalEnvironment implements Environment {
         List<Scenario> scenarios = new LinkedList<>();
 
         for (ScenarioData scenarioData : data.scenarios.values()) {
-            scenarios.add(new LocalScenario(this, scenarioData, getScenarioPath(scenarioData.id)));
+            scenarios.add(new SSHScenario(this, scenarioData, getScenarioPath(scenarioData.id), ssh));
         }
 
         return scenarios;
@@ -212,20 +219,21 @@ public class LocalEnvironment implements Environment {
         data.scenarios.remove(scenario.getId());
         save();
 
-        FileUtils.deleteQuietly(getScenarioPath(scenario.getId()));
+        ssh.deleteQuietly(getScenarioPath(scenario.getId()));
     }
 
-    private LocalSimulation getSimulationHandle(String simulationId) {
-        LocalSimulationData simulationData = data.simulations.get(simulationId);
+    private SSHSimulation getSimulationHandle(String simulationId) {
+        SSHSimulationData simulationData = data.simulations.get(simulationId);
         ControllerData controllerData = data.controllers.get(simulationData.controllerId);
 
-        return new LocalSimulation(
+        return new SSHSimulation(
                 this,
                 simulationData,
                 getSimulationPath(simulationId),
                 getScenarioPath(simulationData.scenarioId),
                 getControllerPath(simulationData.controllerId),
-                controllerData
+                controllerData,
+                ssh
         );
     }
 
@@ -235,19 +243,19 @@ public class LocalEnvironment implements Environment {
             throw new RuntimeException("Simulation '" + simulationId + "' already exists");
         }
 
-        LocalSimulationData data = new LocalSimulationData();
+        SSHSimulationData data = new SSHSimulationData();
         data.id = simulationId;
         data.controllerId = controller.getId();
         data.scenarioId = scenario.getId();
 
-        File localTarget = getSimulationPath(simulationId);
-        localTarget.mkdir();
+        SSHFile remoteTarget = getSimulationPath(simulationId);
+        ssh.mkdirs(remoteTarget);
 
-        File configSource = new File(getScenarioPath(scenario.getId()), scenario.getMainConfigPath());
-        File configTarget = new File(localTarget, "config.xml");
+        SSHFile configSource = new SSHFile(getScenarioPath(scenario.getId()), scenario.getMainConfigPath());
+        SSHFile configTarget = new SSHFile(remoteTarget, "config.xml");
 
         try {
-            FileUtils.copyFile(configSource, configTarget);
+            ssh.copyRemote(configSource, configTarget);
         } catch (IOException e) {
             throw new RuntimeException("Could not copy config " + configSource);
         }
@@ -271,7 +279,7 @@ public class LocalEnvironment implements Environment {
     public Collection<? extends Simulation> getSimulations() {
         List<Simulation> simulations = new LinkedList<>();
 
-        for (LocalSimulationData simulationData : data.simulations.values()) {
+        for (SSHSimulationData simulationData : data.simulations.values()) {
             simulations.add(getSimulationHandle(simulationData.id));
         }
 
@@ -292,7 +300,7 @@ public class LocalEnvironment implements Environment {
         data.simulations.remove(simulation.getId());
         save();
 
-        FileUtils.deleteQuietly(getSimulationPath(simulation.getId()));
+        ssh.deleteQuietly(getSimulationPath(simulation.getId()));
     }
 
     @Override
@@ -300,7 +308,7 @@ public class LocalEnvironment implements Environment {
         List<Simulation> simulations = new LinkedList<>();
 
         for (Simulation simulation : getSimulations()) {
-            SimulationData simulationData = data.simulations.get(simulation.getId());
+            SSHSimulationData simulationData = data.simulations.get(simulation.getId());
 
             if (simulationData.scenarioId == scenario.getId()) {
                 simulations.add(simulation);
@@ -315,7 +323,7 @@ public class LocalEnvironment implements Environment {
         List<Simulation> simulations = new LinkedList<>();
 
         for (Simulation simulation : getSimulations()) {
-            SimulationData simulationData = data.simulations.get(simulation.getId());
+            SSHSimulationData simulationData = data.simulations.get(simulation.getId());
 
             if (simulationData.controllerId == controller.getId()) {
                 simulations.add(simulation);
@@ -327,13 +335,13 @@ public class LocalEnvironment implements Environment {
 
     @Override
     public Controller getController(Simulation simulation) {
-        SimulationData simulationData = data.simulations.get(simulation.getId());
+        SSHSimulationData simulationData = data.simulations.get(simulation.getId());
         return getController(simulationData.controllerId);
     }
 
     @Override
     public Scenario getScenario(Simulation simulation) {
-        SimulationData simulationData = data.simulations.get(simulation.getId());
+        SSHSimulationData simulationData = data.simulations.get(simulation.getId());
         return getScenario(simulationData.scenarioId);
     }
 }

@@ -19,7 +19,7 @@ public interface Environment {
 
     // Simulations
     Simulation createSimulation(String simulationId, Scenario scenario, Controller controller);
-    Simulation getSimulaiton(String simulationId);
+    Simulation getSimulation(String simulationId);
     Collection<? extends Simulation> getSimulations();
     boolean hasSimulation(String simulationId);
     void removeSimulation(Simulation simulation);

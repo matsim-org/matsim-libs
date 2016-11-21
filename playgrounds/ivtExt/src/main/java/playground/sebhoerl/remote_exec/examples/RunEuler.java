@@ -30,7 +30,7 @@ public class RunEuler {
         simulation.getEvents(events);
 
         //ByteArrayOutputStream output = new ByteArrayOutputStream();
-        //simulation.getFile("output_events.xml.gz", output);
+        //simulation.getOutputFile("output_events.xml.gz", output);
 
         //System.out.println(new String(output.toByteArray()));
 

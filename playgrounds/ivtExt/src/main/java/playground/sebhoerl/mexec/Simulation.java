@@ -26,7 +26,8 @@ public interface Simulation {
     InputStream getEvents(Long iteration);
     InputStream getEvents();
 
-    InputStream getFile(String suffix);
+    InputStream getOutputFile(String suffix);
+    String getOutputPath(String suffix);
 
     boolean isActive();
 }
