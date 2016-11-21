@@ -80,13 +80,13 @@ public class AccessibilityComputationKiberaTest {
 		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		final Envelope envelope = new Envelope(252000, 256000, 9854000, 9856000);
 		final String runId = "ke_kibera_" + AccessibilityUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
-		final boolean push2Geoserver = false;
+		final boolean push2Geoserver = true;
 
 		// QGis parameters
 		boolean createQGisOutput = false;
 		final boolean includeDensityLayer = false;
-		final Double lowerBound = 0.; // (upperBound - lowerBound) is ideally easily divisible by 7
-//		final Double lowerBound = 1.75; // (upperBound - lowerBound) is ideally easily divisible by 7
+		final Double lowerBound = 0.; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
+//		final Double lowerBound = 1.75;
 		final Double upperBound = 3.5;
 		final Integer range = 9; // in the current implementation, this need always be 9
 		final int symbolSize = 10;
@@ -102,10 +102,6 @@ public class AccessibilityComputationKiberaTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
-		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true); // if this is not set to true, output CSV will give NaN values
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 				
 		// Collect activity types

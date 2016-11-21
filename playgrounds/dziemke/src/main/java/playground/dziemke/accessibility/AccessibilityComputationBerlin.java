@@ -28,14 +28,14 @@ import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
 import org.matsim.contrib.accessibility.AccessibilityStartupListener;
 import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
-import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
 import org.matsim.contrib.accessibility.NetworkModeProvider;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
-import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -47,14 +47,14 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 import com.vividsolutions.jts.geom.Envelope;
 
-import playground.dziemke.utils.LogToOutputSaver;
-
 /**
  * @author dziemke
  */
 public class AccessibilityComputationBerlin {
-	public static final Logger LOG = Logger.getLogger( AccessibilityComputationBerlin.class ) ;
-
+	public static final Logger LOG = Logger.getLogger(AccessibilityComputationBerlin.class);
+	
+	private static final Double cellSize = 5000.;
+	
 	public static void main(String[] args) {
 		// Input and output
 //		String networkFile = "../../shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.all.xml";
@@ -76,35 +76,40 @@ public class AccessibilityComputationBerlin {
 //		String travelDistanceMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelDistanceMatrix.csv.gz";
 //		String ptStops = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/stops.csv.gz";
 		
-		LogToOutputSaver.setOutputDirectory(outputDirectory);
+//		LogToOutputSaver.setOutputDirectory(outputDirectory);
 		
 		// Parameters
-		final Double cellSize = 5000.;
-		String crs = "EPSG:31468"; // = DHDN GK4
-		Envelope envelope = new Envelope(4574000, 4620000, 5802000, 5839000); // all Berlin
-		final String runId = "de_berlin_" + AccessibilityUtils.getDate() + "_" + cellSize.toString().split("\\.")[0] + "_refugee_initiatives_";
+		final String crs = "EPSG:31468"; // = DHDN GK4
+		final Envelope envelope = new Envelope(4574000, 4620000, 5802000, 5839000); // all Berlin
+		final String runId = "de_berlin_" + AccessibilityUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
 		final boolean push2Geoserver = true;
 		
 		// QGis parameters
-		boolean createQGisOutput = true;
-		boolean includeDensityLayer = false;
-		Double lowerBound = -3.5; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
-		Double upperBound = 3.5;
-		Integer range = 9;
-		Integer symbolSize = 260; // Choose slightly higher than cell size
-		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
+		boolean createQGisOutput = false;
+		final boolean includeDensityLayer = false;
+		final Double lowerBound = -3.5; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
+		final Double upperBound = 3.5;
+		final Integer range = 9;
+		final int symbolSize = 5000; // Choose slightly higher than cell size
+		final int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 		
 		// Storage objects
 		final List<String> modes = new ArrayList<>();
 
 		// Config and scenario
-		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup()) ;
+		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup()
+				//, new MatrixBasedPtRouterConfigGroup()
+				);
 		config.network().setInputFile(networkFile);
 		config.facilities().setInputFile(facilitiesFile);
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
-		final Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+//		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+//		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true); // if this is not set to true, output CSV will give NaN values
+//		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+//		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		// ##### Matrix-based pt
 //		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
@@ -146,12 +151,24 @@ public class AccessibilityComputationBerlin {
 //		log.warn( "found activity types: " + activityTypes );
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
 		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
-		List<String> activityTypes = new ArrayList<String>();
+		final List<String> activityTypes = new ArrayList<String>();
 		activityTypes.add("Refugee_Initiative");
+		
+		// Settings for VSP check
+		config.timeAllocationMutator().setMutationRange(7200.);
+		config.timeAllocationMutator().setAffectingDuration(false);
+		config.plans().setRemovingUnneccessaryPlanAttributes(true);
+		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration);
+		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
 
 		// Collect homes for density layer
-		String activityFacilityType = FacilityTypes.HOME;
-		final ActivityFacilities densityFacilities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityFacilityType);
+//		String activityFacilityType = FacilityTypes.HOME;
+//		final ActivityFacilities densityFacilities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityFacilityType);
+
+		// Network density points
+		ActivityFacilities measuringPoints = AccessibilityUtils.createMeasuringPointsFromNetworkBounds(scenario.getNetwork(), cellSize);
+		double maximumAllowedDistance = 0.5 * cellSize;
+		final ActivityFacilities densityFacilities = AccessibilityUtils.createNetworkDensityFacilities(scenario.getNetwork(), measuringPoints, maximumAllowedDistance);
 
 		// Controller
 		final Controler controler = new Controler(scenario);

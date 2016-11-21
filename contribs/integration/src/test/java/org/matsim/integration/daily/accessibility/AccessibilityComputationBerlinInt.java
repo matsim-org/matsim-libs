@@ -18,13 +18,10 @@
  * *********************************************************************** */
 package org.matsim.integration.daily.accessibility;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
@@ -35,7 +32,6 @@ import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
 import org.matsim.contrib.accessibility.NetworkModeProvider;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
-import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -45,7 +41,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.testcases.MatsimTestUtils;
 
 import com.google.inject.Key;
 import com.google.inject.multibindings.MapBinder;
@@ -55,79 +50,58 @@ import com.vividsolutions.jts.geom.Envelope;
 /**
  * @author dziemke
  */
-public class AccessibilityComputationNairobiTest {
-	public static final Logger log = Logger.getLogger(AccessibilityComputationNairobiTest.class);
+public class AccessibilityComputationBerlinInt {
+	public static final Logger log = Logger.getLogger(AccessibilityComputationBerlinInt.class);
 
 	private static final Double cellSize = 5000.;
+	
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
-
-	@Test
-	public void doAccessibilityTest() throws IOException {
+//	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+//
+//	@Test
+//	public void doAccessibilityTest() throws IOException {
+	public static void main(String[] args) {
 		// Input and output
-		String folderStructure = "../../";
-		String networkFile = "matsimExamples/countries/ke/nairobi/2015-10-15_network.xml";
-//		String networkFile = "../shared-svn/projects/maxess/data/nairobi/network/2015-10-15_network_modified_policy.xml";
-//		String networkFile = "../shared-svn/projects/maxess/data/kenya/network/2016-10-19_network_detailed.xml";
-		// Adapt folder structure that may be different on different machines, in particular on server
-		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
-		networkFile = folderStructure + networkFile;
-//		final String facilitiesFile = folderStructure + "matsimExamples/countries/ke/nairobi/2015-10-15_facilities.xml";
-//		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/land_use/nairobi_LU_2010/facilities.xml";
-//		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/primary_public/facilities.xml";
-//		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/health/hospitals/facilities.xml";
-		final String facilitiesFile = folderStructure + "matsimExamples/countries/ke/nairobi/2016-07-09_facilities_airports.xml"; //airports
-//		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/facilities/04/facilities.xml"; //airports
-		final String outputDirectory = utils.getOutputDirectory();
-//		final String outputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/output/27/";
-//		String travelTimeMatrix = "../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/tt.csv";
-//		String travelDistanceMatrix = "../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/td.csv";
-//		String ptStops = "../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/IDs.csv";
-		
+		String networkFile = "../../../shared-svn/projects/accessibility_berlin/network/2015-05-26/network.xml";
+		String facilitiesFile = "../../../shared-svn/projects/accessibility_berlin/refugee/initiatives.xml";
+		String outputDirectory = "../../../shared-svn/projects/accessibility_berlin/output/refugee/";
+
 		// Parameters
-		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
-		final Envelope envelope = new Envelope(240000, 280000, 9844000, 9874000); // whole Nairobi
-//		final Envelope envelope = new Envelope(246000, 271000, 9853000, 9863000); // whole Nairobi // central part
-//		final Envelope envelope = new Envelope(249000, 255000, 9854000, 9858000); // western Nairobi with Kibera
-//		final Envelope envelope = new Envelope(-70000, 800000, 9450000, 10500000); // whole Kenya
-//		final Envelope envelope = new Envelope(-70000, 420000, 9750000, 10100000); // Southwestern half of Kenya
-		final String runId = "ke_nairobi_" + AccessibilityUtils.getDate() + "_" + cellSize.toString().split("\\.")[0] + "_kodi_sec_";
+		final String crs = "EPSG:31468"; // = DHDN GK4
+		final Envelope envelope = new Envelope(4574000, 4620000, 5802000, 5839000); // all Berlin
+		final String runId = "de_berlin_" + AccessibilityUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
 		final boolean push2Geoserver = true;
-		
+
 		// QGis parameters
 		boolean createQGisOutput = false;
-		final boolean includeDensityLayer = true;
-		final Double lowerBound = -7.; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
-		final Double upperBound = 0.0;
-		final Integer range = 9; // In the current implementation, this must always be 9
-		final int symbolSize = 500; // Usually chosen a little bit larger than cellSize
-		final int populationThreshold = (int) (1 / (1000/cellSize * 1000/cellSize));
+		final boolean includeDensityLayer = false;
+		final Double lowerBound = -3.5; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
+		final Double upperBound = 3.5;
+		final Integer range = 9;
+		final int symbolSize = 5000; // Choose slightly higher than cell size
+		final int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 		
 		// Storage objects
 		final List<String> modes = new ArrayList<>();
-		
+
 		// Config and scenario
-		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
+		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
 		config.network().setInputFile(networkFile);
 		config.facilities().setInputFile(facilitiesFile);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
-//		config.planCalcScore().setBrainExpBeta(200); // Set to high value to base computation on time to nearest facility only
-		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+//		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+//		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true); // if this is not set to true, output CSV will give NaN values
+//		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+//		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-
+				
 		// Collect activity types
 //		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
 //		log.info("Found activity types: " + activityTypes);
 		final List<String> activityTypes = new ArrayList<>();
-		activityTypes.add("airport"); // airport anaylis version
-//		activityTypes.add("Educational"); // land-use file version
-//		activityTypes.add("Commercial"); // land-use file version
-//		activityTypes.add("Industrial"); // land-use file version
-//		activityTypes.add("Public Purpose"); // land-use file version
-//		activityTypes.add("Recreational"); // land-use file version
-//		activityTypes.add("Hospital"); // kodi file version
+		activityTypes.add("Refugee_Initiative");
 		
 		// Settings for VSP check
 		config.timeAllocationMutator().setMutationRange(7200.);
@@ -135,7 +109,7 @@ public class AccessibilityComputationNairobiTest {
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration);
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
-		
+
 		// Network density points
 		ActivityFacilities measuringPoints = AccessibilityUtils.createMeasuringPointsFromNetworkBounds(scenario.getNetwork(), cellSize);
 		double maximumAllowedDistance = 0.5 * cellSize;
