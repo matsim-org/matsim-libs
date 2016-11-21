@@ -17,58 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.source.invermo.generator;
 
 import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.processing.EpisodeTask;
 
 /**
  * @author johannes
  *
  */
-public class SetActivityTimeTask implements EpisodeTask {
+public class LegStartTimeHandler implements LegAttributeHandler {
 
 	@Override
-	public void apply(Episode plan) {
-		if(plan.getActivities().size() == 1) {
-			Attributable act = plan.getActivities().get(0);
-			
-			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, "0");
-			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, "86400");
-		} else {
-			
+	public void handle(Attributable leg, String key, String value) {
+		if(key.endsWith("abstd")) {
+			leg.setAttribute("startTimeHour", value);
+		} else if(key.endsWith("abmin")) {
+			leg.setAttribute("startTimeMin", value);
+		} else if(key.endsWith("abtag")) {
+			leg.setAttribute("startTimeDay", value);
+		} else if(key.endsWith("abmonat")) {
+			leg.setAttribute("startTimeMonth", value);
+		} else if(key.endsWith("abjahr")) {
+			leg.setAttribute("startTimeYear", value);
+		}
 		
-		for(int i = 0; i < plan.getActivities().size(); i++) {
-			String startTime = "0";
-			String endTime = "86400";
-			
-			Attributable act = plan.getActivities().get(i);
-			
-			if(i > 0) {
-				Attributable prev = plan.getLegs().get(i-1);
-				startTime = prev.getAttribute(CommonKeys.LEG_END_TIME);
-				
-				if(startTime != null) {
-					/*
-					 * set end time to 86400 or later if specified
-					 */
-					int start = Integer.parseInt(startTime);
-					int end = Math.max(start + 1, 86400);
-					endTime = String.valueOf(end);
-				}
-			}
-			
-			if(i < plan.getActivities().size() - 1) {
-				Attributable next = plan.getLegs().get(i);
-				endTime = next.getAttribute(CommonKeys.LEG_START_TIME);
-			}
-
-			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, startTime);
-			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, endTime);
-		}
-		}
 	}
 
 }

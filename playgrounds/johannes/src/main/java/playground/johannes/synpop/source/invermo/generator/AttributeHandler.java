@@ -17,49 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo;
+package playground.johannes.synpop.source.invermo.generator;
 
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainSegment;
-import playground.johannes.synpop.source.invermo.generator.AttributeHandler;
-import playground.johannes.synpop.source.invermo.generator.LegAttributeHandler;
-import playground.johannes.synpop.source.invermo.generator.VariableNames;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class LegHandlerAdaptor implements AttributeHandler<Episode> {
+public interface AttributeHandler<T> {
 
-	private List<LegAttributeHandler> delegates = new ArrayList<LegAttributeHandler>();
-
-	public void addHandler(LegAttributeHandler handler) {
-		delegates.add(handler);
-	}
-
-	@Override
-	public void handleAttribute(Episode plan, Map<String, String> attributes) {
-		for (Entry<String, String> entry : attributes.entrySet()) {
-			if (VariableNames.validate(entry.getValue())) {
-				String key = entry.getKey();
-				if (key.startsWith("e")) {
-					int idx = Character.getNumericValue(key.charAt(1));
-					idx = idx - 1;
-					while (idx > plan.getLegs().size() - 1) {
-						plan.addLeg(new PlainSegment());
-					}
-
-					for (LegAttributeHandler legHandler : delegates)
-						legHandler.handle(plan.getLegs().get(idx), key, entry.getValue());
-				}
-			}
-		}
-
-	}
-
+	public void handleAttribute(T object, Map<String, String> attributes);
+	
 }

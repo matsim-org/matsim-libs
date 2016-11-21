@@ -17,49 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo;
-
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainSegment;
-import playground.johannes.synpop.source.invermo.generator.AttributeHandler;
-import playground.johannes.synpop.source.invermo.generator.LegAttributeHandler;
-import playground.johannes.synpop.source.invermo.generator.VariableNames;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+package playground.johannes.synpop.source.invermo;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class LegHandlerAdaptor implements AttributeHandler<Episode> {
+public interface InvermoKeys {
 
-	private List<LegAttributeHandler> delegates = new ArrayList<LegAttributeHandler>();
+	String STATION_NAME = "station";
+	
+	String STATION_DIST = "stationDist";
+	
+	String HOME_LOCATION = "homeLoc";
+	
+	String HOME_COORD = "homeCoord";
 
-	public void addHandler(LegAttributeHandler handler) {
-		delegates.add(handler);
-	}
+	String WORK_LOCATION = "workLoc";
+	
+	String START_LOCATION = "startLoc";
+	
+	String DESTINATION_LOCATION = "destLoc";
+	
+	String WEIGHT = "weight";
+	
+	String PREV = "prev";
+	
+	String HOME = "home";
+	
+	String WORK = "work";
+	
+	String LOCATION = "location";
+	
+	String COORD = "coord";
 
-	@Override
-	public void handleAttribute(Episode plan, Map<String, String> attributes) {
-		for (Entry<String, String> entry : attributes.entrySet()) {
-			if (VariableNames.validate(entry.getValue())) {
-				String key = entry.getKey();
-				if (key.startsWith("e")) {
-					int idx = Character.getNumericValue(key.charAt(1));
-					idx = idx - 1;
-					while (idx > plan.getLegs().size() - 1) {
-						plan.addLeg(new PlainSegment());
-					}
-
-					for (LegAttributeHandler legHandler : delegates)
-						legHandler.handle(plan.getLegs().get(idx), key, entry.getValue());
-				}
-			}
-		}
-
-	}
-
+	String PLAN_ID = "id";
 }

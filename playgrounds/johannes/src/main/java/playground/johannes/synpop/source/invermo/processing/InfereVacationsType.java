@@ -17,57 +17,69 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.source.invermo.processing;
 
+import org.joda.time.DateTime;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.processing.EpisodeTask;
 
 /**
  * @author johannes
- *
+ * 
  */
-public class SetActivityTimeTask implements EpisodeTask {
+public class InfereVacationsType implements EpisodeTask {
 
 	@Override
 	public void apply(Episode plan) {
-		if(plan.getActivities().size() == 1) {
-			Attributable act = plan.getActivities().get(0);
-			
-			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, "0");
-			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, "86400");
-		} else {
-			
-		
-		for(int i = 0; i < plan.getActivities().size(); i++) {
-			String startTime = "0";
-			String endTime = "86400";
-			
-			Attributable act = plan.getActivities().get(i);
-			
-			if(i > 0) {
-				Attributable prev = plan.getLegs().get(i-1);
-				startTime = prev.getAttribute(CommonKeys.LEG_END_TIME);
-				
-				if(startTime != null) {
-					/*
-					 * set end time to 86400 or later if specified
-					 */
-					int start = Integer.parseInt(startTime);
-					int end = Math.max(start + 1, 86400);
-					endTime = String.valueOf(end);
+		boolean hasVacations = false;
+		for (Attributable act : plan.getActivities()) {
+			if ("vacations".equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+				hasVacations = true;
+				break;
+			}
+		}
+
+		if (hasVacations) {
+			boolean isLong = false;
+
+			Attributable first = plan.getLegs().get(0);
+			Attributable last = plan.getLegs().get(plan.getLegs().size() - 1);
+
+			String startStr = first.getAttribute(CommonKeys.LEG_START_TIME);
+			String endStr = last.getAttribute(CommonKeys.LEG_END_TIME);
+
+			if (startStr != null && endStr != null) {
+				DateTime start = SplitPlanTask.formatter.parseDateTime(startStr);
+				DateTime end = SplitPlanTask.formatter.parseDateTime(endStr);
+
+				if (end.getDayOfYear() - start.getDayOfYear() > 3) {
+					isLong = true;
 				}
 			}
 			
-			if(i < plan.getActivities().size() - 1) {
-				Attributable next = plan.getLegs().get(i);
-				endTime = next.getAttribute(CommonKeys.LEG_START_TIME);
+			for (Attributable act : plan.getActivities()) {
+				if ("vacations".equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+					if (isLong) {
+						act.setAttribute(CommonKeys.ACTIVITY_TYPE, "vacations_long");
+					} else {
+						act.setAttribute(CommonKeys.ACTIVITY_TYPE, "vacations_short");
+					}
+				}
 			}
 
-			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, startTime);
-			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, endTime);
-		}
+			for (Segment leg : plan.getLegs()) {
+				if ("vacations".equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_PURPOSE))) {
+					if (isLong) {
+						leg.setAttribute(CommonKeys.LEG_PURPOSE, "vacations_long");
+					} else {
+						leg.setAttribute(CommonKeys.LEG_PURPOSE, "vacations_short");
+					}
+				}
+			}
+
 		}
 	}
 

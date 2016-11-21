@@ -17,58 +17,51 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.source.invermo.processing;
 
 import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.processing.EpisodeTask;
+import playground.johannes.synpop.source.invermo.InvermoKeys;
 
 /**
  * @author johannes
- *
+ * 
  */
-public class SetActivityTimeTask implements EpisodeTask {
+public class SetActivityLocations implements EpisodeTask {
 
 	@Override
 	public void apply(Episode plan) {
-		if(plan.getActivities().size() == 1) {
-			Attributable act = plan.getActivities().get(0);
-			
-			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, "0");
-			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, "86400");
-		} else {
-			
-		
-		for(int i = 0; i < plan.getActivities().size(); i++) {
-			String startTime = "0";
-			String endTime = "86400";
-			
-			Attributable act = plan.getActivities().get(i);
-			
-			if(i > 0) {
-				Attributable prev = plan.getLegs().get(i-1);
-				startTime = prev.getAttribute(CommonKeys.LEG_END_TIME);
-				
-				if(startTime != null) {
-					/*
-					 * set end time to 86400 or later if specified
-					 */
-					int start = Integer.parseInt(startTime);
-					int end = Math.max(start + 1, 86400);
-					endTime = String.valueOf(end);
+
+		for (int i = 0; i < plan.getLegs().size(); i++) {
+			Attributable leg = plan.getLegs().get(i);
+
+			Attributable prev = plan.getActivities().get(i);
+			Attributable next = plan.getActivities().get(i + 1);
+
+			String startLoc = leg.getAttribute(InvermoKeys.START_LOCATION);
+			if (startLoc != null) {
+				if (startLoc.equals(InvermoKeys.HOME)) {
+					prev.setAttribute(InvermoKeys.LOCATION, InvermoKeys.HOME);
+				} else if (startLoc.equals(InvermoKeys.WORK)) {
+					prev.setAttribute(InvermoKeys.LOCATION, InvermoKeys.WORK);
+				} else if (startLoc.equals(InvermoKeys.PREV)) {
+
 				}
 			}
-			
-			if(i < plan.getActivities().size() - 1) {
-				Attributable next = plan.getLegs().get(i);
-				endTime = next.getAttribute(CommonKeys.LEG_START_TIME);
-			}
 
-			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, startTime);
-			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, endTime);
+			String destLoc = leg.getAttribute(InvermoKeys.DESTINATION_LOCATION);
+			if (destLoc != null) {
+				if (destLoc.equals(InvermoKeys.HOME)) {
+					next.setAttribute(InvermoKeys.LOCATION, InvermoKeys.HOME);
+				} else if (destLoc.equals(InvermoKeys.WORK)) {
+					next.setAttribute(InvermoKeys.LOCATION, InvermoKeys.WORK);
+				} else {
+					next.setAttribute(InvermoKeys.LOCATION, destLoc);
+				}
+			}
 		}
-		}
+
 	}
 
 }
