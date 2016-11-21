@@ -169,9 +169,8 @@ public class CNEIntegration {
 		}
 
 		if( airPollutionPricing && (this.gridTools == null || this.responsibilityGridTools == null) ) {
-//			throw new RuntimeException("To internalize air pollution exposure, grid tools " +
-//					"and responsibility grid tools must be passed to the constructor.");
-			// TODO : i think, we need this check here. It is commented right now so that test can pass. Amit Nov 16
+			throw new RuntimeException("To internalize air pollution exposure, grid tools " +
+					"and responsibility grid tools must be passed to the constructor.");
 		}
 		
 		final VTTSHandler vttsHandler;

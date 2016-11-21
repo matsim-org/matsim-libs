@@ -26,10 +26,14 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
 import playground.ikaddoura.analysis.linkDemand.LinkDemandEventHandler;
+import playground.vsp.airPollution.exposure.GridTools;
+import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
 /**
  * @author ikaddoura
@@ -176,9 +180,25 @@ public class CNETest {
 		controler1.run();
 
 		// air pollution pricing
-		CNEIntegration cneIntegration2 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "e");
+		Integer noOfXCells = 30;
+		Integer noOfYCells = 40;
+		double xMin = -1200.00;
+		double xMax = 10100.00;
+		double yMin = -100.00;
+		double yMax = 19050.00;
+		Double timeBinSize = 3600.;
+		int noOfTimeBins = 1;
+
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
+		Controler controler2 = new Controler(scenario);
+		GridTools gt = new GridTools(scenario.getNetwork().getLinks(),xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
+		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
+		scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "e");
+
+		CNEIntegration cneIntegration2 = new CNEIntegration(controler2, gt, rgt);
 		cneIntegration2.setAirPollutionPricing(true);
-		Controler controler2 = cneIntegration2.prepareControler();
+		controler2 = cneIntegration2.prepareControler();
+
 		LinkDemandEventHandler handler2 = new LinkDemandEventHandler(controler2.getScenario().getNetwork());
 		controler2.getEvents().addHandler(handler2);
 		controler2.getConfig().controler().setCreateGraphs(false);
