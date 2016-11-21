@@ -44,7 +44,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.agarwalamit.InternalizationEmissionAndCongestion.EmissionCongestionTravelDisutilityCalculatorFactory;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
 import playground.ikaddoura.integrationCN.TollTimeDistanceTravelDisutilityFactory;
@@ -52,6 +51,7 @@ import playground.ikaddoura.integrationCN.VTTSNoiseTollTimeDistanceTravelDisutil
 import playground.ikaddoura.integrationCN.VTTSTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
+import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.vsp.airPollution.flatEmissions.EmissionTravelDisutilityCalculatorFactory;
 import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
@@ -94,27 +94,24 @@ public class CNEIntegration {
 	private boolean airPollutionAnalysis = false;
 	
 	private boolean useTripAndAgentSpecificVTTSForRouting = false;
-		
+
+	private final ResponsibilityGridTools responsibilityGridTools ;
+
 	public CNEIntegration(String configFile, String outputDirectory) {
 		this.configFile = configFile;
 		this.outputDirectory = outputDirectory;
-	}
-	
-	public CNEIntegration(String configFile) {
-		this.configFile = configFile;
-		this.outputDirectory = null;
-	}
-	
-	public CNEIntegration(Controler controler) {
-		this.controler = controler;
-		this.outputDirectory = null;
-	}
-	
-	public CNEIntegration(Controler controler, String outputDirectory) {
-		this.controler = controler;
-		this.outputDirectory = outputDirectory;
+		this.responsibilityGridTools = null;
 	}
 
+	public CNEIntegration(String configFile) {
+		this (configFile, null);
+	}
+	
+	public CNEIntegration(Controler controler, ResponsibilityGridTools responsibilityGridTools) {
+		this.controler = controler;
+		this.responsibilityGridTools = responsibilityGridTools;
+	}
+	
 	public static void main(String[] args) throws IOException {
 		
 		String configFile;
