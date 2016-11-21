@@ -17,49 +17,53 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo;
-
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainSegment;
-import playground.johannes.synpop.source.invermo.generator.AttributeHandler;
-import playground.johannes.synpop.source.invermo.generator.LegAttributeHandler;
-import playground.johannes.synpop.source.invermo.generator.VariableNames;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+package playground.johannes.synpop.source.invermo.generator;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class LegHandlerAdaptor implements AttributeHandler<Episode> {
+public class VariableNames {
 
-	private List<LegAttributeHandler> delegates = new ArrayList<LegAttributeHandler>();
+	public static final String HOUSEHOLD_ID = "ID";
+	
+	public static final String PERSON_ID = "persnr";
 
-	public void addHandler(LegAttributeHandler handler) {
-		delegates.add(handler);
+	public static final String TRIP_ID = "Reisenr";
+	
+	public static final String STATION_NAME = "hhbhfname";
+	
+	public static final String STATION_DIST = "hhbhfkm";
+	
+	public static final String HOME_TOWN = "wohnort";
+	
+	public static final String HOME_ZIPCODE = "wohnplz";
+	
+	public static final String NA = "nan";
+	
+	public static final String START1_TRIP1 = "e1start1";
+	
+	public static final String START2_TRIP1 = "e1start2";
+	
+	public static final String START1_TRIP2 = "e2start1";
+	
+	public static final String START2_TRIP2 = "e2start2";
+	
+	public static final String START1_TRIP3 = "e3start1";
+	
+	public static final String START2_TRIP3 = "e3start2";
+	
+	public static final String START1_TRIP4 = "e4start1";
+	
+	public static final String MOB_WEIGTH = "gewmobil";
+
+	public static final String WORK_COUNTRY = "arbland";
+
+	public static final String WORK_TOWN = "arbstadtd";
+
+	public static final String WORK_ZIP = "arbplzd";
+	
+	public static boolean validate(String value) {
+		return (value != null && !value.equalsIgnoreCase(NA) && !value.isEmpty());
 	}
-
-	@Override
-	public void handleAttribute(Episode plan, Map<String, String> attributes) {
-		for (Entry<String, String> entry : attributes.entrySet()) {
-			if (VariableNames.validate(entry.getValue())) {
-				String key = entry.getKey();
-				if (key.startsWith("e")) {
-					int idx = Character.getNumericValue(key.charAt(1));
-					idx = idx - 1;
-					while (idx > plan.getLegs().size() - 1) {
-						plan.addLeg(new PlainSegment());
-					}
-
-					for (LegAttributeHandler legHandler : delegates)
-						legHandler.handle(plan.getLegs().get(idx), key, entry.getValue());
-				}
-			}
-		}
-
-	}
-
 }

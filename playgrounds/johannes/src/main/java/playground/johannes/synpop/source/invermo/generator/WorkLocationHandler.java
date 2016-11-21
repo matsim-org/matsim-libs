@@ -17,58 +17,51 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.source.invermo.generator;
 
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.processing.EpisodeTask;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.source.invermo.InvermoKeys;
+import playground.johannes.synpop.source.mid2008.generator.PersonAttributeHandler;
+
+import java.util.Map;
 
 /**
  * @author johannes
- *
+ * 
  */
-public class SetActivityTimeTask implements EpisodeTask {
+public class WorkLocationHandler implements PersonAttributeHandler {
 
 	@Override
-	public void apply(Episode plan) {
-		if(plan.getActivities().size() == 1) {
-			Attributable act = plan.getActivities().get(0);
-			
-			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, "0");
-			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, "86400");
-		} else {
-			
-		
-		for(int i = 0; i < plan.getActivities().size(); i++) {
-			String startTime = "0";
-			String endTime = "86400";
-			
-			Attributable act = plan.getActivities().get(i);
-			
-			if(i > 0) {
-				Attributable prev = plan.getLegs().get(i-1);
-				startTime = prev.getAttribute(CommonKeys.LEG_END_TIME);
-				
-				if(startTime != null) {
-					/*
-					 * set end time to 86400 or later if specified
-					 */
-					int start = Integer.parseInt(startTime);
-					int end = Math.max(start + 1, 86400);
-					endTime = String.valueOf(end);
+	public void handle(Person person, Map<String, String> attributes) {
+		String foreign = attributes.get(VariableNames.WORK_COUNTRY);
+		if (VariableNames.validate(foreign)) {
+			if (foreign.equals("1")) {
+				String zip = attributes.get(VariableNames.WORK_ZIP);
+				if(!VariableNames.validate(zip)) {
+					zip = "";
 				}
+				
+				String town = attributes.get(VariableNames.WORK_TOWN);
+				if(!VariableNames.validate(town)) {
+					town = "";
+				}
+				
+				person.setAttribute(InvermoKeys.WORK_LOCATION, String.format("%s %s", zip, town));
+				
+			} else if (foreign.equals("2")) {
+				String town = attributes.get("arbstadta");
+				if(!VariableNames.validate(town)) {
+					town = "";
+				}
+				
+				String country = attributes.get("arblandname");
+				if(!VariableNames.validate(country)) {
+					country = "";
+				}
+				
+				person.setAttribute(InvermoKeys.WORK_LOCATION, String.format("%s %s", town, country));
 			}
-			
-			if(i < plan.getActivities().size() - 1) {
-				Attributable next = plan.getLegs().get(i);
-				endTime = next.getAttribute(CommonKeys.LEG_START_TIME);
-			}
-
-			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, startTime);
-			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, endTime);
 		}
-		}
+		
 	}
-
 }

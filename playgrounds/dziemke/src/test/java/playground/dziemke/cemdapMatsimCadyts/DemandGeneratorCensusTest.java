@@ -71,7 +71,7 @@ public class DemandGeneratorCensusTest {
 		int male75Plus = 0;
 		int female75Plus = 0;
 
-		Population pop = demandGeneratorCensus.getPop();
+		Population pop = demandGeneratorCensus.getPopulation();
 		for (Person person : pop.getPersons().values()) {
 			//collect data
 			Id<Household> householdId = (Id<Household>) person.getAttributes().getAttribute("householdId");

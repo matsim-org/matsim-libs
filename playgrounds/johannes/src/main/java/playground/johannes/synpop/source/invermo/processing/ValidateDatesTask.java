@@ -17,58 +17,53 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.source.invermo.processing;
 
 import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.processing.EpisodeTask;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author johannes
  *
  */
-public class SetActivityTimeTask implements EpisodeTask {
+public class ValidateDatesTask implements EpisodeTask {
+
+	private final Map<String, String> replacements;
+	
+	public ValidateDatesTask() {
+		replacements = new HashMap<String, String>();
+		replacements.put("0", "2000");
+		replacements.put("1", "2001");
+		replacements.put("2", "2002");
+		replacements.put("99", "1999");
+		replacements.put("3899", "1999");
+		replacements.put("82", "1982");
+		replacements.put("98", "1998");
+	}
 
 	@Override
 	public void apply(Episode plan) {
-		if(plan.getActivities().size() == 1) {
-			Attributable act = plan.getActivities().get(0);
+		for(Attributable leg : plan.getLegs()) {
+			String startYear = leg.getAttribute("startTimeYear");
+			if(startYear != null)
+				leg.setAttribute("startTimeYear", validate(startYear));
 			
-			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, "0");
-			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, "86400");
-		} else {
-			
-		
-		for(int i = 0; i < plan.getActivities().size(); i++) {
-			String startTime = "0";
-			String endTime = "86400";
-			
-			Attributable act = plan.getActivities().get(i);
-			
-			if(i > 0) {
-				Attributable prev = plan.getLegs().get(i-1);
-				startTime = prev.getAttribute(CommonKeys.LEG_END_TIME);
-				
-				if(startTime != null) {
-					/*
-					 * set end time to 86400 or later if specified
-					 */
-					int start = Integer.parseInt(startTime);
-					int end = Math.max(start + 1, 86400);
-					endTime = String.valueOf(end);
-				}
-			}
-			
-			if(i < plan.getActivities().size() - 1) {
-				Attributable next = plan.getLegs().get(i);
-				endTime = next.getAttribute(CommonKeys.LEG_START_TIME);
-			}
-
-			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, startTime);
-			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, endTime);
-		}
+			String endYear = leg.getAttribute("endTimeYear");
+			if(endYear != null)
+				leg.setAttribute("endTimeYear", validate(endYear));
 		}
 	}
 
+	private String validate(String str) {
+		String replace = replacements.get(str);
+		if(replace == null) {
+			return str;
+		} else {
+			return replace;
+		}
+	}
 }

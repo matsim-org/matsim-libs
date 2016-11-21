@@ -40,7 +40,6 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.agarwalamit.munich.controlerListner.MyTollAveragerControlerListner;
 import playground.agarwalamit.utils.FileUtils;
 import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
 import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
@@ -76,7 +75,7 @@ public class SubPopMunichExposureControler {
 					"true",
 					"1.0",
 					FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run10/policies/backcasting/test_oldMethod/",
-					"true" };
+					 };
 		}
 
 		String configFile = args[0];
@@ -86,8 +85,6 @@ public class SubPopMunichExposureControler {
 
 		String outputDir = args[4];
 		
-		boolean isAveragingTollAfterRePlanning = Boolean.valueOf(args [5]);
-
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.controler().setOutputDirectory(outputDir);
 
@@ -180,10 +177,6 @@ public class SubPopMunichExposureControler {
 		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
 		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		
-		if(isAveragingTollAfterRePlanning){
-			controler.addControlerListener(new MyTollAveragerControlerListner());
-		}
-
 		// additional things to get the networkRoute for ride mode. For this, ride mode must be assigned in networkModes of the config file.
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

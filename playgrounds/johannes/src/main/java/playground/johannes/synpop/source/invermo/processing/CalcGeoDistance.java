@@ -17,58 +17,60 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.source.invermo.processing;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+import org.geotools.geometry.jts.JTSFactoryFinder;
+import org.matsim.contrib.common.gis.DistanceCalculator;
+import org.matsim.contrib.common.gis.OrthodromicDistanceCalculator;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.processing.EpisodeTask;
+import playground.johannes.synpop.source.invermo.InvermoKeys;
 
 /**
  * @author johannes
  *
  */
-public class SetActivityTimeTask implements EpisodeTask {
+public class CalcGeoDistance implements EpisodeTask {
+
+	private final GeometryFactory factory = JTSFactoryFinder.getGeometryFactory(null);
+	
+	private final DistanceCalculator dCalc = OrthodromicDistanceCalculator.getInstance();
+	
 
 	@Override
 	public void apply(Episode plan) {
-		if(plan.getActivities().size() == 1) {
-			Attributable act = plan.getActivities().get(0);
+		for(int i = 0; i < plan.getLegs().size(); i++) {
+			Attributable prev = plan.getActivities().get(i);
+			Attributable leg = plan.getLegs().get(i);
+			Attributable next = plan.getActivities().get(i + 1);
 			
-			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, "0");
-			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, "86400");
-		} else {
+			String sourceStr = prev.getAttribute(InvermoKeys.COORD);
+			String destStr = next.getAttribute(InvermoKeys.COORD);
 			
-		
-		for(int i = 0; i < plan.getActivities().size(); i++) {
-			String startTime = "0";
-			String endTime = "86400";
-			
-			Attributable act = plan.getActivities().get(i);
-			
-			if(i > 0) {
-				Attributable prev = plan.getLegs().get(i-1);
-				startTime = prev.getAttribute(CommonKeys.LEG_END_TIME);
+			if(sourceStr != null && destStr != null) {
+				Point source = string2Coord(sourceStr);
+				Point dest = string2Coord(destStr);
 				
-				if(startTime != null) {
-					/*
-					 * set end time to 86400 or later if specified
-					 */
-					int start = Integer.parseInt(startTime);
-					int end = Math.max(start + 1, 86400);
-					endTime = String.valueOf(end);
-				}
-			}
-			
-			if(i < plan.getActivities().size() - 1) {
-				Attributable next = plan.getLegs().get(i);
-				endTime = next.getAttribute(CommonKeys.LEG_START_TIME);
-			}
+				double d = dCalc.distance(source, dest);
 
-			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, startTime);
-			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, endTime);
+				leg.setAttribute(CommonKeys.LEG_GEO_DISTANCE, String.valueOf(d));
+			}
 		}
-		}
+
 	}
+	
+	private Point string2Coord(String str) {
+		String tokens[] = str.split(",");
+		double x = Double.parseDouble(tokens[0]);
+		double y = Double.parseDouble(tokens[1]);
 
+		Point p = factory.createPoint(new Coordinate(x, y));
+		p.setSRID(4326);
+		return p;
+	}
 }

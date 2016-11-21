@@ -17,49 +17,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo;
+package playground.johannes.synpop.source.invermo.generator;
 
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainSegment;
-import playground.johannes.synpop.source.invermo.generator.AttributeHandler;
-import playground.johannes.synpop.source.invermo.generator.LegAttributeHandler;
-import playground.johannes.synpop.source.invermo.generator.VariableNames;
+import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.source.invermo.InvermoKeys;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class LegHandlerAdaptor implements AttributeHandler<Episode> {
-
-	private List<LegAttributeHandler> delegates = new ArrayList<LegAttributeHandler>();
-
-	public void addHandler(LegAttributeHandler handler) {
-		delegates.add(handler);
-	}
+public class HouseholdLocationHandler implements AttributeHandler<PlainElement> {
 
 	@Override
-	public void handleAttribute(Episode plan, Map<String, String> attributes) {
-		for (Entry<String, String> entry : attributes.entrySet()) {
-			if (VariableNames.validate(entry.getValue())) {
-				String key = entry.getKey();
-				if (key.startsWith("e")) {
-					int idx = Character.getNumericValue(key.charAt(1));
-					idx = idx - 1;
-					while (idx > plan.getLegs().size() - 1) {
-						plan.addLeg(new PlainSegment());
-					}
-
-					for (LegAttributeHandler legHandler : delegates)
-						legHandler.handle(plan.getLegs().get(idx), key, entry.getValue());
-				}
-			}
+	public void handleAttribute(PlainElement household, Map<String, String> attributes) {
+		String town = attributes.get(VariableNames.HOME_TOWN);
+		if(!VariableNames.validate(town))
+			town = "";
+		
+		String zip = attributes.get(VariableNames.HOME_ZIPCODE);
+		if(VariableNames.validate(zip)) {
+			int code = Integer.parseInt(zip);
+			household.setAttribute(InvermoKeys.HOME_LOCATION, String.format("%05d %s", code, town));
 		}
-
+		
 	}
 
 }

@@ -51,12 +51,11 @@ import playground.agarwalamit.InternalizationEmissionAndCongestion.InternalizeEm
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.joint.JointCalibrationControler;
 import playground.agarwalamit.munich.controlerListner.MyEmissionCongestionMoneyEventControlerListner;
-import playground.agarwalamit.munich.controlerListner.MyTollAveragerControlerListner;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.FileUtils;
-import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -83,7 +82,6 @@ public class SubPopMunichControler {
 					FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/diss/input/config_wrappedSubActivities_usrGrp_baseCase.xml",
 					"1.0",
 					FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/diss/output/baseCase2/",
-					"false",
 					"false"
 			};
 		}
@@ -99,8 +97,7 @@ public class SubPopMunichControler {
 		String emissionCostFactor = args[4];
 
 		String outputDir = args[5];
-		boolean averageTollAfterRePlanning = Boolean.valueOf(args [6]);
-		boolean writeInfoForEachPersonInEachIteration = Boolean.valueOf(args [7]);
+		boolean writeInfoForEachPersonInEachIteration = Boolean.valueOf(args [6]);
 
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.controler().setOutputDirectory(outputDir);
@@ -229,10 +226,6 @@ public class SubPopMunichControler {
 
 		if(internalizeEmission==false && internalizeBoth ==false){
 			controler.addControlerListener(new EmissionControlerListener());
-		}
-
-		if(averageTollAfterRePlanning){
-			controler.addControlerListener(new MyTollAveragerControlerListner());
 		}
 
 		if(writeInfoForEachPersonInEachIteration){

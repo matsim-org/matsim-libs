@@ -35,6 +35,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.modalShare.FilteredModalShareEventHandler;
 import playground.agarwalamit.opdyts.patna.DistanceDistributionWriter;
+import playground.agarwalamit.opdyts.patna.PatnaObjectiveFunctionValueWriter;
 
 /**
  * Created by amit on 20/09/16.
@@ -44,6 +45,7 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
 
     private final FilteredModalShareEventHandler modalShareEventHandler = new FilteredModalShareEventHandler();
     private DistanceDistributionWriter distanceDistributionWriter;
+    private PatnaObjectiveFunctionValueWriter objectiveFunctionValueWriter;
     private BufferedWriter writer;
     private final Set<String> mode2consider;
     private OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases;
@@ -74,7 +76,8 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
                     "ascs" + "\t" +
                     "util_trav" + "\t" +
                     "util_dist" + "\t" +
-                    "money_dist_rate");
+                    "money_dist_rate" + "\t" +
+                    "objectiveFunctionValue");
             writer.newLine();
         } catch (IOException e) {
             throw new RuntimeException("File not found.");
@@ -83,7 +86,9 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
 
         // initializing it here,
         this.distanceDistributionWriter = new DistanceDistributionWriter(event.getServices().getScenario(), this.opdytsObjectiveFunctionCases);
+        this.objectiveFunctionValueWriter = new PatnaObjectiveFunctionValueWriter(event.getServices().getScenario(), this.opdytsObjectiveFunctionCases);
         this.events.addHandler(this.distanceDistributionWriter.getEventHandler());
+        this.events.addHandler(this.objectiveFunctionValueWriter.getEventHandler());
     }
 
     @Override
@@ -117,6 +122,9 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
                     travs.values().toString() + "\t" +
                     dists.values().toString() + "\t" +
                     moneyRates.values().toString());
+
+            writer.write( "\t" + this.objectiveFunctionValueWriter.getObjectiveFunctionValue());
+
             writer.newLine();
             writer.flush();
         } catch (IOException e) {
