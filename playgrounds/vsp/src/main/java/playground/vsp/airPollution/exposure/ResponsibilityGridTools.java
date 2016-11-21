@@ -127,7 +127,7 @@ public class ResponsibilityGridTools {
 	}
 
 
-	public void init(Double timeBinSize, int noOfTimeBins,
+	private void init(Double timeBinSize, int noOfTimeBins,
 			Map<Id<Link>, Integer> links2xCells, Map<Id<Link>, Integer> links2yCells, int noOfXCells, int noOfYCells) {
 		this.timeBinSize = timeBinSize;
 		this.noOfTimeBins = noOfTimeBins;

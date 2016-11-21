@@ -102,8 +102,8 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());			
 		
-		responsibilityGridTools.init(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
-		
+//		responsibilityGridTools.init(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells); // not really required. amit Nov 2016
+
 		Double simulationEndtime = controler.getConfig().qsim().getEndTime();
 		intervalHandler = new IntervalHandler(timeBinSize, simulationEndtime, noOfXCells, noOfYCells, links2xCells, links2yCells);
 		eventsManager.addHandler(intervalHandler);
