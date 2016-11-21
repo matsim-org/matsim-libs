@@ -3,6 +3,7 @@ package playground.sebhoerl.mexec.examples;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import org.apache.commons.lang3.SystemUtils;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -10,9 +11,12 @@ import org.matsim.core.events.EventsManagerImpl;
 import playground.sebhoerl.mexec.*;
 import playground.sebhoerl.mexec.local.LocalEnvironment;
 import playground.sebhoerl.mexec.local.os.LinuxDriver;
+import playground.sebhoerl.mexec.local.os.OSDriver;
+import playground.sebhoerl.mexec.local.os.WindowsDriver;
 import playground.sebhoerl.mexec.ssh.SSHEnvironment;
 import playground.sebhoerl.mexec.ssh.utils.SSHUtils;
 
+import java.io.File;
 import java.io.IOException;
 
 public class RunEquil {
@@ -22,7 +26,10 @@ public class RunEquil {
     }
 
     private static void runLocally() {
-        runInEnvironment(new LocalEnvironment("/home/sebastian/mexecenv", new LinuxDriver()));
+        OSDriver driver = SystemUtils.IS_OS_WINDOWS ? new WindowsDriver() : new LinuxDriver();
+        File environmentPath = new File(SystemUtils.getUserHome(), "mexecenv");
+
+        runInEnvironment(new LocalEnvironment(environmentPath.toString(), driver));
     }
 
     private static void runRemotely() {

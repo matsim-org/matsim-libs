@@ -17,9 +17,9 @@ public class LinuxDriver implements OSDriver {
         command.add(controller.className);
         command.add(new File(simulationPath, "run_config.xml").toString());
         command.add("1>");
-        command.add(new File(simulationPath, "o.log").toString());
+        command.add(outputPath.toString());
         command.add("2>");
-        command.add(new File(simulationPath, "e.log").toString());
+        command.add(errorPath.toString());
         command.add("&");
         String javaCommand = String.join(" ", command);
 
