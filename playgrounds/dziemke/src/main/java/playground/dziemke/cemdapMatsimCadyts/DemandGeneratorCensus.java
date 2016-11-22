@@ -89,7 +89,7 @@ public class DemandGeneratorCensus {
 //		String censusFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/zensus_2011/bevoelkerung/csv_Bevoelkerung/Zensus11_Datensatz_Bevoelkerung.csv";
 		String censusFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/zensus_2011/bevoelkerung/csv_Bevoelkerung/Zensus11_Datensatz_Bevoelkerung_BE_BB.csv";
 		String shapeFileLors = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Bezirksregion_EPSG_25833.shp";
-		String outputBase = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/syn_pop/26/";
+		String outputBase = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/syn_pop/100/";
 
 		String[] commuterFilesOutgoing = {commuterFileOutgoing1, commuterFileOutgoing2, commuterFileOutgoing3, commuterFileOutgoing4};
 
@@ -640,7 +640,7 @@ public class DemandGeneratorCensus {
     		bufferedWriterHouseholds = new BufferedWriter(fileWriterHouseholds);
     		
     		for (Household household : households.values()) {
-    			Id<Household> householdId = (Id<Household>) household.getAttributes().getAttribute("householdId");
+    			Id<Household> householdId = household.getId();
     			int numberOfAdults = (Integer) household.getAttributes().getAttribute("numberOfAdults");
     			int totalNumberOfHouseholdVehicles = (Integer) household.getAttributes().getAttribute("totalNumberOfHouseholdVehicles");
     			String homeTSZLocation = (String) household.getAttributes().getAttribute("homeTSZLocation");
