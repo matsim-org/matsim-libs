@@ -34,8 +34,10 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -47,6 +49,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
@@ -96,14 +99,13 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 	private MainModeIdentifier mainModeIdentifier;
 	private Map<String,Double> modeCnt = new TreeMap<>() ;
 	
-	private boolean ini = true ;
 	private final Set<String> modes;
 
 	private final static Logger log = Logger.getLogger(ScoreStatsControlerListener.class);
 
 	@Inject
 	ScoreStatsControlerListener(ControlerConfigGroup controlerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,
-								Provider<TripRouter> tripRouterFactory, PlanCalcScoreConfigGroup scoreConfig ) {
+			PlanCalcScoreConfigGroup scoreConfig, Provider<TripRouter> tripRouterFactory ) {
 		this.controlerConfigGroup = controlerConfigGroup;
 		this.population = population1;
 		this.fileName = controlerIO.getOutputFilename(FILENAME_SCORESTATS);
