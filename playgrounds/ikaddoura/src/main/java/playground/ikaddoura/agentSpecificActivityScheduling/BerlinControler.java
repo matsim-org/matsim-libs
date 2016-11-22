@@ -31,7 +31,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
 import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
-import playground.ikaddoura.integrationCNE.CNEIntegration;
+import playground.ikaddoura.decongestion.Decongestion;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
+import playground.ikaddoura.decongestion.data.DecongestionInfo;
 
 /**
 * @author ikaddoura
@@ -46,6 +49,7 @@ public class BerlinControler {
 	private static double activityDurationBin;
 	private static double tolerance;
 	private static boolean pricing;
+	private static double kp;
 	
 	public static void main(String[] args) throws IOException {
 
@@ -66,6 +70,9 @@ public class BerlinControler {
 			pricing = Boolean.parseBoolean(args[4]);			
 			log.info("pricing: "+ pricing);
 
+			kp = Double.parseDouble(args[5]);
+			log.info("kp: "+ kp);
+			
 		} else {
 			
 			configFile = "../../../runs-svn/berlin-dz-time/input/config_test.xml";
@@ -75,7 +82,8 @@ public class BerlinControler {
 			activityDurationBin = 3600.;
 			tolerance = 900.;
 			
-			pricing = false;
+			pricing = true;
+			kp = 2 * ( 12 / 3600.);		
 			
 		}
 		
@@ -97,9 +105,22 @@ public class BerlinControler {
 		}
 				
 		if (pricing) {
-			CNEIntegration cne = new CNEIntegration(controler);
-			cne.setCongestionPricing(true);
-			controler = cne.prepareControler();
+			
+			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+			decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
+			decongestionSettings.setKp(kp);
+			decongestionSettings.setKi(0.);
+			decongestionSettings.setKd(0.);
+			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			
+			final DecongestionInfo info = new DecongestionInfo(controler.getScenario(), decongestionSettings);
+			final Decongestion decongestion = new Decongestion(info);
+			controler = decongestion.getControler();
+				
+//			CNEIntegration cne = new CNEIntegration(controler);
+//			cne.setCongestionPricing(true);
+//			controler = cne.prepareControler();
 		}
 			
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
