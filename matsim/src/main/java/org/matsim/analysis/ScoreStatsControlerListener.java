@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
@@ -74,7 +75,8 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 
 	public static final String FILENAME_SCORESTATS = "scorestats";
 	public static final String FILENAME_MODESTATS = "modestats";
-	public static enum ScoreItem { worst, best, average, executed } ; 
+
+	public static enum ScoreItem { worst, best, average, executed } ;
 
 	final private Population population;
 	final private BufferedWriter out;
@@ -89,6 +91,7 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 	Map<ScoreItem,Map< Integer, Double>> scoreHistory = new HashMap<>() ;
 	Map<String,Map<Integer,Double>> modeHistories = new HashMap<>() ;
 	private int minIteration = 0;
+	private final Provider<TripRouter> tripRouterFactory;
 	private StageActivityTypes stageActivities;
 	private MainModeIdentifier mainModeIdentifier;
 	private Map<String,Double> modeCnt = new TreeMap<>() ;
@@ -100,7 +103,7 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 
 	@Inject
 	ScoreStatsControlerListener(ControlerConfigGroup controlerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,
-			TripRouter tripRouter, PlanCalcScoreConfigGroup scoreConfig ) {
+								Provider<TripRouter> tripRouterFactory, PlanCalcScoreConfigGroup scoreConfig ) {
 		this.controlerConfigGroup = controlerConfigGroup;
 		this.population = population1;
 		this.fileName = controlerIO.getOutputFilename(FILENAME_SCORESTATS);
@@ -119,8 +122,7 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-		this.stageActivities = tripRouter.getStageActivityTypes() ;
-		this.mainModeIdentifier = tripRouter.getMainModeIdentifier() ;
+		this.tripRouterFactory = tripRouterFactory;
 	}
 
 	@Override
@@ -132,6 +134,9 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 		for ( ScoreItem item : ScoreItem.values() ) {
 			scoreHistory.put( item, new TreeMap<Integer,Double>() ) ;
 		}
+		TripRouter tripRouter = tripRouterFactory.get();
+		this.stageActivities = tripRouter.getStageActivityTypes() ;
+		this.mainModeIdentifier = tripRouter.getMainModeIdentifier() ;
 	}
 
 	@Override

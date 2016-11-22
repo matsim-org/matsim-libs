@@ -175,7 +175,6 @@ public final class Controler implements ControlerI, MatsimServices {
 	 */
 	@Override
 	public final void run() {
-		this.injectorCreated = true;
 		this.injector = Injector.createInjector(config, AbstractModule.override(Collections.singleton(new AbstractModule() {
 			@Override
 			public void install() {
@@ -188,7 +187,7 @@ public final class Controler implements ControlerI, MatsimServices {
 				//install(new ScenarioByInstanceModule(scenario));
 			}
 		}), overrides));
-		Gbl.assertNotNull(this.injector);
+		this.injectorCreated = true;
 		ControlerI controler = injector.getInstance(ControlerI.class);
 		controler.run();
 	}
