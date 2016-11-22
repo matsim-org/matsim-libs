@@ -28,8 +28,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -41,63 +39,89 @@ import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyImpl.Builder;
-import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.modules.SubtourModeChoice;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
+
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.joint.JointCalibrationControler;
-import playground.agarwalamit.munich.utils.MunichPersonFilter;
-import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
 import playground.vsp.airPollution.exposure.GridTools;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
-public class CNEMunich {
+/**
+ * 
+ * @author ikaddoura
+ *
+ */
 
-	private static final Integer noOfXCells = 160;
-	private static final Integer noOfYCells = 120;
-	static final double xMin = 4452550.25;
-	static final double xMax = 4479483.33;
-	static final double yMin = 5324955.00;
-	static final double yMax = 5345696.81;
-	private static final Double timeBinSize = 3600.;
-	private static final int noOfTimeBins = 30;
+public class CNEBerlin {
+	private static final Logger log = Logger.getLogger(CNEBerlin.class);
+
+	private static String outputDirectory;
+	private static String configFile;
+
+	private static boolean congestionPricing;
+	private static boolean noisePricing;
+	private static boolean airPollutionPricing;
+	
+	private static double sigma;
 	
 	public static void main(String[] args) throws IOException {
 		
-		String configFile;
-		
 		if (args.length > 0) {
-								
-			// TODO
-			throw new RuntimeException("Not yet implemented. Aborting...");
+			
+			outputDirectory = args[0];
+			log.info("Output directory: " + outputDirectory);
+			
+			configFile = args[1];
+			log.info("Config file: " + configFile);
+			
+			congestionPricing = Boolean.parseBoolean(args[2]);
+			log.info("Congestion Pricing: " + congestionPricing);
+			
+			noisePricing = Boolean.parseBoolean(args[3]);
+			log.info("Noise Pricing: " + noisePricing);
+			
+			airPollutionPricing = Boolean.parseBoolean(args[4]);
+			log.info("Air poullution Pricing: " + airPollutionPricing);
+			
+			sigma = Double.parseDouble(args[5]);
+			log.info("Sigma: " + sigma);
 			
 		} else {
 			
-			configFile = "../../../runs-svn/cne_test/input/config.xml";
+			outputDirectory = null;
+			configFile = "/Users/ihab/Desktop/test/config.xml";
+			
+			congestionPricing = true;
+			noisePricing = true;
+			airPollutionPricing = true;
+			
+			sigma = 0.;
 		}
+				
+		CNEBerlin cnControler = new CNEBerlin();
+		cnControler.run();
+	}
 
+	public void run() {
+								
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 		Controler controler = new Controler(scenario);
-
+		
+		// air pollution Berlin settings
+		
+		double xMin = 0;
+		double xMax = 0;
+		double yMin = 0;
+		double yMax = 0;
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
+		int noOfXCells = 0;
 		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
+		int noOfYCells = 0;
 		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
-		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
-
-		CNEIntegration cneIntegration = new CNEIntegration(controler, rgt);
-		controler = cneIntegration.prepareControler();
-
-		// scenario-specific settings
+		ResponsibilityGridTools rgt = new ResponsibilityGridTools(3600., 30, links2xCells, links2yCells, noOfXCells, noOfYCells);
 		
 		EmissionsConfigGroup ecg = (EmissionsConfigGroup) controler.getConfig().getModule("emissions");
 		ecg.setAverageColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_ColdStart_vehcat_2005average.txt");
@@ -108,68 +132,86 @@ public class CNEMunich {
 		ecg.setUsingDetailedEmissionCalculation(true);
 	
 		controler.getConfig().vehicles().setVehiclesFile("../../../runs-svn/detEval/emissionCongestionInternalization/iatbr/input/emissionVehicles_1pct.xml.gz");
-					
-		controler.addOverridingModule(new OTFVisFileWriterModule());
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
-				String ug = "Rev_Commuter";
-				addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name().concat("_").concat(ug)).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					final String[] availableModes = {"car", "pt_".concat(ug)};
-					final String[] chainBasedModes = {"car", "bike"};
-					@Inject
-					Scenario sc;
 
-					@Override
-					public PlanStrategy get() {
-						final Builder builder = new Builder(new RandomPlanSelector<>());
-						builder.addStrategyModule(new SubtourModeChoice(sc.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
-						builder.addStrategyModule(new ReRoute(sc, tripRouterProvider));
-						return builder.build();
-					}
-				});
-			}
-		});
+		// CNE Integration
 		
-		// noise
+		CNEIntegration cne = new CNEIntegration(controler, rgt);
+		cne.setCongestionPricing(congestionPricing);
+		cne.setNoisePricing(noisePricing);
+		cne.setAirPollutionPricing(airPollutionPricing);
+		cne.setSigma(sigma);
+		cne.setUseTripAndAgentSpecificVTTSForRouting(true);
+		controler = cne.prepareControler();
+		
+		// noise Berlin settings
 		
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) controler.getScenario().getConfig().getModule("noise");
 
 		noiseParameters.setReceiverPointGap(100.);
 		
-		// TODO
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
 			
-		// TODO
 		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForDamages);
 		
-		// TODO
 		String[] hgvIdPrefixes = { "lkw" };
 		noiseParameters.setHgvIdPrefixesArray(hgvIdPrefixes);
 						
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
 				
-		noiseParameters.setScaleFactor(1.);
-
-		// TODO
+		noiseParameters.setScaleFactor(10.);
+		
 		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
-		// 595958075
-//		576277210-576277209-576275366-593677922
-//		591541992
-
-//		tunnelLinkIDs.add(Id.create("108041", Link.class));
-//		tunnelLinkIDs.add(Id.create("108142", Link.class));
+		tunnelLinkIDs.add(Id.create("108041", Link.class));
+		tunnelLinkIDs.add(Id.create("108142", Link.class));
+		tunnelLinkIDs.add(Id.create("108970", Link.class));
+		tunnelLinkIDs.add(Id.create("109085", Link.class));
+		tunnelLinkIDs.add(Id.create("109757", Link.class));
+		tunnelLinkIDs.add(Id.create("109919", Link.class));
+		tunnelLinkIDs.add(Id.create("110060", Link.class));
+		tunnelLinkIDs.add(Id.create("110226", Link.class));
+		tunnelLinkIDs.add(Id.create("110164", Link.class));
+		tunnelLinkIDs.add(Id.create("110399", Link.class));
+		tunnelLinkIDs.add(Id.create("96503", Link.class));
+		tunnelLinkIDs.add(Id.create("110389", Link.class));
+		tunnelLinkIDs.add(Id.create("110116", Link.class));
+		tunnelLinkIDs.add(Id.create("110355", Link.class));
+		tunnelLinkIDs.add(Id.create("92604", Link.class));
+		tunnelLinkIDs.add(Id.create("92603", Link.class));
+		tunnelLinkIDs.add(Id.create("25651", Link.class));
+		tunnelLinkIDs.add(Id.create("25654", Link.class));
+		tunnelLinkIDs.add(Id.create("112540", Link.class));
+		tunnelLinkIDs.add(Id.create("112556", Link.class));
+		tunnelLinkIDs.add(Id.create("5052", Link.class));
+		tunnelLinkIDs.add(Id.create("5053", Link.class));
+		tunnelLinkIDs.add(Id.create("5380", Link.class));
+		tunnelLinkIDs.add(Id.create("5381", Link.class));
+		tunnelLinkIDs.add(Id.create("106309", Link.class));
+		tunnelLinkIDs.add(Id.create("106308", Link.class));
+		tunnelLinkIDs.add(Id.create("26103", Link.class));
+		tunnelLinkIDs.add(Id.create("26102", Link.class));
+		tunnelLinkIDs.add(Id.create("4376", Link.class));
+		tunnelLinkIDs.add(Id.create("4377", Link.class));
+		tunnelLinkIDs.add(Id.create("106353", Link.class));
+		tunnelLinkIDs.add(Id.create("106352", Link.class));
+		tunnelLinkIDs.add(Id.create("103793", Link.class));
+		tunnelLinkIDs.add(Id.create("103792", Link.class));
+		tunnelLinkIDs.add(Id.create("26106", Link.class));
+		tunnelLinkIDs.add(Id.create("26107", Link.class));
+		tunnelLinkIDs.add(Id.create("4580", Link.class));
+		tunnelLinkIDs.add(Id.create("4581", Link.class));
+		tunnelLinkIDs.add(Id.create("4988", Link.class));
+		tunnelLinkIDs.add(Id.create("4989", Link.class));
+		tunnelLinkIDs.add(Id.create("73496", Link.class));
+		tunnelLinkIDs.add(Id.create("73497", Link.class));
 		noiseParameters.setTunnelLinkIDsSet(tunnelLinkIDs);
-		
+				
+		controler.addOverridingModule(new OTFVisFileWriterModule());
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
-			
-		// scenario-specific analysis
 		
+		// analysis
 		PersonTripCongestionNoiseAnalysisMain analysis = new PersonTripCongestionNoiseAnalysisMain(controler.getConfig().controler().getOutputDirectory());
 		analysis.run();
 		
@@ -200,23 +242,6 @@ public class CNEMunich {
 			Logger.getLogger(JointCalibrationControler.class).info("Deleting the directory "+dirToDel);
 			IOUtils.deleteDirectory(new File(dirToDel),false);
 		}
-	
-		new File(OUTPUT_DIR+"/user-group-analysis/").mkdir();
-		String outputEventsFile = OUTPUT_DIR+"/output_events.xml.gz";
-		
-		{
-			String userGroup = MunichUserGroup.Urban.toString();
-			ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new MunichPersonFilter());
-			msc.run();
-			msc.writeResults(OUTPUT_DIR+"/user-group-analysis/modalShareFromEvents_"+userGroup+".txt");	
-		}
-		{
-			String userGroup = MunichUserGroup.Rev_Commuter.toString();
-			ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new MunichPersonFilter());
-			msc.run();
-			msc.writeResults(OUTPUT_DIR+"/user-group-analysis/modalShareFromEvents_"+userGroup+".txt");
-		}
-	
 	}
-
+	
 }
