@@ -376,7 +376,7 @@ public class EventsToPlanElementsSingapore implements TransitDriverStartsEventHa
 				journey.setDest(network.getLinks().get(event.getLinkId())
 						.getCoord());
 				journey.setEndTime(event.getTime());
-				chain.inCar = false;
+				chain.inCongestedMode = false;
 			} else if (event.getLegMode().equals("transit_walk")) {
 				Journey journey = chain.getJourneys().getLast();
 				Walk walk = journey.getWalks().getLast();
@@ -430,7 +430,7 @@ public class EventsToPlanElementsSingapore implements TransitDriverStartsEventHa
 					journey.getPossibleTransfer().getWalks().add(walk);
 				}
 			} else if (event.getLegMode().equals("car")) {
-				chain.inCar = true;
+				chain.inCongestedMode = true;
 				journey = chain.addJourney();
 				journey.setCarJourney(true);
 				journey.setOrig(network.getLinks().get(event.getLinkId())
@@ -577,7 +577,7 @@ public class EventsToPlanElementsSingapore implements TransitDriverStartsEventHa
 					writeTransitIdsForLink(vehicle, event);
 			} else {
 				TravellerChain chain = chains.get(event.getDriverId());
-				if (chain.inCar) {
+				if (chain.inCongestedMode) {
 					Journey journey = chain.getJourneys().getLast();
 					journey.incrementCarDistance(network.getLinks()
 							.get(event.getLinkId()).getLength());

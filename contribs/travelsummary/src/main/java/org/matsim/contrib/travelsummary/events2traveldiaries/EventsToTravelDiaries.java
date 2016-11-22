@@ -32,11 +32,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -70,28 +67,33 @@ public class EventsToTravelDiaries implements
     private String diagnosticString = "39669_2";
     private AtomicInteger eventCounter = new AtomicInteger(0);
     private int maxEvents = Integer.MAX_VALUE;
+    // those unscheduled modes that have been simulated on the network need to be processed the same way as car
+    private Set<String> networkModes = new HashSet<>();
 
     public EventsToTravelDiaries(TransitSchedule transitSchedule,
                                  Network network, Config config) {
-
+        networkModes.addAll(config.qsim().getMainModes());
         this.network = network;
         this.walkSpeed = new TransitRouterConfig(config).getBeelineWalkSpeed();
         this.transitSchedule = transitSchedule;
         this.isTransitScenario = true;
     }
+
     public EventsToTravelDiaries(TransitSchedule transitSchedule,
                                  Network network, Config config, int maxEvents) {
-        this(transitSchedule,network,config);
+        this(transitSchedule, network, config);
         this.maxEvents = maxEvents;
     }
 
-    public EventsToTravelDiaries(Scenario scenario,int maxEvents) {
+    public EventsToTravelDiaries(Scenario scenario, int maxEvents) {
         this(scenario);
         this.maxEvents = maxEvents;
     }
+
     public EventsToTravelDiaries(Scenario scenario) {
+        networkModes.addAll(scenario.getConfig().qsim().getMainModes());
         this.network = scenario.getNetwork();
-        isTransitScenario = scenario.getConfig().transit().isUseTransit() ;
+        isTransitScenario = scenario.getConfig().transit().isUseTransit();
         if (isTransitScenario) {
             this.transitSchedule = scenario.getTransitSchedule();
             this.walkSpeed = new TransitRouterConfig(scenario.getConfig()).getBeelineWalkSpeed();
@@ -231,7 +233,9 @@ public class EventsToTravelDiaries implements
                     return;
             }
             TravellerChain chain = chains.get(event.getPersonId());
-            switch (event.getLegMode()) {
+            String legMode = event.getLegMode();
+            String modeType = networkModes.contains(legMode) ? "congested" : legMode;
+            switch (modeType) {
                 case "walk":
                 case "transit_walk": {
                     Journey journey = chain.getJourneys().getLast();
@@ -242,7 +246,7 @@ public class EventsToTravelDiaries implements
                     walk.setDistance(walk.getDuration() * walkSpeed);
                     break;
                 }
-                case TransportMode.car: {
+                case "congested": {
                     Journey journey = chain.getJourneys().getLast();
                     journey.setDest(network.getLinks().get(event.getLinkId())
                             .getCoord());
@@ -250,7 +254,7 @@ public class EventsToTravelDiaries implements
                     Trip trip = journey.getTrips().getLast();
                     trip.setDistance(journey.getDistance());
                     trip.setEndTime(event.getTime());
-                    chain.inCar = false;
+                    chain.inCongestedMode = false;
                     break;
                 }
                 case "pt":
@@ -277,6 +281,9 @@ public class EventsToTravelDiaries implements
                     journey.setDest(network.getLinks().get(event.getLinkId())
                             .getCoord());
                     journey.setEndTime(event.getTime());
+                    Trip trip = journey.getTrips().getLast();
+                    trip.setDistance(journey.getDistance());
+                    trip.setEndTime(event.getTime());
                     break;
             }
         } catch (Exception e) {
@@ -294,7 +301,9 @@ public class EventsToTravelDiaries implements
             TravellerChain chain = chains.get(event.getPersonId());
             Journey journey;
             Trip trip;
-            switch (event.getLegMode()) {
+            String legMode = event.getLegMode();
+            String modeType = networkModes.contains(legMode) ? "congested" : legMode;
+            switch (modeType) {
                 case TransportMode.walk:
                     //fall through to the next
                 case TransportMode.transit_walk:
@@ -318,8 +327,8 @@ public class EventsToTravelDiaries implements
                         journey.getPossibleTransfer().getWalks().add(walk);
                     }
                     break;
-                case TransportMode.car:
-                    chain.inCar = true;
+                case "congested":
+                    chain.inCongestedMode = true;
                     journey = chain.addJourney();
                     journey.setCarJourney(true);
                     journey.setOrig(network.getLinks().get(event.getLinkId())
@@ -327,7 +336,7 @@ public class EventsToTravelDiaries implements
                     journey.setFromAct(chain.getActs().getLast());
                     journey.setStartTime(event.getTime());
                     trip = journey.addTrip();
-                    trip.setMode("car");
+                    trip.setMode(legMode);
                     trip.setStartTime(event.getTime());
                     break;
                 case TransportMode.pt:
@@ -350,9 +359,9 @@ public class EventsToTravelDiaries implements
                                 .getCoord());
                         journey.setFromAct(chain.getActs().getLast());
                         journey.setStartTime(event.getTime());
-                        journey.setMainmode(event.getLegMode());
+                        journey.setMainmode(legMode);
                         trip = journey.addTrip();
-                        trip.setMode(event.getLegMode());
+                        trip.setMode(legMode);
                         trip.setStartTime(event.getTime());
                     }
                     break;
@@ -363,9 +372,9 @@ public class EventsToTravelDiaries implements
                             .getCoord());
                     journey.setFromAct(chain.getActs().getLast());
                     journey.setStartTime(event.getTime());
-                    journey.setMainmode(event.getLegMode());
+                    journey.setMainmode(legMode);
                     trip = journey.addTrip();
-                    trip.setMode(event.getLegMode());
+                    trip.setMode(legMode);
                     trip.setStartTime(event.getTime());
                     break;
 
@@ -494,7 +503,7 @@ public class EventsToTravelDiaries implements
             } else {
                 TravellerChain chain = chains.get(driverIdFromVehicleId
                         .get(event.getVehicleId()));
-                if (chain.inCar) {
+                if (chain.inCongestedMode) {
                     Journey journey = chain.getJourneys().getLast();
                     journey.incrementCarDistance(network.getLinks()
                             .get(event.getLinkId()).getLength());

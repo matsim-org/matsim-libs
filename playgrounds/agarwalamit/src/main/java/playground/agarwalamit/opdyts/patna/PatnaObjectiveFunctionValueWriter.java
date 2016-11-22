@@ -60,7 +60,11 @@ public class PatnaObjectiveFunctionValueWriter {
         for (String mode : realCounts.keySet()) {
             for (int index = 0 ; index < realCounts.get(mode).length; index ++) {
                 double distClass = distClasses[index];
-                value += Math.abs(  realCounts.get(mode)[index] - simCounts.get(mode).get(distClass) );
+                double realValue = realCounts.get(mode)[index];
+                double simValue ;
+                if (simCounts.containsKey(mode) && simCounts.get(mode).containsKey(distClass)) simValue = simCounts.get(mode).get(distClass);
+                else simValue = 0.;
+                value += Math.abs(  realValue - simValue );
             }
         }
         return value;
