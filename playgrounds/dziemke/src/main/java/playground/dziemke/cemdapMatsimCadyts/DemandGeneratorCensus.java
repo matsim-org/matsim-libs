@@ -683,8 +683,6 @@ public class DemandGeneratorCensus {
 			bufferedWriterPersons = new BufferedWriter(fileWriterPersons);
 			    		    		
 			for (Person person : population.getPersons().values()) {
-				
-				
 				Id<Household> householdId = (Id<Household>) person.getAttributes().getAttribute("householdId");
 				Id<Person> personId = person.getId();
 				
