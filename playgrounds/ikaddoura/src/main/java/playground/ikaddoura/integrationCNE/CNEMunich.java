@@ -138,16 +138,20 @@ public class CNEMunich {
 
 		noiseParameters.setReceiverPointGap(100.);
 		
-		// TODO
+		// TODO define area
+//		static final double xMin = 4452550.25;
+//		static final double xMax = 4479483.33;
+//		static final double yMin = 5324955.00;
+//		static final double yMax = 5345696.81;
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
 			
-		// TODO
+		// TODO: all activities
 		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForDamages);
 		
 		// TODO
-		String[] hgvIdPrefixes = { "lkw" };
+		String[] hgvIdPrefixes = { "gv" };
 		noiseParameters.setHgvIdPrefixesArray(hgvIdPrefixes);
 						
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
