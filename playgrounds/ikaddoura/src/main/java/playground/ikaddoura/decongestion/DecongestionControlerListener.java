@@ -338,12 +338,12 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 				e1.printStackTrace();
 			}
 			try {
-				MATSimVideoUtils.createVideo(event.getServices().getConfig().controler().getOutputDirectory(), this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "delays_perLinkAndTimeBin");
+				if (this.congestionInfo.getDecongestionConfigGroup().isWRITE_LINK_INFO_CHARTS()) MATSimVideoUtils.createVideo(event.getServices().getConfig().controler().getOutputDirectory(), this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "delays_perLinkAndTimeBin");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			try {
-				MATSimVideoUtils.createVideo(event.getServices().getConfig().controler().getOutputDirectory(), this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "toll_perLinkAndTimeBin");
+				if (this.congestionInfo.getDecongestionConfigGroup().isWRITE_LINK_INFO_CHARTS()) MATSimVideoUtils.createVideo(event.getServices().getConfig().controler().getOutputDirectory(), this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "toll_perLinkAndTimeBin");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
