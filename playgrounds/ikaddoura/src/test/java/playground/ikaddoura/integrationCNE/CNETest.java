@@ -190,10 +190,10 @@ public class CNETest {
 		int noOfTimeBins = 1;
 
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
+		scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "e");
 		Controler controler2 = new Controler(scenario);
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(),xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
-		scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "e");
 
 		CNEIntegration cneIntegration2 = new CNEIntegration(controler2, gt, rgt);
 		cneIntegration2.setAirPollutionPricing(true);
@@ -214,11 +214,14 @@ public class CNETest {
 		controler3.run();
 						
 		// air pollution + noise pricing
-		CNEIntegration cneIntegration4 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "cn");
+		scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "cn");
+		Controler controler4 = new Controler(scenario);
+		CNEIntegration cneIntegration4 = new CNEIntegration(controler4, gt, rgt );
 		cneIntegration4.setAirPollutionPricing(true);
 		cneIntegration4.setNoisePricing(true);
 		cneIntegration4.setCongestionPricing(true); // there is no congestion...
-		Controler controler4 = cneIntegration4.prepareControler();
+		controler4 = cneIntegration4.prepareControler();
+
 		LinkDemandEventHandler handler4 = new LinkDemandEventHandler(controler4.getScenario().getNetwork());
 		controler4.getEvents().addHandler(handler4);
 		controler4.getConfig().controler().setCreateGraphs(false);
