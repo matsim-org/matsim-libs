@@ -74,10 +74,8 @@ import org.matsim.core.utils.io.UncheckedIOException;
  * @author mrieser
  */
 public class ScoreStatsControlerListener implements StartupListener, IterationEndsListener, ShutdownListener, ScoreStats {
-	// yy might make sense to either divide this into ScoreStats and ModeStats.  Or rename into IterationStats.  kai, nov'16
 
 	public static final String FILENAME_SCORESTATS = "scorestats";
-	public static final String FILENAME_MODESTATS = "modestats";
 
 	public static enum ScoreItem { worst, best, average, executed } ;
 
@@ -85,21 +83,11 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 	final private BufferedWriter out;
 	final private String fileName;
 	
-	final private BufferedWriter modeOut ;
-	final private String modeFileName ;
-
 	private final boolean createPNG;
 	private final ControlerConfigGroup controlerConfigGroup;
 
 	Map<ScoreItem,Map< Integer, Double>> scoreHistory = new HashMap<>() ;
-	Map<String,Map<Integer,Double>> modeHistories = new HashMap<>() ;
 	private int minIteration = 0;
-	private final Provider<TripRouter> tripRouterFactory;
-	private StageActivityTypes stageActivities;
-	private MainModeIdentifier mainModeIdentifier;
-	private Map<String,Double> modeCnt = new TreeMap<>() ;
-	
-	private final Set<String> modes;
 
 	private final static Logger log = Logger.getLogger(ScoreStatsControlerListener.class);
 
@@ -109,22 +97,13 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 		this.controlerConfigGroup = controlerConfigGroup;
 		this.population = population1;
 		this.fileName = controlerIO.getOutputFilename(FILENAME_SCORESTATS);
-		this.modeFileName = controlerIO.getOutputFilename( FILENAME_MODESTATS ) ;
 		this.createPNG = controlerConfigGroup.isCreateGraphs();
 		this.out = IOUtils.getBufferedWriter(this.fileName + ".txt");
-		this.modeOut = IOUtils.getBufferedWriter(this.modeFileName + ".txt");
 		try {
 			this.out.write("ITERATION\tavg. EXECUTED\tavg. WORST\tavg. AVG\tavg. BEST\n");
-			this.modeOut.write("Iteration");
-			this.modes = scoreConfig.getModes().keySet();
-			for ( String mode : modes ) {
-				this.modeOut.write("\t" + mode);
-			}
-			this.modeOut.write("\n"); ;
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-		this.tripRouterFactory = tripRouterFactory;
 	}
 
 	@Override
@@ -136,80 +115,13 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 		for ( ScoreItem item : ScoreItem.values() ) {
 			scoreHistory.put( item, new TreeMap<Integer,Double>() ) ;
 		}
-		TripRouter tripRouter = tripRouterFactory.get();
-		this.stageActivities = tripRouter.getStageActivityTypes() ;
-		this.mainModeIdentifier = tripRouter.getMainModeIdentifier() ;
 	}
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		collectScoreInfo(event);
-		collectModeShareInfo(event) ;
 	}
 
-	private void collectModeShareInfo(final IterationEndsEvent event) {
-		for (Person person : this.population.getPersons().values()) {
-			Plan plan = person.getSelectedPlan() ;
-			List<Trip> trips = TripStructureUtils.getTrips(plan, stageActivities) ;
-			for ( Trip trip : trips ) {
-				String mode = this.mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ;
-				// yy as stated elsewhere, the "computer science" mode identification may not be the same as the "transport planning" 
-				// mode identification.  Maybe revise.  kai, nov'16
-				
-				Double cnt = this.modeCnt.get( mode );
-				if ( cnt==null ) {
-					cnt = 0. ;
-				}
-				this.modeCnt.put( mode, cnt + 1 ) ;
-			}
-		}
-
-		double sum = 0 ;
-		for ( Double val : this.modeCnt.values() ) {
-			sum += val ;
-		}
-		
-		try {
-			this.modeOut.write( event.getIteration() ) ;
-			for ( String mode : modes ) {
-				Double cnt = this.modeCnt.get(mode) ;
-				double share = 0. ;
-				if ( cnt!=null ) {
-					share = cnt/sum;
-				}
-				log.info("-- mode share of mode " + mode + " = " + share );
-				this.modeOut.write( "\t" + share ) ;
-				
-				Map<Integer, Double> modeHistory = this.modeHistories.get(mode) ;
-				if ( modeHistory == null ) {
-					modeHistory = new TreeMap<>() ;
-				}
-				modeHistory.put( event.getIteration(), share ) ;
-				
-			}
-			this.modeOut.write("\n");
-			this.modeOut.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-
-		if (this.createPNG && event.getIteration() != this.minIteration) {
-			// create chart when data of more than one iteration is available.
-			XYLineChart chart = new XYLineChart("Mode Statistics", "iteration", "mode");
-			for ( Entry<String, Map<Integer, Double>> entry : this.modeHistories.entrySet() ) {
-				String mode = entry.getKey() ;
-				Map<Integer, Double> history = entry.getValue() ;
-				log.warn( "about to add the following series:" ) ;
-				for ( Entry<Integer, Double> item : history.entrySet() ) {
-					log.warn( item.getKey() + " -- " + item.getValue() );
-				}
-				chart.addSeries(mode, history ) ;
-			}
-			chart.addMatsimLogo();
-			chart.saveAsPng(this.modeFileName + ".png", 800, 600);
-		}
-	}
 	private void collectScoreInfo(final IterationEndsEvent event) {
 		double sumScoreWorst = 0.0;
 		double sumScoreBest = 0.0;

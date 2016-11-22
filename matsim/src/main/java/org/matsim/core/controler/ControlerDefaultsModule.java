@@ -53,6 +53,7 @@ public class ControlerDefaultsModule extends AbstractModule {
         install(new LegTimesModule());
         install(new TravelDistanceStatsModule());
         install(new ScoreStatsModule());
+        install(new ModeStatsModule());
         install(new CountsModule());
         install(new PtCountsModule());
         install(new VspPlansCleanerModule());
