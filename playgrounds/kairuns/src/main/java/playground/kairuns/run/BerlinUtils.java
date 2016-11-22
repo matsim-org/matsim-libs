@@ -381,7 +381,7 @@ final class BerlinUtils {
 			// scoring:
 			ModeParams params = new ModeParams( mode ) ;
 			params.setConstant(-1.); // maybe some initiation costs compared to walk
-			params.setMarginalUtilityOfTraveling(-2.);
+			params.setMarginalUtilityOfTraveling(-4.);
 			config.planCalcScore().addModeParams(params);
 		}
 		{
@@ -406,7 +406,7 @@ final class BerlinUtils {
 			
 			// scoring:
 			ModeParams params = new ModeParams(mode) ;
-			params.setConstant(-1.); // worse than bike but better than pt.  But may include some fixed cost ...
+			params.setConstant(-0.); // worse than bike but better than pt.  But may include some fixed cost ...
 			params.setMarginalUtilityOfTraveling(0.);
 			params.setMonetaryDistanceRate(-0.10/1000.); // recall that this is Eu/m (!)
 			config.planCalcScore().addModeParams(params);

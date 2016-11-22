@@ -183,16 +183,17 @@ public final class KNBerlinControler {
 
 		// controler, global, and related:
 
+		final int lastIteration = 1000 ;
 		config.controler().setFirstIteration(0); // with something like "9" we don't get output events! 
-		config.controler().setLastIteration(100); // with something like "9" we don't get output events! 
-		config.controler().setWriteSnapshotsInterval(100);
-		config.controler().setWritePlansInterval(100);
-		config.controler().setWriteEventsInterval(100);
+		config.controler().setLastIteration(lastIteration); // with something like "9" we don't get output events! 
+		config.controler().setWriteSnapshotsInterval(lastIteration);
+		config.controler().setWritePlansInterval(lastIteration);
+		config.controler().setWriteEventsInterval(lastIteration);
 
 		config.controler().setWritePlansUntilIteration(-1); 
 		config.controler().setWriteEventsUntilIteration(1); 
 
-		config.vspExperimental().setWritingOutputEvents(true);
+		config.vspExperimental().setWritingOutputEvents(true); // is actually the default
 
 		config.global().setCoordinateSystem("GK4");
 		config.global().setRandomSeed(4711);
