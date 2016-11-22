@@ -25,9 +25,7 @@ package playground.ikaddoura.integrationCNE;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,7 +41,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.joint.JointCalibrationControler;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
 import playground.vsp.airPollution.exposure.GridTools;
@@ -116,12 +113,10 @@ public class CNEBerlin {
 		double xMax = 0;
 		double yMin = 0;
 		double yMax = 0;
-		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
 		int noOfXCells = 0;
-		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
 		int noOfYCells = 0;
-		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
-		ResponsibilityGridTools rgt = new ResponsibilityGridTools(3600., 30, links2xCells, links2yCells, noOfXCells, noOfYCells);
+		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
+		ResponsibilityGridTools rgt = new ResponsibilityGridTools(3600., 30, gt);
 		
 		EmissionsConfigGroup ecg = (EmissionsConfigGroup) controler.getConfig().getModule("emissions");
 		ecg.setAverageColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_ColdStart_vehcat_2005average.txt");
@@ -135,7 +130,7 @@ public class CNEBerlin {
 
 		// CNE Integration
 		
-		CNEIntegration cne = new CNEIntegration(controler, rgt);
+		CNEIntegration cne = new CNEIntegration(controler, gt, rgt);
 		cne.setCongestionPricing(congestionPricing);
 		cne.setNoisePricing(noisePricing);
 		cne.setAirPollutionPricing(airPollutionPricing);
