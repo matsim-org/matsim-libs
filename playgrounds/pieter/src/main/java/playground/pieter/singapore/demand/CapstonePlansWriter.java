@@ -215,6 +215,7 @@ public class CapstonePlansWriter {
             person.addPlan(plan);
             scenario.getPopulation().addPerson(person);
 
+
         }
     }
 
@@ -286,8 +287,8 @@ public class CapstonePlansWriter {
         DataBaseAdmin dba = new DataBaseAdmin(new File("/Users/fouriep/IdeaProjects/matsim/playgrounds/pieter/connections/matsim2postgres.properties"));
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         FacilitiesToSQL f2sql = new FacilitiesToSQL(dba, scenario);
-        f2sql.loadFacilitiesFromSQL("ro_p_facilities.new_facilities");
-        new CapstonePlansWriter(scenario, dba).run("capsUnroutedPlans", 0.25);
+        f2sql.loadFacilitiesFromSQL("p_facilities.facilities_jpr");
+        new CapstonePlansWriter(scenario, dba).run("capsUnroutedPlans_jpr", 0.25);
 
     }
 
@@ -344,37 +345,44 @@ public class CapstonePlansWriter {
 
     private void generateFreightplans(double fraction) throws SQLException, NoConnectionException {
         ResultSet resultSet = dataBaseAdmin.executeQuery("SELECT * FROM " +
-                "ro_freight_and_foreign_trips.freighttrips where rand2 <= " + fraction);
+                "m_20_freight.freighttrips where rand2 <= " + fraction);
         PopulationFactory populationFactory = scenario.getPopulation().getFactory();
+        int errcount=0;
         while (resultSet.next()) {
-            if (resultSet.getDouble("rand2") <= fraction) {
-                int fromCode = resultSet.getInt("from");
-                int toCode = resultSet.getInt("to");
-                double start = resultSet.getDouble("start");
-                ActivityFacility origin = scenario.getActivityFacilities().getFacilities().get(Id.create(fromCode, ActivityFacility.class));
-                ActivityFacility destination = scenario.getActivityFacilities().getFacilities().get(Id.create(toCode, ActivityFacility.class));
-                Person person = populationFactory.createPerson(Id.createPersonId("freight_" + freightCount++));
-                scenario.getPopulation().addPerson(person);
-                Plan plan = populationFactory.createPlan();
-                person.addPlan(plan);
-                Coord orig = origin.getCoord();
-                Activity origAct = populationFactory.createActivityFromCoord("freight", orig);
-                origAct.setFacilityId(origin.getId());
-                origAct.setEndTime(start);
-                plan.addActivity(origAct);
-                plan.addLeg(populationFactory.createLeg("freight"));
-                Coord dest = destination.getCoord();
-                Activity destAct = populationFactory.createActivityFromCoord("freight", dest);
-                destAct.setFacilityId(destination.getId());
-                plan.addActivity(destAct);
+
+            try {
+                if (resultSet.getDouble("rand2") <= fraction) {
+                    int fromCode = resultSet.getInt("from");
+                    int toCode = resultSet.getInt("to");
+                    double start = resultSet.getDouble("start");
+                    ActivityFacility origin = scenario.getActivityFacilities().getFacilities().get(Id.create(fromCode, ActivityFacility.class));
+                    ActivityFacility destination = scenario.getActivityFacilities().getFacilities().get(Id.create(toCode, ActivityFacility.class));
+                    Person person = populationFactory.createPerson(Id.createPersonId("freight_" + freightCount++));
+                    scenario.getPopulation().addPerson(person);
+                    Plan plan = populationFactory.createPlan();
+                    person.addPlan(plan);
+                    Coord orig = origin.getCoord();
+                    Activity origAct = populationFactory.createActivityFromCoord("freight", orig);
+                    origAct.setFacilityId(origin.getId());
+                    origAct.setEndTime(start);
+                    plan.addActivity(origAct);
+                    plan.addLeg(populationFactory.createLeg("freight"));
+                    Coord dest = destination.getCoord();
+                    Activity destAct = populationFactory.createActivityFromCoord("freight", dest);
+                    destAct.setFacilityId(destination.getId());
+                    plan.addActivity(destAct);
+                }
+            } catch (NullPointerException e) {
+                errcount++;
             }
         }
+        System.out.println("Freight errors: " + errcount);
     }
 
     private void writeObjectAttributes(String popname) throws SQLException, NoConnectionException {
         ObjectAttributes personAttributes = new ObjectAttributes();
 
-        ResultSet resultSet = dataBaseAdmin.executeQuery("SELECT * FROM ro_plansgeneration.plans_input_objattr");
+        ResultSet resultSet = dataBaseAdmin.executeQuery("SELECT * FROM m_11_plan_gen.plans_input_objattr");
         while (resultSet.next()) {
             if (persons.containsKey(resultSet.getString("persid"))) {
                 personAttributes.putAttribute(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3));
@@ -395,13 +403,13 @@ public class CapstonePlansWriter {
 
 
     private void generateCitizenPlansFromSQL(double fraction) throws SQLException, NoConnectionException {
-        ResultSet resultSet = dataBaseAdmin.executeQuery("SELECT p.*  FROM ro_plansgeneration.plans_input p "+
+        ResultSet resultSet = dataBaseAdmin.executeQuery("SELECT p.*  FROM m_11_plan_gen.plans_input p "+
                 "ORDER BY p.hhid, persid, \"no\" ;");
         String hhid = null;
         String persid = null;
         Household household = null;
         PersonEntry person = null;
-
+        int errcount = 0;
 
         while (resultSet.next()) {
             String hhid1 = resultSet.getString("hhid");
@@ -409,7 +417,11 @@ public class CapstonePlansWriter {
                 if (household != null) {
                     household.assignDrivers();
                     for (PersonEntry personEntry : household.pax.values()) {
-                        personEntry.allocateActivityTimes();
+                        try {
+                            personEntry.allocateActivityTimes();
+                        } catch (Exception e) {
+                            errcount++;
+                        }
                     }
                 }
                 hhid = hhid1;
@@ -418,6 +430,7 @@ public class CapstonePlansWriter {
                 households.put(hhid, household);
                 household.pax = new HashMap<>();
             }
+
             String persid1 = resultSet.getString("persid");
             if (!persid1.equals(persid)) {
                 persid = persid1;
@@ -484,10 +497,11 @@ public class CapstonePlansWriter {
                 person.activitySequence.add(activityInfo);
             }
         }
+        System.out.println("Number of errors: " + errcount);
     }
 
     private void writePlans(String plansFile) {
-        new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(plansFile+".xml.gz");
+        new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV5(plansFile+".xml.gz");
     }
 
 }

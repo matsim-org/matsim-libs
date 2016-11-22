@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.siouxFalls.simulationInputs;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.example.EmissionControlerListener;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -27,6 +28,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -118,7 +120,8 @@ public class SiouxFallsControler {
 			TollHandler tollHandler = new TollHandler(controler.getScenario());
 			EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 			final EmissionCongestionTravelDisutilityCalculatorFactory emissionCongestionTravelDisutilityCalculatorFactory = 
-					new EmissionCongestionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, tollHandler, config.planCalcScore());
+					new EmissionCongestionTravelDisutilityCalculatorFactory(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car,
+					controler.getConfig().planCalcScore()), emissionCostModule, emissionModule, config.planCalcScore(), tollHandler);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {

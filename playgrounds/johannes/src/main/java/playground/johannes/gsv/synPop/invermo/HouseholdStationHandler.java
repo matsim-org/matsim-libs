@@ -20,6 +20,9 @@
 package playground.johannes.gsv.synPop.invermo;
 
 import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.source.invermo.InvermoKeys;
+import playground.johannes.synpop.source.invermo.generator.AttributeHandler;
+import playground.johannes.synpop.source.invermo.generator.VariableNames;
 
 import java.util.Map;
 
@@ -31,13 +34,13 @@ public class HouseholdStationHandler implements AttributeHandler<PlainElement> {
 
 	@Override
 	public void handleAttribute(PlainElement household, Map<String, String> attributes) {
-		String val = attributes.get(ColumnKeys.STATION_NAME);
-		if(ColumnKeys.validate(val)) {
+		String val = attributes.get(VariableNames.STATION_NAME);
+		if(VariableNames.validate(val)) {
 			household.setAttribute(InvermoKeys.STATION_NAME, val);
 		}
 		
-		val = attributes.get(ColumnKeys.STATION_DIST);
-		if(ColumnKeys.validate(val)) {
+		val = attributes.get(VariableNames.STATION_DIST);
+		if(VariableNames.validate(val)) {
 			double dist = Double.parseDouble(val);
 			household.setAttribute(InvermoKeys.STATION_DIST, String.valueOf(dist));
 		}

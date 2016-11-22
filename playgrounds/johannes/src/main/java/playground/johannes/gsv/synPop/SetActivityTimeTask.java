@@ -30,9 +30,6 @@ import playground.johannes.synpop.processing.EpisodeTask;
  */
 public class SetActivityTimeTask implements EpisodeTask {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.synpop.processing.EpisodeTask#apply(playground.johannes.synpop.data.PlainEpisode)
-	 */
 	@Override
 	public void apply(Episode plan) {
 		if(plan.getActivities().size() == 1) {
@@ -67,10 +64,7 @@ public class SetActivityTimeTask implements EpisodeTask {
 				Attributable next = plan.getLegs().get(i);
 				endTime = next.getAttribute(CommonKeys.LEG_START_TIME);
 			}
-			
-//			if(Double.parseDouble(endTime) < Double.parseDouble(startTime))
-//				throw new RuntimeException();
-			
+
 			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, startTime);
 			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, endTime);
 		}

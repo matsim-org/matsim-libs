@@ -255,7 +255,7 @@ class EventsToPlanElements implements TransitDriverStartsEventHandler, PersonEnt
 				Trip trip = journey.getTrips().getLast();
 				trip.setDistance(journey.getDistance());
 				trip.setEndTime(event.getTime());
-				chain.inCar = false;
+				chain.inCongestedMode = false;
 			} else if (event.getLegMode().equals("transit_walk")) {
 				Journey journey = chain.getJourneys().getLast();
 				Walk walk = journey.getWalks().getLast();
@@ -324,7 +324,7 @@ class EventsToPlanElements implements TransitDriverStartsEventHandler, PersonEnt
 					journey.getPossibleTransfer().getWalks().add(walk);
 				}
 			} else if (event.getLegMode().equals("car")) {
-				chain.inCar = true;
+				chain.inCongestedMode = true;
 				journey = chain.addJourney();
 				journey.setCarJourney(true);
 				journey.setOrig(network.getLinks().get(event.getLinkId())
@@ -497,7 +497,7 @@ class EventsToPlanElements implements TransitDriverStartsEventHandler, PersonEnt
 
 			} else {
 				TravellerChain chain = chains.get(event.getDriverId());
-				if (chain.inCar) {
+				if (chain.inCongestedMode) {
 					Journey journey = chain.getJourneys().getLast();
 					journey.incrementCarDistance(network.getLinks()
 							.get(event.getLinkId()).getLength());

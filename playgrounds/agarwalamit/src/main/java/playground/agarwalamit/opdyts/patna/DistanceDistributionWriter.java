@@ -124,6 +124,7 @@ public class DistanceDistributionWriter {
                 writer.write("===== end writing distribution from simulation ===== ");
                 writer.newLine();
             }
+            writer.close();
         } catch (IOException e) {
             throw new RuntimeException("Data is not written. Reason "+ e);
         }

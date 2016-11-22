@@ -22,13 +22,13 @@ package playground.johannes.studies.matrix2014.source.mid2008;
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.synPop.ConvertRide2Car;
 import playground.johannes.gsv.synPop.DeleteModes;
-import playground.johannes.gsv.synPop.DeleteNoLegs;
 import playground.johannes.gsv.synPop.analysis.DeleteShortLongTrips;
 import playground.johannes.synpop.data.Factory;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.io.PopulationIO;
 import playground.johannes.synpop.processing.TaskRunner;
+import playground.johannes.synpop.source.invermo.processing.ValidateNoLegs;
 import playground.johannes.synpop.source.mid2008.processing.AdjustJourneyWeight;
 import playground.johannes.synpop.source.mid2008.processing.ReturnEpisodeTask;
 
@@ -67,7 +67,7 @@ public class MergePopulations {
 //        TaskRunner.run(new Convert2MiscType(), persons);
 
         logger.info("Removing non mobile persons...");
-        TaskRunner.validatePersons(new DeleteNoLegs(), persons);
+        TaskRunner.validatePersons(new ValidateNoLegs(), persons);
         logger.info(String.format("Persons after filter: %s", persons.size()));
 //        writer.write(outDir + "pop.mob.xml", persons);
 
@@ -79,12 +79,12 @@ public class MergePopulations {
 
 //        logger.info("Removing legs with less than 3 KM...");
 //        TaskRunner.run(new DeleteShortLongTrips(3000, true), persons);
-//        TaskRunner.validatePersons(new DeleteNoLegs(), persons);
+//        TaskRunner.validatePersons(new ValidateNoLegs(), persons);
 //        logger.info(String.format("Persons after filter: %s", persons.size()));
 
         logger.info("Removing legs with more than 1000 KM...");
         TaskRunner.run(new DeleteShortLongTrips(1000000, false), persons);
-        TaskRunner.validatePersons(new DeleteNoLegs(), persons);
+        TaskRunner.validatePersons(new ValidateNoLegs(), persons);
         logger.info(String.format("Persons after filter: %s", persons.size()));
 
         PopulationIO.writeToXML(args[2], persons);

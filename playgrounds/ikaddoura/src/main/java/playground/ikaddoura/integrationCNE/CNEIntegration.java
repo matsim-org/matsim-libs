@@ -24,7 +24,6 @@ package playground.ikaddoura.integrationCNE;
 
 import java.io.IOException;
 import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,11 +44,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.agarwalamit.InternalizationEmissionAndCongestion.EmissionCongestionTravelDisutilityCalculatorFactory;
-import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
-import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
-import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
 import playground.ikaddoura.integrationCN.TollTimeDistanceTravelDisutilityFactory;
@@ -57,6 +51,10 @@ import playground.ikaddoura.integrationCN.VTTSNoiseTollTimeDistanceTravelDisutil
 import playground.ikaddoura.integrationCN.VTTSTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
+import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
+import playground.vsp.airPollution.flatEmissions.EmissionTravelDisutilityCalculatorFactory;
+import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.controler.CongestionAnalysisControlerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -96,27 +94,28 @@ public class CNEIntegration {
 	private boolean airPollutionAnalysis = false;
 	
 	private boolean useTripAndAgentSpecificVTTSForRouting = false;
-		
+
+	private final ResponsibilityGridTools responsibilityGridTools ;
+
 	public CNEIntegration(String configFile, String outputDirectory) {
 		this.configFile = configFile;
 		this.outputDirectory = outputDirectory;
-	}
-	
-	public CNEIntegration(String configFile) {
-		this.configFile = configFile;
-		this.outputDirectory = null;
-	}
-	
-	public CNEIntegration(Controler controler) {
-		this.controler = controler;
-		this.outputDirectory = null;
-	}
-	
-	public CNEIntegration(Controler controler, String outputDirectory) {
-		this.controler = controler;
-		this.outputDirectory = outputDirectory;
+		this.responsibilityGridTools = null;
 	}
 
+	public CNEIntegration(String configFile) {
+		this (configFile, null);
+	}
+	
+	public CNEIntegration(Controler controler, ResponsibilityGridTools responsibilityGridTools) {
+		this.controler = controler;
+		this.responsibilityGridTools = responsibilityGridTools;
+	}
+
+	public CNEIntegration(Controler controler) {
+		this(controler, null);
+	}
+	
 	public static void main(String[] args) throws IOException {
 		
 		String configFile;
@@ -298,7 +297,7 @@ public class CNEIntegration {
 			final EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 
 			if (useTripAndAgentSpecificVTTSForRouting) {
-				throw new RuntimeException("Not yet implemented. Aborting..."); // TODO
+				throw new RuntimeException("Not yet implemented. Aborting...");
 
 			} else {				
 				
@@ -306,8 +305,7 @@ public class CNEIntegration {
 					throw new RuntimeException("The following travel disutility doesn't allow for randomness. Aborting...");
 				}
 				
-				// TODO: doesn't account for randomness, doesn't account for marginal utility of distance, ... 
-				final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, 
+				final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),emissionModule,
 						emissionCostModule, controler.getConfig().planCalcScore());
 				emissionTducf.setHotspotLinks(hotSpotLinks);
 				controler.addOverridingModule(new AbstractModule() {
@@ -406,32 +404,12 @@ public class CNEIntegration {
 
 		} else if (congestionPricing && noisePricing == false && airPollutionPricing) {
 			// congestion + air pollution pricing
-
-			final TollHandler congestionTollHandlerQBP = new TollHandler(controler.getScenario());
-			
-			final EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 			
 			if (useTripAndAgentSpecificVTTSForRouting) {
-				throw new RuntimeException("Not yet implemented. Aborting..."); // TODO?!
+				throw new RuntimeException("Not yet implemented. Aborting...");
 
 			} else {
-				
-				if (sigma != 0.) {
-					throw new RuntimeException("The following travel disutility doesn't allow for randomness. Aborting...");
-				}
-				
-				// TODO: doesn't account for randomness, doesn't account for marginal utility of distance, ... 
-				final EmissionCongestionTravelDisutilityCalculatorFactory emissionCongestionTravelDisutilityCalculatorFactory = 
-						new EmissionCongestionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, congestionTollHandlerQBP, controler.getConfig().planCalcScore());
-				controler.addOverridingModule(new AbstractModule() {
-					@Override
-					public void install() {
-						bindCarTravelDisutilityFactory().toInstance(emissionCongestionTravelDisutilityCalculatorFactory);
-					}
-				});
-				
-				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandlerQBP, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
-				controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
+				throw new RuntimeException("Not yet implemented. Aborting...");
 			}
 					
 		} else if (congestionPricing == false && noisePricing == false && airPollutionPricing == false) {
