@@ -69,11 +69,11 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		log.info("Initializing ZoneBasedAccessibilityControlerListenerV3 ...");
 		
 		assert(measuringPoints != null);
-		delegate = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
+		delegate = new AccessibilityCalculator(scenario);
 		delegate.setMeasuringPoints(measuringPoints);
 		assert(matsim4opusTempDirectory != null);
 		if (ptMatrix != null) {
-			delegate.putAccessibilityCalculator(
+			delegate.putAccessibilityContributionCalculator(
 			Modes4Accessibility.pt.name(),
 			PtMatrixAccessibilityContributionCalculator.create(
 					ptMatrix,

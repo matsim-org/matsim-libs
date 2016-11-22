@@ -230,14 +230,7 @@ public class CombinedOsmSink implements Sink {
 			// handle and possibly modify name
 			// & and " need to be replaced to avoid problems with parsing the facilities file later
 			String name = tags.get("name");
-			if(name != null) {
-				if (name.contains("&")) {							
-					name = name.replaceAll("&", "u");
-				}
-				if (name.contains("\"")) {							
-					name = name.replaceAll("\"", "");
-				}
-			}
+			name = AccessibilityOsmUtils.simplifyString(name);
 			
 			
 			// get other relevant tags

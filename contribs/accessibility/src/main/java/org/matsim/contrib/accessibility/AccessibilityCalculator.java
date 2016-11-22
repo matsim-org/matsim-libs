@@ -6,14 +6,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.inject.Inject;
-
 import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+//import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
@@ -21,9 +21,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -65,8 +62,7 @@ public final class AccessibilityCalculator {
 	private AccessibilityConfigGroup acg;
 
 
-	@Inject
-	public AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
+	public AccessibilityCalculator(Scenario scenario) {
 		this.scenario = scenario;
 		this.acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 
@@ -93,47 +89,9 @@ public final class AccessibilityCalculator {
 
 		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaWalkTD = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
-
-		initDefaultContributionCalculators(travelTimes, travelDisutilityFactories, scenario);
 	}
-
-	@Deprecated // yyyyyy set from "outside"
-	private void initDefaultContributionCalculators(Map<String, TravelTime> travelTimes,
-			Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
-		{
-			final String mode = TransportMode.car;
-			putAccessibilityCalculator(
-					mode,
-					new NetworkModeAccessibilityExpContributionCalculator(
-							travelTimes.get(mode),
-							travelDisutilityFactories.get(mode),
-							scenario));
-		}{
-			final String mode = TransportMode.car;
-			putAccessibilityCalculator(
-					Modes4Accessibility.freeSpeed.name(),
-					new NetworkModeAccessibilityExpContributionCalculator(
-							new FreeSpeedTravelTime(),
-							travelDisutilityFactories.get(mode),
-							scenario));
-		}{
-			final String mode = TransportMode.walk;
-			putAccessibilityCalculator(
-					mode,
-					new ConstantSpeedAccessibilityExpContributionCalculator(
-							mode,
-							scenario));
-		}{
-			final String mode = TransportMode.bike;
-			putAccessibilityCalculator(
-					mode,
-					new ConstantSpeedAccessibilityExpContributionCalculator(
-							mode,
-							scenario));
-		}
-	}
-
-
+	
+	
 	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface l){
 		this.zoneDataExchangeListeners.add(l);
 	}
@@ -193,8 +151,12 @@ public final class AccessibilityCalculator {
 	public final void computeAccessibilities( Double departureTime, ActivityFacilities opportunities) {
 		aggregateOpportunities(opportunities, scenario.getNetwork());
 
-		Map<Modes4Accessibility,ExpSum> expSums = new HashMap<>() ;
-		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+//		Map<Modes4Accessibility,ExpSum> expSums = new HashMap<>() ;
+		Map<String,ExpSum> expSums = new HashMap<>() ;
+		// new
+		for (String mode : calculators.keySet()) {
+//		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+		// end new
 			expSums.put(mode, new ExpSum());
 		}
 
@@ -233,11 +195,15 @@ public final class AccessibilityCalculator {
 				// points separately anyways?  Answer: The trees need to be computed only once.  (But one could save more.) kai, feb'14
 
 				// aggregated value
-				Map< Modes4Accessibility, Double> accessibilities  = new HashMap<>() ;
-
-				for ( Modes4Accessibility mode : acg.getIsComputingMode() ) {
+				Map<String, Double> accessibilities  = new HashMap<>();
+				
+				// new
+				for (String mode : calculators.keySet()) {
+//				for ( Modes4Accessibility mode : acg.getIsComputingMode() ) {
+				// end new
 					// TODO introduce here a config parameter "computation mode" that can be set to "rawSum", "minimum" or "exponential/logsum/hansen", dz, sept'16
 					if(!useRawSum){
+//						System.out.println("expSums.get(mode).getSum() = " + expSums.get(mode).getSum());
 						accessibilities.put( mode, inverseOfLogitScaleParameter * Math.log( expSums.get(mode).getSum() ) ) ;
 					} else {
 						// this was used by IVT within SustainCity.  Not sure if we should maintain this; they could, after all, just exp the log results. kai, may'15
@@ -285,15 +251,17 @@ public final class AccessibilityCalculator {
 	}
 
 
-	private void computeAndAddExpUtilContributions( Map<Modes4Accessibility,ExpSum> expSums, ActivityFacility origin, 
-			final AggregationObject aggregatedFacility, Double departureTime) 
-	{
+//	private void computeAndAddExpUtilContributions(Map<Modes4Accessibility,ExpSum> expSums, ActivityFacility origin, final AggregationObject aggregatedFacility, Double departureTime) {
+	private void computeAndAddExpUtilContributions(Map<String, ExpSum> expSums, ActivityFacility origin, final AggregationObject aggregatedFacility, Double departureTime) {
 		for ( Map.Entry<String, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet() ) {
-			final Modes4Accessibility mode = Modes4Accessibility.valueOf(calculatorEntry.getKey());
+//			final Modes4Accessibility mode = Modes4Accessibility.valueOf(calculatorEntry.getKey());
+			String mode = calculatorEntry.getKey();
 
-			if ( !this.acg.getIsComputingMode().contains(mode) ) {
-				continue; // XXX yyyyyy should be configured by adding only the relevant calculators
-			}
+			// new
+//			if ( !this.acg.getIsComputingMode().contains(mode) ) {
+//				continue; // XXX yyyyyy should be configured by adding only the relevant calculators
+//			}
+			// end new
 
 			final double expVhk = calculatorEntry.getValue().computeContributionOfOpportunity( origin , aggregatedFacility, departureTime );
 
@@ -307,14 +275,23 @@ public final class AccessibilityCalculator {
 		this.acg.setComputingAccessibilityForMode(mode, val);
 	}
 
-	public final void putAccessibilityCalculator( String mode, AccessibilityContributionCalculator calc ) {
-		this.calculators.put( mode , calc ) ;
+	
+	public final void putAccessibilityContributionCalculator(String mode, AccessibilityContributionCalculator calc) {
+		this.calculators.put(mode , calc) ;
 	}
 
 
+	@Deprecated
 	public Set<Modes4Accessibility> getIsComputingMode() {
 		return this.acg.getIsComputingMode();
 	}
+	
+	
+	// new
+	public Map<String, AccessibilityContributionCalculator> getAccessibilityContributionCalculators() {
+		return this.calculators;
+	}
+	// end new
 
 
 	/**

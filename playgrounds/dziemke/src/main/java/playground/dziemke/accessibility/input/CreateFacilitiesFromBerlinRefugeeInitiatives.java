@@ -27,6 +27,7 @@ import java.net.URL;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.accessibility.osm.AccessibilityOsmUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -50,11 +51,11 @@ public class CreateFacilitiesFromBerlinRefugeeInitiatives {
     public static void main(String[] args) {
     	
     	String urlString = "https://www.berlin.de/fluechtlinge/berlin-engagiert-sich/berliner-initiativen/";
-        String facilitiesFile = "../../../shared-svn/projects/accessibility_berlin/refugee/initiativen_2.xml";
+        String facilitiesFile = "../../../shared-svn/projects/accessibility_berlin/refugee/initiatives.xml";
         String facilitiesFileDescription = "Refugee-relevant facilities in Berlin";
     	
-    	String inputCRS = "EPSG:4326";
-		String outputCRS = TransformationFactory.DHDN_GK4;
+    	String inputCRS = "EPSG:4326"; // WGS84
+		String outputCRS = "EPSG:31468"; // = DHDN GK4
     	
     	CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
     	
@@ -81,7 +82,7 @@ public class CreateFacilitiesFromBerlinRefugeeInitiatives {
                                 String[] coordStrings = lineArray[1].split(",");
                                 double lat = Double.parseDouble(coordStrings[0]);
                                 double lon = Double.parseDouble(coordStrings[1]);
-                                coord = CoordUtils.createCoord(lat, lon);
+                                coord = CoordUtils.createCoord(lon, lat);
                             }
                             bufferedReader.readLine();
                             bufferedReader.readLine();
@@ -93,6 +94,7 @@ public class CreateFacilitiesFromBerlinRefugeeInitiatives {
                                 title = lineArray[1];
                             }
                             if (title != null && coord != null) {
+                            	System.out.println("title = " + title + " -- coord = " + coord);
                             	ActivityFacility activityFacility = createFacility(title, coord, facilitiesFile, ct);
                             	activityFacilities.addActivityFacility(activityFacility);
                             }
@@ -111,8 +113,11 @@ public class CreateFacilitiesFromBerlinRefugeeInitiatives {
     }
 
     private static ActivityFacility createFacility(String title, Coord coord, String outputFile, CoordinateTransformation ct) {
-        	Id<ActivityFacility> id = Id.create(title , ActivityFacility.class);
+    		String name = AccessibilityOsmUtils.simplifyString(title);
+    	
+        	Id<ActivityFacility> id = Id.create(name , ActivityFacility.class);
     		Coord transformedCoord = ct.transform(coord);
+    		System.out.println("transformedCoord = " + transformedCoord + " -- coord = " + coord);
         	
         	ActivityFacilitiesFactory activityFacilitiesFactory = new ActivityFacilitiesFactoryImpl();
     		ActivityFacility activityFacility = activityFacilitiesFactory.createActivityFacility(id, transformedCoord);

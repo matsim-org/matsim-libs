@@ -123,10 +123,10 @@ final public class RunAccessibilityExample {
 								throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
 							}
 							BoundingBox bb = BoundingBox.createBoundingBox(scenario.getNetwork());
-							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
+							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario);
 							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSizeForCellBasedAccessibility));
 
-							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, null, config, scenario, travelTimes, travelDisutilityFactories,bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSizeForCellBasedAccessibility);
+							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, null, config, scenario, bb.getXMin(), bb.getYMin(),bb.getXMax(), bb.getYMax(), cellSizeForCellBasedAccessibility);
 
 							// define the modes that will be considered
 							// here, the accessibility computation is only done for freespeed

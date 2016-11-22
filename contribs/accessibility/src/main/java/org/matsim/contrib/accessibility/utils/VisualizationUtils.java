@@ -18,10 +18,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.accessibility.utils;
 
-import com.vividsolutions.jts.geom.Envelope;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.Labels;
-import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
 import org.matsim.contrib.analysis.vsp.qgis.QGisMapnikFileCreator;
 import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
@@ -32,6 +30,8 @@ import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityRenderer
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityXmlRenderer;
 import org.matsim.core.utils.misc.ExeRunner;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 /**
  * @author nagel, dziemke
  */
@@ -40,7 +40,7 @@ public class VisualizationUtils {
 	private VisualizationUtils(){} // do not instantiate
 
 	
-	public static void createQGisOutput(String actType, Modes4Accessibility mode, Envelope envelope,
+	public static void createQGisOutput(String actType, String mode, Envelope envelope,
 			String workingDirectory, String crs, boolean includeDensityLayer, Double lowerBound,
 			Double upperBound, Integer range, int symbolSize, int populationThreshold) {
 		
@@ -102,7 +102,7 @@ public class VisualizationUtils {
 	 * @param mode
 	 * @param osName
 	 */
-	public static void createSnapshot(String workingDirectory, Modes4Accessibility mode, String osName) {
+	public static void createSnapshot(String workingDirectory, String mode, String osName) {
 		// if OS is Windows
 		// example (daniel r) // os.arch=amd64 // os.name=Windows 7 // os.version=6.1
 		if ( osName.contains("Win") || osName.contains("win")) {

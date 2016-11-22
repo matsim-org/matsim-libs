@@ -20,6 +20,7 @@ package org.matsim.contrib.matsim4urbansim.run;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.NetworkWriter;
@@ -49,6 +50,7 @@ public class MATSim4UrbanSimParcelIntegrationTest {
 	/**
 	 * This test makes sure that five csv files used as input for UrbanSim are written correctly
 	 */
+	@Ignore
 	@Test
 	public void test() {
 		String path = utils.getOutputDirectory() ;
