@@ -244,16 +244,16 @@ public class CNETest {
 		System.out.println("Simultaneous pricing:");
 		printResults2(handler4);
 						
-		Assert.assertEquals("BC: all agents should use the high speed route.", 11, demand_highSpeed_lowN_highE(handler1));		
-		Assert.assertEquals("E: all agents should use the medium speed + low e cost route.", 11, demand_mediumSpeed_highN_lowE(handler2));		
-		Assert.assertEquals("N: all agents should use the high speed + low n cost route.", 11, demand_highSpeed_lowN_highE(handler3));		
-		Assert.assertEquals("N+E: most agents should use the low speed + low n cost  + low e cost route.", true, demand_lowSpeed_lowN_lowE(handler4) > (demand_mediumSpeed_highN_lowE(handler4) + demand_highSpeed_lowN_highE(handler4)) );		
+		Assert.assertEquals("BC: all agents should use the short distance route.", 11, demand_highSpeed_lowN_highE(handler1));		
+		Assert.assertEquals("E: no agent should use the high air pollution emission cost route.", 0, demand_highSpeed_lowN_highE(handler2));		
+		Assert.assertEquals("N: all agents should use the short distance + low n cost route.", 11, demand_highSpeed_lowN_highE(handler3));		
+		Assert.assertEquals("N+E: most agents should use the long distance + low n cost  + low e cost route.", true, demand_lowSpeed_lowN_lowE(handler4) > (demand_mediumSpeed_highN_lowE(handler4) + demand_highSpeed_lowN_highE(handler4)) );		
 	}
 
 	private void printResults2(LinkDemandEventHandler handler) {
-		System.out.println("high speed + low N costs + high E costs: " + demand_highSpeed_lowN_highE(handler));
-		System.out.println("low speed + low N costs + low E costs: " + demand_lowSpeed_lowN_lowE(handler));
-		System.out.println("medium speed + high N costs + low E costs: " + demand_mediumSpeed_highN_lowE(handler));
+		System.out.println("short distance + low N costs + high E costs: " + demand_highSpeed_lowN_highE(handler));
+		System.out.println("long distance + low N costs + low E costs: " + demand_lowSpeed_lowN_lowE(handler));
+		System.out.println("medium distance + high N costs + low E costs: " + demand_mediumSpeed_highN_lowE(handler));
 	}
 
 	private int demand_mediumSpeed_highN_lowE(LinkDemandEventHandler handler) {
