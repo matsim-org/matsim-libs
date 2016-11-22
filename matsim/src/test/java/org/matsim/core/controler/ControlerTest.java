@@ -33,6 +33,7 @@ import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -86,7 +87,7 @@ public class ControlerTest {
 	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
 	public static Collection<Object> parameterObjects () {
 		Object [] capacityUpdates = new Object [] { false, true };
-		return Arrays.asList(capacityUpdates);
+				return Arrays.asList(capacityUpdates);
 		// yyyy I am not sure why it is doing this ... it is necessary to do this around the qsim, but why here?  kai, aug'16
 	}
 	
@@ -919,7 +920,9 @@ public class ControlerTest {
 	 * which itself adds a Guice module... but too late.
 	 *
 	 * @thibautd
+	 * 
 	 */
+	@Ignore // see email 22/nov/16 by kai
 	@Test( expected = RuntimeException.class )
 	public void testGuiceModulesCannotAddModules() {
 		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
