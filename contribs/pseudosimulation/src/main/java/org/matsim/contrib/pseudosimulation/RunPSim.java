@@ -276,7 +276,7 @@ public class RunPSim {
         return matsimControler;
     }
 
-    private void run() {
+    public void run() {
         matsimControler.run();
     }
 
