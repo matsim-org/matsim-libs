@@ -452,7 +452,7 @@ public class DemandGeneratorCensus {
 		
 		for (int i = 0; i < numberOfPersons; i++) {
 			allPersons++;
-			Id<Household> householdId = Id.create(municipalityId + "_" + (counter + i), Household.class);
+			Id<Household> householdId = Id.create(municipalityId + (counter + i), Household.class);
 			HouseholdImpl household = new HouseholdImpl(householdId); // TODO Or use factory?
 			household.getAttributes().putAttribute("numberOfAdults", 1); // always 1; no household structure
 			household.getAttributes().putAttribute("totalNumberOfHouseholdVehicles", 1);
@@ -460,7 +460,7 @@ public class DemandGeneratorCensus {
 			household.getAttributes().putAttribute("numberOfChildren", 0); // none, ignore them in this version
 			household.getAttributes().putAttribute("householdStructure", 1); // 1 = single, no children
 			
-			Id<Person> personId = Id.create(householdId + "_1", Person.class);
+			Id<Person> personId = Id.create(householdId + "1", Person.class);
 			Person person = population.getFactory().createPerson(personId);
 			// Following attribute names inspired by "PersonUtils.java": "sex", "hasLicense", "carAvail", "employed", "age", "travelcards"
 			person.getAttributes().putAttribute("householdId", householdId);
@@ -640,10 +640,10 @@ public class DemandGeneratorCensus {
     		bufferedWriterHouseholds = new BufferedWriter(fileWriterHouseholds);
     		
     		for (Household household : households.values()) {
-    			Id<Household> householdId = household.getId();
+    			int householdId = Integer.parseInt(household.getId().toString());
     			int numberOfAdults = (Integer) household.getAttributes().getAttribute("numberOfAdults");
     			int totalNumberOfHouseholdVehicles = (Integer) household.getAttributes().getAttribute("totalNumberOfHouseholdVehicles");
-    			String homeTSZLocation = (String) household.getAttributes().getAttribute("homeTSZLocation");
+    			int homeTSZLocation = Integer.parseInt(household.getAttributes().getAttribute("homeTSZLocation").toString());
     			int numberOfChildren = (Integer) household.getAttributes().getAttribute("numberOfChildren");
     			int householdStructure = (Integer) household.getAttributes().getAttribute("householdStructure");
 
@@ -683,8 +683,8 @@ public class DemandGeneratorCensus {
 			bufferedWriterPersons = new BufferedWriter(fileWriterPersons);
 			    		    		
 			for (Person person : population.getPersons().values()) {
-				Id<Household> householdId = (Id<Household>) person.getAttributes().getAttribute("householdId");
-				Id<Person> personId = person.getId();
+				int householdId = Integer.parseInt(person.getAttributes().getAttribute("householdId").toString());
+				int personId = Integer.parseInt(person.getId().toString());
 				
 				int employed;
 				if ((boolean) person.getAttributes().getAttribute("employed")) {
@@ -707,8 +707,8 @@ public class DemandGeneratorCensus {
 					driversLicence = 0;
 				}
 				
-				String locationOfWork = (String) person.getAttributes().getAttribute("locationOfWork");
-				String locationOfSchool = (String) person.getAttributes().getAttribute("locationOfSchool");
+				int locationOfWork = Integer.parseInt(person.getAttributes().getAttribute("locationOfWork").toString());
+				int locationOfSchool = Integer.parseInt(person.getAttributes().getAttribute("locationOfSchool").toString());
 				
 				int female = (Integer) person.getAttributes().getAttribute("gender"); // assumes that female = 1
 				int age = (Integer) person.getAttributes().getAttribute("age");
