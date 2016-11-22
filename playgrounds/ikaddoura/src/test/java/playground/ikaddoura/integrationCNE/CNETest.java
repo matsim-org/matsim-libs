@@ -214,8 +214,9 @@ public class CNETest {
 		controler3.run();
 						
 		// air pollution + noise pricing
-		scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "cn");
-		Controler controler4 = new Controler(scenario);
+		Scenario scenario4 = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
+		scenario4.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "cn");
+		Controler controler4 = new Controler(scenario4);
 		CNEIntegration cneIntegration4 = new CNEIntegration(controler4, gt, rgt );
 		cneIntegration4.setAirPollutionPricing(true);
 		cneIntegration4.setNoisePricing(true);
