@@ -22,7 +22,7 @@ public class SantiagoAnalysis {
 	private static final String CASE_NAME = "baseCase10pct";
 	
 	private static final String RUN_DIR = "../../../runs-svn/santiago/" + CASE_NAME + "/";
-	private static final String OUTPUT_FOLDER = RUN_DIR + "output_sim7/";	
+	private static final String OUTPUT_FOLDER = RUN_DIR + "output_storage20pct/";	
 	private static final String ANALYSIS_DIR = OUTPUT_FOLDER + "analysis/";
 	
 	private static final String IT_NUMBER = "100";
@@ -76,8 +76,8 @@ public class SantiagoAnalysis {
 	
 	
 	public static void main (String[]arg){
-//		writeModalShare();
-		writeModeDistanceDistribution();
+		writeModalShare();
+//		writeModeDistanceDistribution();
 //		writeModalTravelTimes();
 
 	}
