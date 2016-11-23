@@ -923,7 +923,6 @@ public class ControlerTest {
 	 * @thibautd
 	 * 
 	 */
-	@Ignore( "Still need to discuss with Kai and MZ")
 	@Test( expected = RuntimeException.class )
 	public void testGuiceModulesCannotAddModules() {
 		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
