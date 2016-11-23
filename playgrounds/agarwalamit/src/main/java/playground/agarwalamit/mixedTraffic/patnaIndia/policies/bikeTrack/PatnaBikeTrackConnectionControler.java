@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -44,11 +45,13 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.*;
+import org.matsim.vehicles.Vehicle;
 import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListner;
 import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
 import playground.agarwalamit.analysis.linkVolume.FilteredLinkVolumeHandler;
@@ -56,6 +59,7 @@ import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.PatnaVehiclesGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
@@ -169,6 +173,7 @@ public class PatnaBikeTrackConnectionControler {
 				@Override
 				public void install() {
 					addEventHandlerBinding().toInstance(volHandler);
+					addTravelTimeBinding(TransportMode.bike).to(BikeTravelTime.class);
 				}
 			});
 			controler.run();
@@ -351,4 +356,12 @@ public class PatnaBikeTrackConnectionControler {
 			}
 		});
 	}
+
+
+	static class BikeTravelTime implements TravelTime {
+		@Override public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+			return link.getLength() / Math.min( link.getFreespeed(time) , MixedTrafficVehiclesUtils.getSpeed(TransportMode.bike)) ;
+		}
+	}
+
 }
