@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.analysis.modeSwitcher;
+package playground.agarwalamit.analysis.modeSwitcherRetainer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
+import playground.agarwalamit.utils.FileUtils;
 
 /**
  *This will first find mode switchers and then returns trip times in groups. 
@@ -46,8 +47,8 @@ public class ModeSwitchersTripTime {
 
 	public static void main(String[] args) {
 
-		String dir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
-		String runCases[] ={"baseCaseCtd","ei","ci","eci","ei_10"};
+		String dir = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run9/";
+		String runCases[] ={"baseCaseCtd"};
 
 		for(String runNr : runCases){
 			ModeSwitchersTripTime mstt = new ModeSwitchersTripTime();
@@ -100,7 +101,7 @@ public class ModeSwitchersTripTime {
 
 	private String getTravelMode(String mode){
 		if(mode.equals(TransportMode.car)) return "car";
-		else return "nonCar";
+		else return "PT";
 	}
 
 	private Map<Id<Person>, List<Tuple<String, Double>>> getPerson2mode2TripTimes(final String eventsFile){

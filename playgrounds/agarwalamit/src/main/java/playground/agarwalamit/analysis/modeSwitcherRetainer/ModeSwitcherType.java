@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.analysis.modeSwitcher;
+package playground.agarwalamit.analysis.modeSwitcherRetainer;
 
 /**
  * Currently, only four types of switches are used for Munich scenario i.e. car2car, car2non-car, non-car2car and non-car2non-car.
