@@ -45,11 +45,11 @@ public class AgentSpecificScoringFunctionFactory implements ScoringFunctionFacto
 	private final CountActEventHandler actCount;
 	private double tolerance;
 		
-	@Inject
 	public AgentSpecificScoringFunctionFactory( final Scenario sc, final CountActEventHandler actCount, double tolerance) {
 		this( new SubpopulationCharyparNagelScoringParameters( sc ) , sc.getNetwork() , actCount , tolerance);
 	}
 	
+	@Inject
 	AgentSpecificScoringFunctionFactory(final CharyparNagelScoringParametersForPerson params, Network network, CountActEventHandler actCount, double tolerance) {
 		this.params = params;
 		this.network = network;

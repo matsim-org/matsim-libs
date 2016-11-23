@@ -47,7 +47,6 @@ public class AgentSpecificActivityScheduling {
 	
 	private boolean preparePopulation = true;
 	private boolean removeNetworkSpecificInformation = false;
-	private boolean keepOnlySelectedPlans = true;
 	
 	private String configFile = null;
 	private Controler controler = null;
@@ -80,8 +79,7 @@ public class AgentSpecificActivityScheduling {
 			
 			log.info("Preparing the population...");
 
-			if (keepOnlySelectedPlans) PopulationTools.getPopulationWithOnlySelectedPlans(controler.getScenario().getPopulation());
-			
+			PopulationTools.setScoresToZero(controler.getScenario().getPopulation());
 			PopulationTools.setActivityTypesAccordingToDurationAndMergeOvernightActivities(controler.getScenario().getPopulation(), activityDurationBin);			
 			PopulationTools.addActivityTimesOfSelectedPlanToPersonAttributes(controler.getScenario().getPopulation());
 			PopulationTools.analyze(controler.getScenario().getPopulation());
@@ -154,10 +152,6 @@ public class AgentSpecificActivityScheduling {
 
 	public void setRemoveNetworkSpecificInformation(boolean removeNetworkSpecificInformation) {
 		this.removeNetworkSpecificInformation = removeNetworkSpecificInformation;
-	}
-
-	public void setKeepOnlySelectedPlans(boolean keepOnlySelectedPlans) {
-		this.keepOnlySelectedPlans = keepOnlySelectedPlans;
 	}
 
 	public void setTolerance(double tolerance) {

@@ -23,7 +23,6 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -41,17 +40,17 @@ public class PopulationActivitySplitter {
 	private static final Logger log = Logger.getLogger(PopulationActivitySplitter.class);
 
 	// input
-//	final private String inputPopulatlionFile = "../../../public-svn/matsim/scenarios/countries/de/berlin/car-traffic-only-1pct-2014-08-01/run_160.150.plans_selected.xml.gz";
+	final private String inputPopulatlionFile = "../../../public-svn/matsim/scenarios/countries/de/berlin/car-traffic-only-1pct-2014-08-01/run_160.150.plans_selected.xml.gz";
 
 //	final private String inputPopulatlionFile = "../../../runs-svn/bln-time/input/bvg.run189.10pct.100.plans.selected.genericPt.xml.gz";
-	final private String inputPopulatlionFile = "../../../runs-svn/congestion-pricing/output/NoPricing/output_plans.xml.gz";
+//	final private String inputPopulatlionFile = "../../../runs-svn/congestion-pricing/output/NoPricing/output_plans.xml.gz";
 	
 	// output
-//	final private String outputDirectory = "../../../runs-svn/berlin-dz-time/baseCase/input/";
-//	final private String outputPopulationFile = "run_160.150.plans_selected_splitActivityTypes.xml.gz";
+	final private String outputDirectory = "../../../runs-svn/berlin-dz-time/input/";
+	final private String outputPopulationFile = "run_160.150.plans_selected_splitActivityTypes.xml.gz";
 
-	final private String outputDirectory = "../../../runs-svn/bln-an-time/input/";
-	final private String outputPopulationFile = "baseCase_output_plans_it.100.selected.genericPt.splitActivityTypes.xml.gz";	
+//	final private String outputDirectory = "../../../runs-svn/bln-an-time/input/";
+//	final private String outputPopulationFile = "baseCase_output_plans_it.100.selected.genericPt.splitActivityTypes.xml.gz";	
 
 	// settings
 	final private double timeCategorySize = 3600.;
@@ -75,15 +74,14 @@ public class PopulationActivitySplitter {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setInputFile(inputPopulatlionFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+				
+		PopulationTools.setActivityTypesAccordingToDurationAndMergeOvernightActivities(scenario.getPopulation(), timeCategorySize);			
+		PopulationTools.addActivityTimesOfSelectedPlanToPersonAttributes(scenario.getPopulation());
+		PopulationTools.setScoresToZero(scenario.getPopulation());
+		PopulationTools.analyze(scenario.getPopulation());
+		PopulationTools.removeNetworkSpecificInformation(scenario.getPopulation());
 		
-		Population population = null;
-		population = PopulationTools.getPopulationWithOnlySelectedPlans(scenario.getPopulation());
-		population = PopulationTools.setActivityTypesAccordingToDurationAndMergeOvernightActivities(population, timeCategorySize);
-		population = PopulationTools.addActivityTimesOfSelectedPlanToPersonAttributes(population);
-//		population = PopulationTools.removeNetworkSpecificInformation(population);
-		PopulationTools.analyze(population);
-	
-		PopulationWriter pw = new PopulationWriter(population);
+		PopulationWriter pw = new PopulationWriter(scenario.getPopulation());
 		pw.write(outputDirectory + outputPopulationFile);		
 	}
 }

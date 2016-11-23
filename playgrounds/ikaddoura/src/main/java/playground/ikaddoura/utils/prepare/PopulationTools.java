@@ -29,8 +29,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 
 /**
 * @author ikaddoura
@@ -40,7 +38,7 @@ public class PopulationTools {
 
 	private static final Logger log = Logger.getLogger(PopulationTools.class);
 
-	public static Population setActivityTypesAccordingToDurationAndMergeOvernightActivities(Population population, double timeCategorySize) {
+	public static void setActivityTypesAccordingToDurationAndMergeOvernightActivities(Population population, double timeCategorySize) {
 				
 		log.info("First, setting activity types according to duration (time bin size: " + timeCategorySize + ")");				
 		log.info("Second, merging evening and morning activity if they have the same (base) type.");
@@ -52,9 +50,7 @@ public class PopulationTools {
 				setActivityTypesAccordingToDuration(plan, timeCategorySize);
 				mergeOvernightActivities(plan);				
 			}
-		}
-		
-		return population;
+		}		
 	}
 	
 	private static void mergeOvernightActivities(Plan plan) {
@@ -154,7 +150,7 @@ public class PopulationTools {
 		}
 	}
 
-	public static Population removeNetworkSpecificInformation(Population population) {
+	public static void removeNetworkSpecificInformation(Population population) {
 		
 		log.info("Removing network specific information (routes, link IDs)");
 		
@@ -175,12 +171,10 @@ public class PopulationTools {
 					}		
 				}
 			}
-		}
-		
-		return population;
+		}		
 	}
 
-	public static Population addActivityTimesOfSelectedPlanToPersonAttributes(Population population) {
+	public static void addActivityTimesOfSelectedPlanToPersonAttributes(Population population) {
 				
 		log.info("Writing activity times in selected plan to person attributes.");
 		
@@ -280,28 +274,8 @@ public class PopulationTools {
 			person.getAttributes().putAttribute("OpeningClosingTimes", actStartEndTimes);					
 
 		}	
-		
-		return population;
 	}
-
-	public static Population getPopulationWithOnlySelectedPlans(Population population) {
-		
-		Population outputPopulation = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
-		
-		for (Person person : population.getPersons().values()) {
-			
-			if (person.getSelectedPlan() == null) {
-				throw new RuntimeException("No selected plan. Aborting...");
-			}
-			
-			Person personCopy = outputPopulation.getFactory().createPerson(person.getId());
-			personCopy.addPlan(person.getSelectedPlan());
-			outputPopulation.addPerson(personCopy);
-		}
-		
-		return outputPopulation;
-	}
-
+	
 	public static void analyze(Population population) {
 		
 		final Map<String, Integer> activityType2Counter = new HashMap<>();
@@ -333,6 +307,14 @@ public class PopulationTools {
 			log.info(actType + " ; " + activityType2Counter.get(actType));
 		}
 		log.info("----");
+	}
+
+	public static void setScoresToZero(Population population) {
+		for (Person person : population.getPersons().values()) {
+			for (Plan plan : person.getPlans()) {				
+				plan.setScore(0.);
+			}
+		}
 	}
 	
 }

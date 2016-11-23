@@ -75,14 +75,13 @@ public class BerlinControler {
 			
 		} else {
 			
-			configFile = "../../../runs-svn/berlin-dz-time/input/config_test.xml";
-//			configFile = "../../../runs-svn/berlin-an-time/input/config_test.xml";
+			configFile = "../../../runs-svn/berlin-dz-time/input/config.xml";
 			
-			addModifiedActivities = true;
+			addModifiedActivities = false;
 			activityDurationBin = 3600.;
-			tolerance = 900.;
+			tolerance = 3600.;
 			
-			pricing = true;
+			pricing = false;
 			kp = 2 * ( 12 / 3600.);		
 			
 		}
