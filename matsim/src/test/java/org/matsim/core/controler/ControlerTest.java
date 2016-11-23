@@ -41,6 +41,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -922,23 +923,37 @@ public class ControlerTest {
 	 * @thibautd
 	 * 
 	 */
-	@Ignore // see email 22/nov/16 by kai
+	@Ignore( "Still need to discuss with Kai and MZ")
 	@Test( expected = RuntimeException.class )
 	public void testGuiceModulesCannotAddModules() {
 		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration( 0 );
 		final Controler controler = new Controler( config );
 
+		final Scenario replacementScenario = ScenarioUtils.createScenario( config );
+
 		controler.addOverridingModule(
 				new AbstractModule() {
 					@Override
 					public void install() {
-						controler.setScoringFunctionFactory( null );
+						controler.addOverridingModule(
+								new AbstractModule() {
+									@Override
+									public void install() {
+										bind( Scenario.class ).toInstance( replacementScenario );
+									}
+								}
+						);
 					}
 				}
 		);
 
 		controler.run();
+
+		Assert.assertSame(
+				"adding a Guice module to the controler from a Guice module is allowed but has no effect",
+				replacementScenario,
+				controler.getScenario() );
 	}
 
 	static class FakeMobsim implements Mobsim {
