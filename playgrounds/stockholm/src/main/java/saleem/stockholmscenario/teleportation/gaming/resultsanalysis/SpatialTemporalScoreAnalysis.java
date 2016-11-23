@@ -96,8 +96,8 @@ public class SpatialTemporalScoreAnalysis {
 	
 	public static void main(String[] args){
 		//Mode can be "car", "pt" or "both"
-		SpatialTemporalScoreAnalysis stsanalyser = new SpatialTemporalScoreAnalysis("C:\\Jayanth\\Alvsjo\\configAlvsjoEmployed10pcMax.xml", "C:\\Jayanth\\Alvsjo\\employedmax\\1000.plans.xml.gz", 
-				"C:\\Jayanth\\Alvsjo\\employedmax\\1000.events.xml.gz");
+		SpatialTemporalScoreAnalysis stsanalyser = new SpatialTemporalScoreAnalysis("C:\\Jayanth\\FarstaCentrum\\configFarstaCentrumEmployed10pcMax.xml", "C:\\Jayanth\\FarstaCentrum\\employedmax\\1000.plans.xml.gz", 
+				"C:\\Jayanth\\FarstaCentrum\\employedmax\\1000.events.xml.gz");
 		stsanalyser.calculateScore("both", new Coord(676397, 6571273), 1000000,  0, 110000);//28800, 36000
 	}
 
