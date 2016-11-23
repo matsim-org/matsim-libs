@@ -48,7 +48,7 @@ public class ModeSwitchersTripTime {
 	public static void main(String[] args) {
 
 		String dir = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run9/";
-		String runCases[] ={"baseCaseCtd"};
+		String runCases[] ={"baseCaseCtd","ei","ci","eci"};
 
 		for(String runNr : runCases){
 			ModeSwitchersTripTime mstt = new ModeSwitchersTripTime();
@@ -89,8 +89,7 @@ public class ModeSwitchersTripTime {
 					String firstMode = getTravelMode(firstItMode.getFirst());
 					String lastMode = getTravelMode(lastItMode.getFirst());
 
-					String switchTyp = firstMode.concat("2").concat(lastMode);
-					ModeSwitcherType modeSwitchType = ModeSwitcherType.valueOf(switchTyp);
+					Tuple<String, String> modeSwitchType = new Tuple<>(firstMode, lastMode);
 					this.modeSwitchInfo.storeTripTimeInfo(pId, modeSwitchType, new Tuple<>(firstItMode.getSecond(), lastItMode.getSecond()));
 				} 
 			} else if(!person2ModeTravelTimesLastIt.containsKey(pId)) {

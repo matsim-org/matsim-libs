@@ -18,12 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.analysis.modeSwitcherRetainer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-
+import java.util.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -33,8 +28,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
-
 import playground.agarwalamit.analysis.legMode.distributions.LegModeRouteDistanceDistributionHandler;
+import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 
@@ -53,8 +48,8 @@ public class ModeSwitchersTripDistance {
 
 	public static void main(String[] args) {
 
-		String dir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
-		String runCases[] ={"baseCaseCtd","ei","ci","eci","ei_10"};
+		String dir = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run9/";
+		String runCases[] ={"baseCaseCtd","ei","ci","eci"};
 
 		for(String runCase : runCases){
 			ModeSwitchersTripDistance mstd = new ModeSwitchersTripDistance();
@@ -96,8 +91,7 @@ public class ModeSwitchersTripDistance {
 					String firstMode = getTravelMode(firstItMode.getFirst());
 					String lastMode = getTravelMode(lastItMode.getFirst());
 
-					String switchTyp = firstMode.concat("2").concat(lastMode);
-					ModeSwitcherType modeSwitchType = ModeSwitcherType.valueOf(switchTyp);
+					Tuple<String, String> modeSwitchType = new Tuple<>(firstMode, lastMode);
 					this.modeSwitchInfo.storeTripDistanceInfo(pId, modeSwitchType, new Tuple<>(firstItMode.getSecond(), lastItMode.getSecond()));
 				} 
 
@@ -111,7 +105,7 @@ public class ModeSwitchersTripDistance {
 
 	private String getTravelMode(final String mode){
 		if(mode.equals(TransportMode.car)) return "car";
-		else return "nonCar";
+		else return "PT";
 	}
 
 	private Map<Id<Person>, List<Tuple<String, Double>>> getPerson2mode2TripDistances(final String eventsFile, final Scenario sc){

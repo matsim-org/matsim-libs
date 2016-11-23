@@ -19,11 +19,7 @@
 package playground.agarwalamit.analysis.modeSwitcherRetainer;
 
 import java.io.BufferedWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
+import java.util.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -38,26 +34,32 @@ import org.matsim.core.utils.io.IOUtils;
 public class ModeSwitcherInfoCollector {
 
 	private static final Logger LOG = Logger.getLogger(ModeSwitcherInfoCollector.class);
-	private final SortedMap<ModeSwitcherType, Tuple<Double, Double>> modeSwitchType2TripDistances = new TreeMap<>();
-	private final SortedMap<ModeSwitcherType, Integer> modeSwitchType2numberOfLegs = new TreeMap<>();
-	private final SortedMap<ModeSwitcherType, List<Id<Person>>> modeSwitchType2PersonIds = new TreeMap<>();
-	private final SortedMap<ModeSwitcherType, Tuple<Double, Double>> modeSwitchType2TripTimes = new TreeMap<>();
+
+	private final Comparator<Tuple<String, String>> comparator = new Comparator<Tuple<String, String>>() {
+		@Override
+		public int compare(Tuple<String, String> o1, Tuple<String, String> o2) {
+			return o1.toString().compareTo(o2.toString());
+		}
+	};
+	private final SortedMap<Tuple<String, String>, Tuple<Double, Double>> modeSwitchType2TripDistances = new TreeMap<>(comparator);
+	private final SortedMap<Tuple<String, String>, Integer> modeSwitchType2numberOfLegs = new TreeMap<>(comparator);
+	private final SortedMap<Tuple<String, String>, List<Id<Person>>> modeSwitchType2PersonIds = new TreeMap<>(comparator);
+	private final SortedMap<Tuple<String, String>, Tuple<Double, Double>> modeSwitchType2TripTimes = new TreeMap<>(comparator);
 
 	public ModeSwitcherInfoCollector() {
-
-		for(ModeSwitcherType str :ModeSwitcherType.values()){
-			this.modeSwitchType2numberOfLegs.put(str, 0);
-			this.modeSwitchType2PersonIds.put(str, new ArrayList<>());
-			this.modeSwitchType2TripDistances.put(str, new Tuple<>(0., 0.));
-			this.modeSwitchType2TripTimes.put(str, new Tuple<>(0., 0.));
-		}
 		LOG.info("This will collect the information of mode switchers between two different iterations.");
 		LOG.warn("DO NOT USE TRIP TIME AND TRIP DISTANCE MAPS SIMULTANEOUSLY.");
 	}
 
-	public void storeTripTimeInfo(final Id<Person> personId, final ModeSwitcherType modeSwitchTyp, final Tuple<Double, Double> travelTimes){
+	public void storeTripTimeInfo(final Id<Person> personId, final Tuple<String, String> modeSwitchTyp, final Tuple<Double, Double> travelTimes){
 
-		this.modeSwitchType2numberOfLegs.put(modeSwitchTyp, this.modeSwitchType2numberOfLegs.get(modeSwitchTyp)+1);
+		if(! this.modeSwitchType2numberOfLegs.containsKey(modeSwitchTyp)) { // initialize all
+			this.modeSwitchType2numberOfLegs.put(modeSwitchTyp, 0);
+			this.modeSwitchType2PersonIds.put(modeSwitchTyp, new ArrayList<>());
+			this.modeSwitchType2TripTimes.put(modeSwitchTyp, new Tuple<>(0., 0.));
+		}
+
+		this.modeSwitchType2numberOfLegs.put(modeSwitchTyp, this.modeSwitchType2numberOfLegs.get(modeSwitchTyp) + 1);
 
 		List<Id<Person>> swicherIds = this.modeSwitchType2PersonIds.get(modeSwitchTyp);
 		swicherIds.add(personId);
@@ -68,7 +70,13 @@ public class ModeSwitcherInfoCollector {
 		this.modeSwitchType2TripTimes.put(modeSwitchTyp, nowFirstLastItsTripTimes);
 	}
 
-	public void storeTripDistanceInfo(final Id<Person> personId, final ModeSwitcherType modeSwitchTyp, final Tuple<Double, Double> travelDistances){
+	public void storeTripDistanceInfo(final Id<Person> personId, final Tuple<String, String> modeSwitchTyp, final Tuple<Double, Double> travelDistances){
+
+		if(! this.modeSwitchType2numberOfLegs.containsKey(modeSwitchTyp)) { // initialize all
+			this.modeSwitchType2numberOfLegs.put(modeSwitchTyp, 0);
+			this.modeSwitchType2PersonIds.put(modeSwitchTyp, new ArrayList<>());
+			this.modeSwitchType2TripDistances.put(modeSwitchTyp, new Tuple<>(0., 0.));
+		}
 
 		this.modeSwitchType2numberOfLegs.put(modeSwitchTyp, this.modeSwitchType2numberOfLegs.get(modeSwitchTyp)+1);
 
@@ -85,10 +93,10 @@ public class ModeSwitcherInfoCollector {
 		String outFile = runCase+"/analysis/modeSwitchersTripTimes.txt";
 		BufferedWriter writer =  IOUtils.getBufferedWriter(outFile);
 		try {
-			writer.write("switchType \t numberOfLegs \t totalTripTimesForFirstIterationInHr \t totalTripTimesForLastIterationInHr \n");
+			writer.write("firstMode \t lastMode \t numberOfLegs \t totalTripTimesForFirstIterationInHr \t totalTripTimesForLastIterationInHr \n");
 
-			for(ModeSwitcherType str:this.modeSwitchType2numberOfLegs.keySet()){
-				writer.write(str+"\t"+this.modeSwitchType2numberOfLegs.get(str)+"\t"
+			for(Tuple<String, String> str:this.modeSwitchType2numberOfLegs.keySet()){
+				writer.write(str.getFirst()+"\t"+str.getSecond()+"\t"+this.modeSwitchType2numberOfLegs.get(str)+"\t"
 						+this.modeSwitchType2TripTimes.get(str).getFirst()/3600.+"\t"
 						+this.modeSwitchType2TripTimes.get(str).getSecond()/3600.+"\n");
 			}
@@ -105,10 +113,10 @@ public class ModeSwitcherInfoCollector {
 		String outFile = runCase+"/analysis/modeSwitchersTripDistances.txt";
 		BufferedWriter writer =  IOUtils.getBufferedWriter(outFile);
 		try {
-			writer.write("switchType \t numberOfLegs \t totalTripDistancesForFirstIterationInKm \t totalTripDistancesForLastIterationInKm \n");
+			writer.write("firstMode \t lastMode \t numberOfLegs \t totalTripDistancesForFirstIterationInKm \t totalTripDistancesForLastIterationInKm \n");
 
-			for(ModeSwitcherType str: this.modeSwitchType2numberOfLegs.keySet()){
-				writer.write(str+"\t"+this.modeSwitchType2numberOfLegs.get(str)+"\t"
+			for(Tuple<String, String> str: this.modeSwitchType2numberOfLegs.keySet()){
+				writer.write(str.getFirst()+"\t"+str.getSecond()+"\t"+this.modeSwitchType2numberOfLegs.get(str)+"\t"
 						+this.modeSwitchType2TripDistances.get(str).getFirst()/1000.+"\t"
 						+this.modeSwitchType2TripDistances.get(str).getSecond()/1000.+"\n");
 			}
@@ -121,19 +129,19 @@ public class ModeSwitcherInfoCollector {
 		LOG.info("Data is written to "+outFile);
 	}
 
-	public SortedMap<ModeSwitcherType, Tuple<Double, Double>> getModeSwitchType2TripDistances() {
+	public SortedMap<Tuple<String, String>, Tuple<Double, Double>> getModeSwitchType2TripDistances() {
 		return modeSwitchType2TripDistances;
 	}
 
-	public SortedMap<ModeSwitcherType, Integer> getModeSwitchType2numberOfLegs() {
+	public SortedMap<Tuple<String, String>, Integer> getModeSwitchType2numberOfLegs() {
 		return modeSwitchType2numberOfLegs;
 	}
 
-	public SortedMap<ModeSwitcherType, List<Id<Person>>> getModeSwitchType2PersonIds() {
+	public SortedMap<Tuple<String, String>, List<Id<Person>>> getModeSwitchType2PersonIds() {
 		return modeSwitchType2PersonIds;
 	}
 
-	public SortedMap<ModeSwitcherType, Tuple<Double, Double>> getModeSwitchType2TripTimes() {
+	public SortedMap<Tuple<String, String>, Tuple<Double, Double>> getModeSwitchType2TripTimes() {
 		return modeSwitchType2TripTimes;
 	}
 }
