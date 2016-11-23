@@ -61,7 +61,7 @@ import playground.ikaddoura.analysis.vtts.VTTScomputation;
  *
  */
 
-public class VTTSspecificRouterTest {
+public class VTTSspecificRouterTestIT {
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
