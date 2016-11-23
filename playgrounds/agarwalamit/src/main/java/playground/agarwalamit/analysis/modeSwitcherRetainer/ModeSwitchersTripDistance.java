@@ -51,10 +51,7 @@ public class ModeSwitchersTripDistance {
 		}
 	};
 
-	private final SortedMap<Tuple<String, String>, List<Id<Person>>> modeSwitchType2PersonIds = new TreeMap<>(comparator);
-	private final SortedMap<Tuple<String, String>, Tuple<Double, Double>> modeSwitchType2TripDistances = new TreeMap<>(comparator);
-	private final SortedMap<Tuple<String, String>, Integer> modeSwitchType2numberOfLegs = new TreeMap<>(comparator);
-
+	private final SortedMap<Tuple<String, String>, ModeSwitcherInfoCollector> modeSwitchType2InfoCollector = new TreeMap<>(comparator);
 
 	public static void main(String[] args) {
 		String dir = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run9/";
@@ -62,19 +59,20 @@ public class ModeSwitchersTripDistance {
 
 		for(String runCase : runCases){
 			ModeSwitchersTripDistance mstd = new ModeSwitchersTripDistance();
-			mstd.run(dir+runCase);
+			mstd.run(dir+runCase, 1000, 1500);
 			mstd.writeModeSwitcherTripDistances(dir+runCase);
 		}
 	}
 
-	private void run (final String runCase){
+	private void run (final String runCase, final int firstIteration, final int lastIteration){
 		// data from event files
-		String eventsFileItFirst = runCase+"/ITERS/it.1000/1000.events.xml.gz";
-		String eventsFileItLast = runCase+"/ITERS/it.1500/1500.events.xml.gz";
+		String eventsFileFirstIt = runCase+"/ITERS/it."+firstIteration+"/"+firstIteration+".events.xml.gz";
+		String eventsFileLastIt = runCase+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
+
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(runCase+"/output_network.xml.gz", runCase+"/output_config.xml");
 
-		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelDistsItFirst = getPerson2mode2TripDistances(eventsFileItFirst,sc);
-		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelDistsTtLast = getPerson2mode2TripDistances(eventsFileItLast,sc);
+		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelDistsItFirst = getPerson2mode2TripDistances(eventsFileFirstIt,sc);
+		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelDistsTtLast = getPerson2mode2TripDistances(eventsFileLastIt,sc);
 
 		for(Id<Person> pId : person2ModeTravelDistsItFirst.keySet()){
 
@@ -83,70 +81,40 @@ public class ModeSwitchersTripDistance {
 				int numberOfLegs = 0;
 				if(person2ModeTravelDistsTtLast.get(pId).size() != person2ModeTravelDistsItFirst.get(pId).size()){
 					//	if person does not have same number of trips as in first iteration
-
 					LOG.warn("Person "+pId+" do not have the same number of trip legs in the two maps. This could be due to stuck and abort event. "
-							+ "\n Thus including only minimum legs (removing the common trups) for that person.");
+							+ "\n Thus including only minimum number of legs (using the common trips) for that person.");
 					numberOfLegs = Math.min(person2ModeTravelDistsTtLast.get(pId).size(),person2ModeTravelDistsItFirst.get(pId).size());
+
 				} else numberOfLegs = person2ModeTravelDistsItFirst.get(pId).size();
 
 				for(int ii=0; ii<numberOfLegs;ii++){
+
 					Tuple<String, Double> firstItMode = person2ModeTravelDistsItFirst.get(pId).get(ii);
 					Tuple<String, Double> lastItMode = person2ModeTravelDistsTtLast.get(pId).get(ii);
 
-					String firstMode = firstItMode.getFirst();
-					String lastMode = lastItMode.getFirst();
-
-					Tuple<String, String> modeSwitchType = new Tuple<>(firstMode, lastMode);
+					Tuple<String, String> modeSwitchType = new Tuple<>(firstItMode.getFirst(), lastItMode.getFirst());
 					storeTripDistanceInfo(pId, modeSwitchType, new Tuple<>(firstItMode.getSecond(), lastItMode.getSecond()));
 				} 
 
 			} else if(!person2ModeTravelDistsTtLast.containsKey(pId)) {
-
 				LOG.warn("Person "+pId+ "is not present in the last iteration map. This person is thus not included in the results. Probably due to stuck and abort event.");
-
-			} 
+			}
 		}
 	}
 
 	public void storeTripDistanceInfo(final Id<Person> personId, final Tuple<String, String> modeSwitchTyp, final Tuple<Double, Double> travelDistances){
 
-		if(! this.modeSwitchType2numberOfLegs.containsKey(modeSwitchTyp)) { // initialize all
-			this.modeSwitchType2numberOfLegs.put(modeSwitchTyp, 0);
-			this.modeSwitchType2PersonIds.put(modeSwitchTyp, new ArrayList<>());
-			this.modeSwitchType2TripDistances.put(modeSwitchTyp, new Tuple<>(0., 0.));
+		ModeSwitcherInfoCollector infoCollector = this.modeSwitchType2InfoCollector.get(modeSwitchTyp);
+		if (infoCollector == null ) {
+			infoCollector = new ModeSwitcherInfoCollector();
 		}
 
-		this.modeSwitchType2numberOfLegs.put(modeSwitchTyp, this.modeSwitchType2numberOfLegs.get(modeSwitchTyp)+1);
+		infoCollector.addPersonToList(personId);
+		infoCollector.addToFirstIterationStats(travelDistances.getFirst());
+		infoCollector.addToLastIterationStats(travelDistances.getSecond());
 
-		List<Id<Person>> swicherIds = this.modeSwitchType2PersonIds.get(modeSwitchTyp);
-		swicherIds.add(personId);
-		this.modeSwitchType2PersonIds.put(modeSwitchTyp, swicherIds);
-
-		Tuple<Double, Double> nowFirstLastItsTripTimes = new Tuple<>(this.modeSwitchType2TripDistances.get(modeSwitchTyp).getFirst() + travelDistances.getFirst(),
-				this.modeSwitchType2TripDistances.get(modeSwitchTyp).getSecond() + travelDistances.getSecond());
-		this.modeSwitchType2TripDistances.put(modeSwitchTyp, nowFirstLastItsTripTimes);
+		this.modeSwitchType2InfoCollector.put(modeSwitchTyp, infoCollector);
 	}
-
-	public void writeModeSwitcherTripDistances(final String runCase){
-		String outFile = runCase+"/analysis/modeSwitchersTripDistances.txt";
-		BufferedWriter writer =  IOUtils.getBufferedWriter(outFile);
-		try {
-			writer.write("firstMode \t lastMode \t numberOfLegs \t totalTripDistancesForFirstIterationInKm \t totalTripDistancesForLastIterationInKm \n");
-
-			for(Tuple<String, String> str: this.modeSwitchType2numberOfLegs.keySet()){
-				writer.write(str.getFirst()+"\t"+str.getSecond()+"\t"+this.modeSwitchType2numberOfLegs.get(str)+"\t"
-						+this.modeSwitchType2TripDistances.get(str).getFirst()/1000.+"\t"
-						+this.modeSwitchType2TripDistances.get(str).getSecond()/1000.+"\n");
-			}
-
-			writer.close();
-		} catch (Exception e) {
-			throw new RuntimeException(
-					"Data is not written in file. Reason: " + e);
-		}
-		LOG.info("Data is written to "+outFile);
-	}
-
 
 	private Map<Id<Person>, List<Tuple<String, Double>>> getPerson2mode2TripDistances(final String eventsFile, final Scenario sc){
 
@@ -155,13 +123,10 @@ public class ModeSwitchersTripDistance {
 
 		LegModeRouteDistanceDistributionHandler distHandler = new LegModeRouteDistanceDistributionHandler(sc);
 		events.addHandler(distHandler);
-
 		reader.readFile(eventsFile);
 
 		SortedMap<String,Map<Id<Person>,List<Double>>> mode2Person2TripDists = distHandler.getMode2PersonId2TravelDistances();
-
 		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelDists = new HashMap<>();
-
 
 		for(String mode : mode2Person2TripDists.keySet()){
 			for (Id<Person> p : mode2Person2TripDists.get(mode).keySet()){
@@ -176,10 +141,32 @@ public class ModeSwitchersTripDistance {
 						mode2TripDistList.add(mode2TripDist);
 						person2ModeTravelDists.put(p, mode2TripDistList);
 					}
-
 				}
 			}
 		}
 		return person2ModeTravelDists;
+	}
+
+	public void writeModeSwitcherTripDistances(final String runCase){
+		String outFile = runCase+"/analysis/modeSwitchersTripDistances.txt";
+		BufferedWriter writer =  IOUtils.getBufferedWriter(outFile);
+		try {
+			writer.write("firstMode \t lastMode \t numberOfLegs \t totalTripDistancesForFirstIterationInKm \t totalTripDistancesForLastIterationInKm \n");
+
+			for(Tuple<String, String> str: this.modeSwitchType2InfoCollector.keySet()){
+				ModeSwitcherInfoCollector infoCollector = this.modeSwitchType2InfoCollector.get(str);
+				writer.write(str.getFirst()+"\t"+
+						str.getSecond()+"\t"+
+						infoCollector.getNumberOfLegs()+"\t" +
+						infoCollector.getFirstIterationStats() / 1000.0 + "\t"+
+						infoCollector.getLastIterationStats() / 1000.0 +
+						"\n");
+			}
+
+			writer.close();
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written in file. Reason: " + e);
+		}
+		LOG.info("Data is written to "+outFile);
 	}
 }

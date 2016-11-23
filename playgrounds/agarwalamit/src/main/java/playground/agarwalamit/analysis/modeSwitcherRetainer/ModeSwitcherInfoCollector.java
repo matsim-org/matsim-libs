@@ -63,8 +63,11 @@ public class ModeSwitcherInfoCollector {
 		return this.numberOfLegs;
 	}
 
-	public Tuple<Double, Double> getFirstLastIterationStats(){
-		return this.firstAndLastIterationStats;
+	public double getFirstIterationStats(){
+		return this.firstAndLastIterationStats.getFirst();
 	}
 
+	public double getLastIterationStats(){
+		return this.firstAndLastIterationStats.getSecond();
+	}
 }
