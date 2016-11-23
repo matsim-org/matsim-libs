@@ -640,7 +640,7 @@ public class DemandGeneratorCensus {
     		bufferedWriterHouseholds = new BufferedWriter(fileWriterHouseholds);
     		
     		for (Household household : households.values()) {
-    			int householdId = Integer.parseInt(household.getId().toString());
+    			long householdId = Long.parseLong(household.getId().toString());
     			int numberOfAdults = (Integer) household.getAttributes().getAttribute("numberOfAdults");
     			int totalNumberOfHouseholdVehicles = (Integer) household.getAttributes().getAttribute("totalNumberOfHouseholdVehicles");
     			int homeTSZLocation = Integer.parseInt(household.getAttributes().getAttribute("homeTSZLocation").toString());
@@ -683,8 +683,8 @@ public class DemandGeneratorCensus {
 			bufferedWriterPersons = new BufferedWriter(fileWriterPersons);
 			    		    		
 			for (Person person : population.getPersons().values()) {
-				int householdId = Integer.parseInt(person.getAttributes().getAttribute("householdId").toString());
-				int personId = Integer.parseInt(person.getId().toString());
+				long householdId = Long.parseLong(person.getAttributes().getAttribute("householdId").toString());
+				long personId = Long.parseLong(person.getId().toString());
 				
 				int employed;
 				if ((boolean) person.getAttributes().getAttribute("employed")) {
