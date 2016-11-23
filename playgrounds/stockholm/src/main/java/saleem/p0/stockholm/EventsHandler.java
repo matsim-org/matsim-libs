@@ -7,30 +7,36 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.vehicles.Vehicle;
 
-public class EventsHandler implements LinkLeaveEventHandler, LinkEnterEventHandler, VehicleLeavesTrafficEventHandler{
+public class EventsHandler implements BasicEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, VehicleLeavesTrafficEventHandler, PersonEntersVehicleEventHandler, PersonStuckEventHandler{
 	List<String> inlinks;
 	double delay = 0;
 	double time = -3600;
 	int numveh = 0;
 	Network network;
 	Map<Id<Vehicle>, Double> entries = new LinkedHashMap<Id<Vehicle>, Double>();//Entry time against vehicle to incoming links for delay calculation
+	Map<Id<Person>, Id<Vehicle>> persontoveh = new LinkedHashMap<Id<Person>, Id<Vehicle>>();//Entry time against vehicle to incoming links for delay calculation
 	Map<String, Double> freetraveltimes = new LinkedHashMap<String, Double>();//Free speed against link id in String form
-	List<Double> times = new ArrayList<Double>();//Time entries for plotting
-	List<Double> delays = new ArrayList<Double>();//Delays for plotting
-	List<Double> numagents = new ArrayList<Double>();//Number of agents moving through pretimed intersections for plotting
-	List<Double> numonlinks = new ArrayList<Double>();//Number of agents on incoming links
+	ArrayList<Double> times = new ArrayList<Double>();//Time entries for plotting
+	ArrayList<Double> delays = new ArrayList<Double>();//Delays for plotting
+	ArrayList<Double> numagents = new ArrayList<Double>();//Number of agents moving through pretimed intersections for plotting
+	ArrayList<Double> numonlinks = new ArrayList<Double>();//Number of agents on incoming links
 	public EventsHandler(List<String> inlinks, Network network) {
 		this.inlinks=inlinks;
 		this.network=network;
@@ -51,28 +57,22 @@ public class EventsHandler implements LinkLeaveEventHandler, LinkEnterEventHandl
 		// TODO Auto-generated method stub
 		
 	}
-
+	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		
-		if(event.getTime()-time>=3190) {
-			if(numveh==0)numveh=1;
-			delays.add(delay/numveh);
-			times.add(event.getTime()/3600);
-			numagents.add((double)numveh);
-			numonlinks.add((double)entries.size());
-			delay=0;numveh = 0;
-			time=event.getTime();
-		}
 		if(inlinks.contains(event.getLinkId().toString())){
-			numveh++;
+//			if(event.getTime()>107000)
+//			System.out.println(event.getTime());
 			if(entries.get(event.getVehicleId())!=null){
 				double del = event.getTime()-entries.get(event.getVehicleId())
 						- freetraveltimes.get(event.getLinkId().toString());
-				delay = delay + del;
-//				if(del>3600){
+				if(del<10000){
+					delay = delay + del;
+					numveh++;
+
 //					System.out.println(del + "..." + event.getLinkId().toString());
-//				}
+				}
 				entries.remove(event.getVehicleId());
 			}
 		}
@@ -87,16 +87,16 @@ public class EventsHandler implements LinkLeaveEventHandler, LinkEnterEventHandl
 		// TODO Auto-generated method stub
 		
 	}
-	public List<Double> getDelays(){
+	public ArrayList<Double> getDelays(){
 		return this.delays;
 	}
-	public List<Double> getAgentsOnIncomingLinks(){
+	public ArrayList<Double> getAgentsOnIncomingLinks(){
 		return this.numonlinks;
 	}
-	public List<Double> getNumAgentsThroughIntersections(){
+	public ArrayList<Double> getNumAgentsThroughIntersections(){
 		return this.numagents;
 	}
-	public List<Double> getTimes(){
+	public ArrayList<Double> getTimes(){
 		return this.times;
 	}
 	@Override
@@ -105,5 +105,33 @@ public class EventsHandler implements LinkLeaveEventHandler, LinkEnterEventHandl
 		if(inlinks.contains(event.getLinkId().toString())){
 			entries.remove(event.getVehicleId());
 		}
+	}
+	@Override
+	public void handleEvent(PersonStuckEvent event) {
+		entries.remove(persontoveh.get(event.getPersonId()));
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		persontoveh.put(event.getPersonId(), event.getVehicleId());
+
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void handleEvent(Event event) {
+		if(event.getTime()-time>=3600) {
+//			System.out.println(event.getTime());
+			if(numveh==0)numveh=1;
+			delays.add(delay/numveh);
+			times.add((double)Math.round(event.getTime()/3600));
+			numagents.add((double)numveh);
+			numonlinks.add((double)entries.size());
+			delay=0;numveh = 0;
+			time=(double)Math.round(event.getTime()/3600)*3600;
+		}
+		// TODO Auto-generated method stub
+		
 	}
 }

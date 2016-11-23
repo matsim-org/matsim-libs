@@ -28,14 +28,14 @@ import saleem.stockholmscenario.utils.CollectionUtil;
 public class AddedPopulationAnalysis {
 	public static void main(String[] args){
 		
-		String planspath = "C:\\Results Matsim\\Gaming\\hemax\\500.plans.xml.gz";
-		String eventspath = "C:\\Results Matsim\\Gaming\\hemax\\500.events.xml.gz";
+		String planspath = "C:\\Jayanth\\Arstafaltet\\unemployedmin\\1000.plans.xml.gz";
+		String eventspath = "C:\\Jayanth\\Arstafaltet\\unemployedmin\\1000.events.xml.gz";
 		    
 		    
 		AddedPopulationAnalysis analyser = new AddedPopulationAnalysis();
 		analyser.analyseEventsForTripDuration(planspath,eventspath );
-//		analyser.analysePlansScore(planspath);
-//		analyser.analyseModalSplit();
+		analyser.analysePlansScore(planspath);
+//		analyser.analyseModalSplit(planspath);
 //		analyser.analyseDistancesTravelled(planspath);
 	}
 	public void analyseEventsForTripDuration(String planspath, String eventspath){
