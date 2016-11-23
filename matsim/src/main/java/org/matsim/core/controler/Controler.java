@@ -178,6 +178,15 @@ public final class Controler implements ControlerI, MatsimServices {
 		this.injector = Injector.createInjector(config, AbstractModule.override(Collections.singleton(new AbstractModule() {
 			@Override
 			public void install() {
+				// this looks awfully hideous, but:
+				// - putting injectorCreated = true AFTER this statement breaks ControlerTest.testGuiceModulesCannotAddModules
+				// - putting injectorCreated = true BEFORE seems to cause other problems (according to communication with Kai and MZ)
+				// not sure the problem MZ solved by putting this line after will be solved by putting this here (they
+				// seem equivalent to me). But semantically, this seems correct (the injector is created if the install
+				// method is called)
+				// td, nov 2016
+				Controler.this.injectorCreated = true;
+
 				install(new NewControlerModule());
 				install(new ControlerDefaultCoreListenersModule());
 				for (AbstractModule module : modules) {
@@ -187,7 +196,6 @@ public final class Controler implements ControlerI, MatsimServices {
 				//install(new ScenarioByInstanceModule(scenario));
 			}
 		}), overrides));
-		this.injectorCreated = true;
 		ControlerI controler = injector.getInstance(ControlerI.class);
 		controler.run();
 	}
