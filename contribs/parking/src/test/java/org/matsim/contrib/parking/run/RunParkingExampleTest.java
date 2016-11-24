@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.contrib.parking.parkingchoice.run.RunParkingExample;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -37,7 +38,7 @@ public class RunParkingExampleTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 	
 	/**
-	 * Test method for {@link org.matsim.contrib.parking.run.RunParkingExample#run(org.matsim.core.config.Config)}.
+	 * Test method for {@link org.matsim.contrib.parking.parkingchoice.run.RunParkingExample#run(org.matsim.core.config.Config)}.
 	 */
 	@Ignore // ignore on master until resolved on branch
 	@Test

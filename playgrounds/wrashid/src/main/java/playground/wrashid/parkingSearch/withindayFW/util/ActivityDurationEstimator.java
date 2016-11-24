@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 
 

@@ -22,7 +22,7 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.analysis.LegHistogramChart;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;

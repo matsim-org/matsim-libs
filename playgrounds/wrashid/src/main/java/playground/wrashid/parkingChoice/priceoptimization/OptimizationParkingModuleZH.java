@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.PC2.GeneralParkingModule;
-import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
+import org.matsim.contrib.parking.parkingchoice.PC2.GeneralParkingModule;
+import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;

@@ -19,7 +19,7 @@
 
 package playground.wrashid.parkingSearch.withindayFW.util;
 
-import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
 
 public class GlobalParkingSearchParams {
 

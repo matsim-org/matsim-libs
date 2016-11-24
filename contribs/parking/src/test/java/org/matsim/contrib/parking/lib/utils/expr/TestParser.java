@@ -1,7 +1,7 @@
 package org.matsim.contrib.parking.lib.utils.expr;
 
-import org.matsim.contrib.parking.lib.utils.expr.Parser;
-import org.matsim.contrib.parking.lib.utils.expr.SyntaxException;
+import org.matsim.contrib.parking.parkingchoice.lib.utils.expr.Parser;
+import org.matsim.contrib.parking.parkingchoice.lib.utils.expr.SyntaxException;
 
 import junit.framework.TestCase;
 

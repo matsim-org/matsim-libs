@@ -1,6 +1,6 @@
 package playground.wrashid.PSF.data;
 
-import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
 import org.matsim.core.utils.charts.XYLineChart;
 
 

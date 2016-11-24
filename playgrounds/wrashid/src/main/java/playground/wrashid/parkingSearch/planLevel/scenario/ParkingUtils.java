@@ -19,8 +19,7 @@
 
 package playground.wrashid.parkingSearch.planLevel.scenario;
 
-import org.matsim.contrib.parking.lib.EventHandlerAtStartupAdder;
-
+import org.matsim.contrib.parking.parkingchoice.lib.EventHandlerAtStartupAdder;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.controler.MatsimServices;

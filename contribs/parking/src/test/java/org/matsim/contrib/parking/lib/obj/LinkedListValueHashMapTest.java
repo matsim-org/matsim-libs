@@ -2,7 +2,8 @@ package org.matsim.contrib.parking.lib.obj;
 
 import java.util.HashMap;
 
-import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.HashMapInverter;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.LinkedListValueHashMap;
 
 import junit.framework.TestCase;
 

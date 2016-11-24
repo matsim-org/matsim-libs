@@ -6,9 +6,9 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.DoubleValueHashMap;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.IntegerValueHashMap;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.facilities.ActivityFacility;
 

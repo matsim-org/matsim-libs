@@ -22,7 +22,7 @@ package playground.wrashid.parkingSearch.withindayFW.util;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;

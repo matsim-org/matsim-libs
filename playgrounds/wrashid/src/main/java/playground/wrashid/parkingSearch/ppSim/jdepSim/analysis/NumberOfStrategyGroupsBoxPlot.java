@@ -2,7 +2,7 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim.analysis;
 
 import java.util.LinkedList;
 
-import org.matsim.contrib.parking.lib.obj.Matrix;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.Matrix;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.analysis.StrategyScoresAnalysis.StrategyScoreLog;

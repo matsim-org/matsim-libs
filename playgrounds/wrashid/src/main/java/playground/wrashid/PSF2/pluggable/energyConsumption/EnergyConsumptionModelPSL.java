@@ -22,7 +22,7 @@ package playground.wrashid.PSF2.pluggable.energyConsumption;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
 import org.matsim.vehicles.VehicleType;
 
 import playground.wrashid.PSF.data.energyConsumption.AverageEnergyConsumptionGalus;

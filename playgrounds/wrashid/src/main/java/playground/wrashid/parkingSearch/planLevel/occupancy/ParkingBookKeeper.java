@@ -7,8 +7,7 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.contrib.parking.lib.DebugLib;
-
+import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
 import org.matsim.core.controler.MatsimServices;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 

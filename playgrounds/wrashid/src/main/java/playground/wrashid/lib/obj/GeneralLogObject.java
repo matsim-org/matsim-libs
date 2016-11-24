@@ -25,8 +25,8 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.lib.obj.list.Lists;
+import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.list.Lists;
 import org.matsim.core.controler.MatsimServices;
 
 

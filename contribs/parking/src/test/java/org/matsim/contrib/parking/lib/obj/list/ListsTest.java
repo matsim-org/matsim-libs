@@ -2,7 +2,7 @@ package org.matsim.contrib.parking.lib.obj.list;
 
 import java.util.ArrayList;
 
-import org.matsim.contrib.parking.lib.obj.list.Lists;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.list.Lists;
 
 import junit.framework.TestCase;
 

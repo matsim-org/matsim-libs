@@ -2,7 +2,7 @@ package playground.wrashid.lib.tools.network;
 
 import java.io.IOException;
 
-import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
 
 
 public class ConvertMATSimNetworkToKMZ {

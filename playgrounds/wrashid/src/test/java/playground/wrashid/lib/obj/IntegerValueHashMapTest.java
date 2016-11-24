@@ -1,6 +1,6 @@
 package playground.wrashid.lib.obj;
 
-import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.IntegerValueHashMap;
 
 import junit.framework.TestCase;
 

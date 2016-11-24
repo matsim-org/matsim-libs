@@ -3,7 +3,7 @@ package org.matsim.contrib.parking.lib.obj;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import org.matsim.contrib.parking.lib.obj.Matrix;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.Matrix;
 
 import junit.framework.TestCase;
 

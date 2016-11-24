@@ -31,7 +31,7 @@ import java.util.ArrayList;
 public class GeneralLib {
 
 	public static void writeList(ArrayList<String> list, String fileName) {
-		org.matsim.contrib.parking.lib.GeneralLib.writeList(list, fileName);
+		org.matsim.contrib.parking.parkingchoice.lib.GeneralLib.writeList(list, fileName);
 	}
 	
 }

@@ -23,7 +23,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
 /**
  * An energy consumption modell is needed to track energy consumption based on different delimiters. 
  * Usually driven distance and speed are of most importance, but time dependency (e.g. for heating) is also possible 

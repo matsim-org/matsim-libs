@@ -23,8 +23,8 @@ import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.DoubleValueHashMap;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 

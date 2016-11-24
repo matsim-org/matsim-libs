@@ -21,8 +21,8 @@ package playground.wrashid.parkingSearch.withindayFW.analysis.trb2012;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.Matrix;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.Matrix;
 
 
 public class FilterWalkTimes {

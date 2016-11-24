@@ -22,8 +22,8 @@ package org.matsim.contrib.transEnergySim.vehicles.api;
 import java.util.LinkedHashSet;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.lib.obj.MathLib;
+import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.MathLib;
 import org.matsim.contrib.transEnergySim.agents.VehicleAgent;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.stationary.ChargingPlugType;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;

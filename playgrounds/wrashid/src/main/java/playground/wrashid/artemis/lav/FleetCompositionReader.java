@@ -2,7 +2,7 @@ package playground.wrashid.artemis.lav;
 
 import java.util.HashMap;
 
-import org.matsim.contrib.parking.lib.obj.Matrix;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.Matrix;
 
 
 public class FleetCompositionReader {

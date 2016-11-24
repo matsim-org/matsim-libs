@@ -1,10 +1,10 @@
 package playground.wrashid.ABMT.rentParking;
 
-import org.matsim.contrib.parking.PC2.simulation.ParkingArrivalEvent;
-import org.matsim.contrib.parking.PC2.simulation.ParkingArrivalEventHandler;
-import org.matsim.contrib.parking.PC2.simulation.ParkingDepartureEvent;
-import org.matsim.contrib.parking.PC2.simulation.ParkingDepartureEventHandler;
-import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.parkingchoice.PC2.simulation.ParkingArrivalEvent;
+import org.matsim.contrib.parking.parkingchoice.PC2.simulation.ParkingArrivalEventHandler;
+import org.matsim.contrib.parking.parkingchoice.PC2.simulation.ParkingDepartureEvent;
+import org.matsim.contrib.parking.parkingchoice.PC2.simulation.ParkingDepartureEventHandler;
+import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
 
 
 public class RentableParkingHandler implements ParkingArrivalEventHandler, ParkingDepartureEventHandler {

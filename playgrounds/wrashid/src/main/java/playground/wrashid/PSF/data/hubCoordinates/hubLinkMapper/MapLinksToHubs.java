@@ -26,10 +26,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.HashMapInverter;
-import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
-import org.matsim.contrib.parking.lib.obj.Matrix;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.HashMapInverter;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.LinkedListValueHashMap;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.Matrix;
 
 
 // TODO: I could it make faster by introducing hierarchical mapping 

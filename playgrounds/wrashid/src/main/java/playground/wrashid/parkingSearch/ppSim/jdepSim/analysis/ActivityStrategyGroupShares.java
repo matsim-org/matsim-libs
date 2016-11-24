@@ -1,10 +1,10 @@
 package playground.wrashid.parkingSearch.ppSim.jdepSim.analysis;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.contrib.parking.lib.obj.TwoKeyHashMapWithDouble;
+import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.Matrix;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.TwoKeyHashMapWithDouble;
 
 // see D:\data\Dropbox\ETH\Projekte\STRC2014\experiments\activityStrategyShare for visualization procedure
 public class ActivityStrategyGroupShares extends

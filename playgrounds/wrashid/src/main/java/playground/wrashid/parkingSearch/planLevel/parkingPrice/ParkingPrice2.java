@@ -1,6 +1,6 @@
 package playground.wrashid.parkingSearch.planLevel.parkingPrice;
 
-import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
 
 public class ParkingPrice2 extends ParkingPrice {
 

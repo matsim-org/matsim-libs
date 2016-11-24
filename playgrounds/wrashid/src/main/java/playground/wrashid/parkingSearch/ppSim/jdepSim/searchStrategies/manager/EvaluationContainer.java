@@ -23,8 +23,8 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
+import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.LinkedListValueHashMap;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;

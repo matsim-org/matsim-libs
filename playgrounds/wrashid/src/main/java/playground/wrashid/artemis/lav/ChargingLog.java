@@ -4,7 +4,7 @@ package playground.wrashid.artemis.lav;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
 
 
 public class ChargingLog {

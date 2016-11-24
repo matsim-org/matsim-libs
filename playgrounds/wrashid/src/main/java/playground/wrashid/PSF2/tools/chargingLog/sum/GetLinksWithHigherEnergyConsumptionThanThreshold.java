@@ -2,8 +2,8 @@ package playground.wrashid.PSF2.tools.chargingLog.sum;
 
 import java.util.LinkedList;
 
-import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.DoubleValueHashMap;
 
 
 public class GetLinksWithHigherEnergyConsumptionThanThreshold {

@@ -3,9 +3,9 @@ package playground.wrashid.lib.tools.txtConfig;
 import java.io.File;
 import java.util.HashMap;
 
-import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.Matrix;
+import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.Matrix;
 
 
 /**

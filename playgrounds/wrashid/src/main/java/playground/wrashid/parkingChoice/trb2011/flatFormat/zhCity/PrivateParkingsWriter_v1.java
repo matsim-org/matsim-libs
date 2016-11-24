@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.DoubleValueHashMap;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.facilities.ActivityFacilityImpl;

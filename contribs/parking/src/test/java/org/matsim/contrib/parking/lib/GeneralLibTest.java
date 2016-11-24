@@ -21,7 +21,8 @@ package org.matsim.contrib.parking.lib;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.parking.lib.obj.Matrix;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.Matrix;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.testcases.MatsimTestCase;
 

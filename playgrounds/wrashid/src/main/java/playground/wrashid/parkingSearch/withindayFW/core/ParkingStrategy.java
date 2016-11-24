@@ -1,7 +1,7 @@
 package playground.wrashid.parkingSearch.withindayFW.core;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.obj.TwoKeyHashMapWithDouble;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.TwoKeyHashMapWithDouble;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;

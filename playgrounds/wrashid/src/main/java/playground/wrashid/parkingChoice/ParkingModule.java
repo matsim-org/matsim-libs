@@ -1,7 +1,7 @@
 package playground.wrashid.parkingChoice;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.parking.lib.EventHandlerAtStartupAdder;
+import org.matsim.contrib.parking.parkingchoice.lib.EventHandlerAtStartupAdder;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;

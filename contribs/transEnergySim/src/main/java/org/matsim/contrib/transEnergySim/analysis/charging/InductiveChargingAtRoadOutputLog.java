@@ -22,7 +22,7 @@ package org.matsim.contrib.transEnergySim.analysis.charging;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
 
 
 public class InductiveChargingAtRoadOutputLog extends ChargingOutputLog {

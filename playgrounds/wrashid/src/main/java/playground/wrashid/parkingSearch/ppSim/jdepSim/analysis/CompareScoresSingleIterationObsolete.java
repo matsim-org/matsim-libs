@@ -21,10 +21,10 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim.analysis;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.contrib.parking.lib.obj.list.Lists;
+import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.Matrix;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.list.Lists;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.analysis.StrategyScoresAnalysis.StrategyScoreLog;

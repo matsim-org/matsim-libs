@@ -21,8 +21,8 @@ package org.matsim.contrib.parking.parkingChoice.infrastructure;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.parkingChoice.infrastructure.cost.CostCalculator;
+import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
 
 /**
  * 

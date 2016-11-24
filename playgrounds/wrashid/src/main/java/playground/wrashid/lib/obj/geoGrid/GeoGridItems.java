@@ -3,7 +3,7 @@ package playground.wrashid.lib.obj.geoGrid;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.LinkedListValueHashMap;
 
 
 public class GeoGridItems<T> {

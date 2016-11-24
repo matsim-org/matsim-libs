@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacility;

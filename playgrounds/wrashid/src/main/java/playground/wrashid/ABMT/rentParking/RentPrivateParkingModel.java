@@ -1,6 +1,6 @@
 package playground.wrashid.ABMT.rentParking;
 
-import org.matsim.contrib.parking.PC2.GeneralParkingModule;
+import org.matsim.contrib.parking.parkingchoice.PC2.GeneralParkingModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
