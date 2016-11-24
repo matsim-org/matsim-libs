@@ -34,8 +34,7 @@ class TestSampers2MATSimResampler {
 			final double sampersTimeScore = rnd.nextGaussian();
 			sampersScores.add(sampersNoTimeScore + sampersTimeScore);
 			sampersTimeScores.add(sampersTimeScore);
-			// matsimTimeScores.add(Math.exp(sampersTimeScore));
-			matsimTimeScores.add(0.5 * sampersTimeScore);
+			matsimTimeScores.add(2 * sampersTimeScore);
 		}
 
 		final double scale = 1.0;
@@ -71,18 +70,24 @@ class TestSampers2MATSimResampler {
 
 		// ---------- CREATE SUBSAMPLES ----------
 
-		final int totalReplications = 100 * 1000;
+		final int totalReplications = 10 * 1000;
 		final int subsampleDraws = 100;
+		final boolean doResampling = true;
 
 		final Map<Alternative, Integer> resample2cnt = new LinkedHashMap<>();
 		for (int replication = 0; replication < totalReplications; replication++) {
-			// System.out.println((replication + 1) + " / " + subsampleCnt);
-			final Set<Alternative> subsample = new LinkedHashSet<>();
+			final Set<Alternative> matsimChoiceSet = new LinkedHashSet<>();
 			for (int i = 0; i < subsampleDraws; i++) {
-				subsample.add(MathHelpers.draw(alternative2sampersChoiceProba, rnd));
+				matsimChoiceSet.add(MathHelpers.draw(alternative2sampersChoiceProba, rnd));
 			}
-			final Sampers2MATSimResampler resampler = new Sampers2MATSimResampler(rnd, subsample, totalReplications);
-			final Alternative resample = resampler.next();
+			final Alternative resample;
+			if (doResampling) {
+				final Sampers2MATSimResampler resampler = new Sampers2MATSimResampler(rnd, matsimChoiceSet,
+						subsampleDraws);
+				resample = resampler.next();
+			} else {
+				resample = (new ArrayList<>(matsimChoiceSet)).get(rnd.nextInt(matsimChoiceSet.size()));
+			}
 			final Integer cnt = resample2cnt.get(resample);
 			if (cnt == null) {
 				resample2cnt.put(resample, 1);
