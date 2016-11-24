@@ -112,6 +112,7 @@ public class BerlinControler {
 			decongestionSettings.setKi(0.);
 			decongestionSettings.setKd(0.);
 			decongestionSettings.setTOLL_BLEND_FACTOR(0.1);
+			decongestionSettings.setMsa(true);
 			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
 			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 			

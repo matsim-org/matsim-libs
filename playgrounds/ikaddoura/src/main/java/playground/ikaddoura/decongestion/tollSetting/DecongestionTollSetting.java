@@ -27,6 +27,6 @@ package playground.ikaddoura.decongestion.tollSetting;
 
 public interface DecongestionTollSetting {
 	
-	public void updateTolls();
+	public void updateTolls(int iteration);
 }
 
