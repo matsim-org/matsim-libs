@@ -77,12 +77,13 @@ public class BerlinControler {
 			
 			configFile = "../../../runs-svn/berlin-dz-time/input/config.xml";
 			
-			addModifiedActivities = false;
+			addModifiedActivities = true;
 			activityDurationBin = 3600.;
 			tolerance = 3600.;
 			
-			pricing = false;
-			kp = 2 * ( 12 / 3600.);		
+			pricing = true;
+			kp = 2 * ( 7 / 3600.);
+//			kp = 9999999.0;		
 			
 		}
 		
@@ -110,6 +111,7 @@ public class BerlinControler {
 			decongestionSettings.setKp(kp);
 			decongestionSettings.setKi(0.);
 			decongestionSettings.setKd(0.);
+			decongestionSettings.setTOLL_BLEND_FACTOR(0.1);
 			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
 			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 			
