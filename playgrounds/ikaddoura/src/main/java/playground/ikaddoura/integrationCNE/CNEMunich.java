@@ -25,7 +25,7 @@ package playground.ikaddoura.integrationCNE;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -41,6 +41,7 @@ import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -138,34 +139,58 @@ public class CNEMunich {
 
 		noiseParameters.setReceiverPointGap(100.);
 		
-		// TODO define area
-//		static final double xMin = 4452550.25;
-//		static final double xMax = 4479483.33;
-//		static final double yMin = 5324955.00;
-//		static final double yMax = 5345696.81;
-		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+		String[] consideredActivitiesForReceiverPointGrid = {""};
 		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
+		noiseParameters.setReceiverPointsGridMinX(xMin);
+		noiseParameters.setReceiverPointsGridMaxX(xMax);
+		noiseParameters.setReceiverPointsGridMinY(yMin);
+		noiseParameters.setReceiverPointsGridMaxY(yMax);
 			
-		// TODO: all activities
-		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+		String[] consideredActivitiesForDamages = new String[controler.getConfig().planCalcScore().getActivityParams().size()];
+		int counter = 0;
+		for (Iterator<ActivityParams> iterator = controler.getConfig().planCalcScore().getActivityParams().iterator(); iterator.hasNext();) {
+			ActivityParams actParams = (ActivityParams) iterator.next();
+			String actType = actParams.getActivityType();
+			consideredActivitiesForDamages[counter] = actType;
+			counter++;
+		}
 		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForDamages);
 		
-		// TODO
 		String[] hgvIdPrefixes = { "gv" };
 		noiseParameters.setHgvIdPrefixesArray(hgvIdPrefixes);
 						
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
 				
-		noiseParameters.setScaleFactor(1.);
+		noiseParameters.setScaleFactor(100.);
 
-		// TODO
 		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
-		// 595958075
-//		576277210-576277209-576275366-593677922
-//		591541992
-
-//		tunnelLinkIDs.add(Id.create("108041", Link.class));
-//		tunnelLinkIDs.add(Id.create("108142", Link.class));
+		tunnelLinkIDs.add(Id.create("591881193", Link.class));
+		tunnelLinkIDs.add(Id.create("589846808-593507025", Link.class));
+		tunnelLinkIDs.add(Id.create("595958075", Link.class));
+		tunnelLinkIDs.add(Id.create("591541992", Link.class));
+		tunnelLinkIDs.add(Id.create("595131857", Link.class));
+		tunnelLinkIDs.add(Id.create("593815853", Link.class));
+		tunnelLinkIDs.add(Id.create("591002378-586890230", Link.class));
+		tunnelLinkIDs.add(Id.create("594773948", Link.class));
+		tunnelLinkIDs.add(Id.create("562772343-595823247-67627622", Link.class));
+		tunnelLinkIDs.add(Id.create("562772343-595823247-67627622", Link.class));
+		tunnelLinkIDs.add(Id.create("554338620-592320125-59404904-591436217", Link.class));
+		tunnelLinkIDs.add(Id.create("52810973", Link.class));
+		tunnelLinkIDs.add(Id.create("52810959-52810960", Link.class));
+		tunnelLinkIDs.add(Id.create("52804319-594971775", Link.class));
+		tunnelLinkIDs.add(Id.create("592627223-52804320", Link.class));
+		tunnelLinkIDs.add(Id.create("595801512", Link.class));
+		tunnelLinkIDs.add(Id.create("594783923", Link.class));
+		tunnelLinkIDs.add(Id.create("595128428", Link.class));
+		tunnelLinkIDs.add(Id.create("562762175", Link.class));
+		tunnelLinkIDs.add(Id.create("593958968", Link.class));
+		tunnelLinkIDs.add(Id.create("594995477", Link.class));
+		tunnelLinkIDs.add(Id.create("52807999-576295186-589861082", Link.class));
+		tunnelLinkIDs.add(Id.create("591705342-576295185-53265241", Link.class));
+		tunnelLinkIDs.add(Id.create("592921817-562763527-562763524-562763523-595224818", Link.class));
+		tunnelLinkIDs.add(Id.create("593949767-594635243-562763528-595166202", Link.class));
+		tunnelLinkIDs.add(Id.create("595877742", Link.class));
+		tunnelLinkIDs.add(Id.create("595870463-586909531-594897602", Link.class));
 		noiseParameters.setTunnelLinkIDsSet(tunnelLinkIDs);
 		
 		controler.run();
