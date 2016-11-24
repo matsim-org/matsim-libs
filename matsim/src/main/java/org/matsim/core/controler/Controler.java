@@ -175,6 +175,14 @@ public final class Controler implements ControlerI, MatsimServices {
 	 */
 	@Override
 	public final void run() {
+		// It is better to keep this line before actually creating the injector, because:
+		// - it actually means "fail if adding new Guice modules"
+		// - adding Guice modules to the Controler from other Guice modules is too late.
+		// This might sound silly, but might, in some cases, happen, through code that
+		// - transformed a StartupListener to a Guice module
+		// - that called methods such as setScoringFunctionFactory(), that redirects to addOverridingModule()
+		// And this happens silently, leading to lots of time and hair lost.
+		// td, nov 17
 		this.injectorCreated = true;
 		this.injector = Injector.createInjector(config, AbstractModule.override(Collections.singleton(new AbstractModule() {
 			@Override
