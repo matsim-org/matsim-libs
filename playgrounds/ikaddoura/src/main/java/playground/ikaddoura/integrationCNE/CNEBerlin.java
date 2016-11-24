@@ -107,12 +107,13 @@ public class CNEBerlin {
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 		Controler controler = new Controler(scenario);
 		
+		double xMin = 4565055.;
+		double xMax = 4632739.;
+		double yMin = 5801109.;
+		double yMax = 5845708.;
+		
 		// air pollution Berlin settings
 		
-		double xMin = 0;
-		double xMax = 0;
-		double yMin = 0;
-		double yMax = 0;
 		int noOfXCells = 0;
 		int noOfYCells = 0;
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
@@ -144,10 +145,14 @@ public class CNEBerlin {
 
 		noiseParameters.setReceiverPointGap(100.);
 		
-		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+		String[] consideredActivitiesForReceiverPointGrid = {""};
 		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
+		noiseParameters.setReceiverPointsGridMinX(xMin);
+		noiseParameters.setReceiverPointsGridMaxX(xMax);
+		noiseParameters.setReceiverPointsGridMinY(yMin);
+		noiseParameters.setReceiverPointsGridMaxY(yMax);
 			
-		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga", "leisure", "other", "shop_daily", "shop_other"};
 		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForDamages);
 		
 		String[] hgvIdPrefixes = { "lkw" };
