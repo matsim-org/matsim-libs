@@ -33,27 +33,46 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * @author jbischoff
+ * @author jbischoff An example how to use parking search in MATSim.
+ *         Technically, all you need as extra input is a facilities file
+ *         containing "car interaction" locations.
+ *
  *
  */
 
 public class RunParkingSearchExample {
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/example/config.xml");
+		// set to false, if you don't require visualisation, the the example will run for 10 iterations
+		new RunParkingSearchExample().run(false);
+
+	}
+
+	/**
+	 * 
+	 * @param otfvis
+	 *            turns otfvis visualisation on or off
+	 */
+	public void run(boolean otfvis) {
+		Config config = ConfigUtils.loadConfig("src/main/ressources/parkingsearch/config.xml");
 		config.plans().setInputFile("population100.xml");
 		config.facilities().setInputFile("parkingFacilities.xml");
-		config.controler().setOutputDirectory("../../../shared-svn/projects/bmw_carsharing/example/output");
+		config.controler().setOutputDirectory("output");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(50);
+		if (otfvis) {
+			config.controler().setLastIteration(0);
+		} else {
+			config.controler().setLastIteration(10);
+		}
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
-        controler.addOverridingModule(new OTFVisLiveModule());
 
+		if (otfvis) {
+			controler.addOverridingModule(new OTFVisLiveModule());
+		}
 		SetupParking.installParkingModules(controler);
 		controler.run();
-
 	}
 
 }

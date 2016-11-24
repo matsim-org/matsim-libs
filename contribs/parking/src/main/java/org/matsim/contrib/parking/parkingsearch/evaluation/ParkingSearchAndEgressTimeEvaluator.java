@@ -108,7 +108,6 @@ public class ParkingSearchAndEgressTimeEvaluator implements PersonArrivalEventHa
 	}
 	public void writeCoordTimeStamps(String filename){
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
-		DecimalFormat df = new DecimalFormat("##.##");	
 			try {
 				bw.write("time;coordX;coordY;Xwgs;Ywgs;searchTime");
 				for (String s: this.coordTimeStamps){

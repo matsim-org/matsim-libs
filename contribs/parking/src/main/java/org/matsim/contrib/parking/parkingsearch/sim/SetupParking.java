@@ -28,7 +28,6 @@ import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.evaluation.ParkingListener;
 import org.matsim.contrib.parking.parkingsearch.manager.FacilityBasedParkingManager;
-import org.matsim.contrib.parking.parkingsearch.manager.LinkLengthBasedParkingManagerWithRandomInitialUtilisation;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
 import org.matsim.contrib.parking.parkingsearch.manager.WalkLegFactory;
 import org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogic.VehicleTeleportationLogic;

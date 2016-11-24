@@ -45,7 +45,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * 
  * 
  */
-public class RunParkingExample {
+public class RunParkingChoiceExample {
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig("src/main/ressources/config.xml");
