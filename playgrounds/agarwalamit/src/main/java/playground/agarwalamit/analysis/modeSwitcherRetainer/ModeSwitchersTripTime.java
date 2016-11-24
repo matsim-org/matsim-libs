@@ -27,6 +27,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.utils.FileUtils;
+import playground.agarwalamit.utils.PersonFilter;
 
 /**
  *This will first find mode switchers and then returns trip times in groups. 
@@ -37,6 +38,24 @@ import playground.agarwalamit.utils.FileUtils;
 public class ModeSwitchersTripTime {
 
 	private static final Logger LOG = Logger.getLogger(ModeSwitchersTripTime.class);
+
+	public ModeSwitchersTripTime(){
+		this(null, null);
+	}
+
+	private final String userGroup;
+	private final PersonFilter pf;
+
+	public ModeSwitchersTripTime (final String userGroup, final PersonFilter personFilter) {
+		this.pf = personFilter;
+		this.userGroup = userGroup;
+
+		if( (userGroup==null && personFilter!=null) || (userGroup!=null && personFilter==null) ) {
+			throw new RuntimeException("Either of user group or person filter is null.");
+		} else if(userGroup!=null && personFilter!=null) {
+			LOG.info("Usergroup filtering is used, result will include persons from given user group only.");
+		}
+	}
 
 	private final Comparator<Tuple<String, String>> comparator = new Comparator<Tuple<String, String>>() {
 		@Override
@@ -69,6 +88,11 @@ public class ModeSwitchersTripTime {
 
 		// start processing
 		for(Id<Person> pId : person2ModeTravelTimesFirstIt.keySet()){
+
+			if(this.userGroup !=null  && ! this.pf.getUserGroupAsStringFromPersonId(pId).equals(this.userGroup)) {
+				continue; // if using person filtering and person does not belong to desired user group, dont include it in the analysis
+			}
+
 			if(person2ModeTravelTimesLastIt.containsKey(pId) ) {
 				int numberOfLegs = 0;
 				if(person2ModeTravelTimesLastIt.get(pId).size() != person2ModeTravelTimesFirstIt.get(pId).size()) {
@@ -94,7 +118,7 @@ public class ModeSwitchersTripTime {
 		}
 	}
 
-	public void storeTripTimeInfo(final Id<Person> personId, final Tuple<String, String> modeSwitchTyp, final Tuple<Double, Double> travelTimes){
+	private void storeTripTimeInfo(final Id<Person> personId, final Tuple<String, String> modeSwitchTyp, final Tuple<Double, Double> travelTimes){
 
 		ModeSwitcherInfoCollector infoCollector = this.modeSwitchType2InfoCollector.get(modeSwitchTyp);
 		if (infoCollector == null ) {

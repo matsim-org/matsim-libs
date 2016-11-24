@@ -32,6 +32,7 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.legMode.distributions.LegModeRouteDistanceDistributionHandler;
 import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
+import playground.agarwalamit.utils.PersonFilter;
 
 
 /**
@@ -43,6 +44,24 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 public class ModeSwitchersTripDistance {
 
 	private static final Logger LOG = Logger.getLogger(ModeSwitchersTripDistance.class);
+
+	public ModeSwitchersTripDistance(){
+		this(null, null);
+	}
+
+	private final String userGroup;
+	private final PersonFilter pf;
+
+	public ModeSwitchersTripDistance (final String userGroup, final PersonFilter personFilter) {
+		this.pf = personFilter;
+		this.userGroup = userGroup;
+
+		if( (userGroup==null && personFilter!=null) || (userGroup!=null && personFilter==null) ) {
+			throw new RuntimeException("Either of user group or person filter is null.");
+		} else if(userGroup!=null && personFilter!=null) {
+			LOG.info("Usergroup filtering is used, result will include persons from given user group only.");
+		}
+	}
 
 	private final Comparator<Tuple<String, String>> comparator = new Comparator<Tuple<String, String>>() {
 		@Override
@@ -76,6 +95,10 @@ public class ModeSwitchersTripDistance {
 
 		for(Id<Person> pId : person2ModeTravelDistsItFirst.keySet()){
 
+			if(this.userGroup !=null  && ! this.pf.getUserGroupAsStringFromPersonId(pId).equals(this.userGroup)) {
+				continue; // if using person filtering and person does not belong to desired user group, dont include it in the analysis
+			}
+
 			if(person2ModeTravelDistsTtLast.containsKey(pId) ) {
 
 				int numberOfLegs = 0;
@@ -102,7 +125,7 @@ public class ModeSwitchersTripDistance {
 		}
 	}
 
-	public void storeTripDistanceInfo(final Id<Person> personId, final Tuple<String, String> modeSwitchTyp, final Tuple<Double, Double> travelDistances){
+	private void storeTripDistanceInfo(final Id<Person> personId, final Tuple<String, String> modeSwitchTyp, final Tuple<Double, Double> travelDistances){
 
 		ModeSwitcherInfoCollector infoCollector = this.modeSwitchType2InfoCollector.get(modeSwitchTyp);
 		if (infoCollector == null ) {
