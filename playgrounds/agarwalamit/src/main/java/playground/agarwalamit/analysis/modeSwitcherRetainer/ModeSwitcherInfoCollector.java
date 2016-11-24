@@ -23,7 +23,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.utils.collections.Tuple;
 
 /**
  * A class to store all information of mode switchers/retainers
@@ -35,24 +34,19 @@ public class ModeSwitcherInfoCollector {
 	private static final Logger LOG = Logger.getLogger(ModeSwitcherInfoCollector.class);
 
 	private final List<Id<Person>> personIds = new ArrayList<>();
-	private int numberOfLegs = 0;
-	private Tuple<Double, Double> firstAndLastIterationStats = new Tuple<>(new Double(0.), new Double(0.));
+	private double firstIterationStat = 0.;
+	private double lastIterationStat = 0.;
 
 	public void addPersonToList(final Id<Person> personId) {
 		this.personIds.add(personId);
-
-		// also increase the counter
-		numberOfLegs++;
 	}
 
 	public void addToFirstIterationStats(final double value){
-		firstAndLastIterationStats = new Tuple<>(firstAndLastIterationStats.getFirst() + value,
-				firstAndLastIterationStats.getSecond());
+		this.firstIterationStat += value;
 	}
 
 	public void addToLastIterationStats(final double value){
-		firstAndLastIterationStats = new Tuple<>(firstAndLastIterationStats.getFirst() ,
-				firstAndLastIterationStats.getSecond() + value);
+		this.lastIterationStat += value;
 	}
 
 	public List<Id<Person>> getPersonIds(){
@@ -60,14 +54,14 @@ public class ModeSwitcherInfoCollector {
 	}
 
 	public int getNumberOfLegs(){
-		return this.numberOfLegs;
+		return this.personIds.size();
 	}
 
 	public double getFirstIterationStats(){
-		return this.firstAndLastIterationStats.getFirst();
+		return this.firstIterationStat;
 	}
 
 	public double getLastIterationStats(){
-		return this.firstAndLastIterationStats.getSecond();
+		return this.lastIterationStat;
 	}
 }
