@@ -32,6 +32,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.ikaddoura.analysis.linkDemand.LinkDemandEventHandler;
+import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
 import playground.vsp.airPollution.exposure.GridTools;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
@@ -64,6 +65,7 @@ public class CNETest {
 		// congestion pricing
 		CNEIntegration cneIntegration2 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "c");
 		cneIntegration2.setCongestionPricing(true);
+		cneIntegration2.setCongestionTollingApproach(CongestionTollingApproach.QBPV3);
 		Controler controler2 = cneIntegration2.prepareControler();
 		LinkDemandEventHandler handler2 = new LinkDemandEventHandler(controler2.getScenario().getNetwork());
 		controler2.getEvents().addHandler(handler2);
@@ -82,6 +84,7 @@ public class CNETest {
 		// congestion + noise pricing
 		CNEIntegration cneIntegration4 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "cn");
 		cneIntegration4.setCongestionPricing(true);
+		cneIntegration4.setCongestionTollingApproach(CongestionTollingApproach.QBPV3);
 		cneIntegration4.setNoisePricing(true);
 		Controler controler4 = cneIntegration4.prepareControler();
 		LinkDemandEventHandler handler4 = new LinkDemandEventHandler(controler4.getScenario().getNetwork());
