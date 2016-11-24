@@ -26,13 +26,18 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
@@ -78,21 +83,33 @@ public class LinkTravelTimeCalculator extends AbstractAnalysisModule {
 		return this.ltth.getLink2PersonTravelTime();
 	}
 
-	public class LinkTravelTimeHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
+	public class LinkTravelTimeHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		private final  Map<Id<Link>,Map<Id<Person>,Double>> link2PersonEnterTime = new HashMap<>();
 		private final Map<Id<Link>,Map<Id<Person>,List<Double>>> link2PersonTravelTime = new HashMap<>();
+		private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 		@Override
 		public void reset(int iteration) {
 			link2PersonEnterTime.clear();
 			link2PersonTravelTime.clear();
+			this.delegate.reset(iteration);
+		}
+
+		@Override
+		public void handleEvent(VehicleEntersTrafficEvent event) {
+			this.delegate.handleEvent(event);
+		}
+
+		@Override
+		public void handleEvent(VehicleLeavesTrafficEvent event) {
+			this.delegate.handleEvent(event);
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
 
 			Id<Link> linkId = event.getLinkId();
-			Id<Person> personId = Id.createPersonId(event.getVehicleId());
+			Id<Person> personId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 			double enterTime = event.getTime();
 
 			if(link2PersonEnterTime.containsKey(linkId)){
@@ -108,7 +125,7 @@ public class LinkTravelTimeCalculator extends AbstractAnalysisModule {
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
 			Id<Link> linkId = event.getLinkId();
-			Id<Person> personId = Id.createPersonId(event.getVehicleId());
+			Id<Person> personId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 			double leaveTime = event.getTime();
 
 			if(! link2PersonEnterTime.containsKey(linkId) || ! link2PersonEnterTime.get(linkId).containsKey(personId) ) return;
