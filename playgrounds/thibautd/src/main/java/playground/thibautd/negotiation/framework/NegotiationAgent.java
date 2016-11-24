@@ -36,15 +36,13 @@ public class NegotiationAgent<P extends Proposition> implements Identifiable<Per
 	private P currentBestProp = null;
 
 	public NegotiationAgent( final Id<Person> id,
-			final PropositionUtility<P> utility,
-			final AlternativesGenerator<P> alternativesGenerator,
 			final NegotiatingAgents<P> negotiatingAgents ) {
 		this.id = id;
-		this.utility = utility;
+		this.utility = negotiatingAgents.getUtility();
 		// ie cost of being alone
 		// find a way to do without nulls
 		this.currentBestUtil = utility.utility( this , null );
-		this.alternativesGenerator = alternativesGenerator;
+		this.alternativesGenerator = negotiatingAgents.getAlternativesGenerator();
 		this.negotiatingAgents = negotiatingAgents;
 	}
 

@@ -18,51 +18,16 @@
  * *********************************************************************** */
 package playground.thibautd.negotiation.framework;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import org.matsim.core.utils.misc.Counter;
-
-import java.util.function.Consumer;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.scenario.ScenarioByConfigModule;
 
 /**
  * @author thibautd
  */
-@Singleton
-public class Negotiator<P extends Proposition> {
-
-	private final NegotiatorConfigGroup configGroup;
-	private final NegotiatingAgents<P> agents;
-
-	@Inject
-	public Negotiator(
-			final NegotiatorConfigGroup configGroup,
-			final NegotiatingAgents<P> agents ) {
-		this.configGroup = configGroup;
-		this.agents = agents;
-	}
-
-	public void negotiate(
-			final Consumer<P> acceptedPropositionCallback ) {
-		double currentSuccessFraction = 1;
-
-		final Counter counter = new Counter( "negotiation round # " );
-		while ( currentSuccessFraction > configGroup.getImprovingFractionThreshold() ) {
-			counter.incCounter();
-			final NegotiationAgent<P> agent = agents.getRandomAgent();
-			final boolean success = agent.planActivity();
-
-			currentSuccessFraction = updateSuccess( currentSuccessFraction , success );
-		}
-		counter.printCounter();
-
-		for ( NegotiationAgent<P> agent : agents ) {
-			acceptedPropositionCallback.accept( agent.getBestProposition() );
-		}
-	}
-
-	private double updateSuccess( final double currentSuccessFraction, final boolean success ) {
-		final double old = (configGroup.getRollingAverageWindow() - 1) * currentSuccessFraction;
-		final double curr = success ? 1 : 0;
-		return (old + curr) / configGroup.getRollingAverageWindow();
+public class NegotiationScenarioFromFileModule extends AbstractModule {
+	@Override
+	public void install() {
+		install( new ScenarioByConfigModule() );
+		install( new NegotiationModule() );
 	}
 }
