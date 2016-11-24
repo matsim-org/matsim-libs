@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -145,16 +144,16 @@ public class SeepageTest {
 			sc.getVehicles().addVehicle(vehicle);
 		}
 		
-		Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes = new HashMap<>();
+		Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes = new HashMap<>();
 
 		EventsManager manager = EventsUtils.createEventsManager();
-		manager.addHandler(new PersonLinkTravelTimeEventHandler(personLinkTravelTimes));
+		manager.addHandler(new VehicleLinkTravelTimeEventHandler(vehicleLinkTravelTimes));
 
 		QSim qSim = QSimUtils.createDefaultQSim(sc, manager);
 		qSim.run();
 
-		Map<Id<Link>, Double> travelTime1 = personLinkTravelTimes.get(Id.createPersonId("2"));
-		Map<Id<Link>, Double> travelTime2 = personLinkTravelTimes.get(Id.createPersonId("1"));
+		Map<Id<Link>, Double> travelTime1 = vehicleLinkTravelTimes.get(Id.createVehicleId("2"));
+		Map<Id<Link>, Double> travelTime2 = vehicleLinkTravelTimes.get(Id.createVehicleId("1"));
 
 		int walkTravelTime = travelTime1.get(Id.createLinkId("2")).intValue(); 
 		int carTravelTime = travelTime2.get(Id.createLinkId("2")).intValue();
@@ -220,20 +219,20 @@ public class SeepageTest {
 			population = scenario.getPopulation();
 		}
 	}
-	private static class PersonLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
+	private static class VehicleLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
-		private final Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes;
+		private final Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes;
 
-		public PersonLinkTravelTimeEventHandler(final Map<Id<Person>, Map<Id<Link>, Double>> agentTravelTimes) {
-			this.personLinkTravelTimes = agentTravelTimes;
+		public VehicleLinkTravelTimeEventHandler(final Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes) {
+			this.vehicleLinkTravelTimes = agentTravelTimes;
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(Id.createPersonId(event.getVehicleId()));
+			Map<Id<Link>, Double> travelTimes = this.vehicleLinkTravelTimes.get(event.getVehicleId());
 			if (travelTimes == null) {
 				travelTimes = new HashMap<>();
-				this.personLinkTravelTimes.put(Id.createPersonId(event.getVehicleId()), travelTimes);
+				this.vehicleLinkTravelTimes.put(event.getVehicleId(), travelTimes);
 			}
 			travelTimes.put(event.getLinkId(), Double.valueOf(event.getTime()));
 			if ( event.getLinkId().equals( Id.createLinkId("2") ) ) {
@@ -243,7 +242,7 @@ public class SeepageTest {
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(Id.createPersonId(event.getVehicleId()));
+			Map<Id<Link>, Double> travelTimes = this.vehicleLinkTravelTimes.get(event.getVehicleId());
 			if (travelTimes != null) {
 				Double d = travelTimes.get(event.getLinkId());
 				if (d != null) {

@@ -74,13 +74,13 @@ public class DeparturesOnSameLinkSameTimeTest {
 	@Test 
 	public void test4LinkEnterTimeOfCarAndBike () {
 		
-		Id<Person> firstAgent = Id.createPersonId(1);
-		Id<Person> secondAgent = Id.createPersonId(2);
+		Id<Vehicle> firstAgent = Id.createVehicleId(1);
+		Id<Vehicle> secondAgent = Id.createVehicleId(2);
 		
 		Id<Link> departureLink = Id.createLinkId(1);
 		
-		Map<Id<Person>,Map<Id<Link>, Double>> motorbikeLinkLeaveTime = getLinkEnterTime("motorbike",3600);
-		Map<Id<Person>,Map<Id<Link>, Double>> carLinkLeaveTime = getLinkEnterTime(TransportMode.car,3600);
+		Map<Id<Vehicle>,Map<Id<Link>, Double>> motorbikeLinkLeaveTime = getLinkEnterTime("motorbike",3600);
+		Map<Id<Vehicle>,Map<Id<Link>, Double>> carLinkLeaveTime = getLinkEnterTime(TransportMode.car,3600);
 		
 		double diff_carAgents_departureLink_LeaveTimes = carLinkLeaveTime.get(secondAgent).get(departureLink) - carLinkLeaveTime.get(firstAgent).get(departureLink);
 		Assert.assertEquals("Both car agents should leave at the gap of 1 sec.", 1., Math.abs(diff_carAgents_departureLink_LeaveTimes), MatsimTestUtils.EPSILON );
@@ -95,13 +95,13 @@ public class DeparturesOnSameLinkSameTimeTest {
 		Assert.assertEquals("Both car agents should leave at the same time", 0., diff_carAgents_departureLink_LeaveTimes, MatsimTestUtils.EPSILON );
 	}
 
-	private Map<Id<Person>,Map<Id<Link>, Double>> getLinkEnterTime (String travelMode, double departureLinkCapacity){
+	private Map<Id<Vehicle>,Map<Id<Link>, Double>> getLinkEnterTime (String travelMode, double departureLinkCapacity){
 		
 		PseudoInputs inputs = new PseudoInputs(travelMode);
 		inputs.createNetwork(departureLinkCapacity);
 		inputs.createPopulation();
 
-		final Map<Id<Person>,Map<Id<Link>, Double>> linkLeaveTimes = new HashMap<>() ;
+		final Map<Id<Vehicle>,Map<Id<Link>, Double>> linkLeaveTimes = new HashMap<>() ;
 
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new LinkLeaveEventHandler() {
@@ -114,19 +114,17 @@ public class DeparturesOnSameLinkSameTimeTest {
 			@Override
 			public void handleEvent(LinkLeaveEvent event) {
 			
-				Id<Person> personId = Id.createPersonId(event.getVehicleId());
+				if(linkLeaveTimes.containsKey(event.getVehicleId())){
 				
-				if(linkLeaveTimes.containsKey(personId)){
-				
-					Map<Id<Link>, Double> times = linkLeaveTimes.get(personId);
+					Map<Id<Link>, Double> times = linkLeaveTimes.get(event.getVehicleId());
 					times.put(event.getLinkId(), event.getTime());
-					linkLeaveTimes.put(personId, times);
+					linkLeaveTimes.put(event.getVehicleId(), times);
 				
 				} else {
 					
 					Map<Id<Link>, Double> times = new HashMap<Id<Link>, Double>();
 					times.put(event.getLinkId(), event.getTime());
-					linkLeaveTimes.put(personId, times);
+					linkLeaveTimes.put(event.getVehicleId(), times);
 					
 				}
 			}

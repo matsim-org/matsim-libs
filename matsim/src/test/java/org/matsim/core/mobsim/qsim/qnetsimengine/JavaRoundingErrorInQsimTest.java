@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,11 +36,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -56,6 +51,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -91,20 +87,20 @@ public class JavaRoundingErrorInQsimTest {
 		net.createNetwork(360);
 		net.createPopulation();
 
-		Map<Id<Person>, Double> personLinkTravelTimes = new HashMap<Id<Person>, Double>();
+		Map<Id<Vehicle>, Double> vehicleLinkTravelTime = new HashMap<>();
 
 		EventsManager manager = EventsUtils.createEventsManager();
-		manager.addHandler(new PersonLinkTravelTimeEventHandler(personLinkTravelTimes));
+		manager.addHandler(new VehicleLinkTravelTimeEventHandler(vehicleLinkTravelTime));
 
 		QSim qSim = createQSim(net,manager);
 		qSim.run();
 
 		//agent 2 is departed first so will have free speed time = 1000/25 +1 = 41 sec
-		Assert.assertEquals( "Wrong travel time for on link 2 for person 2" , 41.0 , personLinkTravelTimes.get(Id.createPersonId(2))  , MatsimTestUtils.EPSILON);
+		Assert.assertEquals( "Wrong travel time for on link 2 for vehicle 2" , 41.0 , vehicleLinkTravelTime.get(Id.createVehicleId(2))  , MatsimTestUtils.EPSILON);
 
 		// agent 1 should have 1000/25 +1 + 10 = 51 but, it may be 52 sec sometimes due to rounding errors in java. Rounding errors is eliminated at the moment if accumulating flow to zero instead of one. 
-		Assert.assertEquals( "Wrong travel time for on link 2 for person 1" , 51.0 , personLinkTravelTimes.get(Id.createPersonId(1))  , MatsimTestUtils.EPSILON);
-		Logger.getLogger(JavaRoundingErrorInQsimTest.class).warn("Although the test is passing instead of failing for person 1. This is done intentionally in order to keep this in mind for future.");
+		Assert.assertEquals( "Wrong travel time for on link 2 for vehicle 1" , 51.0 , vehicleLinkTravelTime.get(Id.createVehicleId(1))  , MatsimTestUtils.EPSILON);
+		Logger.getLogger(JavaRoundingErrorInQsimTest.class).warn("Although the test is passing instead of failing for vehicle 1. This is done intentionally in order to keep this in mind for future.");
 	}
 
 	private QSim createQSim (PseudoInputs net, EventsManager manager){
@@ -125,31 +121,26 @@ public class JavaRoundingErrorInQsimTest {
 		return qSim;
 	}
 
-	private static class PersonLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
+	private static class VehicleLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
-		private final Map<Id<Person>, Double> personTravelTime;
+		private final Map<Id<Vehicle>, Double> vehicleTravelTime;
 
-		public PersonLinkTravelTimeEventHandler(Map<Id<Person>, Double> agentTravelTime) {
-			this.personTravelTime = agentTravelTime;
+		public VehicleLinkTravelTimeEventHandler(Map<Id<Vehicle>, Double> vehicleLinkTravelTime) {
+			this.vehicleTravelTime = vehicleLinkTravelTime;
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-
-			Id<Person> personId = Id.createPersonId(event.getVehicleId());
-			System.out.println(event.toString());
 			if( event.getLinkId().equals(Id.createLinkId(2))){
-				personTravelTime.put(personId, - event.getTime());	
+				vehicleTravelTime.put(event.getVehicleId(), - event.getTime());
 			}
 
 		}
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			Id<Person> personId = Id.createPersonId(event.getVehicleId());
-			System.out.println(event.toString());
 			if( event.getLinkId().equals(Id.createLinkId(2)) ){
-				personTravelTime.put(personId, personTravelTime.get(personId) + event.getTime());	
+				vehicleTravelTime.put(event.getVehicleId(), vehicleTravelTime.get(event.getVehicleId()) + event.getTime());
 			}
 		}
 
