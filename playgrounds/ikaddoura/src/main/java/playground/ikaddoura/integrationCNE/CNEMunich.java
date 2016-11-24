@@ -30,6 +30,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -54,33 +55,76 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.joint.JointCalibrationControler;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
+import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
 import playground.vsp.airPollution.exposure.GridTools;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
 public class CNEMunich {
+	
+	private static final Logger log = Logger.getLogger(CNEMunich.class);
 
 	private static final Integer noOfXCells = 160;
 	private static final Integer noOfYCells = 120;
-	static final double xMin = 4452550.25;
-	static final double xMax = 4479483.33;
-	static final double yMin = 5324955.00;
-	static final double yMax = 5345696.81;
+	private static final double xMin = 4452550.25;
+	private static final double xMax = 4479483.33;
+	private static final double yMin = 5324955.00;
+	private static final double yMax = 5345696.81;
 	private static final Double timeBinSize = 3600.;
 	private static final int noOfTimeBins = 30;
 	
+	private static String outputDirectory;
+	private static String configFile;
+
+	private static boolean congestionPricing;
+	private static boolean noisePricing;
+	private static boolean airPollutionPricing;
+	
+	private static double sigma;
+	
+	private static CongestionTollingApproach congestionTollingApproach;
+	private static double kP;
+	
 	public static void main(String[] args) throws IOException {
-		
-		String configFile;
-		
+				
 		if (args.length > 0) {
 								
-			// TODO
-			throw new RuntimeException("Not yet implemented. Aborting...");
+			outputDirectory = args[0];
+			log.info("Output directory: " + outputDirectory);
+			
+			configFile = args[1];
+			log.info("Config file: " + configFile);
+			
+			congestionPricing = Boolean.parseBoolean(args[2]);
+			log.info("Congestion Pricing: " + congestionPricing);
+			
+			noisePricing = Boolean.parseBoolean(args[3]);
+			log.info("Noise Pricing: " + noisePricing);
+			
+			airPollutionPricing = Boolean.parseBoolean(args[4]);
+			log.info("Air poullution Pricing: " + airPollutionPricing);
+			
+			sigma = Double.parseDouble(args[5]);
+			log.info("Sigma: " + sigma);
+			
+			String congestionTollingApproachString = args[6];
+			
+			if (congestionTollingApproachString.equals(CongestionTollingApproach.QBPV3.toString())) {
+				congestionTollingApproach = CongestionTollingApproach.QBPV3;
+			} else if (congestionTollingApproachString.equals(CongestionTollingApproach.DecongestionPID.toString())) {
+				congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
+			} else {
+				throw new RuntimeException("Unknown congestion pricing approach. Aborting...");
+			}
+			log.info("Congestion Tolling Approach: " + congestionTollingApproach);
+			
+			kP = Double.parseDouble(args[7]);
+			log.info("kP: " + kP);
 			
 		} else {
 			
@@ -90,14 +134,27 @@ public class CNEMunich {
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 		Controler controler = new Controler(scenario);
 
+		if (outputDirectory != null) {
+			controler.getScenario().getConfig().controler().setOutputDirectory(outputDirectory);
+		}
+		
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
 
-		CNEIntegration cneIntegration = new CNEIntegration(controler, gt, rgt);
-		controler = cneIntegration.prepareControler();
-
+		// CNE Integration
+		
+		CNEIntegration cne = new CNEIntegration(controler, gt, rgt);
+		cne.setCongestionPricing(congestionPricing);
+		cne.setNoisePricing(noisePricing);
+		cne.setAirPollutionPricing(airPollutionPricing);
+		cne.setSigma(sigma);
+		cne.setCongestionTollingApproach(congestionTollingApproach);
+		cne.setkP(kP);
+		controler = cne.prepareControler();
+		
 		// scenario-specific settings
 		
+		// TODO: set files in config
 		EmissionsConfigGroup ecg = (EmissionsConfigGroup) controler.getConfig().getModule("emissions");
 		ecg.setAverageColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_ColdStart_vehcat_2005average.txt");
 		ecg.setAverageWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_HOT_vehcat_2005average.txt");
@@ -136,6 +193,8 @@ public class CNEMunich {
 		// noise
 		
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) controler.getScenario().getConfig().getModule("noise");
+
+		noiseParameters.setTimeBinSizeNoiseComputation(timeBinSize);
 
 		noiseParameters.setReceiverPointGap(100.);
 		
