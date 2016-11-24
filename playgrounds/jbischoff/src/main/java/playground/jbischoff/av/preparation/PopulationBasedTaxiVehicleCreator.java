@@ -38,7 +38,9 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -74,10 +76,11 @@ public class PopulationBasedTaxiVehicleCreator
 	private Random random = MatsimRandom.getRandom();
     private List<Vehicle> vehicles = new ArrayList<>();
     private final WeightedRandomSelection<String> wrs;
+    CoordinateTransformation ct; 
 
 	
 	public static void main(String[] args) {
-		for (int i = 1100; i<=11000 ; i=i+1100 ){
+		for (int i = 4500; i<=5400 ; i=i+100 ){
 			PopulationBasedTaxiVehicleCreator tvc = new PopulationBasedTaxiVehicleCreator();
 			System.out.println(i);
 			tvc.run(i);
@@ -91,6 +94,7 @@ public class PopulationBasedTaxiVehicleCreator
 		this.geometry = JbUtils.readShapeFileAndExtractGeometry(shapeFile, "SCHLUESSEL");	
 //		this.geometry = JbUtils.readShapeFileAndExtractGeometry(shapeFile, "ID"); //wolfsburg	
 		this.wrs = new WeightedRandomSelection<>();
+		this.ct = TransformationFactory.getCoordinateTransformation("EPSG:25833", TransformationFactory.DHDN_GK4);
         readPopulationData();
 	}
 	
@@ -118,7 +122,7 @@ public class PopulationBasedTaxiVehicleCreator
 		for (int i = 0 ; i< amount; i++){
 			Link link ;
 		Point p = TaxiDemandWriter.getRandomPointInFeature(random, geometry.get(wrs.select()));
-		link = NetworkUtils.getNearestLinkExactly(((Network) scenario.getNetwork()),MGC.point2Coord(p));
+		link = NetworkUtils.getNearestLinkExactly(((Network) scenario.getNetwork()),ct.transform( MGC.point2Coord(p)));
 		
         Vehicle v = new VehicleImpl(Id.create("rt"+i, Vehicle.class), link, 5, Math.round(1), Math.round(36*3600));
         vehicles.add(v);

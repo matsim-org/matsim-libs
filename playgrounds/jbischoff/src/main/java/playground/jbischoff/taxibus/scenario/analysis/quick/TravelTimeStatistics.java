@@ -41,7 +41,7 @@ public class TravelTimeStatistics   {
 
 	public static void main(String[] args) {
 
-		String run = "run101";
+		String run = "run103.100";
 //		String folder = "D:/runs-svn/vw_rufbus/" + run + "/";
 		String folder = "D:/runs-svn/vw_rufbus/" + run + "/";
 		String inputFile = folder + run + ".output_events.xml.gz";
@@ -91,7 +91,7 @@ public class TravelTimeStatistics   {
 		events.addHandler(carTT);
 		events.addHandler(ptTT);
 		events.addHandler(tbTT);
-		events.addHandler(allTT);
+//		events.addHandler(allTT);
 //		events.addHandler(analyser);
 		
 		events.addHandler(a);

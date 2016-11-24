@@ -40,9 +40,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import com.google.inject.Binder;
 
-import playground.jbischoff.analysis.TripHistogramModule;
 import playground.jbischoff.pt.VariableAccessConfigGroup;
 import playground.jbischoff.pt.VariableAccessModeConfigGroup;
 import playground.jbischoff.pt.VariableAccessTransitRouterModule;
@@ -54,23 +52,35 @@ import playground.jbischoff.pt.VariableAccessTransitRouterModule;
 /**
  *
  */
-public class RunRWPTComboExample {
+public class RunRWPTComboFleetsizeDetermination {
 public static void main(String[] args) {
 	
-		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/10pct/config.xml", new TaxiConfigGroup());
+		if (args.length!=3){
+			throw new RuntimeException("Wrong arguments");
+		}
+		String configfile = args[0];
+		String RUNID = args[1];
+		String taxisFile = args[2];
+	
+		Config config = ConfigUtils.loadConfig(configfile, new TaxiConfigGroup());
+		config.controler().setRunId(RUNID);
+		String outPutDir = config.controler().getOutputDirectory()+"/"+RUNID+"/"; 
+		config.controler().setOutputDirectory(outPutDir);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		
+		TaxiConfigGroup tcg = (TaxiConfigGroup) config.getModule("taxi");
+		tcg.setTaxisFile(taxisFile);
+		
 		VariableAccessModeConfigGroup walk = new VariableAccessModeConfigGroup();
+		
+		
 		walk.setDistance(1000);
 		walk.setTeleported(true);
 		walk.setMode("walk");
 		
 		config.global().setNumberOfThreads(4);
 
-//		VariableAccessModeConfigGroup bike = new VariableAccessModeConfigGroup();
-//		bike.setDistance(1100);
-//		bike.setTeleported(true);
-//		bike.setMode("bike");
-		
+	
 		
 		VariableAccessModeConfigGroup taxi = new VariableAccessModeConfigGroup();
 		taxi.setDistance(200000);
@@ -78,7 +88,6 @@ public static void main(String[] args) {
 		taxi.setMode("taxi");
 		VariableAccessConfigGroup vacfg = new VariableAccessConfigGroup();
 		vacfg.setAccessModeGroup(taxi);
-//		vacfg.setAccessModeGroup(bike);
 		vacfg.setAccessModeGroup(walk);
 		
 		config.addModule(vacfg);
@@ -95,14 +104,7 @@ public static void main(String[] args) {
        Controler controler = new Controler(scenario);
        controler.addOverridingModule(new TaxiModule(taxiData));
        double expAveragingAlpha = 0.05;//from the AV flow paper 
-       
-       controler.addOverridingModule(new AbstractModule() {
-		@Override
-		public void install() {
-			addEventHandlerBinding().to(TaxiFareHandler.class).asEagerSingleton();	
-		}
-	});
-       
+
        controler.addOverridingModule(
                VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
        controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
