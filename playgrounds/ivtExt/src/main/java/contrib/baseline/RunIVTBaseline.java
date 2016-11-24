@@ -2,16 +2,12 @@ package contrib.baseline;
 
 import contrib.baseline.counts.*;
 import com.google.inject.name.Names;
-import contrib.baseline.lib.F2LConfigGroup;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.*;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
@@ -37,12 +33,10 @@ public class RunIVTBaseline {
 		OutputDirectoryLogging.catchLogEntries();
 
 		// It is suggested to use the config created by playground/boescpa/baseline/ConfigCreator.java.
-		final Config config = ConfigUtils.loadConfig(configFile, new BlackListedTimeAllocationMutatorConfigGroup(), new F2LConfigGroup());
+		final Config config = ConfigUtils.loadConfig(configFile, new BlackListedTimeAllocationMutatorConfigGroup());
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		final Controler controler = new Controler(scenario);
-
-		connectFacilitiesWithNetwork(controler);
 
 		// We use a time allocation mutator that allows to exclude certain activities.
 		controler.addOverridingModule(new BlackListedTimeAllocationMutatorStrategyModule());
@@ -76,12 +70,5 @@ public class RunIVTBaseline {
 		});
 
 		controler.run();
-    }
-
-    public static void connectFacilitiesWithNetwork(MatsimServices controler) {
-        ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
-        Network network = controler.getScenario().getNetwork();
-        WorldConnectLocations wcl = new WorldConnectLocations(controler.getConfig());
-        wcl.connectFacilitiesWithLinks(facilities, network);
     }
 }

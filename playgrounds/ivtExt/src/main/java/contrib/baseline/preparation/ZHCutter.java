@@ -33,32 +33,22 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.strategies.ReRoute;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.NetworkRoutingModule;
-import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
-import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -68,7 +58,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.*;
-import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.households.*;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -76,10 +65,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.*;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-
-import contrib.baseline.lib.F2LCreator;
+import contrib.baseline.lib.F2LConnector;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -141,7 +127,7 @@ public class ZHCutter {
 		Network filteredNetwork = cutter.cutNetwork(filteredSchedule, filteredOnlyCarNetwork);
 		cutter.resetPopulation(filteredPopulation);
 		// write new files
-		F2LCreator.createF2L(filteredFacilities, filteredOnlyCarNetwork, cutterConfig.getPathToTargetFolder() + File.separator + FACILITIES2LINKS);
+		F2LConnector.connectFacilitiesToLinks(filteredFacilities, filteredOnlyCarNetwork, null);
 		writeNewFiles(cutterConfig.getPathToTargetFolder() + File.separator, cutter.scenario,
 				filteredPopulation, filteredHouseholds, filteredFacilities, filteredSchedule, filteredVehicles,
 				filteredNetwork, cutter.createConfig(cutterConfig));
@@ -368,13 +354,7 @@ public class ZHCutter {
 	@SuppressWarnings("deprecation")
 	public void findInitialRoutes() {
 		Counter counter = new Counter(" initial routing # ");
-		
-		Config config = ConfigUtils.createConfig();
-		config.setParam("f2l", "inputF2LFile", pathToInputScenarioFolder + FACILITIES2LINKS);
-		
-        WorldConnectLocations wcl = new WorldConnectLocations(config);
-        wcl.connectFacilitiesWithLinks(scenario.getActivityFacilities(), scenario.getNetwork());
-		
+
 		TravelTime travelTime = new FreeSpeedTravelTime();
 		TravelDisutility travelDisutility = new OnlyTimeDependentTravelDisutility(travelTime);
 		

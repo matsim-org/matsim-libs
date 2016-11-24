@@ -28,22 +28,14 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import org.matsim.facilities.*;
 
 /**
- * Links facilities to links...
+ * Connects facilities to links...
  *
  * @author boescpa
  */
-public class F2LCreator {
+public class F2LConnector {
 
 	public static void main(String[] args) {
 		if (args.length < 2 || args.length > 2) {
@@ -57,54 +49,37 @@ public class F2LCreator {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
 
 		// Link facilities to network:
-		createF2L(scenario, args[1]);
+		connectFacilitiesToLinks(scenario, args[1]);
 	}
 
 	/**
-	 * Links facilities to a network (the network should only contain the car-links).
+	 * Connects facilities to a network (the network should only contain the car-links).
 	 *
 	 * @param scenario	A MATSim scenario that at least contains ActivityFacilities and Network.
-	 * @param path2File	Path (incl. filename) to where the f2l-file will be written.
+	 * @param path2File	Path (incl. filename) to where the connected facilities file will be written. If null, no file will be written.
 	 */
-	public static void createF2L(Scenario scenario, String path2File) {
-		createF2L(scenario.getActivityFacilities(), scenario.getNetwork(), path2File);
+	public static void connectFacilitiesToLinks(Scenario scenario, String path2File) {
+		connectFacilitiesToLinks(scenario.getActivityFacilities(), scenario.getNetwork(), path2File);
 	}
 
 	/**
-	 * Links facilities to a network (the network should only contain the car-links).
+	 * Connects facilities to a network (the network should only contain the car-links).
 	 *
 	 * @param facilities Facilities which will be linked.
 	 * @param network	To which facilities will be linked.
-	 * @param path2File	Path (incl. filename) to where the f2l-file will be written.
+	 * @param path2File	Path (incl. filename) to where the connected facilities will be written. If null, no file will be written.
 	 */
-	public static void createF2L(ActivityFacilities facilities, Network network, String path2File) {
-		writeF2L(getF2L(facilities, network), path2File);
-	}
-
-	private static void writeF2L(Map<String, String> f2l, String path2File) {
-		BufferedWriter bw = null;
-		try {
-			bw = new BufferedWriter(new FileWriter(path2File));
-			bw.write("fid\tlid\n");
-			for (String fid : f2l.keySet()) {
-				bw.write(fid + "\t" + f2l.get(fid) + "\n");
-			}
-		} catch (IOException e) {
-			throw new RuntimeException("Error while writing given outputF2LFile.", e);
-		} finally {
-			if (bw != null) {
-				try { bw.close(); }
-				catch (IOException e) { System.out.print("Could not close stream."); }
-			}
+	public static void connectFacilitiesToLinks(ActivityFacilities facilities, Network network, String path2File) {
+		linkF2L(facilities, network);
+		if (path2File != null) {
+			new FacilitiesWriter(facilities).write(path2File);
 		}
 	}
 
-	protected static Map<String, String> getF2L(ActivityFacilities facilities, Network network) {
-		Map<String, String> f2l = new HashMap<>();
+	private static void linkF2L(ActivityFacilities facilities, Network network) {
 		for (ActivityFacility facility : facilities.getFacilities().values()) {
 			Link nearestLink = NetworkUtils.getNearestRightEntryLink(network, facility.getCoord());
-			f2l.put(facility.getId().toString(), nearestLink.getId().toString());
+			((ActivityFacilityImpl)facility).setLinkId(nearestLink.getId());
 		}
-		return f2l;
 	}
 }

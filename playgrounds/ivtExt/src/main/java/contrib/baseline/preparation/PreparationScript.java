@@ -13,7 +13,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import contrib.baseline.preparation.secondaryFacilityCreation.CreationOfCrossBorderFacilities;
 import contrib.baseline.lib.FacilityUtils;
-import contrib.baseline.lib.F2LCreator;
+import contrib.baseline.lib.F2LConnector;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -91,7 +91,7 @@ public class PreparationScript {
             if (saveOriginalFiles() && testScenario(false)) {
                 mergeFacilities();
                 addRemainingLocationChoiceActivities();
-                createF2L();
+                connectF2L();
                 repairActivityChains();
                 setInitialFacilitiesForAllActivities();
                 createPrefsForPopulation();
@@ -245,14 +245,14 @@ public class PreparationScript {
         log.info("In file " + pathFile + " replaced " + stringToReplace + " by " + replacingString + " for " + numberOfReplacements);
     }
 
-    private static void createF2L() {
-        log.info(" ------- Create F2L ------- ");
+    private static void connectF2L() {
+        log.info(" ------- Connect Facilities to network ------- ");
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         MatsimFacilitiesReader facilitiesReader = new MatsimFacilitiesReader(scenario);
         facilitiesReader.readFile(pathFacilities);
         MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
         networkReader.readFile(pathResources + NETWORK_ONLYCAR);
-        F2LCreator.createF2L(scenario, pathScenario + FACILITIES2LINKS);
+        F2LConnector.connectFacilitiesToLinks(scenario, pathFacilities);
     }
 
     private static void addRemainingLocationChoiceActivities() {
