@@ -73,15 +73,15 @@ public class ModeSwitchersTripTime {
 
 		for(String runNr : runCases){
 			ModeSwitchersTripTime mstt = new ModeSwitchersTripTime();
-			mstt.run(dir+runNr, 1000, 1500);
-			mstt.writeModeSwitcherTripTimes(dir+runNr);
+			mstt.processEventsFiles(dir+runNr, 1000, 1500);
+			mstt.writeResults(dir+runNr+"/analysis/");
 		}
 	}
 
-	public void run (final String runCase, final int firstIteration, final int lastIteration){
+	public void processEventsFiles (final String eventsDir, final int firstIteration, final int lastIteration){
 		// data from event files
-		String eventsFileFirstIt = runCase+"/ITERS/it."+firstIteration+"/"+firstIteration+".events.xml.gz";
-		String eventsFileLastIt = runCase+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
+		String eventsFileFirstIt = eventsDir+"/ITERS/it."+firstIteration+"/"+firstIteration+".events.xml.gz";
+		String eventsFileLastIt = eventsDir+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
 
 		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelTimesFirstIt = getPerson2mode2TripTimes(eventsFileFirstIt);
 		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelTimesLastIt = getPerson2mode2TripTimes(eventsFileLastIt);
@@ -160,8 +160,8 @@ public class ModeSwitchersTripTime {
 		return person2ModeTravelTimes;
 	}
 
-	private void writeModeSwitcherTripTimes(final String runCase){
-		String outFile = runCase+"/analysis/modeSwitchersTripTimes.txt";
+	public void writeResults(final String outputFolder){
+		String outFile = outputFolder+"/modeSwitchersTripTimes.txt";
 		BufferedWriter writer =  IOUtils.getBufferedWriter(outFile);
 		try {
 			writer.write("firstMode \t lastMode \t numberOfLegs \t totalTripTimesForFirstIterationInHr \t totalTripTimesForLastIterationInHr \n");

@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Person;
  * @author amit
  */
 
-public class ModeSwitcherInfoCollector {
+ class ModeSwitcherInfoCollector {
 
 	private static final Logger LOG = Logger.getLogger(ModeSwitcherInfoCollector.class);
 
@@ -37,31 +37,31 @@ public class ModeSwitcherInfoCollector {
 	private double firstIterationStat = 0.;
 	private double lastIterationStat = 0.;
 
-	public void addPersonToList(final Id<Person> personId) {
+	void addPersonToList(final Id<Person> personId) {
 		this.personIds.add(personId);
 	}
 
-	public void addToFirstIterationStats(final double value){
+	void addToFirstIterationStats(final double value){
 		this.firstIterationStat += value;
 	}
 
-	public void addToLastIterationStats(final double value){
+	void addToLastIterationStats(final double value){
 		this.lastIterationStat += value;
 	}
 
-	public List<Id<Person>> getPersonIds(){
+	List<Id<Person>> getPersonIds(){
 		return this.personIds;
 	}
 
-	public int getNumberOfLegs(){
+	int getNumberOfLegs(){
 		return this.personIds.size();
 	}
 
-	public double getFirstIterationStats(){
+	double getFirstIterationStats(){
 		return this.firstIterationStat;
 	}
 
-	public double getLastIterationStats(){
+	double getLastIterationStats(){
 		return this.lastIterationStat;
 	}
 }
