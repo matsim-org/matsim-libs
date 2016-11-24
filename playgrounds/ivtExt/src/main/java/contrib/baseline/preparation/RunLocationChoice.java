@@ -22,8 +22,6 @@ import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 
 import java.io.File;
 
-import static contrib.baseline.RunIVTBaseline.connectFacilitiesWithNetwork;
-
 /**
  * Basic main for the ivt baseline scenarios.
  *
@@ -63,8 +61,6 @@ public class RunLocationChoice {
 
         controler.getConfig().controler().setOverwriteFileSetting(
                 OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-
-        connectFacilitiesWithNetwork(controler);
 
         initializeLocationChoice(controler);
 
