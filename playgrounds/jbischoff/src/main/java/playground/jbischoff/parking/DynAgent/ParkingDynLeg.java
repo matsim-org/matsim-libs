@@ -30,9 +30,9 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
-import playground.jbischoff.parking.choice.ParkingChoiceLogic;
 import playground.jbischoff.parking.events.StartParkingSearchEvent;
 import playground.jbischoff.parking.manager.ParkingSearchManager;
+import playground.jbischoff.parking.search.ParkingSearchLogic;
 
 public class ParkingDynLeg implements DriverDynLeg {
 	private final NetworkRoute route;
@@ -43,12 +43,12 @@ public class ParkingDynLeg implements DriverDynLeg {
 	private boolean parkingMode = false;
 	ParkingSearchManager parkingManager;
 	Id<Vehicle> vehicleId;
-	private ParkingChoiceLogic logic;
+	private ParkingSearchLogic logic;
 	private MobsimTimer timer;
 	private EventsManager events;
 	private boolean hasFoundParking = false;
 
-	public ParkingDynLeg(String mode, NetworkRoute route, ParkingChoiceLogic logic, ParkingSearchManager parkingManager,
+	public ParkingDynLeg(String mode, NetworkRoute route, ParkingSearchLogic logic, ParkingSearchManager parkingManager,
 			Id<Vehicle> vehicleId, MobsimTimer timer, EventsManager events) {
 		this.mode = mode;
 		this.route = route;

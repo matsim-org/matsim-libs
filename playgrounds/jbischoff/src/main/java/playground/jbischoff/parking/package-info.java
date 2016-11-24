@@ -13,7 +13,7 @@
  * </ul>
  * 
  * 
- * @author Joschka
+ * @author jfbischoff, nagel
  *
  */
 package playground.jbischoff.parking;

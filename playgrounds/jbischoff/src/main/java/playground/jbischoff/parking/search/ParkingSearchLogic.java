@@ -17,17 +17,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.jbischoff.parking.evaluation;
+package playground.jbischoff.parking.search;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
+
 /**
  * @author  jbischoff
  *
  */
-/**
- *
- */
-public class ExtractRelevantNetwork {
-
+public interface ParkingSearchLogic {
+	/**
+	 * currentLinkId link last visited
+	 * @param vehicleId vehicleId
+	 */
+	Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId);
+	
+	/**
+	 * fixed route search strategies (i.e. find the next carsharing parking lot) might require a reset once search is completed
+	 */
+	void reset();
 }

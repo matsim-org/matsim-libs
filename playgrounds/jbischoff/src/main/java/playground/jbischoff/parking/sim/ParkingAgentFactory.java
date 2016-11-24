@@ -39,12 +39,12 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import playground.jbischoff.parking.DynAgent.agentLogic.ParkingAgentLogic;
-import playground.jbischoff.parking.choice.ParkingChoiceLogic;
-import playground.jbischoff.parking.choice.RandomParkingChoiceLogic;
 import playground.jbischoff.parking.manager.ParkingSearchManager;
 import playground.jbischoff.parking.manager.WalkLegFactory;
 import playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
 import playground.jbischoff.parking.routing.ParkingRouter;
+import playground.jbischoff.parking.search.ParkingSearchLogic;
+import playground.jbischoff.parking.search.RandomParkingSearchLogic;
 
 /**
  * @author jbischoff
@@ -82,7 +82,7 @@ public class ParkingAgentFactory implements AgentFactory {
 
 	@Override
 	public MobsimAgent createMobsimAgentFromPerson(Person p) {
-		ParkingChoiceLogic parkingLogic  = new RandomParkingChoiceLogic(network);
+		ParkingSearchLogic parkingLogic  = new RandomParkingSearchLogic(network);
 		ParkingAgentLogic agentLogic = new ParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkLegFactory,
 				parkingRouter, events, parkingLogic,  ((QSim) qsim).getSimTimer(),teleportationLogic );
 		Id<Link> startLinkId = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getLinkId();

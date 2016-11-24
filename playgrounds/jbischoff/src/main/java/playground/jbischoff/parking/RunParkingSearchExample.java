@@ -38,7 +38,7 @@ import playground.jbischoff.parking.sim.SetupParking;
  *
  */
 
-public class RunParkingExample {
+public class RunParkingSearchExample {
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/example/config.xml");

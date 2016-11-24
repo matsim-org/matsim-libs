@@ -32,9 +32,9 @@ import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
 
-import playground.jbischoff.parking.choice.ParkingChoiceLogic;
-import playground.jbischoff.parking.choice.RandomParkingChoiceLogic;
 import playground.jbischoff.parking.manager.ParkingSearchManager;
+import playground.jbischoff.parking.search.ParkingSearchLogic;
+import playground.jbischoff.parking.search.RandomParkingSearchLogic;
 
 /**
  * teleports vehicle to  a location near the agent, if vehicle is more than  a certain threshold in metres away
@@ -50,7 +50,7 @@ public class VehicleTeleportationToNearbyParking implements VehicleTeleportation
 	@Inject
 	ParkingSearchManager manager;
 	
-	ParkingChoiceLogic parkingLogic;  
+	ParkingSearchLogic parkingLogic;  
 	Network network;
 	
 	@Inject
@@ -60,7 +60,7 @@ public class VehicleTeleportationToNearbyParking implements VehicleTeleportation
 	public VehicleTeleportationToNearbyParking(Config config, Network network) {
 		// TODO Auto-generated constructor stub
 		this.beelineDistanceFactor = config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk).getBeelineDistanceFactor();
-		this.parkingLogic = new RandomParkingChoiceLogic(network);
+		this.parkingLogic = new RandomParkingSearchLogic(network);
 		this.network = network;
 	}
 

@@ -17,25 +17,56 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.parking.choice;
+/**
+ * 
+ */
+package playground.jbischoff.parking.search;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * @author  jbischoff
+ * @author jbischoff
  *
  */
-public interface ParkingChoiceLogic {
+
+public class RandomParkingSearchLogic implements ParkingSearchLogic {
+
+	private Network network;
+	private final Random random = MatsimRandom.getLocalInstance();
+
 	/**
-	 * currentLinkId link last visited
-	 * @param vehicleId vehicleId
+	 * {@link Network} the network
+	 * 
+	 * @param parkingManager
 	 */
-	Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId);
-	
-	/**
-	 * fixed route search strategies (i.e. find the next carsharing parking lot) might require a reset once search is completed
+	public RandomParkingSearchLogic(Network network) {
+		this.network = network;
+	}
+
+	@Override
+	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId) {
+		Link currentLink = network.getLinks().get(currentLinkId);
+		List<Id<Link>> keys = new ArrayList<>(currentLink.getToNode().getOutLinks().keySet());
+		Id<Link> randomKey = keys.get(random.nextInt(keys.size()));
+		return randomKey;
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see playground.jbischoff.parking.choice.ParkingChoiceLogic#reset()
 	 */
-	void reset();
+	@Override
+	public void reset() {
+	}
+
 }

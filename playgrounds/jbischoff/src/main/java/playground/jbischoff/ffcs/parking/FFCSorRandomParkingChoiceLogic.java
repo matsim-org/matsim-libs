@@ -36,15 +36,15 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.vehicles.Vehicle;
 
 import playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager;
-import playground.jbischoff.parking.choice.ParkingChoiceLogic;
 import playground.jbischoff.parking.routing.ParkingRouter;
+import playground.jbischoff.parking.search.ParkingSearchLogic;
 
 /**
  * @author jbischoff
  *
  */
 
-public class FFCSorRandomParkingChoiceLogic implements ParkingChoiceLogic {
+public class FFCSorRandomParkingChoiceLogic implements ParkingSearchLogic {
 
 	private Network network;
 	private final Random random = MatsimRandom.getLocalInstance();
