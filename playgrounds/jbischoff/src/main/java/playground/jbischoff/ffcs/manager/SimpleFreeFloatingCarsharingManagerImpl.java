@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.collections.Tuple;
@@ -42,7 +43,6 @@ import com.google.inject.Inject;
 
 import playground.jbischoff.ffcs.FFCSConfigGroup;
 import playground.jbischoff.ffcs.data.CarsharingData;
-import playground.jbischoff.parking.manager.ParkingSearchManager;
 
 /**
  * @author  jbischoff

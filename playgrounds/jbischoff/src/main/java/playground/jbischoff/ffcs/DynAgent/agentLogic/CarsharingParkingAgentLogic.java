@@ -32,6 +32,14 @@ import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynLeg;
 import org.matsim.contrib.dynagent.StaticDynActivity;
 import org.matsim.contrib.dynagent.StaticPassengerDynLeg;
+import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
+import org.matsim.contrib.parking.parkingsearch.DynAgent.agentLogic.ParkingAgentLogic;
+import org.matsim.contrib.parking.parkingsearch.DynAgent.agentLogic.ParkingAgentLogic.LastParkActionState;
+import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
+import org.matsim.contrib.parking.parkingsearch.manager.WalkLegFactory;
+import org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
+import org.matsim.contrib.parking.parkingsearch.routing.ParkingRouter;
+import org.matsim.contrib.parking.parkingsearch.search.ParkingSearchLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.utils.collections.Tuple;
@@ -42,14 +50,6 @@ import org.matsim.vehicles.Vehicle;
 import playground.jbischoff.ffcs.FFCSConfigGroup;
 import playground.jbischoff.ffcs.FFCSUtils;
 import playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager;
-import playground.jbischoff.parking.ParkingUtils;
-import playground.jbischoff.parking.DynAgent.agentLogic.ParkingAgentLogic;
-import playground.jbischoff.parking.DynAgent.agentLogic.ParkingAgentLogic.LastParkActionState;
-import playground.jbischoff.parking.manager.ParkingSearchManager;
-import playground.jbischoff.parking.manager.WalkLegFactory;
-import playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
-import playground.jbischoff.parking.routing.ParkingRouter;
-import playground.jbischoff.parking.search.ParkingSearchLogic;
 
 /**
  * @author  jbischoff

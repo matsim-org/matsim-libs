@@ -1,9 +1,8 @@
-package playground.jbischoff.ffcs.sim;
+package org.matsim.contrib.parking.parkingsearch.sim;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.matsim.contrib.parking.parkingsearch.sim.ParkingPopulationAgentSource;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -13,6 +12,7 @@ import org.matsim.core.mobsim.qsim.ActivityEnginePlugin;
 import org.matsim.core.mobsim.qsim.QSimProvider;
 import org.matsim.core.mobsim.qsim.TeleportationPlugin;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
 import org.matsim.core.mobsim.qsim.pt.TransitEnginePlugin;
@@ -23,7 +23,7 @@ import com.google.inject.Module;
 import com.google.inject.Provides;
 
 
-class FreefloatingParkingSearchQSimModule extends com.google.inject.AbstractModule {
+class ParkingSearchQSimModule extends com.google.inject.AbstractModule {
 	@Override 
 	protected void configure() {
 		bind(Mobsim.class).toProvider(QSimProvider.class);
@@ -57,10 +57,10 @@ class FreefloatingParkingSearchQSimModule extends com.google.inject.AbstractModu
 					if (getConfig().transit().isUseTransit()) {
 						throw new RuntimeException("parking search together with transit is not implemented (should not be difficult)") ;
 					} else {
-						bind(AgentFactory.class).to(FreefloatingParkingAgentFactory.class).asEagerSingleton(); // (**)
+						bind(AgentFactory.class).to(ParkingAgentFactory.class).asEagerSingleton(); // (**)
 					}
-					bind(FFCSVehicleAgentSource.class).asEagerSingleton();
-					bind(FreefloatingParkingPopulationAgentSource.class).asEagerSingleton();
+					bind(ParkingPopulationAgentSource.class).asEagerSingleton();
+
 				}
 			});
 			return result;
@@ -68,8 +68,8 @@ class FreefloatingParkingSearchQSimModule extends com.google.inject.AbstractModu
 		@Override 
 		public Collection<Class<? extends AgentSource>> agentSources() {
 			Collection<Class<? extends AgentSource>> result = new ArrayList<>();
-			result.add(FreefloatingParkingPopulationAgentSource.class);
-			result.add(FFCSVehicleAgentSource.class);
+			
+			result.add(ParkingPopulationAgentSource.class);
 			return result;
 		}
 	}

@@ -17,37 +17,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.jbischoff.csberlin.scenario;
+package org.matsim.contrib.parking.parkingsearch.routing;
 
-import org.matsim.contrib.parking.parkingsearch.sim.SetupParking;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * @author  jbischoff
  *
  */
-/**
- *
- */
-public class RunCSBerlinBasecaseWithParking {
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/data/scenario/configBCParking_increase_poster.xml");
-		String runId = "bc09_park_poster";
-		config.controler().setOutputDirectory("D:/runs-svn/bmw_carsharing/basecase/"+runId);
-		config.controler().setRunId(runId);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		
-		Controler controler = new Controler(config);
-		SetupParking.installParkingModules(controler);
-		
-		controler.run();
-		
-		
-	}
+public interface ParkingRouter {
+	/**
+	 * *
+	 * @param intendedRoute: may be a network route (car trips) or may be generic (carsharing etc.) 
+	 * @param departureTime
+	 * @param startLinkId
+	 * @return
+	 */
+
+	NetworkRoute getRouteFromParkingToDestination(Id<Link> destinationLinkId, double departureTime, Id<Link> startLinkId);
+	
 }

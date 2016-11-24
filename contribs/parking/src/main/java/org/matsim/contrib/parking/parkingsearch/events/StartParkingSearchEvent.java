@@ -20,34 +20,62 @@
 /**
  * 
  */
-package playground.jbischoff.csberlin.scenario;
+package org.matsim.contrib.parking.parkingsearch.events;
 
-import org.matsim.contrib.parking.parkingsearch.sim.SetupParking;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author  jbischoff
  *
  */
-/**
- *
- */
-public class RunCSBerlinBasecaseWithParking {
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/data/scenario/configBCParking_increase_poster.xml");
-		String runId = "bc09_park_poster";
-		config.controler().setOutputDirectory("D:/runs-svn/bmw_carsharing/basecase/"+runId);
-		config.controler().setRunId(runId);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		
-		Controler controler = new Controler(config);
-		SetupParking.installParkingModules(controler);
-		
-		controler.run();
-		
+
+public class StartParkingSearchEvent extends Event {
+	public static final String EVENT_TYPE = "started parkingSearch";
+	public static final String ATTRIBUTE_VEHICLE = "vehicle";
+	public static final String ATTRIBUTE_LINK = "link";
+	private final Id<Link> linkId;
+	private final Id<Vehicle> vehicleId;
+	/**
+	 * 
+	 */
+	
+	/**
+	 * @param time
+	 */
+	public StartParkingSearchEvent(final double time, Id<Vehicle> vehicleId, Id<Link> linkId) {
+		super(time);
+		this.linkId = linkId;
+		this.vehicleId = vehicleId;
 		
 	}
+
+	/* (non-Javadoc)
+	 * @see org.matsim.api.core.v01.events.Event#getEventType()
+	 */
+	@Override
+	public String getEventType() {
+		// TODO Auto-generated method stub
+		return EVENT_TYPE;
+	}
+	
+	public Id<Link> getLinkId() {
+		return linkId;
+	}
+	
+	public Id<Vehicle> getVehicleId() {
+		return vehicleId;
+	}
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
+		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
+		return attr;
+	}
+
 }

@@ -26,6 +26,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.List;
 
+import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -34,7 +35,6 @@ import org.matsim.core.utils.io.IOUtils;
 import com.google.inject.Inject;
 
 import playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager;
-import playground.jbischoff.parking.manager.ParkingSearchManager;
 
 /**
  * @author  jbischoff

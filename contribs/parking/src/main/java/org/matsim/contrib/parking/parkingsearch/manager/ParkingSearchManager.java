@@ -17,37 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.jbischoff.csberlin.scenario;
+package org.matsim.contrib.parking.parkingsearch.manager;
 
-import org.matsim.contrib.parking.parkingsearch.sim.SetupParking;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import java.util.List;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author  jbischoff
  *
  */
-/**
- *
- */
-public class RunCSBerlinBasecaseWithParking {
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/data/scenario/configBCParking_increase_poster.xml");
-		String runId = "bc09_park_poster";
-		config.controler().setOutputDirectory("D:/runs-svn/bmw_carsharing/basecase/"+runId);
-		config.controler().setRunId(runId);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		
-		Controler controler = new Controler(config);
-		SetupParking.installParkingModules(controler);
-		
-		controler.run();
-		
-		
-	}
+public interface ParkingSearchManager {
+
+	boolean reserveSpaceIfVehicleCanParkHere(Id<Vehicle> vehicleId, Id<Link> linkId);
+	Id<Link> getVehicleParkingLocation(Id<Vehicle> vehicleId);
+	boolean parkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time);
+	boolean unParkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time);
+	
+	List<String> produceStatistics();
+	void reset(int iteration);
+	
+	
 }

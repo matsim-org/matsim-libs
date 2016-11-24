@@ -17,37 +17,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.jbischoff.csberlin.scenario;
+package org.matsim.contrib.parking.parkingsearch.manager;
 
-import org.matsim.contrib.parking.parkingsearch.sim.SetupParking;
+import javax.inject.Inject;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
  * @author  jbischoff
  *
  */
-/**
- *
- */
-public class RunCSBerlinBasecaseWithParking {
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/data/scenario/configBCParking_increase_poster.xml");
-		String runId = "bc09_park_poster";
-		config.controler().setOutputDirectory("D:/runs-svn/bmw_carsharing/basecase/"+runId);
-		config.controler().setRunId(runId);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		
-		Controler controler = new Controler(config);
-		SetupParking.installParkingModules(controler);
-		
-		controler.run();
-		
+public class WalkLegFactory {
+	final Network network;
+	final double walkspeed;
+	final double beelinedistancefactor;
+	
+	@Inject
+	public WalkLegFactory(Network network, Config config) {
+		this.network = network;
+		this.beelinedistancefactor = config.plansCalcRoute().getBeelineDistanceFactors().get("walk");
+		this.walkspeed = config.plansCalcRoute().getTeleportedModeSpeeds().get("walk");
 		
 	}
+
+	public Leg createWalkLeg(Id<Link> from, Id<Link> to, double startTime, String walkMode){
+		Leg leg = PopulationUtils.createLeg(walkMode);
+		double walkDistance = CoordUtils.calcEuclideanDistance(network.getLinks().get(from).getCoord(), network.getLinks().get(to).getCoord())*beelinedistancefactor;
+		double walkTime = walkDistance / walkspeed;
+		Route route = new GenericRouteImpl(from, to);
+		route.setDistance(walkDistance);
+		route.setTravelTime(walkTime);
+		leg.setRoute(route);
+		leg.setDepartureTime(startTime);
+		return leg;
+	}
+	
+	
 }

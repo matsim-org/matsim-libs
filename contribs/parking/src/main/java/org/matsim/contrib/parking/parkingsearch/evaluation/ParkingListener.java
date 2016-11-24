@@ -20,13 +20,20 @@
 /**
  * 
  */
-package playground.jbischoff.csberlin.scenario;
+package org.matsim.contrib.parking.parkingsearch.evaluation;
 
-import org.matsim.contrib.parking.parkingsearch.sim.SetupParking;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.List;
+
+import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.utils.io.IOUtils;
+
+import com.google.inject.Inject;
 
 /**
  * @author  jbischoff
@@ -35,19 +42,39 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 /**
  *
  */
-public class RunCSBerlinBasecaseWithParking {
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/data/scenario/configBCParking_increase_poster.xml");
-		String runId = "bc09_park_poster";
-		config.controler().setOutputDirectory("D:/runs-svn/bmw_carsharing/basecase/"+runId);
-		config.controler().setRunId(runId);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		
-		Controler controler = new Controler(config);
-		SetupParking.installParkingModules(controler);
-		
-		controler.run();
+public class ParkingListener implements IterationEndsListener {
+	
+	@Inject
+	ParkingSearchManager manager;
+	@Inject
+	OutputDirectoryHierarchy output;
+
+	/* (non-Javadoc)
+	 * @see org.matsim.core.controler.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.controler.events.IterationEndsEvent)
+	 */
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		writeStats(manager.produceStatistics(), event.getIteration());
+	}
+
+	/**
+	 * @param produceStatistics
+	 */
+	private void writeStats(List<String> produceStatistics, int iteration) {
+		BufferedWriter bw = IOUtils.getBufferedWriter(output.getIterationFilename(iteration, "parkingStats.csv"));
+		try {
+			for (String s : produceStatistics){
+				bw.write(s);
+				bw.newLine();
+			}
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
 	}
+
 }

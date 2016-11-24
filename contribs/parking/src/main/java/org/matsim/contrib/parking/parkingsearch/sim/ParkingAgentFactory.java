@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.jbischoff.ffcs.sim;
+package org.matsim.contrib.parking.parkingsearch.sim;
 
 import javax.inject.Inject;
 
@@ -38,7 +38,6 @@ import org.matsim.contrib.parking.parkingsearch.routing.ParkingRouter;
 import org.matsim.contrib.parking.parkingsearch.search.ParkingSearchLogic;
 import org.matsim.contrib.parking.parkingsearch.search.RandomParkingSearchLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -46,18 +45,12 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
-import playground.jbischoff.ffcs.FFCSConfigGroup;
-import playground.jbischoff.ffcs.DynAgent.agentLogic.CarsharingParkingAgentLogic;
-import playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager;
-import playground.jbischoff.ffcs.parking.FFCSorRandomParkingChoiceLogic;
-import playground.jbischoff.ffcs.parking.FacilityBasedFreefloatingParkingManager;
-
 /**
  * @author jbischoff
  *
  */
 
-public class FreefloatingParkingAgentFactory implements AgentFactory {
+public class ParkingAgentFactory implements AgentFactory {
 
 	/**
 	 * 
@@ -75,25 +68,22 @@ public class FreefloatingParkingAgentFactory implements AgentFactory {
 	Network network;
 	@Inject
 	VehicleTeleportationLogic teleportationLogic;
-	@Inject
-	FreefloatingCarsharingManager ffcsmanager;
-	
+
 	private final QSim qsim;
-	private final FFCSConfigGroup ffcsconfig;
+
 	/**
 	 * 
 	 */
 	@Inject
-	public FreefloatingParkingAgentFactory(QSim qsim, Config config) {
+	public ParkingAgentFactory(QSim qsim) {
 		this.qsim = qsim;
-		this.ffcsconfig = (FFCSConfigGroup) config.getModule("freefloating");
 	}
 
 	@Override
 	public MobsimAgent createMobsimAgentFromPerson(Person p) {
-		ParkingSearchLogic parkingLogic  = new FFCSorRandomParkingChoiceLogic(network,(FacilityBasedFreefloatingParkingManager) parkingManager,ffcsmanager,parkingRouter);
-		CarsharingParkingAgentLogic agentLogic = new CarsharingParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkLegFactory,
-				parkingRouter, events, parkingLogic,  ((QSim) qsim).getSimTimer(),teleportationLogic, ffcsmanager, ffcsconfig );
+		ParkingSearchLogic parkingLogic  = new RandomParkingSearchLogic(network);
+		ParkingAgentLogic agentLogic = new ParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkLegFactory,
+				parkingRouter, events, parkingLogic,  ((QSim) qsim).getSimTimer(),teleportationLogic );
 		Id<Link> startLinkId = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getLinkId();
 		if (startLinkId == null) {
 			throw new NullPointerException(" No start link found. Should not happen.");
