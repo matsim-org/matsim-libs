@@ -114,10 +114,6 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 					} else {
 						blendFactor = 1.0;
 					}
-					
-					if (this.congestionInfo.getDecongestionConfigGroup().getTOLL_BLEND_FACTOR() != 1.0) {
-						log.info("Appyling method of successive averages (MSA). Ignoring the blend factory defined in the DecongestionConfigGroup.");
-					}
 				} else {
 					blendFactor = this.congestionInfo.getDecongestionConfigGroup().getTOLL_BLEND_FACTOR();
 				}
