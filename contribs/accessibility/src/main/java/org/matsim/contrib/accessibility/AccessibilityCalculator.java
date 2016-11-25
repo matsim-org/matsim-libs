@@ -288,8 +288,8 @@ public final class AccessibilityCalculator {
 	
 	
 	// new
-	public Map<String, AccessibilityContributionCalculator> getAccessibilityContributionCalculators() {
-		return this.calculators;
+	public Set<String> getModes() {
+		return this.calculators.keySet() ;
 	}
 	// end new
 

@@ -93,7 +93,7 @@ public class ConfigGroup implements MatsimExtensionPoint {
 			for ( ConfigGroup set : sets ) set.checkConsistency();
 		}
 	}
-
+	@Deprecated // please try to use the "typed" access structures.  kai, nov'16
 	public String getValue(final String paramName) {
 		return this.params.get(paramName);
 	}

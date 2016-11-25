@@ -105,7 +105,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		
 		log.info(".. done initializing CellBasedAccessibilityControlerListenerV3");
 		// new
-		for (String mode : accessibilityCalculator.getAccessibilityContributionCalculators().keySet()) {
+		for (String mode : accessibilityCalculator.getModes() ) {
 			spatialGridAggregator.getAccessibilityGrids().put(mode, new SpatialGrid(xMin, yMin, xMax, yMax, cellSize, Double.NaN));
 		}
 		// end new
@@ -188,7 +188,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		writer.writeField(Labels.Y_COORDINATE);
 //		writer.writeField(Labels.TIME); // TODO
 		// new
-		for (String mode : accessibilityCalculator.getAccessibilityContributionCalculators().keySet()) {
+		for (String mode : accessibilityCalculator.getModes() ) {
 			writer.writeField(mode + "_accessibility");
 		}
 //		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
@@ -212,7 +212,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 				
 				// new
 //				int counter = 1; // TODO this is only here while refactor
-				for (String mode : accessibilityCalculator.getAccessibilityContributionCalculators().keySet()) {
+				for (String mode : accessibilityCalculator.getModes() ) {
 //				for (Modes4Accessibility mode : Modes4Accessibility.values()) {
 //					if ( accessibilityCalculator.getIsComputingMode().contains(mode) ) {
 						final SpatialGrid spatialGridOfMode = spatialGridAggregator.getAccessibilityGrids().get(mode);

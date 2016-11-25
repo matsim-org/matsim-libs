@@ -68,6 +68,8 @@ public final class AccessibilityStartupListener implements StartupListener {
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
+		// yyyyyy do we still need this as a startup listener when we are solving many of the dependencies through guice now?  kai, nov'16
+		
 		for (final String activityType : activityTypes) {
 			Config config = scenario.getConfig();
 			if (cellSize <= 0) {

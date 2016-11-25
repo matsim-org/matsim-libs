@@ -176,7 +176,7 @@ public class AccessibilityIntegrationTest {
 		// compare some results -> done in EvaluateTestResults
 	}
 
-	private void run(MutableScenario scenario, PtMatrix ptMatrix) {
+	private static void run(MutableScenario scenario, PtMatrix ptMatrix) {
 		Controler controler = new Controler(scenario);
 
 		// creating test opportunities (facilities)
