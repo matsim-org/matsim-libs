@@ -37,9 +37,7 @@ public class PostProcessTravelTime {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimPopulationReader(scenario).readFile(plansFile);
 				
-		String mode = e
-//				config.plansCalcRoute().getBeelineDistanceFactors().get(TransportMode.pt);
-		System.out.println(time);
+		
 		double beelineFactorBike = config.plansCalcRoute().getBeelineDistanceFactors().get(TransportMode.bike);
 		System.out.println(beelineFactorBike);
 	
