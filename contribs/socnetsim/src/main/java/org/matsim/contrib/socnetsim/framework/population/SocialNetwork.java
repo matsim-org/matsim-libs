@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Person;
 
 public interface SocialNetwork {
 
-	public static final String ELEMENT_NAME = "SocialNetwork";
+	String ELEMENT_NAME = "SocialNetwork";
 
 	/**
 	 * Must be called before adding ties.
@@ -37,31 +37,31 @@ public interface SocialNetwork {
 	 * for more safety in simulation (fail if the social network does not cover the
 	 * whole population).
 	 */
-	public void addEgo(Id<Person> id);
+	void addEgo( Id<Person> id );
 
-	public void addEgos(Iterable<? extends Id<Person>> ids);
+	void addEgos( Iterable<? extends Id<Person>> ids );
 
-	public void addBidirectionalTie(Id<Person> id1, Id<Person> id2);
+	void addBidirectionalTie( Id<Person> id1, Id<Person> id2 );
 
-	public void addMonodirectionalTie(Id<Person> ego, Id<Person> alter);
+	void addMonodirectionalTie( Id<Person> ego, Id<Person> alter );
 
-	public Set<Id<Person>> getAlters(Id<Person> ego);
+	Set<Id<Person>> getAlters( Id<Person> ego );
 
-	public Set<Id<Person>> getEgos();
+	Set<Id<Person>> getEgos();
 
-	public Map<Id<Person>, Set<Id<Person>>> getMapRepresentation();
+	Map<Id<Person>, Set<Id<Person>>> getMapRepresentation();
 
-	public boolean isReflective();
+	boolean isReflective();
 
 	/**
 	 * retrieve the metadata
 	 */
-	public Map<String, String> getMetadata();
+	Map<String, String> getMetadata();
 
 	/**
 	 * add metadata. Metadata associates attribute names to values,
 	 * and can be used to store any information useful to organize data:
 	 * date of generation, source, author, etc.
 	 */
-	public void addMetadata(final String att, final String value);
+	void addMetadata( final String att, final String value );
 }
