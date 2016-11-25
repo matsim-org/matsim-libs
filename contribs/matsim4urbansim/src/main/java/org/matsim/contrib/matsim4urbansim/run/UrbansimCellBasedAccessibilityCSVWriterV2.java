@@ -103,7 +103,7 @@ final class UrbansimCellBasedAccessibilityCSVWriterV2 implements FacilityDataExc
 //					node.getCoord().getY() 
 ) ;
 			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-				accessibilityDataWriter.write( "," + accessibilities.get( mode ) );
+				accessibilityDataWriter.write( "," + accessibilities.get( mode.toString() ) );
 			}
 			accessibilityDataWriter.newLine();
 		}

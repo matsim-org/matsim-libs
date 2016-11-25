@@ -108,10 +108,10 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		for (String mode : accessibilityCalculator.getModes() ) {
 			spatialGridAggregator.getAccessibilityGrids().put(mode, new SpatialGrid(xMin, yMin, xMax, yMax, cellSize, Double.NaN));
 		}
-		// end new
 //		for ( Modes4Accessibility mode : accessibilityCalculator.getIsComputingMode()) {
 //			spatialGridAggregator.getAccessibilityGrids().put(mode, new SpatialGrid(xMin, yMin, xMax, yMax, cellSize, Double.NaN));
 //		}
+		// end new
 		
 		lockedForAdditionalFacilityData  = true ;
 		for ( ActivityFacilities facilities : this.additionalFacilityData ) {

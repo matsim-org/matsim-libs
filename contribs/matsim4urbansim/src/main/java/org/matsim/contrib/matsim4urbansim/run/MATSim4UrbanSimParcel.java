@@ -25,6 +25,7 @@ package org.matsim.contrib.matsim4urbansim.run;
 
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -455,6 +456,7 @@ class MATSim4UrbanSimParcel{
 					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
 						@Inject Map<String, TravelTime> travelTimes;
 						@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
+						@Inject Map<String, AccessibilityContributionCalculator> calculators;
 						@Inject Scenario scenario;
 						@Override
 						public ControlerListener get() {
@@ -516,13 +518,20 @@ class MATSim4UrbanSimParcel{
 //								gbacl.setUrbansimMode(true);
 								// this wasn't doing anything when I looked at it.  kai, oct'16
 
-								for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-									accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
+								// new
+//								for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+//									accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
+//								}
+//								if ( ptMatrix==null ) {
+//									accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
+//									// somewhat stupid fix. kai, jan'2015
+//								}
+								for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
+									accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 								}
-								if ( ptMatrix==null ) {
-									accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
-									// somewhat stupid fix. kai, jan'2015
-								}
+								// end new
+								
+								
 							}
 
 							if(isParcelMode){
