@@ -209,32 +209,32 @@ class UtilityFunction {
 	private List<Link> tourLocations = null;
 	private List<Tour.Mode> tourModes = null;
 
-	private Double matsimUtility = null;
-	private Double sampersUtility = null;
+	private Double matsimOnlyUtility = null;
+	private Double sampersOnlyUtility = null;
 
-	Double getMATSimUtility() {
-		return this.matsimUtility;
-	}
-	
-	Double getSampersUtility() {
-		return this.sampersUtility;
+	Double getMATSimOnlyUtility() {
+		return this.matsimOnlyUtility;
 	}
 
-	Double getTotalUtility() {
-		return this.getMATSimUtility() + this.getSampersUtility();
+	Double getSampersOnlyUtility() {
+		return this.sampersOnlyUtility;
 	}
-	
+
+//	Double getTotalUtility() {
+//		return this.getMATSimOnlyUtility() + this.getSampersOnlyUtility();
+//	}
+
 	void evaluate(final Plan plan) {
 
 		this.extractTourData(plan); // result in member variables
 
 		// Score of optimal time structure
 		if (this.timeOpt != null) {
-			this.matsimUtility = this.timeOpt.computeScore(plan);
+			this.matsimOnlyUtility = this.timeOpt.computeScore(plan);
 		}
 
 		// ASC for activity sequence
-		this.sampersUtility = this.tourActSeq2asc.get(this.tourPurposes);
+		this.sampersOnlyUtility = this.tourActSeq2asc.get(this.tourPurposes);
 
 		for (int i = 0; i < this.tourPurposes.size(); i++) {
 			final Tour.Act act = this.tourPurposes.get(i);
@@ -242,10 +242,11 @@ class UtilityFunction {
 			final Tour.Mode mode = this.tourModes.get(i);
 
 			// Size of activity location.
-			this.sampersUtility += this.act2betaSize.get(act) * this.act2link2logSize.get(act).get(loc);
+			this.sampersOnlyUtility += this.act2betaSize.get(act) * this.act2link2logSize.get(act).get(loc);
 
 			// ASC for mode.
-			this.sampersUtility += this.mode2asc.get(mode);
+			this.sampersOnlyUtility += this.mode2asc.get(mode);
+
 		}
 	}
 }

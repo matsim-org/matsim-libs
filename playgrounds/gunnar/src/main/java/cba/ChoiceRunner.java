@@ -84,8 +84,9 @@ class ChoiceRunner implements Runnable {
 			final Plan plan = alternative.asPlan(this.scenario, homeLoc.getId(), this.person);
 			planAlternatives.add(plan);
 			utilityFunction.evaluate(plan);
-			plan.setScore(utilityFunction.getMATSimUtility());
-			final double utility = utilityFunction.getTotalUtility();
+			plan.setScore(utilityFunction.getMATSimOnlyUtility());
+			// final double utility = utilityFunction.getTotalUtility();
+			final double utility = utilityFunction.getSampersOnlyUtility() + utilityFunction.getMATSimOnlyUtility();
 			utilities.add(utility);
 			maxUtility = Math.max(maxUtility, utility);
 		}

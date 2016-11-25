@@ -9,13 +9,13 @@ import org.apache.commons.math3.util.FastMath;
  * @author Gunnar Flötteröd
  *
  */
-class LogitEpsilonDistribution implements EpsilonDistribution {
+public class LogitEpsilonDistribution implements EpsilonDistribution {
 
 	private final static double GAMMA = FastMath.PI / (2 * FastMath.E);
 
 	private final GumbelDistribution gumbel;
 
-	LogitEpsilonDistribution(final double scale) {
+	public LogitEpsilonDistribution(final double scale) {
 		this.gumbel = new GumbelDistribution(-GAMMA * scale, scale);
 	}
 
