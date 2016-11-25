@@ -432,8 +432,7 @@ class MATSim4UrbanSimParcel{
 							if ( ptMatrix==null ) {
 								zbacl.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
 								// somewhat stupid fix. kai, jan'2015
-							}
-							
+							}							
 
 							// writing accessibility measures continuously into "zone.csv"-file. Naming of this 
 							// files is given by the UrbanSim convention importing a csv file into a identically named 
@@ -479,12 +478,15 @@ class MATSim4UrbanSimParcel{
 //								gbacl.setUrbansimMode(true);
 								// this wasn't doing anything when I looked at it.  kai, oct'16
 
-								for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-									accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
-								}
-								if ( ptMatrix==null ) {
-									accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
-									// somewhat stupid fix. kai, jan'2015
+//								for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+//									accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
+//								}
+//								if ( ptMatrix==null ) {
+//									accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
+//									// somewhat stupid fix. kai, jan'2015
+//								}
+								for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
+									accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 								}
 							} else if(computeGridBasedAccessibilityUsingBoundingBox) {
 								Config config = scenario.getConfig();
@@ -496,12 +498,15 @@ class MATSim4UrbanSimParcel{
 //								gbacl.setUrbansimMode(true);
 								// this wasn't doing anything when I looked at it.  kai, oct'16
 
-								for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-									accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
-								}
-								if ( ptMatrix==null ) {
-									accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
-									// somewhat stupid fix. kai, jan'2015
+//								for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+//									accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
+//								}
+//								if ( ptMatrix==null ) {
+//									accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
+//									// somewhat stupid fix. kai, jan'2015
+//								}
+								for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
+									accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 								}
 							} else {
 								Config config = scenario.getConfig();
