@@ -214,10 +214,6 @@ public class AccessibilityIntegrationTest {
 		
 		Envelope envelope = new Envelope(Double.parseDouble(left), Double.parseDouble(right), Double.parseDouble(bottom), Double.parseDouble(top));
 
-		// new
-		// Controller
-		//				final Controler controler = new Controler(sc);
-
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(false);
 

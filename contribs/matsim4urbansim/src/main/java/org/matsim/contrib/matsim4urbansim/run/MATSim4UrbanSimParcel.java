@@ -436,7 +436,7 @@ class MATSim4UrbanSimParcel{
 
 							final UrbanSimParameterConfigModuleV3 urbanSimConfig = ConfigUtils.addOrGetModule( getConfig(), UrbanSimParameterConfigModuleV3.class);
 							ZoneBasedAccessibilityControlerListenerV3 zbacl = new ZoneBasedAccessibilityControlerListenerV3( accessibilityCalculator,
-									opportunities, ptMatrix, urbanSimConfig.getMATSim4OpusTemp(), scenario, travelTimes, travelDisutilityFactories);
+									opportunities, urbanSimConfig.getMATSim4OpusTemp(), scenario);
 
 							// writing accessibility measures continuously into "zone.csv"-file. Naming of this 
 							// files is given by the UrbanSim convention importing a csv file into a identically named 

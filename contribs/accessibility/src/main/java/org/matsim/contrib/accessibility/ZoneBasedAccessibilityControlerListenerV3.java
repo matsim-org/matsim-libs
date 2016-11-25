@@ -1,17 +1,12 @@
 package org.matsim.contrib.accessibility;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
-import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 
 /**
@@ -57,9 +52,8 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 	
 	public ZoneBasedAccessibilityControlerListenerV3(AccessibilityCalculator accessibilityCalculator,
 													 ActivityFacilitiesImpl opportunities,
-													 PtMatrix ptMatrix,
 													 String matsim4opusTempDirectory,
-													 Scenario scenario, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories) {
+													 Scenario scenario) {
 		
 		this.accessibilityCalculator = accessibilityCalculator;
 		log.info("Initializing ZoneBasedAccessibilityControlerListenerV3 ...");

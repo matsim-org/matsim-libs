@@ -75,9 +75,8 @@ public final class AccessibilityStartupListener implements StartupListener {
 			if (cellSize <= 0) {
 				throw new IllegalArgumentException("Cell Size needs to be assigned a value greater than zero.");
 			}
-			AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
 			ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(), cellSize);
-			accessibilityCalculator.setMeasuringPoints(measuringPoints);
+			AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
 			for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
 				accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 			}

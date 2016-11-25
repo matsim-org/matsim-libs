@@ -1,5 +1,6 @@
 package org.matsim.contrib.matsim4urbansim.accessibility;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -34,6 +35,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -56,6 +58,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class AccessibilityTest implements SpatialGridDataExchangeInterface, FacilityDataExchangeInterface {
+	private static Logger log = Logger.getLogger( AccessibilityTest.class ) ;
+	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private double resolution = 100.;
@@ -113,7 +117,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 		//create a new controler for the simulation
 		Controler ctrl = new Controler(scenario);
 		ctrl.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		
+
 		final List<String> modes = new ArrayList<>();
 		// Add calculators
 		ctrl.addOverridingModule(new AbstractModule() {
@@ -146,7 +150,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 				}
 			}
 		});
-		
+
 
 		//pt not used in this test
 		final PtMatrix ptMatrix = null;
@@ -175,12 +179,8 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 						@Override
 						public ControlerListener get() {
 							//initialize new grid based accessibility controler listener and grids for the modes we want to analyze here
+							ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution) ;
 							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
-							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution));
-//							for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-//								accessibilityCalculator.setComputingAccessibilityForMode(mode.toString(), true);
-//							}
-//							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
 							for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
 								accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 							}
@@ -259,39 +259,61 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 		opportunities.createAndAddFacility(Id.create("opp", ActivityFacility.class), new Coord((double) 200, (double) 100));
 
 		final ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution);
-		ctrl.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
-					@Inject Map<String, TravelTime> travelTimes;
-					@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
+		final AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints) ;
 
-					@Override
-					public ControlerListener get() {
-						//initialize new zone based accessibility controler listener and grids for the modes we want to analyze here
-						ZoneBasedAccessibilityControlerListenerV3 listener = new ZoneBasedAccessibilityControlerListenerV3(measuringPoints, opportunities, null, path, scenario, travelTimes, travelDisutilityFactories);
-						for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-							listener.setComputingAccessibilityForMode(mode, true);
+		ctrl.addOverridingModule(new AbstractModule() {
+			@Override public void install() {
+				MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
+				{
+					String mode = Modes4Accessibility.freespeed.name() ;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new FreeSpeedNetworkModeProvider(TransportMode.car));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+				}
+				{
+					String mode = TransportMode.car;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+				}
+				{ 
+					String mode = TransportMode.bike;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+				}
+				{
+					final String mode = TransportMode.walk;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+				}
+
+				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {				
+					@Inject Map<String, AccessibilityContributionCalculator> calculators ;
+					@Override public ControlerListener get() {
+
+						// yyyyyy total total total overkill to first inject it and then use it as follows; just doing it in this way to get test back up and running.
+						for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
+							accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 						}
-						listener.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
-						// don't know why this is not activated as a test. kai, feb'14
+						ZoneBasedAccessibilityControlerListenerV3 listener = new ZoneBasedAccessibilityControlerListenerV3(
+								accessibilityCalculator, opportunities, path, scenario);
 
 						listener.addFacilityDataExchangeListener(AccessibilityTest.this);
 
-						//add grid based accessibility services listener to the services and run the simulation
-						return listener;
+						return listener ;
 					}
-				});
-
+				} ) ;
 			}
 		});
 		ctrl.run();
 
 		//test case: verify that accessibility of work zone (200,100) is higher than the home zone's (0,100)
 
-		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+		for ( String mode : accessibilityCalculator.getModes() ) {
+
 			final Double accHZ = accessibilitiesHomeZone.get(mode);
+			Gbl.assertNotNull(accHZ);
+			Gbl.assertNotNull(accessibilitiesWorkZone);
 			final Double accWZ = accessibilitiesWorkZone.get(mode);
+			Gbl.assertNotNull(accWZ);
 			if ( accHZ != null && accWZ!=null ) {
 				Assert.assertTrue (accHZ < accWZ ) ;
 			}
@@ -334,12 +356,19 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 
 	@Override
 	public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, Map<String, Double> accessibilities1) {
+		log.warn("");
+		log.warn("RECEIVING accessibilities; start zone=" + measurePoint.getId() + " with coord=" + measurePoint.getCoord() );
+		for ( Entry<String, Double> entry : accessibilities1.entrySet() ) {
+			log.warn( "mode=" + entry.getKey() + "; accessibility=" + entry.getValue() ) ;
+		}
 
 		//store the accessibilities of the zone in the list for home or work accessibilities
 		if(measurePoint.getCoord().equals(new Coord((double) 100, (double) 0))){
+			log.warn("accepting as HZ");
 			accessibilitiesHomeZone = accessibilities1 ;
 		}
 		if(measurePoint.getCoord().equals(new Coord((double) 200, (double) 100))){
+			log.warn("accepting as WZ");
 			accessibilitiesWorkZone = accessibilities1 ;
 		}
 

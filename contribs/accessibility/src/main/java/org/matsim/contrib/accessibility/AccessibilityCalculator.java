@@ -211,7 +211,7 @@ public final class AccessibilityCalculator {
 				}
 
 				log.warn("");
-				log.warn("sending accessibilities; start zone=" + origin.getId() );
+				log.warn("SENDING accessibilities; start zone=" + origin.getId() );
 				for ( Entry<String, Double> entry : accessibilities.entrySet() ) {
 					log.warn( "mode=" + entry.getKey() + "; accessibility=" + entry.getValue() ) ;
 				}

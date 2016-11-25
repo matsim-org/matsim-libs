@@ -41,8 +41,8 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 	private String outputSubdirectory;
 
 	private boolean	calculateAggregateValues;
-	private Map<Modes4Accessibility, Double> accessibilitySums = new HashMap<Modes4Accessibility, Double>();
-	private Map<Modes4Accessibility, Double> accessibilityGiniCoefficients = new HashMap<Modes4Accessibility, Double>();
+	private Map<String, Double> accessibilitySums = new HashMap<>();
+	private Map<String, Double> accessibilityGiniCoefficients = new HashMap<>();
 
 	final double xMin, yMin, xMax, yMax, cellSize;
 
@@ -251,12 +251,13 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		final SpatialGrid spatialGrid = spatialGridAggregator.getAccessibilityGrids().get(Modes4Accessibility.freespeed) ;
 		// yy for time being, have to assume that this is always there
 
-		for (Modes4Accessibility mode : accessibilityCalculator.getIsComputingMode()) {
+		for (String mode : accessibilityCalculator.getModes() ) {
 			List<Double> valueList = new ArrayList<>();
 
 			for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution()) {
 				for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
 					final SpatialGrid spatialGridOfMode = spatialGridAggregator.getAccessibilityGrids().get(mode);
+					Gbl.assertNotNull(spatialGridOfMode);
 					final double value = spatialGridOfMode.getValue(x, y);
 					if ( !Double.isNaN(value ) ) {
 						valueList.add(value);
@@ -342,12 +343,12 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 	}
 
 
-	public Map<Modes4Accessibility, Double> getAccessibilitySums() {
+	public Map<String, Double> getAccessibilitySums() {
 		return this.accessibilitySums;
 	}
 
 
-	public Map<Modes4Accessibility, Double> getAccessibilityGiniCoefficients() {
+	public Map<String, Double> getAccessibilityGiniCoefficients() {
 		return this.accessibilityGiniCoefficients;
 	}
 }

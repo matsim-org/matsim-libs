@@ -25,6 +25,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
@@ -117,11 +118,14 @@ public class AccessibilityComputationNMBWorkEquiv {
 					@Override
 					public ControlerListener get() {
 						BoundingBox bb = BoundingBox.createBoundingBox(((Scenario) scenario).getNetwork());
+						ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize) ;
 						AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
-						accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize));
 						GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, (ActivityFacilities) amenities, null, scenario, bb.getXMin(), bb.getYMin(),
 						bb.getXMax(),bb.getYMax(), cellSize);
-						accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
+						if ( true ) {
+							throw new RuntimeException("The following needs to be replaced with the more flexible newer syntax. kai, nov'16" ) ;
+						}
+//						accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
 						listener.addAdditionalFacilityData(homes) ;
 						listener.writeToSubdirectoryWithName("w-eq");
 						return listener;
