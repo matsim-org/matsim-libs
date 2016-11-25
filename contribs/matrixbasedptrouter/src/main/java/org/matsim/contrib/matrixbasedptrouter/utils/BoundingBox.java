@@ -3,6 +3,8 @@ package org.matsim.contrib.matrixbasedptrouter.utils;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 public final class BoundingBox {
 	
 	private double boundingBox [] = null;
@@ -53,6 +55,13 @@ public final class BoundingBox {
 	// getter methods
 	////////////////////////////////
 	
+	public BoundingBox(Envelope env) {
+		boundingBox[0] = env.getMinX() ;
+		boundingBox[1] = env.getMinY() ;
+		boundingBox[2] = env.getMaxX() ;
+		boundingBox[3] = env.getMaxY() ;
+	}
+
 	public double[] getBoundingBox(){
 		return this.boundingBox;
 	}

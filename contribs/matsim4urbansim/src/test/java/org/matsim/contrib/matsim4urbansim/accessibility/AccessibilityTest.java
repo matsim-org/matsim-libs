@@ -185,7 +185,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 								accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 							}
 
-							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, minX, minY, maxX, maxY, resolution);
+							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, minX, minY, maxX, maxY, resolution);
 
 							//add grid data exchange listener to get accessibilities
 							listener.addSpatialGridDataExchangeListener(AccessibilityTest.this);

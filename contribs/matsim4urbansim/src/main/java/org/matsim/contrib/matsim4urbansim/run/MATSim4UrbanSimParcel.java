@@ -155,7 +155,7 @@ class MATSim4UrbanSimParcel{
 	boolean computeAgentPerformance					 = false;	// determines whether agent performances should be calculated
 	String shapeFile 						 		 = null;
 	double cellSizeInMeter 							 = -1;
-	BoundingBox nwBoundaryBox				 = null;
+	BoundingBox box				 = null;
 
 	/**
 	 * constructor
@@ -456,62 +456,33 @@ class MATSim4UrbanSimParcel{
 
 				if(computeGridBasedAccessibility){
 					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
-						@Inject Map<String, TravelTime> travelTimes;
-						@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
-						@Inject Map<String, AccessibilityContributionCalculator> calculators;
-						@Inject Scenario scenario;
 						@Inject Map<String, AccessibilityContributionCalculator> calculators;
 						@Override public ControlerListener get() {
 							// initializing grid based accessibility controler listener
-							GridBasedAccessibilityShutdownListenerV3 gbacl;
+							final ActivityFacilitiesImpl measuringPoints ;
 							if(computeGridBasedAccessibilitiesUsingShapeFile) {
 								Geometry boundary = GridUtils.getBoundary(shapeFile);
 								Envelope env = boundary.getEnvelopeInternal();
-								double xMin = env.getMinX();
-								double xMax = env.getMaxX();
-								double yMin = env.getMinY();
-								double yMax = env.getMaxY();
-								Config config = scenario.getConfig();
-								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSizeInMeter));
+								box = new BoundingBox( env ) ;
+								measuringPoints = GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSizeInMeter);
 								log.info("Using custom bounding box to determine the area for accessibility computation.");
-
-								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, xMin, xMax, yMin, yMax, cellSizeInMeter);
-
-								for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
-									log.warn("adding accessibility calculator for mode=" + entry.getKey()) ;
-									accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
-								}
-
 							} else if(computeGridBasedAccessibilityUsingBoundingBox) {
-								Config config = scenario.getConfig();
-								ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
-								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
-
+								measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(box, cellSizeInMeter);
 								log.info("Using custom bounding box to determine the area for accessibility computation.");
-								for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
-									log.warn("adding accessibility calculator for mode=" + entry.getKey()) ;
-									accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
-								}
-
-								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
 							} else {
-								Config config = scenario.getConfig();
-								ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter) ;
-								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
-
+								measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(box, cellSizeInMeter) ;
 								log.info("Using the boundary of the network file to determine the area for accessibility computation.");
 								log.warn("This could lead to memory issues when the network is large and/or the cell size is too fine!");
 								if (cellSizeInMeter <= 0) {
 									throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
 								}
-								for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
-									log.warn("adding accessibility calculator for mode=" + entry.getKey()) ;
-									accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
-								}
-
-								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(),nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
-
 							}
+							final AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
+							for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
+								log.warn("adding accessibility calculator for mode=" + entry.getKey()) ;
+								accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
+							}
+							final GridBasedAccessibilityShutdownListenerV3 gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, box, cellSizeInMeter);
 
 							if(isParcelMode){
 								// creating a writer listener that writes out accessibility results in UrbanSim format for parcels
@@ -587,14 +558,14 @@ class MATSim4UrbanSimParcel{
 		// the boundary is either defined by a user defined boundary box or if not applicable by the extend of the road network
 		if(this.computeGridBasedAccessibilityUsingBoundingBox){	// check if a boundary box is defined
 			// log.info("Using custom bounding box for accessibility computation.");
-			nwBoundaryBox = BoundingBox.createBoundingBox(moduleAccessibility.getBoundingBoxLeft(), 
+			box = BoundingBox.createBoundingBox(moduleAccessibility.getBoundingBoxLeft(), 
 					moduleAccessibility.getBoundingBoxBottom(), 
 					moduleAccessibility.getBoundingBoxRight(), 
 					moduleAccessibility.getBoundingBoxTop());
 		}
 		else{	// no boundary box defined using boundary of hole network for accessibility computation
 			// log.warn("Using the boundary of the network file for accessibility computation. This could lead to memory issues when the network is large and/or the cell size is too fine.");
-			nwBoundaryBox = BoundingBox.createBoundingBox(scenario.getNetwork());
+			box = BoundingBox.createBoundingBox(scenario.getNetwork());
 		}
 	}
 

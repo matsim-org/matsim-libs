@@ -15,7 +15,7 @@ import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
-import org.matsim.core.config.Config;
+import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -54,17 +54,21 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 
 	private ActivityFacilities opportunities;
 
+	public GridBasedAccessibilityShutdownListenerV3(AccessibilityCalculator accessibilityCalculator, ActivityFacilities opportunities, 
+			PtMatrix ptMatrix, Scenario scenario, BoundingBox box, double cellSize) {
+		this( accessibilityCalculator, opportunities, ptMatrix, scenario, box.getXMin(), box.getYMin(), box.getXMax(), box.getYMax(), cellSize ) ;
+	}
+
 	/**
 	 * constructor
 	 * @param opportunities represented by ActivityFacilitiesImpl
 	 * @param ptMatrix matrix with travel times and distances for any pair of pt stops
-	 * @param config MATSim Config object
 	 * @param scenario MATSim scenario
 	 */
 	public GridBasedAccessibilityShutdownListenerV3(AccessibilityCalculator accessibilityCalculator, ActivityFacilities opportunities, 
-			PtMatrix ptMatrix, Config config, Scenario scenario, 
-			double xMin, double yMin, 
-			double xMax, double yMax, double cellSize) {
+			PtMatrix ptMatrix, Scenario scenario, double xMin, 
+			double yMin, double xMax, 
+			double yMax, double cellSize) {
 		this.xMin = xMin;
 		this.yMin = yMin;
 		this.xMax = xMax;

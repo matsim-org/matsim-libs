@@ -126,7 +126,7 @@ final public class RunAccessibilityExample {
 							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
 							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSizeForCellBasedAccessibility));
 
-							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, null, config, scenario, bb.getXMin(), bb.getYMin(),bb.getXMax(), bb.getYMax(), cellSizeForCellBasedAccessibility);
+							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, null, scenario, bb.getXMin(), bb.getYMin(), bb.getXMax(),bb.getYMax(), cellSizeForCellBasedAccessibility);
 
 							// define the modes that will be considered
 							// here, the accessibility computation is only done for freespeed

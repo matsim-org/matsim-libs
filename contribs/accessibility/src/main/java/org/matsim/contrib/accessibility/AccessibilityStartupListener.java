@@ -83,7 +83,7 @@ public final class AccessibilityStartupListener implements StartupListener {
 			}
 			ActivityFacilities activityFacilities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType);
 			GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, activityFacilities, 
-					ptMatrix, config, scenario, envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(), cellSize);
+					ptMatrix, scenario, envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(), cellSize);
 			listener.addAdditionalFacilityData(densityFacilities);
 			listener.writeToSubdirectoryWithName(activityType);
 			if (push2Geoserver == true) {
