@@ -25,6 +25,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.kairuns.run.KNBerlinControler;
+import playground.kairuns.run.KNBerlinControler.A100;
 
 /**
  * @author nagel
@@ -65,7 +66,7 @@ public class KNModeChoiceCalibTestIT {
 		
 		String[] args = new String[]{ utils.getPackageInputDirectory() + "/config.xml"  } ;
 
-		final Config config = KNBerlinControler.prepareConfig(args, assignment, equil, modeChoice) ;
+		final Config config = KNBerlinControler.prepareConfig(args, assignment, equil, modeChoice, A100.base ) ;
 		
 		config.plans().setInputFile("relaxed_plans.xml.gz");
 		config.network().setInputFile("network.xml.gz");

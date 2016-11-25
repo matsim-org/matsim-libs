@@ -36,18 +36,22 @@ public final class KNBerlinControler {
 	private static final Logger log = Logger.getLogger(KNBerlinControler.class);
 
 	public static double capFactorForEWS = Double.NaN ;
+	
+	public static enum A100 { base, ba16, ba1617, stork } ;
 
 	public static void main ( String[] args ) {
-		final boolean assignment = false ;
 		final boolean equil = false ;
 		final boolean unterLindenQuiet = false ;
+		final A100 a100 = A100.base ;
+
+		final boolean assignment = false ;
 		final boolean modeChoice = true ;
 
 		OutputDirectoryLogging.catchLogEntries();
 
 		log.info("Starting KNBerlinControler ...") ;
 
-		Config config = prepareConfig(args, assignment, equil, modeChoice);
+		Config config = prepareConfig(args, assignment, equil, modeChoice, a100);
 
 		// ===
 
@@ -136,7 +140,7 @@ public final class KNBerlinControler {
 		return scenario;
 	}
 
-	public static Config prepareConfig(String[] args, final boolean assignment, final boolean equil, boolean modeChoice) {
+	public static Config prepareConfig(String[] args, final boolean assignment, final boolean equil, boolean modeChoice, A100 a100) {
 		double sampleFactor;
 		if ( equil ) {
 			sampleFactor = 1. ;
@@ -153,11 +157,25 @@ public final class KNBerlinControler {
 			config.plans().setInputFile("plans2000.xml.gz");
 		} else {
 			config = ConfigUtils.createConfig( new NoiseConfigGroup() ) ;
-			config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-base_ext.xml.gz");
-			//		config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_ext.xml.gz") ;
-			//			config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_17_ext.xml.gz") ;
-			//			config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_17_storkower_ext.xml.gz") ;
-			config.plans().setInputFile("~/kairuns/a100/baseplan_900s_routed.xml.gz") ;
+			switch ( a100 ) {
+			case base:
+				config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-base_ext.xml.gz");
+				break;
+			case ba16:
+				config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_ext.xml.gz") ;
+				break;
+			case ba1617:
+				config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_17_ext.xml.gz") ;
+				break;
+			case stork:
+				config.network().setInputFile("~/shared-svn/studies/countries/de/berlin/counts/iv_counts/network-ba16_17_storkower_ext.xml.gz") ;
+				break;
+			default:
+				throw new RuntimeException("not implemented") ;
+			}
+
+//			config.plans().setInputFile("~/kairuns/a100/baseplan_900s_routed.xml.gz") ;
+			config.plans().setInputFile("~/kairuns/a100/Aoutput-2016-11-19-triang-w-mode-choice/long-2016-11-23-09hhXX/output_plans.xml.gz") ;
 		}
 
 		if ( assignment ) {
@@ -183,7 +201,7 @@ public final class KNBerlinControler {
 
 		// controler, global, and related:
 
-		final int lastIteration = 1000 ;
+		final int lastIteration = 100 ;
 		config.controler().setFirstIteration(0); // with something like "9" we don't get output events! 
 		config.controler().setLastIteration(lastIteration); // with something like "9" we don't get output events! 
 		config.controler().setWriteSnapshotsInterval(lastIteration);
