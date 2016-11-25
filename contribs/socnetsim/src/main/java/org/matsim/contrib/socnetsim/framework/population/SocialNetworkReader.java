@@ -38,6 +38,10 @@ public class SocialNetworkReader extends MatsimXmlParser {
 
 	private final String elementName;
 
+	public SocialNetworkReader() {
+		this( null );
+	}
+
 	public SocialNetworkReader(final Scenario scenario) {
 		this.scenario = scenario;
 		this.elementName = SocialNetwork.ELEMENT_NAME;
@@ -50,6 +54,11 @@ public class SocialNetworkReader extends MatsimXmlParser {
 		this.elementName = elementName;
 	}
 
+	public SocialNetwork read( final String file ) {
+		readFile( file );
+		return this.socialNetwork;
+	}
+
 	@Override
 	public void startTag(
 			final String name,
@@ -58,7 +67,10 @@ public class SocialNetworkReader extends MatsimXmlParser {
 		if ( name.equals( SocialNetworkWriter.ROOT_TAG ) ) {
 			this.isReflective = Boolean.parseBoolean( atts.getValue( SocialNetworkWriter.REFLECTIVE_ATT ) );
 			this.socialNetwork = new SocialNetworkImpl( this.isReflective );
-			this.scenario.addScenarioElement( elementName , this.socialNetwork );
+			if ( this.scenario != null ) {
+				// this dates back from pre-Guice times, and could hopefully be removed. Needs tests.
+				this.scenario.addScenarioElement( elementName, this.socialNetwork );
+			}
 		}
 		else if ( name.equals( SocialNetworkWriter.EGO_TAG ) ) {
 			final Id<Person> ego = Id.create(
@@ -88,5 +100,6 @@ public class SocialNetworkReader extends MatsimXmlParser {
 			final String name,
 			final String content,
 			final Stack<String> context) {}
+
 }
 
