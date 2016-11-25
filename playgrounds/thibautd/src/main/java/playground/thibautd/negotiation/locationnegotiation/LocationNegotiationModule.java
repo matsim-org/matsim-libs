@@ -19,6 +19,8 @@
 package playground.thibautd.negotiation.locationnegotiation;
 
 import com.google.inject.AbstractModule;
+import playground.thibautd.negotiation.framework.AlternativesGenerator;
+import playground.thibautd.negotiation.framework.PropositionUtility;
 
 /**
  * @author thibautd
@@ -26,6 +28,7 @@ import com.google.inject.AbstractModule;
 public class LocationNegotiationModule extends AbstractModule {
 	@Override
 	protected void configure() {
-
+		bind( PropositionUtility.class ).to( LocationUtility.class );
+		bind( AlternativesGenerator.class ).to( LocationAlternativesGenerator.class );
 	}
 }

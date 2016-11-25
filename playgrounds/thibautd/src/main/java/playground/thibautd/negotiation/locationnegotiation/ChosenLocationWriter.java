@@ -18,39 +18,41 @@
  * *********************************************************************** */
 package playground.thibautd.negotiation.locationnegotiation;
 
-import com.google.inject.Key;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Injector;
-import playground.ivt.utils.MonitoringUtils;
-import playground.thibautd.negotiation.framework.Negotiator;
-import playground.thibautd.negotiation.framework.NegotiatorConfigGroup;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 
 /**
  * @author thibautd
  */
-public class RunLocationNegotiation {
-	public static void main( final String... args ) throws Exception {
-		try ( AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose() ) {
-			run( args );
+public class ChosenLocationWriter implements AutoCloseable {
+	private final BufferedWriter writer;
+	private int groupNr = 0;
+
+	public ChosenLocationWriter( final String file ) throws IOException {
+		writer = IOUtils.getBufferedWriter( file );
+		writer.write( "groupNr\tpersonId\tfacilityId" );
+	}
+
+	public void writeLocation( final LocationProposition location ) {
+		try {
+			groupNr++;
+			for ( Id<Person> person : location.getGroupIds() ) {
+				writer.newLine();
+				writer.write( groupNr+"\t"+person+"\t"+location.getFacility().getId() );
+			}
+		}
+		catch ( IOException e ) {
+			throw new UncheckedIOException( e );
 		}
 	}
 
-	private static void run( final String... args ) throws IOException {
-		final Config config = ConfigUtils.loadConfig( args[ 0 ] , new NegotiatorConfigGroup() , new LocationUtilityConfigGroup() );
-
-		final Negotiator<LocationProposition> negotiator =
-				Injector.createInjector(
-				config,
-				new LocationNegotiationModule() ).getInstance(
-						new Key<Negotiator<LocationProposition>>() {} );
-
-		try ( ChosenLocationWriter writer = new ChosenLocationWriter( config.controler().getOutputDirectory()+"/locations.dat" ) ) {
-			negotiator.negotiate( writer::writeLocation );
-		}
+	@Override
+	public void close() throws IOException {
+		writer.close();
 	}
-
-
 }
