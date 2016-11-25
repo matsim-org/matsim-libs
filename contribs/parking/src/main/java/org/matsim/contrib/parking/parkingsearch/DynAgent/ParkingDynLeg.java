@@ -34,18 +34,18 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
 public class ParkingDynLeg implements DriverDynLeg {
-	private final NetworkRoute route;
-	private int currentLinkIdx;
-	private final String mode;
-	private Tuple<Id<Link>, Id<Link>> currentAndNextParkLink = null;
-	Id<Link> currentLinkId;
-	private boolean parkingMode = false;
-	ParkingSearchManager parkingManager;
-	Id<Vehicle> vehicleId;
-	private ParkingSearchLogic logic;
-	private MobsimTimer timer;
-	private EventsManager events;
-	private boolean hasFoundParking = false;
+	protected final NetworkRoute route;
+	protected int currentLinkIdx;
+	protected final String mode;
+	protected Tuple<Id<Link>, Id<Link>> currentAndNextParkLink = null;
+	protected Id<Link> currentLinkId;
+	protected boolean parkingMode = false;
+	protected ParkingSearchManager parkingManager;
+	protected Id<Vehicle> vehicleId;
+	protected ParkingSearchLogic logic;
+	protected MobsimTimer timer;
+	protected EventsManager events;
+	protected boolean hasFoundParking = false;
 
 	public ParkingDynLeg(String mode, NetworkRoute route, ParkingSearchLogic logic, ParkingSearchManager parkingManager,
 			Id<Vehicle> vehicleId, MobsimTimer timer, EventsManager events) {
