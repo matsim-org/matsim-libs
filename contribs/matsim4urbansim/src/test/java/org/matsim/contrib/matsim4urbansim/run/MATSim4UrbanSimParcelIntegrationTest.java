@@ -50,7 +50,6 @@ public class MATSim4UrbanSimParcelIntegrationTest {
 	/**
 	 * This test makes sure that five csv files used as input for UrbanSim are written correctly
 	 */
-	@Ignore
 	@Test
 	public void test() {
 		String path = utils.getOutputDirectory() ;
@@ -95,9 +94,15 @@ public class MATSim4UrbanSimParcelIntegrationTest {
 		String originalFileName = utils.getClassInputDirectory() + fileName ;
 		log.info( "old: " + originalFileName ) ;
 		Set<String> expected = fileToLines(originalFileName);
+		for ( String str : expected ) {
+			System.err.println(str);
+		}
 		String revisedFileName = utils.getOutputDirectory() + fileName ;
 		log.info( "new: " + revisedFileName ) ;
 		Set<String> actual = fileToLines(revisedFileName);
+		for ( String str : actual ) {
+			System.err.println(str);
+		}
 		Assert.assertEquals(expected, actual);
 	}
 	

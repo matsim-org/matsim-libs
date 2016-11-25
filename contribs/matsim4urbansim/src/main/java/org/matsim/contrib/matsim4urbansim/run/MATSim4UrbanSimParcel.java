@@ -42,9 +42,13 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.accessibility.AccessibilityCalculator;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
+import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
+import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
+import org.matsim.contrib.accessibility.NetworkModeProvider;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
@@ -85,6 +89,9 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 
+import com.google.inject.Key;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.name.Names;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -374,6 +381,36 @@ class MATSim4UrbanSimParcel{
 					UrbanSimParameterConfigModuleV3 module = M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(getConfig());
 					addControlerListenerBinding().toInstance(new AgentPerformanceControlerListener(benchmark, ptMatrix, module));
 				}
+				
+				if ( computeZoneBasedAccessibilities || computeGridBasedAccessibility ) {
+					controler.addOverridingModule(new AbstractModule() {
+						@Override
+						public void install() {
+							MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
+							{
+								String mode = "freeSpeed";
+								this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new FreeSpeedNetworkModeProvider(TransportMode.car));
+								accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+							}
+							{
+								String mode = TransportMode.car;
+								this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
+								accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+							}
+							{ 
+								String mode = TransportMode.bike;
+								this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+								accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+							}
+							{
+								final String mode = TransportMode.walk;
+								this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+								accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+							}
+						}
+					});
+
+				}
 
 				if(computeZoneBasedAccessibilities){
 					// creates zone based table of log sums
@@ -395,6 +432,7 @@ class MATSim4UrbanSimParcel{
 								zbacl.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
 								// somewhat stupid fix. kai, jan'2015
 							}
+							
 
 							// writing accessibility measures continuously into "zone.csv"-file. Naming of this 
 							// files is given by the UrbanSim convention importing a csv file into a identically named 
@@ -506,6 +544,8 @@ class MATSim4UrbanSimParcel{
 
 
 				}
+				
+				
 
 				// From here outputs are for analysis/debugging purposes only
 				{ // dump population in csv format
