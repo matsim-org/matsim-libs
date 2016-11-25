@@ -81,7 +81,8 @@ public class DemandGeneratorCensusTest {
 			int female = (Integer) person.getAttributes().getAttribute("gender"); // assumes that female = 1
 
 			//assert
-			Assert.assertEquals("Wrong household", "12060034", householdId.toString().split("_")[0]);
+			// TODO "wrong household" does not seem to be the correct description. This rather checks if we are in the correct municipality
+			Assert.assertEquals("Wrong household", "12060034", householdId.toString().substring(0,8));
 			if (!employed) {
 				Assert.assertEquals("Wrong locationOfWork", "-99", locationOfWork);
 			} else if (locationOfWork.length() != 6) {
