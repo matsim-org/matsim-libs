@@ -24,7 +24,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  * @author thibautd
  */
 public class NegotiatorConfigGroup extends ReflectiveConfigGroup {
-	private static final String GROUP_NAME = "negociator";
+	private static final String GROUP_NAME = "negotiator";
 
 	private int rollingAverageWindow = 100;
 	private double improvingFractionThreshold = 0.01;

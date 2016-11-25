@@ -23,6 +23,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Injector;
 import playground.ivt.utils.MonitoringUtils;
+import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.negotiation.framework.Negotiator;
 import playground.thibautd.negotiation.framework.NegotiatorConfigGroup;
 
@@ -33,14 +34,15 @@ import java.io.IOException;
  */
 public class RunLocationNegotiation {
 	public static void main( final String... args ) throws Exception {
-		try ( AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose() ) {
-			run( args );
+		final Config config = ConfigUtils.loadConfig( args[ 0 ] , new NegotiatorConfigGroup() , new LocationUtilityConfigGroup() );
+
+		try ( AutoCloseable out = MoreIOUtils.initOut( config ) ;
+			  AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose() ) {
+			run( config );
 		}
 	}
 
-	private static void run( final String... args ) throws IOException {
-		final Config config = ConfigUtils.loadConfig( args[ 0 ] , new NegotiatorConfigGroup() , new LocationUtilityConfigGroup() );
-
+	private static void run( final Config config ) throws IOException {
 		final Negotiator<LocationProposition> negotiator =
 				Injector.createInjector(
 				config,
