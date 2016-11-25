@@ -50,35 +50,21 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
  *
  */
 public final class ZoneBasedAccessibilityControlerListenerV3 implements ShutdownListener{
-	
 	private static final Logger log = Logger.getLogger(ZoneBasedAccessibilityControlerListenerV3.class);
-	private final AccessibilityCalculator delegate;
-	private ActivityFacilitiesImpl opportunities;
+
+	private final AccessibilityCalculator accessibilityCalculator;
+	private final ActivityFacilitiesImpl opportunities;
 	
-
-	// ////////////////////////////////////////////////////////////////////
-	// constructors
-	// ////////////////////////////////////////////////////////////////////
-
-	public ZoneBasedAccessibilityControlerListenerV3(ActivityFacilitiesImpl measuringPoints,
+	public ZoneBasedAccessibilityControlerListenerV3(AccessibilityCalculator accessibilityCalculator,
 													 ActivityFacilitiesImpl opportunities,
 													 PtMatrix ptMatrix,
 													 String matsim4opusTempDirectory,
 													 Scenario scenario, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories) {
 		
+		this.accessibilityCalculator = accessibilityCalculator;
 		log.info("Initializing ZoneBasedAccessibilityControlerListenerV3 ...");
 		
-		assert(measuringPoints != null);
-		delegate = new AccessibilityCalculator(scenario);
-		delegate.setMeasuringPoints(measuringPoints);
 		assert(matsim4opusTempDirectory != null);
-		if (ptMatrix != null) {
-			delegate.putAccessibilityContributionCalculator(
-			Modes4Accessibility.pt.name(),
-			PtMatrixAccessibilityContributionCalculator.create(
-					ptMatrix,
-					scenario.getConfig())); // this could be zero of no input files for pseudo pt are given ...
-		}
 		assert(scenario != null);
 
 		this.opportunities = opportunities;
@@ -91,14 +77,9 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		log.info("Entering notifyShutdown ..." );
-		if(delegate.getIsComputingMode().isEmpty()) {
+//		if(delegate.getIsComputingMode().isEmpty()) {
+		if ( accessibilityCalculator.getModes().isEmpty() ) {
 			log.error("No transport mode for accessibility calculation is activated! For this reason no accessibilities can be calculated!");
-			log.info("Please activate at least one transport mode by using the corresponding method when initializing the accessibility listener to fix this problem:");
-			log.info("- useFreeSpeedGrid()");
-			log.info("- useCarGrid()");
-			log.info("- useBikeGrid()");
-			log.info("- useWalkGrid()");
-			log.info("- usePtGrid()");
 			return;
 		}
 		
@@ -107,23 +88,14 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		MatsimServices controler = event.getServices();
 		log.info("Computing and writing zone based accessibility measures ..." );
 
-		AccessibilityConfigGroup moduleAPCM =
-				ConfigUtils.addOrGetModule(
-						controler.getScenario().getConfig(),
-						AccessibilityConfigGroup.GROUP_NAME,
-						AccessibilityConfigGroup.class);
+		AccessibilityConfigGroup accessibilityConfig = ConfigUtils.addOrGetModule( controler.getScenario().getConfig(), AccessibilityConfigGroup.class);
 
 
-		delegate.computeAccessibilities(moduleAPCM.getTimeOfDay(), opportunities);
-	}
-
-	@Deprecated // set modes from "outside"
-	public void setComputingAccessibilityForMode(Modes4Accessibility mode, boolean val) {
-		delegate.setComputingAccessibilityForMode(mode, val);
+		accessibilityCalculator.computeAccessibilities(accessibilityConfig.getTimeOfDay(), opportunities);
 	}
 
 	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface l) {
-		delegate.addFacilityDataExchangeListener(l);
+		accessibilityCalculator.addFacilityDataExchangeListener(l);
 	}
 
 }

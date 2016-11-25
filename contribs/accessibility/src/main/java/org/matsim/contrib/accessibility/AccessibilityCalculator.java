@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
@@ -33,7 +34,7 @@ public final class AccessibilityCalculator {
 	private static final Logger log = Logger.getLogger(AccessibilityCalculator.class);
 
 	// measuring points (origins) for accessibility calculation
-	private ActivityFacilitiesImpl measuringPoints;
+	private final ActivityFacilitiesImpl measuringPoints;
 	// destinations, opportunities like jobs etc ...
 	private AggregationObject[] aggregatedOpportunities;
 
@@ -62,8 +63,9 @@ public final class AccessibilityCalculator {
 	private AccessibilityConfigGroup acg;
 
 
-	public AccessibilityCalculator(Scenario scenario) {
+	public AccessibilityCalculator(Scenario scenario, ActivityFacilitiesImpl measuringPoints) {
 		this.scenario = scenario;
+		this.measuringPoints = measuringPoints;
 		this.acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
@@ -151,12 +153,9 @@ public final class AccessibilityCalculator {
 	public final void computeAccessibilities( Double departureTime, ActivityFacilities opportunities) {
 		aggregateOpportunities(opportunities, scenario.getNetwork());
 
-//		Map<Modes4Accessibility,ExpSum> expSums = new HashMap<>() ;
 		Map<String,ExpSum> expSums = new HashMap<>() ;
-		// new
 		for (String mode : calculators.keySet()) {
-//		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
-		// end new
+			log.warn("calculate ExpSum for mode=" + mode );
 			expSums.put(mode, new ExpSum());
 		}
 
@@ -164,11 +163,12 @@ public final class AccessibilityCalculator {
 		Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins = aggregateMeasurePointsWithSameNearestNode();
 
 		log.info("Now going through all origins:");
-		ProgressBar bar = new ProgressBar(aggregatedOrigins.size());
+//		ProgressBar bar = new ProgressBar(aggregatedOrigins.size());
 
 		// go through all nodes (keys) that have a measuring point (origin) assigned
 		for (Id<Node> nodeId : aggregatedOrigins.keySet()) {
-			bar.update();
+			log.info("calculate accessibility for node=" + nodeId );
+//			bar.update();
 
 			Node fromNode = scenario.getNetwork().getNodes().get(nodeId);
 
@@ -178,6 +178,7 @@ public final class AccessibilityCalculator {
 
 			// get list with origins that are assigned to "fromNode"
 			for ( ActivityFacility origin : aggregatedOrigins.get( nodeId ) ) {
+				log.info("-- calculate accessibility for origin=" + origin.getId() );
 				assert( origin.getCoord() != null );
 
 				for ( ExpSum expSum : expSums.values() ) {
@@ -197,13 +198,11 @@ public final class AccessibilityCalculator {
 				// aggregated value
 				Map<String, Double> accessibilities  = new HashMap<>();
 				
-				// new
 				for (String mode : calculators.keySet()) {
-//				for ( Modes4Accessibility mode : acg.getIsComputingMode() ) {
-				// end new
+					log.info("---- calculate accessibility for mode=" + mode );
 					// TODO introduce here a config parameter "computation mode" that can be set to "rawSum", "minimum" or "exponential/logsum/hansen", dz, sept'16
 					if(!useRawSum){
-//						System.out.println("expSums.get(mode).getSum() = " + expSums.get(mode).getSum());
+						System.out.println("expSums.get(mode).getSum() = " + expSums.get(mode).getSum());
 						accessibilities.put( mode, inverseOfLogitScaleParameter * Math.log( expSums.get(mode).getSum() ) ) ;
 					} else {
 						// this was used by IVT within SustainCity.  Not sure if we should maintain this; they could, after all, just exp the log results. kai, may'15
@@ -211,8 +210,12 @@ public final class AccessibilityCalculator {
 					}
 				}
 
+				log.warn("");
+				log.warn("sending accessibilities; start zone=" + origin.getId() );
+				for ( Entry<String, Double> entry : accessibilities.entrySet() ) {
+					log.warn( "mode=" + entry.getKey() + "; accessibility=" + entry.getValue() ) ;
+				}
 				for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
-					//log.info("here");
 					zoneDataExchangeInterface.setFacilityAccessibilities(origin, departureTime, accessibilities);
 				}
 			}
@@ -229,6 +232,8 @@ public final class AccessibilityCalculator {
 	private Map<Id<Node>, ArrayList<ActivityFacility>> aggregateMeasurePointsWithSameNearestNode() {
 		Map<Id<Node>,ArrayList<ActivityFacility>> aggregatedOrigins = new ConcurrentHashMap<>();
 
+		Gbl.assertNotNull(measuringPoints);
+		Gbl.assertNotNull(measuringPoints.getFacilities()) ;
 		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values()) {
 
 			// determine nearest network node (from- or toNode) based on the link
@@ -270,28 +275,13 @@ public final class AccessibilityCalculator {
 	}
 
 
-	@Deprecated // should be replaced by something like what follows after 
-	public final void setComputingAccessibilityForMode( Modes4Accessibility mode, boolean val ) {
-		this.acg.setComputingAccessibilityForMode(mode, val);
-	}
-
-	
 	public final void putAccessibilityContributionCalculator(String mode, AccessibilityContributionCalculator calc) {
 		this.calculators.put(mode , calc) ;
 	}
 
-
-	@Deprecated
-	public Set<Modes4Accessibility> getIsComputingMode() {
-		return this.acg.getIsComputingMode();
-	}
-	
-	
-	// new
 	public Set<String> getModes() {
 		return this.calculators.keySet() ;
 	}
-	// end new
 
 
 	/**
@@ -316,8 +306,4 @@ public final class AccessibilityCalculator {
 		}
 	}
 
-
-	public void setMeasuringPoints(ActivityFacilitiesImpl measuringPoints) {
-		this.measuringPoints = measuringPoints;
-	}
 }

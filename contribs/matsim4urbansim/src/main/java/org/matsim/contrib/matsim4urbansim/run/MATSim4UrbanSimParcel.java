@@ -43,13 +43,14 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.accessibility.AccessibilityCalculator;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
 import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
 import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
-import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.NetworkModeProvider;
+import org.matsim.contrib.accessibility.PtMatrixModeProvider;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
@@ -73,6 +74,10 @@ import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimParcelCSVWrite
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
@@ -196,14 +201,13 @@ class MATSim4UrbanSimParcel{
 		// get the network. Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
 		Network network = scenario.getNetwork();
-		modifyNetwork(network);
 		cleanNetwork(network);
 
 		// get the data from UrbanSim (parcels and persons)
 		prepareReadFromUrbanSim();
 
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
-//		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim parcels") ;
+		//		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim parcels") ;
 		ActivityFacilitiesImpl parcels = (ActivityFacilitiesImpl) scenario.getActivityFacilities() ;
 
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
@@ -228,7 +232,6 @@ class MATSim4UrbanSimParcel{
 		// population generation
 		int pc = benchmark.addMeasure("Population construction");
 		Population newPopulation = readUrbansimPersons(parcels, zones, network);
-		modifyPopulation(newPopulation);
 		benchmark.stoppMeasurement(pc);
 		System.out.println("Population construction took: " + benchmark.getDurationInSeconds( pc ) + " seconds.");
 
@@ -364,11 +367,11 @@ class MATSim4UrbanSimParcel{
 	final void addControlerListener(final ActivityFacilitiesImpl zones, final ActivityFacilitiesImpl parcels, final ActivityFacilitiesImpl opportunities, final Controler controler, final PtMatrix ptMatrix) {
 		if ( computeZoneBasedAccessibilities || computeGridBasedAccessibility ) {
 			controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
+				@Inject Config config ;
+				@Override public void install() {
 					MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
 					{
-						String mode = "freeSpeed";
+						String mode = Modes4Accessibility.freespeed.name() ;
 						this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new FreeSpeedNetworkModeProvider(TransportMode.car));
 						accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
 					}
@@ -387,10 +390,18 @@ class MATSim4UrbanSimParcel{
 						this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
 						accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
 					}
+					{
+						final String mode = TransportMode.pt;
+						// yyyy don't know if the following works; the test case does not test it.  kai, nov'16
+						if ( ptMatrix!=null ) {
+							this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new PtMatrixModeProvider(ptMatrix));
+							accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+						} 
+					}
 				}
 			});
 		}
-		
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -400,10 +411,7 @@ class MATSim4UrbanSimParcel{
 					// comparisons. kai, apr'13)
 
 					// creates zone2zone impedance matrix
-					addControlerListenerBinding().toInstance( new Zone2ZoneImpedancesControlerListener( zones,
-							parcels,
-							ptMatrix,
-							benchmark) );
+					addControlerListenerBinding().toInstance( new Zone2ZoneImpedancesControlerListener( zones, parcels, ptMatrix, benchmark) );
 				}
 
 				if(computeAgentPerformance) {
@@ -411,35 +419,31 @@ class MATSim4UrbanSimParcel{
 					UrbanSimParameterConfigModuleV3 module = M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(getConfig());
 					addControlerListenerBinding().toInstance(new AgentPerformanceControlerListener(benchmark, ptMatrix, module));
 				}
-				
 
 				if(computeZoneBasedAccessibilities){
 					// creates zone based table of log sums
 					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
 						@Inject Map<String, TravelTime> travelTimes;
 						@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
-						@Override
-						public ControlerListener get() {
-							final String matsim4opusTempDirectory = ((UrbanSimParameterConfigModuleV3) getConfig().getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME)).getMATSim4OpusTemp();
-							ZoneBasedAccessibilityControlerListenerV3 zbacl = new ZoneBasedAccessibilityControlerListenerV3( zones,
-									opportunities,
-									ptMatrix,
-									matsim4opusTempDirectory,
-									scenario, travelTimes, travelDisutilityFactories);
-							for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-								zbacl.setComputingAccessibilityForMode(mode, true);
+						@Inject Map<String, AccessibilityContributionCalculator> calculators;
+						@Override public ControlerListener get() {
+							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, zones);
+
+							for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
+								log.warn("adding accessibility calculator for mode=" + entry.getKey()) ;
+								accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 							}
-							if ( ptMatrix==null ) {
-								zbacl.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
-								// somewhat stupid fix. kai, jan'2015
-							}							
+
+							final UrbanSimParameterConfigModuleV3 urbanSimConfig = ConfigUtils.addOrGetModule( getConfig(), UrbanSimParameterConfigModuleV3.class);
+							ZoneBasedAccessibilityControlerListenerV3 zbacl = new ZoneBasedAccessibilityControlerListenerV3( accessibilityCalculator,
+									opportunities, ptMatrix, urbanSimConfig.getMATSim4OpusTemp(), scenario, travelTimes, travelDisutilityFactories);
 
 							// writing accessibility measures continuously into "zone.csv"-file. Naming of this 
 							// files is given by the UrbanSim convention importing a csv file into a identically named 
 							// data set table. THIS PRODUCES URBANSIM INPUT
 							String matsimOutputDirectory = scenario.getConfig().controler().getOutputDirectory();
 
-							UrbanSimZoneCSVWriterV2 urbanSimZoneCSVWriterV2 = new UrbanSimZoneCSVWriterV2(matsim4opusTempDirectory, matsimOutputDirectory);
+							UrbanSimZoneCSVWriterV2 urbanSimZoneCSVWriterV2 = new UrbanSimZoneCSVWriterV2(urbanSimConfig.getMATSim4OpusTemp(), matsimOutputDirectory);
 							zbacl.addFacilityDataExchangeListener(urbanSimZoneCSVWriterV2);
 
 							return zbacl;
@@ -448,7 +452,6 @@ class MATSim4UrbanSimParcel{
 
 					log.error("yyyy I think that ZoneBasedAccessibilityControlerListener and GridBasedAccessibilityControlerListener are writing " +
 							"to the same file!!!!  Check, and fix if true.  kai, jul'13") ;
-
 				}
 
 				if(computeGridBasedAccessibility){
@@ -457,8 +460,8 @@ class MATSim4UrbanSimParcel{
 						@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 						@Inject Map<String, AccessibilityContributionCalculator> calculators;
 						@Inject Scenario scenario;
-						@Override
-						public ControlerListener get() {
+						@Inject Map<String, AccessibilityContributionCalculator> calculators;
+						@Override public ControlerListener get() {
 							// initializing grid based accessibility controler listener
 							GridBasedAccessibilityShutdownListenerV3 gbacl;
 							if(computeGridBasedAccessibilitiesUsingShapeFile) {
@@ -469,74 +472,45 @@ class MATSim4UrbanSimParcel{
 								double yMin = env.getMinY();
 								double yMax = env.getMaxY();
 								Config config = scenario.getConfig();
-								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario);
+								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSizeInMeter));
 								log.info("Using custom bounding box to determine the area for accessibility computation.");
 
 								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, xMin, xMax, yMin, yMax, cellSizeInMeter);
-								accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSizeInMeter));
 
-//								gbacl.setUrbansimMode(true);
-								// this wasn't doing anything when I looked at it.  kai, oct'16
-
-//								for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-//									accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
-//								}
-//								if ( ptMatrix==null ) {
-//									accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
-//									// somewhat stupid fix. kai, jan'2015
-//								}
 								for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
+									log.warn("adding accessibility calculator for mode=" + entry.getKey()) ;
 									accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 								}
+
 							} else if(computeGridBasedAccessibilityUsingBoundingBox) {
 								Config config = scenario.getConfig();
-								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario);
-								accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter));
+								ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
+								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
 
 								log.info("Using custom bounding box to determine the area for accessibility computation.");
-								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
-//								gbacl.setUrbansimMode(true);
-								// this wasn't doing anything when I looked at it.  kai, oct'16
-
-//								for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-//									accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
-//								}
-//								if ( ptMatrix==null ) {
-//									accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
-//									// somewhat stupid fix. kai, jan'2015
-//								}
 								for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
+									log.warn("adding accessibility calculator for mode=" + entry.getKey()) ;
 									accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 								}
+
+								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
 							} else {
 								Config config = scenario.getConfig();
-								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario);
-								accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter));
+								ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter) ;
+								AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
 
 								log.info("Using the boundary of the network file to determine the area for accessibility computation.");
 								log.warn("This could lead to memory issues when the network is large and/or the cell size is too fine!");
 								if (cellSizeInMeter <= 0) {
 									throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
 								}
-								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(),nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
-
-//								gbacl.setUrbansimMode(true);
-								// this wasn't doing anything when I looked at it.  kai, oct'16
-
-								// new
-//								for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-//									accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
-//								}
-//								if ( ptMatrix==null ) {
-//									accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
-//									// somewhat stupid fix. kai, jan'2015
-//								}
 								for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
+									log.warn("adding accessibility calculator for mode=" + entry.getKey()) ;
 									accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 								}
-								// end new
-								
-								
+
+								gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(),nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
+
 							}
 
 							if(isParcelMode){
@@ -546,20 +520,17 @@ class MATSim4UrbanSimParcel{
 								// (adding such a listener is optional, here its done to be compatible with UrbanSim)
 								gbacl.addSpatialGridDataExchangeListener(csvParcelWiterListener);
 							}
-							
+
 							UrbansimCellBasedAccessibilityCSVWriterV2 urbansimAccessibilityWriter = null;
-								urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(scenario.getConfig().controler().getOutputDirectory());
-								gbacl.addFacilityDataExchangeListener(urbansimAccessibilityWriter);
+							urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(scenario.getConfig().controler().getOutputDirectory());
+							gbacl.addFacilityDataExchangeListener(urbansimAccessibilityWriter);
 
 							// accessibility calculations will be triggered when mobsim finished
 							return gbacl;
 						}
 					});
 
-
 				}
-				
-				
 
 				// From here outputs are for analysis/debugging purposes only
 				{ // dump population in csv format
@@ -641,28 +612,6 @@ class MATSim4UrbanSimParcel{
 	}
 
 	/**
-	 * This method allows to modify the MATSim network
-	 * This needs to be implemented by another class
-	 * 
-	 * @param network
-	 */
-	void modifyNetwork(Network network){
-		// this is just a stub and does nothing. 
-		// This needs to be implemented/overwritten by an inherited class
-	}
-
-	/**
-	 * This method allows to modify the population
-	 * This needs to be implemented by another class
-	 * 
-	 * @param population
-	 */
-	void modifyPopulation(Population population){
-		// this is just a stub and does nothing. 
-		// This needs to be implemented/overwritten by an inherited class
-	}
-
-	/**
 	 * triggers backup of MATSim and UrbanSim Output
 	 */
 	void matsim4UrbanSimShutdown(){
@@ -694,13 +643,14 @@ class MATSim4UrbanSimParcel{
 	 * @return MATSim4UrbanSimControlerConfigModuleV3
 	 */
 	M4UControlerConfigModuleV3 getMATSim4UrbanSimControlerConfig() {
-		ConfigGroup m = this.scenario.getConfig().getModule(M4UControlerConfigModuleV3.GROUP_NAME);
-		if (m instanceof M4UControlerConfigModuleV3) {
-			return (M4UControlerConfigModuleV3) m;
-		}
-		M4UControlerConfigModuleV3 mccm = new M4UControlerConfigModuleV3();
-		this.scenario.getConfig().getModules().put(M4UControlerConfigModuleV3.GROUP_NAME, mccm);
-		return mccm;
+		//		ConfigGroup m = this.scenario.getConfig().getModule(M4UControlerConfigModuleV3.GROUP_NAME);
+		//		if (m instanceof M4UControlerConfigModuleV3) {
+		//			return (M4UControlerConfigModuleV3) m;
+		//		}
+		//		M4UControlerConfigModuleV3 mccm = new M4UControlerConfigModuleV3();
+		//		this.scenario.getConfig().getModules().put(M4UControlerConfigModuleV3.GROUP_NAME, mccm);
+		//		return mccm;
+		return ConfigUtils.addOrGetModule(scenario.getConfig(), M4UControlerConfigModuleV3.class ) ;
 	}
 
 	/**
@@ -708,13 +658,14 @@ class MATSim4UrbanSimParcel{
 	 * @return UrbanSimParameterConfigModuleV3
 	 */
 	UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfig() {
-		ConfigGroup m = this.scenario.getConfig().getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
-		if (m instanceof UrbanSimParameterConfigModuleV3) {
-			return (UrbanSimParameterConfigModuleV3) m;
-		}
-		UrbanSimParameterConfigModuleV3 upcm = new UrbanSimParameterConfigModuleV3();
-		this.scenario.getConfig().getModules().put(UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm);
-		return upcm;
+		//		ConfigGroup m = this.scenario.getConfig().getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
+		//		if (m instanceof UrbanSimParameterConfigModuleV3) {
+		//			return (UrbanSimParameterConfigModuleV3) m;
+		//		}
+		//		UrbanSimParameterConfigModuleV3 upcm = new UrbanSimParameterConfigModuleV3();
+		//		this.scenario.getConfig().getModules().put(UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm);
+		//		return upcm;
+		return ConfigUtils.addOrGetModule(scenario.getConfig(), UrbanSimParameterConfigModuleV3.class ) ;
 	}
 
 	/**

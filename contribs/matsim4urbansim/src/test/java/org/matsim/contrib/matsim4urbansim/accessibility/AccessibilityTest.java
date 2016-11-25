@@ -121,7 +121,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 			public void install() {
 				MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
 				{
-					String mode = "freeSpeed";
+					String mode = Modes4Accessibility.freespeed.name() ;
 					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new FreeSpeedNetworkModeProvider(TransportMode.car));
 					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
 					if (!modes.contains(mode)) modes.add(mode); // This install method is called four times, but each new mode should only be added once
@@ -175,7 +175,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 						@Override
 						public ControlerListener get() {
 							//initialize new grid based accessibility controler listener and grids for the modes we want to analyze here
-							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario);
+							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
 							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution));
 //							for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 //								accessibilityCalculator.setComputingAccessibilityForMode(mode.toString(), true);

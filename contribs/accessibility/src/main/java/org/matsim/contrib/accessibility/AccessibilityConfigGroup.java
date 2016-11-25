@@ -63,12 +63,12 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 
 	public AccessibilityConfigGroup() {
 		super(GROUP_NAME);
-		isComputingMode.add(Modes4Accessibility.freeSpeed);
+		isComputingMode.add(Modes4Accessibility.freespeed);
 	}
 	
 	@Override
 	public Map<String,String> getComments() {
-		Map<String,String> map = new TreeMap<String,String>() ;
+		Map<String,String> map = new TreeMap<>() ;
 		
 		map.put(TIME_OF_DAY, "time of day at which trips for accessibility computations are assumed to start") ;
 		

@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.Labels;
@@ -65,7 +66,7 @@ import org.matsim.facilities.ActivityFacility;
 	@Override
 	public void setFacilityAccessibilities( ActivityFacility startZone, Double timeOfDay, Map<String,Double> accessibilities ) {
 		// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
-
+		
 		try{
 			assert(zoneWriter != null);
 			zoneWriter.write( startZone.getId().toString() ) ;

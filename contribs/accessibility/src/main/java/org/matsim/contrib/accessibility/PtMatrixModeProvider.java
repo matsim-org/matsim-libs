@@ -18,27 +18,24 @@
  * *********************************************************************** */
 package org.matsim.contrib.accessibility;
 
-import org.matsim.api.core.v01.network.Network;
+import javax.inject.Inject;
+import javax.inject.Provider;
+
+import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.config.Config;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-
 /**
- * @author dziemke
+ * @author nagel
+ *
  */
-public class ConstantSpeedModeProvider implements Provider<AccessibilityContributionCalculator>{
+public class PtMatrixModeProvider implements Provider<AccessibilityContributionCalculator>{
+	private final PtMatrix ptMatrix ;
+	@Inject Config config ;
+	public PtMatrixModeProvider(PtMatrix ptMatrix2) {
+		this.ptMatrix = ptMatrix2;
+	}
+	@Override public AccessibilityContributionCalculator get() {
+		return PtMatrixAccessibilityContributionCalculator.create(ptMatrix, config) ;
+	}
 
-    private String mode;
-    @Inject Config config ;
-    @Inject Network network ;
-    
-    public ConstantSpeedModeProvider(String mode) {
-        this.mode = mode;
-    }
-    
-    @Override
-    public AccessibilityContributionCalculator get() {
-        return new ConstantSpeedAccessibilityExpContributionCalculator( mode, config, network);
-    }
 }

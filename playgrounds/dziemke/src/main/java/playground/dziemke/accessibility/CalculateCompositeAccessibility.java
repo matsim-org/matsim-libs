@@ -51,7 +51,7 @@ public class CalculateCompositeAccessibility {
 
 				if (!header[0].equals(Labels.X_COORDINATE)) { throw new RuntimeException("Column is not the expected one!"); }
 				if (!header[1].equals(Labels.Y_COORDINATE)) { throw new RuntimeException("Column is not the expected one!"); }
-				if (!header[2].equals(Modes4Accessibility.freeSpeed + "_accessibility")) { throw new RuntimeException("Column is not the expected one!"); }
+				if (!header[2].equals(Modes4Accessibility.freespeed + "_accessibility")) { throw new RuntimeException("Column is not the expected one!"); }
 				if (!header[3].equals(Modes4Accessibility.car + "_accessibility")) { throw new RuntimeException("Column is not the expected one!"); }
 				if (!header[4].equals(Modes4Accessibility.bike + "_accessibility")) { throw new RuntimeException("Column is not the expected one!"); }
 				if (!header[5].equals(Modes4Accessibility.walk + "_accessibility")) { throw new RuntimeException("Column is not the expected one!"); }
@@ -196,7 +196,7 @@ public class CalculateCompositeAccessibility {
 		writer.writeNewLine();
 		
 		// write data
-		double resolution = accessibilityGrids.get(activityTypes[0]).get(Modes4Accessibility.freeSpeed).getResolution();
+		double resolution = accessibilityGrids.get(activityTypes[0]).get(Modes4Accessibility.freespeed).getResolution();
 		
 		for(double y = minY; y <= maxY ; y += resolution) {
 			for(double x = minX; x <= maxX; x += resolution) {

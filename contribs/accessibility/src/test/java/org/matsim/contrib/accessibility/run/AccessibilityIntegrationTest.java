@@ -442,7 +442,7 @@ public class AccessibilityIntegrationTest {
 					}
 
 					final AccessibilityResults actual = new AccessibilityResults();
-					actual.accessibilityFreespeed = spatialGrids.get(Modes4Accessibility.freeSpeed).getValue(new Coord(x, y));
+					actual.accessibilityFreespeed = spatialGrids.get(Modes4Accessibility.freespeed).getValue(new Coord(x, y));
 					actual.accessibilityCar = spatialGrids.get(Modes4Accessibility.car).getValue(new Coord(x, y));
 					actual.accessibilityBike = spatialGrids.get(Modes4Accessibility.bike).getValue(new Coord(x, y));
 					actual.accessibilityWalk = spatialGrids.get(Modes4Accessibility.walk).getValue(new Coord(x, y));
