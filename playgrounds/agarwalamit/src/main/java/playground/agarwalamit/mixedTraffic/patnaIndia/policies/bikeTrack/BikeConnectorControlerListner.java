@@ -27,10 +27,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.controler.TerminationCriterion;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -53,24 +53,23 @@ import playground.agarwalamit.utils.NetworkUtils;
  * Created by amit on 24/11/2016.
  */
 
-
-public class BikeConnectorControlerListner implements StartupListener, IterationStartsListener, IterationEndsListener, TerminationCriterion, ShutdownListener {
+public class BikeConnectorControlerListner implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 
     private static final Logger LOG = Logger.getLogger(PatnaBikeTrackConnectionControler.class);
+    public static final List<String> allowedModes = Arrays.asList(TransportMode.bike);
 
-    private final int numberOfConnectorsRequired ;
-    private final int removeOneConnectorAfterIteration;
+    private final int numberOfBikeConnectorsRequired;
+    private final int removeAConnectorAfterIteration;
 
-    private final List<String> consideredModesOnTrack = Arrays.asList("bike");
-    private FilteredLinkVolumeHandler handler = new FilteredLinkVolumeHandler(consideredModesOnTrack);
-
-    private final SortedMap<Id<Link>,Double> linkId2Count = new TreeMap<>();
     private final List<Id<Link>> removedConnectorLinks = new ArrayList<>();
+    private final FilteredLinkVolumeHandler handler = new FilteredLinkVolumeHandler(allowedModes);
 
-    private final String bikeTrack ;
+    private final Map<Id<Link>,Double> linkId2Count = new HashMap<>();
+
+    private final String bikeTrackFile;
     private final double reduceLinkLengthBy;
 
-    private int numberOfConnectors = 0;
+    private final List<Id<Link>> bikeConnectorLinks = new ArrayList<>(); // in total 500 links will be added to the list.
     private boolean terminateSimulation = false;
 
     @Inject
@@ -78,9 +77,9 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
 
     public BikeConnectorControlerListner(final int numberOfConnectorsRequired, final int removeOneConnectorAfterIteration,
                                          final String bikeTrackFile, final double reduceLinkLengthBy) {
-        this.numberOfConnectorsRequired = numberOfConnectorsRequired;
-        this.removeOneConnectorAfterIteration = removeOneConnectorAfterIteration;
-        this.bikeTrack = bikeTrackFile;
+        this.numberOfBikeConnectorsRequired = numberOfConnectorsRequired;
+        this.removeAConnectorAfterIteration = removeOneConnectorAfterIteration;
+        this.bikeTrackFile = bikeTrackFile;
         this.reduceLinkLengthBy = reduceLinkLengthBy;
     }
 
@@ -90,10 +89,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
         // that's why, not using core network simplifier or cleaner.
         NetworkUtils.removeIsolatedNodes(scenario.getNetwork());
 
-        // time dependent network for network change events
-        scenario.getConfig().network().setTimeVariantNetwork(true);
-
-        Network bikeNetwork = LoadMyScenarios.loadScenarioFromNetwork(this.bikeTrack).getNetwork();
+        Network bikeNetwork = LoadMyScenarios.loadScenarioFromNetwork(this.bikeTrackFile).getNetwork();
 
         LOG.info("========================== Adding links from proposed bike track to regular network.");
         for(Node n : bikeNetwork.getNodes().values()) {
@@ -108,7 +104,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
                 Node toNode = scenario.getNetwork().getNodes().get(l.getToNode().getId());
                 Link lNew = org.matsim.core.network.NetworkUtils.createAndAddLink(scenario.getNetwork(), l.getId(), fromNode, toNode,
                         l.getLength()/reduceLinkLengthBy, l.getFreespeed(), l.getCapacity(), l.getNumberOfLanes());
-                lNew.setAllowedModes(new HashSet<>(consideredModesOnTrack));
+                lNew.setAllowedModes(new HashSet<>(allowedModes));
             }
         }
 
@@ -118,41 +114,60 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
             Coord cord = bikeNode.getCoord();
 
             Node n = org.matsim.core.network.NetworkUtils.getNearestNode(scenario.getNetwork(), cord);
-            addLinksToScenario(scenario.getNetwork(), new Node [] {bikeNode, n}); // it will add 2 links in both directions
-            this.numberOfConnectors += 2;
+            addBikeConnectorLinksToScenario(scenario.getNetwork(), new Node [] {bikeNode, n});
         }
     }
 
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
-        if (event.getIteration() % this.removeOneConnectorAfterIteration == 0) {
+        if (event.getIteration() % this.removeAConnectorAfterIteration == 0 && event.getIteration()!= event.getServices().getConfig().controler().getFirstIteration() ) {
 
-            int numberOfRemainingConnectors = this.numberOfConnectors - this.removedConnectorLinks.size();
-            if( numberOfRemainingConnectors > this.numberOfConnectorsRequired) {
+            int numberOfRemainingConnectors = this.bikeConnectorLinks.size() - this.removedConnectorLinks.size();
+            if( numberOfRemainingConnectors > this.numberOfBikeConnectorsRequired) {
 
                 Map<Id<Link>, Map<Integer, Double>> link2time2vol = this.handler.getLinkId2TimeSlot2LinkCount();
-                for (Id<Link> linkId : link2time2vol.keySet()) {
-                    this.linkId2Count.put(linkId, playground.agarwalamit.utils.MapUtils.doubleValueSum(link2time2vol.get(linkId)));
+                this.linkId2Count.clear();
+//               this.linkId2Count.putAll(
+//                       link2time2vol.entrySet().stream().filter(
+//                               mapEntry->this.bikeConnectorLinks.contains(mapEntry.getKey())).collect(
+//                        Collectors.toMap(
+//                                entry -> entry.getKey(), entry -> MapUtils.doubleValueSum( entry.getValue())
+//                        )
+//                       )
+//               );
+
+                for (Id<Link> linkId : this.bikeConnectorLinks) {
+                   if(link2time2vol.containsKey(linkId)) {
+                       this.linkId2Count.put(linkId, playground.agarwalamit.utils.MapUtils.doubleValueSum(link2time2vol.get(linkId)));
+                   } else {
+                       this.linkId2Count.put(linkId, 0.);
+                   }
                 }
 
                 // sort based on the values (i.e. link volume)
-                Comparator<Map.Entry<Id<Link>, Double>> byValue = (entry1, entry2) -> entry1.getValue().compareTo(
-                        entry2.getValue());
+//                Comparator<Map.Entry<Id<Link>, Double>> byValue = (entry1, entry2) -> entry1.getValue().compareTo(
+//                        entry2.getValue());
+                Comparator<Map.Entry<Id<Link>, Double>> byValue = Comparator.comparing(Map.Entry::getValue);
 
                 Id<Link> connector2remove = linkId2Count.entrySet().stream().sorted(byValue).limit(1).iterator().next().getKey();
                 this.removedConnectorLinks.add(connector2remove);
+                this.bikeConnectorLinks.remove(connector2remove); // necessary, else, in the next round, same link can appear for removal.
 
                 double startTime = scenario.getConfig().qsim().getStartTime();
 
-                NetworkChangeEvent networkChangeEvent = new NetworkChangeEvent(startTime);
+                final NetworkChangeEvent networkChangeEvent = new NetworkChangeEvent(startTime);
                 networkChangeEvent.addLink(scenario.getNetwork().getLinks().get(connector2remove));
                 NetworkChangeEvent.ChangeValue changeValue = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 0.01);
                 networkChangeEvent.setFreespeedChange(changeValue);
-                LOG.info("========================== The free speed on the link " + connector2remove + " is set to " + changeValue.getValue() + "m/s.");
+                LOG.info("========================== The free speed on the link " + connector2remove + " is set to " + changeValue.getValue() + " m/s.");
+                LOG.info("========================== Effectively, number of bike track connectors are "+this.bikeConnectorLinks.size());
 
-                org.matsim.core.network.NetworkUtils.addNetworkChangeEvent(scenario.getNetwork(), networkChangeEvent);
+                List<NetworkChangeEvent> networkChangeEventList = new ArrayList<>();
+                networkChangeEventList.add(networkChangeEvent);
+                // dont use addNetworkChangeEvent else it will throw exception about unequal network change events from VariableIntervalTimeVariantAttribute (line 70).
+                // I think, the above method is useful, when adding all network change events once.
+                org.matsim.core.network.NetworkUtils.setNetworkChangeEvents(scenario.getNetwork(), networkChangeEventList);
             } else {
-                //terminate the simulation after removeOneConnectorAfterIteration.
                 terminateSimulation = true;
             }
             event.getServices().getEvents().removeHandler(this.handler);
@@ -161,13 +176,13 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
 
     @Override
     public void notifyIterationStarts(IterationStartsEvent event) {
-        if (event.getIteration() % this.removeOneConnectorAfterIteration == 0) {
+        if (event.getIteration() % this.removeAConnectorAfterIteration == 0 && event.getIteration()!=event.getServices().getConfig().controler().getFirstIteration() ) {
             handler.reset(event.getIteration());
             event.getServices().getEvents().addHandler(handler);
         }
     }
 
-    private void addLinksToScenario(final Network network, final Node[] nodes) {
+    private void addBikeConnectorLinksToScenario(final Network network, final Node[] nodes) {
         double dist = CoordUtils.calcEuclideanDistance(nodes[0].getCoord(), nodes[1].getCoord());
         double linkCapacity = 1500.;
         double linkSpeed = 40./3.6;
@@ -176,18 +191,19 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
             Id<Link> linkId = Id.createLinkId(id);
             Link l = org.matsim.core.network.NetworkUtils.createAndAddLink(scenario.getNetwork(), linkId, nodes[0],
                     nodes[1], dist/reduceLinkLengthBy, linkSpeed, linkCapacity, 1);
+            this.bikeConnectorLinks.add(linkId);
         }
         {
             String id = "connecter_link_"+ scenario.getNetwork().getLinks().size();
             Id<Link> linkId = Id.createLinkId(id);
             Link l = org.matsim.core.network.NetworkUtils.createAndAddLink(scenario.getNetwork(), linkId, nodes[1],
                     nodes[0], dist/reduceLinkLengthBy, linkSpeed, linkCapacity, 1);
+            this.bikeConnectorLinks.add(linkId);
         }
     }
 
-    @Override
-    public boolean continueIterations(int iteration) {
-        return (!terminateSimulation);
+    public boolean isTerminating(){
+        return this.terminateSimulation;
     }
 
     @Override
@@ -205,7 +221,6 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
             writer.close();
         } catch (IOException e) {
             throw new RuntimeException("Data is not written/read. Reason : " + e);
-
         }
     }
 }

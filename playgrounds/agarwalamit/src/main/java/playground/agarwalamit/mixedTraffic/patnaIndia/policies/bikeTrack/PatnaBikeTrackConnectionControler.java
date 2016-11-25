@@ -20,12 +20,10 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.policies.bikeTrack;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collection;
 import javax.inject.Inject;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -41,22 +39,21 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.TerminationCriterion;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.*;
-import org.matsim.vehicles.Vehicle;
 import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListner;
 import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
-import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.PatnaVehiclesGenerator;
+import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
@@ -69,194 +66,110 @@ import playground.agarwalamit.utils.FileUtils;
 public class PatnaBikeTrackConnectionControler {
 
 	private static String dir = FileUtils.RUNS_SVN+"/patnaIndia/run108/jointDemand/policies/0.15pcu/";
-
-//	private static String initialNetwork = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/network.xml.gz";
 	private static String bikeTrack = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/bikeTrack.xml.gz";
 
-	private static final Logger LOG = Logger.getLogger(PatnaBikeTrackConnectionControler.class);
-
-//	private static final List<String> modes = Arrays.asList("bike");
-//	private static final Set<String> allowedModes = new HashSet<>(modes);
-//	private static final double blendFactor = 0.95;
-	private static int numberOfConnectors = 50;
-	private static int updateConnectorsAfterIteration = 10;
-//	private static int maxItration = 100;
+	private static int numberOfConnectors = 499;
+	private static int updateConnectorsAfterIteration = 2;
 	private static double reduceLinkLengthBy = 1.;
 	private static boolean useBikeTravelTime = true;
 
-	private static final boolean isAllwoingMotorbikeOnBikeTrack = false;
-
 	public static void main(String[] args) {
-
 
 		if(args.length>0){
 			dir= args[0];
-//			initialNetwork = args[1];
 			numberOfConnectors = Integer.valueOf(args[1]);
 			updateConnectorsAfterIteration = Integer.valueOf(args[2]);
 			bikeTrack = args[3];
 			reduceLinkLengthBy = Double.valueOf(args[4]);
 			useBikeTravelTime = Boolean.valueOf(args[5]);
-
-//			maxItration = Integer.valueOf(args[5]);
-
 		}
 
-//		Map<Id<Link>, Link> linkIds = new HashMap<>(); // just to keep information about links
-//		SortedMap<Id<Link>,Double> linkId2Count = new TreeMap<>(); // need to update the counts after every run.
-//
-//		BikeTrackConnectionIdentifier connectionIdentifier = new BikeTrackConnectionIdentifier(initialNetwork,bikeTrack);
-//		connectionIdentifier.run();
-//
-//		linkIds = connectionIdentifier.getConnectedLinks();
-//
-//		// sort based on the values (i.e. link volume)
-//		Comparator<Map.Entry<Id<Link>, Double>> byValue = (entry1, entry2) -> entry1.getValue().compareTo(
-//				entry2.getValue());
-//
-//		// start trials
-//		for(int index = 1; index < maxItration/updateConnectorsAfterIteration; index++) {
-//			LOG.info("========================== Initializing scenario ... ");
-//			Scenario scenario = getScenario();
-
-//			// add bike network first
-//			for(Node n : connectionIdentifier.getBikeTrackNetwork().getNodes().values()) {
-//				if(scenario.getNetwork().getNodes().containsKey(n.getId())) continue;
-//				NetworkUtils.createAndAddNode(scenario.getNetwork(),n.getId(),n.getCoord());
-//			}
-//
-//			for(Link l : connectionIdentifier.getBikeTrackNetwork().getLinks().values()){
-//				if (scenario.getNetwork().getLinks().containsKey(l.getId()) ) continue;
-//				else{// link must be re-created so that node objects are same.
-//					addLinkToScenario(scenario, l);
-//				}
-//			}
-//
-//			if(index==1) {
-//				// add all possible connectors to it
-//				LOG.info("========================== Adding all possible connectors to bike track...");
-//
-//				for (Id<Link> lId : linkIds.keySet()) {
-//					Link l = linkIds.get(lId);
-//					// link must be re-created so that node objects are same.
-//					addLinkToScenario(scenario, l);
-//				}
-//			} else {
-//				LOG.info("========================== Adding new connectors links based on the count...");
-//				// take only pre-decided number of links.
-//				Iterator<Map.Entry<Id<Link>, Double>> iterator = linkId2Count.entrySet().stream().sorted(byValue.reversed()).limit(numberOfConnectors).iterator();
-//				while (iterator.hasNext()) {
-//					Map.Entry<Id<Link>, Double> next = iterator.next();
-//					Link l = linkIds.get(next.getKey());
-//					addLinkToScenario(scenario, l);
-//					LOG.info("========================== Connector "+ l.getId()+" is added to the network, volume on this link is "+ next.getValue());
-//				}
-//			}
-//
-//			LOG.info("========================== Running trial "+index);
-//			FilteredLinkVolumeHandler volHandler = new FilteredLinkVolumeHandler(modes);
-//			volHandler.reset(0);
-
-//			String outputDir = scenario.getConfig().controler().getOutputDirectory();
-//			outputDir = outputDir+"_"+index+"/";
-//			int firstIt = scenario.getConfig().controler().getFirstIteration();
-//			int lastIt = firstIt + updateConnectorsAfterIteration;
-//
-//			scenario.getConfig().controler().setLastIteration( lastIt );
-
-//			scenario.getConfig().controler().setOutputDirectory(outputDir);
-
 		Scenario scenario = getScenario();
+		scenario.getConfig().controler().setOutputDirectory(dir+"bikeTrackConnectors_"+numberOfConnectors+"_"+updateConnectorsAfterIteration+"_"+reduceLinkLengthBy+"/");
 		BikeConnectorControlerListner bikeConnectorControlerListner = new BikeConnectorControlerListner(numberOfConnectors, updateConnectorsAfterIteration, bikeTrack,
 				 reduceLinkLengthBy);
 
 		final Controler controler = new Controler(scenario);
-			addOverrides(controler);
-			controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					if (useBikeTravelTime) {
-						addTravelTimeBinding(TransportMode.bike).to(BikeTravelTime.class);
-					}
-					addControlerListenerBinding().toInstance(bikeConnectorControlerListner);
+
+		TerminationCriterion terminationCriterion = new MyTerminationCriteria(bikeConnectorControlerListner);
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				// plotting modal share over iterations
+				this.bind(ModalShareEventHandler.class);
+				this.addControlerListenerBinding().to(ModalShareControlerListner.class);
+
+				this.bind(ModalTripTravelTimeHandler.class);
+				this.addControlerListenerBinding().to(ModalTravelTimeControlerListner.class);
+
+				// adding pt fare system based on distance
+				this.addEventHandlerBinding().to(PtFareEventHandler.class);
+
+				if (useBikeTravelTime) {
+					addTravelTimeBinding(TransportMode.bike).to(FreeSpeedTravelTimeForBike.class);
 				}
-			});
-			controler.run();
+				addControlerListenerBinding().toInstance(bikeConnectorControlerListner);
+				bind(TerminationCriterion.class).toInstance(terminationCriterion);
+			}
+		});
 
-//			LOG.info("========================== Finished trial "+index);
+		// for PT fare system to work, make sure that util_dist and monetary dist rate for pt are zero.
+		ModeParams mp = controler.getConfig().planCalcScore().getModes().get("pt");
+		mp.setMarginalUtilityOfDistance(0.0);
+		mp.setMonetaryDistanceRate(0.0);
 
+		// add income dependent scoring function factory
+		addScoringFunction(controler);
 
-//			LOG.info("========================== Updating the bike counts on the connectors link...");
-//			// update the link counts
-//			if(index==1) { // nothing to update; just store info
-//				boolean isBikeTrackUsed = false;
-//				Map<Id<Link>, Map<Integer, Double>> link2time2vol = volHandler.getLinkId2TimeSlot2LinkCount();
-//				for(Id<Link> linkId : linkIds.keySet()) {
-//					double count;
-//					if ( link2time2vol.containsKey(linkId) ) {
-//						count = MapUtils.doubleValueSum( link2time2vol.get(linkId) );
-//						isBikeTrackUsed = true;
-//					}
-//					else count = 0.0;
-//					linkId2Count.put(linkId, count);
-//				}
-//				if(! isBikeTrackUsed) throw new RuntimeException("bike track is not used at all.");
-//			} else {
-//				Map<Id<Link>, Map<Integer, Double>> link2time2vol = volHandler.getLinkId2TimeSlot2LinkCount();
-//				for(Id<Link> linkId : linkId2Count.keySet()) {
-//					double oldCount = linkId2Count.get(linkId);
-//					double count = link2time2vol.containsKey(linkId) ? MapUtils.doubleValueSum( link2time2vol.get(linkId) ) : 0.0;
-//					linkId2Count.put(linkId,  count * (1-blendFactor) +  blendFactor * oldCount);
-//				}
-//			}
+		controler.run();
 
-			// delete unnecessary iterations folder here.
-			String outputDir = controler.getScenario().getConfig().controler().getOutputDirectory();
-			int firstIt = controler.getScenario().getConfig().controler().getFirstIteration();
-			int lastIt = controler.getScenario().getConfig().controler().getLastIteration();
+		String outputDir = controler.getScenario().getConfig().controler().getOutputDirectory();
 
-			FileUtils.deleteIntermediateIterations(outputDir,firstIt,lastIt);
+		new File(outputDir+"/analysis/").mkdir();
+		String outputEventsFile = outputDir+"/output_events.xml.gz";
+		// write some default analysis
+		String userGroup = PatnaPersonFilter.PatnaUserGroup.urban.toString();
+		ModalTravelTimeAnalyzer mtta = new ModalTravelTimeAnalyzer(outputEventsFile, userGroup, new PatnaPersonFilter());
+		mtta.run();
+		mtta.writeResults(outputDir+"/analysis/modalTravelTime_"+userGroup+".txt");
 
-			new File(outputDir+"/analysis/").mkdir();
-			String outputEventsFile = outputDir+"/output_events.xml.gz";
-			// write some default analysis
-			String userGroup = PatnaPersonFilter.PatnaUserGroup.urban.toString();
-			ModalTravelTimeAnalyzer mtta = new ModalTravelTimeAnalyzer(outputEventsFile, userGroup, new PatnaPersonFilter());
-			mtta.run();
-			mtta.writeResults(outputDir+"/analysis/modalTravelTime_"+userGroup+".txt");
+		ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new PatnaPersonFilter());
+		msc.run();
+		msc.writeResults(outputDir+"/analysis/modalShareFromEvents_"+userGroup+".txt");
 
-			ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new PatnaPersonFilter());
-			msc.run();
-			msc.writeResults(outputDir+"/analysis/modalShareFromEvents_"+userGroup+".txt");
-
-//			StatsWriter.run(outputDir);
-//		}
+		//StatsWriter.run(outputDir);
 	}
 
-//	private static void addLinkToScenario(Scenario scenario, Link l) {
-//		Node fromNode = scenario.getNetwork().getNodes().get(l.getFromNode().getId());
-//		Node toNode = scenario.getNetwork().getNodes().get(l.getToNode().getId());
-//		Link lNew = NetworkUtils.createAndAddLink(scenario.getNetwork(), l.getId(), fromNode, toNode,
-//                l.getLength()/reduceLinkLengthBy, l.getFreespeed(), l.getCapacity(), l.getNumberOfLanes());
-//		lNew.setAllowedModes(new HashSet<>(modes));
-//	}
+	private static class MyTerminationCriteria implements TerminationCriterion{
+
+		private final BikeConnectorControlerListner bikeConnectorControlerListner;
+
+		MyTerminationCriteria(final BikeConnectorControlerListner bikeConnectorControlerListner) {
+			this.bikeConnectorControlerListner = bikeConnectorControlerListner;
+		}
+
+		@Override
+		public boolean continueIterations(int iteration) {
+			return !this.bikeConnectorControlerListner.isTerminating();
+		}
+	}
 
 	public static Scenario getScenario() {
 		Config config = ConfigUtils.createConfig();
-		String outputDir ;
-
-		if(isAllwoingMotorbikeOnBikeTrack) outputDir = dir+"/bikeTrackConnectors-mb/";
-		else outputDir = dir+"/bikeTrackConnectors/";
 
 		String inputDir = dir+"/input/";
 		String configFile = inputDir + "configBaseCaseCtd.xml";
 
 		ConfigUtils.loadConfig(config, configFile);
-		config.controler().setOutputDirectory(outputDir);
 
 		config.network().setInputFile(inputDir+"network.xml.gz");
-		String inPlans = inputDir+"baseCaseOutput_plans.xml.gz";
-		config.plans().setInputFile( inPlans);
+		// time dependent network for network change events
+		config.network().setTimeVariantNetwork(true);
+
+//		String inPlans = inputDir+"samplePlansForTesting.xml";
+		String inPlans = inputDir+"/baseCaseOutput_plans.xml.gz";
+		config.plans().setInputFile( inPlans );
 		config.plans().setInputPersonAttributeFile(inputDir+"output_personAttributes.xml.gz");
 		config.vehicles().setVehiclesFile(null); // see below for vehicle type info
 
@@ -293,34 +206,6 @@ public class PatnaBikeTrackConnectionControler {
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
 		return scenario;
-	}
-
-	private static void addOverrides(Controler controler) {
-		controler.addOverridingModule(new AbstractModule() { // plotting modal share over iterations
-			@Override
-			public void install() {
-				this.bind(ModalShareEventHandler.class);
-				this.addControlerListenerBinding().to(ModalShareControlerListner.class);
-
-				this.bind(ModalTripTravelTimeHandler.class);
-				this.addControlerListenerBinding().to(ModalTravelTimeControlerListner.class);
-			}
-		});
-
-		// adding pt fare system based on distance
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				this.addEventHandlerBinding().to(PtFareEventHandler.class);
-			}
-		});
-		// for above make sure that util_dist and monetary dist rate for pt are zero.
-		ModeParams mp = controler.getConfig().planCalcScore().getModes().get("pt");
-		mp.setMarginalUtilityOfDistance(0.0);
-		mp.setMonetaryDistanceRate(0.0);
-
-		// add income dependent scoring function factory
-		addScoringFunction(controler);
 	}
 
 	private static void addScoringFunction(final Controler controler){
@@ -364,12 +249,5 @@ public class PatnaBikeTrackConnectionControler {
 				return sumScoringFunction;
 			}
 		});
-	}
-
-
-	static class BikeTravelTime implements TravelTime {
-		@Override public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-			return link.getLength() / Math.min( link.getFreespeed(time) , MixedTrafficVehiclesUtils.getSpeed(TransportMode.bike)) ;
-		}
 	}
 }
