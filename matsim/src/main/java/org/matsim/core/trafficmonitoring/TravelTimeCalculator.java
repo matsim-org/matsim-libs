@@ -146,6 +146,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 
 	@Inject
 	TravelTimeCalculator(TravelTimeCalculatorConfigGroup ttconfigGroup, EventsManager eventsManager, Network network) {
+		// this injected constructor is not used when getSeparateModes is true
 		this(network, ttconfigGroup.getTraveltimeBinSize(), ttconfigGroup.getMaxTime(), ttconfigGroup.isCalculateLinkTravelTimes(), ttconfigGroup.isCalculateLinkToLinkTravelTimes(), ttconfigGroup.isFilterModes(), CollectionUtils.stringToSet(ttconfigGroup.getAnalyzedModes()));
 		eventsManager.addHandler(this);
 		configure(this, ttconfigGroup, network);
@@ -160,11 +161,11 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 	}
 
 	TravelTimeCalculator(final Network network, final int timeslice, final int maxTime,
-								boolean calculateLinkTravelTimes, boolean calculateLinkToLinkTravelTimes, boolean filterModes, Set<String> strings) {
+								boolean calculateLinkTravelTimes, boolean calculateLinkToLinkTravelTimes, boolean filterModes, Set<String> analyzedModes) {
 		this.calculateLinkTravelTimes = calculateLinkTravelTimes;
 		this.calculateLinkToLinkTravelTimes = calculateLinkToLinkTravelTimes;
 		this.filterAnalyzedModes = filterModes;
-		this.analyzedModes = strings;
+		this.analyzedModes = analyzedModes;
 		this.timeSlice = timeslice;
 		this.numSlots = TimeBinUtils.getTimeBinCount(maxTime, timeslice);
 		this.aggregator = new OptimisticTravelTimeAggregator(this.numSlots, this.timeSlice);
