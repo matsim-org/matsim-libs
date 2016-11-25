@@ -1,3 +1,4 @@
+package playground.tschlenther.parkingSearch.PSandCSold;
 /*package playground.tschlenther.parkingSearch;
 
 import javax.inject.Provider;

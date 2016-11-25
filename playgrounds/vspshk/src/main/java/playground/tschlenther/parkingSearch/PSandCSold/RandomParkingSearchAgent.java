@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.tschlenther.parkingSearch;
+package playground.tschlenther.parkingSearch.PSandCSold;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
