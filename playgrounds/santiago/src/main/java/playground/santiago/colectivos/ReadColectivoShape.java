@@ -95,7 +95,7 @@ public class ReadColectivoShape {
 		List<String> shortLinks = new ArrayList<>();
 		Map<String,Double> distanceOfLines = new HashMap <String,Double>();
 		Network network = NetworkUtils.createNetwork();
-		new MatsimNetworkReader(network).readFile("C:/Users/Felix/Documents/Uni/Santiago de Chile/santiago/scenario/inputForMATSim/network/zzz_archive/santiago_tertiary.xml.gz");
+		new MatsimNetworkReader(network).readFile("C:/Users/Felix/Documents/Uni/Santiago de Chile/santiago/scenario/inputForMATSim/network/network_merged_cl.xml.gz");
 
 //		Filtering car network
 		NetworkFilterManager m = new NetworkFilterManager(network);
@@ -118,7 +118,7 @@ public class ReadColectivoShape {
 		DijkstraFactory df = new DijkstraFactory();
 		FreespeedTravelTimeAndDisutility fs =new FreespeedTravelTimeAndDisutility(-6, 7,-100);
 		
-		lcp =  df.createPathCalculator(network, fs,fs);
+		lcp =  df.createPathCalculator(network2, fs,fs);
 		
 
 //		reading Files
@@ -135,13 +135,17 @@ public class ReadColectivoShape {
 		{
 			numberLines++;
 			String linienName = entry.getKey();
+			if (linienName.equals("20") || linienName.equals("294")){
+				continue;
+			}
+			
 			MultiLineString mls = (MultiLineString) entry.getValue();
 			
 			Coord start = new Coord (mls.getCoordinates()[0].x,mls.getCoordinates()[0].y);
-				Node startNode = NetworkUtils.getNearestNode(network, start);
+				Node startNode = NetworkUtils.getNearestNode(network2, start);
 			int l = mls.getCoordinates().length;
 			Coord end = new Coord (mls.getCoordinates()[l-1].x, mls.getCoordinates()[l-1].y);
-				Node endNode = NetworkUtils.getNearestNode(network, end);
+				Node endNode = NetworkUtils.getNearestNode(network2, end);
 			
 			double midCoordinatefinderA = 0;
 			double midCoordinatefinderB = 0;
@@ -178,9 +182,9 @@ public class ReadColectivoShape {
 						{
 							Coord midCoord = new Coord ((coord.x + midCoordinatefinderA )/2 , (coord.y + midCoordinatefinderB)/2);
 	
-							List<Link> closestLinks = getNearestNLinks(network, midCoord, 5);
+							List<Link> closestLinks = getNearestNLinks(network2, midCoord, 5);
 			
-							List<Link> routeToClosestLink = findRouteToNextLink(midCoord, lastNode, closestLinks, network);
+							List<Link> routeToClosestLink = findRouteToNextLink(midCoord, lastNode, closestLinks, network2);
 							route.addAll(routeToClosestLink);
 							int n = route.size()-1;
 							if (n>0){
@@ -194,10 +198,12 @@ public class ReadColectivoShape {
 					}		
 				}
 			// adds route to end node
-			List<Link> closestLinks = getNearestNLinks(network, end, 5);
-			List<Link> routeToClosestLink = findRouteToNextLink(end, lastNode, closestLinks, network);
+			List<Link> closestLinks = getNearestNLinks(network2, end, 5);
+			List<Link> routeToClosestLink = findRouteToNextLink(end, lastNode, closestLinks, network2);
 			
+		
 			route.addAll(routeToClosestLink);
+			route.remove(0); //first link goes wrong way
 				for (Link lllink : route)
 				{
 											
@@ -245,7 +251,7 @@ public class ReadColectivoShape {
 			}
 			distanceOfLines.put(linienName, distance);
 		}
-		setFaresAndWriteFile(distanceOfLines, shortestDistance, longestDistance);
+//		setFaresAndWriteFile(distanceOfLines, shortestDistance, longestDistance);
 		
 		//create vehicles, get the old vehicles- and schedule-file and add new colectivo vehicles and schedule
 		createVehicles(scenario.getTransitSchedule(),scenario.getTransitVehicles());
@@ -253,8 +259,8 @@ public class ReadColectivoShape {
 		new VehicleReaderV1(scenario.getTransitVehicles()).readFile("C:/Users/Felix/Documents/Uni/Santiago de Chile/santiago/scenario/inputForMATSim/transit/old/transitvehicles.xml"); 
  		new TransitScheduleReader(scenario).readFile("C:/Users/Felix/Documents/Uni/Santiago de Chile/santiago/scenario/inputForMATSim/transit/old/transitschedule_simplified.xml");
  				
- 		new TransitScheduleWriter(transitSchedule).writeFile("C:/Users/Felix/Documents/Uni/Santiago de Chile/schedule_simplified_all.xml");
- 		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile("C:/Users/Felix/Documents/Uni/Santiago de Chile/vehicles_simplified_all.xml");
+ 		new TransitScheduleWriter(transitSchedule).writeFile("C:/Users/Felix/Documents/Uni/Santiago de Chile/schedule_simplified_all2.xml");
+ 		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile("C:/Users/Felix/Documents/Uni/Santiago de Chile/vehicles_simplified_all2.xml");
 		System.out.println("shortest distance:        "+shortestDistance);
 		System.out.println("shortest line:            "+shortestLine);
 		System.out.println("longest distance :        "+longestDistance);
@@ -335,6 +341,7 @@ private void addTransitRoute(String routeName, List<Link> route, Double distance
 	TransitRouteStop stop1 = transitSchedule.getFactory().createTransitRouteStop(stopf1, j*30, j*30);
 	stops.add(stop1);
 	this.transitSchedule.addStopFacility(stopf1);
+	stopf1.setLinkId(route.get(j).getId());
 	}
 	
 	nr.setLinkIds(route.get(0).getId(), linkIds, route.get(route.size()-1).getId());
