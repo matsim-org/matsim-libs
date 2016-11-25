@@ -361,6 +361,35 @@ class MATSim4UrbanSimParcel{
 	 * @param controler
 	 */
 	final void addControlerListener(final ActivityFacilitiesImpl zones, final ActivityFacilitiesImpl parcels, final ActivityFacilitiesImpl opportunities, final Controler controler, final PtMatrix ptMatrix) {
+		if ( computeZoneBasedAccessibilities || computeGridBasedAccessibility ) {
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
+					{
+						String mode = "freeSpeed";
+						this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new FreeSpeedNetworkModeProvider(TransportMode.car));
+						accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					}
+					{
+						String mode = TransportMode.car;
+						this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
+						accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					}
+					{ 
+						String mode = TransportMode.bike;
+						this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+						accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					}
+					{
+						final String mode = TransportMode.walk;
+						this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+						accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					}
+				}
+			});
+		}
+		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -382,35 +411,6 @@ class MATSim4UrbanSimParcel{
 					addControlerListenerBinding().toInstance(new AgentPerformanceControlerListener(benchmark, ptMatrix, module));
 				}
 				
-				if ( computeZoneBasedAccessibilities || computeGridBasedAccessibility ) {
-					controler.addOverridingModule(new AbstractModule() {
-						@Override
-						public void install() {
-							MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
-							{
-								String mode = "freeSpeed";
-								this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new FreeSpeedNetworkModeProvider(TransportMode.car));
-								accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-							}
-							{
-								String mode = TransportMode.car;
-								this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
-								accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-							}
-							{ 
-								String mode = TransportMode.bike;
-								this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
-								accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-							}
-							{
-								final String mode = TransportMode.walk;
-								this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
-								accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-							}
-						}
-					});
-
-				}
 
 				if(computeZoneBasedAccessibilities){
 					// creates zone based table of log sums
