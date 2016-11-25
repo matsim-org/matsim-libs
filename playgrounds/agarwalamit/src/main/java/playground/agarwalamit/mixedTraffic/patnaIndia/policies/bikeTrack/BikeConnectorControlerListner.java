@@ -68,7 +68,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
     private final List<Id<Link>> removedConnectorLinks = new ArrayList<>();
 
     private final String bikeTrack ;
-    private final int reduceLinkLengthBy;
+    private final double reduceLinkLengthBy;
 
     private int numberOfConnectors = 0;
     private boolean terminateSimulation = false;
@@ -77,7 +77,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
     Scenario scenario;
 
     public BikeConnectorControlerListner(final int numberOfConnectorsRequired, final int removeOneConnectorAfterIteration,
-                                         final String bikeTrackFile, final int reduceLinkLengthBy) {
+                                         final String bikeTrackFile, final double reduceLinkLengthBy) {
         this.numberOfConnectorsRequired = numberOfConnectorsRequired;
         this.removeOneConnectorAfterIteration = removeOneConnectorAfterIteration;
         this.bikeTrack = bikeTrackFile;
@@ -130,6 +130,11 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
             int numberOfRemainingConnectors = this.numberOfConnectors - this.removedConnectorLinks.size();
             if( numberOfRemainingConnectors > this.numberOfConnectorsRequired) {
 
+                Map<Id<Link>, Map<Integer, Double>> link2time2vol = this.handler.getLinkId2TimeSlot2LinkCount();
+                for (Id<Link> linkId : link2time2vol.keySet()) {
+                    this.linkId2Count.put(linkId, playground.agarwalamit.utils.MapUtils.doubleValueSum(link2time2vol.get(linkId)));
+                }
+
                 // sort based on the values (i.e. link volume)
                 Comparator<Map.Entry<Id<Link>, Double>> byValue = (entry1, entry2) -> entry1.getValue().compareTo(
                         entry2.getValue());
@@ -150,14 +155,16 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
                 //terminate the simulation after removeOneConnectorAfterIteration.
                 terminateSimulation = true;
             }
+            event.getServices().getEvents().removeHandler(this.handler);
         }
-        event.getServices().getEvents().removeHandler(this.handler);
     }
 
     @Override
     public void notifyIterationStarts(IterationStartsEvent event) {
-        handler.reset(event.getIteration());
-        event.getServices().getEvents().addHandler(handler);
+        if (event.getIteration() % this.removeOneConnectorAfterIteration == 0) {
+            handler.reset(event.getIteration());
+            event.getServices().getEvents().addHandler(handler);
+        }
     }
 
     private void addLinksToScenario(final Network network, final Node[] nodes) {
