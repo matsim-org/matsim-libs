@@ -19,11 +19,13 @@
 package playground.thibautd.negotiation.locationnegotiation;
 
 import com.google.inject.Key;
+import org.matsim.contrib.socnetsim.framework.SocialNetworkConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Injector;
 import playground.ivt.utils.MonitoringUtils;
 import playground.ivt.utils.MoreIOUtils;
+import playground.thibautd.negotiation.framework.NegotiationScenarioFromFileModule;
 import playground.thibautd.negotiation.framework.Negotiator;
 import playground.thibautd.negotiation.framework.NegotiatorConfigGroup;
 
@@ -34,7 +36,12 @@ import java.io.IOException;
  */
 public class RunLocationNegotiation {
 	public static void main( final String... args ) throws Exception {
-		final Config config = ConfigUtils.loadConfig( args[ 0 ] , new NegotiatorConfigGroup() , new LocationUtilityConfigGroup() );
+		final Config config =
+				ConfigUtils.loadConfig(
+						args[ 0 ] ,
+						new NegotiatorConfigGroup() ,
+						new LocationUtilityConfigGroup() ,
+						new SocialNetworkConfigGroup() );
 
 		try ( AutoCloseable out = MoreIOUtils.initOut( config ) ;
 			  AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose() ) {
@@ -46,6 +53,7 @@ public class RunLocationNegotiation {
 		final Negotiator<LocationProposition> negotiator =
 				Injector.createInjector(
 				config,
+						new NegotiationScenarioFromFileModule(),
 				new LocationNegotiationModule() ).getInstance(
 						new Key<Negotiator<LocationProposition>>() {} );
 

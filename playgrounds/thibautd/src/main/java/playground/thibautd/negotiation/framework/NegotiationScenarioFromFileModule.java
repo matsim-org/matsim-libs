@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.thibautd.negotiation.framework;
 
+import org.matsim.contrib.socnetsim.framework.controller.SocialNetworkModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.scenario.ScenarioByConfigModule;
 
@@ -29,5 +30,6 @@ public class NegotiationScenarioFromFileModule extends AbstractModule {
 	public void install() {
 		install( new ScenarioByConfigModule() );
 		install( new NegotiationModule() );
+		install( new SocialNetworkModule() );
 	}
 }

@@ -19,6 +19,8 @@
 package playground.thibautd.negotiation.locationnegotiation;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import playground.thibautd.negotiation.framework.AlternativesGenerator;
 import playground.thibautd.negotiation.framework.PropositionUtility;
 
@@ -28,7 +30,7 @@ import playground.thibautd.negotiation.framework.PropositionUtility;
 public class LocationNegotiationModule extends AbstractModule {
 	@Override
 	protected void configure() {
-		bind( PropositionUtility.class ).to( LocationUtility.class );
-		bind( AlternativesGenerator.class ).to( LocationAlternativesGenerator.class );
+		bind( new Key<PropositionUtility<LocationProposition>>() {} ).to( LocationUtility.class );
+		bind( new Key<AlternativesGenerator<LocationProposition>>() {} ).to( LocationAlternativesGenerator.class );
 	}
 }

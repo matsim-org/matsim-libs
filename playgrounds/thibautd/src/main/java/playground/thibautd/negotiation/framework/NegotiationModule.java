@@ -19,15 +19,20 @@
 package playground.thibautd.negotiation.framework;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import playground.thibautd.negotiation.locationnegotiation.LocationHelper;
+import playground.thibautd.negotiation.locationnegotiation.RandomSeedHelper;
 
 /**
  * @author thibautd
  */
-public class NegotiationModule extends AbstractModule {
+public class NegotiationModule<P extends Proposition> extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind( Negotiator.class );
-		// need to put type parameters?
-		bind( NegotiatingAgents.class );
+		bind( new Key<NegotiatingAgents<P>>() {} );
+		bind( LocationHelper.class );
+		bind( RandomSeedHelper.class );
 	}
 }
