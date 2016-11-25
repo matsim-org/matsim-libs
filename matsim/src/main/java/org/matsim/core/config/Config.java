@@ -330,6 +330,7 @@ public class Config implements MatsimExtensionPoint {
 	 *            name of the requested module
 	 * @return requested module
 	 */
+	@Deprecated // please try to use the "typed" access structures.  kai, nov'16
 	public final ConfigGroup getModule(final String moduleName) {
 		return this.modules.get(moduleName);
 	}

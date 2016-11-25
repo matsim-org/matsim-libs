@@ -1,7 +1,7 @@
 package playground.wrashid.lib.tools.network.obj;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
 
 
 

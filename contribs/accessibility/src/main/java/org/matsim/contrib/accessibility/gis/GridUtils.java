@@ -13,6 +13,7 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.geometry.BoundingBox;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -104,6 +105,9 @@ public final class GridUtils {
 		return measuringPoints;
 	}
 	
+	public static ActivityFacilitiesImpl createGridLayerByGridSizeByBoundingBoxV2( org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox box, double gridSize ) {
+		return createGridLayerByGridSizeByBoundingBoxV2( box.getXMin(), box.getYMin(), box.getXMax(), box.getYMax(), gridSize) ;
+	}
 	
 	/**
 	 * creates measuring points for accessibility computation

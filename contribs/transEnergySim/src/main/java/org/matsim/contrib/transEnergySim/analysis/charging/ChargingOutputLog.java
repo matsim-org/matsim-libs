@@ -22,8 +22,8 @@ package org.matsim.contrib.transEnergySim.analysis.charging;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.transEnergySim.analysis.energyConsumption.EnergyConsumptionLogRow;
 import org.matsim.contrib.transEnergySim.visualization.charging.inductiveAtRoads.LinkEvent;
 import org.matsim.contrib.transEnergySim.visualization.charging.inductiveAtRoads.LinkValueChangeEvent;

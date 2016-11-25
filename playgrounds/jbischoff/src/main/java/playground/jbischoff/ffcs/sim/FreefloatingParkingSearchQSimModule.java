@@ -3,6 +3,7 @@ package playground.jbischoff.ffcs.sim;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.matsim.contrib.parking.parkingsearch.sim.ParkingPopulationAgentSource;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -20,8 +21,6 @@ import org.matsim.pt.config.TransitConfigGroup;
 
 import com.google.inject.Module;
 import com.google.inject.Provides;
-
-import playground.jbischoff.parking.sim.ParkingPopulationAgentSource;
 
 
 class FreefloatingParkingSearchQSimModule extends com.google.inject.AbstractModule {
@@ -61,7 +60,7 @@ class FreefloatingParkingSearchQSimModule extends com.google.inject.AbstractModu
 						bind(AgentFactory.class).to(FreefloatingParkingAgentFactory.class).asEagerSingleton(); // (**)
 					}
 					bind(FFCSVehicleAgentSource.class).asEagerSingleton();
-					bind(ParkingPopulationAgentSource.class).asEagerSingleton();
+					bind(FreefloatingParkingPopulationAgentSource.class).asEagerSingleton();
 				}
 			});
 			return result;
@@ -69,7 +68,7 @@ class FreefloatingParkingSearchQSimModule extends com.google.inject.AbstractModu
 		@Override 
 		public Collection<Class<? extends AgentSource>> agentSources() {
 			Collection<Class<? extends AgentSource>> result = new ArrayList<>();
-			result.add(ParkingPopulationAgentSource.class);
+			result.add(FreefloatingParkingPopulationAgentSource.class);
 			result.add(FFCSVehicleAgentSource.class);
 			return result;
 		}

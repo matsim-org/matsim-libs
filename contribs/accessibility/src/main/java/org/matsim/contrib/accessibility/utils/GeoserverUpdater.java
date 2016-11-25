@@ -41,11 +41,10 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 		this.name = name;
 	}
 
-	private Map<Tuple<ActivityFacility, Double>, Map<Modes4Accessibility,Double>> accessibilitiesMap = new HashMap<>() ;
+	private Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = new HashMap<>() ;
 
 	@Override
-	public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay,
-			Map<Modes4Accessibility, Double> accessibilities) {
+	public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay,	Map<String, Double> accessibilities) {
 		accessibilitiesMap.put( new Tuple<>(measurePoint, timeOfDay), accessibilities ) ;
 	}
 
@@ -84,7 +83,7 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 		// yy for time being, have to assume that this is always there
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(this.crs, TransformationFactory.WGS84);
 
-		for (Entry<Tuple<ActivityFacility, Double>, Map<Modes4Accessibility, Double>> entry : accessibilitiesMap.entrySet()) {
+		for (Entry<Tuple<ActivityFacility, Double>, Map<String, Double>> entry : accessibilitiesMap.entrySet()) {
 			ActivityFacility facility = entry.getKey().getFirst();
 			Double timeOfDay = entry.getKey().getSecond();
 			Coord coord = facility.getCoord() ;
@@ -94,9 +93,11 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 			featureBuilder.add(coord.getY());
 //			featureBuilder.add(timeOfDay);
 
-			Map<Modes4Accessibility, Double> accessibilities = entry.getValue();
-			for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+			Map<String, Double> accessibilities = entry.getValue();
+			for (Modes4Accessibility modeEnum : Modes4Accessibility.values()) {
+				String mode = modeEnum.toString(); // TODO only temporarily
 				Double accessibility = accessibilities.get(mode);
+				System.out.println("mode = " + mode + " -- accessibility = " + accessibility);
 				if (accessibility != null && !Double.isNaN(accessibility)) {
 					featureBuilder.add(accessibility);
 				} else {
@@ -121,6 +122,7 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 			params.put( "user", "vsppostgres");
 			params.put( "passwd", "jafs30_A");
 			DataStore dataStore = DataStoreFinder.getDataStore(params);
+			System.out.println("dataStore = " + dataStore);
 			try {
 				dataStore.removeSchema(name);
 			} catch (IllegalArgumentException e) {

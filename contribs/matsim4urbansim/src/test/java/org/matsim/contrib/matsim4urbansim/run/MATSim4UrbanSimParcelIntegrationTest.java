@@ -20,6 +20,7 @@ package org.matsim.contrib.matsim4urbansim.run;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.NetworkWriter;
@@ -71,20 +72,20 @@ public class MATSim4UrbanSimParcelIntegrationTest {
 		final String ZONES = "zones.csv" ;
 		final String PARCELS = "parcels.csv" ;
 		
-		log.info("comparing travel data ...");
-		compareFilesByLinesInMemory(TRAVEL_DATA) ;
-		log.info("... done.");
-		log.info("comparing persons data ...");
-		compareFilesByLinesInMemory(PERSONS) ;
-		log.info("... done.");
-		log.info("comparing zones data ...");
-		compareFilesByLinesInMemory(ZONES) ;
-		log.info("... done.");
 		log.info("comparing parcels data ...");
 		compareFilesByLinesInMemory(PARCELS) ;
 		log.info("... done.");
 		log.info("comparing accessibility indicators ...");
 		compareFilesByLinesInMemory(ACCESSIBILITY_INDICATORS) ;
+		log.info("... done.");
+		log.info("comparing zones data ...");
+		compareFilesByLinesInMemory(ZONES) ;
+		log.info("... done.");
+		log.info("comparing travel data ...");
+		compareFilesByLinesInMemory(TRAVEL_DATA) ;
+		log.info("... done.");
+		log.info("comparing persons data ...");
+		compareFilesByLinesInMemory(PERSONS) ;
 		log.info("... done.");
 	}
 
@@ -93,9 +94,15 @@ public class MATSim4UrbanSimParcelIntegrationTest {
 		String originalFileName = utils.getClassInputDirectory() + fileName ;
 		log.info( "old: " + originalFileName ) ;
 		Set<String> expected = fileToLines(originalFileName);
+		for ( String str : expected ) {
+			System.err.println(str);
+		}
 		String revisedFileName = utils.getOutputDirectory() + fileName ;
 		log.info( "new: " + revisedFileName ) ;
 		Set<String> actual = fileToLines(revisedFileName);
+		for ( String str : actual ) {
+			System.err.println(str);
+		}
 		Assert.assertEquals(expected, actual);
 	}
 	

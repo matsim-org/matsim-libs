@@ -1,6 +1,6 @@
 package org.matsim.contrib.parking.lib.obj;
 
-import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.DoubleValueHashMap;
 
 import junit.framework.TestCase;
 

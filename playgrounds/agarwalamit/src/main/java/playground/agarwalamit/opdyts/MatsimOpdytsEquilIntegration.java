@@ -97,7 +97,7 @@ public class MatsimOpdytsEquilIntegration {
 
 		//==
 
-		Scenario scenario = KNBerlinControler.prepareScenario(true, config);
+		Scenario scenario = KNBerlinControler.prepareScenario(true, false, config);
 
 		double time = 6*3600. ;
 		for ( Person person : scenario.getPopulation().getPersons().values() ) {

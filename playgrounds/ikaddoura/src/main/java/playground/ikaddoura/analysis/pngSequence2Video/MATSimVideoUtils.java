@@ -45,6 +45,9 @@ public class MATSimVideoUtils {
 
 		log.info("Generating a video using a png sequence...");
 		
+		if (!outputDirectory.endsWith("/")) {
+			outputDirectory = outputDirectory + "/";
+		}
 		String outputFile = outputDirectory + pngFileName + ".mp4";
 		SequenceEncoder enc = new SequenceEncoder(new File(outputFile));
 						

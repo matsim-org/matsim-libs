@@ -37,13 +37,12 @@ public final class DefaultRoutingModules {
 
 	public static RoutingModule createPseudoTransitRouter( String mode, PopulationFactory popFac, Network net, LeastCostPathCalculator routeAlgo,
 			ModeRoutingParams params ) {
-		return new PseudoTransitRoutingModule(
+		return new FreespeedFactorRoutingModule(
 				mode,
 				popFac,
 				net,
 				routeAlgo,
-				params.getTeleportedModeFreespeedFactor(),
-				params.getBeelineDistanceFactor()) ;
+				params) ;
 	}
 
 	public static RoutingModule createTeleportationRouter( String mode, PopulationFactory popFac, ModeRoutingParams params ) {

@@ -2,12 +2,18 @@ package org.matsim.contrib.matsim4urbansim.run;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.Labels;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
 
@@ -19,6 +25,9 @@ final class UrbansimCellBasedAccessibilityCSVWriterV2 implements FacilityDataExc
 	private static final String ACCESSIBILITY_INDICATORS= "accessibility_indicators.csv";
 
 	private BufferedWriter accessibilityDataWriter ;
+	
+	private boolean ini = true ;
+	private List<String> modes = new ArrayList<>() ; 
 
 	/**
 	 * writes the header of accessibility data csv file
@@ -36,46 +45,8 @@ final class UrbansimCellBasedAccessibilityCSVWriterV2 implements FacilityDataExc
 			throw new RuntimeException( "writer is null") ;
 		}
 		
-		// create header
-		try {
-			accessibilityDataWriter.write( Labels.ZONE_ID + "," +
-					Labels.X_COORDINATE + "," +
-					Labels.Y_COORDINATE + "," + 
-//					Labels.NEARESTNODE_ID + "," +
-//					Labels.NEARESTNODE_X_COORD + "," +
-//					Labels.NEARESTNODE_Y_COORD + "," + 
-					Labels.ACCESSIBILITY_BY_FREESPEED + "," +
-					Labels.ACCESSIBILITY_BY_CAR + "," +
-					Labels.ACCESSIBILITY_BY_BIKE + "," +
-					Labels.ACCESSIBILITY_BY_WALK + "," +
-					Labels.ACCESSIBILITY_BY_PT);
-			accessibilityDataWriter.newLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("io did not work") ;
-		}
 
 		log.info("... done!");
-	}
-	/**
-	 * writes the header of accessibility data csv file
-	 */
-	public UrbansimCellBasedAccessibilityCSVWriterV2(String matsimOutputDirectory, String modeName){
-		try{
-			log.info("Initializing ...");
-			accessibilityDataWriter = IOUtils.getBufferedWriter( matsimOutputDirectory + "/" + ACCESSIBILITY_INDICATORS + "_" + modeName + ".csv" );
-			// yyyyyy in some calling sequences, this is called too early, and the directory is not yet there. kai, feb'14
-
-			// create header
-			accessibilityDataWriter.write( "x" + "\t" + "y" + "\t" + "accessibility" );
-			accessibilityDataWriter.newLine();
-
-			log.info("... done!");
-		}
-		catch(Exception e){
-			e.printStackTrace();
-			throw new RuntimeException("io not possible") ;
-		}
 	}
 
 	/**
@@ -88,10 +59,42 @@ final class UrbansimCellBasedAccessibilityCSVWriterV2 implements FacilityDataExc
 	 * 
 	 */
 	@Override
-	public void setFacilityAccessibilities(ActivityFacility startZone, Double timeOfDay, Map<Modes4Accessibility,Double> accessibilities ) {
+	public void setFacilityAccessibilities(ActivityFacility startZone, Double timeOfDay, Map<String,Double> accessibilities ) {
 		// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
+
+		// memorize the modes:
 		
-		log.info( "here2");
+		if ( ini ) {
+			ini = false ;
+			modes.add( Modes4Accessibility.freespeed.name() ) ; // needs to be first to pass existing test. kai,, nov'16
+			for ( String mode : accessibilities.keySet() ) {
+				if ( !mode.equals( Modes4Accessibility.freespeed.name() ) ) {
+					modes.add( mode ) ; // copy this into a data structure where we know that the sequence is stable
+				}
+			}
+			// create header
+			try {
+				accessibilityDataWriter.write( Labels.ZONE_ID + "," +
+						Labels.X_COORDINATE + "," +
+						Labels.Y_COORDINATE ) ; 
+//						Labels.NEARESTNODE_ID + "," +
+//						Labels.NEARESTNODE_X_COORD + "," +
+//						Labels.NEARESTNODE_Y_COORD + "," +
+				for ( String mode : modes ) {
+					accessibilityDataWriter.write( "," + mode + "_accessibility");
+				}
+				accessibilityDataWriter.newLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("io did not work") ;
+			}
+		}
+		
+		log.warn(""); 
+		log.warn("receiving accessibilities; start zone=" + startZone.getId() );
+		for ( String mode : modes ) {
+			log.warn( "mode=" + mode + "; accessibility=" + accessibilities.get(mode) ) ;
+		}
 
 		try{
 			assert(accessibilityDataWriter != null);
@@ -102,14 +105,16 @@ final class UrbansimCellBasedAccessibilityCSVWriterV2 implements FacilityDataExc
 //					node.getCoord().getX() + "," +  
 //					node.getCoord().getY() 
 ) ;
-			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-				accessibilityDataWriter.write( "," + accessibilities.get( mode ) );
+			for ( String mode : modes ) {
+				final Double accessibilityByMode = accessibilities.get( mode );
+				Gbl.assertNotNull(accessibilityByMode);
+				accessibilityDataWriter.write( "," + accessibilityByMode );
 			}
 			accessibilityDataWriter.newLine();
 		}
 		catch(Exception e){
 			e.printStackTrace();
-			System.exit(-1) ;
+			throw new RuntimeException() ;
 		}
 	}
 

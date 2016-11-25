@@ -21,7 +21,6 @@ package playground.ikaddoura.integrationCNE;
 
 import java.util.Map;
 import java.util.Set;
-
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -36,8 +35,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
-
-import playground.benjamin.internalization.EmissionCostModule;
+import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 import playground.vsp.congestion.handlers.TollHandler;
 
 /**
@@ -55,7 +53,7 @@ public class CNETollTimeDistanceTravelDisutility implements TravelDisutility {
 	private final TravelDisutility randomizedTimeDistanceTravelDisutility;
 	private final TravelTime timeCalculator;
 	private final EmissionModule emissionModule;
-	private final EmissionCostModule emissionCostModule;
+	private final EmissionResponsibilityCostModule emissionCostModule;
 	private final NoiseContext noiseContext;
 	private TollHandler tollHandler;
 	private final double marginalUtilityOfMoney;
@@ -65,7 +63,7 @@ public class CNETollTimeDistanceTravelDisutility implements TravelDisutility {
 	
 	public CNETollTimeDistanceTravelDisutility(TravelDisutility randomizedTimeDistanceTravelDisutility,
 			TravelTime timeCalculator,
-			EmissionModule emissionModule, EmissionCostModule emissionCostModule,
+			EmissionModule emissionModule, EmissionResponsibilityCostModule emissionCostModule,
 			NoiseContext noiseContext,
 			TollHandler tollHandler,
 			double marginalUtilityOfMoney,
@@ -188,10 +186,10 @@ public class CNETollTimeDistanceTravelDisutility implements TravelDisutility {
 
 		if(this.hotspotLinks == null){
 			// pricing applies for all links
-			expectedLinkExhaustEmissionTollDisutility = calculateExpectedEmissionDisutility(emissionVehicle, link, link.getLength(), linkTravelTime);
+			expectedLinkExhaustEmissionTollDisutility = calculateExpectedEmissionDisutility(emissionVehicle, link, link.getLength(), linkTravelTime, time);
 		} else {
 			// pricing applies for the current link
-			if(this.hotspotLinks.contains(link.getId())) expectedLinkExhaustEmissionTollDisutility = calculateExpectedEmissionDisutility(emissionVehicle, link, link.getLength(), linkTravelTime);
+			if(this.hotspotLinks.contains(link.getId())) expectedLinkExhaustEmissionTollDisutility = calculateExpectedEmissionDisutility(emissionVehicle, link, link.getLength(), linkTravelTime, time);
 			// pricing applies not for the current link
 			else expectedLinkExhaustEmissionTollDisutility = 0.0;
 		}
@@ -202,7 +200,7 @@ public class CNETollTimeDistanceTravelDisutility implements TravelDisutility {
 		return linkExpectedTollDisutility;
 	}
 	
-	private double calculateExpectedEmissionDisutility(Vehicle vehicle, Link link, double distance, double linkTravelTime) {
+	private double calculateExpectedEmissionDisutility(Vehicle vehicle, Link link, double distance, double linkTravelTime, double time) {
 		double linkExpectedEmissionDisutility;
 
 		/* The following is an estimate of the warm emission costs that an agent (depending on her vehicle type and
@@ -218,7 +216,7 @@ public class CNETollTimeDistanceTravelDisutility implements TravelDisutility {
 				distance,
 				linkTravelTime
 				);
-		double expectedEmissionCosts = this.emissionCostModule.calculateWarmEmissionCosts(expectedWarmEmissions);
+		double expectedEmissionCosts = this.emissionCostModule.calculateWarmEmissionCosts(expectedWarmEmissions, link.getId(), time);
 		linkExpectedEmissionDisutility = this.marginalUtilityOfMoney * expectedEmissionCosts ;
 
 		return linkExpectedEmissionDisutility;

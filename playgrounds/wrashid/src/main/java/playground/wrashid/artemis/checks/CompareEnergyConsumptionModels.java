@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import org.geotools.math.Statistics;
-import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
 
 import playground.wrashid.artemis.lav.EnergyConsumptionRegressionModel;
 import playground.wrashid.artemis.lav.EnergyConsumptionRegressionModel.EnergyConsumptionModelRow;

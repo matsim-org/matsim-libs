@@ -38,7 +38,8 @@ class PTripRouterFactoryFactory {
 
 	private final static Logger log = Logger.getLogger(PTripRouterFactoryFactory.class);
 
-	public static Provider<TripRouter> getTripRouterFactoryInstance(MatsimServices controler, Class<? extends Provider<TripRouter>> tripRouterFactory, PTransitRouterFactory pTransitRouterFactory){
+	public static Provider<TripRouter> getTripRouterFactoryInstance(MatsimServices controler, 
+			Class<? extends Provider<TripRouter>> tripRouterFactory, PTransitRouterFactory pTransitRouterFactory){
 
 		if(tripRouterFactory == null){
 			// standard case

@@ -21,7 +21,7 @@ package playground.wrashid.lib.tools.log;
 
 import java.util.LinkedList;
 
-import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
 
 
 public class FilterConsoleOutput {

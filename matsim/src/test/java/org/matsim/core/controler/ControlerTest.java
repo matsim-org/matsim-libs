@@ -33,6 +33,7 @@ import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +41,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -86,7 +88,7 @@ public class ControlerTest {
 	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
 	public static Collection<Object> parameterObjects () {
 		Object [] capacityUpdates = new Object [] { false, true };
-		return Arrays.asList(capacityUpdates);
+				return Arrays.asList(capacityUpdates);
 		// yyyy I am not sure why it is doing this ... it is necessary to do this around the qsim, but why here?  kai, aug'16
 	}
 	
@@ -919,6 +921,7 @@ public class ControlerTest {
 	 * which itself adds a Guice module... but too late.
 	 *
 	 * @thibautd
+	 * 
 	 */
 	@Test( expected = RuntimeException.class )
 	public void testGuiceModulesCannotAddModules() {
@@ -926,16 +929,30 @@ public class ControlerTest {
 		config.controler().setLastIteration( 0 );
 		final Controler controler = new Controler( config );
 
+		final Scenario replacementScenario = ScenarioUtils.createScenario( config );
+
 		controler.addOverridingModule(
 				new AbstractModule() {
 					@Override
 					public void install() {
-						controler.setScoringFunctionFactory( null );
+						controler.addOverridingModule(
+								new AbstractModule() {
+									@Override
+									public void install() {
+										bind( Scenario.class ).toInstance( replacementScenario );
+									}
+								}
+						);
 					}
 				}
 		);
 
 		controler.run();
+
+		Assert.assertSame(
+				"adding a Guice module to the controler from a Guice module is allowed but has no effect",
+				replacementScenario,
+				controler.getScenario() );
 	}
 
 	static class FakeMobsim implements Mobsim {

@@ -1,6 +1,7 @@
 package org.matsim.contrib.accessibility.utils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -211,5 +212,17 @@ public class AccessibilityUtils {
 //		FacilitiesWriter facilitiesWriter = new FacilitiesWriter(facilities);
 //		facilitiesWriter.write("../../../public-svn/matsim/specifiy_location/...xml.gz");
 		return facilities;
+	}
+
+
+	public static String getDate() {
+		Calendar cal = Calendar.getInstance ();
+		int month = cal.get(Calendar.MONTH) + 1;
+		String monthStr = month + "";
+		if (month < 10)
+			monthStr = "0" + month;
+		String date = cal.get(Calendar.YEAR) + "-" 
+				+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);
+		return date;
 	}
 }

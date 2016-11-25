@@ -4,10 +4,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
@@ -25,7 +27,6 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 	// but less elsewhere)
 	private final LeastCostPathTree lcptTravelDistance = new LeastCostPathTree( new FreeSpeedTravelTime(), new LinkLengthTravelDisutility());
 
-	private final Scenario scenario;
 	private final double betaWalkTT;
 	private final double betaWalkTD;
 	private final double walkSpeedMeterPerHour;
@@ -40,19 +41,23 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 	private Node fromNode = null;
 
-	public ConstantSpeedAccessibilityExpContributionCalculator(
-			final String mode,
-			final Scenario scenario) {
-		this.scenario = scenario;
+	private final Network network;
 
-		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore() ;
+	public ConstantSpeedAccessibilityExpContributionCalculator( final String mode, Config config, Network network) {
+
+		this.network = network;
+		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore() ;
 
 		if ( planCalcScoreConfigGroup.getOrCreateModeParams( mode ).getMonetaryDistanceRate() != 0. ) {
 			log.error( "monetary distance cost rate for "+mode+" different from zero but not used in accessibility computations");
 		}
 
 		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta() ;
-		speedMeterPerHour = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get( mode ) * 3600.;
+		final Double speedMetersPerSec = config.plansCalcRoute().getTeleportedModeSpeeds().get( mode );
+		if ( speedMetersPerSec==null ) {
+			log.error( "mode=" + mode );
+		}
+		speedMeterPerHour = speedMetersPerSec * 3600.;
 
 		final PlanCalcScoreConfigGroup.ModeParams modeParams = planCalcScoreConfigGroup.getOrCreateModeParams( mode );
 		betaTT = modeParams.getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
@@ -63,19 +68,19 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 		constant = modeParams.getConstant();
 
-		this.walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get( TransportMode.walk ) * 3600;
+		this.walkSpeedMeterPerHour = config.plansCalcRoute().getTeleportedModeSpeeds().get( TransportMode.walk ) * 3600;
 	}
 
 	@Override
 	public void notifyNewOriginNode(Node fromNode, Double departureTime) {
 		this.fromNode = fromNode;
-		this.lcptTravelDistance.calculate(scenario.getNetwork(), fromNode, departureTime);
+		this.lcptTravelDistance.calculate(network, fromNode, departureTime);
 	}
 
 	@Override
 	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
 		// get the nearest link:
-		Link nearestLink = NetworkUtils.getNearestLinkExactly(scenario.getNetwork(),origin.getCoord());
+		Link nearestLink = NetworkUtils.getNearestLinkExactly(network,origin.getCoord());
 
 		// captures the distance (as walk time) between the origin via the link to the node:
 		Distances distances = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);

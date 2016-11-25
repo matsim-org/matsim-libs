@@ -8,6 +8,9 @@ import org.matsim.contrib.analysis.vsp.qgis.QGisPointSymbolLayer;
 import org.matsim.contrib.analysis.vsp.qgis.Range;
 import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
 
+/**
+ * @author dhosse, dziemke
+ */
 public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 	
 	private Range[] ranges;
@@ -41,30 +44,6 @@ public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 	public void init() {
 		double spread = this.upperBound - this.lowerBound;
 		double stepSize = spread / (this.range - 2);
-
-		// fixed color ramp suited for NMBM work facilities
-//		this.ranges = new Range[9];
-//		this.ranges[0] = new Range(-67.38258, 2, " 2");
-//		this.ranges[1] = new Range(2, 2.5, "2 - 2.5");
-//		this.ranges[2] = new Range(2.5, 3, "2 - 3");
-//		this.ranges[3] = new Range(3, 3.5, "3 - 3.5");
-//		this.ranges[4] = new Range(3.5, 4, "3.5 - 4");
-//		this.ranges[5] = new Range(4, 4.5, "4 - 4.5");
-//		this.ranges[6] = new Range(4.5, 5, "4.5 - 5");
-//		this.ranges[7] = new Range(5, 5.5, "5 - 5.5");
-//		this.ranges[8] = new Range(5.5, 5.863296, "> 5.5");
-		
-		// fixed color ramp suited for BE shopping facilities
-//		this.ranges = new Range[9];
-//		this.ranges[0] = new Range(-67.38258, 1.75, " 1.75");
-//		this.ranges[1] = new Range(1.75, 2.5, "1.75 - 2.5");
-//		this.ranges[2] = new Range(2.5, 3.25, "2.5 - 3.25");
-//		this.ranges[3] = new Range(3.25, 4, "3.25 - 4");
-//		this.ranges[4] = new Range(4, 4.75, "4 - 4.75");
-//		this.ranges[5] = new Range(4.75, 5.5, "4.75 - 5.5");
-//		this.ranges[6] = new Range(5.5, 6.25, "5.5 - 6.25");
-//		this.ranges[7] = new Range(6.25, 7, "6.25 - 7");
-//		this.ranges[8] = new Range(7, 8, "> 7");
 		
 		// adjustable color ramp
 		this.ranges = new Range[this.range];
@@ -78,7 +57,6 @@ public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 		
 		
 		double sizeMapUnitScale[] = {0,0};
-		// int symbolSize = 1010;
 		
 		QGisPointSymbolLayer level0 = new QGisPointSymbolLayer();
 		level0.setId(0);
@@ -153,7 +131,7 @@ public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 		this.addSymbolLayer(level5);
 		
 		QGisPointSymbolLayer level6 = new QGisPointSymbolLayer();
-		level6.setId(5);
+		level6.setId(6);
 		level6.setColor(new Color(171,221,164,255));
 		level6.setColorBorder(new Color(0,0,0,255));
 		level6.setPointLayerSymbol(QGisConstants.pointLayerSymbol.rectangle);
@@ -165,7 +143,7 @@ public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 		this.addSymbolLayer(level6);
 		
 		QGisPointSymbolLayer level7 = new QGisPointSymbolLayer();
-		level7.setId(5);
+		level7.setId(7);
 		level7.setColor(new Color(107,176,175,255));
 		level7.setColorBorder(new Color(0,0,0,255));
 		level7.setPointLayerSymbol(QGisConstants.pointLayerSymbol.rectangle);
@@ -177,7 +155,7 @@ public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 		this.addSymbolLayer(level7);
 		
 		QGisPointSymbolLayer level8 = new QGisPointSymbolLayer();
-		level8.setId(5);
+		level8.setId(8);
 		level8.setColor(new Color(43,131,186,255));
 		level8.setColorBorder(new Color(0,0,0,255));
 		level8.setPointLayerSymbol(QGisConstants.pointLayerSymbol.rectangle);

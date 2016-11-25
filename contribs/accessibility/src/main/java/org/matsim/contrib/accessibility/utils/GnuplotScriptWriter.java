@@ -44,7 +44,7 @@ public final class GnuplotScriptWriter {
 	//					log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 	//					continue ;
 	//				}
-					if ( !mode.equals(Modes4Accessibility.freeSpeed) ) {
+					if ( !mode.equals(Modes4Accessibility.freespeed) ) {
 						log.error("skipping everything except freespeed for debugging purposes; remove in production code. dz, nov'14") ;
 						continue ;
 					}

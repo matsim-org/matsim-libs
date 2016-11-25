@@ -142,9 +142,10 @@ public class TripSpeedEstimator{
 				for(DigicoreChain chain : dv.getChains()){
 					String chainDate = DigicoreUtils.getShortDate(chain.getFirstMajorActivity().getEndTimeGregorianCalendar());
 					if(chainDate.equalsIgnoreCase(date)){
-						for(int i = 1; i < chain.size(); i++){
-							DigicoreActivity d1 = chain.get(i-1);
-							DigicoreActivity d2 = chain.get(i);
+						List<DigicoreActivity> activities = chain.getAllActivities();
+						for(int i = 1; i < activities.size(); i++){
+							DigicoreActivity d1 = activities.get(i-1);
+							DigicoreActivity d2 = activities.get(i);
 							
 							/* Get start hour */
 							int hour = d1.getEndTimeGregorianCalendar().get(Calendar.HOUR_OF_DAY);

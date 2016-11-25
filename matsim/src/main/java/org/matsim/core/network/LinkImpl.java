@@ -181,10 +181,12 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	/*deliberately package*/ final String getOrigId2() {
+		// yyyyyy should now be possible to solve this with Attributable. kai, nov'16
 		return this.origid ;
 	}
 
 	/*deliberately package*/ final String getType2() {
+		// yyyyyy should now be possible to solve this with Attributable. kai, nov'16
 		return this.type ;
 	}
 	
@@ -304,8 +306,10 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		"[freespeed=" + this.freespeed + "]" +
 		"[capacity=" + this.capacity + "]" +
 		"[permlanes=" + this.nofLanes + "]" +
-		"[origid=" + this.origid + "]" +
-		"[type=" + this.type + "]";
+		"[modes=" + this.allowedModes ;
+//		"[origid=" + this.origid + "]" + // not in api
+//		"[type=" + this.type + "]"; // not in api
+		// yyyyyy add the "free text" attributes
 	}
 
 	@Override
@@ -356,6 +360,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	/*deliberately package*/ void setType2(String type2) {
+		// yyyyyy should now be possible to solve this with Attributable. kai, nov'16
 		this.type = type2 ;
 	}
 }

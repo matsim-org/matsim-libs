@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -59,12 +60,14 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 
 		boolean willHaveATripFromLocation = willUseTheVehicleLaterFromLocation(destinationLink.getId(), plan, legToBeRouted);
 		
-		boolean keepTheCar = keepTheCarModel.keepTheCarDuringNextActivity(0.0, plan.getPerson(), carsharingType);	
+		double durationOfNextActivity = getDurationOfNextActivity(plan, legToBeRouted, time);		
+		
+		boolean keepTheCar = keepTheCarModel.keepTheCarDuringNextActivity(durationOfNextActivity, plan.getPerson(), carsharingType);	
 		//TODO: create a method for getting the search distance
 		double searchDistance = 1000.0;
 		if (vehicle != null) {
 			
-			if (willHaveATripFromLocation && keepTheCar) {
+			if ((willHaveATripFromLocation && keepTheCar) || (willHaveATripFromLocation && carsharingType.equals("twoway"))) {
 			return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, carsharingType, vehicle,
 					startLink, destinationLink, true, true);
 			}
@@ -99,10 +102,10 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 			//=== agent does not hold the vehicle, therefore must find a one from the supply side===
 			//=== here he chooses the company, type of vehicle and in the end vehicle ===
 			//=== possibly this could be moved to one method which decides based on the supply which vehicle to take
-			
-			String companyId = chooseCompany.pickACompany(plan, legToBeRouted, time);
+			String typeOfVehicle = chooseVehicleType.getPreferredVehicleType(plan, legToBeRouted);
+
+			String companyId = chooseCompany.pickACompany(plan, legToBeRouted, time, typeOfVehicle);
 			if (!companyId.equals("")) {
-				String typeOfVehicle = chooseVehicleType.getPreferredVehicleType(plan, legToBeRouted);
 				vehicle = this.carsharingSupplyContainer.findClosestAvailableVehicle(startLink,
 						carsharingType, typeOfVehicle, companyId, searchDistance);
 				if (vehicle == null)
@@ -115,7 +118,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 			
 				eventsManager.processEvent(new StartRentalEvent(time, carsharingType, startLink, stationLink, person.getId(), vehicle.getVehicleId()));
 			
-				if (willHaveATripFromLocation && keepTheCar) {
+				if ((willHaveATripFromLocation && keepTheCar) || (willHaveATripFromLocation && carsharingType.equals("twoway"))) {
 					return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, carsharingType, vehicle,
 							stationLink, destinationLink, true, false);
 				}
@@ -140,6 +143,15 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 		}					
 	}
 	
+	private double getDurationOfNextActivity(Plan plan, Leg legToBeRouted, double time) {
+		
+		int index = plan.getPlanElements().indexOf(legToBeRouted);
+		
+		Activity a = (Activity) plan.getPlanElements().get(index + 1);
+		
+		return a.getEndTime() - time > 0.0 ? a.getEndTime() - time : 0.0;		
+	}
+
 	private boolean willUseTheVehicleLaterFromLocation(Id<Link> linkId, Plan plan, Leg currentLeg) {
 		boolean willUseVehicle = false;
 

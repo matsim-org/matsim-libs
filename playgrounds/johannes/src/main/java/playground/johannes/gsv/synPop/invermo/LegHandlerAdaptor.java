@@ -21,6 +21,9 @@ package playground.johannes.gsv.synPop.invermo;
 
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainSegment;
+import playground.johannes.synpop.source.invermo.generator.AttributeHandler;
+import playground.johannes.synpop.source.invermo.generator.LegAttributeHandler;
+import playground.johannes.synpop.source.invermo.generator.VariableNames;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +45,7 @@ public class LegHandlerAdaptor implements AttributeHandler<Episode> {
 	@Override
 	public void handleAttribute(Episode plan, Map<String, String> attributes) {
 		for (Entry<String, String> entry : attributes.entrySet()) {
-			if (ColumnKeys.validate(entry.getValue())) {
+			if (VariableNames.validate(entry.getValue())) {
 				String key = entry.getKey();
 				if (key.startsWith("e")) {
 					int idx = Character.getNumericValue(key.charAt(1));
@@ -52,7 +55,7 @@ public class LegHandlerAdaptor implements AttributeHandler<Episode> {
 					}
 
 					for (LegAttributeHandler legHandler : delegates)
-						legHandler.handle(plan.getLegs().get(idx), idx, key, entry.getValue());
+						legHandler.handle(plan.getLegs().get(idx), key, entry.getValue());
 				}
 			}
 		}

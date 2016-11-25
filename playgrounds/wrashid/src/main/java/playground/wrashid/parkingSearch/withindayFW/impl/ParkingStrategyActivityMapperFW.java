@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.LinkedListValueHashMap;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;

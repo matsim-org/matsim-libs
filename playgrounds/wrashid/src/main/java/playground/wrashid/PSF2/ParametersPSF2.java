@@ -22,7 +22,7 @@ package playground.wrashid.PSF2;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.LinkedListValueHashMap;
 import org.matsim.core.controler.MatsimServices;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF2.chargingSchemes.ActivityIntervalTracker_NonParallelizableHandler;

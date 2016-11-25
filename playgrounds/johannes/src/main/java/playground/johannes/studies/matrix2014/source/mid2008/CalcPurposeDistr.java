@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import playground.johannes.gsv.matrices.plans2matrix.ReplaceMiscType;
 import playground.johannes.gsv.synPop.ConvertRide2Car;
-import playground.johannes.gsv.synPop.DeleteNoLegs;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
@@ -32,6 +31,7 @@ import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.PopulationIO;
 import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.processing.TaskRunner;
+import playground.johannes.synpop.source.invermo.processing.ValidateNoLegs;
 
 import java.io.IOException;
 import java.util.*;
@@ -59,7 +59,7 @@ public class CalcPurposeDistr {
 //        TaskRunner.run(new Convert2MiscType(), persons);
 
         logger.info("Removing non mobile persons...");
-        TaskRunner.validatePersons(new DeleteNoLegs(), persons);
+        TaskRunner.validatePersons(new ValidateNoLegs(), persons);
         logger.info(String.format("Persons after filter: %s", persons.size()));
 //        writer.write(outDir + "pop.mob.xml", persons);
 
@@ -77,7 +77,7 @@ public class CalcPurposeDistr {
 
 //        logger.info("Removing legs with less than 3 KM...");
 //        TaskRunner.run(new DeleteShortLongTrips(3000, true), persons);
-//        TaskRunner.validatePersons(new DeleteNoLegs(), persons);
+//        TaskRunner.validatePersons(new ValidateNoLegs(), persons);
 //        logger.info(String.format("Persons after filter: %s", persons.size()));
 //        PopulationIO.writeToXML(args[2], persons);
 

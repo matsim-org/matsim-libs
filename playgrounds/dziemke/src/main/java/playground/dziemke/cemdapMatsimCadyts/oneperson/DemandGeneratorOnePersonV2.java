@@ -266,7 +266,7 @@ public class DemandGeneratorOnePersonV2 {
     		    		    		
     		for (SimplePerson person : persons.values()) {
     			int householdId = person.getHouseholdId();
-    			String personId = person.getpersonId();
+    			int personId = Integer.parseInt(person.getpersonId().toString());
     			int employed = person.getEmployed();
     			int student = person.getStudent();
     			int driversLicence = person.getDriversLicence();

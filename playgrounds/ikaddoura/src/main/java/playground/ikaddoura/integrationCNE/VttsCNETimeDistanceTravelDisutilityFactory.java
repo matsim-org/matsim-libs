@@ -20,7 +20,6 @@
 package playground.ikaddoura.integrationCNE;
 
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -29,9 +28,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import playground.benjamin.internalization.EmissionCostModule;
 import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
+import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 import playground.vsp.congestion.handlers.TollHandler;
 
 
@@ -49,13 +47,13 @@ public final class VttsCNETimeDistanceTravelDisutilityFactory implements TravelD
 	private Set<Id<Link>> hotspotLinks = null;
 	private VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory;
 	private final EmissionModule emissionModule;
-	private final EmissionCostModule emissionCostModule;
+	private final EmissionResponsibilityCostModule emissionCostModule;
 	private final NoiseContext noiseContext;
 	private final TollHandler tollHandler;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-	public VttsCNETimeDistanceTravelDisutilityFactory(VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory, 
-			EmissionModule emissionModule, EmissionCostModule emissionCostModule, NoiseContext noiseContext, TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public VttsCNETimeDistanceTravelDisutilityFactory(VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory,
+													  EmissionModule emissionModule, EmissionResponsibilityCostModule emissionCostModule, NoiseContext noiseContext, TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.vttsTimeDistanceTravelDisutilityFactory = vttsTimeDistanceTravelDisutilityFactory;
 		this.emissionModule = emissionModule;
 		this.emissionCostModule = emissionCostModule;

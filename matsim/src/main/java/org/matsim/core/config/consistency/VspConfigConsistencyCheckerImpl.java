@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
@@ -140,12 +141,20 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				throw new RuntimeException("unexpected setting; aborting ... ") ;
 			}
 		}
+		for ( ModeParams params : config.planCalcScore().getModes().values() ) {
+			if ( params.getMonetaryDistanceRate() > 0. ) {
+				problem = true ;
+				System.out.flush() ;
+				log.error("found monetary distance rate for mode " + params.getMode() + " > 0.  You probably want a value < 0 here.\n" ) ;
+			}
+			if ( params.getMonetaryDistanceRate() < -0.01 ) {
+				System.out.flush() ;
+				log.error("found monetary distance rate for mode " + params.getMode() + " < -0.01.  -0.01 per meter means -10 per km.  You probably want to divide your value by 1000." ) ;
+			}
+		}
 		
 		if ( config.planCalcScore().getModes().get(TransportMode.car).getMonetaryDistanceRate() > 0 ) {
 			problem = true ;
-			System.out.flush() ;
-			log.error("found monetary distance cost rate car > 0.  You probably want a value < 0 here.  " +
-					"This is a bug and may be changed eventually.  kai, jun'11") ;
 		}
 		if ( config.planCalcScore().getModes().get(TransportMode.pt).getMonetaryDistanceRate() > 0 ) {
 			problem = true ;

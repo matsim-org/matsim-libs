@@ -47,7 +47,8 @@ import org.matsim.core.utils.io.IOUtils;
  * @author dgrether, michaz
  *
  */
-public abstract class OutputDirectoryLogging {
+public final class OutputDirectoryLogging {
+	private OutputDirectoryLogging(){} // do not instantiate
 
 	public static final String LOGFILE = "logfile.log";
 

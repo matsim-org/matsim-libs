@@ -27,6 +27,7 @@ import org.matsim.contrib.minibus.performance.raptor.Raptor;
 import org.matsim.contrib.minibus.performance.raptor.RaptorDisutility;
 import org.matsim.contrib.minibus.performance.raptor.TransitRouterQuadTree;
 import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
@@ -87,7 +88,9 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 				if (this.ptRouter.equalsIgnoreCase("raptor")) {
 					// nothing to do here
 				} else {
-					log.warn("Could not create speedy router, fall back to normal one.");
+					log.warn("Could not create speedy router, fall back to normal one.  This is so far not fatal.");
+//					Gbl.assertNotNull(this.schedule);
+					Gbl.assertNotNull(this.transitRouterConfig);
 					this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.transitRouterConfig.getBeelineWalkConnectionDistance());
 				}
 			}

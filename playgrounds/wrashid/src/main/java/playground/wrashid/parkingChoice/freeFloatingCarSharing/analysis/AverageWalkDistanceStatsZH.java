@@ -21,8 +21,8 @@ package playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.PC2.analysis.AverageWalkDistanceStats;
-import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
+import org.matsim.contrib.parking.parkingchoice.PC2.analysis.AverageWalkDistanceStats;
+import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking;
 
 public class AverageWalkDistanceStatsZH extends AverageWalkDistanceStats {
 

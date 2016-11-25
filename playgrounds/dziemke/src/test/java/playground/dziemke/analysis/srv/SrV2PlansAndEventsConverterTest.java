@@ -2,7 +2,6 @@ package playground.dziemke.analysis.srv;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -28,7 +27,7 @@ import java.util.TreeMap;
  */
 public class SrV2PlansAndEventsConverterTest {
 
-	private static final Logger LOG = Logger.getLogger(TripAnalyzerSrVV2.class);
+	private static final Logger LOG = Logger.getLogger(SrV2PlansAndEventsConverterTest.class);
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -36,7 +35,6 @@ public class SrV2PlansAndEventsConverterTest {
 //	private static final String NETWORK_FILE = "../../../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 	private static final String TRIPS_FILENAME = "W2008_Berlin_Weekday_Sample.dat";
 
-	@Ignore
 	@Test
 	public void TestConvert() {
 

@@ -48,7 +48,7 @@ import org.matsim.core.population.routes.RouteUtils;
  *
  * @author mrieser
  */
-public class PersonPrepareForSim extends AbstractPersonAlgorithm {
+public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 
 	private final PlanAlgorithm router;
 	private final XY2Links xy2links;

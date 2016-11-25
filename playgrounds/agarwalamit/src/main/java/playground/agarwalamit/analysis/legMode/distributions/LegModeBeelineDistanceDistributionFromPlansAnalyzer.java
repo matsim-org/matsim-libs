@@ -182,7 +182,7 @@ public class LegModeBeelineDistanceDistributionFromPlansAnalyzer extends Abstrac
 				if(pe instanceof Leg){
 					Leg leg = (Leg)pe;
 					Route route = ((Route)((Leg)pe).getRoute());
-					double distance = route.getDistance();
+					double distance = route != null ? route.getDistance() : 0.;
 					for(int i=0;i<this.distanceClasses.size()-1;i++){
 						if(distance > this.distanceClasses.get(i) && distance <= this.distanceClasses.get(i + 1)){
 							SortedMap<Double, Integer> distanceClass2NoOfLegs = this.mode2DistanceClass2LegCount.get(leg.getMode());
@@ -205,7 +205,7 @@ public class LegModeBeelineDistanceDistributionFromPlansAnalyzer extends Abstrac
 				if(pe instanceof Leg){
 					Leg leg = (Leg)pe;
 					Route route = ((Route)((Leg)pe).getRoute());
-					double distance = route.getDistance();
+					double distance = route != null ? route.getDistance() : 0.;
 					Map<Id<Person>, List<Double>> personId2dist = this.mode2PersonId2dist.get(leg.getMode());
 					if(personId2dist.containsKey(person.getId())){
 						List<Double> dists = personId2dist.get(person.getId());
@@ -229,7 +229,7 @@ public class LegModeBeelineDistanceDistributionFromPlansAnalyzer extends Abstrac
 			for(PlanElement pe : planElements){
 				if(pe instanceof Leg ){
 					Route route = ((Route)((Leg)pe).getRoute());
-					double distance = route.getDistance();
+					double distance = route!=null ? route.getDistance() : 0.;
 					if(distance > longestDistance){
 						longestDistance = distance;
 					}

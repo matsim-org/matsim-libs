@@ -1,15 +1,14 @@
 /**
- * This is probably an implementation of an approach where<ul>
- * <li> parking spaces on a per link basis are limited (somehow taken from external data)
- * <li> cars that attempt to park are <i>always</i> accepted but the drivers obtain a negative score for this
- * <li> over the iterations, parking supply is balanced with parking demand
- * <li> Walk from/to the parked vehicle is not executed, not even as teleportation, that is, it consumes zero time.  What <i> is </i> done
- * is that the walk leg is negatively scored.
+ * The parking contrib is split into two substantially different parts<ul>
+ * <li> Parking Choice, based on work of Rashid Waraich. Parts of the contrib are used in the carsharing contrib.
+ * 		<p> Its main goal, as far as we understand it, is the simulation of parking choice (e.g. between garages). There is no modelling of circulating traffic searching for parking or walking of agents to/from parking.
+ * 
+ * <li> Parking Search, by Joschka Bischoff. This contrib is currently developed at TU Berlin.
+ * 		<p> The main goal is to model parking search, including walk legs of agents and vehicles searching for parking spaces.
  * </ul>
- * As said, this is our speculation.  
  * 
  * 
- * @author (of documentation) nagel
+ * @author jfbischoff, nagel
+ *
  */
-
 package org.matsim.contrib.parking;

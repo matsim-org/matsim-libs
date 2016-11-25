@@ -21,7 +21,7 @@ package org.matsim.contrib.transEnergySim.analysis.charging;
 
 import java.util.ArrayList;
 
-import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
 
 // note somewhere, the facilityId can be a parking facility or a normal facilityId, if parking module not used
 public class StationaryChargingOutputLog extends ChargingOutputLog {

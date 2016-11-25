@@ -19,10 +19,14 @@
 
 package org.matsim.contrib.taxi.util;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.taxi.data.*;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.utils.misc.Time;
 
 import com.google.inject.Inject;
 
@@ -31,12 +35,14 @@ public class TaxiSimulationConsistencyChecker
     implements AfterMobsimListener
 {
     private final TaxiData taxiData;
-
+    private final TaxiConfigGroup tcg;
 
     @Inject
-    public TaxiSimulationConsistencyChecker(TaxiData taxiData)
+    public TaxiSimulationConsistencyChecker(TaxiData taxiData, Config config)
     {
         this.taxiData = taxiData;
+        this.tcg = (TaxiConfigGroup) config.getModule(TaxiConfigGroup.GROUP_NAME);
+        
     }
 
 
@@ -44,7 +50,11 @@ public class TaxiSimulationConsistencyChecker
     {
         for (TaxiRequest r : taxiData.getTaxiRequests().values()) {
             if (r.getStatus() != TaxiRequestStatus.PERFORMED) {
+            	if (tcg.isBreakSimulationIfNotAllRequestsServed()){
                 throw new IllegalStateException();
+            	}else {
+            		Logger.getLogger(getClass()).warn("Taxi request not performed. Request time:\t"+Time.writeTime(r.getT0()) +"\tPassenger:\t"+r.getPassenger().getId() );
+            	}
             }
         }
     }

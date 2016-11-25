@@ -9,11 +9,11 @@ import java.util.Map;
 
 class SpatialGridAggregator implements FacilityDataExchangeInterface {
 
-	private Map<Modes4Accessibility,SpatialGrid> accessibilityGrids = new HashMap<>() ;
+	private Map<String, SpatialGrid> accessibilityGrids = new HashMap<>() ;
 
 	@Override
-	public void setFacilityAccessibilities(ActivityFacility origin, Double timeOfDay, Map<Modes4Accessibility, Double> accessibilities) {
-		for (Map.Entry<Modes4Accessibility, Double> modes4AccessibilityDoubleEntry : accessibilities.entrySet()) {
+	public void setFacilityAccessibilities(ActivityFacility origin, Double timeOfDay, Map<String, Double> accessibilities) {
+		for (Map.Entry<String, Double> modes4AccessibilityDoubleEntry : accessibilities.entrySet()) {
 			accessibilityGrids.get(modes4AccessibilityDoubleEntry.getKey()).setValue(modes4AccessibilityDoubleEntry.getValue(), origin.getCoord().getX(), origin.getCoord().getY());
 		}
 	}
@@ -23,7 +23,7 @@ class SpatialGridAggregator implements FacilityDataExchangeInterface {
 
 	}
 
-	Map<Modes4Accessibility, SpatialGrid> getAccessibilityGrids() {
+	Map<String, SpatialGrid> getAccessibilityGrids() {
 		return accessibilityGrids;
 	}
 

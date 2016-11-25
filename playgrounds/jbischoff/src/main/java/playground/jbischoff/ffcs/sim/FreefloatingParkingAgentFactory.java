@@ -30,6 +30,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.parking.parkingsearch.DynAgent.agentLogic.ParkingAgentLogic;
+import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
+import org.matsim.contrib.parking.parkingsearch.manager.WalkLegFactory;
+import org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
+import org.matsim.contrib.parking.parkingsearch.routing.ParkingRouter;
+import org.matsim.contrib.parking.parkingsearch.search.ParkingSearchLogic;
+import org.matsim.contrib.parking.parkingsearch.search.RandomParkingSearchLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -44,13 +51,6 @@ import playground.jbischoff.ffcs.DynAgent.agentLogic.CarsharingParkingAgentLogic
 import playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager;
 import playground.jbischoff.ffcs.parking.FFCSorRandomParkingChoiceLogic;
 import playground.jbischoff.ffcs.parking.FacilityBasedFreefloatingParkingManager;
-import playground.jbischoff.parking.DynAgent.agentLogic.ParkingAgentLogic;
-import playground.jbischoff.parking.choice.ParkingChoiceLogic;
-import playground.jbischoff.parking.choice.RandomParkingChoiceLogic;
-import playground.jbischoff.parking.manager.ParkingSearchManager;
-import playground.jbischoff.parking.manager.WalkLegFactory;
-import playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
-import playground.jbischoff.parking.routing.ParkingRouter;
 
 /**
  * @author jbischoff
@@ -91,7 +91,7 @@ public class FreefloatingParkingAgentFactory implements AgentFactory {
 
 	@Override
 	public MobsimAgent createMobsimAgentFromPerson(Person p) {
-		ParkingChoiceLogic parkingLogic  = new FFCSorRandomParkingChoiceLogic(network,(FacilityBasedFreefloatingParkingManager) parkingManager,ffcsmanager,parkingRouter);
+		ParkingSearchLogic parkingLogic  = new FFCSorRandomParkingChoiceLogic(network,(FacilityBasedFreefloatingParkingManager) parkingManager,ffcsmanager,parkingRouter);
 		CarsharingParkingAgentLogic agentLogic = new CarsharingParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkLegFactory,
 				parkingRouter, events, parkingLogic,  ((QSim) qsim).getSimTimer(),teleportationLogic, ffcsmanager, ffcsconfig );
 		Id<Link> startLinkId = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getLinkId();

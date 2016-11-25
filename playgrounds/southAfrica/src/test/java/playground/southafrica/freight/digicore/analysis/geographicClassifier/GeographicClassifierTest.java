@@ -21,6 +21,11 @@ import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.io.DigicoreVehicleWriter;
 
 
+/**
+ * TODO Update to use V2 vehicle.
+ *
+ * @author jwjoubert
+ */
 public class GeographicClassifierTest{
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
@@ -154,8 +159,8 @@ public class GeographicClassifierTest{
 		vehicle.getChains().add(chain);
 			
 		/* Write vehicle to output folder */
-		DigicoreVehicleWriter dvw = new DigicoreVehicleWriter();
-		dvw.write(utils.getOutputDirectory() + "/" + vehicle.getId().toString() + ".xml.gz", vehicle);
+		DigicoreVehicleWriter dvw = new DigicoreVehicleWriter(vehicle);
+		dvw.writeV1(utils.getOutputDirectory() + "/" + vehicle.getId().toString() + ".xml.gz");
 	}
 	
 	
@@ -197,8 +202,8 @@ public class GeographicClassifierTest{
 		vehicle.getChains().add(chain);
 			
 		/* Write vehicle to output folder */
-		DigicoreVehicleWriter dvw = new DigicoreVehicleWriter();
-		dvw.write(utils.getOutputDirectory() + "/" + vehicle.getId().toString() + ".xml.gz", vehicle);
+		DigicoreVehicleWriter dvw = new DigicoreVehicleWriter(vehicle);
+		dvw.writeV1(utils.getOutputDirectory() + "/" + vehicle.getId().toString() + ".xml.gz");
 	}
 	
 	
@@ -235,7 +240,7 @@ public class GeographicClassifierTest{
 		vehicle.getChains().add(chain);
 			
 		/* Write vehicle to output folder */
-		DigicoreVehicleWriter dvw = new DigicoreVehicleWriter();
-		dvw.write(utils.getOutputDirectory() + "/" + vehicle.getId().toString() + ".xml.gz", vehicle);
+		DigicoreVehicleWriter dvw = new DigicoreVehicleWriter(vehicle);
+		dvw.writeV1(utils.getOutputDirectory() + "/" + vehicle.getId().toString() + ".xml.gz");
 	}
 }

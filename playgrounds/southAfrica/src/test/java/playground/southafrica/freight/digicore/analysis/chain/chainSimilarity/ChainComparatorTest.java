@@ -28,16 +28,16 @@ public class ChainComparatorTest {
 		Assert.assertEquals("Wrong number of chains.", 2, vehicle.getChains().size());
 		
 		Assert.assertEquals("Wrong umber of activities in chain 1.", 4, vehicle.getChains().get(0).size());
-		Assert.assertTrue("Wrong activity: 'a' should be in there.", vehicle.getChains().get(0).get(0).getType().equalsIgnoreCase("a"));
-		Assert.assertTrue("Wrong activity: 'b' should be in there.", vehicle.getChains().get(0).get(1).getType().equalsIgnoreCase("b"));
-		Assert.assertTrue("Wrong activity: 'c' should be in there.", vehicle.getChains().get(0).get(2).getType().equalsIgnoreCase("c"));
-		Assert.assertTrue("Wrong activity: 'd' should be in there.", vehicle.getChains().get(0).get(3).getType().equalsIgnoreCase("d"));
+		Assert.assertTrue("Wrong activity: 'a' should be in there.", vehicle.getChains().get(0).getAllActivities().get(0).getType().equalsIgnoreCase("a"));
+		Assert.assertTrue("Wrong activity: 'b' should be in there.", vehicle.getChains().get(0).getAllActivities().get(1).getType().equalsIgnoreCase("b"));
+		Assert.assertTrue("Wrong activity: 'c' should be in there.", vehicle.getChains().get(0).getAllActivities().get(2).getType().equalsIgnoreCase("c"));
+		Assert.assertTrue("Wrong activity: 'd' should be in there.", vehicle.getChains().get(0).getAllActivities().get(3).getType().equalsIgnoreCase("d"));
 		
 		Assert.assertEquals("Wrong umber of activities in chain 2.", 4, vehicle.getChains().get(1).size());
-		Assert.assertTrue("Wrong activity: 'a' should be in there.", vehicle.getChains().get(1).get(0).getType().equalsIgnoreCase("a"));
-		Assert.assertTrue("Wrong activity: 'c' should be in there.", vehicle.getChains().get(1).get(1).getType().equalsIgnoreCase("c"));
-		Assert.assertTrue("Wrong activity: 'd' should be in there.", vehicle.getChains().get(1).get(2).getType().equalsIgnoreCase("d"));
-		Assert.assertTrue("Wrong activity: 'e' should be in there.", vehicle.getChains().get(1).get(3).getType().equalsIgnoreCase("e"));
+		Assert.assertTrue("Wrong activity: 'a' should be in there.", vehicle.getChains().get(1).getAllActivities().get(0).getType().equalsIgnoreCase("a"));
+		Assert.assertTrue("Wrong activity: 'c' should be in there.", vehicle.getChains().get(1).getAllActivities().get(1).getType().equalsIgnoreCase("c"));
+		Assert.assertTrue("Wrong activity: 'd' should be in there.", vehicle.getChains().get(1).getAllActivities().get(2).getType().equalsIgnoreCase("d"));
+		Assert.assertTrue("Wrong activity: 'e' should be in there.", vehicle.getChains().get(1).getAllActivities().get(3).getType().equalsIgnoreCase("e"));
 	}
 	
 	@Test

@@ -41,7 +41,7 @@ import playground.jbischoff.ffcs.sim.SetupFreefloatingParking;
  */
 public class RunFreefloatingParkingExample {
 public static void main(String[] args) {
-	Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/bmw_carsharing/example/config _ffcs.xml", new FFCSConfigGroup());
+	Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/bmw_carsharing/example/config_ffcs.xml", new FFCSConfigGroup());
 	config.plans().setInputFile("populationffcs100.xml");
 	config.facilities().setInputFile("parkingFacilities.xml");
 	config.controler().setOutputDirectory("../../../shared-svn/projects/bmw_carsharing/example/ffcs_output");

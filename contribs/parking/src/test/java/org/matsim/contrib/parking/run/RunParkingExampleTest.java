@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.contrib.parking.parkingchoice.run.RunParkingChoiceExample;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -37,7 +38,7 @@ public class RunParkingExampleTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 	
 	/**
-	 * Test method for {@link org.matsim.contrib.parking.run.RunParkingExample#run(org.matsim.core.config.Config)}.
+	 * Test method for {@link org.matsim.contrib.parking.parkingchoice.run.RunParkingChoiceExample#run(org.matsim.core.config.Config)}.
 	 */
 	@Ignore // ignore on master until resolved on branch
 	@Test
@@ -45,7 +46,7 @@ public class RunParkingExampleTest {
 		Config config = ConfigUtils.loadConfig("src/main/ressources/config.xml");
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		config.vspExperimental().setWritingOutputEvents(true);
-		RunParkingExample.run(config);
+		RunParkingChoiceExample.run(config);
 		final String filenameExpected = utils.getInputDirectory() + "/output_events.xml.gz";
 		long expected = CRCChecksum.getCRCFromFile( filenameExpected ) ;
 		final String filenameActual = utils.getOutputDirectory() + "/output_events.xml.gz";

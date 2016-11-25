@@ -1,6 +1,6 @@
 package playground.wrashid.PSF.converter.scenario;
 
-import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
 import org.matsim.core.scenario.MutableScenario;
 
 import playground.wrashid.PSF.converter.addingParkings.AddParkingsToPlans;

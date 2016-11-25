@@ -21,7 +21,7 @@ package playground.wrashid.ABMT.rentParking;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.PC2.scoring.ParkingCostModel;
+import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingCostModel;
 import org.matsim.core.config.Config;
 
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;

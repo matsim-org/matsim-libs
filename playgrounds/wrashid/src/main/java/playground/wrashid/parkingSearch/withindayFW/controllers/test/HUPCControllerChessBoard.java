@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.multimodal.router.util.BikeTravelTime;
 import org.matsim.contrib.multimodal.router.util.UnknownTravelTime;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
-import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.IntegerValueHashMap;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;

@@ -48,7 +48,7 @@ public 	 class TravellerChain {
 	}
 
 	private boolean inPT = false;
-	public boolean inCar;
+	public boolean inCongestedMode;
 	public boolean traveledVehicle;
 	public boolean traveling=false;
 	private double linkEnterTime;

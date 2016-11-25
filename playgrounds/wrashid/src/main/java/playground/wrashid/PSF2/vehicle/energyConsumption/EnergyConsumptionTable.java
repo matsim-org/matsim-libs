@@ -21,8 +21,8 @@
 package playground.wrashid.PSF2.vehicle.energyConsumption;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.Matrix;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.Matrix;
 import org.matsim.vehicles.VehicleType;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;

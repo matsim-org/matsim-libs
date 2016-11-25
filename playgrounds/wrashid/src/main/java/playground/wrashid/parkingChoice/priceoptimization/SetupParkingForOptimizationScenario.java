@@ -30,14 +30,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
-import org.matsim.contrib.parking.PC2.infrastructure.PPRestrictedToFacilities;
-import org.matsim.contrib.parking.PC2.infrastructure.PublicParking;
-import org.matsim.contrib.parking.PC2.scoring.ParkingBetas;
-import org.matsim.contrib.parking.PC2.scoring.ParkingCostModel;
-import org.matsim.contrib.parking.PC2.scoring.ParkingScoreManager;
-import org.matsim.contrib.parking.PC2.scoring.RandomErrorTermManager;
-import org.matsim.contrib.parking.PC2.simulation.ParkingInfrastructureManager;
-import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PPRestrictedToFacilities;
+import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PublicParking;
+import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingBetas;
+import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingCostModel;
+import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingScoreManager;
+import org.matsim.contrib.parking.parkingchoice.PC2.scoring.RandomErrorTermManager;
+import org.matsim.contrib.parking.parkingchoice.PC2.simulation.ParkingInfrastructureManager;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.DoubleValueHashMap;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.MatsimServices;
@@ -122,13 +122,13 @@ public class SetupParkingForOptimizationScenario {
 						
 					}
 					publicParking = new OptimizableParking(Id.create(parking.getId(), 
-							org.matsim.contrib.parking.PC2.infrastructure.PC2Parking.class), 
+							org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking.class), 
 							parking.getIntCapacity(), parking.getCoord(), pcm, groupName, cost, cost,
 							highTariffParkingZone.isInHighTariffZone(parking.getCoord()));
 				}
 				else {
 					publicParking = new PublicParking(Id.create(parking.getId(), 
-						org.matsim.contrib.parking.PC2.infrastructure.PC2Parking.class), 
+						org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking.class), 
 						parking.getIntCapacity(), parking.getCoord(), pcm, groupName);
 				}
 				publicParkings.add(publicParking);
@@ -137,7 +137,7 @@ public class SetupParkingForOptimizationScenario {
 				HashSet<Id<ActivityFacility>> hs=new HashSet<>();
 				hs.add(pp.getActInfo().getFacilityId());
 				groupName="privateParking";
-				PPRestrictedToFacilities PPRestrictedToFacilitiesTmp=new PPRestrictedToFacilities(Id.create(parking.getId(), org.matsim.contrib.parking.PC2.infrastructure.PC2Parking.class), parking.getIntCapacity(),parking.getCoord(),pcm,groupName,hs);
+				PPRestrictedToFacilities PPRestrictedToFacilitiesTmp=new PPRestrictedToFacilities(Id.create(parking.getId(), org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking.class), parking.getIntCapacity(),parking.getCoord(),pcm,groupName,hs);
 				ppRestrictedToFacilities.add(PPRestrictedToFacilitiesTmp);
 			}
 		}

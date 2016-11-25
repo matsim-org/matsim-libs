@@ -32,9 +32,6 @@ extends ReflectiveConfigGroup
 	private static final String EMISSION_ROADTYPE_MAPPING_FILE = "emissionRoadTypeMappingFile";
 	private String emissionRoadTypeMappingFile = null;
 
-	private static final String EMISSION_VEHICLE_FILE = "emissionVehicleFile";
-	private String emissionVehicleFile = null;
-
 	private static final String EMISSION_FACTORS_WARM_FILE_AVERAGE = "averageFleetWarmEmissionFactorsFile";
 	private String averageFleetWarmEmissionFactorsFile = null;
 
@@ -50,7 +47,7 @@ extends ReflectiveConfigGroup
 	private static final String EMISSION_FACTORS_COLD_FILE_DETAILED = "detailedColdEmissionFactorsFile";
 	private String detailedColdEmissionFactorsFile;
 
-	private static final String IS_USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION = "isUsingVehicleTypeIdAsVehicleDescription";
+	private static final String USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION = "isUsingVehicleTypeIdAsVehicleDescription";
 	private boolean isUsingVehicleIdAsVehicleDescription = false;
 
 	static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED: mapping from input road types to HBEFA 3.1 road type strings";
@@ -59,6 +56,18 @@ extends ReflectiveConfigGroup
 	static final String USING_DETAILED_EMISSION_CALCULATION_CMT = "if true then detailed emission factor files must be provided!";
 	static final String EMISSION_FACTORS_WARM_FILE_DETAILED_CMT = "OPTIONAL: file with HBEFA 3.1 detailed warm emission factors";
 	static final String EMISSION_FACTORS_COLD_FILE_DETAILED_CMT = "OPTIONAL: file with HBEFA 3.1 detailed cold emission factors";
+	static final String USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION_CMT = "The vehicle information (or vehicles file) should be passed to the scenario." +
+			"The definition of emission specifications:" +  "\n\t\t" +
+			" - REQUIRED: it must start with the respective HbefaVehicleCategory followed by `;'" + "\n\t\t" +
+			" - OPTIONAL: if detailed emission calculation is switched on, the emission specifications should aditionally contain" +
+			" HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED+"."+
+
+			"\n" +
+
+			"TRUE: for backward compatibility; vehicle type id is used for the emission specifications. " + "\n"+
+			"FALSE: vehicle description is used for the emission specifications." +
+			"The emission specifications of a vehicle type should be surrounded by emission specification markers i.e."+
+			EmissionDescriptionMarker.BEGIN_EMISSIONS + " and " + EmissionDescriptionMarker.END_EMISSIONS + "." ;
 
 	@Override
 	public Map<String, String> getComments() {
@@ -66,12 +75,6 @@ extends ReflectiveConfigGroup
 
 
 		map.put(EMISSION_ROADTYPE_MAPPING_FILE, EMISSION_ROADTYPE_MAPPING_FILE_CMT);
-
-		//        map.put(EMISSION_VEHICLE_FILE, "definition of a vehicle for every person (who is allowed to choose a vehicle in the simulation):" + "\n\t\t" +
-		//                " - REQUIRED: vehicle type Id must start with the respective HbefaVehicleCategory followed by `;'" + "\n\t\t" +
-		//                " - OPTIONAL: if detailed emission calculation is switched on, vehicle type Id should aditionally contain" +
-		//                " HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED+"" +
-		//                "This must be set in the vehicles container.");
 
 		map.put(EMISSION_FACTORS_WARM_FILE_AVERAGE, EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT);
 
@@ -83,22 +86,13 @@ extends ReflectiveConfigGroup
 
 		map.put(EMISSION_FACTORS_COLD_FILE_DETAILED, EMISSION_FACTORS_COLD_FILE_DETAILED_CMT);
 
-		map.put(IS_USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION, "OPTIONAL: vehicle id is used for the description. " +
-				"The vehicle information (or vehicles file) should be passed to the scenario."+
-				"The description of a vehicle for every person (who is allowed to choose a vehicle in the simulation) should be " +
-				"surrounded by emission descrption markers i.e. "+EmissionDescriptionMarker.BEGIN_EMISSIONS+" and +" +
-				EmissionDescriptionMarker.END_EMISSIONS+"." + "\n\t\t" +
-				" - REQUIRED: it must start with the respective HbefaVehicleCategory followed by `;'" + "\n\t\t" +
-				" - OPTIONAL: if detailed emission calculation is switched on, vehicle type Id should aditionally contain" +
-				" HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED+".");
+		map.put(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION, USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION_CMT);
 
 		return map;
 	}
 
 	/**
-	 * {@value #EMISSION_ROADTYPE_MAPPING_FILE_CMT}
-	 * 
-	 * @param roadTypeMappingFile
+	 * @param roadTypeMappingFile -- {@value #EMISSION_ROADTYPE_MAPPING_FILE_CMT}
 	 */
 	@StringSetter(EMISSION_ROADTYPE_MAPPING_FILE)
 	public void setEmissionRoadTypeMappingFile(String roadTypeMappingFile) {
@@ -113,6 +107,9 @@ extends ReflectiveConfigGroup
 		return ConfigGroup.getInputFileURL(context, this.emissionRoadTypeMappingFile);
 	}
 
+	/**
+	 * @param averageFleetWarmEmissionFactorsFile -- {@value #EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT}
+	 */
 	@StringSetter(EMISSION_FACTORS_WARM_FILE_AVERAGE)
 	public void setAverageWarmEmissionFactorsFile(String averageFleetWarmEmissionFactorsFile) {
 		this.averageFleetWarmEmissionFactorsFile = averageFleetWarmEmissionFactorsFile;
@@ -126,6 +123,9 @@ extends ReflectiveConfigGroup
 		return ConfigGroup.getInputFileURL(context, this.averageFleetWarmEmissionFactorsFile);
 	}
 
+	/**
+	 * @param averageFleetColdEmissionFactorsFile -- {@value #EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT}
+	 */
 	@StringSetter(EMISSION_FACTORS_COLD_FILE_AVERAGE)
 	public void setAverageColdEmissionFactorsFile(String averageFleetColdEmissionFactorsFile) {
 		this.averageFleetColdEmissionFactorsFile = averageFleetColdEmissionFactorsFile;
@@ -143,10 +143,16 @@ extends ReflectiveConfigGroup
 	public boolean isUsingDetailedEmissionCalculation(){
 		return this.isUsingDetailedEmissionCalculation;
 	}
+	/**
+	 * @param isUsingDetailedEmissionCalculation -- {@value #USING_DETAILED_EMISSION_CALCULATION_CMT}
+	 */
 	@StringSetter(USING_DETAILED_EMISSION_CALCULATION)
 	public void setUsingDetailedEmissionCalculation(final boolean isUsingDetailedEmissionCalculation) {
 		this.isUsingDetailedEmissionCalculation = isUsingDetailedEmissionCalculation;
 	}
+	/**
+	 * @param detailedWarmEmissionFactorsFile -- {@value #EMISSION_FACTORS_WARM_FILE_DETAILED_CMT}
+	 */
 	@StringSetter(EMISSION_FACTORS_WARM_FILE_DETAILED)
 	public void setDetailedWarmEmissionFactorsFile(String detailedWarmEmissionFactorsFile) {
 		this.detailedWarmEmissionFactorsFile = detailedWarmEmissionFactorsFile;
@@ -160,6 +166,9 @@ extends ReflectiveConfigGroup
 		return ConfigGroup.getInputFileURL(context, this.detailedWarmEmissionFactorsFile);
 	}
 
+	/**
+	 * @param detailedColdEmissionFactorsFile -- {@value #EMISSION_FACTORS_COLD_FILE_DETAILED_CMT}
+	 */
 	@StringSetter(EMISSION_FACTORS_COLD_FILE_DETAILED)
 	public void setDetailedColdEmissionFactorsFile(String detailedColdEmissionFactorsFile) {
 		this.detailedColdEmissionFactorsFile = detailedColdEmissionFactorsFile;
@@ -178,12 +187,15 @@ extends ReflectiveConfigGroup
 		super(GROUP_NAME);
 	}
 
-	@StringGetter(IS_USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION)
+	@StringGetter(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION)
 	public boolean isUsingVehicleTypeIdAsVehicleDescription() {
 		return isUsingVehicleIdAsVehicleDescription;
 	}
 
-	@StringSetter(IS_USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION)
+	/**
+	 * @param usingVehicleIdAsVehicleDescription -- {@value #USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION_CMT}
+	 */
+	@StringSetter(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION)
 	public void setUsingVehicleTypeIdAsVehicleDescription(boolean usingVehicleIdAsVehicleDescription) {
 		isUsingVehicleIdAsVehicleDescription = usingVehicleIdAsVehicleDescription;
 	}

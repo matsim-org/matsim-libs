@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
+import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking;
 
 
 public interface ParkingModuleWithFreeFloatingCarSharing {

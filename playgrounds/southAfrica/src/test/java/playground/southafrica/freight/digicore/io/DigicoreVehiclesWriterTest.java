@@ -32,6 +32,8 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
+import playground.southafrica.freight.digicore.containers.DigicorePosition;
+import playground.southafrica.freight.digicore.containers.DigicoreTrace;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicles;
 
@@ -47,8 +49,35 @@ public class DigicoreVehiclesWriterTest {
 	@Test
 	public void testWriteV1() {
 		DigicoreVehicles dvs = buildVehicles();
-		new DigicoreVehiclesWriter(dvs).writeV1(utils.getOutputDirectory() + "vehicles.xml");
+		try{
+			new DigicoreVehiclesWriter(dvs).writeV1(utils.getOutputDirectory() + "vehicles.xml");
+		} catch(Exception e){
+			fail("Should write vehicles without exception.");
+		}
 		assertTrue("Output file does not exist.", new File(utils.getOutputDirectory() + "vehicles.xml").exists());
+	}
+	
+	@Test
+	public void testWriteV2() {
+		DigicoreVehicles dvs = buildVehicles();
+		try{
+			new DigicoreVehiclesWriter(dvs).writeV2(utils.getOutputDirectory() + "vehicles.xml");
+		} catch(Exception e){
+			fail("Should write vehicles without exception.");
+		}
+		assertTrue("Output file does not exist.", new File(utils.getOutputDirectory() + "vehicles.xml").exists());
+	}
+	
+	@Test
+	public void testWriteV2WithInconsistentCrs(){
+		DigicoreVehicles dvs = buildVehicles();
+		dvs.setCoordinateReferenceSystem("Something else.");
+		try{
+			new DigicoreVehiclesWriter(dvs).writeV2(utils.getOutputDirectory() + "error.xml");
+			fail("Should not write the file when the coordinate reference system of the container and traces differ.");
+		} catch(IllegalStateException e){
+			/* Correctly caught exception. */
+		}
 	}
 	
 	private DigicoreVehicles buildVehicles(){
@@ -67,6 +96,11 @@ public class DigicoreVehiclesWriterTest {
 		DigicoreActivity act = new DigicoreActivity("TestActivity", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
 		act.setCoord(CoordUtils.createCoord(0.0, 0.0));
 		chain.add(act);
+		DigicoreTrace trace = new DigicoreTrace("Test CRS");
+		trace.add(new DigicorePosition(10, 0.0, 0.0));
+		trace.add(new DigicorePosition(20, 1.0, 1.0));
+		trace.add(new DigicorePosition(30, 2.0, 2.0));
+		chain.add(trace);
 		dv2.getChains().add(chain);
 		dvs.addDigicoreVehicle(dv2);
 		

@@ -30,7 +30,7 @@ import org.matsim.core.config.Config;
 
 import playground.agarwalamit.analysis.congestion.CausedDelayAnalyzer;
 import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
-import playground.benjamin.internalization.EmissionCostFactors;
+import playground.vsp.airPollution.flatEmissions.EmissionCostFactors;
 
 /**
  * @author amit

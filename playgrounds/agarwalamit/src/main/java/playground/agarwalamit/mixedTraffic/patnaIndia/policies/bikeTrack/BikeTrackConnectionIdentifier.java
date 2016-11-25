@@ -19,9 +19,7 @@
 
 package playground.agarwalamit.mixedTraffic.patnaIndia.policies.bikeTrack;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -46,13 +44,9 @@ public class BikeTrackConnectionIdentifier {
     BikeTrackConnectionIdentifier(final String initialNetwork, final String bikeTrack){
         net = LoadMyScenarios.loadScenarioFromNetwork(initialNetwork).getNetwork();
 
-        // remove unused nodes
-        List<Node> nodes2remove = new ArrayList<>();
-        for(Node n: net.getNodes().values()) {
-            if( n.getInLinks().size() == 0 && n.getOutLinks().size() == 0) nodes2remove.add(n);
-        }
-
-        for(Node n : nodes2remove) {net.removeNode(n.getId());}
+        // dont want to do anything except removing isolated nodes,
+        // that's why, not using core network simplifier or cleaner.
+       playground.agarwalamit.utils.NetworkUtils.removeIsolatedNodes(net);
 
         bikeTrackNetwork = LoadMyScenarios.loadScenarioFromNetwork(bikeTrack).getNetwork();
     }

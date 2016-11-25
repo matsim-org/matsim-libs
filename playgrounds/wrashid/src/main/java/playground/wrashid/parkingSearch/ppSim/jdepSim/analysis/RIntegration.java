@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
-import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.Matrix;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.Matrix;
 
 /**
  * Requirements: some scripts need write access to r folder to install new packages -> put r folder outside of programms folder and remove read only access

@@ -1,7 +1,7 @@
 package playground.wrashid.parkingSearch.ppSim.jdepSim.analysis;
 
-import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.Matrix;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.Matrix;
 
 public class CompareSelectedParkingPropertyTwoRuns extends CompareSelectedParkingPropertyOneRun {
 

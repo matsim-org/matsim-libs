@@ -122,6 +122,7 @@ public class TraveltimeAndDistanceEventHandler implements ActivityStartEventHand
 		// return (personId.toString().endsWith("vw") ? true : false);
 //		return ((personId.toString().startsWith("BS_WB") || (personId.toString().startsWith("WB_BS"))) ? true : false);
 		 return (personId.toString().startsWith("BS_WB") ? true : false);
+//		 return ((personId.toString().startsWith("BS_WB"))&&(personId.toString().endsWith("vw")) ? true : false);
 
 		// return true;
 	}

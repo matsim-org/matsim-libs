@@ -19,36 +19,26 @@
  * *********************************************************************** */
 package playground.agarwalamit.analysis.legMode.distributions;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
+import java.util.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 /**
  * 1) Two categories congested modes and teleported modes (only departure and arrival events)
  * 2) oneTripDist map is used first just to accumulate the distance (linkLevae Event) and then on arrival transfered to distances map
  * @author amit
  */
-public class LegModeRouteDistanceDistributionHandler implements PersonDepartureEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, TeleportationArrivalEventHandler {
+public class LegModeRouteDistanceDistributionHandler implements PersonDepartureEventHandler, LinkLeaveEventHandler,
+		PersonArrivalEventHandler, TeleportationArrivalEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private final static Logger LOG = Logger.getLogger(LegModeRouteDistanceDistributionHandler.class);
 
 	private final Network network;
@@ -59,6 +49,8 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 	private final Map<Id<Person>, String> personId2LegModes = new HashMap<>();
 	private double maxDist = Double.NEGATIVE_INFINITY;
 	private final SortedMap<String, Double> mode2NumberOfLegs = new TreeMap<>();
+
+	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 	public LegModeRouteDistanceDistributionHandler(final Scenario scenario){
 		LOG.info("Route distance will be calculated based on events.");
@@ -79,7 +71,7 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id<Person> personId = Id.createPersonId(event.getVehicleId().toString());
+		Id<Person> personId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 		Id<Link> linkId = event.getLinkId();
 		// TODO if a person is in more than two groups, then which one is correct mode ?
 		String mode = this.personId2LegModes.get(personId);
@@ -87,6 +79,16 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 		double distSoFar = person2Dist.get(personId);
 		double distNew = distSoFar+ network.getLinks().get(linkId).getLength();
 		person2Dist.put(personId, distNew);
+	}
+
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		this.delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		this.delegate.handleEvent(event);
 	}
 
 	@Override

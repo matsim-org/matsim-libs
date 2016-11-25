@@ -4,16 +4,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.inject.Inject;
-
 import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+//import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
@@ -21,9 +22,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -36,7 +34,7 @@ public final class AccessibilityCalculator {
 	private static final Logger log = Logger.getLogger(AccessibilityCalculator.class);
 
 	// measuring points (origins) for accessibility calculation
-	private ActivityFacilitiesImpl measuringPoints;
+	private final ActivityFacilitiesImpl measuringPoints;
 	// destinations, opportunities like jobs etc ...
 	private AggregationObject[] aggregatedOpportunities;
 
@@ -65,9 +63,9 @@ public final class AccessibilityCalculator {
 	private AccessibilityConfigGroup acg;
 
 
-	@Inject
-	public AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
+	public AccessibilityCalculator(Scenario scenario, ActivityFacilitiesImpl measuringPoints) {
 		this.scenario = scenario;
+		this.measuringPoints = measuringPoints;
 		this.acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
@@ -93,47 +91,9 @@ public final class AccessibilityCalculator {
 
 		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaWalkTD = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
-
-		initDefaultContributionCalculators(travelTimes, travelDisutilityFactories, scenario);
 	}
-
-	@Deprecated // yyyyyy set from "outside"
-	private void initDefaultContributionCalculators(Map<String, TravelTime> travelTimes,
-			Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
-		{
-			final String mode = TransportMode.car;
-			putAccessibilityCalculator(
-					mode,
-					new NetworkModeAccessibilityExpContributionCalculator(
-							travelTimes.get(mode),
-							travelDisutilityFactories.get(mode),
-							scenario));
-		}{
-			final String mode = TransportMode.car;
-			putAccessibilityCalculator(
-					Modes4Accessibility.freeSpeed.name(),
-					new NetworkModeAccessibilityExpContributionCalculator(
-							new FreeSpeedTravelTime(),
-							travelDisutilityFactories.get(mode),
-							scenario));
-		}{
-			final String mode = TransportMode.walk;
-			putAccessibilityCalculator(
-					mode,
-					new ConstantSpeedAccessibilityExpContributionCalculator(
-							mode,
-							scenario));
-		}{
-			final String mode = TransportMode.bike;
-			putAccessibilityCalculator(
-					mode,
-					new ConstantSpeedAccessibilityExpContributionCalculator(
-							mode,
-							scenario));
-		}
-	}
-
-
+	
+	
 	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface l){
 		this.zoneDataExchangeListeners.add(l);
 	}
@@ -193,8 +153,9 @@ public final class AccessibilityCalculator {
 	public final void computeAccessibilities( Double departureTime, ActivityFacilities opportunities) {
 		aggregateOpportunities(opportunities, scenario.getNetwork());
 
-		Map<Modes4Accessibility,ExpSum> expSums = new HashMap<>() ;
-		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+		Map<String,ExpSum> expSums = new HashMap<>() ;
+		for (String mode : calculators.keySet()) {
+			log.warn("calculate ExpSum for mode=" + mode );
 			expSums.put(mode, new ExpSum());
 		}
 
@@ -202,11 +163,12 @@ public final class AccessibilityCalculator {
 		Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins = aggregateMeasurePointsWithSameNearestNode();
 
 		log.info("Now going through all origins:");
-		ProgressBar bar = new ProgressBar(aggregatedOrigins.size());
+//		ProgressBar bar = new ProgressBar(aggregatedOrigins.size());
 
 		// go through all nodes (keys) that have a measuring point (origin) assigned
 		for (Id<Node> nodeId : aggregatedOrigins.keySet()) {
-			bar.update();
+			log.info("calculate accessibility for node=" + nodeId );
+//			bar.update();
 
 			Node fromNode = scenario.getNetwork().getNodes().get(nodeId);
 
@@ -216,6 +178,7 @@ public final class AccessibilityCalculator {
 
 			// get list with origins that are assigned to "fromNode"
 			for ( ActivityFacility origin : aggregatedOrigins.get( nodeId ) ) {
+				log.info("-- calculate accessibility for origin=" + origin.getId() );
 				assert( origin.getCoord() != null );
 
 				for ( ExpSum expSum : expSums.values() ) {
@@ -233,11 +196,13 @@ public final class AccessibilityCalculator {
 				// points separately anyways?  Answer: The trees need to be computed only once.  (But one could save more.) kai, feb'14
 
 				// aggregated value
-				Map< Modes4Accessibility, Double> accessibilities  = new HashMap<>() ;
-
-				for ( Modes4Accessibility mode : acg.getIsComputingMode() ) {
+				Map<String, Double> accessibilities  = new HashMap<>();
+				
+				for (String mode : calculators.keySet()) {
+					log.info("---- calculate accessibility for mode=" + mode );
 					// TODO introduce here a config parameter "computation mode" that can be set to "rawSum", "minimum" or "exponential/logsum/hansen", dz, sept'16
 					if(!useRawSum){
+						System.out.println("expSums.get(mode).getSum() = " + expSums.get(mode).getSum());
 						accessibilities.put( mode, inverseOfLogitScaleParameter * Math.log( expSums.get(mode).getSum() ) ) ;
 					} else {
 						// this was used by IVT within SustainCity.  Not sure if we should maintain this; they could, after all, just exp the log results. kai, may'15
@@ -245,8 +210,12 @@ public final class AccessibilityCalculator {
 					}
 				}
 
+				log.warn("");
+				log.warn("SENDING accessibilities; start zone=" + origin.getId() );
+				for ( Entry<String, Double> entry : accessibilities.entrySet() ) {
+					log.warn( "mode=" + entry.getKey() + "; accessibility=" + entry.getValue() ) ;
+				}
 				for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
-					//log.info("here");
 					zoneDataExchangeInterface.setFacilityAccessibilities(origin, departureTime, accessibilities);
 				}
 			}
@@ -263,6 +232,8 @@ public final class AccessibilityCalculator {
 	private Map<Id<Node>, ArrayList<ActivityFacility>> aggregateMeasurePointsWithSameNearestNode() {
 		Map<Id<Node>,ArrayList<ActivityFacility>> aggregatedOrigins = new ConcurrentHashMap<>();
 
+		Gbl.assertNotNull(measuringPoints);
+		Gbl.assertNotNull(measuringPoints.getFacilities()) ;
 		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values()) {
 
 			// determine nearest network node (from- or toNode) based on the link
@@ -285,15 +256,17 @@ public final class AccessibilityCalculator {
 	}
 
 
-	private void computeAndAddExpUtilContributions( Map<Modes4Accessibility,ExpSum> expSums, ActivityFacility origin, 
-			final AggregationObject aggregatedFacility, Double departureTime) 
-	{
+//	private void computeAndAddExpUtilContributions(Map<Modes4Accessibility,ExpSum> expSums, ActivityFacility origin, final AggregationObject aggregatedFacility, Double departureTime) {
+	private void computeAndAddExpUtilContributions(Map<String, ExpSum> expSums, ActivityFacility origin, final AggregationObject aggregatedFacility, Double departureTime) {
 		for ( Map.Entry<String, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet() ) {
-			final Modes4Accessibility mode = Modes4Accessibility.valueOf(calculatorEntry.getKey());
+//			final Modes4Accessibility mode = Modes4Accessibility.valueOf(calculatorEntry.getKey());
+			String mode = calculatorEntry.getKey();
 
-			if ( !this.acg.getIsComputingMode().contains(mode) ) {
-				continue; // XXX yyyyyy should be configured by adding only the relevant calculators
-			}
+			// new
+//			if ( !this.acg.getIsComputingMode().contains(mode) ) {
+//				continue; // XXX yyyyyy should be configured by adding only the relevant calculators
+//			}
+			// end new
 
 			final double expVhk = calculatorEntry.getValue().computeContributionOfOpportunity( origin , aggregatedFacility, departureTime );
 
@@ -302,18 +275,12 @@ public final class AccessibilityCalculator {
 	}
 
 
-	@Deprecated // should be replaced by something like what follows after 
-	public final void setComputingAccessibilityForMode( Modes4Accessibility mode, boolean val ) {
-		this.acg.setComputingAccessibilityForMode(mode, val);
+	public final void putAccessibilityContributionCalculator(String mode, AccessibilityContributionCalculator calc) {
+		this.calculators.put(mode , calc) ;
 	}
 
-	public final void putAccessibilityCalculator( String mode, AccessibilityContributionCalculator calc ) {
-		this.calculators.put( mode , calc ) ;
-	}
-
-
-	public Set<Modes4Accessibility> getIsComputingMode() {
-		return this.acg.getIsComputingMode();
+	public Set<String> getModes() {
+		return this.calculators.keySet() ;
 	}
 
 
@@ -339,8 +306,4 @@ public final class AccessibilityCalculator {
 		}
 	}
 
-
-	public void setMeasuringPoints(ActivityFacilitiesImpl measuringPoints) {
-		this.measuringPoints = measuringPoints;
-	}
 }

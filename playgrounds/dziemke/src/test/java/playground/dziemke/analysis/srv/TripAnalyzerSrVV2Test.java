@@ -2,7 +2,6 @@ package playground.dziemke.analysis.srv;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -13,23 +12,23 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class TripAnalyzerSrVV2Test {
 
-	private static final Logger LOG = Logger.getLogger(TripAnalyzerSrVV2.class);
+	private static final Logger LOG = Logger.getLogger(TripAnalyzerSrVV2Test.class);
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static final String INPUT_TRIPS_FILENAME = "W2008_Berlin_Weekday_Sample.dat";
 	private static final String INPUT_PERSONS_FILENAME = "P2008_Berlin2_Sample.dat";
-	private static final String INPUT_NETWORK_FILE = "../../../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+	private static final String INPUT_NETWORK_FILE = "emptyNetwork.xml";
 
-	@Ignore
 	@Test
 	public void TestAnalyze() {
 
 		final String inputTripsFile = utils.getInputDirectory() + INPUT_TRIPS_FILENAME;
 		final String inputPersonsFile = utils.getInputDirectory() + INPUT_PERSONS_FILENAME;
+		final String inputNetworkFile = utils.getInputDirectory() + INPUT_NETWORK_FILE;
 		LOG.info("Start analyzing");
-		TripAnalyzerSrVV2.analyze(inputTripsFile, inputPersonsFile, INPUT_NETWORK_FILE, utils.getOutputDirectory());
+		TripAnalyzerSrVV2.analyze(inputTripsFile, inputPersonsFile, inputNetworkFile, utils.getOutputDirectory());
 		LOG.info("Finished analyzing");
 
 		LOG.info("Start checking checksums");

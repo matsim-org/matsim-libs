@@ -22,12 +22,11 @@
  */
 package playground.jbischoff.csberlin.scenario;
 
+import org.matsim.contrib.parking.parkingsearch.sim.SetupParking;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-
-import playground.jbischoff.parking.sim.SetupParking;
 
 /**
  * @author  jbischoff

@@ -1,5 +1,6 @@
 package org.matsim.contrib.matsim4urbansim.accessibility;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -7,12 +8,17 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.AccessibilityCalculator;
+import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
+import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
+import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
+import org.matsim.contrib.accessibility.NetworkModeProvider;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
@@ -29,6 +35,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -38,19 +45,29 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
+import com.google.inject.Key;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.name.Names;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class AccessibilityTest implements SpatialGridDataExchangeInterface, FacilityDataExchangeInterface {
+	private static Logger log = Logger.getLogger( AccessibilityTest.class ) ;
+	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private double resolution = 100.;
 	private int nPersons = 3;
 	private double[][] accessibilities;
 
-	private Map<Modes4Accessibility,Double> accessibilitiesHomeZone;
-	private Map<Modes4Accessibility,Double> accessibilitiesWorkZone;
+	private Map<String,Double> accessibilitiesHomeZone;
+	private Map<String,Double> accessibilitiesWorkZone;
 
 	@SuppressWarnings("static-method")
 	@Before
@@ -101,6 +118,40 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 		Controler ctrl = new Controler(scenario);
 		ctrl.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
+		final List<String> modes = new ArrayList<>();
+		// Add calculators
+		ctrl.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
+				{
+					String mode = Modes4Accessibility.freespeed.name() ;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new FreeSpeedNetworkModeProvider(TransportMode.car));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					if (!modes.contains(mode)) modes.add(mode); // This install method is called four times, but each new mode should only be added once
+				}
+				{
+					String mode = TransportMode.car;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					if (!modes.contains(mode)) modes.add(mode); // This install method is called four times, but each new mode should only be added once
+				}
+				{ 
+					String mode = TransportMode.bike;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					if (!modes.contains(mode)) modes.add(mode); // This install method is called four times, but each new mode should only be added once
+				}
+				{
+					final String mode = TransportMode.walk;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					if (!modes.contains(mode)) modes.add(mode); // This install method is called four times, but each new mode should only be added once
+				}
+			}
+		});
+
+
 		//pt not used in this test
 		final PtMatrix ptMatrix = null;
 
@@ -123,18 +174,18 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
 						@Inject Map<String, TravelTime> travelTimes;
 						@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
+						@Inject Map<String, AccessibilityContributionCalculator> calculators;
 
 						@Override
 						public ControlerListener get() {
 							//initialize new grid based accessibility controler listener and grids for the modes we want to analyze here
-							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
-							accessibilityCalculator.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution));
-							for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-								accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
+							ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution) ;
+							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
+							for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
+								accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 							}
-							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
 
-							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, config, scenario, travelTimes, travelDisutilityFactories, minX, minY, maxX, maxY, resolution);
+							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, minX, minY, maxX, maxY, resolution);
 
 							//add grid data exchange listener to get accessibilities
 							listener.addSpatialGridDataExchangeListener(AccessibilityTest.this);
@@ -208,39 +259,61 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 		opportunities.createAndAddFacility(Id.create("opp", ActivityFacility.class), new Coord((double) 200, (double) 100));
 
 		final ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution);
-		ctrl.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
-					@Inject Map<String, TravelTime> travelTimes;
-					@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
+		final AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints) ;
 
-					@Override
-					public ControlerListener get() {
-						//initialize new zone based accessibility controler listener and grids for the modes we want to analyze here
-						ZoneBasedAccessibilityControlerListenerV3 listener = new ZoneBasedAccessibilityControlerListenerV3(measuringPoints, opportunities, null, path, scenario, travelTimes, travelDisutilityFactories);
-						for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-							listener.setComputingAccessibilityForMode(mode, true);
+		ctrl.addOverridingModule(new AbstractModule() {
+			@Override public void install() {
+				MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
+				{
+					String mode = Modes4Accessibility.freespeed.name() ;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new FreeSpeedNetworkModeProvider(TransportMode.car));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+				}
+				{
+					String mode = TransportMode.car;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+				}
+				{ 
+					String mode = TransportMode.bike;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+				}
+				{
+					final String mode = TransportMode.walk;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+				}
+
+				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {				
+					@Inject Map<String, AccessibilityContributionCalculator> calculators ;
+					@Override public ControlerListener get() {
+
+						// yyyyyy total total total overkill to first inject it and then use it as follows; just doing it in this way to get test back up and running.
+						for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
+							accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 						}
-						listener.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
-						// don't know why this is not activated as a test. kai, feb'14
+						ZoneBasedAccessibilityControlerListenerV3 listener = new ZoneBasedAccessibilityControlerListenerV3(
+								accessibilityCalculator, opportunities, path, scenario);
 
 						listener.addFacilityDataExchangeListener(AccessibilityTest.this);
 
-						//add grid based accessibility services listener to the services and run the simulation
-						return listener;
+						return listener ;
 					}
-				});
-
+				} ) ;
 			}
 		});
 		ctrl.run();
 
 		//test case: verify that accessibility of work zone (200,100) is higher than the home zone's (0,100)
 
-		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+		for ( String mode : accessibilityCalculator.getModes() ) {
+
 			final Double accHZ = accessibilitiesHomeZone.get(mode);
+			Gbl.assertNotNull(accHZ);
+			Gbl.assertNotNull(accessibilitiesWorkZone);
 			final Double accWZ = accessibilitiesWorkZone.get(mode);
+			Gbl.assertNotNull(accWZ);
 			if ( accHZ != null && accWZ!=null ) {
 				Assert.assertTrue (accHZ < accWZ ) ;
 			}
@@ -250,7 +323,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 	}
 
 	@Override
-	public void setAndProcessSpatialGrids( Map<Modes4Accessibility,SpatialGrid> spatialGrids ) {
+	public void setAndProcessSpatialGrids( Map<String,SpatialGrid> spatialGrids ) {
 
 		if(accessibilities==null)
 			//initialize accessibilities-array with place for 9 measuring points and 4 modes
@@ -282,13 +355,20 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 	}
 
 	@Override
-	public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, Map<Modes4Accessibility, Double> accessibilities1) {
+	public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, Map<String, Double> accessibilities1) {
+		log.warn("");
+		log.warn("RECEIVING accessibilities; start zone=" + measurePoint.getId() + " with coord=" + measurePoint.getCoord() );
+		for ( Entry<String, Double> entry : accessibilities1.entrySet() ) {
+			log.warn( "mode=" + entry.getKey() + "; accessibility=" + entry.getValue() ) ;
+		}
 
 		//store the accessibilities of the zone in the list for home or work accessibilities
 		if(measurePoint.getCoord().equals(new Coord((double) 100, (double) 0))){
+			log.warn("accepting as HZ");
 			accessibilitiesHomeZone = accessibilities1 ;
 		}
 		if(measurePoint.getCoord().equals(new Coord((double) 200, (double) 100))){
+			log.warn("accepting as WZ");
 			accessibilitiesWorkZone = accessibilities1 ;
 		}
 

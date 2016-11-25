@@ -43,7 +43,8 @@ public class TaxiConfigGroup
     public static final String DROPOFF_DURATION = "dropoffDuration";
     public static final String A_STAR_EUCLIDEAN_OVERDO_FACTOR = "AStarEuclideanOverdoFactor";
     public static final String ONLINE_VEHICLE_TRACKER = "onlineVehicleTracker";
-
+    public static final String BREAK_IF_NOT_All_REQUESTS_SERVED = "breakIfNotAllRequestsServed";
+    
     //input
     public static final String TAXIS_FILE = "taxisFile";
 
@@ -52,6 +53,7 @@ public class TaxiConfigGroup
     public static final String DETAILED_STATS = "detailedStats";
 
     public static final String OPTIMIZER_PARAMETER_SET = "optimizer";
+    
 
     private boolean destinationKnown = false;
     private boolean vehicleDiversion = false;
@@ -64,7 +66,7 @@ public class TaxiConfigGroup
 
     private boolean timeProfiles = false;
     private boolean detailedStats = false;
-
+    private boolean breakSimulationIfNotAllRequestsServed = true;
 
     public TaxiConfigGroup()
     {
@@ -100,6 +102,7 @@ public class TaxiConfigGroup
                 "Specifies the type and parameters of the TaxiOptimizer."
                         + " See: TaxiOptimizerParams and classes implementing it,"
                         + " e.g. AbstractTaxiOptimizerParams.");
+        map.put(BREAK_IF_NOT_All_REQUESTS_SERVED, "Specifies whether the simulation should interrupt if not all requests were performed when an interation ends. Otherwise, a warning is given. Default == true");
         return map;
     }
 
@@ -179,6 +182,15 @@ public class TaxiConfigGroup
     {
         return onlineVehicleTracker;
     }
+    
+    @StringGetter(BREAK_IF_NOT_All_REQUESTS_SERVED)
+    public boolean isBreakSimulationIfNotAllRequestsServed() {
+		return breakSimulationIfNotAllRequestsServed;
+	}
+    @StringSetter(BREAK_IF_NOT_All_REQUESTS_SERVED)
+    public void setBreakSimulationIfNotAllRequestsServed(boolean breakSimulationIfNotAllRequestsServed) {
+		this.breakSimulationIfNotAllRequestsServed = breakSimulationIfNotAllRequestsServed;
+	}
 
 
     @StringSetter(ONLINE_VEHICLE_TRACKER)

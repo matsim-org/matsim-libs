@@ -84,6 +84,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.addActivityParams(params);
 		}
 		{
+			ActivityParams params = new ActivityParams("pt interaction") ; // need this for self-programmed pseudo pt.  kai, nov'16
+			params.setScoringThisActivityAtAll(false);
+			this.addActivityParams(params);
+		}
+		{
 			ActivityParams params = new ActivityParams("bike interaction") ;
 			params.setScoringThisActivityAtAll(false);
 			this.addActivityParams(params);
@@ -777,7 +782,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		final static String SET_TYPE = "modeParams";
 
 		private static final String MONETARY_DISTANCE_RATE = "monetaryDistanceRate";
+		private static final String MONETARY_DISTANCE_RATE_CMT = "[unit_of_money/m] conversion of distance into money. Normally negative.";
+
 		private static final String MARGINAL_UTILITY_OF_TRAVELING = "marginalUtilityOfTraveling_util_hr";
+
+		private static final String CONSTANT = "constant";
 
 		private String mode = null;
 		private double traveling = -6.0;
@@ -810,8 +819,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 					"of the opportunity cost of time");
 			map.put( "marginalUtilityOfDistance_util_m", "[utils/m] utility of walking per m, normally negative.  this is " +
 					"on top of the time (dis)utility.") ;
-			map.put(MONETARY_DISTANCE_RATE, "[unit_of_money/m] conversion of distance into money. Normally negative." ) ;
-			map.put("constant",  "[utils] alternative-specific constant.  no guarantee that this is used anywhere. " +
+			map.put(MONETARY_DISTANCE_RATE, MONETARY_DISTANCE_RATE_CMT ) ;
+			map.put(CONSTANT,  "[utils] alternative-specific constant.  no guarantee that this is used anywhere. " +
 					"default=0 to be backwards compatible for the time being" ) ;
 			return map;
 		}
@@ -865,6 +874,9 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			return this.monetaryDistanceRate;
 		}
 
+		/**
+		 * @param monetaryDistanceRate -- {@value #MONETARY_DISTANCE_RATE_CMT}
+		 */
 		@StringSetter( MONETARY_DISTANCE_RATE )
 		public void setMonetaryDistanceRate(double monetaryDistanceRate) {
 			testForLocked() ;

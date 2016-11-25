@@ -7,7 +7,7 @@
 		
 	  (1) <================link_1_2 / link_2_1===============> (2)
 	   A														A
-       |		(high speed, low N costs, high E costs)		    |
+       |		(short distance, low N costs, high E costs)		    |
        |														|
        |														|
        |														|
@@ -22,7 +22,7 @@
 	   V														V
 (0)<=>(3) ==================== link_3_6 =====================> (6)<=>(9)
 	   |														A
-	   |			(low speed, low N costs, low E costs)		|
+	   |		(long distance, low N costs, low E costs)		|
 	   |														|
 	   |														|
        |														|
@@ -34,7 +34,7 @@
 	   V														|
 (10)<=>(7) ===================== link_7_8 ====================> (8)
 	  
-	  				(medium speed, high N costs, low E costs)
+	  			(medium distance, high N costs, low E costs)
 	  					
 	
 -->

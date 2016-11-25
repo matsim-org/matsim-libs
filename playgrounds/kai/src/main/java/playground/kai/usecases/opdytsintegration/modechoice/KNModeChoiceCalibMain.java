@@ -20,6 +20,7 @@ import opdytsintegration.MATSimSimulator;
 import opdytsintegration.MATSimStateFactoryImpl;
 import opdytsintegration.utils.TimeDiscretization;
 import playground.kairuns.run.KNBerlinControler;
+import playground.kairuns.run.KNBerlinControler.A100;
 
 /**
  * 
@@ -30,10 +31,10 @@ class KNModeChoiceCalibMain {
 	public static void main(String[] args) {
 		boolean equil = true ;
 		boolean calib = true ;
-
+		boolean modeChoice = false ;
 		boolean assignment = false ;
 
-		final Config config = KNBerlinControler.prepareConfig(args, assignment, equil) ;
+		final Config config = KNBerlinControler.prepareConfig(args, assignment, equil, modeChoice, A100.base ) ;
 		
 		config.transitRouter().setDirectWalkFactor(1.e7);
 		
@@ -55,10 +56,10 @@ class KNModeChoiceCalibMain {
 		}
 		config.controler().setOutputDirectory(outputDirectory);
 
-		run(config, equil, calib, assignment, outputDirectory) ;
+		run(config, equil, calib, assignment, outputDirectory, false) ;
 	}
 	
-	public static void run( Config config, boolean equil, boolean calib, boolean assignment, String outputDirectory ) {
+	public static void run( Config config, boolean equil, boolean calib, boolean assignment, String outputDirectory, boolean testcase ) {
 
 		OutputDirectoryLogging.catchLogEntries();
 
@@ -95,7 +96,8 @@ class KNModeChoiceCalibMain {
 
 		// ===
 
-		final Scenario scenario = KNBerlinControler.prepareScenario(equil, config) ;
+		boolean unterLindenQuiet = false ;
+		final Scenario scenario = KNBerlinControler.prepareScenario(equil, unterLindenQuiet, config) ;
 
 		// ===
 
@@ -121,10 +123,16 @@ class KNModeChoiceCalibMain {
 			boolean interpolate = true ;
 			boolean includeCurrentBest = false ;
 			final ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable( scenario.getConfig().planCalcScore(), scenario );
+			final FixedIterationNumberConvergenceCriterion convergenceCriterion ;
+			if ( testcase ) {
+				convergenceCriterion= new FixedIterationNumberConvergenceCriterion(2, 1 );
+			} else {
+				convergenceCriterion= new FixedIterationNumberConvergenceCriterion(100, 10 );
+			}
 			RandomSearch<ModeChoiceDecisionVariable> randomSearch = new RandomSearch<>( simulator,
 					new ModeChoiceRandomizer(scenario) ,
 					initialDecisionVariable ,
-					new FixedIterationNumberConvergenceCriterion(100, 10 ) ,
+					convergenceCriterion ,
 					maxIterations, maxTransitions, populationSize, 
 					MatsimRandom.getRandom(),
 					interpolate,

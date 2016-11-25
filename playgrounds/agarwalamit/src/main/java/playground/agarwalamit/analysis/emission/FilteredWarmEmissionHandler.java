@@ -58,7 +58,18 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 		this.network = network;
 		this.ug=userGroup;
 		this.pf = personFilter;
-		LOGGER.info("Area and user group filtering is used, links fall inside the given shape and belongs to the given user group will be considered.");
+
+		if( (this.ug==null && this.pf!=null) || this.ug!=null && this.pf==null ) {
+			throw new RuntimeException("Either of person filter or user group is null.");
+		} else if( this.ug!=null && this.af !=null) {
+			LOGGER.info("Area and user group filtering is used, links fall inside the given shape and belongs to the "+this.ug+" user group will be considered.");
+		} else if(this.ug!=null) {
+			LOGGER.info("User group filtering is used, result will include all links but persons from "+this.ug+" user group only.");
+		} else if (this.af !=null) {
+			LOGGER.info("Area filtering is used, result will include links falls inside the given shape and persons from all user groups.");
+		} else {
+			LOGGER.info("No filtering is used, result will include all links, persons from all user groups.");
+		}
 	}
 
 	/**
@@ -67,7 +78,6 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 	 */
 	public FilteredWarmEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String userGroup, final PersonFilter personFilter){
 		this(simulationEndTime,noOfTimeBins,userGroup,personFilter, null, null);
-		LOGGER.info("Usergroup filtering is used, result will include all links but persons from given user group only.");
 		LOGGER.warn( "This could be achieved from the other class \"EmissionsPerPersonPerUserGroup\", alternatively verify your results with the other class.");
 	}
 
@@ -76,7 +86,6 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 	 */
 	public FilteredWarmEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final Network network, final AreaFilter areaFilter){
 		this(simulationEndTime,noOfTimeBins,null,null,network,areaFilter);
-		LOGGER.info("Area filtering is used, result will include links falls inside the given shape and persons from all user groups.");
 	}
 
 	/**
@@ -84,13 +93,12 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 	 */
 	public FilteredWarmEmissionHandler (final double simulationEndTime, final int noOfTimeBins){
 		this(simulationEndTime,noOfTimeBins,null,null,null,null);
-		LOGGER.info("No filtering is used, result will include all links, persons from all user groups..");
 	}
 
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
 
-		Id<Person> driverId = Id.createPersonId(event.getVehicleId());// AA_TODO: either it should be mapped to vehicle id or read events file too to get driver id
+		Id<Person> driverId = Id.createPersonId(event.getVehicleId());// TODO [AA]: either it should be mapped to vehicle id or read events file too to get driver id
 
 		if (this.af!=null) { // area filtering
 			Link link = network.getLinks().get(event.getLinkId());

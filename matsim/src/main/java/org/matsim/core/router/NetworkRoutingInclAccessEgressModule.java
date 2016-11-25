@@ -192,6 +192,16 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			}
 			
 			accessActLink = NetworkUtils.getNearestLink(this.network, fromFacility.getCoord()) ;
+			if ( accessActLink == null ) {
+				int ii = 0 ;
+				for ( Link link : this.network.getLinks().values() ) {
+					if ( ii==10 ) {
+						break ;
+					}
+					ii++ ;
+					log.warn( link );
+				}
+			}
 			Gbl.assertNotNull(accessActLink);
 		}
 		return accessActLink;
@@ -229,8 +239,6 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		leg.setRoute(route);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		Leg r = (leg);
-		r.setTravelTime( depTime + travTime - r.getDepartureTime() ); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
 		return travTime;
 	}
 
@@ -252,12 +260,11 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 		Node endNode = toLink.getFromNode(); // the target is the start of the link
 
-		//		CarRoute route = null;
-		//		Path path = null;
-		if (toLink != fromLink) {
-			// (a "true" route)
+		if (toLink != fromLink) { // (a "true" route)
+
 			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
+
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 			route.setTravelTime((int) path.travelTime);
@@ -265,6 +272,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			route.setDistance(RouteUtils.calcDistance(route, 1.0,1.0,this.network));
 			leg.setRoute(route);
 			travTime = (int) path.travelTime;
+
 		} else {
 			// create an empty route == staying on place if toLink == endLink
 			// note that we still do a route: someone may drive from one location to another on the link. kai, dec'15
@@ -277,11 +285,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		if ( leg instanceof Leg ) {
-			Leg r = (leg);
-			r.setTravelTime( depTime + travTime - r.getDepartureTime() ); 
-			// (not in interface!)
-		}
+
 		return travTime;
 	}
 

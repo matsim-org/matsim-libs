@@ -89,4 +89,18 @@ public abstract class CollectionUtils {
 		}
 		return tmp;
 	}
+
+	public static final Set<String> stringArrayToSet(final String [] array) {
+		if (array == null) {
+			return Collections.emptySet();
+		}
+		Set<String> tmp = new LinkedHashSet<>();
+		for (String part : array) {
+			String trimmed = part.trim();
+			if (trimmed.length() > 0) {
+				tmp.add(trimmed.intern());
+			}
+		}
+		return tmp;
+	}
 }

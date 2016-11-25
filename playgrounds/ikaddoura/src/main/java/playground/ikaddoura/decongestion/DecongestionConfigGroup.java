@@ -38,6 +38,7 @@ public class DecongestionConfigGroup {
 	// PID approach
 	private TollingApproach TOLLING_APPROACH = TollingApproach.PID;
 	private double TOLL_BLEND_FACTOR = 1.0; // default: 1.0
+	private boolean msa = false;
 	private double Kp = 1.0;
 	private double Kd = 1.0;
 	private double Ki = 1.0;
@@ -52,7 +53,7 @@ public class DecongestionConfigGroup {
 	private double FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = 1.0; // set below 1.0 to disable price adjustment for final iterations
 	
 	public enum TollingApproach {
-        NoPricing, V8, BangBang, PID
+        NoPricing, BangBang, PID
 	}
 	
 	// ######################################################################################
@@ -179,6 +180,14 @@ public class DecongestionConfigGroup {
 
 	public void setWRITE_LINK_INFO_CHARTS(boolean wRITE_CHARTS) {
 		WRITE_LINK_INFO_CHARTS = wRITE_CHARTS;
+	}
+
+	public boolean isMsa() {
+		return msa;
+	}
+
+	public void setMsa(boolean msa) {
+		this.msa = msa;
 	}
 			
 }

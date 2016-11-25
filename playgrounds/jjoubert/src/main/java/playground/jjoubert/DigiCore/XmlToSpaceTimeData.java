@@ -59,7 +59,7 @@ public class XmlToSpaceTimeData {
 				for(DigicoreChain chain : vehicle.getChains()){
 					double startTime = chain.getFirstMajorActivity().getEndTimeGregorianCalendar().getTimeInMillis()/1000;
 					double endTime = chain.getLastMajorActivity().getStartTimeGregorianCalendar().getTimeInMillis()/1000;
-					int activities = chain.getNumberOfMinorActivities();
+					int activities = chain.getMinorActivities().size();
 					
 					bw.write(String.format("%.0f,%.0f,%d\n", startTime, endTime, activities));
 				}

@@ -74,8 +74,6 @@ public class IVTConfigCreator {
 		config.counts().setWriteCountsInterval(WRITE_OUT_INTERVAL);
 		config.ptCounts().setPtCountsInterval(WRITE_OUT_INTERVAL);
 		config.linkStats().setWriteLinkStatsInterval(WRITE_OUT_INTERVAL);
-        // Add f2l
-        config.createModule(WorldConnectLocations.CONFIG_F2L);
         // Set coordinate system
 		config.global().setCoordinateSystem(COORDINATE_SYSTEM);
         // Set end time
@@ -129,7 +127,6 @@ public class IVTConfigCreator {
 		config.qsim().setFlowCapFactor(prctScenario / 100d);
         // Add files
 		config.facilities().setInputFile(INBASE_FILES + FACILITIES);
-		config.setParam(WorldConnectLocations.CONFIG_F2L, WorldConnectLocations.CONFIG_F2L_INPUTF2LFile, INBASE_FILES + FACILITIES2LINKS);
 		config.households().setInputFile(INBASE_FILES + HOUSEHOLDS);
 		config.households().setInputHouseholdAttributesFile(INBASE_FILES + HOUSEHOLD_ATTRIBUTES);
 		config.network().setInputFile(INBASE_FILES + NETWORK);

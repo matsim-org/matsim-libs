@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.juliakern.distribution.withScoringFast;
 
+import java.util.ArrayList;
+import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,15 +40,11 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
-
-import playground.benjamin.scenarios.munich.exposure.GridTools;
-import playground.benjamin.scenarios.munich.exposure.IntervalHandler;
 import playground.juliakern.distribution.EmActivity;
 import playground.juliakern.distribution.EmPerCell;
 import playground.juliakern.responsibilityOffline.EmCarTrip;
-
-import java.util.ArrayList;
-import java.util.Map;
+import playground.vsp.airPollution.exposure.GridTools;
+import playground.vsp.airPollution.exposure.IntervalHandler;
 
 /**
  * @author benjamin
@@ -96,7 +94,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	public EmissionControlerListener(MatsimServices controler) {
 		this.controler = controler;
         setMinMax(controler.getScenario().getNetwork());
-        this.gt = new GridTools(controler.getScenario().getNetwork().getLinks(), xMin, xMax, yMin, yMax);
+        this.gt = new GridTools(controler.getScenario().getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		
 		Scenario scenario = controler.getScenario() ;
 		emissionModule = new EmissionModule(scenario);
@@ -108,7 +106,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	public EmissionControlerListener(MatsimServices controler, Network network, String eventsFile, String emissionFile){
 		this.controler = controler;
 		setMinMax(network);
-		this.gt = new GridTools(network.getLinks(), xMin, xMax, yMin, yMax);
+		this.gt = new GridTools(network.getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		this.eventsFile = eventsFile;
 		this.network=network;
 		this.emissionFile1=emissionFile;
@@ -140,8 +138,8 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		
 		logger.info("mapping links to cells");
 
-		links2xcells = gt.mapLinks2Xcells(noOfXCells);
-		links2ycells = gt.mapLinks2Ycells(noOfYCells);
+//		links2xcells = gt.mapLinks2Xcells(noOfXCells);
+//		links2ycells = gt.mapLinks2Ycells(noOfYCells);
 		if(links2xcells.isEmpty() || links2ycells.isEmpty()){
 			logger.warn("Something went wrong while mapping links to cells.");
 		}
@@ -157,7 +155,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		timeBinSize = simulationEndTime/noOfTimeBins;
 		
 		logger.info("timebinsize----------------" + timeBinSize);
-		intervalHandler = new IntervalHandler(timeBinSize, simulationEndTime, noOfXCells, noOfYCells, links2xcells, links2ycells);
+		intervalHandler = new IntervalHandler(timeBinSize, simulationEndTime, this.gt);
 				//new IntervalHandler(timeBinSize, simulationEndTime, noOfXCells, noOfYCells, links2xcells, links2ycells, gt, network );
 		
 		eventsManager.addHandler(intervalHandler);

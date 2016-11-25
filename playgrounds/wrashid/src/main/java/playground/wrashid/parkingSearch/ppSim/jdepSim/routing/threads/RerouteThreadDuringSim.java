@@ -26,7 +26,7 @@ import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.parking.lib.obj.SortableMapObject;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.SortableMapObject;
 import org.matsim.contrib.transEnergySim.visualization.charging.inductiveAtRoads.LinkEvent;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelDisutility;

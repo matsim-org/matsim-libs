@@ -41,21 +41,22 @@ public class ConfigConfiguredPlanLinkIdentifierModule extends AbstractModule {
         bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Strong.class ).toProvider( PlanLinkIdentifierUtils.LinkIdentifierProvider.class );
         bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Weak.class ).toProvider( PlanLinkIdentifierUtils.WeakLinkIdentifierProvider.class );
 
-		bind(IncompatiblePlansIdentifierFactory.class).toProvider(
-		new Provider<IncompatiblePlansIdentifierFactory>() {
-			@Inject
-			Scenario sc;
-
-			@Override
-			public IncompatiblePlansIdentifierFactory get() {
-				final GroupReplanningConfigGroup conf = (GroupReplanningConfigGroup) sc.getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME );
-				return conf.getConsiderVehicleIncompatibilities() &&
-						sc.getScenarioElement( VehicleRessources.ELEMENT_NAME ) != null ?
-							new VehicleBasedIncompatiblePlansIdentifierFactory(
-									SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) :
-							new EmptyIncompatiblePlansIdentifierFactory();
-			}
-		} );
+		bind(IncompatiblePlansIdentifierFactory.class).toProvider( new IncompatibilityProvider() );
 
     }
+
+	private static class IncompatibilityProvider implements Provider<IncompatiblePlansIdentifierFactory> {
+		@Inject
+		Scenario sc;
+
+		@Override
+		public IncompatiblePlansIdentifierFactory get() {
+			final GroupReplanningConfigGroup conf = (GroupReplanningConfigGroup) sc.getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME );
+			return conf.getConsiderVehicleIncompatibilities() &&
+					sc.getScenarioElement( VehicleRessources.ELEMENT_NAME ) != null ?
+						new VehicleBasedIncompatiblePlansIdentifierFactory(
+								SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) :
+						new EmptyIncompatiblePlansIdentifierFactory();
+		}
+	}
 }

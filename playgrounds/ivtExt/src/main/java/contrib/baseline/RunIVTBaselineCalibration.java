@@ -22,7 +22,6 @@
 package contrib.baseline;
 
 import contrib.baseline.counts.*;
-import contrib.baseline.lib.F2LConfigGroup;
 import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
@@ -39,8 +38,6 @@ import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 
 import java.io.File;
-
-import static contrib.baseline.RunIVTBaseline.connectFacilitiesWithNetwork;
 
 /**
  * Basic main for the calibration of the ivt baseline scenarios.
@@ -64,7 +61,9 @@ public class RunIVTBaselineCalibration {
 		OutputDirectoryLogging.catchLogEntries();
 
 		// It is suggested to use the config created by playground/boescpa/baseline/ConfigCreator.java.
-		final Config config = ConfigUtils.loadConfig(configFile, new BlackListedTimeAllocationMutatorConfigGroup(), new F2LConfigGroup(), new DestinationChoiceConfigGroup());
+		final Config config = ConfigUtils.loadConfig(configFile,
+				new BlackListedTimeAllocationMutatorConfigGroup(),
+				new DestinationChoiceConfigGroup());
 
 		// This is currently needed for location choice: initializing
 		// the location choice writes K-values files to the output directory, which:
@@ -80,8 +79,6 @@ public class RunIVTBaselineCalibration {
 
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-
-		connectFacilitiesWithNetwork(controler);
 
 		initializeLocationChoice(controler);
 

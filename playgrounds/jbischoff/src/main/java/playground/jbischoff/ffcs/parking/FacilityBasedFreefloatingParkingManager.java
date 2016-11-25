@@ -38,6 +38,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
+import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
@@ -49,8 +51,6 @@ import com.google.inject.Inject;
 import playground.jbischoff.ffcs.FFCSConfigGroup;
 import playground.jbischoff.ffcs.FFCSUtils;
 import playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager;
-import playground.jbischoff.parking.ParkingUtils;
-import playground.jbischoff.parking.manager.ParkingSearchManager;
 
 /**
  * @author  jbischoff
@@ -281,8 +281,13 @@ public class FacilityBasedFreefloatingParkingManager implements ParkingSearchMan
 			Id<Link> linkId = this.parkingFacilities.get(e.getKey()).getLinkId();
 			double capacity = this.parkingFacilities.get(e.getKey()).getActivityOptions()
 					.get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
-			double ffcapacity = this.parkingFacilities.get(e.getKey()).getActivityOptions()
-					.get(FFCSUtils.FREEFLOATINGPARKACTIVITYTYPE).getCapacity();
+			double ffcapacity = 0;
+			try {
+			ffcapacity = this.parkingFacilities.get(e.getKey()).getActivityOptions()
+					.get(FFCSUtils.FREEFLOATINGPARKACTIVITYTYPE).getCapacity();}
+			catch (NullPointerException ex){
+			
+			} ;
 			int ffocupancy = this.csoccupancy.get(e.getKey()).intValue();
 			
 			String s = linkId.toString() + ";" + e.getKey().toString() + ";" + capacity + ";" + e.getValue().toString()+";"+ffcapacity+";"+ffocupancy;

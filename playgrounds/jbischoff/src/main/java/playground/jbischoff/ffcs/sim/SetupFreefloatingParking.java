@@ -25,6 +25,14 @@ package playground.jbischoff.ffcs.sim;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
+import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
+import org.matsim.contrib.parking.parkingsearch.evaluation.ParkingListener;
+import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
+import org.matsim.contrib.parking.parkingsearch.manager.WalkLegFactory;
+import org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
+import org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogic.VehicleTeleportationToNearbyParking;
+import org.matsim.contrib.parking.parkingsearch.routing.ParkingRouter;
+import org.matsim.contrib.parking.parkingsearch.routing.WithinDayParkingRouter;
 import org.matsim.contrib.zone.Zones;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -38,14 +46,6 @@ import playground.jbischoff.ffcs.manager.FreefloatingCarsharingManager;
 import playground.jbischoff.ffcs.manager.ShapeBasedFreeFloatingCarsharingManager;
 import playground.jbischoff.ffcs.manager.SimpleFreeFloatingCarsharingManagerImpl;
 import playground.jbischoff.ffcs.parking.FacilityBasedFreefloatingParkingManager;
-import playground.jbischoff.parking.ParkingUtils;
-import playground.jbischoff.parking.evaluation.ParkingListener;
-import playground.jbischoff.parking.manager.ParkingSearchManager;
-import playground.jbischoff.parking.manager.WalkLegFactory;
-import playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
-import playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationToNearbyParking;
-import playground.jbischoff.parking.routing.ParkingRouter;
-import playground.jbischoff.parking.routing.WithinDayParkingRouter;
 
 /**
  * @author  jbischoff

@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.example.EmissionControlerListener;
@@ -41,6 +42,7 @@ import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -49,12 +51,12 @@ import playground.agarwalamit.InternalizationEmissionAndCongestion.InternalizeEm
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.joint.JointCalibrationControler;
 import playground.agarwalamit.munich.controlerListner.MyEmissionCongestionMoneyEventControlerListner;
-import playground.agarwalamit.munich.controlerListner.MyTollAveragerControlerListner;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
-import playground.benjamin.internalization.EmissionCostModule;
+import playground.agarwalamit.utils.FileUtils;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
-import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
+import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.TollHandler;
@@ -77,10 +79,9 @@ public class SubPopMunichControler {
 					"false",
 					"false",
 					"false",
-					"../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/input/config_wrappedSubActivities_usrGrp_baseCase.xml",
+					FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/diss/input/config_wrappedSubActivities_usrGrp_baseCase.xml",
 					"1.0",
-					"../../../../repos/runs-svn/detEval/emissionCongestionInternalization/diss/output/baseCase2/",
-					"false",
+					FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/diss/output/baseCase2/",
 					"false"
 			};
 		}
@@ -96,8 +97,7 @@ public class SubPopMunichControler {
 		String emissionCostFactor = args[4];
 
 		String outputDir = args[5];
-		boolean averageTollAfterRePlanning = Boolean.valueOf(args [6]);
-		boolean writeInfoForEachPersonInEachIteration = Boolean.valueOf(args [7]);
+		boolean writeInfoForEachPersonInEachIteration = Boolean.valueOf(args [6]);
 
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.controler().setOutputDirectory(outputDir);
@@ -107,6 +107,7 @@ public class SubPopMunichControler {
 			config.plans().setInputFile("mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities_usrGrp.xml.gz");
 			config.plans().setInputPersonAttributeFile("personsAttributes_1pct_usrGrp.xml.gz");
 			config.counts().setInputFile("counts-2008-01-10_correctedSums_manuallyChanged_strongLinkMerge.xml");
+			config.vehicles().setVehiclesFile("emissionVehicles_1pct.xml.gz");
 		}
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -143,7 +144,6 @@ public class SubPopMunichControler {
 		ecg.setDetailedColdEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_ColdStart_SubSegm_2005detailed.txt");
 		ecg.setDetailedWarmEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_HOT_SubSegm_2005detailed.txt");
 		ecg.setEmissionRoadTypeMappingFile("../../munich/input/roadTypeMapping.txt");
-		controler.getConfig().vehicles().setVehiclesFile("../../munich/input/emissionVehicles_1pct.xml.gz");
 
 		if(offline){
 			ecg.setAverageColdEmissionFactorsFile("../../../input/matsimHBEFAStandardsFiles/EFA_ColdStart_vehcat_2005average.txt");
@@ -193,7 +193,7 @@ public class SubPopMunichControler {
 			TollHandler tollHandler = new TollHandler(controler.getScenario());
 			EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 			final EmissionCongestionTravelDisutilityCalculatorFactory emissionCongestionTravelDisutilityCalculatorFactory = 
-					new EmissionCongestionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, tollHandler, config.planCalcScore());
+					new EmissionCongestionTravelDisutilityCalculatorFactory(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car,controler.getConfig().planCalcScore()), emissionCostModule, emissionModule, config.planCalcScore(), tollHandler);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
@@ -226,10 +226,6 @@ public class SubPopMunichControler {
 
 		if(internalizeEmission==false && internalizeBoth ==false){
 			controler.addControlerListener(new EmissionControlerListener());
-		}
-
-		if(averageTollAfterRePlanning){
-			controler.addControlerListener(new MyTollAveragerControlerListner());
 		}
 
 		if(writeInfoForEachPersonInEachIteration){

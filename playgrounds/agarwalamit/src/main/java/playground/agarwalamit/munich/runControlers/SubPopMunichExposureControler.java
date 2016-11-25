@@ -20,16 +20,11 @@ package playground.agarwalamit.munich.runControlers;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-
+import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
@@ -42,15 +37,15 @@ import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.agarwalamit.munich.controlerListner.MyTollAveragerControlerListner;
-import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityCostModule;
+import playground.agarwalamit.utils.FileUtils;
 import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
-import playground.benjamin.scenarios.munich.exposure.GridTools;
-import playground.benjamin.scenarios.munich.exposure.InternalizeEmissionResponsibilityControlerListener;
-import playground.benjamin.scenarios.munich.exposure.ResponsibilityGridTools;
+import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
+import playground.vsp.airPollution.exposure.GridTools;
+import playground.vsp.airPollution.exposure.InternalizeEmissionResponsibilityControlerListener;
+import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
 /**
  * @author amit
@@ -75,12 +70,12 @@ public class SubPopMunichExposureControler {
 		if(! isRunningOnCluster){
 
 			args = new String [] {
-					"../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/input/config_subActivities_subPop_baseCaseCtd.xml",
+					FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/otherRuns/input/config_subActivities_subPop_baseCaseCtd.xml",
 					"1.0",
 					"true",
 					"1.0",
-					"../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run10/policies/backcasting/ExI/",
-					"true" };
+					FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run10/policies/backcasting/test_oldMethod/",
+					 };
 		}
 
 		String configFile = args[0];
@@ -90,10 +85,16 @@ public class SubPopMunichExposureControler {
 
 		String outputDir = args[4];
 		
-		boolean isAveragingTollAfterRePlanning = Boolean.valueOf(args [5]);
-
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.controler().setOutputDirectory(outputDir);
+
+		if(! isRunningOnCluster){
+			config.network().setInputFile("network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml");
+			config.plans().setInputFile(FileUtils.RUNS_SVN+"detEval/emissionCongestionInternalization/otherRuns/output/1pct/run10/baseCase/c4/output_plans.xml.gz");
+			config.plans().setInputPersonAttributeFile("personsAttributes_1pct_usrGrp.xml.gz");
+			config.counts().setInputFile("counts-2008-01-10_correctedSums_manuallyChanged_strongLinkMerge.xml");
+			config.vehicles().setVehiclesFile( "emissionVehicles_1pct.xml.gz");
+		}
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
@@ -111,15 +112,17 @@ public class SubPopMunichExposureControler {
 			public void install() {
 				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 
-				addPlanStrategyBinding("SubtourModeChoice_".concat("COMMUTER_REV_COMMUTER")).toProvider(new javax.inject.Provider<PlanStrategy>() {
+				addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name().concat("_").concat("COMMUTER_REV_COMMUTER")).toProvider(new javax.inject.Provider<PlanStrategy>() {
 					final String[] availableModes = {"car", "pt_COMMUTER_REV_COMMUTER"};
 					final String[] chainBasedModes = {"car", "bike"};
+					@Inject
+					Scenario sc;
 
 					@Override
 					public PlanStrategy get() {
 						final Builder builder = new Builder(new RandomPlanSelector<>());
-						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
-						builder.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
+						builder.addStrategyModule(new SubtourModeChoice(sc.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
+						builder.addStrategyModule(new ReRoute(sc, tripRouterProvider));
 						return builder.build();
 					}
 				});
@@ -134,32 +137,32 @@ public class SubPopMunichExposureControler {
 		String hbefaDirectory;
 
 		if (isRunningOnCluster ) hbefaDirectory = "../../matsimHBEFAStandardsFiles/";
-		else hbefaDirectory = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/input/hbefaForMatsim/";
+		else hbefaDirectory = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/otherRuns/input/hbefaForMatsim/";
 		
 		ecg.setAverageColdEmissionFactorsFile(hbefaDirectory+"EFA_ColdStart_vehcat_2005average.txt");
 		ecg.setAverageWarmEmissionFactorsFile(hbefaDirectory+"EFA_HOT_vehcat_2005average.txt");
 		ecg.setDetailedColdEmissionFactorsFile(hbefaDirectory+"EFA_ColdStart_SubSegm_2005detailed.txt");
 		ecg.setDetailedWarmEmissionFactorsFile(hbefaDirectory+"EFA_HOT_SubSegm_2005detailed.txt");
-		
+		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
+
 		String emissionRelatedInputFilesDir ;
 		
 		if(isRunningOnCluster) emissionRelatedInputFilesDir = "../../munich/input/";
-		else emissionRelatedInputFilesDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/input/";
+		else emissionRelatedInputFilesDir = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/otherRuns/input/";
 		
 		ecg.setEmissionRoadTypeMappingFile(emissionRelatedInputFilesDir + "/roadTypeMapping.txt");
-		controler.getConfig().vehicles().setVehiclesFile(emissionRelatedInputFilesDir + "/emissionVehicles_1pct.xml.gz");
-		
+
 		EmissionModule emissionModule = new EmissionModule(scenario);
 		emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
 
-		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
-		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
-		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
+		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
+//		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
+//		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
 		
-		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
-		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostMultiplicationFactor),	Boolean.parseBoolean(considerCO2Costs), rgt, links2xCells, links2yCells);
+		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
+		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostMultiplicationFactor),	Boolean.parseBoolean(considerCO2Costs), rgt, gt);
 		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, 
 				emissionCostModule, config.planCalcScore());
 		
@@ -171,13 +174,9 @@ public class SubPopMunichExposureControler {
 			}
 		});
 		
-		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, links2xCells, links2yCells));
+		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
 		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		
-		if(isAveragingTollAfterRePlanning){
-			controler.addControlerListener(new MyTollAveragerControlerListner());
-		}
-
 		// additional things to get the networkRoute for ride mode. For this, ride mode must be assigned in networkModes of the config file.
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

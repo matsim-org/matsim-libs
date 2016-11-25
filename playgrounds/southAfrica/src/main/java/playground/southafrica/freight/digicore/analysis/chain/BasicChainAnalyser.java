@@ -169,11 +169,11 @@ public class BasicChainAnalyser {
 			
 			/* Check each chain. */
 			for(DigicoreChain chain : dv.getChains()){
-				GregorianCalendar chainStart = chain.get(0).getEndTimeGregorianCalendar();
+				GregorianCalendar chainStart = chain.getFirstMajorActivity().getEndTimeGregorianCalendar();
 				String day = DigicoreUtils.getShortDate(chainStart);
 				int dayType = getDayType(chainStart);
 				int hour = chainStart.get(Calendar.HOUR_OF_DAY);
-				int numberOfActivities = chain.getNumberOfMinorActivities();
+				int numberOfActivities = chain.getMinorActivities().size();
 				
 				this.outputList.add(String.format("%s,%s,%d,%d,%d\n", 
 						dv.getId().toString(), day, dayType, hour, numberOfActivities));

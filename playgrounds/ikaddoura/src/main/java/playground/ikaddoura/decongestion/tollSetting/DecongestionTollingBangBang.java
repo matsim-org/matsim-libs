@@ -45,7 +45,7 @@ public class DecongestionTollingBangBang implements DecongestionTollSetting {
 	}
 
 	@Override
-	public void updateTolls() {
+	public void updateTolls(int iteration) {
 	
 		for (Id<Link> linkId : this.congestionInfo.getlinkInfos().keySet()) {
 			for (Integer intervalNr : this.congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().keySet()) {

@@ -21,10 +21,10 @@ package org.matsim.contrib.parking.parkingChoice.manager;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.obj.SortableMapObject;
-import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
-import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
 import org.matsim.contrib.parking.parkingChoice.infrastructure.Parking;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.SortableMapObject;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.network.EnclosingRectangle;
+import org.matsim.contrib.parking.parkingchoice.lib.obj.network.QuadTreeInitializer;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.utils.collections.QuadTree;
 

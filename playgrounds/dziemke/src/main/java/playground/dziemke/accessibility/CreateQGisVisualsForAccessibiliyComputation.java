@@ -49,7 +49,8 @@ public class CreateQGisVisualsForAccessibiliyComputation {
 		String osName = System.getProperty("os.name");
 		String actSpecificWorkingDirectory =  workingDirectory + actType + "/";
 		
-		for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
+		for ( Modes4Accessibility modeOld : Modes4Accessibility.values()) {
+			String mode = modeOld.toString();
 			VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
 					lowerBound, upperBound, range, symbolSize, populationThreshold);
 			VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);

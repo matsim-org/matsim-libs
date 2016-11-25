@@ -40,7 +40,7 @@ import playground.agarwalamit.utils.MapUtils;
 
 public class LinkVolumeWriter {
 
-	private static final String dir = FileUtils.RUNS_SVN+"/patnaIndia/run110/1pct/output_PassingQ_withHoles_7/";
+	private static final String dir = FileUtils.RUNS_SVN+"/patnaIndia/run110/randomNrFix/slowCapacityUpdate/100pct/output_PassingQ_withHoles_2/";
 	private static final String eventsFile = dir+"/output_events.xml.gz";
 	private Map<Id<Link>, Map<Integer, Double>> linkid2Count = new HashMap<>();
 

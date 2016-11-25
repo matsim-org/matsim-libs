@@ -20,7 +20,6 @@ package playground.agarwalamit.InternalizationEmissionAndCongestion;
 
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
@@ -36,8 +35,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
-
-import playground.benjamin.internalization.EmissionCostModule;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.vsp.congestion.handlers.TollHandler;
 
 /**
@@ -53,6 +51,7 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 	 * the old value will be totally overwritten.
 	 */
 	private final double blendFactor = 0.1;
+	private final TravelDisutility randomizedTimeDistanceTravelDisutility;
 	private final TravelTime timeCalculator;
 	private final double marginalUtlOfMoney;
 	private final double distanceCostRateCar;
@@ -61,15 +60,17 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 	private final EmissionCostModule emissionCostModule;
 	private final Set<Id<Link>> hotspotLinks;
 	private final TollHandler tollHandler;
+	private final double sigma ;
 
-
-	public EmissionCongestionTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionCostModule emissionCostModule, Set<Id<Link>> hotspotLinks, TollHandler tollHandler) {
+	public EmissionCongestionTravelDisutilityCalculator(TravelDisutility randomizingTimeDistanceTravelDisutilityFactory, TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionCostModule emissionCostModule, double sigma, Set<Id<Link>> hotspotLinks, TollHandler tollHandler) {
+		this.randomizedTimeDistanceTravelDisutility = randomizingTimeDistanceTravelDisutilityFactory;
 		this.timeCalculator = timeCalculator;
 		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
 		this.distanceCostRateCar = cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate();
 		this.marginalUtlOfTravelTime = (-cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
 		this.emissionModule = emissionModule;
 		this.emissionCostModule = emissionCostModule;
+		this.sigma = sigma;
 		this.hotspotLinks = hotspotLinks;
 		
 		this.tollHandler = tollHandler;
@@ -79,6 +80,13 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle v) {
+		double randomizedTimeDistanceDisutilityForLink = this.randomizedTimeDistanceTravelDisutility.getLinkTravelDisutility(link, time, person, v);
+
+		double logNormalRnd = 1. ;
+		if ( sigma != 0. ) {
+			logNormalRnd = (double) person.getCustomAttributes().get("logNormalRnd") ;
+		}
+
 		Vehicle emissionVehicle = v;
 		if (v == null){
 			// the link travel disutility is asked without information about the vehicle
@@ -92,34 +100,23 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 			}
 		}
 		
-		double linkTravelDisutility;
-
 		double linkTravelTime = this.timeCalculator.getLinkTravelTime(link, time, person, emissionVehicle);
-		double linkTravelTimeDisutility = this.marginalUtlOfTravelTime * linkTravelTime ;
-
-		double distance = link.getLength();
-		double distanceCost = - this.distanceCostRateCar * distance;
-		double linkDistanceDisutility = this.marginalUtlOfMoney * distanceCost;
 
 		double linkExpectedEmissionDisutility;
 
 		if(this.hotspotLinks == null){
 			// pricing applies for all links
-			linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(emissionVehicle, link, distance, linkTravelTime);
+			linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(emissionVehicle, link, link.getLength(), linkTravelTime);
 		} else {
 			// pricing applies for the current link
-			if(this.hotspotLinks.contains(link.getId())) linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(emissionVehicle, link, distance, linkTravelTime);
+			if(this.hotspotLinks.contains(link.getId())) linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(emissionVehicle, link, link.getLength(), linkTravelTime);
 			// pricing applies not for the current link
 			else linkExpectedEmissionDisutility = 0.0;
 		}
-		/* // Test the routing:
-			if(!link.getId().equals(new IdImpl("11"))) 
-			generalizedTravelCost = generalizedTravelTimeCost + generalizedDistanceCost;
-			else */	
-		double linkExpectedTollDisutility = calculateExpectedTollDisutility(link, time, person);
-		linkTravelDisutility = linkTravelTimeDisutility + linkDistanceDisutility + linkExpectedEmissionDisutility + linkExpectedTollDisutility;
 
-			return linkTravelDisutility;
+		double linkExpectedTollDisutility = calculateExpectedTollDisutility(link, time, person);
+		return  randomizedTimeDistanceDisutilityForLink + logNormalRnd * ( linkExpectedEmissionDisutility + linkExpectedTollDisutility );
+
 	}
 
 	private double calculateExpectedEmissionDisutility(Vehicle vehicle, Link link, double distance, double linkTravelTime) {
@@ -156,13 +153,7 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 		double blendedOldValue = (1 - this.blendFactor) * linkExpectedTollOldValue;
 		double blendedNewValue = this.blendFactor * linkExpectedTollNewValue;	
 		
-//		if (linkExpectedTollNewValue != 0 || linkExpectedTollOldValue != 0) {
-//			log.info("-----------> Person " + person.getId() + ": Expected toll (new value) on link " + link.getId() + " at " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + ": " + linkExpectedTollNewValue);
-//			log.info("-----------> Person " + person.getId() + ": Expected toll (old value) on link " + link.getId() + " at " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + ": " + linkExpectedTollOldValue);
-//		
-//			log.info("ExpectedToll: " + (blendedNewValue + blendedOldValue) );
-//		}
-				
+
 		double linkExpectedTollDisutility = -1 * this.marginalUtlOfMoney * (blendedOldValue + blendedNewValue);			
 		return linkExpectedTollDisutility;
 	}

@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.qsim.FreefloatingAreas;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
+import org.matsim.contrib.carsharing.vehicles.FFVehicleImpl;
 import org.matsim.core.network.SearchableNetwork;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -86,13 +87,16 @@ public class FreeFloatingVehiclesContainer implements VehiclesContainer{
 
 		CSVehicle closest = null;
 		double closestFound = searchDistance;
+		
 		for(CSVehicle vehicle: location) {
 			
-			Coord coord = this.availableFFvehiclesMap.get(vehicle).getCoord();
-			
-			if (CoordUtils.calcEuclideanDistance(startLink.getCoord(), coord) < closestFound ) {
-				closest = vehicle;
-				closestFound = CoordUtils.calcEuclideanDistance(startLink.getCoord(), coord);
+			if (vehicle.getType().equals(typeOfVehicle)) {
+				Coord coord = this.availableFFvehiclesMap.get(vehicle).getCoord();
+				
+				if (CoordUtils.calcEuclideanDistance(startLink.getCoord(), coord) < closestFound ) {
+					closest = vehicle;
+					closestFound = CoordUtils.calcEuclideanDistance(startLink.getCoord(), coord);
+				}
 			}
 		}		
 		return closest;

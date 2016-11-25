@@ -25,12 +25,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
-import playground.benjamin.internalization.EmissionCostModule;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.vsp.congestion.handlers.TollHandler;
 
 /**
@@ -40,12 +41,15 @@ public class EmissionCongestionTravelDisutilityCalculatorFactory implements Trav
 
 	private final EmissionModule emissionModule;
 	private final EmissionCostModule emissionCostModule;
+	private final RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;
 	private Set<Id<Link>> hotspotLinks;
 	private final TollHandler tollHandler;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
+	private double sigma=0.;
 	
-	public EmissionCongestionTravelDisutilityCalculatorFactory(EmissionModule emissionModule, EmissionCostModule emissionCostModule, 
-			TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public EmissionCongestionTravelDisutilityCalculatorFactory(RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory, EmissionCostModule emissionCostModule, EmissionModule emissionModule,
+															   PlanCalcScoreConfigGroup cnScoringGroup, TollHandler tollHandler) {
+		this.randomizedTimeDistanceTravelDisutilityFactory = randomizedTimeDistanceTravelDisutilityFactory;
 		this.emissionModule = emissionModule;
 		this.emissionCostModule = emissionCostModule;
 		this.tollHandler = tollHandler;
@@ -54,7 +58,7 @@ public class EmissionCongestionTravelDisutilityCalculatorFactory implements Trav
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator){
-		final EmissionCongestionTravelDisutilityCalculator ectdc = new EmissionCongestionTravelDisutilityCalculator(timeCalculator, cnScoringGroup, this.emissionModule, this.emissionCostModule, this.hotspotLinks, this.tollHandler);
+		final EmissionCongestionTravelDisutilityCalculator ectdc = new EmissionCongestionTravelDisutilityCalculator(this.randomizedTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator), timeCalculator, cnScoringGroup, this.emissionModule, this.emissionCostModule, this.sigma, this.hotspotLinks, this.tollHandler);
 
 		return new TravelDisutility(){
 
@@ -69,6 +73,10 @@ public class EmissionCongestionTravelDisutilityCalculatorFactory implements Trav
 				return ectdc.getLinkMinimumTravelDisutility(link);
 			}
 		};
+	}
+
+	public void setSigma ( double val ) {
+		this.sigma = val;
 	}
 
 	public void setHotspotLinks(Set<Id<Link>> hotspotLinks) {

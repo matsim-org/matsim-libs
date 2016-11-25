@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.juliakern.distribution.withScoring;
 
+import java.util.ArrayList;
+import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -29,13 +31,9 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.events.algorithms.EventWriterXML;
-
-import playground.benjamin.scenarios.munich.exposure.GridTools;
 import playground.juliakern.distribution.ResponsibilityEvent;
 import playground.juliakern.distribution.withScoringFast.GeneratedEmissionsHandler;
-
-import java.util.ArrayList;
-import java.util.Map;
+import playground.vsp.airPollution.exposure.GridTools;
 
 /**
  * @author benjamin
@@ -76,7 +74,7 @@ ShutdownListener, ScoringListener, AfterMobsimListener{
 
 	public EmissionControlerListener(MatsimServices controler) {
 		this.controler = controler;
-        this.gt = new GridTools(controler.getScenario().getNetwork().getLinks(), xMin, xMax, yMin, yMax);
+        this.gt = new GridTools(controler.getScenario().getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		this.intervalHandler = new IntervalHandler();
 
         logger.warn(controler.getScenario().getNetwork().getLinks().size() + " number of links");
@@ -95,8 +93,8 @@ ShutdownListener, ScoringListener, AfterMobsimListener{
 		
 		logger.info("mapping links to cells");
 
-		this.links2xcells = gt.mapLinks2Xcells(noOfXCells);
-		this.links2ycells = gt.mapLinks2Ycells(noOfYCells);
+//		this.links2xcells = gt.mapLinks2Xcells(noOfXCells);
+//		this.links2ycells = gt.mapLinks2Ycells(noOfYCells);
 		if(links2xcells.isEmpty() || links2ycells.isEmpty()){
 			logger.warn("Something went wrong while mapping links to cells.");
 		}

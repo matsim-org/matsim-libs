@@ -23,12 +23,15 @@
 
 package org.matsim.analysis;
 
+import java.util.Map;
+
+import org.matsim.analysis.ScoreStatsControlerListener.ScoreItem;
 
 public interface ScoreStats {
 
     /**
      * @return the history of scores in last iterations
      */
-    double[][] getHistory();
+    Map<ScoreItem, Map<Integer, Double>> getScoreHistory();
 
 }

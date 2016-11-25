@@ -69,6 +69,12 @@ public class PModule {
 
         if (pTransitRouterFactory == null) {
             pTransitRouterFactory = new PTransitRouterFactory(pConfig.getPtEnabler(), pConfig.getPtRouter(), pConfig.getEarningsPerBoardingPassenger(), pConfig.getEarningsPerKilometerAndPassenger() / 1000.0);
+
+            // For some unknown reason, the core starts failing when I start requesting a trip router out of an injected trip router in 
+            // ScoreStatsControlerListener.  Presumably, the manually constructed build procedure here conflicts with the (newer) standard guice
+            // procedure.  For the time being, the following two lines seem to fix it.  kai, nov'16
+            pTransitRouterFactory.createTransitRouterConfig(controler.getConfig());
+            pTransitRouterFactory.updateTransitSchedule(controler.getScenario().getTransitSchedule());
         }
         controler.setTripRouterFactory(PTripRouterFactoryFactory.getTripRouterFactoryInstance(controler, tripRouterFactory, this.pTransitRouterFactory));
 

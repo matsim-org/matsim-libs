@@ -54,7 +54,7 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 
 public class PatnaUrbanOpdytsCalibrator {
 
-	public static final OpdytsObjectiveFunctionCases PATNA_1_PCT = OpdytsObjectiveFunctionCases.PATNA_1Pct;
+	private static final OpdytsObjectiveFunctionCases PATNA_1_PCT = OpdytsObjectiveFunctionCases.PATNA_1Pct;
 	private static String OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/output222/";
 	private static final String configDir = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/input/";
 

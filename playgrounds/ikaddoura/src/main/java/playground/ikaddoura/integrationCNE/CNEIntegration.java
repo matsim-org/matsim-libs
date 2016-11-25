@@ -46,17 +46,25 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.agarwalamit.InternalizationEmissionAndCongestion.EmissionCongestionTravelDisutilityCalculatorFactory;
-import playground.benjamin.internalization.EmissionCostModule;
-import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
-import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
+import playground.ikaddoura.decongestion.Decongestion;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
+import playground.ikaddoura.decongestion.DecongestionControlerListener;
+import playground.ikaddoura.decongestion.data.DecongestionInfo;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
 import playground.ikaddoura.integrationCN.TollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.integrationCN.VTTSNoiseTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.integrationCN.VTTSTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
+import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
+import playground.vsp.airPollution.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
+import playground.vsp.airPollution.exposure.GridTools;
+import playground.vsp.airPollution.exposure.InternalizeEmissionResponsibilityControlerListener;
+import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.controler.CongestionAnalysisControlerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -67,13 +75,9 @@ import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutil
  * 
  * A controler to start a simultaneous congestion, noise and air pollution pricing run or other joint pricing runs.
  * 
- * TODO: add switch / add different congestion pricing approaches
- * 
- * TODO: add switch / add exhaust emission pricing approaches
+ * TODO: get rid of unused / not maintained pricing combinations etc.
  * 
  * TODO: compare simulation outcome with previous runs, e.g. Munich congestion + exhaust emission pricing
- * 
- * TODO: make the code look nicer (requires some modifications in BK's playground)
  * 
  * @author ikaddoura, amit
  *
@@ -96,27 +100,38 @@ public class CNEIntegration {
 	private boolean airPollutionAnalysis = false;
 	
 	private boolean useTripAndAgentSpecificVTTSForRouting = false;
-		
+	
+	private CongestionTollingApproach congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
+	private double kP = 0.;
+
+	private final GridTools gridTools;
+	private final ResponsibilityGridTools responsibilityGridTools ;
+
+	public enum CongestionTollingApproach {
+        DecongestionPID, QBPV3
+	}
+	
 	public CNEIntegration(String configFile, String outputDirectory) {
 		this.configFile = configFile;
 		this.outputDirectory = outputDirectory;
-	}
-	
-	public CNEIntegration(String configFile) {
-		this.configFile = configFile;
-		this.outputDirectory = null;
-	}
-	
-	public CNEIntegration(Controler controler) {
-		this.controler = controler;
-		this.outputDirectory = null;
-	}
-	
-	public CNEIntegration(Controler controler, String outputDirectory) {
-		this.controler = controler;
-		this.outputDirectory = outputDirectory;
+		this.responsibilityGridTools = null;
+		this.gridTools = null;
 	}
 
+	public CNEIntegration(String configFile) {
+		this (configFile, null);
+	}
+	
+	public CNEIntegration(Controler controler, GridTools gridTools, ResponsibilityGridTools responsibilityGridTools) {
+		this.controler = controler;
+		this.gridTools = gridTools;
+		this.responsibilityGridTools = responsibilityGridTools;
+	}
+
+	public CNEIntegration(Controler controler) {
+		this(controler, null, null);
+	}
+	
 	public static void main(String[] args) throws IOException {
 		
 		String configFile;
@@ -170,6 +185,11 @@ public class CNEIntegration {
 			}
 			controler.getConfig().controler().setOutputDirectory(outputDirectory);
 		}
+
+		if( airPollutionPricing && (this.gridTools == null || this.responsibilityGridTools == null) ) {
+			throw new RuntimeException("To internalize air pollution exposure, grid tools " +
+					"and responsibility grid tools must be passed to the constructor.");
+		}
 		
 		final VTTSHandler vttsHandler;
 		if (useTripAndAgentSpecificVTTSForRouting) {
@@ -202,9 +222,9 @@ public class CNEIntegration {
 		
 		// ########################## Air pollution ##########################
 				
-		final String emissionEfficiencyFactor ="1.0";
-		final String considerCO2Costs = "true";
-		final String emissionCostFactor = "1.0";
+		final double emissionEfficiencyFactor = 1.0;
+		final boolean considerCO2Costs = true;
+		final double emissionCostFactor = 1.0;
 		final Set<Id<Link>> hotSpotLinks = null;
 		
 		EmissionModule emissionModule = null;
@@ -215,7 +235,7 @@ public class CNEIntegration {
 		if (this.airPollutionPricing == true || this.airPollutionAnalysis == true) {
 			
 			emissionModule = new EmissionModule(controler.getScenario());
-			emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
+			emissionModule.setEmissionEfficiencyFactor(emissionEfficiencyFactor);
 			emissionModule.createLookupTables();
 			emissionModule.createEmissionHandler();			
 		}
@@ -226,39 +246,64 @@ public class CNEIntegration {
 			
 			// only congestion pricing
 			
-			final TollHandler congestionTollHandlerQBP = new TollHandler(controler.getScenario());
-			
-			if (useTripAndAgentSpecificVTTSForRouting) {
-				final VTTSCongestionTollTimeDistanceTravelDisutilityFactory factory = new VTTSCongestionTollTimeDistanceTravelDisutilityFactory(
-						new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, controler.getConfig().planCalcScore()),
-						congestionTollHandlerQBP, controler.getConfig().planCalcScore()
-					);
-				factory.setSigma(sigma);
+			if (congestionTollingApproach.toString().equals(CongestionTollingApproach.QBPV3.toString())) {
+				final TollHandler congestionTollHandlerQBP = new TollHandler(controler.getScenario());
 				
-				controler.addOverridingModule(new AbstractModule(){
-					@Override
-					public void install() {
-						this.bindCarTravelDisutilityFactory().toInstance( factory );
-					}
-				}); 
+				if (useTripAndAgentSpecificVTTSForRouting) {
+					final VTTSCongestionTollTimeDistanceTravelDisutilityFactory factory = new VTTSCongestionTollTimeDistanceTravelDisutilityFactory(
+							new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, controler.getConfig().planCalcScore()),
+							congestionTollHandlerQBP, controler.getConfig().planCalcScore()
+						);
+					factory.setSigma(sigma);
+					
+					controler.addOverridingModule(new AbstractModule(){
+						@Override
+						public void install() {
+							this.bindCarTravelDisutilityFactory().toInstance( factory );
+						}
+					}); 
+					
+				} else {
+					final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(
+							new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
+							congestionTollHandlerQBP, controler.getConfig().planCalcScore()
+						);
+					factory.setSigma(sigma);
+					
+					controler.addOverridingModule(new AbstractModule(){
+						@Override
+						public void install() {
+							this.bindCarTravelDisutilityFactory().toInstance( factory );
+						}
+					}); 
+				}
+				
+				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandlerQBP, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));	
+			
+			} else if (congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionPID.toString())) {
+			
+				if (useTripAndAgentSpecificVTTSForRouting) {
+					throw new RuntimeException("Not yet implemented. Aborting...");
+				
+				} else {
+					final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+					decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
+					decongestionSettings.setKp(kP);
+					decongestionSettings.setKi(0.);
+					decongestionSettings.setKd(0.);
+					decongestionSettings.setMsa(true);
+					decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+					decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+					
+					final DecongestionInfo info = new DecongestionInfo(controler.getScenario(), decongestionSettings);
+					final Decongestion decongestion = new Decongestion(info);
+					controler = decongestion.getControler();
+				}
 				
 			} else {
-				final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(
-						new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
-						congestionTollHandlerQBP, controler.getConfig().planCalcScore()
-					);
-				factory.setSigma(sigma);
-				
-				controler.addOverridingModule(new AbstractModule(){
-					@Override
-					public void install() {
-						this.bindCarTravelDisutilityFactory().toInstance( factory );
-					}
-				}); 
+				throw new RuntimeException("Unknown congestion pricing approach. Aborting...");
 			}
-			
-			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandlerQBP, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));	
-			
+		
 		} else if (congestionPricing == false && noisePricing && airPollutionPricing == false) {
 			// only noise pricing
 			
@@ -294,77 +339,136 @@ public class CNEIntegration {
 
 		} else if (congestionPricing == false && noisePricing == false && airPollutionPricing) {
 			// only air pollution pricing
-			
-			final EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
+			final EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( emissionCostFactor, considerCO2Costs, this.responsibilityGridTools, this.gridTools);
 
 			if (useTripAndAgentSpecificVTTSForRouting) {
-				throw new RuntimeException("Not yet implemented. Aborting..."); // TODO
+				throw new RuntimeException("Not yet implemented. Aborting...");
 
 			} else {				
 				
 				if (sigma != 0.) {
 					throw new RuntimeException("The following travel disutility doesn't allow for randomness. Aborting...");
 				}
-				
-				// TODO: doesn't account for randomness, doesn't account for marginal utility of distance, ... 
-				final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, 
-						emissionCostModule, controler.getConfig().planCalcScore());
-				emissionTducf.setHotspotLinks(hotSpotLinks);
+				EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(
+						new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
+						emissionModule,
+						emissionCostModule,
+						controler.getConfig().planCalcScore()
+				);
 				controler.addOverridingModule(new AbstractModule() {
+
 					@Override
 					public void install() {
-						bindCarTravelDisutilityFactory().toInstance(emissionTducf);
+						bindCarTravelDisutilityFactory().toInstance(emfac);
 					}
 				});
 			}
-			
-			controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
-			
+			controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, this.responsibilityGridTools, this.gridTools));
+
 		} else if (congestionPricing && noisePricing && airPollutionPricing) {
 			// congestion + noise + airPollution pricing
+
+			final EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( emissionCostFactor, considerCO2Costs, this.responsibilityGridTools, this.gridTools);
 			
-			final EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
-			final TollHandler congestionTollHandlerQBP = new TollHandler(controler.getScenario());
-			
-			if (useTripAndAgentSpecificVTTSForRouting) {
-				final VttsCNETimeDistanceTravelDisutilityFactory factory = new VttsCNETimeDistanceTravelDisutilityFactory(
-						new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, controler.getConfig().planCalcScore()),
-						emissionModule, emissionCostModule,
-						noiseContext,
-						congestionTollHandlerQBP,
-						controler.getConfig().planCalcScore()
-					);
-				factory.setSigma(sigma);
-				factory.setHotspotLinks(null);
+			if (congestionTollingApproach.toString().equals(CongestionTollingApproach.QBPV3.toString())) {
+				final TollHandler congestionTollHandlerQBP = new TollHandler(controler.getScenario());
 				
-				controler.addOverridingModule(new AbstractModule(){
-					@Override
-					public void install() {
-						this.bindCarTravelDisutilityFactory().toInstance( factory );
+				if (useTripAndAgentSpecificVTTSForRouting) {
+					final VttsCNETimeDistanceTravelDisutilityFactory factory = new VttsCNETimeDistanceTravelDisutilityFactory(
+							new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, controler.getConfig().planCalcScore()),
+							emissionModule, emissionCostModule,
+							noiseContext,
+							congestionTollHandlerQBP,
+							controler.getConfig().planCalcScore()
+						);
+					factory.setSigma(sigma);
+					factory.setHotspotLinks(null);
+					
+					controler.addOverridingModule(new AbstractModule(){
+						@Override
+						public void install() {
+							this.bindCarTravelDisutilityFactory().toInstance( factory );
+						}
+					}); 
+				} else {
+					final CNETimeDistanceTravelDisutilityFactory factory = new CNETimeDistanceTravelDisutilityFactory(
+							new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
+							emissionModule, emissionCostModule,
+							noiseContext,
+							congestionTollHandlerQBP,
+							controler.getConfig().planCalcScore()
+						);
+					factory.setSigma(sigma); // TODO : I dont know, why we are setting sigma here and not anywhere else. amit nov 16.
+					factory.setHotspotLinks(hotSpotLinks);
+					
+					controler.addOverridingModule(new AbstractModule(){
+						@Override
+						public void install() {
+							this.bindCarTravelDisutilityFactory().toInstance( factory );
+						}
+					}); 				
+				}
+				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandlerQBP, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));						
+
+			} else if (congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionPID.toString())) {
+				if (useTripAndAgentSpecificVTTSForRouting) {
+					throw new RuntimeException("Not yet implemented. Aborting...");
+					
+				} else {
+					
+					final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+					decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
+					decongestionSettings.setKp(kP);
+					decongestionSettings.setKi(0.);
+					decongestionSettings.setKd(0.);
+					decongestionSettings.setMsa(true);
+					decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+					decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+					
+					final DecongestionInfo decongestionInfo = new DecongestionInfo(controler.getScenario(), decongestionSettings);
+					
+					DecongestionTollSetting tollSettingApproach = null;
+
+					if (decongestionInfo.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.PID)) {
+						tollSettingApproach = new DecongestionTollingPID(decongestionInfo);	
+												
+					} else {
+						throw new RuntimeException("Decongestion toll setting approach not implemented. Aborting...");
 					}
-				}); 
+					
+					// decongestion pricing
+					final DecongestionControlerListener decongestion = new DecongestionControlerListener(decongestionInfo, tollSettingApproach);		
+					controler.addOverridingModule(new AbstractModule() {
+						@Override
+						public void install() {
+							this.addControlerListenerBinding().toInstance(decongestion);
+						}
+					});
+					
+					// toll-adjusted routing
+					final CbNETimeDistanceTravelDisutilityFactory travelDisutilityFactory = new CbNETimeDistanceTravelDisutilityFactory(
+							new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
+							emissionModule,
+							emissionCostModule,
+							noiseContext,
+							decongestionInfo,
+							controler.getConfig().planCalcScore());
+					
+					travelDisutilityFactory.setSigma(0.);
+					controler.addOverridingModule(new AbstractModule(){
+						@Override
+						public void install() {
+							this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
+						}
+					});						
+				}
+
 			} else {
-				final CNETimeDistanceTravelDisutilityFactory factory = new CNETimeDistanceTravelDisutilityFactory(
-						new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
-						emissionModule, emissionCostModule,
-						noiseContext,
-						congestionTollHandlerQBP,
-						controler.getConfig().planCalcScore()
-					);
-				factory.setSigma(sigma);
-				factory.setHotspotLinks(hotSpotLinks);
-				
-				controler.addOverridingModule(new AbstractModule(){
-					@Override
-					public void install() {
-						this.bindCarTravelDisutilityFactory().toInstance( factory );
-					}
-				}); 				
+				throw new RuntimeException("Unknown congestion pricing approach. Aborting...");
 			}
 				
-			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandlerQBP, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));						
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
-			controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
+			controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, this.responsibilityGridTools, this.gridTools));
 			
 		} else if (congestionPricing && noisePricing && airPollutionPricing == false) {
 			// congestion + noise pricing
@@ -406,33 +510,8 @@ public class CNEIntegration {
 
 		} else if (congestionPricing && noisePricing == false && airPollutionPricing) {
 			// congestion + air pollution pricing
-
-			final TollHandler congestionTollHandlerQBP = new TollHandler(controler.getScenario());
 			
-			final EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
-			
-			if (useTripAndAgentSpecificVTTSForRouting) {
-				throw new RuntimeException("Not yet implemented. Aborting..."); // TODO?!
-
-			} else {
-				
-				if (sigma != 0.) {
-					throw new RuntimeException("The following travel disutility doesn't allow for randomness. Aborting...");
-				}
-				
-				// TODO: doesn't account for randomness, doesn't account for marginal utility of distance, ... 
-				final EmissionCongestionTravelDisutilityCalculatorFactory emissionCongestionTravelDisutilityCalculatorFactory = 
-						new EmissionCongestionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, congestionTollHandlerQBP, controler.getConfig().planCalcScore());
-				controler.addOverridingModule(new AbstractModule() {
-					@Override
-					public void install() {
-						bindCarTravelDisutilityFactory().toInstance(emissionCongestionTravelDisutilityCalculatorFactory);
-					}
-				});
-				
-				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandlerQBP, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
-				controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
-			}
+			throw new RuntimeException("Not yet implemented. Aborting...");
 					
 		} else if (congestionPricing == false && noisePricing == false && airPollutionPricing == false) {
 			// no pricing
@@ -478,7 +557,13 @@ public class CNEIntegration {
 			// only noise pricing
 			
 			// add congestion analysis
-			if (congestionAnalysis) controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
+			if (congestionAnalysis) {
+				if (congestionTollingApproach.toString().equals(CongestionTollingApproach.QBPV3.toString())) {
+					controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
+				} else {
+					// no specific analysis required
+				}
+			}
 			
 			// add air pollution analysis
 			if (airPollutionAnalysis) controler.addControlerListener(new EmissionControlerListener());			
@@ -487,8 +572,14 @@ public class CNEIntegration {
 			// only air pollution pricing
 				
 			// add congestion analysis
-			if (congestionAnalysis) controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
-						
+			if (congestionAnalysis) {
+				if (congestionTollingApproach.toString().equals(CongestionTollingApproach.QBPV3.toString())) {
+					controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
+				} else {
+					// no specific analysis required
+				}
+			}
+			
 			// add noise analysis
 			if (noiseAnalysis) controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			
@@ -514,8 +605,14 @@ public class CNEIntegration {
 			// no pricing
 			
 			// add congestion analysis
-			if (congestionAnalysis)	controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
-		
+			if (congestionAnalysis) {
+				if (congestionTollingApproach.toString().equals(CongestionTollingApproach.QBPV3.toString())) {
+					controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
+				} else {
+					// no specific analysis required
+				}
+			}
+						
 			// add air pollution analysis
 			if (airPollutionAnalysis) controler.addControlerListener(new EmissionControlerListener());
 			
@@ -559,6 +656,14 @@ public class CNEIntegration {
 
 	public void setUseTripAndAgentSpecificVTTSForRouting(boolean useTripAndAgentSpecificVTTSForRouting) {
 		this.useTripAndAgentSpecificVTTSForRouting = useTripAndAgentSpecificVTTSForRouting;
+	}
+
+	public void setCongestionTollingApproach(CongestionTollingApproach congestionTollingApproach) {
+		this.congestionTollingApproach = congestionTollingApproach;
+	}
+
+	public void setkP(double kP) {
+		this.kP = kP;
 	}
 
 }

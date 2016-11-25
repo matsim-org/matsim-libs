@@ -54,7 +54,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 	}
 
 	@Override
-	public void updateTolls() {
+	public void updateTolls(int iteration) {
 	
 		for (Id<Link> linkId : this.congestionInfo.getlinkInfos().keySet()) {
 			for (Integer intervalNr : this.congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().keySet()) {
@@ -101,17 +101,30 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 				}
 				
 				// 5) smoothen the tolls
+				
 				double previousToll = Double.NEGATIVE_INFINITY;
 				if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(intervalNr)) {
 					previousToll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr);
 				}
+
+				double blendFactor = Double.NEGATIVE_INFINITY;
+				if (this.congestionInfo.getDecongestionConfigGroup().isMsa()) {
+					if (iteration > 0) {
+						blendFactor = 1.0 / (double) iteration;
+					} else {
+						blendFactor = 1.0;
+					}
+				} else {
+					blendFactor = this.congestionInfo.getDecongestionConfigGroup().getTOLL_BLEND_FACTOR();
+				}
+				
 				double smoothedToll = Double.NEGATIVE_INFINITY;
 				if (previousToll >= 0.) {
-					smoothedToll = toll * this.congestionInfo.getDecongestionConfigGroup().getTOLL_BLEND_FACTOR() + previousToll * (1 - this.congestionInfo.getDecongestionConfigGroup().getTOLL_BLEND_FACTOR());
+					smoothedToll = toll * blendFactor + previousToll * (1 - blendFactor);
 				} else {
 					smoothedToll = toll;
 				}
-				
+								
 				// 6) store the updated toll
 				Map<Integer, Double> time2toll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll();
 				time2toll.put(intervalNr, smoothedToll);

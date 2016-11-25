@@ -6,11 +6,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
-import org.matsim.contrib.parking.PC2.simulation.ParkingArrivalEvent;
-import org.matsim.contrib.parking.PC2.simulation.ParkingArrivalEventHandler;
-import org.matsim.contrib.parking.PC2.simulation.ParkingDepartureEvent;
-import org.matsim.contrib.parking.PC2.simulation.ParkingDepartureEventHandler;
+import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking;
+import org.matsim.contrib.parking.parkingchoice.PC2.simulation.ParkingArrivalEvent;
+import org.matsim.contrib.parking.parkingchoice.PC2.simulation.ParkingArrivalEventHandler;
+import org.matsim.contrib.parking.parkingchoice.PC2.simulation.ParkingDepartureEvent;
+import org.matsim.contrib.parking.parkingchoice.PC2.simulation.ParkingDepartureEventHandler;
 
 public class ArrivalDepartureParkingHandler implements ParkingArrivalEventHandler,
 	ParkingDepartureEventHandler {

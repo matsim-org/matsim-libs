@@ -2,7 +2,7 @@ package org.matsim.contrib.parking.parkingChoice.carsharing;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
+import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking;
 import org.matsim.vehicles.Vehicle;
 
 public class ParkingLinkInfo {

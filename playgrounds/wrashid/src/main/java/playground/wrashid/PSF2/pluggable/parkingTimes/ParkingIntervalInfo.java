@@ -21,7 +21,7 @@
 package playground.wrashid.PSF2.pluggable.parkingTimes;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
 
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 

@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.events.handler.EventHandler;
 
 

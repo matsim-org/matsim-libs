@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.*;
+import javax.inject.Inject;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,9 +63,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import javax.inject.Inject;
-import java.util.*;
-
 
 /**
  * Tests that a faster vehicle can pass slower vehicle on the same link
@@ -105,17 +104,17 @@ public class PassingTest {
 			net.population.addPerson(p);
 		}
 
-		PersonLinkTravelTimeEventHandler handler = new PersonLinkTravelTimeEventHandler();
+		VehicleLinkTravelTimeEventHandler handler = new VehicleLinkTravelTimeEventHandler();
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(handler);
 
 		QSim qSim = createQSim(net,manager);
 		qSim.run();
 
-		Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes =  handler.getPersonId2LinkTravelTime();
+		Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes =  handler.getVehicleId2LinkTravelTime();
 
-		Map<Id<Link>, Double> travelTime1 = personLinkTravelTimes.get(Id.create("0", Person.class));
-		Map<Id<Link>, Double> travelTime2 = personLinkTravelTimes.get(Id.create("1", Person.class));
+		Map<Id<Link>, Double> travelTime1 = vehicleLinkTravelTimes.get(Id.create("0", Vehicle.class));
+		Map<Id<Link>, Double> travelTime2 = vehicleLinkTravelTimes.get(Id.create("1", Vehicle.class));
 
 		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue(); 
 		int carTravelTime = travelTime2.get(Id.create("2", Link.class)).intValue();
@@ -192,10 +191,10 @@ public class PassingTest {
 		cntrlr.addControlerListener(travelTimeCntrlrListner); 
 		cntrlr.run();
 
-		Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes = travelTimeCntrlrListner.getPersonId2Time();
+		Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes = travelTimeCntrlrListner.getVehicleId2Time();
 
-		Map<Id<Link>, Double> travelTime1 = personLinkTravelTimes.get(Id.create("0", Person.class));
-		Map<Id<Link>, Double> travelTime2 = personLinkTravelTimes.get(Id.create("1", Person.class));
+		Map<Id<Link>, Double> travelTime1 = vehicleLinkTravelTimes.get(Id.create("0", Vehicle.class));
+		Map<Id<Link>, Double> travelTime2 = vehicleLinkTravelTimes.get(Id.create("1", Vehicle.class));
 
 		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue(); 
 		int carTravelTime = travelTime2.get(Id.create("2", Link.class)).intValue();
@@ -209,24 +208,24 @@ public class PassingTest {
 
 	private class TravelTimeControlerListner implements StartupListener, IterationEndsListener {
 
-		Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes = new HashMap<Id<Person>, Map<Id<Link>,Double>>();
-		PersonLinkTravelTimeEventHandler hand;
+		Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes = new HashMap<>();
+		VehicleLinkTravelTimeEventHandler hand;
 		@Inject EventsManager eventsManager;
 
 		@Override
 		public void notifyStartup(StartupEvent event) {
 
-			hand = new PersonLinkTravelTimeEventHandler();
+			hand = new VehicleLinkTravelTimeEventHandler();
 			eventsManager.addHandler(hand);
 		}
 
-		public Map<Id<Person>, Map<Id<Link>, Double>> getPersonId2Time(){
-			return this.personLinkTravelTimes;
+		public Map<Id<Vehicle>, Map<Id<Link>, Double>> getVehicleId2Time(){
+			return this.vehicleLinkTravelTimes;
 		}
 
 		@Override
 		public void notifyIterationEnds(IterationEndsEvent event) {
-			this.personLinkTravelTimes = this.hand.getPersonId2LinkTravelTime();
+			this.vehicleLinkTravelTimes = this.hand.getVehicleId2LinkTravelTime();
 		}
 	}
 
@@ -316,27 +315,27 @@ public class PassingTest {
 			population = scenario.getPopulation();
 		}
 	}
-	private static class PersonLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
+	private static class VehicleLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
-		private final Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes;
+		private final Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes;
 
-		public PersonLinkTravelTimeEventHandler() {
-			this.personLinkTravelTimes = new HashMap<Id<Person>, Map<Id<Link>,Double>>();
+		public VehicleLinkTravelTimeEventHandler() {
+			this.vehicleLinkTravelTimes = new HashMap<>();
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(Id.createPersonId(event.getVehicleId()));
+			Map<Id<Link>, Double> travelTimes = this.vehicleLinkTravelTimes.get(event.getVehicleId());
 			if (travelTimes == null) {
 				travelTimes = new HashMap<Id<Link>, Double>();
-				this.personLinkTravelTimes.put(Id.createPersonId(event.getVehicleId()), travelTimes);
+				this.vehicleLinkTravelTimes.put(event.getVehicleId(), travelTimes);
 			}
 			travelTimes.put(event.getLinkId(), Double.valueOf(event.getTime()));
 		}
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(Id.createPersonId(event.getVehicleId()));
+			Map<Id<Link>, Double> travelTimes = this.vehicleLinkTravelTimes.get(event.getVehicleId());
 			if (travelTimes != null) {
 				Double d = travelTimes.get(event.getLinkId());
 				if (d != null) {
@@ -350,8 +349,8 @@ public class PassingTest {
 		public void reset(int iteration) {
 		}
 
-		public Map<Id<Person>, Map<Id<Link>, Double>> getPersonId2LinkTravelTime(){
-			return this.personLinkTravelTimes;
+		public Map<Id<Vehicle>, Map<Id<Link>, Double>> getVehicleId2LinkTravelTime(){
+			return this.vehicleLinkTravelTimes;
 		}
 	}
 }

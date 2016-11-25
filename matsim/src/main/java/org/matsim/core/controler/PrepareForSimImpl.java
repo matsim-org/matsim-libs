@@ -20,7 +20,6 @@ import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.Lockable;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacilities;
 
 class PrepareForSimImpl implements PrepareForSim {
@@ -85,6 +84,8 @@ class PrepareForSimImpl implements PrepareForSim {
 		if ( network instanceof Lockable ) {
 			((Lockable) network).setLocked();
 		}
+		
+		// (yyyy means that if someone replaces prepareForSim and does not add the above lines, the containers are not locked.  kai, nov'16)
 
 	}
 }

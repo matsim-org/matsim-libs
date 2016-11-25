@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.parkingchoice.lib.DebugLib;
 
 public abstract class AbstractInterpolatedEnergyConsumptionModel implements EnergyConsumptionModel{
 

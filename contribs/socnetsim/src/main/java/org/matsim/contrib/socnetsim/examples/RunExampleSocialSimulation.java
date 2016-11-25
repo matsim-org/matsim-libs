@@ -61,7 +61,7 @@ public class RunExampleSocialSimulation {
 		// The first step is to set the modifications to the co-evolutionary algorithm
 		controler.addOverridingModule( new JointDecisionProcessModule() );
 
-		// Then, one can add the "features", as overriding modules, in case they errase
+		// Then, one can add the "features", as overriding modules, in case they erase
 		// defaults from the JointDecisionProcessModule
 		// One needs however to add the various features one wants to use in one module to be safe:
 		// this way, if two features conflict, a crash will occur at injection.

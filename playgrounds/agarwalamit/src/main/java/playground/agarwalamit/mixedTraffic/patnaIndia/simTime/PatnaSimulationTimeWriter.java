@@ -57,10 +57,11 @@ public class PatnaSimulationTimeWriter {
 	
 	private static String linkDynamics_CSV = "FIFO,PassingQ,SeepageQ";
 	private static String trafficDynamics_CSV = "queue,withHoles";
-	private static  int numberOfRandomSeedsToUse = randomSeeds.length;
+	private static int numberOfRandomSeedsToUse = randomSeeds.length;
 	private static boolean isUsingFastCapacityUpdate = false;
-	
 	private static int cloningFactor = 1;
+
+	private static double storageCapacityFactor = 0.03 * cloningFactor;
 
 	public static void main(String[] args) {
 
@@ -76,6 +77,7 @@ public class PatnaSimulationTimeWriter {
 			trafficDynamics_CSV = args[4]; // for 100% scenario, all cases (72) cant be simulated only in one job
 			numberOfRandomSeedsToUse = Integer.valueOf(args[5]);
 			isUsingFastCapacityUpdate = Boolean.valueOf(args[6]);
+			storageCapacityFactor = Double.valueOf(args[7]);
 		}
 
 		PatnaSimulationTimeWriter pstw = new PatnaSimulationTimeWriter();
@@ -189,7 +191,7 @@ public class PatnaSimulationTimeWriter {
 		config.controler().setWritePlansInterval(200);
 
 		config.qsim().setFlowCapFactor(0.01*cloningFactor);		
-		config.qsim().setStorageCapFactor(0.03*cloningFactor);
+		config.qsim().setStorageCapFactor(storageCapacityFactor);
 		config.qsim().setEndTime(36*3600);
 		config.qsim().setMainModes(PatnaUtils.URBAN_MAIN_MODES);
 

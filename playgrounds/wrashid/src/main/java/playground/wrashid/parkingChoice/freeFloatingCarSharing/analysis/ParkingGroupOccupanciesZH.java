@@ -19,7 +19,7 @@
 package playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.PC2.analysis.ParkingGroupOccupancies;
+import org.matsim.contrib.parking.parkingchoice.PC2.analysis.ParkingGroupOccupancies;
 import org.matsim.core.controler.MatsimServices;
 
 public class ParkingGroupOccupanciesZH extends ParkingGroupOccupancies {

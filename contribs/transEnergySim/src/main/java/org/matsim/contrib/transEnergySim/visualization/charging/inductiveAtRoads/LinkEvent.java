@@ -20,7 +20,7 @@
 package org.matsim.contrib.transEnergySim.visualization.charging.inductiveAtRoads;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
 
 public class LinkEvent {
 

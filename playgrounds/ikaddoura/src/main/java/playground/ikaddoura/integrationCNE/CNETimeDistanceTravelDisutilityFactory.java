@@ -20,7 +20,6 @@
 package playground.ikaddoura.integrationCNE;
 
 import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -30,8 +29,7 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import playground.benjamin.internalization.EmissionCostModule;
+import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 import playground.vsp.congestion.handlers.TollHandler;
 
 
@@ -47,14 +45,14 @@ public final class CNETimeDistanceTravelDisutilityFactory implements TravelDisut
 	private double sigma = 0. ;
 	private RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;
 	private final EmissionModule emissionModule;
-	private final EmissionCostModule emissionCostModule;
+	private final EmissionResponsibilityCostModule emissionCostModule;
 	private final NoiseContext noiseContext;
 	private final TollHandler tollHandler;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
 	private Set<Id<Link>> hotspotLinks = null;
 
 	public CNETimeDistanceTravelDisutilityFactory(RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory, 
-			EmissionModule emissionModule, EmissionCostModule emissionCostModule, NoiseContext noiseContext, TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
+			EmissionModule emissionModule, EmissionResponsibilityCostModule emissionCostModule, NoiseContext noiseContext, TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.randomizedTimeDistanceTravelDisutilityFactory = randomizedTimeDistanceTravelDisutilityFactory;
 		this.emissionModule = emissionModule;
 		this.emissionCostModule = emissionCostModule;
