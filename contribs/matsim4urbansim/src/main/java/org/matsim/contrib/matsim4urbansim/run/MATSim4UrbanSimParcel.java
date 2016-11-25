@@ -246,16 +246,16 @@ class MATSim4UrbanSimParcel{
 
 	private void prepareReadFromUrbanSim() {
 		// get the data from UrbanSim (parcels and persons)
-		if(getMATSim4UrbanSimControlerConfig().usingShapefileLocationDistribution()){
-			readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
-					getMATSim4UrbanSimControlerConfig().getUrbansimZoneRandomLocationDistributionShapeFile(),
-					getMATSim4UrbanSimControlerConfig().getUrbanSimZoneRadiusLocationDistribution(), 
+		if(ConfigUtils.addOrGetModule(scenario.getConfig(), M4UControlerConfigModuleV3.class ).usingShapefileLocationDistribution()){
+			readFromUrbansim = new ReadFromUrbanSimModel( ConfigUtils.addOrGetModule(scenario.getConfig(), UrbanSimParameterConfigModuleV3.class ).getYear(),
+					ConfigUtils.addOrGetModule(scenario.getConfig(), M4UControlerConfigModuleV3.class ).getUrbansimZoneRandomLocationDistributionShapeFile(),
+					ConfigUtils.addOrGetModule(scenario.getConfig(), M4UControlerConfigModuleV3.class ).getUrbanSimZoneRadiusLocationDistribution(), 
 					this.scenario.getConfig());
 		}
 		else{
-			readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
+			readFromUrbansim = new ReadFromUrbanSimModel( ConfigUtils.addOrGetModule(scenario.getConfig(), UrbanSimParameterConfigModuleV3.class ).getYear(),
 					null,
-					getMATSim4UrbanSimControlerConfig().getUrbanSimZoneRadiusLocationDistribution(), 
+					ConfigUtils.addOrGetModule(scenario.getConfig(), M4UControlerConfigModuleV3.class ).getUrbanSimZoneRadiusLocationDistribution(), 
 					this.scenario.getConfig());
 		}
 	}
@@ -270,7 +270,7 @@ class MATSim4UrbanSimParcel{
 		// read UrbanSim population (these are simply those entities that have the person, home and work ID)
 		Population oldPopulation = null;
 
-		UrbanSimParameterConfigModuleV3 uspModule = getUrbanSimParameterConfig();
+		UrbanSimParameterConfigModuleV3 uspModule = ConfigUtils.addOrGetModule(scenario.getConfig(), UrbanSimParameterConfigModuleV3.class );
 
 		// check for existing plans file
 		if ( scenario.getConfig().plans().getInputFile() != null ) {
@@ -563,8 +563,8 @@ class MATSim4UrbanSimParcel{
 	 */
 	void setControlerSettings() {
 
-		AccessibilityConfigGroup moduleAccessibility = getAccessibilityParameterConfig();
-		UrbanSimParameterConfigModuleV3 moduleUrbanSim = getUrbanSimParameterConfig();
+		AccessibilityConfigGroup moduleAccessibility = ConfigUtils.addOrGetModule( scenario.getConfig(), AccessibilityConfigGroup.class );
+		UrbanSimParameterConfigModuleV3 moduleUrbanSim = ConfigUtils.addOrGetModule(scenario.getConfig(), UrbanSimParameterConfigModuleV3.class );
 
 		this.computeAgentPerformance	= moduleUrbanSim.usingAgentPerformance();
 		this.computeZone2ZoneImpedance	= moduleUrbanSim.usingZone2ZoneImpedance();
@@ -622,50 +622,6 @@ class MATSim4UrbanSimParcel{
 		} else if( module.isBackup() ){
 			BackupMATSimOutput.saveRunOutputs(scenario);
 		}
-	}
-
-	/**
-	 * access to AccessibilityParameterConfigModule and related parameter settings
-	 * @return AccessibilityParameterConfigModule
-	 */
-	AccessibilityConfigGroup getAccessibilityParameterConfig() {
-		ConfigGroup m = this.scenario.getConfig().getModule(AccessibilityConfigGroup.GROUP_NAME);
-		if (m instanceof AccessibilityConfigGroup) {
-			return (AccessibilityConfigGroup) m;
-		}
-		AccessibilityConfigGroup apcm = new AccessibilityConfigGroup();
-		this.scenario.getConfig().getModules().put(AccessibilityConfigGroup.GROUP_NAME, apcm);
-		return apcm;
-	}
-
-	/**
-	 * access to MATSim4UrbanSimControlerConfigModuleV3 and related parameter settings
-	 * @return MATSim4UrbanSimControlerConfigModuleV3
-	 */
-	M4UControlerConfigModuleV3 getMATSim4UrbanSimControlerConfig() {
-		//		ConfigGroup m = this.scenario.getConfig().getModule(M4UControlerConfigModuleV3.GROUP_NAME);
-		//		if (m instanceof M4UControlerConfigModuleV3) {
-		//			return (M4UControlerConfigModuleV3) m;
-		//		}
-		//		M4UControlerConfigModuleV3 mccm = new M4UControlerConfigModuleV3();
-		//		this.scenario.getConfig().getModules().put(M4UControlerConfigModuleV3.GROUP_NAME, mccm);
-		//		return mccm;
-		return ConfigUtils.addOrGetModule(scenario.getConfig(), M4UControlerConfigModuleV3.class ) ;
-	}
-
-	/**
-	 * access to UrbanSimParameterConfigModuleV3 and related parameter settings
-	 * @return UrbanSimParameterConfigModuleV3
-	 */
-	UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfig() {
-		//		ConfigGroup m = this.scenario.getConfig().getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
-		//		if (m instanceof UrbanSimParameterConfigModuleV3) {
-		//			return (UrbanSimParameterConfigModuleV3) m;
-		//		}
-		//		UrbanSimParameterConfigModuleV3 upcm = new UrbanSimParameterConfigModuleV3();
-		//		this.scenario.getConfig().getModules().put(UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm);
-		//		return upcm;
-		return ConfigUtils.addOrGetModule(scenario.getConfig(), UrbanSimParameterConfigModuleV3.class ) ;
 	}
 
 	/**
