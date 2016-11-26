@@ -24,7 +24,7 @@ public class Sampers2MATSimResampler {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public Sampers2MATSimResampler(final Random rnd, final Set<Alternative> choiceSet, final int drawsWithReplacement) {
+	public Sampers2MATSimResampler(final Random rnd, final Set<? extends Alternative> choiceSet, final int drawsWithReplacement) {
 
 		this.rnd = rnd;
 		this.alternatives = new ArrayList<>(choiceSet.size());

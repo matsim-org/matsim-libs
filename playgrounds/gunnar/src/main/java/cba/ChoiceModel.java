@@ -6,6 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Scenario;
@@ -26,6 +27,10 @@ class ChoiceModel {
 
 	// -------------------- MEMBERS --------------------
 
+	private final int sampleCnt;
+
+	private final Random rnd;
+
 	private final Scenario scenario;
 
 	private final Provider<TripRouter> tripRouterProvider;
@@ -35,23 +40,30 @@ class ChoiceModel {
 	private final int maxTrials;
 
 	private final int maxFailures;
+	
+	private final boolean includeMATSimScore;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	ChoiceModel(final Scenario scenario, final Provider<TripRouter> tripRouterProvider,
-			final Map<String, TravelTime> mode2travelTime, final int maxTrials, final int maxFailures) {
+	ChoiceModel(final int sampleCnt, final Random rnd, final Scenario scenario,
+			final Provider<TripRouter> tripRouterProvider, final Map<String, TravelTime> mode2travelTime,
+			final int maxTrials, final int maxFailures, final boolean includeMATSimScore) {
+		this.sampleCnt = sampleCnt;
+		this.rnd = rnd;
 		this.scenario = scenario;
 		this.tripRouterProvider = tripRouterProvider;
 		this.mode2travelTime = mode2travelTime;
 		this.maxTrials = maxTrials;
 		this.maxFailures = maxFailures;
+		this.includeMATSimScore = includeMATSimScore;
 	}
 
-	ChoiceRunner newChoiceRunner(final Link homeLoc, final Person person, final int workAlts, final int otherAlts,
-			final boolean carAvailable) {
-		return new ChoiceRunner(this.scenario, this.tripRouterProvider, this.mode2travelTime, homeLoc, person,
+	ChoiceRunnerForResampling newChoiceRunner(final Link homeLoc, final Person person, final int workAlts,
+			final int otherAlts, final boolean carAvailable) {
+		return new ChoiceRunnerForResampling(this.sampleCnt, this.rnd, this.scenario, this.tripRouterProvider,
+				this.mode2travelTime, homeLoc, person,
 				newTourSeqAlternatives(this.scenario, workAlts, otherAlts, carAvailable, homeLoc), this.maxTrials,
-				this.maxFailures);
+				this.maxFailures, this.includeMATSimScore);
 	}
 
 	// -------------------- IMPLEMENTATION --------------------

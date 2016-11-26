@@ -16,6 +16,7 @@ import org.matsim.facilities.Facility;
 
 import besttimeresponse.PlannedActivity;
 import besttimeresponse.TimeAllocator;
+import besttimeresponse.TripTravelTimes;
 import floetteroed.utilities.Units;
 import opdytsintegration.utils.TimeDiscretization;
 
@@ -39,7 +40,8 @@ public class BestTimeResponseStrategyFunctionality {
 
 	private final TimeAllocator<Facility, String> timeAlloc;
 
-	private final BestTimeResponseTravelTimes myTravelTimes;
+	// private final BestTimeResponseTravelTimes myTravelTimes;
+	private final TripTravelTimes<Facility, String> myTravelTimes;
 
 	private final boolean verbose = false;
 
@@ -53,7 +55,8 @@ public class BestTimeResponseStrategyFunctionality {
 
 	public BestTimeResponseStrategyFunctionality(final Plan plan, final Network network,
 			final CharyparNagelScoringParametersForPerson scoringParams, final TimeDiscretization timeDiscretization,
-			final BestTimeResponseTravelTimes myTravelTimes) {
+			final TripTravelTimes<Facility, String> myTravelTimes) {
+//			final BestTimeResponseTravelTimes myTravelTimes) {
 
 		final CharyparNagelScoringParameters personScoringParams = scoringParams.getScoringParameters(plan.getPerson());
 
@@ -122,7 +125,8 @@ public class BestTimeResponseStrategyFunctionality {
 		return this.timeAlloc.evaluate(this.plannedActivities, this.initialDptTimesArray_s());
 	}
 
-	public BestTimeResponseTravelTimes getTravelTimes() {
+	// public BestTimeResponseTravelTimes getTravelTimes() {
+	public TripTravelTimes<Facility, String> getTravelTimes() {
 		return this.myTravelTimes;
 	}
 

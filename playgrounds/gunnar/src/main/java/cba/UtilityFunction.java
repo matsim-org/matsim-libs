@@ -39,7 +39,9 @@ class UtilityFunction {
 
 	private final Map<Tour.Mode, Double> mode2asc = new LinkedHashMap<>();
 
-	private final TimeStructureOptimizer timeOpt;
+	private final TimeStructureOptimizer congTimeOpt;
+
+	private final TimeStructureOptimizer freeTimeOpt;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -165,11 +167,12 @@ class UtilityFunction {
 		 */
 
 		if (tripRouterProvider != null) {
-			this.timeOpt = new TimeStructureOptimizer(this.scenario, tripRouterProvider, maxTrials, maxFailures,
+			this.congTimeOpt = new TimeStructureOptimizer(this.scenario, tripRouterProvider, maxTrials, maxFailures,
 					mode2travelTime);
 		} else {
-			this.timeOpt = null;
+			this.congTimeOpt = null;
 		}
+		this.freeTimeOpt = new TimeStructureOptimizer(this.scenario, null, maxTrials, maxFailures, null);
 	}
 
 	// -------------------- INTERNALS --------------------
@@ -211,27 +214,31 @@ class UtilityFunction {
 
 	private Double matsimOnlyUtility = null;
 	private Double sampersOnlyUtility = null;
+	private Double matsimOnlyZeroTravelTimeUtility = null;
 
 	Double getMATSimOnlyUtility() {
 		return this.matsimOnlyUtility;
+	}
+
+	Double getMATSimOnlyZeroTravelTimeUtility() {
+		return this.matsimOnlyZeroTravelTimeUtility;
 	}
 
 	Double getSampersOnlyUtility() {
 		return this.sampersOnlyUtility;
 	}
 
-//	Double getTotalUtility() {
-//		return this.getMATSimOnlyUtility() + this.getSampersOnlyUtility();
-//	}
-
 	void evaluate(final Plan plan) {
 
 		this.extractTourData(plan); // result in member variables
 
 		// Score of optimal time structure
-		if (this.timeOpt != null) {
-			this.matsimOnlyUtility = this.timeOpt.computeScore(plan);
+		if (this.congTimeOpt != null) {
+			this.matsimOnlyUtility = this.congTimeOpt.computeScore(plan);
 		}
+
+		// Score of the zero-travel time structure
+		this.matsimOnlyZeroTravelTimeUtility = this.freeTimeOpt.computeScore(plan);
 
 		// ASC for activity sequence
 		this.sampersOnlyUtility = this.tourActSeq2asc.get(this.tourPurposes);

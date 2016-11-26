@@ -47,12 +47,18 @@ class ChoiceRunnerForResampling implements Runnable {
 
 	private final int maxFailures;
 
+	private final boolean includeMatsimScore;
+
 	private Set<PlanForResampling> chosenPlans = null;
+
+	Set<PlanForResampling> getChosenPlans() {
+		return this.chosenPlans;
+	}
 
 	ChoiceRunnerForResampling(final int sampleCnt, final Random rnd, final Scenario scenario,
 			final Provider<TripRouter> tripRouterProvider, final Map<String, TravelTime> mode2travelTime,
 			final Link homeLoc, final Person person, final List<TourSequence> tourSeqAlternatives, final int maxTrials,
-			final int maxFailures) {
+			final int maxFailures, final boolean includeMatsimScore) {
 		this.sampleCnt = sampleCnt;
 		this.rnd = rnd;
 		this.scenario = scenario;
@@ -63,11 +69,14 @@ class ChoiceRunnerForResampling implements Runnable {
 		this.mode2travelTime = mode2travelTime;
 		this.maxTrials = maxTrials;
 		this.maxFailures = maxFailures;
+		this.includeMatsimScore = includeMatsimScore;
 	}
 
 	@Override
 	public void run() {
 
+		try {
+		
 		// using a copy of mode2travelTime for thread safety
 
 		final UtilityFunction utilityFunction = new UtilityFunction(this.scenario, this.tripRouterProvider,
@@ -78,24 +87,27 @@ class ChoiceRunnerForResampling implements Runnable {
 		final List<Plan> planAlternatives = new ArrayList<>(this.alternatives.size());
 		final List<Double> sampersOnlyScores = new ArrayList<>(this.alternatives.size());
 
-		final double scale = 1.0;
+		final double sampersOnlyScale = 0.0;
 		final MultinomialLogit sampersOnlyMNL = new MultinomialLogit(this.alternatives.size(), 1);
-		sampersOnlyMNL.setUtilityScale(scale);
+		sampersOnlyMNL.setUtilityScale(sampersOnlyScale);
 		sampersOnlyMNL.setCoefficient(0, 1.0);
 
+		final double sampersAndMatsimScale = 1.0;
 		final MultinomialLogit sampersAndMatsimMNL = new MultinomialLogit(this.alternatives.size(), 1);
-		sampersAndMatsimMNL.setUtilityScale(scale);
+		sampersAndMatsimMNL.setUtilityScale(sampersAndMatsimScale);
 		sampersAndMatsimMNL.setCoefficient(0, 1.0);
 
-		for (int i = 0; i < planAlternatives.size(); i++) {
+		for (int i = 0; i < this.alternatives.size(); i++) {
 			final Plan plan = this.alternatives.get(i).asPlan(this.scenario, homeLoc.getId(), this.person);
 			planAlternatives.add(plan);
 
 			utilityFunction.evaluate(plan);
-			sampersOnlyScores.add(utilityFunction.getSampersOnlyUtility());
+			sampersOnlyScores.add(
+					utilityFunction.getSampersOnlyUtility() + utilityFunction.getMATSimOnlyZeroTravelTimeUtility());
 			plan.setScore(utilityFunction.getMATSimOnlyUtility());
 
-			sampersOnlyMNL.setAttribute(i, 0, utilityFunction.getSampersOnlyUtility());
+			sampersOnlyMNL.setAttribute(i, 0,
+					utilityFunction.getSampersOnlyUtility() + utilityFunction.getMATSimOnlyZeroTravelTimeUtility());
 			sampersOnlyMNL.setASC(i, 0.0);
 
 			sampersAndMatsimMNL.setAttribute(i, 0,
@@ -109,16 +121,29 @@ class ChoiceRunnerForResampling implements Runnable {
 
 		final Map<Integer, PlanForResampling> plansForResampling = new LinkedHashMap<>(this.sampleCnt);
 		for (int i = 0; i < this.sampleCnt; i++) {
-			final int planIndex = sampersAndMatsimMNL.draw(this.rnd);
-			final Plan plan = planAlternatives.get(i);
+			final int planIndex;
+			if (this.includeMatsimScore) {
+				planIndex = sampersAndMatsimMNL.draw(this.rnd);
+			} else {
+				planIndex = sampersOnlyMNL.draw(this.rnd);
+			}
+			final Plan plan = planAlternatives.get(planIndex);
 			plansForResampling.put(planIndex,
 					new PlanForResampling(plan, sampersOnlyScores.get(planIndex),
 							sampersOnlyScores.get(planIndex) + plan.getScore(),
-							sampersOnlyMNL.getProbs().get(planIndex), new LogitEpsilonDistribution(scale)));
+							sampersOnlyMNL.getProbs().get(planIndex), new LogitEpsilonDistribution(sampersAndMatsimScale)));
 		}
 
 		this.chosenPlans = new LinkedHashSet<>(plansForResampling.values());
 
-		System.out.println("computed " + this.chosenPlans + " alternatives for person " + this.person.getId());
+		System.out.println("computed " + this.chosenPlans.size() + " alternatives for person " + this.person.getId());
+		
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+			System.out.println();
+			
+		}
+		
 	}
 }

@@ -24,6 +24,8 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import com.google.inject.Provider;
 
+import cba.resampling.Sampers2MATSimResampler;
+
 /**
  * 
  * @author Gunnar Flötteröd
@@ -127,13 +129,14 @@ class DemandModel {
 		(new ObjectAttributesXmlWriter(personAttrs)).writeFile("testdata/cba/person-attributes.xml");
 	}
 
-	static void replanPopulation(final Scenario scenario, final Provider<TripRouter> tripRouterProvider,
-			final double replanProba, final String expectationFileName, final String demandStatsFileName,
-			final int maxTrials, final int maxFailures, final Map<String, TravelTime> mode2travelTime) {
+	static void replanPopulation(final int sampleCnt, final Random rnd, final Scenario scenario,
+			final Provider<TripRouter> tripRouterProvider, final double replanProba, final String expectationFileName,
+			final String demandStatsFileName, final int maxTrials, final int maxFailures,
+			final Map<String, TravelTime> mode2travelTime, final boolean includeMATSimScore) {
 
-		final ChoiceModel choiceModel = new ChoiceModel(scenario, tripRouterProvider, mode2travelTime, maxTrials,
-				maxFailures);
-		final Map<Person, ChoiceRunner> person2choiceRunner = new LinkedHashMap<>();
+		final ChoiceModel choiceModel = new ChoiceModel(sampleCnt, rnd, scenario, tripRouterProvider, mode2travelTime,
+				maxTrials, maxFailures, includeMATSimScore);
+		final Map<Person, ChoiceRunnerForResampling> person2choiceRunner = new LinkedHashMap<>();
 
 		// Replan in parallel.
 		final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -147,8 +150,8 @@ class DemandModel {
 				final boolean carAvailable = (Boolean) scenario.getPopulation().getPersonAttributes()
 						.getAttribute(person.getId().toString(), caravailable);
 
-				final ChoiceRunner choiceRunner = choiceModel.newChoiceRunner(homeLoc, person, locChoiceSetSize,
-						locChoiceSetSize, carAvailable);
+				final ChoiceRunnerForResampling choiceRunner = choiceModel.newChoiceRunner(homeLoc, person,
+						locChoiceSetSize, locChoiceSetSize, carAvailable);
 				person2choiceRunner.put(person, choiceRunner);
 				threadPool.execute(choiceRunner);
 			}
@@ -170,16 +173,28 @@ class DemandModel {
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
-		for (Map.Entry<Person, ChoiceRunner> entry : person2choiceRunner.entrySet()) {
+		for (Map.Entry<Person, ChoiceRunnerForResampling> entry : person2choiceRunner.entrySet()) {
 			final Person person = entry.getKey();
-			final Plan plan = entry.getValue().getChosenPlan();
+
+			final Sampers2MATSimResampler resampler = new Sampers2MATSimResampler(rnd,
+					entry.getValue().getChosenPlans(), sampleCnt);
+			final PlanForResampling planForResampling = (PlanForResampling) resampler.next();
+
+			// final PlanForResampling planForResampling =
+			// entry.getValue().getChosenPlans().iterator().next();
+
+			final Plan plan = planForResampling.plan;
 			person.getPlans().clear();
 			person.setSelectedPlan(null);
 			person.addPlan(plan);
 			plan.setPerson(person);
 			person.setSelectedPlan(plan);
-			expectationWriter.println(person.getId() + "\t" + plan.getScore());
-			demandAnalyzer.registerChoice(plan, entry.getValue().getSampersUtility());
+			if (includeMATSimScore) {
+				expectationWriter.println(person.getId() + "\t" + plan.getScore());
+			} else {
+				expectationWriter.println(person.getId() + "\t" + planForResampling.getSampersScore());
+			}
+			demandAnalyzer.registerChoice(plan, planForResampling.getSampersScore());
 		}
 		expectationWriter.flush();
 		expectationWriter.close();
