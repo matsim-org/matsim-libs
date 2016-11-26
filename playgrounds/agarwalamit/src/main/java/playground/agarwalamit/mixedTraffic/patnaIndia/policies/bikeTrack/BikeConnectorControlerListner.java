@@ -170,7 +170,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
                 // I think, the above method is useful, when adding all network change events once.
                 org.matsim.core.network.NetworkUtils.setNetworkChangeEvents(scenario.getNetwork(), networkChangeEventList);
 
-                String outNetworkFile = event.getServices().getConfig().controler().getOutputDirectory()+"/it."+event.getIteration()+"/"+event.getIteration()+".network.xml.gz";
+                String outNetworkFile = event.getServices().getConfig().controler().getOutputDirectory()+"/ITERS/it."+event.getIteration()+"/"+event.getIteration()+".network.xml.gz";
                 new NetworkWriter(scenario.getNetwork()).write(outNetworkFile);
             } else {
                 terminateSimulation = true;
@@ -252,7 +252,6 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
 //        void run(){
 //            for(Person p : pop.getPersons().values()) {
 //                for (Plan plan : p.getPlans() ) {
-//
 //                    for (PlanElement pe : plan.getPlanElements()) {
 //                        if (pe instanceof Leg) {
 //                            NetworkRoute route = (NetworkRoute)((Leg)pe).getRoute();
