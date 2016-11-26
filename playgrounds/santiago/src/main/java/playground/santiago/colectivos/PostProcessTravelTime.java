@@ -3,9 +3,11 @@ package playground.santiago.colectivos;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -54,6 +56,7 @@ public class PostProcessTravelTime {
 
 
 		new MatsimEventsReader(events).readFile(eventsFile);
+//		Id<Person> personId = vehicleId2PersonId(event.getVehicleId());
 
 	
 	}
