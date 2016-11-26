@@ -81,10 +81,8 @@ public class BerlinControler {
 			activityDurationBin = 3600.;
 			tolerance = 3600.;
 			
-			pricing = true;
+			pricing = false;
 			kp = 2 * ( 7 / 3600.);
-//			kp = 9999999.0;		
-			
 		}
 		
 		BerlinControler berlin = new BerlinControler();
@@ -121,6 +119,7 @@ public class BerlinControler {
 			controler = decongestion.getControler();
 				
 //			CNEIntegration cne = new CNEIntegration(controler);
+//			cne.setCongestionTollingApproach(CongestionTollingApproach.QBPV3);
 //			cne.setCongestionPricing(true);
 //			controler = cne.prepareControler();
 		}
