@@ -115,7 +115,7 @@ public class CNEBerlin {
 		} else {
 			
 			outputDirectory = null;
-			configFile = "/Users/ihab/Desktop/test/config.xml";
+			configFile = "../../../runs-svn/berlin-an-time/input/config.xml";
 			
 			congestionPricing = true;
 			noisePricing = true;
@@ -147,12 +147,6 @@ public class CNEBerlin {
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
 		
-		EmissionsConfigGroup ecg = (EmissionsConfigGroup) controler.getConfig().getModule("emissions");
-		// TODO: set files in config
-		ecg.setUsingDetailedEmissionCalculation(true); // TODO
-	
-		controler.getConfig().vehicles().setVehiclesFile("../../../runs-svn/detEval/emissionCongestionInternalization/iatbr/input/emissionVehicles_1pct.xml.gz");
-
 		// CNE Integration
 		
 		CNEIntegration cne = new CNEIntegration(controler, gt, rgt);
@@ -163,6 +157,18 @@ public class CNEBerlin {
 		cne.setCongestionTollingApproach(congestionTollingApproach);
 		cne.setkP(kP);
 		controler = cne.prepareControler();
+		
+		// TODO: set files in config
+		EmissionsConfigGroup ecg = (EmissionsConfigGroup) controler.getConfig().getModule("emissions");
+		ecg.setAverageColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_ColdStart_vehcat_2005average.txt");
+		ecg.setAverageWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_HOT_vehcat_2005average.txt");
+		ecg.setDetailedColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_ColdStart_SubSegm_2005detailed.txt");
+		ecg.setDetailedWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_HOT_SubSegm_2005detailed.txt");
+		ecg.setEmissionRoadTypeMappingFile("../../../shared-svn/projects/detailedEval/matsim-input-files/roadTypeMapping_v0.txt");
+		
+		ecg.setUsingDetailedEmissionCalculation(false); // TODO?
+	
+		controler.getConfig().vehicles().setVehiclesFile("../../../shared-svn/projects/detailedEval/matsim-input-files/emissionVehicles_1pct_v0.xml.gz");
 		
 		// noise Berlin settings
 		
