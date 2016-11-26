@@ -24,12 +24,14 @@ import java.io.IOException;
 import java.util.*;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -167,6 +169,9 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
                 // dont use addNetworkChangeEvent else it will throw exception about unequal network change events from VariableIntervalTimeVariantAttribute (line 70).
                 // I think, the above method is useful, when adding all network change events once.
                 org.matsim.core.network.NetworkUtils.setNetworkChangeEvents(scenario.getNetwork(), networkChangeEventList);
+
+                String outNetworkFile = event.getServices().getConfig().controler().getOutputDirectory()+"/it."+event.getIteration()+"/"+event.getIteration()+".network.xml.gz";
+                new NetworkWriter(scenario.getNetwork()).write(outNetworkFile);
             } else {
                 terminateSimulation = true;
             }
@@ -203,6 +208,14 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
     }
 
     public boolean isTerminating(){
+        if(this.terminateSimulation) {
+            LOG.info("========================== Total possible connectors are " + this.bikeConnectorLinks.size());
+            LOG.info("========================== The number of required connectors are " + this.numberOfBikeConnectorsRequired);
+            LOG.info("========================== The number of removed connectors are " + this.removedConnectorLinks.size());
+            Assert.assertEquals("The number of required and removed connectors should be equal to total connectors", this.bikeConnectorLinks.size(),
+                    this.removedConnectorLinks.size()+this.numberOfBikeConnectorsRequired);
+            LOG.info("========================== Terminating the solution.");
+        }
         return this.terminateSimulation;
     }
 
@@ -212,7 +225,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
         BufferedWriter writer = IOUtils.getBufferedWriter(outFile);
         this.removedConnectorLinks.forEach(link -> {
             try {
-                writer.write(link.toString());
+                writer.write(link.toString()+"\n");
             } catch (IOException e) {
                 throw new RuntimeException("Data is not written/read. Reason : " + e);
             }
@@ -223,4 +236,37 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
             throw new RuntimeException("Data is not written/read. Reason : " + e);
         }
     }
+
+//    class PlansCleaner {
+//
+//        private final Population pop;
+//        private final Id<Link> linkId;
+//
+//        private boolean removePlans = false;
+//
+//        PlansCleaner (final Population pop, final Id<Link> linkId) {
+//            this.pop = pop;
+//            this.linkId = linkId;
+//        }
+//
+//        void run(){
+//            for(Person p : pop.getPersons().values()) {
+//                for (Plan plan : p.getPlans() ) {
+//
+//                    for (PlanElement pe : plan.getPlanElements()) {
+//                        if (pe instanceof Leg) {
+//                            NetworkRoute route = (NetworkRoute)((Leg)pe).getRoute();
+//                            if ( route.getLinkIds().contains(this.linkId) ) {
+//                                removePlans = true;
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        void rePlan
+//
+//
+//    }
 }
