@@ -261,7 +261,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
             for (Plan plan : p.getPlans()) {
                 boolean needsReRoute = false;
                 for (PlanElement pe : plan.getPlanElements()) {
-                    if (pe instanceof Leg) {
+                    if (pe instanceof Leg && ((Leg) pe).getRoute() instanceof NetworkRoute) {
                         NetworkRoute route = (NetworkRoute) ((Leg) pe).getRoute();
                         if (route.getLinkIds().contains(linkId)) {
                             ((Leg) pe).setRoute(null);
