@@ -99,4 +99,20 @@ public final class MapUtils {
 		}
 		return outMap;
 	}
+
+//	just some useful lambda syntax, to sum up all the values of a map using MapUtils.doubleValueSum and then
+//	storing it to another map.
+
+//	this.linkId2Count.putAll(
+//                       link2time2vol.entrySet().stream().filter(
+//                               mapEntry->this.bikeConnectorLinks.contains(mapEntry.getKey())).collect(
+//                        Collectors.toMap(
+//                                entry -> entry.getKey(), entry -> MapUtils.doubleValueSum( entry.getValue())
+//                        )
+//                       )
+//               );
+
+//	another useful syntax for sorting by value (also see BikeConnectorControlerListner or intellij suggestion)
+//Comparator<Map.Entry<Id<Link>, Double>> byValue = (entry1, entry2) -> entry1.getValue().compareTo(
+//                        entry2.getValue());
 }
