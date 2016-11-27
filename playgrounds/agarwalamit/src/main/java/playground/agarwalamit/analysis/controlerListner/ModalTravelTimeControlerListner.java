@@ -83,23 +83,6 @@ public class ModalTravelTimeControlerListner implements StartupListener, Iterati
 
 		if(itNrIndex == 0) return;
 
-//		if(itNrIndex == 0) {
-//			for(String mode : mode2AvgTripTime.keySet()) {
-//				if ( ! mode2AvgTripTimes.containsKey(mode)){ // initialize
-//					double [] avgTimes = new double [this.numberOfIterations];
-//					avgTimes[0] = mode2AvgTripTime.get(mode);
-//					mode2AvgTripTimes.put(mode, avgTimes);
-//				}
-//			}
-//			return; // only one data points... so no plotting
-//		}
-//
-//		//storeData
-//		for(String mode : mode2AvgTripTime.keySet()) {
-//			double [] avgTimes = this.mode2AvgTripTimes.get(mode);
-//			avgTimes[itNrIndex] = mode2AvgTripTime.get(mode);
-//		}
-
 		//plot data here...
 		XYLineChart chart = new XYLineChart("Modal Travel Time", "iteration", "travel time [sec]");
 
