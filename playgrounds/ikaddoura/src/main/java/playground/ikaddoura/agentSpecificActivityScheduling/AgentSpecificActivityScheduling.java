@@ -35,8 +35,18 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.ikaddoura.utils.prepare.PopulationTools;
 
 /**
-* @author ikaddoura
-*/
+ * Idea: Interpret the activity times in the initial population as agent-specific activity opening and closing times.
+ * This allows to switch on time allocation and to adjust the elasticity via beta_performing.
+ * 
+ * (1) Adjusts the population in the scenario:
+ * 		(a) converts normal activities (e.g. home, work) to duration-specific activities (e.g. home_7200, work_3600, ...)
+ * 		(b) merges overnight activities in case they have the same base type (e.g. home_7200 and home_3600 --> home_10800) 
+ * 		(c) writes initial activity times (= agent-specific activity opening and closing times) to person attributes
+ * (2) Adjusts the config to account for the new activity types (the typical duration is set according to the duration in the initial situation).
+ * (3) Replaces the default activity scoring by an agent-specific activity scoring function which accounts for the opening/closing times in the person attributes.
+ * 
+ * @author ikaddoura
+ */
 
 public class AgentSpecificActivityScheduling {
 
@@ -45,7 +55,6 @@ public class AgentSpecificActivityScheduling {
 	private double activityDurationBin = 3600.;
 	private double tolerance = 900.;
 	
-	private boolean preparePopulation = true;
 	private boolean removeNetworkSpecificInformation = false;
 	
 	private String configFile = null;
@@ -74,20 +83,17 @@ public class AgentSpecificActivityScheduling {
 			controler = this.controler;
 		}
 		
-		// adjust population	
-		if (preparePopulation) {
-			
-			log.info("Preparing the population...");
+		
+		log.info("Preparing the population...");
 
-			PopulationTools.setScoresToZero(controler.getScenario().getPopulation());
-			PopulationTools.setActivityTypesAccordingToDurationAndMergeOvernightActivities(controler.getScenario().getPopulation(), activityDurationBin);			
-			PopulationTools.addActivityTimesOfSelectedPlanToPersonAttributes(controler.getScenario().getPopulation());
-			PopulationTools.analyze(controler.getScenario().getPopulation());
+		PopulationTools.setScoresToZero(controler.getScenario().getPopulation());
+		PopulationTools.setActivityTypesAccordingToDurationAndMergeOvernightActivities(controler.getScenario().getPopulation(), activityDurationBin);			
+		PopulationTools.addActivityTimesOfSelectedPlanToPersonAttributes(controler.getScenario().getPopulation());
+		PopulationTools.analyze(controler.getScenario().getPopulation());
 			
-			if (removeNetworkSpecificInformation) PopulationTools.removeNetworkSpecificInformation(controler.getScenario().getPopulation());
+		if (removeNetworkSpecificInformation) PopulationTools.removeNetworkSpecificInformation(controler.getScenario().getPopulation());
 
-			log.info("Preparing the population... Done.");					
-		}
+		log.info("Preparing the population... Done.");					
 		
 		// adjust config
 		log.info("Adding duration-specific activity types to config...");
@@ -140,10 +146,6 @@ public class AgentSpecificActivityScheduling {
 		log.info("Replacing the default activity scoring by an agent-specific opening / closing time consideration... Done.");
 		
 		return controler;
-	}
-	
-	public void setPreparePopulation(boolean preparePopulation) {
-		this.preparePopulation = preparePopulation;
 	}
 
 	public void setActivityDurationBin(double activityDurationBin) {
