@@ -47,9 +47,10 @@ public class Main {
 	static final String experienceFilePrefix = "./testdata/cba/experience-after-it";
 	static final String demandStatsFilePrefix = "./testdata/cba/demandStats-in-it";
 
-	static final int sampleCnt = 10;
+	static final int sampleCnt = 1;
 	static final Random rnd = new Random();
 	static final boolean includeMATSimScore = false;
+	static final double sampersUtilityScale = 1.0;
 
 	static final int maxTrials = 10;
 	static final int maxFailures = 3;
@@ -109,7 +110,7 @@ public class Main {
 
 		DemandModel.replanPopulation(sampleCnt, rnd, scenario, factory, outerIt == 1 ? 1.0 : replanProba,
 				expectationFilePrefix + outerIt + ".txt", demandStatsFilePrefix + outerIt + ".txt", maxTrials,
-				maxFailures, mode2tt, includeMATSimScore);
+				maxFailures, mode2tt, includeMATSimScore, sampersUtilityScale);
 
 		final PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		popwriter.write("testdata/cba/triangle-population.xml");

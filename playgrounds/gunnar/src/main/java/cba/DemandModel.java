@@ -132,10 +132,11 @@ class DemandModel {
 	static void replanPopulation(final int sampleCnt, final Random rnd, final Scenario scenario,
 			final Provider<TripRouter> tripRouterProvider, final double replanProba, final String expectationFileName,
 			final String demandStatsFileName, final int maxTrials, final int maxFailures,
-			final Map<String, TravelTime> mode2travelTime, final boolean includeMATSimScore) {
+			final Map<String, TravelTime> mode2travelTime, final boolean includeMATSimScore,
+			final double sampersUtilityScale) {
 
 		final ChoiceModel choiceModel = new ChoiceModel(sampleCnt, rnd, scenario, tripRouterProvider, mode2travelTime,
-				maxTrials, maxFailures, includeMATSimScore);
+				maxTrials, maxFailures, includeMATSimScore, sampersUtilityScale);
 		final Map<Person, ChoiceRunnerForResampling> person2choiceRunner = new LinkedHashMap<>();
 
 		// Replan in parallel.
@@ -189,6 +190,11 @@ class DemandModel {
 			person.addPlan(plan);
 			plan.setPerson(person);
 			person.setSelectedPlan(plan);
+			
+			/*
+			 * The logic 
+			 */
+			
 			if (includeMATSimScore) {
 				expectationWriter.println(person.getId() + "\t" + plan.getScore());
 			} else {

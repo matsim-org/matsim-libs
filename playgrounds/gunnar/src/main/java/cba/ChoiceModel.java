@@ -40,14 +40,17 @@ class ChoiceModel {
 	private final int maxTrials;
 
 	private final int maxFailures;
-	
+
 	private final boolean includeMATSimScore;
+
+	private final double sampersUtilityScale;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	ChoiceModel(final int sampleCnt, final Random rnd, final Scenario scenario,
 			final Provider<TripRouter> tripRouterProvider, final Map<String, TravelTime> mode2travelTime,
-			final int maxTrials, final int maxFailures, final boolean includeMATSimScore) {
+			final int maxTrials, final int maxFailures, final boolean includeMATSimScore,
+			final double sampersUtilityScale) {
 		this.sampleCnt = sampleCnt;
 		this.rnd = rnd;
 		this.scenario = scenario;
@@ -56,6 +59,7 @@ class ChoiceModel {
 		this.maxTrials = maxTrials;
 		this.maxFailures = maxFailures;
 		this.includeMATSimScore = includeMATSimScore;
+		this.sampersUtilityScale = sampersUtilityScale;
 	}
 
 	ChoiceRunnerForResampling newChoiceRunner(final Link homeLoc, final Person person, final int workAlts,
@@ -63,7 +67,7 @@ class ChoiceModel {
 		return new ChoiceRunnerForResampling(this.sampleCnt, this.rnd, this.scenario, this.tripRouterProvider,
 				this.mode2travelTime, homeLoc, person,
 				newTourSeqAlternatives(this.scenario, workAlts, otherAlts, carAvailable, homeLoc), this.maxTrials,
-				this.maxFailures, this.includeMATSimScore);
+				this.maxFailures, this.includeMATSimScore, this.sampersUtilityScale);
 	}
 
 	// -------------------- IMPLEMENTATION --------------------

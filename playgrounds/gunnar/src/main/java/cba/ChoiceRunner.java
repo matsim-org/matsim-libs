@@ -73,7 +73,7 @@ class ChoiceRunner implements Runnable {
 
 		// using a copy of mode2travelTime for thread safety
 		final UtilityFunction utilityFunction = new UtilityFunction(this.scenario, this.tripRouterProvider,
-				new LinkedHashMap<>(this.mode2travelTime), this.maxTrials, this.maxFailures);
+				new LinkedHashMap<>(this.mode2travelTime), this.maxTrials, this.maxFailures, 1.0);
 
 		final List<Plan> planAlternatives = new ArrayList<>(this.alternatives.size());
 
