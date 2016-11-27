@@ -3,12 +3,11 @@ package org.matsim.contrib.accessibility;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -31,7 +30,7 @@ import org.matsim.facilities.ActivityFacility;
  */
 public final class AccessibilityCalculator {
 
-	private static final Logger log = Logger.getLogger(AccessibilityCalculator.class);
+	private static final Logger LOG = Logger.getLogger(AccessibilityCalculator.class);
 
 	// measuring points (origins) for accessibility calculation
 	private final ActivityFacilitiesImpl measuringPoints;
@@ -75,16 +74,16 @@ public final class AccessibilityCalculator {
 		inverseOfLogitScaleParameter = 1 / (logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
 
 		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0.) {
-			log.error("marginal utility of distance for car different from zero but not used in accessibility computations");
+			LOG.error("marginal utility of distance for car different from zero but not used in accessibility computations");
 		}
 		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.pt).getMarginalUtilityOfDistance() != 0.) {
-			log.error("marginal utility of distance for pt different from zero but not used in accessibility computations");
+			LOG.error("marginal utility of distance for pt different from zero but not used in accessibility computations");
 		}
 		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.bike).getMonetaryDistanceRate() != 0.) {
-			log.error("monetary distance cost rate for bike different from zero but not used in accessibility computations");
+			LOG.error("monetary distance cost rate for bike different from zero but not used in accessibility computations");
 		}
 		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.walk).getMonetaryDistanceRate() != 0.) {
-			log.error("monetary distance cost rate for walk different from zero but not used in accessibility computations");
+			LOG.error("monetary distance cost rate for walk different from zero but not used in accessibility computations");
 		}
 
 		walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
@@ -117,7 +116,7 @@ public final class AccessibilityCalculator {
 		// yyyy this method ignores the "capacities" of the facilities. kai, mar'14
 		// for now, we decided not to add "capacities" as it is not needed for current projects. dz, feb'16
 
-		log.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with identical nearest node ...");
+		LOG.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with identical nearest node ...");
 		Map<Id<Node>, AggregationObject> opportunityClusterMap = new ConcurrentHashMap<>();
 		ProgressBar bar = new ProgressBar( opportunities.getFacilities().size() );
 
@@ -140,12 +139,12 @@ public final class AccessibilityCalculator {
 			}
 			if ( cnt == 0 ) {
 				cnt++;
-				log.warn("ignoring the capacities of the facilities");
-				log.warn(Gbl.ONLYONCE);
+				LOG.warn("ignoring the capacities of the facilities");
+				LOG.warn(Gbl.ONLYONCE);
 			}
 			jco.addObject(opportunity.getId(), expVjk);
 		}
-		log.info("Aggregated " + opportunities.getFacilities().size() + " number of opportunities to " + opportunityClusterMap.size() + " nodes.");
+		LOG.info("Aggregated " + opportunities.getFacilities().size() + " number of opportunities to " + opportunityClusterMap.size() + " nodes.");
 		this.aggregatedOpportunities = opportunityClusterMap.values().toArray(new AggregationObject[opportunityClusterMap.size()]);
 	}
 
@@ -155,19 +154,19 @@ public final class AccessibilityCalculator {
 
 		Map<String,ExpSum> expSums = new HashMap<>() ;
 		for (String mode : calculators.keySet()) {
-			log.warn("calculate ExpSum for mode=" + mode );
+			LOG.warn("calculate ExpSum for mode=" + mode );
 			expSums.put(mode, new ExpSum());
 		}
 
 		// Condense measuring points (origins) that have the same nearest node on the network
 		Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins = aggregateMeasurePointsWithSameNearestNode();
 
-		log.info("Now going through all origins:");
+		LOG.info("Now going through all origins:");
 //		ProgressBar bar = new ProgressBar(aggregatedOrigins.size());
 
 		// go through all nodes (keys) that have a measuring point (origin) assigned
 		for (Id<Node> nodeId : aggregatedOrigins.keySet()) {
-			log.info("calculate accessibility for node=" + nodeId );
+			LOG.info("calculate accessibility for node=" + nodeId );
 //			bar.update();
 
 			Node fromNode = scenario.getNetwork().getNodes().get(nodeId);
@@ -178,7 +177,7 @@ public final class AccessibilityCalculator {
 
 			// get list with origins that are assigned to "fromNode"
 			for ( ActivityFacility origin : aggregatedOrigins.get( nodeId ) ) {
-				log.info("-- calculate accessibility for origin=" + origin.getId() );
+				LOG.info("-- calculate accessibility for origin=" + origin.getId() );
 				assert( origin.getCoord() != null );
 
 				for ( ExpSum expSum : expSums.values() ) {
@@ -199,7 +198,7 @@ public final class AccessibilityCalculator {
 				Map<String, Double> accessibilities  = new HashMap<>();
 				
 				for (String mode : calculators.keySet()) {
-					log.info("---- calculate accessibility for mode=" + mode );
+					LOG.info("---- calculate accessibility for mode=" + mode );
 					// TODO introduce here a config parameter "computation mode" that can be set to "rawSum", "minimum" or "exponential/logsum/hansen", dz, sept'16
 					if(!useRawSum){
 						System.out.println("expSums.get(mode).getSum() = " + expSums.get(mode).getSum());
@@ -210,10 +209,10 @@ public final class AccessibilityCalculator {
 					}
 				}
 
-				log.warn("");
-				log.warn("SENDING accessibilities; start zone=" + origin.getId() );
+				LOG.warn("");
+				LOG.warn("SENDING accessibilities; start zone=" + origin.getId() );
 				for ( Entry<String, Double> entry : accessibilities.entrySet() ) {
-					log.warn( "mode=" + entry.getKey() + "; accessibility=" + entry.getValue() ) ;
+					LOG.warn( "mode=" + entry.getKey() + "; accessibility=" + entry.getValue() ) ;
 				}
 				for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
 					zoneDataExchangeInterface.setFacilityAccessibilities(origin, departureTime, accessibilities);
@@ -250,8 +249,8 @@ public final class AccessibilityCalculator {
 			// assign measure point (origin) to it's nearest node
 			aggregatedOrigins.get(nodeId).add(measuringPoint);
 		}
-		log.info("Number of measurement points (origins): " + measuringPoints.getFacilities().values().size());
-		log.info("Number of aggregated measurement points (origins): " + aggregatedOrigins.size());
+		LOG.info("Number of measurement points (origins): " + measuringPoints.getFacilities().values().size());
+		LOG.info("Number of aggregated measurement points (origins): " + aggregatedOrigins.size());
 		return aggregatedOrigins;
 	}
 

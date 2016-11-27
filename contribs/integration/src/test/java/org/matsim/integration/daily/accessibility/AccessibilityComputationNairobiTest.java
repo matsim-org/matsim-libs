@@ -114,7 +114,6 @@ public class AccessibilityComputationNairobiTest {
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
 //		config.planCalcScore().setBrainExpBeta(200); // Set to high value to base computation on time to nearest facility only
-		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		// Collect activity types

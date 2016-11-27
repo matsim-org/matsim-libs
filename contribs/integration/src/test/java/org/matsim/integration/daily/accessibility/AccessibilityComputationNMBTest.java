@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package org.matsim.integration.daily.accessibility;
 
-import static org.junit.Assert.assertNotNull;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +32,6 @@ import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
 import org.matsim.contrib.accessibility.AccessibilityStartupListener;
 import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
 import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
-import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.NetworkModeProvider;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
@@ -44,12 +41,10 @@ import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
@@ -111,8 +106,6 @@ public class AccessibilityComputationNMBTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
-		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-//		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true); // TODO add PT in new version
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		// Collect activity types
@@ -131,7 +124,7 @@ public class AccessibilityComputationNMBTest {
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
 		
 		// Matrix-based pt
-		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
+		MatrixBasedPtRouterConfigGroup mbpcg = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class);
 		mbpcg.setPtStopsInputFile(ptStopsFile);
 		mbpcg.setUsingTravelTimesAndDistances(true);
 		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrixFile);

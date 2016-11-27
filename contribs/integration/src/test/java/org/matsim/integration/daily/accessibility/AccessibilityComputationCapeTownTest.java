@@ -105,7 +105,6 @@ public class AccessibilityComputationCapeTownTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
-		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		// Matrix-based pt

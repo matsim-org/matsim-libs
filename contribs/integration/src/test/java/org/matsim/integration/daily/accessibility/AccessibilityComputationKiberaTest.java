@@ -33,7 +33,6 @@ import org.matsim.contrib.accessibility.AccessibilityStartupListener;
 import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
-import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.NetworkModeProvider;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
