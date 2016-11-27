@@ -141,21 +141,7 @@ public class PatnaBikeTrackConnectionControler {
 		//StatsWriter.run(outputDir);
 	}
 
-	private static class MyTerminationCriteria implements TerminationCriterion{
-
-		private final BikeConnectorControlerListner bikeConnectorControlerListner;
-
-		MyTerminationCriteria(final BikeConnectorControlerListner bikeConnectorControlerListner) {
-			this.bikeConnectorControlerListner = bikeConnectorControlerListner;
-		}
-
-		@Override
-		public boolean continueIterations(int iteration) {
-			return !this.bikeConnectorControlerListner.isTerminating();
-		}
-	}
-
-	public static Scenario getScenario() {
+	private static Scenario getScenario() {
 		Config config = ConfigUtils.createConfig();
 
 		String inputDir = dir+"/input/";
@@ -204,12 +190,10 @@ public class PatnaBikeTrackConnectionControler {
 		if ( scenario.getVehicles().getVehicles().size() != 0 ) throw new RuntimeException("Only vehicle types should be loaded if vehicle source "+
 				QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData +" is assigned.");
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
-
 		return scenario;
 	}
 
 	private static void addScoringFunction(final Controler controler){
-		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
 			@Inject
@@ -249,5 +233,19 @@ public class PatnaBikeTrackConnectionControler {
 				return sumScoringFunction;
 			}
 		});
+	}
+
+	private static class MyTerminationCriteria implements TerminationCriterion{
+
+		private final BikeConnectorControlerListner bikeConnectorControlerListner;
+
+		MyTerminationCriteria(final BikeConnectorControlerListner bikeConnectorControlerListner) {
+			this.bikeConnectorControlerListner = bikeConnectorControlerListner;
+		}
+
+		@Override
+		public boolean continueIterations(int iteration) {
+			return !this.bikeConnectorControlerListner.isTerminating();
+		}
 	}
 }
