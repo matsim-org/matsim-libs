@@ -191,16 +191,15 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         switch (this.opdytsObjectiveFunctionCases) {
             case EQUIL:
             case EQUIL_MIXEDTRAFFIC:
-                return getEquilObjectiveFunctionValue();
             case PATNA_1Pct:
             case PATNA_10Pct:
-                return getPatnaObjectiveFunctionValue();
+                return getSumOfSquareObjectiveFunctionValue();
             default:
                 throw new RuntimeException("not implemented yet.");
         }
     }
 
-    private double getPatnaObjectiveFunctionValue() {
+    private double getSumOfAbsoluteErrorsObjectiveFunctionValue() {
         double objective = 0. ;
         for ( Map.Entry<StatType, Databins<String>> entry : simStatsContainer.entrySet() ) {
             StatType theStatType = entry.getKey() ;  // currently only one type ;
@@ -227,7 +226,8 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         return objective ;
     }
 
-    private double getEquilObjectiveFunctionValue (){
+    private double getSumOfSquareObjectiveFunctionValue(){
+        log.error("This should be used with great caution, with Patna, it was not a good experience. See email from GF on 24.11.2016");
         double objective = 0. ;
         double sum = 0.;
         for ( Map.Entry<StatType, Databins<String>> entry : simStatsContainer.entrySet() ) {
