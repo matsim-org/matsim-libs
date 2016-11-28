@@ -1,0 +1,103 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.matsim</groupId>
+	<artifactId>matsim-example-project</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<name>MATSim example project</name>
+	<description>MATSim example project</description>
+
+	<repositories>
+		<repository>
+			<!-- Geotools is not on Maven central -->
+			<id>osgeo</id>
+			<name>Geotools repository</name>
+			<url>http://download.osgeo.org/webdav/geotools</url>
+		</repository>
+		<repository>
+			<id>matsim</id>
+			<url>http://dl.bintray.com/matsim/matsim</url>
+		</repository>
+		<repository>
+			<id>ojo-snapshots</id>
+			<url>http://oss.jfrog.org/libs-snapshot</url>
+		</repository>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.matsim</groupId>
+			<artifactId>matsim</artifactId>
+ 			<version>0.9.0-SNAPSHOT</version>
+		
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		
+	<!-- the following dependencies show how to use MATSim contributions. 
+	For a list of available contribs, see http://matsim.org/extensions -->
+		
+
+		<dependency>
+ 			<groupId>org.matsim.contrib</groupId>
+ 			<artifactId>otfvis</artifactId>
+ 			<version>0.9.0-SNAPSHOT</version>
+ 		</dependency>
+ 		
+		<!-- An example on how to add a contribution using the 0.9.0-SNAPSHOT -->
+		<!--dependency>
+ 			<groupId>org.matsim.contrib</groupId>
+ 			<artifactId>av</artifactId>
+ 			<version>0.9.0-SNAPSHOT</version>
+ 		</dependency-->
+ 	
+<!-- 		<dependency>
+			<groupId>com.github.msmobility</groupId>
+			<artifactId>silo</artifactId>
+			<version>master-SNAPSHOT</version>
+		</dependency>
+ -->	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+					<showWarnings>false</showWarnings>
+					<showDeprecation>false</showDeprecation>
+					<encoding>UTF-8</encoding>
+					<!-- configure initial and maximal memory for compiling -->
+					<fork>true</fork>
+					<meminitial>128m</meminitial>
+					<maxmem>512m</maxmem>
+					<compilerArguments>
+						<Xmaxwarns>4000</Xmaxwarns>
+						<Xmaxerrs>100</Xmaxerrs>
+					</compilerArguments>
+				</configuration>
+			</plugin>
+			<plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-eclipse-plugin</artifactId>
+			  <configuration>
+			    <downloadSources>true</downloadSources>
+			    <downloadJavadocs>true</downloadJavadocs>
+			  </configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
