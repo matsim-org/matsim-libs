@@ -24,12 +24,9 @@ package org.matsim.contrib.accessibility.run;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.junit.Ignore;
@@ -42,18 +39,14 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
-import org.matsim.contrib.accessibility.AccessibilityCalculator;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
-import org.matsim.contrib.accessibility.AccessibilityStartupListener;
 import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
-import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.NetworkModeProvider;
-import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
@@ -62,14 +55,9 @@ import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ReflectiveConfigGroup.StringGetter;
-import org.matsim.core.config.ReflectiveConfigGroup.StringSetter;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -195,13 +183,13 @@ public class AccessibilityIntegrationTest {
 		// yy the correct test is essentially already in AccessibilityTest.testAccessibilityMeasure().  kai, jun'13
 		// But that test uses the matsim4urbansim setup, which we don't want to use in the present test.
 
-		boolean push2Geoserver = false;
+		final boolean push2Geoserver = false;
 		
 //		controler.run();
 		// Storage objects
 		final List<String> modes = new ArrayList<>();
 
-		List<String> activityTypes = AccessibilityUtils.collectAllFacilityOptionTypes(scenario);
+		final List<String> activityTypes = AccessibilityUtils.collectAllFacilityOptionTypes(scenario);
 		
 		// Collect homes for density layer
 		String activityFacilityType = FacilityTypes.HOME;
@@ -212,14 +200,24 @@ public class AccessibilityIntegrationTest {
 		String left = scenario.getConfig().getModule("accessibility").getValue("boundingBoxLeft");
 		String right = scenario.getConfig().getModule("accessibility").getValue("boundingBoxRight");
 		
-		Envelope envelope = new Envelope(Double.parseDouble(left), Double.parseDouble(right), Double.parseDouble(bottom), Double.parseDouble(top));
+		final Envelope envelope = new Envelope(Double.parseDouble(left), Double.parseDouble(right), Double.parseDouble(bottom), Double.parseDouble(top));
 
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(false);
 
-		String crs = null;
-		String runId = "test";
-		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, runId, envelope, cellSize, push2Geoserver));
+//		controler.addOverridingModule(new AbstractModule() {
+			final String crs = null;
+			final String runId = "test";
+			
+//			@Override
+//			public void install() {
+//				this.bind(EvaluateTestResults.class);
+//				AccessibilityStartupListenerTestExtended asl = new AccessibilityStartupListenerTestExtended(activityTypes, densityFacilities, crs, runId, envelope, cellSize, push2Geoserver);
+//				this.addControlerListenerBinding().toInstance(asl);
+//			}
+//			
+//		});
+		controler.addControlerListener(new AccessibilityStartupListenerTestExtended(activityTypes, densityFacilities, crs, runId, envelope, cellSize, push2Geoserver));
 
 		// Add calculators
 		controler.addOverridingModule(new AbstractModule() {
@@ -256,6 +254,7 @@ public class AccessibilityIntegrationTest {
 		// end new
 	}
 
+	@Ignore
 	@Test
 	public void testWithExtentDeterminedByNetwork() {
 		final Config config = ConfigUtils.createConfig();
@@ -291,6 +290,7 @@ public class AccessibilityIntegrationTest {
         
 	}
 	
+	@Ignore
 	@Test
 	public void testWithExtentDeterminedShapeFile() {
 		
@@ -345,7 +345,7 @@ public class AccessibilityIntegrationTest {
 	 * @author thomas
 	 *
 	 */
-	public class EvaluateTestResults implements SpatialGridDataExchangeInterface{
+	public static class EvaluateTestResults implements SpatialGridDataExchangeInterface{
 		
 //		private Map<Modes4Accessibility,Boolean> isComputingMode = new HashMap<Modes4Accessibility,Boolean>();
 		
@@ -363,13 +363,14 @@ public class AccessibilityIntegrationTest {
 		 * @param usingPtGrid
 		 */
 		// new
-		public EvaluateTestResults(){
+		public EvaluateTestResults(Set<String> modes){
 //		public EvaluateTestResults(boolean usingFreeSpeedGrid, boolean usingCarGrid, boolean usingBikeGrid, boolean usingWalkGrid, boolean usingPtGrid){
 //			this.isComputingMode.put( Modes4Accessibility.freeSpeed, usingFreeSpeedGrid ) ;
 //			this.isComputingMode.put( Modes4Accessibility.car, usingCarGrid ) ;
 //			this.isComputingMode.put( Modes4Accessibility.bike, usingBikeGrid ) ;
 //			this.isComputingMode.put( Modes4Accessibility.walk, usingWalkGrid ) ;
 //			this.isComputingMode.put( Modes4Accessibility.pt, usingPtGrid ) ;
+			log.error("############################################ construct");
 		}
 		// end new
 		
@@ -383,6 +384,7 @@ public class AccessibilityIntegrationTest {
 		public void setAndProcessSpatialGrids( Map<String,SpatialGrid> spatialGrids ){
 			
 			log.info("Evaluating resuts ...");
+			log.error("############################################");
 			
 //			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 //				if ( this.isComputingMode.get(mode)) {
