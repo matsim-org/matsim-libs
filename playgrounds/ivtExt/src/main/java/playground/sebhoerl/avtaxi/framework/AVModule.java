@@ -1,13 +1,11 @@
 package playground.sebhoerl.avtaxi.framework;
 
 import com.google.inject.*;
-import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
-import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.population.routes.RouteFactories;
@@ -18,23 +16,19 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vehicles.VehicleUtils;
-import org.opengis.filter.capability.Operator;
 import playground.sebhoerl.avtaxi.config.*;
 import playground.sebhoerl.avtaxi.data.*;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.dispatcher.SingleFIFODispatcher;
+import playground.sebhoerl.avtaxi.dispatcher.single_fifo.SingleFIFODispatcher;
+import playground.sebhoerl.avtaxi.dispatcher.single_heuristic.SingleHeuristicDispatcher;
 import playground.sebhoerl.avtaxi.generator.AVGenerator;
 import playground.sebhoerl.avtaxi.generator.PopulationDensityGenerator;
-import playground.sebhoerl.avtaxi.passenger.AVRequestCreator;
 import playground.sebhoerl.avtaxi.replanning.AVOperatorChoiceStrategy;
 import playground.sebhoerl.avtaxi.routing.AVRoute;
 import playground.sebhoerl.avtaxi.routing.AVRouteFactory;
 import playground.sebhoerl.avtaxi.routing.AVRoutingModule;
-import playground.sebhoerl.avtaxi.schedule.AVOptimizer;
 import playground.sebhoerl.avtaxi.scoring.AVScoringFunctionFactory;
-import playground.sebhoerl.avtaxi.vrpagent.AVActionCreator;
 
 import javax.inject.Named;
 import java.io.File;
@@ -72,7 +66,10 @@ public class AVModule extends AbstractModule {
         bind(new TypeLiteral<Map<String, Class<? extends AVDispatcher.AVDispatcherFactory>>>() {}).toInstance(dispatcherStrategies);
 
         dispatcherStrategies.put("SingleFIFO", SingleFIFODispatcher.Factory.class);
+        dispatcherStrategies.put("SingleHeuristic", SingleHeuristicDispatcher.Factory.class);
+
         bind(SingleFIFODispatcher.Factory.class);
+        bind(SingleHeuristicDispatcher.Factory.class);
     }
 
     private void configureGeneratorStrategies() {
