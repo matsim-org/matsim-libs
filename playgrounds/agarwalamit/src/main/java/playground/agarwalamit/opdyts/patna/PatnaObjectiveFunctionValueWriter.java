@@ -52,6 +52,7 @@ public class PatnaObjectiveFunctionValueWriter {
 
     public double getObjectiveFunctionValue(){
         double value = 0.;
+        double realValueSum = 0;
 
         SortedMap<String, double []> realCounts = this.referenceStudyDistri.getMode2DistanceBasedLegs();
         double [] distClasses =  this.referenceStudyDistri.getDistClasses();
@@ -64,9 +65,11 @@ public class PatnaObjectiveFunctionValueWriter {
                 double simValue ;
                 if (simCounts.containsKey(mode) && simCounts.get(mode).containsKey(distClass)) simValue = simCounts.get(mode).get(distClass);
                 else simValue = 0.;
-                value += Math.abs(  realValue - simValue );
+                value += Math.pow( (realValue - simValue ), 2) ;
+                realValueSum += realValue;
             }
         }
-        return value;
+        double objectiveFnValue = value / (realValueSum * realValueSum);
+        return objectiveFnValue;
     }
 }
