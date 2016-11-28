@@ -42,17 +42,21 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class ManteuffelRoadTypeMapper {
 	
-	private static final String netFile = "C:/Users/Work/VSP/Emissions/Charlottenburg/bc09_park/bc09_park.output_network.xml.gz";
-	private static final String outputNetFile = "C:/Users/Work/VSP/Emissions/Charlottenburg/Emission Files/chb-emission-network";
-	
+//	private static final String netFile = "C:/Users/Work/VSP/Emissions/Charlottenburg/bc09_park/bc09_park.output_network.xml.gz";
+	private static final String netFile = "../../../runs-svn/berlin-an-time/input/network.xml";
+
+//	private static final String outputNetFile = "C:/Users/Work/VSP/Emissions/Charlottenburg/Emission Files/chb-emission-network";
+	private static final String outputNetFile = "../../../runs-svn/berlin-an-time/input/network_withRoadTypes";
+
 //	private static final String netFile = "../../runs-svn/manteuffelstrasse/p3/bvg.run190.25pct.dilution001.network.20150731.LP2.III.output_network.xml.gz";
 //	private static final String outputNetFile = "../../runs-svn/manteuffelstrasse/p3/bvg.run190.25pct.dilution001.network.20150731.LP2.III.emissionNetwork.xml.gz";
 	
 //	private static final String netFile = "../../runs-svn/manteuffelstrasse/p4/bvg.run190.25pct.dilution001.network.20150731.LP2.IV.output_network.xml.gz";
 //	private static final String outputNetFile = "../../runs-svn/manteuffelstrasse/p4/bvg.run190.25pct.dilution001.network.20150731.LP2.IV.emissionNetwork.xml.gz";
 	
-	private static final String roadTypeMappingFile = "C:/Users/Work/VSP/Emissions/Charlottenburg/chb-emission-network.RoadTypeMapping.txt";
-	
+//	private static final String roadTypeMappingFile = "C:/Users/Work/VSP/Emissions/Charlottenburg/chb-emission-network.RoadTypeMapping.txt";
+	private static final String roadTypeMappingFile = "../../../runs-svn/berlin-an-time/input/roadTypeMapping_berlin.txt";
+
 	private static Scenario scenario;
 	private static Network outputNet;
 	private static BufferedWriter writer;
@@ -63,7 +67,7 @@ public class ManteuffelRoadTypeMapper {
 		scenario = ScenarioUtils.loadScenario(config);
 		Network inputNet = scenario.getNetwork();
 		addEmissionInformation(inputNet);
-		new NetworkWriter(outputNet).writeFileV1(outputNetFile + "_v1.xml");
+//		new NetworkWriter(outputNet).writeFileV1(outputNetFile + "_v1.xml");
 		new NetworkWriter(outputNet).write(outputNetFile + ".xml");
 		writeRoadTypeMappingFile();
 	}
