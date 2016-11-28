@@ -22,47 +22,54 @@ package playground.agarwalamit.opdyts;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
+import playground.agarwalamit.analysis.legMode.distributions.LegModeBeelineDistanceDistributionFromPlansAnalyzer;
+import playground.agarwalamit.analysis.legMode.distributions.LegModeBeelineDistanceDistributionHandler;
 import playground.agarwalamit.analysis.modalShare.FilteredModalShareEventHandler;
-import playground.agarwalamit.opdyts.patna.DistanceDistributionWriter;
-import playground.agarwalamit.opdyts.patna.PatnaObjectiveFunctionValueWriter;
+import playground.agarwalamit.opdyts.patna.PatnaCMPDistanceDistribution;
 
 /**
  * Created by amit on 20/09/16.
  */
 
-public class ModalStatsControlerListner implements StartupListener, IterationEndsListener, ShutdownListener {
+public class ModalStatsControlerListner implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
+
+    @Inject
+    private EventsManager events;
 
     private final FilteredModalShareEventHandler modalShareEventHandler = new FilteredModalShareEventHandler();
-    private DistanceDistributionWriter distanceDistributionWriter;
-    private PatnaObjectiveFunctionValueWriter objectiveFunctionValueWriter;
+    private final PatnaCMPDistanceDistribution referenceStudyDistri ;
+    private LegModeBeelineDistanceDistributionHandler beelineDistanceDistributionHandler;
+
+    private final SortedMap<String, SortedMap<Double, Integer>> initialMode2DistanceClass2LegCount = new TreeMap<>();
+
     private BufferedWriter writer;
     private final Set<String> mode2consider;
-    private OpdytsScenarios opdytsScenarios;
+    private final OpdytsScenarios opdytsScenarios ;
 
     public ModalStatsControlerListner(final Set<String> modes2consider, final OpdytsScenarios opdytsScenarios) {
         this.mode2consider = modes2consider;
         this.opdytsScenarios = opdytsScenarios;
+
+        this.referenceStudyDistri = new PatnaCMPDistanceDistribution(this.opdytsScenarios);
     }
 
     public ModalStatsControlerListner() {
-        this.mode2consider = new HashSet<>();
-        this.mode2consider.add(TransportMode.car);
-        this.mode2consider.add(TransportMode.pt);
+        this(new HashSet<>(Arrays.asList(TransportMode.car, TransportMode.pt)), null);
     }
-
-    @Inject
-    private EventsManager events;
 
     @Override
     public void notifyStartup(StartupEvent event) {
@@ -82,18 +89,48 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
         } catch (IOException e) {
             throw new RuntimeException("File not found.");
         }
-        events.addHandler(modalShareEventHandler);
 
-        // initializing it here,
-        this.distanceDistributionWriter = new DistanceDistributionWriter(event.getServices().getScenario(), this.opdytsScenarios);
-        this.objectiveFunctionValueWriter = new PatnaObjectiveFunctionValueWriter(event.getServices().getScenario(), this.opdytsScenarios);
-        this.events.addHandler(this.distanceDistributionWriter.getEventHandler());
-        this.events.addHandler(this.objectiveFunctionValueWriter.getEventHandler());
+        this.events.addHandler(modalShareEventHandler);
+
+        // initializing it here so that scenario can be accessed.
+        List<Double> dists = Arrays.stream(this.referenceStudyDistri.getDistClasses()).boxed().collect(Collectors.toList());
+        this.beelineDistanceDistributionHandler = new LegModeBeelineDistanceDistributionHandler(dists, event.getServices().getScenario().getNetwork());
+        this.events.addHandler(this.beelineDistanceDistributionHandler);
+
+        // this must be processed here, so that the output remains unchanged.
+//        probably, just take this from first iteration, then just use the same beelineDistanceDistributionHandler.
+        LegModeBeelineDistanceDistributionFromPlansAnalyzer initialBeelineDistribution = new LegModeBeelineDistanceDistributionFromPlansAnalyzer(dists);
+        initialBeelineDistribution.init(event.getServices().getScenario());
+        initialBeelineDistribution.preProcessData();
+        initialBeelineDistribution.postProcessData();
+        this.initialMode2DistanceClass2LegCount.clear();
+        this.initialMode2DistanceClass2LegCount.putAll(initialBeelineDistribution.getMode2DistanceClass2LegCount());
+    }
+
+    @Override
+    public void notifyIterationStarts(final IterationStartsEvent event) {
+        this.beelineDistanceDistributionHandler.reset(event.getIteration());
+        this.modalShareEventHandler.reset(event.getIteration());
     }
 
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
         SortedMap<String, Integer> mode2Legs = modalShareEventHandler.getMode2numberOflegs();
+
+        // evaluate objective function value
+        ObjectiveFunctionEvaluator objectiveFunctionEvaluator = new ObjectiveFunctionEvaluator();
+        Map<String, double []> realCounts = this.referenceStudyDistri.getMode2DistanceBasedLegs();
+        Map<String, double []> simCounts = new TreeMap<>();
+
+        SortedMap<String, SortedMap<Double, Integer>> simCountsHandler = this.beelineDistanceDistributionHandler.getMode2DistanceClass2LegCounts();
+        for (Map.Entry<String, SortedMap<Double, Integer>> e : simCountsHandler.entrySet() ) {
+            double [] counts = new double [simCountsHandler.get(e.getKey()).size()] ;
+            int index = 0;
+            for (Integer count : simCountsHandler.get(e.getKey()).values()) {
+                counts [index++] = count;
+            }
+            simCounts.put(e.getKey(),counts);
+        }
 
         try {
             writer.write(event.getIteration() + "\t" +
@@ -123,18 +160,16 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
                     dists.values().toString() + "\t" +
                     moneyRates.values().toString());
 
-            writer.write( "\t" + this.objectiveFunctionValueWriter.getObjectiveFunctionValue());
-
+            writer.write( "\t" + objectiveFunctionEvaluator.getObjectiveFunctionValue(realCounts,simCounts));
             writer.newLine();
             writer.flush();
         } catch (IOException e) {
             throw new RuntimeException("File not found.");
         }
-        modalShareEventHandler.reset(event.getIteration());
 
-        //
+        // dist-distribution file
         String outFile = event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/it."+event.getIteration()+"/"+event.getIteration()+".distanceDistri.txt";
-        this.distanceDistributionWriter.writeResults(outFile);
+        writeDistanceDistribution(outFile);
     }
 
     @Override
@@ -146,6 +181,70 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
         }
     }
 
+    private void writeDistanceDistribution(String outputFile) {
+        final BufferedWriter writer2 = IOUtils.getBufferedWriter(outputFile);
+        try {
+            writer2.write( "distBins" + "\t" );
+            for(Double d : referenceStudyDistri.getDistClasses()) {
+                writer2.write(d + "\t");
+            }
+            writer2.newLine();
 
+            // from initial plans
+            {
+                writer2.write("===== begin writing distribution from initial plans ===== ");
+                writer2.newLine();
 
+                for (String mode : this.initialMode2DistanceClass2LegCount.keySet()) {
+                    writer2.write(mode + "\t");
+                    for (Double d : this.initialMode2DistanceClass2LegCount.get(mode).keySet()) {
+                        writer2.write(this.initialMode2DistanceClass2LegCount.get(mode).get(d) + "\t");
+                    }
+                    writer2.newLine();
+                }
+
+                writer2.write("===== end writing distribution from initial plans ===== ");
+                writer2.newLine();
+            }
+
+            // from objective function
+            {
+                writer2.write("===== begin writing distribution from objective function ===== ");
+                writer2.newLine();
+
+                SortedMap<String, double []> mode2counts = this.referenceStudyDistri.getMode2DistanceBasedLegs();
+                for (String mode : mode2counts.keySet()) {
+                    writer2.write(mode + "\t");
+                    for (Double d : mode2counts.get(mode)) {
+                        writer2.write(d + "\t");
+                    }
+                    writer2.newLine();
+                }
+
+                writer2.write("===== end writing distribution from objective function ===== ");
+                writer2.newLine();
+            }
+
+            // from simulation
+            {
+                writer2.write("===== begin writing distribution from simulation ===== ");
+                writer2.newLine();
+
+                SortedMap<String, SortedMap<Double, Integer>> mode2dist2counts = this.beelineDistanceDistributionHandler.getMode2DistanceClass2LegCounts();
+                for (String mode : mode2dist2counts.keySet()) {
+                    writer2.write(mode + "\t");
+                    for (Double d : mode2dist2counts.get(mode).keySet()) {
+                        writer2.write(mode2dist2counts.get(mode).get(d) + "\t");
+                    }
+                    writer2.newLine();
+                }
+
+                writer2.write("===== end writing distribution from simulation ===== ");
+                writer2.newLine();
+            }
+            writer2.close();
+        } catch (IOException e) {
+            throw new RuntimeException("Data is not written. Reason "+ e);
+        }
+    }
 }

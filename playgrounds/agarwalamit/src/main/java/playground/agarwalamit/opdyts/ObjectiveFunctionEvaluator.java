@@ -64,15 +64,19 @@ public class ObjectiveFunctionEvaluator {
     public double getObjectiveFunctionValue(final Map<String, double[]> realCounts, final Map<String, double[]> simCounts){
         double objective = 0. ;
         double realValueSum = 0;
-        for ( Map.Entry<String, double[]> theEntry : simCounts.entrySet() ) {
+        for ( Map.Entry<String, double[]> theEntry : realCounts.entrySet() ) {
             String mode = theEntry.getKey() ;
             LOG.warn("mode=" + mode);
 
-            double[] simValue = theEntry.getValue() ;
-            double[] reaVal = realCounts.get(mode);
+            double[] realValue = theEntry.getValue() ;
+            double[] simValue = simCounts.get(mode);
 
-            for ( int ii=0 ; ii < simValue.length ; ii++ ) {
-                double diff = Math.abs( simValue[ii] - reaVal[ii] ) ;
+            for ( int ii=0 ; ii < realValue.length ; ii++ ) {
+                double diff = 0;
+
+                if(realValue==null) diff = simValue[ii];
+                else if (simValue == null) diff = realValue[ii];
+                else diff = Math.abs( realValue[ii] - simValue[ii] ) ;
 
                 switch (this.objectiveFunctionType) {
                     case SUM_ABS_DIFF:
@@ -80,7 +84,7 @@ public class ObjectiveFunctionEvaluator {
                         break;
                     case SUM_SQR_DIFF_NORMALIZED:
                         objective += diff * diff;
-                        realValueSum += reaVal[ii];
+                        realValueSum += simValue[ii];
                         break;
                     default:
                         throw new RuntimeException("not implemented yet.");
