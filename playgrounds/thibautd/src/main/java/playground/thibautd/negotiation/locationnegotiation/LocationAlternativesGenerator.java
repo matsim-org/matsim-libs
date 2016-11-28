@@ -28,9 +28,11 @@ import org.matsim.facilities.ActivityFacility;
 import playground.thibautd.negotiation.framework.AlternativesGenerator;
 import playground.thibautd.negotiation.framework.NegotiationAgent;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author thibautd
@@ -71,15 +73,21 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 
 		// TODO sample possible out-of-home locations
 
-		return homes.stream()
-				.flatMap( f -> generatePropositions( ego.getId() , alterIds , f ) )
-				.collect( Collectors.toList() );
+		final List<LocationProposition> propositions = new ArrayList<>( 2 * alters.size() );
+		for ( Person alter : alters ) {
+			propositions.add(
+					new LocationProposition(
+							ego.getId() ,
+							Collections.singleton( alter.getId() ) ,
+							locations.getHomeLocation( ego ) ) );
+			propositions.add(
+					new LocationProposition(
+							ego.getId() ,
+							Collections.singleton( alter.getId() ) ,
+							locations.getHomeLocation( alter ) ) );
+		}
+
+		return propositions;
 	}
 
-	private static Stream<LocationProposition> generatePropositions(
-			final Id<Person> egoId,
-			final Collection<Id<Person>> alterIds,
-			final ActivityFacility facility ) {
-		return alterIds.stream().map( as -> new LocationProposition( egoId , alterIds , facility ) );
-	}
 }

@@ -18,30 +18,13 @@
  * *********************************************************************** */
 package playground.thibautd.negotiation.framework;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Key;
-import com.google.inject.util.Types;
-import playground.ivt.utils.ConcurrentStopWatch;
-import playground.thibautd.negotiation.locationnegotiation.LocationHelper;
-import playground.thibautd.negotiation.locationnegotiation.RandomSeedHelper;
-
 /**
  * @author thibautd
  */
-public class NegotiationModule extends AbstractModule {
-	private final Class<? extends Proposition> propositionClass;
-
-	public NegotiationModule( final Class<? extends Proposition> propositionClass ) {
-		this.propositionClass = propositionClass;
-	}
-
-	@Override
-	protected void configure() {
-		bind( Key.get( Types.newParameterizedType( Negotiator.class , propositionClass ) ) );
-		bind( Key.get( Types.newParameterizedType( NegotiatingAgents.class , propositionClass ) ) );
-		bind( LocationHelper.class );
-		bind( RandomSeedHelper.class );
-
-		bind( new Key<ConcurrentStopWatch<StopWatchMeasurement>>() {} ).toInstance( new ConcurrentStopWatch<>( StopWatchMeasurement.class ) );
-	}
+public enum StopWatchMeasurement {
+	total,
+	utility,
+	askAcceptance,
+	notifyResult,
+	generateAlternatives
 }

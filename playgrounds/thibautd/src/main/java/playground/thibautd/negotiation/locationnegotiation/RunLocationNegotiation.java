@@ -23,13 +23,16 @@ import org.matsim.contrib.socnetsim.framework.SocialNetworkConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Injector;
+import playground.ivt.utils.ConcurrentStopWatch;
 import playground.ivt.utils.MonitoringUtils;
 import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.negotiation.framework.NegotiationScenarioFromFileModule;
 import playground.thibautd.negotiation.framework.Negotiator;
 import playground.thibautd.negotiation.framework.NegotiatorConfigGroup;
+import playground.thibautd.negotiation.framework.StopWatchMeasurement;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author thibautd
@@ -51,15 +54,22 @@ public class RunLocationNegotiation {
 	}
 
 	private static void run( final Config config ) throws IOException {
+
+		final com.google.inject.Injector injector = Injector.createInjector(
+				config,
+				new NegotiationScenarioFromFileModule( LocationProposition.class ),
+				new LocationNegotiationModule() );
 		final Negotiator<LocationProposition> negotiator =
-				Injector.createInjector(
-						config,
-						new NegotiationScenarioFromFileModule( LocationProposition.class ),
-						new LocationNegotiationModule() ).getInstance(
+				injector.getInstance(
 								new Key<Negotiator<LocationProposition>>() {} );
+
+		final ConcurrentStopWatch<StopWatchMeasurement> stopWatch = injector.getInstance( new Key<ConcurrentStopWatch<StopWatchMeasurement>>() {} );
 
 		try ( ChosenLocationWriter writer = new ChosenLocationWriter( config.controler().getOutputDirectory()+"/locations.dat" ) ) {
 			negotiator.negotiate( writer::writeLocation );
+		}
+		finally {
+			stopWatch.printStats( TimeUnit.SECONDS );
 		}
 	}
 

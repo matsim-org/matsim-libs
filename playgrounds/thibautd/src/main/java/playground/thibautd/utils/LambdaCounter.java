@@ -16,32 +16,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.negotiation.framework;
+package playground.thibautd.utils;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Key;
-import com.google.inject.util.Types;
-import playground.ivt.utils.ConcurrentStopWatch;
-import playground.thibautd.negotiation.locationnegotiation.LocationHelper;
-import playground.thibautd.negotiation.locationnegotiation.RandomSeedHelper;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.LongConsumer;
 
 /**
  * @author thibautd
  */
-public class NegotiationModule extends AbstractModule {
-	private final Class<? extends Proposition> propositionClass;
+public class LambdaCounter {
+	private final AtomicLong counter = new AtomicLong(0);
+	private final AtomicLong nextCounter = new AtomicLong(1);
 
-	public NegotiationModule( final Class<? extends Proposition> propositionClass ) {
-		this.propositionClass = propositionClass;
+	private final LongConsumer consumer;
+
+	public LambdaCounter( final LongConsumer consumer ) {
+		this.consumer = consumer;
 	}
 
-	@Override
-	protected void configure() {
-		bind( Key.get( Types.newParameterizedType( Negotiator.class , propositionClass ) ) );
-		bind( Key.get( Types.newParameterizedType( NegotiatingAgents.class , propositionClass ) ) );
-		bind( LocationHelper.class );
-		bind( RandomSeedHelper.class );
+	public void incCounter() {
+		long i = this.counter.incrementAndGet();
+		long n = this.nextCounter.get();
+		if (i >= n) {
+			if (this.nextCounter.compareAndSet(n, n*2)) {
+				consumer.accept( i );
+			}
+		}
+	}
 
-		bind( new Key<ConcurrentStopWatch<StopWatchMeasurement>>() {} ).toInstance( new ConcurrentStopWatch<>( StopWatchMeasurement.class ) );
+	public void printCounter() {
+		consumer.accept( counter.get() );
+	}
+
+	public long getCounter() {
+		return this.counter.get();
+	}
+
+	public void reset() {
+		this.counter.set(0);
+		this.nextCounter.set(1);
 	}
 }

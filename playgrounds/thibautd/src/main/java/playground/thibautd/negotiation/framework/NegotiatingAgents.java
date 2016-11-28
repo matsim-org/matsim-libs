@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.core.gbl.MatsimRandom;
+import playground.ivt.utils.ConcurrentStopWatch;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,13 +36,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import static org.osgeo.proj4j.parser.Proj4Keyword.a;
-
 /**
  * @author thibautd
  */
 @Singleton
 public class NegotiatingAgents<P extends Proposition> implements Iterable<NegotiationAgent<P>> {
+	private final ConcurrentStopWatch<StopWatchMeasurement> stopwatch;
+
 	private static final Logger log = Logger.getLogger( NegotiatingAgents.class );
 	private final Map<Id<Person>, NegotiationAgent<P>> agents = new HashMap<>();
 	private final List<NegotiationAgent<P>> agentList;
@@ -55,15 +56,17 @@ public class NegotiatingAgents<P extends Proposition> implements Iterable<Negoti
 	public NegotiatingAgents(
 			final SocialNetwork socialNetwork,
 			final Population population,
+			final ConcurrentStopWatch<StopWatchMeasurement> stopwatch,
 			final PropositionUtility<P> utility,
 			final AlternativesGenerator<P> alternativesGenerator ) {
 		agentList = new ArrayList<>( socialNetwork.getEgos().size() );
+		this.stopwatch = stopwatch;
 		this.utility = utility;
 		this.alternativesGenerator = alternativesGenerator;
 
 		socialNetwork.getEgos().stream()
 				.map( population.getPersons()::get )
-				.map( p -> new NegotiationAgent<>( p.getId() , this ) )
+				.map( p -> new NegotiationAgent<>( p.getId() , this, this.stopwatch ) )
 				.forEach( a -> {
 					agentList.add( a );
 					agents.put( a.getId() , a );
