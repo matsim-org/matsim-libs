@@ -52,10 +52,10 @@ public class RunLocationNegotiation {
 	private static void run( final Config config ) throws IOException {
 		final Negotiator<LocationProposition> negotiator =
 				Injector.createInjector(
-				config,
-						new NegotiationScenarioFromFileModule(),
-				new LocationNegotiationModule() ).getInstance(
-						new Key<Negotiator<LocationProposition>>() {} );
+						config,
+						new NegotiationScenarioFromFileModule( LocationProposition.class ),
+						new LocationNegotiationModule() ).getInstance(
+								new Key<Negotiator<LocationProposition>>() {} );
 
 		try ( ChosenLocationWriter writer = new ChosenLocationWriter( config.controler().getOutputDirectory()+"/locations.dat" ) ) {
 			negotiator.negotiate( writer::writeLocation );

@@ -26,10 +26,16 @@ import org.matsim.core.scenario.ScenarioByConfigModule;
  * @author thibautd
  */
 public class NegotiationScenarioFromFileModule extends AbstractModule {
+	private final Class<? extends Proposition> propositionClass;
+
+	public NegotiationScenarioFromFileModule( final Class<? extends Proposition> propositionClass ) {
+		this.propositionClass = propositionClass;
+	}
+
 	@Override
 	public void install() {
 		install( new ScenarioByConfigModule() );
-		install( new NegotiationModule() );
+		install( new NegotiationModule( propositionClass ) );
 		install( new SocialNetworkModule() );
 	}
 }

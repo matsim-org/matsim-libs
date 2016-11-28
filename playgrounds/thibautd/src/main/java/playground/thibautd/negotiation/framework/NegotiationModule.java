@@ -20,18 +20,24 @@ package playground.thibautd.negotiation.framework;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
+import com.google.inject.util.Types;
 import playground.thibautd.negotiation.locationnegotiation.LocationHelper;
 import playground.thibautd.negotiation.locationnegotiation.RandomSeedHelper;
 
 /**
  * @author thibautd
  */
-public class NegotiationModule<P extends Proposition> extends AbstractModule {
+public class NegotiationModule extends AbstractModule {
+	private final Class<? extends Proposition> propositionClass;
+
+	public NegotiationModule( final Class<? extends Proposition> propositionClass ) {
+		this.propositionClass = propositionClass;
+	}
+
 	@Override
 	protected void configure() {
-		bind( Negotiator.class );
-		bind( new Key<NegotiatingAgents<P>>() {} );
+		bind( Key.get( Types.newParameterizedType( Negotiator.class , propositionClass ) ) );
+		bind( Key.get( Types.newParameterizedType( NegotiatingAgents.class , propositionClass ) ) );
 		bind( LocationHelper.class );
 		bind( RandomSeedHelper.class );
 	}
