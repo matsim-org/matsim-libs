@@ -57,7 +57,6 @@ public class Negotiator<P extends Proposition> {
 				new LambdaCounter( l -> {
 					log.info( "Negotiation round # " + l + ": success fraction " + currentSuccessFraction );
 					stopwatch.printStats( TimeUnit.MILLISECONDS );
-					log.info( "" );
 				} );
 		while ( currentSuccessFraction.get() > configGroup.getImprovingFractionThreshold() ) {
 			counter.incCounter();

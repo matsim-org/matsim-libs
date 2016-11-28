@@ -59,33 +59,23 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 	@Override
 	public Collection<LocationProposition> generateAlternatives( final NegotiationAgent<LocationProposition> agent ) {
 		final Collection<Id<Person>> alterIds = socialNetwork.getAlters( agent.getId() );
-		final Collection<Person> alters =
-				alterIds.stream()
-						.map( population.getPersons()::get )
-						.collect( Collectors.toList() );
 		final Person ego = population.getPersons().get( agent.getId() );
 
-		final Collection<ActivityFacility> homes =
-				alters.stream()
-						.map( locations::getHomeLocation )
-						.collect( Collectors.toSet() );
-		homes.add( locations.getHomeLocation( ego ) );
-
-		// TODO sample possible out-of-home locations
-
-		final List<LocationProposition> propositions = new ArrayList<>( 2 * alters.size() );
-		for ( Person alter : alters ) {
+		final Collection<LocationProposition> propositions = new ArrayList<>( 2 * alterIds.size() );
+		for ( Id<Person> alter : alterIds ) {
 			propositions.add(
 					new LocationProposition(
 							ego.getId() ,
-							Collections.singleton( alter.getId() ) ,
+							Collections.singleton( alter ) ,
 							locations.getHomeLocation( ego ) ) );
 			propositions.add(
 					new LocationProposition(
 							ego.getId() ,
-							Collections.singleton( alter.getId() ) ,
-							locations.getHomeLocation( alter ) ) );
+							Collections.singleton( alter ) ,
+							locations.getHomeLocation( population.getPersons().get( alter ) ) ) );
 		}
+
+		// TODO sample possible out-of-home locations
 
 		return propositions;
 	}
