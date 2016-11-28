@@ -43,15 +43,15 @@ public class PlaceStationsVehicles extends MatsimXmlWriter {
 		writeXmlHead();
 		List<Tuple<String, String>> attsC = new ArrayList<Tuple<String, String>>();
 		
-		attsC.add(new Tuple<>("name", "Catchacar"));
+		attsC.add(new Tuple<>("name", "Mobility"));
 		writeStartTag("companies", null);
 		writeStartTag("company", attsC);
-		for (int i = 1; i <= 400; i++) {
+		for (int i = 1; i <= 200; i++) {
 			Link link = (Link) array[r.nextInt(numberLinks)];
 
 			writeStation("twoway", link, i);
 		}
-		writeVehicles();
+		//writeVehicles();
 
 		
 		writeEndTag("company");

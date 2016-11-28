@@ -13,7 +13,7 @@ public class CostStructureTwoWay implements CostCalculation {
 		double startTime = rentalInfo.getStartTime();
 		double rentalTime = rentalInfo.getEndTime() - startTime;
 		double distance = rentalInfo.getDistance();
-		double reduction = 0.75;
+		double reduction = 1.0;
 		
 		return reduction * scaleTOMatchCar * (rentalTime / 3600.0 * 2.8 + distance / 1000.0 * 0.6); 				
 			

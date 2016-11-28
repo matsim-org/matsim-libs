@@ -168,13 +168,13 @@ public class RunCarsharing {
 			
 			//=== here customizable cost structures come in ===
 			//===what follows is just an example!! and should be modified according to the study at hand===
-			if (s.equals("Mobility"))
-				costCalculations.put("freefloating", new CostStructure1());		
-			else {
-				costCalculations.put("freefloating", new CostStructure1());
+			//if (s.equals("Mobility"))
+		//		costCalculations.put("freefloating", new CostStructure1());		
+		//	else {
+		//		costCalculations.put("freefloating", new CostStructure1());
 				costCalculations.put("twoway", new CostStructureTwoWay());
 
-			}
+		//	}
 			CompanyCosts companyCosts = new CompanyCosts(costCalculations);
 			
 			companyCostsContainer.getCompanyCostsMap().put(s, companyCosts);
