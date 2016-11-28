@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.TravelTime;
@@ -65,66 +64,48 @@ class TimeStructureOptimizer {
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	double computeScore(final Plan plan) {
+	double computeScoreAndSetDepartureTimes(final Plan plan) {
 
+		final TripTravelTimes<Facility, String> travelTimes;
 		if ((this.tripRouterProvider != null) && (this.mode2travelTime != null)) {
-
-			final BestTimeResponseTravelTimes travelTimes = new BestTimeResponseTravelTimes(this.scenario.getNetwork(),
-					this.timeDiscretization, this.tripRouterProvider.get(), plan.getPerson(), this.mode2travelTime);
-
-			final BestTimeResponseStrategyFunctionality initialPlanData = new BestTimeResponseStrategyFunctionality(
-					plan, this.scenario.getNetwork(), this.scoringParams, this.timeDiscretization, travelTimes);
-
-			final TimeAllocator<Facility, String> timeAlloc = initialPlanData.getTimeAllocator();
-
-			timeAlloc.optimizeDepartureTimes(initialPlanData.plannedActivities, this.maxTrials, this.maxFailures);
-
-			for (int i = 0; i < timeAlloc.getResultPoint().length; i++) {
-				final Activity act = (Activity) plan.getPlanElements().get(2 * i);
-				act.setEndTime(timeAlloc.getResultPoint()[i]);
-			}
-
-			return timeAlloc.getResultValue();
-
+			// use simulated travel times
+			travelTimes = new BestTimeResponseTravelTimes(this.scenario.getNetwork(), this.timeDiscretization,
+					this.tripRouterProvider.get(), plan.getPerson(), this.mode2travelTime);
 		} else if ((this.tripRouterProvider == null) && (this.mode2travelTime == null)) {
-
-			final TripTravelTimes<Facility, String> travelTimes = new TripTravelTimes<Facility, String>() {
-
+			// use fictitious teleportation travel times
+			travelTimes = new TripTravelTimes<Facility, String>() {
 				@Override
 				public double getTravelTime_s(Facility origin, Facility destination, double dptTime_s, String mode) {
-					final Id<Link> fromLinkId = ((ActivityWrapperFacility) origin).getLinkId();
-					final Id<Link> toLinkId = ((ActivityWrapperFacility) destination).getLinkId();
-					final Link fromLink = scenario.getNetwork().getLinks().get(fromLinkId);
-					final Link toLink = scenario.getNetwork().getLinks().get(toLinkId);
-					final Coord fromCoord_km = CoordUtils.getCenter(fromLink.getFromNode().getCoord(),
-							fromLink.getToNode().getCoord());
-					final Coord toCoord_km = CoordUtils.getCenter(toLink.getFromNode().getCoord(),
-							toLink.getToNode().getCoord());
-					final double dist_km = CoordUtils.calcEuclideanDistance(fromCoord_km, toCoord_km);
-					final double time_h = dist_km / 10.0;
-					return Units.S_PER_H * time_h;
+//					final Id<Link> fromLinkId = ((ActivityWrapperFacility) origin).getLinkId();
+//					final Id<Link> toLinkId = ((ActivityWrapperFacility) destination).getLinkId();
+//					final Link fromLink = scenario.getNetwork().getLinks().get(fromLinkId);
+//					final Link toLink = scenario.getNetwork().getLinks().get(toLinkId);
+//					final Coord fromCoord_km = CoordUtils.getCenter(fromLink.getFromNode().getCoord(),
+//							fromLink.getToNode().getCoord());
+//					final Coord toCoord_km = CoordUtils.getCenter(toLink.getFromNode().getCoord(),
+//							toLink.getToNode().getCoord());
+//					final double dist_km = CoordUtils.calcEuclideanDistance(fromCoord_km, toCoord_km);
+//					final double time_h = dist_km / 10.0;
+//					return Units.S_PER_H * time_h;
+					return Units.S_PER_H * 0.25;
 				}
 			};
-
-			final BestTimeResponseStrategyFunctionality initialPlanData = new BestTimeResponseStrategyFunctionality(
-					plan, this.scenario.getNetwork(), this.scoringParams, this.timeDiscretization, travelTimes);
-
-			final TimeAllocator<Facility, String> timeAlloc = initialPlanData.getTimeAllocator();
-
-			timeAlloc.optimizeDepartureTimes(initialPlanData.plannedActivities, this.maxTrials, this.maxFailures);
-
-			for (int i = 0; i < timeAlloc.getResultPoint().length; i++) {
-				final Activity act = (Activity) plan.getPlanElements().get(2 * i);
-				act.setEndTime(timeAlloc.getResultPoint()[i]);
-			}
-
-			return timeAlloc.getResultValue();
-
 		} else {
-
 			throw new RuntimeException();
-
 		}
 
+		final BestTimeResponseStrategyFunctionality initialPlanData = new BestTimeResponseStrategyFunctionality(plan,
+				this.scenario.getNetwork(), this.scoringParams, this.timeDiscretization, travelTimes);
+		final TimeAllocator<Facility, String> timeAlloc = initialPlanData.getTimeAllocator();
+		timeAlloc.optimizeDepartureTimes(initialPlanData.plannedActivities, this.maxTrials, this.maxFailures);
+
+		// set departure times in the plan that was passed to this function
+		for (int i = 0; i < timeAlloc.getResultPoint().length; i++) {
+			final Activity act = (Activity) plan.getPlanElements().get(2 * i);
+			act.setEndTime(timeAlloc.getResultPoint()[i]);
+		}
+
+		// return the corresponding utility value
+		return timeAlloc.getResultValue();
 	}
 }

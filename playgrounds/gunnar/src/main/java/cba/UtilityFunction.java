@@ -41,18 +41,14 @@ class UtilityFunction {
 
 	private final TimeStructureOptimizer congTimeOpt;
 
-	private final TimeStructureOptimizer freeTimeOpt;
-
-	private final double sampersUtilityScale;
+	private final TimeStructureOptimizer telepTimeOpt;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	UtilityFunction(final Scenario scenario, final Provider<TripRouter> tripRouterProvider,
-			final Map<String, TravelTime> mode2travelTime, final int maxTrials, final int maxFailures,
-			final double sampersUtilityScale) {
+			final Map<String, TravelTime> mode2travelTime, final int maxTrials, final int maxFailures) {
 
 		this.scenario = scenario;
-		this.sampersUtilityScale = sampersUtilityScale;
 
 		final Network net = scenario.getNetwork(); // just a shortcut
 
@@ -176,7 +172,7 @@ class UtilityFunction {
 		} else {
 			this.congTimeOpt = null;
 		}
-		this.freeTimeOpt = new TimeStructureOptimizer(this.scenario, null, maxTrials, maxFailures, null);
+		this.telepTimeOpt = new TimeStructureOptimizer(this.scenario, null, maxTrials, maxFailures, null);
 	}
 
 	// -------------------- INTERNALS --------------------
@@ -218,31 +214,41 @@ class UtilityFunction {
 
 	private Double matsimOnlyUtility = null;
 	private Double sampersOnlyUtility = null;
-	private Double matsimOnlyUncongestedTravelTimeUtility = null;
+	private Double matsimTeleportationTravelTimeUtility = null;
 
 	Double getMATSimOnlyUtility() {
 		return this.matsimOnlyUtility;
 	}
 
-	Double getMATSimOnlyZeroTravelTimeUtility() {
-		return this.matsimOnlyUncongestedTravelTimeUtility;
+	Double getMATSimTeleportationTravelTimeUtility() {
+		return this.matsimTeleportationTravelTimeUtility;
 	}
 
 	Double getSampersOnlyUtility() {
-		return this.sampersUtilityScale * this.sampersOnlyUtility;
+		return this.sampersOnlyUtility;
 	}
 
 	void evaluate(final Plan plan) {
 
 		this.extractTourData(plan); // result in member variables
 
+		/*
+		 * Extract MATSim-related scores.
+		 */
+
 		// Score of optimal time structure
 		if (this.congTimeOpt != null) {
-			this.matsimOnlyUtility = this.congTimeOpt.computeScore(plan);
+			this.matsimOnlyUtility = this.congTimeOpt.computeScoreAndSetDepartureTimes(plan);
+		} else {
+			this.matsimOnlyUtility = null;
 		}
 
 		// Score of the zero-travel time structure
-		this.matsimOnlyUncongestedTravelTimeUtility = this.freeTimeOpt.computeScore(plan);
+		this.matsimTeleportationTravelTimeUtility = this.telepTimeOpt.computeScoreAndSetDepartureTimes(plan);
+
+		/*
+		 * Extract Sampers-related scores.
+		 */
 
 		// ASC for activity sequence
 		this.sampersOnlyUtility = this.tourActSeq2asc.get(this.tourPurposes);
@@ -257,7 +263,6 @@ class UtilityFunction {
 
 			// ASC for mode.
 			this.sampersOnlyUtility += this.mode2asc.get(mode);
-
 		}
 	}
 }

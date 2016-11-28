@@ -24,6 +24,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import com.google.inject.Provider;
 
+import cba.resampling.ResamplingTest;
 import cba.resampling.Sampers2MATSimResampler;
 
 /**
@@ -132,11 +133,10 @@ class DemandModel {
 	static void replanPopulation(final int sampleCnt, final Random rnd, final Scenario scenario,
 			final Provider<TripRouter> tripRouterProvider, final double replanProba, final String expectationFileName,
 			final String demandStatsFileName, final int maxTrials, final int maxFailures,
-			final Map<String, TravelTime> mode2travelTime, final boolean includeMATSimScore,
-			final double sampersUtilityScale) {
+			final Map<String, TravelTime> mode2travelTime, final boolean includeMATSimScore) {
 
 		final ChoiceModel choiceModel = new ChoiceModel(sampleCnt, rnd, scenario, tripRouterProvider, mode2travelTime,
-				maxTrials, maxFailures, includeMATSimScore, sampersUtilityScale);
+				maxTrials, maxFailures, includeMATSimScore);
 		final Map<Person, ChoiceRunnerForResampling> person2choiceRunner = new LinkedHashMap<>();
 
 		// Replan in parallel.
@@ -167,6 +167,7 @@ class DemandModel {
 		// Collect replanning results.
 
 		final DemandAnalyzer demandAnalyzer = new DemandAnalyzer();
+		final ResamplingTest resamplingTest = new ResamplingTest();
 
 		final PrintWriter expectationWriter;
 		try {
@@ -181,8 +182,23 @@ class DemandModel {
 					entry.getValue().getChosenPlans(), sampleCnt);
 			final PlanForResampling planForResampling = (PlanForResampling) resampler.next();
 
-			// final PlanForResampling planForResampling =
-			// entry.getValue().getChosenPlans().iterator().next();
+			// >>> REGISTER CHOSEN PLAN AND CHOICE SET WITH RESAMPLING TEST >>>
+
+			final List<Double> probabilities = new ArrayList<>(entry.getValue().getChosenPlans().size());
+			Integer choiceIndex = null;
+			int i = 0;
+			for (PlanForResampling planAlternativeForResampling : entry.getValue().getChosenPlans()) {
+				probabilities.add(planAlternativeForResampling.getMATSimChoiceProba());
+				if (planForResampling == planAlternativeForResampling) {
+					assert (choiceIndex == null);
+					choiceIndex = i;
+				}
+				i++;
+			}
+			resamplingTest.registerChoiceAndDistribution(choiceIndex, probabilities);
+			System.out.println("G = " + resamplingTest.getStatistic());
+			
+			// <<< REGISTER CHOSEN PLAN AND CHOICE SET WITH RESAMPLING TEST <<<
 
 			final Plan plan = planForResampling.plan;
 			person.getPlans().clear();
@@ -190,17 +206,17 @@ class DemandModel {
 			person.addPlan(plan);
 			plan.setPerson(person);
 			person.setSelectedPlan(plan);
-			
+
 			/*
-			 * The logic 
+			 * The logic
 			 */
-			
+
 			if (includeMATSimScore) {
-				expectationWriter.println(person.getId() + "\t" + plan.getScore());
+				expectationWriter.println(person.getId() + "\t" + planForResampling.getMATSimTimeScore());
 			} else {
-				expectationWriter.println(person.getId() + "\t" + planForResampling.getSampersScore());
+				expectationWriter.println(person.getId() + "\t" + planForResampling.getSampersTimeScore());
 			}
-			demandAnalyzer.registerChoice(plan, planForResampling.getSampersScore());
+			demandAnalyzer.registerChoice(plan, planForResampling.getSampersOnlyScore());
 		}
 		expectationWriter.flush();
 		expectationWriter.close();

@@ -7,7 +7,7 @@ package cba.resampling;
  */
 public interface Alternative {
 
-	public double getSampersScore();
+	public double getSampersOnlyScore();
 
 	public double getSampersTimeScore();
 

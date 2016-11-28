@@ -49,8 +49,6 @@ class ChoiceRunnerForResampling implements Runnable {
 
 	private final boolean includeMatsimScore;
 
-	private final double sampersUtilityScale;
-
 	private Set<PlanForResampling> chosenPlans = null;
 
 	Set<PlanForResampling> getChosenPlans() {
@@ -60,7 +58,7 @@ class ChoiceRunnerForResampling implements Runnable {
 	ChoiceRunnerForResampling(final int sampleCnt, final Random rnd, final Scenario scenario,
 			final Provider<TripRouter> tripRouterProvider, final Map<String, TravelTime> mode2travelTime,
 			final Link homeLoc, final Person person, final List<TourSequence> tourSeqAlternatives, final int maxTrials,
-			final int maxFailures, final boolean includeMatsimScore, final double sampersUtilityScale) {
+			final int maxFailures, final boolean includeMatsimScore) {
 		this.sampleCnt = sampleCnt;
 		this.rnd = rnd;
 		this.scenario = scenario;
@@ -72,81 +70,77 @@ class ChoiceRunnerForResampling implements Runnable {
 		this.maxTrials = maxTrials;
 		this.maxFailures = maxFailures;
 		this.includeMatsimScore = includeMatsimScore;
-		this.sampersUtilityScale = sampersUtilityScale;
 	}
 
 	@Override
 	public void run() {
 
-		try {
+		// using a copy of mode2travelTime for thread safety
 
-			// using a copy of mode2travelTime for thread safety
+		final UtilityFunction utilityFunction = new UtilityFunction(this.scenario, this.tripRouterProvider,
+				new LinkedHashMap<>(this.mode2travelTime), this.maxTrials, this.maxFailures);
 
-			final UtilityFunction utilityFunction = new UtilityFunction(this.scenario, this.tripRouterProvider,
-					new LinkedHashMap<>(this.mode2travelTime), this.maxTrials, this.maxFailures, this.sampersUtilityScale);
+		// create plan alternatives and Sampers and Matsim choice model
 
-			// create plan alternatives as well as Sampers and Matsim choice
-			// model
+		final List<Plan> planAlternatives = new ArrayList<>(this.alternatives.size());
 
-			final List<Plan> planAlternatives = new ArrayList<>(this.alternatives.size());
-			final List<Double> sampersOnlyScores = new ArrayList<>(this.alternatives.size());
+		final List<Double> sampersOnlyScores = new ArrayList<>(this.alternatives.size());
+		final List<Double> teleportationTimeScores = new ArrayList<>(this.alternatives.size());
+		final List<Double> matsimTimeScores = new ArrayList<>(this.alternatives.size());
 
-			final MultinomialLogit sampersOnlyMNL = new MultinomialLogit(this.alternatives.size(), 1);
-			sampersOnlyMNL.setUtilityScale(1.0);
-			sampersOnlyMNL.setCoefficient(0, 1.0);
+		final MultinomialLogit sampersAndTeleportationMNL = new MultinomialLogit(this.alternatives.size(), 1);
+		sampersAndTeleportationMNL.setUtilityScale(1.0);
+		sampersAndTeleportationMNL.setCoefficient(0, 1.0);
 
-			final MultinomialLogit sampersAndMatsimMNL = new MultinomialLogit(this.alternatives.size(), 1);
-			sampersAndMatsimMNL.setUtilityScale(1.0);
-			sampersAndMatsimMNL.setCoefficient(0, 1.0);
+		final MultinomialLogit sampersAndMatsimMNL = new MultinomialLogit(this.alternatives.size(), 1);
+		sampersAndMatsimMNL.setUtilityScale(1.0);
+		sampersAndMatsimMNL.setCoefficient(0, 1.0);
 
-			for (int i = 0; i < this.alternatives.size(); i++) {
-				final Plan plan = this.alternatives.get(i).asPlan(this.scenario, homeLoc.getId(), this.person);
-				planAlternatives.add(plan);
-				utilityFunction.evaluate(plan);
-				
-				sampersOnlyScores.add(
-						utilityFunction.getSampersOnlyUtility() + utilityFunction.getMATSimOnlyZeroTravelTimeUtility());
-				plan.setScore(utilityFunction.getMATSimOnlyUtility());
+		for (int i = 0; i < this.alternatives.size(); i++) {
+			final Plan plan = this.alternatives.get(i).asPlan(this.scenario, homeLoc.getId(), this.person);
+			planAlternatives.add(plan);
+			utilityFunction.evaluate(plan);
 
-				sampersOnlyMNL.setAttribute(i, 0,
-						utilityFunction.getSampersOnlyUtility() + utilityFunction.getMATSimOnlyZeroTravelTimeUtility());
-				sampersOnlyMNL.setASC(i, 0.0);
+			final double sampersOnlyScore = utilityFunction.getSampersOnlyUtility();
+			final double teleportationTimeScore = utilityFunction.getMATSimTeleportationTravelTimeUtility();
+			final double matsimTimeScore = utilityFunction.getMATSimOnlyUtility();
 
-				sampersAndMatsimMNL.setAttribute(i, 0,
-						utilityFunction.getSampersOnlyUtility() + utilityFunction.getMATSimOnlyUtility());
-				sampersAndMatsimMNL.setASC(i, 0.0);
+			sampersOnlyScores.add(sampersOnlyScore);
+			teleportationTimeScores.add(teleportationTimeScore);
+			matsimTimeScores.add(matsimTimeScore);
+
+			plan.setScore(matsimTimeScore);
+
+			sampersAndTeleportationMNL.setAttribute(i, 0, sampersOnlyScore + teleportationTimeScore);
+			sampersAndTeleportationMNL.setASC(i, 0.0);
+
+			sampersAndMatsimMNL.setAttribute(i, 0, sampersOnlyScore + matsimTimeScore);
+			sampersAndMatsimMNL.setASC(i, 0.0);
+		}
+		sampersAndTeleportationMNL.enforcedUpdate();
+		sampersAndMatsimMNL.enforcedUpdate();
+
+		// simulate choices
+
+		final Map<Integer, PlanForResampling> plansForResampling = new LinkedHashMap<>(this.sampleCnt);
+		for (int i = 0; i < this.sampleCnt; i++) {
+			final int planIndex;
+			if (this.includeMatsimScore) {
+				planIndex = sampersAndMatsimMNL.draw(this.rnd);
+			} else {
+				planIndex = sampersAndTeleportationMNL.draw(this.rnd);
 			}
-			sampersOnlyMNL.enforcedUpdate();
-			sampersAndMatsimMNL.enforcedUpdate();
+			final Plan plan = planAlternatives.get(planIndex);
+			final PlanForResampling planForResampling = new PlanForResampling(plan, sampersOnlyScores.get(planIndex),
+					teleportationTimeScores.get(planIndex), matsimTimeScores.get(planIndex),
+					sampersAndTeleportationMNL.getProbs().get(planIndex), new LogitEpsilonDistribution(1.0));
+			planForResampling.setMATSimChoiceProba(sampersAndMatsimMNL.getProbs().get(planIndex));
 
-			// simulate choices
-
-			final Map<Integer, PlanForResampling> plansForResampling = new LinkedHashMap<>(this.sampleCnt);
-			for (int i = 0; i < this.sampleCnt; i++) {
-				final int planIndex;
-				if (this.includeMatsimScore) {
-					planIndex = sampersAndMatsimMNL.draw(this.rnd);
-				} else {
-					planIndex = sampersOnlyMNL.draw(this.rnd);
-				}
-				final Plan plan = planAlternatives.get(planIndex);
-				plansForResampling.put(planIndex,
-						new PlanForResampling(plan, sampersOnlyScores.get(planIndex),
-								sampersOnlyScores.get(planIndex) + plan.getScore(),
-								sampersOnlyMNL.getProbs().get(planIndex), new LogitEpsilonDistribution(1.0)));
-			}
-
-			this.chosenPlans = new LinkedHashSet<>(plansForResampling.values());
-
-			System.out
-					.println("computed " + this.chosenPlans.size() + " alternatives for person " + this.person.getId());
-
-		} catch (Exception e) {
-
-			e.printStackTrace();
-			System.out.println();
-
+			plansForResampling.put(planIndex, planForResampling);
 		}
 
+		this.chosenPlans = new LinkedHashSet<>(plansForResampling.values());
+
+		System.out.println("computed " + this.chosenPlans.size() + " alternatives for person " + this.person.getId());
 	}
 }

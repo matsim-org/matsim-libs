@@ -35,7 +35,7 @@ class DummySampersAlternative implements Alternative {
 	// -------------------- IMPLEMENTATION OF Alternative --------------------
 
 	@Override
-	public double getSampersScore() {
+	public double getSampersOnlyScore() {
 		return this.sampersScore;
 	}
 

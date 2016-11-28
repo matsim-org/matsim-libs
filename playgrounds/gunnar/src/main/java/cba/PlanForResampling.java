@@ -15,29 +15,46 @@ class PlanForResampling implements Alternative {
 	// -------------------- MEMBERS --------------------d
 
 	final Plan plan;
-	
+
 	private final double sampersOnlyScore;
-	
-	private final double sampersAndMATSimScore;
+
+	private final double sampersTimeScore;
+
+	private final double matsimTimeScore;
 
 	private final double sampersChoiceProba;
-	
+
 	private final EpsilonDistribution epsDistr;
-	
+
+	// for testing
+	private Double matsimChoiceProba = null;
+
 	// -------------------- CONSTRUCTION --------------------
 
-	PlanForResampling(final Plan plan, final double sampersOnlyScore, final double sampersAndMATSimScore, final double sampersChoiceProba, final EpsilonDistribution epsDistr) {
+	PlanForResampling(final Plan plan, final double sampersOnlyScore, final double sampersTimeScore,
+			final double matsimTimeScore, final double sampersChoiceProba, final EpsilonDistribution epsDistr) {
 		this.plan = plan;
 		this.sampersOnlyScore = sampersOnlyScore;
-		this.sampersAndMATSimScore = sampersAndMATSimScore;
+		this.sampersTimeScore = sampersTimeScore;
+		this.matsimTimeScore = matsimTimeScore;
 		this.sampersChoiceProba = sampersChoiceProba;
 		this.epsDistr = epsDistr;
 	}
 
-	// -------------------- TODO IMPLEMENTATION OF Attribute --------------------
+	// -------------------- FOR TESTING --------------------
+
+	void setMATSimChoiceProba(final Double matsimChoiceProba) {
+		this.matsimChoiceProba = matsimChoiceProba;
+	}
+
+	Double getMATSimChoiceProba() {
+		return this.matsimChoiceProba;
+	}
+
+	// -------------------- IMPLEMENTATION OF Attribute --------------------
 
 	@Override
-	public double getSampersScore() {
+	public double getSampersOnlyScore() {
 		return this.sampersOnlyScore;
 	}
 
@@ -53,11 +70,11 @@ class PlanForResampling implements Alternative {
 
 	@Override
 	public double getSampersTimeScore() {
-		return 0;
+		return this.sampersTimeScore;
 	}
 
 	@Override
 	public double getMATSimTimeScore() {
-		return (this.sampersAndMATSimScore - this.sampersOnlyScore);
+		return this.matsimTimeScore;
 	}
 }
