@@ -30,6 +30,7 @@ import playground.thibautd.negotiation.framework.NegotiationAgent;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author thibautd
@@ -71,11 +72,14 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 		// TODO sample possible out-of-home locations
 
 		return homes.stream()
-				.map( f ->
-						new LocationProposition(
-								agent.getId(),
-								alterIds,
-								f ) )
+				.flatMap( f -> generatePropositions( ego.getId() , alterIds , f ) )
 				.collect( Collectors.toList() );
+	}
+
+	private static Stream<LocationProposition> generatePropositions(
+			final Id<Person> egoId,
+			final Collection<Id<Person>> alterIds,
+			final ActivityFacility facility ) {
+		return alterIds.stream().map( as -> new LocationProposition( egoId , alterIds , facility ) );
 	}
 }

@@ -56,7 +56,10 @@ public class LocationUtility implements PropositionUtility<LocationProposition> 
 	}
 
 	@Override
-	public double utility( final NegotiationAgent<LocationProposition> agent, final LocationProposition proposition ) {
+	public double utility(
+			final NegotiationAgent<LocationProposition> agent,
+			final LocationProposition proposition ) {
+		if ( proposition == null ) return Double.NEGATIVE_INFINITY;
 		final Person ego = population.getPersons().get( agent.getId() );
 		final Collection<Person> alters =
 				proposition.getGroupIds().stream()

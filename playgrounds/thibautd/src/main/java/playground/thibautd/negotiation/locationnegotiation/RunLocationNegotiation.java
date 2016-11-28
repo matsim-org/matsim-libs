@@ -44,7 +44,8 @@ public class RunLocationNegotiation {
 						new SocialNetworkConfigGroup() );
 
 		try ( AutoCloseable out = MoreIOUtils.initOut( config ) ;
-			  AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose() ) {
+			  AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose();
+			  AutoCloseable writingMonitor = MonitoringUtils.writeGCFigure( config.controler().getOutputDirectory()+"/gc.dat" )) {
 			run( config );
 		}
 	}

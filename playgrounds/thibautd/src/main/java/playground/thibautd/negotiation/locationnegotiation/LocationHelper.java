@@ -25,6 +25,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 
+import static javafx.scene.input.KeyCode.Q;
+import static org.osgeo.proj4j.parser.Proj4Keyword.f;
+
 /**
  * @author thibautd
  */
@@ -49,11 +52,20 @@ public class LocationHelper {
 						.filter( pe -> pe instanceof Activity )
 						.map( pe -> (Activity) pe )
 						// TODO make type configurable
-						.filter( a -> a.getType().equals( HOME ) )
+						//.filter( a -> a.getType().equals( HOME ) )
 						.findFirst()
-						.get();
+						.orElseThrow( () -> new RuntimeException( "could not find home of "+person ) );
 
 		facility = facilities.getFacilities().get( homeActivity.getFacilityId() );
+
+		if ( facility == null ) {
+			// need to create a dummy facility. happens for instance in the CH Scenario...
+			facility = facilities.getFactory().createActivityFacility(
+					homeActivity.getFacilityId(),
+					homeActivity.getCoord(),
+					homeActivity.getLinkId() );
+		}
+
 		person.getCustomAttributes().put( "home location" , facility );
 		return facility;
 	}
