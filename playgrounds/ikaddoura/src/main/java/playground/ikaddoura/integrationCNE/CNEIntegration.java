@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.example.EmissionControlerListener;
-import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.noise.NoiseCalculationOnline;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.data.NoiseContext;
@@ -205,8 +204,7 @@ public class CNEIntegration {
 		
 		NoiseContext noiseContext = null;
 		
-		NoiseConfigGroup ncg = new NoiseConfigGroup();
-		controler.getConfig().addModule(ncg);
+		NoiseConfigGroup ncg = (NoiseConfigGroup) controler.getScenario().getConfig().getModule(NoiseConfigGroup.GROUP_NAME);
 		
 		if (this.noisePricing == true || this.noiseAnalysis == true) {
 			
@@ -228,10 +226,7 @@ public class CNEIntegration {
 		final Set<Id<Link>> hotSpotLinks = null;
 		
 		EmissionModule emissionModule = null;
-		
-		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		controler.getConfig().addModule(ecg);
-		
+				
 		if (this.airPollutionPricing == true || this.airPollutionAnalysis == true) {
 			
 			emissionModule = new EmissionModule(controler.getScenario());

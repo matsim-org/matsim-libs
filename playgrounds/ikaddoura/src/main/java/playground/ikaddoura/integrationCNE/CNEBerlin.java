@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,12 +37,13 @@ import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.joint.JointCalibrationControler;
+
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
 import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
 import playground.vsp.airPollution.exposure.GridTools;
@@ -132,8 +134,11 @@ public class CNEBerlin {
 	}
 
 	public void run() {
-								
-		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
+						
+		Config config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup(), new NoiseConfigGroup());
+		config.vehicles().setVehiclesFile("../../../runs-svn/berlin-an-time/input/population_1agent.emissionVehicle.xml.gz");
+		
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		
 		if (outputDirectory != null) {
@@ -147,29 +152,16 @@ public class CNEBerlin {
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
 		
-		// CNE Integration
-		
-		CNEIntegration cne = new CNEIntegration(controler, gt, rgt);
-		cne.setCongestionPricing(congestionPricing);
-		cne.setNoisePricing(noisePricing);
-		cne.setAirPollutionPricing(airPollutionPricing);
-		cne.setSigma(sigma);
-		cne.setCongestionTollingApproach(congestionTollingApproach);
-		cne.setkP(kP);
-		controler = cne.prepareControler();
-		
 		// TODO: set files in config
 		EmissionsConfigGroup ecg = (EmissionsConfigGroup) controler.getConfig().getModule("emissions");
 		ecg.setAverageColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_ColdStart_vehcat_2005average.txt");
 		ecg.setAverageWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_HOT_vehcat_2005average.txt");
 		ecg.setDetailedColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_ColdStart_SubSegm_2005detailed.txt");
 		ecg.setDetailedWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_HOT_SubSegm_2005detailed.txt");
-		ecg.setEmissionRoadTypeMappingFile("../../../shared-svn/projects/detailedEval/matsim-input-files/roadTypeMapping_v0.txt");
-		
-		ecg.setUsingDetailedEmissionCalculation(false); // TODO?
+		ecg.setEmissionRoadTypeMappingFile("../../../runs-svn/berlin-an-time/input/roadTypeMapping_berlin.txt");
+		ecg.setUsingDetailedEmissionCalculation(false);
+		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 	
-		controler.getConfig().vehicles().setVehiclesFile("../../../shared-svn/projects/detailedEval/matsim-input-files/emissionVehicles_1pct_v0.xml.gz");
-		
 		// noise Berlin settings
 		
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) controler.getScenario().getConfig().getModule("noise");
@@ -239,6 +231,17 @@ public class CNEBerlin {
 		tunnelLinkIDs.add(Id.create("73496", Link.class));
 		tunnelLinkIDs.add(Id.create("73497", Link.class));
 		noiseParameters.setTunnelLinkIDsSet(tunnelLinkIDs);
+		
+		// CNE Integration
+		
+		CNEIntegration cne = new CNEIntegration(controler, gt, rgt);
+		cne.setCongestionPricing(congestionPricing);
+		cne.setNoisePricing(noisePricing);
+		cne.setAirPollutionPricing(airPollutionPricing);
+		cne.setSigma(sigma);
+		cne.setCongestionTollingApproach(congestionTollingApproach);
+		cne.setkP(kP);
+		controler = cne.prepareControler();
 				
 		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
@@ -272,7 +275,7 @@ public class CNEBerlin {
 		String OUTPUT_DIR = controler.getConfig().controler().getOutputDirectory();
 		for (int index =firstIt+1; index <lastIt; index ++){
 			String dirToDel = OUTPUT_DIR+"/ITERS/it."+index;
-			Logger.getLogger(JointCalibrationControler.class).info("Deleting the directory "+dirToDel);
+			log.info("Deleting the directory "+dirToDel);
 			IOUtils.deleteDirectory(new File(dirToDel),false);
 		}
 	}
