@@ -20,6 +20,7 @@ package playground.thibautd.negotiation.framework;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -41,6 +42,7 @@ import static org.osgeo.proj4j.parser.Proj4Keyword.a;
  */
 @Singleton
 public class NegotiatingAgents<P extends Proposition> implements Iterable<NegotiationAgent<P>> {
+	private static final Logger log = Logger.getLogger( NegotiatingAgents.class );
 	private final Map<Id<Person>, NegotiationAgent<P>> agents = new HashMap<>();
 	private final List<NegotiationAgent<P>> agentList;
 
@@ -62,8 +64,14 @@ public class NegotiatingAgents<P extends Proposition> implements Iterable<Negoti
 		socialNetwork.getEgos().stream()
 				.map( population.getPersons()::get )
 				.map( p -> new NegotiationAgent<>( p.getId() , this ) )
-				.peek( agentList::add )
-				.peek( a -> agents.put( a.getId() , a ) );
+				.forEach( a -> {
+					agentList.add( a );
+					agents.put( a.getId() , a );
+				} );
+
+		log.info( "Negotiating Agents initialized with "+agentList.size()
+				+" agents from population "+population.getPersons().size()
+				+" with social network with "+socialNetwork.getEgos().size() );
 	}
 
 	public NegotiationAgent<P> getRandomAgent() {
