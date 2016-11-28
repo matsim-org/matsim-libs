@@ -36,7 +36,6 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.analysis.legMode.distributions.LegModeBeelineDistanceDistributionFromPlansAnalyzer;
 import playground.agarwalamit.analysis.legMode.distributions.LegModeBeelineDistanceDistributionHandler;
 import playground.agarwalamit.analysis.modalShare.FilteredModalShareEventHandler;
 import playground.agarwalamit.opdyts.patna.PatnaCMPDistanceDistribution;
@@ -96,15 +95,6 @@ public class OpdytsModalStatsControlerListner implements StartupListener, Iterat
         List<Double> dists = Arrays.stream(this.referenceStudyDistri.getDistClasses()).boxed().collect(Collectors.toList());
         this.beelineDistanceDistributionHandler = new LegModeBeelineDistanceDistributionHandler(dists, event.getServices().getScenario().getNetwork());
         this.events.addHandler(this.beelineDistanceDistributionHandler);
-
-        // this must be processed here, so that the output remains unchanged.
-//        probably, just take this from first iteration, then just use the same beelineDistanceDistributionHandler.
-        LegModeBeelineDistanceDistributionFromPlansAnalyzer initialBeelineDistribution = new LegModeBeelineDistanceDistributionFromPlansAnalyzer(dists);
-        initialBeelineDistribution.init(event.getServices().getScenario());
-        initialBeelineDistribution.preProcessData();
-        initialBeelineDistribution.postProcessData();
-        this.initialMode2DistanceClass2LegCount.clear();
-        this.initialMode2DistanceClass2LegCount.putAll(initialBeelineDistribution.getMode2DistanceClass2LegCount());
     }
 
     @Override
@@ -115,6 +105,13 @@ public class OpdytsModalStatsControlerListner implements StartupListener, Iterat
 
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
+
+        if(event.getIteration() == event.getServices().getConfig().controler().getFirstIteration()) {
+            this.initialMode2DistanceClass2LegCount.putAll(this.beelineDistanceDistributionHandler.getMode2DistanceClass2LegCounts());
+        } else {
+            // nothing to do
+        }
+
         SortedMap<String, Integer> mode2Legs = modalShareEventHandler.getMode2numberOflegs();
 
         // evaluate objective function value
