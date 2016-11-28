@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.carsharing.events.NoVehicleCarSharingEvent;
 import org.matsim.contrib.carsharing.events.StartRentalEvent;
 import org.matsim.contrib.carsharing.manager.demand.CurrentTotalDemand;
 import org.matsim.contrib.carsharing.manager.routers.RouterProvider;
@@ -108,8 +109,10 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 			if (!companyId.equals("")) {
 				vehicle = this.carsharingSupplyContainer.findClosestAvailableVehicle(startLink,
 						carsharingType, typeOfVehicle, companyId, searchDistance);
-				if (vehicle == null)
-					return null;			
+				if (vehicle == null) {					
+					eventsManager.processEvent(new NoVehicleCarSharingEvent(time, startLink.getId(), carsharingType));				
+					return null;				
+				}
 				CompanyContainer companyContainer = this.carsharingSupplyContainer.getCompany(companyId);
 
 				VehiclesContainer vehiclesContainer = companyContainer.getVehicleContainer(carsharingType);
