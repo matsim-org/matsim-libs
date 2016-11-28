@@ -27,6 +27,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
+import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -192,7 +194,7 @@ public class CNETest {
 		Double timeBinSize = 3600.;
 		int noOfTimeBins = 1;
 
-		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup()));
 		scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "e");
 		Controler controler2 = new Controler(scenario);
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(),xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
@@ -217,7 +219,7 @@ public class CNETest {
 		controler3.run();
 						
 		// air pollution + noise pricing
-		Scenario scenario4 = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
+		Scenario scenario4 = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup()));
 		scenario4.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "cn");
 		Controler controler4 = new Controler(scenario4);
 		CNEIntegration cneIntegration4 = new CNEIntegration(controler4, gt, rgt );

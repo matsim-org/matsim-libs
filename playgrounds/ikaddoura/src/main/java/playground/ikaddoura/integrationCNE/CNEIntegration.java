@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.example.EmissionControlerListener;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.noise.NoiseCalculationOnline;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.data.NoiseContext;
@@ -159,7 +160,7 @@ public class CNEIntegration {
 		Controler controler = null;
 		
 		if (configFile != null) {
-			Config config = ConfigUtils.loadConfig(configFile);
+			Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup());
 			Scenario scenario = ScenarioUtils.loadScenario(config);
 			controler = new Controler(scenario);
 		} else {
