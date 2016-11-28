@@ -23,7 +23,7 @@ package playground.agarwalamit.opdyts;
 /**
  * Created by amit on 03/10/16.
  */
-public enum OpdytsObjectiveFunctionCases {
+public enum OpdytsScenarios {
 
     EQUIL,
     EQUIL_MIXEDTRAFFIC,

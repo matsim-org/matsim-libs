@@ -48,11 +48,11 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
     private PatnaObjectiveFunctionValueWriter objectiveFunctionValueWriter;
     private BufferedWriter writer;
     private final Set<String> mode2consider;
-    private OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases;
+    private OpdytsScenarios opdytsScenarios;
 
-    public ModalStatsControlerListner(final Set<String> modes2consider, final OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases) {
+    public ModalStatsControlerListner(final Set<String> modes2consider, final OpdytsScenarios opdytsScenarios) {
         this.mode2consider = modes2consider;
-        this.opdytsObjectiveFunctionCases = opdytsObjectiveFunctionCases;
+        this.opdytsScenarios = opdytsScenarios;
     }
 
     public ModalStatsControlerListner() {
@@ -85,8 +85,8 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
         events.addHandler(modalShareEventHandler);
 
         // initializing it here,
-        this.distanceDistributionWriter = new DistanceDistributionWriter(event.getServices().getScenario(), this.opdytsObjectiveFunctionCases);
-        this.objectiveFunctionValueWriter = new PatnaObjectiveFunctionValueWriter(event.getServices().getScenario(), this.opdytsObjectiveFunctionCases);
+        this.distanceDistributionWriter = new DistanceDistributionWriter(event.getServices().getScenario(), this.opdytsScenarios);
+        this.objectiveFunctionValueWriter = new PatnaObjectiveFunctionValueWriter(event.getServices().getScenario(), this.opdytsScenarios);
         this.events.addHandler(this.distanceDistributionWriter.getEventHandler());
         this.events.addHandler(this.objectiveFunctionValueWriter.getEventHandler());
     }
@@ -145,5 +145,7 @@ public class ModalStatsControlerListner implements StartupListener, IterationEnd
             throw new RuntimeException("File not found.");
         }
     }
+
+
 
 }

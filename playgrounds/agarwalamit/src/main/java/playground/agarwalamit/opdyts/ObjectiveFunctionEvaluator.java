@@ -1,0 +1,105 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.agarwalamit.opdyts;
+
+import java.util.Map;
+import java.util.stream.Collectors;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.analysis.kai.Databins;
+
+/**
+ * Created by amit on 28/11/2016.
+ */
+
+
+public class ObjectiveFunctionEvaluator {
+
+    private static final Logger LOG = Logger.getLogger(ObjectiveFunctionEvaluator.class);
+
+    public enum ObjectiveFunctionType {
+        SUM_ABS_DIFF, SUM_SQR_DIFF_NORMALIZED
+    }
+
+    private final ObjectiveFunctionType objectiveFunctionType;
+
+    public ObjectiveFunctionEvaluator(){
+        this(ObjectiveFunctionType.SUM_SQR_DIFF_NORMALIZED);
+    }
+
+    public ObjectiveFunctionEvaluator(ObjectiveFunctionType objectiveFunctionType) {
+        this.objectiveFunctionType = objectiveFunctionType;
+    }
+
+    public double getObjectiveFunctionValue(final Databins<String> realCounts, final Databins<String> simCounts){
+        // databins to maps.
+
+        Map<String, double [] > realCountMap = realCounts.entrySet().stream().collect(
+                Collectors.toMap(e -> e.getKey(), e -> e.getValue())
+        );
+
+        Map<String, double [] > simCountMap = simCounts.entrySet().stream().collect(
+                Collectors.toMap(e -> e.getKey(), e -> e.getValue())
+        );
+
+        return getObjectiveFunctionValue(realCountMap, simCountMap);
+    }
+
+    public double getObjectiveFunctionValue(final Map<String, double[]> realCounts, final Map<String, double[]> simCounts){
+        double objective = 0. ;
+        double realValueSum = 0;
+        for ( Map.Entry<String, double[]> theEntry : simCounts.entrySet() ) {
+            String mode = theEntry.getKey() ;
+            LOG.warn("mode=" + mode);
+
+            double[] simValue = theEntry.getValue() ;
+            double[] reaVal = realCounts.get(mode);
+
+            for ( int ii=0 ; ii < simValue.length ; ii++ ) {
+                double diff = Math.abs( simValue[ii] - reaVal[ii] ) ;
+
+                switch (this.objectiveFunctionType) {
+                    case SUM_ABS_DIFF:
+                        objective += diff;
+                        break;
+                    case SUM_SQR_DIFF_NORMALIZED:
+                        objective += diff * diff;
+                        realValueSum += reaVal[ii];
+                        break;
+                    default:
+                        throw new RuntimeException("not implemented yet.");
+                }
+            }
+        }
+
+        switch (this.objectiveFunctionType) {
+            case SUM_ABS_DIFF:
+                LOG.error("This should be used with great caution, with Patna, it was not a good experience. See email from GF on 24.11.2016");
+                break;
+            case SUM_SQR_DIFF_NORMALIZED:
+                objective /= (realValueSum * realValueSum);
+                break;
+            default:
+                throw new RuntimeException("not implemented yet.");
+        }
+
+        LOG.warn( "objective=" + objective );
+        return objective;
+    }
+}

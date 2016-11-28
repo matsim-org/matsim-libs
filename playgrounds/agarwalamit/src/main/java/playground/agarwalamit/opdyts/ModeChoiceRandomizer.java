@@ -36,10 +36,10 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
     private final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser;
     private final double randomVariance;
     private final String subPopName;
-    private final OpdytsObjectiveFunctionCases objectiveFunctionCases;
+    private final OpdytsScenarios objectiveFunctionCases;
 
     public ModeChoiceRandomizer(final Scenario scenario, final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser,
-                                final double randomVariance, final OpdytsObjectiveFunctionCases objectiveFunctionCases, final String subPopName) {
+                                final double randomVariance, final OpdytsScenarios objectiveFunctionCases, final String subPopName) {
         this.scenario = scenario;
         this.rnd = new Random(4711);
         // (careful with using matsim-random since it is always the same sequence in one run)
@@ -49,7 +49,7 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
         this.objectiveFunctionCases = objectiveFunctionCases;
     }
 
-    public ModeChoiceRandomizer(final Scenario scenario, final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser, final OpdytsObjectiveFunctionCases objectiveFunctionCases) {
+    public ModeChoiceRandomizer(final Scenario scenario, final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser, final OpdytsScenarios objectiveFunctionCases) {
         this(scenario,randomizedUtilityParametersChoser, 0.1, objectiveFunctionCases, null);
     }
 

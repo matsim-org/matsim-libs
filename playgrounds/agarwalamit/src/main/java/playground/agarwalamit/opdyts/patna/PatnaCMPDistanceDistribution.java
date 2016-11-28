@@ -21,7 +21,7 @@ package playground.agarwalamit.opdyts.patna;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
-import playground.agarwalamit.opdyts.OpdytsObjectiveFunctionCases;
+import playground.agarwalamit.opdyts.OpdytsScenarios;
 
 /**
  * Created by amit on 21/10/16.
@@ -34,9 +34,9 @@ public final class PatnaCMPDistanceDistribution {
     private final double [] distClasses = new double[] {0., 2000., 4000., 6000., 8000., 10000.};
     private double legsSumAllModes = 0;
 
-    public PatnaCMPDistanceDistribution (final OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases){
+    public PatnaCMPDistanceDistribution (final OpdytsScenarios opdytsScenarios){
         double totalLegs = 0 ;
-        switch (opdytsObjectiveFunctionCases) {
+        switch (opdytsScenarios) {
             case EQUIL:
             case EQUIL_MIXEDTRAFFIC:
                 default:

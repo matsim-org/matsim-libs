@@ -57,7 +57,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 	private static final String EQUIL_DIR = "./matsim/examples/equil-mixedTraffic/";
 	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil-mixedTraffic/";
-	public static final OpdytsObjectiveFunctionCases EQUIL_MIXEDTRAFFIC = OpdytsObjectiveFunctionCases.EQUIL_MIXEDTRAFFIC;
+	public static final OpdytsScenarios EQUIL_MIXEDTRAFFIC = OpdytsScenarios.EQUIL_MIXEDTRAFFIC;
 
 	public static void main(String[] args) {
 		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 

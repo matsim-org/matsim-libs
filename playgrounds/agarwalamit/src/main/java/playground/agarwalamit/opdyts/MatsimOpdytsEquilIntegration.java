@@ -54,7 +54,7 @@ import playground.kairuns.run.KNBerlinControler;
 
 public class MatsimOpdytsEquilIntegration {
 
-	public static final OpdytsObjectiveFunctionCases EQUIL = OpdytsObjectiveFunctionCases.EQUIL;
+	public static final OpdytsScenarios EQUIL = OpdytsScenarios.EQUIL;
 	private static final String EQUIL_DIR = "./matsim/examples/equil/";
 	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,pt_withoutHoles_200its/";
 

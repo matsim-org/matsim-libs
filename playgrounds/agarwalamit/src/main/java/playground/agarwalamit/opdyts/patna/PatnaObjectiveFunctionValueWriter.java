@@ -27,12 +27,11 @@ import java.util.stream.Collectors;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.events.handler.EventHandler;
 import playground.agarwalamit.analysis.legMode.distributions.LegModeBeelineDistanceDistributionHandler;
-import playground.agarwalamit.opdyts.OpdytsObjectiveFunctionCases;
+import playground.agarwalamit.opdyts.OpdytsScenarios;
 
 /**
  * Created by amit on 21/11/2016.
  */
-
 
 public class PatnaObjectiveFunctionValueWriter {
 
@@ -40,8 +39,8 @@ public class PatnaObjectiveFunctionValueWriter {
     private final LegModeBeelineDistanceDistributionHandler handler ;
     private final SortedMap<String, SortedMap<Double, Integer>> mode2DistanceClass2LegCount = new TreeMap<>();
 
-    public PatnaObjectiveFunctionValueWriter(final Scenario scenario, final OpdytsObjectiveFunctionCases opdytsObjectiveFunctionCases) {
-        referenceStudyDistri = new PatnaCMPDistanceDistribution(opdytsObjectiveFunctionCases);
+    public PatnaObjectiveFunctionValueWriter(final Scenario scenario, final OpdytsScenarios opdytsScenarios) {
+        referenceStudyDistri = new PatnaCMPDistanceDistribution(opdytsScenarios);
         List<Double> dists = Arrays.stream(this.referenceStudyDistri.getDistClasses()).boxed().collect(Collectors.toList());
         this.handler = new LegModeBeelineDistanceDistributionHandler(dists, scenario.getNetwork());
     }
