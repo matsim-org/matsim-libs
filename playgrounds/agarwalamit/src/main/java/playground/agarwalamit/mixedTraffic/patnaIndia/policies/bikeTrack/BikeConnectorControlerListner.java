@@ -83,6 +83,8 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
     private final double reduceLinkLengthBy;
 
     private final List<Id<Link>> bikeConnectorLinks = new ArrayList<>(); // in total 500 links will be added to the list.
+    private int totalPossibleConnectors = 0;
+
     @Inject
     Scenario scenario;
     private boolean terminateSimulation = false;
@@ -117,6 +119,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
 
             addBikeConnectorLinksToScenario(scenario.getNetwork(), new Node[]{bikeNode, n});
         }
+        this.totalPossibleConnectors = this.bikeConnectorLinks.size();
 
         LOG.info("========================== Adding links from proposed bike track to regular network.");
         for (Node n : bikeNetwork.getNodes().values()) {
@@ -134,11 +137,6 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
                 lNew.setAllowedModes(new HashSet<>(allowedModes));
             }
         }
-
-        String outNetworkFile = event.getServices().getConfig().controler().getOutputDirectory() + "/networkWithBikeTrackAndAllPossibleConnectors.xml.gz";
-        new NetworkWriter(scenario.getNetwork()).write(outNetworkFile);
-
-        this.router = getRouter(); // must be initialized when scenario is available.
     }
 
     @Override
@@ -159,16 +157,23 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
                     }
                 }
 
-                // sort based on the values (i.e. link volume)
+                // sort based on the values (i.e. link count and not PCU)
                 Comparator<Map.Entry<Id<Link>, Double>> byValue = Comparator.comparing(Map.Entry::getValue);
 
                 Id<Link> connector2remove = linkId2Count.entrySet().stream().sorted(byValue).limit(1).iterator().next().getKey();
                 this.removedConnectorLinks.add(connector2remove);
                 this.bikeConnectorLinks.remove(connector2remove); // necessary, else, in the next round, same link can appear for removal.
 
+                double aboutZeroFreeSpeed = 0.01;
+//                addNetworkChangeEvent(connector2remove, aboutZeroFreeSpeed);
+                // i think, i can simply change the speed, rather than using network change event because
+//                 it is permanent change and I can observe this directly in network file.
+                this.scenario.getNetwork().getLinks().get(connector2remove).setFreespeed(aboutZeroFreeSpeed);
+
                 reRoutePlan(connector2remove); // only if this connector is present in the route of any leg.
 
-                addNetworkChangeEvent(connector2remove);
+                LOG.info("========================== The free speed on the link " + connector2remove + " is set to " + aboutZeroFreeSpeed + " m/s.");
+                LOG.info("========================== Effectively, number of bike track connectors are " + this.bikeConnectorLinks.size());
 
                 String outNetworkFile = event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/" + event.getIteration() + ".network.xml.gz";
                 new NetworkWriter(scenario.getNetwork()).write(outNetworkFile);
@@ -179,15 +184,13 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
         }
     }
 
-    private void addNetworkChangeEvent(Id<Link> connector2remove) {
+    private void addNetworkChangeEvent(final Id<Link> connector2remove, final double aboutZeroFreeSpeed) {
         double startTime = scenario.getConfig().qsim().getStartTime();
 
         final NetworkChangeEvent networkChangeEvent = new NetworkChangeEvent(startTime);
         networkChangeEvent.addLink(scenario.getNetwork().getLinks().get(connector2remove));
-        NetworkChangeEvent.ChangeValue changeValue = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 0.01);
+        NetworkChangeEvent.ChangeValue changeValue = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, aboutZeroFreeSpeed);
         networkChangeEvent.setFreespeedChange(changeValue);
-        LOG.info("========================== The free speed on the link " + connector2remove + " is set to " + changeValue.getValue() + " m/s.");
-        LOG.info("========================== Effectively, number of bike track connectors are " + this.bikeConnectorLinks.size());
 
         List<NetworkChangeEvent> networkChangeEventList = new ArrayList<>();
         networkChangeEventList.add(networkChangeEvent);
@@ -209,7 +212,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
         double linkCapacity = 1500.;
         double linkSpeed = 40. / 3.6;
         {
-            String id = "connecter_link_" + scenario.getNetwork().getLinks().size();
+            String id = "connector_link_" + scenario.getNetwork().getLinks().size();
             Id<Link> linkId = Id.createLinkId(id);
             Link l = org.matsim.core.network.NetworkUtils.createAndAddLink(scenario.getNetwork(), linkId, nodes[0],
                     nodes[1], dist / reduceLinkLengthBy, linkSpeed, linkCapacity, 1);
@@ -217,7 +220,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
             this.bikeConnectorLinks.add(linkId);
         }
         {
-            String id = "connecter_link_" + scenario.getNetwork().getLinks().size();
+            String id = "connector_link_" + scenario.getNetwork().getLinks().size();
             Id<Link> linkId = Id.createLinkId(id);
             Link l = org.matsim.core.network.NetworkUtils.createAndAddLink(scenario.getNetwork(), linkId, nodes[1],
                     nodes[0], dist / reduceLinkLengthBy, linkSpeed, linkCapacity, 1);
@@ -228,11 +231,9 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
 
     public boolean isTerminating() {
         if (this.terminateSimulation) {
-            LOG.info("========================== Total possible connectors are " + this.bikeConnectorLinks.size());
+            LOG.info("========================== Total possible connectors are " + this.totalPossibleConnectors);
             LOG.info("========================== The number of required connectors are " + this.numberOfBikeConnectorsRequired);
             LOG.info("========================== The number of removed connectors are " + this.removedConnectorLinks.size());
-//            Assert.assertEquals("The number of required and removed connectors should be equal to total connectors", this.bikeConnectorLinks.size(),
-//                    this.removedConnectorLinks.size() + this.numberOfBikeConnectorsRequired);
             LOG.info("========================== Terminating the solution.");
         }
         return this.terminateSimulation;
@@ -257,6 +258,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
     }
 
     private void reRoutePlan(final Id<Link> linkId) {
+        this.router = getRouter();
         for (Person p : this.scenario.getPopulation().getPersons().values()) {
             for (Plan plan : p.getPlans()) {
                 boolean needsReRoute = false;
@@ -275,7 +277,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
     }
 
     private PlanAlgorithm getRouter() {
-        TravelTime travelTime = new FreeSpeedTravelTimeForBike();
+        final TravelTime travelTime = new FreeSpeedTravelTimeForBike();
         TripRouterFactoryBuilderWithDefaults routerFactory = new TripRouterFactoryBuilderWithDefaults();
         routerFactory.setTravelTime(travelTime);
         routerFactory.setTravelDisutility(
