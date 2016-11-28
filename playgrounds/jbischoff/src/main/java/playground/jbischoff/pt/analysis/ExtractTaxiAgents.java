@@ -20,12 +20,20 @@
 /**
  * 
  */
-package playground.jbischoff.pt;
+package playground.jbischoff.pt.analysis;
 
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
+
+import playground.jbischoff.utils.JbUtils;
 
 /**
  * @author  jbischoff
@@ -34,41 +42,26 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 /**
  *
  */
-public class VariableAccessConfigGroup extends ReflectiveConfigGroup {
-
-	public static final String GROUPNAME = "variableAccess";
-	
-	
-	public static final String MODEGROUPNAME = "variableAccessMode";
-
-	/**
-	 * @param name
-	 */
-	public VariableAccessConfigGroup() {
-		super(GROUPNAME);
-		// TODO Auto-generated constructor stub
-	}
-	
-	  public Collection< ConfigGroup> getVariableAccessModeConfigGroups()
-	    {
-	        return (Collection<ConfigGroup>) getParameterSets(MODEGROUPNAME);
-	    }
-	  
-	  public void setAccessModeGroup(ConfigGroup modeConfig)
-	    {
-	        addParameterSet(modeConfig);
-	    }
-	  
+public class ExtractTaxiAgents {
+public static void main(String[] args) {
+	EventsManager events = EventsUtils.createEventsManager();
+	final Set<Id<Person>> taxicustomers = new HashSet<>();
+	events.addHandler(new PersonDepartureEventHandler() {
+		
 		@Override
-		public ConfigGroup createParameterSet(final String type) {
-			switch ( type ) {
-				
-				case MODEGROUPNAME:
-					return new VariableAccessModeConfigGroup();
-				default:
-					throw new IllegalArgumentException( type );
+		public void reset(int iteration) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void handleEvent(PersonDepartureEvent event) {
+			if (event.getLegMode().equals("taxi")){
+				taxicustomers.add(event.getPersonId());
 			}
 		}
-
-
+	});
+	new MatsimEventsReader(events).readFile("D:/runs-svn/intermodal/5000_routeDevel/5000_routeDevel.output_events.xml.gz");
+	JbUtils.collection2Text(taxicustomers, "D:/runs-svn/intermodal/5000_routeDevel/taxicustomers.txt");
+}
 }

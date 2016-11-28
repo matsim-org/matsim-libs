@@ -19,10 +19,15 @@
 
 package playground.jbischoff.utils;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -69,5 +74,22 @@ public class JbUtils {
 			 
 		}	
 		return geometry;
+	}
+	
+	public static <T> void collection2Text(Collection<T> c, String filename){
+		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+		try {
+
+			for (Iterator<T> iterator = c.iterator(); iterator.hasNext();) {
+				
+				bw.write(iterator.next().toString());
+				bw.newLine();
+			}
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
