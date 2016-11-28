@@ -42,7 +42,7 @@ import com.google.inject.Inject;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * @author mzilske, dziemke, knagel
+ * @author mzilske, dziemke, nagel
  */
 public final class AccessibilityStartupListenerTestExtended implements StartupListener {
 	@Inject Scenario scenario;
@@ -58,12 +58,8 @@ public final class AccessibilityStartupListenerTestExtended implements StartupLi
 	Double cellSize;
 	boolean push2Geoserver;
 	
-	private static final Logger log = Logger.getLogger(AccessibilityStartupListenerTestExtended.class);
-
+	private static final Logger LOG = Logger.getLogger(AccessibilityStartupListenerTestExtended.class);
 	
-//	@Inject EvaluateTestResults etr;
-	
-
 	public AccessibilityStartupListenerTestExtended(List<String> activityTypes, ActivityFacilities densityFacilities, String crs, String runId, Envelope envelope, Double cellSize, boolean push2Geoserver) {
 		this.activityTypes = activityTypes;
 		this.densityFacilities = densityFacilities;
@@ -79,9 +75,11 @@ public final class AccessibilityStartupListenerTestExtended implements StartupLi
 	public void notifyStartup(StartupEvent event) {
 		// yyyyyy do we still need this as a startup listener when we are solving many of the dependencies through guice now?  kai, nov'16
 		
-		log.error("----------------------------- Statup Listener ------------------------");
+		if (activityTypes.isEmpty()) {
+			throw new RuntimeException("There are no activity types at all!");
+		};
+		
 		for (final String activityType : activityTypes) {
-			
 //			Config config = scenario.getConfig();
 			if (cellSize <= 0) {
 				throw new IllegalArgumentException("Cell Size needs to be assigned a value greater than zero.");
@@ -92,23 +90,22 @@ public final class AccessibilityStartupListenerTestExtended implements StartupLi
 				accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 			}
 			ActivityFacilities activityFacilities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType);
-			GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, activityFacilities, 
+			GridBasedAccessibilityShutdownListenerV3 gbasl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, activityFacilities, 
 					ptMatrix, scenario, envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(), cellSize);
-			listener.addAdditionalFacilityData(densityFacilities);
-			listener.writeToSubdirectoryWithName(activityType);
+			if (densityFacilities != null) {
+				gbasl.addAdditionalFacilityData(densityFacilities);
+			} else {
+				LOG.warn("No density facilites assigned.");
+			}
+			gbasl.writeToSubdirectoryWithName(activityType);
 			if (push2Geoserver == true) {
 				accessibilityCalculator.addFacilityDataExchangeListener(new GeoserverUpdater(crs, runId + "_" + activityType));
 			}
-			
-			// for tests
-			EvaluateTestResults etr = new EvaluateTestResults(calculators.keySet());
-			listener.addSpatialGridDataExchangeListener(etr);
-			System.out.println("################################################# EvaluateTestResults hinzugefügt ######################################");
-			//
-
-			controlerListenerManager.addControlerListener(listener);
+			// ------------- TEST-SPECIFIC
+			EvaluateTestResults etr = new EvaluateTestResults(true, true, true, true, false);
+			gbasl.addSpatialGridDataExchangeListener(etr);
+			// ------------- END TEST-SPECIFIC
+			controlerListenerManager.addControlerListener(gbasl);
 		}
-		
-		
 	}
 }

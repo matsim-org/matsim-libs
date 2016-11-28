@@ -17,9 +17,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.contrib.accessibility.run;
 
 import java.io.File;
@@ -79,14 +76,12 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 
 
-
 /**
  * @author nagel
- *
  */
 public class AccessibilityIntegrationTestOld {
 	
-	private static final Logger log = Logger.getLogger(AccessibilityIntegrationTest.class);
+	private static final Logger LOG = Logger.getLogger(AccessibilityIntegrationTest.class);
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
@@ -173,12 +168,12 @@ public class AccessibilityIntegrationTestOld {
 		// compare some results -> done in EvaluateTestResults
 	}
 
-	private void run(MutableScenario sc, PtMatrix ptMatrix) {
-		Controler controler = new Controler(sc);
+	private void run(MutableScenario scenario, PtMatrix ptMatrix) {
+		Controler controler = new Controler(scenario);
 
 		// creating test opportunities (facilities)
-		final ActivityFacilities opportunities = sc.getActivityFacilities();
-		for ( Link link : sc.getNetwork().getLinks().values() ) {
+		final ActivityFacilities opportunities = scenario.getActivityFacilities();
+		for ( Link link : scenario.getNetwork().getLinks().values() ) {
 			Id<ActivityFacility> id = Id.create(link.getId(), ActivityFacility.class);
 			Coord coord = link.getCoord();
 			ActivityFacility facility = opportunities.getFactory().createActivityFacility(id, coord);
@@ -195,43 +190,40 @@ public class AccessibilityIntegrationTestOld {
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(false);
 		
-		//
-		// Add calculators
+		// Storage objects
 		final List<String> modes = new ArrayList<>();
-		
-				controler.addOverridingModule(new AbstractModule() {
-					@Override
-					public void install() {
-						MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
-						{
-							String mode = "freespeed";
-							this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new FreeSpeedNetworkModeProvider(TransportMode.car));
-							accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-							modes.add(mode);
-						}
-						{
-							String mode = TransportMode.car;
-							this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
-							accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-							modes.add(mode);
-						}
-						{ 
-							String mode = TransportMode.bike;
-							this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
-							accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-							modes.add(mode);
-						}
-						{
-							final String mode = TransportMode.walk;
-							this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
-							accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-							modes.add(mode);
-						}
-					}
-				});
-		//
-		
-		
+
+		// Add calculators
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
+				{
+					String mode = "freespeed";
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new FreeSpeedNetworkModeProvider(TransportMode.car));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					modes.add(mode);
+				}
+				{
+					String mode = TransportMode.car;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					modes.add(mode);
+				}
+				{ 
+					String mode = TransportMode.bike;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					modes.add(mode);
+				}
+				{
+					final String mode = TransportMode.walk;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					modes.add(mode);
+				}
+			}
+		});
 		controler.run();
 	}
 
@@ -282,7 +274,7 @@ public class AccessibilityIntegrationTestOld {
 		File f = new File(this.utils.getInputDirectory() + "shapefile.shp"); // shape file completely covers the road network
 
 		if(!f.exists()){
-			log.error("Shape file not found! testWithExtentDeterminedShapeFile could not be tested...");
+			LOG.error("Shape file not found! testWithExtentDeterminedShapeFile could not be tested...");
 			Assert.assertTrue(f.exists());
 		}
 
@@ -360,13 +352,10 @@ public class AccessibilityIntegrationTestOld {
 		@Override
 		public void setAndProcessSpatialGrids( Map<String,SpatialGrid> spatialGrids ){
 			
-			log.info("Evaluating resuts ...");
+			LOG.info("Evaluating resuts ...");
 			
 			for ( Modes4Accessibility modeEnum : Modes4Accessibility.values() ) {
-				String mode = modeEnum.toString(); // temporarily
-				log.error("mode = " + mode);
-				log.error("######################################## " + spatialGrids.get("freespeed"));
-				log.error("spatial grids = " + spatialGrids);
+				String mode = modeEnum.toString(); // TODO only temporarily
 				if ( this.isComputingMode.get(modeEnum)) {
 					Assert.assertNotNull( spatialGrids.get(mode) ) ;
 				} else {
@@ -440,7 +429,7 @@ public class AccessibilityIntegrationTestOld {
 				
 			}
 			
-			log.info("... done!");
+			LOG.info("... done!");
 		}
 	}
 
@@ -519,6 +508,7 @@ public class AccessibilityIntegrationTestOld {
 		}
 	}
 
+	
 	private class GridBasedAccessibilityModule extends AbstractModule {
 		private final PtMatrix ptMatrix;
 		private final double cellSize;
@@ -542,15 +532,9 @@ public class AccessibilityIntegrationTestOld {
 					ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize);
 					AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
 					GridBasedAccessibilityShutdownListenerV3 gacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, bb.getXMin(), bb.getYMin(),bb.getXMax(), bb.getYMax(), cellSize);
-					// activating transport modes of interest
-//					for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-//						accessibilityCalculator.setComputingAccessibilityForMode(mode, true);
-//					}
 					for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
 						accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 					}
-					//		gacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
-					// not sure why this is "false"; presumably, the test is not configured. kai, feb'14
 
 					// this will be called by the accessibility listener after the accessibility calculations are finished
 					// It checks if the SpatialGrid for activated (true) transport modes are instantiated or null if not (false)
@@ -560,7 +544,6 @@ public class AccessibilityIntegrationTestOld {
 					return gacl;
 				}
 			});
-
 		}
 	}
 }
