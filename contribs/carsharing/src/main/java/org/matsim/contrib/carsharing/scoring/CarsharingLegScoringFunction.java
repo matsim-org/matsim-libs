@@ -34,8 +34,8 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 	private static final  Set<String> walkingLegs = ImmutableSet.of("egress_walk_ow", "access_walk_ow",
 			"egress_walk_tw", "access_walk_tw", "egress_walk_ff", "access_walk_ff");
 	
-	private static final  Set<String> carsharingLegs = ImmutableSet.of("oneway", "twoway",
-			"freefloating");
+	private static final  Set<String> carsharingLegs = ImmutableSet.of("oneway_vehicle", "twoway_vehicle",
+			"freefloating_vehicle");
 	
 	public CarsharingLegScoringFunction(CharyparNagelScoringParameters params, 
 			Config config,  Network network, DemandHandler demandHandler,
@@ -81,18 +81,18 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 		String mode = leg.getMode();
 		if (carsharingLegs.contains(mode)) {
 					
-			if (("oneway").equals(mode)) {				
+			if (("oneway_vehicle").equals(mode)) {				
 				tmpScore += Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("constantOneWayCarsharing"));
 				tmpScore += travelTime * Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("travelingOneWayCarsharing")) / 3600.0;
 			}		
 		
-			else if (("freefloating").equals(mode)) {				
+			else if (("freefloating_vehicle").equals(mode)) {				
 				
 				tmpScore += Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("constantFreeFloating"));
 				tmpScore += travelTime * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("travelingFreeFloating")) / 3600.0;
 			}		
 			
-			else if (("twoway").equals(mode)) {				
+			else if (("twoway_vehicle").equals(mode)) {				
 				
 				tmpScore += Double.parseDouble(this.config.getModule("TwoWayCarsharing").getParams().get("constantTwoWayCarsharing"));
 				tmpScore += travelTime * Double.parseDouble(this.config.getModule("TwoWayCarsharing").getParams().get("travelingTwoWayCarsharing")) / 3600.0;
