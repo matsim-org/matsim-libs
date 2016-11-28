@@ -152,6 +152,10 @@ public class WarmEmissionAnalysisModule {
 			if(vehicle.getType().getDescription()==null) {
 				vehicle.getType().setDescription(EmissionDescriptionMarker.BEGIN_EMISSIONS
 						+vehicle.getType().getId().toString()+EmissionDescriptionMarker.END_EMISSIONS);
+			} else {
+				String vehicleDescription = vehicle.getType().getDescription() + EmissionDescriptionMarker.BEGIN_EMISSIONS
+				+ vehicle.getType().getId().toString()+EmissionDescriptionMarker.END_EMISSIONS;
+				vehicle.getType().setDescription(vehicleDescription);
 			}
 		}
 
