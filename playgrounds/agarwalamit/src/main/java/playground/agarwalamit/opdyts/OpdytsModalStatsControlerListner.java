@@ -45,7 +45,7 @@ import playground.agarwalamit.opdyts.patna.PatnaCMPDistanceDistribution;
  * Created by amit on 20/09/16.
  */
 
-public class ModalStatsControlerListner implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
+public class OpdytsModalStatsControlerListner implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 
     @Inject
     private EventsManager events;
@@ -60,14 +60,14 @@ public class ModalStatsControlerListner implements StartupListener, IterationSta
     private final Set<String> mode2consider;
     private final OpdytsScenarios opdytsScenarios ;
 
-    public ModalStatsControlerListner(final Set<String> modes2consider, final OpdytsScenarios opdytsScenarios) {
+    public OpdytsModalStatsControlerListner(final Set<String> modes2consider, final OpdytsScenarios opdytsScenarios) {
         this.mode2consider = modes2consider;
         this.opdytsScenarios = opdytsScenarios;
 
         this.referenceStudyDistri = new PatnaCMPDistanceDistribution(this.opdytsScenarios);
     }
 
-    public ModalStatsControlerListner() {
+    public OpdytsModalStatsControlerListner() {
         this(new HashSet<>(Arrays.asList(TransportMode.car, TransportMode.pt)), null);
     }
 

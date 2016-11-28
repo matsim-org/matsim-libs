@@ -101,7 +101,7 @@ public class PatnaJointOpdytsCalibrator {
 		modes2consider.add("pt");
 		modes2consider.add("walk");
 
-		ModalStatsControlerListner stasControlerListner = new ModalStatsControlerListner(modes2consider,PATNA_10_PCT);
+		OpdytsModalStatsControlerListner stasControlerListner = new OpdytsModalStatsControlerListner(modes2consider,PATNA_10_PCT);
 
 		// following is the  entry point to start a matsim controler together with opdyts
 		MATSimSimulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization);
