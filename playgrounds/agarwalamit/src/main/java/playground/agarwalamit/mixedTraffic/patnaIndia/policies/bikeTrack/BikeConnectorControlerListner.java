@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.*;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -72,13 +71,11 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
     private static final List<String> allowedModes = Arrays.asList(TransportMode.bike);
 
     private final int numberOfBikeConnectorsRequired;
-    private final int removeAConnectorAfterIteration;
+    private final int removeConnectorAfterIteration;
     private final int initialStabilizationIterations = 100;
 
     private final List<Id<Link>> removedConnectorLinks = new ArrayList<>();
     private final FilteredLinkVolumeHandler handler = new FilteredLinkVolumeHandler(allowedModes);
-
-    private final Map<Id<Link>, Double> linkId2Count = new HashMap<>();
 
     private final String bikeTrackFile;
     private final double reduceLinkLengthBy;
@@ -94,7 +91,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
     public BikeConnectorControlerListner(final int numberOfConnectorsRequired, final int removeOneConnectorAfterIteration,
                                          final String bikeTrackFile, final double reduceLinkLengthBy) {
         this.numberOfBikeConnectorsRequired = numberOfConnectorsRequired;
-        this.removeAConnectorAfterIteration = removeOneConnectorAfterIteration;
+        this.removeConnectorAfterIteration = removeOneConnectorAfterIteration;
         this.bikeTrackFile = bikeTrackFile;
         this.reduceLinkLengthBy = reduceLinkLengthBy;
     }
@@ -107,27 +104,20 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
 
         Network bikeNetwork = LoadMyScenarios.loadScenarioFromNetwork(this.bikeTrackFile).getNetwork();
 
-        // first, add all possible connectors other wise, the nearest node will be one of the node of the link itself.
-        LOG.info("========================== Adding all possible connectors to bike track first ...");
+        // first evaluate all node pairs for all possible connectors but dont create and add
+        // nodes to regular network otherwise, nodes on the bike track will be returned as nearest nodes.
+        List<Node[]> toAndFromNodesPairs = new ArrayList<>();
         for (Node bikeNode : bikeNetwork.getNodes().values()) {
-            Coord cord = bikeNode.getCoord();
-
-            Node n = org.matsim.core.network.NetworkUtils.getNearestNode(scenario.getNetwork(), cord);
-
-            if (! scenario.getNetwork().getNodes().containsKey(bikeNode.getId())) {
-                org.matsim.core.network.NetworkUtils.createAndAddNode(scenario.getNetwork(), bikeNode.getId(), cord);
-            }
-
-            addBikeConnectorLinksToScenario(scenario.getNetwork(), new Node[]{bikeNode, n});
-        }
-        this.totalPossibleConnectors = this.bikeConnectorLinks.size();
-
-        LOG.info("========================== Adding links from proposed bike track to regular network.");
-        for (Node n : bikeNetwork.getNodes().values()) {
-            if (scenario.getNetwork().getNodes().containsKey(n.getId())) continue;
-            org.matsim.core.network.NetworkUtils.createAndAddNode(scenario.getNetwork(), n.getId(), n.getCoord());
+            Node n = org.matsim.core.network.NetworkUtils.getNearestNode(scenario.getNetwork(), bikeNode.getCoord());
+            toAndFromNodesPairs.add(new Node[]{bikeNode, n});
         }
 
+        LOG.info("========================== Adding nodes from bike track to regular network ...");
+        bikeNetwork.getNodes().values().forEach(bikeNode ->
+                org.matsim.core.network.NetworkUtils.createAndAddNode(scenario.getNetwork(), bikeNode.getId(), bikeNode.getCoord())
+        );
+
+        LOG.info("========================== Adding links from proposed bike track to regular network ...");
         for (Link l : bikeNetwork.getLinks().values()) {
             if (scenario.getNetwork().getLinks().containsKey(l.getId())) continue;
             else {// link must be re-created so that node objects are same.
@@ -138,6 +128,12 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
                 lNew.setAllowedModes(new HashSet<>(allowedModes));
             }
         }
+
+        LOG.info("========================== Adding all possible connectors to regular network ...");
+        toAndFromNodesPairs.forEach(pair -> addBikeConnectorLinksToScenario(pair));
+        this.totalPossibleConnectors = this.bikeConnectorLinks.size();
+
+        new NetworkWriter(this.scenario.getNetwork()).write(this.scenario.getConfig().controler().getOutputDirectory()+"/networkWithAllConnectors.xml.gz");
     }
 
     @Override
@@ -148,13 +144,13 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
             if (numberOfRemainingConnectors > this.numberOfBikeConnectorsRequired) {
 
                 Map<Id<Link>, Map<Integer, Double>> link2time2vol = this.handler.getLinkId2TimeSlot2LinkCount();
-                this.linkId2Count.clear();
+                Map<Id<Link>, Double> linkId2Count = new HashMap<>();
 
                 for (Id<Link> linkId : this.bikeConnectorLinks) {
                     if (link2time2vol.containsKey(linkId)) {
-                        this.linkId2Count.put(linkId, playground.agarwalamit.utils.MapUtils.doubleValueSum(link2time2vol.get(linkId)));
+                        linkId2Count.put(linkId, playground.agarwalamit.utils.MapUtils.doubleValueSum(link2time2vol.get(linkId)));
                     } else {
-                        this.linkId2Count.put(linkId, 0.);
+                        linkId2Count.put(linkId, 0.);
                     }
                 }
 
@@ -168,7 +164,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
                 double aboutZeroFreeSpeed = 0.01;
 //                addNetworkChangeEvent(connector2remove, aboutZeroFreeSpeed);
                 // i think, i can simply change the speed, rather than using network change event because
-//                 it is permanent change and I can observe this directly in network file.
+                // it is permanent change and I can observe this directly in network file.
                 this.scenario.getNetwork().getLinks().get(connector2remove).setFreespeed(aboutZeroFreeSpeed);
 
                 reRoutePlan(connector2remove); // only if this connector is present in the route of any leg.
@@ -187,7 +183,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
 
     private boolean isRemovingBikeConnector(int iteration) {
         return iteration >= this.scenario.getConfig().controler().getFirstIteration() + initialStabilizationIterations // let most persons use bike track.
-                && iteration % this.removeAConnectorAfterIteration == 0;
+                && iteration % this.removeConnectorAfterIteration == 0;
     }
 
     private void addNetworkChangeEvent(final Id<Link> connector2remove, final double aboutZeroFreeSpeed) {
@@ -213,7 +209,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
         }
     }
 
-    private void addBikeConnectorLinksToScenario(final Network network, final Node[] nodes) {
+    private void addBikeConnectorLinksToScenario(final Node[] nodes) {
         double dist = CoordUtils.calcEuclideanDistance(nodes[0].getCoord(), nodes[1].getCoord());
         double linkCapacity = 1500.;
         double linkSpeed = 40. / 3.6;
