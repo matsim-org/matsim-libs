@@ -49,12 +49,13 @@ public class NoiseValidation {
 	
 //	private final String processedImmissionFile = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_2016-11-09_rpGap100/analysis_it.100/immissions/immission_processed.csv";
 //	private final String processedImmissionFile = "../../../runs-svn/berlin_internalizationCar/output/berlin-noise-analysis_2016-11-14/noiseAnalysis_gap50-2/analysis_it.100/immissions/immission_processed.csv";
-	private final String processedImmissionFile = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_2016-11-14_rpGap10_tiergarten/analysis_it.100/immissions/immission_processed.csv";
+//	private final String processedImmissionFile = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_2016-11-14_rpGap10_tiergarten/analysis_it.100/immissions/immission_processed.csv";
+	private final String processedImmissionFile = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_2016-11-14_rpGap5_schoeneberg/analysis_it.100/immissions/immission_processed.csv";
 	
 	// output
 //	private final String outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_2016-11-09_rpGap100/analysis_it.100/immissions/";
 //	private final String outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/berlin-noise-analysis_2016-11-14/noiseAnalysis_gap50-2/analysis_it.100/immissions/";
-	private final String outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_2016-11-14_rpGap10_tiergarten/analysis_it.100/immissions/";
+	private final String outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_2016-11-14_rpGap5_schoeneberg/analysis_it.100/immissions/";
 
 	public static void main(String[] args) throws IOException {
 		NoiseValidation noiseValidation = new NoiseValidation();

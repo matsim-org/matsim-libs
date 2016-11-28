@@ -73,8 +73,8 @@ public class NoiseOfflineCalculationIK {
 		} else {
 			
 			runDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
-			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_2016-11-14_rpGap10_tiergarten/";
-			receiverPointGap = 10.;
+			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_2016-11-14_rpGap5_schoeneberg/";
+			receiverPointGap = 5.;
 			lastIteration = 100;
 			timeBinSize = 3600.;
 		}
@@ -91,11 +91,19 @@ public class NoiseOfflineCalculationIK {
 		
 		noiseParameters.setReceiverPointGap(receiverPointGap);
 		
+		// Wilmersdorf with motorway: 4589486,5816193 : 4590778,5817029
+		
+		// somewhere in Schoeneberg: 4591842 5817767 : 4593134 5818603
+		double xMin = 4591842.;
+		double yMin = 5817767.;
+		double xMax = 4593134.;
+		double yMax = 5818603.;
+		
 		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
-		double xMin = 4590855.;
-		double yMin = 5819679.;
-		double xMax = 4594202.;
-		double yMax = 5821736.;
+//		double xMin = 4590855.;
+//		double yMin = 5819679.;
+//		double xMax = 4594202.;
+//		double yMax = 5821736.;
 		
 //		// Berlin Coordinates: Area around the Tempelhofer Feld 4591900,5813265 : 4600279,5818768
 //		double xMin = 4591900.;
