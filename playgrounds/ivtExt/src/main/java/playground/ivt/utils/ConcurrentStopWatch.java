@@ -69,7 +69,7 @@ public class ConcurrentStopWatch<T extends Enum<T>> {
 			final long measurement = measurements[ i ].get();
 			if ( openMeasurements[ i ].get() != 0 ) {
 				log.warn( "Not the same number of starts and ends for measurements of type "+type+"! " +
-								" The results are most problably complete rubbish..." );
+								" The results are most probably complete rubbish..." );
 			}
 			log.info( "Time elapsed for "+type+" (in "+unit.name()+"): "+
 							unit.convert( measurement , TimeUnit.MILLISECONDS ) );
