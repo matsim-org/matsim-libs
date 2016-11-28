@@ -73,6 +73,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
 
     private final int numberOfBikeConnectorsRequired;
     private final int removeAConnectorAfterIteration;
+    private final int initialStabilizationIterations = 100;
 
     private final List<Id<Link>> removedConnectorLinks = new ArrayList<>();
     private final FilteredLinkVolumeHandler handler = new FilteredLinkVolumeHandler(allowedModes);
@@ -141,7 +142,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
 
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
-        if (event.getIteration() % this.removeAConnectorAfterIteration == 0 && event.getIteration() != event.getServices().getConfig().controler().getFirstIteration()) {
+        if ( isRemovingBikeConnector(event.getIteration()) ) {
 
             int numberOfRemainingConnectors = this.bikeConnectorLinks.size() - this.removedConnectorLinks.size();
             if (numberOfRemainingConnectors > this.numberOfBikeConnectorsRequired) {
@@ -184,6 +185,11 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
         }
     }
 
+    private boolean isRemovingBikeConnector(int iteration) {
+        return iteration >= this.scenario.getConfig().controler().getFirstIteration() + initialStabilizationIterations // let most persons use bike track.
+                && iteration % this.removeAConnectorAfterIteration == 0;
+    }
+
     private void addNetworkChangeEvent(final Id<Link> connector2remove, final double aboutZeroFreeSpeed) {
         double startTime = scenario.getConfig().qsim().getStartTime();
 
@@ -201,7 +207,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
 
     @Override
     public void notifyIterationStarts(IterationStartsEvent event) {
-        if (event.getIteration() % this.removeAConnectorAfterIteration == 0 && event.getIteration() != event.getServices().getConfig().controler().getFirstIteration()) {
+        if (isRemovingBikeConnector(event.getIteration())) {
             handler.reset(event.getIteration());
             event.getServices().getEvents().addHandler(handler);
         }
