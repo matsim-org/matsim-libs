@@ -29,7 +29,6 @@ import org.matsim.contrib.accessibility.AccessibilityStartupListener;
 import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
-import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.NetworkModeProvider;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
@@ -58,7 +57,6 @@ public class AccessibilityComputationCottbus {
 	
 	public static void main(String[] args) {
 		// Input and output	
-//		String runOutputFolder = "../../../public-svn/matsim/scenarios/countries/de/cottbus/cottbus-with-pt/output/cb02/";
 		String runOutputFolder = "../../../public-svn/matsim/scenarios/countries/de/cottbus/commuter-population-only-car-traffic-only-100pct-2016-03-18/";
 		String accessibilityOutputDirectory = runOutputFolder + "accessibilities/";
 		String networkFile = "network_wgs84_utm33n.xml.gz";
@@ -67,7 +65,7 @@ public class AccessibilityComputationCottbus {
 		// Parameters
 		final Double cellSize = 200.;
 		String crs = TransformationFactory.WGS84_UTM33N; // EPSG:32633 -- UTM33N
-		Envelope envelope = new Envelope(447000,5729000,461000,5740000);
+		Envelope envelope = new Envelope(447000,461000,5729000,5740000);
 		final String runId = "de_cottbus_" + "2106-11-10" + "_" + cellSize.toString().split("\\.")[0];
 		final boolean push2Geoserver = false;
 
@@ -90,10 +88,6 @@ public class AccessibilityComputationCottbus {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(accessibilityOutputDirectory);
 		config.controler().setLastIteration(0);
-		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true); // if this is not set to true, output CSV will give NaN values
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 //		config.transit().setTransitScheduleFile(runOutputFolder + "output_transitSchedule.xml.gz");
 //		config.transit().setVehiclesFile(runOutputFolder + "output_transitVehicles.xml.gz");

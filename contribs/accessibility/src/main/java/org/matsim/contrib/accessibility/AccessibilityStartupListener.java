@@ -27,7 +27,6 @@ import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.GeoserverUpdater;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -71,7 +70,7 @@ public final class AccessibilityStartupListener implements StartupListener {
 		// yyyyyy do we still need this as a startup listener when we are solving many of the dependencies through guice now?  kai, nov'16
 		
 		for (final String activityType : activityTypes) {
-			Config config = scenario.getConfig();
+//			Config config = scenario.getConfig();
 			if (cellSize <= 0) {
 				throw new IllegalArgumentException("Cell Size needs to be assigned a value greater than zero.");
 			}
