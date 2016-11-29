@@ -149,13 +149,15 @@ public class WarmEmissionAnalysisModule {
 			double travelTime) {
 
 		if(this.ecg.isUsingVehicleTypeIdAsVehicleDescription() ) {
-			if(vehicle.getType().getDescription()==null) {
+			if(vehicle.getType().getDescription()==null) { // emission specification is in vehicle type id
 				vehicle.getType().setDescription(EmissionDescriptionMarker.BEGIN_EMISSIONS
 						+vehicle.getType().getId().toString()+EmissionDescriptionMarker.END_EMISSIONS);
+			} else if( vehicle.getType().getDescription().contains(EmissionDescriptionMarker.BEGIN_EMISSIONS.toString()) ) {
+				// emission specification is in vehicle type id and in vehicle description too.
 			} else {
-//				String vehicleDescription = vehicle.getType().getDescription() + "EmissionDescriptionMarker.BEGIN_EMISSIONS
-//				+ vehicle.getType().getId().toString()+EmissionDescriptionMarker.END_EMISSIONS;
-//				vehicle.getType().setDescription(vehicleDescription);
+				String vehicleDescription = vehicle.getType().getDescription() + EmissionDescriptionMarker.BEGIN_EMISSIONS
+						+ vehicle.getType().getId().toString()+EmissionDescriptionMarker.END_EMISSIONS;
+				vehicle.getType().setDescription(vehicleDescription);
 			}
 		}
 
