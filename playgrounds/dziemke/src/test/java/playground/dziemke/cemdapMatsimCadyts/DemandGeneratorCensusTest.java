@@ -1,6 +1,7 @@
 package playground.dziemke.cemdapMatsimCadyts;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Person;
@@ -20,6 +21,7 @@ public class DemandGeneratorCensusTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
+	@Ignore
 	@Test
 	public void TestGenerateDemand() {
 
@@ -31,11 +33,11 @@ public class DemandGeneratorCensusTest {
 		String[] commuterFilesOutgoing = {commuterFileOutgoingTest};
 
 		// Parameters
-		int numberOfPlansPerPerson = 5;
+		int numberOfPlansPerPerson = 1;
 		String planningAreaId = "11000000"; // "Amtliche Gemeindeschlüssel (AGS)" of Berlin is "11000000"
 		double defaultAdultsToEmployeesRatio = 1.23;  // Calibrated based on sum value from Zensus 2011.
 		double defaultEmployeesToCommutersRatio = 2.5;  // This is an assumption, oriented on observed values, deliberately chosen slightly too high.
-		boolean writeMatsimPlanFiles = true;
+		boolean writeMatsimPlanFiles = false;
 		boolean includeChildren = false;
 
 		DemandGeneratorCensus demandGeneratorCensus = new DemandGeneratorCensus(commuterFilesOutgoing, censusFile,
@@ -86,6 +88,7 @@ public class DemandGeneratorCensusTest {
 			int female = (Integer) person.getAttributes().getAttribute("gender"); // assumes that female = 1
 
 			//assert
+//			Assert.assertEquals("Wrong municipality", "12060034", householdId.toString().substring(0,8));
 			if (!employed) {
 				Assert.assertEquals("Wrong locationOfWork", "-99", locationOfWork);
 			} else if (locationOfWork.length() != 6) {
