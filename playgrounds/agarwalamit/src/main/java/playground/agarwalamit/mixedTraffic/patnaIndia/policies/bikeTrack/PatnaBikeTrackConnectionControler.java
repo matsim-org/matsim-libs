@@ -149,7 +149,8 @@ public class PatnaBikeTrackConnectionControler {
 
 		ConfigUtils.loadConfig(config, configFile);
 
-		config.network().setInputFile(inputDir+"network.xml.gz");
+		config.network().setInputFile(inputDir+"networkWithAllConnectors.xml.gz");
+//		config.network().setInputFile(inputDir+"network.xml.gz");
 		// time dependent network for network change events
 		config.network().setTimeVariantNetwork(true);
 
