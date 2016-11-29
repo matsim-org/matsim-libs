@@ -59,7 +59,10 @@ public class PTFareHandlerFelix implements ActivityStartEventHandler, PersonDepa
 	private final double offPeakFare = -640.;
 	
 	private final double studentSeniorFare = -210.;
-	Double lineFare = (Double) this.controler.getScenario().getTransitSchedule().getTransitLinesAttributes().getAttribute("Liniennummer","fare"); 
+
+//	Double lineFare = (Double) this.controler.getScenario().getTransitSchedule().getTransitLinesAttributes().getAttribute("Liniennummer","fare");
+	// you cannot do the above ... since when this is called, this.controler has not yet been set.  kai, nov'16
+	Double lineFare = null ;
 	
 	private final double startIntermediateTimeMorning = 6.5 * 3600;
 //	private final double endIntermediateTimeMorning = (7.0 * 3600) - 1;
@@ -82,6 +85,7 @@ public class PTFareHandlerFelix implements ActivityStartEventHandler, PersonDepa
 	
 	public PTFareHandlerFelix(final MatsimServices controler, boolean doModeChoice, Population population){
 		this.controler = controler;
+		this.lineFare = (Double) this.controler.getScenario().getTransitSchedule().getTransitLinesAttributes().getAttribute("Liniennummer","fare");
 		this.doModeChoice = doModeChoice;
 		if(this.doModeChoice){
 			this.transitVehicles = controler.getScenario().getTransitVehicles();
