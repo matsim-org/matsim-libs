@@ -66,6 +66,10 @@ public final class PatnaUtils {
 	
 	public static final Double PCU_2W = 0.15;
 
+	public static final String BIKE_TRACK_PREFIX = "bikeTrackLink_";
+
+	public static final String BIKE_TRACK_CONNECTOR_PREFIX = "bikeTrackConnectorLink_";
+
 	private PatnaUtils(){} 
 
 	public static int getAverageIncome(final String incomeCode){

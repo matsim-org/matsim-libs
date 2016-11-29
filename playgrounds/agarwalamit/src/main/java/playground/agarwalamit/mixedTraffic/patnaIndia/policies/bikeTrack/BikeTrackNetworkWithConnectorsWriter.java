@@ -85,8 +85,7 @@ public class BikeTrackNetworkWithConnectorsWriter {
           // link must be re-created so that node objects are same.
             Node fromNode = net.getNodes().get(l.getFromNode().getId());
             Node toNode = net.getNodes().get(l.getToNode().getId());
-//            String linkId = "bikeTrackLink_"+l.getId().toString();
-            String linkId = l.getId().toString();
+            String linkId = PatnaUtils.BIKE_TRACK_PREFIX+l.getId().toString();
             Link lNew = org.matsim.core.network.NetworkUtils.createAndAddLink(net, Id.createLinkId(linkId), fromNode, toNode,
                     l.getLength() / reduceLinkLengthByFactor, freeSpeed, capacity, l.getNumberOfLanes());
             lNew.setAllowedModes(new HashSet<>(allowedModes));
@@ -107,14 +106,14 @@ public class BikeTrackNetworkWithConnectorsWriter {
         nodes[1] = net.getNodes().get(nodes[1].getId());
 
         {
-            String id = "bikeTrackConnectorLink_" + net.getLinks().size();
+            String id = PatnaUtils.BIKE_TRACK_CONNECTOR_PREFIX + net.getLinks().size();
             Id<Link> linkId = Id.createLinkId(id);
             Link l = NetworkUtils.createAndAddLink(net, linkId, nodes[0], nodes[1], dist/reduceLinkLengthByFactor,
                     freeSpeed, capacity, 1);
             l.setAllowedModes(allowedModes);
         }
         {
-            String id = "bikeTrackConnectorLink_" + net.getLinks().size();
+            String id = PatnaUtils.BIKE_TRACK_CONNECTOR_PREFIX + net.getLinks().size();
             Id<Link> linkId = Id.createLinkId(id);
             Link l = NetworkUtils.createAndAddLink(net, linkId, nodes[1], nodes[0], dist/reduceLinkLengthByFactor,
                     freeSpeed, capacity, 1);

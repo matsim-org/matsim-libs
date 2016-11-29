@@ -53,6 +53,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.linkVolume.FilteredLinkVolumeHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 /**
  * The idea is to first connect the proposed bike track to regular network by all possible connectors
@@ -94,7 +95,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
         this.bikeConnectorLinks.clear();
         this.bikeConnectorLinks.addAll(
                 this.scenario.getNetwork().getLinks().keySet().stream().filter(
-                linkId -> linkId.toString().startsWith("connector_link_")).collect(
+                linkId -> linkId.toString().startsWith(PatnaUtils.BIKE_TRACK_CONNECTOR_PREFIX)).collect(
                         Collectors.toList())
         );
 
