@@ -83,15 +83,17 @@ public class LegModeBeelineDistanceDistributionHandler implements PersonDepartur
         SortedMap<Double, Integer> dist2counts = this.mode2DistClass2Count.get(mode);
         if( dist2counts == null ) {
             dist2counts = new TreeMap<>();
+            for(double cls : this.distClasses){
+                dist2counts.put(cls, 0);
+            }
             dist2counts.put(distClass, 1);
             this.mode2DistClass2Count.put(mode,dist2counts);
         } else {
-            if(dist2counts.containsKey(distClass)) dist2counts.put(distClass, dist2counts.get(distClass)+1);
-            else dist2counts.put(distClass, 1);
+            dist2counts.put(distClass, dist2counts.get(distClass)+1);
         }
     }
 
-    private double getDistanceBin(final double dist){ // dist = 1500
+    private double getDistanceBin(final double dist){
         for( int i = 0; i < this.distClasses.size() ; i++   ) {
             if (i == this.distClasses.size()-1 ) return this.distClasses.get(i);
             else if (dist >= this.distClasses.get(i) && dist < this.distClasses.get(i+1) ) {

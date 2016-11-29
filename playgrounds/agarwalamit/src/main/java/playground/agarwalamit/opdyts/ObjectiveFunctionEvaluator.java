@@ -66,7 +66,7 @@ public class ObjectiveFunctionEvaluator {
         double realValueSum = 0;
         for ( Map.Entry<String, double[]> theEntry : realCounts.entrySet() ) {
             String mode = theEntry.getKey() ;
-            LOG.warn("mode=" + mode);
+//            LOG.warn("mode=" + mode);
 
             double[] realValue = theEntry.getValue() ;
             double[] simValue = simCounts.get(mode);
@@ -76,6 +76,10 @@ public class ObjectiveFunctionEvaluator {
 
                 if(realValue==null) diff = simValue[ii];
                 else if (simValue == null) diff = realValue[ii];
+                else if(realValue.length != simValue.length) {
+                    throw new RuntimeException("The length of the real ("+realValue.length+") and sim value ("+simValue.length+ ") arrays for the mode "+mode+" are not same " +
+                            "i.e. one of the distance class is missing. The simulation is aborting, because not sure, which bin is missing.");
+                }
                 else diff = Math.abs( realValue[ii] - simValue[ii] ) ;
 
                 switch (this.objectiveFunctionType) {
@@ -103,7 +107,7 @@ public class ObjectiveFunctionEvaluator {
                 throw new RuntimeException("not implemented yet.");
         }
 
-        LOG.warn( "objective=" + objective );
+//        LOG.warn( "objective=" + objective );
         return objective;
     }
 }
