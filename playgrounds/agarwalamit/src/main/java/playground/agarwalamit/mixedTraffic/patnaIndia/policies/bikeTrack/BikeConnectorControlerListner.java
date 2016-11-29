@@ -73,9 +73,6 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
     private final List<Id<Link>> removedConnectorLinks = new ArrayList<>();
     private final FilteredLinkVolumeHandler handler = new FilteredLinkVolumeHandler(allowedModes);
 
-    private final String bikeTrackFile;
-    private final double reduceLinkLengthBy;
-
     private final List<Id<Link>> bikeConnectorLinks = new ArrayList<>(); // in total 500 links will be added to the list.
     private int totalPossibleConnectors = 0;
 
@@ -85,12 +82,9 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
     private boolean terminateSimulation = false;
     private PlanAlgorithm router;
 
-    public BikeConnectorControlerListner(final int numberOfConnectorsRequired, final int removeOneConnectorAfterIteration,
-                                         final String bikeTrackFile, final double reduceLinkLengthBy) {
+    public BikeConnectorControlerListner(final int numberOfConnectorsRequired, final int removeOneConnectorAfterIteration) {
         this.numberOfBikeConnectorsRequired = numberOfConnectorsRequired;
         this.removeConnectorAfterIteration = removeOneConnectorAfterIteration;
-        this.bikeTrackFile = bikeTrackFile;
-        this.reduceLinkLengthBy = reduceLinkLengthBy;
     }
 
     @Override
@@ -105,8 +99,6 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
         );
 
         this.totalPossibleConnectors = this.bikeConnectorLinks.size();
-        System.out.println(this.totalPossibleConnectors);
-
 //        // dont want to do anything except removing isolated nodes,
 //        // that's why, not using core network simplifier or cleaner.
 //        NetworkUtils.removeIsolatedNodes(scenario.getNetwork());

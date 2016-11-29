@@ -20,7 +20,10 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.policies.bikeTrack;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import javax.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -84,10 +87,18 @@ public class PatnaBikeTrackConnectionControler {
 			useBikeTravelTime = Boolean.valueOf(args[5]);
 		}
 
-		Scenario scenario = getScenario();
+		String regularNet = dir+"/input/network.xml.gz";
+		String outBikeTrackConnectorFile = dir+"/input/networkWiBikeTrackAndConnectors.xml.gz";
+
+		Set<String> allowedModes = new HashSet<>(Arrays.asList("bike"));
+		BikeTrackNetworkWithConnectorsWriter trackNetworkWithConnectorsWriter = new BikeTrackNetworkWithConnectorsWriter(regularNet);
+		trackNetworkWithConnectorsWriter.processBikeTrackFile(bikeTrack, reduceLinkLengthBy, allowedModes);
+		trackNetworkWithConnectorsWriter.writeNetwork(outBikeTrackConnectorFile);
+
+		Scenario scenario = prepareScenario(outBikeTrackConnectorFile);
+
 		scenario.getConfig().controler().setOutputDirectory(dir+"bikeTrackConnectors_"+numberOfConnectors+"_"+updateConnectorsAfterIteration+"_"+reduceLinkLengthBy+"/");
-		BikeConnectorControlerListner bikeConnectorControlerListner = new BikeConnectorControlerListner(numberOfConnectors, updateConnectorsAfterIteration, bikeTrack,
-				 reduceLinkLengthBy);
+		BikeConnectorControlerListner bikeConnectorControlerListner = new BikeConnectorControlerListner(numberOfConnectors, updateConnectorsAfterIteration);
 
 		final Controler controler = new Controler(scenario);
 
@@ -126,22 +137,24 @@ public class PatnaBikeTrackConnectionControler {
 
 		String outputDir = controler.getScenario().getConfig().controler().getOutputDirectory();
 
-		new File(outputDir+"/analysis/").mkdir();
 		String outputEventsFile = outputDir+"/output_events.xml.gz";
-		// write some default analysis
-		String userGroup = PatnaPersonFilter.PatnaUserGroup.urban.toString();
-		ModalTravelTimeAnalyzer mtta = new ModalTravelTimeAnalyzer(outputEventsFile, userGroup, new PatnaPersonFilter());
-		mtta.run();
-		mtta.writeResults(outputDir+"/analysis/modalTravelTime_"+userGroup+".txt");
+		if(new File(outputEventsFile).exists()) {
+			new File(outputDir+"/analysis/").mkdir();
+			// write some default analysis
+			String userGroup = PatnaPersonFilter.PatnaUserGroup.urban.toString();
+			ModalTravelTimeAnalyzer mtta = new ModalTravelTimeAnalyzer(outputEventsFile, userGroup, new PatnaPersonFilter());
+			mtta.run();
+			mtta.writeResults(outputDir+"/analysis/modalTravelTime_"+userGroup+".txt");
 
-		ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new PatnaPersonFilter());
-		msc.run();
-		msc.writeResults(outputDir+"/analysis/modalShareFromEvents_"+userGroup+".txt");
+			ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new PatnaPersonFilter());
+			msc.run();
+			msc.writeResults(outputDir+"/analysis/modalShareFromEvents_"+userGroup+".txt");
+		}
 
 		//StatsWriter.run(outputDir);
 	}
 
-	private static Scenario getScenario() {
+	private static Scenario prepareScenario(final String networkFile) {
 		Config config = ConfigUtils.createConfig();
 
 		String inputDir = dir+"/input/";
@@ -149,13 +162,13 @@ public class PatnaBikeTrackConnectionControler {
 
 		ConfigUtils.loadConfig(config, configFile);
 
-		config.network().setInputFile(inputDir+"networkWithAllConnectors.xml.gz");
+		config.network().setInputFile(networkFile);
 //		config.network().setInputFile(inputDir+"network.xml.gz");
 		// time dependent network for network change events
 		config.network().setTimeVariantNetwork(true);
 
-//		String inPlans = inputDir+"samplePlansForTesting.xml";
-		String inPlans = inputDir+"/baseCaseOutput_plans.xml.gz";
+		String inPlans = inputDir+"samplePlansForTesting.xml";
+//		String inPlans = inputDir+"/baseCaseOutput_plans.xml.gz";
 		config.plans().setInputFile( inPlans );
 		config.plans().setInputPersonAttributeFile(inputDir+"output_personAttributes.xml.gz");
 		config.vehicles().setVehiclesFile(null); // see below for vehicle type info
@@ -173,8 +186,9 @@ public class PatnaBikeTrackConnectionControler {
 		}
 		//==
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setWriteEventsInterval(10);
 		config.controler().setDumpDataAtEnd(true);
+
+		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
 		config.vspExperimental().setWritingOutputEvents(true);
@@ -184,13 +198,15 @@ public class PatnaBikeTrackConnectionControler {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		String vehiclesFile = inputDir+"output_vehicles.xml.gz";
+		String vehiclesFile = inputDir+"output_vehicles.xml.gz"; // following is done to extract only vehicle types and not vehicle info. Amit Nov 2016
 		PatnaVehiclesGenerator.addVehiclesToScenarioFromVehicleFile(vehiclesFile, scenario);
 
 		// no vehicle info should be present if using VehiclesSource.modeVEhicleTypesFromVehiclesData
-		if ( scenario.getVehicles().getVehicles().size() != 0 ) throw new RuntimeException("Only vehicle types should be loaded if vehicle source "+
-				QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData +" is assigned.");
-		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+		if ( scenario.getConfig().qsim().getVehiclesSource()==QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData  &&
+				scenario.getVehicles().getVehicles().size() != 0 ) {
+			throw new RuntimeException("Only vehicle types should be loaded if vehicle source "+
+					QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData +" is assigned.");
+		}
 		return scenario;
 	}
 
