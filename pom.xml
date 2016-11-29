@@ -3,7 +3,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.matsim</groupId>
-	<artifactId>matsim-example-project</artifactId>
+	<artifactId>matsim-vw</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
 	<name>MATSim example project</name>
@@ -55,18 +55,24 @@
  		</dependency>
  		
 		<!-- An example on how to add a contribution using the 0.9.0-SNAPSHOT -->
-		<!--dependency>
+		<dependency>
  			<groupId>org.matsim.contrib</groupId>
  			<artifactId>av</artifactId>
  			<version>0.9.0-SNAPSHOT</version>
- 		</dependency-->
+ 		</dependency>
  	
 <!-- 		<dependency>
 			<groupId>com.github.msmobility</groupId>
 			<artifactId>silo</artifactId>
 			<version>master-SNAPSHOT</version>
 		</dependency>
- -->	</dependencies>
+ -->
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>dvrp</artifactId>
+			<version>0.9.0-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>

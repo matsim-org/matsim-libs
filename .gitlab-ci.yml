@@ -1,0 +1,6 @@
+image: maven:3-jdk-7
+
+build:
+  script: "mvn install -B --fail-at-end -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true"
+
+# see http://stackoverflow.com/questions/33430487/how-to-use-gitlab-ci-to-build-a-java-maven-project
