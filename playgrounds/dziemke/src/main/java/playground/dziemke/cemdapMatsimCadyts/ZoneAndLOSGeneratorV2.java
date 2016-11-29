@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,7 +50,7 @@ public class ZoneAndLOSGeneratorV2 {
 
 	
 	//
-	private Set<String> municipalities;
+	private Set<String> municipalities = new HashSet<>();
 	//
 
 	private Map <Integer, Zone> zonesMap = new HashMap <Integer, Zone>();
@@ -100,7 +101,8 @@ public class ZoneAndLOSGeneratorV2 {
 	private void readMunicipalities(String[] commuterFilesOutgoing) {
 		for (String commuterFileOutgoing : commuterFilesOutgoing) {
 			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing, "\t");
-			this.municipalities = commuterFileReader.getMunicipalities();
+			Set<String> currentMunicipalities = commuterFileReader.getMunicipalities();
+			this.municipalities.addAll(currentMunicipalities);
 		}
 	}
 
@@ -137,8 +139,8 @@ public class ZoneAndLOSGeneratorV2 {
 		}
 		
 		for (String key : municipalities) {
-			if (!this.municipalities.contains(key)) {
-				LOG.error("Zone from commuter relations in shapes; zone = " + key);
+			if (!this.zonesMap.keySet().contains(Integer.parseInt(key))) {
+				LOG.error("Zone from commuter relations not in shapes; zone = " + key);
 			}
 		}
 	}
