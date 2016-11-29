@@ -3,10 +3,8 @@ package playground.dziemke.cemdapMatsimCadyts;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.households.Household;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.dziemke.accessibility.OTPMatrix.CSVReader;
 
@@ -32,9 +30,17 @@ public class DemandGeneratorCensusTest {
 
 		String[] commuterFilesOutgoing = {commuterFileOutgoingTest};
 
+		// Parameters
+		int numberOfPlansPerPerson = 5;
+		String planningAreaId = "11000000"; // "Amtliche Gemeindeschlüssel (AGS)" of Berlin is "11000000"
+		double defaultAdultsToEmployeesRatio = 1.23;  // Calibrated based on sum value from Zensus 2011.
+		double defaultEmployeesToCommutersRatio = 2.5;  // This is an assumption, oriented on observed values, deliberately chosen slightly too high.
+		boolean writeMatsimPlanFiles = true;
+		boolean includeChildren = false;
+
 		DemandGeneratorCensus demandGeneratorCensus = new DemandGeneratorCensus(commuterFilesOutgoing, censusFile,
-				shapeFileLors, utils.getOutputDirectory());
-		demandGeneratorCensus.generateDemand();
+				shapeFileLors, utils.getOutputDirectory(), 	numberOfPlansPerPerson, planningAreaId,
+				defaultAdultsToEmployeesRatio, defaultEmployeesToCommutersRatio, writeMatsimPlanFiles, includeChildren);
 
 		String municipal = "Breydin";
 		ArrayList<String> possibleLocationsOfWork = readPossibleLocationsOfWork(commuterFileOutgoingTest, municipal);
@@ -74,14 +80,12 @@ public class DemandGeneratorCensusTest {
 		Population pop = demandGeneratorCensus.getPopulation();
 		for (Person person : pop.getPersons().values()) {
 			//collect data
-			Id<Household> householdId = (Id<Household>) person.getAttributes().getAttribute("householdId");
 			String locationOfWork = (String) person.getAttributes().getAttribute("locationOfWork");
 			boolean employed = (boolean) person.getAttributes().getAttribute("employed");
 			int age = (Integer) person.getAttributes().getAttribute("age");
 			int female = (Integer) person.getAttributes().getAttribute("gender"); // assumes that female = 1
 
 			//assert
-			Assert.assertEquals("Wrong municipality", "12060034", householdId.toString().substring(0,8));
 			if (!employed) {
 				Assert.assertEquals("Wrong locationOfWork", "-99", locationOfWork);
 			} else if (locationOfWork.length() != 6) {
