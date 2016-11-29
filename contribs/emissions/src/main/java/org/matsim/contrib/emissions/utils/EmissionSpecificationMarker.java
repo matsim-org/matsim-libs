@@ -25,15 +25,5 @@ package org.matsim.contrib.emissions.utils;
  */
 public enum EmissionSpecificationMarker {
 
-    BEGIN_EMISSIONS ("BEGIN_EMISSIONS-"), END_EMISSIONS ("-END_EMISSIONS");
-
-    private String emissionDescriptionMarker;
-
-    private EmissionSpecificationMarker(final String emissionDescriptionMarker) {
-        this.emissionDescriptionMarker = emissionDescriptionMarker;
-    }
-
-    public String getEmissionDescriptionMarker(){
-        return this.emissionDescriptionMarker;
-    }
+    BEGIN_EMISSIONS , END_EMISSIONS ;
 }
