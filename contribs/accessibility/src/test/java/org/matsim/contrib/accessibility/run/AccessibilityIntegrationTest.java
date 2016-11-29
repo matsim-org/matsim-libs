@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
+import org.matsim.contrib.accessibility.AccessibilityStartupListener;
 import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
 import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
@@ -198,8 +199,10 @@ public class AccessibilityIntegrationTest {
 		double left = acg.getBoundingBoxLeft();
 		double right = acg.getBoundingBoxRight();
 		final Envelope envelope = new Envelope(left, right, bottom, top);
-
-		controler.addControlerListener(new AccessibilityStartupListenerTestExtended(activityTypes, null, null, null, envelope, cellSize, false));
+		
+		AccessibilityStartupListener asl = new AccessibilityStartupListener(activityTypes, null, null, null, envelope, cellSize, false);
+		controler.addControlerListener(asl);
+		asl.useEvaluteTestResults(true);;
 		// ------------------ NEW END HERE
 		
 		// Storage objects

@@ -25,6 +25,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.gis.GridUtils;
+import org.matsim.contrib.accessibility.run.AccessibilityIntegrationTest.EvaluateTestResults;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.GeoserverUpdater;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
@@ -54,7 +55,10 @@ public final class AccessibilityStartupListener implements StartupListener {
 	Double cellSize;
 	boolean push2Geoserver;
 	
-	private static final Logger LOG = Logger.getLogger(AccessibilityStartupListener.class);	
+	boolean useEvaluteTestResults = false;
+	
+	private static final Logger LOG = Logger.getLogger(AccessibilityStartupListener.class);
+
 	
 	public AccessibilityStartupListener(List<String> activityTypes, ActivityFacilities densityFacilities, String crs, String runId, Envelope envelope, Double cellSize, boolean push2Geoserver) {
 		this.activityTypes = activityTypes;
@@ -97,7 +101,16 @@ public final class AccessibilityStartupListener implements StartupListener {
 			if (push2Geoserver == true) {
 				accessibilityCalculator.addFacilityDataExchangeListener(new GeoserverUpdater(crs, runId + "_" + activityType));
 			}
+			if (useEvaluteTestResults) {
+				EvaluateTestResults etr = new EvaluateTestResults(true, true, true, true, false);
+				gbasl.addSpatialGridDataExchangeListener(etr);
+			}
 			controlerListenerManager.addControlerListener(gbasl);
 		}
+	}
+	
+	
+	public void useEvaluteTestResults(boolean value) {
+		this.useEvaluteTestResults = value;
 	}
 }
