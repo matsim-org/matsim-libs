@@ -65,7 +65,10 @@ public class RunLocationNegotiation {
 
 		final ConcurrentStopWatch<StopWatchMeasurement> stopWatch = injector.getInstance( new Key<ConcurrentStopWatch<StopWatchMeasurement>>() {} );
 
-		try ( ChosenLocationWriter writer = new ChosenLocationWriter( config.controler().getOutputDirectory()+"/locations.dat" ) ) {
+		try ( ChosenLocationWriter writer =
+					  new ChosenLocationWriter(
+					  		config.controler().getOutputDirectory()+"/locations.dat",
+							injector.getInstance( LocationHelper.class ) ) ) {
 			negotiator.negotiate( writer::writeLocation );
 		}
 		finally {

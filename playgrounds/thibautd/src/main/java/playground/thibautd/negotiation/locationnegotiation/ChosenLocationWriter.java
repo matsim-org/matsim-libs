@@ -20,6 +20,7 @@ package playground.thibautd.negotiation.locationnegotiation;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import playground.thibautd.negotiation.framework.NegotiationAgent;
@@ -33,10 +34,12 @@ import java.util.Collection;
  */
 public class ChosenLocationWriter implements AutoCloseable {
 	private final BufferedWriter writer;
+	private final LocationHelper locations;
 
-	public ChosenLocationWriter( final String file ) throws IOException {
+	public ChosenLocationWriter( final String file, final LocationHelper locations ) throws IOException {
 		writer = IOUtils.getBufferedWriter( file );
-		writer.write( "groupNr\tpersonId\tfacilityId" );
+		this.locations = locations;
+		writer.write( "groupNr\tpersonId\tfacilityId\tdistance" );
 	}
 
 	public void writeLocation( final NegotiationAgent<LocationProposition> agent ) {
@@ -46,8 +49,13 @@ public class ChosenLocationWriter implements AutoCloseable {
 			final String groupId = location == null ? "NA" : getGroupId( location.getGroupIds() );
 			final String facilityId = location == null ? "NA" : location.getFacility().getId().toString();
 
+			final String distance = location == null ? "NA" :
+					""+CoordUtils.calcEuclideanDistance(
+							location.getFacility().getCoord(),
+							locations.getHomeLocation( agent.getId() ).getCoord() );
+
 			writer.newLine();
-			writer.write( groupId+"\t"+agent.getId()+"\t"+facilityId );
+			writer.write( groupId+"\t"+agent.getId()+"\t"+facilityId+"\t"+distance );
 		}
 		catch ( IOException e ) {
 			throw new UncheckedIOException( e );

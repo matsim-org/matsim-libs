@@ -20,24 +20,25 @@ package playground.thibautd.negotiation.locationnegotiation;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-
-import static javafx.scene.input.KeyCode.Q;
-import static org.osgeo.proj4j.parser.Proj4Keyword.f;
 
 /**
  * @author thibautd
  */
 @Singleton
 public class LocationHelper {
+	private final Population population;
 	private final ActivityFacilities facilities;
 	private static final String HOME = "home";
 
 	@Inject
-	public LocationHelper( final ActivityFacilities facilities ) {
+	public LocationHelper( final Population population, final ActivityFacilities facilities ) {
+		this.population = population;
 		this.facilities = facilities;
 	}
 
@@ -68,5 +69,9 @@ public class LocationHelper {
 
 		person.getCustomAttributes().put( "home location" , facility );
 		return facility;
+	}
+
+	public ActivityFacility getHomeLocation( final Id<Person> id ) {
+		return getHomeLocation( population.getPersons().get( id ) );
 	}
 }
