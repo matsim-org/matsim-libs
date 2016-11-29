@@ -24,15 +24,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
-import org.matsim.facilities.ActivityFacility;
 import playground.thibautd.negotiation.framework.AlternativesGenerator;
 import playground.thibautd.negotiation.framework.NegotiationAgent;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author thibautd
