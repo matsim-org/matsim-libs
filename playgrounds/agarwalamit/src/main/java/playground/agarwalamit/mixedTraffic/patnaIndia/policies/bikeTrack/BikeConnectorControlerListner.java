@@ -100,40 +100,6 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
         );
 
         this.totalPossibleConnectors = this.bikeConnectorLinks.size();
-//        // dont want to do anything except removing isolated nodes,
-//        // that's why, not using core network simplifier or cleaner.
-//        NetworkUtils.removeIsolatedNodes(scenario.getNetwork());
-//
-//        Network bikeNetwork = LoadMyScenarios.loadScenarioFromNetwork(this.bikeTrackFile).getNetwork();
-//
-//        // first evaluate all node pairs for all possible connectors but dont create and add
-//        // nodes to regular network otherwise, nodes on the bike track will be returned as nearest nodes.
-//        List<Node[]> toAndFromNodesPairsForConnectors = new ArrayList<>();
-//        for (Node bikeNode : bikeNetwork.getNodes().values()) {
-//            Node n = org.matsim.core.network.NetworkUtils.getNearestNode(scenario.getNetwork(), bikeNode.getCoord());
-//            toAndFromNodesPairsForConnectors.add(new Node[]{bikeNode, n});
-//        }
-//
-//        LOG.info("========================== Adding nodes from bike track to regular network ...");
-//        bikeNetwork.getNodes().values().forEach(bikeNode ->
-//                org.matsim.core.network.NetworkUtils.createAndAddNode(scenario.getNetwork(), bikeNode.getId(), bikeNode.getCoord())
-//        );
-//
-//        LOG.info("========================== Adding links from proposed bike track to regular network ...");
-//        for (Link l : bikeNetwork.getLinks().values()) {
-//          // link must be re-created so that node objects are same.
-//            Node fromNode = scenario.getNetwork().getNodes().get(l.getFromNode().getId());
-//            Node toNode = scenario.getNetwork().getNodes().get(l.getToNode().getId());
-//            Link lNew = org.matsim.core.network.NetworkUtils.createAndAddLink(scenario.getNetwork(), l.getId(), fromNode, toNode,
-//                    l.getLength() / reduceLinkLengthBy, l.getFreespeed(), l.getCapacity(), l.getNumberOfLanes());
-//            lNew.setAllowedModes(new HashSet<>(allowedModes));
-//        }
-//
-//        LOG.info("========================== Adding all possible connectors to regular network ...");
-//        toAndFromNodesPairsForConnectors.forEach(pair -> addBikeConnectorLinksToScenario(pair));
-//        this.totalPossibleConnectors = this.bikeConnectorLinks.size();
-//
-//        new NetworkWriter(this.scenario.getNetwork()).write(this.scenario.getConfig().controler().getOutputDirectory()+"/networkWithAllConnectors.xml.gz");
     }
 
     @Override
@@ -208,31 +174,6 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
             event.getServices().getEvents().addHandler(handler);
         }
     }
-
-//    private void addBikeConnectorLinksToScenario(final Node[] nodes) {
-//        double dist = CoordUtils.calcEuclideanDistance(nodes[0].getCoord(), nodes[1].getCoord());
-//        double linkCapacity = 1500.;
-//        double linkSpeed = 40. / 3.6;
-//
-//        Node n1 = scenario.getNetwork().getNodes().get(nodes[0].getId()); // get the same node object. Amit, Nov 2016
-//        Node n2 = scenario.getNetwork().getNodes().get(nodes[1].getId());
-//        {
-//            String id = "connector_link_" + scenario.getNetwork().getLinks().size();
-//            Id<Link> linkId = Id.createLinkId(id);
-//            Link l = org.matsim.core.network.NetworkUtils.createAndAddLink(scenario.getNetwork(), linkId, n1,
-//                    n2, dist / reduceLinkLengthBy, linkSpeed, linkCapacity, 1);
-//            l.setAllowedModes(new HashSet<>(allowedModes));
-//            this.bikeConnectorLinks.add(linkId);
-//        }
-//        {
-//            String id = "connector_link_" + scenario.getNetwork().getLinks().size();
-//            Id<Link> linkId = Id.createLinkId(id);
-//            Link l = org.matsim.core.network.NetworkUtils.createAndAddLink(scenario.getNetwork(), linkId, n2,
-//                    n1, dist / reduceLinkLengthBy, linkSpeed, linkCapacity, 1);
-//            l.setAllowedModes(new HashSet<>(allowedModes));
-//            this.bikeConnectorLinks.add(linkId);
-//        }
-//    }
 
     public boolean isTerminating() {
         if (this.terminateSimulation) {
