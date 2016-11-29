@@ -129,18 +129,18 @@ public class AccessibilityIntegrationTestOld {
 	public void testWithBoundingBox() {
 		final Config config = ConfigUtils.createConfig();
 		
-		// test values to define bounding box.
-		// these values usually come from a config file
+		// test values to define bounding box; these values usually come from a config file
 		double min = 0.;
 		double max = 200.;
 
 		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
-		config.addModule( acm);
+		config.addModule(acm);
+		// set bounding box manually in this test
 		acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox.toString());
 		acm.setBoundingBoxBottom(min);
 		acm.setBoundingBoxTop(max);
 		acm.setBoundingBoxLeft(min);
-		acm.setBoundingBoxRight(max);
+		acm.setBoundingBoxRight(max); // TODO does not seem to have any impact
 		
 		// modify config according to needs
 		Network network = CreateTestNetwork.createTestNetwork();
@@ -164,10 +164,10 @@ public class AccessibilityIntegrationTestOld {
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 
 		run(sc, ptMatrix);
-		
 		// compare some results -> done in EvaluateTestResults
 	}
 
+	
 	private void run(MutableScenario scenario, PtMatrix ptMatrix) {
 		Controler controler = new Controler(scenario);
 
@@ -231,17 +231,25 @@ public class AccessibilityIntegrationTestOld {
 	@Test
 	public void testWithExtentDeterminedByNetwork() {
 		final Config config = ConfigUtils.createConfig();
-
+		
 		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
-		config.addModule( acm);
-//		acm.setCellBasedAccessibilityNetwork(true);
-		// is now default
+		config.addModule(acm);
+//		acm.setCellBasedAccessibilityNetwork(true); // is now default
 		
 		// modify config according to needs
 		Network network = CreateTestNetwork.createTestNetwork();
 		String networkFile = utils.getOutputDirectory() +"network.xml";
 		new NetworkWriter(network).write(networkFile);
 		config.network().setInputFile( networkFile);
+		
+		// new
+		BoundingBox bb = BoundingBox.createBoundingBox(network);
+		acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromNetwork.toString());
+		acm.setBoundingBoxBottom(bb.getYMin());
+		acm.setBoundingBoxTop(bb.getYMax());
+		acm.setBoundingBoxLeft(bb.getXMin());
+		acm.setBoundingBoxRight(bb.getXMax());
+		// end new
 		
 		MatrixBasedPtRouterConfigGroup mbConfig = new MatrixBasedPtRouterConfigGroup();
 		mbConfig.setPtStopsInputFile(utils.getClassInputDirectory() + "ptStops.csv");
@@ -250,6 +258,7 @@ public class AccessibilityIntegrationTestOld {
 		mbConfig.setUsingPtStops(true);
 		mbConfig.setUsingTravelTimesAndDistances(true);
 		config.addModule(mbConfig);
+		
 		config.controler().setLastIteration(10);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
@@ -260,7 +269,6 @@ public class AccessibilityIntegrationTestOld {
 
 		run(sc, ptMatrix);
 		// compare some results -> done in EvaluateTestResults
-        
 	}
 	
 
@@ -270,7 +278,6 @@ public class AccessibilityIntegrationTestOld {
 		Config config = ConfigUtils.createConfig();
 
 //		URL url = AccessibilityIntegrationTest.class.getClassLoader().getResource(new File(this.utils.getInputDirectory()).getAbsolutePath() + "shapeFile2.shp");
-
 		File f = new File(this.utils.getInputDirectory() + "shapefile.shp"); // shape file completely covers the road network
 
 		if(!f.exists()){
@@ -279,10 +286,11 @@ public class AccessibilityIntegrationTestOld {
 		}
 
 		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
-		config.addModule( acm);
+		config.addModule(acm);
+		// set area by shapefile in this test
 		acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromShapeFile.toString());
-//		 acm.setShapeFileCellBasedAccessibility(url.getPath()); // yyyyyy todo
-		acm.setShapeFileCellBasedAccessibility(f.getAbsolutePath());
+//		acm.setShapeFileCellBasedAccessibility(url.getPath()); // yyyyyy todo
+		acm.setShapeFileCellBasedAccessibility(f.getAbsolutePath()); // TODO does not seem to have any impact
 		
 		// modify config according to needs
 		Network network = CreateTestNetwork.createTestNetwork();
@@ -297,26 +305,26 @@ public class AccessibilityIntegrationTestOld {
 		mbConfig.setUsingPtStops(true);
 		mbConfig.setUsingTravelTimesAndDistances(true);
 		config.addModule(mbConfig);
+		
 		config.controler().setLastIteration(10);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
 		final MutableScenario sc = (MutableScenario) ScenarioUtils.loadScenario(config);
-		PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
+		
+		PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig);
+		
 		run(sc, ptMatrix);
 
 		// compare some results -> done in EvaluateTestResults 
-        
 	}
+
 	
 	/**
-	 * This is called by the GridBasedAccessibilityListener and 
-	 * gets the resulting SpatialGrids. This test checks if the 
-	 * SpatialGrids for activated transport modes (see above) are 
-	 * instantiated or null if the specific transport mode is not 
-	 * activated.
+	 * This is called by the GridBasedAccessibilityListener and gets the resulting SpatialGrids. This test checks if the 
+	 * SpatialGrids for activated transport modes (see above) are instantiated or null if the specific transport mode is
+	 * not activated.
 	 * 
 	 * @author thomas
-	 *
 	 */
 	public class EvaluateTestResults implements SpatialGridDataExchangeInterface{
 		
@@ -527,11 +535,17 @@ public class AccessibilityIntegrationTestOld {
 
 				@Override
 				public ControlerListener get() {
-					BoundingBox bb = BoundingBox.createBoundingBox(scenario.getNetwork());
+					// new
+					AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.class);
+					// end new
+//					BoundingBox bb = BoundingBox.createBoundingBox(scenario.getNetwork());
 					
-					ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize);
+					ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(
+							acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop(), cellSize);
+//					ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize);
 					AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
-					GridBasedAccessibilityShutdownListenerV3 gacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, bb.getXMin(), bb.getYMin(),bb.getXMax(), bb.getYMax(), cellSize);
+					GridBasedAccessibilityShutdownListenerV3 gacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, 
+							acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop(), cellSize);
 					for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
 						accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 					}

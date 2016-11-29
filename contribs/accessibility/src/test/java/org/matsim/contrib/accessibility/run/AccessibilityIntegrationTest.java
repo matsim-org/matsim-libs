@@ -122,13 +122,13 @@ public class AccessibilityIntegrationTest {
 	public void testWithBoundingBox() {
 		final Config config = ConfigUtils.createConfig();
 		
-		// test values to define bounding box.
-		// these values usually come from a config file
+		// test values to define bounding box; these values usually come from a config file
 		double min = 0.;
 		double max = 200.;
 
 		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
-		config.addModule( acm);
+		config.addModule(acm);
+		// set bounding box manually in this test
 		acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox.toString());
 		acm.setBoundingBoxBottom(min);
 		acm.setBoundingBoxTop(max);
@@ -157,10 +157,10 @@ public class AccessibilityIntegrationTest {
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 
 		run(sc, ptMatrix);
-		
 		// compare some results -> done in EvaluateTestResults
 	}
 
+	
 	private void run(MutableScenario scenario, PtMatrix ptMatrix) {
 		Controler controler = new Controler(scenario);
 
@@ -243,11 +243,10 @@ public class AccessibilityIntegrationTest {
 	@Test
 	public void testWithExtentDeterminedByNetwork() {
 		final Config config = ConfigUtils.createConfig();
-
+		
 		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
-		config.addModule( acm);
-//		acm.setCellBasedAccessibilityNetwork(true);
-		// is now default
+		config.addModule(acm);
+//		acm.setCellBasedAccessibilityNetwork(true); // is now default
 		
 		// modify config according to needs
 		Network network = CreateTestNetwork.createTestNetwork();
@@ -262,9 +261,9 @@ public class AccessibilityIntegrationTest {
 		mbConfig.setUsingPtStops(true);
 		mbConfig.setUsingTravelTimesAndDistances(true);
 		config.addModule(mbConfig);
+		
 		config.controler().setLastIteration(10);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
-
 
 		final MutableScenario sc = (MutableScenario) ScenarioUtils.loadScenario(config);
 
@@ -272,7 +271,6 @@ public class AccessibilityIntegrationTest {
 
 		run(sc, ptMatrix);
 		// compare some results -> done in EvaluateTestResults
-        
 	}
 	
 	@Ignore
@@ -282,7 +280,6 @@ public class AccessibilityIntegrationTest {
 		Config config = ConfigUtils.createConfig();
 
 //		URL url = AccessibilityIntegrationTest.class.getClassLoader().getResource(new File(this.utils.getInputDirectory()).getAbsolutePath() + "shapeFile2.shp");
-
 		File f = new File(this.utils.getInputDirectory() + "shapefile.shp"); // shape file completely covers the road network
 
 		if(!f.exists()){
@@ -291,9 +288,10 @@ public class AccessibilityIntegrationTest {
 		}
 
 		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
-		config.addModule( acm);
+		config.addModule(acm);
+		// set area by shapefile in this test
 		acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromShapeFile.toString());
-//		 acm.setShapeFileCellBasedAccessibility(url.getPath()); // yyyyyy todo
+//		acm.setShapeFileCellBasedAccessibility(url.getPath()); // yyyyyy todo
 		acm.setShapeFileCellBasedAccessibility(f.getAbsolutePath());
 		
 		// modify config according to needs
@@ -309,26 +307,26 @@ public class AccessibilityIntegrationTest {
 		mbConfig.setUsingPtStops(true);
 		mbConfig.setUsingTravelTimesAndDistances(true);
 		config.addModule(mbConfig);
+		
 		config.controler().setLastIteration(10);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
 		final MutableScenario sc = (MutableScenario) ScenarioUtils.loadScenario(config);
-		PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
+		
+		PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig);
+		
 		run(sc, ptMatrix);
 
 		// compare some results -> done in EvaluateTestResults 
-        
 	}
+
 	
 	/**
-	 * This is called by the GridBasedAccessibilityListener and 
-	 * gets the resulting SpatialGrids. This test checks if the 
-	 * SpatialGrids for activated transport modes (see above) are 
-	 * instantiated or null if the specific transport mode is not 
-	 * activated.
+	 * This is called by the GridBasedAccessibilityListener and gets the resulting SpatialGrids. This test checks if the 
+	 * SpatialGrids for activated transport modes (see above) are instantiated or null if the specific transport mode is
+	 * not activated.
 	 * 
 	 * @author thomas
-	 *
 	 */
 	public static class EvaluateTestResults implements SpatialGridDataExchangeInterface{
 		
