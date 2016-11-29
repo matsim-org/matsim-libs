@@ -28,7 +28,7 @@ public class MixedTrafficVehiclesUtils {
 	public final static String CAR = TransportMode.car;
 	public final static String BIKE = TransportMode.bike;
 	public final static String WALK = TransportMode.walk;
-	// ZZ_TODO : check PT speed and PCU.
+	// TODO [AA] : check PT speed and PCU.
 	public final static String PT = TransportMode.pt;
 	public final static String MOTORBIKE = "motorbike";
 	public final static String TRUCK = "truck";

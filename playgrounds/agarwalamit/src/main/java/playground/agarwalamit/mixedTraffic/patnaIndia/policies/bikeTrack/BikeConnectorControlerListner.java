@@ -84,7 +84,8 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
     private int totalPossibleConnectors = 0;
 
     @Inject
-    Scenario scenario;
+    private Scenario scenario;
+
     private boolean terminateSimulation = false;
     private PlanAlgorithm router;
 
@@ -119,14 +120,12 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
 
         LOG.info("========================== Adding links from proposed bike track to regular network ...");
         for (Link l : bikeNetwork.getLinks().values()) {
-            if (scenario.getNetwork().getLinks().containsKey(l.getId())) continue;
-            else {// link must be re-created so that node objects are same.
-                Node fromNode = scenario.getNetwork().getNodes().get(l.getFromNode().getId());
-                Node toNode = scenario.getNetwork().getNodes().get(l.getToNode().getId());
-                Link lNew = org.matsim.core.network.NetworkUtils.createAndAddLink(scenario.getNetwork(), l.getId(), fromNode, toNode,
-                        l.getLength() / reduceLinkLengthBy, l.getFreespeed(), l.getCapacity(), l.getNumberOfLanes());
-                lNew.setAllowedModes(new HashSet<>(allowedModes));
-            }
+          // link must be re-created so that node objects are same.
+            Node fromNode = scenario.getNetwork().getNodes().get(l.getFromNode().getId());
+            Node toNode = scenario.getNetwork().getNodes().get(l.getToNode().getId());
+            Link lNew = org.matsim.core.network.NetworkUtils.createAndAddLink(scenario.getNetwork(), l.getId(), fromNode, toNode,
+                    l.getLength() / reduceLinkLengthBy, l.getFreespeed(), l.getCapacity(), l.getNumberOfLanes());
+            lNew.setAllowedModes(new HashSet<>(allowedModes));
         }
 
         LOG.info("========================== Adding all possible connectors to regular network ...");
