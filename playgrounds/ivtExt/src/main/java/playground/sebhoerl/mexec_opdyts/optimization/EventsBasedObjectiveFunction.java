@@ -1,11 +1,13 @@
-package playground.sebhoerl.mexec_opdyts.opdyts;
+package playground.sebhoerl.mexec_opdyts.optimization;
 
-import org.apache.commons.lang3.event.EventUtils;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.handler.EventHandler;
 import playground.sebhoerl.mexec.Simulation;
+import playground.sebhoerl.mexec.SimulationUtils;
 
 public class EventsBasedObjectiveFunction implements IterationObjectiveFunction {
     final private IterationEventHandler handler;
@@ -15,14 +17,15 @@ public class EventsBasedObjectiveFunction implements IterationObjectiveFunction 
     }
 
     @Override
-    public double compute(Simulation simulation, Long iteration) {
-        handler.reset(iteration.intValue());
+    public double compute(Simulation simulation, IterationState iteration) {
+        handler.reset((int) iteration.getIteration());
+
+        Logger.getLogger(EventsManagerImpl.class).setLevel(Level.OFF);
 
         EventsManager events = EventsUtils.createEventsManager();
         events.addHandler(handler);
 
-        EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-        reader.parse(simulation.getEvents(iteration));
+        SimulationUtils.processEvents(events, simulation, iteration.getIteration());
 
         return handler.getValue();
     }

@@ -94,6 +94,9 @@ public class RunEquil {
             config.setParameter("plans", "inputPlansFile", "%{scenario}/plans100.xml");
             config.setParameter("controler", "outputDirectory", "%{output}");
             config.setParameter("controler", "overwriteFiles", "deleteDirectoryIfExists");
+
+            config.setParameter("controler", "overwriteFiles", "%{custom_utility}");
+
             simulation.save();
 
             simulation.start();
