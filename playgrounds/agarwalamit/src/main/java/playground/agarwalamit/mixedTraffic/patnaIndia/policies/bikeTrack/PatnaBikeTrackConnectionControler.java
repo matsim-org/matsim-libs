@@ -167,8 +167,8 @@ public class PatnaBikeTrackConnectionControler {
 		// time dependent network for network change events
 		config.network().setTimeVariantNetwork(true);
 
-		String inPlans = inputDir+"samplePlansForTesting.xml";
-//		String inPlans = inputDir+"/baseCaseOutput_plans.xml.gz";
+//		String inPlans = inputDir+"samplePlansForTesting.xml";
+		String inPlans = inputDir+"/baseCaseOutput_plans.xml.gz";
 		config.plans().setInputFile( inPlans );
 		config.plans().setInputPersonAttributeFile(inputDir+"output_personAttributes.xml.gz");
 		config.vehicles().setVehiclesFile(null); // see below for vehicle type info
