@@ -29,7 +29,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -39,33 +41,67 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 
-public class ZoneLOSGenerator {
+/**
+ * @author dziemke
+ */
+public class ZoneAndLOSGeneratorV2 {
+	private static final Logger LOG = Logger.getLogger(ZoneAndLOSGeneratorV2.class);
+
+	
+	//
+	private Set<String> municipalities;
+	//
 
 	private Map <Integer, Zone> zonesMap = new HashMap <Integer, Zone>();
 	private Map <String, Zone2Zone> zone2ZoneMap = new HashMap <String, Zone2Zone>();
-
-	// private String shapeFile = new String("D:/Workspace/container/demand/input/gemeinden/gemeindenLOR_proj.shp");
-	// changed to "gemeindenLOR_DHDN_GK4.shp" before producing "cemdap_berlin/02" (on 2013-03-23)
-	// IDs are unaffected by this change, distance calculation is affected slightly
-	private String shapeFile = new String("D:/Workspace/container/demand/input/shapefiles/gemeindenLOR_DHDN_GK4.shp");
 	
-	private String outputFileZone2Zone = new String("D:/Workspace/container/demand/input/cemdap_berlin/18/zone2zone.dat");
-	private String outputFileZones = new String("D:/Workspace/container/demand/input/cemdap_berlin/18/zones.dat");
-	private String outputFileLosOffPkAM = new String("D:/Workspace/container/demand/input/cemdap_berlin/18/losoffpkam.dat");
+//	private String shapeFile = new String("D:/Workspace/container/demand/input/shapefiles/gemeindenLOR_DHDN_GK4.shp");
+//	
+//	private String outputFileZone2Zone = new String("D:/Workspace/container/demand/input/cemdap_berlin/18/zone2zone.dat");
+//	private String outputFileZones = new String("D:/Workspace/container/demand/input/cemdap_berlin/18/zones.dat");
+//	private String outputFileLosOffPkAM = new String("D:/Workspace/container/demand/input/cemdap_berlin/18/losoffpkam.dat");
+	
+	private String shapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenLOR_DHDN_GK4.shp";
+//	private String shapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeinden.shp";
+//	private String shapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Bezirksregion_EPSG_25833.shp";
+	
+	private String outputFileZone2Zone = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/2016-11-29/zone2zone.dat";
+	private String outputFileZones = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/2016-11-29/zones.dat";
+	private String outputFileLosOffPkAM = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/2016-11-29/losoffpkam.dat";
+	
+//	private String outputBase;
 	
 	
 	public static void main(String[] args) {
-		ZoneLOSGenerator zoneFilesGenerator = new ZoneLOSGenerator();
-		zoneFilesGenerator.run();
+		
+		String commuterFileOutgoing1 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Berlin_2009/B2009Ga.txt";
+		String commuterFileOutgoing2 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil1BR2009Ga.txt";
+		String commuterFileOutgoing3 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil2BR2009Ga.txt";
+		String commuterFileOutgoing4 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil3BR2009Ga.txt";
+		
+		String[] commuterFilesOutgoing = {commuterFileOutgoing1, commuterFileOutgoing2, commuterFileOutgoing3, commuterFileOutgoing4};
+		ZoneAndLOSGeneratorV2 zoneFilesGenerator = new ZoneAndLOSGeneratorV2(commuterFilesOutgoing);
+//		zoneFilesGenerator.run();
 	}
 
 	
-	public void run() {
+	public ZoneAndLOSGeneratorV2(String[] commuterFilesOutgoing) {
+//		LogToOutputSaver.setOutputDirectory(outputBase);
+		readMunicipalities(commuterFilesOutgoing);
 		readShape();
+		compare();
 		generateZone2Zone();
 		writeZone2ZoneFile();
 		writeZonesFile();
 		writeLosFile();
+	}
+	
+	
+	private void readMunicipalities(String[] commuterFilesOutgoing) {
+		for (String commuterFileOutgoing : commuterFilesOutgoing) {
+			CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing, "\t");
+			this.municipalities = commuterFileReader.getMunicipalities();
+		}
 	}
 
 	
@@ -73,6 +109,8 @@ public class ZoneLOSGenerator {
 		Collection <SimpleFeature> features = ShapeFileReader.getAllFeatures(this.shapeFile);
 		for (SimpleFeature feature : features) {
 			Integer key = Integer.parseInt((String) feature.getAttribute("NR"));
+//			Integer key = Integer.parseInt((String) feature.getAttribute("SCHLUESSEL"));
+			
 			Geometry geo = (Geometry) feature.getDefaultGeometry();
 			
 			// Point point = getRandomPointInFeature(new Random(), geo);
@@ -85,6 +123,23 @@ public class ZoneLOSGenerator {
 			Coord coord = new Coord(Double.parseDouble(xcoordinate.toString()), Double.parseDouble(ycoordinate.toString()));
 			Zone zone = new Zone(key, coord);
 			zonesMap.put(key, zone);
+		}
+	}
+	
+	private void compare() {
+		LOG.error("########## Municipality set has " + this.municipalities.size() + " elements.");
+		LOG.error("########## Zones set has " + this.zonesMap.size() + " elements.");
+		
+		for (Integer key : zonesMap.keySet()) {
+			if (!this.municipalities.contains(key.toString())) {
+				LOG.error("Zone from shapefile not in commuter relations; zone = " + key);
+			}
+		}
+		
+		for (String key : municipalities) {
+			if (!this.municipalities.contains(key)) {
+				LOG.error("Zone from commuter relations in shapes; zone = " + key);
+			}
 		}
 	}
 	

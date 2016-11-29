@@ -21,8 +21,8 @@ package playground.dziemke.cemdapMatsimCadyts;
 
 
 import java.util.HashMap;
-//import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -105,5 +105,10 @@ public class CommuterFileReaderV2 {
 	
 	public Map<String, Map<String, CommuterRelationV2>> getRelationsMap() {
 		return this.relationsMap;
+	}
+	
+	
+	public Set<String> getMunicipalities() {
+		return this.relationsMap.keySet();
 	}
 }
