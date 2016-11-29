@@ -34,6 +34,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -46,7 +47,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * 
  * @author aneumann
  */
-public class PControlerTest implements TabularFileHandler{
+public class PControlerTestIT implements TabularFileHandler{
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -63,16 +64,24 @@ public class PControlerTest implements TabularFileHandler{
 		final String outputPath = utils.getOutputDirectory() + scenarioName + "/";
 
 		final String configFile = inputPath + "config_" + scenarioName + ".xml";
+		
+		// ---
 
 		Config config = ConfigUtils.loadConfig(configFile, new PConfigGroup());
 
 		config.controler().setLastIteration(numberOfIterations);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setCreateGraphs(false);
+		config.controler().setOutputDirectory(outputPath);
+		
+		// ---
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		ScenarioUtils.loadScenario(scenario);
+		
+		// ---
+		
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.getConfig().controler().setCreateGraphs(false);
 
 		// manipulate config
 		PModule builder = new PModule() ;
