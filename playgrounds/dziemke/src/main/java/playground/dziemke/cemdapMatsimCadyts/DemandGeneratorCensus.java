@@ -38,48 +38,33 @@ import java.util.*;
 
 /**
  * This class is derived from "playground.dziemke.cemdapMatsimCadyts.oneperson.DemandGeneratorOnePersonV2.java"
- * In contrast to its predecessors, it creates a full population (not just car users).
- * Its main inputs are the Census and the Pendlerstatistik
+ * In contrast to its predecessors, it creates a full population based on the Zensus 2001. People are assigned
+ * commuter relations based on the Pendlerstatistik 2009.
  * 
  * @author dziemke
  */
 public class DemandGeneratorCensus {
 	private static final Logger LOG = Logger.getLogger(DemandGeneratorCensus.class);
 
-	
-	/*
-	 * there will be mismatches between number of employees from zensus and commuter from commuter file
-	 * - because of socially secured workers (commuter file) vs. all workers (zensus)
-	 * - because not exactly the same year
-	 * Handle by scaling?
-	 */
-
-	// Parameters
-	private int numberOfPlansPerPerson = 5;
-	private String planningAreaId = "11000000"; // "Amtliche Gemeindeschlüssel (AGS)" of Berlin is "11000000"
-	private double defaultAdultsToEmployeesRatio = 1.23;  // Calibrated based on sum value from Zensus 2011.
-	private double defaultEmployeesToCommutersRatio = 2.5;  // This is an assumption, oriented on observed values, deliberately chosen slightly too high.
-	private boolean writeMatsimPlanFiles = false;
-	private boolean includeChildren = false;
-
-	// Other objects
+	// Storage objects
 	private Population population;
 	private Map<Id<Household>, Household> households;
-	private CensusReader censusReader;
 	private ObjectAttributes municipalities;
 	private Map<String, Map<String, CommuterRelationV2>> relationsMap;
 	private List<String> lors;
 
-	private static int counterMissingComRel = 0;
-	private static int counterComRelUnassigned = 0;
-	private static int allEmployees = 0;
-	private static int allPersons = 0;
-	private static int allStudents = 0;
+	// Counters
+	private int counterMissingComRel = 0;
+	private int counterComRelUnassigned = 0;
+	private int allEmployees = 0;
+	private int allPersons = 0;
+	private int allStudents = 0;
 	
+	// Other
 	private String outputBase;
+	
 
 	public static void main(String[] args) {
-
 		// Input and output files
 		String commuterFileOutgoing1 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Berlin_2009/B2009Ga.txt";
 		String commuterFileOutgoing2 = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil1BR2009Ga.txt";
@@ -90,17 +75,25 @@ public class DemandGeneratorCensus {
 		String censusFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/zensus_2011/bevoelkerung/csv_Bevoelkerung/Zensus11_Datensatz_Bevoelkerung_BE_BB.csv";
 		String shapeFileLors = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Bezirksregion_EPSG_25833.shp";
 		String outputBase = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/syn_pop/100/";
+		
+		// Parameters
+		int numberOfPlansPerPerson = 5;
+		String planningAreaId = "11000000"; // "Amtliche Gemeindeschlüssel (AGS)" of Berlin is "11000000"
+		double defaultAdultsToEmployeesRatio = 1.23;  // Calibrated based on sum value from Zensus 2011.
+		double defaultEmployeesToCommutersRatio = 2.5;  // This is an assumption, oriented on observed values, deliberately chosen slightly too high.
+		boolean writeMatsimPlanFiles = true;
+		boolean includeChildren = false;
 
 		String[] commuterFilesOutgoing = {commuterFileOutgoing1, commuterFileOutgoing2, commuterFileOutgoing3, commuterFileOutgoing4};
 
-		DemandGeneratorCensus demandGeneratorCensus = new DemandGeneratorCensus(commuterFilesOutgoing, censusFile,
-				shapeFileLors, outputBase);
-		demandGeneratorCensus.generateDemand();
+		new DemandGeneratorCensus(commuterFilesOutgoing, censusFile, shapeFileLors, outputBase,	numberOfPlansPerPerson, planningAreaId,
+				defaultAdultsToEmployeesRatio, defaultEmployeesToCommutersRatio, writeMatsimPlanFiles, includeChildren);
 	}
 
 	
-	public DemandGeneratorCensus(String[] commuterFilesOutgoing, String censusFile, String shapeFileLors,
-			String outputBase) {
+	public DemandGeneratorCensus(String[] commuterFilesOutgoing, String censusFile, String shapeFileLors, String outputBase,
+			int numberOfPlansPerPerson, String planningAreaId, double defaultAdultsToEmployeesRatio, double defaultEmployeesToCommutersRatio,
+			boolean writeMatsimPlanFiles, boolean includeChildren) {
 		LogToOutputSaver.setOutputDirectory(outputBase);
 		
 		this.outputBase = outputBase;
@@ -109,7 +102,7 @@ public class DemandGeneratorCensus {
 		households = new HashMap<>();
 
 		// Read census
-		censusReader = new CensusReader(censusFile, ";");
+		CensusReader censusReader = new CensusReader(censusFile, ";");
 		municipalities = censusReader.getMunicipalities();
 
 		// Read commuter relations
@@ -122,11 +115,17 @@ public class DemandGeneratorCensus {
 
 		// Read LORs
 		lors = readShape(shapeFileLors, "SCHLUESSEL");
+		
+		generateDemand(numberOfPlansPerPerson, planningAreaId, defaultAdultsToEmployeesRatio, defaultEmployeesToCommutersRatio,
+				writeMatsimPlanFiles, includeChildren);
 	}
 
 	
-	public void generateDemand() {
-		for (String munId : relationsMap.keySet()) { // Loop over  municipalities from commuter file
+	public void generateDemand(int numberOfPlansPerPerson, String planningAreaId, double defaultAdultsToEmployeesRatio,
+			double defaultEmployeesToCommutersRatio, boolean writeMatsimPlanFiles, boolean includeChildren) {
+		int counter = 1;
+		
+		for (String munId : relationsMap.keySet()) { // Loop over municipalities from commuter file
 			Map<String, CommuterRelationV2> relationsFromMunicipality = relationsMap.get(munId);
 
 			// Employees from Zensus seems to be all employees, not only socially-secured employees
@@ -136,8 +135,6 @@ public class DemandGeneratorCensus {
 			scaleRelations(relationsFromMunicipality, employeesMale, employeesFemale, defaultEmployeesToCommutersRatio);
 			List<String> commuterRelationListMale = createRelationList(relationsFromMunicipality, "male");
 			List<String> commuterRelationListFemale = createRelationList(relationsFromMunicipality, "female");
-
-			int counter = 1;
 
 			int pop0_2Male = (int) municipalities.getAttribute(munId, "pop0_2Male");
 			int pop3_5Male = (int) municipalities.getAttribute(munId, "pop3_5Male");
@@ -382,23 +379,22 @@ public class DemandGeneratorCensus {
 				LOG.info(commuterRelationListFemale.size() + " female commuter relations from " + munId +
 						" remain unassigned; based on census, there are " + employeesFemale + " female employees.");
 			}
-
-
 		}
+		
 		
 		// Write some relavant information on console
 		LOG.warn("There are " + counterMissingComRel + " employees who have been set to unemployed since no commuter relation could be assigned to them.");
 		LOG.warn("Share of employees that had to be set to unemployed due to lack of commuter relations: " + ((double) counterMissingComRel / (double) allEmployees));
 		LOG.warn("Altogether " + counterComRelUnassigned + " commuter relations remain unassigned.");
 		LOG.warn("Total number of employees: " + allEmployees);
-		LOG.warn("Total poulation: " + allPersons);
+		LOG.warn("Total population: " + allPersons);
 		LOG.warn("Total number of students: " + allStudents);
 		
 		// Write output files
 		writeHouseholdsFile(households, outputBase + "households.dat");
 		writePersonsFile(population, outputBase + "persons.dat");
 		if (writeMatsimPlanFiles) {
-			writeMatsimPlansFile(population, outputBase + "plans.xml");
+			writeMatsimPlansFile(population, outputBase + "plans.xml.gz");
 		}
 
 		// Create copies of population, but with different work locations
@@ -440,19 +436,20 @@ public class DemandGeneratorCensus {
 			}
 			writePersonsFile(population2, outputBase + "persons" + (i+1) + ".dat");
 			if (writeMatsimPlanFiles) {
-				writeMatsimPlansFile(population2, outputBase + "plans" + (i+1) + ".xml");
+				writeMatsimPlansFile(population2, outputBase + "plans" + (i+1) + ".xml.gz");
 			}
 		}
 	}
 
 
-	private static void createHouseholdsAndPersons(Population population, Map<Id<Household>, Household> households, int counter,
+	private void createHouseholdsAndPersons(Population population, Map<Id<Household>, Household> households, int counter,
 			String municipalityId, String planningAreaId, List<String> lors, int numberOfPersons, int gender,
 			int lowerAgeBound, int upperAgeBound, double adultsToEmployeesRatio, List<String> commuterRelationList) {
 		
 		for (int i = 0; i < numberOfPersons; i++) {
 			allPersons++;
-			Id<Household> householdId = Id.create(municipalityId + (counter + i), Household.class);
+//			Id<Household> householdId = Id.create(municipalityId + (counter + i), Household.class);
+			Id<Household> householdId = Id.create((counter + i), Household.class);
 			HouseholdImpl household = new HouseholdImpl(householdId); // TODO Or use factory?
 			household.getAttributes().putAttribute("numberOfAdults", 1); // always 1; no household structure
 			household.getAttributes().putAttribute("totalNumberOfHouseholdVehicles", 1);
@@ -460,7 +457,7 @@ public class DemandGeneratorCensus {
 			household.getAttributes().putAttribute("numberOfChildren", 0); // none, ignore them in this version
 			household.getAttributes().putAttribute("householdStructure", 1); // 1 = single, no children
 			
-			Id<Person> personId = Id.create(householdId + "1", Person.class);
+			Id<Person> personId = Id.create(householdId + "01", Person.class);
 			Person person = population.getFactory().createPerson(personId);
 			// Following attribute names inspired by "PersonUtils.java": "sex", "hasLicense", "carAvail", "employed", "age", "travelcards"
 			person.getAttributes().putAttribute("householdId", householdId);
@@ -640,7 +637,7 @@ public class DemandGeneratorCensus {
     		bufferedWriterHouseholds = new BufferedWriter(fileWriterHouseholds);
     		
     		for (Household household : households.values()) {
-    			long householdId = Long.parseLong(household.getId().toString());
+    			int householdId = Integer.parseInt(household.getId().toString());
     			int numberOfAdults = (Integer) household.getAttributes().getAttribute("numberOfAdults");
     			int totalNumberOfHouseholdVehicles = (Integer) household.getAttributes().getAttribute("totalNumberOfHouseholdVehicles");
     			int homeTSZLocation = Integer.parseInt(household.getAttributes().getAttribute("homeTSZLocation").toString());
@@ -683,8 +680,8 @@ public class DemandGeneratorCensus {
 			bufferedWriterPersons = new BufferedWriter(fileWriterPersons);
 			    		    		
 			for (Person person : population.getPersons().values()) {
-				long householdId = Long.parseLong(person.getAttributes().getAttribute("householdId").toString());
-				long personId = Long.parseLong(person.getId().toString());
+				int householdId = Integer.parseInt(person.getAttributes().getAttribute("householdId").toString());
+				int personId = Integer.parseInt(person.getId().toString());
 				
 				int employed;
 				if ((boolean) person.getAttributes().getAttribute("employed")) {
