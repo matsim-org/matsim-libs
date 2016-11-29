@@ -23,8 +23,17 @@ package org.matsim.contrib.emissions.utils;
 /**
  * Created by amit on 29/09/16.
  */
-public enum EmissionDescriptionMarker {
+public enum EmissionSpecificationMarker {
 
-    BEGIN_EMISSIONS, END_EMISSIONS;
+    BEGIN_EMISSIONS ("BEGIN_EMISSIONS-"), END_EMISSIONS ("-END_EMISSIONS");
 
+    private String emissionDescriptionMarker;
+
+    private EmissionSpecificationMarker(final String emissionDescriptionMarker) {
+        this.emissionDescriptionMarker = emissionDescriptionMarker;
+    }
+
+    public String getEmissionDescriptionMarker(){
+        return this.emissionDescriptionMarker;
+    }
 }

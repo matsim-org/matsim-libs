@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
 import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
-import org.matsim.contrib.emissions.utils.EmissionDescriptionMarker;
+import org.matsim.contrib.emissions.utils.EmissionSpecificationMarker;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -69,7 +69,7 @@ public class EmissionVehicleGenerator {
 					vehicleAttributes.getHbefaEmConcept(), VehicleType.class);
 			VehicleType vehicleType = VehicleUtils.getFactory().createVehicleType(vehTypeId);
 			
-			vehicleType.setDescription(EmissionDescriptionMarker.BEGIN_EMISSIONS + vehTypeId.toString() + EmissionDescriptionMarker.END_EMISSIONS);			
+			vehicleType.setDescription(EmissionSpecificationMarker.BEGIN_EMISSIONS + vehTypeId.toString() + EmissionSpecificationMarker.END_EMISSIONS);
 			
 			if(!(outputVehicles.getVehicleTypes().containsKey(vehTypeId))){
 				outputVehicles.addVehicleType(vehicleType);

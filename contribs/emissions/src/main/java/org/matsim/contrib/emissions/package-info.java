@@ -47,7 +47,7 @@
  * or see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup} for a detailed description.
  * 
  * <li>emissionVehicleFile: This data type is defined in the EmissionsConfigGroup,
- * see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup}. The following information is surrounded by {@link org.matsim.contrib.emissions.utils.EmissionDescriptionMarker EmissionDescriptionMarker}. It is described as "definition of a vehicle
+ * see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup}. The following information is surrounded by {@link org.matsim.contrib.emissions.utils.EmissionSpecificationMarker EmissionSpecificationMarker}. It is described as "definition of a vehicle
  *  for every person (who is allowed to choose a vehicle in the simulation):
  *  <ul>
  *  <li> REQUIRED: Vehicle description must start with the respective HbefaVehicleCategory followed by ";"

@@ -67,7 +67,7 @@ extends ReflectiveConfigGroup
 			"TRUE: for backward compatibility; vehicle type id is used for the emission specifications. " + "\n"+
 			"FALSE: vehicle description is used for the emission specifications." +
 			"The emission specifications of a vehicle type should be surrounded by emission specification markers i.e."+
-			EmissionDescriptionMarker.BEGIN_EMISSIONS + " and " + EmissionDescriptionMarker.END_EMISSIONS + "." ;
+			EmissionSpecificationMarker.BEGIN_EMISSIONS + " and " + EmissionSpecificationMarker.END_EMISSIONS + "." ;
 
 	@Override
 	public Map<String, String> getComments() {
