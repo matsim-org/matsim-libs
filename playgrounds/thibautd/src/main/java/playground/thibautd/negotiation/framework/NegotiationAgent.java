@@ -109,6 +109,10 @@ public class NegotiationAgent<P extends Proposition> implements Identifiable<Per
 		return currentBestProp;
 	}
 
+	public double getBestUtility() {
+		return currentBestUtil;
+	}
+
 	@Override
 	public Id<Person> getId() {
 		return id;

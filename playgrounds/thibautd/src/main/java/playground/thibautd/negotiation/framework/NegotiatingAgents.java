@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.core.gbl.MatsimRandom;
 import playground.ivt.utils.ConcurrentStopWatch;
+import playground.thibautd.utils.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -79,7 +80,10 @@ public class NegotiatingAgents<P extends Proposition> implements Iterable<Negoti
 	}
 
 	public NegotiationAgent<P> getRandomAgent() {
-		return agentList.get( random.nextInt( agentList.size() ) );
+		// get a random sublist and get the agent with the minimum best utility from it.
+		// avoids loosing too much time re-considering "lucky" agents
+		final List<NegotiationAgent<P>> choiceSet = RandomUtils.sublist_withSideEffect( random , agentList , 100 );
+		return choiceSet.stream().min( (a1, a2) -> Double.compare( a1.getBestUtility() , a2.getBestUtility() ) ).get();
 	}
 
 	public NegotiationAgent<P> get( final Id<Person> id ) {
