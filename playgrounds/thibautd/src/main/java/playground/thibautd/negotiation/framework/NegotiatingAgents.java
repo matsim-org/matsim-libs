@@ -45,6 +45,7 @@ public class NegotiatingAgents<P extends Proposition> implements Iterable<Negoti
 
 	private static final Logger log = Logger.getLogger( NegotiatingAgents.class );
 	private final Map<Id<Person>, NegotiationAgent<P>> agents = new HashMap<>();
+
 	private final List<NegotiationAgent<P>> agentList;
 
 	private final Random random = MatsimRandom.getLocalInstance();

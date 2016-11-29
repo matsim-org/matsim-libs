@@ -22,33 +22,46 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import playground.thibautd.negotiation.framework.NegotiationAgent;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * @author thibautd
  */
 public class ChosenLocationWriter implements AutoCloseable {
 	private final BufferedWriter writer;
-	private int groupNr = 0;
 
 	public ChosenLocationWriter( final String file ) throws IOException {
 		writer = IOUtils.getBufferedWriter( file );
 		writer.write( "groupNr\tpersonId\tfacilityId" );
 	}
 
-	public void writeLocation( final LocationProposition location ) {
+	public void writeLocation( final NegotiationAgent<LocationProposition> agent ) {
 		try {
-			groupNr++;
-			for ( Id<Person> person : location.getGroupIds() ) {
-				writer.newLine();
-				writer.write( groupNr+"\t"+person+"\t"+location.getFacility().getId() );
-			}
+			final LocationProposition location = agent.getBestProposition();
+
+			final String groupId = location == null ? "NA" : getGroupId( location.getGroupIds() );
+			final String facilityId = location == null ? "NA" : location.getFacility().getId().toString();
+
+			writer.newLine();
+			writer.write( groupId+"\t"+agent.getId()+"\t"+facilityId );
 		}
 		catch ( IOException e ) {
 			throw new UncheckedIOException( e );
 		}
+	}
+
+	private static String getGroupId( final Collection<Id<Person>> participants ) {
+		return participants.stream()
+				.sorted()
+				.collect(
+						StringBuilder::new,
+						StringBuilder::append,
+						StringBuilder::append )
+				.toString();
 	}
 
 	@Override

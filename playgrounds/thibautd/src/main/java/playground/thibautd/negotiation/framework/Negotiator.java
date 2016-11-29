@@ -51,7 +51,7 @@ public class Negotiator<P extends Proposition> {
 	}
 
 	public void negotiate(
-			final Consumer<P> acceptedPropositionCallback ) {
+			final Consumer<NegotiationAgent<P>> acceptedPropositionCallback ) {
 		final AtomicDouble currentSuccessFraction = new AtomicDouble( 1 );
 
 		final LambdaCounter counter =
@@ -69,7 +69,7 @@ public class Negotiator<P extends Proposition> {
 		counter.printCounter();
 
 		for ( NegotiationAgent<P> agent : agents ) {
-			acceptedPropositionCallback.accept( agent.getBestProposition() );
+			acceptedPropositionCallback.accept( agent );
 		}
 	}
 
