@@ -37,8 +37,8 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.misc.Time;
 
-import playground.jbischoff.taxibus.scenario.analysis.WobDistanceAnalyzer;
 
 /**
  * @author  jbischoff
@@ -124,7 +124,7 @@ public class TTLocationBasedEventHandler implements ActivityStartEventHandler, P
 		System.out.println("Activity\tLegs\tAveTT");
 		for (Entry<String,Double> e : this.ttToActivity.entrySet()){
 			double legs = this.legsToActivity.get(e.getKey());
-			System.out.println(e.getKey()+"\t"+legs+"\t"+ WobDistanceAnalyzer.prettyPrintSeconds(e.getValue()/legs));
+			System.out.println(e.getKey()+"\t"+legs+"\t"+ Time.writeTime(e.getValue()/legs));
 		}
 
 	}

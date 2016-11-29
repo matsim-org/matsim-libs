@@ -44,7 +44,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-import playground.jbischoff.taxibus.scenario.analysis.WobDistanceAnalyzer;
 
 /**
  * @author jbischoff
@@ -169,7 +168,7 @@ public class TraveltimeAndDistanceEventHandler implements ActivityStartEventHand
 				distance = distanceToActivity.get(e.getKey());
 			distance = distance / legs;
 			System.out.println(e.getKey() + "\t" + legs + "\t"
-					+ WobDistanceAnalyzer.prettyPrintSeconds(e.getValue() / legs) + "\t" + distance);
+					+ Time.writeTime(e.getValue() / legs) + "\t" + distance);
 		}
 
 	}
@@ -204,7 +203,7 @@ public class TraveltimeAndDistanceEventHandler implements ActivityStartEventHand
 					distance = distanceToActivity.get(e.getKey());
 				distance = distance / 1000;
 				writer.append(e.getKey() + "\t" + Math.round(legs) + "\t"
-						+ WobDistanceAnalyzer.prettyPrintSeconds(e.getValue() / legs));
+						+ Time.writeTime(e.getValue() / legs));
 				if (writeDistance)
 					writer.append("\t" + df.format(distance / legs));
 				writer.newLine();
@@ -221,12 +220,12 @@ public class TraveltimeAndDistanceEventHandler implements ActivityStartEventHand
 			}
 			writer.newLine();
 			writer.append("Morgenspitze" + "\t" + outboundLegCount + "\t"
-					+ WobDistanceAnalyzer.prettyPrintSeconds(outboundTravelTime / outboundLegCount));
+					+ Time.writeTime(outboundTravelTime / outboundLegCount));
 			if (writeDistance)
 				writer.append("\t" + df.format(outboundDistance / outboundLegCount));
 			writer.newLine();
 			writer.append("Abendspitze" + "\t" + inboundLegCount + "\t"
-					+ WobDistanceAnalyzer.prettyPrintSeconds(inboundTravelTime / inboundLegCount));
+					+ Time.writeTime(inboundTravelTime / inboundLegCount));
 			if (writeDistance)
 				writer.append("\t" + df.format(inboundDistance / inboundLegCount));
 			writer.flush();
