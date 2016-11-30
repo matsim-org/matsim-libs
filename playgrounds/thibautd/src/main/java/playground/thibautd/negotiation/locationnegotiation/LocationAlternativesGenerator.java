@@ -50,7 +50,7 @@ import java.util.stream.Stream;
  */
 @Singleton
 public class LocationAlternativesGenerator implements AlternativesGenerator<LocationProposition> {
-	private static final int N_OUT_OF_HOME = 10;
+	private static final int N_OUT_OF_HOME = 100;
 	private static final double OUT_OF_HOME_RADIUS_M = 30 * 1000;
 
 	private final SocialNetwork socialNetwork;
@@ -59,6 +59,8 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 	private final LocationHelper locations;
 	private final PropositionUtility<LocationProposition> utility;
 	private final QuadTree<ActivityFacility> facilities;
+
+	private final Random random = MatsimRandom.getLocalInstance();
 
 	@Inject
 	public LocationAlternativesGenerator(
@@ -123,32 +125,24 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 		final Coord home = locations.getHomeLocation( agent.getId() ).getCoord();
 		final Collection<ActivityFacility> close = facilities.getDisk( home.getX() , home.getY() , OUT_OF_HOME_RADIUS_M );
 
-		return getBests(
-				close.stream()
-						.flatMap( facility ->
-								alters.stream().map( alter ->
-										new LocationProposition(
-												agent.getId(),
-												Collections.singleton( alter ),
-												facility ) ) )
-						.collect( Collectors.toList() ),
-				p -> utility.utility( agent , p ) );
+		// no need to be too smart (e.g. only select a few of the best facilities):
+		// being smart requires a lot of utility computations here, plus in the negotiator.
+		// being dumb but returning more options leads to those options only being evaluated
+		// once.
+		final List<ActivityFacility> subsample= RandomUtils.sublist_withSideEffect(
+				random,
+				(List<ActivityFacility>) close,
+				N_OUT_OF_HOME );
 
-	}
+		return subsample.stream()
+				.flatMap( facility ->
+						alters.stream().map( alter ->
+								new LocationProposition(
+										agent.getId(),
+										Collections.singleton( alter ),
+										facility ) ) )
+				.collect( Collectors.toList() );
 
-	private Collection<LocationProposition> getBests(
-			final Collection<LocationProposition> propositions,
-			final ToDoubleFunction<LocationProposition> utilFunction ) {
-		final Queue<LocationProposition> queue =
-				new PriorityQueue<>(
-						propositions.size(),
-						(p1,p2) -> Double.compare(
-								utilFunction.applyAsDouble( p2 ),
-								utilFunction.applyAsDouble( p1 ) ) );
-
-		queue.addAll( propositions );
-
-		return Stream.generate( queue::poll ).limit( N_OUT_OF_HOME ).collect( Collectors.toList() );
 	}
 
 }
