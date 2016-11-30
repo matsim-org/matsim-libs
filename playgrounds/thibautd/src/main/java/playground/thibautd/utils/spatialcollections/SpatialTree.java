@@ -31,7 +31,7 @@ public interface SpatialTree<C, T> {
 
 	Collection<T> getAll();
 
-	void add( Collection<T> toAdd );
+	void add( Collection<? extends T> toAdd );
 
 	boolean remove( T value );
 

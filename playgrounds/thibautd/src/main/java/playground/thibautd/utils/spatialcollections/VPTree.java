@@ -120,12 +120,12 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 	}
 
 	@Override
-	public void add( final Collection<T> toAdd ) {
+	public void add( final Collection<? extends T> toAdd ) {
 		if ( size() > 0 ) throw new IllegalStateException();
 		add( root , toAdd );
 	}
 
-	private void add( final Node<C,T> addRoot , final Collection<T> points ) {
+	private void add( final Node<C,T> addRoot , final Collection<? extends T> points ) {
 		final Queue<AddFrame<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>( 1 + (int) Math.log( 1 + points.size() ) ) );
 
 		// copy parameter list as it is modified in place

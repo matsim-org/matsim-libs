@@ -285,11 +285,11 @@ public class KDTree<T> implements SpatialTree<double[],T> {
 	 *
 	 * @param points
 	 */
-	public void add( Collection<T> points ) {
+	public void add( Collection<? extends T> points ) {
 		add( root , points );
 	}
 
-	private void add( Node<T> addRoot , Collection<T> points ) {
+	private void add( Node<T> addRoot , Collection<? extends T> points ) {
 		size += points.size();
 		// very rough heuristic. No theory behind it.
 		// optimal value depends on the ratio modification/query
