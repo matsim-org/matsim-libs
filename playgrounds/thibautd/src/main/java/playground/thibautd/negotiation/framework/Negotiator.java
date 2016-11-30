@@ -34,7 +34,7 @@ import java.util.function.Consumer;
 @Singleton
 public class Negotiator<P extends Proposition> {
 	private static final Logger log = Logger.getLogger( Negotiator.class );
-	private static final boolean LOG_SW = false;
+	private final boolean logStopwatch;
 
 	private final NegotiatorConfigGroup configGroup;
 	private final NegotiatingAgents<P> agents;
@@ -48,6 +48,7 @@ public class Negotiator<P extends Proposition> {
 		this.configGroup = configGroup;
 		this.agents = agents;
 		this.stopwatch = stopwatch;
+		logStopwatch = configGroup.isLogStopwatch();
 	}
 
 	public void negotiate(
@@ -57,7 +58,7 @@ public class Negotiator<P extends Proposition> {
 		final LambdaCounter counter =
 				new LambdaCounter( l -> {
 					log.info( "Negotiation round # " + l + ": success fraction " + currentSuccessFraction );
-					if ( LOG_SW ) stopwatch.printStats( TimeUnit.MILLISECONDS );
+					if ( logStopwatch ) stopwatch.printStats( TimeUnit.MILLISECONDS );
 				} );
 		while ( currentSuccessFraction.get() > configGroup.getImprovingFractionThreshold() ) {
 			counter.incCounter();

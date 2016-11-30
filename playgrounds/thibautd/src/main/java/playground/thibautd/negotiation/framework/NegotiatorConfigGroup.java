@@ -28,6 +28,7 @@ public class NegotiatorConfigGroup extends ReflectiveConfigGroup {
 
 	private int rollingAverageWindow = 100;
 	private double improvingFractionThreshold = 0.01;
+	private boolean logStopwatch = false;
 
 	public NegotiatorConfigGroup() {
 		super( GROUP_NAME );
@@ -53,5 +54,15 @@ public class NegotiatorConfigGroup extends ReflectiveConfigGroup {
 	public void setImprovingFractionThreshold( final double improvingFractionThreshold ) {
 		if ( improvingFractionThreshold < 0 || improvingFractionThreshold > 1 ) throw new IllegalArgumentException( "improving fraction threshold must be in [0,1], got "+improvingFractionThreshold );
 		this.improvingFractionThreshold = improvingFractionThreshold;
+	}
+
+	@StringGetter("logStopwatch")
+	public boolean isLogStopwatch() {
+		return logStopwatch;
+	}
+
+	@StringSetter("logStopwatch")
+	public void setLogStopwatch( final boolean logStopwatch ) {
+		this.logStopwatch = logStopwatch;
 	}
 }
