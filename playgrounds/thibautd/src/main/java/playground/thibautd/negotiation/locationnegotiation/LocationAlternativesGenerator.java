@@ -34,9 +34,16 @@ import playground.thibautd.negotiation.framework.NegotiationAgent;
 import playground.thibautd.negotiation.framework.PropositionUtility;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.function.DoubleFunction;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author thibautd
@@ -68,6 +75,7 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 		this.utility = utility;
 
 		final QuadTreeRebuilder<ActivityFacility> qt = new QuadTreeRebuilder<>();
+		// TODO: filter here, or outside, by activity type?
 		facilities.getFacilities().values().forEach( f -> qt.put( f.getCoord() , f ) );
 		this.facilities = qt.getQuadTree();
 	}
@@ -115,16 +123,32 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 		final Coord home = locations.getHomeLocation( agent.getId() ).getCoord();
 		final Collection<ActivityFacility> close = facilities.getDisk( home.getX() , home.getY() , OUT_OF_HOME_RADIUS_M );
 
-		return close.stream()
-				.sorted()
-				.limit( N_OUT_OF_HOME )
-				.flatMap( facility ->
-						alters.stream().map( alter ->
-								new LocationProposition(
-										agent.getId(),
-										Collections.singleton( alter ),
-										facility ) ) )
-				.collect( Collectors.toList() );
+		return getBests(
+				close.stream()
+						.flatMap( facility ->
+								alters.stream().map( alter ->
+										new LocationProposition(
+												agent.getId(),
+												Collections.singleton( alter ),
+												facility ) ) )
+						.collect( Collectors.toList() ),
+				p -> utility.utility( agent , p ) );
+
+	}
+
+	private Collection<LocationProposition> getBests(
+			final Collection<LocationProposition> propositions,
+			final ToDoubleFunction<LocationProposition> utilFunction ) {
+		final Queue<LocationProposition> queue =
+				new PriorityQueue<>(
+						propositions.size(),
+						(p1,p2) -> Double.compare(
+								utilFunction.applyAsDouble( p2 ),
+								utilFunction.applyAsDouble( p1 ) ) );
+
+		queue.addAll( propositions );
+
+		return Stream.generate( queue::poll ).limit( N_OUT_OF_HOME ).collect( Collectors.toList() );
 	}
 
 }
