@@ -25,15 +25,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
+import org.matsim.contrib.socnetsim.utils.QuadTreeRebuilder;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import playground.thibautd.negotiation.framework.AlternativesGenerator;
 import playground.thibautd.negotiation.framework.NegotiationAgent;
 import playground.thibautd.negotiation.framework.PropositionUtility;
 import playground.thibautd.utils.RandomUtils;
-import playground.thibautd.utils.spatialcollections.VPTree;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,7 +55,7 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 	private final RandomSeedHelper seeds;
 	private final LocationHelper locations;
 	private final PropositionUtility<LocationProposition> utility;
-	private final VPTree<Coord,ActivityFacility> facilities;
+	private final QuadTree<ActivityFacility> facilities;
 
 	private final Random random = MatsimRandom.getLocalInstance();
 
@@ -73,11 +73,10 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 		this.locations = locations;
 		this.utility = utility;
 
-		this.facilities =
-				new VPTree<>(
-						CoordUtils::calcEuclideanDistance,
-						ActivityFacility::getCoord );
-		this.facilities.add( facilities.getFacilities().values() );
+		final QuadTreeRebuilder<ActivityFacility> qt = new QuadTreeRebuilder<>();
+		// TODO: filter here, or outside, by activity type?
+		facilities.getFacilities().values().forEach( f -> qt.put( f.getCoord() , f ) );
+		this.facilities = qt.getQuadTree();
 	}
 
 	@Override
@@ -121,7 +120,7 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 			final NegotiationAgent<LocationProposition> agent,
 			final Collection<Id<Person>> alters ) {
 		final Coord home = locations.getHomeLocation( agent.getId() ).getCoord();
-		final Collection<ActivityFacility> close = facilities.getBall( home , OUT_OF_HOME_RADIUS_M , f -> true );
+		final Collection<ActivityFacility> close = facilities.getDisk( home.getX() , home.getY() , OUT_OF_HOME_RADIUS_M );
 
 		// no need to be too smart (e.g. only select a few of the best facilities):
 		// being smart requires a lot of utility computations here, plus in the negotiator.
