@@ -3,6 +3,7 @@ package playground.gleich.bestTimeIntegration;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -20,8 +21,8 @@ import matsimintegration.TimeDiscretizationInjection;
 public class RunCottbusScenarioWithDifferentStrategies {
 	
 	public static void main (String[] args){
-		runSeparateTimeAllocationMutatorAndReRoute();
-		runCombinedTimeAllocationMutatorReRoute();
+//		runSeparateTimeAllocationMutatorAndReRoute();
+//		runCombinedTimeAllocationMutatorReRoute();
 		runBestTimeResponse();
 	}
 	
@@ -70,9 +71,29 @@ public class RunCottbusScenarioWithDifferentStrategies {
 	}
 	
 	static void runBestTimeResponse(){
+		/*
+		 *  Use restrictions of BestTimeResponse strategy:
+		 *  - number of (real) activities > 1
+		 *  - zeroUtility activity duration >= 0.1 s -> e.g. 5 min duration kindergarten1 activity causes exception
+		 *  - pt lead to crashes prior to 28-11-2016 modifications in BestTimeResponseTravelTimes and BestTimeResponseStrategyFunctionality
+		 *  - Cottbus scenario gives no console output for more than 2h after replanning starts for the first time
+		 */
+		
 		String configFile = "C:/Users/gleich/ArbeitWorkspace5/Input-data/cottbus-with-pt/config_withoutStrategySet.xml" ;
+//		String configFile = "C:/Users/gleich/ArbeitWorkspace5/matsim/matsim/examples/scenarios/pt-tutorial/0.config.xml" ;
+
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.controler().setOutputDirectory("output/bestTimeIntegration/BestTimeResponse");
+//		config.controler().setOutputDirectory("output/bestTimeIntegration/pt-tutorial/BestTimeResponse");
+		
+//		config.controler().setLastIteration(10);
+		
+		for(ActivityParams actParam: config.planCalcScore().getActivityParams()){
+			if(actParam.getTypicalDuration() < 2*60*60){
+				actParam.setTypicalDuration(2*60*60);
+			}
+		}
+		
 		String STRATEGY_NAME = "BestTimeResponse";
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		StrategySettings stratSets = new StrategySettings();

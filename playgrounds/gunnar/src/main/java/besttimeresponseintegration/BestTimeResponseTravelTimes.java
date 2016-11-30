@@ -4,15 +4,22 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
+import org.matsim.pt.PtConstants;
+import org.matsim.pt.router.TransitActsRemover;
 
 import besttimeresponse.TripTravelTimes;
 import opdytsintegration.utils.TimeDiscretization;
@@ -90,24 +97,34 @@ public class BestTimeResponseTravelTimes implements TripTravelTimes<Facility, St
 			final double tripDptTime_s = Math.max(this.timeDiscr.getBinStartTime_s(bin), 0);
 			final List<? extends PlanElement> tripSequence = this.tripRouter.calcRoute(mode, origin, destination,
 					tripDptTime_s, this.person);
-
+			
 			double startTime_s = tripDptTime_s;
 			double time_s = tripDptTime_s;
 			for (int i = 0; i < tripSequence.size(); i++) {
-				final Leg leg = (Leg) tripSequence.get(i);
-				if (leg.getRoute() instanceof NetworkRoute) {
-					final TravelTime travelTime = this.mode2travelTime.get(leg.getMode());
-					final NetworkRoute route = (NetworkRoute) leg.getRoute();
-					for (Id<Link> linkId : route.getLinkIds()) {
-						final Link link = this.network.getLinks().get(linkId);
-						final double linkTT_s = travelTime.getLinkTravelTime(link, time_s, this.person, null);
-						time_s += linkTT_s + 1.0;
+				if(tripSequence.get(i) instanceof Leg){
+					final Leg leg = (Leg) tripSequence.get(i);
+					if (leg.getRoute() instanceof NetworkRoute) {
+						final TravelTime travelTime = this.mode2travelTime.get(leg.getMode());
+						final NetworkRoute route = (NetworkRoute) leg.getRoute();
+						for (Id<Link> linkId : route.getLinkIds()) {
+							final Link link = this.network.getLinks().get(linkId);
+							final double linkTT_s = travelTime.getLinkTravelTime(link, time_s, this.person, null);
+							time_s += linkTT_s + 1.0;
+						}
+						final Link endLink = this.network.getLinks().get(route.getEndLinkId());
+						time_s += travelTime.getLinkTravelTime(endLink, time_s, this.person, null) + 1.0;
+					} else {
+						time_s += leg.getTravelTime();
 					}
-					final Link endLink = this.network.getLinks().get(route.getEndLinkId());
-					time_s += travelTime.getLinkTravelTime(endLink, time_s, this.person, null) + 1.0;
-				} else {
-					time_s += leg.getTravelTime();
-				}
+					// catch pt interaction activities -- always maximal duration = 0s ! ->  waiting time at pt stops is not considered? should not be summed up?
+				} 
+//				else if (tripSequence.get(i) instanceof Activity) {
+//					final Activity act = (Activity) tripSequence.get(i);
+//					
+//					if (PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType()) && act.getStartTime()!= Double.NEGATIVE_INFINITY && act.getEndTime() != Double.NEGATIVE_INFINITY) {
+//						time_s += act.getEndTime() - act.getStartTime();
+//					}
+//				}
 			}
 			tt_s = time_s - startTime_s;
 
