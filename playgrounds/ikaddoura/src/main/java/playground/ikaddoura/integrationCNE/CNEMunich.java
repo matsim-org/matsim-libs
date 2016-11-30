@@ -171,7 +171,7 @@ public class CNEMunich {
 			@Override
 			public void install() {
 				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
-				String ug = "Rev_Commuter";
+				String ug = "Rev_Commuter"; //TODO [AA] probably, this can cause an exception, to fix, this either change ("COMMUTER_REV_COMMUTER") or make changes in config and person attributes.
 				addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name().concat("_").concat(ug)).toProvider(new javax.inject.Provider<PlanStrategy>() {
 					final String[] availableModes = {"car", "pt_".concat(ug)};
 					final String[] chainBasedModes = {"car", "bike"};
@@ -285,21 +285,24 @@ public class CNEMunich {
 			log.info("Deleting the directory "+dirToDel);
 			IOUtils.deleteDirectory(new File(dirToDel),false);
 		}
-	
-		new File(OUTPUT_DIR+"/user-group-analysis/").mkdir();
+
+
 		String outputEventsFile = OUTPUT_DIR+"/output_events.xml.gz";
-		
-		{
-			String userGroup = MunichUserGroup.Urban.toString();
-			ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new MunichPersonFilter());
-			msc.run();
-			msc.writeResults(OUTPUT_DIR+"/user-group-analysis/modalShareFromEvents_"+userGroup+".txt");	
-		}
-		{
-			String userGroup = MunichUserGroup.Rev_Commuter.toString();
-			ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new MunichPersonFilter());
-			msc.run();
-			msc.writeResults(OUTPUT_DIR+"/user-group-analysis/modalShareFromEvents_"+userGroup+".txt");
+		if(new File(outputEventsFile).exists()) {
+			new File(OUTPUT_DIR + "/user-group-analysis/").mkdir();
+
+			{
+				String userGroup = MunichUserGroup.Urban.toString();
+				ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new MunichPersonFilter());
+				msc.run();
+				msc.writeResults(OUTPUT_DIR + "/user-group-analysis/modalShareFromEvents_" + userGroup + ".txt");
+			}
+			{
+				String userGroup = MunichUserGroup.Rev_Commuter.toString();
+				ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile, userGroup, new MunichPersonFilter());
+				msc.run();
+				msc.writeResults(OUTPUT_DIR + "/user-group-analysis/modalShareFromEvents_" + userGroup + ".txt");
+			}
 		}
 	
 	}
