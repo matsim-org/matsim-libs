@@ -1,6 +1,7 @@
 package playground.sebhoerl.avtaxi.framework;
 
 import com.google.inject.*;
+import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -62,22 +63,16 @@ public class AVModule extends AbstractModule {
 	}
 
 	private void configureDispatchmentStrategies() {
-        HashMap<String, Class<? extends AVDispatcher.AVDispatcherFactory>> dispatcherStrategies = new HashMap<>();
-        bind(new TypeLiteral<Map<String, Class<? extends AVDispatcher.AVDispatcherFactory>>>() {}).toInstance(dispatcherStrategies);
-
-        dispatcherStrategies.put("SingleFIFO", SingleFIFODispatcher.Factory.class);
-        dispatcherStrategies.put("SingleHeuristic", SingleHeuristicDispatcher.Factory.class);
-
         bind(SingleFIFODispatcher.Factory.class);
         bind(SingleHeuristicDispatcher.Factory.class);
+
+        AVUtils.bindDispatcherFactory(binder(), "SingleFIFO").to(SingleFIFODispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), "SingleHeuristic").to(SingleHeuristicDispatcher.Factory.class);
     }
 
     private void configureGeneratorStrategies() {
-        HashMap<String, Class<? extends AVGenerator.AVGeneratorFactory>> generatorStrategies = new HashMap<>();
-        bind(new TypeLiteral<Map<String, Class<? extends AVGenerator.AVGeneratorFactory>>>() {}).toInstance(generatorStrategies);
-
-        generatorStrategies.put("PopulationDensity", PopulationDensityGenerator.Factory.class);
         bind(PopulationDensityGenerator.Factory.class);
+        AVUtils.bindGeneratorFactory(binder(), "PopulationDensity").to(PopulationDensityGenerator.Factory.class);
     }
 
     @Provides
@@ -117,7 +112,7 @@ public class AVModule extends AbstractModule {
     }
 
     @Provides @Singleton
-    Map<Id<AVOperator>, AVGenerator> provideGenerators(Map<String, Class<? extends AVGenerator.AVGeneratorFactory>> factories, AVConfig config, Injector injector) {
+    Map<Id<AVOperator>, AVGenerator> provideGenerators(Map<String, AVGenerator.AVGeneratorFactory> factories, AVConfig config, Injector injector) {
         Map<Id<AVOperator>, AVGenerator> generators = new HashMap<>();
 
         for (AVOperatorConfig oc : config.getOperatorConfigs()) {
@@ -128,7 +123,7 @@ public class AVModule extends AbstractModule {
                 throw new IllegalArgumentException("Generator strategy '" + strategy + "' is not registered.");
             }
 
-            AVGenerator.AVGeneratorFactory factory = injector.getInstance(factories.get(strategy));
+            AVGenerator.AVGeneratorFactory factory = factories.get(strategy);
             AVGenerator generator = factory.createGenerator(gc);
 
             generators.put(oc.getId(), generator);
@@ -138,7 +133,7 @@ public class AVModule extends AbstractModule {
     }
 
     @Provides @Singleton
-    Map<Id<AVOperator>, AVDispatcher> provideDispatchers(Map<String, Class<? extends AVDispatcher.AVDispatcherFactory>> factories, AVConfig config, Injector injector) {
+    Map<Id<AVOperator>, AVDispatcher> provideDispatchers(Map<String, AVDispatcher.AVDispatcherFactory> factories, AVConfig config, Injector injector) {
         Map<Id<AVOperator>, AVDispatcher> dispatchers = new HashMap<>();
 
         for (AVOperatorConfig oc : config.getOperatorConfigs()) {
@@ -149,7 +144,7 @@ public class AVModule extends AbstractModule {
                 throw new IllegalArgumentException("Dispatcher strategy '" + strategy + "' is not registered.");
             }
 
-            AVDispatcher.AVDispatcherFactory factory = injector.getInstance(factories.get(strategy));
+            AVDispatcher.AVDispatcherFactory factory = factories.get(strategy);
             AVDispatcher dispatcher = factory.createDispatcher(dc);
 
             dispatchers.put(oc.getId(), dispatcher);
