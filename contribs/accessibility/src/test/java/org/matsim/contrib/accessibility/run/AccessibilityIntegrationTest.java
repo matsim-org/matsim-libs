@@ -202,7 +202,8 @@ public class AccessibilityIntegrationTest {
 		
 		AccessibilityStartupListener asl = new AccessibilityStartupListener(activityTypes, null, null, null, envelope, cellSize, false);
 		controler.addControlerListener(asl);
-		asl.useEvaluteTestResults(true);;
+		EvaluateTestResults etr = new EvaluateTestResults(true, true, true, true, false);
+		asl.addAdditionalSpatialDataGridExchangeListener(etr);
 		// ------------------ NEW END HERE
 		
 		// Storage objects

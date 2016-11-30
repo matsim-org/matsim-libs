@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.accessibility;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,6 +26,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.gis.GridUtils;
+import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.run.AccessibilityIntegrationTest.EvaluateTestResults;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.GeoserverUpdater;
@@ -55,6 +57,8 @@ public final class AccessibilityStartupListener implements StartupListener {
 	Double cellSize;
 	boolean push2Geoserver;
 	
+	List<SpatialGridDataExchangeInterface> additionalSpatialGridDataExchangeListener = new LinkedList<>();
+	
 	boolean useEvaluteTestResults = false;
 	
 	private static final Logger LOG = Logger.getLogger(AccessibilityStartupListener.class);
@@ -70,7 +74,7 @@ public final class AccessibilityStartupListener implements StartupListener {
 		this.push2Geoserver = push2Geoserver;
 	}
 
-	
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		// yyyyyy do we still need this as a startup listener when we are solving many of the dependencies through guice now?  kai, nov'16
@@ -90,6 +94,7 @@ public final class AccessibilityStartupListener implements StartupListener {
 				accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 			}
 			ActivityFacilities activityFacilities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType);
+//			GridBasedAccessibilityShutdownListenerV3 
 			GridBasedAccessibilityShutdownListenerV3 gbasl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, activityFacilities, 
 					ptMatrix, scenario, envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(), cellSize);
 			if (densityFacilities != null) {
@@ -101,16 +106,15 @@ public final class AccessibilityStartupListener implements StartupListener {
 			if (push2Geoserver == true) {
 				accessibilityCalculator.addFacilityDataExchangeListener(new GeoserverUpdater(crs, runId + "_" + activityType));
 			}
-			if (useEvaluteTestResults) {
-				EvaluateTestResults etr = new EvaluateTestResults(true, true, true, true, false);
-				gbasl.addSpatialGridDataExchangeListener(etr);
+			for (SpatialGridDataExchangeInterface spatialGridDataExchangeListener : additionalSpatialGridDataExchangeListener) {
+				gbasl.addSpatialGridDataExchangeListener(spatialGridDataExchangeListener);
 			}
 			controlerListenerManager.addControlerListener(gbasl);
 		}
 	}
 	
 	
-	public void useEvaluteTestResults(boolean value) {
-		this.useEvaluteTestResults = value;
+	public void addAdditionalSpatialDataGridExchangeListener(SpatialGridDataExchangeInterface spatialGridDataExchangeListener) {
+		additionalSpatialGridDataExchangeListener.add(spatialGridDataExchangeListener);
 	}
 }
