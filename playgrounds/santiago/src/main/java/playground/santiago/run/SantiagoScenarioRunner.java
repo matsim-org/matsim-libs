@@ -64,6 +64,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
+import org.matsim.roadpricing.RoadPricingModule;
 
 import playground.santiago.SantiagoScenarioConstants;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
@@ -138,14 +139,14 @@ public class SantiagoScenarioRunner {
 			// mapping agents' activities to links on the road network to avoid being stuck on the transit network
 			if(mapActs2Links) mapActivities2properLinks(scenario);
 			
-			//Adding the toll links file
+			//Adding the toll links file in the config
 			RoadPricingConfigGroup rpcg = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
 			rpcg.setTollLinksFile(gantriesFile);
 			
-			//Adding randomness to the router
+			//Adding randomness to the router, sigma = 3
 			config.plansCalcRoute().setRoutingRandomness(sigma); 
-			controler.setModules(new ControlerDefaultsWithRoadPricingModule());
-	
+
+			controler.addOverridingModule(new RoadPricingModule());	
 			controler.addOverridingModule(new CadytsCarModule());
 
 			// include cadyts into the plan scoring (this will add the cadyts corrections to the scores):
