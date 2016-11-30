@@ -46,8 +46,11 @@ class KNTaxi
                     "endActivitiesAtTimeZero makes sense only in combination with removeNonPassengers");
         }
 
-        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(),
-                new OTFVisConfigGroup());
+        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new OTFVisConfigGroup());
+        
+        OTFVisConfigGroup otfConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.class ) ;
+        otfConfig.setAgentSize( otfConfig.getAgentSize()*2 );
+        
         Controler controler = RunTaxiScenario.createControler(config, otfvis);
 
         if (removeNonPassengers) {
