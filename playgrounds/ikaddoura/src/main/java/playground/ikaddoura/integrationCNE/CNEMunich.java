@@ -41,6 +41,7 @@ import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
@@ -68,12 +69,12 @@ public class CNEMunich {
 	
 	private static final Logger log = Logger.getLogger(CNEMunich.class);
 
-	private static final Integer noOfXCells = 160;
-	private static final Integer noOfYCells = 120;
-	private static final double xMin = 4452550.25;
-	private static final double xMax = 4479483.33;
-	private static final double yMin = 5324955.00;
-	private static final double yMax = 5345696.81;
+	private static final Integer noOfXCells = 270;
+	private static final Integer noOfYCells = 208;
+	private static final double xMin = 4452550.;
+	private static final double xMax = 4479550.;
+	private static final double yMin = 5324955.;
+	private static final double yMax = 5345755.;
 	private static final Double timeBinSize = 3600.;
 	private static final int noOfTimeBins = 30;
 	
@@ -130,7 +131,10 @@ public class CNEMunich {
 			configFile = "../../../runs-svn/cne_test/input/config.xml";
 		}
 
-		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
+		Config config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup(), new NoiseConfigGroup());
+		config.vehicles().setVehiclesFile("../../../runs-svn/detEval/emissionCongestionInternalization/iatbr/input/emissionVehicles_1pct.xml.gz");
+		
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 
 		if (outputDirectory != null) {
@@ -139,17 +143,6 @@ public class CNEMunich {
 		
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
-
-		// CNE Integration
-		
-		CNEIntegration cne = new CNEIntegration(controler, gt, rgt);
-		cne.setCongestionPricing(congestionPricing);
-		cne.setNoisePricing(noisePricing);
-		cne.setAirPollutionPricing(airPollutionPricing);
-		cne.setSigma(sigma);
-		cne.setCongestionTollingApproach(congestionTollingApproach);
-		cne.setkP(kP);
-		controler = cne.prepareControler();
 		
 		// scenario-specific settings
 		
@@ -161,9 +154,8 @@ public class CNEMunich {
 		ecg.setDetailedWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_HOT_SubSegm_2005detailed.txt");
 		ecg.setEmissionRoadTypeMappingFile("../../../runs-svn/detEval/emissionCongestionInternalization/iatbr/input/roadTypeMapping.txt");
 		ecg.setUsingDetailedEmissionCalculation(true);
-	
-		controler.getConfig().vehicles().setVehiclesFile("../../../runs-svn/detEval/emissionCongestionInternalization/iatbr/input/emissionVehicles_1pct.xml.gz");
-					
+		ecg.setUsingVehicleTypeIdAsVehicleDescription(false);
+		
 		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		
@@ -189,7 +181,7 @@ public class CNEMunich {
 			}
 		});
 		
-		// noise
+		// noise Munich settings
 		
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) controler.getScenario().getConfig().getModule("noise");
 
@@ -251,9 +243,21 @@ public class CNEMunich {
 		tunnelLinkIDs.add(Id.create("595870463-586909531-594897602", Link.class));
 		noiseParameters.setTunnelLinkIDsSet(tunnelLinkIDs);
 		
+		// CNE Integration
+		
+		CNEIntegration cne = new CNEIntegration(controler, gt, rgt);
+		cne.setCongestionPricing(congestionPricing);
+		cne.setNoisePricing(noisePricing);
+		cne.setAirPollutionPricing(airPollutionPricing);
+		cne.setSigma(sigma);
+		cne.setCongestionTollingApproach(congestionTollingApproach);
+		cne.setkP(kP);
+		controler = cne.prepareControler();
+		
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 			
-		// scenario-specific analysis
+		// analysis
 		
 		PersonTripCongestionNoiseAnalysisMain analysis = new PersonTripCongestionNoiseAnalysisMain(controler.getConfig().controler().getOutputDirectory());
 		analysis.run();

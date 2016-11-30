@@ -138,7 +138,6 @@ public class CNEIntegration {
 		
 		if (args.length > 0) {
 								
-			// TODO
 			throw new RuntimeException("Not yet implemented. Aborting...");
 			
 		} else {
@@ -162,7 +161,7 @@ public class CNEIntegration {
 		if (configFile != null) {
 			Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup());
 			Scenario scenario = ScenarioUtils.loadScenario(config);
-			controler = new Controler(scenario);
+			controler = new Controler(scenario);			
 		} else {
 			if (this.controler == null) {
 				throw new RuntimeException("Controler is null. Aborting...");
