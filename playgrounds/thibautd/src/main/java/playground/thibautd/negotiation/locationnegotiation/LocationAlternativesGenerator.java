@@ -75,7 +75,9 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 
 		final QuadTreeRebuilder<ActivityFacility> qt = new QuadTreeRebuilder<>();
 		// TODO: filter here, or outside, by activity type?
-		facilities.getFacilities().values().forEach( f -> qt.put( f.getCoord() , f ) );
+		facilities.getFacilities().values().stream()
+				.filter( f -> f.getActivityOptions().containsKey( "leisure" ) )
+				.forEach( f -> qt.put( f.getCoord() , f ) );
 		this.facilities = qt.getQuadTree();
 	}
 
@@ -126,7 +128,7 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 		// being smart requires a lot of utility computations here, plus in the negotiator.
 		// being dumb but returning more options leads to those options only being evaluated
 		// once.
-		final List<ActivityFacility> subsample= RandomUtils.sublist_withSideEffect(
+		final List<ActivityFacility> subsample = RandomUtils.sublist_withSideEffect(
 				random,
 				(List<ActivityFacility>) close,
 				N_OUT_OF_HOME );
