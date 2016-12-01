@@ -55,7 +55,7 @@ public class MyEmissionCongestionMoneyEventControlerListener implements StartupL
 	private MoneyEventHandler moneyHandler;
 	private ExperiencedDelayHandler congestionCostHandler;
 	private final EmissionModule emissionModule;
-	private EmissionCostsCollector emissCostHandler;
+	private EmissionCostsHandler emissCostHandler;
 	private double vttsCar;
 	
 	public MyEmissionCongestionMoneyEventControlerListener(EmissionCostModule emissionCostModule, EmissionModule emissionModule) {
@@ -68,7 +68,7 @@ public class MyEmissionCongestionMoneyEventControlerListener implements StartupL
 		this.scenario = (MutableScenario) event.getServices().getScenario();
 		this.vttsCar = (this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 
-		this.emissCostHandler = new EmissionCostsCollector(emissionCostModule);
+		this.emissCostHandler = new EmissionCostsHandler(emissionCostModule);
 		this.moneyHandler = new MoneyEventHandler();
 		this.congestionCostHandler = new ExperiencedDelayHandler(scenario,1);
 
@@ -86,8 +86,8 @@ public class MyEmissionCongestionMoneyEventControlerListener implements StartupL
 
 		this.pId2Tolls = this.moneyHandler.getPersonId2amount();
 		this.pId2CongestionCosts = this.congestionCostHandler.getDelayPerPersonAndTimeInterval().get(event.getServices().getConfig().qsim().getEndTime());
-		this.pId2ColdEmissionsCosts = this.emissCostHandler.getPersonId2ColdEmissCosts();
-		this.pId2WarmEmissionsCosts = this.emissCostHandler.getPersonId2WarmEmissCosts();
+		this.pId2ColdEmissionsCosts = this.emissCostHandler.getPersonId2ColdEmissionsCosts();
+		this.pId2WarmEmissionsCosts = this.emissCostHandler.getPersonId2WarmEmissionsCosts();
 
 		String outputFile = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "person2VariousCosts.txt");
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
