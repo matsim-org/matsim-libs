@@ -79,6 +79,8 @@ public class PatnaBikeTrackConnectionControler {
 
 	private static boolean modeChoiceUntilLastIteration = true;
 
+	private static boolean isRunningOnCluster = false;
+
 	public static void main(String[] args) {
 
 		if(args.length>0){
@@ -90,6 +92,8 @@ public class PatnaBikeTrackConnectionControler {
 			useBikeTravelTime = Boolean.valueOf(args[5]);
 
 			modeChoiceUntilLastIteration = Boolean.valueOf(args[5]);
+
+			isRunningOnCluster = true;
 		}
 
 		String regularNet = dir+"/input/network.xml.gz";
@@ -173,8 +177,10 @@ public class PatnaBikeTrackConnectionControler {
 		// time dependent network for network change events
 		config.network().setTimeVariantNetwork(true);
 
-		String inPlans = inputDir+"samplePlansForTesting.xml";
-//		String inPlans = inputDir+"/baseCaseOutput_plans.xml.gz";
+		String inPlans ;
+		if(isRunningOnCluster) inPlans = inputDir+"/baseCaseOutput_plans.xml.gz";
+		else inPlans = inputDir+"samplePlansForTesting.xml";
+
 		config.plans().setInputFile( inPlans );
 		config.plans().setInputPersonAttributeFile(inputDir+"output_personAttributes.xml.gz");
 		config.vehicles().setVehiclesFile(null); // see below for vehicle type info
