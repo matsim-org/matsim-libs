@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.analysis.controlerListner;
+package playground.agarwalamit.analysis.controlerListener;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -37,7 +37,7 @@ import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
  * @author amit
  */
 
-public class ModalShareControlerListner implements StartupListener, IterationEndsListener{
+public class ModalShareControlerListener implements StartupListener, IterationEndsListener{
 
 	private int firstIteration = 0;
 //	private int numberOfIterations = 0;

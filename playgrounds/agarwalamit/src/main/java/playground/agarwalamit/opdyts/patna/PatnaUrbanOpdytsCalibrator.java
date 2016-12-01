@@ -40,8 +40,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListner;
-import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
+import playground.agarwalamit.analysis.controlerListener.ModalShareControlerListener;
+import playground.agarwalamit.analysis.controlerListener.ModalTravelTimeControlerListener;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.opdyts.*;
@@ -107,7 +107,7 @@ public class PatnaUrbanOpdytsCalibrator {
 //		modes2consider.add("pt");
 //		modes2consider.add("walk");
 
-		OpdytsModalStatsControlerListner stasControlerListner = new OpdytsModalStatsControlerListner(modes2consider,PATNA_1_PCT);
+		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,PATNA_1_PCT);
 
 		// following is the  entry point to start a matsim controler together with opdyts
 		MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization, modes2consider);
@@ -122,10 +122,10 @@ public class PatnaUrbanOpdytsCalibrator {
 				addControlerListenerBinding().toInstance(stasControlerListner);
 
 				this.bind(ModalShareEventHandler.class);
-				this.addControlerListenerBinding().to(ModalShareControlerListner.class);
+				this.addControlerListenerBinding().to(ModalShareControlerListener.class);
 
 				this.bind(ModalTripTravelTimeHandler.class);
-				this.addControlerListenerBinding().to(ModalTravelTimeControlerListner.class);
+				this.addControlerListenerBinding().to(ModalTravelTimeControlerListener.class);
 
 				bind(CharyparNagelScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
 			}

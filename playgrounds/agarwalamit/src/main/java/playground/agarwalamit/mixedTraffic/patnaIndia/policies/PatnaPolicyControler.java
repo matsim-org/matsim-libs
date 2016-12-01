@@ -47,8 +47,8 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.*;
 import playground.agarwalamit.analysis.StatsWriter;
-import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListner;
-import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
+import playground.agarwalamit.analysis.controlerListener.ModalShareControlerListener;
+import playground.agarwalamit.analysis.controlerListener.ModalTravelTimeControlerListener;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
@@ -153,10 +153,10 @@ public class PatnaPolicyControler {
 			@Override
 			public void install() {
 				this.bind(ModalShareEventHandler.class);
-				this.addControlerListenerBinding().to(ModalShareControlerListner.class);
+				this.addControlerListenerBinding().to(ModalShareControlerListener.class);
 
 				this.bind(ModalTripTravelTimeHandler.class);
-				this.addControlerListenerBinding().to(ModalTravelTimeControlerListner.class);
+				this.addControlerListenerBinding().to(ModalTravelTimeControlerListener.class);
 
 				this.addControlerListenerBinding().to(MultiModeCountsControlerListener.class);
 			}

@@ -31,7 +31,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
+import playground.agarwalamit.analysis.controlerListener.ModalTravelTimeControlerListener;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
@@ -110,7 +110,7 @@ public class EvacPatnaControler {
 			@Override
 			public void install() {
 				this.bind(ModalTripTravelTimeHandler.class);
-				this.addControlerListenerBinding().to(ModalTravelTimeControlerListner.class);
+				this.addControlerListenerBinding().to(ModalTravelTimeControlerListener.class);
 			}
 		});
 

@@ -186,7 +186,7 @@ public class PassingTest {
 		cntrlr.getConfig().controler().setCreateGraphs(false);
 		cntrlr.getConfig().controler().setDumpDataAtEnd(false);
 
-		TravelTimeControlerListner travelTimeCntrlrListner = new TravelTimeControlerListner();
+		TravelTimeControlerListener travelTimeCntrlrListner = new TravelTimeControlerListener();
 
 		cntrlr.addControlerListener(travelTimeCntrlrListner); 
 		cntrlr.run();
@@ -206,7 +206,7 @@ public class PassingTest {
 
 	}
 
-	private class TravelTimeControlerListner implements StartupListener, IterationEndsListener {
+	private class TravelTimeControlerListener implements StartupListener, IterationEndsListener {
 
 		Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes = new HashMap<>();
 		VehicleLinkTravelTimeEventHandler hand;

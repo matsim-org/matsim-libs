@@ -42,8 +42,8 @@ import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandle
  * @author amit
  */
 
-public class MyEmissionCongestionMoneyEventControlerListner implements StartupListener, IterationEndsListener{
-	public static final Logger log =Logger.getLogger(MyEmissionCongestionMoneyEventControlerListner.class);
+public class MyEmissionCongestionMoneyEventControlerListener implements StartupListener, IterationEndsListener{
+	public static final Logger log =Logger.getLogger(MyEmissionCongestionMoneyEventControlerListener.class);
 
 	private Map<Id<Person>, Double> pId2ColdEmissionsCosts = new HashMap<>();
 	private Map<Id<Person>, Double> pId2WarmEmissionsCosts= new HashMap<>();
@@ -58,7 +58,7 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 	private EmissionCostsCollector emissCostHandler;
 	private double vttsCar;
 	
-	public MyEmissionCongestionMoneyEventControlerListner(EmissionCostModule emissionCostModule, EmissionModule emissionModule) {
+	public MyEmissionCongestionMoneyEventControlerListener(EmissionCostModule emissionCostModule, EmissionModule emissionModule) {
 		this.emissionCostModule = emissionCostModule;
 		this.emissionModule = emissionModule;
 	}

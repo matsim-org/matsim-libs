@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.analysis.controlerListner;
+package playground.agarwalamit.analysis.controlerListener;
 
 import java.util.*;
 
@@ -39,7 +39,7 @@ import playground.agarwalamit.utils.ListUtils;
  * @author amit
  */
 
-public class ModalTravelTimeControlerListner implements StartupListener, IterationEndsListener{
+public class ModalTravelTimeControlerListener implements StartupListener, IterationEndsListener{
 
 	private int firstIteration = 0;
 //	private int numberOfIterations = 0;

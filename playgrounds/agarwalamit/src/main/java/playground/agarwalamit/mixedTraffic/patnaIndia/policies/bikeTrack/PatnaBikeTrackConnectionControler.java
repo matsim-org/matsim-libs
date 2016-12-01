@@ -49,8 +49,8 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.*;
-import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListner;
-import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
+import playground.agarwalamit.analysis.controlerListener.ModalShareControlerListener;
+import playground.agarwalamit.analysis.controlerListener.ModalTravelTimeControlerListener;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
@@ -108,21 +108,21 @@ public class PatnaBikeTrackConnectionControler {
 
 		scenario.getConfig().controler().setOutputDirectory(dir+"bikeTrackConnectors_"+numberOfConnectors+"_"+updateConnectorsAfterIteration+"_"+
 				reduceLinkLengthBy+"_"+useBikeTravelTime+"_"+modeChoiceUntilLastIteration+"/");
-		BikeConnectorControlerListner bikeConnectorControlerListner = new BikeConnectorControlerListner(numberOfConnectors, updateConnectorsAfterIteration, initialStabilizationIterations);
+		BikeConnectorControlerListener bikeConnectorControlerListener = new BikeConnectorControlerListener(numberOfConnectors, updateConnectorsAfterIteration, initialStabilizationIterations);
 
 		final Controler controler = new Controler(scenario);
 
-		TerminationCriterion terminationCriterion = new MyTerminationCriteria(bikeConnectorControlerListner);
+		TerminationCriterion terminationCriterion = new MyTerminationCriteria(bikeConnectorControlerListener);
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				// plotting modal share over iterations
 				this.bind(ModalShareEventHandler.class);
-				this.addControlerListenerBinding().to(ModalShareControlerListner.class);
+				this.addControlerListenerBinding().to(ModalShareControlerListener.class);
 
 				this.bind(ModalTripTravelTimeHandler.class);
-				this.addControlerListenerBinding().to(ModalTravelTimeControlerListner.class);
+				this.addControlerListenerBinding().to(ModalTravelTimeControlerListener.class);
 
 				// adding pt fare system based on distance
 				this.addEventHandlerBinding().to(PtFareEventHandler.class);
@@ -130,7 +130,7 @@ public class PatnaBikeTrackConnectionControler {
 				if (useBikeTravelTime) {
 					addTravelTimeBinding(TransportMode.bike).to(FreeSpeedTravelTimeForBike.class);
 				}
-				addControlerListenerBinding().toInstance(bikeConnectorControlerListner);
+				addControlerListenerBinding().toInstance(bikeConnectorControlerListener);
 				bind(TerminationCriterion.class).toInstance(terminationCriterion);
 			}
 		});
@@ -268,15 +268,15 @@ public class PatnaBikeTrackConnectionControler {
 
 	private static class MyTerminationCriteria implements TerminationCriterion{
 
-		private final BikeConnectorControlerListner bikeConnectorControlerListner;
+		private final BikeConnectorControlerListener bikeConnectorControlerListener;
 
-		MyTerminationCriteria(final BikeConnectorControlerListner bikeConnectorControlerListner) {
-			this.bikeConnectorControlerListner = bikeConnectorControlerListner;
+		MyTerminationCriteria(final BikeConnectorControlerListener bikeConnectorControlerListener) {
+			this.bikeConnectorControlerListener = bikeConnectorControlerListener;
 		}
 
 		@Override
 		public boolean continueIterations(int iteration) {
-			return !this.bikeConnectorControlerListner.isTerminating();
+			return !this.bikeConnectorControlerListener.isTerminating();
 		}
 	}
 }

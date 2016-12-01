@@ -112,7 +112,7 @@ public final class MapUtils {
 //                       )
 //               );
 
-//	another useful syntax for sorting by value (also see BikeConnectorControlerListner or intellij suggestion)
+//	another useful syntax for sorting by value (also see BikeConnectorControlerListener or intellij suggestion)
 //Comparator<Map.Entry<Id<Link>, Double>> byValue = (entry1, entry2) -> entry1.getValue().compareTo(
 //                        entry2.getValue());
 }

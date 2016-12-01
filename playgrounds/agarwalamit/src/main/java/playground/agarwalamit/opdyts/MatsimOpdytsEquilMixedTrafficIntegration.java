@@ -133,7 +133,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		modes2consider.add("car");
 		modes2consider.add("bike");
 
-		OpdytsModalStatsControlerListner stasControlerListner = new OpdytsModalStatsControlerListner(modes2consider,EQUIL_MIXEDTRAFFIC);
+		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,EQUIL_MIXEDTRAFFIC);
 
 		// following is the  entry point to start a matsim controler together with opdyts
 		MATSimSimulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization);

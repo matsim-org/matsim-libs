@@ -30,11 +30,11 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListner;
-import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
+import playground.agarwalamit.analysis.controlerListener.ModalShareControlerListener;
+import playground.agarwalamit.analysis.controlerListener.ModalTravelTimeControlerListener;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
-import playground.agarwalamit.opdyts.OpdytsModalStatsControlerListner;
+import playground.agarwalamit.opdyts.OpdytsModalStatsControlerListener;
 import playground.agarwalamit.opdyts.OpdytsScenarios;
 
 /**
@@ -70,12 +70,12 @@ public class PatnaPlansRelaxor {
 				addControlerListenerBinding().to(KaiAnalysisListener.class);
 
 				this.bind(ModalShareEventHandler.class);
-				this.addControlerListenerBinding().to(ModalShareControlerListner.class);
+				this.addControlerListenerBinding().to(ModalShareControlerListener.class);
 
 				this.bind(ModalTripTravelTimeHandler.class);
-				this.addControlerListenerBinding().to(ModalTravelTimeControlerListner.class);
+				this.addControlerListenerBinding().to(ModalTravelTimeControlerListener.class);
 
-				this.addControlerListenerBinding().toInstance(new OpdytsModalStatsControlerListner(modes2consider, OpdytsScenarios.PATNA_1Pct));
+				this.addControlerListenerBinding().toInstance(new OpdytsModalStatsControlerListener(modes2consider, OpdytsScenarios.PATNA_1Pct));
 			}
 		});
 	controler.run();
