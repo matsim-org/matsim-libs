@@ -34,6 +34,7 @@ import playground.thibautd.negotiation.framework.AlternativesGenerator;
 import playground.thibautd.negotiation.framework.NegotiationAgent;
 import playground.thibautd.negotiation.framework.PropositionUtility;
 import playground.thibautd.utils.RandomUtils;
+import sun.management.resources.agent;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -83,45 +84,48 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 
 	@Override
 	public Collection<LocationProposition> generateAlternatives( final NegotiationAgent<LocationProposition> agent ) {
-		final Collection<Id<Person>> alterIds = socialNetwork.getAlters( agent.getId() );
+		final Collection<Person> alters =
+				socialNetwork.getAlters( agent.getId() ).stream()
+						.map( population.getPersons()::get )
+						.collect( Collectors.toList() );
 		final Person ego = population.getPersons().get( agent.getId() );
 
 		final Collection<LocationProposition> propositions =
 				new ArrayList<>(
-						2 * alterIds.size() + // visits
+						2 * alters.size() + // visits
 								1 + // alone at home
-								N_OUT_OF_HOME * alterIds.size() ); // out of home
+								N_OUT_OF_HOME * alters.size() ); // out of home
 		// visits
-		for ( Id<Person> alter : alterIds ) {
+		for ( Person alter : alters ) {
 			propositions.add(
 					LocationProposition.create(
-							ego.getId() ,
+							ego ,
 							Collections.singleton( alter ) ,
 							locations.getHomeLocation( ego ) ) );
 			propositions.add(
 					LocationProposition.create(
-							ego.getId() ,
+							ego ,
 							Collections.singleton( alter ) ,
-							locations.getHomeLocation( population.getPersons().get( alter ) ) ) );
+							locations.getHomeLocation( alter ) ) );
 		}
 
 		// alone at home
 		propositions.add(
 				LocationProposition.create(
-						ego.getId() ,
+						ego ,
 						Collections.emptyList(),
 						locations.getHomeLocation( ego ) ) );
 
 		// out-of-home locations
-		propositions.addAll( generateOutOfHome( agent , alterIds ) );
+		propositions.addAll( generateOutOfHome( ego, alters ) );
 
 		return propositions;
 	}
 
 	private Collection<LocationProposition> generateOutOfHome(
-			final NegotiationAgent<LocationProposition> agent,
-			final Collection<Id<Person>> alters ) {
-		final Coord home = locations.getHomeLocation( agent.getId() ).getCoord();
+			final Person ego,
+			final Collection<Person> alters ) {
+		final Coord home = locations.getHomeLocation( ego.getId() ).getCoord();
 		final Collection<ActivityFacility> close = facilities.getDisk( home.getX() , home.getY() , OUT_OF_HOME_RADIUS_M );
 
 		// no need to be too smart (e.g. only select a few of the best facilities):
@@ -137,11 +141,10 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 				.flatMap( facility ->
 						alters.stream().map( alter ->
 								LocationProposition.create(
-										agent.getId(),
+										ego,
 										Collections.singleton( alter ),
 										facility ) ) )
 				.collect( Collectors.toList() );
-
 	}
 
 }

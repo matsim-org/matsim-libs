@@ -72,7 +72,7 @@ public class NegotiationAgent<P extends Proposition> implements Identifiable<Per
 		stopwatch.endMeasurement( StopWatchMeasurement.generateAlternatives );
 
 		for ( P proposition : alternatives ) {
-			if ( !negotiatingAgents.contains( proposition.getProposedIds() ) ) continue;
+			if ( !proposition.getProposed().stream().allMatch( a -> negotiatingAgents.contains( a.getId() ) ) ) continue;
 
 			stopwatch.startMeasurement( StopWatchMeasurement.utility );
 			final double u = utility.utility( this , proposition );
@@ -80,7 +80,8 @@ public class NegotiationAgent<P extends Proposition> implements Identifiable<Per
 			if ( u < currentBestUtil ) continue;
 
 			stopwatch.startMeasurement( StopWatchMeasurement.askAcceptance );
-			if ( !proposition.getProposedIds().stream()
+			if ( !proposition.getProposed().stream()
+					.map( Person::getId )
 					.map( negotiatingAgents::get )
 					.allMatch( a -> a.accept( proposition ) ) ) {
 				stopwatch.endMeasurement( StopWatchMeasurement.askAcceptance );
@@ -95,7 +96,8 @@ public class NegotiationAgent<P extends Proposition> implements Identifiable<Per
 
 		stopwatch.startMeasurement( StopWatchMeasurement.notifyResult );
 		if ( found ) {
-			currentBestProp.getGroupIds().stream()
+			currentBestProp.getGroup().stream()
+					.map( Person::getId )
 					.map( negotiatingAgents::get )
 					.forEach( a -> a.notifyAccepted( currentBestProp ) );
 		}

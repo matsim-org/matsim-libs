@@ -28,13 +28,13 @@ import java.util.Collection;
  * @author thibautd
  */
 public interface Proposition {
-	Id<Person> getProposerId();
-	Collection<Id<Person>> getProposedIds();
+	Person getProposer();
+	Collection<Person> getProposed();
 
-	default Collection<Id<Person>> getGroupIds() {
-		final Collection<Id<Person>> ids = new ArrayList<>( getProposedIds().size() + 1 );
-		ids.addAll( getProposedIds() );
-		ids.add( getProposerId() );
+	default Collection<Person> getGroup() {
+		final Collection<Person> ids = new ArrayList<>( getProposed().size() + 1 );
+		ids.addAll( getProposed() );
+		ids.add( getProposer() );
 		return ids;
 	}
 }

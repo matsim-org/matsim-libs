@@ -46,7 +46,7 @@ public class ChosenLocationWriter implements AutoCloseable {
 		try {
 			final LocationProposition location = agent.getBestProposition();
 
-			final String groupId = location == null ? "NA" : getGroupId( location.getGroupIds() );
+			final String groupId = location == null ? "NA" : getGroupId( location.getGroup() );
 			final String facilityId = location == null ? "NA" : location.getFacility().getId().toString();
 
 			final String distance = location == null ? "NA" :
@@ -62,8 +62,9 @@ public class ChosenLocationWriter implements AutoCloseable {
 		}
 	}
 
-	private static String getGroupId( final Collection<Id<Person>> participants ) {
+	private static String getGroupId( final Collection<Person> participants ) {
 		return participants.stream()
+				.map( Person::getId )
 				.sorted()
 				.collect(
 						StringBuilder::new,

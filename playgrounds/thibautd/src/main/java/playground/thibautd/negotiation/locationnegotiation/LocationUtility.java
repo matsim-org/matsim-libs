@@ -62,10 +62,7 @@ public class LocationUtility implements PropositionUtility<LocationProposition> 
 		if ( proposition == null ) return Double.NEGATIVE_INFINITY;
 		return proposition.getOrUpdateUtility( () -> {
 			final Person ego = population.getPersons().get( agent.getId() );
-			final Collection<Person> alters =
-					proposition.getGroupIds().stream()
-							.map( population.getPersons()::get )
-							.collect( Collectors.toList() );
+			final Collection<Person> alters = proposition.getGroup();
 
 			final ActivityFacility location = proposition.getFacility();
 
@@ -74,8 +71,8 @@ public class LocationUtility implements PropositionUtility<LocationProposition> 
 							.mapToDouble( a -> seeds.getUniformErrorTerm( a, ego ) * configGroup.getMuContact() )
 							.sum();
 
-			final double utilLocation = seeds.getGaussianErrorTerm( ego,
-					asAttr( location ) ) * configGroup.getSigmaFacility();
+			final double utilLocation =
+					seeds.getGaussianErrorTerm( ego, asAttr( location ) ) * configGroup.getSigmaFacility();
 
 			final double utilTravelTime = getTravelTime( ego, location ) * configGroup.getBetaTime();
 

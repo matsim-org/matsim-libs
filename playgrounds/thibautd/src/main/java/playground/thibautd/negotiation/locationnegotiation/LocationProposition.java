@@ -31,8 +31,8 @@ import java.util.function.DoubleSupplier;
  * @author thibautd
  */
 public class LocationProposition implements Proposition {
-	private final Id<Person> proposer;
-	private final Collection<Id<Person>> proposed;
+	private final Person proposer;
+	private final Collection<Person> proposed;
 
 	private final ActivityFacility facility;
 
@@ -45,8 +45,8 @@ public class LocationProposition implements Proposition {
 	private double cachedUtility = Double.NEGATIVE_INFINITY;
 
 	private LocationProposition(
-			final Id<Person> proposer,
-			final Collection<Id<Person>> proposed,
+			final Person proposer,
+			final Collection<Person> proposed,
 			final ActivityFacility facility ) {
 		this.proposer = proposer;
 		this.proposed = proposed;
@@ -54,20 +54,20 @@ public class LocationProposition implements Proposition {
 	}
 
 	public static LocationProposition create(
-			final Id<Person> proposer,
-			final Collection<Id<Person>> proposed,
+			final Person proposer,
+			final Collection<Person> proposed,
 			final ActivityFacility facility ) {
 		final LocationProposition proposition = new LocationProposition( proposer, proposed, facility );
 		return cache.getOrPut( proposition , proposition );
 	}
 
 	@Override
-	public Id<Person> getProposerId() {
+	public Person getProposer() {
 		return proposer;
 	}
 
 	@Override
-	public Collection<Id<Person>> getProposedIds() {
+	public Collection<Person> getProposed() {
 		return proposed;
 	}
 
