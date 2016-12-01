@@ -193,7 +193,7 @@ public class PatnaBikeTrackConnectionControler {
 			ss.setDisableAfter(-1);
 			if ( ss.getStrategyName().equals(DefaultStrategy.TimeAllocationMutator.toString()) ) {
 				throw new RuntimeException("Time mutation should not be used; fixed departure time must be used after cadyts calibration.");
-			} else if (modeChoiceUntilLastIteration && ss.getStrategyName().equals(DefaultStrategy.ChangeTripMode.toString())) {
+			} else if ( ! modeChoiceUntilLastIteration && ss.getStrategyName().equals(DefaultStrategy.ChangeTripMode.toString())) {
 				ss.setDisableAfter(config.controler().getFirstIteration() + initialStabilizationIterations);
 			}
 		}
