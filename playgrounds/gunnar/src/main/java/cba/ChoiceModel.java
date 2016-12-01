@@ -109,17 +109,18 @@ class ChoiceModel {
 		// }
 
 		// ONE TOUR (WORK OR OTHER)
-		{
-			for (Link loc : workLocs) {
-				for (Tour.Act act : new Tour.Act[] { Tour.Act.work, Tour.Act.other }) {
-					for (Tour.Mode mode : availableModes) {
-						final TourSequence alternative = new TourSequence();
-						alternative.tours.add(new Tour(loc, act, mode));
-						tmpAlternatives.add(alternative);
-					}
-				}
-			}
-		}
+		// {
+		// for (Link loc : workLocs) {
+		// for (Tour.Act act : new Tour.Act[] { Tour.Act.work, Tour.Act.other })
+		// {
+		// for (Tour.Mode mode : availableModes) {
+		// final TourSequence alternative = new TourSequence();
+		// alternative.tours.add(new Tour(loc, act, mode));
+		// tmpAlternatives.add(alternative);
+		// }
+		// }
+		// }
+		// }
 
 		// TWO TOURS (WORK, THEN OTHER)
 		{

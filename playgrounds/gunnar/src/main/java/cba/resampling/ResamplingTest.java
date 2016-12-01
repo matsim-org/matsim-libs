@@ -1,9 +1,12 @@
 package cba.resampling;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import floetteroed.utilities.Tuple;
 import floetteroed.utilities.math.MathHelpers;
 import floetteroed.utilities.math.Vector;
 
@@ -33,6 +36,13 @@ public class ResamplingTest {
 
 	// -------------------- DATA REGISTRATION --------------------
 
+	private void registerChoiceData(final double logOfRealizedChoiceProba, final double expOfLogOfChoiceProba,
+			final double varOfLogOfChoiceProba) {
+		this.logsOfRealizedChoiceProbas.add(logOfRealizedChoiceProba);
+		this.expOfLogsOfChoiceProbas.add(expOfLogOfChoiceProba);
+		this.varOfLogsOfChoiceProbas.add(varOfLogOfChoiceProba);
+	}
+
 	public void registerChoiceAndDistribution(final int choiceIndex, final List<Double> probabilities) {
 		if (probabilities.get(choiceIndex) == 0) {
 			throw new RuntimeException("Cannot register an impossible event.");
@@ -46,39 +56,62 @@ public class ResamplingTest {
 				expLnChoice2 += proba * logProba * logProba;
 			}
 		}
-		this.logsOfRealizedChoiceProbas.add(Math.log(probabilities.get(choiceIndex)));
-		this.expOfLogsOfChoiceProbas.add(expLnChoice);
-		this.varOfLogsOfChoiceProbas.add(expLnChoice2 - expLnChoice * expLnChoice);
+		this.registerChoiceData(Math.log(probabilities.get(choiceIndex)), expLnChoice,
+				expLnChoice2 - expLnChoice * expLnChoice);
+		// this.logsOfRealizedChoiceProbas.add(Math.log(probabilities.get(choiceIndex)));
+		// this.expOfLogsOfChoiceProbas.add(expLnChoice);
+		// this.varOfLogsOfChoiceProbas.add(expLnChoice2 - expLnChoice *
+		// expLnChoice);
 	}
 
 	// -------------------- TEST RESULTS --------------------
 
 	public double getStatistic() {
 
-		final double _N = this.logsOfRealizedChoiceProbas.size();
-
-		double meanOfLogsOfRealizedChoiceProbas = 0;
+		double sumOfLogsOfRealizedChoiceProbas = 0;
 		for (double real : this.logsOfRealizedChoiceProbas) {
-			meanOfLogsOfRealizedChoiceProbas += real;
+			sumOfLogsOfRealizedChoiceProbas += real;
 		}
-		meanOfLogsOfRealizedChoiceProbas /= _N;
 
-		double meanOfExpOfLogsOfChoiceProbas = 0;
+		double sumOfExpOfLogsOfChoiceProbas = 0;
 		for (double exp : this.expOfLogsOfChoiceProbas) {
-			meanOfExpOfLogsOfChoiceProbas += exp;
+			sumOfExpOfLogsOfChoiceProbas += exp;
 		}
-		meanOfExpOfLogsOfChoiceProbas /= _N;
 
-		double meanOfVarOfLogsOfChoiceProbas = 0;
+		double sumOfVarOfLogsOfChoiceProbas = 0;
 		for (double var : this.varOfLogsOfChoiceProbas) {
-			meanOfVarOfLogsOfChoiceProbas += var;
+			sumOfVarOfLogsOfChoiceProbas += var;
 		}
-		meanOfVarOfLogsOfChoiceProbas /= (_N * _N);
 
-		final double statistic = Math.abs(meanOfLogsOfRealizedChoiceProbas - meanOfExpOfLogsOfChoiceProbas)
-				/ Math.sqrt(meanOfVarOfLogsOfChoiceProbas);
+		final double statistic = (sumOfLogsOfRealizedChoiceProbas - sumOfExpOfLogsOfChoiceProbas)
+				/ Math.sqrt(sumOfVarOfLogsOfChoiceProbas);
 
 		return statistic;
+	}
+
+	public Tuple<Double, Double> getBootstrap95Percent(final int bootstrapDraws, final Random rnd) {
+
+		final LinkedList<Double> resampledStatisticList = new LinkedList<>();
+		for (int bootstrapDraw = 0; bootstrapDraw < bootstrapDraws; bootstrapDraw++) {
+			final ResamplingTest bootstrapTest = new ResamplingTest();
+			for (int i = 0; i < this.logsOfRealizedChoiceProbas.size(); i++) {
+				final int resampleIndex = rnd.nextInt(this.logsOfRealizedChoiceProbas.size());
+				bootstrapTest.registerChoiceData(this.logsOfRealizedChoiceProbas.get(resampleIndex),
+						this.expOfLogsOfChoiceProbas.get(resampleIndex),
+						this.varOfLogsOfChoiceProbas.get(resampleIndex));
+			}
+			resampledStatisticList.add(bootstrapTest.getStatistic());
+		}
+
+		Collections.sort(resampledStatisticList);
+
+		// remove 2.5 percent on either end
+		for (int remove = 0; remove < (0.025 * bootstrapDraws); remove++) {
+			resampledStatisticList.removeFirst();
+			resampledStatisticList.removeLast();
+		}
+
+		return new Tuple<Double, Double>(resampledStatisticList.getFirst(), resampledStatisticList.getLast());
 	}
 
 	static List<Double> newDistr(final int size, final Random rnd) {

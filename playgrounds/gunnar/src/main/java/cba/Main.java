@@ -47,15 +47,15 @@ public class Main {
 	static final String experienceFilePrefix = "./testdata/cba/experience-after-it";
 	static final String demandStatsFilePrefix = "./testdata/cba/demandStats-in-it";
 
-	static final int sampleCnt = 10;
+	static final int resampleCnt = 10 * 1000;
 	static final Random rnd = new Random();
-	static final boolean includeMATSimScore = false;
+	static final boolean useRealMATSimScore = false;
 
 	static final int maxTrials = 10;
 	static final int maxFailures = 3;
 
-	final static int minLocChoiceSetSize = 1;
-	final static int maxLocChoiceSetSize = 10;
+	final static int minLocChoiceSetSize = 1; // 1;
+	final static int maxLocChoiceSetSize = 10; // 10;
 
 	final static double carAvailProba = 0.5;
 
@@ -107,13 +107,12 @@ public class Main {
 		final Map<String, TravelTime> mode2tt = new LinkedHashMap<>();
 		mode2tt.put("car", carTravelTime);
 
-		DemandModel.replanPopulation(sampleCnt, rnd, scenario, factory, outerIt == 1 ? 1.0 : replanProba,
+		DemandModel.replanPopulation(resampleCnt, rnd, scenario, factory, outerIt == 1 ? 1.0 : replanProba,
 				expectationFilePrefix + outerIt + ".txt", demandStatsFilePrefix + outerIt + ".txt", maxTrials,
-				maxFailures, mode2tt, includeMATSimScore);
+				maxFailures, mode2tt, useRealMATSimScore);
 
 		final PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		popwriter.write("testdata/cba/triangle-population.xml");
-		// System.exit(0);
 	}
 
 	/*-

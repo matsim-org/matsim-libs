@@ -58,22 +58,23 @@ class UtilityFunction {
 
 		final Map<Link, Double> workSizes = new LinkedHashMap<>();
 
-		// no work opportunities in the outer ring
+		// no work opportunities in the outer ring. (size 1 for numerical
+		// reasons)
 
-		workSizes.put(net.getLinks().get(Id.createLinkId("1_2")), log(0.0));
-		workSizes.put(net.getLinks().get(Id.createLinkId("2_1")), log(0.0));
-		workSizes.put(net.getLinks().get(Id.createLinkId("1_6")), log(0.0));
-		workSizes.put(net.getLinks().get(Id.createLinkId("6_1")), log(0.0));
+		workSizes.put(net.getLinks().get(Id.createLinkId("1_2")), log(1.0));
+		workSizes.put(net.getLinks().get(Id.createLinkId("2_1")), log(1.0));
+		workSizes.put(net.getLinks().get(Id.createLinkId("1_6")), log(1.0));
+		workSizes.put(net.getLinks().get(Id.createLinkId("6_1")), log(1.0));
 
-		workSizes.put(net.getLinks().get(Id.createLinkId("3_2")), log(0.0));
-		workSizes.put(net.getLinks().get(Id.createLinkId("2_3")), log(0.0));
-		workSizes.put(net.getLinks().get(Id.createLinkId("3_4")), log(0.0));
-		workSizes.put(net.getLinks().get(Id.createLinkId("4_3")), log(0.0));
+		workSizes.put(net.getLinks().get(Id.createLinkId("3_2")), log(1.0));
+		workSizes.put(net.getLinks().get(Id.createLinkId("2_3")), log(1.0));
+		workSizes.put(net.getLinks().get(Id.createLinkId("3_4")), log(1.0));
+		workSizes.put(net.getLinks().get(Id.createLinkId("4_3")), log(1.0));
 
-		workSizes.put(net.getLinks().get(Id.createLinkId("5_4")), log(0.0));
-		workSizes.put(net.getLinks().get(Id.createLinkId("4_5")), log(0.0));
-		workSizes.put(net.getLinks().get(Id.createLinkId("5_6")), log(0.0));
-		workSizes.put(net.getLinks().get(Id.createLinkId("6_5")), log(0.0));
+		workSizes.put(net.getLinks().get(Id.createLinkId("5_4")), log(1.0));
+		workSizes.put(net.getLinks().get(Id.createLinkId("4_5")), log(1.0));
+		workSizes.put(net.getLinks().get(Id.createLinkId("5_6")), log(1.0));
+		workSizes.put(net.getLinks().get(Id.createLinkId("6_5")), log(1.0));
 
 		// 2000 work opportunities in the middle ring
 
@@ -155,9 +156,13 @@ class UtilityFunction {
 		 */
 
 		this.tourActSeq2asc.put(new ArrayList<Tour.Act>(0), 0.0);
-		this.tourActSeq2asc.put(Arrays.asList(Tour.Act.work), +22.0);
+		// this.tourActSeq2asc.put(Arrays.asList(Tour.Act.work), +22.0);
+		// this.tourActSeq2asc.put(Arrays.asList(Tour.Act.other), 0.0);
+		// this.tourActSeq2asc.put(Arrays.asList(Tour.Act.work, Tour.Act.other),
+		// -85.0);
+		this.tourActSeq2asc.put(Arrays.asList(Tour.Act.work), 0.0);
 		this.tourActSeq2asc.put(Arrays.asList(Tour.Act.other), 0.0);
-		this.tourActSeq2asc.put(Arrays.asList(Tour.Act.work, Tour.Act.other), -85.0);
+		this.tourActSeq2asc.put(Arrays.asList(Tour.Act.work, Tour.Act.other), 0.0);
 
 		this.mode2asc.put(Tour.Mode.car, 0.0);
 		this.mode2asc.put(Tour.Mode.pt, 0.0);

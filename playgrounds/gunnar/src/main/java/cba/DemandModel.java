@@ -26,6 +26,8 @@ import com.google.inject.Provider;
 
 import cba.resampling.ResamplingTest;
 import cba.resampling.Sampers2MATSimResampler;
+import floetteroed.utilities.Tuple;
+import floetteroed.utilities.math.BasicStatistics;
 
 /**
  * 
@@ -140,10 +142,10 @@ class DemandModel {
 		final Map<Person, ChoiceRunnerForResampling> person2choiceRunner = new LinkedHashMap<>();
 
 		// Replan in parallel.
+
 		final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			if (Math.random() < replanProba) {
-				// System.out.println("replanning person " + person.getId());
 				final Link homeLoc = scenario.getNetwork().getLinks()
 						.get(((Activity) person.getSelectedPlan().getPlanElements().get(0)).getLinkId());
 				final int locChoiceSetSize = (Integer) scenario.getPopulation().getPersonAttributes()
@@ -168,6 +170,7 @@ class DemandModel {
 
 		final DemandAnalyzer demandAnalyzer = new DemandAnalyzer();
 		final ResamplingTest resamplingTest = new ResamplingTest();
+		final BasicStatistics coverageStats = new BasicStatistics();
 
 		final PrintWriter expectationWriter;
 		try {
@@ -175,14 +178,15 @@ class DemandModel {
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
+		System.out.println("<coverage>\ttest-statistic\t95%-int.");
 		for (Map.Entry<Person, ChoiceRunnerForResampling> entry : person2choiceRunner.entrySet()) {
 			final Person person = entry.getKey();
+
+			coverageStats.add(entry.getValue().getCoverage());
 
 			final Sampers2MATSimResampler resampler = new Sampers2MATSimResampler(rnd,
 					entry.getValue().getChosenPlans(), sampleCnt);
 			final PlanForResampling planForResampling = (PlanForResampling) resampler.next();
-
-			// >>> REGISTER CHOSEN PLAN AND CHOICE SET WITH RESAMPLING TEST >>>
 
 			final List<Double> probabilities = new ArrayList<>(entry.getValue().getChosenPlans().size());
 			Integer choiceIndex = null;
@@ -196,9 +200,9 @@ class DemandModel {
 				i++;
 			}
 			resamplingTest.registerChoiceAndDistribution(choiceIndex, probabilities);
-			System.out.println("G = " + resamplingTest.getStatistic());
-			
-			// <<< REGISTER CHOSEN PLAN AND CHOICE SET WITH RESAMPLING TEST <<<
+			final Tuple<Double, Double> conf = resamplingTest.getBootstrap95Percent(10 * 1000, rnd);
+			System.out.println(coverageStats.getAvg() + "\t" + resamplingTest.getStatistic() + "\t[" + conf.getA()
+					+ ", " + conf.getB() + "]");
 
 			final Plan plan = planForResampling.plan;
 			person.getPlans().clear();

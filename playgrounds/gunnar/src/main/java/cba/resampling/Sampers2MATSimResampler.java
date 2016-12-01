@@ -22,9 +22,12 @@ public class Sampers2MATSimResampler {
 
 	private final List<Double> acceptanceProbas;
 
+	private final int maxResamples = 1000 * 1000;
+
 	// -------------------- CONSTRUCTION --------------------
 
-	public Sampers2MATSimResampler(final Random rnd, final Set<? extends Alternative> choiceSet, final int drawsWithReplacement) {
+	public Sampers2MATSimResampler(final Random rnd, final Set<? extends Alternative> choiceSet,
+			final int drawsWithReplacement) {
 
 		this.rnd = rnd;
 		this.alternatives = new ArrayList<>(choiceSet.size());
@@ -47,10 +50,10 @@ public class Sampers2MATSimResampler {
 		for (Double acceptanceWeight : acceptanceWeights) {
 			this.acceptanceProbas.add(acceptanceWeight / maxAcceptanceWeight);
 		}
-		
-//		System.out.println(acceptanceWeights);
-//		System.out.println(this.acceptanceProbas);
-//		System.exit(0);
+
+		// System.out.println(acceptanceWeights);
+		// System.out.println(this.acceptanceProbas);
+		// System.exit(0);
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
@@ -73,12 +76,12 @@ public class Sampers2MATSimResampler {
 	}
 
 	public Alternative next() {
+		int resample = 0;
 		while (true) {
 			final int candidateIndex = this.drawMATSimRUChoiceIndex();
 			final double x = this.rnd.nextDouble();
 			final double accProba = this.acceptanceProbas.get(candidateIndex);
-//			System.out.println(x + " vs " + accProba);
-			if (x < accProba) {
+			if ((x < accProba) || (++resample >= this.maxResamples)) {
 				return this.alternatives.get(candidateIndex);
 			}
 		}

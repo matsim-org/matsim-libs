@@ -55,6 +55,10 @@ class ChoiceRunnerForResampling implements Runnable {
 		return this.chosenPlans;
 	}
 
+	double getCoverage() {
+		return ((double) this.chosenPlans.size()) / ((double) this.alternatives.size());
+	}
+
 	ChoiceRunnerForResampling(final int sampleCnt, final Random rnd, final Scenario scenario,
 			final Provider<TripRouter> tripRouterProvider, final Map<String, TravelTime> mode2travelTime,
 			final Link homeLoc, final Person person, final List<TourSequence> tourSeqAlternatives, final int maxTrials,
@@ -141,6 +145,8 @@ class ChoiceRunnerForResampling implements Runnable {
 
 		this.chosenPlans = new LinkedHashSet<>(plansForResampling.values());
 
-		System.out.println("computed " + this.chosenPlans.size() + " alternatives for person " + this.person.getId());
+		System.out.println("computed " + this.chosenPlans.size() + " alternatives for person " + this.person.getId()
+				+ ". Coverage = " + (100.0 * (double) this.chosenPlans.size()) / ((double) this.alternatives.size())
+				+ " percent.");
 	}
 }
