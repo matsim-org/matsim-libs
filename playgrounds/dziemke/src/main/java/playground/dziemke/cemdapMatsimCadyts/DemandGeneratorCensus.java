@@ -55,6 +55,7 @@ public class DemandGeneratorCensus {
 
 	// Counters
 	private int counterMissingComRel = 0;
+	private int counterExternalCommuters = 0;
 	private int counterComRelUnassigned = 0;
 	private int allEmployees = 0;
 	private int allPersons = 0;
@@ -386,6 +387,7 @@ public class DemandGeneratorCensus {
 		LOG.warn("There are " + counterMissingComRel + " employees who have been set to unemployed since no commuter relation could be assigned to them.");
 		LOG.warn("Share of employees that had to be set to unemployed due to lack of commuter relations: " + ((double) counterMissingComRel / (double) allEmployees));
 		LOG.warn("Altogether " + counterComRelUnassigned + " commuter relations remain unassigned.");
+		LOG.warn("The are " + counterExternalCommuters + " people who commute outside of Berlin and Brandenburg.");
 		LOG.warn("Total number of employees: " + allEmployees);
 		LOG.warn("Total population: " + allPersons);
 		LOG.warn("Total number of students: " + allStudents);
@@ -481,7 +483,14 @@ public class DemandGeneratorCensus {
 					person.getAttributes().putAttribute("locationOfWork", "-99");
 					person.getAttributes().putAttribute("employed", false);
 				} else {
-					person.getAttributes().putAttribute("locationOfWork", getRandomWorkLocation(commuterRelationList, planningAreaId, lors));
+					String locationOfWork = getRandomWorkLocation(commuterRelationList, planningAreaId, lors);
+					if (locationOfWork.length() == 8 && (!locationOfWork.startsWith("12"))) { // TODO external commuter are currently treated as non workers
+						counterExternalCommuters++;
+						person.getAttributes().putAttribute("locationOfWork", "-99");
+						person.getAttributes().putAttribute("employed", false);
+					} else {
+					person.getAttributes().putAttribute("locationOfWork", locationOfWork);
+					}
 				}
 			} else {
 				person.getAttributes().putAttribute("locationOfWork", "-99");
