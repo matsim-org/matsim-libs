@@ -69,7 +69,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
 
     private final int numberOfBikeConnectorsRequired;
     private final int removeConnectorAfterIteration;
-    private final int initialStabilizationIterations = 100;
+    private final int initialStabilizationIterations ;
 
     private final List<Id<Link>> removedConnectorLinks = new ArrayList<>();
     private final FilteredLinkVolumeHandler handler = new FilteredLinkVolumeHandler(allowedModes);
@@ -83,9 +83,10 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
     private boolean terminateSimulation = false;
     private PlanAlgorithm router;
 
-    public BikeConnectorControlerListner(final int numberOfConnectorsRequired, final int removeOneConnectorAfterIteration) {
+    public BikeConnectorControlerListner(final int numberOfConnectorsRequired, final int removeOneConnectorAfterIteration, final int initialStabilizationIterations) {
         this.numberOfBikeConnectorsRequired = numberOfConnectorsRequired;
         this.removeConnectorAfterIteration = removeOneConnectorAfterIteration;
+        this.initialStabilizationIterations = initialStabilizationIterations;
     }
 
     @Override
@@ -106,7 +107,7 @@ public class BikeConnectorControlerListner implements StartupListener, Iteration
     public void notifyIterationEnds(IterationEndsEvent event) {
         if ( isRemovingBikeConnector(event.getIteration()) ) {
 
-            int numberOfRemainingConnectors = this.bikeConnectorLinks.size() - this.removedConnectorLinks.size();
+            int numberOfRemainingConnectors = this.totalPossibleConnectors - this.removedConnectorLinks.size();
             if (numberOfRemainingConnectors > this.numberOfBikeConnectorsRequired) {
 
                 Map<Id<Link>, Map<Integer, Double>> link2time2vol = this.handler.getLinkId2TimeSlot2LinkCount();

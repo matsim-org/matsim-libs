@@ -70,11 +70,14 @@ public class PatnaBikeTrackConnectionControler {
 
 	private static String dir = FileUtils.RUNS_SVN+"/patnaIndia/run108/jointDemand/policies/0.15pcu/";
 	private static String bikeTrack = PatnaUtils.INPUT_FILES_DIR + "/simulationInputs/network/shpNetwork/bikeTrack.xml.gz";
+	private static final int initialStabilizationIterations = 100;
 
 	private static int numberOfConnectors = 499;
 	private static int updateConnectorsAfterIteration = 2;
 	private static double reduceLinkLengthBy = 1.;
 	private static boolean useBikeTravelTime = true;
+
+	private static boolean modeChoiceUntilLastIteration = true;
 
 	public static void main(String[] args) {
 
@@ -85,6 +88,8 @@ public class PatnaBikeTrackConnectionControler {
 			bikeTrack = args[3];
 			reduceLinkLengthBy = Double.valueOf(args[4]);
 			useBikeTravelTime = Boolean.valueOf(args[5]);
+
+			modeChoiceUntilLastIteration = Boolean.valueOf(args[5]);
 		}
 
 		String regularNet = dir+"/input/network.xml.gz";
@@ -97,8 +102,9 @@ public class PatnaBikeTrackConnectionControler {
 
 		Scenario scenario = prepareScenario(outBikeTrackConnectorFile);
 
-		scenario.getConfig().controler().setOutputDirectory(dir+"bikeTrackConnectors_"+numberOfConnectors+"_"+updateConnectorsAfterIteration+"_"+reduceLinkLengthBy+"/");
-		BikeConnectorControlerListner bikeConnectorControlerListner = new BikeConnectorControlerListner(numberOfConnectors, updateConnectorsAfterIteration);
+		scenario.getConfig().controler().setOutputDirectory(dir+"bikeTrackConnectors_"+numberOfConnectors+"_"+updateConnectorsAfterIteration+"_"+
+				reduceLinkLengthBy+"_"+useBikeTravelTime+"_"+modeChoiceUntilLastIteration+"/");
+		BikeConnectorControlerListner bikeConnectorControlerListner = new BikeConnectorControlerListner(numberOfConnectors, updateConnectorsAfterIteration, initialStabilizationIterations);
 
 		final Controler controler = new Controler(scenario);
 
@@ -167,23 +173,25 @@ public class PatnaBikeTrackConnectionControler {
 		// time dependent network for network change events
 		config.network().setTimeVariantNetwork(true);
 
-//		String inPlans = inputDir+"samplePlansForTesting.xml";
-		String inPlans = inputDir+"/baseCaseOutput_plans.xml.gz";
+		String inPlans = inputDir+"samplePlansForTesting.xml";
+//		String inPlans = inputDir+"/baseCaseOutput_plans.xml.gz";
 		config.plans().setInputFile( inPlans );
 		config.plans().setInputPersonAttributeFile(inputDir+"output_personAttributes.xml.gz");
 		config.vehicles().setVehiclesFile(null); // see below for vehicle type info
 
 		//==
 		// after calibration;  departure time is fixed for urban; check if time choice is not present
+		config.strategy().setFractionOfIterationsToDisableInnovation(1.0); // let all the innovations (except mode choice) go on until last iteration.
 		Collection<StrategySettings> strategySettings = config.strategy().getStrategySettings();
 		for(StrategySettings ss : strategySettings){ // departure time is fixed now.
+			ss.setDisableAfter(-1);
 			if ( ss.getStrategyName().equals(DefaultStrategy.TimeAllocationMutator.toString()) ) {
 				throw new RuntimeException("Time mutation should not be used; fixed departure time must be used after cadyts calibration.");
-			} else if (  ss.getStrategyName().equals(DefaultStrategy.ReRoute.toString())  ) {
-				// increase chances of re-routing to 25%
-				ss.setWeight(0.25);
+			} else if (modeChoiceUntilLastIteration && ss.getStrategyName().equals(DefaultStrategy.ChangeTripMode.toString())) {
+				ss.setDisableAfter(config.controler().getFirstIteration() + initialStabilizationIterations);
 			}
 		}
+
 		//==
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setDumpDataAtEnd(true);
@@ -198,7 +206,7 @@ public class PatnaBikeTrackConnectionControler {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		String vehiclesFile = inputDir+"output_vehicles.xml.gz"; // following is done to extract only vehicle types and not vehicle info. Amit Nov 2016
+		String vehiclesFile = inputDir+"output_vehicles.xml.gz"; // following is required to extract only vehicle types and not vehicle info. Amit Nov 2016
 		PatnaVehiclesGenerator.addVehiclesToScenarioFromVehicleFile(vehiclesFile, scenario);
 
 		// no vehicle info should be present if using VehiclesSource.modeVEhicleTypesFromVehiclesData
