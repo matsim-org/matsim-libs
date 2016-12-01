@@ -154,7 +154,14 @@ public final class TransitRouterQuadTree {
 				
 				for (TransitRouteStop stop : route.getStops()) {
 					for (int j = 0; j < departureTimes.length; j++) {
+						if (stop.getArrivalOffset() == Double.NEGATIVE_INFINITY) {
+							// There should always be a valid number set OR the field should not be present - it's optional
+							// Take the departure offset as fallback
+							arrivalTimesList.add(departureTimes[j] + stop.getDepartureOffset());
+						} else {
 						arrivalTimesList.add(departureTimes[j] + stop.getArrivalOffset());
+						}
+						
 						departureTimesList.add(departureTimes[j] + stop.getDepartureOffset());
 					}
 				}
