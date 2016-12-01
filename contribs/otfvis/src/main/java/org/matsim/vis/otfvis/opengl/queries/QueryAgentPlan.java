@@ -141,7 +141,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			log.error("No plan found for id " + this.agentId);
 		}
 		MobsimAgent mobsimAgent = simulationView.getAgents().get(this.agentId);
-		if (mobsimAgent != null && mobsimAgent.getState() == MobsimAgent.State.ACTIVITY) {
+		if (mobsimAgent != null && mobsimAgent.getState() == MobsimAgent.State.ACTIVITY && mobsimAgent instanceof PlanAgent ) {
 			Activity act = (Activity) ((PlanAgent) mobsimAgent).getCurrentPlanElement();
 			Coord c2 = getCoord(act);
 			if (simulationView.getTime() > act.getStartTime() && simulationView.getTime() <= act.getEndTime()) {
