@@ -376,9 +376,14 @@ public class CombinedOsmSink implements Sink {
 				
 				// Create facility for building
 				if (activityType != null) {
-					createFacility(aff, entity, name, centroidCoord, activityType);
-					if ( !this.unmannedEntitiesList.contains(buildingType) ) {
-						createFacility(aff, entity, name, centroidCoord, FacilityTypes.WORK);
+					if(activityType.equalsIgnoreCase("home")){
+						/* Ignore buildings that has a 'home' activity associated with it. */
+					} else{
+						/* Associate work with it. */
+						createFacility(aff, entity, name, centroidCoord, activityType);
+						if ( !this.unmannedEntitiesList.contains(buildingType) ) {
+							createFacility(aff, entity, name, centroidCoord, FacilityTypes.WORK);
+						}
 					}
 				}
 			}
