@@ -25,12 +25,13 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Supplier;
 
 /**
- * A cache that keeps entries as long as the Virtual Maching is happy
+ * A cache that keeps entries as long as the Virtual Machine is happy
  * with it, using SoftReferences.
  * It is designed to be usable from multiple threads with minimal locking
- * using a ConcurentHashMap internally.
+ * using a ConcurrentHashMap internally.
  * At construction, a daemon thread is started to handle cleaning of the GC'd
  * entries, which gets stopped at most 5 seconds after the cache instance is finalized.
  * <br>
@@ -65,12 +66,7 @@ public class SoftCache<K,V> {
 	 * or no reference to them is kept.
 	 */
 	public SoftCache() {
-		this( new Cloner<V>() {
-				@Override
-				public V clone(V cloned) {
-					return cloned;
-				}
-			} );
+		this( cloned -> cloned );
 	}
 
 	/**
@@ -109,9 +105,22 @@ public class SoftCache<K,V> {
 
 	public void put( final K key , final V value ) {
 		final V clone = cloner.clone( value );
-		// one could use putIfAbsent to add a "lazilly computing" object,
-		// to avoid computing twice the same value
-		cleaner.softRefsMap.put( key , new SoftEntry<K, V>( cleaner.queue, key , clone ) );
+		cleaner.softRefsMap.put( key , new SoftEntry<>( cleaner.queue, key, clone ) );
+	}
+
+	public V getOrPut( final K key , final V value ) {
+		return getOrPut( key , () -> value );
+	}
+
+	public V getOrPut( final K key , final Supplier<V> supplier ) {
+		V obj = get( key );
+
+		if ( obj == null ) {
+			obj = supplier.get();
+			put( key , obj );
+		}
+
+		return obj;
 	}
 
 	@Override
