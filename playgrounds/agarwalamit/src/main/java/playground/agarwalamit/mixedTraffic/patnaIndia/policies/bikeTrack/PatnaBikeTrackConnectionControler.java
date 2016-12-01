@@ -91,7 +91,7 @@ public class PatnaBikeTrackConnectionControler {
 			reduceLinkLengthBy = Double.valueOf(args[4]);
 			useBikeTravelTime = Boolean.valueOf(args[5]);
 
-			modeChoiceUntilLastIteration = Boolean.valueOf(args[5]);
+			modeChoiceUntilLastIteration = Boolean.valueOf(args[6]);
 
 			isRunningOnCluster = true;
 		}
