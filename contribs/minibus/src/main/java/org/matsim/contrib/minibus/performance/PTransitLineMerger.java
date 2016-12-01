@@ -94,7 +94,7 @@ public class PTransitLineMerger {
 				
 				for (Departure oldDeparture : transitRoute.getDepartures().values()) {
 					// increase departure id
-					Id<Departure> newDepartureId = Id.create(mergeDestination.getDepartures().values().size(), Departure.class);
+					Id<Departure> newDepartureId = Id.create("new_" + mergeDestination.getDepartures().values().size(), Departure.class);
 					Departure newDeparture = transitScheduleFactory.createDeparture(newDepartureId, oldDeparture.getDepartureTime());
 					newDeparture.setVehicleId(oldDeparture.getVehicleId());
 					mergeDestination.addDeparture(newDeparture);
