@@ -40,7 +40,6 @@ import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 public class ModalShareControlerListener implements StartupListener, IterationEndsListener{
 
 	private int firstIteration = 0;
-//	private int numberOfIterations = 0;
 	private SortedMap<String, double []> mode2numberofLegs = new TreeMap<>();
 
 	@Inject
@@ -52,8 +51,6 @@ public class ModalShareControlerListener implements StartupListener, IterationEn
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.firstIteration = event.getServices().getConfig().controler().getFirstIteration();
-//		this.numberOfIterations = event.getServices().getConfig().controler().getLastIteration() - this.firstIteration + 1;
-
 		this.events.addHandler(this.modalShareHandler);
 	}
 
@@ -79,23 +76,6 @@ public class ModalShareControlerListener implements StartupListener, IterationEn
 				mode2numberofLegs.put(mode,legsNew);
 			}
 		}
-
-//		if(itNrIndex == 0) {
-//			for(String mode : mode2legs.keySet()) {
-//				if ( ! mode2numberofLegs.containsKey(mode)){ // initialize
-//					double [] legs = new double [this.numberOfIterations];
-//					legs[itNrIndex] = mode2legs.get(mode);
-//					mode2numberofLegs.put(mode, legs);
-//				}
-//			}
-//			return; // only one data points... so no plotting
-//		}
-//
-//		//storeData
-//		for(String mode : mode2legs.keySet()) {
-//			double [] legs = this.mode2numberofLegs.get(mode);
-//			legs[itNrIndex] = mode2legs.get(mode);
-//		}
 
 		if(itNrIndex == 0) return;
 

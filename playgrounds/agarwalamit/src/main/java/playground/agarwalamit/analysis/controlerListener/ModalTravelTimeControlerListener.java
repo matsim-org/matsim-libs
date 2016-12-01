@@ -42,7 +42,6 @@ import playground.agarwalamit.utils.ListUtils;
 public class ModalTravelTimeControlerListener implements StartupListener, IterationEndsListener{
 
 	private int firstIteration = 0;
-//	private int numberOfIterations = 0;
 	private SortedMap<String, double []> mode2AvgTripTimes = new TreeMap<>();
 
 	@Inject
@@ -54,8 +53,6 @@ public class ModalTravelTimeControlerListener implements StartupListener, Iterat
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.firstIteration = event.getServices().getConfig().controler().getFirstIteration();
-//		this.numberOfIterations = event.getServices().getConfig().controler().getLastIteration() - this.firstIteration + 1;
-
 		this.events.addHandler(this.travelTimeHandler);
 	}
 
