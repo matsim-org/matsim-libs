@@ -21,9 +21,11 @@ package playground.thibautd.negotiation.locationnegotiation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.facilities.ActivityFacility;
+import playground.ivt.utils.SoftCache;
 import playground.thibautd.negotiation.framework.Proposition;
 
 import java.util.Collection;
+import java.util.function.DoubleSupplier;
 
 /**
  * @author thibautd
@@ -34,12 +36,29 @@ public class LocationProposition implements Proposition {
 
 	private final ActivityFacility facility;
 
-	public LocationProposition( final Id<Person> proposer,
+	/* Use a soft cache for created propositions, not for memory reasons (propositions are quickly discarded),
+	 * but for avoiding re-computing utility value if re-stumbling on the same proposition.
+	 * This goes together with the cached utility.
+	 * This of course makes a difference only if proposition is still in cache when encountered for the second time...
+	 */
+	private static final SoftCache<LocationProposition,LocationProposition> cache = new SoftCache<>();
+	private double cachedUtility = Double.NEGATIVE_INFINITY;
+
+	private LocationProposition(
+			final Id<Person> proposer,
 			final Collection<Id<Person>> proposed,
 			final ActivityFacility facility ) {
 		this.proposer = proposer;
 		this.proposed = proposed;
 		this.facility = facility;
+	}
+
+	public static LocationProposition create(
+			final Id<Person> proposer,
+			final Collection<Id<Person>> proposed,
+			final ActivityFacility facility ) {
+		final LocationProposition proposition = new LocationProposition( proposer, proposed, facility );
+		return cache.getOrPut( proposition , proposition );
 	}
 
 	@Override
@@ -54,5 +73,31 @@ public class LocationProposition implements Proposition {
 
 	public ActivityFacility getFacility() {
 		return facility;
+	}
+
+	double getOrUpdateUtility( final DoubleSupplier util ) {
+		if ( cachedUtility == Double.NEGATIVE_INFINITY ) this.cachedUtility = util.getAsDouble();
+		return cachedUtility;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = proposer.hashCode();
+
+		hash *= 37;
+		hash += proposed.hashCode();
+
+		hash *= 37;
+		hash += facility.hashCode();
+
+		return hash;
+	}
+
+	@Override
+	public boolean equals( final Object obj ) {
+		return obj instanceof LocationProposition &&
+				( (LocationProposition) obj ).facility.equals( facility ) &&
+				( (LocationProposition) obj ).proposed.equals( proposed ) &&
+				( (LocationProposition) obj ).proposer.equals( proposer );
 	}
 }

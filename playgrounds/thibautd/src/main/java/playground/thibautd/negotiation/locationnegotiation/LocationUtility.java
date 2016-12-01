@@ -60,24 +60,27 @@ public class LocationUtility implements PropositionUtility<LocationProposition> 
 			final NegotiationAgent<LocationProposition> agent,
 			final LocationProposition proposition ) {
 		if ( proposition == null ) return Double.NEGATIVE_INFINITY;
-		final Person ego = population.getPersons().get( agent.getId() );
-		final Collection<Person> alters =
-				proposition.getGroupIds().stream()
-						.map( population.getPersons()::get )
-						.collect( Collectors.toList() );
+		return proposition.getOrUpdateUtility( () -> {
+			final Person ego = population.getPersons().get( agent.getId() );
+			final Collection<Person> alters =
+					proposition.getGroupIds().stream()
+							.map( population.getPersons()::get )
+							.collect( Collectors.toList() );
 
-		final ActivityFacility location = proposition.getFacility();
+			final ActivityFacility location = proposition.getFacility();
 
-		final double sumOfAlterUtils =
-				alters.stream()
-					.mapToDouble( a -> seeds.getUniformErrorTerm( a , ego ) * configGroup.getMuContact() )
-					.sum();
+			final double sumOfAlterUtils =
+					alters.stream()
+							.mapToDouble( a -> seeds.getUniformErrorTerm( a, ego ) * configGroup.getMuContact() )
+							.sum();
 
-		final double utilLocation = seeds.getGaussianErrorTerm( ego , asAttr( location ) ) * configGroup.getSigmaFacility();
+			final double utilLocation = seeds.getGaussianErrorTerm( ego,
+					asAttr( location ) ) * configGroup.getSigmaFacility();
 
-		final double utilTravelTime = getTravelTime( ego , location ) * configGroup.getBetaTime();
+			final double utilTravelTime = getTravelTime( ego, location ) * configGroup.getBetaTime();
 
-		return sumOfAlterUtils + utilLocation + utilTravelTime;
+			return sumOfAlterUtils + utilLocation + utilTravelTime;
+		} );
 	}
 
 	// TODO: make facilities actually implement attributable!

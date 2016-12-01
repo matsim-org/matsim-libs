@@ -94,12 +94,12 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 		// visits
 		for ( Id<Person> alter : alterIds ) {
 			propositions.add(
-					new LocationProposition(
+					LocationProposition.create(
 							ego.getId() ,
 							Collections.singleton( alter ) ,
 							locations.getHomeLocation( ego ) ) );
 			propositions.add(
-					new LocationProposition(
+					LocationProposition.create(
 							ego.getId() ,
 							Collections.singleton( alter ) ,
 							locations.getHomeLocation( population.getPersons().get( alter ) ) ) );
@@ -107,7 +107,7 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 
 		// alone at home
 		propositions.add(
-				new LocationProposition(
+				LocationProposition.create(
 						ego.getId() ,
 						Collections.emptyList(),
 						locations.getHomeLocation( ego ) ) );
@@ -136,7 +136,7 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 		return subsample.stream()
 				.flatMap( facility ->
 						alters.stream().map( alter ->
-								new LocationProposition(
+								LocationProposition.create(
 										agent.getId(),
 										Collections.singleton( alter ),
 										facility ) ) )
