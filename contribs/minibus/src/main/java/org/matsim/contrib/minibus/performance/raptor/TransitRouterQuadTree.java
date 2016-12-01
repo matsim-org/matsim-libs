@@ -111,7 +111,7 @@ public final class TransitRouterQuadTree {
 				int position = 0;
 				for (TransitRouteStop routeStop : route.getStops()) {
 					
-					String routeStopHash = this.getHash(route, routeStop, position);
+					String routeStopHash = this.getHash(line, route, routeStop, position);
 					WrappedTransitRouteStop wrappedRouteStop = new WrappedTransitRouteStop(routeStop);
 					hash2routeStop.put(routeStopHash, wrappedRouteStop);
 					
@@ -172,7 +172,7 @@ public final class TransitRouterQuadTree {
 				// fill route stops
 				int placeOfCurrentStop = 0;
 				for (TransitRouteStop routeStop : route.getStops()) {
-					String routeStopHash = this.getHash(route, routeStop, placeOfCurrentStop);
+					String routeStopHash = this.getHash(line, route, routeStop, placeOfCurrentStop);
 					WrappedTransitRouteStop wrappedRouteStop = hash2routeStop.get(routeStopHash);
 					
 					placeOfCurrentStop++;
@@ -376,7 +376,7 @@ public final class TransitRouterQuadTree {
 	    return array;
 	}
 	
-	private String getHash(TransitRoute transitRoute, TransitRouteStop transitRouteStop, int position){
-		return transitRoute.getId().toString() + "-" + transitRouteStop.getStopFacility().getId().toString() + "-" + position;
+	private String getHash(TransitLine transitLine, TransitRoute transitRoute, TransitRouteStop transitRouteStop, int position){
+		return transitLine.getId().toString() + "-" + transitRoute.getId().toString() + "-" + transitRouteStop.getStopFacility().getId().toString() + "-" + position;
 	}
 }
