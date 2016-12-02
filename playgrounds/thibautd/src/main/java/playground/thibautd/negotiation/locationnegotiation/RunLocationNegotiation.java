@@ -44,7 +44,8 @@ public class RunLocationNegotiation {
 						args[ 0 ] ,
 						new NegotiatorConfigGroup() ,
 						new LocationUtilityConfigGroup() ,
-						new SocialNetworkConfigGroup() );
+						new SocialNetworkConfigGroup(),
+						new LocationAlternativesConfigGroup() );
 
 		try ( AutoCloseable out = MoreIOUtils.initOut( config ) ;
 			  AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose();
