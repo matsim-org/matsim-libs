@@ -252,6 +252,7 @@ public class CNEMunich {
 		cne.setSigma(sigma);
 		cne.setCongestionTollingApproach(congestionTollingApproach);
 		cne.setkP(kP);
+		cne.setPersonFilter(new MunichPersonFilter());
 		controler = cne.prepareControler();
 		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);

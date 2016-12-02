@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.analysis.emission;
+package playground.agarwalamit.analysis.emission.experienced;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -35,24 +35,24 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.utils.MapUtils;
 import playground.agarwalamit.utils.PersonFilter;
-import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
+import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 
 /**
  * Created by amit on 01/12/2016.
  */
 
-public class EmissionAnalysisControlerListener implements StartupListener, IterationEndsListener, ShutdownListener {
+public class ExperiencedEmissionAnalysisControlerListener implements StartupListener, IterationEndsListener, ShutdownListener {
 
-    public EmissionAnalysisControlerListener(final EmissionCostModule ecm, final EmissionModule emissionModule, final PersonFilter pf) {
-        this.emissionCostHandler = new EmissionCostHandler(ecm, pf);
+    public ExperiencedEmissionAnalysisControlerListener(final EmissionResponsibilityCostModule ecm, final EmissionModule emissionModule, final PersonFilter pf) {
+        this.causedEmissionCostHandler = new ExperiencedEmissionCostHandler(ecm, pf);
         this.emissionModule = emissionModule;
     }
 
-    public EmissionAnalysisControlerListener(final EmissionCostModule ecm, final EmissionModule emissionModule) {
+    public ExperiencedEmissionAnalysisControlerListener(final EmissionResponsibilityCostModule ecm, final EmissionModule emissionModule) {
         this(ecm, emissionModule, null);
     }
 
-    private final EmissionCostHandler emissionCostHandler;
+    private final ExperiencedEmissionCostHandler causedEmissionCostHandler;
     private final EmissionModule emissionModule;
     private BufferedWriter writer ;
 
@@ -74,12 +74,12 @@ public class EmissionAnalysisControlerListener implements StartupListener, Itera
         event.getServices().getEvents().addHandler(this.emissionModule.getWarmEmissionHandler());
         event.getServices().getEvents().addHandler(this.emissionModule.getColdEmissionHandler());
 
-        emissionModule.getEmissionEventsManager().addHandler(this.emissionCostHandler);
+        emissionModule.getEmissionEventsManager().addHandler(this.causedEmissionCostHandler);
     }
 
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
-        Map<String, Double> userGrp2cost = this.emissionCostHandler.getUserGroup2TotalEmissionsCost();
+        Map<String, Double> userGrp2cost = this.causedEmissionCostHandler.getUserGroup2TotalEmissionsCost();
         try {
             this.writer.write(event.getIteration()+"\t");
             for (MunichPersonFilter.MunichUserGroup munichUserGroup : MunichPersonFilter.MunichUserGroup.values()) {

@@ -24,7 +24,6 @@ package playground.ikaddoura.integrationCNE;
 
 import java.io.IOException;
 import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,7 +44,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-
+import playground.agarwalamit.utils.PersonFilter;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
 import playground.ikaddoura.decongestion.Decongestion;
@@ -60,11 +59,7 @@ import playground.ikaddoura.integrationCN.VTTSNoiseTollTimeDistanceTravelDisutil
 import playground.ikaddoura.integrationCN.VTTSTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
-import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
-import playground.vsp.airPollution.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
-import playground.vsp.airPollution.exposure.GridTools;
-import playground.vsp.airPollution.exposure.InternalizeEmissionResponsibilityControlerListener;
-import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
+import playground.vsp.airPollution.exposure.*;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.controler.CongestionAnalysisControlerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -103,6 +98,8 @@ public class CNEIntegration {
 	
 	private CongestionTollingApproach congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
 	private double kP = 0.;
+
+	private PersonFilter personFilter = null;
 
 	private final GridTools gridTools;
 	private final ResponsibilityGridTools responsibilityGridTools ;
@@ -543,7 +540,9 @@ public class CNEIntegration {
 			// only congestion pricing
 			
 			// add air pollution analysis
-			if (airPollutionAnalysis) controler.addControlerListener(new EmissionControlerListener());
+			if (airPollutionAnalysis) {
+				controler.addControlerListener(new EmissionControlerListener());
+			}
 			
 			// add noise analysis
 			if (noiseAnalysis) controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
@@ -661,4 +660,7 @@ public class CNEIntegration {
 		this.kP = kP;
 	}
 
+	public void setPersonFilter(PersonFilter personFilter) {
+		this.personFilter = personFilter;
+	}
 }

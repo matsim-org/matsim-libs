@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.analysis.emission;
+package playground.agarwalamit.analysis.emission.caused;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,12 +34,14 @@ import playground.agarwalamit.utils.PersonFilter;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 
 /**
+ * Emission costs (flat emission cost module is used).
+ *
  * @author amit
  */
 
-public class EmissionCostHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler{
+public class CausedEmissionCostHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler{
 
-	private static final Logger LOG = Logger.getLogger(EmissionCostHandler.class);
+	private static final Logger LOG = Logger.getLogger(CausedEmissionCostHandler.class);
 
 	private final EmissionCostModule emissionCostModule;
 	private final Map<Id<Vehicle>, Double> vehicleId2ColdEmissCosts = new HashMap<>();
@@ -47,11 +49,11 @@ public class EmissionCostHandler implements WarmEmissionEventHandler, ColdEmissi
 
 	private final PersonFilter pf ; // what if no person filter is available..?
 
-	public EmissionCostHandler(final EmissionCostModule emissionCostModule) {
+	public CausedEmissionCostHandler(final EmissionCostModule emissionCostModule) {
 		this(emissionCostModule, null);
 	}
 
-	public EmissionCostHandler(final EmissionCostModule emissionCostModule, final PersonFilter pf) {
+	public CausedEmissionCostHandler(final EmissionCostModule emissionCostModule, final PersonFilter pf) {
 		this.emissionCostModule = emissionCostModule;
 		this.pf = pf;
 	}
@@ -60,7 +62,7 @@ public class EmissionCostHandler implements WarmEmissionEventHandler, ColdEmissi
 		String emissionEventsFile = FileUtils.RUNS_SVN+ "/detEval/emissionCongestionInternalization/iatbr/output/ei/ITERS/it.1500/1500.emission.events.xml.gz";
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionCostModule ecm = new EmissionCostModule(1.0, true);
-		EmissionCostHandler ech = new EmissionCostHandler(ecm);
+		CausedEmissionCostHandler ech = new CausedEmissionCostHandler(ecm);
 		eventsManager.addHandler(ech);
 		new EmissionEventsReader(eventsManager).readFile(emissionEventsFile);
 
