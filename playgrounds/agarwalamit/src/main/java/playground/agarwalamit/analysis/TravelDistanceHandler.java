@@ -21,13 +21,10 @@ package playground.agarwalamit.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -43,17 +40,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
-import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
-import org.opengis.feature.simple.SimpleFeature;
-
-import com.vividsolutions.jts.geom.Geometry;
-
-import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
-import playground.agarwalamit.utils.GeometryUtils;
-import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.agarwalamit.utils.MapUtils;
+import playground.agarwalamit.utils.*;
 
 /**
  * @author amit
@@ -61,12 +50,13 @@ import playground.agarwalamit.utils.MapUtils;
 
 public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private static final Logger LOGGER = Logger.getLogger(TravelDistanceHandler.class.getName());
+
 	private final Vehicle2DriverEventHandler veh2DriverDelegate = new Vehicle2DriverEventHandler();
-	private final MunichPersonFilter pf = new MunichPersonFilter();
+	private final PersonFilter pf ;
+	private final AreaFilter af;
 
 	private final double timeBinSize ;
 	private final Network network;
-	private final Collection<Geometry> zonalGeoms;
 	private final String ug ;
 
 	private final SortedMap<Double,Map<Id<Person>,Double>> timeBin2personId2travelledDistance = new TreeMap<>();
@@ -74,56 +64,56 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 	/**
 	 * Area and user group filtering will be used, links fall inside the given shape and persons belongs to the given user group will be considered.
 	 */
-	public TravelDistanceHandler(final double simulationEndTime, final int noOfTimeBins, final Network network, final String shapeFile, final String userGroup) {
+	public TravelDistanceHandler(final double simulationEndTime, final int noOfTimeBins, final Network network, final AreaFilter af, final PersonFilter pf, final String userGroup) {
 		this.timeBinSize = simulationEndTime/noOfTimeBins;
 		this.network = network;
-
-		if(shapeFile!=null) {
-			Collection<SimpleFeature> features = new ShapeFileReader().readFileAndInitialize(shapeFile);
-			this.zonalGeoms = GeometryUtils.getSimplifiedGeometries(features);
-		}
-		else this.zonalGeoms = new ArrayList<>();
-
+		this.af = af;
+		this.pf = pf;
 		this.ug=userGroup;
-		LOGGER.info("Area and user group filtering is used, links fall inside the given shape and belongs to the given user group will be considered.");
-		LOGGER.warn("User group will be identified for Munich scenario only, i.e. Urban, (Rev)Commuter and Freight.");
+
+		if( (this.ug==null && this.pf!=null) || this.ug!=null && this.pf==null ) {
+			throw new RuntimeException("Either of person filter or user group is null.");
+		} else if( this.ug!=null && this.af !=null) {
+			LOGGER.info("Area and user group filtering is used, links fall inside the given shape and belongs to the "+this.ug+" user group will be considered.");
+		} else if(this.ug!=null) {
+			LOGGER.info("User group filtering is used, result will include all links but persons from "+this.ug+" user group only.");
+		} else if (this.af !=null) {
+			LOGGER.info("Area filtering is used, result will include links falls inside the given shape and persons from all user groups.");
+		} else {
+			LOGGER.info("No filtering is used, result will include all links, persons from all user groups.");
+		}
 	}
 
 	/**
 	 * Area filtering will be used, result will include links falls inside the given shape and persons from all user groups.
 	 */
-	public TravelDistanceHandler(final double simulationEndTime, final int noOfTimeBins, final String ShapeFile, final Network network) {
-		this(simulationEndTime, noOfTimeBins, network, ShapeFile, null);	
-		LOGGER.info("Area filtering is used, result will include links falls inside the given shape and persons from all user groups.");
+	public TravelDistanceHandler(final double simulationEndTime, final int noOfTimeBins, final Network network, final AreaFilter af) {
+		this(simulationEndTime, noOfTimeBins, network, af, null,null);
 	}
 
 	/**
 	 * User group filtering will be used, result will include all links but persons from given user group only.
 	 */
-	public TravelDistanceHandler(final double simulationEndTime, final int noOfTimeBins, final Network network, final String userGroup) {
-		this(simulationEndTime, noOfTimeBins, network, null, userGroup);
-		LOGGER.info("Usergroup filtering is used, result will include all links but persons from given user group only.");
-		LOGGER.warn("User group will be identified for Munich scenario only, i.e. Urban, (Rev)Commuter and Freight.");
+	public TravelDistanceHandler(final double simulationEndTime, final int noOfTimeBins, final Network network, final PersonFilter pf, final String userGroup) {
+		this(simulationEndTime, noOfTimeBins, network, null, pf, userGroup);
 	}
 
 	/**
 	 * No filtering will be used, result will include all links, persons from all user groups.
 	 */
 	public TravelDistanceHandler(final double simulationEndTime, final int noOfTimeBins, final Network network) {
-		this(simulationEndTime,noOfTimeBins,network,null,null);
-		LOGGER.info("No filtering is used, result will include all links, persons from all user groups.");
+		this(simulationEndTime, noOfTimeBins, network,null, null, null);
 	}
 
 	public static void main(String[] args) {
-		MunichPersonFilter pf = new MunichPersonFilter();
-		String scenario = "ei";
-		String eventsFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/ITERS/it.1500/1500.events.xml.gz";
-		String configFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/output_config.xml.gz";
-		String networkFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/output_network.xml.gz";
-		String outputFolder = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/analysis/";
+		String scenario = "bau";
+		String eventsFile = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/ITERS/it.1500/1500.events.xml.gz";
+		String configFile = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/output_config.xml.gz";
+		String networkFile = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/output_network.xml.gz";
+		String outputFolder = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/analysis/";
 
-		String shapeFileCity = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-		String shapeFileMMA = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
+		String shapeFileCity = FileUtils.SHARED_SVN+"/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+		String shapeFileMMA = FileUtils.SHARED_SVN+"/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
 
 		String [] areas = {shapeFileCity, shapeFileMMA, null};
 		String [] areasName = {"city","MMA","wholeArea"};
@@ -133,12 +123,13 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 		SortedMap<String, SortedMap<String, Double>> area2usrGrp2Dist = new TreeMap<>();
 
 		for(int ii=0; ii<areas.length;ii++) {
+			AreaFilter areaFilter = new AreaFilter(areas[ii]);
 			SortedMap<String, Double> usrGrp2Dist = new TreeMap<>();
 			for ( MunichUserGroup ug : MunichUserGroup.values() ) {
 				if(area2usrGrp2Dist.containsKey(ug.toString())) continue;
 
 				EventsManager em = EventsUtils.createEventsManager();
-				TravelDistanceHandler tdh = new TravelDistanceHandler(simEndTime, 1, network, areas[ii],  ug.toString());
+				TravelDistanceHandler tdh = new TravelDistanceHandler(simEndTime, 1, network, areaFilter);
 				em.addHandler(tdh);
 				MatsimEventsReader reader = new MatsimEventsReader(em);
 				reader.readFile(eventsFile);
@@ -164,7 +155,6 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 
 	@Override
 	public void reset(int iteration) {
-		this.zonalGeoms.clear();
 		this.veh2DriverDelegate.reset(iteration);
 		this.timeBin2personId2travelledDistance.clear();
 	}
@@ -174,26 +164,26 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 		double time = Math.max(1, Math.ceil( event.getTime()/this.timeBinSize) ) * this.timeBinSize;
 		double dist = 0;
 		Id<Person> driverId = veh2DriverDelegate.getDriverOfVehicle(event.getVehicleId());
-		Link link = this.network.getLinks().get(event.getLinkId());
+		Link link = network.getLinks().get(event.getLinkId());
 
-		if(this.ug!=null){ 
-			if ( ! this.zonalGeoms.isEmpty() ) { // filtering for both
-				if ( this.pf.getUserGroupAsStringFromPersonId(driverId).equals(ug)  && GeometryUtils.isLinkInsideGeometries(zonalGeoms, link)   ) {
-					dist = link.getLength();
-				}
-			} else { // filtering for user group only
-				if ( this.pf.getUserGroupAsStringFromPersonId(driverId).equals(ug)  ) {
-					dist = link.getLength();
-				}
-			}
-		} else {
-			if( ! this.zonalGeoms.isEmpty()  ) { // filtering for area only
-				if( GeometryUtils.isLinkInsideGeometries(zonalGeoms, link)   ) {
-					dist = link.getLength();
-				}
-			} else { // no filtering at all
+		if (this.af!=null) { // area filtering
+			if(! this.af.isLinkInsideShape(link)) return;
+
+			if(this.ug==null || this.pf==null) {// only area filtering
+				dist = link.getLength();
+			} else if (this.pf.getUserGroupAsStringFromPersonId(driverId).equals(this.ug)) { // both filtering
 				dist = link.getLength();
 			}
+
+		} else {
+
+			if (this.pf.getUserGroupAsStringFromPersonId(driverId).equals(this.ug))
+
+				if(this.ug==null || this.pf==null) {// no filtering
+					dist = link.getLength();
+				} else if (this.pf.getUserGroupAsStringFromPersonId(driverId).equals(this.ug)) { // user group filtering
+					dist = link.getLength();
+				}
 		}
 
 		if(timeBin2personId2travelledDistance.containsKey(time)) {

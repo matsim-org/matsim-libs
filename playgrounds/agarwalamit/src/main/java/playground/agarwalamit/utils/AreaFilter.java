@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class AreaFilter {
 
 	private final Collection<Geometry> features;
-	private final static String MUNICH_SHAPE_FILE  = "../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+	private final static String MUNICH_SHAPE_FILE  = FileUtils.SHARED_SVN+"/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 
 	/**
 	 * @param shapeFile person will be soreted based on this shape file. In general this should be a polygon shape.
