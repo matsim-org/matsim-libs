@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package playground.thibautd.negotiation.locationnegotiation;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.facilities.ActivityFacility;
 import playground.ivt.utils.SoftCache;
@@ -33,10 +32,13 @@ import java.util.function.DoubleSupplier;
 public class LocationProposition implements Proposition {
 	private final static boolean CACHE = false;
 
+	public enum Type {visit, outOfHome, alone}
+
 	private final Person proposer;
 	private final Collection<Person> proposed;
 
 	private final ActivityFacility facility;
+	private final Type type;
 
 	/* Use a soft cache for created propositions, not for memory reasons (propositions are quickly discarded),
 	 * but for avoiding re-computing utility value if re-stumbling on the same proposition.
@@ -49,17 +51,20 @@ public class LocationProposition implements Proposition {
 	private LocationProposition(
 			final Person proposer,
 			final Collection<Person> proposed,
-			final ActivityFacility facility ) {
+			final ActivityFacility facility,
+			final Type type ) {
 		this.proposer = proposer;
 		this.proposed = proposed;
 		this.facility = facility;
+		this.type = type;
 	}
 
 	public static LocationProposition create(
 			final Person proposer,
 			final Collection<Person> proposed,
-			final ActivityFacility facility ) {
-		final LocationProposition proposition = new LocationProposition( proposer, proposed, facility );
+			final ActivityFacility facility,
+			final Type type ) {
+		final LocationProposition proposition = new LocationProposition( proposer, proposed, facility, type );
 		return CACHE ? cache.getOrPut( proposition , proposition ) : proposition;
 	}
 
@@ -75,6 +80,10 @@ public class LocationProposition implements Proposition {
 
 	public ActivityFacility getFacility() {
 		return facility;
+	}
+
+	public Type getType() {
+		return type;
 	}
 
 	double getOrUpdateUtility( final DoubleSupplier util ) {

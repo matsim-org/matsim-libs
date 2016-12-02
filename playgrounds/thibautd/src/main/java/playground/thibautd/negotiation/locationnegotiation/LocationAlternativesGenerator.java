@@ -101,12 +101,14 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 					LocationProposition.create(
 							ego ,
 							Collections.singleton( alter ) ,
-							locations.getHomeLocation( ego ) ) );
+							locations.getHomeLocation( ego ),
+							LocationProposition.Type.visit ) );
 			propositions.add(
 					LocationProposition.create(
 							ego ,
 							Collections.singleton( alter ) ,
-							locations.getHomeLocation( alter ) ) );
+							locations.getHomeLocation( alter ),
+							LocationProposition.Type.visit ) );
 		}
 
 		// alone at home
@@ -114,7 +116,8 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 				LocationProposition.create(
 						ego ,
 						Collections.emptyList(),
-						locations.getHomeLocation( ego ) ) );
+						locations.getHomeLocation( ego ),
+						LocationProposition.Type.alone ) );
 
 		// out-of-home locations
 		propositions.addAll( generateOutOfHome( ego, alters ) );
@@ -143,7 +146,8 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 								LocationProposition.create(
 										ego,
 										Collections.singleton( alter ),
-										facility ) ) )
+										facility,
+										LocationProposition.Type.outOfHome ) ) )
 				.collect( Collectors.toList() );
 	}
 
