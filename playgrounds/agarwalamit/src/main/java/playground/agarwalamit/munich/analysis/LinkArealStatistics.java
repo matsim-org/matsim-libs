@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.vividsolutions.jts.geom.Geometry;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -34,6 +35,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
+import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.GeometryUtils;
 import playground.agarwalamit.utils.ListUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
@@ -44,26 +46,40 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class LinkArealStatistics {
 
-	private static final String DIR = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
-	private static final String NET_FILE = DIR+"/bau/output_network.xml.gz";
-	private static final String EVENTS_FILE = DIR+"/bau/ITERS/it.1500/1500.events.xml.gz";
+	private static final String DIR = FileUtils.RUNS_SVN + "/detEval/emissionCongestionInternalization/hEART/output/";
+	private static final String shapeFileCity = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+	private static final String shapeFileMMA = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
+
 	private Network network ;
 
 	public static void main(String[] args) {
-		new LinkArealStatistics().run();
+
+		String cases [] = new String[] {"bau", "ei", "5ei", "10ei", "15ei", "20ei", "25ei"};
+		for (String str : cases) {
+			new LinkArealStatistics().run(str);
+		}
 	}
 
-	private void run(){
-		network = LoadMyScenarios.loadScenarioFromNetwork(NET_FILE).getNetwork();
-		String shapeFileCity = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-		String shapeFileMMA = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
-		BufferedWriter writer = IOUtils.getBufferedWriter(DIR+"/analysis/linkArealStatistics.txt");
+	private void run(final String runCase){
+		String networkFile = DIR+"/"+runCase+"/output_network.xml.gz";
+		String eventsFile = DIR+"/"+runCase+"/ITERS/it.1500/1500.events.xml.gz";
+		network = LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork();
+
+		Collection<SimpleFeature> features_city = new ArrayList<>();
+		features_city.addAll( new ShapeFileReader().readFileAndInitialize(shapeFileCity) );
+		Collection<Geometry> simplifiedGeoms_city = GeometryUtils.getSimplifiedGeometries(features_city);
+
+		Collection<SimpleFeature> features_mma = new ArrayList<>();
+		features_mma.addAll( new ShapeFileReader().readFileAndInitialize(shapeFileMMA) );
+		Collection<Geometry> simplifiedGeoms_mma = GeometryUtils.getSimplifiedGeometries(features_mma);
+
+		BufferedWriter writer = IOUtils.getBufferedWriter(DIR+"/analysis/linkArealStatistics_"+runCase+".txt");
 		try {
 			writer.write("area \t numberOfLinks \t totalTraveledDistanceInKm \n");
 
-			writer.write("cityArea \t"+getNumberOfLinks(shapeFileCity)+"\t"+getTraveledDistance(EVENTS_FILE, shapeFileCity)/1000+"\n");
-			writer.write("metroArea \t"+getNumberOfLinks(shapeFileMMA)+"\t"+getTraveledDistance(EVENTS_FILE, shapeFileMMA)/1000+"\n");
-			writer.write("allInclusive \t "+getNumberOfLinks(null)+"\t"+getTraveledDistance(EVENTS_FILE, null)/1000+"\n");
+			writer.write("cityArea \t"+getNumberOfLinks(simplifiedGeoms_city)+"\t"+getTraveledDistance(eventsFile, simplifiedGeoms_city)/1000+"\n");
+			writer.write("metroArea \t"+getNumberOfLinks(simplifiedGeoms_mma)+"\t"+getTraveledDistance(eventsFile, simplifiedGeoms_mma)/1000+"\n");
+			writer.write("allInclusive \t "+getNumberOfLinks(null)+"\t"+getTraveledDistance(eventsFile, null)/1000+"\n");
 
 			writer.close();
 		} catch (Exception e) {
@@ -71,15 +87,13 @@ public class LinkArealStatistics {
 		}
 	}
 
-	private Integer getNumberOfLinks (String polygonShapeFile){
-		boolean isFiltering = !(polygonShapeFile == null) ;
-		Collection<SimpleFeature> features = new ArrayList<>();
-		if ( isFiltering ) features.addAll( new ShapeFileReader().readFileAndInitialize(polygonShapeFile) );
-		
+	private Integer getNumberOfLinks (final Collection<Geometry> features){
+		boolean isFiltering = (features!=null && ! features.isEmpty()) ;
+
 		int numberOfLinks = 0;
 		for (Link l : network.getLinks().values()){
 			if(isFiltering) {
-				if (GeometryUtils.isLinkInsideCity(features, l) ){
+				if (GeometryUtils.isLinkInsideGeometries(features, l) ){
 					numberOfLinks++;
 				}
 			} else {
@@ -89,13 +103,10 @@ public class LinkArealStatistics {
 		return numberOfLinks;
 	}
 	
-	private double getTraveledDistance (String eventsFile, String polygonShapeFile){
+	private double getTraveledDistance (final String eventsFile, final Collection<Geometry> features){
 		final List<Double> dists =  new ArrayList<>();
-		
-		final boolean isFiltering = !(polygonShapeFile == null) ;
-		final Collection<SimpleFeature> features = new ArrayList<>();
-		if ( isFiltering ) features.addAll( new ShapeFileReader().readFileAndInitialize(polygonShapeFile) );
-		
+		boolean isFiltering = (features!=null && ! features.isEmpty()) ;
+
 		EventsManager events = EventsUtils.createEventsManager();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		events.addHandler(new LinkLeaveEventHandler() {
@@ -107,7 +118,7 @@ public class LinkArealStatistics {
 			public void handleEvent(LinkLeaveEvent event) {
 				Link l = network.getLinks().get(event.getLinkId());
 				if (isFiltering){
-					if ( GeometryUtils.isLinkInsideCity(features, l) ) {
+					if ( GeometryUtils.isLinkInsideGeometries(features, l) ) {
 						dists.add(l.getLength());
 					}
 				} else {

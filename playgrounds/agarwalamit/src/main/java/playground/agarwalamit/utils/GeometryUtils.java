@@ -69,7 +69,7 @@ public final class GeometryUtils {
 		return false;
 	}
 	
-	public static boolean isCoordInsideShare(final Collection<Geometry> features, final Coord coord) {
+	public static boolean isCoordInsideShape(final Collection<Geometry> features, final Coord coord) {
 		Geometry point = GF.createPoint(new Coordinate(coord.getX(), coord.getY()));
 		for(Geometry  geo: features){
 			if ( geo.contains(point) ) {
