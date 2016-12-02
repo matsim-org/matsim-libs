@@ -8,19 +8,15 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 
 public class ColectivoTraveltimesEvaluator implements TransitDriverStartsEventHandler, PersonArrivalEventHandler {
 
-	private final Network network;
 	private final Map<Id<Person>,Double> startTimes = new HashMap<>();
-	private final Map<Id<Person>,Double> endTimes = new HashMap<>();
 	private final Map<Id<Person>,Double> travelTimes = new HashMap<>();
 	private int counter =0;
 	
-	public ColectivoTraveltimesEvaluator(Network network) {
-		this.network = network;
+	public ColectivoTraveltimesEvaluator() {
 	}
 
 	public void handleEvent(TransitDriverStartsEvent event) {
@@ -31,24 +27,13 @@ public class ColectivoTraveltimesEvaluator implements TransitDriverStartsEventHa
 	}
 
 	public void handleEvent(PersonArrivalEvent event) {
-		if (event.getLegMode().equals("colectivo")){
-			if (event.getPersonId().toString().contains("co")){
-			endTimes.put(event.getPersonId(), event.getTime());
-			}
+		if (startTimes.containsKey(event.getPersonId())){
+			double endTime = event.getTime();
+			double travelTime = endTime-startTimes.get(event.getPersonId());
+			travelTimes.put(event.getPersonId(), travelTime);
 		}
 		
-		for (Map.Entry<Id<Person>,Double> start : startTimes.entrySet()){
-			for (Map.Entry<Id<Person>,Double> end : endTimes.entrySet()){
-				if (start.getKey().equals(end.getKey())){
-					double travelTime = end.getValue() - start.getValue();
-					counter = counter ++;
-					travelTimes.put(start.getKey(), travelTime);
-					System.out.println(start.getKey());
-					System.out.println(travelTime);
-				}
-			}
-		}
-		
+	
 		
 	}
 	

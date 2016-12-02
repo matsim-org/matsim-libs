@@ -42,7 +42,7 @@ public class PostProcessTravelTime {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new PopulationReader(scenario).readFile(plansFile);
 			
-		ColectivoTraveltimesEvaluator colectivoTraveltimesEvaluator = new ColectivoTraveltimesEvaluator(network);
+		ColectivoTraveltimesEvaluator colectivoTraveltimesEvaluator = new ColectivoTraveltimesEvaluator();
 		
 		events.addHandler(colectivoTraveltimesEvaluator);
 		System.out.println("hallo");
