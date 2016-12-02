@@ -31,6 +31,8 @@ import java.util.function.DoubleSupplier;
  * @author thibautd
  */
 public class LocationProposition implements Proposition {
+	private final static boolean CACHE = false;
+
 	private final Person proposer;
 	private final Collection<Person> proposed;
 
@@ -58,7 +60,7 @@ public class LocationProposition implements Proposition {
 			final Collection<Person> proposed,
 			final ActivityFacility facility ) {
 		final LocationProposition proposition = new LocationProposition( proposer, proposed, facility );
-		return cache.getOrPut( proposition , proposition );
+		return CACHE ? cache.getOrPut( proposition , proposition ) : proposition;
 	}
 
 	@Override
