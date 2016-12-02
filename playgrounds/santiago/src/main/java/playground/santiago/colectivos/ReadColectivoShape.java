@@ -125,7 +125,7 @@ public class ReadColectivoShape {
 		Map<String,Geometry> lines = readShapeFileAndExtractGeometry("C:/Users/Felix/Documents/Uni/Santiago de Chile/Shape-Files/Rutas_Licitadas.shp");
 //		Map<String,String> lineas = readShapeFileAndExtractFare("C:/Users/Felix/Documents/Uni/Santiago de Chile/Shape-Files/Rutas_Licitadas.shp");
 		Map<String,String> fleet = readExcelFileAndExtractFleet("C:/Users/Felix/Documents/Uni/Santiago de Chile/Shape-Files/Resumen_Geocodificacion.csv");
-//		createVehicleType(scenario.getTransitSchedule(),scenario.getTransitVehicles());
+
 		 	
 		
 	
