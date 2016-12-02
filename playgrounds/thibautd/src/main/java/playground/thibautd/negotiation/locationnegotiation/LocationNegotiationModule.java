@@ -20,7 +20,6 @@ package playground.thibautd.negotiation.locationnegotiation;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
 import playground.thibautd.negotiation.framework.AlternativesGenerator;
 import playground.thibautd.negotiation.framework.PropositionUtility;
 

@@ -32,7 +32,6 @@ import playground.thibautd.negotiation.framework.NegotiationAgent;
 import playground.thibautd.negotiation.framework.PropositionUtility;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 /**
  * @author thibautd
