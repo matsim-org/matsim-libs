@@ -21,7 +21,6 @@ package playground.thibautd.negotiation.locationnegotiation;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
@@ -34,7 +33,6 @@ import playground.thibautd.negotiation.framework.AlternativesGenerator;
 import playground.thibautd.negotiation.framework.NegotiationAgent;
 import playground.thibautd.negotiation.framework.PropositionUtility;
 import playground.thibautd.utils.RandomUtils;
-import sun.management.resources.agent;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,15 +46,11 @@ import java.util.stream.Collectors;
  */
 @Singleton
 public class LocationAlternativesGenerator implements AlternativesGenerator<LocationProposition> {
-	private static final int N_OUT_OF_HOME = 100;
-	private static final double OUT_OF_HOME_RADIUS_M = 30 * 1000;
-
 	private final SocialNetwork socialNetwork;
 	private final Population population;
-	private final RandomSeedHelper seeds;
 	private final LocationHelper locations;
-	private final PropositionUtility<LocationProposition> utility;
 	private final QuadTree<ActivityFacility> facilities;
+	private final LocationAlternativesConfigGroup configGroup;
 
 	private final Random random = MatsimRandom.getLocalInstance();
 
@@ -65,14 +59,12 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 			final SocialNetwork socialNetwork,
 			final Population population,
 			final ActivityFacilities facilities,
-			final RandomSeedHelper seeds,
 			final LocationHelper locations,
-			final PropositionUtility<LocationProposition> utility ) {
+			final LocationAlternativesConfigGroup configGroup ) {
 		this.socialNetwork = socialNetwork;
 		this.population = population;
-		this.seeds = seeds;
 		this.locations = locations;
-		this.utility = utility;
+		this.configGroup = configGroup;
 
 		final QuadTreeRebuilder<ActivityFacility> qt = new QuadTreeRebuilder<>();
 		// TODO: filter here, or outside, by activity type?
@@ -94,7 +86,7 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 				new ArrayList<>(
 						2 * alters.size() + // visits
 								1 + // alone at home
-								N_OUT_OF_HOME * alters.size() ); // out of home
+								configGroup.getnOutOfHomeAlternatives() * alters.size() ); // out of home
 		// visits
 		for ( Person alter : alters ) {
 			propositions.add(
@@ -129,7 +121,11 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 			final Person ego,
 			final Collection<Person> alters ) {
 		final Coord home = locations.getHomeLocation( ego.getId() ).getCoord();
-		final Collection<ActivityFacility> close = facilities.getDisk( home.getX() , home.getY() , OUT_OF_HOME_RADIUS_M );
+		final Collection<ActivityFacility> close =
+				facilities.getDisk(
+						home.getX(),
+						home.getY(),
+						configGroup.getMaxOutOfHomeRadius_km() * 1000 );
 
 		// no need to be too smart (e.g. only select a few of the best facilities):
 		// being smart requires a lot of utility computations here, plus in the negotiator.
@@ -138,7 +134,7 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 		final List<ActivityFacility> subsample = RandomUtils.sublist_withSideEffect(
 				random,
 				(List<ActivityFacility>) close,
-				N_OUT_OF_HOME );
+				configGroup.getnOutOfHomeAlternatives() );
 
 		return subsample.stream()
 				.flatMap( facility ->
