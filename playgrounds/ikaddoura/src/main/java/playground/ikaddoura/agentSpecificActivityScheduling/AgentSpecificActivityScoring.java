@@ -25,6 +25,9 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 /**
+*
+* The default {@link CharyparNagelActivityScoring} except that opening and closing times are taken from the person attributes. 
+* 
 * @author ikaddoura
 */
 
