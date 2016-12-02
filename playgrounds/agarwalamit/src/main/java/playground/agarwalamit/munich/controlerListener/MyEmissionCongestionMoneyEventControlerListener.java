@@ -59,7 +59,7 @@ public class MyEmissionCongestionMoneyEventControlerListener implements StartupL
 	private EmissionCostsHandler emissCostHandler;
 	private double vttsCar;
 	
-	public MyEmissionCongestionMoneyEventControlerListener(EmissionCostModule emissionCostModule, EmissionModule emissionModule) {
+	public MyEmissionCongestionMoneyEventControlerListener(final EmissionCostModule emissionCostModule, final EmissionModule emissionModule) {
 		this.emissionCostModule = emissionCostModule;
 		this.emissionModule = emissionModule;
 	}
