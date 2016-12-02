@@ -28,6 +28,7 @@ import org.matsim.contrib.emissions.events.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.vehicles.Vehicle;
+import playground.agarwalamit.analysis.emission.EmissionCostHandler;
 import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.MapUtils;
 import playground.agarwalamit.utils.PersonFilter;
@@ -39,7 +40,7 @@ import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
  * @author amit
  */
 
-public class CausedEmissionCostHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler{
+public class CausedEmissionCostHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler, EmissionCostHandler{
 
 	private static final Logger LOG = Logger.getLogger(CausedEmissionCostHandler.class);
 
@@ -66,7 +67,7 @@ public class CausedEmissionCostHandler implements WarmEmissionEventHandler, Cold
 		eventsManager.addHandler(ech);
 		new EmissionEventsReader(eventsManager).readFile(emissionEventsFile);
 
-		Map<String, Double> usrGrp2Cost = ech.getUserGroup2TotalEmissionsCost();
+		Map<String, Double> usrGrp2Cost = ech.getUserGroup2TotalEmissionCosts();
 		usrGrp2Cost.entrySet().forEach(entry -> System.out.print(entry.getKey()+"\t"+entry.getValue()));
 	}
 
@@ -104,32 +105,38 @@ public class CausedEmissionCostHandler implements WarmEmissionEventHandler, Cold
 		}
 	}
 
-	@Deprecated
-	public Map<Id<Person>, Double> getPersonId2ColdEmissionsCosts() {
+	public Map<Id<Person>, Double> getPersonId2ColdEmissionCosts() {
 		final Map<Id<Person>, Double> personId2ColdEmissCosts =	this.vehicleId2ColdEmissCosts.entrySet().stream().collect(
 				Collectors.toMap(entry -> Id.createPersonId(entry.getKey().toString()), entry -> entry.getValue())
 		);
 		return personId2ColdEmissCosts;
 	}
 
-	@Deprecated
-	public Map<Id<Person>, Double> getPersonId2WarmEmissionsCosts() {
+	public Map<Id<Person>, Double> getPersonId2WarmEmissionCosts() {
 		final Map<Id<Person>, Double> personId2WarmEmissCosts =	this.vehicleId2WarmEmissCosts.entrySet().stream().collect(
 				Collectors.toMap(entry -> Id.createPersonId(entry.getKey().toString()), entry -> entry.getValue())
 		);
 		return personId2WarmEmissCosts;
 	}
 
-	public Map<Id<Vehicle>, Double> getVehicleId2TotalEmissionsCosts(){
+	@Override
+	public Map<Id<Person>, Double> getPersonId2TotalEmissionCosts() {
+		return getPersonId2ColdEmissionCosts().entrySet().stream().collect(
+				Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue() + this.getPersonId2WarmEmissionCosts().get(entry.getKey()))
+		);
+	}
+
+	@Override
+	public Map<Id<Vehicle>, Double> getVehicleId2TotalEmissionCosts(){
 		return this.vehicleId2ColdEmissCosts.entrySet().stream().collect(
 				Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue() + this.vehicleId2WarmEmissCosts.get(entry.getKey()))
 		);
 	}
 
-	public Map<String, Double> getUserGroup2WarmEmissionsCost(){
+	public Map<String, Double> getUserGroup2WarmEmissionCosts(){
 		Map<String, Double> usrGrp2Cost = new HashMap<>();
 		if (this.pf != null) {
-			for (Map.Entry<Id<Person>, Double> entry : getPersonId2WarmEmissionsCosts().entrySet()) {
+			for (Map.Entry<Id<Person>, Double> entry : getPersonId2WarmEmissionCosts().entrySet()) {
 				String ug = this.pf.getUserGroupAsStringFromPersonId(entry.getKey());
 				usrGrp2Cost.put(ug,   usrGrp2Cost.containsKey(ug) ? entry.getValue() + usrGrp2Cost.get(ug) : entry.getValue());
 			}
@@ -140,10 +147,10 @@ public class CausedEmissionCostHandler implements WarmEmissionEventHandler, Cold
 		return usrGrp2Cost;
 	}
 
-	public Map<String, Double> getUserGroup2ColdEmissionsCost(){
+	public Map<String, Double> getUserGroup2ColdEmissionCosts(){
 		Map<String, Double> usrGrp2Cost = new HashMap<>();
 		if(this.pf!=null) {
-			for (Map.Entry<Id<Person>, Double> entry : getPersonId2ColdEmissionsCosts().entrySet()) {
+			for (Map.Entry<Id<Person>, Double> entry : getPersonId2ColdEmissionCosts().entrySet()) {
 				String ug = this.pf.getUserGroupAsStringFromPersonId(entry.getKey());
 				usrGrp2Cost.put(ug, usrGrp2Cost.containsKey(ug) ? entry.getValue() + usrGrp2Cost.get(ug) : entry.getValue());
 			}
@@ -154,18 +161,19 @@ public class CausedEmissionCostHandler implements WarmEmissionEventHandler, Cold
 		return usrGrp2Cost;
 	}
 
-	public Map<String, Double> getUserGroup2TotalEmissionsCost(){
-		return getUserGroup2ColdEmissionsCost().entrySet().stream().collect(
+	@Override
+	public Map<String, Double> getUserGroup2TotalEmissionCosts(){
+		return getUserGroup2ColdEmissionCosts().entrySet().stream().collect(
 				Collectors.toMap(entry -> entry.getKey(),
-						entry -> entry.getValue() + getUserGroup2WarmEmissionsCost().get(entry.getKey()))
+						entry -> entry.getValue() + getUserGroup2WarmEmissionCosts().get(entry.getKey()))
 		);
 	}
 
-	public Map<Id<Vehicle>, Double> getVehicleId2ColdEmissionsCosts() {
+	public Map<Id<Vehicle>, Double> getVehicleId2ColdEmissionCosts() {
 		return this.vehicleId2ColdEmissCosts;
 	}
 
-	public Map<Id<Vehicle>, Double> getVehicleId2WarmEmissionsCosts() {
+	public Map<Id<Vehicle>, Double> getVehicleId2WarmEmissionCosts() {
 		return this.vehicleId2WarmEmissCosts;
 	}
 }

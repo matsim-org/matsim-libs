@@ -79,7 +79,7 @@ public class ExperiencedEmissionAnalysisControlerListener implements StartupList
 
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
-        Map<String, Double> userGrp2cost = this.causedEmissionCostHandler.getUserGroup2TotalEmissionsCost();
+        Map<String, Double> userGrp2cost = this.causedEmissionCostHandler.getUserGroup2TotalEmissionCosts();
         try {
             this.writer.write(event.getIteration()+"\t");
             for (MunichPersonFilter.MunichUserGroup munichUserGroup : MunichPersonFilter.MunichUserGroup.values()) {
