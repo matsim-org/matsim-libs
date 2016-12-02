@@ -41,7 +41,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.utils.*;
 
 /**
@@ -117,34 +117,36 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 
 		String [] areas = {shapeFileCity, shapeFileMMA, null};
 		String [] areasName = {"city","MMA","wholeArea"};
+
 		double simEndTime = LoadMyScenarios.getSimulationEndTime(configFile);
 		Network network = LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork();
 
 		SortedMap<String, SortedMap<String, Double>> area2usrGrp2Dist = new TreeMap<>();
 
 		for(int ii=0; ii<areas.length;ii++) {
-			AreaFilter areaFilter = new AreaFilter(areas[ii]);
+			AreaFilter areaFilter =  areas[ii] ==null ? null : new AreaFilter(areas[ii]);
 			SortedMap<String, Double> usrGrp2Dist = new TreeMap<>();
-			for ( MunichUserGroup ug : MunichUserGroup.values() ) {
+			for ( MunichPersonFilter.MunichUserGroup ug : MunichPersonFilter.MunichUserGroup.values() ) {
 				if(area2usrGrp2Dist.containsKey(ug.toString())) continue;
 
 				EventsManager em = EventsUtils.createEventsManager();
-				TravelDistanceHandler tdh = new TravelDistanceHandler(simEndTime, 1, network, areaFilter);
+				TravelDistanceHandler tdh = new TravelDistanceHandler(simEndTime, 1, network, areaFilter, new MunichPersonFilter(), ug.toString());
 				em.addHandler(tdh);
 				MatsimEventsReader reader = new MatsimEventsReader(em);
 				reader.readFile(eventsFile);
 				usrGrp2Dist.put(ug.toString(), MapUtils.doubleValueSum(tdh.getTimeBin2TravelDist() ) );
 			}
+
 			usrGrp2Dist.put("allPersons", MapUtils.doubleValueSum(usrGrp2Dist));
 			area2usrGrp2Dist.put(areasName[ii], usrGrp2Dist);
 		}
 
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/areaToUserGroupToTotalTravelDistance.txt");
 		try {
-			writer.write("area \t userGroup \t totalTravelDistInMeter \n");
+			writer.write("area \t userGroup \t totalTravelDistInKm \n");
 			for(String a : area2usrGrp2Dist.keySet()) {
 				for(String s : area2usrGrp2Dist.get(a).keySet()) {
-					writer.write(a+"\t"+s+"\t"+area2usrGrp2Dist.get(a).get(s)+"\n");
+					writer.write(a+"\t"+s+"\t"+area2usrGrp2Dist.get(a).get(s)/1000.0+"\n");
 				}
 			}
 			writer.close();
@@ -176,14 +178,11 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 			}
 
 		} else {
-
-			if (this.pf.getUserGroupAsStringFromPersonId(driverId).equals(this.ug))
-
-				if(this.ug==null || this.pf==null) {// no filtering
-					dist = link.getLength();
-				} else if (this.pf.getUserGroupAsStringFromPersonId(driverId).equals(this.ug)) { // user group filtering
-					dist = link.getLength();
-				}
+			if(this.ug==null || this.pf==null) {// no filtering
+				dist = link.getLength();
+			} else if (this.pf.getUserGroupAsStringFromPersonId(driverId).equals(this.ug)) { // user group filtering
+				dist = link.getLength();
+			}
 		}
 
 		if(timeBin2personId2travelledDistance.containsKey(time)) {

@@ -111,9 +111,6 @@ public class FilteredColdEmissionHandler implements ColdEmissionEventHandler{
 			}
 
 		} else {
-
-			if (this.pf.getUserGroupAsStringFromPersonId(driverId).equals(this.ug))
-			
 			if(this.ug==null || this.pf==null) {// no filtering
 				delegate.handleEvent(event); 
 			} else if (this.pf.getUserGroupAsStringFromPersonId(driverId).equals(this.ug)) { // user group filtering
