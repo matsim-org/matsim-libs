@@ -23,12 +23,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.emissions.events.ColdEmissionEvent;
-import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
-import org.matsim.contrib.emissions.events.WarmEmissionEvent;
-import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
+import org.matsim.contrib.emissions.events.*;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.vehicles.Vehicle;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.utils.FileUtils;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 
 /**
@@ -46,6 +46,18 @@ public class EmissionCostsHandler implements WarmEmissionEventHandler, ColdEmiss
 		this.emissionCostModule = emissionCostModule;
 	}
 
+	public static void main(String[] args) {
+		String emissionEventsFile = FileUtils.RUNS_SVN+ "/detEval/emissionCongestionInternalization/iatbr/output/ei/ITERS/it.1500/1500.emission.events.xml.gz";
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EmissionCostModule ecm = new EmissionCostModule(1.0, true);
+		EmissionCostsHandler ech = new EmissionCostsHandler(ecm);
+		eventsManager.addHandler(ech);
+		new EmissionEventsReader(eventsManager).readFile(emissionEventsFile);
+
+		Map<String, Double> usrGrp2Cost = ech.getUserGroup2TotalEmissionsCost();
+		usrGrp2Cost.entrySet().forEach(entry -> System.out.print(entry.getKey()+"\t"+entry.getValue()));
+	}
+
 	@Override
 	public void reset(int iteration) {
 		this.vehicleId2ColdEmissCosts.clear();
@@ -56,7 +68,7 @@ public class EmissionCostsHandler implements WarmEmissionEventHandler, ColdEmiss
 	public void handleEvent(WarmEmissionEvent event) {
 		Id<Vehicle> vehicleId = event.getVehicleId();
 		double warmEmissionCosts = this.emissionCostModule.calculateWarmEmissionCosts(event.getWarmEmissions());
-		double amount2Pay = - warmEmissionCosts;
+		double amount2Pay =  warmEmissionCosts;
 
 		if(this.vehicleId2WarmEmissCosts.containsKey(vehicleId)){
 			double nowCost = this.vehicleId2WarmEmissCosts.get(vehicleId);
@@ -70,7 +82,7 @@ public class EmissionCostsHandler implements WarmEmissionEventHandler, ColdEmiss
 	public void handleEvent(ColdEmissionEvent event) {
 		Id<Vehicle> vehicleId = event.getVehicleId();
 		double coldEmissionCosts = this.emissionCostModule.calculateColdEmissionCosts(event.getColdEmissions());
-		double amount2Pay = - coldEmissionCosts;
+		double amount2Pay =  coldEmissionCosts;
 
 		if(this.vehicleId2ColdEmissCosts.containsKey(vehicleId)){
 			double nowCost = this.vehicleId2ColdEmissCosts.get(vehicleId);
@@ -118,6 +130,13 @@ public class EmissionCostsHandler implements WarmEmissionEventHandler, ColdEmiss
 			usrGrp2Cost.put(ug,   usrGrp2Cost.containsKey(ug) ? entry.getValue() + usrGrp2Cost.get(ug) : entry.getValue());
 		}
 		return usrGrp2Cost;
+	}
+
+	public Map<String, Double> getUserGroup2TotalEmissionsCost(){
+		return getUserGroup2ColdEmissionsCost().entrySet().stream().collect(
+				Collectors.toMap(entry -> entry.getKey(),
+						entry -> entry.getValue() + getUserGroup2WarmEmissionsCost().get(entry.getKey()))
+		);
 	}
 
 	public Map<Id<Vehicle>, Double> getVehicleId2ColdEmissionsCosts() {

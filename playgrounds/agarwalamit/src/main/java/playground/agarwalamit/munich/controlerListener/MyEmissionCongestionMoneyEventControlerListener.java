@@ -108,10 +108,10 @@ public class MyEmissionCongestionMoneyEventControlerListener implements StartupL
 				else delaysCosts = 	this.pId2CongestionCosts.get(personId) / 3600 * vttsCar;
 
 				if(!this.pId2ColdEmissionsCosts.containsKey(personId)) coldEmissCosts=0;
-				else coldEmissCosts = this.pId2ColdEmissionsCosts.get(personId);
+				else coldEmissCosts = this.pId2ColdEmissionsCosts.get(personId); // value is positive. Amit Dec 16
 
 				if(!this.pId2WarmEmissionsCosts.containsKey(personId)) warmEmissCosts =0;
-				else warmEmissCosts  = this.pId2WarmEmissionsCosts.get(personId);
+				else warmEmissCosts  = this.pId2WarmEmissionsCosts.get(personId); // value is positive. Amit Dec 16
 
 				if(!this.pId2Tolls.containsKey(personId)) toll =0;
 				else toll = this.pId2Tolls.get(personId);
