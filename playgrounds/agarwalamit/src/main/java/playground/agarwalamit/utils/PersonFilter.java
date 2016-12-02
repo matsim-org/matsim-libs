@@ -28,6 +28,6 @@ import org.matsim.api.core.v01.population.Person;
 
 public interface PersonFilter {
 	
-	String getUserGroupAsStringFromPersonId(Id<Person> personId);
+	String getUserGroupAsStringFromPersonId(final Id<Person> personId);
 
 }

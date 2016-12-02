@@ -21,36 +21,46 @@ package playground.agarwalamit.analysis.emission;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.vehicles.Vehicle;
-import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.utils.FileUtils;
+import playground.agarwalamit.utils.MapUtils;
+import playground.agarwalamit.utils.PersonFilter;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 
 /**
  * @author amit
  */
 
-public class EmissionCostsHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler{
+public class EmissionCostHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler{
+
+	private static final Logger LOG = Logger.getLogger(EmissionCostHandler.class);
+
 	private final EmissionCostModule emissionCostModule;
 	private final Map<Id<Vehicle>, Double> vehicleId2ColdEmissCosts = new HashMap<>();
 	private final Map<Id<Vehicle>, Double> vehicleId2WarmEmissCosts = new HashMap<>();
 
-	private final MunichPersonFilter pf = new MunichPersonFilter();
+	private final PersonFilter pf ; // what if no person filter is available..?
 
-	public EmissionCostsHandler(EmissionCostModule emissionCostModule) {
+	public EmissionCostHandler(final EmissionCostModule emissionCostModule) {
+		this(emissionCostModule, null);
+	}
+
+	public EmissionCostHandler(final EmissionCostModule emissionCostModule, final PersonFilter pf) {
 		this.emissionCostModule = emissionCostModule;
+		this.pf = pf;
 	}
 
 	public static void main(String[] args) {
 		String emissionEventsFile = FileUtils.RUNS_SVN+ "/detEval/emissionCongestionInternalization/iatbr/output/ei/ITERS/it.1500/1500.emission.events.xml.gz";
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionCostModule ecm = new EmissionCostModule(1.0, true);
-		EmissionCostsHandler ech = new EmissionCostsHandler(ecm);
+		EmissionCostHandler ech = new EmissionCostHandler(ecm);
 		eventsManager.addHandler(ech);
 		new EmissionEventsReader(eventsManager).readFile(emissionEventsFile);
 
@@ -116,18 +126,28 @@ public class EmissionCostsHandler implements WarmEmissionEventHandler, ColdEmiss
 
 	public Map<String, Double> getUserGroup2WarmEmissionsCost(){
 		Map<String, Double> usrGrp2Cost = new HashMap<>();
-		for (Map.Entry<Id<Person>, Double> entry : getPersonId2WarmEmissionsCosts().entrySet()) {
-			String ug = this.pf.getUserGroupAsStringFromPersonId(entry.getKey());
-			usrGrp2Cost.put(ug,   usrGrp2Cost.containsKey(ug) ? entry.getValue() + usrGrp2Cost.get(ug) : entry.getValue());
+		if (this.pf != null) {
+			for (Map.Entry<Id<Person>, Double> entry : getPersonId2WarmEmissionsCosts().entrySet()) {
+				String ug = this.pf.getUserGroupAsStringFromPersonId(entry.getKey());
+				usrGrp2Cost.put(ug,   usrGrp2Cost.containsKey(ug) ? entry.getValue() + usrGrp2Cost.get(ug) : entry.getValue());
+			}
+		} else {
+			LOG.warn("The person filter is null, still, trying to get emission costs per user group. Returning emission costs for all persons.");
+			usrGrp2Cost.put("AllPersons", MapUtils.doubleValueSum(this.vehicleId2WarmEmissCosts));
 		}
 		return usrGrp2Cost;
 	}
 
 	public Map<String, Double> getUserGroup2ColdEmissionsCost(){
 		Map<String, Double> usrGrp2Cost = new HashMap<>();
-		for (Map.Entry<Id<Person>, Double> entry : getPersonId2ColdEmissionsCosts().entrySet()) {
-			String ug = this.pf.getUserGroupAsStringFromPersonId(entry.getKey());
-			usrGrp2Cost.put(ug,   usrGrp2Cost.containsKey(ug) ? entry.getValue() + usrGrp2Cost.get(ug) : entry.getValue());
+		if(this.pf!=null) {
+			for (Map.Entry<Id<Person>, Double> entry : getPersonId2ColdEmissionsCosts().entrySet()) {
+				String ug = this.pf.getUserGroupAsStringFromPersonId(entry.getKey());
+				usrGrp2Cost.put(ug, usrGrp2Cost.containsKey(ug) ? entry.getValue() + usrGrp2Cost.get(ug) : entry.getValue());
+			}
+		} else {
+			LOG.warn("The person filter is null, still, trying to get emission costs per user group. Returning emission costs for all persons.");
+			usrGrp2Cost.put("AllPersons", MapUtils.doubleValueSum(this.vehicleId2ColdEmissCosts));
 		}
 		return usrGrp2Cost;
 	}

@@ -35,7 +35,7 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayHandler;
-import playground.agarwalamit.analysis.emission.EmissionCostsHandler;
+import playground.agarwalamit.analysis.emission.EmissionCostHandler;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
 
@@ -56,7 +56,7 @@ public class MyEmissionCongestionMoneyEventControlerListener implements StartupL
 	private MoneyEventHandler moneyHandler;
 	private ExperiencedDelayHandler congestionCostHandler;
 	private final EmissionModule emissionModule;
-	private EmissionCostsHandler emissCostHandler;
+	private EmissionCostHandler emissCostHandler;
 	private double vttsCar;
 	
 	public MyEmissionCongestionMoneyEventControlerListener(final EmissionCostModule emissionCostModule, final EmissionModule emissionModule) {
@@ -69,7 +69,7 @@ public class MyEmissionCongestionMoneyEventControlerListener implements StartupL
 		this.scenario = (MutableScenario) event.getServices().getScenario();
 		this.vttsCar = (this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 
-		this.emissCostHandler = new EmissionCostsHandler(emissionCostModule);
+		this.emissCostHandler = new EmissionCostHandler(emissionCostModule);
 		this.moneyHandler = new MoneyEventHandler();
 		this.congestionCostHandler = new ExperiencedDelayHandler(scenario,1);
 

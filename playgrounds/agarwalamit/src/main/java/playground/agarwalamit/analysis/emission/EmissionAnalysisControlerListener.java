@@ -34,6 +34,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.utils.MapUtils;
+import playground.agarwalamit.utils.PersonFilter;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 
 /**
@@ -42,17 +43,20 @@ import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 
 public class EmissionAnalysisControlerListener implements StartupListener, IterationEndsListener, ShutdownListener {
 
-    public EmissionAnalysisControlerListener(final EmissionCostModule ecm, final EmissionModule emissionModule) {
-        this.emissionCostsHandler = new EmissionCostsHandler(ecm);
+    public EmissionAnalysisControlerListener(final EmissionCostModule ecm, final EmissionModule emissionModule, final PersonFilter pf) {
+        this.emissionCostHandler = new EmissionCostHandler(ecm, pf);
         this.emissionModule = emissionModule;
     }
 
-    private final EmissionCostsHandler emissionCostsHandler;
+    public EmissionAnalysisControlerListener(final EmissionCostModule ecm, final EmissionModule emissionModule) {
+        this(ecm, emissionModule, null);
+    }
+
+    private final EmissionCostHandler emissionCostHandler;
     private final EmissionModule emissionModule;
+    private BufferedWriter writer ;
 
     @Inject private Scenario scenario;
-
-    private BufferedWriter writer ;
 
     @Override
     public void notifyStartup(StartupEvent event) {
@@ -70,12 +74,12 @@ public class EmissionAnalysisControlerListener implements StartupListener, Itera
         event.getServices().getEvents().addHandler(this.emissionModule.getWarmEmissionHandler());
         event.getServices().getEvents().addHandler(this.emissionModule.getColdEmissionHandler());
 
-        emissionModule.getEmissionEventsManager().addHandler(this.emissionCostsHandler);
+        emissionModule.getEmissionEventsManager().addHandler(this.emissionCostHandler);
     }
 
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
-        Map<String, Double> userGrp2cost = this.emissionCostsHandler.getUserGroup2TotalEmissionsCost();
+        Map<String, Double> userGrp2cost = this.emissionCostHandler.getUserGroup2TotalEmissionsCost();
         try {
             this.writer.write(event.getIteration()+"\t");
             for (MunichPersonFilter.MunichUserGroup munichUserGroup : MunichPersonFilter.MunichUserGroup.values()) {
