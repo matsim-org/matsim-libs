@@ -99,12 +99,6 @@ public class NoiseValidation {
 			Coord oldCoord = validationPoints.get(valPointId).getFirst();
 			Coord transformedCoord = ct.transform(oldCoord);
 			
-//			if (oldCoord.getX() == 14090.8 && oldCoord.getY() == 23720.24) {
-//				System.out.println("old coordinate: " + oldCoord.toString());
-//				System.out.println("transformed validation point coordinate: " + transformedCoord.toString());
-//				throw new RuntimeException("aborting...");
-//			}
-			
 			validationPoints.put(valPointId, new Tuple<Coord, Double>(transformedCoord, validationPoints.get(valPointId).getSecond()));
 		}
 		log.info("Transforming coordinates... Done.");	
