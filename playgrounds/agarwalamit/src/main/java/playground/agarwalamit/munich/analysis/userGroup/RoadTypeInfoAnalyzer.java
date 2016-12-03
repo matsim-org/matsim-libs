@@ -1,6 +1,8 @@
 package playground.agarwalamit.munich.analysis.userGroup;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -45,26 +47,30 @@ public class RoadTypeInfoAnalyzer {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outFolder+"/roadTypeInfo_freight_city.txt");
 		
 		Map<String,Map<String,Integer>> runCase2RoadType2Count = new HashMap<>();
-		Set<String> roadTypes = new HashSet<>();
+		Set<String> roadNr = new HashSet<>();
 		
 		for(String runCase:runCases){
 			RoadTypeInfoAnalyzer rti = new RoadTypeInfoAnalyzer(network, runDir+runCase+"/ITERS/it.1500/1500.events.xml.gz", new AreaFilter(shapeFileCity));
 			rti.run();
 			Map<String, Integer> roadType2OccuranceCount = rti.getRoadType2OccuranceCount(MunichUserGroup.Freight);
 			runCase2RoadType2Count.put(runCase, roadType2OccuranceCount);
-			roadTypes.addAll(roadType2OccuranceCount.keySet());
+			roadNr.addAll(roadType2OccuranceCount.keySet());
 		}
-		
+
+		String roadTypeMappingFile = FileUtils.SHARED_SVN + "/projects/detailedEval/matsim-input-files/roadTypeMapping_v0.txt";
+		Map<Integer, String> roadNr2roadType = getRoadNr2RoadType(roadTypeMappingFile);
+
 		try {
-			writer.write("roadType \t");
+			writer.write("roadNr \t roadName \t");
 			for (String rc : runCases){
 				writer.write(rc+"\t");
 			}
 			writer.newLine();
-			for(String rt:roadTypes){
-				writer.write(rt+"\t");
+			for(String rn:roadNr){
+				writer.write(rn+"\t");
+				writer.write(roadNr2roadType.get(Integer.valueOf(rn))+"\t");
 				for (String rc : runCases){
-					int count = runCase2RoadType2Count.get(rc).containsKey(rt) ? runCase2RoadType2Count.get(rc).get(rt) : 0;
+					int count = runCase2RoadType2Count.get(rc).containsKey(rn) ? runCase2RoadType2Count.get(rc).get(rn) : 0;
 					writer.write( count +"\t");
 				}
 				writer.newLine();
@@ -74,7 +80,31 @@ public class RoadTypeInfoAnalyzer {
 			throw new RuntimeException("Data is not written. Rason : "+e);
 		}
 	}
-	
+
+
+	private static Map<Integer, String> getRoadNr2RoadType(final String roadTypeMappingFile) {
+		Map<Integer, String> roadNr2roadType = new HashMap<>();
+
+		BufferedReader reader = IOUtils.getBufferedReader(roadTypeMappingFile);
+		try {
+			String  line = reader.readLine();
+			boolean isFirstLine = true;
+			while(line!=null){
+				String parts [] = line.split(";");
+				if(! isFirstLine ) {
+					int roadNr = Integer.valueOf(parts[0]); // VISUM_RT_NR
+					String roadName = parts[2]; // HBEFA_RT_NAME
+					roadNr2roadType.put(roadNr, roadName);
+				}
+				line = reader.readLine();
+				isFirstLine = false;
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Data is not written/read. Reason : " + e);
+		}
+		return roadNr2roadType;
+	}
+
 	RoadTypeInfoAnalyzer (final Network network, final String eventsFile, final AreaFilter areaFilter){
 		this.rth = new RoadTypeHandler(network, areaFilter);
 		this.eventsFile = eventsFile;
