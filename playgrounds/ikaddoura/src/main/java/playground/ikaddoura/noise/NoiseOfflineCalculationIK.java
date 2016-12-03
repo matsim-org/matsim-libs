@@ -51,6 +51,8 @@ public class NoiseOfflineCalculationIK {
 	private static double receiverPointGap;
 	private static double timeBinSize;
 				
+	private static String receiverPointsGridCSVFile;	
+
 	public static void main(String[] args) {
 		
 		if (args.length > 0) {
@@ -70,13 +72,17 @@ public class NoiseOfflineCalculationIK {
 			timeBinSize = Double.valueOf(args[4]);		
 			log.info("Time bin size: " + timeBinSize);
 			
+			receiverPointsGridCSVFile = args[5];		
+			log.info("receiverPointGridCSVFile: " + receiverPointsGridCSVFile);
+			
 		} else {
 			
 			runDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
-			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_2016-11-14_rpGap5_wilmersdorf/";
+			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_gridCSVFile/";
 			receiverPointGap = 5.;
 			lastIteration = 100;
 			timeBinSize = 3600.;
+			receiverPointsGridCSVFile = "../../../shared-svn/studies/countries/de/berlin_noise/Fassadenpegel/FP_gesamt_Atom_repaired.txt";
 		}
 		
 		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
@@ -88,14 +94,14 @@ public class NoiseOfflineCalculationIK {
 		// adjust the default noise parameters
 		
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
-		
 		noiseParameters.setReceiverPointGap(receiverPointGap);
+		noiseParameters.setReceiverPointsGridCSVFile(receiverPointsGridCSVFile);
 		
 		// Wilmersdorf with motorway: 4589486 , 5816193 : 4590778 , 5817029
-		double xMin = 4589486.;
-		double yMin = 5816193.;
-		double xMax = 4590778.;
-		double yMax = 5817029.;
+//		double xMin = 4589486.;
+//		double yMin = 5816193.;
+//		double xMax = 4590778.;
+//		double yMax = 5817029.;
 		
 		// somewhere in Schoeneberg: 4591842 5817767 : 4593134 5818603
 //		double xMin = 4591842.;
@@ -139,10 +145,10 @@ public class NoiseOfflineCalculationIK {
 //		double xMax = 4598267.52;
 //		double yMax = 5820953.98;	
 		
-		noiseParameters.setReceiverPointsGridMinX(xMin);
-		noiseParameters.setReceiverPointsGridMinY(yMin);
-		noiseParameters.setReceiverPointsGridMaxX(xMax);
-		noiseParameters.setReceiverPointsGridMaxY(yMax);
+//		noiseParameters.setReceiverPointsGridMinX(xMin);
+//		noiseParameters.setReceiverPointsGridMinY(yMin);
+//		noiseParameters.setReceiverPointsGridMaxX(xMax);
+//		noiseParameters.setReceiverPointsGridMaxY(yMax);
 		
 //		 Berlin Activity Types
 //		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
