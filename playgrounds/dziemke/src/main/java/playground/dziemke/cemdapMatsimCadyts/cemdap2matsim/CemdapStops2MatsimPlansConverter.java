@@ -38,6 +38,8 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.opengis.feature.simple.SimpleFeature;
 
+import playground.dziemke.utils.LogToOutputSaver;
+
 
 /**
  * @author dziemke
@@ -47,19 +49,25 @@ public class CemdapStops2MatsimPlansConverter {
 	private static final Logger log = Logger.getLogger(CemdapStops2MatsimPlansConverter.class);
 	
 	// Parameters
-	private static int numberOfFirstCemdapOutputFile = 87;
-	private static int numberOfPlans = 3;
+//	private static int numberOfFirstCemdapOutputFile = 87;
+	private static int numberOfFirstCemdapOutputFile = 100;
+//	private static int numberOfPlans = 3;
+	private static int numberOfPlans = 1;
 	private static boolean addStayHomePlan = true;
-	private static int numberOfPlansFile = 34;
+//	private static int numberOfPlansFile = 34;
+	private static int numberOfPlansFile = 100;
 	
 	// Input and output
-	private static String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/" + numberOfPlansFile + "/";
+//	private static String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/" + numberOfPlansFile + "/";
+	private static String outputDirectory = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/matsim_initial/" + numberOfPlansFile + "/";
 	private static String tazShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenLOR_DHDN_GK4.shp";
 	private static String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
-	private static String cemdapOutputRoot = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_output/";
+//	private static String cemdapOutputRoot = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_output/";
+	private static String cemdapOutputRoot = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/cemdap_output/";
 	
 	
 	public static void main(String[] args) throws IOException {
+		LogToOutputSaver.setOutputDirectory(outputDirectory);
 		// find respective stops file
 		Map<Integer, String> cemdapStopsFilesMap = new HashMap<>();
 //		Map<Integer, String> cemdapToursFilesMap = new HashMap<>();
