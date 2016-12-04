@@ -35,6 +35,8 @@ import playground.ikaddoura.decongestion.Decongestion;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
+import playground.ikaddoura.integrationCNE.CNEIntegration;
+import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
 
 /**
 * @author ikaddoura
@@ -79,10 +81,10 @@ public class BerlinControler {
 			
 			addModifiedActivities = true;
 			activityDurationBin = 3600.;
-			tolerance = 3600.;
+			tolerance = 7200.;
 			
-			pricing = false;
-			kp = 2 * ( 7 / 3600.);
+			pricing = true;
+			kp = 2 * ( 12. / 3600.);
 		}
 		
 		BerlinControler berlin = new BerlinControler();
@@ -114,14 +116,14 @@ public class BerlinControler {
 			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
 			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 			
-			final DecongestionInfo info = new DecongestionInfo(controler.getScenario(), decongestionSettings);
-			final Decongestion decongestion = new Decongestion(info);
-			controler = decongestion.getControler();
+//			final DecongestionInfo info = new DecongestionInfo(controler.getScenario(), decongestionSettings);
+//			final Decongestion decongestion = new Decongestion(info);
+//			controler = decongestion.getControler();
 				
-//			CNEIntegration cne = new CNEIntegration(controler);
-//			cne.setCongestionTollingApproach(CongestionTollingApproach.QBPV3);
-//			cne.setCongestionPricing(true);
-//			controler = cne.prepareControler();
+			CNEIntegration cne = new CNEIntegration(controler);
+			cne.setCongestionTollingApproach(CongestionTollingApproach.QBPV3);
+			cne.setCongestionPricing(true);
+			controler = cne.prepareControler();
 		}
 			
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
