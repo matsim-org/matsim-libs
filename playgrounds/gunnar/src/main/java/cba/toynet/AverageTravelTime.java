@@ -1,4 +1,4 @@
-package cba;
+package cba.toynet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,18 +22,18 @@ import org.matsim.vehicles.Vehicle;
 class AverageTravelTime implements TravelTime {
 
 	private final List<TravelTime> myTravelTimes = new ArrayList<>();
-	
+
 	AverageTravelTime() {
 	}
-	
-	AverageTravelTime(final Scenario scenario, final int avgIts) {		
+
+	AverageTravelTime(final Scenario scenario, final int avgIts) {
 		this.addData(scenario, avgIts);
 	}
 
 	void addData(final Scenario scenario, final int avgIts) {
-		
+
 		this.myTravelTimes.clear();
-		
+
 		final int lastIt = scenario.getConfig().controler().getLastIteration();
 		for (int it = lastIt - avgIts + 1; it <= lastIt; it++) {
 			final EventsManager events = EventsUtils.createEventsManager();
@@ -41,9 +41,9 @@ class AverageTravelTime implements TravelTime {
 					(TravelTimeCalculatorConfigGroup) scenario.getConfig().getModule("travelTimeCalculator"));
 			events.addHandler(travelTimeCalculator);
 			final MatsimEventsReader reader = new MatsimEventsReader(events);
-			reader.readFile("./testdata/cba/output/ITERS/it." + it + "/" + it + ".events.xml.gz");
-			this.myTravelTimes.add(travelTimeCalculator.getLinkTravelTimes());			
-		}		
+			reader.readFile("./output/cba/toynet/output/ITERS/it." + it + "/" + it + ".events.xml.gz");
+			this.myTravelTimes.add(travelTimeCalculator.getLinkTravelTimes());
+		}
 	}
 
 	@Override
@@ -53,6 +53,6 @@ class AverageTravelTime implements TravelTime {
 		for (int i = startIndex; i < this.myTravelTimes.size(); i++) {
 			sum += this.myTravelTimes.get(i).getLinkTravelTime(link, time, person, vehicle);
 		}
-		return (sum / (this.myTravelTimes.size() - startIndex));		
+		return (sum / (this.myTravelTimes.size() - startIndex));
 	}
 }

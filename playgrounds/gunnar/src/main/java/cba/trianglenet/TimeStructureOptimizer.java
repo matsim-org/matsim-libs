@@ -1,4 +1,4 @@
-package cba;
+package cba.trianglenet;
 
 import java.util.Map;
 

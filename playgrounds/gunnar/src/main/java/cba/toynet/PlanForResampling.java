@@ -1,4 +1,4 @@
-package cba;
+package cba.toynet;
 
 import org.matsim.api.core.v01.population.Plan;
 
@@ -16,27 +16,29 @@ class PlanForResampling implements Alternative {
 
 	final Plan plan;
 
-	private final double sampersOnlyScore;
+	private final double activityModeOnlyUtility;
 
-	private final double sampersTimeScore;
+	private final double teleportationTravelTimeUtility;
 
-	private final double matsimTimeScore;
+	private final double congestedTravelTimeUtility;
 
 	private final double sampersChoiceProba;
 
 	private final EpsilonDistribution epsDistr;
 
-	// for testing
 	private Double matsimChoiceProba = null;
+
+	private TourSequence tourSequence = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	PlanForResampling(final Plan plan, final double sampersOnlyScore, final double sampersTimeScore,
-			final double matsimTimeScore, final double sampersChoiceProba, final EpsilonDistribution epsDistr) {
+	PlanForResampling(final Plan plan, final double activityModeOnlyUtility,
+			final double teleportationTravelTimeUtility, final double congestedTravelTimeUtility,
+			final double sampersChoiceProba, final EpsilonDistribution epsDistr) {
 		this.plan = plan;
-		this.sampersOnlyScore = sampersOnlyScore;
-		this.sampersTimeScore = sampersTimeScore;
-		this.matsimTimeScore = matsimTimeScore;
+		this.activityModeOnlyUtility = activityModeOnlyUtility;
+		this.teleportationTravelTimeUtility = teleportationTravelTimeUtility;
+		this.congestedTravelTimeUtility = congestedTravelTimeUtility;
 		this.sampersChoiceProba = sampersChoiceProba;
 		this.epsDistr = epsDistr;
 	}
@@ -51,11 +53,19 @@ class PlanForResampling implements Alternative {
 		return this.matsimChoiceProba;
 	}
 
+	void setTourSequence(final TourSequence tourSequence) {
+		this.tourSequence = tourSequence;
+	}
+
+	TourSequence getTourSequence() {
+		return this.tourSequence;
+	}
+
 	// -------------------- IMPLEMENTATION OF Attribute --------------------
 
 	@Override
 	public double getSampersOnlyScore() {
-		return this.sampersOnlyScore;
+		return this.activityModeOnlyUtility;
 	}
 
 	@Override
@@ -70,11 +80,11 @@ class PlanForResampling implements Alternative {
 
 	@Override
 	public double getSampersTimeScore() {
-		return this.sampersTimeScore;
+		return this.teleportationTravelTimeUtility;
 	}
 
 	@Override
 	public double getMATSimTimeScore() {
-		return this.matsimTimeScore;
+		return this.congestedTravelTimeUtility;
 	}
 }

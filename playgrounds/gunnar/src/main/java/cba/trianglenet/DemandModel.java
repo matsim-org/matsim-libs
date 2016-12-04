@@ -1,4 +1,4 @@
-package cba;
+package cba.trianglenet;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;

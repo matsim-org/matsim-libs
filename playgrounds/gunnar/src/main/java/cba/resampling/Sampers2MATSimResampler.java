@@ -61,8 +61,8 @@ public class Sampers2MATSimResampler {
 	private int drawMATSimRUChoiceIndex() {
 		final List<Double> randomUtilityRealizations = new ArrayList<>(this.alternatives.size());
 		for (Alternative alt : this.alternatives) {
-			final double matsimScore = alt.getSampersOnlyScore() - alt.getSampersTimeScore() + alt.getMATSimTimeScore();
-			randomUtilityRealizations.add(matsimScore + alt.getEpsilonDistribution().nextEpsilon());
+			final double targetScore = alt.getSampersOnlyScore() + alt.getMATSimTimeScore();
+			randomUtilityRealizations.add(targetScore + alt.getEpsilonDistribution().nextEpsilon());
 		}
 		int result = 0;
 		double resultRU = randomUtilityRealizations.get(0);
