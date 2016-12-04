@@ -48,7 +48,6 @@ import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
 import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
 import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
-import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.NetworkModeProvider;
 import org.matsim.contrib.accessibility.PtMatrixModeProvider;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
@@ -72,12 +71,7 @@ import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
 import org.matsim.contrib.matsim4urbansim.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimParcelCSVWriterListener;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
@@ -87,18 +81,16 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 
 import com.google.inject.Key;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 
@@ -148,14 +140,14 @@ class MATSim4UrbanSimParcel{
 
 	// run selected controler
 	boolean computeGridBasedAccessibility			 = false;	// determines whether grid based accessibilities should be calculated
-	boolean computeGridBasedAccessibilitiesUsingShapeFile= false;// determines whether to use a shape file boundary defining the area for grid based accessibilities 
-	boolean computeGridBasedAccessibilityUsingBoundingBox = false; // determines whether to use a customized bounding box
+//	boolean computeGridBasedAccessibilitiesUsingShapeFile= false;// determines whether to use a shape file boundary defining the area for grid based accessibilities 
+//	boolean computeGridBasedAccessibilityUsingBoundingBox = false; // determines whether to use a customized bounding box
 	boolean computeZoneBasedAccessibilities			 = false;	// determines whether zone based accessibilities should be calculated
 	boolean computeZone2ZoneImpedance		   		 = false;	// determines whether zone o zone impedances should be calculated
 	boolean computeAgentPerformance					 = false;	// determines whether agent performances should be calculated
-	String shapeFile 						 		 = null;
-	double cellSizeInMeter 							 = -1;
-	BoundingBox box				 = null;
+//	String shapeFile 						 		 = null;
+//	double cellSizeInMeter 							 = -1;
+//	BoundingBox box				 = null;
 
 	/**
 	 * constructor
@@ -210,8 +202,8 @@ class MATSim4UrbanSimParcel{
 		//		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim parcels") ;
 		ActivityFacilitiesImpl parcels = (ActivityFacilitiesImpl) scenario.getActivityFacilities() ;
 
-		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
-		ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunity locations (e.g. workplaces) for zones or parcels");
+		ActivityFacilitiesImpl zones = (ActivityFacilitiesImpl) FacilitiesUtils.createActivityFacilities("urbansim zones");
+		ActivityFacilitiesImpl opportunities = (ActivityFacilitiesImpl) FacilitiesUtils.createActivityFacilities("opportunity locations (e.g. workplaces) for zones or parcels");
 		// yyyy parcels and opportunities should be come one ...
 		// yyyy ... and then become the matsim activity facilities.
 
@@ -367,11 +359,10 @@ class MATSim4UrbanSimParcel{
 	final void addControlerListener(final ActivityFacilitiesImpl zones, final ActivityFacilitiesImpl parcels, final ActivityFacilitiesImpl opportunities, final Controler controler, final PtMatrix ptMatrix) {
 		if ( computeZoneBasedAccessibilities || computeGridBasedAccessibility ) {
 			controler.addOverridingModule(new AbstractModule() {
-				@Inject Config config ;
 				@Override public void install() {
 					MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
 					{
-						String mode = Modes4Accessibility.freespeed.name() ;
+						String mode = "freespeed";
 						this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new FreeSpeedNetworkModeProvider(TransportMode.car));
 						accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
 					}
@@ -423,8 +414,6 @@ class MATSim4UrbanSimParcel{
 				if(computeZoneBasedAccessibilities){
 					// creates zone based table of log sums
 					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
-						@Inject Map<String, TravelTime> travelTimes;
-						@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 						@Inject Map<String, AccessibilityContributionCalculator> calculators;
 						@Override public ControlerListener get() {
 							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, zones);
@@ -457,32 +446,37 @@ class MATSim4UrbanSimParcel{
 				if(computeGridBasedAccessibility){
 					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
 						@Inject Map<String, AccessibilityContributionCalculator> calculators;
+						@Inject Config config;
 						@Override public ControlerListener get() {
+							AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
+							double cellSize_m = acg.getCellSizeCellBasedAccessibility();
 							// initializing grid based accessibility controler listener
+							BoundingBox boundingBox = null;
 							final ActivityFacilitiesImpl measuringPoints ;
-							if(computeGridBasedAccessibilitiesUsingShapeFile) {
-								Geometry boundary = GridUtils.getBoundary(shapeFile);
-								Envelope env = boundary.getEnvelopeInternal();
-								box = new BoundingBox( env ) ;
-								measuringPoints = GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSizeInMeter);
-								log.info("Using custom bounding box to determine the area for accessibility computation.");
-							} else if(computeGridBasedAccessibilityUsingBoundingBox) {
-								measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(box, cellSizeInMeter);
+							if (cellSize_m <= 0) {
+								throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
+							}
+							if(acg.getAreaOfAccessibilityComputation().equals(AreaOfAccesssibilityComputation.fromShapeFile.toString())) {
+								Geometry boundary = GridUtils.getBoundary(acg.getShapeFileCellBasedAccessibility());
+								boundingBox = new BoundingBox(boundary.getEnvelopeInternal()) ;
+								measuringPoints = GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize_m);
+								log.info("Using shape file to determine the area for accessibility computation.");
+							} else if(acg.getAreaOfAccessibilityComputation().equals(AreaOfAccesssibilityComputation.fromBoundingBox.toString())) {
+								boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
+								measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, cellSize_m);
 								log.info("Using custom bounding box to determine the area for accessibility computation.");
 							} else {
-								measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(box, cellSizeInMeter) ;
+								boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
+								measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, cellSize_m) ;
 								log.info("Using the boundary of the network file to determine the area for accessibility computation.");
 								log.warn("This could lead to memory issues when the network is large and/or the cell size is too fine!");
-								if (cellSizeInMeter <= 0) {
-									throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
-								}
 							}
 							final AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
 							for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
-								log.warn("adding accessibility calculator for mode=" + entry.getKey()) ;
+								log.warn("Adding accessibility calculator for mode = " + entry.getKey()) ;
 								accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 							}
-							final GridBasedAccessibilityShutdownListenerV3 gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, box, cellSizeInMeter);
+							final GridBasedAccessibilityShutdownListenerV3 gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, boundingBox, cellSize_m);
 
 							if(isParcelMode){
 								// creating a writer listener that writes out accessibility results in UrbanSim format for parcels
@@ -533,40 +527,12 @@ class MATSim4UrbanSimParcel{
 	 * Getting parameter  
 	 */
 	void setControlerSettings() {
-
-		AccessibilityConfigGroup moduleAccessibility = ConfigUtils.addOrGetModule( scenario.getConfig(), AccessibilityConfigGroup.class );
 		UrbanSimParameterConfigModuleV3 moduleUrbanSim = ConfigUtils.addOrGetModule(scenario.getConfig(), UrbanSimParameterConfigModuleV3.class );
 
 		this.computeAgentPerformance	= moduleUrbanSim.usingAgentPerformance();
 		this.computeZone2ZoneImpedance	= moduleUrbanSim.usingZone2ZoneImpedance();
 		this.computeZoneBasedAccessibilities = moduleUrbanSim.usingZoneBasedAccessibility();
 		this.computeGridBasedAccessibility	= moduleUrbanSim.usingGridBasedAccessibility();
-
-		if ( moduleAccessibility.getAreaOfAccessibilityComputation().equals( AreaOfAccesssibilityComputation.fromBoundingBox.toString() ) ) {
-			this.computeGridBasedAccessibilityUsingBoundingBox = true ;
-		} else if ( moduleAccessibility.getAreaOfAccessibilityComputation().equals( AreaOfAccesssibilityComputation.fromShapeFile.toString() ) ) {
-			this.computeGridBasedAccessibilitiesUsingShapeFile = true ;
-		} 
-		// if the other two are false, then network is used.
-
-
-		// this.computeGridBasedAccessibilitiesUsingNetworkBoundary = moduleAccessibility.isCellBasedAccessibilityNetwork();
-		this.cellSizeInMeter 			= moduleAccessibility.getCellSizeCellBasedAccessibility();
-		this.shapeFile					= moduleAccessibility.getShapeFileCellBasedAccessibility();
-
-		// the boundary box defines the study area for accessibility calculations if no shape file is provided or a zone based UrbanSim application is used
-		// the boundary is either defined by a user defined boundary box or if not applicable by the extend of the road network
-		if(this.computeGridBasedAccessibilityUsingBoundingBox){	// check if a boundary box is defined
-			// log.info("Using custom bounding box for accessibility computation.");
-			box = BoundingBox.createBoundingBox(moduleAccessibility.getBoundingBoxLeft(), 
-					moduleAccessibility.getBoundingBoxBottom(), 
-					moduleAccessibility.getBoundingBoxRight(), 
-					moduleAccessibility.getBoundingBoxTop());
-		}
-		else{	// no boundary box defined using boundary of hole network for accessibility computation
-			// log.warn("Using the boundary of the network file for accessibility computation. This could lead to memory issues when the network is large and/or the cell size is too fine.");
-			box = BoundingBox.createBoundingBox(scenario.getNetwork());
-		}
 	}
 
 	/**
