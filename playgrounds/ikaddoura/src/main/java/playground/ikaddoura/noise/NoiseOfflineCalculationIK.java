@@ -34,6 +34,7 @@ import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 /**
  * (1) Computes noise emissions, immissions, person activities and damages based on a standard events file.
@@ -78,24 +79,25 @@ public class NoiseOfflineCalculationIK {
 		} else {
 			
 			runDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
-			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_gridCSVFile/";
+			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_gridCSVFile_wilmersdorf/";
 			receiverPointGap = 5.;
 			lastIteration = 100;
 			timeBinSize = 3600.;
-			receiverPointsGridCSVFile = "../../../shared-svn/studies/countries/de/berlin_noise/Fassadenpegel/FP_gesamt_Atom_repaired.txt";
+			receiverPointsGridCSVFile = "../../../shared-svn/studies/countries/de/berlin_noise/Fassadenpegel/facade-points_wilmersdorf.csv";
 		}
 		
 		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
 		config.network().setInputFile(runDirectory + "output_network.xml.gz");
 		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
-		config.controler().setLastIteration(lastIteration);		
+		config.controler().setLastIteration(lastIteration);	
+		config.global().setCoordinateSystem(TransformationFactory.DHDN_GK4);
 						
 		// adjust the default noise parameters
 		
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setReceiverPointGap(receiverPointGap);
-		noiseParameters.setReceiverPointsGridCSVFile(receiverPointsGridCSVFile);
+		noiseParameters.setReceiverPointsCSVFile(receiverPointsGridCSVFile);
 		
 		// Wilmersdorf with motorway: 4589486 , 5816193 : 4590778 , 5817029
 //		double xMin = 4589486.;
@@ -241,16 +243,16 @@ public class NoiseOfflineCalculationIK {
 		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", noiseParameters.getReceiverPointGap());
 		process.run();
 				
-		final String[] labels = { "immission", "consideredAgentUnits" , "damages_receiverPoint" };
-		final String[] workingDirectories = { outputFilePath + "/immissions/" , outputFilePath + "/consideredAgentUnits/" , outputFilePath + "/damages_receiverPoint/" };
-
-		MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
-		merger.setReceiverPointsFile(outputFilePath + "receiverPoints/receiverPoints.csv");
-		merger.setOutputDirectory(outputFilePath);
-		merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
-		merger.setWorkingDirectory(workingDirectories);
-		merger.setLabel(labels);
-		merger.run();
+//		final String[] labels = { "immission", "consideredAgentUnits" , "damages_receiverPoint" };
+//		final String[] workingDirectories = { outputFilePath + "/immissions/" , outputFilePath + "/consideredAgentUnits/" , outputFilePath + "/damages_receiverPoint/" };
+//
+//		MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
+//		merger.setReceiverPointsFile(outputFilePath + "receiverPoints/receiverPoints.csv");
+//		merger.setOutputDirectory(outputFilePath);
+//		merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
+//		merger.setWorkingDirectory(workingDirectories);
+//		merger.setLabel(labels);
+//		merger.run();
 	}
 }
 		

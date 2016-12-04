@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
@@ -70,7 +71,8 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private double receiverPointsGridMaxX = 0.;
 	private double receiverPointsGridMaxY = 0.;
 	
-	private String receiverPointsGridCSVFile = null;
+	private String receiverPointsCSVFile = null;
+	private String receiverPointsCSVFileCoordinateSystem = TransformationFactory.DHDN_SoldnerBerlin;
 	
 	private double annualCostRate = (85.0/(1.95583)) * (Math.pow(1.02, (2014-1995)));
 	private double timeBinSizeNoiseComputation = 3600.0;
@@ -116,7 +118,8 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 		comments.put("receiverPointsGridMaxY", "Specifies a boundary coordinate min/max x/y value of the receiver point grid. "
 				+ "0.0 means the boundary coordinates are ignored and the grid is created based on the agents' activity coordinates of the specified activity types "
 				+ "(see parameter 'consideredActivitiesForReceiverPointGrid')." ) ;
-		comments.put("receiverPointGridCSVFile", "A csv file which provides the ReceiverPoint coordinates (first column: x-coordinate, second column: y-coordinate)");
+		comments.put("receiverPointCSVFile", "A csv file which provides the ReceiverPoint coordinates (first column: x-coordinate, second column: y-coordinate; separator: ',')");
+		comments.put("receiverPointsCSVFileCoordinateSystem", "The coordinate reference system of the provided ReceiverPoint csv file.");
 		comments.put("annualCostRate", "annual noise cost rate [in EUR per exposed pulation unit]; following the German EWS approach" ) ;
 		comments.put("timeBinSizeNoiseComputation", "Specifies the temporal resolution, i.e. the time bin size [in seconds] to compute noise levels." ) ;
 		comments.put("scaleFactor", "Set to '1.' for a 100 percent sample size. Set to '10.' for a 10 percent sample size. Set to '100.' for a 1 percent sample size." ) ;
@@ -572,6 +575,26 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 	public void setTunnelLinkIDs(String tunnelLinkIDs) {		
 		this.setTunnelLinkIDsSet(stringToLinkIdSet(tunnelLinkIDs));
 	}
+	
+	@StringGetter( "receiverPointsCSVFile" )
+	public String getReceiverPointsCSVFile() {
+		return receiverPointsCSVFile;
+	}
+
+	@StringSetter( "receiverPointsCSVFile" )
+	public void setReceiverPointsCSVFile(String receiverPointsGridCSVFile) {
+		this.receiverPointsCSVFile = receiverPointsGridCSVFile;
+	}
+	
+	@StringGetter( "receiverPointsCSVFileCoordinateSystem" )
+	public String getReceiverPointsCSVFileCoordinateSystem() {
+		return receiverPointsCSVFileCoordinateSystem;
+	}
+
+	@StringSetter( "receiverPointsCSVFileCoordinateSystem" )
+	public void setReceiverPointsCSVFileCoordinateSystem(String receiverPointsCSVFileCoordinateSystem) {
+		this.receiverPointsCSVFileCoordinateSystem = receiverPointsCSVFileCoordinateSystem;
+	}
 
 	public void setHgvIdPrefixesArray(String[] hgvIdPrefix) {
 		log.info("setting the HGV Id Prefixes to " + hgvIdPrefix.toString());
@@ -629,11 +652,4 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 		return tmp;
 	}
 
-	public String getReceiverPointsGridCSVFile() {
-		return receiverPointsGridCSVFile;
-	}
-
-	public void setReceiverPointsGridCSVFile(String receiverPointsGridCSVFile) {
-		this.receiverPointsGridCSVFile = receiverPointsGridCSVFile;
-	}
 }

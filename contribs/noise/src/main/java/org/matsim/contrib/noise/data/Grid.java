@@ -38,6 +38,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.PtConstants;
 
@@ -103,11 +105,11 @@ public class Grid {
 	private void initialize() {
 		setActivityCoords();
 		
-		if (this.noiseParams.getReceiverPointsGridCSVFile() == null) {
+		if (this.noiseParams.getReceiverPointsCSVFile() == null) {
 			log.info("Creating receiver point square grid...");
 			createGrid();
 		} else {
-			log.info("Loading receiver point grid based on provided grid points in 'receiverPointGridCSVFile'...");
+			log.info("Loading receiver points based on provided point coordinates in " + this.noiseParams.getReceiverPointsCSVFile());
 			loadGrid();
 		}
 		
@@ -153,7 +155,7 @@ public class Grid {
 	
 	private void loadGrid() {
 				
-		String gridCSVFile = this.noiseParams.getReceiverPointsGridCSVFile();
+		String gridCSVFile = this.noiseParams.getReceiverPointsCSVFile();
 		
 		Map<Id<ReceiverPoint>, Coord> gridPoints = null;
 		try {
@@ -162,8 +164,14 @@ public class Grid {
 			e.printStackTrace();
 		}
 		
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(this.noiseParams.getReceiverPointsCSVFileCoordinateSystem(), this.scenario.getConfig().global().getCoordinateSystem());
+		
 		for (Id<ReceiverPoint> id : gridPoints.keySet()) {
-			ReceiverPoint rp = new ReceiverPoint(id, gridPoints.get(id));			
+			
+			Coord coord = gridPoints.get(id);
+			Coord transformedCoord = ct.transform(coord);
+			
+			ReceiverPoint rp = new ReceiverPoint(id, transformedCoord);			
 			receiverPoints.put(id, rp);
 								
 			Tuple<Integer,Integer> zoneTuple = getZoneTuple(gridPoints.get(id));
