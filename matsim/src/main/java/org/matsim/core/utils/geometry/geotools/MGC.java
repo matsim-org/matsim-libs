@@ -91,8 +91,9 @@ public class MGC {
 				"PROJCS[\"WGS_1984_Transverse_Mercator\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",28001.642],PARAMETER[\"False_Northing\",38744.572],PARAMETER[\"Central_Meridian\",103.8333333333333],PARAMETER[\"Scale_Factor\",1.0],PARAMETER[\"Latitude_Of_Origin\",1.366666666666667],UNIT[\"Meter\",1.0]]");
 		COORDINATE_REFERENCE_SYSTEMS.put(TransformationFactory.PCS_ITRF2000_TM_UOS, // South Korea - but used by University of Seoul - probably a wrong one. !NEW!: Replaced by the correct one! TODO: probably needs to be renamed but since UOS use that already let's keep it.
 				"PROJCS[\"Korean 1985 Katech(TM128)\",GEOGCS[\"GCS_Korean_Datum_1985\",DATUM[\"D_Korean_Datum_1985\",SPHEROID[\"Bessel_1841\",6377397.155,299.1528128]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",400000.0],PARAMETER[\"False_Northing\",600000.0],PARAMETER[\"Central_Meridian\",128.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",38.0],UNIT[\"Meter\",1.0]]");
+		COORDINATE_REFERENCE_SYSTEMS.put(TransformationFactory.DHDN_SoldnerBerlin, // Berlin
+				"PROJCS[\"DHDN / Soldner Berlin\",GEOGCS[\"DHDN\",DATUM[\"Deutsches_Hauptdreiecksnetz\",SPHEROID[\"Bessel 1841\",6377397.155,299.1528128,AUTHORITY[\"EPSG\",\"7004\"]],AUTHORITY[\"EPSG\",\"6314\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4314\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],PROJECTION[\"Cassini_Soldner\"],PARAMETER[\"latitude_of_origin\",52.41864827777778],PARAMETER[\"central_meridian\",13.62720366666667],PARAMETER[\"false_easting\",40000],PARAMETER[\"false_northing\",10000],AUTHORITY[\"EPSG\",\"3068\"],AXIS[\"y\",EAST],AXIS[\"x\",NORTH]]");
 	}
-
 
 	/**
 	 * Converts a MATSim {@link org.matsim.api.core.v01.Coord} into a Geotools <code>Coordinate</code>
