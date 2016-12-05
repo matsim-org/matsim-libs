@@ -127,9 +127,10 @@ public class PatnaBikeTrackConnectionControler {
 				// adding pt fare system based on distance
 				this.addEventHandlerBinding().to(PtFareEventHandler.class);
 
-				if (useBikeTravelTime) {
-					addTravelTimeBinding(TransportMode.bike).to(FreeSpeedTravelTimeForBike.class);
-				}
+				// it has been observed that, bike travel time routes more agents on bike track than using default settings in
+				// travel time calculator config group. Amit Dec 16.
+				addTravelTimeBinding(TransportMode.bike).to(FreeSpeedTravelTimeForBike.class);
+
 				addControlerListenerBinding().toInstance(bikeConnectorControlerListener);
 				bind(TerminationCriterion.class).toInstance(terminationCriterion);
 			}

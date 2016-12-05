@@ -21,14 +21,12 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.policies;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.List;
 import javax.inject.Inject;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -54,12 +52,12 @@ import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
+import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.FileUtils;
-import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * @author amit
@@ -85,10 +83,11 @@ public class PatnaPolicyControler {
 			outputDir = dir+args[4];
 		}  else {
 			if(applyTrafficRestrain ) {
-				if (isAllwoingMotorbikeOnBikeTrack) throw new RuntimeException("Two situations -- traffic restrain and motorbike on bike track -- are not considered.");
-				if (addBikeTrack) outputDir = dir+"/both/";
-				else outputDir = dir+"/trafficRestrain/";
-			} else if(addBikeTrack && !isAllwoingMotorbikeOnBikeTrack) outputDir = dir+"/bikeTrack/";
+//				if (isAllwoingMotorbikeOnBikeTrack) throw new RuntimeException("Two situations -- traffic restrain and motorbike on bike track -- are not considered.");
+//				if (addBikeTrack) outputDir = dir+"/both/";
+//				else outputDir = dir+"/trafficRestrain/";
+				throw new RuntimeException("not implemented yet.");
+			} else if(addBikeTrack && !isAllwoingMotorbikeOnBikeTrack) outputDir = dir+"/BT-b/";
 			else if(isAllwoingMotorbikeOnBikeTrack) outputDir = dir+"/BT-mb/";
 			else outputDir = dir+"/baseCaseCtd/";			
 		}
@@ -124,11 +123,12 @@ public class PatnaPolicyControler {
 		config.travelTimeCalculator().setAnalyzedModes(String.join(",", PatnaUtils.ALL_MAIN_MODES));
 
 		// policies if any
-		if (applyTrafficRestrain && addBikeTrack ) {
-			config.network().setInputFile(inputDir + "/networkWithTrafficRestricationAndBikeTrack.xml.gz");
-		} else if (applyTrafficRestrain ) {
-			config.network().setInputFile(inputDir + "/networkWithTrafficRestrication.xml.gz");
-		} else if(addBikeTrack && !isAllwoingMotorbikeOnBikeTrack) {
+//		if (applyTrafficRestrain && addBikeTrack ) {
+//			config.network().setInputFile(inputDir + "/networkWithTrafficRestricationAndBikeTrack.xml.gz");
+//		} else if (applyTrafficRestrain ) {
+//			config.network().setInputFile(inputDir + "/networkWithTrafficRestrication.xml.gz");
+//		} else
+		if(addBikeTrack && !isAllwoingMotorbikeOnBikeTrack) {
 			config.network().setInputFile(inputDir + "/networkWithBikeTrack.xml.gz");
 		} else if (isAllwoingMotorbikeOnBikeTrack) {
 			config.network().setInputFile(inputDir + "/networkWithBikeMotorbikeTrack.xml.gz");
@@ -141,10 +141,6 @@ public class PatnaPolicyControler {
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
 		final Controler controler = new Controler(scenario);
-
-		// removal of some links may lead to exception if routes are not removed from leg.
-		// do this before setting a new network so that cord from removed links can be extracted.
-		if(applyTrafficRestrain ) removeRoutes(scenario, inputDir+"/network.xml.gz"); 
 
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 		controler.getConfig().strategy().setMaxAgentPlanMemorySize(10);
@@ -176,6 +172,13 @@ public class PatnaPolicyControler {
 
 		// add income dependent scoring function factory
 		addScoringFunction(controler);
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addTravelTimeBinding(TransportMode.bike).to(FreeSpeedTravelTimeForBike.class);
+			}
+		});
 
 		controler.run();
 
@@ -240,36 +243,5 @@ public class PatnaPolicyControler {
 				return sumScoringFunction;
 			}
 		});
-	}
-
-	private static void removeRoutes(final Scenario scenario, final String baseCaseNetwork){
-		// this is required because routes are generated from initial base case network; and new network does not have certain links.
-		Scenario scNetwork = LoadMyScenarios.loadScenarioFromNetwork(baseCaseNetwork); 
-
-		//since some links are now removed, route in the plans will throw exception, remove them.
-		for (Person p : scenario.getPopulation().getPersons().values()){
-			for(Plan plan : p.getPlans()){
-				List<PlanElement> pes = plan.getPlanElements();
-				for (PlanElement pe :pes ){
-					if (pe instanceof Activity) { 
-						Activity act = ((Activity)pe);
-						Id<Link> linkId = act.getLinkId();
-						Coord cord = act.getCoord();
-
-						if (cord == null && linkId == null) throw new RuntimeException("Activity "+act.toString()+" do not have either of link id or coord. Aborting...");
-						else if (linkId == null ) { /*nothing to do; cord is assigned*/ }
-						else if (cord==null && ! scNetwork.getNetwork().getLinks().containsKey(linkId)) throw new RuntimeException("Activity "+act.toString()+" do not have cord and link id is not present in network. Aborting...");
-						else {
-							cord = scNetwork.getNetwork().getLinks().get(linkId).getCoord();
-							act.setLinkId(null);
-							act.setCoord(cord);
-						}
-					} else if ( pe instanceof Leg){
-						Leg leg = (Leg) pe;
-						leg.setRoute(null);
-					}
-				}
-			}
-		}
 	}
 }

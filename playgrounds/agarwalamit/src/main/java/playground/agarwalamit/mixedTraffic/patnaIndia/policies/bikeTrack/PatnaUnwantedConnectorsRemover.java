@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 /**
  * Created by amit on 05/12/2016.
@@ -38,7 +39,9 @@ public class PatnaUnwantedConnectorsRemover {
     }
 
     void processNetworkForRemoval (final Network network){
-        List<Link> links2remove = network.getLinks().values().stream().filter(link -> link.getFreespeed()==0.01).collect(Collectors.toList());
+        List<Link> links2remove = network.getLinks().values().stream().filter(
+                link -> link.getId().toString().startsWith(PatnaUtils.BIKE_TRACK_CONNECTOR_PREFIX.toString()) && link.getFreespeed()==0.01
+        ).collect(Collectors.toList());
         links2remove.stream().forEach(link -> network.removeLink(link.getId()));
     }
 }
