@@ -45,6 +45,7 @@ import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
 import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.NetworkModeProvider;
+import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
@@ -68,6 +69,7 @@ import com.google.inject.Key;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -127,8 +129,9 @@ public class AccessibilityIntegrationTest {
 		double min = 0.;
 		double max = 200.;
 
-		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
-		config.addModule(acm);
+		final AccessibilityConfigGroup acm = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
+		acm.setCellSizeCellBasedAccessibility(100);
+
 		// set bounding box manually in this test
 		acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox.toString());
 		acm.setBoundingBoxBottom(min);
@@ -178,7 +181,6 @@ public class AccessibilityIntegrationTest {
 		}
 
 		// yyyy the following is taken from AccessibilityTest without any consideration of a good design.
-		final double cellSize = 100. ;
 
 //		controler.addOverridingModule(new GridBasedAccessibilityModule(ptMatrix, cellSize));
 		// yy the correct test is essentially already in AccessibilityTest.testAccessibilityMeasure().  kai, jun'13
@@ -194,13 +196,28 @@ public class AccessibilityIntegrationTest {
 		};
 		
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
-		double top = acg.getBoundingBoxTop();
-		double bottom = acg.getBoundingBoxBottom();
-		double left = acg.getBoundingBoxLeft();
-		double right = acg.getBoundingBoxRight();
-		final Envelope envelope = new Envelope(left, right, bottom, top);
+		double cellSize_m = acg.getCellSizeCellBasedAccessibility();
 		
-		AccessibilityStartupListener asl = new AccessibilityStartupListener(activityTypes, null, null, null, envelope, cellSize, false);
+		BoundingBox boundingBox;
+		if (cellSize_m <= 0) {
+			throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
+		}
+		if(acg.getAreaOfAccessibilityComputation().equals(AreaOfAccesssibilityComputation.fromShapeFile.toString())) {
+			Geometry boundary = GridUtils.getBoundary(acg.getShapeFileCellBasedAccessibility());
+			Envelope envelope = boundary.getEnvelopeInternal();
+			boundingBox = BoundingBox.createBoundingBox(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY());
+			LOG.info("Using shape file to determine the area for accessibility computation.");
+		} else if(acg.getAreaOfAccessibilityComputation().equals(AreaOfAccesssibilityComputation.fromBoundingBox.toString())) {
+			boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
+			LOG.info("Using custom bounding box to determine the area for accessibility computation.");
+		} else {
+			boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
+			LOG.info("Using the boundary of the network file to determine the area for accessibility computation.");
+			LOG.warn("This could lead to memory issues when the network is large and/or the cell size is too fine!");
+		}
+		final Envelope envelope = new Envelope(boundingBox.getXMin(), boundingBox.getXMax(), boundingBox.getYMin(), boundingBox.getYMax());
+		
+		AccessibilityStartupListener asl = new AccessibilityStartupListener(activityTypes, null, null, null, envelope, cellSize_m, false);
 		controler.addControlerListener(asl);
 		EvaluateTestResults etr = new EvaluateTestResults(true, true, true, true, false);
 		asl.addAdditionalSpatialDataGridExchangeListener(etr);
@@ -243,14 +260,13 @@ public class AccessibilityIntegrationTest {
 		controler.run();
 	}
 
-	@Ignore
+
 	@Test
 	public void testWithExtentDeterminedByNetwork() {
 		final Config config = ConfigUtils.createConfig();
 		
-		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
-		config.addModule(acm);
-//		acm.setCellBasedAccessibilityNetwork(true); // is now default
+		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
+		acg.setCellSizeCellBasedAccessibility(100);
 		
 		// modify config according to needs
 		Network network = CreateTestNetwork.createTestNetwork();
@@ -277,7 +293,7 @@ public class AccessibilityIntegrationTest {
 		// compare some results -> done in EvaluateTestResults
 	}
 	
-	@Ignore
+
 	@Test
 	public void testWithExtentDeterminedShapeFile() {
 		
@@ -291,8 +307,8 @@ public class AccessibilityIntegrationTest {
 			Assert.assertTrue(f.exists());
 		}
 
-		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
-		config.addModule(acm);
+		final AccessibilityConfigGroup acm = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
+		acm.setCellSizeCellBasedAccessibility(100);
 		// set area by shapefile in this test
 		acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromShapeFile.toString());
 //		acm.setShapeFileCellBasedAccessibility(url.getPath()); // yyyyyy todo
@@ -521,43 +537,4 @@ public class AccessibilityIntegrationTest {
 					'}';
 		}
 	}
-
-	
-//	private class GridBasedAccessibilityModule extends AbstractModule {
-//		private final PtMatrix ptMatrix;
-//		private final double cellSize;
-//
-//		public GridBasedAccessibilityModule(PtMatrix ptMatrix, double cellSize) {
-//			this.ptMatrix = ptMatrix;
-//			this.cellSize = cellSize;
-//		}
-//
-//		@Override
-//		public void install() {
-//			addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
-//				@Inject Scenario scenario;
-//				@Inject ActivityFacilities opportunities;
-//				@Inject Map<String, AccessibilityContributionCalculator> calculators;
-//
-//				@Override
-//				public ControlerListener get() {
-//					BoundingBox bb = BoundingBox.createBoundingBox(scenario.getNetwork());
-//					
-//					ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize);
-//					AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
-//					GridBasedAccessibilityShutdownListenerV3 gacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, bb.getXMin(), bb.getYMin(),bb.getXMax(), bb.getYMax(), cellSize);
-//					for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
-//						accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
-//					}
-//
-//					// this will be called by the accessibility listener after the accessibility calculations are finished
-//					// It checks if the SpatialGrid for activated (true) transport modes are instantiated or null if not (false)
-//					EvaluateTestResults etr = new EvaluateTestResults(true, true, true, true, true);
-//					gacl.addSpatialGridDataExchangeListener(etr);
-//
-//					return gacl;
-//				}
-//			});
-//		}
-//	}
 }

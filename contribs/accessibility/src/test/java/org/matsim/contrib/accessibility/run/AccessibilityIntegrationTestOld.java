@@ -137,12 +137,13 @@ public class AccessibilityIntegrationTestOld {
 
 		final AccessibilityConfigGroup acm = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
 		acm.setCellSizeCellBasedAccessibility(100);
+
 		// set bounding box manually in this test
 		acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox.toString());
 		acm.setBoundingBoxBottom(min);
 		acm.setBoundingBoxTop(max);
 		acm.setBoundingBoxLeft(min);
-		acm.setBoundingBoxRight(max); // TODO does not seem to have any impact
+		acm.setBoundingBoxRight(max);
 		
 		// modify config according to needs
 		Network network = CreateTestNetwork.createTestNetwork();
@@ -233,8 +234,8 @@ public class AccessibilityIntegrationTestOld {
 	public void testWithExtentDeterminedByNetwork() {
 		final Config config = ConfigUtils.createConfig();
 		
-		final AccessibilityConfigGroup acm = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
-		acm.setCellSizeCellBasedAccessibility(100);
+		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
+		acg.setCellSizeCellBasedAccessibility(100);
 		
 		// modify config according to needs
 		Network network = CreateTestNetwork.createTestNetwork();
@@ -252,7 +253,6 @@ public class AccessibilityIntegrationTestOld {
 		
 		config.controler().setLastIteration(10);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
-
 
 		final MutableScenario sc = (MutableScenario) ScenarioUtils.loadScenario(config);
 
@@ -281,7 +281,7 @@ public class AccessibilityIntegrationTestOld {
 		// set area by shapefile in this test
 		acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromShapeFile.toString());
 //		acm.setShapeFileCellBasedAccessibility(url.getPath()); // yyyyyy todo
-		acm.setShapeFileCellBasedAccessibility(f.getAbsolutePath()); // TODO does not seem to have any impact
+		acm.setShapeFileCellBasedAccessibility(f.getAbsolutePath());
 		
 		// modify config according to needs
 		Network network = CreateTestNetwork.createTestNetwork();
