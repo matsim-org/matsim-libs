@@ -42,7 +42,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
@@ -151,21 +150,6 @@ public class BikeConnectorControlerListener implements StartupListener, Iteratio
     private boolean isRemovingBikeConnector(int iteration) {
         return iteration >= this.scenario.getConfig().controler().getFirstIteration() + initialStabilizationIterations // let most persons use bike track.
                 && iteration % this.removeConnectorAfterIteration == 0;
-    }
-
-    private void addNetworkChangeEvent(final Id<Link> connector2remove, final double aboutZeroFreeSpeed) {
-        double startTime = scenario.getConfig().qsim().getStartTime();
-
-        final NetworkChangeEvent networkChangeEvent = new NetworkChangeEvent(startTime);
-        networkChangeEvent.addLink(scenario.getNetwork().getLinks().get(connector2remove));
-        NetworkChangeEvent.ChangeValue changeValue = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, aboutZeroFreeSpeed);
-        networkChangeEvent.setFreespeedChange(changeValue);
-
-        List<NetworkChangeEvent> networkChangeEventList = new ArrayList<>();
-        networkChangeEventList.add(networkChangeEvent);
-        // dont use addNetworkChangeEvent else it will throw exception about unequal network change events from VariableIntervalTimeVariantAttribute (line 70).
-        // I think, the above method is meant for something else, probably, when adding all network change events one by one before starting the controler.
-        org.matsim.core.network.NetworkUtils.setNetworkChangeEvents(scenario.getNetwork(), networkChangeEventList);
     }
 
     @Override
