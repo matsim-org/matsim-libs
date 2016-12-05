@@ -20,7 +20,6 @@ package org.matsim.contrib.matsim4urbansim.run;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.NetworkWriter;
