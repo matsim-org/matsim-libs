@@ -347,7 +347,41 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 			final C coord,
 			final double maxDist,
 			final Predicate<T> predicate ) {
-		return getBallsIntersection( Collections.singleton( coord ) , maxDist , predicate );
+		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>( 1 + (int) Math.log( 1 + size() )) );
+		stack.add( root );
+
+		final Collection<T> ball = new ArrayList<>();
+
+		while( !stack.isEmpty() ) {
+			final Node<C,T> current = stack.poll();
+
+			if ( current.value == null &&
+					current.close == null &&
+					current.far == null ) {
+				continue;
+			}
+
+			final double distToVp = metric.calcDistance( coord , current.coordinate );
+
+			// check if current VP in ball
+			if ( current.value != null &&
+					distToVp < maxDist &&
+					predicate.test( current.value ) ) {
+				ball.add( current.value );
+			}
+
+			// test intersection of disc with the children
+			if ( current.close != null &&
+					distToVp - maxDist <= current.cuttoffDistance ) {
+				stack.add( current.close );
+			}
+			if ( current.far != null &&
+					distToVp + maxDist >= current.cuttoffDistance ) {
+				stack.add( current.far );
+			}
+		}
+
+		return ball;
 	}
 
 	public Collection<T> getBallsIntersection(
