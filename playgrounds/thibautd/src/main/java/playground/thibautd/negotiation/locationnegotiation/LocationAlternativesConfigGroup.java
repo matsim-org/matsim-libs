@@ -29,6 +29,8 @@ public class LocationAlternativesConfigGroup extends ReflectiveConfigGroup {
 	private int nOutOfHomeAlternatives = 100;
 	private double maxOutOfHomeRadius_km = 30;
 
+	private String activityType = "leisure";
+
 	public LocationAlternativesConfigGroup( ) {
 		super( GROUP_NAME );
 	}
@@ -51,5 +53,15 @@ public class LocationAlternativesConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter("maxOutOfHomeRadius_km")
 	public void setMaxOutOfHomeRadius_km( final double maxOutOfHomeRadius_km ) {
 		this.maxOutOfHomeRadius_km = maxOutOfHomeRadius_km;
+	}
+
+	@StringGetter("activityType")
+	public String getActivityType() {
+		return activityType;
+	}
+
+	@StringSetter("activityType")
+	public void setActivityType( final String activityType ) {
+		this.activityType = activityType;
 	}
 }

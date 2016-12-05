@@ -66,9 +66,8 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 		this.configGroup = configGroup;
 
 		final QuadTreeRebuilder<ActivityFacility> qt = new QuadTreeRebuilder<>();
-		// TODO: filter here, or outside, by activity type?
 		facilities.getFacilities().values().stream()
-				.filter( f -> f.getActivityOptions().containsKey( "leisure" ) )
+				.filter( f -> f.getActivityOptions().containsKey( configGroup.getActivityType() ) )
 				.forEach( f -> qt.put( f.getCoord() , f ) );
 		this.facilities = qt.getQuadTree();
 	}
