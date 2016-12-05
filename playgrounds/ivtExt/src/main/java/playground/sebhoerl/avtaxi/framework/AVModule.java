@@ -21,6 +21,7 @@ import org.matsim.vehicles.VehicleUtils;
 import playground.sebhoerl.avtaxi.config.*;
 import playground.sebhoerl.avtaxi.data.*;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
+import playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic.MultiODHeuristic;
 import playground.sebhoerl.avtaxi.dispatcher.single_fifo.SingleFIFODispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.single_heuristic.SingleHeuristicDispatcher;
 import playground.sebhoerl.avtaxi.generator.AVGenerator;
@@ -65,9 +66,11 @@ public class AVModule extends AbstractModule {
 	private void configureDispatchmentStrategies() {
         bind(SingleFIFODispatcher.Factory.class);
         bind(SingleHeuristicDispatcher.Factory.class);
+        bind(MultiODHeuristic.Factory.class);
 
         AVUtils.bindDispatcherFactory(binder(), "SingleFIFO").to(SingleFIFODispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), "SingleHeuristic").to(SingleHeuristicDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), "MultiOD").to(MultiODHeuristic.Factory.class);
     }
 
     private void configureGeneratorStrategies() {

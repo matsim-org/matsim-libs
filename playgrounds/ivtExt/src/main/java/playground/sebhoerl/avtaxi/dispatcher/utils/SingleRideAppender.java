@@ -54,7 +54,7 @@ public class SingleRideAppender {
         AVDriveTask pickupDriveTask = new AVDriveTask(pickupPath);
         AVPickupTask pickupTask = new AVPickupTask(
                 pickupPath.getArrivalTime(),
-                pickupPath.getArrivalTime() + timing.getDropoffDurationPerStop(),
+                pickupPath.getArrivalTime() + timing.getPickupDurationPerStop(),
                 request.getFromLink(), Arrays.asList(request));
         AVDriveTask dropoffDriveTask = new AVDriveTask(dropoffPath, Arrays.asList(request));
         AVDropoffTask dropoffTask = new AVDropoffTask(
@@ -83,9 +83,5 @@ public class SingleRideAppender {
         if (dropoffTask.getEndTime() < scheduleEndTime) {
             schedule.addTask(new AVStayTask(dropoffTask.getEndTime(), scheduleEndTime, dropoffTask.getLink()));
         }
-    }
-
-    public void advance() {
-
     }
 }

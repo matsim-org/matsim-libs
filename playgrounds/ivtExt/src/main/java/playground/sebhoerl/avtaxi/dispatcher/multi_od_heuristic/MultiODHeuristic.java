@@ -1,4 +1,4 @@
-package playground.sebhoerl.avtaxi.dispatcher.single_heuristic;
+package playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -6,70 +6,84 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.schedule.AbstractTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.QuadTree;
-import playground.sebhoerl.av.model.dispatcher.HeuristicDispatcher;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.config.AVTimingParameters;
 import playground.sebhoerl.avtaxi.data.AVOperator;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.dispatcher.utils.SingleRideAppender;
+import playground.sebhoerl.avtaxi.dispatcher.single_heuristic.ModeChangeEvent;
+import playground.sebhoerl.avtaxi.dispatcher.single_heuristic.SingleHeuristicDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
-import playground.sebhoerl.avtaxi.schedule.*;
+import playground.sebhoerl.avtaxi.schedule.AVStayTask;
+import playground.sebhoerl.avtaxi.schedule.AVTask;
 
 import java.util.*;
 
-public class SingleHeuristicDispatcher implements AVDispatcher {
+public class MultiODHeuristic implements AVDispatcher {
     private boolean reoptimize = true;
 
-    final private SingleRideAppender appender;
     final private Id<AVOperator> operatorId;
     final private EventsManager eventsManager;
 
+    final private List<AVRequest> submittedRequestsBuffer = Collections.synchronizedList(new LinkedList<>());
+
     final private List<AVVehicle> availableVehicles = new LinkedList<>();
-    final private List<AVRequest> pendingRequests = new LinkedList<>();
+    final private List<AggregateODRequest> pendingRequests = new LinkedList<>();
+    final private List<AggregateODRequest> assignableRequests = new LinkedList<>();
 
     final private QuadTree<AVVehicle> availableVehiclesTree;
-    final private QuadTree<AVRequest> pendingRequestsTree;
+    final private QuadTree<AggregateODRequest> pendingRequestsTree;
 
     final private Map<AVVehicle, Link> vehicleLinks = new HashMap<>();
-    final private Map<AVRequest, Link> requestLinks = new HashMap<>();
+    final private Map<AggregateODRequest, Link> requestLinks = new HashMap<>();
 
-    public enum HeuristicMode {
-        OVERSUPPLY, UNDERSUPPLY
-    }
+    final private Map<AVVehicle, AggregateODRequest> vehicle2Request = new HashMap<>();
 
-    private HeuristicMode mode = HeuristicMode.OVERSUPPLY;
+    private SingleHeuristicDispatcher.HeuristicMode mode = SingleHeuristicDispatcher.HeuristicMode.OVERSUPPLY;
 
-    public SingleHeuristicDispatcher(Id<AVOperator> operatorId, EventsManager eventsManager, Network network, SingleRideAppender appender) {
-        this.appender = appender;
+    final private AggregateRideAppender appender;
+    final private TravelTimeEstimator estimator;
+
+    private static int count = 0;
+
+    public MultiODHeuristic(Id<AVOperator> operatorId, EventsManager eventsManager, Network network, AggregateRideAppender appender, TravelTimeEstimator estimator) {
+        System.err.println("MultiODHeuristic::MultiODHeuristic()" + String.valueOf(count++));
+
         this.operatorId = operatorId;
         this.eventsManager = eventsManager;
+        this.appender = appender;
+        this.estimator = estimator;
 
         double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values()); // minx, miny, maxx, maxy
 
         availableVehiclesTree = new QuadTree<>(bounds[0], bounds[1], bounds[2], bounds[3]);
         pendingRequestsTree = new QuadTree<>(bounds[0], bounds[1], bounds[2], bounds[3]);
     }
-    
+
     @Override
     public void onRequestSubmitted(AVRequest request) {
-        addRequest(request, request.getFromLink());
+        submittedRequestsBuffer.add(request);
+    }
+
+    private void processSubmittedRequestsBuffer() {
+        for (AVRequest request : submittedRequestsBuffer) {
+            addRequest(request, request.getFromLink());
+        }
+
+        submittedRequestsBuffer.clear();
     }
 
     @Override
     public void onNextTaskStarted(AVTask task) {
+        if (task.getAVTaskType() == AVTask.AVTaskType.PICKUP) {
+            assignableRequests.remove(vehicle2Request.remove((AVVehicle) task.getSchedule().getVehicle()));
+        }
+
         if (task.getAVTaskType() == AVTask.AVTaskType.STAY) {
             addVehicle((AVVehicle) task.getSchedule().getVehicle(), ((AVStayTask) task).getLink());
         }
@@ -77,13 +91,13 @@ public class SingleHeuristicDispatcher implements AVDispatcher {
 
     private void reoptimize(double now) {
         while (pendingRequests.size() > 0 && availableVehicles.size() > 0) {
-            AVRequest request = null;
+            AggregateODRequest request = null;
             AVVehicle vehicle = null;
 
             switch (mode) {
                 case OVERSUPPLY:
                     request = findRequest();
-                    vehicle = findClosestVehicle(request.getFromLink());
+                    vehicle = findClosestVehicle(request.getMasterRequest().getFromLink());
                     break;
                 case UNDERSUPPLY:
                     vehicle = findVehicle();
@@ -93,11 +107,16 @@ public class SingleHeuristicDispatcher implements AVDispatcher {
 
             removeRequest(request);
             removeVehicle(vehicle);
+            vehicle2Request.put(vehicle, request);
 
             appender.schedule(request, vehicle, now);
         }
 
-        HeuristicMode updatedMode = availableVehicles.size() > 0 ? HeuristicMode.OVERSUPPLY : HeuristicMode.UNDERSUPPLY;
+        SingleHeuristicDispatcher.HeuristicMode updatedMode =
+                availableVehicles.size() > 0 ?
+                        SingleHeuristicDispatcher.HeuristicMode.OVERSUPPLY :
+                        SingleHeuristicDispatcher.HeuristicMode.UNDERSUPPLY;
+
         if (!updatedMode.equals(mode)) {
             mode = updatedMode;
             eventsManager.processEvent(new ModeChangeEvent(mode, operatorId, now));
@@ -106,17 +125,42 @@ public class SingleHeuristicDispatcher implements AVDispatcher {
 
     @Override
     public void onNextTimestep(double now) {
+        processSubmittedRequestsBuffer();
         if (reoptimize) reoptimize(now);
     }
 
     private void addRequest(AVRequest request, Link link) {
-        pendingRequests.add(request);
-        pendingRequestsTree.put(link.getCoord().getX(), link.getCoord().getY(), request);
-        requestLinks.put(request, link);
-        reoptimize = true;
+        AggregateODRequest aggregate = findAggregateRequest(request);
+
+        if (aggregate != null) {
+            aggregate.addSlaveRequest(request);
+        } else {
+            aggregate = new AggregateODRequest(request, estimator);
+
+            pendingRequests.add(aggregate);
+            assignableRequests.add(aggregate);
+            requestLinks.put(aggregate, link);
+            pendingRequestsTree.put(link.getCoord().getX(), link.getCoord().getY(), aggregate);
+        }
     }
 
-    private AVRequest findRequest() {
+    private AggregateODRequest findAggregateRequest(AVRequest request) {
+        AggregateODRequest bestAggregate = null;
+        double bestCost = Double.POSITIVE_INFINITY;
+
+        for (AggregateODRequest candidate : assignableRequests) {
+            Double cost = candidate.accept(request);
+
+            if (cost != null && cost < bestCost) {
+                bestCost = cost;
+                bestAggregate = candidate;
+            }
+        }
+
+        return bestAggregate;
+    }
+
+    private AggregateODRequest findRequest() {
         return pendingRequests.get(0);
     }
 
@@ -129,7 +173,7 @@ public class SingleHeuristicDispatcher implements AVDispatcher {
         return availableVehiclesTree.getClosest(coord.getX(), coord.getY());
     }
 
-    private AVRequest findClosestRequest(Link link) {
+    private AggregateODRequest findClosestRequest(Link link) {
         Coord coord = link.getCoord();
         return pendingRequestsTree.getClosest(coord.getX(), coord.getY());
     }
@@ -152,14 +196,15 @@ public class SingleHeuristicDispatcher implements AVDispatcher {
         availableVehiclesTree.remove(coord.getX(), coord.getY(), vehicle);
     }
 
-    private void removeRequest(AVRequest request) {
+    private void removeRequest(AggregateODRequest request) {
         pendingRequests.remove(request);
         Coord coord = requestLinks.remove(request).getCoord();
         pendingRequestsTree.remove(coord.getX(), coord.getY(), request);
     }
 
     static public class Factory implements AVDispatcherFactory {
-        @Inject private Network network;
+        @Inject
+        private Network network;
         @Inject private EventsManager eventsManager;
 
         @Inject @Named(AVModule.AV_MODE)
@@ -170,11 +215,15 @@ public class SingleHeuristicDispatcher implements AVDispatcher {
 
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config) {
-            return new SingleHeuristicDispatcher(
+            double threshold = Double.parseDouble(config.getParams().getOrDefault("aggregationThreshold", "600.0"));
+            TravelTimeEstimator estimator = new TravelTimeEstimator(router, threshold);
+
+            return new MultiODHeuristic(
                     config.getParent().getId(),
                     eventsManager,
                     network,
-                    new SingleRideAppender(config, router, travelTime)
+                    new AggregateRideAppender(config, router, travelTime, estimator),
+                    estimator
             );
         }
     }
