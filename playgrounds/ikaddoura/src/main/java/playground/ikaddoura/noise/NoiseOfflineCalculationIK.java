@@ -79,11 +79,11 @@ public class NoiseOfflineCalculationIK {
 		} else {
 			
 			runDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
-			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_gridCSVFile_wilmersdorf/";
+			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_gridCSVFile_kaiserdamm/";
 			receiverPointGap = 5.;
 			lastIteration = 100;
 			timeBinSize = 3600.;
-			receiverPointsGridCSVFile = "../../../shared-svn/studies/countries/de/berlin_noise/Fassadenpegel/facade-points_wilmersdorf.csv";
+			receiverPointsGridCSVFile = "../../../shared-svn/studies/countries/de/berlin_noise/Fassadenpegel/FP_gesamt_Atom_repaired_kaiserdamm.csv";
 		}
 		
 		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
@@ -98,6 +98,7 @@ public class NoiseOfflineCalculationIK {
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setReceiverPointGap(receiverPointGap);
 		noiseParameters.setReceiverPointsCSVFile(receiverPointsGridCSVFile);
+		noiseParameters.setReceiverPointsCSVFileCoordinateSystem(TransformationFactory.DHDN_SoldnerBerlin);
 		
 		// Wilmersdorf with motorway: 4589486 , 5816193 : 4590778 , 5817029
 //		double xMin = 4589486.;
