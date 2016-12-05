@@ -458,7 +458,7 @@ class MATSim4UrbanSimParcel{
 							}
 							if(acg.getAreaOfAccessibilityComputation().equals(AreaOfAccesssibilityComputation.fromShapeFile.toString())) {
 								Geometry boundary = GridUtils.getBoundary(acg.getShapeFileCellBasedAccessibility());
-								boundingBox = new BoundingBox(boundary.getEnvelopeInternal()) ;
+								boundingBox = new BoundingBox(boundary.getEnvelopeInternal());
 								measuringPoints = GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize_m);
 								log.info("Using shape file to determine the area for accessibility computation.");
 							} else if(acg.getAreaOfAccessibilityComputation().equals(AreaOfAccesssibilityComputation.fromBoundingBox.toString())) {
