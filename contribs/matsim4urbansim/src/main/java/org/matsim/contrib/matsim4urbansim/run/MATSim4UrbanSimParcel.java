@@ -24,6 +24,10 @@
 package org.matsim.contrib.matsim4urbansim.run;
 
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -83,6 +87,7 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.FacilitiesUtils;
@@ -472,10 +477,23 @@ class MATSim4UrbanSimParcel{
 								log.warn("This could lead to memory issues when the network is large and/or the cell size is too fine!");
 							}
 							final AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
-							for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
-								log.warn("Adding accessibility calculator for mode = " + entry.getKey()) ;
-								accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
+							
+							List<String> tmp = new ArrayList<>( calculators.keySet() ) ;
+
+							// keeping control over the sequence in order to pass test:
+							final String[] array = new String [] {"freespeed", "car", "bike", "walk" };
+							Collection<String> modes = CollectionUtils.stringArrayToSet( array );
+							for ( String mode : modes ) {
+								tmp.remove(mode) ;
+								log.warn("Adding accessibility calculator for mode = " + mode ) ;
+								accessibilityCalculator.putAccessibilityContributionCalculator( mode, calculators.get(mode) ) ;
 							}
+							// add modes not contained before:
+							for ( String mode : tmp ) {
+								log.warn("Adding accessibility calculator for mode = " + mode ) ;
+								accessibilityCalculator.putAccessibilityContributionCalculator( mode, calculators.get(mode) ) ;
+							}
+							
 							final GridBasedAccessibilityShutdownListenerV3 gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, boundingBox, cellSize_m);
 
 							if(isParcelMode){
