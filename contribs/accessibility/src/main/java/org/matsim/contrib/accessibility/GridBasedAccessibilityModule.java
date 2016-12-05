@@ -3,8 +3,6 @@ package org.matsim.contrib.accessibility;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.google.inject.Inject;
-
 //import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -13,7 +11,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
-import org.matsim.contrib.accessibility.run.AccessibilityIntegrationTest;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.ConfigUtils;
@@ -22,11 +19,12 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 
+import com.google.inject.Inject;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GridBasedAccessibilityModule extends AbstractModule {
-	private static final Logger LOG = Logger.getLogger(AccessibilityIntegrationTest.class);
+	private static final Logger LOG = Logger.getLogger(GridBasedAccessibilityModule.class);
 	
 //	private final PtMatrix ptMatrix;
 
