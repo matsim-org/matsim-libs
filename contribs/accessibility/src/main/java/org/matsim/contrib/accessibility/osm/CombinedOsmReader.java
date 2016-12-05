@@ -56,6 +56,7 @@ public class CombinedOsmReader {
 	private QuadTree<Id<ActivityFacility>> linkQT;
 	private ActivityFacilities facilities;
 	private ObjectAttributes facilityAttributes;
+	private String idPrefix = "";
 	
 	private final String outputCRS;
 	
@@ -123,6 +124,7 @@ public class CombinedOsmReader {
 				this.osmAmenityToMatsimTypeMap,	this.osmLeisureToMatsimTypeMap,
 				this.osmTourismToMatsimTypeMap, this.unmannedEntitiesList,
 				this.buildingTypeFromVicinityRange);
+		combinedOsmSink.setIdPrefix(idPrefix);
 		XmlReader xmlReader = new XmlReader(file, false, CompressionMethod.None);
 		xmlReader.setSink(combinedOsmSink);
 		xmlReader.run();		
@@ -182,6 +184,17 @@ public class CombinedOsmReader {
 	
 	public ActivityFacilities getActivityFacilities(){
 		return this.facilities;
+	}
+	
+	/**
+	 * Sets a prefix that will be used for each id. For example, useful when
+	 * parsing from osm (as one of many sources) to use the prefix "osm_" so 
+	 * that the resulting facilities can be identified accordingly.
+	 * 
+	 * @param prefix
+	 */
+	public void setIdPrefix(String prefix){
+		this.idPrefix = prefix;
 	}
 	
 
