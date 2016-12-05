@@ -2,6 +2,7 @@ package org.matsim.contrib.accessibility;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -37,7 +38,8 @@ public final class AccessibilityCalculator {
 	// destinations, opportunities like jobs etc ...
 	private AggregationObject[] aggregatedOpportunities;
 
-	private final Map<String, AccessibilityContributionCalculator> calculators = new HashMap<>();
+	private final Map<String, AccessibilityContributionCalculator> calculators = new LinkedHashMap<>();
+	// (test may depend on that this is a "Linked" Hash Map. kai, dec'16)
 
 	private final ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 
