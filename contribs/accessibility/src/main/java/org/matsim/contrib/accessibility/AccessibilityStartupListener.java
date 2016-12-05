@@ -44,7 +44,7 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public final class AccessibilityStartupListener implements StartupListener {
 	@Inject Scenario scenario;
-	@Inject(optional = true) PtMatrix ptMatrix = null; // Downstream code knows how to handle a null PtMatrix
+	@Inject (optional = true) PtMatrix ptMatrix = null; // Downstream code knows how to handle a null PtMatrix
 	@Inject ControlerListenerManager controlerListenerManager;
 	@Inject Map<String, AccessibilityContributionCalculator> calculators;
 

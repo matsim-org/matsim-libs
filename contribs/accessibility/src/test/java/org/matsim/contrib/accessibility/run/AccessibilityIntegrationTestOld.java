@@ -24,10 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -41,16 +37,14 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
-import org.matsim.contrib.accessibility.AccessibilityCalculator;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
 import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
 import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
+import org.matsim.contrib.accessibility.GridBasedAccessibilityModule;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.NetworkModeProvider;
-import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
@@ -61,11 +55,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.ActivityOptionImpl;
@@ -74,8 +66,6 @@ import org.matsim.testcases.MatsimTestUtils;
 import com.google.inject.Key;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -165,13 +155,13 @@ public class AccessibilityIntegrationTestOld {
 		final MutableScenario sc = (MutableScenario) ScenarioUtils.loadScenario(config);
 
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
-
+		
 		run(sc, ptMatrix);
 		// compare some results -> done in EvaluateTestResults
 	}
 
 	
-	private void run(MutableScenario scenario, PtMatrix ptMatrix) {
+	private void run(MutableScenario scenario, final PtMatrix ptMatrix) {
 		Controler controler = new Controler(scenario);
 
 		// creating test opportunities (facilities)
@@ -185,7 +175,17 @@ public class AccessibilityIntegrationTestOld {
 
 		// yyyy the following is taken from AccessibilityTest without any consideration of a good design.
 
-		controler.addOverridingModule(new GridBasedAccessibilityModule(ptMatrix));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				this.bind(SpatialGridDataExchangeInterface.class).toInstance(new EvaluateTestResults(true, true, true, true, true));
+				this.bind(PtMatrix.class).toInstance(ptMatrix);
+				
+			}
+		});
+		
+//		controler.addOverridingModule(new GridBasedAccessibilityModule(ptMatrix));
+		controler.addOverridingModule(new GridBasedAccessibilityModule());
 		// yy the correct test is essentially already in AccessibilityTest.testAccessibilityMeasure().  kai, jun'13
 		// But that test uses the matsim4urbansim setup, which we don't want to use in the present test.
 
@@ -229,7 +229,7 @@ public class AccessibilityIntegrationTestOld {
 		controler.run();
 	}
 
-
+//	@Ignore
 	@Test
 	public void testWithExtentDeterminedByNetwork() {
 		final Config config = ConfigUtils.createConfig();
@@ -262,7 +262,7 @@ public class AccessibilityIntegrationTestOld {
 		// compare some results -> done in EvaluateTestResults
 	}
 	
-
+//	@Ignore
 	@Test
 	public void testWithExtentDeterminedShapeFile() {
 		
@@ -388,7 +388,7 @@ public class AccessibilityIntegrationTestOld {
 						expected.accessibilityFreespeed = 2.1766435716006005;
 						expected.accessibilityCar = 2.1766435716006005;
 						expected.accessibilityBike = 2.2445468698643367;
-//						expected.accessibilityBike = 1.; // deliberately false for testing
+//						expected.accessibilityBike = 1.; // deliberately wrong for testing
 						expected.accessibilityWalk = 1.7719146868026079;
 //						expected.accessibilityPt = 0.461863556339195;
 						
@@ -504,64 +504,6 @@ public class AccessibilityIntegrationTestOld {
 					", accessibilityWalk=" + accessibilityWalk +
 					", accessibilityPt=" + accessibilityPt +
 					'}';
-		}
-	}
-
-	
-	private class GridBasedAccessibilityModule extends AbstractModule {
-		private final PtMatrix ptMatrix;
-
-		public GridBasedAccessibilityModule(PtMatrix ptMatrix) {
-			this.ptMatrix = ptMatrix;
-		}
-
-		@Override
-		public void install() {
-			addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
-				@Inject Scenario scenario;
-				@Inject ActivityFacilities opportunities;
-				@Inject Map<String, AccessibilityContributionCalculator> calculators;
-
-				@Override
-				public ControlerListener get() {
-					AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.class);
-					double cellSize_m = acg.getCellSizeCellBasedAccessibility();
-					BoundingBox boundingBox;
-					final ActivityFacilitiesImpl measuringPoints;
-					if (cellSize_m <= 0) {
-						throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
-					}
-					if(acg.getAreaOfAccessibilityComputation().equals(AreaOfAccesssibilityComputation.fromShapeFile.toString())) {
-						Geometry boundary = GridUtils.getBoundary(acg.getShapeFileCellBasedAccessibility());
-						Envelope envelope = boundary.getEnvelopeInternal();
-						boundingBox = BoundingBox.createBoundingBox(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY());
-						measuringPoints = GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize_m);
-						LOG.info("Using shape file to determine the area for accessibility computation.");
-					} else if(acg.getAreaOfAccessibilityComputation().equals(AreaOfAccesssibilityComputation.fromBoundingBox.toString())) {
-						boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
-						measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, cellSize_m);
-						LOG.info("Using custom bounding box to determine the area for accessibility computation.");
-					} else {
-						boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
-						measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, cellSize_m) ;
-						LOG.info("Using the boundary of the network file to determine the area for accessibility computation.");
-						LOG.warn("This could lead to memory issues when the network is large and/or the cell size is too fine!");
-					}
-					AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
-					GridBasedAccessibilityShutdownListenerV3 gacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, 
-							boundingBox, cellSize_m);
-					for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
-						accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
-					}
-
-					// this will be called by the accessibility listener after the accessibility calculations are finished
-					// It checks if the SpatialGrid for activated (true) transport modes are instantiated or null if not (false)
-					EvaluateTestResults etr = new EvaluateTestResults(true, true, true, true, true);
-					gacl.addSpatialGridDataExchangeListener(etr);
-
-					return gacl;
-				}
-			});
 		}
 	}
 }
