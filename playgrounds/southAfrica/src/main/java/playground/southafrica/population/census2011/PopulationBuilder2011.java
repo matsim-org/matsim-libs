@@ -69,7 +69,8 @@ public class PopulationBuilder2011 {
 	 * <ol>
 	 * 		<li> input folder where the MLIPF zonal population was written to;
 	 * 		<li> the subplace shapefile corresponding to the subplaces for 
-	 * 			which the population was fitted;
+	 * 			 which the population was fitted (it seems, JWJ Dec 2016) that 
+	 * 		     the CRS used is a projected one, typically WGS84_SA_Albers;
 	 * 		<li> the Id field containing the subplace code; and
 	 * 		<li> the output folder where the population will be written to.
 	 * </ol>

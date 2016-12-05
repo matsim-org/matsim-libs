@@ -23,7 +23,6 @@ package playground.southafrica.projects.erAfrica;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -192,7 +191,7 @@ public class ERAfricaActivityLocationAdjuster {
 		
 		/*FIXME Households' home coordinate were initially hard coded using
 		 * WGS84_SA_ALbers as CRS. This should be WGSS84. */
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "EPSG:2048");
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "SA_Lo19");
 		
 		Counter counter = new Counter("  households # ");
 		for(Household hh : sc.getHouseholds().getHouseholds().values()){
