@@ -43,7 +43,7 @@ public class UrbanSimParcelCSVWriterListener implements SpatialGridDataExchangeI
 		// from here accessibility feedback for each parcel
 		UrbanSimParcelCSVWriter.initUrbanSimZoneWriter(config);
 		
-		Map<Modes4Accessibility,Interpolation> interpolations = new HashMap<Modes4Accessibility,Interpolation>() ;
+		Map<Modes4Accessibility,Interpolation> interpolations = new HashMap<>() ;
 		
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			final SpatialGrid spatialGrid = spatialGrids.get(mode);
@@ -56,7 +56,7 @@ public class UrbanSimParcelCSVWriterListener implements SpatialGridDataExchangeI
 
 			int numberOfParcels = this.parcels.getFacilities().size();
 			
-			Map<Modes4Accessibility,Double> interpolatedAccessibilities = new HashMap<Modes4Accessibility,Double>() ;
+			Map<Modes4Accessibility,Double> interpolatedAccessibilities = new HashMap<>() ;
 
 			log.info(numberOfParcels + " parcels are now processing ...");
 

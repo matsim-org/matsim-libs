@@ -1,12 +1,7 @@
 package org.matsim.contrib.accessibility;
 
 public class Labels {
-	
-	public static final String ACCESSIBILITY_BY_FREESPEED = "freespeed_accessibility";
-	public static final String ACCESSIBILITY_BY_CAR = "car_accessibility";
-	public static final String ACCESSIBILITY_BY_BIKE = "bike_accessibility";
-	public static final String ACCESSIBILITY_BY_WALK = "walk_accessibility";
-	public static final String ACCESSIBILITY_BY_PT = "pt_accessibility";
+	public static final String _ACCESSIBILITY = "_accessibility" ;
 	
 	public static final String ZONE_ID = "zone_id";
 	public static final String X_COORDINATE = "xcoord";

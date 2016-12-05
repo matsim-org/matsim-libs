@@ -197,11 +197,10 @@ public final class AccessibilityCalculator {
 				// points separately anyways?  Answer: The trees need to be computed only once.  (But one could save more.) kai, feb'14
 
 				// aggregated value
-				Map<String, Double> accessibilities  = new HashMap<>();
+				Map<String, Double> accessibilities  = new LinkedHashMap<>();
 				
 				for (String mode : calculators.keySet()) {
 					LOG.info("---- calculate accessibility for mode=" + mode );
-					// TODO introduce here a config parameter "computation mode" that can be set to "rawSum", "minimum" or "exponential/logsum/hansen", dz, sept'16
 					if(!useRawSum){
 						System.out.println("expSums.get(mode).getSum() = " + expSums.get(mode).getSum());
 						accessibilities.put( mode, inverseOfLogitScaleParameter * Math.log( expSums.get(mode).getSum() ) ) ;
@@ -277,6 +276,7 @@ public final class AccessibilityCalculator {
 
 
 	public final void putAccessibilityContributionCalculator(String mode, AccessibilityContributionCalculator calc) {
+		LOG.warn("Adding accessibility calculator for mode = " + mode ) ;
 		this.calculators.put(mode , calc) ;
 	}
 

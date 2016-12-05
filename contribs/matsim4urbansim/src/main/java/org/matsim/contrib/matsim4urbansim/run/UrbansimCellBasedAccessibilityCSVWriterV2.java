@@ -22,7 +22,7 @@ import org.matsim.facilities.ActivityFacility;
 final class UrbansimCellBasedAccessibilityCSVWriterV2 implements FacilityDataExchangeInterface {
 	private static final Logger log = Logger.getLogger(UrbansimCellBasedAccessibilityCSVWriterV2.class);
 
-	private static final String ACCESSIBILITY_INDICATORS= "accessibility_indicators.csv";
+	public static final String ACCESSIBILITY_INDICATORS= "accessibility_indicators.csv";
 
 	private BufferedWriter accessibilityDataWriter ;
 	
@@ -35,7 +35,7 @@ final class UrbansimCellBasedAccessibilityCSVWriterV2 implements FacilityDataExc
 	public UrbansimCellBasedAccessibilityCSVWriterV2(String matsimOutputDirectory){
 		log.info("Initializing  ...");
 		try {
-		accessibilityDataWriter = IOUtils.getBufferedWriter( matsimOutputDirectory + "/" + ACCESSIBILITY_INDICATORS );
+			accessibilityDataWriter = IOUtils.getBufferedWriter( matsimOutputDirectory + "/" + ACCESSIBILITY_INDICATORS );
 		} catch ( Exception ee ) {
 			ee.printStackTrace();
 			throw new RuntimeException("writer could not be instantiated") ;
@@ -44,8 +44,6 @@ final class UrbansimCellBasedAccessibilityCSVWriterV2 implements FacilityDataExc
 		if ( accessibilityDataWriter==null ) {
 			throw new RuntimeException( "writer is null") ;
 		}
-		
-
 		log.info("... done!");
 	}
 

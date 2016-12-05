@@ -27,6 +27,7 @@ package org.matsim.contrib.matsim4urbansim.run;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -423,9 +424,19 @@ class MATSim4UrbanSimParcel{
 						@Override public ControlerListener get() {
 							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, zones);
 
-							for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
-								log.warn("adding accessibility calculator for mode=" + entry.getKey()) ;
-								accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
+							List<String> tmp = new ArrayList<>( calculators.keySet() ) ;
+
+							// keeping control over the sequence in order to pass test:
+							final String[] array = new String [] {"freespeed", "car", "walk", "bike" };
+							LinkedHashSet<String> modes = (LinkedHashSet<String>) CollectionUtils.stringArrayToSet( array );
+							for ( String mode : modes ) {
+								tmp.remove(mode) ;
+								accessibilityCalculator.putAccessibilityContributionCalculator( mode, calculators.get(mode) ) ;
+							}
+							// add modes not contained before:
+							for ( String mode : tmp ) {
+								log.warn("Adding accessibility calculator for mode = " + mode ) ;
+								accessibilityCalculator.putAccessibilityContributionCalculator( mode, calculators.get(mode) ) ;
 							}
 
 							final UrbanSimParameterConfigModuleV3 urbanSimConfig = ConfigUtils.addOrGetModule( getConfig(), UrbanSimParameterConfigModuleV3.class);
@@ -481,11 +492,10 @@ class MATSim4UrbanSimParcel{
 							List<String> tmp = new ArrayList<>( calculators.keySet() ) ;
 
 							// keeping control over the sequence in order to pass test:
-							final String[] array = new String [] {"freespeed", "car", "bike", "walk" };
-							Collection<String> modes = CollectionUtils.stringArrayToSet( array );
+							final String[] array = new String [] {"freespeed", "car", "walk", "bike" };
+							LinkedHashSet<String> modes = (LinkedHashSet<String>) CollectionUtils.stringArrayToSet( array );
 							for ( String mode : modes ) {
 								tmp.remove(mode) ;
-								log.warn("Adding accessibility calculator for mode = " + mode ) ;
 								accessibilityCalculator.putAccessibilityContributionCalculator( mode, calculators.get(mode) ) ;
 							}
 							// add modes not contained before:

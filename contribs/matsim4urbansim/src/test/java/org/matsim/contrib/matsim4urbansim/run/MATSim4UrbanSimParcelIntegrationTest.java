@@ -25,7 +25,10 @@ import org.junit.Test;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4urbansim.config.CreateTestM4UConfig;
+import org.matsim.contrib.matsim4urbansim.matsim4urbansim.Zone2ZoneImpedancesControlerListener;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestUrbansimPopulation;
+import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimParcelCSVWriter;
+import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimPersonCSVWriter;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.BufferedReader;
@@ -65,26 +68,20 @@ public class MATSim4UrbanSimParcelIntegrationTest {
 		String[] args = { filename } ;
 		MATSim4UrbanSimParcel.main( args ); 
 				
-		final String ACCESSIBILITY_INDICATORS = "accessibility_indicators.csv" ;
-		final String TRAVEL_DATA = "travel_data.csv" ;
-		final String PERSONS = "persons.csv" ;
-		final String ZONES = "zones.csv" ;
-		final String PARCELS = "parcels.csv" ;
-		
 		log.info("comparing parcels data ...");
-		compareFilesByLinesInMemory(PARCELS) ;
+		compareFilesByLinesInMemory(UrbanSimParcelCSVWriter.FILE_NAME) ;
 		log.info("... done.");
 		log.info("comparing accessibility indicators ...");
-		compareFilesByLinesInMemory(ACCESSIBILITY_INDICATORS) ;
+		compareFilesByLinesInMemory(UrbansimCellBasedAccessibilityCSVWriterV2.ACCESSIBILITY_INDICATORS) ;
 		log.info("... done.");
 		log.info("comparing zones data ...");
-		compareFilesByLinesInMemory(ZONES) ;
+		compareFilesByLinesInMemory(UrbanSimZoneCSVWriterV2.FILE_NAME) ;
 		log.info("... done.");
 		log.info("comparing travel data ...");
-		compareFilesByLinesInMemory(TRAVEL_DATA) ;
+		compareFilesByLinesInMemory(Zone2ZoneImpedancesControlerListener.FILE_NAME) ;
 		log.info("... done.");
 		log.info("comparing persons data ...");
-		compareFilesByLinesInMemory(PERSONS) ;
+		compareFilesByLinesInMemory(UrbanSimPersonCSVWriter.FILE_NAME) ;
 		log.info("... done.");
 	}
 

@@ -28,6 +28,8 @@ import org.matsim.facilities.ActivityFacility;
 	public static final String FILE_NAME= "zones.csv";
 	private  String matsim4opusTempDirectory ;
 	private String matsimOutputDirectory;
+	
+	boolean first = true ;
 
 	/**
 	 * writes the header for zones csv file
@@ -42,16 +44,7 @@ import org.matsim.facilities.ActivityFacility;
 			log.info("Initializing UrbanSimZoneCSVWriterV2 ...");
 			zoneWriter = IOUtils.getBufferedWriter( matsim4opusTempDirectory + FILE_NAME );
 			log.info("Writing data into " + matsim4opusTempDirectory + FILE_NAME + " ...");
-			
-			// create header
-			zoneWriter.write(Labels.ZONE_ID + "," +
-							 Labels.ACCESSIBILITY_BY_FREESPEED + "," +
-							 Labels.ACCESSIBILITY_BY_CAR + "," +
-							 Labels.ACCESSIBILITY_BY_BIKE + "," +
-							 Labels.ACCESSIBILITY_BY_WALK + "," +
-							 Labels.ACCESSIBILITY_BY_PT);
-			zoneWriter.newLine();
-			
+						
 			log.info("... done!");
 		}
 		catch(Exception e){
@@ -69,6 +62,15 @@ import org.matsim.facilities.ActivityFacility;
 		
 		try{
 			assert(zoneWriter != null);
+			if ( first ) {
+				first = false ;
+				zoneWriter.write( Labels.ZONE_ID );
+				for ( String mode : accessibilities.keySet() ) {
+					zoneWriter.write("," + mode + Labels._ACCESSIBILITY );
+				}
+				zoneWriter.newLine(); 
+			}
+			// ---
 			zoneWriter.write( startZone.getId().toString() ) ;
 			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) { // seems a bit safer with respect to sequence. kai, feb'14
 				zoneWriter.write( "," + accessibilities.get( mode) ) ;
