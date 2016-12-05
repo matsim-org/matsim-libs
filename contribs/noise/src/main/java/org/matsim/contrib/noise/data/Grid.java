@@ -159,7 +159,7 @@ public class Grid {
 		
 		Map<Id<ReceiverPoint>, Coord> gridPoints = null;
 		try {
-			gridPoints = readCSVFile(gridCSVFile, ",", -1, 0, 1);
+			gridPoints = readCSVFile(gridCSVFile, ",", 0, 1, 2);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

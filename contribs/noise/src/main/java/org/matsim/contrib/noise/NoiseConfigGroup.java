@@ -118,7 +118,7 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 		comments.put("receiverPointsGridMaxY", "Specifies a boundary coordinate min/max x/y value of the receiver point grid. "
 				+ "0.0 means the boundary coordinates are ignored and the grid is created based on the agents' activity coordinates of the specified activity types "
 				+ "(see parameter 'consideredActivitiesForReceiverPointGrid')." ) ;
-		comments.put("receiverPointCSVFile", "A csv file which provides the ReceiverPoint coordinates (first column: x-coordinate, second column: y-coordinate; separator: ',')");
+		comments.put("receiverPointCSVFile", "A csv file which provides the ReceiverPoint coordinates (first column: id, second column: x-coordinate, third column: y-coordinate, separator: ',')");
 		comments.put("receiverPointsCSVFileCoordinateSystem", "The coordinate reference system of the provided ReceiverPoint csv file.");
 		comments.put("annualCostRate", "annual noise cost rate [in EUR per exposed pulation unit]; following the German EWS approach" ) ;
 		comments.put("timeBinSizeNoiseComputation", "Specifies the temporal resolution, i.e. the time bin size [in seconds] to compute noise levels." ) ;
