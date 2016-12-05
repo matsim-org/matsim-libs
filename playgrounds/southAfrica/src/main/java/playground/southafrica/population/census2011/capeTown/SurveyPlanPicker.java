@@ -31,12 +31,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -49,12 +47,14 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
 import playground.southafrica.population.capeTownTravelSurvey.PersonEnums;
+import playground.southafrica.population.census2011.attributeConverters.CoordConverter;
 import playground.southafrica.population.census2011.containers.Income2011;
 import playground.southafrica.population.demographics.SaDemographicsAge;
 import playground.southafrica.population.demographics.SaDemographicsEmployment;
@@ -99,14 +99,21 @@ public class SurveyPlanPicker {
 		String populationCRS = args[3];
 		String surveyCRS = args[4];
 		
+		populationFolder += populationFolder.endsWith("/") ? "" : "/";
+		
 		SurveyPlanPicker spp = new SurveyPlanPicker(areaShapefile);
 		spp.buildQuadTreeFromSurvey(surveyPopulationFolder);
 		spp.pickActivityChainsForPopulation(populationFolder, populationCRS, surveyCRS);
 		
-		/* Write the adapted population. Only the people's activity chains have
-		 * been adapted, so we need not write all of the files. */
+		/* Write the adapted population. The people's activity chains and the
+		 * household attributes (home coordinate) were adapted, so we need not 
+		 * write all of the files. */
 		PopulationWriter pw = new PopulationWriter(spp.censusPopulation.getScenario().getPopulation());
-		pw.write(populationFolder + (populationFolder.endsWith("/") ? "" : "/") + "population_withPlans.xml.gz");
+		pw.write(populationFolder + "population_withPlans.xml.gz");
+		//
+		ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(spp.censusPopulation.getScenario().getHouseholds().getHouseholdAttributes());
+		oaw.putAttributeConverter(Coord.class, new CoordConverter());
+		oaw.writeFile(populationFolder + "householdAttributes_withPlanHome.xml.gz");
 
 		Header.printFooter();
 	}
@@ -232,11 +239,17 @@ public class SurveyPlanPicker {
 	
 	
 	public void pickActivityChainsForPopulation(String populationFolder, String originalCRS, String targetCRS){
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(originalCRS, targetCRS);
 		/* Parse the population for which plans are sought. */
 		LOG.info("Parsing population that must be assigned plans...");
 		censusPopulation = new ComprehensivePopulationReader();
 		censusPopulation.parse(populationFolder);
+		
+		/* First adapt the home location (of the household) to the new CRS. */
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(originalCRS, targetCRS);
+		for(Id<Household> hhid : censusPopulation.getScenario().getHouseholds().getHouseholds().keySet()){
+			Coord old = (Coord) censusPopulation.getScenario().getHouseholds().getHouseholdAttributes().getAttribute(hhid.toString(), "homeCoord");
+			censusPopulation.getScenario().getHouseholds().getHouseholdAttributes().putAttribute(hhid.toString(), "homeCoord", ct.transform(old));
+		}
 		
 		/*TODO Variables for debugging. Can be removed once validated. */
 		Map<String, Integer> noQtMap = new TreeMap<String, Integer>();
@@ -249,9 +262,12 @@ public class SurveyPlanPicker {
 			/* Remove all the existing plans the person may have. */
 			person.getPlans().clear();
 			
-			/* Get the household's home coordinate. */
+			/* Get the household's home coordinate. Since the household 
+			 * coordinate is in the original CRS, it has to be converted to 
+			 * the survey CRS so that we can find a survey household in close
+			 * proximity. */
 			Id<Household> hhid = Id.create( (String) censusPopulation.getScenario().getPopulation().getPersonAttributes().getAttribute(personId.toString(), "householdId") , Household.class);
-			Coord home = ct.transform( (Coord) censusPopulation.getScenario().getHouseholds().getHouseholdAttributes().getAttribute(hhid.toString(), "homeCoord") );
+			Coord home = (Coord) censusPopulation.getScenario().getHouseholds().getHouseholdAttributes().getAttribute(hhid.toString(), "homeCoord") ;
 			
 			/* Get person's demographic 'signature' */
 			String a = SaDemographicsEmployment.convertCensus2011Employment( PersonUtils.isEmployed(person) ).toString();
