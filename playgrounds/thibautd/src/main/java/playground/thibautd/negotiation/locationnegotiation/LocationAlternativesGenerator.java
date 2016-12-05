@@ -24,14 +24,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
-import org.matsim.contrib.socnetsim.utils.QuadTreeRebuilder;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import playground.thibautd.negotiation.framework.AlternativesGenerator;
 import playground.thibautd.negotiation.framework.NegotiationAgent;
 import playground.thibautd.utils.RandomUtils;
+import playground.thibautd.utils.spatialcollections.VPTree;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,8 +48,8 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 	private final SocialNetwork socialNetwork;
 	private final Population population;
 	private final LocationHelper locations;
-	private final QuadTree<ActivityFacility> facilities;
 	private final LocationAlternativesConfigGroup configGroup;
+	private final VPTree<Coord,ActivityFacility> facilities;
 
 	private final Random random = MatsimRandom.getLocalInstance();
 
@@ -65,11 +65,14 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 		this.locations = locations;
 		this.configGroup = configGroup;
 
-		final QuadTreeRebuilder<ActivityFacility> qt = new QuadTreeRebuilder<>();
-		facilities.getFacilities().values().stream()
-				.filter( f -> f.getActivityOptions().containsKey( configGroup.getActivityType() ) )
-				.forEach( f -> qt.put( f.getCoord() , f ) );
-		this.facilities = qt.getQuadTree();
+		this.facilities =
+				new VPTree<>(
+						CoordUtils::calcEuclideanDistance,
+						ActivityFacility::getCoord );
+		this.facilities.add(
+				facilities.getFacilities().values().stream()
+					.filter( f -> f.getActivityOptions().containsKey( configGroup.getActivityType() ) )
+					.collect( Collectors.toList() ));
 	}
 
 	@Override
@@ -120,10 +123,10 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 			final Collection<Person> alters ) {
 		final Coord home = locations.getHomeLocation( ego.getId() ).getCoord();
 		final Collection<ActivityFacility> close =
-				facilities.getDisk(
-						home.getX(),
-						home.getY(),
-						configGroup.getMaxOutOfHomeRadius_km() * 1000 );
+				facilities.getBall(
+						home,
+						configGroup.getMaxOutOfHomeRadius_km() * 1000,
+						f -> true );
 
 		// no need to be too smart (e.g. only select a few of the best facilities):
 		// being smart requires a lot of utility computations here, plus in the negotiator.
