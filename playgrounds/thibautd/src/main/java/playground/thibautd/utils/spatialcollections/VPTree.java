@@ -345,8 +345,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 
 	public Collection<T> getBall(
 			final C coord,
-			final double maxDist,
-			final Predicate<T> predicate ) {
+			final double maxDist ) {
 		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>( 1 + (int) Math.log( 1 + size() )) );
 		stack.add( root );
 
@@ -363,10 +362,15 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 
 			final double distToVp = metric.calcDistance( coord , current.coordinate );
 
+			// check if all subtree in ball
+			if ( distToVp  + current.cuttoffDistance < maxDist ) {
+				ball.addAll( getAll( current ) );
+				continue;
+			}
+
 			// check if current VP in ball
 			if ( current.value != null &&
-					distToVp < maxDist &&
-					predicate.test( current.value ) ) {
+					distToVp < maxDist ) {
 				ball.add( current.value );
 			}
 

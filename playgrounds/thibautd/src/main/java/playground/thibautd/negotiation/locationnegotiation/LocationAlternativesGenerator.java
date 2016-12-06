@@ -125,8 +125,7 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 		final Collection<ActivityFacility> close =
 				facilities.getBall(
 						home,
-						configGroup.getMaxOutOfHomeRadius_km() * 1000,
-						f -> true );
+						configGroup.getMaxOutOfHomeRadius_km() * 1000 );
 
 		// no need to be too smart (e.g. only select a few of the best facilities):
 		// being smart requires a lot of utility computations here, plus in the negotiator.
