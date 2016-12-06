@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -36,17 +38,23 @@ public class TripAnalyzerV2Extended {
 	
 	private static final Integer planningAreaId = 11000000; // 11000000 = Berlin
 
-	private static final boolean onlyCar = true; // "car"; should be used for runs with ChangeLegMode enabled
+	private static final boolean onlySpecificMode = true; // "car"; should be used for runs with ChangeLegMode enabled
+	private static final String specificMode = TransportMode.car;
+	
 	private static final boolean onlyInterior = false; // "int"
 	private static final boolean onlyBerlinBased = true; // "ber"; usually varied for analysis // <----------
 	
-	private static final boolean distanceFilter = true; // "dist"; usually varied for analysis // <----------
+	private static final boolean useDistanceFilter = true; // "dist"; usually varied for analysis // <----------
 	// private static final double double minDistance = 0;
 	private static final double maxDistance_km = 100;
 
-	private static final boolean onlyWorkTrips = false; // "work"
+	private static final boolean onlySpecificActivityEndType = false; // used to be only "work"
+	private static final String spedificActivityEndType = "work";
+	
+	private static final boolean onlySpecificActivityStartType = false;
+	private static final String spedificActivityStartType = "work";
 
-	private static final boolean ageFilter = false; // "age"
+	private static final boolean useAgeFilter = false; // "age"
 	private static final Integer minAge = 80; // typically "x0"
 	private static final Integer maxAge = 119; // typically "x9"; highest number ususally chosen is 119
 
@@ -106,7 +114,7 @@ public class TripAnalyzerV2Extended {
 	    
 		AnalysisFileWriter writer = new AnalysisFileWriter();
 
-		if (ageFilter == true) {
+		if (useAgeFilter == true) {
 	    	// TODO needs to be adapted for other analyses that are based on person-specific attributes as well
 	    	CemdapPersonInputFileReader cemdapPersonInputFileReader = new CemdapPersonInputFileReader();
 		 	cemdapPersonInputFileReader.parse(cemdapPersonsInputFile);
@@ -193,22 +201,25 @@ public class TripAnalyzerV2Extended {
 	@SuppressWarnings("all")
 	private static void adaptOutputDirectory() {
 		outputDirectory = outputDirectory + "_" + usedIteration;
-	    if (onlyCar == true) {
-			outputDirectory = outputDirectory + "_car";
+	    if (onlySpecificMode) {
+			outputDirectory = outputDirectory + specificMode;
 		}
-	    if (onlyInterior == true) {
+	    if (onlyInterior) {
 			outputDirectory = outputDirectory + "_int";
 	    }
-		if (onlyBerlinBased == true) {
+		if (onlyBerlinBased) {
 			outputDirectory = outputDirectory + "_ber";
 		}
-		if (distanceFilter == true) {
+		if (useDistanceFilter) {
 			outputDirectory = outputDirectory + "_dist";
 		}
-		if (onlyWorkTrips == true) {
-			outputDirectory = outputDirectory + "_work";
+		if (onlySpecificActivityEndType) {
+			outputDirectory = outputDirectory + "_from-" + spedificActivityEndType;
 		}
-		if (ageFilter == true) {
+		if (onlySpecificActivityStartType) {
+			outputDirectory = outputDirectory + "_to-" + spedificActivityStartType;
+		}
+		if (useAgeFilter) {
 			outputDirectory = outputDirectory + "_age_" + minAge.toString();
 			outputDirectory = outputDirectory + "_" + maxAge.toString();
 		}
@@ -241,12 +252,12 @@ public class TripAnalyzerV2Extended {
 			Point departureLocation = MGC.xy2Point(departureCoordX, departureCoordY);
 
 			// choose if trip will be considered
-			if (onlyBerlinBased == true) {
+			if (onlyBerlinBased) {
 				if (!planningAreaGeometry.contains(arrivalLocation) && !planningAreaGeometry.contains(departureLocation)) {
 					continue;
 				}
 			}
-			if (onlyInterior == true) {
+			if (onlyInterior) {
 				if (!planningAreaGeometry.contains(arrivalLocation) || !planningAreaGeometry.contains(departureLocation)) {
 					continue;
 				}
@@ -254,19 +265,28 @@ public class TripAnalyzerV2Extended {
 //			if (!trip.getMode().equals("car") && !trip.getMode().equals("pt")) {
 //				throw new RuntimeException("In current implementation leg mode must either be car or pt");
 //			}
-			if (onlyCar == true) {
-				if (!trip.getMode().equals("car")) {
+			if (onlySpecificMode) {
+				if (!trip.getMode().equals(specificMode)) {
 					continue;
 				}
 			}
-			if (distanceFilter == true && (trip.getDistanceBeelineByCalculation_m(network) / 1000.) >= maxDistance_km) {
+			if (useDistanceFilter && (trip.getDistanceBeelineByCalculation_m(network) / 1000.) >= maxDistance_km) {
 				continue;
 			}
 //			if (distanceFilter == true && (trip.getBeelineDistance(network) / 1000.) <= minDistance) {
 //    			continue;
 //    		}
-			if (onlyWorkTrips == true) {
-				if (trip.getActivityEndActType().equals("work")) {
+			if (onlySpecificActivityEndType && onlySpecificActivityStartType) {
+				Log.warn("onlySpecificActivityEndType and onlySpecificActivityStartType activated at the same time. This"
+						+ " may lead to results that are hard to interpret: rather not use these options simultaneously.");
+			}
+			if (onlySpecificActivityEndType) {
+				if (!trip.getActivityEndActType().equals(spedificActivityEndType)) {
+					continue;
+				}
+			}
+			if (onlySpecificActivityStartType) {
+				if (!trip.getActivityEndActType().equals(spedificActivityStartType)) {
 					continue;
 				}
 			}
@@ -278,7 +298,7 @@ public class TripAnalyzerV2Extended {
 //    		}
 
 			/* Person-specific attributes */
-			if (ageFilter == true) {
+			if (useAgeFilter) {
 				// TODO needs to be adapted for other analyses that are based on person-specific attributes as well
 				// so far age is the only one
 				String personId = trip.getPersonId().toString();
