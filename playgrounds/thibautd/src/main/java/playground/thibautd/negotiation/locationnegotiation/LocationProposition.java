@@ -45,7 +45,7 @@ public class LocationProposition implements Proposition {
 	 * This goes together with the cached utility.
 	 * This of course makes a difference only if proposition is still in cache when encountered for the second time...
 	 */
-	private static final SoftCache<LocationProposition,LocationProposition> cache = new SoftCache<>();
+	private static final SoftCache<LocationProposition,LocationProposition> cache = CACHE ? new SoftCache<>() : null;
 	private double cachedUtility = Double.NEGATIVE_INFINITY;
 
 	private LocationProposition(
