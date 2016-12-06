@@ -21,8 +21,12 @@
  */
 package playground.southafrica.projects.erAfrica;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -33,19 +37,26 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.households.Household;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
+import playground.southafrica.population.census2011.attributeConverters.CoordConverter;
 import playground.southafrica.population.utilities.ComprehensivePopulationReader;
+import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
 /**
@@ -67,6 +78,10 @@ public class ERAfricaActivityLocationAdjuster {
 	private QuadTree<ActivityFacility> qtLeisure;
 	private QuadTree<ActivityFacility> qtMedical;
 	private QuadTree<ActivityFacility> qtOther;
+	
+	private static List<Tuple<Double, Double>> tuplesWork = new ArrayList<>();
+	private static List<Tuple<Double, Double>> tuplesEducation = new ArrayList<>();
+	private static List<Tuple<Double, Double>> tuplesSecondary = new ArrayList<>();
 
 	/**
 	 * @param args
@@ -74,11 +89,15 @@ public class ERAfricaActivityLocationAdjuster {
 	public static void main(String[] args) {
 		Header.printHeader(ERAfricaActivityLocationAdjuster.class.toString(), args);
 
-		String populationFolder = args[0];
-		String osmFacilitiesFile = args[1];
-		String ctFacilitiesFile = args[2];
-		String ctInformalHousing = args[3];
-		String finalPopulation = args[4];
+		String treasuryPopulation = args[0];
+		String populationFolder = args[1];
+		String osmFacilitiesFile = args[2];
+		String ctFacilitiesFile = args[3];
+		String ctInformalHousing = args[4];
+		String finalPopulationFolder = args[5];
+		String sample = args[6];
+		
+		setup(treasuryPopulation, populationFolder, sample);
 
 		ComprehensivePopulationReader cpr = new ComprehensivePopulationReader();
 		cpr.parse(populationFolder);
@@ -87,8 +106,105 @@ public class ERAfricaActivityLocationAdjuster {
 		ERAfricaActivityLocationAdjuster ala = new ERAfricaActivityLocationAdjuster(sc);
 		ala.buildQuadTreeFromFacilities(osmFacilitiesFile, ctFacilitiesFile, ctInformalHousing);
 		ala.processHouseholds();
+		
+		writeTuples(populationFolder);
+		
+		writeUpdatedScenario(sc, finalPopulationFolder);
 
 		Header.printFooter();
+	}
+	
+	private static void writeTuples(String folder){
+		BufferedWriter bw = IOUtils.getBufferedWriter(folder + "tuples.csv");
+		try{
+			bw.write("type,old,new");
+			bw.newLine();
+			
+			for(Tuple<Double, Double> t : tuplesWork){
+				bw.write(String.format("w,%.0f,%.0f\n", t.getFirst(), t.getSecond()));
+			}
+			for(Tuple<Double, Double> t : tuplesEducation){
+				bw.write(String.format("e,%.0f,%.0f\n", t.getFirst(), t.getSecond()));
+			}
+			for(Tuple<Double, Double> t : tuplesSecondary){
+				bw.write(String.format("secondary,%.0f,%.0f\n", t.getFirst(), t.getSecond()));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot write tuples to file.");
+		}finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close tuples file.");
+			}
+		}
+	}
+	
+	
+	private static void writeUpdatedScenario(Scenario sc, String folder){
+		folder += folder.endsWith("/") ? "" : "/";
+		
+		/* Updated household coordinates. */
+		ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(sc.getHouseholds().getHouseholdAttributes());
+		oaw.putAttributeConverter(Coord.class, new CoordConverter());
+		oaw.writeFile(folder + "householdAttributes.xml.gz");
+		
+		/* Updated activity locations of population. */
+		new PopulationWriter(sc.getPopulation()).writeV5(folder + "persons.xml.gz");
+	}
+	
+	
+	public static void setup(String treasurePopulation, String populationFolderName, String sample){
+		LOG.info("Setting up the population files...");
+
+		/* Delete and create the temporary folder for population files. */
+		treasurePopulation += treasurePopulation.endsWith("/") ? "" : "/";
+		File populationFolder = new File(populationFolderName);
+		if(populationFolder.exists()){
+			LOG.warn("Population folder will be deleted and overwritten.");
+			LOG.warn("Deleting " + populationFolder.getAbsolutePath());
+			FileUtils.delete(populationFolder);
+		}
+		populationFolder.mkdirs();
+		
+		String folder = null;
+		switch (sample) {
+		case "001":
+			folder = treasurePopulation + "sample/001/CapeTown/";
+			break;
+		case "010":
+			folder = treasurePopulation + "sample/010/CapeTown/";
+			break;
+		case "100":
+			folder = treasurePopulation + "full/CapeTown/";
+			break;
+		default:
+			LOG.error("Don't know how to interpret sample " + sample);
+			break;
+		}
+		
+		/* Copying the files from the original treasure data set. */
+		try {
+			FileUtils.copyFile(
+					new File(folder + "population_withPlans.xml.gz"),
+					new File(populationFolderName + "population.xml.gz"));
+			FileUtils.copyFile(
+					new File(folder + "populationAttributes.xml.gz"),
+					new File(populationFolderName + "populationAttributes.xml.gz"));
+			FileUtils.copyFile(
+					new File(folder + "households.xml.gz"),
+					new File(populationFolderName + "households.xml.gz"));
+			FileUtils.copyFile(
+					new File(folder + "householdAttributes_withPlanHome.xml.gz"),
+					new File(populationFolderName + "householdAttributes.xml.gz"));
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot copy input files for setup.");
+		}
+		
+		LOG.info("Done setting up.");
 	}
 
 	public ERAfricaActivityLocationAdjuster(Scenario sc) {
@@ -190,8 +306,10 @@ public class ERAfricaActivityLocationAdjuster {
 		LOG.info("Handle each member of each household...");
 		
 		/*FIXME Households' home coordinate were initially hard coded using
-		 * WGS84_SA_ALbers as CRS. This should be WGSS84. */
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "SA_Lo19");
+		 * WGS84_SA_ALbers as CRS. The SurveyPlanPicker then converts it to 
+		 * EPSG:3857. The facilities (from land use and OSM) are all parsed 
+		 * and converted to SA_Lo19. */
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:3857", "SA_Lo19");
 		
 		Counter counter = new Counter("  households # ");
 		for(Household hh : sc.getHouseholds().getHouseholds().values()){
@@ -199,28 +317,29 @@ public class ERAfricaActivityLocationAdjuster {
 			/* Find an appropriate home for the household. */
 			Coord censusCoord = ct.transform((Coord) sc.getHouseholds().getHouseholdAttributes().getAttribute(hh.getId().toString(), "homeCoord"));
 			String mainDwelling = sc.getHouseholds().getHouseholdAttributes().getAttribute(hh.getId().toString(), "mainDwellingType").toString();
-			Coord homeCoord = null;
+			ActivityFacility homeFacility = null;
 			if(mainDwelling.equalsIgnoreCase("Informal")){
-				ActivityFacility home = sampleSingleActivityFacility(qtHomeInformal, censusCoord);
-				homeCoord = home.getCoord();
+				homeFacility = sampleSingleActivityFacility(qtHomeInformal, censusCoord);
 				
 				/* Informal housing units are removed one selected. */
-				qtHomeInformal.remove(home.getCoord().getX(), home.getCoord().getY(), home);
+				qtHomeInformal.remove(homeFacility.getCoord().getX(), homeFacility.getCoord().getY(), homeFacility);
 			} else{
-				ActivityFacility home = sampleSingleActivityFacility(qtHomeFormal, censusCoord);
-				homeCoord = home.getCoord();
+				homeFacility = sampleSingleActivityFacility(qtHomeFormal, censusCoord);
 				
 				/* Remove single houses with capacity of 1. */
-				if(home.getActivityOptions().get(FacilityTypes.HOME).getCapacity() == 1.0){
-					qtHomeFormal.remove(homeCoord.getX(), homeCoord.getY(), home);
+				if(homeFacility.getActivityOptions().get(FacilityTypes.HOME).getCapacity() == 1.0){
+					qtHomeFormal.remove(homeFacility.getCoord().getX(), homeFacility.getCoord().getY(), homeFacility);
 				}
 			}
 			
-			
+			/* Handle each member of the household. */
 			for(Id<Person> pId : hh.getMemberIds()){
 				Plan plan = this.sc.getPopulation().getPersons().get(pId).getSelectedPlan();
-				relocatePlanActivities(plan, homeCoord);
+				relocatePlanActivities(plan, homeFacility);
 			}
+			
+			/* Finally, update the household's homeCoord attribute. */
+			sc.getHouseholds().getHouseholdAttributes().putAttribute(hh.getId().toString(), "homeCoord", homeFacility.getCoord());
 			counter.incCounter();
 		}
 		counter.printCounter();
@@ -233,7 +352,7 @@ public class ERAfricaActivityLocationAdjuster {
 		Collection<ActivityFacility> col = qt.getDisk(c.getX(), c.getY(), radius);
 		int tries = 1;
 		while(col.size() == 0 && tries <= 10){
-			radius *= 2;
+			radius *= 2.0;
 			col = qt.getDisk(c.getX(), c.getY(), radius);
 			tries++;
 		}
@@ -248,35 +367,274 @@ public class ERAfricaActivityLocationAdjuster {
 	}
 	
 	
-	public void relocatePlanActivities(Plan plan, Coord home){
+	public ActivityFacility sampleActivityFacilityInRing(QuadTree<ActivityFacility> qt, Coord c, double radius){
+		ActivityFacility facility = null;
+		double factor = 0.1;
+		double lower = radius/(1.0 + factor);
+		double upper = radius*(1.0 + factor);
+		Collection<ActivityFacility> col = qt.getRing(c.getX(), c.getY(), lower, upper);
+		int tries = 1;
+		while(col.size() == 0 && tries <= 10){
+			factor *= 2.0;
+			lower = radius/(1.0 + factor);
+			upper = radius*(1.0 + factor);
+			col = qt.getRing(c.getX(), c.getY(), lower, upper);
+			tries++;
+		}
+		
+		List<ActivityFacility> list = new ArrayList<>(col);
+		
+		if(list.size() > 0){
+			facility = list.get(MatsimRandom.getLocalInstance().nextInt(list.size()));
+		} else{
+			LOG.error("Could not sample a facility.");
+		}
+		return facility;
+	}
+	
+	public ActivityFacility sampleActivityFacilityBetweenPrimaries(QuadTree<ActivityFacility> qt, Coord c1, Coord c2, double dist){
+		ActivityFacility facility = null;
+		double primaryDistance = CoordUtils.calcEuclideanDistance(c1, c2);
+		
+		if(primaryDistance == 0.0){
+			/* It is an activity from a single point. Sample it from a ring
+			 * instead. */
+			facility = sampleActivityFacilityInRing(qt, c1, dist);
+			return facility;
+		}
+		
+		primaryDistance = Math.max(primaryDistance, dist);
+
+		double factor = 0.1;
+		double distance = primaryDistance * (1.0 + factor);
+		Collection<ActivityFacility> col = qt.getElliptical(c1.getX(), c1.getY(), c2.getX(), c2.getY(), distance);
+		int tries = 1;
+		while(col.size() == 0 && tries <= 10){
+			factor *= 2.0;
+			distance = primaryDistance * (1.0 + factor);
+			col = qt.getElliptical(c1.getX(), c1.getY(), c2.getX(), c2.getY(), distance);
+			tries++;
+		}
+		
+		List<ActivityFacility> list = new ArrayList<>(col);
+		
+		if(list.size() > 0){
+			facility = list.get(MatsimRandom.getLocalInstance().nextInt(list.size()));
+		} else{
+			LOG.error("Could not sample a facility.");
+		}
+		return facility;
+	}
+	
+	
+	public void relocatePlanActivities(Plan plan, ActivityFacility home){
 		List<PlanElement> elements = plan.getPlanElements();
 		
-		Coord previousLocation = null;
-		
-		/* Handle first activity, assuming that each plan must start with an activity. */
-		if(elements.get(0) instanceof Activity){
-			Activity first = (Activity)elements.get(0);
-			if(first.getType().startsWith("h")){
-				first.setCoord(home);
-			} else{
-				QuadTree<ActivityFacility> qt = getQuadtreeFromActivityType(first.getType());
+		/* Fix the home location(s). */
+		Coord oldHome = null;
+		Iterator<PlanElement> peIterator = elements.iterator();
+		while(peIterator.hasNext()){
+			PlanElement pe = peIterator.next();
+			if(pe instanceof Activity){
+				Activity activity = (Activity)pe;
+				if(activity.getType().startsWith("h")){
+					if(oldHome == null){
+						oldHome = activity.getCoord();
+					}
+					activity.setCoord(home.getCoord());
+					activity.setFacilityId(home.getId());
+				}
 			}
-		} else{
-			throw new IllegalArgumentException("This class assumes that a plan starts with an 'Activity'.");
-		}
-		
-		for(int i = 1; i < elements.size(); i++){
-			
 		}
 
+		/* Fix the work location(s). */
+		List<Activity> workList = getActivityType(plan, "w");
+		if(workList.size() > 0){
+			for(Activity activity : workList){
+				double distanceFromHome = CoordUtils.calcEuclideanDistance(
+						oldHome, 
+						activity.getCoord());
+				ActivityFacility af = sampleActivityFacilityInRing(qtWork, home.getCoord(), distanceFromHome);
+				activity.setCoord(af.getCoord());
+				activity.setFacilityId(af.getId());
+				double newDistanceFromHome = CoordUtils.calcEuclideanDistance(home.getCoord(), af.getCoord());
+				Tuple<Double, Double> tuple = new Tuple<Double, Double>(distanceFromHome, newDistanceFromHome);
+				tuplesWork.add(tuple);
+//				LOG.info(String.format("(old: %.0f; new: %.0f)", distanceFromHome, newDistanceFromHome));
+			}
+		}
+		
+		/* Fix the education location(s). */
+		List<Activity> educationList = getActivityType(plan, "e");
+		if(educationList.size() > 0){
+			for(Activity activity : educationList){
+				double distanceFromHome = CoordUtils.calcEuclideanDistance(
+						oldHome, 
+						activity.getCoord());
+				ActivityFacility af = sampleActivityFacilityInRing(qtEducation, home.getCoord(), distanceFromHome);
+				activity.setCoord(af.getCoord());
+				activity.setFacilityId(af.getId());
+				double newDistanceFromHome = CoordUtils.calcEuclideanDistance(home.getCoord(), af.getCoord());
+				Tuple<Double, Double> tuple = new Tuple<Double, Double>(distanceFromHome, newDistanceFromHome);
+				tuplesEducation.add(tuple);
+//				LOG.info(String.format("(old: %.0f; new: %.0f)", distanceFromHome, newDistanceFromHome));
+			}
+		}
+		
+		/* Fix the secondary activities. */
+		Activity firstPrimary = null;
+		Activity secondPrimary = null;
+		List<Activity> secondaries = new ArrayList<>();
+		Iterator<PlanElement> iterator = elements.iterator();
+		while(iterator.hasNext()){
+			PlanElement pe = iterator.next();
+			if(pe instanceof Activity){
+				Activity act = (Activity)pe;
+				boolean isPrimary = isPrimary(act);
+				if(isPrimary){
+					if(firstPrimary == null){
+						firstPrimary = act;
+					} else if(secondPrimary == null){
+						/*TODO Process the facilities in between. */
+						secondPrimary = act;
+						if(secondaries.size() > 0){
+							for(Activity a : secondaries){
+								QuadTree<ActivityFacility> qt = getQuadtreeFromActivityType(a.getType());
+								double distanceFromHome = CoordUtils.calcEuclideanDistance(
+										oldHome, 
+										a.getCoord());
+								ActivityFacility af = sampleActivityFacilityBetweenPrimaries(
+										qt, firstPrimary.getCoord(), secondPrimary.getCoord(), distanceFromHome);
+								a.setCoord(af.getCoord());
+								a.setFacilityId(af.getId());
+								double newDistanceFromHome = CoordUtils.calcEuclideanDistance(home.getCoord(), af.getCoord());
+								Tuple<Double, Double> tuple = new Tuple<Double, Double>(distanceFromHome, newDistanceFromHome);
+								tuplesSecondary.add(tuple);
+							}
+							secondaries = new ArrayList<>();
+						} else{
+							/* Ignore it - there are no secondaries. */
+						}
+						firstPrimary = secondPrimary;
+						secondPrimary = null;
+					} else{
+						LOG.error("Can this happen?!");
+					}
+				} else{
+					if(firstPrimary == null){
+						/*TODO This is a loose-standing activity, just sample
+						 * any activity location within the given radius. */
+						QuadTree<ActivityFacility> qt = getQuadtreeFromActivityType(act.getType());
+						double distanceFromHome = CoordUtils.calcEuclideanDistance(
+								oldHome, 
+								act.getCoord());
+						ActivityFacility af = sampleActivityFacilityInRing(qt, home.getCoord(), distanceFromHome);
+						act.setCoord(af.getCoord());
+						act.setFacilityId(af.getId());
+						double newDistanceFromHome = CoordUtils.calcEuclideanDistance(home.getCoord(), af.getCoord());
+						Tuple<Double, Double> tuple = new Tuple<Double, Double>(distanceFromHome, newDistanceFromHome);
+						tuplesSecondary.add(tuple);
+					} else{
+						secondaries.add(act);
+					}
+				}
+			}
+		}
+		
+		/* Handle the remaining secondary activities. */
+		for(Activity act : secondaries){
+			QuadTree<ActivityFacility> qt = getQuadtreeFromActivityType(act.getType());
+			double distanceFromHome = CoordUtils.calcEuclideanDistance(
+					oldHome, 
+					act.getCoord());
+			ActivityFacility af = sampleActivityFacilityInRing(qt, firstPrimary.getCoord(), distanceFromHome);
+			act.setCoord(af.getCoord());
+			act.setFacilityId(af.getId());
+			double newDistanceFromPrimary = CoordUtils.calcEuclideanDistance(firstPrimary.getCoord(), af.getCoord());
+			Tuple<Double, Double> tuple = new Tuple<Double, Double>(distanceFromHome, newDistanceFromPrimary);
+			tuplesSecondary.add(tuple);
+		}
+	}
+	
+	
+	private boolean isPrimary(Activity activity){
+		boolean isPrimary = false;
+		String type = activity.getType().substring(0, 1);
+		if(type.equalsIgnoreCase("h") ||
+		   type.equalsIgnoreCase("e") ||
+		   type.equalsIgnoreCase("w")){
+			isPrimary = true;
+		}
+		return isPrimary;
+	}
+	
+	
+	
+	
+	private List<Activity> getActivityType(Plan plan, String typePrefix){
+		List<Activity> list = new ArrayList<>();
+		Iterator<PlanElement> iterator = plan.getPlanElements().iterator();
+		while(iterator.hasNext()){
+			PlanElement pe = iterator.next();
+			if(pe instanceof Activity){
+				Activity activity = (Activity)pe;
+				if(activity.getType().startsWith(typePrefix)){
+					list.add(activity);
+				}
+			}
+		}
+
+		return list;
+	}
+	
+	private boolean hasActivityType(Plan plan, String typePrefix){
+		boolean hasActivity = false;
+		
+		Iterator<PlanElement> iterator = plan.getPlanElements().iterator();
+		while(!hasActivity && iterator.hasNext()){
+			PlanElement pe = iterator.next();
+			if(pe instanceof Activity){
+				Activity activity = (Activity)pe;
+				if(activity.getType().startsWith(typePrefix)){
+					hasActivity = true;
+				}
+			}
+		}
+		
+		return hasActivity;
 	}
 	
 	
 	private QuadTree<ActivityFacility> getQuadtreeFromActivityType(String type){
 		QuadTree<ActivityFacility> qt = null;
+		String prefix = type.substring(0,1);
+		switch (prefix) {
+		case "e":
+			qt = qtEducation;
+			break;
+		case "w":
+			qt = qtWork;
+			break;
+		case "s":
+			qt = qtShopping;
+			break;
+		case "l":
+			qt = qtLeisure;
+			break;
+		case "m":
+			qt = qtMedical;
+			break;
+		case "o":
+			qt = qtOther;
+			break;
+		case "v":
+			qt = qtHomeFormal;
+			break;
+		default:
+			break;
+		}
 		
-		
-		if(qt ==  null){
+		if(qt == null){
 			LOG.error("Could not find an appropriate QuadTree for activity type ''" + type + "''");
 		}
 		return qt;

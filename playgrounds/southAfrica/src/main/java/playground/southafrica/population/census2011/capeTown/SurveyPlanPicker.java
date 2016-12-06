@@ -109,7 +109,7 @@ public class SurveyPlanPicker {
 		 * household attributes (home coordinate) were adapted, so we need not 
 		 * write all of the files. */
 		PopulationWriter pw = new PopulationWriter(spp.censusPopulation.getScenario().getPopulation());
-		pw.write(populationFolder + "population_withPlans.xml.gz");
+		pw.writeV5(populationFolder + "population_withPlans.xml.gz");
 		//
 		ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(spp.censusPopulation.getScenario().getHouseholds().getHouseholdAttributes());
 		oaw.putAttributeConverter(Coord.class, new CoordConverter());

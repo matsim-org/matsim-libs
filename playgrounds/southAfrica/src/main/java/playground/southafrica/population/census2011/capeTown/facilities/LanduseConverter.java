@@ -19,7 +19,7 @@
 /**
  * 
  */
-package playground.southafrica.projects.erAfrica;
+package playground.southafrica.population.census2011.capeTown.facilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.southafrica.projects.erAfrica.Parcel.Landuse;
+import playground.southafrica.population.census2011.capeTown.facilities.Parcel.Landuse;
 
 /**
  * Class to convert a parcel with various land uses into a facility with 

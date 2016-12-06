@@ -73,6 +73,8 @@ import playground.southafrica.utilities.Header;
  * vehicles, editing the network to ensure all routed modes are addressed, and
  * some (possible) other cleaning occurs.<br><br>
  * 
+ * FIXME Need to first get the correct population (persons)
+ * 
  * This class is basically just a repeatable script of area-specific edits that
  * must be done for the City of Cape Town scenario. It requires the following 
  * files to be present in the given input folder:

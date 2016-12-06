@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.southafrica.projects.erAfrica;
+package playground.southafrica.population.census2011.capeTown.facilities;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
