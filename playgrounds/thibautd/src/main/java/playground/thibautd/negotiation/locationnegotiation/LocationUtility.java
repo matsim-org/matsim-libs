@@ -67,6 +67,7 @@ public class LocationUtility implements PropositionUtility<LocationProposition> 
 
 			final double sumOfAlterUtils =
 					alters.stream()
+							.filter( a -> !a.getId().equals( agent.getId() ) )
 							.mapToDouble( a -> seeds.getUniformErrorTerm( a, ego ) * configGroup.getMuContact() )
 							.sum();
 
