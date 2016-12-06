@@ -359,7 +359,7 @@ public class EmissionModule {
 		HbefaVehicleCategory hbefaVehicleCategory;
 		if(string.contains("pass. car")) hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
 		else if(string.contains("HGV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
-		// TODO not sure, if some key is present in HBEFA database corresponding to ZEV; need to confirm. Amit sep 16
+		else if(string.contains("motorcycle")) hbefaVehicleCategory = HbefaVehicleCategory.MOTORCYCLE;
 		else{
 			logger.warn("Could not map String " + string + " to any HbefaVehicleCategory; please check syntax in file " + averageFleetWarmEmissionFactorsFile);
 			throw new RuntimeException();
