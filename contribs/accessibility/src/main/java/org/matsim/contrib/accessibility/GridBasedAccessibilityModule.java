@@ -1,9 +1,27 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.contrib.accessibility;
 
 import java.util.Map;
 import java.util.Map.Entry;
 
-//import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.apache.log4j.Logger;
@@ -23,14 +41,13 @@ import com.google.inject.Inject;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
+/**
+ * @author dziemke
+ */
 public class GridBasedAccessibilityModule extends AbstractModule {
 	private static final Logger LOG = Logger.getLogger(GridBasedAccessibilityModule.class);
 	
-//	private final PtMatrix ptMatrix;
-
-//	public GridBasedAccessibilityModule(PtMatrix ptMatrix) {
 	public GridBasedAccessibilityModule() {
-//		this.ptMatrix = ptMatrix;
 	}
 
 	@Override
@@ -46,7 +63,7 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 			public ControlerListener get() {
 				AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.class);
 				double cellSize_m = acg.getCellSizeCellBasedAccessibility();
-				BoundingBox boundingBox;
+				final BoundingBox boundingBox;
 				final ActivityFacilitiesImpl measuringPoints;
 				if (cellSize_m <= 0) {
 					throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
@@ -65,23 +82,19 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 					boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
 					measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, cellSize_m) ;
 					LOG.info("Using the boundary of the network file to determine the area for accessibility computation.");
-					LOG.warn("This could lead to memory issues when the network is large and/or the cell size is too fine!");
+					LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");
 				}
 				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
-				GridBasedAccessibilityShutdownListenerV3 gacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, 
+				GridBasedAccessibilityShutdownListenerV3 gbasl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, 
 						boundingBox, cellSize_m);
 				for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
 					accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 				}
 
-				// this will be called by the accessibility listener after the accessibility calculations are finished
-				// It checks if the SpatialGrid for activated (true) transport modes are instantiated or null if not (false)
 				if (spatialGridDataExchangeListener != null) {
-////					EvaluateTestResults etr = new EvaluateTestResults(true, true, true, true, true);
-					gacl.addSpatialGridDataExchangeListener(spatialGridDataExchangeListener);
+					gbasl.addSpatialGridDataExchangeListener(spatialGridDataExchangeListener);
 				}
-
-				return gacl;
+				return gbasl;
 			}
 		});
 	}

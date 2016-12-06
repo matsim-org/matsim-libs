@@ -125,15 +125,15 @@ public class AccessibilityIntegrationTestOld {
 		double min = 0.;
 		double max = 200.;
 
-		final AccessibilityConfigGroup acm = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
-		acm.setCellSizeCellBasedAccessibility(100);
+		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
+		acg.setCellSizeCellBasedAccessibility(100);
 
 		// set bounding box manually in this test
-		acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox.toString());
-		acm.setBoundingBoxBottom(min);
-		acm.setBoundingBoxTop(max);
-		acm.setBoundingBoxLeft(min);
-		acm.setBoundingBoxRight(max);
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox.toString());
+		acg.setBoundingBoxBottom(min);
+		acg.setBoundingBoxTop(max);
+		acg.setBoundingBoxLeft(min);
+		acg.setBoundingBoxRight(max);
 		
 		// modify config according to needs
 		Network network = CreateTestNetwork.createTestNetwork();
@@ -173,18 +173,14 @@ public class AccessibilityIntegrationTestOld {
 			opportunities.addActivityFacility(facility);
 		}
 
-		// yyyy the following is taken from AccessibilityTest without any consideration of a good design.
-
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				this.bind(SpatialGridDataExchangeInterface.class).toInstance(new EvaluateTestResults(true, true, true, true, true));
 				this.bind(PtMatrix.class).toInstance(ptMatrix);
-				
 			}
 		});
 		
-//		controler.addOverridingModule(new GridBasedAccessibilityModule(ptMatrix));
 		controler.addOverridingModule(new GridBasedAccessibilityModule());
 		// yy the correct test is essentially already in AccessibilityTest.testAccessibilityMeasure().  kai, jun'13
 		// But that test uses the matsim4urbansim setup, which we don't want to use in the present test.
@@ -229,7 +225,7 @@ public class AccessibilityIntegrationTestOld {
 		controler.run();
 	}
 
-//	@Ignore
+
 	@Test
 	public void testWithExtentDeterminedByNetwork() {
 		final Config config = ConfigUtils.createConfig();
@@ -262,7 +258,7 @@ public class AccessibilityIntegrationTestOld {
 		// compare some results -> done in EvaluateTestResults
 	}
 	
-//	@Ignore
+
 	@Test
 	public void testWithExtentDeterminedShapeFile() {
 		
@@ -276,12 +272,12 @@ public class AccessibilityIntegrationTestOld {
 			Assert.assertTrue(f.exists());
 		}
 
-		final AccessibilityConfigGroup acm = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
-		acm.setCellSizeCellBasedAccessibility(100);
+		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
+		acg.setCellSizeCellBasedAccessibility(100);
 		// set area by shapefile in this test
-		acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromShapeFile.toString());
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromShapeFile.toString());
 //		acm.setShapeFileCellBasedAccessibility(url.getPath()); // yyyyyy todo
-		acm.setShapeFileCellBasedAccessibility(f.getAbsolutePath());
+		acg.setShapeFileCellBasedAccessibility(f.getAbsolutePath());
 		
 		// modify config according to needs
 		Network network = CreateTestNetwork.createTestNetwork();
