@@ -107,7 +107,7 @@ public class VPTree<C,T> implements SpatialTree<C, T> {
 		final Queue<Node<C,T>> stack = Collections.asLifoQueue( new ArrayDeque<>() );
 		stack.add( node );
 
-		final Collection<T> all = new ArrayList<>();
+		final Collection<T> all = new ArrayList<>( node.size );
 		while ( !stack.isEmpty() ) {
 			final Node<C,T> current = stack.poll();
 
