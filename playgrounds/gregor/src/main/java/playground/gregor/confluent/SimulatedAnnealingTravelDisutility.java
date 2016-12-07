@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -34,7 +33,10 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class SimulatedAnnealingTravelDisutility implements TravelDisutility, LinkEnterEventHandler, PersonArrivalEventHandler, AfterMobsimListener, BeforeMobsimListener {
 
@@ -73,7 +75,6 @@ public class SimulatedAnnealingTravelDisutility implements TravelDisutility, Lin
         tc = 0;
         cnt = 0;
         activeLinks.clear();
-        ;
     }
 
     @Override
