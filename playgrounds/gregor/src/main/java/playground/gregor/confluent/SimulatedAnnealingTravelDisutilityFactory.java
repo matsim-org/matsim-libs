@@ -18,23 +18,20 @@ package playground.gregor.confluent;/* *****************************************
  *                                                                         *
  * *********************************************************************** */
 
+import com.google.inject.Inject;
 import com.google.inject.Injector;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.router.costcalculators.TravelDisutilityModule;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
-import javax.inject.Inject;
-
-public class MSATravelDisutilityModule extends TravelDisutilityModule {
+public class SimulatedAnnealingTravelDisutilityFactory implements org.matsim.core.router.costcalculators.TravelDisutilityFactory {
     @Inject
     Injector injector;
 
+    @Inject
+    SimulatedAnnealingTravelDisutility msaTD;
+
     @Override
-    public void install() {
-        addEventHandlerBinding().to(MSATravelDisutility.class);
-        PlansCalcRouteConfigGroup routeConfigGroup = getConfig().plansCalcRoute();
-        MSATravelDisutilityFactory fac = injector.getInstance(MSATravelDisutilityFactory.class);
-        for (String mode : routeConfigGroup.getNetworkModes()) {
-            addTravelDisutilityFactoryBinding(mode).toInstance(fac);
-        }
+    public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
+        return msaTD;
     }
 }
