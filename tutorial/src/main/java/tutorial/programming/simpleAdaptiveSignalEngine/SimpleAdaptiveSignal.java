@@ -55,7 +55,7 @@ import org.matsim.core.utils.io.IOUtils;
  * 
  * It does not need any signal input as basis.
  * It creates the signals as a MobsimInitializedListener before the simulation is started.
- * There are to conflicting streams, link 4 and link 5.
+ * There are two conflicting streams, link 4 and link 5.
  * During the simulation the adaptive signal switches link 5 to green whenever vehicles want to leave it.
  * 
  * @author nagel
