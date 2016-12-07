@@ -405,7 +405,7 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 
 	
 	/**
-	 * Collect all signals of the signal system and prepare sensors (event handlers) in front of them
+	 * Collect all signals of the signal system and prepare sensors (event handlers) upstream of them
 	 * to count vehicles in a specific distance (when no lanes are used) or on the last lane (if lanes are used).
 	 */
 	private void initializeSensoring(){
