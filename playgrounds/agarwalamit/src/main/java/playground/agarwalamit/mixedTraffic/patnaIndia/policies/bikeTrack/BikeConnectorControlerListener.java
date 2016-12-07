@@ -23,7 +23,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -47,11 +47,10 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.linkVolume.FilteredLinkVolumeHandler;
-import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 /**
@@ -79,6 +78,13 @@ public class BikeConnectorControlerListener implements StartupListener, Iteratio
     @Inject
     private Scenario scenario;
 
+    @Inject
+    private Map<String, TravelTime> travelTimes;
+
+    @Inject
+    private Map<String, TravelDisutilityFactory> travelDisutilityFactories;
+
+
     private boolean terminateSimulation = false;
     private PlanAlgorithm router;
 
@@ -100,6 +106,7 @@ public class BikeConnectorControlerListener implements StartupListener, Iteratio
         );
 
         this.totalPossibleConnectors = this.bikeConnectorLinks.size();
+//        this.router = new PlanRouter(event.getServices().getTripRouterProvider().get());
     }
 
     @Override
@@ -128,10 +135,12 @@ public class BikeConnectorControlerListener implements StartupListener, Iteratio
                 this.bikeConnectorLinks.remove(connector2remove); // necessary, else, in the next round, same link can appear for removal.
 
                 double aboutZeroFreeSpeed = 0.01;
-//                addNetworkChangeEvent(connector2remove, aboutZeroFreeSpeed);
-                // i think, i can simply change the speed, rather than using network change event because
+                Link link2Modify = this.scenario.getNetwork().getLinks().get(connector2remove);
+                // i think, i can simply change the speed (and lenght, capacity), rather than using network change event because
                 // it is permanent change and I can observe this directly in network file.
-                this.scenario.getNetwork().getLinks().get(connector2remove).setFreespeed(aboutZeroFreeSpeed);
+                link2Modify.setFreespeed(aboutZeroFreeSpeed);
+                link2Modify.setLength(100.* link2Modify.getLength());
+                link2Modify.setCapacity(0.001* link2Modify.getCapacity());
 
                 reRoutePlan(connector2remove); // only if this connector is present in the route of any leg.
 
@@ -208,11 +217,12 @@ public class BikeConnectorControlerListener implements StartupListener, Iteratio
     }
 
     private PlanAlgorithm getRouter() {
-        final TravelTime travelTime = new FreeSpeedTravelTimeForBike();
+//        final TravelTime travelTime = new FreeSpeedTravelTimeForBike();
+        final TravelTime travelTime = this.travelTimes.get(TransportMode.bike);
         TripRouterFactoryBuilderWithDefaults routerFactory = new TripRouterFactoryBuilderWithDefaults();
         routerFactory.setTravelTime(travelTime);
-        routerFactory.setTravelDisutility(
-                new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.bike, scenario.getConfig().planCalcScore()).createTravelDisutility(travelTime));
+        routerFactory.setTravelDisutility( this.travelDisutilityFactories.get(TransportMode.bike).createTravelDisutility(travelTime) );
+//                new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.bike, scenario.getConfig().planCalcScore()).createTravelDisutility(travelTime));
 
         final TripRouter tripRouter = routerFactory.build(this.scenario).get();
         PlanAlgorithm router = new PlanRouter(tripRouter);
