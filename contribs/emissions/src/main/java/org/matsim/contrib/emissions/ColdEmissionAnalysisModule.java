@@ -77,6 +77,7 @@ public class ColdEmissionAnalysisModule {
 	private int vehInfoWarnHDVCnt = 0;
 	private int vehAttributesNotSpecifiedCnt = 0;
 	private static final int maxWarnCnt = 3;
+	private int vehInfoWarnMotorCylceCnt = 0;
 
 	public static class ColdEmissionAnalysisModuleParameter {
 		public final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
@@ -143,13 +144,8 @@ public class ColdEmissionAnalysisModule {
 					"Please make sure that requirements for emission vehicles in " + 
 					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
-        if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.ZERO_EMISSION_VEHICLE)) {
-			for (ColdPollutant cp : ColdPollutant.values()){
-				coldEmissions.put( cp, 0.0 );
-			}
-		} else {
-			coldEmissions = getColdPollutantDoubleMap(vehicle.getId(), parkingDuration, vehicleInformationTuple, distance_km);
-		}
+
+		coldEmissions = getColdPollutantDoubleMap(vehicle.getId(), parkingDuration, vehicleInformationTuple, distance_km);
 
 		// a basic apporach to introduce emission reduced cars:
 		if(emissionEfficiencyFactor != null){
@@ -171,7 +167,7 @@ public class ColdEmissionAnalysisModule {
 	}
 
     private Map<ColdPollutant, Double> getColdPollutantDoubleMap(Id<Vehicle> vehicleId, double parkingDuration, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km) {
-        Map<ColdPollutant, Double> coldEmissionsOfEvent = new HashMap<>();
+        final Map<ColdPollutant, Double> coldEmissionsOfEvent = new HashMap<>();
 
         HbefaColdEmissionFactorKey key = new HbefaColdEmissionFactorKey();
 
@@ -185,10 +181,26 @@ public class ColdEmissionAnalysisModule {
                         ". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
                 if(vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
             }
-        } else{
+        } else if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.ZERO_EMISSION_VEHICLE)) {
+			for (ColdPollutant cp : ColdPollutant.values()){
+				coldEmissionsOfEvent.put( cp, 0.0 );
+			}
+			return coldEmissionsOfEvent;
+		} else if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.MOTORCYCLE)) {
+			if(vehInfoWarnMotorCylceCnt == 0) {
+				vehInfoWarnMotorCylceCnt++;
+				logger.warn("HBEFA 3.1 does not provide cold start emission factors for " +
+						HbefaVehicleCategory.MOTORCYCLE +
+						". Setting cold emissions to zero.");
+				logger.warn(Gbl.ONLYONCE + "\t" + Gbl.FUTURE_SUPPRESSED);
+			}
+			for (ColdPollutant cp : ColdPollutant.values()){
+				coldEmissionsOfEvent.put( cp, 0.0 );
+			}
+			return coldEmissionsOfEvent;
+		} else {
             key.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
         }
-
 
         int parkingDuration_h = Math.max(1, (int) (parkingDuration / 3600));
         if (parkingDuration_h >= 12) parkingDuration_h = 13;

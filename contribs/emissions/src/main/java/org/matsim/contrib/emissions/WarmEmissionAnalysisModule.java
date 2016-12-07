@@ -178,13 +178,8 @@ public class WarmEmissionAnalysisModule {
 					"Please make sure that requirements for emission vehicles in " + 
 					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
-		if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.ZERO_EMISSION_VEHICLE)) {
-			for (WarmPollutant warmPollutant : WarmPollutant.values()) {
-				warmEmissions.put( warmPollutant, 0.0 );
-			}
-		} else {
-			warmEmissions = calculateWarmEmissions(vehicle.getId(), travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple);
-		}
+
+		warmEmissions = calculateWarmEmissions(vehicle.getId(), travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple);
 
 		// a basic apporach to introduce emission reduced cars:
 		if(emissionEfficiencyFactor != null){
@@ -222,10 +217,19 @@ public class WarmEmissionAnalysisModule {
 		if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)){
 			keyFreeFlow.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
 			keyStopAndGo.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
-		} else{
+		} else if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.MOTORCYCLE)) {
+			keyFreeFlow.setHbefaVehicleCategory(HbefaVehicleCategory.MOTORCYCLE);
+			keyStopAndGo.setHbefaVehicleCategory(HbefaVehicleCategory.MOTORCYCLE);
+		} else if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.ZERO_EMISSION_VEHICLE)) {
+			for (WarmPollutant warmPollutant : WarmPollutant.values()) {
+				warmEmissionsOfEvent.put( warmPollutant, 0.0 );
+			}
+			return warmEmissionsOfEvent;
+		} else {
 			keyFreeFlow.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
 			keyStopAndGo.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
 		}
+
 		keyFreeFlow.setHbefaRoadCategory(hbefaRoadTypeName);
 		keyStopAndGo.setHbefaRoadCategory(hbefaRoadTypeName);
 		keyFreeFlow.setHbefaTrafficSituation(HbefaTrafficSituation.FREEFLOW);
