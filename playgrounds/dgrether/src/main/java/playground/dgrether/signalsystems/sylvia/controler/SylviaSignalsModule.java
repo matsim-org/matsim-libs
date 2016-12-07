@@ -26,6 +26,7 @@ import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
+import org.matsim.contrib.signals.builder.SignalModelFactory;
 import org.matsim.contrib.signals.controler.SignalsControllerListener;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
@@ -68,6 +69,10 @@ public class SylviaSignalsModule extends AbstractModule {
 		}
 		
 		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
+			bind(DgSylviaConfig.class).toInstance(sylviaConfig);
+			bind(SignalModelFactory.class).to(DgSylviaSignalModelFactory.class);
+			bind(FromDataBuilder.class);
+			
             bind(SignalsControllerListener.class).to(DgSylviaSignalControlerListener.class);
             addControlerListenerBinding().to(SignalsControllerListener.class);
             addMobsimListenerBinding().to(QSimSignalEngine.class);
@@ -80,8 +85,7 @@ public class SylviaSignalsModule extends AbstractModule {
         }
 	}
 	
-	@Provides SignalSystemsManager provideSignalSystemsManager(Scenario scenario, EventsManager eventsManager, ReplanningContext replanningContext, DgSensorManager sensorManager) {	
-		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, new DgSylviaSignalModelFactory(new DefaultSignalModelFactory(), sensorManager, sylviaConfig), eventsManager);
+	@Provides SignalSystemsManager provideSignalSystemsManager(ReplanningContext replanningContext, FromDataBuilder modelBuilder) {	
 		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		signalManager.resetModel(replanningContext.getIteration());		
 		return signalManager;

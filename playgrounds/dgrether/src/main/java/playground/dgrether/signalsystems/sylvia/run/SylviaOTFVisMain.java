@@ -75,7 +75,7 @@ public class SylviaOTFVisMain {
 		events.addHandler(sensorManager);
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 
-				new DgSylviaSignalModelFactory(new DefaultSignalModelFactory(), sensorManager, new DgSylviaConfig()) , events);
+				new DgSylviaSignalModelFactory(sensorManager, new DgSylviaConfig()) , events);
 		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		
 		

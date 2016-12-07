@@ -43,6 +43,9 @@ import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.core.config.ConfigUtils;
+
+import com.google.inject.Inject;
+
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 
 /**
@@ -52,10 +55,11 @@ import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 public class FromDataBuilder implements SignalSystemsModelBuilder{
 
 	private SignalsData signalsData;
-	private SignalModelFactory factory = new DefaultSignalModelFactory();
+	private SignalModelFactory factory;
 	private EventsManager events;
 	private Scenario scenario;
 
+	@Inject
 	public FromDataBuilder(Scenario scenario, SignalModelFactory factory, EventsManager events){
 		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		this.scenario = scenario;
@@ -63,6 +67,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		this.events = events;
 	}
 	
+	// TODO how to bind default?
 	public FromDataBuilder(Scenario scenario, EventsManager events){
 		this(scenario, new DefaultSignalModelFactory(), events);
 	}
