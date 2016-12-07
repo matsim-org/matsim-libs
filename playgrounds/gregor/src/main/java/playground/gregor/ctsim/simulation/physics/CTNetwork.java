@@ -7,10 +7,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import playground.gregor.ctsim.debug.Debugger3;
 import playground.gregor.ctsim.run.CTRunner;
 import playground.gregor.ctsim.simulation.CTEvent;
 import playground.gregor.ctsim.simulation.CTEventsPaulPriorityQueue;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
+import playground.gregor.sim2d_v4.events.debug.TextEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,6 +39,28 @@ public class CTNetwork {
 	}
 
 	private void init() {
+		if (CTRunner.DEBUG) {
+			TextEvent e1 = new TextEvent(0, "alpha: " + CTLink.WIDTH, 10 + CTLink.WIDTH, -Debugger3.WIDTH / 2 - 3);
+
+			this.em.processEvent(e1);
+			TextEvent e2 = new TextEvent(0, "rho_m: " + CTCell.RHO_M, 10 + CTLink.WIDTH, -Debugger3.WIDTH / 2 - 3 - 2);
+			this.em.processEvent(e2);
+			TextEvent e3 = new TextEvent(0, "v_0: " + CTCell.V_0, 10 + CTLink.WIDTH, -Debugger3.WIDTH / 2 - 3 - 4);
+			this.em.processEvent(e3);
+			TextEvent e4 = new TextEvent(0, "gamma: " + CTCell.GAMMA, 10 + CTLink.WIDTH, -Debugger3.WIDTH / 2 - 3 - 6);
+			this.em.processEvent(e4);
+			TextEvent e5 = new TextEvent(0, "p_0: " + CTCell.P0, 10 + CTLink.WIDTH, -Debugger3.WIDTH / 2 - 3 - 8);
+			this.em.processEvent(e5);
+			TextEvent e6 = new TextEvent(0, "#left -> right: " + Debugger3.AGENTS_LR, 10 + CTLink.WIDTH, -Debugger3.WIDTH / 2 - 3 - 10);
+			this.em.processEvent(e6);
+			TextEvent e7 = new TextEvent(0, "#right -> left: " + Debugger3.AGENTS_RL, 10 + CTLink.WIDTH, -Debugger3.WIDTH / 2 - 3 - 12);
+			this.em.processEvent(e7);
+			TextEvent e8 = new TextEvent(0, "inflow [1/s]: left -> right: " + 1 / Debugger3.INV_INFLOW, 10 + CTLink.WIDTH, -Debugger3.WIDTH / 2 - 3 - 14);
+			this.em.processEvent(e8);
+			TextEvent e9 = new TextEvent(0, "inflow [1/s]: right -> left: " + 1 / Debugger3.INV_INFLOW, 10 + CTLink.WIDTH, -Debugger3.WIDTH / 2 - 3 - 16);
+			this.em.processEvent(e9);
+		}
+
 //		log.info("initializing network; using " + this.cores + " threads.");
 //		List<Worker> workers = new ArrayList<>();
 //		List<Thread> threads = new ArrayList<>();

@@ -196,10 +196,8 @@ public class EventsBasedVisDebugger extends PApplet {
 		strokeCap(ROUND);
 
 		synchronized (this.elementsStatic) {
-			Iterator<Object> it = this.elementsStatic.iterator();
-			while (it.hasNext()) {
-				Object el = it.next();
-				if (el instanceof Line) {
+            for (Object el : this.elementsStatic) {
+                if (el instanceof Line) {
 					drawLine((Line) el);
 				} else if (el instanceof Circle) {
 					drawCircle((Circle) el);

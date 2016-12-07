@@ -17,6 +17,7 @@ import playground.gregor.ctsim.run.CTRunner;
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.events.debug.LineEvent;
+import playground.gregor.sim2d_v4.events.debug.TextEvent;
 
 import java.util.*;
 
@@ -112,7 +113,7 @@ public class CTLink implements CTNetworkEntity {
 		bounds[3] = new Coordinate(this.dsLink.getFromNode().getCoord().getX() + dy * width / 2,
 				this.dsLink.getFromNode().getCoord().getY() - dx * width / 2);
 		bounds[4] = bounds[0];
-		debugBound(bounds);
+
 		GeometryFactory geofac = new GeometryFactory();
 		LinearRing lr = geofac.createLinearRing(bounds);
 
@@ -124,6 +125,7 @@ public class CTLink implements CTNetworkEntity {
 
 		Map<ProtoCell, CTCell> cellsMap = new HashMap<>();
 		Map<ProtoCell, Geometry> geoMap = new HashMap<>();
+		int id = 0;
 		for (ProtoCell pt : cells) {
 			double area = (1.5 * Math.sqrt(3) * (WIDTH / 2) * (WIDTH / 2));
 			CTCell c = new CTLinkCell(pt.x, pt.y, this.network, this, WIDTH / 2, area);
@@ -222,24 +224,28 @@ public class CTLink implements CTNetworkEntity {
 
 		//append cells
 
-
-//        for (CTCell c : this.cells) {
-//            c.debug(this.em);
-//        }
-
-		if (CTRunner.DEBUG) {
-			for (CTCell c : dsJumpOns) {
-				c.g = 255;
+		if (this.dsLink.getId().equals(Id.createLinkId("l1_8"))) {
+			debugBound(bounds);
+			for (CTCell c : this.cells) {
 				c.debug(this.em);
-			}
-
-			for (CTCell c : usJumpOns) {
-				c.r = 255;
-				c.g = 0;
-				c.b = 0;
-				c.debug(this.em);
+				TextEvent textEvent = new TextEvent(0, c.id + "", c.getX(), c.getY());
+				this.em.processEvent(textEvent);
 			}
 		}
+
+//		if (CTRunner.DEBUG) {
+//			for (CTCell c : dsJumpOns) {
+//				c.g = 255;
+//				c.debug(this.em);
+//			}
+//
+//			for (CTCell c : usJumpOns) {
+//				c.r = 255;
+//				c.g = 0;
+//				c.b = 0;
+//				c.debug(this.em);
+//			}
+//		}
 	}
 
 

@@ -41,12 +41,18 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import playground.gregor.ctsim.events.JumpEventCSVWriter;
+import playground.gregor.ctsim.events.JumpEventHandler;
 import playground.gregor.ctsim.router.CTRoutingModule;
 import playground.gregor.ctsim.run.CTRunner;
 import playground.gregor.ctsim.simulation.CTMobsimFactory;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -55,11 +61,11 @@ import java.util.Set;
  */
 public class Debugger3 {
 
-	private static final double WIDTH = 20;
-	private static double LL = 500;
-	private static double AGENTS_LR = 6000;
-	private static double AGENTS_RL = 6000;
-	private static double INV_INFLOW = 0.2;
+	public static final double WIDTH = 20;
+	private static double LL = 64.95190528383289850700;
+	public static double AGENTS_LR = 6000;
+	public static double AGENTS_RL = 6000;
+	public static double INV_INFLOW = 0.3;
 
 	public static void main(String[] args) {
 		Config c2 = ConfigUtils.createConfig();
@@ -97,6 +103,14 @@ public class Debugger3 {
 		em.addHandler(dbg);
 		//END_DEBUG
 
+		BufferedWriter bw = null;
+		try {
+			bw = new BufferedWriter(new FileWriter(new File("/Users/laemmel/scenarios/misanthrope/sc1")));
+			JumpEventHandler h = new JumpEventCSVWriter(bw);
+			em.addHandler(h);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
@@ -122,6 +136,12 @@ public class Debugger3 {
 		});
 
 		controller.run();
+
+		try {
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void setupConfig(Scenario sc) {

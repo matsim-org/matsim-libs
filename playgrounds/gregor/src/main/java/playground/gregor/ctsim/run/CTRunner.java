@@ -40,7 +40,7 @@ import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer
 
 public class CTRunner implements IterationStartsListener {
 
-	public static boolean DEBUG = false;
+    public static boolean DEBUG = true;
 
 	private MatsimServices controller;
 	private QSimDensityDrawer qSimDrawer;

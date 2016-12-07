@@ -36,7 +36,7 @@ import java.util.Map;
 public class EventBasedVisDebuggerEngine implements
 		CASimAgentConstructEventHandler, XYVxVyEventsHandler,
 		 LineEventHandler, ForceReDrawEventHandler,
-		RectEventHandler, CircleEventHandler {
+        RectEventHandler, CircleEventHandler, TextEventHandler {
 
 	double time;
 	private final EventsBasedVisDebugger vis;
@@ -187,6 +187,12 @@ public class EventBasedVisDebuggerEngine implements
 			// event.getAgent().toString(), 50);
 
 	}
+
+    @Override
+    public void handleEvent(TextEvent event) {
+        this.vis.addTextStatic(event.getX(), event.getY(), event.getText(), 10);
+    }
+
 
 	@Override
 	public void handleEvent(CircleEvent event) {

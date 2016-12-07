@@ -13,14 +13,19 @@ public abstract class CTCell {
 
 	protected static final Logger log = Logger.getLogger(CTCell.class);
 
-	private static final double RHO_M = 6.667;
-	private static final double V_0 = 1.5;
-	private static final double GAMMA = 0.3;
-	private static final double P0 = 0.2;
+	public static final double RHO_M = 6.667;
+	public static final double V_0 = 1.5;
+	public static final double GAMMA = 0.3;
+	public static final double P0 = 0.2;
+	private static int ID = 0;
 	private static double Q;
 
 	static {
 		Q = (V_0 * RHO_M) / (V_0 / GAMMA + 1);
+	}
+
+	public CTNetwork getNet() {
+		return net;
 	}
 
 	protected final CTNetwork net;
@@ -31,13 +36,14 @@ public abstract class CTCell {
 	//	private final HashSet<CTPed> peds = new HashSet<>();
 //	private final Map<Double,LinkedList<CTPed>> pop = new ArrayMap<>();//TODO is this faster than HashMap?
 	private final List<CTCell> neighbors = new ArrayList<>();
+	final int id;
 	protected CTPed next = null;
 	protected double nextCellJumpTime;
 	protected CTEvent currentEvent = null;
 	protected int n = 0; //nr peds
 	int r = 0;
 	int g = 0;
-	int b = 192;
+	int b = 0;
 	private double alpha; //area
 	private double rho; //current density
 	private double x;
@@ -52,6 +58,7 @@ public abstract class CTCell {
 		this.parent = parent;
 		this.width = width;
 		this.setArea(area);
+		this.id = ID++;
 //		pop.put(Math.PI/6., new LinkedList<CTPed>());
 //		pop.put(Math.PI/2., new LinkedList<CTPed>());
 //		pop.put(5*Math.PI/6., new LinkedList<CTPed>());
@@ -86,9 +93,11 @@ public abstract class CTCell {
 		if (!CTRunner.DEBUG) {
 			return;
 		}
-//		for (CTCellFace f : faces) {
-//			debug(f, em);
-//		}
+		for (CTCellFace f : faces) {
+			debug(f, em);
+		}
+
+
 
 	}
 
@@ -111,7 +120,7 @@ public abstract class CTCell {
 			s.y0 = f.y0;
 			s.x1 = f.x1;
 			s.y1 = f.y1;
-			LineEvent le = new LineEvent(0, s, true, r, g, b, 255, 50);
+			LineEvent le = new LineEvent(0, s, true, r, g, b, 255, 0);
 			em.processEvent(le);
 		}
 	}
@@ -131,6 +140,7 @@ public abstract class CTCell {
 	public CTNetworkEntity getParent() {
 		return this.parent;
 	}
+
 
 	public void jumpAndUpdateNeighbors(double now) {
 
