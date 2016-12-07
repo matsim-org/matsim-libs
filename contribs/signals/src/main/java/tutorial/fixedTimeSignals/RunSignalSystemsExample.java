@@ -45,8 +45,6 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
  * @author dgrether, tthunig
  */
 public class RunSignalSystemsExample {
-
-	private static final String INPUT_DIR = "./../../matsim/examples/equil-extended/";
 	
 	public static void main(String[] args) {
 		run(true);
