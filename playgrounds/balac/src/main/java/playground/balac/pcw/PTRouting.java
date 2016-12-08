@@ -14,11 +14,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.DefaultRoutingModules;
+import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.facilities.Facility;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -31,6 +32,7 @@ import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl
 import playground.balac.utils.NetworkLinkUtils;
 import playground.balac.utils.TimeConversion;
 import playground.balac.utils.TransitRouterImplFactory;
+import playground.balac.utils.TransitRouterNetworkReaderMatsimV1;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -143,43 +145,41 @@ public class PTRouting {
 	//	config.network().setInputFile("C:/Users/balacm/Desktop/InputPt/network_multimodal.xml.gz");
 
 	  //  config.facilities().setInputFile("C:/Users/balacm/Desktop/InputPt/facilities.xml.gz");
-	    config.network().setInputFile("C:/Users/balacm/Desktop/InputPt/mmNetwork.xml.gz");
+	    config.network().setInputFile("./mmNetwork.xml.gz");
 
-	    config.transit().setTransitScheduleFile("C:/Users/balacm/Desktop/InputPt/mmSchedule.xml.gz");
-	    config.transit().setVehiclesFile("C:/Users/balacm/Desktop/InputPt/mmVehicles.xml.gz");
+	    config.transit().setTransitScheduleFile("./mmSchedule.xml.gz");
+	    config.transit().setVehiclesFile("./mmVehicles.xml.gz");
 		
-		config.scenario().setUseTransit(true);
-		config.scenario().setUseVehicles(true);
-		
-		
+	    config.transit().setUseTransit(true);
+		config.transitRouter().setSearchRadius(2000.0);
+		config.transitRouter().setMaxBeelineWalkConnectionDistance(300.0);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 				
-		TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), 100.0D);
+		TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), 300.0D);
 	    ((PlanCalcScoreConfigGroup)config.getModule("planCalcScore")).setUtilityOfLineSwitch(-2.0D);
 		final double travelingWalk = -12.0D;
-		((PlanCalcScoreConfigGroup)config.getModule("planCalcScore")).getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
-
-		PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
-	    routeConfigGroup.getModeRoutingParams().get("walk").setBeelineDistanceFactor(1.2);
-	    routeConfigGroup.getModeRoutingParams().get("walk").setTeleportedModeSpeed(4.8 / 3.6);
+		((PlanCalcScoreConfigGroup)config.getModule("planCalcScore")).getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);	    
+	    PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
+	    routeConfigGroup.getModeRoutingParams().get("walk").setBeelineDistanceFactor(1.3);
+	    routeConfigGroup.getModeRoutingParams().get("walk").setTeleportedModeSpeed(4.8 / 5.0);
 	   // new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("C:/Users/balacm/Desktop/InputPt/mmNetwork.xml.gz");
 
 	  //  ((PlansCalcRouteConfigGroup)config.getModule("planscalcroute")).getModeRoutingParams().get("walk").setTeleportedModeSpeed(1.34);
 	    
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(),
 				config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
-		
+
 	//	transitRouterFactory = new FastTransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, routerNetwork);
 		transitRouterFactory = new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, routerNetwork);
-		 BufferedReader readLink = IOUtils.getBufferedReader("P:/Projekte/SNF/SNF Post-Car World/STATEDCHOICE_WAVE1/geo_coded_SC_wave1_referencevalues_sexyage_1008.txt");
+		 BufferedReader readLink = IOUtils.getBufferedReader("./clean_weg_geocoded.csv");
 
 //		    BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/travelTimesPT_"+args[0] +".txt");
 //	final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/coord_"+args[0]+".txt");
-			final BufferedWriter outLinkF = IOUtils.getBufferedWriter("P:/Projekte/SNF/SNF Post-Car World/STATEDCHOICE_WAVE1/travelTimesPTFr_sexyage_1008_"+args[0]+".txt");
+			final BufferedWriter outLinkF = IOUtils.getBufferedWriter("./clean_weg_pt_routes.txt");
 
-			final BufferedWriter outFrequency = IOUtils.getBufferedWriter("P:/Projekte/SNF/SNF Post-Car World/STATEDCHOICE_WAVE1/frequency_sexyage_1008_"+args[0]+".txt");
-			
-		((TransitRouterConfigGroup) config.getModule("transitRouter")).setSearchRadius(2000.0);
+			final BufferedWriter outFrequency = IOUtils.getBufferedWriter("./clean_weg_frequency.txt");
+			final BufferedWriter outWalk = IOUtils.getBufferedWriter("./clean_weg_walk.txt");
+
 			
 		String s = readLink.readLine();
 		
@@ -206,213 +206,224 @@ public class PTRouting {
 		while(s != null) {
 			
 			String[] arr = s.split(";");
-			
-			if (!(arr[1].startsWith("-") || arr[2].startsWith("-") || arr[3].startsWith("-") || arr[4].startsWith("-"))) {
-
-				Coord coordStart = new Coord(Double.parseDouble(arr[5]), Double.parseDouble(arr[6]));
-			
-			
-			
-			Link lStart = lUtils.getClosestLink(coordStart);
-
-
-				Coord coordEnd = new Coord(Double.parseDouble(arr[7]), Double.parseDouble(arr[8]));
-			
-
-			Link lEnd = lUtils.getClosestLink(coordEnd);
-
-			
-			Person person = scenario.getPopulation().getFactory().createPerson(Id.createPersonId(arr[0]));
-			
-			double m = TimeConversion.convertTimeToDouble(arr[10]);
-			
-			
-			TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("100", TwoWayCSFacility.class), coordStart, lStart.getId());
-			
-			TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("101", TwoWayCSFacility.class), coordEnd, lEnd.getId());
-			
-			ArrayList<List<? extends PlanElement>> allRoutes = new ArrayList<List<? extends PlanElement>>();
-			
-			List<? extends PlanElement> route =  routingModule.calcRoute(startFacility, endFacility, m * 60, person);
-			((Leg)route.get(0)).setDepartureTime(m * 60);
-
-			System.out.println("routed for the initial time");
-			
-			double departureTime = m *60 + ((Leg)route.get(0)).getTravelTime();
-			
-			System.out.println(departureTime);
-			double travelTime = this.getTraveltime(route);			
-			int numberOfTransfers = this.getNumberOfTransfers(route);
-			
-			double firstTime = 0.0;
-			double lastTime = 0.0;
+			if ( !arr[1].equals("-99")) {
+				if (!(arr[1].startsWith("-") || arr[2].startsWith("-") || arr[3].startsWith("-") || arr[4].startsWith("-"))) {
 				
-			int count = 0;
-			
-			ArrayList<List<? extends PlanElement>> allRoutesFirst = new ArrayList<List<? extends PlanElement>>();
-			
-			if(route.size() == 1) {
-				System.out.println(((Leg)route.get(0)).getTravelTime());
-				System.out.println(((Leg)route.get(0)).getMode());
-			}
-
-			
-			if (route.size() != 1) {
-				allRoutes.add(route);
-			for (double time = departureTime + 7200; time >= departureTime - 7200; time -= timeStep) {
-				
-					List<? extends PlanElement> routeNew =  routingModule.calcRoute(startFacility, endFacility, time, person);
+					Coord coordStart = new Coord(Double.parseDouble(arr[5]), Double.parseDouble(arr[6]));
 					
-					double travelTimeNew = getTraveltime (routeNew);
+					
+					
+					Link lStart = lUtils.getClosestLink(coordStart);
+					
+					
+					Coord coordEnd = new Coord(Double.parseDouble(arr[7]), Double.parseDouble(arr[8]));
+					
+		
+					Link lEnd = lUtils.getClosestLink(coordEnd);
+		
+					
+					Person person = scenario.getPopulation().getFactory().createPerson(Id.createPersonId(arr[0]));
+					
+					double m = Integer.parseInt(arr[12]);
+					
+					
+					TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("100", TwoWayCSFacility.class), coordStart, lStart.getId());
+					
+					TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("101", TwoWayCSFacility.class), coordEnd, lEnd.getId());
+					
+					ArrayList<List<? extends PlanElement>> allRoutes = new ArrayList<List<? extends PlanElement>>();
+					
+					List<? extends PlanElement> route =  routingModule.calcRoute(startFacility, endFacility, m * 60, person);
+					((Leg)route.get(0)).setDepartureTime(m * 60);
+		
+					System.out.println("routed for the initial time");
+					
+					double departureTime = m *60 + ((Leg)route.get(0)).getTravelTime();
+					
+					System.out.println(departureTime);
+					double travelTime = this.getTraveltime(route);			
+					int numberOfTransfers = this.getNumberOfTransfers(route);
+					
+					double firstTime = 0.0;
+					double lastTime = 0.0;
 						
-					((Leg)routeNew.get(0)).setDepartureTime(time);
-						
-					if(!isDominatedWithTran(routeNew, allRoutes)) {
-						if (routeNew.size() != 1) {
-								
-							allRoutesFirst.add(routeNew);	
-							if (travelTimeNew < 1.30 * travelTime && numberOfTransfers + 2 > this.getNumberOfTransfers(routeNew) && 
-									!isDominatedWithoutTran(routeNew, allRoutes)	
-									) {
+					int count = 0;
+					
+					ArrayList<List<? extends PlanElement>> allRoutesFirst = new ArrayList<List<? extends PlanElement>>();
+					
+					if(route.size() == 1) {
+						outWalk.write(arr[0] + "," + ((Leg)route.get(0)).getTravelTime());
+						outWalk.newLine();
+						System.out.println(((Leg)route.get(0)).getTravelTime());
+						System.out.println(((Leg)route.get(0)).getMode());
+					}
+		
+					
+					if (route.size() != 1) {
+						allRoutes.add(route);
+						for (double time = departureTime + 7200; time >= departureTime - 7200; time -= timeStep) {
 							
-								allRoutes.add(routeNew);
+								List<? extends PlanElement> routeNew =  routingModule.calcRoute(startFacility, endFacility, time, person);
+								
+								double travelTimeNew = getTraveltime (routeNew);
+									
+								((Leg)routeNew.get(0)).setDepartureTime(time);
+									
+								if(!isDominatedWithTran(routeNew, allRoutes)) {
+									if (routeNew.size() != 1) {
+											
+										allRoutesFirst.add(routeNew);	
+										if (travelTimeNew < 1.30 * travelTime && numberOfTransfers + 2 > this.getNumberOfTransfers(routeNew) && 
+												!isDominatedWithoutTran(routeNew, allRoutes)	
+												) {
+										
+											allRoutes.add(routeNew);
+											
+										}
+											
+									}
+								}
+						}
+						
+						System.out.println("found all the routes");
+			
+						
+						double lastArrival = ((Leg)route.get(0)).getDepartureTime();
+			
+						int countTransfers = -1;
+						
+						double transferTime = 0.0;
+						
+						boolean writtenAccessTime = false;
+						
+						double egressTime = 0.0;
+						
+						double distance = 0.0;
+						
+						outLinkF.write(arr[0] + ";"); // writing the ID of the person routed
+			
+						for(PlanElement pe1: route) {
+							
+							if (pe1 instanceof Leg && ((Leg) pe1).getMode().equals("pt")) {
+								countTransfers++;
+								//plan.addLeg((Leg)pe1);
+								ExperimentalTransitRoute tr1 = ((ExperimentalTransitRoute)(((Leg)pe1).getRoute()));
+								double temp = Double.MAX_VALUE;
+								//scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getDepartures()
+								for (Departure d: scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getDepartures().values()) {
+									
+									double fromStopArrivalOffset = scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getStop(scenario.getTransitSchedule().getFacilities().get(tr1.getAccessStopId())).getDepartureOffset();
+																
+									if (d.getDepartureTime() + fromStopArrivalOffset >= lastArrival && d.getDepartureTime() + fromStopArrivalOffset < temp) {
+										
+										temp = d.getDepartureTime() + fromStopArrivalOffset;
+										
+									}
+								}
+								
+								distance += ((Leg) pe1).getRoute().getDistance();
+								
+								double transfertTimePart = temp - lastArrival;
+								
+								if (countTransfers == 0)
+									outLinkF.write(Double.toString(transfertTimePart) + ";"); //writing first waiting time
+								
+								else
+									
+									transferTime += transfertTimePart;
+									
+								lastArrival +=  ((Leg) pe1).getTravelTime();
+							}
+							else if (pe1 instanceof Leg) {
+								lastArrival += ((Leg) pe1).getTravelTime();
+								
+								if (!writtenAccessTime) {
+									
+									if (route.size() == 1) {
+										outLinkF.write(Double.toString(((Leg) pe1).getDepartureTime()) + ";");  //writing departure time
+			
+									
+										
+										outLinkF.write(Double.toString(0.0) + ";"); //writing access time
+									}						
+									else{			
+										outLinkF.write(Double.toString(((Leg) pe1).getDepartureTime()) + ";");  //writing departure time
+									
+			
+										outLinkF.write(Double.toString(((Leg) pe1).getTravelTime()) + ";"); //writing access time
+									}
+									writtenAccessTime = true;
+								}
+								
+								egressTime = ((Leg) pe1).getTravelTime();
 								
 							}
-								
+							
 						}
+						System.out.println("written the rout to output");
+			
+						outLinkF.write(Double.toString(transferTime) + ";"); //writing transfer times not including first wait time
+						
+						outLinkF.write(Integer.toString(countTransfers) + ";"); //writing the number of transfers (-1 means pure walk trip)
+						
+						if (route.size() == 1)
+							outLinkF.write(Double.toString(0.0) + ";"); //writing egress time
+			
+						else
+							outLinkF.write(Double.toString(egressTime) + ";");  //writing egress time
+						
+						outLinkF.write(Double.toString(lastArrival - ((Leg)route.get(0)).getDepartureTime()) + ";"); //writing the total travel time from door to door
+						
+						outLinkF.write(Double.toString(distance));
+						
+						outLinkF.newLine();
+						
+						
+						for (List<? extends PlanElement> routeIter : allRoutes) {
+						
+							lastArrival = ((Leg)routeIter.get(0)).getDepartureTime();
+							
+								if (routeIter.size() != 1) {
+									if (lastTime == 0.0)
+										lastTime = lastArrival;
+									else if (lastTime < lastArrival)
+										lastTime = lastArrival;
+															
+									if (firstTime == 0.0)
+										firstTime = lastArrival;
+									else if (firstTime > lastArrival)
+										firstTime = lastArrival;
+															
+									count++;
+								}
+							
+						
+						
+						
+						}
+						System.out.println("found frequency");
+			
+						
+						outFrequency.write(arr[0] + ";");
+						
+						if (count == 1)
+							outFrequency.write(Integer.toString(0));
+						else
+							outFrequency.write(Double.toString((lastTime - firstTime)/(count - 1)));
+						
+						outFrequency.newLine();
+					
 					}
-			}
-			
-			System.out.println("found all the routes");
-
-			
-			double lastArrival = ((Leg)route.get(0)).getDepartureTime();
-
-			int countTransfers = -1;
-			
-			double transferTime = 0.0;
-			
-			boolean writtenAccessTime = false;
-			
-			double egressTime = 0.0;
-			
-			double distance = 0.0;
-			
-			outLinkF.write(arr[0] + ";"); // writing the ID of the person routed
-
-			for(PlanElement pe1: route) {
 				
-				if (pe1 instanceof Leg && ((Leg) pe1).getMode().equals("pt")) {
-					countTransfers++;
-					//plan.addLeg((Leg)pe1);
-					ExperimentalTransitRoute tr1 = ((ExperimentalTransitRoute)(((Leg)pe1).getRoute()));
-					double temp = Double.MAX_VALUE;
-					//scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getDepartures()
-					for (Departure d: scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getDepartures().values()) {
-						
-						double fromStopArrivalOffset = scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getStop(scenario.getTransitSchedule().getFacilities().get(tr1.getAccessStopId())).getDepartureOffset();
-													
-						if (d.getDepartureTime() + fromStopArrivalOffset >= lastArrival && d.getDepartureTime() + fromStopArrivalOffset < temp) {
-							
-							temp = d.getDepartureTime() + fromStopArrivalOffset;
-							
-						}
-					}
-					
-					distance += ((Leg) pe1).getRoute().getDistance();
-					
-					double transfertTimePart = temp - lastArrival;
-					
-					if (countTransfers == 0)
-						outLinkF.write(Double.toString(transfertTimePart) + ";"); //writing first waiting time
-					
-					else
-						
-						transferTime += transfertTimePart;
-						
-					lastArrival +=  ((Leg) pe1).getTravelTime();
 				}
-				else if (pe1 instanceof Leg) {
-					lastArrival += ((Leg) pe1).getTravelTime();
-					
-					if (!writtenAccessTime) {
-						
-						if (route.size() == 1) {
-							outLinkF.write(Double.toString(((Leg) pe1).getDepartureTime()) + ";");  //writing departure time
-
-						
-							
-							outLinkF.write(Double.toString(0.0) + ";"); //writing access time
-						}						
-						else{			
-							outLinkF.write(Double.toString(((Leg) pe1).getDepartureTime()) + ";");  //writing departure time
-						
-
-							outLinkF.write(Double.toString(((Leg) pe1).getTravelTime()) + ";"); //writing access time
-						}
-						writtenAccessTime = true;
-					}
-					
-					egressTime = ((Leg) pe1).getTravelTime();
-					
-				}
-				
 			}
-			System.out.println("written the rout to output");
+			else {
+				outFrequency.write(arr[0] + ";" + "-99");
+				outFrequency.newLine();
+				outLinkF.write(arr[0] + ";" + "-99" + ";" + "-99" + ";" + "-99" + ";" + "-99"+ 
+						";" + "-99" + ";" + "-99" + ";" + "-99" + ";" + "-99" + "-99" + ";" + "-99");
+				outLinkF.newLine();
 
-			outLinkF.write(Double.toString(transferTime) + ";"); //writing transfer times not including first wait time
-			
-			outLinkF.write(Integer.toString(countTransfers) + ";"); //writing the number of transfers (-1 means pure walk trip)
-			
-			if (route.size() == 1)
-				outLinkF.write(Double.toString(0.0) + ";"); //writing egress time
-
-			else
-				outLinkF.write(Double.toString(egressTime) + ";");  //writing egress time
-			
-			outLinkF.write(Double.toString(lastArrival - ((Leg)route.get(0)).getDepartureTime()) + ";"); //writing the total travel time from door to door
-			
-			outLinkF.write(Double.toString(distance));
-			
-			outLinkF.newLine();
-			
-			
-			for (List<? extends PlanElement> routeIter : allRoutes) {
-			
-				lastArrival = ((Leg)routeIter.get(0)).getDepartureTime();
-				
-					if (routeIter.size() != 1) {
-						if (lastTime == 0.0)
-							lastTime = lastArrival;
-						else if (lastTime < lastArrival)
-							lastTime = lastArrival;
-												
-						if (firstTime == 0.0)
-							firstTime = lastArrival;
-						else if (firstTime > lastArrival)
-							firstTime = lastArrival;
-												
-						count++;
-					}
-				
-			
-			
-			
-			}
-			System.out.println("found frequency");
-
-			
-			outFrequency.write(arr[0] + ";");
-			
-			if (count == 1)
-				outFrequency.write(Integer.toString(0));
-			else
-				outFrequency.write(Double.toString((lastTime - firstTime)/(count - 1)));
-			
-			outFrequency.newLine();
-			
-			}
-			
 			}
 		
 			s = readLink.readLine();	
@@ -427,7 +438,8 @@ public class PTRouting {
 		outLinkF.flush();
 		outLinkF.close();
 		
-		
+		outWalk.flush();
+		outWalk.close();
 
 }
 
