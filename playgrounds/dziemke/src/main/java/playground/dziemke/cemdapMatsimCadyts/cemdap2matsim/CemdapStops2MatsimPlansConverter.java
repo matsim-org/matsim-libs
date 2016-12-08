@@ -107,7 +107,7 @@ public class CemdapStops2MatsimPlansConverter {
 //		Map<Integer, Map<String,String>> mapOfTourAttributesMaps = new HashMap<Integer, Map<String,String>>();
 		for (int i=0; i<numberOfPlans; i++) {
 			int numberOfCurrentInputFile = numberOfFirstCemdapOutputFile + i;
-			String cemdapStopsFile = cemdapDataRoot + numberOfCurrentInputFile + "/stops.out";
+			String cemdapStopsFile = cemdapDataRoot + numberOfCurrentInputFile + "/" + cemdapStopsFilename;
 //			String cemdapToursFile = cemdapOutputRoot + numberOfCurrentInputFile + "/tours.out";
 //			Map<String,String> tourAttributesMap = new HashMap<String,String>();
 			cemdapStopsFilesMap.put(i, cemdapStopsFile);
