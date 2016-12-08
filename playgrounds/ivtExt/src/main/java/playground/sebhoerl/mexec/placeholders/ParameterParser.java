@@ -51,7 +51,7 @@ public class ParameterParser {
                     if (current.charAt(length - 1) == '}') {
                         state = State.EXTERNAL;
                         current = "";
-                    } else if (Character.isLetterOrDigit(current.charAt(length - 1))) {
+                    } else  {
                         state = State.PLACEHOLDER;
                         current = "";
                         i -= 1;
@@ -59,8 +59,8 @@ public class ParameterParser {
 
                     break;
                 case PLACEHOLDER:
-                    if (!Character.isLetterOrDigit(current.charAt(length - 1))) {
-                        parameter.addElement(new PlaceholderElement(current.substring(0, length - 1)));
+                    if (current.charAt(length - 1) == '}') {
+                        parameter.addElement(new PlaceholderElement(current.substring(0, length - 1).trim()));
 
                         state = State.INTERNAL;
                         current = "";

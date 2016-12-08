@@ -95,10 +95,7 @@ public class RunEquil {
             config.setParameter("controler", "outputDirectory", "%{output}");
             config.setParameter("controler", "overwriteFiles", "deleteDirectoryIfExists");
 
-            config.setParameter("controler", "overwriteFiles", "%{custom_utility}");
-
             simulation.save();
-
             simulation.start();
         }
 
