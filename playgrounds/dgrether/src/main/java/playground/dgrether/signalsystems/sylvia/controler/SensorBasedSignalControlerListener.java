@@ -20,7 +20,7 @@
 package playground.dgrether.signalsystems.sylvia.controler;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.signals.controler.SignalsControllerListener;
+import org.matsim.contrib.signals.controler.SignalControlerListener;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -37,7 +37,7 @@ import playground.dgrether.signalsystems.LinkSensorManager;
 /**
  * @author dgrether, tthunig
  */
-public class DgSylviaSignalControlerListener implements SignalsControllerListener, IterationStartsListener,
+public class SensorBasedSignalControlerListener implements SignalControlerListener, IterationStartsListener,
 		ShutdownListener {
 
 	@Inject private SignalSystemsManager signalManager;

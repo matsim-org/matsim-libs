@@ -27,6 +27,6 @@ package org.matsim.contrib.signals.controler;
  */
 public interface SignalsControllerListenerFactory {
 
-	public SignalsControllerListener createSignalsControllerListener();
+	public SignalControlerListener createSignalsControllerListener();
 	
 }

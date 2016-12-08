@@ -30,7 +30,7 @@ import org.matsim.lanes.data.Lanes;
 import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.controler.SignalsControllerListener;
+import org.matsim.contrib.signals.controler.SignalControlerListener;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -43,7 +43,8 @@ import playground.dgrether.signalsystems.LinkSensorManager;
  * @author dgrether
  *
  */
-public class DgRoederGershensonControllerListener implements SignalsControllerListener, StartupListener, ShutdownListener, IterationStartsListener {
+@Deprecated // use SensorBasedSignalControlerListener (former DgSylviaSignalControlerListener)
+public class DgRoederGershensonControllerListener implements SignalControlerListener, StartupListener, ShutdownListener, IterationStartsListener {
 	
 	private SignalSystemsManager signalManager;
 	private SignalsData signalsData;

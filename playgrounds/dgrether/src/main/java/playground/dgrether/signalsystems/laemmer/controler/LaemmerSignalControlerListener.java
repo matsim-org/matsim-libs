@@ -29,7 +29,7 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.lanes.data.Lanes;
 import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
-import org.matsim.contrib.signals.controler.SignalsControllerListener;
+import org.matsim.contrib.signals.controler.SignalControlerListener;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.mobsim.SignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
@@ -42,7 +42,8 @@ import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalModelFactory
  * @author dgrether
  *
  */
-public class LaemmerSignalControlerListener implements SignalsControllerListener , StartupListener, IterationStartsListener,
+@Deprecated // use SensorBasedSignalControlerListener (former DgSylviaSignalControlerListener)
+public class LaemmerSignalControlerListener implements SignalControlerListener , StartupListener, IterationStartsListener,
 		ShutdownListener {
 
 	private SignalSystemsManager signalManager;

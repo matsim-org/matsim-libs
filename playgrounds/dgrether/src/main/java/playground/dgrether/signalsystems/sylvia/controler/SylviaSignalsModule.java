@@ -25,7 +25,7 @@ import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.builder.SignalModelFactory;
-import org.matsim.contrib.signals.controler.SignalsControllerListener;
+import org.matsim.contrib.signals.controler.SignalControlerListener;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.core.config.ConfigUtils;
@@ -73,8 +73,8 @@ public class SylviaSignalsModule extends AbstractModule {
 			// bindings for sensor based signals
 			bind(LinkSensorManager.class).asEagerSingleton();
             addEventHandlerBinding().to(LinkSensorManager.class);
-            bind(SignalsControllerListener.class).to(DgSylviaSignalControlerListener.class);
-            addControlerListenerBinding().to(SignalsControllerListener.class);
+            bind(SignalControlerListener.class).to(SensorBasedSignalControlerListener.class);
+            addControlerListenerBinding().to(SignalControlerListener.class);
             
 			// general signal bindings
 			bind(FromDataBuilder.class);

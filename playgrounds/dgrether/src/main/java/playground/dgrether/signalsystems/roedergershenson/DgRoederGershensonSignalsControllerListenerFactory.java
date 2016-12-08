@@ -20,7 +20,7 @@
 package playground.dgrether.signalsystems.roedergershenson;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.signals.controler.SignalsControllerListener;
+import org.matsim.contrib.signals.controler.SignalControlerListener;
 import org.matsim.contrib.signals.controler.SignalsControllerListenerFactory;
 
 
@@ -40,7 +40,7 @@ public class DgRoederGershensonSignalsControllerListenerFactory implements
 	}
 
 	@Override
-	public SignalsControllerListener createSignalsControllerListener() {
+	public SignalControlerListener createSignalsControllerListener() {
 		log.info("Using DgRoederGershenson signal model if configured for specific signals in xml data...");
 		return new DgRoederGershensonControllerListener();
 	}

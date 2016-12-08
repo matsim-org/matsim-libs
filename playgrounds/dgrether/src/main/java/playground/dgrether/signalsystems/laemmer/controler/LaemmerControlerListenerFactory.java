@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.laemmer.controler;
 
-import org.matsim.contrib.signals.controler.SignalsControllerListener;
+import org.matsim.contrib.signals.controler.SignalControlerListener;
 import org.matsim.contrib.signals.controler.SignalsControllerListenerFactory;
 
 
@@ -30,7 +30,7 @@ import org.matsim.contrib.signals.controler.SignalsControllerListenerFactory;
 public class LaemmerControlerListenerFactory implements SignalsControllerListenerFactory {
 
 	@Override
-	public SignalsControllerListener createSignalsControllerListener() {
+	public SignalControlerListener createSignalsControllerListener() {
 		return new LaemmerSignalControlerListener();
 	}
 
