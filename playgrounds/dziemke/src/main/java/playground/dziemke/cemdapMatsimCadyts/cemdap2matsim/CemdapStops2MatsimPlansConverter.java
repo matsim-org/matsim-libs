@@ -52,7 +52,6 @@ public class CemdapStops2MatsimPlansConverter {
 	private int numberOfFirstCemdapOutputFile = -1;
 	private int numberOfPlans = -1;
 	private boolean addStayHomePlan = false;
-	private int numberOfPlansFile = -1;
 	
 	// Input and output
 	private String outputDirectory;
@@ -64,8 +63,8 @@ public class CemdapStops2MatsimPlansConverter {
 		int numberOfFirstCemdapOutputFile = 87;
 		int numberOfPlans = 3;
 		boolean addStayHomePlan = true;
-		int numberOfPlansFile = 34;
 		
+		int numberOfPlansFile = 34;
 		String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/" + numberOfPlansFile + "/";
 		String tazShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenLOR_DHDN_GK4.shp";
 		String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
@@ -80,7 +79,6 @@ public class CemdapStops2MatsimPlansConverter {
 		converter.setNumberOfFirstCemdapOutputFile(numberOfFirstCemdapOutputFile);
 		converter.setNumberOfPlans(numberOfPlans);
 		converter.setAddStayHomePlan(addStayHomePlan);
-		converter.setNumberOfPlansFile(numberOfPlansFile);
 		
 		try {
 			converter.convert();
@@ -189,8 +187,7 @@ public class CemdapStops2MatsimPlansConverter {
 
 	private boolean dependenciesSet() {
 		return (numberOfFirstCemdapOutputFile != -1 &&
-			numberOfPlans != -1 &&
-			numberOfPlansFile != -1);
+			numberOfPlans != -1);
 	}
 
 	public int getNumberOfFirstCemdapOutputFile() {
@@ -215,13 +212,5 @@ public class CemdapStops2MatsimPlansConverter {
 
 	public void setAddStayHomePlan(boolean addStayHomePlan) {
 		this.addStayHomePlan = addStayHomePlan;
-	}
-
-	public int getNumberOfPlansFile() {
-		return numberOfPlansFile;
-	}
-
-	public void setNumberOfPlansFile(int numberOfPlansFile) {
-		this.numberOfPlansFile = numberOfPlansFile;
 	}
 }
