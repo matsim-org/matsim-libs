@@ -66,16 +66,21 @@ public class SylviaSignalsModule extends AbstractModule {
 		}
 		
 		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
+			// sylvia specific bindings
 			bind(DgSylviaConfig.class).toInstance(sylviaConfig);
 			bind(SignalModelFactory.class).to(DgSylviaSignalModelFactory.class);
-			bind(FromDataBuilder.class);
-			bind(QSimSignalEngine.class);
 			
+			// bindings for sensor based signals
+			bind(DgSensorManager.class).asEagerSingleton();
+            addEventHandlerBinding().to(DgSensorManager.class);
             bind(SignalsControllerListener.class).to(DgSylviaSignalControlerListener.class);
             addControlerListenerBinding().to(SignalsControllerListener.class);
+            
+			// general signal bindings
+			bind(FromDataBuilder.class);
+			bind(QSimSignalEngine.class);
             addMobsimListenerBinding().to(QSimSignalEngine.class);
-            bind(DgSensorManager.class).asEagerSingleton();
-            addEventHandlerBinding().to(DgSensorManager.class);
+            
             // bind tool to write information about signal states for via
 			bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
             addEventHandlerBinding().to(SignalEvents2ViaCSVWriter.class);
@@ -88,10 +93,6 @@ public class SylviaSignalsModule extends AbstractModule {
 		signalManager.resetModel(replanningContext.getIteration());		
 		return signalManager;
     }
-	
-//	@Provides QSimSignalEngine provideQSimSignalEngine(SignalSystemsManager signalManager) {
-//        return new QSimSignalEngine(signalManager);
-//    }
 
 	public void setAlwaysSameMobsimSeed(boolean alwaysSameMobsimSeed) {
 		this.alwaysSameMobsimSeed = alwaysSameMobsimSeed;
