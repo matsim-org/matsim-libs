@@ -187,7 +187,8 @@ public class CemdapStops2MatsimPlansConverter {
 
 	private boolean dependenciesSet() {
 		return (numberOfFirstCemdapOutputFile != -1 &&
-			numberOfPlans != -1);
+			numberOfPlans != -1 &&
+			!outputDirectory.isEmpty());
 	}
 
 	public int getNumberOfFirstCemdapOutputFile() {
@@ -212,5 +213,13 @@ public class CemdapStops2MatsimPlansConverter {
 
 	public void setAddStayHomePlan(boolean addStayHomePlan) {
 		this.addStayHomePlan = addStayHomePlan;
+	}
+
+	public String getOutputDirectory() {
+		return outputDirectory;
+	}
+
+	public void setOutputDirectory(String outputDirectory) {
+		this.outputDirectory = outputDirectory;
 	}
 }
