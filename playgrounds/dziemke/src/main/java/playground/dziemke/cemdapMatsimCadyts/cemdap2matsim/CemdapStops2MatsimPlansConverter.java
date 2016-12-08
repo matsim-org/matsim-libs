@@ -58,6 +58,7 @@ public class CemdapStops2MatsimPlansConverter {
 	private String tazShapeFile;
 	private String networkFile;
 	private String cemdapDataRoot;
+	private String cemdapStopFilename = "stops.out";
 	
 	public static void main(String[] args) {
 		int numberOfFirstCemdapOutputFile = 87;
@@ -188,7 +189,8 @@ public class CemdapStops2MatsimPlansConverter {
 	private boolean dependenciesSet() {
 		return (numberOfFirstCemdapOutputFile != -1 &&
 			numberOfPlans != -1 &&
-			!outputDirectory.isEmpty());
+			!outputDirectory.isEmpty() &&
+			!cemdapStopFilename.isEmpty());
 	}
 
 	public int getNumberOfFirstCemdapOutputFile() {
@@ -221,5 +223,13 @@ public class CemdapStops2MatsimPlansConverter {
 
 	public void setOutputDirectory(String outputDirectory) {
 		this.outputDirectory = outputDirectory;
+	}
+
+	public String getCemdapStopFilename() {
+		return cemdapStopFilename;
+	}
+
+	public void setCemdapStopFilename(String cemdapStopFilename) {
+		this.cemdapStopFilename = cemdapStopFilename;
 	}
 }
