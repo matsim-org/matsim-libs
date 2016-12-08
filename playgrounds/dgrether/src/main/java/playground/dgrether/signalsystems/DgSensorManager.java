@@ -50,7 +50,7 @@ import com.google.inject.Inject;
  * @author dgrether
  *
  */
-public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHandler, 
+public final class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 	VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler, LaneEnterEventHandler, LaneLeaveEventHandler{
 
 	private static final Logger log = Logger.getLogger(DgSensorManager.class);
