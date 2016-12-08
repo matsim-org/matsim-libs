@@ -40,10 +40,10 @@ public final class DefaultSignalModelFactory implements SignalModelFactory {
 	
 	private static final Logger log = Logger.getLogger(DefaultSignalModelFactory.class);
 	
-	@Override
-	public SignalSystemsManager createSignalSystemsManager() {
-		return new SignalSystemsManagerImpl();
-	}
+//	@Override
+//	public SignalSystemsManager createSignalSystemsManager() {
+//		return new SignalSystemsManagerImpl();
+//	}
 
 	@Override
 	public SignalSystem createSignalSystem(Id<SignalSystem> id) {

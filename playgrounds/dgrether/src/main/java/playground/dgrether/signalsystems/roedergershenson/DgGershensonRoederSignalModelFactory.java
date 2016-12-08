@@ -57,10 +57,10 @@ public final class DgGershensonRoederSignalModelFactory implements SignalModelFa
 		return this.delegate.createSignalSystemController(controllerIdentifier);
 	}
 
-	@Override
-	public SignalSystemsManager createSignalSystemsManager() {
-		return this.delegate.createSignalSystemsManager();
-	}
+//	@Override
+//	public SignalSystemsManager createSignalSystemsManager() {
+//		return this.delegate.createSignalSystemsManager();
+//	}
 
 	@Override
 	public SignalPlan createSignalPlan(SignalPlanData planData) {

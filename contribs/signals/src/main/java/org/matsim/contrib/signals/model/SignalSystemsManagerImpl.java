@@ -24,8 +24,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.core.api.experimental.events.EventsManager;
 
 /**
  * @author dgrether
@@ -36,14 +36,17 @@ public class SignalSystemsManagerImpl implements SignalSystemsManager {
 	
 	private AmberLogic amberLogic = new EmptyAmberLogicImpl();
 
-	private EventsManager eventsManager = null;
+	private EventsManager eventsManager;
 
-	private SignalsData signalData = null;
+	private SignalsData signalData;
 
 	private IntergreensLogic intergreensLogic = null;
-
-    public SignalSystemsManagerImpl(){
-		
+	
+	// TODO is it possible to inject scenario and eventsManager although SignalSystemsManagerImpl is not created by guice?
+	public SignalSystemsManagerImpl(SignalsData signalData, EventsManager eventsManager) {
+//		this.signalData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+		this.signalData = signalData;
+		this.eventsManager = eventsManager;
 	}
 	
 	@Override

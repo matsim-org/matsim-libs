@@ -59,10 +59,10 @@ public final class DgSylviaSignalModelFactory implements SignalModelFactory {
 		this.sylviaConfig = sylviaConfig;
 	}
 	
-	@Override
-	public SignalSystemsManager createSignalSystemsManager() {
-		return this.delegate.createSignalSystemsManager();
-	}
+//	@Override
+//	public SignalSystemsManager createSignalSystemsManager() {
+//		return this.delegate.createSignalSystemsManager();
+//	}
 
 	@Override
 	public SignalSystem createSignalSystem(Id<SignalSystem> id) {

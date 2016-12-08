@@ -46,10 +46,10 @@ public final class LaemmerSignalModelFactory implements SignalModelFactory {
 		this.sensorManager = sensorManager;
 	}
 
-	@Override
-	public SignalSystemsManager createSignalSystemsManager() {
-		return this.delegate.createSignalSystemsManager();
-	}
+//	@Override
+//	public SignalSystemsManager createSignalSystemsManager() {
+//		return this.delegate.createSignalSystemsManager();
+//	}
 
 	@Override
 	public SignalSystem createSignalSystem(Id id) {

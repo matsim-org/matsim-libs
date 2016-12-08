@@ -33,7 +33,7 @@ import org.matsim.contrib.signals.model.SignalSystemsManager;
  */
 public interface SignalModelFactory {
 	
-	public SignalSystemsManager createSignalSystemsManager();
+//	public SignalSystemsManager createSignalSystemsManager();
 	
 	public SignalSystem createSignalSystem(Id<SignalSystem> id);
 	

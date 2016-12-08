@@ -42,6 +42,7 @@ import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
+import org.matsim.contrib.signals.model.SignalSystemsManagerImpl;
 import org.matsim.core.config.ConfigUtils;
 
 import com.google.inject.Inject;
@@ -125,12 +126,12 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		}
 	}
 	
-	public SignalSystemsManager createSignalSystemManager(){
-		SignalSystemsManager manager = this.factory.createSignalSystemsManager();
-		manager.setSignalsData(this.signalsData);
-		manager.setEventsManager(events);
-		return manager;
-	}
+//	public SignalSystemsManager createSignalSystemManager(){
+//		SignalSystemsManager manager = this.factory.createSignalSystemsManager();
+//		manager.setSignalsData(this.signalsData);
+//		manager.setEventsManager(events);
+//		return manager;
+//	}
 	
 	public void createAndAddIntergreenTimesLogic(SignalSystemsManager manager){
 		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseIntergreenTimes()){
@@ -142,7 +143,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 	@Override
 	public SignalSystemsManager createAndInitializeSignalSystemsManager() {
 		//1.) SignalSystemsManager
-		SignalSystemsManager manager = this.createSignalSystemManager();
+		SignalSystemsManager manager = new SignalSystemsManagerImpl((SignalsData)scenario.getScenarioElement(SignalsData.ELEMENT_NAME), events);
 		//2.) SignalSystems
 		this.createAndAddSignalSystemsFromData(manager);
 		//3.) Signals then SignalGroups then SignalController
