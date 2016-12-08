@@ -22,8 +22,8 @@
  */
 package playground.ikaddoura.integrationCNE;
 
-import java.io.IOException;
 import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,14 +36,15 @@ import org.matsim.contrib.noise.NoiseCalculationOnline;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.routing.NoiseTollTimeDistanceTravelDisutilityFactory;
-import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.agarwalamit.analysis.emission.EmissionAnalysisControlerListener;
+import playground.agarwalamit.analysis.emission.experienced.ExperiencedEmissionCostHandler;
 import playground.agarwalamit.utils.PersonFilter;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
@@ -59,9 +60,12 @@ import playground.ikaddoura.integrationCN.VTTSNoiseTollTimeDistanceTravelDisutil
 import playground.ikaddoura.integrationCN.VTTSTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
-import playground.vsp.airPollution.exposure.*;
+import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
+import playground.vsp.airPollution.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
+import playground.vsp.airPollution.exposure.GridTools;
+import playground.vsp.airPollution.exposure.InternalizeEmissionResponsibilityControlerListener;
+import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
-import playground.vsp.congestion.controler.CongestionAnalysisControlerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
@@ -81,7 +85,6 @@ import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutil
 public class CNEIntegration {
 	private static final Logger log = Logger.getLogger(CNEIntegration.class);
 
-	private String configFile = null;
 	private Controler controler = null;
 	private String outputDirectory = null;
 	private double sigma = 0.;
@@ -89,10 +92,6 @@ public class CNEIntegration {
 	private boolean congestionPricing = false;	
 	private boolean noisePricing = false;
 	private boolean airPollutionPricing = false;
-	
-	private boolean congestionAnalysis = false;
-	private boolean noiseAnalysis = false;
-	private boolean airPollutionAnalysis = false;
 	
 	private boolean useTripAndAgentSpecificVTTSForRouting = false;
 	
@@ -109,10 +108,14 @@ public class CNEIntegration {
 	}
 	
 	public CNEIntegration(String configFile, String outputDirectory) {
-		this.configFile = configFile;
+		
+		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup());
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		this.controler = new Controler(scenario);
+		
 		this.outputDirectory = outputDirectory;
 		this.responsibilityGridTools = null;
-		this.gridTools = null;
+		this.gridTools = null;	
 	}
 
 	public CNEIntegration(String configFile) {
@@ -121,51 +124,20 @@ public class CNEIntegration {
 	
 	public CNEIntegration(Controler controler, GridTools gridTools, ResponsibilityGridTools responsibilityGridTools) {
 		this.controler = controler;
-		this.gridTools = gridTools;
+		
 		this.responsibilityGridTools = responsibilityGridTools;
+		this.gridTools = gridTools;
 	}
 
 	public CNEIntegration(Controler controler) {
 		this(controler, null, null);
 	}
-	
-	public static void main(String[] args) throws IOException {
-		
-		String configFile;
-		
-		if (args.length > 0) {
-								
-			throw new RuntimeException("Not yet implemented. Aborting...");
-			
-		} else {
-			
-			configFile = "../../../runs-svn/cne_test/input/config.xml";
-		}
-				
-		CNEIntegration cneIntegration = new CNEIntegration(configFile);
-		
-		Controler controler = cneIntegration.prepareControler();
-		
-		controler.addOverridingModule(new OTFVisFileWriterModule());
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		controler.run();		
-	}
 
 	public Controler prepareControler() {
 		
-		Controler controler = null;
-		
-		if (configFile != null) {
-			Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup());
-			Scenario scenario = ScenarioUtils.loadScenario(config);
-			controler = new Controler(scenario);			
-		} else {
-			if (this.controler == null) {
-				throw new RuntimeException("Controler is null. Aborting...");
-			}
-			controler = this.controler;
-		}
-		
+		boolean analyzeAirPollution = false;
+		boolean analyzeNoise = false;
+				
 		if (outputDirectory == null) {
 			if (controler.getConfig().controler().getOutputDirectory() == null || controler.getConfig().controler().getOutputDirectory() == "") {
 				throw new RuntimeException("Either provide an output directory in the config file or the controler. Aborting...");
@@ -181,11 +153,33 @@ public class CNEIntegration {
 			}
 			controler.getConfig().controler().setOutputDirectory(outputDirectory);
 		}
-
-		if( airPollutionPricing && (this.gridTools == null || this.responsibilityGridTools == null) ) {
-			throw new RuntimeException("To internalize air pollution exposure, grid tools " +
-					"and responsibility grid tools must be passed to the constructor.");
+		
+		if (controler.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME) != null && gridTools != null && responsibilityGridTools != null) {
+			log.info("Controler contains the emissions module. Air pollution exposures will be analyzed." );
+			analyzeAirPollution = true;
+		} else {
+			log.info("Controler doesn't contain the emission module. Air pollution exposures will not be analyzed.");
 		}
+		
+		if (controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME) != null) {
+			log.info("Controler contains the noise module. Noise exposures will be analyzed." );
+			analyzeNoise = true;
+		} else {
+			log.info("Controler doesn't contain the noise module. Noise exposures will not be analyzed.");
+		}
+		
+		// check consistency
+		
+		if( airPollutionPricing && (this.gridTools == null || this.responsibilityGridTools == null || controler.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME) == null) ) {
+			throw new RuntimeException("To internalize air pollution exposure costs, the emission config group must be loaded"
+					+ "and grid tools and responsibility grid tools must be passed to the constructor. Aborting...");
+		}
+		
+		if (noisePricing && controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME) == null) {
+			throw new RuntimeException("To internalize noise exposure costs, the noise config group must be loaded. Aborting...");
+		}
+		
+		// ########################## trip-specific VTTS routing ##########################
 		
 		final VTTSHandler vttsHandler;
 		if (useTripAndAgentSpecificVTTSForRouting) {
@@ -201,37 +195,37 @@ public class CNEIntegration {
 		
 		NoiseContext noiseContext = null;
 		
-		NoiseConfigGroup ncg = (NoiseConfigGroup) controler.getScenario().getConfig().getModule(NoiseConfigGroup.GROUP_NAME);
-		
-		if (this.noisePricing == true || this.noiseAnalysis == true) {
+		if (analyzeNoise) {
+			noiseContext = new NoiseContext(controler.getScenario());
+			NoiseConfigGroup ncg = (NoiseConfigGroup) controler.getScenario().getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
 			
 			if (noisePricing) {	
 				ncg.setInternalizeNoiseDamages(true);
 			} else {
 				ncg.setInternalizeNoiseDamages(false);
 			}
-
-			// computation of noise events
-			noiseContext = new NoiseContext(controler.getScenario());
 		}
 		
 		// ########################## Air pollution ##########################
-				
-		final double emissionEfficiencyFactor = 1.0;
-		final boolean considerCO2Costs = true;
-		final double emissionCostFactor = 1.0;
-		final Set<Id<Link>> hotSpotLinks = null;
 		
 		EmissionModule emissionModule = null;
-				
-		if (this.airPollutionPricing == true || this.airPollutionAnalysis == true) {
+		EmissionResponsibilityCostModule emissionCostModule = null;
+		final Set<Id<Link>> hotSpotLinks = null;
+
+		if (analyzeAirPollution) {
+			
+			final double emissionEfficiencyFactor = 1.0;
+			final boolean considerCO2Costs = true;
+			final double emissionCostFactor = 1.0;
 			
 			emissionModule = new EmissionModule(controler.getScenario());
 			emissionModule.setEmissionEfficiencyFactor(emissionEfficiencyFactor);
 			emissionModule.createLookupTables();
-			emissionModule.createEmissionHandler();			
+			emissionModule.createEmissionHandler();
+			
+			emissionCostModule = new EmissionResponsibilityCostModule( emissionCostFactor, considerCO2Costs, this.responsibilityGridTools, this.gridTools);
 		}
-		
+						
 		// ########################## Pricing setup ##########################
 				
 		if (congestionPricing && noisePricing == false && airPollutionPricing == false) {
@@ -331,7 +325,6 @@ public class CNEIntegration {
 
 		} else if (congestionPricing == false && noisePricing == false && airPollutionPricing) {
 			// only air pollution pricing
-			final EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( emissionCostFactor, considerCO2Costs, this.responsibilityGridTools, this.gridTools);
 
 			if (useTripAndAgentSpecificVTTSForRouting) {
 				throw new RuntimeException("Not yet implemented. Aborting...");
@@ -359,8 +352,6 @@ public class CNEIntegration {
 
 		} else if (congestionPricing && noisePricing && airPollutionPricing) {
 			// congestion + noise + airPollution pricing
-
-			final EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( emissionCostFactor, considerCO2Costs, this.responsibilityGridTools, this.gridTools);
 			
 			if (congestionTollingApproach.toString().equals(CongestionTollingApproach.QBPV3.toString())) {
 				final TollHandler congestionTollHandlerQBP = new TollHandler(controler.getScenario());
@@ -536,85 +527,18 @@ public class CNEIntegration {
 		
 		// ########################## Analysis setup ##########################
 		
-		if (congestionPricing && noisePricing == false && airPollutionPricing == false) {
-			// only congestion pricing
-			
-			// add air pollution analysis
-			if (airPollutionAnalysis) {
+		// Noise analysis
+		
+		if (analyzeNoise && this.noisePricing == false) {
+			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
+		}
+		
+		// Air pollution analysis
+		if (analyzeAirPollution) {
+			if (!airPollutionPricing) {
 				controler.addControlerListener(new EmissionControlerListener());
 			}
-			
-			// add noise analysis
-			if (noiseAnalysis) controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
-			
-		} else if (congestionPricing == false && noisePricing && airPollutionPricing == false) {
-			// only noise pricing
-			
-			// add congestion analysis
-			if (congestionAnalysis) {
-				if (congestionTollingApproach.toString().equals(CongestionTollingApproach.QBPV3.toString())) {
-					controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
-				} else {
-					// no specific analysis required
-				}
-			}
-			
-			// add air pollution analysis
-			if (airPollutionAnalysis) controler.addControlerListener(new EmissionControlerListener());			
-
-		} else if (congestionPricing == false && noisePricing == false && airPollutionPricing) {
-			// only air pollution pricing
-				
-			// add congestion analysis
-			if (congestionAnalysis) {
-				if (congestionTollingApproach.toString().equals(CongestionTollingApproach.QBPV3.toString())) {
-					controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
-				} else {
-					// no specific analysis required
-				}
-			}
-			
-			// add noise analysis
-			if (noiseAnalysis) controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
-			
-		} else if (congestionPricing && noisePricing && airPollutionPricing) {
-			// congestion + noise + airPollution pricing
-			
-			// no additional analysis to add
-			
-		} else if (congestionPricing && noisePricing && airPollutionPricing == false) {
-			// congestion + noise pricing
-				
-			// add air pollution analysis
-			if (airPollutionAnalysis) controler.addControlerListener(new EmissionControlerListener());
-			
-		} else if (congestionPricing && noisePricing == false && airPollutionPricing) {
-			
-			// congestion + air pollution pricing
-
-			// add noise analysis
-			if (noiseAnalysis) controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
-					
-		} else if (congestionPricing == false && noisePricing == false && airPollutionPricing == false) {
-			// no pricing
-			
-			// add congestion analysis
-			if (congestionAnalysis) {
-				if (congestionTollingApproach.toString().equals(CongestionTollingApproach.QBPV3.toString())) {
-					controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
-				} else {
-					// no specific analysis required
-				}
-			}
-						
-			// add air pollution analysis
-			if (airPollutionAnalysis) controler.addControlerListener(new EmissionControlerListener());
-			
-			// add noise analysis
-			if (noiseAnalysis) controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
-
-		} else {
-			throw new RuntimeException("Not yet implemented. Aborting...");
+			controler.addControlerListener(new EmissionAnalysisControlerListener(new ExperiencedEmissionCostHandler(emissionCostModule, personFilter)  , emissionModule));
 		}
 		
 		return controler;
@@ -634,18 +558,6 @@ public class CNEIntegration {
 
 	public void setAirPollutionPricing(boolean airPollutionPricing) {
 		this.airPollutionPricing = airPollutionPricing;
-	}
-
-	public void setCongestionAnalysis(boolean congestionAnalysis) {
-		this.congestionAnalysis = congestionAnalysis;
-	}
-
-	public void setNoiseAnalysis(boolean noiseAnalysis) {
-		this.noiseAnalysis = noiseAnalysis;
-	}
-
-	public void setAirPollutionAnalysis(boolean airPollutionAnalysis) {
-		this.airPollutionAnalysis = airPollutionAnalysis;
 	}
 
 	public void setUseTripAndAgentSpecificVTTSForRouting(boolean useTripAndAgentSpecificVTTSForRouting) {

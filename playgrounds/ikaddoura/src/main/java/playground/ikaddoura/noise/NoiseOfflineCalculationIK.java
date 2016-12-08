@@ -79,11 +79,11 @@ public class NoiseOfflineCalculationIK {
 		} else {
 			
 			runDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
-			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_gridCSVFile_kaiserdamm/";
+			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_gridCSVFile_heerstrasse/";
 			receiverPointGap = 5.;
 			lastIteration = 100;
 			timeBinSize = 3600.;
-			receiverPointsGridCSVFile = "../../../shared-svn/studies/countries/de/berlin_noise/Fassadenpegel/FP_gesamt_Atom_repaired_kaiserdamm.csv";
+			receiverPointsGridCSVFile = "../../../shared-svn/studies/countries/de/berlin_noise/Fassadenpegel/FP_gesamt_Atom_repaired_heerstrasse.csv";
 		}
 		
 		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());

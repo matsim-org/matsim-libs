@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.noise.NoiseConfigGroup;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -174,16 +175,9 @@ public class CNETest {
 	
 	@Test
 	public final void test2(){
+		
 		String configFile = testUtils.getPackageInputDirectory() + "CNETest/test2/config.xml";
 		
-		// baseCase
-		CNEIntegration cneIntegration1 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "bc");
-		Controler controler1 = cneIntegration1.prepareControler();		
-		LinkDemandEventHandler handler1 = new LinkDemandEventHandler(controler1.getScenario().getNetwork());
-		controler1.getEvents().addHandler(handler1);
-		controler1.getConfig().controler().setCreateGraphs(false);
-		controler1.run();
-
 		// air pollution pricing
 		Integer noOfXCells = 30;
 		Integer noOfYCells = 40;
@@ -193,12 +187,27 @@ public class CNETest {
 		double yMax = 19050.00;
 		Double timeBinSize = 3600.;
 		int noOfTimeBins = 1;
-
-		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup()));
-		scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "e");
-		Controler controler2 = new Controler(scenario);
-		GridTools gt = new GridTools(scenario.getNetwork().getLinks(),xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
+		
+		Scenario scenario1 = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup()));
+		
+		GridTools gt = new GridTools(scenario1.getNetwork().getLinks(),xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
+		
+		// baseCase
+		Controler controler1 = new Controler(scenario1);
+		CNEIntegration cneIntegration1 = new CNEIntegration(controler1, gt, rgt);
+		scenario1.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "bc");
+
+		controler1 = cneIntegration1.prepareControler();		
+		LinkDemandEventHandler handler1 = new LinkDemandEventHandler(controler1.getScenario().getNetwork());
+		controler1.getEvents().addHandler(handler1);
+		controler1.getConfig().controler().setCreateGraphs(false);
+		controler1.run();		
+
+		// e
+		Scenario scenario2 = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup()));
+		scenario2.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "e");
+		Controler controler2 = new Controler(scenario2);
 
 		CNEIntegration cneIntegration2 = new CNEIntegration(controler2, gt, rgt);
 		cneIntegration2.setAirPollutionPricing(true);
@@ -210,17 +219,20 @@ public class CNETest {
 		controler2.run();
 
 		// noise pricing
-		CNEIntegration cneIntegration3 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "n");
+		Scenario scenario3 = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup()));
+		scenario3.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "n");
+		Controler controler3 = new Controler(scenario3);
+		CNEIntegration cneIntegration3 = new CNEIntegration(controler3, gt, rgt);
 		cneIntegration3.setNoisePricing(true);
-		Controler controler3 = cneIntegration3.prepareControler();
+		controler3 = cneIntegration3.prepareControler();
 		LinkDemandEventHandler handler3 = new LinkDemandEventHandler(controler3.getScenario().getNetwork());
 		controler3.getEvents().addHandler(handler3);
 		controler3.getConfig().controler().setCreateGraphs(false);
 		controler3.run();
 						
-		// air pollution + noise pricing
+		// (congestion +) air pollution + noise pricing
 		Scenario scenario4 = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup()));
-		scenario4.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "cn");
+		scenario4.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "cne");
 		Controler controler4 = new Controler(scenario4);
 		CNEIntegration cneIntegration4 = new CNEIntegration(controler4, gt, rgt );
 		cneIntegration4.setAirPollutionPricing(true);
@@ -232,6 +244,8 @@ public class CNETest {
 		controler4.getEvents().addHandler(handler4);
 		controler4.getConfig().controler().setCreateGraphs(false);
 		controler4.run();
+		
+		// Print outs
 		
 		System.out.println("----------------------------------");
 		System.out.println("Base case:");

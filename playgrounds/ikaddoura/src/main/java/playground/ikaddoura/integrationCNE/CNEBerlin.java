@@ -36,7 +36,6 @@ import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
-import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -152,20 +151,18 @@ public class CNEBerlin {
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
 		
-		// TODO: set files in config
-		EmissionsConfigGroup ecg = (EmissionsConfigGroup) controler.getConfig().getModule("emissions");
-		ecg.setAverageColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_ColdStart_vehcat_2005average.txt");
-		ecg.setAverageWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_HOT_vehcat_2005average.txt");
-		ecg.setDetailedColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_ColdStart_SubSegm_2005detailed.txt");
-		ecg.setDetailedWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_HOT_SubSegm_2005detailed.txt");
-		ecg.setEmissionRoadTypeMappingFile("../../../runs-svn/berlin-an-time/input/roadTypeMapping_berlin.txt");
-		ecg.setUsingDetailedEmissionCalculation(false);
-		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
+//		EmissionsConfigGroup ecg = (EmissionsConfigGroup) controler.getConfig().getModule("emissions");
+//		ecg.setAverageColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_ColdStart_vehcat_2005average.txt");
+//		ecg.setAverageWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_HOT_vehcat_2005average.txt");
+//		ecg.setDetailedColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_ColdStart_SubSegm_2005detailed.txt");
+//		ecg.setDetailedWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_HOT_SubSegm_2005detailed.txt");
+//		ecg.setEmissionRoadTypeMappingFile("../../../runs-svn/berlin-an-time/input/roadTypeMapping_berlin.txt");
+//		ecg.setUsingDetailedEmissionCalculation(false);
+//		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 	
 		// noise Berlin settings
 		
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) controler.getScenario().getConfig().getModule("noise");
-
+		NoiseConfigGroup noiseParameters =  (NoiseConfigGroup) controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
 		noiseParameters.setTimeBinSizeNoiseComputation(timeBinSize);
 		
 		noiseParameters.setReceiverPointGap(100.);
@@ -254,8 +251,7 @@ public class CNEBerlin {
 		String immissionsDir = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/";
 		String receiverPointsFile = controler.getConfig().controler().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
 		
-		NoiseConfigGroup ncg =  (NoiseConfigGroup) controler.getConfig().getModule("noise");
-		ProcessNoiseImmissions processNoiseImmissions = new ProcessNoiseImmissions(immissionsDir, receiverPointsFile, ncg.getReceiverPointGap());
+		ProcessNoiseImmissions processNoiseImmissions = new ProcessNoiseImmissions(immissionsDir, receiverPointsFile, noiseParameters.getReceiverPointGap());
 		processNoiseImmissions.run();
 		
 		final String[] labels = { "immission", "consideredAgentUnits" , "damages_receiverPoint" };
@@ -264,7 +260,7 @@ public class CNEBerlin {
 		MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
 		merger.setReceiverPointsFile(receiverPointsFile);
 		merger.setOutputDirectory(controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/");
-		merger.setTimeBinSize(ncg.getTimeBinSizeNoiseComputation());
+		merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
 		merger.setWorkingDirectory(workingDirectories);
 		merger.setLabel(labels);
 		merger.run();

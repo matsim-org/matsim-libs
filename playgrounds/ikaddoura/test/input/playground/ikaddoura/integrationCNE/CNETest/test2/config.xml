@@ -55,7 +55,7 @@
 	</module>
 	
 	<module name="emissions" >
-		<param name="averageFleetColdEmissionFactorsFile" value="../../../../../../../../../contribs/emissions/test/input/org/matsim/contrib/emissions/sample_EFA_ColdStart_vehcat_2005average.txt" />
+		<param name="averageFleetColdEmissionFactorsFile" value="sample_EFA_ColdStart_vehcat_2005average.txt" />
 		<param name="averageFleetWarmEmissionFactorsFile" value="test_EFA_HOT_vehcat_2005average.txt" />
 		<param name="detailedColdEmissionFactorsFile" value="" />
 		<param name="detailedWarmEmissionFactorsFile" value="" />
