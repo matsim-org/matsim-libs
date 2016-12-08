@@ -1,14 +1,15 @@
-package playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic;
+package playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic.aggregation;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordUtils;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
+import playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic.TravelTimeEstimator;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 import java.util.Collection;
 import java.util.LinkedList;
 
-public class AggregateODRequest {
+public class AggregatedRequest {
     final private AVRequest master;
     final Collection<AVRequest> slaves = new LinkedList<>();
 
@@ -19,7 +20,7 @@ public class AggregateODRequest {
 
     final private TravelTimeEstimator estimator;
 
-    public AggregateODRequest(AVRequest master, TravelTimeEstimator estimator) {
+    public AggregatedRequest(AVRequest master, TravelTimeEstimator estimator) {
         this.master = master;
         this.estimator = estimator;
 

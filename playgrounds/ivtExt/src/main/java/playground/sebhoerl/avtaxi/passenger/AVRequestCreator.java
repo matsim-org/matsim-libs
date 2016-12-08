@@ -12,6 +12,7 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import playground.sebhoerl.avtaxi.data.AVData;
 import playground.sebhoerl.avtaxi.data.AVOperator;
+import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.routing.AVRoute;
 
 import java.util.Map;
@@ -23,6 +24,9 @@ public class AVRequestCreator implements PassengerRequestCreator {
 
     @Inject
     Map<Id<AVOperator>, AVOperator> operators;
+
+    @Inject
+    Map<Id<AVOperator>, AVDispatcher> dispatchers;
 
     @Override
     public PassengerRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link pickupLink, Link dropoffLink, double t0, double t1, double now) {
@@ -42,6 +46,6 @@ public class AVRequestCreator implements PassengerRequestCreator {
             throw new IllegalStateException("Operator '" + route.getOperatorId().toString() + "' does not exist.");
         }
 
-        return new AVRequest(id, passenger, pickupLink, dropoffLink, t1, now, route, operator);
+        return new AVRequest(id, passenger, pickupLink, dropoffLink, t1, now, route, operator, dispatchers.get(route.getOperatorId()));
     }
 }

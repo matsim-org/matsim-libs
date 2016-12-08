@@ -1,5 +1,6 @@
 package playground.sebhoerl.avtaxi.schedule;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -16,30 +17,34 @@ import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.opengis.filter.capability.Operator;
 import playground.sebhoerl.avtaxi.data.AVOperator;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Singleton
 public class AVOptimizer implements VrpOptimizer, MobsimBeforeSimStepListener {
     private double now;
+    final private List<AVRequest> submittedRequestsBuffer = Collections.synchronizedList(new LinkedList<>());
 
-    AVDispatcher getDispatcher(Request request) {
-        return ((AVRequest) request).getOperator().getDispatcher();
-    }
 
-    AVDispatcher getDispatcher(Schedule<? extends Task> schedule) {
-        return ((AVVehicle) ((Schedule<AVTask>) schedule).getVehicle()).getOperator().getDispatcher();
-    }
+    @Inject private Map<Id<AVOperator>, AVDispatcher> dispatchers;
 
     @Override
     public void requestSubmitted(Request request) {
-        getDispatcher(request).onRequestSubmitted((AVRequest) request);
+        // TODO: IS this necessary?
+        submittedRequestsBuffer.add((AVRequest) request);
+    }
+
+    private void processSubmittedRequestsBuffer() {
+        for (AVRequest request : submittedRequestsBuffer) {
+            request.getDispatcher().onRequestSubmitted(request);
+        }
+
+        submittedRequestsBuffer.clear();
     }
 
     @Override
@@ -80,12 +85,13 @@ public class AVOptimizer implements VrpOptimizer, MobsimBeforeSimStepListener {
         schedule.nextTask();
 
         if (nextTask != null) {
-            getDispatcher(schedule).onNextTaskStarted(nextTask);
+            ((AVVehicle) schedule.getVehicle()).getDispatcher().onNextTaskStarted(nextTask);
         }
     }
 
     @Override
     public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
         now = e.getSimulationTime();
+        processSubmittedRequestsBuffer();
     }
 }

@@ -14,21 +14,14 @@ import playground.sebhoerl.avtaxi.data.AVOperator;
 import java.util.Map;
 
 @Singleton
-public class AVDispatchmentListener implements MobsimBeforeSimStepListener, MobsimInitializedListener {
+public class AVDispatchmentListener implements MobsimBeforeSimStepListener {
     @Inject
-    Map<Id<AVOperator>, AVOperator> operators;
+    Map<Id<AVOperator>, AVDispatcher> dispatchers;
 
     @Override
     public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
-        for (AVOperator operator : operators.values()) {
-            operator.getDispatcher().onNextTimestep(e.getSimulationTime());
-        }
-    }
-
-    @Override
-    public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-        for (AVOperator operator : operators.values()) {
-            operator.getDispatcher().reset();
+        for (AVDispatcher dispatcher : dispatchers.values()) {
+            dispatcher.onNextTimestep(e.getSimulationTime());
         }
     }
 }

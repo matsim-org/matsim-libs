@@ -15,6 +15,11 @@ public class TravelTimeEstimator {
 
     public double getDistance(Link fromLink, Link toLink, double startTime) {
         //return CoordUtils.calcEuclideanDistance(fromLink.getCoord(), toLink.getCoord());
+
+        if (fromLink.equals(toLink)) {
+            return 0.0;
+        }
+
         return router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), startTime, null, null).travelTime;
     }
 

@@ -13,6 +13,7 @@ import org.matsim.core.router.util.TravelTime;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVTimingParameters;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
+import playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic.aggregation.AggregatedRequest;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.avtaxi.schedule.*;
 
@@ -31,7 +32,7 @@ public class AggregateRideAppender {
         this.travelTimeEstimator = travelTimeEstimator;
     }
 
-    public void schedule(AggregateODRequest request, AVVehicle vehicle, double now) {
+    public void schedule(AggregatedRequest request, AVVehicle vehicle, double now) {
         AVTimingParameters timing = config.getParent().getTimingParameters();
 
         Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicle.getSchedule();
@@ -132,7 +133,7 @@ public class AggregateRideAppender {
             if (currentTask instanceof AVPickupTask) {
                 ((AVPickupTask) currentTask).addRequest(pickup);
                 currentRequests.add(pickup);
-                System.err.println("Request added to pickup");
+                //System.err.println("Request added to pickup");
             } else {
                 AVPickupTask pickupTask = new AVPickupTask(
                         currentTime,
@@ -167,7 +168,7 @@ public class AggregateRideAppender {
             if (currentTask instanceof AVDropoffTask) {
                 ((AVDropoffTask) currentTask).addRequest(dropoff);
                 currentRequests.remove(dropoff);
-                System.err.println("Request added to dropoff");
+                //System.err.println("Request added to dropoff");
             } else {
                 AVDropoffTask dropoffTask = new AVDropoffTask(
                         currentTime,

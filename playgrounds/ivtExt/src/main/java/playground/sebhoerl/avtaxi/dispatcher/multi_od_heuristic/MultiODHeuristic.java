@@ -15,6 +15,9 @@ import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVOperator;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
+import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
+import playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic.aggregation.AggregatedRequest;
+import playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic.aggregation.AggregationEvent;
 import playground.sebhoerl.avtaxi.dispatcher.single_heuristic.ModeChangeEvent;
 import playground.sebhoerl.avtaxi.dispatcher.single_heuristic.SingleHeuristicDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
@@ -30,30 +33,28 @@ public class MultiODHeuristic implements AVDispatcher {
     final private Id<AVOperator> operatorId;
     final private EventsManager eventsManager;
 
-    final private List<AVRequest> submittedRequestsBuffer = Collections.synchronizedList(new LinkedList<>());
-
     final private List<AVVehicle> availableVehicles = new LinkedList<>();
-    final private List<AggregateODRequest> pendingRequests = new LinkedList<>();
-    final private List<AggregateODRequest> assignableRequests = new LinkedList<>();
+    final private List<AggregatedRequest> pendingRequests = new LinkedList<>();
+    final private List<AggregatedRequest> assignableRequests = new LinkedList<>();
 
     final private QuadTree<AVVehicle> availableVehiclesTree;
-    final private QuadTree<AggregateODRequest> pendingRequestsTree;
+    final private QuadTree<AggregatedRequest> pendingRequestsTree;
 
     final private Map<AVVehicle, Link> vehicleLinks = new HashMap<>();
-    final private Map<AggregateODRequest, Link> requestLinks = new HashMap<>();
+    final private Map<AggregatedRequest, Link> requestLinks = new HashMap<>();
 
-    final private Map<AVVehicle, AggregateODRequest> vehicle2Request = new HashMap<>();
+    final private Map<AVVehicle, AggregatedRequest> vehicle2Request = new HashMap<>();
 
     private SingleHeuristicDispatcher.HeuristicMode mode = SingleHeuristicDispatcher.HeuristicMode.OVERSUPPLY;
 
     final private AggregateRideAppender appender;
     final private TravelTimeEstimator estimator;
 
-    private static int count = 0;
+    final private Map<Long, Long> shareHistogram = new HashMap<>();
+
+    private double now;
 
     public MultiODHeuristic(Id<AVOperator> operatorId, EventsManager eventsManager, Network network, AggregateRideAppender appender, TravelTimeEstimator estimator) {
-        System.err.println("MultiODHeuristic::MultiODHeuristic()" + String.valueOf(count++));
-
         this.operatorId = operatorId;
         this.eventsManager = eventsManager;
         this.appender = appender;
@@ -63,19 +64,16 @@ public class MultiODHeuristic implements AVDispatcher {
 
         availableVehiclesTree = new QuadTree<>(bounds[0], bounds[1], bounds[2], bounds[3]);
         pendingRequestsTree = new QuadTree<>(bounds[0], bounds[1], bounds[2], bounds[3]);
+
+        shareHistogram.put(new Long(1), new Long(0));
+        shareHistogram.put(new Long(2), new Long(0));
+        shareHistogram.put(new Long(3), new Long(0));
+        shareHistogram.put(new Long(4), new Long(0));
     }
 
     @Override
     public void onRequestSubmitted(AVRequest request) {
-        submittedRequestsBuffer.add(request);
-    }
-
-    private void processSubmittedRequestsBuffer() {
-        for (AVRequest request : submittedRequestsBuffer) {
-            addRequest(request, request.getFromLink());
-        }
-
-        submittedRequestsBuffer.clear();
+        addRequest(request, request.getFromLink());
     }
 
     @Override
@@ -91,7 +89,7 @@ public class MultiODHeuristic implements AVDispatcher {
 
     private void reoptimize(double now) {
         while (pendingRequests.size() > 0 && availableVehicles.size() > 0) {
-            AggregateODRequest request = null;
+            AggregatedRequest request = null;
             AVVehicle vehicle = null;
 
             switch (mode) {
@@ -109,7 +107,11 @@ public class MultiODHeuristic implements AVDispatcher {
             removeVehicle(vehicle);
             vehicle2Request.put(vehicle, request);
 
+            assignableRequests.remove(request); // TODO: IMPORTANT; otherwise REscheduling is necessary!!!
             appender.schedule(request, vehicle, now);
+
+            long count = request.getSlaveRequests().size() + 1;
+            shareHistogram.put(count, shareHistogram.get(count) + 1);
         }
 
         SingleHeuristicDispatcher.HeuristicMode updatedMode =
@@ -125,17 +127,18 @@ public class MultiODHeuristic implements AVDispatcher {
 
     @Override
     public void onNextTimestep(double now) {
-        processSubmittedRequestsBuffer();
+        this.now = now;
         if (reoptimize) reoptimize(now);
     }
 
     private void addRequest(AVRequest request, Link link) {
-        AggregateODRequest aggregate = findAggregateRequest(request);
+        AggregatedRequest aggregate = findAggregateRequest(request);
 
         if (aggregate != null) {
             aggregate.addSlaveRequest(request);
+            eventsManager.processEvent(new AggregationEvent(aggregate.getMasterRequest(), request, now));
         } else {
-            aggregate = new AggregateODRequest(request, estimator);
+            aggregate = new AggregatedRequest(request, estimator);
 
             pendingRequests.add(aggregate);
             assignableRequests.add(aggregate);
@@ -144,11 +147,12 @@ public class MultiODHeuristic implements AVDispatcher {
         }
     }
 
-    private AggregateODRequest findAggregateRequest(AVRequest request) {
-        AggregateODRequest bestAggregate = null;
+    private AggregatedRequest findAggregateRequest(AVRequest request) {
+        AggregatedRequest bestAggregate = null;
         double bestCost = Double.POSITIVE_INFINITY;
 
-        for (AggregateODRequest candidate : assignableRequests) {
+        for (AggregatedRequest candidate : assignableRequests) {
+            if (candidate == null) throw new IllegalStateException();
             Double cost = candidate.accept(request);
 
             if (cost != null && cost < bestCost) {
@@ -160,7 +164,7 @@ public class MultiODHeuristic implements AVDispatcher {
         return bestAggregate;
     }
 
-    private AggregateODRequest findRequest() {
+    private AggregatedRequest findRequest() {
         return pendingRequests.get(0);
     }
 
@@ -173,7 +177,7 @@ public class MultiODHeuristic implements AVDispatcher {
         return availableVehiclesTree.getClosest(coord.getX(), coord.getY());
     }
 
-    private AggregateODRequest findClosestRequest(Link link) {
+    private AggregatedRequest findClosestRequest(Link link) {
         Coord coord = link.getCoord();
         return pendingRequestsTree.getClosest(coord.getX(), coord.getY());
     }
@@ -181,6 +185,7 @@ public class MultiODHeuristic implements AVDispatcher {
     @Override
     public void addVehicle(AVVehicle vehicle) {
         addVehicle(vehicle, vehicle.getStartLink());
+        eventsManager.processEvent(new AVVehicleAssignmentEvent(vehicle, 0));
     }
 
     private void addVehicle(AVVehicle vehicle, Link link) {
@@ -196,7 +201,7 @@ public class MultiODHeuristic implements AVDispatcher {
         availableVehiclesTree.remove(coord.getX(), coord.getY(), vehicle);
     }
 
-    private void removeRequest(AggregateODRequest request) {
+    private void removeRequest(AggregatedRequest request) {
         pendingRequests.remove(request);
         Coord coord = requestLinks.remove(request).getCoord();
         pendingRequestsTree.remove(coord.getX(), coord.getY(), request);

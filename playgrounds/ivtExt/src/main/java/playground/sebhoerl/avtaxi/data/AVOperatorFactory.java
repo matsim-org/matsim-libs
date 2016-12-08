@@ -15,7 +15,7 @@ import java.util.Map;
 
 @Singleton
 public class AVOperatorFactory {
-    public AVOperator createOperator(Id<AVOperator> id, AVOperatorConfig config, AVDispatcher dispatcher) {
-        return new AVOperatorImpl(id, dispatcher);
+    public AVOperator createOperator(Id<AVOperator> id, AVOperatorConfig config) {
+        return new AVOperatorImpl(id, config);
     }
 }

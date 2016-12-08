@@ -18,6 +18,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.opengis.filter.capability.Operator;
 import playground.sebhoerl.avtaxi.config.*;
 import playground.sebhoerl.avtaxi.data.*;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
@@ -27,14 +28,19 @@ import playground.sebhoerl.avtaxi.dispatcher.single_heuristic.SingleHeuristicDis
 import playground.sebhoerl.avtaxi.generator.AVGenerator;
 import playground.sebhoerl.avtaxi.generator.PopulationDensityGenerator;
 import playground.sebhoerl.avtaxi.replanning.AVOperatorChoiceStrategy;
+import playground.sebhoerl.avtaxi.routing.AVParallelRouterFactory;
 import playground.sebhoerl.avtaxi.routing.AVRoute;
 import playground.sebhoerl.avtaxi.routing.AVRouteFactory;
 import playground.sebhoerl.avtaxi.routing.AVRoutingModule;
 import playground.sebhoerl.avtaxi.scoring.AVScoringFunctionFactory;
+import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
+import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculatorFactory;
 
 import javax.inject.Named;
 import java.io.File;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class AVModule extends AbstractModule {
@@ -61,7 +67,16 @@ public class AVModule extends AbstractModule {
 
         configureDispatchmentStrategies();
         configureGeneratorStrategies();
+
+        bind(AVParallelRouterFactory.class);
+        addControlerListenerBinding().to(Key.get(ParallelLeastCostPathCalculator.class, Names.named(AVModule.AV_MODE)));
+        addMobsimListenerBinding().to(Key.get(ParallelLeastCostPathCalculator.class, Names.named(AVModule.AV_MODE)));
 	}
+
+	@Provides @Singleton @Named(AVModule.AV_MODE)
+	private ParallelLeastCostPathCalculator provideParallelLeastCostPathCalculator(AVConfigGroup config, AVParallelRouterFactory factory) {
+        return new ParallelLeastCostPathCalculator((int) config.getParallelRouters(), factory);
+    }
 
 	private void configureDispatchmentStrategies() {
         bind(SingleFIFODispatcher.Factory.class);
@@ -91,12 +106,11 @@ public class AVModule extends AbstractModule {
     }
 
 	@Provides @Singleton
-    Map<Id<AVOperator>, AVOperator> provideOperators(AVConfig config, AVOperatorFactory factory, Map<Id<AVOperator>, AVDispatcher> dispatchers) {
+    Map<Id<AVOperator>, AVOperator> provideOperators(AVConfig config, AVOperatorFactory factory) {
         Map<Id<AVOperator>, AVOperator> operators = new HashMap<>();
 
         for (AVOperatorConfig oc : config.getOperatorConfigs()) {
-            AVDispatcher dispatcher = dispatchers.get(oc.getId());
-            operators.put(oc.getId(), factory.createOperator(oc.getId(), oc, dispatcher));
+            operators.put(oc.getId(), factory.createOperator(oc.getId(), oc));
         }
 
         return operators;
@@ -115,7 +129,20 @@ public class AVModule extends AbstractModule {
     }
 
     @Provides @Singleton
-    Map<Id<AVOperator>, AVGenerator> provideGenerators(Map<String, AVGenerator.AVGeneratorFactory> factories, AVConfig config, Injector injector) {
+    public AVData provideData(Map<Id<AVOperator>, AVOperator> operators, Map<Id<AVOperator>, List<AVVehicle>> vehicles) {
+        AVData data = new AVData();
+
+        for (List<AVVehicle> vehs : vehicles.values()) {
+            for (AVVehicle vehicle : vehs) {
+                data.addVehicle(vehicle);
+            }
+        }
+
+        return data;
+    }
+
+    @Provides @Singleton
+    Map<Id<AVOperator>, AVGenerator> provideGenerators(Map<String, AVGenerator.AVGeneratorFactory> factories, AVConfig config) {
         Map<Id<AVOperator>, AVGenerator> generators = new HashMap<>();
 
         for (AVOperatorConfig oc : config.getOperatorConfigs()) {
@@ -136,42 +163,23 @@ public class AVModule extends AbstractModule {
     }
 
     @Provides @Singleton
-    Map<Id<AVOperator>, AVDispatcher> provideDispatchers(Map<String, AVDispatcher.AVDispatcherFactory> factories, AVConfig config, Injector injector) {
-        Map<Id<AVOperator>, AVDispatcher> dispatchers = new HashMap<>();
-
-        for (AVOperatorConfig oc : config.getOperatorConfigs()) {
-            AVDispatcherConfig dc = oc.getDispatcherConfig();
-            String strategy = dc.getStrategyName();
-
-            if (!factories.containsKey(strategy)) {
-                throw new IllegalArgumentException("Dispatcher strategy '" + strategy + "' is not registered.");
-            }
-
-            AVDispatcher.AVDispatcherFactory factory = factories.get(strategy);
-            AVDispatcher dispatcher = factory.createDispatcher(dc);
-
-            dispatchers.put(oc.getId(), dispatcher);
-        }
-
-        return dispatchers;
-    }
-
-    @Provides @Singleton
-    public AVData provideData(Map<Id<AVOperator>, AVOperator> operators, Map<Id<AVOperator>, AVGenerator> generators) {
-        AVData data = new AVData();
+    public Map<Id<AVOperator>, List<AVVehicle>> provideVehicles(Map<Id<AVOperator>, AVOperator> operators, Map<Id<AVOperator>, AVGenerator> generators) {
+        Map<Id<AVOperator>, List<AVVehicle>> vehicles = new HashMap<>();
 
         for (AVOperator operator : operators.values()) {
+            LinkedList<AVVehicle> operatorList = new LinkedList<>();
+
             AVGenerator generator = generators.get(operator.getId());
 
             while (generator.hasNext()) {
                 AVVehicle vehicle = generator.next();
-
                 vehicle.setOpeartor(operator);
-                operator.getDispatcher().addVehicle(vehicle);
-                data.addVehicle(vehicle);
+                operatorList.add(vehicle);
             }
+
+            vehicles.put(operator.getId(), operatorList);
         }
 
-        return data;
+        return vehicles;
     }
 }

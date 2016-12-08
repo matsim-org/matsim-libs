@@ -6,27 +6,20 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.schedule.AbstractTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.QuadTree;
-import playground.sebhoerl.av.model.dispatcher.HeuristicDispatcher;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.config.AVTimingParameters;
 import playground.sebhoerl.avtaxi.data.AVOperator;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
+import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
 import playground.sebhoerl.avtaxi.dispatcher.utils.SingleRideAppender;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.avtaxi.schedule.*;
+import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 import java.util.*;
 
@@ -106,6 +99,7 @@ public class SingleHeuristicDispatcher implements AVDispatcher {
 
     @Override
     public void onNextTimestep(double now) {
+        appender.update();
         if (reoptimize) reoptimize(now);
     }
 
@@ -136,6 +130,7 @@ public class SingleHeuristicDispatcher implements AVDispatcher {
 
     @Override
     public void addVehicle(AVVehicle vehicle) {
+        eventsManager.processEvent(new AVVehicleAssignmentEvent(vehicle, 0));
         addVehicle(vehicle, vehicle.getStartLink());
     }
 
@@ -163,10 +158,10 @@ public class SingleHeuristicDispatcher implements AVDispatcher {
         @Inject private EventsManager eventsManager;
 
         @Inject @Named(AVModule.AV_MODE)
-        private LeastCostPathCalculator router;
+        private TravelTime travelTime;
 
         @Inject @Named(AVModule.AV_MODE)
-        private TravelTime travelTime;
+        private ParallelLeastCostPathCalculator router;
 
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config) {

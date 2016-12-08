@@ -125,21 +125,21 @@ public class AVScoringFunction implements SumScoringFunction.ArbitraryEventScori
         double costs = 0.0;
 
         if (priceStructure != null) {
-            double billableDistance = Math.ceil(
-                    route.getDistance() / priceStructure.getSpatialBillingInterval())
+            double billableDistance = Math.min(1, Math.ceil(
+                    route.getDistance() / priceStructure.getSpatialBillingInterval()))
                     * priceStructure.getSpatialBillingInterval();
 
-            double billableTravelTime = Math.ceil(
-                    route.getTravelTime() / priceStructure.getTemporalBillingInterval())
+            double billableTravelTime = Math.min(1, Math.ceil(
+                    route.getTravelTime() / priceStructure.getTemporalBillingInterval()))
                     * priceStructure.getTemporalBillingInterval();
 
-            costs += billableDistance / 1000.0 * priceStructure.getPricePerKm() * marginalUtilityOfMoney;
-            costs += billableTravelTime / 60.0 * priceStructure.getPricePerMin() * marginalUtilityOfMoney;
-            costs += priceStructure.getPricePerTrip() * marginalUtilityOfMoney;
+            costs += billableDistance / 1000.0 * priceStructure.getPricePerKm();
+            costs += billableTravelTime / 60.0 * priceStructure.getPricePerMin();
+            costs += priceStructure.getPricePerTrip();
 
             if(priceStructure.getDailySubscriptionFee() > 0.0) {
                 if (!subscriptions.contains(route.getOperatorId())) {
-                    costs += priceStructure.getDailySubscriptionFee() * marginalUtilityOfMoney;
+                    costs += priceStructure.getDailySubscriptionFee();
                     subscriptions.add(route.getOperatorId());
                 }
             }
@@ -148,7 +148,7 @@ public class AVScoringFunction implements SumScoringFunction.ArbitraryEventScori
             noPricingWarningCount--;
         }
 
-        return -costs;
+        return -costs * marginalUtilityOfMoney;
     }
     
     @Override

@@ -1,6 +1,7 @@
 package playground.sebhoerl.avtaxi.data;
 
 import org.matsim.api.core.v01.Id;
+import playground.sebhoerl.avtaxi.config.AVOperatorConfig;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 
 import java.util.Collection;
@@ -10,11 +11,11 @@ import java.util.Set;
 
 public class AVOperatorImpl implements AVOperator {
     final private Id<AVOperator> id;
-    final private AVDispatcher dispatcher;
+    private final AVOperatorConfig config;
 
-    public AVOperatorImpl(Id<AVOperator> id, AVDispatcher dispatcher) {
+    public AVOperatorImpl(Id<AVOperator> id, AVOperatorConfig config) {
         this.id = id;
-        this.dispatcher = dispatcher;
+        this.config = config;
     }
 
     @Override
@@ -23,7 +24,7 @@ public class AVOperatorImpl implements AVOperator {
     }
 
     @Override
-    public AVDispatcher getDispatcher() {
-        return dispatcher;
+    public AVOperatorConfig getConfig() {
+        return config;
     }
 }
