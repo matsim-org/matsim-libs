@@ -29,7 +29,7 @@ import org.matsim.lanes.data.Lane;
  * @author dgrether
  *
  */
-public class LaneSensor {
+public final class LaneSensor {
 
 	private Link link;
 	private Lane lane;

@@ -36,7 +36,7 @@ import org.matsim.vehicles.Vehicle;
  * @author dgrether
  *
  */
-public class LinkSensor {
+public final class LinkSensor {
 	
 	private static final Logger log = Logger.getLogger(LinkSensor.class);
 	
