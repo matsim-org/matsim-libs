@@ -26,7 +26,6 @@ import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
 
 
 /**
@@ -44,7 +43,7 @@ public final class DgGershensonRoederSignalModelFactory implements SignalModelFa
 	}
 	
 	@Override
-	public SignalSystem createSignalSystem(Id id) {
+	public SignalSystem createSignalSystem(Id<SignalSystem> id) {
 		return this.delegate.createSignalSystem(id);
 	}
 
@@ -56,11 +55,6 @@ public final class DgGershensonRoederSignalModelFactory implements SignalModelFa
 		}
 		return this.delegate.createSignalSystemController(controllerIdentifier);
 	}
-
-//	@Override
-//	public SignalSystemsManager createSignalSystemsManager() {
-//		return this.delegate.createSignalSystemsManager();
-//	}
 
 	@Override
 	public SignalPlan createSignalPlan(SignalPlanData planData) {

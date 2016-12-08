@@ -24,14 +24,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.SignalModelFactory;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
+import org.matsim.contrib.signals.model.DatabasedSignalPlan;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
 
 import com.google.inject.Inject;
-
-import org.matsim.contrib.signals.model.DatabasedSignalPlan;
 
 import playground.dgrether.signalsystems.DgSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
@@ -58,11 +56,6 @@ public final class DgSylviaSignalModelFactory implements SignalModelFactory {
 		this.sensorManager = sensorManager;
 		this.sylviaConfig = sylviaConfig;
 	}
-	
-//	@Override
-//	public SignalSystemsManager createSignalSystemsManager() {
-//		return this.delegate.createSignalSystemsManager();
-//	}
 
 	@Override
 	public SignalSystem createSignalSystem(Id<SignalSystem> id) {

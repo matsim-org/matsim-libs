@@ -26,7 +26,6 @@ import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
 
 import playground.dgrether.signalsystems.DgSensorManager;
 
@@ -46,13 +45,8 @@ public final class LaemmerSignalModelFactory implements SignalModelFactory {
 		this.sensorManager = sensorManager;
 	}
 
-//	@Override
-//	public SignalSystemsManager createSignalSystemsManager() {
-//		return this.delegate.createSignalSystemsManager();
-//	}
-
 	@Override
-	public SignalSystem createSignalSystem(Id id) {
+	public SignalSystem createSignalSystem(Id<SignalSystem> id) {
 		return this.delegate.createSignalSystem(id);
 	}
 
