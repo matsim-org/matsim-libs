@@ -36,9 +36,9 @@ import org.matsim.vehicles.Vehicle;
  * @author dgrether
  *
  */
-public class DgSensor {
+public class LinkSensor {
 	
-	private static final Logger log = Logger.getLogger(DgSensor.class);
+	private static final Logger log = Logger.getLogger(LinkSensor.class);
 	
 	private Link link = null;
 	public int vehiclesOnLink = 0;
@@ -48,7 +48,7 @@ public class DgSensor {
 	private Map<Id<Vehicle>, VehicleLeavesTrafficEvent> link2WaitEventPerVehicleId = null;
 	private Map<Double, Map<Id<Vehicle>, CarLocator>> inActivityDistanceCarLocatorMap = null;
 	
-	public DgSensor(Link link){
+	public LinkSensor(Link link){
 		this.link  = link;
 	}
 	

@@ -29,27 +29,27 @@ import org.matsim.lanes.data.Lane;
  * @author dgrether
  *
  */
-public class DgLaneSensor {
+public class LaneSensor {
 
 	private Link link;
 	private Lane lane;
-	private int agentsOnLink = 0;
+	private int agentsOnLane = 0;
 
-	public DgLaneSensor(Link link, Lane lane) {
+	public LaneSensor(Link link, Lane lane) {
 		this.link = link;
 		this.lane = lane;
 	}
 
 	public void handleEvent(LaneLeaveEvent event) {
-		this.agentsOnLink--;
+		this.agentsOnLane--;
 	}
 
 	public void handleEvent(LaneEnterEvent event) {
-		this.agentsOnLink++;
+		this.agentsOnLane++;
 	}
 
-	public int getNumberOfCarsOnLink() {
-		return this.agentsOnLink;
+	public int getNumberOfCarsOnLane() {
+		return this.agentsOnLane;
 	}
 	
 	

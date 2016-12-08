@@ -40,7 +40,7 @@ import org.matsim.lanes.data.Lane;
 import org.matsim.lanes.data.Lanes;
 import org.matsim.lanes.data.LanesToLinkAssignment;
 
-import playground.dgrether.signalsystems.DgSensorManager;
+import playground.dgrether.signalsystems.LinkSensorManager;
 
 
 /**
@@ -98,12 +98,12 @@ public class DgRoederGershensonController implements SignalController {
 
 	private double switchedGreen = 0;
 
-	private DgSensorManager sensorManager = null;
+	private LinkSensorManager sensorManager = null;
 
 	private Map<Id, SignalGroupMetadata> signalGroupIdMetadataMap = null;
 
 	
-	public void registerAndInitializeSensorManager(DgSensorManager sensorManager) {
+	public void registerAndInitializeSensorManager(LinkSensorManager sensorManager) {
 		this.sensorManager = sensorManager;
 		for (SignalGroupMetadata metadata : this.signalGroupIdMetadataMap.values()){
 			for (Link outLink : metadata.getOutLinks()){

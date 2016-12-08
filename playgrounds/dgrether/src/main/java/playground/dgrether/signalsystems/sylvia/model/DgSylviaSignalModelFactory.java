@@ -31,7 +31,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 
 import com.google.inject.Inject;
 
-import playground.dgrether.signalsystems.DgSensorManager;
+import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 
@@ -48,11 +48,11 @@ public final class DgSylviaSignalModelFactory implements SignalModelFactory {
 	// TODO how to inject this?
 	private SignalModelFactory delegate = new DefaultSignalModelFactory();
 	
-	private DgSensorManager sensorManager;
+	private LinkSensorManager sensorManager;
 	private DgSylviaConfig sylviaConfig;
 
 	@Inject
-	public DgSylviaSignalModelFactory(DgSensorManager sensorManager, DgSylviaConfig sylviaConfig) {
+	public DgSylviaSignalModelFactory(LinkSensorManager sensorManager, DgSylviaConfig sylviaConfig) {
 		this.sensorManager = sensorManager;
 		this.sylviaConfig = sylviaConfig;
 	}

@@ -25,7 +25,7 @@ import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalGroup;
 
-import playground.dgrether.signalsystems.DgSensorManager;
+import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.utils.DgAbstractSignalController;
 
 
@@ -39,10 +39,10 @@ public class LaemmerSignalController  extends DgAbstractSignalController impleme
 	
 	public static final String IDENTIFIER = "LaemmerSignalSystemController";
 	
-	private DgSensorManager sensorManager = null;
+	private LinkSensorManager sensorManager = null;
 
 	
-	public LaemmerSignalController(DgSensorManager sensorManager){
+	public LaemmerSignalController(LinkSensorManager sensorManager){
 		this.sensorManager = sensorManager;
 	}
 	

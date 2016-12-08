@@ -70,7 +70,7 @@ public class DgSensorTest {
 	public void testSensorNumberOfCarsMonitoring(){
 		Scenario sc = this.createScenario();
 		Link link = sc.getNetwork().getLinks().get(Id.create(1, Link.class));
-		DgSensor sensor = new DgSensor(link);
+		LinkSensor sensor = new LinkSensor(link);
 		int numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(0, numberOfCars);
 		
@@ -122,7 +122,7 @@ public class DgSensorTest {
 	public void testSensorDistanceMonitoring(){
 		Scenario sc = this.createScenario();
 		Link link = sc.getNetwork().getLinks().get(Id.create(1, Link.class));
-		DgSensor sensor = new DgSensor(link);
+		LinkSensor sensor = new LinkSensor(link);
 		sensor.registerDistanceToMonitor(100.0);
 		int numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(0, numberOfCars);

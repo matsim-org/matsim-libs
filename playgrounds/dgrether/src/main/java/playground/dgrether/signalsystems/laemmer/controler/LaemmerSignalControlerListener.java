@@ -34,7 +34,7 @@ import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.mobsim.SignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
 
-import playground.dgrether.signalsystems.DgSensorManager;
+import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalModelFactory;
 
 
@@ -46,14 +46,14 @@ public class LaemmerSignalControlerListener implements SignalsControllerListener
 		ShutdownListener {
 
 	private SignalSystemsManager signalManager;
-	private DgSensorManager sensorManager;
+	private LinkSensorManager sensorManager;
 
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		MutableScenario scenario = (MutableScenario) event.getServices().getScenario();
 		
-		this.sensorManager = new DgSensorManager(event.getServices().getScenario());
+		this.sensorManager = new LinkSensorManager(event.getServices().getScenario());
 		event.getServices().getEvents().addHandler(sensorManager);
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 

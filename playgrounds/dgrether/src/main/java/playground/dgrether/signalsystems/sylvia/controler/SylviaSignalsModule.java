@@ -37,7 +37,7 @@ import org.matsim.core.replanning.ReplanningContext;
 
 import com.google.inject.Provides;
 
-import playground.dgrether.signalsystems.DgSensorManager;
+import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.sylvia.model.DgSylviaSignalModelFactory;
 
 /**
@@ -71,8 +71,8 @@ public class SylviaSignalsModule extends AbstractModule {
 			bind(SignalModelFactory.class).to(DgSylviaSignalModelFactory.class);
 			
 			// bindings for sensor based signals
-			bind(DgSensorManager.class).asEagerSingleton();
-            addEventHandlerBinding().to(DgSensorManager.class);
+			bind(LinkSensorManager.class).asEagerSingleton();
+            addEventHandlerBinding().to(LinkSensorManager.class);
             bind(SignalsControllerListener.class).to(DgSylviaSignalControlerListener.class);
             addControlerListenerBinding().to(SignalsControllerListener.class);
             

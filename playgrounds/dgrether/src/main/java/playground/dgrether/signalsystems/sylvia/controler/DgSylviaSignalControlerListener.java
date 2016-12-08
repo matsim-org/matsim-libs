@@ -31,7 +31,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 
 import com.google.inject.Inject;
 
-import playground.dgrether.signalsystems.DgSensorManager;
+import playground.dgrether.signalsystems.LinkSensorManager;
 
 
 /**
@@ -41,7 +41,7 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 		ShutdownListener {
 
 	@Inject private SignalSystemsManager signalManager;
-	@Inject private DgSensorManager sensorManager;
+	@Inject private LinkSensorManager sensorManager;
 	
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {

@@ -27,7 +27,7 @@ import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 
-import playground.dgrether.signalsystems.DgSensorManager;
+import playground.dgrether.signalsystems.LinkSensorManager;
 
 
 /**
@@ -36,11 +36,11 @@ import playground.dgrether.signalsystems.DgSensorManager;
  */
 public final class LaemmerSignalModelFactory implements SignalModelFactory {
 
-	private DgSensorManager sensorManager;
+	private LinkSensorManager sensorManager;
 	private DefaultSignalModelFactory delegate;
 
 	public LaemmerSignalModelFactory(DefaultSignalModelFactory defaultSignalModelFactory,
-			DgSensorManager sensorManager) {
+			LinkSensorManager sensorManager) {
 		this.delegate = defaultSignalModelFactory;
 		this.sensorManager = sensorManager;
 	}

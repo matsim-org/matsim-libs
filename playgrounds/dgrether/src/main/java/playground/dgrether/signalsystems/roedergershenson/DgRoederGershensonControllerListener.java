@@ -36,7 +36,7 @@ import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
 
-import playground.dgrether.signalsystems.DgSensorManager;
+import playground.dgrether.signalsystems.LinkSensorManager;
 
 
 /**
@@ -61,7 +61,7 @@ public class DgRoederGershensonControllerListener implements SignalsControllerLi
 
 		
 		//TODO init gershenson controller and sensor manager here
-		DgSensorManager sensorManager = new DgSensorManager(scenario);
+		LinkSensorManager sensorManager = new LinkSensorManager(scenario);
 		event.getServices().getEvents().addHandler(sensorManager);
 		for (SignalSystem ss : this.signalManager.getSignalSystems().values()){
 			if (ss.getSignalController() instanceof DgRoederGershensonController){

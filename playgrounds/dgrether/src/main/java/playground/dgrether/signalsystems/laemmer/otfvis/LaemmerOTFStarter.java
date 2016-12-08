@@ -33,7 +33,7 @@ import org.matsim.lanes.data.Lanes;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-import playground.dgrether.signalsystems.DgSensorManager;
+import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalModelFactory;
 import playground.dgrether.utils.DgOTFVisUtils;
 
@@ -52,7 +52,7 @@ public class LaemmerOTFStarter {
 	public void playScenario(Scenario scenario){
 		EventsManager events = EventsUtils.createEventsManager();
 
-		DgSensorManager sensorManager = new DgSensorManager(scenario);
+		LinkSensorManager sensorManager = new LinkSensorManager(scenario);
 		events.addHandler(sensorManager);
 		
 		DefaultSignalModelFactory defaultSignalModelFactory = new DefaultSignalModelFactory();

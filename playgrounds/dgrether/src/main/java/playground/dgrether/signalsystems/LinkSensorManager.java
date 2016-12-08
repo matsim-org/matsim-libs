@@ -50,16 +50,16 @@ import com.google.inject.Inject;
  * @author dgrether
  *
  */
-public final class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHandler, 
+public final class LinkSensorManager implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 	VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler, LaneEnterEventHandler, LaneLeaveEventHandler{
 
-	private static final Logger log = Logger.getLogger(DgSensorManager.class);
+	private static final Logger log = Logger.getLogger(LinkSensorManager.class);
 	
 //	private Set<Id> monitoredLinkIds = new HashSet<Id>();
 //	private Map<Id, Double> linkIdNumberOfCarsInDistanceMap = new HashMap<Id, Double>();
-	private Map<Id<Link>, DgSensor> linkIdSensorMap = new HashMap<>();
+	private Map<Id<Link>, LinkSensor> linkIdSensorMap = new HashMap<>();
 
-	private Map<Id<Link>, Map<Id<Lane>, DgLaneSensor>> linkIdLaneIdSensorMap = new HashMap<>();
+	private Map<Id<Link>, Map<Id<Lane>, LaneSensor>> linkIdLaneIdSensorMap = new HashMap<>();
 	
 	@Deprecated // not tested
 	private Map<Id<Link>, Tuple<Double, Double>> linkFirstSecondDistanceMeterMap = new HashMap<>();
@@ -68,7 +68,7 @@ public final class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEv
 	private Lanes laneDefinitions = null;
 	
 	@Inject
-	public DgSensorManager(Scenario scenario){
+	public LinkSensorManager(Scenario scenario){
 		this.network = scenario.getNetwork();
 		if (scenario.getConfig().network().getLaneDefinitionsFile() != null || scenario.getConfig().qsim().isUseLanes()) {
 			laneDefinitions = scenario.getLanes();
@@ -82,7 +82,7 @@ public final class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEv
 			if (link == null){
 				throw new IllegalStateException("Link with Id " + linkId + " is not in the network, can't register sensor");
 			}
-			this.linkIdSensorMap.put(linkId, new DgSensor(link));
+			this.linkIdSensorMap.put(linkId, new LinkSensor(link));
 		}
 	}
 	
@@ -97,7 +97,7 @@ public final class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEv
 			if (link == null){
 				throw new IllegalStateException("Link with Id " + linkId + " is not in the network, can't register sensor");
 			}
-			this.linkIdSensorMap.put(link.getId(), new DgSensor(link));
+			this.linkIdSensorMap.put(link.getId(), new LinkSensor(link));
 //			this.monitoredLinkIds.add(link.getId());
 		}
 		this.linkIdSensorMap.get(linkId).registerDistanceToMonitor(distanceMeter);
@@ -117,7 +117,7 @@ public final class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEv
 		}
 		if (! this.linkIdLaneIdSensorMap.get(linkId).containsKey(laneId)){
 			Lane lane = this.laneDefinitions.getLanesToLinkAssignments().get(linkId).getLanes().get(laneId);
-			this.linkIdLaneIdSensorMap.get(linkId).put(laneId, new DgLaneSensor(link, lane));
+			this.linkIdLaneIdSensorMap.get(linkId).put(laneId, new LaneSensor(link, lane));
 		}
 	
 	}
@@ -160,11 +160,11 @@ public final class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEv
 		if (!this.linkIdLaneIdSensorMap.containsKey(linkId)){
 			throw new IllegalStateException("No sensor on link " + linkId + "! Register measurement for this link by calling one of the 'register...' methods of this class first.");
 		}
-		Map<Id<Lane>, DgLaneSensor> map = this.linkIdLaneIdSensorMap.get(linkId);
+		Map<Id<Lane>, LaneSensor> map = this.linkIdLaneIdSensorMap.get(linkId);
 		if (map == null || !map.containsKey(laneId)){
 			throw new IllegalStateException("No sensor on lane " + laneId + " of link " + linkId + "! Register measurement for this link lane pair!");
 		}
-		return map.get(laneId).getNumberOfCarsOnLink();
+		return map.get(laneId).getNumberOfCarsOnLane();
 	}
 
 	
@@ -212,7 +212,7 @@ public final class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEv
 	@Override
 	public void handleEvent(LaneLeaveEvent event) {
 		if (this.linkIdLaneIdSensorMap.containsKey(event.getLinkId())){
-			Map<Id<Lane>, DgLaneSensor> map = this.linkIdLaneIdSensorMap.get(event.getLinkId());
+			Map<Id<Lane>, LaneSensor> map = this.linkIdLaneIdSensorMap.get(event.getLinkId());
 			if (map.containsKey(event.getLaneId())){
 				map.get(event.getLaneId()).handleEvent(event);
 			}
@@ -222,7 +222,7 @@ public final class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEv
 	@Override
 	public void handleEvent(LaneEnterEvent event) {
 		if (this.linkIdLaneIdSensorMap.containsKey(event.getLinkId())){
-			Map<Id<Lane>, DgLaneSensor> map = this.linkIdLaneIdSensorMap.get(event.getLinkId());
+			Map<Id<Lane>, LaneSensor> map = this.linkIdLaneIdSensorMap.get(event.getLinkId());
 			if (map.containsKey(event.getLaneId())){
 				map.get(event.getLaneId()).handleEvent(event);
 			}

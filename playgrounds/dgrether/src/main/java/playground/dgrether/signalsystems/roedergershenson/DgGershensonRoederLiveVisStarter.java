@@ -41,7 +41,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.dgrether.koehlerstrehlersignal.figure9scenario.DgFigure9Runner;
-import playground.dgrether.signalsystems.DgSensorManager;
+import playground.dgrether.signalsystems.LinkSensorManager;
 
 
 /**
@@ -65,7 +65,7 @@ public class DgGershensonRoederLiveVisStarter {
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, new DgGershensonRoederSignalModelFactory(new DefaultSignalModelFactory()) , events);
 		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
-		DgSensorManager sensorManager = new DgSensorManager(scenario);
+		LinkSensorManager sensorManager = new LinkSensorManager(scenario);
 		events.addHandler(sensorManager);
 		for (SignalSystem ss : signalManager.getSignalSystems().values()){
 			if (ss.getSignalController() instanceof DgRoederGershensonController){

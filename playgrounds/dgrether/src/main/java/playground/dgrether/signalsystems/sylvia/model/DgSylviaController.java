@@ -38,7 +38,7 @@ import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.lanes.data.Lane;
 
-import playground.dgrether.signalsystems.DgSensorManager;
+import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import playground.dgrether.signalsystems.utils.DgAbstractSignalController;
@@ -71,9 +71,9 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 	
 	private DgExtensionPoint currentExtensionPoint = null;
 
-	private DgSensorManager sensorManager = null;
+	private LinkSensorManager sensorManager = null;
 
-	public DgSylviaController(DgSylviaConfig sylviaConfig, DgSensorManager sensorManager) {
+	public DgSylviaController(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager) {
 		this.sylviaConfig = sylviaConfig;
 		this.sensorManager = sensorManager;
 		this.init();
