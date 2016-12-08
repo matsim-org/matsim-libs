@@ -42,7 +42,6 @@ public class SignalSystemsManagerImpl implements SignalSystemsManager {
 
 	private IntergreensLogic intergreensLogic = null;
 	
-	// TODO is it possible to inject scenario and eventsManager although SignalSystemsManagerImpl is not created by guice?
 	public SignalSystemsManagerImpl(SignalsData signalData, EventsManager eventsManager) {
 //		this.signalData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		this.signalData = signalData;
@@ -53,12 +52,6 @@ public class SignalSystemsManagerImpl implements SignalSystemsManager {
 	public EventsManager getEventsManager() {
 		return this.eventsManager;
 	}
-
-	@Override
-	public void setEventsManager(EventsManager events) {
-		this.eventsManager = events;
-	}
-
 	
 	@Override
 	public void requestControlUpdate(double time_sec) {
@@ -96,11 +89,6 @@ public class SignalSystemsManagerImpl implements SignalSystemsManager {
 	@Override
 	public Map<Id<SignalSystem>, SignalSystem> getSignalSystems() {
 		return this.signalSystems;
-	}
-	
-	@Override
-	public void setSignalsData(SignalsData signalsData){
-		this.signalData = signalsData;
 	}
 
 	@Override
