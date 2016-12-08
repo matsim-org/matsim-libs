@@ -126,13 +126,6 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		}
 	}
 	
-//	public SignalSystemsManager createSignalSystemManager(){
-//		SignalSystemsManager manager = this.factory.createSignalSystemsManager();
-//		manager.setSignalsData(this.signalsData);
-//		manager.setEventsManager(events);
-//		return manager;
-//	}
-	
 	public void createAndAddIntergreenTimesLogic(SignalSystemsManager manager){
 		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseIntergreenTimes()){
 			IntergreensLogic intergreensLogic = new IntergreensLogicImpl(this.signalsData.getIntergreenTimesData(), ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
