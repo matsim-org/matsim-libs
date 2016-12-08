@@ -49,24 +49,58 @@ public class CemdapStops2MatsimPlansConverter {
 	private static final Logger log = Logger.getLogger(CemdapStops2MatsimPlansConverter.class);
 	
 	// Parameters
-//	private static int numberOfFirstCemdapOutputFile = 87;
-	private static int numberOfFirstCemdapOutputFile = 100;
-//	private static int numberOfPlans = 3;
-	private static int numberOfPlans = 1;
-	private static boolean addStayHomePlan = true;
-//	private static int numberOfPlansFile = 34;
-	private static int numberOfPlansFile = 100;
+	private int numberOfFirstCemdapOutputFile = -1;
+	private int numberOfPlans = -1;
+	private boolean addStayHomePlan = false;
+	private int numberOfPlansFile = -1;
 	
 	// Input and output
-//	private static String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/" + numberOfPlansFile + "/";
-	private static String outputDirectory = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/matsim_initial/" + numberOfPlansFile + "/";
-	private static String tazShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenLOR_DHDN_GK4.shp";
-	private static String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
-//	private static String cemdapOutputRoot = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_output/";
-	private static String cemdapOutputRoot = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/cemdap_output/";
+	private String outputDirectory;
+	private String tazShapeFile;
+	private String networkFile;
+	private String cemdapDataRoot;
 	
+	public static void main(String[] args) {
+		int numberOfFirstCemdapOutputFile = 87;
+		int numberOfPlans = 3;
+		boolean addStayHomePlan = true;
+		int numberOfPlansFile = 34;
+		
+		String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/" + numberOfPlansFile + "/";
+		String tazShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenLOR_DHDN_GK4.shp";
+		String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+		String cemdapDataRoot = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_output/";
+		
+		CemdapStops2MatsimPlansConverter converter = new CemdapStops2MatsimPlansConverter(
+				outputDirectory, 
+				tazShapeFile, 
+				networkFile, 
+				cemdapDataRoot);
+		
+		converter.setNumberOfFirstCemdapOutputFile(numberOfFirstCemdapOutputFile);
+		converter.setNumberOfPlans(numberOfPlans);
+		converter.setAddStayHomePlan(addStayHomePlan);
+		converter.setNumberOfPlansFile(numberOfPlansFile);
+		
+		try {
+			converter.convert();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
-	public static void main(String[] args) throws IOException {
+	public CemdapStops2MatsimPlansConverter(String outputDirectory, String tazShapeFile, String networkFile, String cemdapDataRoot) {
+		this.outputDirectory = outputDirectory;
+		this.tazShapeFile = tazShapeFile;
+		this.networkFile = networkFile;
+		this.cemdapDataRoot = cemdapDataRoot;
+	}
+	
+	public void convert() throws IOException {
+		if (!dependenciesSet()) {
+			log.warn("The dependet parameters are not set. Will not convert.");
+			return;
+		}
 		LogToOutputSaver.setOutputDirectory(outputDirectory);
 		// find respective stops file
 		Map<Integer, String> cemdapStopsFilesMap = new HashMap<>();
@@ -74,7 +108,7 @@ public class CemdapStops2MatsimPlansConverter {
 //		Map<Integer, Map<String,String>> mapOfTourAttributesMaps = new HashMap<Integer, Map<String,String>>();
 		for (int i=0; i<numberOfPlans; i++) {
 			int numberOfCurrentInputFile = numberOfFirstCemdapOutputFile + i;
-			String cemdapStopsFile = cemdapOutputRoot + numberOfCurrentInputFile + "/stops.out";
+			String cemdapStopsFile = cemdapDataRoot + numberOfCurrentInputFile + "/stops.out";
 //			String cemdapToursFile = cemdapOutputRoot + numberOfCurrentInputFile + "/tours.out";
 //			Map<String,String> tourAttributesMap = new HashMap<String,String>();
 			cemdapStopsFilesMap.put(i, cemdapStopsFile);
@@ -151,5 +185,43 @@ public class CemdapStops2MatsimPlansConverter {
 		new File(outputDirectory).mkdir();
 		new PopulationWriter(scenario.getPopulation(), null).write(outputDirectory + "plans.xml.gz");
 		//new ObjectAttributesXmlWriter(personObjectAttributesMap.get(0)).writeFile(outputBase+"personObjectAttributes0.xml.gz");
+	}
+
+	private boolean dependenciesSet() {
+		return (numberOfFirstCemdapOutputFile != -1 &&
+			numberOfPlans != -1 &&
+			numberOfPlansFile != -1);
+	}
+
+	public int getNumberOfFirstCemdapOutputFile() {
+		return numberOfFirstCemdapOutputFile;
+	}
+
+	public void setNumberOfFirstCemdapOutputFile(int numberOfFirstCemdapOutputFile) {
+		this.numberOfFirstCemdapOutputFile = numberOfFirstCemdapOutputFile;
+	}
+
+	public int getNumberOfPlans() {
+		return numberOfPlans;
+	}
+
+	public void setNumberOfPlans(int numberOfPlans) {
+		this.numberOfPlans = numberOfPlans;
+	}
+
+	public boolean isAddStayHomePlan() {
+		return addStayHomePlan;
+	}
+
+	public void setAddStayHomePlan(boolean addStayHomePlan) {
+		this.addStayHomePlan = addStayHomePlan;
+	}
+
+	public int getNumberOfPlansFile() {
+		return numberOfPlansFile;
+	}
+
+	public void setNumberOfPlansFile(int numberOfPlansFile) {
+		this.numberOfPlansFile = numberOfPlansFile;
 	}
 }
