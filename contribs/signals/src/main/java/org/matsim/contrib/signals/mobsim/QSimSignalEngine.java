@@ -30,6 +30,9 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkLanesImpl;
 import org.matsim.lanes.data.Lane;
+
+import com.google.inject.Inject;
+
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
@@ -45,6 +48,7 @@ public class QSimSignalEngine implements SignalEngine {
 
 	private SignalSystemsManager signalManager;
 
+	@Inject
 	public QSimSignalEngine(SignalSystemsManager signalManager) {
 		this.signalManager = signalManager;
 	}

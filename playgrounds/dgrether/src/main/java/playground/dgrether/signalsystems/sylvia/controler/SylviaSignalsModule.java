@@ -21,16 +21,13 @@
  */
 package playground.dgrether.signalsystems.sylvia.controler;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
-import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.builder.SignalModelFactory;
 import org.matsim.contrib.signals.controler.SignalsControllerListener;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.gbl.MatsimRandom;
@@ -72,6 +69,7 @@ public class SylviaSignalsModule extends AbstractModule {
 			bind(DgSylviaConfig.class).toInstance(sylviaConfig);
 			bind(SignalModelFactory.class).to(DgSylviaSignalModelFactory.class);
 			bind(FromDataBuilder.class);
+			bind(QSimSignalEngine.class);
 			
             bind(SignalsControllerListener.class).to(DgSylviaSignalControlerListener.class);
             addControlerListenerBinding().to(SignalsControllerListener.class);
@@ -91,9 +89,9 @@ public class SylviaSignalsModule extends AbstractModule {
 		return signalManager;
     }
 	
-	@Provides QSimSignalEngine provideQSimSignalEngine(SignalSystemsManager signalManager) {
-        return new QSimSignalEngine(signalManager);
-    }
+//	@Provides QSimSignalEngine provideQSimSignalEngine(SignalSystemsManager signalManager) {
+//        return new QSimSignalEngine(signalManager);
+//    }
 
 	public void setAlwaysSameMobsimSeed(boolean alwaysSameMobsimSeed) {
 		this.alwaysSameMobsimSeed = alwaysSameMobsimSeed;
