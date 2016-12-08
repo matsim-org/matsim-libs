@@ -38,7 +38,7 @@ public class AVRequestCreator implements PassengerRequestCreator {
         Leg leg = (Leg) agent.getCurrentPlanElement();
 
         AVRoute route = (AVRoute) leg.getRoute();
-        route.setDistance(0.0);
+        route.setDistance(Double.NaN);
 
         AVOperator operator = operators.get(route.getOperatorId());
 
