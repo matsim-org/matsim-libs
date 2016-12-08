@@ -29,7 +29,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
-import com.google.common.collect.ComparisonChain;
 
 import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusDriveWithPassengerTask;
 import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusTask;
