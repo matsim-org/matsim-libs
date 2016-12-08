@@ -72,11 +72,11 @@ public class CemdapStops2MatsimPlansConverter {
 		String cemdapDataRoot = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_output/";
 		
 		CemdapStops2MatsimPlansConverter converter = new CemdapStops2MatsimPlansConverter(
-				outputDirectory, 
 				tazShapeFile, 
 				networkFile, 
 				cemdapDataRoot);
 		
+		converter.setOutputDirectory(outputDirectory);
 		converter.setNumberOfFirstCemdapOutputFile(numberOfFirstCemdapOutputFile);
 		converter.setNumberOfPlans(numberOfPlans);
 		converter.setAddStayHomePlan(addStayHomePlan);
@@ -88,18 +88,14 @@ public class CemdapStops2MatsimPlansConverter {
 		}
 	}
 	
-	public CemdapStops2MatsimPlansConverter(String outputDirectory, String tazShapeFile, String networkFile, String cemdapDataRoot) {
-		this.outputDirectory = outputDirectory;
+	public CemdapStops2MatsimPlansConverter(String tazShapeFile, String networkFile, String cemdapDataRoot) {
 		this.tazShapeFile = tazShapeFile;
 		this.networkFile = networkFile;
 		this.cemdapDataRoot = cemdapDataRoot;
 	}
 	
 	public void convert() throws IOException {
-		if (!dependenciesSet()) {
-			log.warn("The dependet parameters are not set. Will not convert.");
-			return;
-		}
+		if (!areDependenciesSet()) return;
 		LogToOutputSaver.setOutputDirectory(outputDirectory);
 		// find respective stops file
 		Map<Integer, String> cemdapStopsFilesMap = new HashMap<>();
@@ -186,11 +182,24 @@ public class CemdapStops2MatsimPlansConverter {
 		//new ObjectAttributesXmlWriter(personObjectAttributesMap.get(0)).writeFile(outputBase+"personObjectAttributes0.xml.gz");
 	}
 
-	private boolean dependenciesSet() {
-		return (numberOfFirstCemdapOutputFile != -1 &&
-			numberOfPlans != -1 &&
-			!outputDirectory.isEmpty() &&
-			!cemdapStopsFilename.isEmpty());
+	private boolean areDependenciesSet() {
+		if (numberOfFirstCemdapOutputFile == -1) {
+			log.warn("NumberOfFirstCemdapOutputFile not set.");
+			return false;
+		}
+		if (numberOfPlans == -1) {
+			log.warn("NumberOfPlans not set.");
+			return false;
+		}
+		if (!outputDirectory.isEmpty()) {
+			log.warn("OutputDirectory is empty.");
+			return false;
+		}
+		if (!cemdapStopsFilename.isEmpty()) {
+			log.warn("CemdapStopsFilename is empty.");
+			return false;
+		}
+		return true;
 	}
 
 	public int getNumberOfFirstCemdapOutputFile() {
