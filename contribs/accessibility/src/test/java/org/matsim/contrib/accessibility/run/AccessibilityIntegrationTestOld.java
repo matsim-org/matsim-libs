@@ -22,7 +22,6 @@ package org.matsim.contrib.accessibility.run;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +55,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -65,7 +63,6 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
-import com.google.inject.Binder;
 import com.google.inject.Key;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
@@ -164,12 +161,7 @@ public class AccessibilityIntegrationTestOld {
 	}
 
 	
-	private void run(Scenario scenario, final PtMatrix ptMatrix) {
-		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		scenario.getConfig().controler().setCreateGraphs(false);
-		
-		// ---
-		
+	private void run(MutableScenario scenario, final PtMatrix ptMatrix) {
 		Controler controler = new Controler(scenario);
 
 		// creating test opportunities (facilities)
@@ -193,15 +185,41 @@ public class AccessibilityIntegrationTestOld {
 		// yy the correct test is essentially already in AccessibilityTest.testAccessibilityMeasure().  kai, jun'13
 		// But that test uses the matsim4urbansim setup, which we don't want to use in the present test.
 
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controler().setCreateGraphs(false);
+		
+		// Storage objects
+		final List<String> modes = new ArrayList<>();
+
 		// Add calculators
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				MapBinder<String,AccessibilityContributionCalculator> accessibilityBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
-				addFreeSpeedNetworkMode(this.binder(), accessibilityBinder, "freespeed");
-				addNetworkMode(this.binder(), accessibilityBinder, TransportMode.car);
-				addConstantSpeedMode(this.binder(), accessibilityBinder, TransportMode.bike);
-				addConstantSpeedMode(this.binder(), accessibilityBinder, TransportMode.walk);
+				MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
+				{
+					String mode = "freespeed";
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new FreeSpeedNetworkModeProvider(TransportMode.car));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					modes.add(mode);
+				}
+				{
+					String mode = TransportMode.car;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					modes.add(mode);
+				}
+				{ 
+					String mode = TransportMode.bike;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					modes.add(mode);
+				}
+				{
+					final String mode = TransportMode.walk;
+					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+					modes.add(mode);
+				}
 			}
 		});
 		controler.run();
@@ -288,25 +306,6 @@ public class AccessibilityIntegrationTestOld {
 	}
 
 	
-	private static void addFreeSpeedNetworkMode(Binder binder,
-			MapBinder<String, AccessibilityContributionCalculator> accessibilityBinder, String mode) {
-		binder.bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new FreeSpeedNetworkModeProvider(mode));
-		accessibilityBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-	}
-
-
-	private static void addNetworkMode(Binder binder, MapBinder<String, AccessibilityContributionCalculator> accessibilityBinder, String mode) {
-		binder.bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
-		accessibilityBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-	}
-
-
-	private static void addConstantSpeedMode(Binder binder, MapBinder<String, AccessibilityContributionCalculator> accessibilityBinder, String mode) {
-		binder.bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
-		accessibilityBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-	}
-
-
 	/**
 	 * This is called by the GridBasedAccessibilityListener and gets the resulting SpatialGrids. This test checks if the 
 	 * SpatialGrids for activated transport modes (see above) are instantiated or null if the specific transport mode is
@@ -316,7 +315,7 @@ public class AccessibilityIntegrationTestOld {
 	 */
 	public class EvaluateTestResults implements SpatialGridDataExchangeInterface{
 		
-		private Map<Modes4Accessibility,Boolean> isComputingMode = new HashMap<>();
+		private Map<Modes4Accessibility,Boolean> isComputingMode = new HashMap<Modes4Accessibility,Boolean>();
 		
 		/**
 		 * constructor
