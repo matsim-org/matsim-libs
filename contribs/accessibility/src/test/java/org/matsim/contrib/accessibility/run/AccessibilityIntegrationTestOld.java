@@ -176,7 +176,7 @@ public class AccessibilityIntegrationTestOld {
 				controler.addOverridingModule(mm);
 			
 				// Add calculators
-				controler.addOverridingModule(RunAccessibilityExample.new AbstractModule() {
+				controler.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {
 						MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
@@ -243,7 +243,7 @@ public class AccessibilityIntegrationTestOld {
 				controler.addOverridingModule(mm);
 			
 				// Add calculators
-				controler.addOverridingModule(RunAccessibilityExample.new AbstractModule() {
+				controler.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {
 						MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
@@ -325,7 +325,7 @@ public class AccessibilityIntegrationTestOld {
 				controler.addOverridingModule(mm);
 			
 				// Add calculators
-				controler.addOverridingModule(RunAccessibilityExample.new AbstractModule() {
+				controler.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {
 						MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
