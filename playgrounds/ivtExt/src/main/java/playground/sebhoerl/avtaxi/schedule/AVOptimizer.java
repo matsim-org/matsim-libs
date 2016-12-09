@@ -7,6 +7,8 @@ import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import playground.sebhoerl.avtaxi.data.AVOperator;
@@ -21,8 +23,8 @@ public class AVOptimizer implements VrpOptimizer, MobsimBeforeSimStepListener {
     private double now;
     final private List<AVRequest> submittedRequestsBuffer = Collections.synchronizedList(new LinkedList<>());
 
-
     @Inject private Map<Id<AVOperator>, AVDispatcher> dispatchers;
+    @Inject private EventsManager eventsManager;
 
     @Override
     public void requestSubmitted(Request request) {
@@ -47,6 +49,10 @@ public class AVOptimizer implements VrpOptimizer, MobsimBeforeSimStepListener {
 
         Task currentTask = schedule.getCurrentTask();
         currentTask.setEndTime(now);
+
+        if (currentTask instanceof AVDropoffTask) {
+            processTeleportationEvent((AVDropoffTask) currentTask);
+        }
 
         List<AVTask> tasks = ((Schedule<AVTask>) schedule).getTasks();
         int index = currentTask.getTaskIdx() + 1;
@@ -84,5 +90,11 @@ public class AVOptimizer implements VrpOptimizer, MobsimBeforeSimStepListener {
     public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
         now = e.getSimulationTime();
         processSubmittedRequestsBuffer();
+    }
+
+    private void processTeleportationEvent(AVDropoffTask task) {
+        for (AVRequest request : task.getRequests()) {
+            eventsManager.processEvent(new AVTransitEvent(request, now));
+        }
     }
 }
