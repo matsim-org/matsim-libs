@@ -103,6 +103,8 @@ public class CNEBerlin {
 			
 			if (congestionTollingApproachString.equals(CongestionTollingApproach.QBPV3.toString())) {
 				congestionTollingApproach = CongestionTollingApproach.QBPV3;
+			} else if (congestionTollingApproachString.equals(CongestionTollingApproach.QBPV9.toString())) {
+				congestionTollingApproach = CongestionTollingApproach.QBPV9;
 			} else if (congestionTollingApproachString.equals(CongestionTollingApproach.DecongestionPID.toString())) {
 				congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
 			} else {
