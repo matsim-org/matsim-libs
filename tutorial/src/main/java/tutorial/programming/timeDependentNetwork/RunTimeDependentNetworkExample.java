@@ -58,14 +58,14 @@ public class RunTimeDependentNetworkExample {
 					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  threshold/10 ));
 					event.addLink(link);
 					final NetworkChangeEvent event1 = event;
-					NetworkUtils.addNetworkChangeEvent(scenario.getNetwork(),event1);
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 				}
 				{
 					NetworkChangeEvent event = new NetworkChangeEvent(11.5*3600.) ;
 					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE_IN_SI_UNITS,  speed ));
 					event.addLink(link);
 					final NetworkChangeEvent event1 = event;
-					NetworkUtils.addNetworkChangeEvent(scenario.getNetwork(),event1);
+					NetworkUtils.addNetworkChangeEvent(((Network)scenario.getNetwork()),event1);
 				}
 			}
 		}

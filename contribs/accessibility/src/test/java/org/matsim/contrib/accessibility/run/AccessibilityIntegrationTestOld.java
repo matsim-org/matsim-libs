@@ -170,6 +170,8 @@ public class AccessibilityIntegrationTestOld {
 		
 		// ---
 		
+		Controler controler = new Controler(scenario);
+
 		// creating test opportunities (facilities)
 		final ActivityFacilities opportunities = scenario.getActivityFacilities();
 		for ( Link link : scenario.getNetwork().getLinks().values() ) {
@@ -179,14 +181,11 @@ public class AccessibilityIntegrationTestOld {
 			opportunities.addActivityFacility(facility);
 		}
 
-		// ---
-		
-		Controler controler = new Controler(scenario);
-
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				this.bind(SpatialGridDataExchangeInterface.class).toInstance(new EvaluateTestResults(true, true, true, true, true));
+				this.bind(PtMatrix.class).toInstance(ptMatrix);
 			}
 		});
 		
@@ -205,9 +204,6 @@ public class AccessibilityIntegrationTestOld {
 				addConstantSpeedMode(this.binder(), accessibilityBinder, TransportMode.walk);
 			}
 		});
-		
-		// ---
-		
 		controler.run();
 	}
 
