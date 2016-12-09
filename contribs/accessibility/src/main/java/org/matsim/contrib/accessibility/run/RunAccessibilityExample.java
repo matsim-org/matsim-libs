@@ -88,14 +88,15 @@ final public class RunAccessibilityExample {
 		
 		final List<String> activityTypes = new ArrayList<>() ;
 		final ActivityFacilities homes = FacilitiesUtils.createActivityFacilities("homes") ;
-		for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
-			for ( ActivityOption option : fac.getActivityOptions().values() ) {
+
+		for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) { // go through all facilities ...
+			for ( ActivityOption option : fac.getActivityOptions().values() ) { // go through all activity options at each facility ...
 				// figure out all activity types
 				if ( !activityTypes.contains(option.getType()) ) {
 					activityTypes.add( option.getType() ) ;
 				}
 				// figure out where the homes are
-				if ( option.getType().equals("h") ) {
+				if ( option.getType().equals("h") ) { // yyyyyy hardcoded home activity option; replace!!!!
 					homes.addActivityFacility(fac);
 				}
 			}
@@ -166,24 +167,11 @@ final public class RunAccessibilityExample {
 	public static void run2(Scenario scenario, AbstractModule... overridingModule ) {
 		Controler controler = new Controler(scenario);
 
-		// yyyyyy found this in a way that the interface _has_ to be bound, so bounding it by a dummy implementation that may or may not 
-		// be overwritten later.  :-( :-( :-(  kai, dec'16
-		controler.addOverridingModule(new AbstractModule(){
-			@Override public void install() {
-				this.bind(SpatialGridDataExchangeInterface.class).toInstance(new SpatialGridDataExchangeInterface(){
-					@Override public void setAndProcessSpatialGrids(Map<String, SpatialGrid> spatialGrids) {
-					}
-				}) ;
-			}
-		});
-		
 		for ( int ii=0 ; ii< overridingModule.length ; ii++ ) {
 			controler.addOverridingModule( overridingModule[ii] );
 		}
 	
 		controler.addOverridingModule(new GridBasedAccessibilityModule());
-		// yy the correct test is essentially already in AccessibilityTest.testAccessibilityMeasure().  kai, jun'13
-		// But that test uses the matsim4urbansim setup, which we don't want to use in the present test.
 	
 		// Add calculators
 		controler.addOverridingModule(new AbstractModule() {

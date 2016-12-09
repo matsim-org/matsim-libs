@@ -56,7 +56,7 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 			@Inject private Scenario scenario;
 			@Inject private ActivityFacilities opportunities;
 			@Inject private Map<String, AccessibilityContributionCalculator> calculators;
-			@Inject private SpatialGridDataExchangeInterface spatialGridDataExchangeListener;
+			@Inject (optional = true) private SpatialGridDataExchangeInterface spatialGridDataExchangeListener; // Downstream code knows how to handle a null PtMatrix
 			@Inject (optional = true) PtMatrix ptMatrix = null; // Downstream code knows how to handle a null PtMatrix
 
 			@Override

@@ -323,7 +323,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		this.outputSubdirectory = subdirectory;
 	}
 
-
+	@Deprecated // use FacilityDataExchangeInterface instead
 	public void addSpatialGridDataExchangeListener(SpatialGridDataExchangeInterface l) {
 		this.spatialGridDataExchangeListener.add(l);
 	}
