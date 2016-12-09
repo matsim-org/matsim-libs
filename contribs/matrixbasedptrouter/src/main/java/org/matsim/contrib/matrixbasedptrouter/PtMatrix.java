@@ -61,6 +61,7 @@ import org.matsim.vehicles.Vehicle;
 public final class PtMatrix {
 
 	private static final Logger log = Logger.getLogger(PtMatrix.class);
+	public static final String NAME = "PtMatrix" ;
 
 	/**
 	 * Creates an instance of this class. The config group contains the input file names, and whether speed/distance matrices are provided or not.
