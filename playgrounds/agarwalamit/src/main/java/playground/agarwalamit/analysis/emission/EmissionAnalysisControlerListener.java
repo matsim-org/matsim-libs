@@ -57,6 +57,7 @@ public class EmissionAnalysisControlerListener implements StartupListener, Itera
                 this.writer.write(munichUserGroup.toString()+"\t");
             }
             this.writer.write("total\n");
+            this.writer.flush();
         } catch (IOException e) {
             throw new RuntimeException("Data is not written/read. Reason : " + e);
         }
@@ -76,6 +77,7 @@ public class EmissionAnalysisControlerListener implements StartupListener, Itera
                 this.writer.write(userGrp2cost.get(munichUserGroup.toString())+"\t");
             }
             this.writer.write(MapUtils.doubleValueSum(userGrp2cost)+"\n");
+            this.writer.flush();
         } catch (IOException e) {
             throw new RuntimeException("Data is not written/read. Reason : " + e);
         }
