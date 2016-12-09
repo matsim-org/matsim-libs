@@ -174,6 +174,7 @@ public final class AccessibilityCalculator {
 			Node fromNode = scenario.getNetwork().getNodes().get(nodeId);
 
 			for (AccessibilityContributionCalculator calculator : calculators.values()) {
+				Gbl.assertNotNull(calculator) ;
 				calculator.notifyNewOriginNode(fromNode, departureTime);
 			}
 
@@ -277,6 +278,7 @@ public final class AccessibilityCalculator {
 
 	public final void putAccessibilityContributionCalculator(String mode, AccessibilityContributionCalculator calc) {
 		LOG.warn("Adding accessibility calculator for mode = " + mode ) ;
+		Gbl.assertNotNull(calc);
 		this.calculators.put(mode , calc) ;
 	}
 

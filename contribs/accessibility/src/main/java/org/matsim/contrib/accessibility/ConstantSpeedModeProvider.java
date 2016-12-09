@@ -27,6 +27,7 @@ import com.google.inject.Provider;
 /**
  * @author dziemke
  */
+@Deprecated // yyyyyy somehow I think that this can go away again.  kai, dec'16
 public class ConstantSpeedModeProvider implements Provider<AccessibilityContributionCalculator>{
 
     private String mode;

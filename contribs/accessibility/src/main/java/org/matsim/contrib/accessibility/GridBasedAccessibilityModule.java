@@ -22,21 +22,27 @@ package org.matsim.contrib.accessibility;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.inject.Provider;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 
@@ -76,10 +82,16 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 	@Override
 	public void install() {
 		addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+			// yy not sure if this truly needs to be a provider.  kai, dec'16
+			
+			@Inject private Config config ;
+			@Inject private Network network ;
 			@Inject private Scenario scenario;
 			@Inject private ActivityFacilities opportunities;
 			@Inject (optional = true) PtMatrix ptMatrix = null; // Downstream code knows how to handle a null PtMatrix
-
+			@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
+			@Inject private Map<String,TravelTime> travelTimes ;
+			
 			@Override
 			public ControlerListener get() {
 				AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.class);
@@ -107,24 +119,31 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 				}
 				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
 				for ( Modes4Accessibility mode : acg.getIsComputingMode() ) {
+					AccessibilityContributionCalculator calc = null ;
 					switch( mode ) {
 					case bike:
-						new ConstantSpeedModeProvider(mode.name()) ;
+						calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
 						break;
-					case car:
-						new NetworkModeProvider(mode.name()) ;
-						break;
-					case freespeed:
-						new FreeSpeedNetworkModeProvider(mode.name()) ;
-						break;
+					case car: {
+						final TravelTime travelTime = travelTimes.get(mode.name());
+						Gbl.assertNotNull(travelTime);
+						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(mode.name());
+						calc = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario) ;
+						break; }
+					case freespeed: {
+						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
+						Gbl.assertNotNull(travelDisutilityFactory);
+						calc = new NetworkModeAccessibilityExpContributionCalculator( new FreeSpeedTravelTime(), travelDisutilityFactory, scenario) ;
+						break; }
 					case pt:
 						throw new RuntimeException("currently not implemented") ;
 					case walk:
-						new ConstantSpeedModeProvider(mode.name()) ;
+						calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
 						break;
 					default:
 						throw new RuntimeException("not implemented") ;
 					}
+					accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calc ) ;
 				}
 				
 				GridBasedAccessibilityShutdownListenerV3 gbasl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, 

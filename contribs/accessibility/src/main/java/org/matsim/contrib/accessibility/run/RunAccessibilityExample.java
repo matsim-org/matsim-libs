@@ -24,8 +24,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityModule;
+import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -59,7 +61,14 @@ final public class RunAccessibilityExample {
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
+		AccessibilityConfigGroup accConfig = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class ) ;
+		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
+		
+		// ---
+		
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+		
+		// ---
 		
 		// the run method is extracted so that a test can operate on it.
 		run( scenario);
@@ -85,34 +94,19 @@ final public class RunAccessibilityExample {
 		}
 		
 		log.warn( "found the following activity types: " + activityTypes );
-		AbstractModule[] overridingModule = {}; 
 		
-		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		
-				
-				Controler controler = new Controler(scenario);
-		
-				for ( int ii=0 ; ii< overridingModule.length ; ii++ ) {
-					controler.addOverridingModule( overridingModule[ii] );
-				}
-			
-				final GridBasedAccessibilityModule mm = new GridBasedAccessibilityModule();
-		//		mm.addSpatialGridDataExchangeInterface( null ) ;
-				mm.addAdditionalFacilityData(homes) ;
-				controler.addOverridingModule(mm);
-			
-				// Add calculators
-				controler.addOverridingModule(new AbstractModule() {
-					@Override
-					public void install() {
-						MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
-						AccessibilityUtils.addFreeSpeedNetworkMode(this.binder(), accBinder, TransportMode.car);
-						AccessibilityUtils.addNetworkMode(this.binder(), accBinder, TransportMode.car);
-						AccessibilityUtils.addConstantSpeedMode(this.binder(), accBinder, TransportMode.bike);
-					}
-			
-				});
-				controler.run();
+		Controler controler = new Controler(scenario);
+
+
+		final GridBasedAccessibilityModule module = new GridBasedAccessibilityModule();
+
+		// add additional facility data to an additional column in the output
+		// here, an additional population density column is used
+		module.addAdditionalFacilityData(homes) ;
+
+		controler.addOverridingModule(module);
+
+		controler.run();
 		
 //		
 //		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some other algorithms,

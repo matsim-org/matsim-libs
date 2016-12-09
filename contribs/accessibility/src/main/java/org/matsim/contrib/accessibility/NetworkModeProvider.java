@@ -30,6 +30,7 @@ import com.google.inject.Provider;
 /**
  * @author dziemke
  */
+@Deprecated // somehow I think that this can go away again.  kai, dec'16
 public class NetworkModeProvider implements Provider<AccessibilityContributionCalculator>{
 
     private String mode;

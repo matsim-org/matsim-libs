@@ -44,7 +44,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 	private Map<String, Double> accessibilitySums = new HashMap<>();
 	private Map<String, Double> accessibilityGiniCoefficients = new HashMap<>();
 
-	final double xMin, yMin, xMax, yMax, cellSize;
+	private final double xMin, yMin, xMax, yMax, cellSize;
 
 	private SpatialGridAggregator spatialGridAggregator;
 
