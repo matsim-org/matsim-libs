@@ -37,6 +37,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -73,8 +74,7 @@ final public class RunAccessibilityExample {
 	
 	public static void run(final Scenario scenario) {
 		
-		final List<String> activityTypes = new ArrayList<String>() ;
-		final ActivityFacilities homes = FacilitiesUtils.createActivityFacilities("homes") ;
+		final List<String> activityTypes = new ArrayList<>() ; final ActivityFacilities homes = FacilitiesUtils.createActivityFacilities("homes") ;
 		for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
 			for ( ActivityOption option : fac.getActivityOptions().values() ) {
 				// figure out all activity types
@@ -94,8 +94,7 @@ final public class RunAccessibilityExample {
 		// the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
 		
 		final Controler controler = new Controler(scenario) ;
-		controler.getConfig().controler().setOverwriteFileSetting(
-				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
