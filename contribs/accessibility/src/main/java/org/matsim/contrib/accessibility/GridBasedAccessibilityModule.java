@@ -63,11 +63,11 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 			public ControlerListener get() {
 				AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.class);
 				double cellSize_m = acg.getCellSizeCellBasedAccessibility();
-				final BoundingBox boundingBox;
-				final ActivityFacilitiesImpl measuringPoints;
 				if (cellSize_m <= 0) {
 					throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
 				}
+				final BoundingBox boundingBox;
+				final ActivityFacilitiesImpl measuringPoints;
 				if(acg.getAreaOfAccessibilityComputation().equals(AreaOfAccesssibilityComputation.fromShapeFile.toString())) {
 					Geometry boundary = GridUtils.getBoundary(acg.getShapeFileCellBasedAccessibility());
 					Envelope envelope = boundary.getEnvelopeInternal();
@@ -85,11 +85,11 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 					LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");
 				}
 				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
-				GridBasedAccessibilityShutdownListenerV3 gbasl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, 
-						boundingBox, cellSize_m);
 				for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
 					accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
 				}
+				GridBasedAccessibilityShutdownListenerV3 gbasl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, 
+						boundingBox, cellSize_m);
 
 				if (spatialGridDataExchangeListener != null) {
 					gbasl.addSpatialGridDataExchangeListener(spatialGridDataExchangeListener);
