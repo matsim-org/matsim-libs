@@ -50,7 +50,7 @@ public class EmissionAnalysisControlerListener implements StartupListener, Itera
 
     @Override
     public void notifyStartup(StartupEvent event) {
-        this.writer = IOUtils.getBufferedWriter(event.getServices().getConfig().controler().getOutputDirectory()+"/userGroup2EmissionsCosts.txt");
+        this.writer = IOUtils.getBufferedWriter(event.getServices().getConfig().controler().getOutputDirectory()+"/totalEmissionsCosts.txt");
         try {
             this.writer.write("ItNr\t");
             for (MunichPersonFilter.MunichUserGroup munichUserGroup : MunichPersonFilter.MunichUserGroup.values()) {

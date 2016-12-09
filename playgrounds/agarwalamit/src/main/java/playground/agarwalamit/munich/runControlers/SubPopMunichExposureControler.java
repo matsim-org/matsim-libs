@@ -88,14 +88,6 @@ public class SubPopMunichExposureControler {
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.controler().setOutputDirectory(outputDir);
 
-		if(! isRunningOnCluster){
-			config.network().setInputFile("network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml");
-			config.plans().setInputFile(FileUtils.RUNS_SVN+"detEval/emissionCongestionInternalization/otherRuns/output/1pct/run10/baseCase/c4/output_plans.xml.gz");
-			config.plans().setInputPersonAttributeFile("personsAttributes_1pct_usrGrp.xml.gz");
-			config.counts().setInputFile("counts-2008-01-10_correctedSums_manuallyChanged_strongLinkMerge.xml");
-			config.vehicles().setVehiclesFile( "emissionVehicles_1pct.xml.gz");
-		}
-		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		// allowing car and ride on all links
@@ -158,9 +150,7 @@ public class SubPopMunichExposureControler {
 		emissionModule.createEmissionHandler();
 
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
-//		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
-//		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
-		
+
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
 		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostMultiplicationFactor),	Boolean.parseBoolean(considerCO2Costs), rgt, gt);
 		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, 

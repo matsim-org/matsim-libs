@@ -416,7 +416,7 @@ public class CNEIntegration {
 							congestionTollHandlerQBP,
 							controler.getConfig().planCalcScore()
 						);
-					factory.setSigma(sigma); // TODO : I dont know, why we are setting sigma here and not anywhere else. amit nov 16.
+					factory.setSigma(sigma);
 					factory.setHotspotLinks(hotSpotLinks);
 					
 					controler.addOverridingModule(new AbstractModule(){
