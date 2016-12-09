@@ -19,8 +19,12 @@
 
 package org.matsim.contrib.accessibility;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.inject.Provider;
 
@@ -46,8 +50,16 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class GridBasedAccessibilityModule extends AbstractModule {
 	private static final Logger LOG = Logger.getLogger(GridBasedAccessibilityModule.class);
+
+	private List<SpatialGridDataExchangeInterface> exchangers = new ArrayList<>() ;
+
+	private List<ActivityFacilities> additionalFacs = new ArrayList<>() ; 
 	
 	public GridBasedAccessibilityModule() {
+	}
+	
+	void addGridExchanger( SpatialGridDataExchangeInterface exchanger ) {
+		exchangers.add( exchanger ) ;
 	}
 
 	@Override
@@ -56,7 +68,6 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 			@Inject private Scenario scenario;
 			@Inject private ActivityFacilities opportunities;
 			@Inject private Map<String, AccessibilityContributionCalculator> calculators;
-			@Inject (optional = true) private SpatialGridDataExchangeInterface spatialGridDataExchangeListener; // Downstream code knows how to handle a null PtMatrix
 			@Inject (optional = true) PtMatrix ptMatrix = null; // Downstream code knows how to handle a null PtMatrix
 
 			@Override
@@ -91,11 +102,18 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 				GridBasedAccessibilityShutdownListenerV3 gbasl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, 
 						boundingBox, cellSize_m);
 
-				if (spatialGridDataExchangeListener != null) {
-					gbasl.addSpatialGridDataExchangeListener(spatialGridDataExchangeListener);
+				for ( SpatialGridDataExchangeInterface listener : exchangers ) {
+					gbasl.addSpatialGridDataExchangeListener(listener) ;
+				}
+				for ( ActivityFacilities fac : additionalFacs ) {
+					gbasl.addAdditionalFacilityData(fac);
 				}
 				return gbasl;
 			}
 		});
+	}
+
+	public void addAdditionalFacilityData(ActivityFacilities homes) {
+		additionalFacs.add(homes) ;
 	}
 }

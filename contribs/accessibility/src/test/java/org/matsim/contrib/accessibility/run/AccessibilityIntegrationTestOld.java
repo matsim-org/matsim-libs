@@ -36,15 +36,20 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
+import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
+import org.matsim.contrib.accessibility.GridBasedAccessibilityModule;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
+import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -53,6 +58,8 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.testcases.MatsimTestUtils;
+
+import com.google.inject.multibindings.MapBinder;
 
 
 /**
@@ -151,10 +158,35 @@ public class AccessibilityIntegrationTestOld {
 			ActivityFacility facility = opportunities.getFactory().createActivityFacility(id, coord);
 			opportunities.addActivityFacility(facility);
 		}
+		AbstractModule[] overridingModule = { new EvaluateTestResultsModule() };
 	
 
 		
-		RunAccessibilityExample.run2(sc, new EvaluateTestResultsModule() );
+		sc.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		
+				
+				Controler controler = new Controler(sc);
+		
+				for ( int ii=0 ; ii< overridingModule.length ; ii++ ) {
+					controler.addOverridingModule( overridingModule[ii] );
+				}
+			
+				final GridBasedAccessibilityModule mm = new GridBasedAccessibilityModule();
+		//		mm.addSpatialGridDataExchangeInterface( null ) ;
+				controler.addOverridingModule(mm);
+			
+				// Add calculators
+				controler.addOverridingModule(RunAccessibilityExample.new AbstractModule() {
+					@Override
+					public void install() {
+						MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
+						AccessibilityUtils.addFreeSpeedNetworkMode(this.binder(), accBinder, TransportMode.car);
+						AccessibilityUtils.addNetworkMode(this.binder(), accBinder, TransportMode.car);
+						AccessibilityUtils.addConstantSpeedMode(this.binder(), accBinder, TransportMode.bike);
+					}
+			
+				});
+				controler.run();
 		// compare some results -> done in EvaluateTestResults
 	}
 
@@ -194,9 +226,34 @@ public class AccessibilityIntegrationTestOld {
 			ActivityFacility facility = opportunities.getFactory().createActivityFacility(id, coord);
 			opportunities.addActivityFacility(facility);
 		}
+		AbstractModule[] overridingModule = { new EvaluateTestResultsModule() };
 	
 
-		RunAccessibilityExample.run2(sc, new EvaluateTestResultsModule());
+		sc.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		
+				
+				Controler controler = new Controler(sc);
+		
+				for ( int ii=0 ; ii< overridingModule.length ; ii++ ) {
+					controler.addOverridingModule( overridingModule[ii] );
+				}
+			
+				final GridBasedAccessibilityModule mm = new GridBasedAccessibilityModule();
+		//		mm.addSpatialGridDataExchangeInterface( null ) ;
+				controler.addOverridingModule(mm);
+			
+				// Add calculators
+				controler.addOverridingModule(RunAccessibilityExample.new AbstractModule() {
+					@Override
+					public void install() {
+						MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
+						AccessibilityUtils.addFreeSpeedNetworkMode(this.binder(), accBinder, TransportMode.car);
+						AccessibilityUtils.addNetworkMode(this.binder(), accBinder, TransportMode.car);
+						AccessibilityUtils.addConstantSpeedMode(this.binder(), accBinder, TransportMode.bike);
+					}
+			
+				});
+				controler.run();
 		// compare some results -> done in EvaluateTestResults
 	}
 
@@ -251,9 +308,34 @@ public class AccessibilityIntegrationTestOld {
 			ActivityFacility facility = opportunities.getFactory().createActivityFacility(id, coord);
 			opportunities.addActivityFacility(facility);
 		}
+		AbstractModule[] overridingModule = { new EvaluateTestResultsModule() };
 	
 
-		RunAccessibilityExample.run2(sc, new EvaluateTestResultsModule());
+		sc.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		
+				
+				Controler controler = new Controler(sc);
+		
+				for ( int ii=0 ; ii< overridingModule.length ; ii++ ) {
+					controler.addOverridingModule( overridingModule[ii] );
+				}
+			
+				final GridBasedAccessibilityModule mm = new GridBasedAccessibilityModule();
+		//		mm.addSpatialGridDataExchangeInterface( null ) ;
+				controler.addOverridingModule(mm);
+			
+				// Add calculators
+				controler.addOverridingModule(RunAccessibilityExample.new AbstractModule() {
+					@Override
+					public void install() {
+						MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
+						AccessibilityUtils.addFreeSpeedNetworkMode(this.binder(), accBinder, TransportMode.car);
+						AccessibilityUtils.addNetworkMode(this.binder(), accBinder, TransportMode.car);
+						AccessibilityUtils.addConstantSpeedMode(this.binder(), accBinder, TransportMode.bike);
+					}
+			
+				});
+				controler.run();
 
 		// compare some results -> done in EvaluateTestResults 
 	}

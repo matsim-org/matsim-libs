@@ -36,6 +36,8 @@ import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityModule;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
+import org.matsim.contrib.accessibility.SpatialGridDataExchangeInterfaces;
+import org.matsim.contrib.accessibility.SpatialGridDataExchangeInterfacesI;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
@@ -44,6 +46,8 @@ import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -77,6 +81,8 @@ final public class RunAccessibilityExample {
 		}
 		Config config = ConfigUtils.loadConfig( args[0] ) ;
 		
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		
 		// the run method is extracted so that a test can operate on it.
@@ -102,9 +108,35 @@ final public class RunAccessibilityExample {
 			}
 		}
 		
-		log.warn( "found the following activity types: " + activityTypes ); 
+		log.warn( "found the following activity types: " + activityTypes );
+		AbstractModule[] overridingModule = {}; 
 		
-		run2(scenario) ;
+		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		
+				
+				Controler controler = new Controler(scenario);
+		
+				for ( int ii=0 ; ii< overridingModule.length ; ii++ ) {
+					controler.addOverridingModule( overridingModule[ii] );
+				}
+			
+				final GridBasedAccessibilityModule mm = new GridBasedAccessibilityModule();
+		//		mm.addSpatialGridDataExchangeInterface( null ) ;
+				mm.addAdditionalFacilityData(homes) ;
+				controler.addOverridingModule(mm);
+			
+				// Add calculators
+				controler.addOverridingModule(new AbstractModule() {
+					@Override
+					public void install() {
+						MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
+						AccessibilityUtils.addFreeSpeedNetworkMode(this.binder(), accBinder, TransportMode.car);
+						AccessibilityUtils.addNetworkMode(this.binder(), accBinder, TransportMode.car);
+						AccessibilityUtils.addConstantSpeedMode(this.binder(), accBinder, TransportMode.bike);
+					}
+			
+				});
+				controler.run();
 		
 //		
 //		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some other algorithms,
@@ -161,30 +193,5 @@ final public class RunAccessibilityExample {
 //
 //
 //		controler.run();
-	}
-
-
-	public static void run2(Scenario scenario, AbstractModule... overridingModule ) {
-		Controler controler = new Controler(scenario);
-
-		for ( int ii=0 ; ii< overridingModule.length ; ii++ ) {
-			controler.addOverridingModule( overridingModule[ii] );
-		}
-	
-		controler.addOverridingModule(new GridBasedAccessibilityModule());
-	
-		// Add calculators
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
-				AccessibilityUtils.addFreeSpeedNetworkMode(this.binder(), accBinder, TransportMode.car);
-				AccessibilityUtils.addNetworkMode(this.binder(), accBinder, TransportMode.car);
-				AccessibilityUtils.addConstantSpeedMode(this.binder(), accBinder, TransportMode.bike);
-				AccessibilityUtils.addConstantSpeedMode(this.binder(), accBinder, TransportMode.walk);
-			}
-	
-		});
-		controler.run();
 	}
 }
