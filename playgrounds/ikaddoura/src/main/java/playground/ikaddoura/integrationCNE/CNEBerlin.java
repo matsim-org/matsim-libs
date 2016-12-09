@@ -137,7 +137,7 @@ public class CNEBerlin {
 	public void run() {
 						
 		Config config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup(), new NoiseConfigGroup());
-		config.vehicles().setVehiclesFile("../../../runs-svn/berlin-an-time/input/population_1agent.emissionVehicle.xml.gz");
+//		config.vehicles().setVehiclesFile("../../../runs-svn/berlin-an-time/input/population_1agent.emissionVehicle.xml.gz");
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
