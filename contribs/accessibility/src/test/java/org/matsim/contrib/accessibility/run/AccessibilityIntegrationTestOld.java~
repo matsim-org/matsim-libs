@@ -170,6 +170,8 @@ public class AccessibilityIntegrationTestOld {
 		
 		// ---
 		
+		Controler controler = new Controler(scenario);
+
 		// creating test opportunities (facilities)
 		final ActivityFacilities opportunities = scenario.getActivityFacilities();
 		for ( Link link : scenario.getNetwork().getLinks().values() ) {
@@ -179,14 +181,11 @@ public class AccessibilityIntegrationTestOld {
 			opportunities.addActivityFacility(facility);
 		}
 
-		// ---
-		
-		Controler controler = new Controler(scenario);
-
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				this.bind(SpatialGridDataExchangeInterface.class).toInstance(new EvaluateTestResults(true, true, true, true, true));
+				this.bind(PtMatrix.class).toInstance(ptMatrix);
 			}
 		});
 		
@@ -205,13 +204,15 @@ public class AccessibilityIntegrationTestOld {
 				addConstantSpeedMode(this.binder(), accessibilityBinder, TransportMode.walk);
 			}
 		});
-		
-		// ---
-		
 		controler.run();
 	}
 
+<<<<<<< 6f390f940a9c5d90370e4368e324fa84d79e976f
 
+||||||| merged common ancestors
+//	@Ignore
+=======
+>>>>>>> condensing code in accessibility contrib
 	@Test
 	public void testWithExtentDeterminedByNetwork() {
 		final Config config = ConfigUtils.createConfig();
