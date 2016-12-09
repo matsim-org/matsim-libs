@@ -48,7 +48,7 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 	private final Map<Id<Vehicle>, Double> vehicleId2ColdEmissCosts = new HashMap<>();
 	private final Map<Id<Vehicle>, Double> vehicleId2WarmEmissCosts = new HashMap<>();
 
-	private final PersonFilter pf ; // what if no person filter is available..?
+	private final PersonFilter pf  ; // TODO : what if no person filter is available..?
 
 	public ExperiencedEmissionCostHandler(final EmissionResponsibilityCostModule emissionCostModule) {
 		this(emissionCostModule, null);
@@ -157,6 +157,11 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 		);
 	}
 
+	@Override
+	public boolean isFiltering() {
+		return ! (pf==null);
+	}
+
 	public Map<Id<Vehicle>, Double> getVehicleId2ColdEmissionCosts() {
 		return this.vehicleId2ColdEmissCosts;
 	}
@@ -164,4 +169,5 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 	public Map<Id<Vehicle>, Double> getVehicleId2WarmEmissionCosts() {
 		return this.vehicleId2WarmEmissCosts;
 	}
+
 }

@@ -53,8 +53,10 @@ public class EmissionAnalysisControlerListener implements StartupListener, Itera
         this.writer = IOUtils.getBufferedWriter(event.getServices().getConfig().controler().getOutputDirectory()+"/totalEmissionsCosts.txt");
         try {
             this.writer.write("ItNr\t");
-            for (MunichPersonFilter.MunichUserGroup munichUserGroup : MunichPersonFilter.MunichUserGroup.values()) {
-                this.writer.write(munichUserGroup.toString()+"\t");
+            if(this.emissionCostHandler.isFiltering()) {
+                for (MunichPersonFilter.MunichUserGroup munichUserGroup : MunichPersonFilter.MunichUserGroup.values()) {
+                    this.writer.write(munichUserGroup.toString()+"\t");
+                }
             }
             this.writer.write("total\n");
             this.writer.flush();
@@ -73,8 +75,10 @@ public class EmissionAnalysisControlerListener implements StartupListener, Itera
         Map<String, Double> userGrp2cost = this.emissionCostHandler.getUserGroup2TotalEmissionCosts();
         try {
             this.writer.write(event.getIteration()+"\t");
-            for (MunichPersonFilter.MunichUserGroup munichUserGroup : MunichPersonFilter.MunichUserGroup.values()) {
-                this.writer.write(userGrp2cost.get(munichUserGroup.toString())+"\t");
+            if(this.emissionCostHandler.isFiltering()) {
+                for (MunichPersonFilter.MunichUserGroup munichUserGroup : MunichPersonFilter.MunichUserGroup.values()) {
+                    this.writer.write(userGrp2cost.get(munichUserGroup.toString()) + "\t");
+                }
             }
             this.writer.write(MapUtils.doubleValueSum(userGrp2cost)+"\n");
             this.writer.flush();
