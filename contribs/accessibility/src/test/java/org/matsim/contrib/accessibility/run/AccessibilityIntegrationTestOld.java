@@ -144,12 +144,15 @@ public class AccessibilityIntegrationTestOld {
 
 		config.controler().setLastIteration(10);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+
+		// ---
 
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
-		
+
 		// creating test opportunities (facilities)
 		final ActivityFacilities opportunities = sc.getActivityFacilities();
 		for ( Link link : sc.getNetwork().getLinks().values() ) {
@@ -158,35 +161,26 @@ public class AccessibilityIntegrationTestOld {
 			ActivityFacility facility = opportunities.getFactory().createActivityFacility(id, coord);
 			opportunities.addActivityFacility(facility);
 		}
-		AbstractModule[] overridingModule = { new EvaluateTestResultsModule() };
-	
 
-		
-		sc.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		
-				
-				Controler controler = new Controler(sc);
-		
-				for ( int ii=0 ; ii< overridingModule.length ; ii++ ) {
-					controler.addOverridingModule( overridingModule[ii] );
-				}
-			
-				final GridBasedAccessibilityModule mm = new GridBasedAccessibilityModule();
-		//		mm.addSpatialGridDataExchangeInterface( null ) ;
-				controler.addOverridingModule(mm);
-			
-				// Add calculators
-				controler.addOverridingModule(new AbstractModule() {
-					@Override
-					public void install() {
-						MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
-						AccessibilityUtils.addFreeSpeedNetworkMode(this.binder(), accBinder, TransportMode.car);
-						AccessibilityUtils.addNetworkMode(this.binder(), accBinder, TransportMode.car);
-						AccessibilityUtils.addConstantSpeedMode(this.binder(), accBinder, TransportMode.bike);
-					}
-			
-				});
-				controler.run();
+		// ---
+
+		Controler controler = new Controler(sc);
+
+		controler.addOverridingModule(new GridBasedAccessibilityModule());
+
+		controler.addOverridingModule(new EvaluateTestResultsModule() ) ;
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
+				AccessibilityUtils.addFreeSpeedNetworkMode(this.binder(), accBinder, TransportMode.car);
+				AccessibilityUtils.addNetworkMode(this.binder(), accBinder, TransportMode.car);
+				AccessibilityUtils.addConstantSpeedMode(this.binder(), accBinder, TransportMode.bike);
+			}
+
+		});
+		controler.run();
 		// compare some results -> done in EvaluateTestResults
 	}
 
@@ -227,33 +221,33 @@ public class AccessibilityIntegrationTestOld {
 			opportunities.addActivityFacility(facility);
 		}
 		AbstractModule[] overridingModule = { new EvaluateTestResultsModule() };
-	
+
 
 		sc.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		
-				
-				Controler controler = new Controler(sc);
-		
-				for ( int ii=0 ; ii< overridingModule.length ; ii++ ) {
-					controler.addOverridingModule( overridingModule[ii] );
-				}
-			
-				final GridBasedAccessibilityModule mm = new GridBasedAccessibilityModule();
+
+
+		Controler controler = new Controler(sc);
+
+		for ( int ii=0 ; ii< overridingModule.length ; ii++ ) {
+			controler.addOverridingModule( overridingModule[ii] );
+		}
+
+		final GridBasedAccessibilityModule mm = new GridBasedAccessibilityModule();
 		//		mm.addSpatialGridDataExchangeInterface( null ) ;
-				controler.addOverridingModule(mm);
-			
-				// Add calculators
-				controler.addOverridingModule(new AbstractModule() {
-					@Override
-					public void install() {
-						MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
-						AccessibilityUtils.addFreeSpeedNetworkMode(this.binder(), accBinder, TransportMode.car);
-						AccessibilityUtils.addNetworkMode(this.binder(), accBinder, TransportMode.car);
-						AccessibilityUtils.addConstantSpeedMode(this.binder(), accBinder, TransportMode.bike);
-					}
-			
-				});
-				controler.run();
+		controler.addOverridingModule(mm);
+
+		// Add calculators
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
+				AccessibilityUtils.addFreeSpeedNetworkMode(this.binder(), accBinder, TransportMode.car);
+				AccessibilityUtils.addNetworkMode(this.binder(), accBinder, TransportMode.car);
+				AccessibilityUtils.addConstantSpeedMode(this.binder(), accBinder, TransportMode.bike);
+			}
+
+		});
+		controler.run();
 		// compare some results -> done in EvaluateTestResults
 	}
 
@@ -309,33 +303,33 @@ public class AccessibilityIntegrationTestOld {
 			opportunities.addActivityFacility(facility);
 		}
 		AbstractModule[] overridingModule = { new EvaluateTestResultsModule() };
-	
+
 
 		sc.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		
-				
-				Controler controler = new Controler(sc);
-		
-				for ( int ii=0 ; ii< overridingModule.length ; ii++ ) {
-					controler.addOverridingModule( overridingModule[ii] );
-				}
-			
-				final GridBasedAccessibilityModule mm = new GridBasedAccessibilityModule();
+
+
+		Controler controler = new Controler(sc);
+
+		for ( int ii=0 ; ii< overridingModule.length ; ii++ ) {
+			controler.addOverridingModule( overridingModule[ii] );
+		}
+
+		final GridBasedAccessibilityModule mm = new GridBasedAccessibilityModule();
 		//		mm.addSpatialGridDataExchangeInterface( null ) ;
-				controler.addOverridingModule(mm);
-			
-				// Add calculators
-				controler.addOverridingModule(new AbstractModule() {
-					@Override
-					public void install() {
-						MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
-						AccessibilityUtils.addFreeSpeedNetworkMode(this.binder(), accBinder, TransportMode.car);
-						AccessibilityUtils.addNetworkMode(this.binder(), accBinder, TransportMode.car);
-						AccessibilityUtils.addConstantSpeedMode(this.binder(), accBinder, TransportMode.bike);
-					}
-			
-				});
-				controler.run();
+		controler.addOverridingModule(mm);
+
+		// Add calculators
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
+				AccessibilityUtils.addFreeSpeedNetworkMode(this.binder(), accBinder, TransportMode.car);
+				AccessibilityUtils.addNetworkMode(this.binder(), accBinder, TransportMode.car);
+				AccessibilityUtils.addConstantSpeedMode(this.binder(), accBinder, TransportMode.bike);
+			}
+
+		});
+		controler.run();
 
 		// compare some results -> done in EvaluateTestResults 
 	}
@@ -347,7 +341,7 @@ public class AccessibilityIntegrationTestOld {
 			this.bind(SpatialGridDataExchangeInterface.class).toInstance(new EvaluateTestResults(true, true, true, true, true));
 		}
 	}
-	
+
 
 	/**
 	 * This is called by the GridBasedAccessibilityListener and gets the resulting SpatialGrids. This test checks if the 

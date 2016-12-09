@@ -20,11 +20,9 @@
 package org.matsim.contrib.accessibility;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.inject.Provider;
 
@@ -32,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.gis.GridUtils;
+import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
@@ -51,15 +50,27 @@ import com.vividsolutions.jts.geom.Geometry;
 public class GridBasedAccessibilityModule extends AbstractModule {
 	private static final Logger LOG = Logger.getLogger(GridBasedAccessibilityModule.class);
 
-	private List<SpatialGridDataExchangeInterface> exchangers = new ArrayList<>() ;
+	private List<SpatialGridDataExchangeInterface> spatialGridDataListeners = new ArrayList<>() ;
 
-	private List<ActivityFacilities> additionalFacs = new ArrayList<>() ; 
+	private List<FacilityDataExchangeInterface> facilityDataListeners = new ArrayList<>() ; 
+
+	private List<ActivityFacilities> additionalFacs = new ArrayList<>() ;
+
 	
+	/**
+	 * If this class does not provide you with enough flexibility, do your own new AbstractModule(){...}, copy the install part from this class
+	 * into that, and go from there. 
+	 */
 	public GridBasedAccessibilityModule() {
 	}
 	
-	void addGridExchanger( SpatialGridDataExchangeInterface exchanger ) {
-		exchangers.add( exchanger ) ;
+	@Deprecated
+	public final void addSpatialGridDataExchangeListener( SpatialGridDataExchangeInterface listener ) {
+		spatialGridDataListeners.add( listener ) ;
+	}
+	
+	public final void addFacilityDataExchangeListener( FacilityDataExchangeInterface listener ) {
+		this.facilityDataListeners.add( listener ) ;
 	}
 
 	@Override
@@ -67,7 +78,6 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 		addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
 			@Inject private Scenario scenario;
 			@Inject private ActivityFacilities opportunities;
-			@Inject private Map<String, AccessibilityContributionCalculator> calculators;
 			@Inject (optional = true) PtMatrix ptMatrix = null; // Downstream code knows how to handle a null PtMatrix
 
 			@Override
@@ -96,17 +106,38 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 					LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");
 				}
 				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
-				for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
-					accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
+				for ( Modes4Accessibility mode : acg.getIsComputingMode() ) {
+					switch( mode ) {
+					case bike:
+						new ConstantSpeedModeProvider(mode.name()) ;
+						break;
+					case car:
+						new NetworkModeProvider(mode.name()) ;
+						break;
+					case freespeed:
+						new FreeSpeedNetworkModeProvider(mode.name()) ;
+						break;
+					case pt:
+						throw new RuntimeException("currently not implemented") ;
+					case walk:
+						new ConstantSpeedModeProvider(mode.name()) ;
+						break;
+					default:
+						throw new RuntimeException("not implemented") ;
+					}
 				}
-				GridBasedAccessibilityShutdownListenerV3 gbasl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, 
-						boundingBox, cellSize_m);
+				
+				GridBasedAccessibilityShutdownListenerV3 gbasl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, 
+						opportunities, ptMatrix, scenario, boundingBox, cellSize_m);
 
-				for ( SpatialGridDataExchangeInterface listener : exchangers ) {
+				for ( SpatialGridDataExchangeInterface listener : spatialGridDataListeners ) {
 					gbasl.addSpatialGridDataExchangeListener(listener) ;
 				}
 				for ( ActivityFacilities fac : additionalFacs ) {
 					gbasl.addAdditionalFacilityData(fac);
+				}
+				for ( FacilityDataExchangeInterface listener : facilityDataListeners ) {
+					gbasl.addFacilityDataExchangeListener(listener);
 				}
 				return gbasl;
 			}

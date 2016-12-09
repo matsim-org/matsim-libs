@@ -195,8 +195,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	}
 
     @StringSetter(AREA_OF_ACC_COMP)
-	public void setAreaOfAccessibilityComputation(
-			String areaOfAccessibilityComputation) {
+	public void setAreaOfAccessibilityComputation( String areaOfAccessibilityComputation) {
     	boolean problem = true ;
     	for ( AreaOfAccesssibilityComputation var : AreaOfAccesssibilityComputation.values() ) {
     		if ( var.toString().equals(areaOfAccessibilityComputation) ) {
