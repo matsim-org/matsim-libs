@@ -24,9 +24,11 @@ import java.io.IOException;
 import java.util.Map;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
@@ -37,7 +39,7 @@ import playground.agarwalamit.utils.MapUtils;
  * Created by amit on 01/12/2016.
  */
 
-public class EmissionAnalysisControlerListener implements StartupListener, IterationEndsListener, ShutdownListener {
+public class EmissionAnalysisControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 
     public EmissionAnalysisControlerListener(final EmissionCostHandler emissionCostHandler, final EmissionModule emissionModule) {
         this.emissionCostHandler = emissionCostHandler;
@@ -68,6 +70,11 @@ public class EmissionAnalysisControlerListener implements StartupListener, Itera
         event.getServices().getEvents().addHandler(this.emissionModule.getColdEmissionHandler());
 
         emissionModule.getEmissionEventsManager().addHandler(this.emissionCostHandler);
+    }
+
+    @Override
+    public void notifyIterationStarts(IterationStartsEvent event) {
+        this.emissionCostHandler.reset(event.getIteration());
     }
 
     @Override
