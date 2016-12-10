@@ -33,6 +33,7 @@ import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssib
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
+import org.matsim.contrib.accessibility.utils.GeoserverUpdater;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
@@ -64,7 +65,13 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 
 	private ActivityFacilities opportunities = null ;
 
-	private String writeToSubdirectoryWithName;
+	private String activityType;
+
+	private boolean pushing2Geoserver;
+
+	private String runId;
+
+	private String crs;
 
 	
 	/**
@@ -72,6 +79,10 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 	 * into that, and go from there. 
 	 */
 	public GridBasedAccessibilityModule() {
+	}
+	
+	public final void setPushing2Geoserver( boolean pushing2Geoserver ) {
+		this.pushing2Geoserver = pushing2Geoserver ;
 	}
 	
 	@Deprecated
@@ -154,6 +165,11 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 					accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calc ) ;
 				}
 				
+				if (pushing2Geoserver == true) {
+					accessibilityCalculator.addFacilityDataExchangeListener(new GeoserverUpdater(crs, runId + "_" + activityType));
+				}
+
+				
 				GridBasedAccessibilityShutdownListenerV3 gbasl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, 
 						opportunities, ptMatrix, scenario, boundingBox, cellSize_m);
 
@@ -167,7 +183,7 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 					gbasl.addFacilityDataExchangeListener(listener);
 				}
 				
-				gbasl.writeToSubdirectoryWithName(writeToSubdirectoryWithName);
+				gbasl.writeToSubdirectoryWithName(activityType);
 				
 				return gbasl;
 			}
@@ -177,8 +193,13 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 	public void addAdditionalFacilityData(ActivityFacilities homes) {
 		additionalFacs.add(homes) ;
 	}
-
-	public void writeToSubdirectoryWithName(String str) {
-		this.writeToSubdirectoryWithName = str ;
+	public void setActivityType(String str) {
+		this.activityType = str ;
+	}
+	public final void setRunId(String str){
+		this.runId = str ;
+	}
+	public final void setCrs(String str){
+		this.crs = str ;
 	}
 }

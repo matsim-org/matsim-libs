@@ -110,7 +110,7 @@ final public class RunAccessibilityExample {
 
 			final GridBasedAccessibilityModule module = new GridBasedAccessibilityModule();
 			module.setOpportunities(opportunities);
-			module.writeToSubdirectoryWithName(actType);
+			module.setActivityType(actType);
 
 			// add additional facility data to an additional column in the output
 			// here, an additional population density column is used
