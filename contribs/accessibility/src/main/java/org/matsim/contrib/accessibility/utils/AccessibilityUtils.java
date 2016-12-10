@@ -15,10 +15,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
-import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
-import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
-import org.matsim.contrib.accessibility.NetworkModeProvider;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.network.NetworkUtils;
@@ -29,12 +25,6 @@ import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
-import org.matsim.facilities.FacilitiesWriter;
-
-import com.google.inject.Binder;
-import com.google.inject.Key;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.name.Names;
 
 /**
  * @author dziemke
@@ -236,21 +226,21 @@ public class AccessibilityUtils {
 	}
 
 
-	public static void addNetworkMode(Binder binder, MapBinder<String, AccessibilityContributionCalculator> accBinder, String mode) {
-		binder.bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
-		accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-	}
-
-
-	public static void addFreeSpeedNetworkMode(Binder binder, MapBinder<String, AccessibilityContributionCalculator> accBinder, String mode) {
-		final String str = "freespeed"; // yyyyyy should really be mode+"_freespeed" but need to see where that would fail tests.  kai, dec'16
-		binder.bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(str)).toProvider(new FreeSpeedNetworkModeProvider(mode));
-		accBinder.addBinding(str).to(Key.get(AccessibilityContributionCalculator.class, Names.named(str)));
-	}
-
-
-	public static void addConstantSpeedMode(Binder bnd, MapBinder<String, AccessibilityContributionCalculator> accBinder, String mode) {
-		bnd.bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
-		accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-	}
+//	public static void addNetworkMode(Binder binder, MapBinder<String, AccessibilityContributionCalculator> accBinder, String mode) {
+//		binder.bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
+//		accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+//	}
+//
+//
+//	public static void addFreeSpeedNetworkMode(Binder binder, MapBinder<String, AccessibilityContributionCalculator> accBinder, String mode) {
+//		final String str = "freespeed"; // yyyyyy should really be mode+"_freespeed" but need to see where that would fail tests.  kai, dec'16
+//		binder.bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(str)).toProvider(new FreeSpeedNetworkModeProvider(mode));
+//		accBinder.addBinding(str).to(Key.get(AccessibilityContributionCalculator.class, Names.named(str)));
+//	}
+//
+//
+//	public static void addConstantSpeedMode(Binder bnd, MapBinder<String, AccessibilityContributionCalculator> accBinder, String mode) {
+//		bnd.bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+//		accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+//	}
 }

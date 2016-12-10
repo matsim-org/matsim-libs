@@ -62,6 +62,8 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 
 	private List<ActivityFacilities> additionalFacs = new ArrayList<>() ;
 
+	private ActivityFacilities opportunities = null ;
+
 	
 	/**
 	 * If this class does not provide you with enough flexibility, do your own new AbstractModule(){...}, copy the install part from this class
@@ -78,6 +80,10 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 	public final void addFacilityDataExchangeListener( FacilityDataExchangeInterface listener ) {
 		this.facilityDataListeners.add( listener ) ;
 	}
+	
+	public final void setOpportunities( ActivityFacilities opportunities ) {
+		this.opportunities = opportunities ;
+	}
 
 	@Override
 	public void install() {
@@ -87,7 +93,7 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 			@Inject private Config config ;
 			@Inject private Network network ;
 			@Inject private Scenario scenario;
-			@Inject private ActivityFacilities opportunities;
+
 			@Inject (optional = true) PtMatrix ptMatrix = null; // Downstream code knows how to handle a null PtMatrix
 			@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
 			@Inject private Map<String,TravelTime> travelTimes ;

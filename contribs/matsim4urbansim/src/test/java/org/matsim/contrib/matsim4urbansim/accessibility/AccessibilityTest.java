@@ -1,5 +1,11 @@
 package org.matsim.contrib.matsim4urbansim.accessibility;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,23 +19,24 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.AccessibilityCalculator;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
-import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
-import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
+import org.matsim.contrib.accessibility.ConstantSpeedAccessibilityExpContributionCalculator;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.NetworkModeProvider;
+import org.matsim.contrib.accessibility.NetworkModeAccessibilityExpContributionCalculator;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
-import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
+import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestPopulation;
 import org.matsim.contrib.matsim4urbansim.config.CreateTestM4UConfig;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -41,21 +48,10 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
-
-import com.google.inject.Key;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.name.Names;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 public class AccessibilityTest implements SpatialGridDataExchangeInterface, FacilityDataExchangeInterface {
 	private static Logger log = Logger.getLogger( AccessibilityTest.class ) ;
@@ -118,39 +114,6 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 		Controler ctrl = new Controler(scenario);
 		ctrl.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
-		final List<String> modes = new ArrayList<>();
-		// Add calculators
-		ctrl.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
-				{
-					String mode = Modes4Accessibility.freespeed.name() ;
-					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new FreeSpeedNetworkModeProvider(TransportMode.car));
-					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-					if (!modes.contains(mode)) modes.add(mode); // This install method is called four times, but each new mode should only be added once
-				}
-				{
-					String mode = TransportMode.car;
-					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
-					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-					if (!modes.contains(mode)) modes.add(mode); // This install method is called four times, but each new mode should only be added once
-				}
-				{ 
-					String mode = TransportMode.bike;
-					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
-					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-					if (!modes.contains(mode)) modes.add(mode); // This install method is called four times, but each new mode should only be added once
-				}
-				{
-					final String mode = TransportMode.walk;
-					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
-					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-					if (!modes.contains(mode)) modes.add(mode); // This install method is called four times, but each new mode should only be added once
-				}
-			}
-		});
-
 
 		//pt not used in this test
 		final PtMatrix ptMatrix = null;
@@ -174,17 +137,41 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
 						@Inject Map<String, TravelTime> travelTimes;
 						@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
-						@Inject Map<String, AccessibilityContributionCalculator> calculators;
+						@Inject Network network ;
 
 						@Override
 						public ControlerListener get() {
 							//initialize new grid based accessibility controler listener and grids for the modes we want to analyze here
 							ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution) ;
 							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
-							for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
-								accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
+							AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
+							for ( Modes4Accessibility mode : acg.getIsComputingMode() ) {
+								AccessibilityContributionCalculator calc = null ;
+								switch( mode ) {
+								case bike:
+									calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
+									break;
+								case car: {
+									final TravelTime travelTime = travelTimes.get(mode.name());
+									Gbl.assertNotNull(travelTime);
+									final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(mode.name());
+									calc = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario) ;
+									break; }
+								case freespeed: {
+									final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
+									Gbl.assertNotNull(travelDisutilityFactory);
+									calc = new NetworkModeAccessibilityExpContributionCalculator( new FreeSpeedTravelTime(), travelDisutilityFactory, scenario) ;
+									break; }
+								case pt:
+									throw new RuntimeException("currently not implemented") ;
+								case walk:
+									calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
+									break;
+								default:
+									throw new RuntimeException("not implemented") ;
+								}
+								accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calc ) ;
 							}
-
 							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, minX, minY, maxX, maxY, resolution);
 
 							//add grid data exchange listener to get accessibilities
@@ -263,35 +250,41 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 
 		ctrl.addOverridingModule(new AbstractModule() {
 			@Override public void install() {
-				MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
-				{
-					String mode = Modes4Accessibility.freespeed.name() ;
-					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new FreeSpeedNetworkModeProvider(TransportMode.car));
-					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-				}
-				{
-					String mode = TransportMode.car;
-					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
-					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-				}
-				{ 
-					String mode = TransportMode.bike;
-					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
-					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-				}
-				{
-					final String mode = TransportMode.walk;
-					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
-					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-				}
 
-				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {				
-					@Inject Map<String, AccessibilityContributionCalculator> calculators ;
+				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {		
+					@Inject private Map<String,TravelTime> travelTimes ;
+					@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
+					@Inject private Network network ;
+					
 					@Override public ControlerListener get() {
 
-						// yyyyyy total total total overkill to first inject it and then use it as follows; just doing it in this way to get test back up and running.
-						for (Entry<String, AccessibilityContributionCalculator> entry : calculators.entrySet()) {
-							accessibilityCalculator.putAccessibilityContributionCalculator(entry.getKey(), entry.getValue());
+						AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.class);
+						for ( Modes4Accessibility mode : acg.getIsComputingMode() ) {
+							AccessibilityContributionCalculator calc = null ;
+							switch( mode ) {
+							case bike:
+								calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
+								break;
+							case car: {
+								final TravelTime travelTime = travelTimes.get(mode.name());
+								Gbl.assertNotNull(travelTime);
+								final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(mode.name());
+								calc = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario) ;
+								break; }
+							case freespeed: {
+								final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
+								Gbl.assertNotNull(travelDisutilityFactory);
+								calc = new NetworkModeAccessibilityExpContributionCalculator( new FreeSpeedTravelTime(), travelDisutilityFactory, scenario) ;
+								break; }
+							case pt:
+								throw new RuntimeException("currently not implemented") ;
+							case walk:
+								calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
+								break;
+							default:
+								throw new RuntimeException("not implemented") ;
+							}
+							accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calc ) ;
 						}
 						ZoneBasedAccessibilityControlerListenerV3 listener = new ZoneBasedAccessibilityControlerListenerV3(
 								accessibilityCalculator, opportunities, path, scenario);

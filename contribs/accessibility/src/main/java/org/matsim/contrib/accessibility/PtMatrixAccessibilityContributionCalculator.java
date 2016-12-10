@@ -17,7 +17,7 @@ import org.matsim.facilities.ActivityFacility;
  * @author thibautd
  * @author michaz
  */
-class PtMatrixAccessibilityContributionCalculator {
+public final class PtMatrixAccessibilityContributionCalculator {
 
 	public static AccessibilityContributionCalculator create(
 			final PtMatrix ptMatrix,
