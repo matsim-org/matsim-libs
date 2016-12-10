@@ -185,6 +185,10 @@ public final class AccessibilityModule extends AbstractModule {
 		});
 	}
 
+	/**
+	 * Add additional facility data that will generate an additional column for each (x,y,t)-Entry.  The facilities are aggreated to
+	 * the measurement points in downstream code.
+	 */
 	public void addAdditionalFacilityData(ActivityFacilities facilities) {
 		additionalFacs.add(facilities) ;
 	}
@@ -196,4 +200,5 @@ public final class AccessibilityModule extends AbstractModule {
 		// yyyy could be done via config
 		this.crs = outputCrs ;
 	}
+
 }

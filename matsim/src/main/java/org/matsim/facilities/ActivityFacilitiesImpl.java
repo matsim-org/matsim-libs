@@ -20,6 +20,7 @@
 
 package org.matsim.facilities;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -30,13 +31,15 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
  * Maintainer: mrieser / Senozon AG
  * @author balmermi
  */
-public class ActivityFacilitiesImpl implements ActivityFacilities {
+public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableActivityFacilities {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -47,11 +50,13 @@ public class ActivityFacilitiesImpl implements ActivityFacilities {
 	private static final Logger log = Logger.getLogger(ActivityFacilitiesImpl.class);
 	private final ActivityFacilitiesFactory factory ;
 
-	private final Map<Id<ActivityFacility>, ActivityFacility> facilities = new LinkedHashMap<Id<ActivityFacility>, ActivityFacility>();
+	private final Map<Id<ActivityFacility>, ActivityFacility> facilities = new LinkedHashMap<>();
 
 	private String name;
 
 	private final ObjectAttributes facilityAttributes = new ObjectAttributes();
+
+	private QuadTree<ActivityFacility> facilitiesQuadTree;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
@@ -104,7 +109,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities {
 
 	@Override
 	public final TreeMap<Id<ActivityFacility>, ActivityFacility> getFacilitiesForActivityType(final String act_type) {
-		TreeMap<Id<ActivityFacility>, ActivityFacility> facs = new TreeMap<Id<ActivityFacility>, ActivityFacility>();
+		TreeMap<Id<ActivityFacility>, ActivityFacility> facs = new TreeMap<>();
 		Iterator<ActivityFacility> iter = this.facilities.values().iterator();
 		while (iter.hasNext()){
 			ActivityFacility f = iter.next();
@@ -153,5 +158,66 @@ public class ActivityFacilitiesImpl implements ActivityFacilities {
 		
 		return stb.toString() ;
 	}
+
+	synchronized private void buildQuadTree() {
+		/* the method must be synchronized to ensure we only build one quadTree
+		 * in case that multiple threads call a method that requires the quadTree.
+		 */
+		if (this.facilitiesQuadTree != null) {
+			return;
+		}
+		double startTime = System.currentTimeMillis();
+		double minx = Double.POSITIVE_INFINITY;
+		double miny = Double.POSITIVE_INFINITY;
+		double maxx = Double.NEGATIVE_INFINITY;
+		double maxy = Double.NEGATIVE_INFINITY;
+		for ( ActivityFacility n : this.facilities.values()) {
+			if (n.getCoord().getX() < minx) { minx = n.getCoord().getX(); }
+			if (n.getCoord().getY() < miny) { miny = n.getCoord().getY(); }
+			if (n.getCoord().getX() > maxx) { maxx = n.getCoord().getX(); }
+			if (n.getCoord().getY() > maxy) { maxy = n.getCoord().getY(); }
+		}
+		minx -= 1.0;
+		miny -= 1.0;
+		maxx += 1.0;
+		maxy += 1.0;
+		// yy the above four lines are problematic if the coordinate values are much smaller than one. kai, oct'15
+
+		log.info("building QuadTree for nodes: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
+		QuadTree<ActivityFacility> quadTree = new QuadTree<>(minx, miny, maxx, maxy);
+		for (ActivityFacility n : this.facilities.values()) {
+			quadTree.put(n.getCoord().getX(), n.getCoord().getY(), n);
+		}
+		/* assign the quadTree at the very end, when it is complete.
+		 * otherwise, other threads may already start working on an incomplete quadtree
+		 */
+		this.facilitiesQuadTree = quadTree;
+		log.info("Building QuadTree took " + ((System.currentTimeMillis() - startTime) / 1000.0) + " seconds.");
+	}
+	
+
+	/**
+	 * finds the node nearest to <code>coord</code>
+	 *
+	 * @param coord the coordinate to which the closest node should be found
+	 * @return the closest node found, null if none
+	 */
+	@Override public ActivityFacility getNearestFacility(final Coord coord) {
+		if (this.facilitiesQuadTree == null) { buildQuadTree(); }
+		return this.facilitiesQuadTree.getClosest(coord.getX(), coord.getY());
+	}
+
+	/**
+	 * finds the nodes within distance to <code>coord</code>
+	 *
+	 * @param coord the coordinate around which nodes should be located
+	 * @param distance the maximum distance a node can have to <code>coord</code> to be found
+	 * @return all nodes within distance to <code>coord</code>
+	 */
+	@Override public Collection<ActivityFacility> getNearestFacilities(final Coord coord, final double distance) {
+		if (this.facilitiesQuadTree == null) { buildQuadTree(); }
+		return this.facilitiesQuadTree.getDisk(coord.getX(), coord.getY(), distance);
+	}
+
 
 }
