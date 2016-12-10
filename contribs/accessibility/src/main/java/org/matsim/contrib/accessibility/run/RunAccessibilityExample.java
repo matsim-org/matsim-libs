@@ -97,71 +97,29 @@ final public class RunAccessibilityExample {
 		
 		Controler controler = new Controler(scenario);
 
+		for (final String actType : activityTypes) { // add an overriding module per activity type:
 
-		final GridBasedAccessibilityModule module = new GridBasedAccessibilityModule();
+			final ActivityFacilities opportunities = FacilitiesUtils.createActivityFacilities() ;
+			for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
+				for ( ActivityOption option : fac.getActivityOptions().values() ) {
+					if ( option.getType().equals(actType) ) {
+						opportunities.addActivityFacility(fac);
+					}
+				}
+			}
 
-		// add additional facility data to an additional column in the output
-		// here, an additional population density column is used
-		module.addAdditionalFacilityData(homes) ;
+			final GridBasedAccessibilityModule module = new GridBasedAccessibilityModule();
+			module.setOpportunities(opportunities);
+			module.writeToSubdirectoryWithName(actType);
 
-		controler.addOverridingModule(module);
+			// add additional facility data to an additional column in the output
+			// here, an additional population density column is used
+			module.addAdditionalFacilityData(homes) ;
+
+			controler.addOverridingModule(module);
+		}
 
 		controler.run();
 		
-//		
-//		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some other algorithms,
-//		// the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
-//		
-//		final Controler controler = new Controler(scenario) ;
-//		controler.getConfig().controler().setOverwriteFileSetting(
-//				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
-//
-//		controler.addOverridingModule(new AbstractModule() {
-//			@Override
-//			public void install() {
-//				for (final String actType : activityTypes) {
-//
-//					final ActivityFacilities opportunities = FacilitiesUtils.createActivityFacilities() ;
-//					for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
-//						for ( ActivityOption option : fac.getActivityOptions().values() ) {
-//							if ( option.getType().equals(actType) ) {
-//								opportunities.addActivityFacility(fac);
-//							}
-//						}
-//					}
-//					
-//					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
-//						@Override public ControlerListener get() {
-//							Double cellSizeForCellBasedAccessibility = Double.parseDouble(scenario.getConfig().getModule("accessibility").getValue("cellSizeForCellBasedAccessibility"));
-//							Config config = scenario.getConfig();
-//							if (cellSizeForCellBasedAccessibility <= 0) {
-//								throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
-//							}
-//							BoundingBox bb = BoundingBox.createBoundingBox(scenario.getNetwork());
-//							ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSizeForCellBasedAccessibility) ;
-//							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
-//
-//							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, null, scenario, bb.getXMin(), bb.getYMin(), bb.getXMax(),bb.getYMax(), cellSizeForCellBasedAccessibility);
-//
-//							if ( true ) {
-//								throw new RuntimeException("The following needs to be replaced with the newer, more modern syntax.  kai, nov'16" ) ;
-//							}
-//							// define the modes that will be considered
-//							// here, the accessibility computation is only done for freespeed
-////							accessibilityCalculator.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
-//
-//							// add additional facility data to an additional column in the output
-//							// here, an additional population density column is used
-//							listener.addAdditionalFacilityData(homes) ;
-//							listener.writeToSubdirectoryWithName(actType);
-//							return listener;
-//						}
-//					});
-//				}
-//			}
-//		});
-//
-//
-//		controler.run();
 	}
 }

@@ -64,6 +64,8 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 
 	private ActivityFacilities opportunities = null ;
 
+	private String writeToSubdirectoryWithName;
+
 	
 	/**
 	 * If this class does not provide you with enough flexibility, do your own new AbstractModule(){...}, copy the install part from this class
@@ -164,6 +166,9 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 				for ( FacilityDataExchangeInterface listener : facilityDataListeners ) {
 					gbasl.addFacilityDataExchangeListener(listener);
 				}
+				
+				gbasl.writeToSubdirectoryWithName(writeToSubdirectoryWithName);
+				
 				return gbasl;
 			}
 		});
@@ -171,5 +176,9 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 
 	public void addAdditionalFacilityData(ActivityFacilities homes) {
 		additionalFacs.add(homes) ;
+	}
+
+	public void writeToSubdirectoryWithName(String str) {
+		this.writeToSubdirectoryWithName = str ;
 	}
 }
