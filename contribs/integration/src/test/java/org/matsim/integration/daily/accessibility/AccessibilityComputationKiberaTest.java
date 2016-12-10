@@ -28,14 +28,12 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.FacilityTypes;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityModule;
+import org.matsim.contrib.accessibility.AccessibilityModule;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -93,6 +91,13 @@ public class AccessibilityComputationKiberaTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
+		config.controler().setRunId(runId);
+		
+		// Settings for VSP check
+		ConfigUtils.setVspDefaults(config);
+
+		// ---
+		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 				
 		// Collect activity types
@@ -101,12 +106,6 @@ public class AccessibilityComputationKiberaTest {
 		final List<String> activityTypes = new ArrayList<>();
 		activityTypes.add(FacilityTypes.DRINKING_WATER);
 		
-		// Settings for VSP check
-		config.timeAllocationMutator().setMutationRange(7200.);
-		config.timeAllocationMutator().setAffectingDuration(false);
-		config.plans().setRemovingUnneccessaryPlanAttributes(true);
-		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration);
-		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
 
 		// Network density points
 		ActivityFacilities measuringPoints = AccessibilityUtils.createMeasuringPointsFromNetworkBounds(scenario.getNetwork(), cellSize);
@@ -126,13 +125,11 @@ public class AccessibilityComputationKiberaTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, false);
 		
 		for ( String activityType : activityTypes ) {
-			GridBasedAccessibilityModule module = new GridBasedAccessibilityModule() ;
-			module.setActivityType(activityType);
+			AccessibilityModule module = new AccessibilityModule() ;
+			module.setConsideredActivityType(activityType);
 			module.addAdditionalFacilityData(densityFacilities);
-			module.setCrs(crs);
-			module.setRunId(runId);
+			module.setOutputCrs(crs);
 			module.setPushing2Geoserver(push2Geoserver);
-			module.setOpportunities(AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType) ) ; // yyyy do this in the "module"?
 			controler.addOverridingModule(module);
 		}
 

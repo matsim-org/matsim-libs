@@ -27,6 +27,10 @@ import org.matsim.facilities.ActivityFacilities;
  * @author thomas, dziemke
  */
 public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownListener {
+	// yyyy The zone based and the grid based accessibility controler listeners should be combined, since the coordinate points on which this is
+	// computed are now external anyways.  There is probably one or the other grid dependency in the grid based accessibility controler
+	// listener, but we wanted to remove that anyways.  kai, dec'16
+
 	private static final Logger log = Logger.getLogger(GridBasedAccessibilityShutdownListenerV3.class);
 
 

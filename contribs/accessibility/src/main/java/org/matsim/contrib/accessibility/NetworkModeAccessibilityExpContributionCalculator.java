@@ -22,7 +22,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 /**
  * @author thibautd
  */
- public class NetworkModeAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
+ public final class NetworkModeAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
 	private static final Logger log = Logger.getLogger( NetworkModeAccessibilityExpContributionCalculator.class );
 
 	@Deprecated // yyyy should be possible to get this from car travel disutility

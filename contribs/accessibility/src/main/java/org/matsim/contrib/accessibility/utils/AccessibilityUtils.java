@@ -42,9 +42,13 @@ public class AccessibilityUtils {
 	public static ActivityFacilities collectActivityFacilitiesWithOptionOfType(Scenario scenario, String activityOptionType) {
 		ActivityFacilities activityFacilities = FacilitiesUtils.createActivityFacilities(activityOptionType) ;
 		for (ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()) {
-			for (ActivityOption option : fac.getActivityOptions().values()) {
-				if (option.getType().equals(activityOptionType)) {
-					activityFacilities.addActivityFacility(fac);
+			if ( activityOptionType==null ) { // no activity option type for facility given, use all of them
+				activityFacilities.addActivityFacility(fac);
+			} else {
+				for (ActivityOption option : fac.getActivityOptions().values()) {
+					if (option.getType().equals(activityOptionType)) {
+						activityFacilities.addActivityFacility(fac);
+					}
 				}
 			}
 		}
@@ -59,7 +63,7 @@ public class AccessibilityUtils {
 	 * @return
 	 */
 	public static List<String> collectAllFacilityOptionTypes(Scenario scenario) {
-		List<String> activityOptionTypes = new ArrayList<String>() ;
+		List<String> activityOptionTypes = new ArrayList<>() ;
 		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
 			for (ActivityOption option : facility.getActivityOptions().values()) {
 				// collect all activity types that are contained within the provided facilities file

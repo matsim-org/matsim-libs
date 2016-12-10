@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityModule;
+import org.matsim.contrib.accessibility.AccessibilityModule;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.core.config.Config;
@@ -70,52 +70,21 @@ final public class RunAccessibilityExample {
 		
 		// ---
 		
-		// the run method is extracted so that a test can operate on it.
 		run( scenario);
+		// (the run method is extracted so that a test can operate on it)
 	}
 
 	
 	public static void run(final Scenario scenario) {
 		
-		final List<String> activityTypes = new ArrayList<>() ;
-		final ActivityFacilities homes = FacilitiesUtils.createActivityFacilities("homes") ;
-
-		for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) { // go through all facilities ...
-			for ( ActivityOption option : fac.getActivityOptions().values() ) { // go through all activity options at each facility ...
-				// figure out all activity types
-				if ( !activityTypes.contains(option.getType()) ) {
-					activityTypes.add( option.getType() ) ;
-				}
-				// figure out where the homes are
-				if ( option.getType().equals("h") ) { // yyyyyy hardcoded home activity option; replace!!!!
-					homes.addActivityFacility(fac);
-				}
-			}
-		}
-		
+		List<String> activityTypes = AccessibilityUtils.collectAllFacilityOptionTypes(scenario) ;
 		log.warn( "found the following activity types: " + activityTypes );
 		
 		Controler controler = new Controler(scenario);
 
 		for (final String actType : activityTypes) { // add an overriding module per activity type:
-
-			final ActivityFacilities opportunities = FacilitiesUtils.createActivityFacilities() ;
-			for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
-				for ( ActivityOption option : fac.getActivityOptions().values() ) {
-					if ( option.getType().equals(actType) ) {
-						opportunities.addActivityFacility(fac);
-					}
-				}
-			}
-
-			final GridBasedAccessibilityModule module = new GridBasedAccessibilityModule();
-			module.setOpportunities(opportunities);
-			module.setActivityType(actType);
-
-			// add additional facility data to an additional column in the output
-			// here, an additional population density column is used
-			module.addAdditionalFacilityData(homes) ;
-
+			final AccessibilityModule module = new AccessibilityModule();
+			module.setConsideredActivityType(actType);
 			controler.addOverridingModule(module);
 		}
 

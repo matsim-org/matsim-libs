@@ -33,6 +33,7 @@ import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssib
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
+import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.GeoserverUpdater;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
@@ -54,8 +55,8 @@ import com.vividsolutions.jts.geom.Geometry;
 /**
  * @author dziemke
  */
-public class GridBasedAccessibilityModule extends AbstractModule {
-	private static final Logger LOG = Logger.getLogger(GridBasedAccessibilityModule.class);
+public final class AccessibilityModule extends AbstractModule {
+	private static final Logger LOG = Logger.getLogger(AccessibilityModule.class);
 
 	private List<SpatialGridDataExchangeInterface> spatialGridDataListeners = new ArrayList<>() ;
 
@@ -63,13 +64,9 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 
 	private List<ActivityFacilities> additionalFacs = new ArrayList<>() ;
 
-	private ActivityFacilities opportunities = null ;
-
 	private String activityType;
 
 	private boolean pushing2Geoserver;
-
-	private String runId;
 
 	private String crs;
 
@@ -78,7 +75,7 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 	 * If this class does not provide you with enough flexibility, do your own new AbstractModule(){...}, copy the install part from this class
 	 * into that, and go from there. 
 	 */
-	public GridBasedAccessibilityModule() {
+	public AccessibilityModule() {
 	}
 	
 	public final void setPushing2Geoserver( boolean pushing2Geoserver ) {
@@ -94,10 +91,6 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 		this.facilityDataListeners.add( listener ) ;
 	}
 	
-	public final void setOpportunities( ActivityFacilities opportunities ) {
-		this.opportunities = opportunities ;
-	}
-
 	@Override
 	public void install() {
 		addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
@@ -118,6 +111,9 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 				if (cellSize_m <= 0) {
 					throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
 				}
+				
+				ActivityFacilities opportunities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType) ;
+				
 				final BoundingBox boundingBox;
 				final ActivityFacilitiesImpl measuringPoints;
 				if(acg.getAreaOfAccessibilityComputation().equals(AreaOfAccesssibilityComputation.fromShapeFile.toString())) {
@@ -166,10 +162,9 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 				}
 				
 				if (pushing2Geoserver == true) {
-					accessibilityCalculator.addFacilityDataExchangeListener(new GeoserverUpdater(crs, runId + "_" + activityType));
+					accessibilityCalculator.addFacilityDataExchangeListener(new GeoserverUpdater(crs, config.controler().getRunId() + "_" + activityType));
 				}
 
-				
 				GridBasedAccessibilityShutdownListenerV3 gbasl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, 
 						opportunities, ptMatrix, scenario, boundingBox, cellSize_m);
 
@@ -190,16 +185,15 @@ public class GridBasedAccessibilityModule extends AbstractModule {
 		});
 	}
 
-	public void addAdditionalFacilityData(ActivityFacilities homes) {
-		additionalFacs.add(homes) ;
+	public void addAdditionalFacilityData(ActivityFacilities facilities) {
+		additionalFacs.add(facilities) ;
 	}
-	public void setActivityType(String str) {
-		this.activityType = str ;
+	public void setConsideredActivityType(String activityType) {
+		// yyyy could be done via config (list of activities)
+		this.activityType = activityType ;
 	}
-	public final void setRunId(String str){
-		this.runId = str ;
-	}
-	public final void setCrs(String str){
-		this.crs = str ;
+	public final void setOutputCrs(String outputCrs){
+		// yyyy could be done via config
+		this.crs = outputCrs ;
 	}
 }

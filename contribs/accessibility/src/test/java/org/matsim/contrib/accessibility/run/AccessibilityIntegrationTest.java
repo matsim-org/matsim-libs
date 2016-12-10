@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityModule;
+import org.matsim.contrib.accessibility.AccessibilityModule;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
@@ -128,15 +128,17 @@ public class AccessibilityIntegrationTest {
 
 		Controler controler = new Controler(sc);
 
-		final GridBasedAccessibilityModule module = new GridBasedAccessibilityModule();
-		module.addSpatialGridDataExchangeListener( new EvaluateTestResults(true,true,true,true,true) ) ;
+		final AccessibilityModule module = new AccessibilityModule();
+		final EvaluateTestResults evaluateListener = new EvaluateTestResults(true,true,true,true,true);
+		module.addSpatialGridDataExchangeListener( evaluateListener ) ;
 		controler.addOverridingModule(module);
 
 		// ---
 
 		controler.run();
 
-		// compare some results -> done in EvaluateTestResults
+		// compare some results -> done in EvaluateTestResults.  But check that this was done at all:
+		Assert.assertTrue( evaluateListener.isDone() ) ;
 	}
 
 
@@ -152,15 +154,17 @@ public class AccessibilityIntegrationTest {
 
 		Controler controler = new Controler(sc);
 
-		final GridBasedAccessibilityModule module = new GridBasedAccessibilityModule();
-		module.addSpatialGridDataExchangeListener( new EvaluateTestResults(true,true,true,true,true) ) ;
+		final AccessibilityModule module = new AccessibilityModule();
+		final EvaluateTestResults evaluateListener = new EvaluateTestResults(true,true,true,true,true);
+		module.addSpatialGridDataExchangeListener( evaluateListener ) ;
 		controler.addOverridingModule(module);
 
 		// ---
 
 		controler.run();
 
-		// compare some results -> done in EvaluateTestResults
+		// compare some results -> done in EvaluateTestResults.  But check that this was done at all:
+		Assert.assertTrue( evaluateListener.isDone() ) ;
 	}
 
 
@@ -192,7 +196,7 @@ public class AccessibilityIntegrationTest {
 		
 		Controler controler = new Controler(sc);
 
-		final GridBasedAccessibilityModule module = new GridBasedAccessibilityModule();
+		final AccessibilityModule module = new AccessibilityModule();
 		module.addSpatialGridDataExchangeListener( new EvaluateTestResults(true,true,true,true,true) ) ;
 		controler.addOverridingModule(module);
 		
@@ -212,9 +216,11 @@ public class AccessibilityIntegrationTest {
 	 * 
 	 * @author thomas
 	 */
-	public static class EvaluateTestResults implements SpatialGridDataExchangeInterface{
+	 static class EvaluateTestResults implements SpatialGridDataExchangeInterface{
 
 		private Map<Modes4Accessibility,Boolean> isComputingMode = new HashMap<>();
+		
+		private boolean isDone = false ;
 
 		/**
 		 * constructor
@@ -330,7 +336,11 @@ public class AccessibilityIntegrationTest {
 
 			}
 
+			isDone = true ;
 			LOG.info("... done!");
+		}
+		boolean isDone() {
+			return isDone ;
 		}
 	}
 
