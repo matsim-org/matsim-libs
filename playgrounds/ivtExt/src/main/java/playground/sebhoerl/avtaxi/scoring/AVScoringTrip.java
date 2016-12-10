@@ -70,7 +70,16 @@ public class AVScoringTrip {
         return inVehicleTravelTime + waitingTime;
     }
 
+    public double getDepartureTime() {
+        if (!stage.equals(Stage.FINISHED)) throw new IllegalStateException();
+        return departureTime;
+    }
+
     public boolean isFinished() {
         return stage.equals(Stage.FINISHED);
+    }
+
+    public Stage getStage() {
+        return stage;
     }
 }

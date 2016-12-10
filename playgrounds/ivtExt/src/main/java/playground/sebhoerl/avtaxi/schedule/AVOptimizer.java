@@ -50,10 +50,6 @@ public class AVOptimizer implements VrpOptimizer, MobsimBeforeSimStepListener {
         Task currentTask = schedule.getCurrentTask();
         currentTask.setEndTime(now);
 
-        if (currentTask instanceof AVDropoffTask) {
-            processTeleportationEvent((AVDropoffTask) currentTask);
-        }
-
         List<AVTask> tasks = ((Schedule<AVTask>) schedule).getTasks();
         int index = currentTask.getTaskIdx() + 1;
         AVTask nextTask = null;
@@ -84,6 +80,10 @@ public class AVOptimizer implements VrpOptimizer, MobsimBeforeSimStepListener {
         if (nextTask != null) {
             ((AVVehicle) schedule.getVehicle()).getDispatcher().onNextTaskStarted(nextTask);
         }
+
+        if (nextTask != null && nextTask instanceof AVDropoffTask) {
+            processTransitEvent((AVDropoffTask) nextTask);
+        }
     }
 
     @Override
@@ -92,7 +92,7 @@ public class AVOptimizer implements VrpOptimizer, MobsimBeforeSimStepListener {
         processSubmittedRequestsBuffer();
     }
 
-    private void processTeleportationEvent(AVDropoffTask task) {
+    private void processTransitEvent(AVDropoffTask task) {
         for (AVRequest request : task.getRequests()) {
             eventsManager.processEvent(new AVTransitEvent(request, now));
         }

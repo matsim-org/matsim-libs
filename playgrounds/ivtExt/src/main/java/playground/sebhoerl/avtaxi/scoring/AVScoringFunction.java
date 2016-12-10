@@ -33,11 +33,14 @@ public class AVScoringFunction implements SumScoringFunction.ArbitraryEventScori
     private AVScoringTrip scoringTrip = null;
     private double score = 0.0;
 
+    final private Person person;
+
     public AVScoringFunction(AVConfig config, Person person, double marginalUtilityOfMoney, double marginalUtilityOfTraveling) {
         this.marginalUtilityOfWaiting = config.getMarginalUtilityOfWaitingTime() / 3600.0;
         this.marginalUtilityOfTraveling = marginalUtilityOfTraveling;
         this.marginalUtilityOfMoney = marginalUtilityOfMoney;
         this.config = config;
+        this.person = person;
     }
     
     @Override

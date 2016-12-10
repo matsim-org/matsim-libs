@@ -14,13 +14,13 @@ public class TravelTimeEstimator {
     }
 
     public double getDistance(Link fromLink, Link toLink, double startTime) {
-        //return CoordUtils.calcEuclideanDistance(fromLink.getCoord(), toLink.getCoord());
+        return 3.6 * CoordUtils.calcEuclideanDistance(fromLink.getCoord(), toLink.getCoord()) / 40.0;
 
-        if (fromLink.equals(toLink)) {
+        /*if (fromLink.equals(toLink)) {
             return 0.0;
         }
 
-        return router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), startTime, null, null).travelTime;
+        return router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), startTime, null, null).travelTime;*/
     }
 
     public double getThreshold() {
