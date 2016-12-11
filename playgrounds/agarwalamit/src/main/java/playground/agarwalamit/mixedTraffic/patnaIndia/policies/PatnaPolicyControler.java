@@ -128,7 +128,7 @@ public class PatnaPolicyControler {
 		config.travelTimeCalculator().setAnalyzedModes(String.join(",", PatnaUtils.ALL_MAIN_MODES));
 
 		if(addBikeTrack) config.network().setInputFile(inputDir + "/networkWithOptimizedConnectors.xml.gz"); // must be after getting optimum number of connectors
-		else config.network().setInputCRS(inputDir+"network.xml.gz");
+		else config.network().setInputFile(inputDir+"/network.xml.gz");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
