@@ -21,6 +21,7 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.policies;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -52,6 +53,7 @@ import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.PatnaVehiclesGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
@@ -68,7 +70,7 @@ public class PatnaPolicyControler {
 	private static String dir = FileUtils.RUNS_SVN + "/patnaIndia/run108/jointDemand/policies/0.15pcu/";
 	private static boolean applyTrafficRestrain = false;
 	private static boolean addBikeTrack = false;
-	private static boolean isAllwoingMotorbikeOnBikeTrack = true;
+	private static boolean isAllwoingMotorbikeOnBikeTrack = false;
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
@@ -114,6 +116,9 @@ public class PatnaPolicyControler {
 		// not anymore, there is now second calibration after cadyts and before baseCaseCtd; thus all plans in the choice set.
 		String inPlans = "baseCaseOutput_plans.xml.gz";
 		config.plans().setInputFile(inputDir + inPlans);
+		config.plans().setInputPersonAttributeFile(inputDir+"output_personAttributes.xml.gz");
+
+		config.vehicles().setVehiclesFile(null); // vehicle types are added from vehicle file later.
 		//==
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -122,19 +127,18 @@ public class PatnaPolicyControler {
 		config.travelTimeCalculator().setFilterModes(true);
 		config.travelTimeCalculator().setAnalyzedModes(String.join(",", PatnaUtils.ALL_MAIN_MODES));
 
-		// policies if any
-//		if (applyTrafficRestrain && addBikeTrack ) {
-//			config.network().setInputFile(inputDir + "/networkWithTrafficRestricationAndBikeTrack.xml.gz");
-//		} else if (applyTrafficRestrain ) {
-//			config.network().setInputFile(inputDir + "/networkWithTrafficRestrication.xml.gz");
-//		} else
-		if(addBikeTrack && !isAllwoingMotorbikeOnBikeTrack) {
-			config.network().setInputFile(inputDir + "/networkWithBikeTrack.xml.gz");
-		} else if (isAllwoingMotorbikeOnBikeTrack) {
-			config.network().setInputFile(inputDir + "/networkWithBikeMotorbikeTrack.xml.gz");
-		}
+		if(addBikeTrack) config.network().setInputFile(inputDir + "/networkWithOptimizedConnectors.xml.gz"); // must be after getting optimum number of connectors
+		else config.network().setInputCRS(inputDir+"network.xml.gz");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		// remove the connectors on which freespeed is only 0.01 m/s
+		scenario.getNetwork().getLinks().values().stream().filter(
+				link -> link.getId().toString().startsWith(PatnaUtils.BIKE_TRACK_CONNECTOR_PREFIX.toString()) && link.getFreespeed()==0.01
+		).collect(Collectors.toList()).forEach(link -> scenario.getNetwork().removeLink(link.getId()));
+
+		String vehiclesFile = inputDir+"output_vehicles.xml.gz"; // following is required to extract only vehicle types and not vehicle info. Amit Nov 2016
+		PatnaVehiclesGenerator.addVehiclesToScenarioFromVehicleFile(vehiclesFile, scenario);
 
 		if ( scenario.getVehicles().getVehicles().size() != 0 ) throw new RuntimeException("Only vehicle types should be loaded if vehicle source "+
 				QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData +" is assigned.");
