@@ -111,7 +111,6 @@ public class AccessibilityComputationKiberaTest {
 			AccessibilityModule module = new AccessibilityModule() ;
 			module.setConsideredActivityType(activityType);
 			module.addAdditionalFacilityData(densityFacilities);
-			module.setOutputCrs("EPSG:21037");
 			module.setPushing2Geoserver(push2Geoserver);
 			controler.addOverridingModule(module);
 		}

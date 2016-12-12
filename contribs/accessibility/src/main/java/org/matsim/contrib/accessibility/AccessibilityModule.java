@@ -111,6 +111,7 @@ public final class AccessibilityModule extends AbstractModule {
 				if (cellSize_m <= 0) {
 					throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
 				}
+				crs = acg.getOutputCrs() ;
 				
 				ActivityFacilities opportunities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType) ;
 				
@@ -196,9 +197,4 @@ public final class AccessibilityModule extends AbstractModule {
 		// yyyy could be done via config (list of activities)
 		this.activityType = activityType ;
 	}
-	public final void setOutputCrs(String outputCrs){
-		// yyyy could be done via config
-		this.crs = outputCrs ;
-	}
-
 }
