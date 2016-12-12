@@ -141,8 +141,10 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 							stationLink, destinationLink, false, false);				
 				}	
 			}
-			else
+			else {
+				eventsManager.processEvent(new NoVehicleCarSharingEvent(time, startLink.getId(), carsharingType));
 				return null;
+			}
 		}					
 	}
 	
