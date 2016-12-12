@@ -110,7 +110,8 @@ public class OneWayContainer implements VehiclesContainer{
 				closestFound = CoordUtils.calcEuclideanDistance(destinationLink.getCoord(), coord);
 			}
 		}
-		
+		if (closest == null)
+			return null;
 		return closest.getLink();
 	}
 
