@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.analysis.legMode.distributions;
+package playground.agarwalamit.analysis.legMode.tripDistance;
 
 import java.util.*;
 import org.apache.log4j.Logger;
@@ -38,6 +38,8 @@ import org.matsim.core.utils.geometry.CoordUtils;
 public class LegModeBeelineDistanceDistributionHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
     private static final Logger LOG = Logger.getLogger(LegModeBeelineDistanceDistributionHandler.class);
+
+    private final SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2distances = new TreeMap<>();
 
     private SortedMap<String, SortedMap<Double, Integer>> mode2DistClass2Count = new TreeMap<>();
     private Map<Id<Person>,Coord> personId2DepartCoord = new HashMap<>();
@@ -73,7 +75,8 @@ public class LegModeBeelineDistanceDistributionHandler implements PersonDepartur
 
     @Override
     public void handleEvent(PersonArrivalEvent event) {
-        Coord fromCoord = this.personId2DepartCoord.remove(event.getPersonId());
+        Id<Person> personId = event.getPersonId();
+        Coord fromCoord = this.personId2DepartCoord.remove(personId);
         Coord toCoord = this.network.getLinks().get(event.getLinkId()).getCoord();
         double dist = CoordUtils.calcEuclideanDistance(fromCoord,toCoord);
         double distClass = getDistanceBin(dist);
@@ -91,6 +94,28 @@ public class LegModeBeelineDistanceDistributionHandler implements PersonDepartur
         } else {
             dist2counts.put(distClass, dist2counts.get(distClass)+1);
         }
+
+        // store distances
+        if (this.mode2PersonId2distances.containsKey(mode)) {
+            Map<Id<Person>, List<Double>> personId2Dists = this.mode2PersonId2distances.get(mode);
+
+            if(personId2Dists.containsKey(personId)) {
+                List<Double> dists = personId2Dists.get(personId);
+                dists.add(dist);
+                personId2Dists.put(personId, dists);
+            } else {
+                List<Double> dists = new ArrayList<>();
+                dists.add(dist);
+                personId2Dists.put(personId,dists);
+            }
+
+        } else {
+            Map<Id<Person>, List<Double>> personId2Dists = new TreeMap<>();
+            List<Double> dists = new ArrayList<>();
+            dists.add(dist);
+            personId2Dists.put(personId, dists);
+            this.mode2PersonId2distances.put(mode, personId2Dists);
+        }
     }
 
     private double getDistanceBin(final double dist){
@@ -105,5 +130,9 @@ public class LegModeBeelineDistanceDistributionHandler implements PersonDepartur
 
     public SortedMap<String, SortedMap<Double, Integer>> getMode2DistanceClass2LegCounts(){
         return this.mode2DistClass2Count;
+    }
+
+    public SortedMap<String, Map<Id<Person>, List<Double>>> getMode2PersonId2TravelDistances(){
+        return this.mode2PersonId2distances;
     }
 }
