@@ -36,8 +36,10 @@ public class OneWayCarsharingStation implements CarsharingStation{
 	}	
 	
 	public ArrayList<CSVehicle> getVehicles(String type) {
-		
-		return this.vehiclesPerType.get(type);
+		if (this.vehiclesPerType.containsKey(type))
+			return this.vehiclesPerType.get(type);
+		else
+			return new ArrayList<CSVehicle>();
 	}	
 
 	public void removeCar(String type, CSVehicle vehicle) {
