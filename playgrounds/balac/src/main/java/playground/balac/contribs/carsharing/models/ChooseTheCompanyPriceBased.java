@@ -57,18 +57,39 @@ public class ChooseTheCompanyPriceBased implements ChooseTheCompany {
 		
 		
 		String chosenCompany = "";
-		double price = 0.0;
+		double price = -1.0;
 		Random random = MatsimRandom.getRandom();
 		
 		Link startLink = network.getLinks().get(leg.getRoute().getStartLinkId());
-		
+		double minDistance = -1;
 		for(String companyName : availableCompanies) {
 			//estimate the rental price for each company
 			
 			CSVehicle vehicle = this.carsharingSupply.findClosestAvailableVehicle(network.getLinks().get(leg.getRoute().getStartLinkId()),
 					mode, vehicleType, companyName, 1000.0);
+			
+			/*if (vehicle != null) {
+				
+				Link vehicleLocation = this.carsharingSupply.getCompany(companyName).getVehicleContainer(mode).getVehicleLocation(vehicle);
+
+				double distance = CoordUtils.calcEuclideanDistance(startLink.getCoord(), vehicleLocation.getCoord());
+				double x = random.nextBoolean() ? -0.0001 : + 0.0001;
+
+				if (minDistance == -1 || distance + x < minDistance) {
+					chosenCompany = companyName;
+					minDistance = distance;
+				}
+				
+			}*/
+				
+			
+			
+			
+			
+			
+			
 			if (vehicle != null) {
-				Link vehicleLocation = this.carsharingSupply.getAllVehicleLocations().get(vehicle);
+				Link vehicleLocation = this.carsharingSupply.getCompany(companyName).getVehicleContainer(mode).getVehicleLocation(vehicle);
 				
 				double walkTravelTime = estimateWalkTravelTime(startLink, vehicleLocation);
 				
@@ -77,9 +98,9 @@ public class ChooseTheCompanyPriceBased implements ChooseTheCompany {
 				rentalInfo.setInVehicleTime(time);
 				rentalInfo.setStartTime(now);
 				rentalInfo.setEndTime(now + walkTravelTime + time); 
-				
-				if (price == 0.0 || costCalculator.getCost(companyName, carsharingType, rentalInfo) +
-						(random.nextDouble() - 0.5) / 1000.0 < price) {
+				double x = random.nextBoolean() ? -0.0001 : + 0.0001;
+				if (price == -1.0 || costCalculator.getCost(companyName, carsharingType, rentalInfo) +
+						x < price) {
 					
 						chosenCompany = companyName;
 						price = costCalculator.getCost(companyName, carsharingType, rentalInfo);					
