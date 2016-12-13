@@ -56,7 +56,7 @@ public class AccessibilityComputationKiberaTest {
 	}
 	@Test
 	public void testLocal() {
-		run( 10., false, false ) ; // the qgis stuff currently does not work in general
+		run( 10., false, true ) ;
 	}
 	@Test
 	public void testOnServer() {
@@ -121,27 +121,20 @@ public class AccessibilityComputationKiberaTest {
 
 		// QGis
 		if (createQGisOutput == true) {
-			final List<String> modes = new ArrayList<>();
-			// QGis parameters
 			final boolean includeDensityLayer = false;
 			final Double lowerBound = 0.; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
-//			final Double lowerBound = 1.75;
 			final Double upperBound = 3.5;
 			final Integer range = 9; // in the current implementation, this need always be 9
-			final int symbolSize = 10;
 			final int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 
-			if ( true ) {
-				throw new RuntimeException("this currently does not work; minimally because it does not know the modes") ;
-			}
 			String osName = System.getProperty("os.name");
 			String workingDirectory = config.controler().getOutputDirectory();
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
-				for (String mode : modes) {
-					VisualizationUtils.createQGisOutput(actType, mode, new Envelope(252000, 256000, 9854000, 9856000), workingDirectory, "EPSG:21037", includeDensityLayer,
-							lowerBound, upperBound, range, symbolSize, populationThreshold);
-					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
+					VisualizationUtils.createQGisOutput(actType, mode.toString(), new Envelope(252000, 256000, 9854000, 9856000), workingDirectory, "EPSG:21037", includeDensityLayer,
+							lowerBound, upperBound, range, cellSize.intValue(), populationThreshold);
+					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode.toString(), osName);
 				}
 			}  
 		}
