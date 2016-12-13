@@ -1,4 +1,4 @@
-package playground.gthunig;
+package playground.gthunig.utils;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
