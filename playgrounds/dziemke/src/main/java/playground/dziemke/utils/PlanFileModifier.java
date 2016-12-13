@@ -32,7 +32,7 @@ public class PlanFileModifier {
 	static boolean considerHomeStayingAgents = true;
 	static boolean includeStayHomePlans = true;
 	static boolean onlyConsiderPeopleAlwaysGoingByCar = false;
-	static int maxNumberOfAgentsConsidered = 1000000;
+	static int maxNumberOfAgentsConsidered = 10000000;
 //	static String runId = "run_194";
 //	static int iteration = 300;
 	static boolean removeLinksAndRoutes = true;
@@ -50,8 +50,10 @@ public class PlanFileModifier {
 //	static final String OUTPUT_PLANS_FILE = OUTPUT_ROOT + "population.xml";
 	
 	// In case using input plans that have not yet been iterated
-	static final String INPUT_PLANS_FILE = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/30/plans.xml.gz";
-	static final String OUTPUT_PLANS_FILE = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/30/plans_no_links_routes.xml.gz";
+//	static final String INPUT_PLANS_FILE = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/30/plans.xml.gz";
+//	static final String OUTPUT_PLANS_FILE = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/30/plans_no_links_routes.xml.gz";
+	static final String INPUT_PLANS_FILE = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/matsim_initial/100/plans.xml.gz";
+	static final String OUTPUT_PLANS_FILE = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/matsim_initial/100/plans_no_links_routes.xml.gz";
 	
 	
 //	if (onlyTransferSelectedPlan == true) {

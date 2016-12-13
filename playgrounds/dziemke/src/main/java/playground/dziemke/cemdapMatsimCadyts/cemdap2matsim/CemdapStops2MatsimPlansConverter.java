@@ -30,16 +30,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.io.NetworkReaderMatsimV1;
-import org.matsim.core.population.algorithms.XY2Links;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.dziemke.utils.LogToOutputSaver;
-
 
 /**
  * @author dziemke
@@ -49,21 +45,21 @@ public class CemdapStops2MatsimPlansConverter {
 	private static final Logger log = Logger.getLogger(CemdapStops2MatsimPlansConverter.class);
 	
 	// Parameters
-//	private static int numberOfFirstCemdapOutputFile = 87;
-	private static int numberOfFirstCemdapOutputFile = 100;
+	private static int numberOfFirstCemdapOutputFile = 87;
+//	private static int numberOfFirstCemdapOutputFile = 100;
 //	private static int numberOfPlans = 3;
 	private static int numberOfPlans = 1;
 	private static boolean addStayHomePlan = true;
-//	private static int numberOfPlansFile = 34;
-	private static int numberOfPlansFile = 100;
+	private static int numberOfPlansFile = 34;
+//	private static int numberOfPlansFile = 100;
 	
 	// Input and output
-//	private static String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/" + numberOfPlansFile + "/";
-	private static String outputDirectory = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/matsim_initial/" + numberOfPlansFile + "/";
+	private static String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/test/" + numberOfPlansFile + "/";
+//	private static String outputDirectory = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/matsim_initial/" + numberOfPlansFile + "/";
 	private static String tazShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenLOR_DHDN_GK4.shp";
-	private static String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
-//	private static String cemdapOutputRoot = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_output/";
-	private static String cemdapOutputRoot = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/cemdap_output/";
+//	private static String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+	private static String cemdapOutputRoot = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_output/";
+//	private static String cemdapOutputRoot = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/cemdap_output/";
 	
 	
 	public static void main(String[] args) throws IOException {
@@ -91,7 +87,7 @@ public class CemdapStops2MatsimPlansConverter {
 		}
 		
 		// read in network
-		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(networkFile);
+//		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(networkFile);
 		
 		// write all (geographic) features of planning area to a map
 		Map<String,SimpleFeature> combinedFeatures = new HashMap<String, SimpleFeature>();
@@ -145,7 +141,7 @@ public class CemdapStops2MatsimPlansConverter {
 		log.info(counter + " persons have " + expectedNumberOfPlans + " plans.");
 		
 		// assign activities to links
-		new XY2Links((MutableScenario)scenario).run(scenario.getPopulation());
+//		new XY2Links((MutableScenario)scenario).run(scenario.getPopulation());
 		
 		// write population file
 		new File(outputDirectory).mkdir();
