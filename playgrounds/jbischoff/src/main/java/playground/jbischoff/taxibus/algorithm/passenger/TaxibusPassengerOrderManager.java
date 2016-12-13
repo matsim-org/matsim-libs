@@ -35,7 +35,6 @@ import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.utils.misc.Time;
 
 import playground.jbischoff.taxibus.algorithm.utils.TaxibusUtils;
 
@@ -88,7 +87,6 @@ public class TaxibusPassengerOrderManager implements ActivityStartEventHandler, 
 							double departureTime = mobsimAgent.getActivityEndTime();
 							if (departureTime < event.getTime())  {
 								departureTime = event.getTime() + 60;}
-//							System.out.println(Time.writeTime(event.getTime()));
 							prebookTaxiBusTrip(mobsimAgent, leg, departureTime);
 						}
 					}

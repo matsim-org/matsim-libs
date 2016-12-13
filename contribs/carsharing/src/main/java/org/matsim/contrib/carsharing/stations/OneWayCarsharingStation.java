@@ -29,13 +29,17 @@ public class OneWayCarsharingStation implements CarsharingStation{
 	}
 	
 	public int getNumberOfVehicles(String type) {
-		
-		return this.numberOfvehiclesPerType.get(type);
+		if (this.numberOfvehiclesPerType.containsKey(type))
+			return this.numberOfvehiclesPerType.get(type);
+		else 
+			return 0;
 	}	
 	
 	public ArrayList<CSVehicle> getVehicles(String type) {
-		
-		return this.vehiclesPerType.get(type);
+		if (this.vehiclesPerType.containsKey(type))
+			return this.vehiclesPerType.get(type);
+		else
+			return new ArrayList<CSVehicle>();
 	}	
 
 	public void removeCar(String type, CSVehicle vehicle) {

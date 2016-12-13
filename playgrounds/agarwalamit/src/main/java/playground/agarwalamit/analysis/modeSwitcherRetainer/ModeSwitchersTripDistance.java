@@ -29,7 +29,9 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.analysis.legMode.distributions.LegModeRouteDistanceDistributionHandler;
+import playground.agarwalamit.analysis.legMode.tripDistance.LegModeBeelineDistanceDistributionHandler;
+import playground.agarwalamit.analysis.legMode.tripDistance.LegModeRouteDistanceDistributionHandler;
+import playground.agarwalamit.analysis.legMode.tripDistance.TripDistanceType;
 import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.PersonFilter;
@@ -46,15 +48,17 @@ public class ModeSwitchersTripDistance {
 	private static final Logger LOG = Logger.getLogger(ModeSwitchersTripDistance.class);
 
 	public ModeSwitchersTripDistance(){
-		this(null, null);
+		this(null, null, TripDistanceType.ROUTE_DISTANCE);
 	}
 
 	private final String userGroup;
 	private final PersonFilter pf;
+	private final TripDistanceType tripDistanceType;
 
-	public ModeSwitchersTripDistance (final String userGroup, final PersonFilter personFilter) {
+	public ModeSwitchersTripDistance (final String userGroup, final PersonFilter personFilter, final TripDistanceType tripDistanceType) {
 		this.pf = personFilter;
 		this.userGroup = userGroup;
+		this.tripDistanceType = tripDistanceType;
 
 		if( (userGroup==null && personFilter!=null) || (userGroup!=null && personFilter==null) ) {
 			throw new RuntimeException("Either of user group or person filter is null.");
@@ -141,14 +145,8 @@ public class ModeSwitchersTripDistance {
 
 	private Map<Id<Person>, List<Tuple<String, Double>>> getPerson2mode2TripDistances(final String eventsFile, final Scenario sc){
 
-		EventsManager events = EventsUtils.createEventsManager();
-		MatsimEventsReader reader = new MatsimEventsReader(events);
+		SortedMap<String,Map<Id<Person>,List<Double>>> mode2Person2TripDists = getTripDistanceMap( eventsFile, sc );
 
-		LegModeRouteDistanceDistributionHandler distHandler = new LegModeRouteDistanceDistributionHandler(sc);
-		events.addHandler(distHandler);
-		reader.readFile(eventsFile);
-
-		SortedMap<String,Map<Id<Person>,List<Double>>> mode2Person2TripDists = distHandler.getMode2PersonId2TravelDistances();
 		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelDists = new HashMap<>();
 
 		for(String mode : mode2Person2TripDists.keySet()){
@@ -170,8 +168,33 @@ public class ModeSwitchersTripDistance {
 		return person2ModeTravelDists;
 	}
 
+	private SortedMap<String, Map<Id<Person>, List<Double>>> getTripDistanceMap(final String eventsFile, final Scenario sc){
+		EventsManager events = EventsUtils.createEventsManager();
+		MatsimEventsReader reader = new MatsimEventsReader(events);
+
+		SortedMap<String,Map<Id<Person>,List<Double>>> mode2Person2TripDists ;
+
+		switch (this.tripDistanceType){
+			case ROUTE_DISTANCE:
+				LegModeRouteDistanceDistributionHandler distHandler = new LegModeRouteDistanceDistributionHandler(sc);
+				events.addHandler(distHandler);
+				reader.readFile(eventsFile);
+				mode2Person2TripDists = distHandler.getMode2PersonId2TravelDistances();
+				break;
+			case BEELINE_DISTANCE:
+				LegModeBeelineDistanceDistributionHandler beelinDistHandler = new LegModeBeelineDistanceDistributionHandler(sc.getNetwork());
+				events.addHandler(beelinDistHandler);
+				reader.readFile(eventsFile);
+				mode2Person2TripDists = beelinDistHandler.getMode2PersonId2TravelDistances();
+				break;
+			default:
+				throw new RuntimeException("not implemented yet.");
+		}
+		return mode2Person2TripDists;
+	}
+
 	public void writeResults(final String outputFolder){
-		String outFile = outputFolder+"/modeSwitchersTripDistances.txt";
+		String outFile = outputFolder+"/modeSwitchersTripDistances_"+this.tripDistanceType+".txt";
 		BufferedWriter writer =  IOUtils.getBufferedWriter(outFile);
 		try {
 			writer.write("firstMode \t lastMode \t numberOfLegs \t totalTripDistancesForFirstIterationInKm \t totalTripDistancesForLastIterationInKm \n");

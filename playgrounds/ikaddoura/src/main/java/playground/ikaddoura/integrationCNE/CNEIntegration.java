@@ -67,6 +67,7 @@ import playground.vsp.airPollution.exposure.InternalizeEmissionResponsibilityCon
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
 
@@ -104,7 +105,7 @@ public class CNEIntegration {
 	private final ResponsibilityGridTools responsibilityGridTools ;
 
 	public enum CongestionTollingApproach {
-        DecongestionPID, QBPV3
+        DecongestionPID, QBPV3, QBPV9
 	}
 	
 	public CNEIntegration(String configFile, String outputDirectory) {
@@ -266,6 +267,40 @@ public class CNEIntegration {
 				
 				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandlerQBP, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));	
 			
+			} else if (congestionTollingApproach.toString().equals(CongestionTollingApproach.QBPV9.toString())) {
+				final TollHandler congestionTollHandlerQBP = new TollHandler(controler.getScenario());
+				
+				if (useTripAndAgentSpecificVTTSForRouting) {
+					final VTTSCongestionTollTimeDistanceTravelDisutilityFactory factory = new VTTSCongestionTollTimeDistanceTravelDisutilityFactory(
+							new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, controler.getConfig().planCalcScore()),
+							congestionTollHandlerQBP, controler.getConfig().planCalcScore()
+						);
+					factory.setSigma(sigma);
+					
+					controler.addOverridingModule(new AbstractModule(){
+						@Override
+						public void install() {
+							this.bindCarTravelDisutilityFactory().toInstance( factory );
+						}
+					}); 
+					
+				} else {
+					final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(
+							new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
+							congestionTollHandlerQBP, controler.getConfig().planCalcScore()
+						);
+					factory.setSigma(sigma);
+					
+					controler.addOverridingModule(new AbstractModule(){
+						@Override
+						public void install() {
+							this.bindCarTravelDisutilityFactory().toInstance( factory );
+						}
+					}); 
+				}
+				
+				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandlerQBP, new CongestionHandlerImplV9(controler.getEvents(), controler.getScenario())));
+				
 			} else if (congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionPID.toString())) {
 			
 				if (useTripAndAgentSpecificVTTSForRouting) {
@@ -381,7 +416,7 @@ public class CNEIntegration {
 							congestionTollHandlerQBP,
 							controler.getConfig().planCalcScore()
 						);
-					factory.setSigma(sigma); // TODO : I dont know, why we are setting sigma here and not anywhere else. amit nov 16.
+					factory.setSigma(sigma);
 					factory.setHotspotLinks(hotSpotLinks);
 					
 					controler.addOverridingModule(new AbstractModule(){
@@ -393,6 +428,46 @@ public class CNEIntegration {
 				}
 				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandlerQBP, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));						
 
+			} else if (congestionTollingApproach.toString().equals(CongestionTollingApproach.QBPV9.toString())) {
+				final TollHandler congestionTollHandlerQBP = new TollHandler(controler.getScenario());
+				
+				if (useTripAndAgentSpecificVTTSForRouting) {
+					final VttsCNETimeDistanceTravelDisutilityFactory factory = new VttsCNETimeDistanceTravelDisutilityFactory(
+							new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, controler.getConfig().planCalcScore()),
+							emissionModule, emissionCostModule,
+							noiseContext,
+							congestionTollHandlerQBP,
+							controler.getConfig().planCalcScore()
+						);
+					factory.setSigma(sigma);
+					factory.setHotspotLinks(null);
+					
+					controler.addOverridingModule(new AbstractModule(){
+						@Override
+						public void install() {
+							this.bindCarTravelDisutilityFactory().toInstance( factory );
+						}
+					}); 
+				} else {
+					final CNETimeDistanceTravelDisutilityFactory factory = new CNETimeDistanceTravelDisutilityFactory(
+							new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
+							emissionModule, emissionCostModule,
+							noiseContext,
+							congestionTollHandlerQBP,
+							controler.getConfig().planCalcScore()
+						);
+					factory.setSigma(sigma);
+					factory.setHotspotLinks(hotSpotLinks);
+					
+					controler.addOverridingModule(new AbstractModule(){
+						@Override
+						public void install() {
+							this.bindCarTravelDisutilityFactory().toInstance( factory );
+						}
+					}); 				
+				}
+				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandlerQBP, new CongestionHandlerImplV9(controler.getEvents(), controler.getScenario())));
+				
 			} else if (congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionPID.toString())) {
 				if (useTripAndAgentSpecificVTTSForRouting) {
 					throw new RuntimeException("Not yet implemented. Aborting...");

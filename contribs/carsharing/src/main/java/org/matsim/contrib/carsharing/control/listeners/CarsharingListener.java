@@ -30,10 +30,11 @@ public class CarsharingListener implements IterationEndsListener{
 	@Inject private CarsharingSupplyInterface carsharingSupply;
 
 	ArrayList<Integer> rentalsPerIteration = new ArrayList<>();
+
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {		
 		int numberOfRentals = 0;
-		
+
 		Map<Id<Person>, AgentRentals> agentRentalsMap = demandHandler.getAgentRentalsMap();
 		final BufferedWriter outLink = IOUtils.getBufferedWriter(this.controler.getControlerIO().getIterationFilename(event.getIteration(), "CS.txt"));
 		try {
@@ -42,15 +43,17 @@ public class CarsharingListener implements IterationEndsListener{
 			outLink.newLine();		
 		
 		for (Id<Person> personId: agentRentalsMap.keySet()) {
-			numberOfRentals += agentRentalsMap.get(personId).getArr().size();
+			
 			for (RentalInfo i : agentRentalsMap.get(personId).getArr()) {
-				CSVehicle vehicle = this.carsharingSupply.getAllVehicles().get(i.getVehId().toString());
+				CSVehicle vehicle = this.carsharingSupply.getAllVehicles().get(i.getVehId().toString());		
+				numberOfRentals++;
 				outLink.write(personId + "," + i.toString() + "," + vehicle.getCompanyId() + "," + vehicle.getType());
 				outLink.newLine();
 			}
 			
 		}
 		rentalsPerIteration.add(numberOfRentals);
+
 		outLink.flush();
 		outLink.close();
 		
@@ -67,7 +70,8 @@ public class CarsharingListener implements IterationEndsListener{
 				outLinkStats.newLine();
 				int k = 0;
 				for (Integer i : rentalsPerIteration) {
-					outLinkStats.write(k++ + "," + i);
+					outLinkStats.write(k + "," + i);
+					k++;
 					outLinkStats.newLine();
 				}
 				

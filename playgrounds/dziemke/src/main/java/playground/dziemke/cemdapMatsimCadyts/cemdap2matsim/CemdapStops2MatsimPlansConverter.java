@@ -30,16 +30,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.io.NetworkReaderMatsimV1;
-import org.matsim.core.population.algorithms.XY2Links;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.dziemke.utils.LogToOutputSaver;
-
 
 /**
  * @author dziemke
@@ -56,7 +52,6 @@ public class CemdapStops2MatsimPlansConverter {
 	// Input and output
 	private String outputDirectory;
 	private String tazShapeFile;
-	private String networkFile;
 	private String cemdapDataRoot;
 	private String cemdapStopsFilename = "stops.out";
 	
@@ -68,12 +63,11 @@ public class CemdapStops2MatsimPlansConverter {
 		int numberOfPlansFile = 34;
 		String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/" + numberOfPlansFile + "/";
 		String tazShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenLOR_DHDN_GK4.shp";
-		String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+//		String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 		String cemdapDataRoot = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_output/";
 		
 		CemdapStops2MatsimPlansConverter converter = new CemdapStops2MatsimPlansConverter(
 				tazShapeFile, 
-				networkFile, 
 				cemdapDataRoot);
 		
 		converter.setOutputDirectory(outputDirectory);
@@ -88,9 +82,8 @@ public class CemdapStops2MatsimPlansConverter {
 		}
 	}
 	
-	public CemdapStops2MatsimPlansConverter(String tazShapeFile, String networkFile, String cemdapDataRoot) {
+	public CemdapStops2MatsimPlansConverter(String tazShapeFile, String cemdapDataRoot) {
 		this.tazShapeFile = tazShapeFile;
-		this.networkFile = networkFile;
 		this.cemdapDataRoot = cemdapDataRoot;
 	}
 	
@@ -120,7 +113,7 @@ public class CemdapStops2MatsimPlansConverter {
 		}
 		
 		// read in network
-		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(networkFile);
+//		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(networkFile);
 		
 		// write all (geographic) features of planning area to a map
 		Map<String,SimpleFeature> combinedFeatures = new HashMap<String, SimpleFeature>();
@@ -174,7 +167,7 @@ public class CemdapStops2MatsimPlansConverter {
 		log.info(counter + " persons have " + expectedNumberOfPlans + " plans.");
 		
 		// assign activities to links
-		new XY2Links((MutableScenario)scenario).run(scenario.getPopulation());
+//		new XY2Links((MutableScenario)scenario).run(scenario.getPopulation());
 		
 		// write population file
 		new File(outputDirectory).mkdir();

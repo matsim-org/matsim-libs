@@ -45,9 +45,9 @@ import org.matsim.core.network.io.MatsimNetworkReader;
  */
 public class CreateVehicleFileFromLastPosition {
 public static void main(String[] args) {
-	String eventsFile = "D:/runs-svn/intermodal/5000/5000.output_events.xml.gz";
-	String networkFile = "D:/runs-svn/intermodal/5000/5000.output_network.xml.gz";
-	String vehiclesFile = "D:/runs-svn/intermodal/5000/v5000_lastPosition.xml";
+	String eventsFile = "D:/runs-svn/intermodal/4400/4400.output_events.xml.gz";
+	String networkFile = "D:/runs-svn/intermodal/4400/4400.output_network.xml.gz";
+	String vehiclesFile = "D:/runs-svn/intermodal/4400/v4400_lastPosition.xml";
 	final int capacity = 4;
 	final int t0 = 0;
 	final int t1 = 36*3600; 

@@ -19,6 +19,7 @@
 
 package playground.agarwalamit.mixedTraffic.patnaIndia.policies.analysis;
 
+import playground.agarwalamit.analysis.legMode.tripDistance.TripDistanceType;
 import playground.agarwalamit.analysis.modeSwitcherRetainer.ModeSwitchersTripDistance;
 import playground.agarwalamit.analysis.modeSwitcherRetainer.ModeSwitchersTripTime;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
@@ -32,12 +33,12 @@ import playground.agarwalamit.utils.PersonFilter;
 
 public class PatnaModeSwitcherStats {
 
-    private final String dir = FileUtils.RUNS_SVN+"patnaIndia/run108/jointDemand/policies/0.15pcu/bikeTrackConnectors_0/_4/";
+    private final String dir = FileUtils.RUNS_SVN+"patnaIndia/run108/jointDemand/policies/0.15pcu/BT-b_halfLength/";
 
     private final PersonFilter pf = new PatnaPersonFilter();
     private final String userGroup = PatnaPersonFilter.PatnaUserGroup.urban.toString();
     private final int firstIteration = 1200;
-    private final int lastIteration = 1300;
+    private final int lastIteration = 1400;
 
     public static void main(String[] args) {
         new PatnaModeSwitcherStats().run();
@@ -49,10 +50,17 @@ public class PatnaModeSwitcherStats {
         mstt.processEventsFiles(dir, firstIteration, lastIteration);
         mstt.writeResults(dir+"/analysis/");
 
-        ModeSwitchersTripDistance mstd = new ModeSwitchersTripDistance(userGroup,pf);
-        mstd.processEventsFiles(dir, firstIteration, lastIteration);
-        mstd.writeResults(dir+"/analysis/");
+        {
+            ModeSwitchersTripDistance mstd = new ModeSwitchersTripDistance(userGroup, pf, TripDistanceType.BEELINE_DISTANCE);
+            mstd.processEventsFiles(dir, firstIteration, lastIteration);
+            mstd.writeResults(dir+"/analysis/");
+        }
 
+        {
+            ModeSwitchersTripDistance mstd = new ModeSwitchersTripDistance(userGroup, pf, TripDistanceType.ROUTE_DISTANCE);
+            mstd.processEventsFiles(dir, firstIteration, lastIteration);
+            mstd.writeResults(dir+"/analysis/");
+        }
 
     }
 

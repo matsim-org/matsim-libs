@@ -27,7 +27,10 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -218,5 +221,13 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 			}
         }
 		return moduleClass.cast(module);
+	}
+
+	public static void setVspDefaults(final Config config) {
+		config.timeAllocationMutator().setMutationRange(7200.);
+		config.timeAllocationMutator().setAffectingDuration(false);
+		config.plans().setRemovingUnneccessaryPlanAttributes(true);
+		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration);
+		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
 	}
 }

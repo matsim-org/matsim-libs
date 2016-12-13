@@ -24,6 +24,8 @@ import java.util.*;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	// yyyy todo: change in similar way as with other modes ("_mode") 
 	
@@ -54,9 +56,21 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	public static enum AreaOfAccesssibilityComputation{ fromNetwork, fromBoundingBox, fromShapeFile } 
 	private AreaOfAccesssibilityComputation areaOfAccessibilityComputation = AreaOfAccesssibilityComputation.fromNetwork ;
 	private Set<Modes4Accessibility> isComputingMode = EnumSet.noneOf(Modes4Accessibility.class);
+	
+	// ---
+	private String outputCrs = null ;
+	private static final String OUTPUT_CRS="outputCRS" ;
 
 	
 	// ===
+	@StringGetter(OUTPUT_CRS)
+	public final String getOutputCrs() {
+		return this.outputCrs;
+	}
+	@StringSetter(OUTPUT_CRS)
+	public final void setOutputCrs(String outputCrs) {
+		this.outputCrs = outputCrs;
+	}
 
 	public static final String TIME_OF_DAY = "timeOfDay";
 	private Double timeOfDay = 8.*3600 ;
@@ -188,6 +202,16 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
     public void setBoundingBoxBottom(double value) {
         this.boundingBoxBottom = value;
     }
+    
+    /**
+	 * helper method to set bounding box in code
+	 */
+    public void setEnvelope( Envelope envelope ) {
+	    this.boundingBoxBottom = envelope.getMinY() ;
+	    this.boundingBoxLeft = envelope.getMinX() ;
+	    this.boundingBoxRight = envelope.getMaxX() ;
+	    this.boundingBoxTop = envelope.getMaxY() ;
+    }
 
     @StringGetter(AREA_OF_ACC_COMP)
 	public String getAreaOfAccessibilityComputation() {
@@ -195,8 +219,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	}
 
     @StringSetter(AREA_OF_ACC_COMP)
-	public void setAreaOfAccessibilityComputation(
-			String areaOfAccessibilityComputation) {
+	public void setAreaOfAccessibilityComputation( String areaOfAccessibilityComputation) {
     	boolean problem = true ;
     	for ( AreaOfAccesssibilityComputation var : AreaOfAccesssibilityComputation.values() ) {
     		if ( var.toString().equals(areaOfAccessibilityComputation) ) {

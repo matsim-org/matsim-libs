@@ -18,6 +18,7 @@ package playground.gregor.confluent;/* *****************************************
  *                                                                         *
  * *********************************************************************** */
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -25,36 +26,40 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class SimulatedAnnealingTravelDisutility implements TravelDisutility, LinkEnterEventHandler, PersonArrivalEventHandler, AfterMobsimListener, BeforeMobsimListener {
 
 
+    private static final Logger log = Logger.getLogger(SimulatedAnnealingTravelDisutility.class);
+
     private double tc = 0;
     private int cnt = 0;
 
-    private HashMap<Id<Link>, LinkInfo> lis = new HashMap<>();
+    private Configuration bestConfiguration;
+    private Configuration randomConfiguration;
 
-    private Set<LinkInfo> activeLinks = new HashSet<>();
     private int iteration;
 
     @Override
     public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
-        LinkInfo li = this.lis.get(link.getId());
-        if (li == null) {
-            return 1.;
+        if (this.randomConfiguration == null) {
+            return 1;
         }
+
+        LinkInfo li = this.randomConfiguration.linkInfoHashMap.get(link.getId());
+
         return li.tc;
     }
 
@@ -74,27 +79,82 @@ public class SimulatedAnnealingTravelDisutility implements TravelDisutility, Lin
         this.iteration = iteration;
         tc = 0;
         cnt = 0;
-        activeLinks.clear();
     }
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
-        for (LinkInfo li : this.lis.values()) {
-            li.cnt = iteration;
-            if (this.activeLinks.contains(li)) {
-                li.tc = (li.cnt / (li.cnt + 1.0)) * li.tc + (1.0 / (li.cnt + 1.0)) * this.tc;
-                li.cnt++;
-            } else {
-                li.tc = (li.cnt / (li.cnt + 1.0)) * li.tc;
-                li.cnt++;
+        if (randomConfiguration == null) {
+            initialize(event.getServices().getScenario().getNetwork());
+        }
+
+        if (this.iteration == event.getServices().getConfig().controler().getLastIteration() - 1) {
+            log.info("Kept current solution");
+            for (Map.Entry<Id<Link>, LinkInfo> entry : bestConfiguration.linkInfoHashMap.entrySet()) {
+                randomConfiguration.linkInfoHashMap.get(entry.getKey()).tc = entry.getValue().tc;
+            }
+            randomConfiguration.score = bestConfiguration.score;
+            return;
+        }
+
+        double itrs = event.getServices().getConfig().controler().getLastIteration();
+        double temperature = itrs / ((double) this.iteration + 1.0);
+        randomConfiguration.score = -6 * (tc - 3 * 3600) / 3600;
+
+        boolean sw;
+        if (randomConfiguration.score > bestConfiguration.score) {
+            sw = true;
+        } else {
+            double gamma = 6;
+
+            double exp = Math.exp(-gamma * (bestConfiguration.score - randomConfiguration.score) / temperature);
+            sw = MatsimRandom.getRandom().nextDouble() < exp;
+        }
+
+
+        if (sw) { // as of now, 0.01 is hardcoded (proba to change when both
+            log.info("Switched to random solution");
+            for (Map.Entry<Id<Link>, LinkInfo> entry : randomConfiguration.linkInfoHashMap.entrySet()) {
+                bestConfiguration.linkInfoHashMap.get(entry.getKey()).tc = entry.getValue().tc;
+            }
+            bestConfiguration.score = randomConfiguration.score;
+
+        } else {
+            // scores are the same)
+            log.info("Kept current solution");
+            for (Map.Entry<Id<Link>, LinkInfo> entry : bestConfiguration.linkInfoHashMap.entrySet()) {
+                randomConfiguration.linkInfoHashMap.get(entry.getKey()).tc = entry.getValue().tc;
+            }
+            randomConfiguration.score = bestConfiguration.score;
+
+        }
+
+
+        for (LinkInfo li : randomConfiguration.linkInfoHashMap.values()) {
+            if (MatsimRandom.getRandom().nextDouble() < 0.01) {
+                li.tc = MatsimRandom.getRandom().nextDouble() * 1000;
             }
         }
+
+    }
+
+    private void initialize(Network network) {
+        this.randomConfiguration = new Configuration();
+        this.bestConfiguration = new Configuration();
+        for (Link l : network.getLinks().values()) {
+            LinkInfo li = new LinkInfo();
+            li.tc = MatsimRandom.getRandom().nextDouble();
+            this.randomConfiguration.linkInfoHashMap.put(l.getId(), li);
+            LinkInfo li2 = new LinkInfo();
+            li2.tc = MatsimRandom.getRandom().nextDouble();
+            this.bestConfiguration.linkInfoHashMap.put(l.getId(), li2);
+            this.bestConfiguration.score = Double.NEGATIVE_INFINITY;
+        }
+
     }
 
     @Override
     public void handleEvent(LinkEnterEvent event) {
-        LinkInfo li = this.lis.computeIfAbsent(event.getLinkId(), k -> new LinkInfo());
-        activeLinks.add(li);
+
     }
 
     @Override
@@ -113,7 +173,6 @@ public class SimulatedAnnealingTravelDisutility implements TravelDisutility, Lin
 
 
     private static final class LinkInfo {
-        int cnt = 0;
         double tc = 0;
     }
 }

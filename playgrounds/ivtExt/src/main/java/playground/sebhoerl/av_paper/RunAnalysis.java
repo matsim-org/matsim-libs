@@ -49,7 +49,7 @@ public class RunAnalysis {
 		public TravelTimeHandler(BinCalculator binCalculator) {
 			this.binCalculator = binCalculator;
 			
-			for (String mode : Arrays.asList("car", "av", "pt", "walk")) {
+			for (String mode : Arrays.asList("car", "taxi", "pt", "walk")) {
 				List<List<Double>> modeBin = new LinkedList<List<Double>>();
 				histogram.put(mode, modeBin);
 				
@@ -61,7 +61,7 @@ public class RunAnalysis {
 		
 		@Override
 		public void handleTrip(PersonExperiencedTrip trip) {
-			if (trip.getPerson().toString().contains("av")) return;
+			if (trip.getPerson().toString().contains("Taxi")) return;
 			if (trip.getPerson().toString().contains("pt")) return;
 			
 			List<List<Double>> modeBin = histogram.get(trip.getMode());
@@ -82,11 +82,11 @@ public class RunAnalysis {
 		
 		public DistanceHandler() {
 			personDistances.put("car", 0.0);
-			personDistances.put("av", 0.0);
+			personDistances.put("taxi", 0.0);
 			personDistances.put("pt", 0.0);
 			
 			vehicleDistances.put("car", 0.0);
-			vehicleDistances.put("av", 0.0);
+			vehicleDistances.put("taxi", 0.0);
 			vehicleDistances.put("pt", 0.0);
 		}
 		
@@ -94,8 +94,8 @@ public class RunAnalysis {
 		public void handleLeg(PersonExperiencedLeg leg) {
 			if (leg.getAgentId().toString().contains("pt")) {
 				vehicleDistances.put("pt", vehicleDistances.get("pt") + leg.getLeg().getRoute().getDistance());
-			} else if (leg.getAgentId().toString().contains("av")) {
-				vehicleDistances.put("av", vehicleDistances.get("av") + leg.getLeg().getRoute().getDistance());
+			} else if (leg.getAgentId().toString().contains("Taxi")) {
+				vehicleDistances.put("taxi", vehicleDistances.get("taxi") + leg.getLeg().getRoute().getDistance());
 			} else {
 				String mode = leg.getLeg().getMode();
 				
@@ -204,7 +204,7 @@ public class RunAnalysis {
 		
 		@Override
 		public void handleActivity(PersonExperiencedActivity experiencedActivity) {
-			if (!experiencedActivity.getAgentId().toString().contains("av")) return;
+			if (!experiencedActivity.getAgentId().toString().contains("Taxi")) return;
 			
 			Activity activity = experiencedActivity.getActivity();
 			double endTime = activity.getEndTime();
@@ -239,7 +239,7 @@ public class RunAnalysis {
 
 		@Override
 		public void handleLeg(PersonExperiencedLeg leg) {
-			if (!leg.getAgentId().toString().contains("av")) return;
+			if (!leg.getAgentId().toString().contains("Taxi")) return;
 			String mode = current.get(leg.getAgentId());
 			
 			if (mode != null) {
@@ -280,22 +280,22 @@ public class RunAnalysis {
 			enrouteHistogram.put("car", new ArrayList<>(Collections.nCopies(binCalculator.getBins(), 0.0)));
 			enrouteHistogram.put("pt", new ArrayList<>(Collections.nCopies(binCalculator.getBins(), 0.0)));
 			enrouteHistogram.put("walk", new ArrayList<>(Collections.nCopies(binCalculator.getBins(), 0.0)));
-			enrouteHistogram.put("av", new ArrayList<>(Collections.nCopies(binCalculator.getBins(), 0.0)));
+			enrouteHistogram.put("taxi", new ArrayList<>(Collections.nCopies(binCalculator.getBins(), 0.0)));
 			
 			departureHistogram.put("car", new ArrayList<>(Collections.nCopies(binCalculator.getBins(), 0.0)));
 			departureHistogram.put("pt", new ArrayList<>(Collections.nCopies(binCalculator.getBins(), 0.0)));
 			departureHistogram.put("walk", new ArrayList<>(Collections.nCopies(binCalculator.getBins(), 0.0)));
-			departureHistogram.put("av", new ArrayList<>(Collections.nCopies(binCalculator.getBins(), 0.0)));
+			departureHistogram.put("taxi", new ArrayList<>(Collections.nCopies(binCalculator.getBins(), 0.0)));
 			
 			arrivalHistogram.put("car", new ArrayList<>(Collections.nCopies(binCalculator.getBins(), 0.0)));
 			arrivalHistogram.put("pt", new ArrayList<>(Collections.nCopies(binCalculator.getBins(), 0.0)));
 			arrivalHistogram.put("walk", new ArrayList<>(Collections.nCopies(binCalculator.getBins(), 0.0)));
-			arrivalHistogram.put("av", new ArrayList<>(Collections.nCopies(binCalculator.getBins(), 0.0)));
+			arrivalHistogram.put("taxi", new ArrayList<>(Collections.nCopies(binCalculator.getBins(), 0.0)));
 		}
 		
 		@Override
 		public void handleTrip(PersonExperiencedTrip trip) {
-			if (trip.getPerson().toString().contains("av")) return;
+			if (trip.getPerson().toString().contains("Taxi")) return;
 			if (trip.getPerson().toString().contains("pt")) return;
 			
 			List<Double> enrouteBin = enrouteHistogram.get(trip.getMode());
@@ -374,7 +374,7 @@ public class RunAnalysis {
 
 		@Override
 		public void handleEvent(PersonDepartureEvent event) {
-			if (event.getLegMode().equals("av")) {
+			if (event.getLegMode().equals("taxi")) {
 				waiting.put(event.getPersonId(), event.getTime());
 			}
 		}
@@ -437,15 +437,25 @@ public class RunAnalysis {
 		//run("/home/sebastian/sioux/config.xml", "/home/sebastian/paper/km/results/km4/10000.xml.gz", "/home/sebastian/paper/km/results/km4/10000.json");
 		//run("/home/sebastian/sioux/config.xml", "/home/sebastian/paper/km/results/km4/12000.xml.gz", "/home/sebastian/paper/km/results/km4/12000.json");
 		
-		run("/home/sebastian/sioux/config.xml", "/home/sebastian/paper/km/results/km4/12000.xml.gz", "/home/sebastian/paper/km/results/km4/12000.json");
-		run("/home/sebastian/sioux/config.xml", "/home/sebastian/paper/km/results/km4/14000.xml.gz", "/home/sebastian/paper/km/results/km4/14000.json");
-		run("/home/sebastian/sioux/config.xml", "/home/sebastian/paper/km/results/km4/16000.xml.gz", "/home/sebastian/paper/km/results/km4/16000.json");
-		run("/home/sebastian/sioux/config.xml", "/home/sebastian/paper/km/results/km4/18000.xml.gz", "/home/sebastian/paper/km/results/km4/18000.json");
-		run("/home/sebastian/sioux/config.xml", "/home/sebastian/paper/km/results/km4/20000.xml.gz", "/home/sebastian/paper/km/results/km4/20000.json");
-		run("/home/sebastian/sioux/config.xml", "/home/sebastian/paper/km/results/km4/22000.xml.gz", "/home/sebastian/paper/km/results/km4/22000.json");
-		run("/home/sebastian/sioux/config.xml", "/home/sebastian/paper/km/results/km4/24000.xml.gz", "/home/sebastian/paper/km/results/km4/24000.json");
-		run("/home/sebastian/sioux/config.xml", "/home/sebastian/paper/km/results/km4/26000.xml.gz", "/home/sebastian/paper/km/results/km4/26000.json");
-		run("/home/sebastian/sioux/config.xml", "/home/sebastian/paper/km/results/km4/28000.xml.gz", "/home/sebastian/paper/km/results/km4/28000.json");
+		run("/home/sebastian/avtaxi/config.xml", "/home/sebastian/avtaxi/results/1_500.xml.gz", "/home/sebastian/avtaxi/results/1_500.json");
+		run("/home/sebastian/avtaxi/config.xml", "/home/sebastian/avtaxi/results/1_1000.xml.gz", "/home/sebastian/avtaxi/results/1_1000.json");
+		run("/home/sebastian/avtaxi/config.xml", "/home/sebastian/avtaxi/results/1_1500.xml.gz", "/home/sebastian/avtaxi/results/1_1500.json");
+		run("/home/sebastian/avtaxi/config.xml", "/home/sebastian/avtaxi/results/1_2000.xml.gz", "/home/sebastian/avtaxi/results/1_2000.json");
+		
+		run("/home/sebastian/avtaxi/config.xml", "/home/sebastian/avtaxi/results/2_500.xml.gz", "/home/sebastian/avtaxi/results/2_500.json");
+		run("/home/sebastian/avtaxi/config.xml", "/home/sebastian/avtaxi/results/2_1000.xml.gz", "/home/sebastian/avtaxi/results/2_1000.json");
+		run("/home/sebastian/avtaxi/config.xml", "/home/sebastian/avtaxi/results/2_1500.xml.gz", "/home/sebastian/avtaxi/results/2_1500.json");
+		run("/home/sebastian/avtaxi/config.xml", "/home/sebastian/avtaxi/results/2_2000.xml.gz", "/home/sebastian/avtaxi/results/2_2000.json");
+		
+		run("/home/sebastian/avtaxi/config.xml", "/home/sebastian/avtaxi/results/3_500.xml.gz", "/home/sebastian/avtaxi/results/3_500.json");
+		run("/home/sebastian/avtaxi/config.xml", "/home/sebastian/avtaxi/results/3_1000.xml.gz", "/home/sebastian/avtaxi/results/3_1000.json");
+		run("/home/sebastian/avtaxi/config.xml", "/home/sebastian/avtaxi/results/3_1500.xml.gz", "/home/sebastian/avtaxi/results/3_1500.json");
+		run("/home/sebastian/avtaxi/config.xml", "/home/sebastian/avtaxi/results/3_2000.xml.gz", "/home/sebastian/avtaxi/results/3_2000.json");
+		
+		run("/home/sebastian/avtaxi/config.xml", "/home/sebastian/avtaxi/results/4_500.xml.gz", "/home/sebastian/avtaxi/results/4_500.json");
+		run("/home/sebastian/avtaxi/config.xml", "/home/sebastian/avtaxi/results/4_1000.xml.gz", "/home/sebastian/avtaxi/results/4_1000.json");
+		run("/home/sebastian/avtaxi/config.xml", "/home/sebastian/avtaxi/results/4_1500.xml.gz", "/home/sebastian/avtaxi/results/4_1500.json");
+		run("/home/sebastian/avtaxi/config.xml", "/home/sebastian/avtaxi/results/4_2000.xml.gz", "/home/sebastian/avtaxi/results/4_2000.json");
 	}
 	
 	private static void run(String configPath, String eventsPath, String outputPath) throws JsonGenerationException, JsonMappingException, IOException {		

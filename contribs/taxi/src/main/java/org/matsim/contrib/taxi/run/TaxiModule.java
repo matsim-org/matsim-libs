@@ -60,8 +60,8 @@ public class TaxiModule
         bind(VehicleType.class).annotatedWith(Names.named(TAXI_MODE)).toInstance(vehicleType);
         bind(TaxiOptimizerFactory.class).to(DefaultTaxiOptimizerFactory.class);
 
-        addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
-        addControlerListenerBinding().to(TaxiStatsDumper.class);
+        //addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
+        //addControlerListenerBinding().to(TaxiStatsDumper.class);
 
         if (TaxiConfigGroup.get(getConfig()).getTimeProfiles()) {
             addMobsimListenerBinding().toProvider(TaxiStatusTimeProfileCollectorProvider.class);

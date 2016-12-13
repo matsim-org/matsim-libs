@@ -36,7 +36,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.analysis.legMode.distributions.LegModeBeelineDistanceDistributionHandler;
+import playground.agarwalamit.analysis.legMode.tripDistance.LegModeBeelineDistanceDistributionHandler;
 import playground.agarwalamit.analysis.modalShare.FilteredModalShareEventHandler;
 import playground.agarwalamit.opdyts.patna.PatnaCMPDistanceDistribution;
 

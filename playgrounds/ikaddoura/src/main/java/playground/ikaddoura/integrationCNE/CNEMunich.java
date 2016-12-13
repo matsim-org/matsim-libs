@@ -24,13 +24,12 @@ package playground.ikaddoura.integrationCNE;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -56,10 +55,10 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
+import playground.agarwalamit.utils.FileUtils;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
 import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
 import playground.vsp.airPollution.exposure.GridTools;
@@ -116,6 +115,8 @@ public class CNEMunich {
 			
 			if (congestionTollingApproachString.equals(CongestionTollingApproach.QBPV3.toString())) {
 				congestionTollingApproach = CongestionTollingApproach.QBPV3;
+			} else if (congestionTollingApproachString.equals(CongestionTollingApproach.QBPV9.toString())) {
+				congestionTollingApproach = CongestionTollingApproach.QBPV9;
 			} else if (congestionTollingApproachString.equals(CongestionTollingApproach.DecongestionPID.toString())) {
 				congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
 			} else {
@@ -128,11 +129,12 @@ public class CNEMunich {
 			
 		} else {
 			
-			configFile = "../../../runs-svn/cne_test/input/config.xml";
+			configFile = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/config_1pct_v2.xml";
+//			configFile = "../../../shared-svn/projects/detailedEval/matsim-input-files/config_1pct_v2.xml";
+
 		}
 
 		Config config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup(), new NoiseConfigGroup());
-		config.vehicles().setVehiclesFile("../../../runs-svn/detEval/emissionCongestionInternalization/iatbr/input/emissionVehicles_1pct.xml.gz");
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
@@ -146,15 +148,6 @@ public class CNEMunich {
 		
 		// scenario-specific settings
 		
-//		EmissionsConfigGroup ecg = (EmissionsConfigGroup) controler.getConfig().getModule("emissions");
-//		ecg.setAverageColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_ColdStart_vehcat_2005average.txt");
-//		ecg.setAverageWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_HOT_vehcat_2005average.txt");
-//		ecg.setDetailedColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_ColdStart_SubSegm_2005detailed.txt");
-//		ecg.setDetailedWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_HOT_SubSegm_2005detailed.txt");
-//		ecg.setEmissionRoadTypeMappingFile("../../../runs-svn/detEval/emissionCongestionInternalization/iatbr/input/roadTypeMapping.txt");
-//		ecg.setUsingDetailedEmissionCalculation(true);
-//		ecg.setUsingVehicleTypeIdAsVehicleDescription(false);
-		
 		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		
@@ -162,7 +155,7 @@ public class CNEMunich {
 			@Override
 			public void install() {
 				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
-				String ug = "Rev_Commuter"; //TODO [AA] probably, this can cause an exception, to fix, this either change ("COMMUTER_REV_COMMUTER") or make changes in config and person attributes.
+				String ug = "COMMUTER_REV_COMMUTER";
 				addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name().concat("_").concat(ug)).toProvider(new javax.inject.Provider<PlanStrategy>() {
 					final String[] availableModes = {"car", "pt_".concat(ug)};
 					final String[] chainBasedModes = {"car", "bike"};
@@ -179,7 +172,22 @@ public class CNEMunich {
 				});
 			}
 		});
-		
+
+		// additional things to get the networkRoute for ride mode. For this, ride mode must be assigned in networkModes of the config file.
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addTravelTimeBinding("ride").to(networkTravelTime());
+				addTravelDisutilityFactoryBinding("ride").to(carTravelDisutilityFactoryKey());
+			}
+		});
+
+		// allowing car and ride on all links (it is also necessary in order to get network routes for ride mode).
+		for (Link l : controler.getScenario().getNetwork().getLinks().values()){
+			Set<String> modes = new HashSet<>(Arrays.asList("car","ride"));
+			l.setAllowedModes(modes);
+		}
+
 		// noise Munich settings
 		
 		NoiseConfigGroup noiseParameters =  (NoiseConfigGroup) controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);

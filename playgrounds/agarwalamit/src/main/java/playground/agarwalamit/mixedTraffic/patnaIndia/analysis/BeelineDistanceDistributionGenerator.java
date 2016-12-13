@@ -36,7 +36,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.legMode.distributions.LegModeBeelineDistanceDistributionFromPlansAnalyzer;
+import playground.agarwalamit.analysis.legMode.tripDistance.LegModeBeelineDistanceDistributionFromPlansAnalyzer;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.MapUtils;

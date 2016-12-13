@@ -93,8 +93,8 @@ public final class AccessibilityCalculator {
 		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaWalkTD = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
 	}
-	
-	
+
+
 	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface l){
 		this.zoneDataExchangeListeners.add(l);
 	}
@@ -150,6 +150,8 @@ public final class AccessibilityCalculator {
 		this.aggregatedOpportunities = opportunityClusterMap.values().toArray(new AggregationObject[opportunityClusterMap.size()]);
 	}
 
+	private static int cnt2 = 0 ;
+	private static boolean prn = true ;
 
 	public final void computeAccessibilities( Double departureTime, ActivityFacilities opportunities) {
 		aggregateOpportunities(opportunities, scenario.getNetwork());
@@ -164,22 +166,25 @@ public final class AccessibilityCalculator {
 		Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins = aggregateMeasurePointsWithSameNearestNode();
 
 		LOG.info("Now going through all origins:");
-//		ProgressBar bar = new ProgressBar(aggregatedOrigins.size());
+		//		ProgressBar bar = new ProgressBar(aggregatedOrigins.size());
 
 		// go through all nodes (keys) that have a measuring point (origin) assigned
 		for (Id<Node> nodeId : aggregatedOrigins.keySet()) {
 			LOG.info("calculate accessibility for node=" + nodeId );
-//			bar.update();
+			//			bar.update();
 
 			Node fromNode = scenario.getNetwork().getNodes().get(nodeId);
 
 			for (AccessibilityContributionCalculator calculator : calculators.values()) {
+				Gbl.assertNotNull(calculator) ;
 				calculator.notifyNewOriginNode(fromNode, departureTime);
 			}
 
 			// get list with origins that are assigned to "fromNode"
 			for ( ActivityFacility origin : aggregatedOrigins.get( nodeId ) ) {
-				LOG.info("-- calculate accessibility for origin=" + origin.getId() );
+				cnt++ ;
+				if ( cnt >=10 ) prn = false ;
+				if ( prn ) LOG.info("-- calculate accessibility for origin=" + origin.getId() );
 				assert( origin.getCoord() != null );
 
 				for ( ExpSum expSum : expSums.values() ) {
@@ -198,11 +203,11 @@ public final class AccessibilityCalculator {
 
 				// aggregated value
 				Map<String, Double> accessibilities  = new LinkedHashMap<>();
-				
+
 				for (String mode : calculators.keySet()) {
-					LOG.info("---- calculate accessibility for mode=" + mode );
+					if ( prn ) LOG.info("---- calculate accessibility for mode=" + mode );
 					if(!useRawSum){
-						System.out.println("expSums.get(mode).getSum() = " + expSums.get(mode).getSum());
+						if ( prn ) LOG.info("expSums.get(mode).getSum() = " + expSums.get(mode).getSum());
 						accessibilities.put( mode, inverseOfLogitScaleParameter * Math.log( expSums.get(mode).getSum() ) ) ;
 					} else {
 						// this was used by IVT within SustainCity.  Not sure if we should maintain this; they could, after all, just exp the log results. kai, may'15
@@ -210,10 +215,12 @@ public final class AccessibilityCalculator {
 					}
 				}
 
-				LOG.warn("");
-				LOG.warn("SENDING accessibilities; start zone=" + origin.getId() );
-				for ( Entry<String, Double> entry : accessibilities.entrySet() ) {
-					LOG.warn( "mode=" + entry.getKey() + "; accessibility=" + entry.getValue() ) ;
+				if ( prn ) {
+					LOG.warn("");
+					LOG.warn("SENDING accessibilities; start zone=" + origin.getId() );
+					for ( Entry<String, Double> entry : accessibilities.entrySet() ) {
+						LOG.warn( "mode=" + entry.getKey() + "; accessibility=" + entry.getValue() ) ;
+					}
 				}
 				for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
 					zoneDataExchangeInterface.setFacilityAccessibilities(origin, departureTime, accessibilities);
@@ -256,16 +263,16 @@ public final class AccessibilityCalculator {
 	}
 
 
-//	private void computeAndAddExpUtilContributions(Map<Modes4Accessibility,ExpSum> expSums, ActivityFacility origin, final AggregationObject aggregatedFacility, Double departureTime) {
+	//	private void computeAndAddExpUtilContributions(Map<Modes4Accessibility,ExpSum> expSums, ActivityFacility origin, final AggregationObject aggregatedFacility, Double departureTime) {
 	private void computeAndAddExpUtilContributions(Map<String, ExpSum> expSums, ActivityFacility origin, final AggregationObject aggregatedFacility, Double departureTime) {
 		for ( Map.Entry<String, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet() ) {
-//			final Modes4Accessibility mode = Modes4Accessibility.valueOf(calculatorEntry.getKey());
+			//			final Modes4Accessibility mode = Modes4Accessibility.valueOf(calculatorEntry.getKey());
 			String mode = calculatorEntry.getKey();
 
 			// new
-//			if ( !this.acg.getIsComputingMode().contains(mode) ) {
-//				continue; // XXX yyyyyy should be configured by adding only the relevant calculators
-//			}
+			//			if ( !this.acg.getIsComputingMode().contains(mode) ) {
+			//				continue; // XXX yyyyyy should be configured by adding only the relevant calculators
+			//			}
 			// end new
 
 			final double expVhk = calculatorEntry.getValue().computeContributionOfOpportunity( origin , aggregatedFacility, departureTime );
@@ -277,6 +284,7 @@ public final class AccessibilityCalculator {
 
 	public final void putAccessibilityContributionCalculator(String mode, AccessibilityContributionCalculator calc) {
 		LOG.warn("Adding accessibility calculator for mode = " + mode ) ;
+		Gbl.assertNotNull(calc);
 		this.calculators.put(mode , calc) ;
 	}
 

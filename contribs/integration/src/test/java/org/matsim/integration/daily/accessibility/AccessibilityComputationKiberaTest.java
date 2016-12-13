@@ -18,38 +18,28 @@
  * *********************************************************************** */
 package org.matsim.integration.daily.accessibility;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
-import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
-import org.matsim.contrib.accessibility.AccessibilityStartupListener;
-import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
+import org.matsim.contrib.accessibility.AccessibilityModule;
 import org.matsim.contrib.accessibility.FacilityTypes;
-import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
-import org.matsim.contrib.accessibility.NetworkModeProvider;
+import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.testcases.MatsimTestUtils;
 
-import com.google.inject.Key;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.name.Names;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
@@ -58,116 +48,93 @@ import com.vividsolutions.jts.geom.Envelope;
 public class AccessibilityComputationKiberaTest {
 	public static final Logger log = Logger.getLogger(AccessibilityComputationKiberaTest.class);
 
-	private static final Double cellSize = 1000.;
-
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
-	public void doAccessibilityTest() throws IOException {
-		// Input and output
+	public void testQuick() {
+		run(1000.,false, false );
+	}
+	@Test
+	public void testLocal() {
+		run( 10., false, true ) ;
+	}
+	@Test
+	public void testOnServer() {
+		run( 10., true, false ) ;
+	}
+	
+	public void run(Double cellSize, boolean push2Geoserver, boolean createQGisOutput) {
+
+		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
+
+		// Network file:
 		String folderStructure = "../../";
 		String networkFile = "matsimExamples/countries/ke/kibera/2015-11-05_network_paths_detailed.xml";
-//		String networkFile = "../shared-svn/projects/maxess/data/nairobi/network/2015-11-05_kibera_paths_detailed.xml";
 		// Adapt folder structure that may be different on different machines, in particular on server
 		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
 		networkFile = folderStructure + networkFile;
-		final String facilitiesFile = folderStructure + "matsimExamples/countries/ke/kibera/2015-11-05_facilities.xml";
-//		final String facilitiesFile = folderStructure + "../shared-svn/projects/maxess/data/nairobi/facilities/03/facilities.xml";
-		final String outputDirectory = utils.getOutputDirectory();
-
-		// Parameters
-		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
-		final Envelope envelope = new Envelope(252000, 256000, 9854000, 9856000);
-		final String runId = "ke_kibera_" + AccessibilityUtils.getDate() + "_" + cellSize.toString().split("\\.")[0];
-		final boolean push2Geoserver = true;
-
-		// QGis parameters
-		boolean createQGisOutput = false;
-		final boolean includeDensityLayer = false;
-		final Double lowerBound = 0.; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
-//		final Double lowerBound = 1.75;
-		final Double upperBound = 3.5;
-		final Integer range = 9; // in the current implementation, this need always be 9
-		final int symbolSize = 10;
-		final int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
-		
-		// Storage objects
-		final List<String> modes = new ArrayList<>();
-
-		// Config and scenario
-		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
 		config.network().setInputFile(networkFile);
-		config.facilities().setInputFile(facilitiesFile);
+
+		config.facilities().setInputFile(folderStructure + "matsimExamples/countries/ke/kibera/2015-11-05_facilities.xml");
+
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(outputDirectory);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
+		config.controler().setRunId("ke_kibera_" + AccessibilityUtils.getDate() + "_" + cellSize.toString().split("\\.")[0]);
+		
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;	
+		acg.setCellSizeCellBasedAccessibility(cellSize.intValue()); 
+		acg.setEnvelope(new Envelope(252000, 256000, 9854000, 9856000)) ;
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, false);
+		acg.setOutputCrs("EPSG:21037"); // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
+		
+		ConfigUtils.setVspDefaults(config);
+
+		// ---
+		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 				
-		// Collect activity types
-//		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
-//		log.info("Found activity types: " + activityTypes);
-		final List<String> activityTypes = new ArrayList<>();
-		activityTypes.add(FacilityTypes.DRINKING_WATER);
+		// activity type:
+		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.DRINKING_WATER,FacilityTypes.CLINIC}) ; 
+		log.info("Using activity types: " + activityTypes);
+
+		// Network density points (as proxy for population density):
+		final ActivityFacilities densityFacilities = AccessibilityUtils.createFacilityForEachLink(scenario.getNetwork()) ;
+		// will be aggregated in downstream code!
 		
-		// Settings for VSP check
-		config.timeAllocationMutator().setMutationRange(7200.);
-		config.timeAllocationMutator().setAffectingDuration(false);
-		config.plans().setRemovingUnneccessaryPlanAttributes(true);
-		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration);
-		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
+		// ---
 
-		// Network density points
-		ActivityFacilities measuringPoints = AccessibilityUtils.createMeasuringPointsFromNetworkBounds(scenario.getNetwork(), cellSize);
-		double maximumAllowedDistance = 0.5 * cellSize;
-		final ActivityFacilities densityFacilities = AccessibilityUtils.createNetworkDensityFacilities(scenario.getNetwork(), measuringPoints, maximumAllowedDistance);
-
-		// Controller
 		final Controler controler = new Controler(scenario);
-		controler.addControlerListener(new AccessibilityStartupListener(activityTypes, densityFacilities, crs, runId, envelope, cellSize, push2Geoserver));
 		
-		// Add calculators
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
-				{
-					String mode = "freeSpeed";
-					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new FreeSpeedNetworkModeProvider(TransportMode.car));
-					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-					if (!modes.contains(mode)) modes.add(mode); // This install method is called four times, but each new mode should only be added once
-				}
-				{
-					String mode = TransportMode.car;
-					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
-					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-					if (!modes.contains(mode)) modes.add(mode); // This install method is called four times, but each new mode should only be added once
-				}
-				{ 
-					String mode = TransportMode.bike;
-					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
-					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-					if (!modes.contains(mode)) modes.add(mode); // This install method is called four times, but each new mode should only be added once
-				}
-				{
-					final String mode = TransportMode.walk;
-					this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
-					accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-					if (!modes.contains(mode)) modes.add(mode); // This install method is called four times, but each new mode should only be added once
-				}
-			}
-		});
+		for ( String activityType : activityTypes ) {
+			AccessibilityModule module = new AccessibilityModule() ;
+			module.setConsideredActivityType(activityType);
+			module.addAdditionalFacilityData(densityFacilities);
+			module.setPushing2Geoserver(push2Geoserver);
+			controler.addOverridingModule(module);
+		}
+		
+		// ---
+
 		controler.run();
 
 		// QGis
 		if (createQGisOutput == true) {
+			final boolean includeDensityLayer = false;
+			final Double lowerBound = 0.; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
+			final Double upperBound = 3.5;
+			final Integer range = 9; // in the current implementation, this need always be 9
+			final int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
+
 			String osName = System.getProperty("os.name");
 			String workingDirectory = config.controler().getOutputDirectory();
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
-				for (String mode : modes) {
-					VisualizationUtils.createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer,
-							lowerBound, upperBound, range, symbolSize, populationThreshold);
-					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
+					VisualizationUtils.createQGisOutput(actType, mode.toString(), new Envelope(252000, 256000, 9854000, 9856000), workingDirectory, "EPSG:21037", includeDensityLayer,
+							lowerBound, upperBound, range, cellSize.intValue(), populationThreshold);
+					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode.toString(), osName);
 				}
 			}  
 		}

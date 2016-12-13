@@ -169,6 +169,12 @@ public class CausedEmissionCostHandler implements WarmEmissionEventHandler, Cold
 		);
 	}
 
+	@Override
+	public boolean isFiltering() {
+		return ! (pf==null);
+	}
+
+
 	public Map<Id<Vehicle>, Double> getVehicleId2ColdEmissionCosts() {
 		return this.vehicleId2ColdEmissCosts;
 	}

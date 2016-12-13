@@ -2,7 +2,9 @@ package org.matsim.contrib.accessibility.utils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -18,6 +20,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
@@ -25,7 +28,7 @@ import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
-import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.SearchableActivityFacilities;
 
 /**
  * @author dziemke
@@ -43,9 +46,13 @@ public class AccessibilityUtils {
 	public static ActivityFacilities collectActivityFacilitiesWithOptionOfType(Scenario scenario, String activityOptionType) {
 		ActivityFacilities activityFacilities = FacilitiesUtils.createActivityFacilities(activityOptionType) ;
 		for (ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()) {
-			for (ActivityOption option : fac.getActivityOptions().values()) {
-				if (option.getType().equals(activityOptionType)) {
-					activityFacilities.addActivityFacility(fac);
+			if ( activityOptionType==null ) { // no activity option type for facility given, use all of them
+				activityFacilities.addActivityFacility(fac);
+			} else {
+				for (ActivityOption option : fac.getActivityOptions().values()) {
+					if (option.getType().equals(activityOptionType)) {
+						activityFacilities.addActivityFacility(fac);
+					}
 				}
 			}
 		}
@@ -60,7 +67,7 @@ public class AccessibilityUtils {
 	 * @return
 	 */
 	public static List<String> collectAllFacilityOptionTypes(Scenario scenario) {
-		List<String> activityOptionTypes = new ArrayList<String>() ;
+		List<String> activityOptionTypes = new ArrayList<>() ;
 		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
 			for (ActivityOption option : facility.getActivityOptions().values()) {
 				// collect all activity types that are contained within the provided facilities file
@@ -72,7 +79,16 @@ public class AccessibilityUtils {
 		LOG.warn("The following activity option types where found within the activity facilities: " + activityOptionTypes);
 		return activityOptionTypes;
 	}
-
+	
+	public static final ActivityFacilities createFacilityForEachLink( Network network ) {
+		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities("LinkFacilities") ;
+		ActivityFacilitiesFactory ff = facilities.getFactory() ;
+		for ( Link link : network.getLinks().values() ) {
+			ActivityFacility facility = ff.createActivityFacility( Id.create(link.getId(),ActivityFacility.class) , link.getCoord(), link.getId() ) ;
+			facilities.addActivityFacility(facility);
+		}
+		return facilities ;
+	}
 	
 	/**
 	 * Goes through a given set of measuring points and creates a facility on the measuring point if the
@@ -86,18 +102,21 @@ public class AccessibilityUtils {
 	 * @param cellSize
 	 * @return
 	 */
+	@Deprecated
 	public static ActivityFacilities createNetworkDensityFacilities(Network network,
 			ActivityFacilities measuringPoints, double maximumAllowedDistance) {
+		// yyyyyy This method scares me ... since in the code it is used by code that does not really know the measuring points and so
+		// only speculates about it.  kai, dec'16
+		// yyyyyy Why not just create a facility for each link?  (The GridBasedAccessibilityListener aggregates those anyways ...).  kai, dec'16
+		
 		ActivityFacilitiesFactory aff = new ActivityFacilitiesFactoryImpl();
 		ActivityFacilities networkDensityFacilities = FacilitiesUtils.createActivityFacilities("network_densities");
 
 		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values() ) {
 			Coord coord = measuringPoint.getCoord();
 			Link link = NetworkUtils.getNearestLink(network, coord);
-			final Coord coord1 = coord;
-			Link r = ((Link) link);
 			// TODO check if this is good or if orthogonal projection etc. is more suitable
-			double distance = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1);
+			double distance = CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
 			if (distance <= maximumAllowedDistance) {
 				ActivityFacility facility = aff.createActivityFacility(measuringPoint.getId(), coord);
 				networkDensityFacilities.addActivityFacility(facility);
@@ -109,10 +128,6 @@ public class AccessibilityUtils {
 
 	/**
 	 * Creates measuring points based on the scenario's network and a specified cell size.
-	 * 
-	 * @param scenario
-	 * @param cellSize
-	 * @return
 	 */
 	public static ActivityFacilities createMeasuringPointsFromNetworkBounds(Network network, double cellSize) {
 		BoundingBox boundingBox = BoundingBox.createBoundingBox(network);
@@ -225,4 +240,23 @@ public class AccessibilityUtils {
 				+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);
 		return date;
 	}
+
+
+//	public static void addNetworkMode(Binder binder, MapBinder<String, AccessibilityContributionCalculator> accBinder, String mode) {
+//		binder.bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
+//		accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+//	}
+//
+//
+//	public static void addFreeSpeedNetworkMode(Binder binder, MapBinder<String, AccessibilityContributionCalculator> accBinder, String mode) {
+//		final String str = "freespeed"; // yyyyyy should really be mode+"_freespeed" but need to see where that would fail tests.  kai, dec'16
+//		binder.bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(str)).toProvider(new FreeSpeedNetworkModeProvider(mode));
+//		accBinder.addBinding(str).to(Key.get(AccessibilityContributionCalculator.class, Names.named(str)));
+//	}
+//
+//
+//	public static void addConstantSpeedMode(Binder bnd, MapBinder<String, AccessibilityContributionCalculator> accBinder, String mode) {
+//		bnd.bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
+//		accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
+//	}
 }

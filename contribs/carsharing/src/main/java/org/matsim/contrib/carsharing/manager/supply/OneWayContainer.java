@@ -17,35 +17,48 @@ import org.matsim.core.utils.geometry.CoordUtils;
 public class OneWayContainer implements VehiclesContainer{	
 	
 	private QuadTree<CarsharingStation> owvehicleLocationQuadTree;	
-	private Map<CSVehicle, Link> owvehiclesMap ;	
+	private Map<String, CarsharingStation> stationsMap;
+	private Map<CSVehicle, Link> owvehiclesMap ;
+	private Map<CSVehicle, String> vehicleToStationMap;
 	
 	public OneWayContainer(QuadTree<CarsharingStation> owvehicleLocationQuadTree2,
-			Map<CSVehicle, Link> owvehiclesMap2) {
+			Map<String, CarsharingStation> stationsMap,
+			Map<CSVehicle, Link> owvehiclesMap2, Map<CSVehicle, String> vehicleToStationMap) {
 		this.owvehicleLocationQuadTree = owvehicleLocationQuadTree2;
+		this.stationsMap = stationsMap;
 		this.owvehiclesMap = owvehiclesMap2;
+		this.vehicleToStationMap = vehicleToStationMap;
 	}
 
 	public void reserveVehicle(CSVehicle vehicle) {
 		Link link = this.owvehiclesMap.get(vehicle);
 		Coord coord = link.getCoord();
 		this.owvehiclesMap.remove(vehicle);			
-		CarsharingStation station = owvehicleLocationQuadTree.getClosest(coord.getX(), coord.getY());
 		
-		((OneWayCarsharingStation)station).removeCar(vehicle);		
+		Collection<CarsharingStation> stations = 
+				owvehicleLocationQuadTree.getDisk(coord.getX(), coord.getY(), 0.0);
+		
+		for (CarsharingStation cs : stations) {
+			
+			if (((OneWayCarsharingStation)cs).getVehicles(vehicle.getType()).contains(vehicle)) {
+				((OneWayCarsharingStation)cs).removeCar(vehicle);
+				this.vehicleToStationMap.remove(vehicle);
+			}
+
+		}	
 	}
 
 	public void parkVehicle(CSVehicle vehicle, Link link) {
 		Coord coord = link.getCoord();			
 		owvehiclesMap.put(vehicle, link);			
 		CarsharingStation station = owvehicleLocationQuadTree.getClosest(coord.getX(), coord.getY());
-		((OneWayCarsharingStation)station).addCar(vehicle.getType(),  vehicle);	
+		((OneWayCarsharingStation)station).addCar(vehicle.getType(), vehicle);
+		this.vehicleToStationMap.put(vehicle, station.getStationId());
 		
 	}	
 	
-	public void freeParkingSpot(Link link) {
-		Coord coord = link.getCoord();
-		OneWayCarsharingStation station = (OneWayCarsharingStation) this.owvehicleLocationQuadTree.getClosest(coord.getX(), coord.getY());
-
+	public void freeParkingSpot(CSVehicle vehicle) {
+		OneWayCarsharingStation station = (OneWayCarsharingStation) this.stationsMap.get(this.vehicleToStationMap.get(vehicle));
 		station.freeParkingSpot();
 	}
 
@@ -110,7 +123,8 @@ public class OneWayContainer implements VehiclesContainer{
 				closestFound = CoordUtils.calcEuclideanDistance(destinationLink.getCoord(), coord);
 			}
 		}
-		
+		if (closest == null)
+			return null;
 		return closest.getLink();
 	}
 

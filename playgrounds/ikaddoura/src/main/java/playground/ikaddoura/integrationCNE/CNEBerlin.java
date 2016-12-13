@@ -103,6 +103,8 @@ public class CNEBerlin {
 			
 			if (congestionTollingApproachString.equals(CongestionTollingApproach.QBPV3.toString())) {
 				congestionTollingApproach = CongestionTollingApproach.QBPV3;
+			} else if (congestionTollingApproachString.equals(CongestionTollingApproach.QBPV9.toString())) {
+				congestionTollingApproach = CongestionTollingApproach.QBPV9;
 			} else if (congestionTollingApproachString.equals(CongestionTollingApproach.DecongestionPID.toString())) {
 				congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
 			} else {
@@ -135,7 +137,6 @@ public class CNEBerlin {
 	public void run() {
 						
 		Config config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup(), new NoiseConfigGroup());
-		config.vehicles().setVehiclesFile("../../../runs-svn/berlin-an-time/input/population_1agent.emissionVehicle.xml.gz");
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
@@ -150,15 +151,6 @@ public class CNEBerlin {
 		int noOfYCells = 446;
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
-		
-//		EmissionsConfigGroup ecg = (EmissionsConfigGroup) controler.getConfig().getModule("emissions");
-//		ecg.setAverageColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_ColdStart_vehcat_2005average.txt");
-//		ecg.setAverageWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_HOT_vehcat_2005average.txt");
-//		ecg.setDetailedColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_ColdStart_SubSegm_2005detailed.txt");
-//		ecg.setDetailedWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_HOT_SubSegm_2005detailed.txt");
-//		ecg.setEmissionRoadTypeMappingFile("../../../runs-svn/berlin-an-time/input/roadTypeMapping_berlin.txt");
-//		ecg.setUsingDetailedEmissionCalculation(false);
-//		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 	
 		// noise Berlin settings
 		

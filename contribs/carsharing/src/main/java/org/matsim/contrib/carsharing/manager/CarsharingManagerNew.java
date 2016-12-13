@@ -141,8 +141,10 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 							stationLink, destinationLink, false, false);				
 				}	
 			}
-			else
+			else {
+				eventsManager.processEvent(new NoVehicleCarSharingEvent(time, startLink.getId(), carsharingType));
 				return null;
+			}
 		}					
 	}
 	
@@ -187,12 +189,10 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 	public void freeParkingSpot(String vehicleId, Id<Link> linkId) {
 		
 		CSVehicle vehicle = this.carsharingSupplyContainer.getVehicleWithId(vehicleId);
-		Network network = scenario.getNetwork();
-		Link link = network.getLinks().get(linkId);
 		CompanyContainer companyContainer = this.carsharingSupplyContainer.getCompany(vehicle.getCompanyId());
 		VehiclesContainer vehiclesContainer = companyContainer.getVehicleContainer(vehicle.getCsType());
 		
-		((OneWayContainer)vehiclesContainer).freeParkingSpot(link);			
+		((OneWayContainer)vehiclesContainer).freeParkingSpot(vehicle);			
 	}
 
 	@Override

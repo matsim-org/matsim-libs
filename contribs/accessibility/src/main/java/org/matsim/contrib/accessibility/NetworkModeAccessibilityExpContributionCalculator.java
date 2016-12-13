@@ -10,6 +10,7 @@ import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -21,7 +22,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 /**
  * @author thibautd
  */
- public class NetworkModeAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
+ public final class NetworkModeAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
 	private static final Logger log = Logger.getLogger( NetworkModeAccessibilityExpContributionCalculator.class );
 
 	@Deprecated // yyyy should be possible to get this from car travel disutility
@@ -60,6 +61,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 		this.scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
 		this.travelTime = travelTime;		
 
+		Gbl.assertNotNull(travelDisutilityFactory);
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
 
 		this.lcpt = new LeastCostPathTreeExtended(travelTime, travelDisutility, this.scheme);

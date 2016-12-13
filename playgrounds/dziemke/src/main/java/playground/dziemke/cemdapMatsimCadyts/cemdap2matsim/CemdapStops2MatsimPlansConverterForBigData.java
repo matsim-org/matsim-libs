@@ -18,10 +18,8 @@ public class CemdapStops2MatsimPlansConverterForBigData {
 	
 	private static int numberOfFirstCemdapOutputFile = 100;
 	private static int numberOfPlans = 1;
-	private static boolean addStayHomePlan = false;
 	
 	private static String tazShapeFile = "C:/Users/gthunig/SVN/shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenLOR_DHDN_GK4.shp";
-	private static String networkFile = "C:/Users/gthunig/SVN/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 	private static String cemdapDataRoot = "C:/Users/gthunig/CEMDAP/cemdap_output/";
 	private static String outputRoot = "C:/Users/gthunig/SVN/shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/";
 	
@@ -57,7 +55,7 @@ public class CemdapStops2MatsimPlansConverterForBigData {
 	
 	public static void convertData(String outputRoot, int numberOfFirstCemdapOutputFile, boolean addStayHomePlan) throws IOException {
 		
-		CemdapStops2MatsimPlansConverter converter = new CemdapStops2MatsimPlansConverter(tazShapeFile, networkFile, cemdapDataRoot);
+		CemdapStops2MatsimPlansConverter converter = new CemdapStops2MatsimPlansConverter(tazShapeFile, cemdapDataRoot);
 				
 		converter.setNumberOfFirstCemdapOutputFile(numberOfFirstCemdapOutputFile);
 		converter.setNumberOfPlans(numberOfPlans);

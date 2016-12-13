@@ -76,15 +76,7 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 
 	private Map<String, CarsharingStation> twowaycarsharingstationsMap = new HashMap<String, CarsharingStation>();
 	private Map<String, CarsharingStation> onewaycarsharingstationsMap = new HashMap<String, CarsharingStation>();
-
-	public Map<String, CarsharingStation> getTwowaycarsharingstationsMap() {
-		return twowaycarsharingstationsMap;
-	}
-
-	public Map<String, CarsharingStation> getOnewaycarsharingstationsMap() {
-		return onewaycarsharingstationsMap;
-	}
-
+	
 	private Map<CSVehicle, Link> ffvehiclesMap = new HashMap<CSVehicle, Link>();	
 	private Map<String, CSVehicle> ffvehicleIdMap = new HashMap<String, CSVehicle>();
 	
@@ -94,6 +86,18 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 	
 	private Map<String, CSVehicle> twvehicleIdMap = new HashMap<String, CSVehicle>();
 	private Map<CSVehicle, Link> twvehiclesMap = new HashMap<CSVehicle, Link>();
+
+	private Map<CSVehicle, String> owvehicleToStationMap = new HashMap<CSVehicle, String>();
+		
+	public Map<String, CarsharingStation> getTwowaycarsharingstationsMap() {
+		return twowaycarsharingstationsMap;
+	}
+
+	public Map<String, CarsharingStation> getOnewaycarsharingstationsMap() {
+		return onewaycarsharingstationsMap;
+	}
+
+	
 	
 	public Map<String, CSVehicle> getOwvehicleIdMap() {
 		return owvehicleIdMap;
@@ -150,6 +154,10 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 			
 			twvehicleIdMap = new HashMap<String, CSVehicle>();
 			twvehiclesMap = new HashMap<CSVehicle, Link>();
+			
+			owvehicleToStationMap = new HashMap<CSVehicle, String>();
+			
+			
 			//allVehicles = new HashMap<String, CSVehicle>();
 			//companies = new HashMap<String, CompanyContainer>();
 		}
@@ -221,8 +229,8 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 			}
 			
 			if (hasOW) {
-				VehiclesContainer owvehiclesContainer = new OneWayContainer(owvehicleLocationQuadTree,
-						owvehiclesMap);
+				VehiclesContainer owvehiclesContainer = new OneWayContainer(owvehicleLocationQuadTree, onewaycarsharingstationsMap,
+						owvehiclesMap, owvehicleToStationMap);
 					companyContainer.addCarsharingType("oneway", owvehiclesContainer);
 					hasOW = false;
 				
@@ -239,6 +247,7 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 				if (name.equals("oneway")) {
 					this.owvehicleIdMap.put(vehicle.getVehicleId(), vehicle);
 					this.owvehiclesMap.put(vehicle, link);
+					this.owvehicleToStationMap.put(vehicle, id);
 				}
 				else if (name.equals("twoway")) {
 					this.twvehicleIdMap.put(vehicle.getVehicleId(), vehicle);
@@ -289,6 +298,7 @@ public class CarsharingXmlReaderNew extends MatsimXmlParser {
 				
 				owvehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), station);
 				this.onewaycarsharingstationsMap.put(id, station);
+
 				owStations.add(station);
 				
 			}

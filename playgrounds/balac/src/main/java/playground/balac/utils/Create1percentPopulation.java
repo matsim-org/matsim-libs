@@ -1,10 +1,6 @@
 package playground.balac.utils;
 
-
-
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
@@ -12,7 +8,6 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
 
 public class Create1percentPopulation {
 
@@ -20,8 +15,8 @@ public class Create1percentPopulation {
 	public void run(String plansFilePath, String networkFilePath) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimReader populationReader = new PopulationReader(scenario);
-		//MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
-		//networkReader.readFile(networkFilePath);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
+		networkReader.readFile(networkFilePath);
 	//	new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);
 		populationReader.readFile(plansFilePath);
 				
@@ -42,7 +37,8 @@ public class Create1percentPopulation {
 			//}
 		}
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV4("C:/Users/balacm/Documents/MATSim/WorkspaceShaghai/MATSimTest/examples/siouxfalls-2014/plans_10perc.xml.gz");		
+		new PopulationWriter(scenario.getPopulation(), 
+				scenario.getNetwork()).writeV4("C:\\LocalDocuments\\Papers\\CarsharingFramework2016\\Scenario\\population_10perc.xml.gz");		
 		
 	}
 	
@@ -51,7 +47,7 @@ public class Create1percentPopulation {
 		Create1percentPopulation cp = new Create1percentPopulation();
 				
 		String plansFilePath = args[0]; 
-		String networkFilePath = args[1];
+		String networkFilePath =args[1];
 		//String facilitiesfilePath = args[2];
 		//String outputFolder = args[2];
 		
