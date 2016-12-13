@@ -27,8 +27,10 @@ public class TwoWayCarsharingStation implements CarsharingStation {
 	}
 	
 	public int getNumberOfVehicles(String type) {
-		
-		return this.numberOfvehiclesPerType.get(type);
+		if (this.numberOfvehiclesPerType.containsKey(type))
+			return this.numberOfvehiclesPerType.get(type);
+		else
+			return 0;
 	}	
 	
 	public ArrayList<CSVehicle> getVehicles(String type) {
