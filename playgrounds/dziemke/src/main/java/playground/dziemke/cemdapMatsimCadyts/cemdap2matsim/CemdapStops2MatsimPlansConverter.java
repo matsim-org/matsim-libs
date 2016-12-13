@@ -191,11 +191,11 @@ public class CemdapStops2MatsimPlansConverter {
 			log.warn("NumberOfPlans not set.");
 			return false;
 		}
-		if (!outputDirectory.isEmpty()) {
+		if (outputDirectory.isEmpty()) {
 			log.warn("OutputDirectory is empty.");
 			return false;
 		}
-		if (!cemdapStopsFilename.isEmpty()) {
+		if (cemdapStopsFilename.isEmpty()) {
 			log.warn("CemdapStopsFilename is empty.");
 			return false;
 		}
