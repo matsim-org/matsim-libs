@@ -81,10 +81,11 @@ public class BerlinControler {
 			
 			agentSpecificActivityScheduling = true;
 			activityDurationBin = 3600.;
-			tolerance = 0.;
+			tolerance = 3600.;
 			
-			pricing = false;
+			pricing = true;
 			kp = 2 * ( 12. / 3600.);
+//			kp = 999999.;
 		}
 		
 		BerlinControler berlin = new BerlinControler();
@@ -117,7 +118,7 @@ public class BerlinControler {
 			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 			
 			final DecongestionInfo info = new DecongestionInfo(controler.getScenario(), decongestionSettings);
-			final Decongestion decongestion = new Decongestion(info);
+			final Decongestion decongestion = new Decongestion(controler, info);
 			controler = decongestion.getControler();
 				
 //			CNEIntegration cne = new CNEIntegration(controler);
