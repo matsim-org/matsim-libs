@@ -201,7 +201,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 		double[] iterations1 = new double[event.getIteration() + 1];
 		double[] values1a = new double[event.getIteration() + 1];
 		double[] values1b = new double[event.getIteration() + 1];
-		for (int i = 0; i <= event.getIteration(); i++) {
+		for (int i = this.congestionInfo.getScenario().getConfig().controler().getFirstIteration(); i <= event.getIteration(); i++) {
 			iterations1[i] = i;
 			values1a[i] = this.iteration2totalDelay.get(i) / 3600.;
 			values1b[i] = this.iteration2totalTravelTime.get(i) / 3600.;
@@ -216,7 +216,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 		double[] values2b = new double[event.getIteration() + 1];
 		double[] values2c = new double[event.getIteration() + 1];
 
-		for (int i = 0; i <= event.getIteration(); i++) {
+		for (int i = this.congestionInfo.getScenario().getConfig().controler().getFirstIteration(); i <= event.getIteration(); i++) {
 			iterations2[i] = i;
 			values2a[i] = this.iteration2userBenefits.get(i) + this.iteration2totalTollPayments.get(i);
 			values2b[i] = this.iteration2userBenefits.get(i);
