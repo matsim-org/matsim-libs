@@ -149,6 +149,7 @@ public class AgentSpecificActivityScoringTest {
 			scoringFunction.handleActivity(thirdActivity2);
 			scoringFunction.finish();
 			assertEquals("agent-specific activity-score of plan2 should result in a lower score compared to default scoring (tolerance: 0.)", true, defaultScorePlan2 > scoringFunction.getScore());
+			assertEquals("wrong agent-specific activity-score of plan2", 136.33326279184783, scoringFunction.getScore(), MatsimTestUtils.EPSILON);
 		}
 	
 	}
@@ -252,6 +253,7 @@ public class AgentSpecificActivityScoringTest {
 			scoringFunction.handleActivity(thirdActivity2);
 			scoringFunction.finish();
 			assertEquals("agent-specific activity-score of plan2 should result in a lower score compared to default scoring (tolerance: 0.)", true, defaultScorePlan2 > scoringFunction.getScore());
+			assertEquals("wrong agent-specific activity-score of plan2", 127.3332627918783, scoringFunction.getScore(), MatsimTestUtils.EPSILON);
 		}
 	
 	}
