@@ -47,7 +47,7 @@ public class BerlinControler {
 	private static final Logger log = Logger.getLogger(BerlinControler.class);
 	
 	private static String configFile;
-	private static boolean addModifiedActivities;
+	private static boolean agentSpecificActivityScheduling;
 	private static double activityDurationBin;
 	private static double tolerance;
 	private static boolean pricing;
@@ -60,8 +60,8 @@ public class BerlinControler {
 			configFile = args[0];		
 			log.info("configFile: "+ configFile);
 			
-			addModifiedActivities = Boolean.parseBoolean(args[1]);
-			log.info("addModifiedActivities: "+ addModifiedActivities);
+			agentSpecificActivityScheduling = Boolean.parseBoolean(args[1]);
+			log.info("addModifiedActivities: "+ agentSpecificActivityScheduling);
 
 			activityDurationBin = Double.parseDouble(args[2]);
 			log.info("activityDurationBin: "+ activityDurationBin);
@@ -79,11 +79,11 @@ public class BerlinControler {
 			
 			configFile = "../../../runs-svn/berlin-dz-time/input/config.xml";
 			
-			addModifiedActivities = true;
+			agentSpecificActivityScheduling = true;
 			activityDurationBin = 3600.;
-			tolerance = 7200.;
+			tolerance = 0.;
 			
-			pricing = true;
+			pricing = false;
 			kp = 2 * ( 12. / 3600.);
 		}
 		
@@ -97,7 +97,7 @@ public class BerlinControler {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 				
-		if (addModifiedActivities) {		
+		if (agentSpecificActivityScheduling) {		
 			AgentSpecificActivityScheduling aa = new AgentSpecificActivityScheduling(controler);
 			aa.setActivityDurationBin(activityDurationBin);
 			aa.setTolerance(tolerance);
@@ -116,14 +116,14 @@ public class BerlinControler {
 			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
 			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 			
-//			final DecongestionInfo info = new DecongestionInfo(controler.getScenario(), decongestionSettings);
-//			final Decongestion decongestion = new Decongestion(info);
-//			controler = decongestion.getControler();
+			final DecongestionInfo info = new DecongestionInfo(controler.getScenario(), decongestionSettings);
+			final Decongestion decongestion = new Decongestion(info);
+			controler = decongestion.getControler();
 				
-			CNEIntegration cne = new CNEIntegration(controler);
-			cne.setCongestionTollingApproach(CongestionTollingApproach.QBPV3);
-			cne.setCongestionPricing(true);
-			controler = cne.prepareControler();
+//			CNEIntegration cne = new CNEIntegration(controler);
+//			cne.setCongestionTollingApproach(CongestionTollingApproach.QBPV3);
+//			cne.setCongestionPricing(true);
+//			controler = cne.prepareControler();
 		}
 			
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
