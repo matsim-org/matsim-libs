@@ -113,7 +113,7 @@ public class DecongestionRun {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 				
 		final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-		final Decongestion decongestion = new Decongestion(info);
+		final Decongestion decongestion = new Decongestion(new Controler(scenario), info);
 		
 		final Controler controler = decongestion.getControler();
         controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);

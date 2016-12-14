@@ -317,7 +317,8 @@ public class CNEIntegration {
 					decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 					
 					final DecongestionInfo info = new DecongestionInfo(controler.getScenario(), decongestionSettings);
-					final Decongestion decongestion = new Decongestion(info);
+					final Decongestion decongestion = new Decongestion(controler, info);
+					decongestion.setSigma(sigma);
 					controler = decongestion.getControler();
 				}
 				
@@ -512,7 +513,7 @@ public class CNEIntegration {
 							decongestionInfo,
 							controler.getConfig().planCalcScore());
 					
-					travelDisutilityFactory.setSigma(0.);
+					travelDisutilityFactory.setSigma(sigma);
 					controler.addOverridingModule(new AbstractModule(){
 						@Override
 						public void install() {

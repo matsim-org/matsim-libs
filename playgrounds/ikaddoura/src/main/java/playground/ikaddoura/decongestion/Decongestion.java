@@ -41,12 +41,8 @@ public class Decongestion {
 	private final DecongestionInfo info;
 	private final Controler controler;
 	
-	public Decongestion(DecongestionInfo info) {
-		this.info = info;
-		this.controler = new Controler(info.getScenario());
-		prepare();
-	}
-	
+	private double sigma = 0.;
+		
 	public Decongestion(Controler controler, DecongestionInfo info) {
 		this.info = info;
 		this.controler = controler;
@@ -86,7 +82,7 @@ public class Decongestion {
 		
 		// toll-adjusted routing
 		final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory(info, info.getScenario().getConfig().planCalcScore());
-		travelDisutilityFactory.setSigma(0.);
+		travelDisutilityFactory.setSigma(sigma);
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
@@ -105,6 +101,10 @@ public class Decongestion {
 
 	public Controler getControler() {
 		return controler;
+	}
+	
+	public void setSigma(double sigma) {
+		this.sigma = sigma;
 	}
 
 }

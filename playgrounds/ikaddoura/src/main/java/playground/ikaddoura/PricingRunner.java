@@ -247,7 +247,7 @@ public class PricingRunner {
 			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
 			
 			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-			Decongestion decongestion = new Decongestion(info);
+			Decongestion decongestion = new Decongestion(new Controler(scenario), info);
 			controler = decongestion.getControler();
 			
 		} else if (pricingApproach.equals(PricingApproach.DecongestionBangBangA)) {
@@ -262,7 +262,7 @@ public class PricingRunner {
 			decongestionSettings.setTOLL_ADJUSTMENT(1.0);
 			
 			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-			Decongestion decongestion = new Decongestion(info);
+			Decongestion decongestion = new Decongestion(new Controler(scenario), info);
 			controler = decongestion.getControler();	
 			
 		} else if (pricingApproach.equals(PricingApproach.DecongestionBangBangB)) {
@@ -277,7 +277,7 @@ public class PricingRunner {
 			decongestionSettings.setTOLL_ADJUSTMENT(10.0);
 			
 			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-			Decongestion decongestion = new Decongestion(info);
+			Decongestion decongestion = new Decongestion(new Controler(scenario), info);
 			controler = decongestion.getControler();		
 			
 		} else if (pricingApproach.equals(PricingApproach.DecongestionP)) {
@@ -293,7 +293,7 @@ public class PricingRunner {
 			decongestionSettings.setKd(0.0);
 			
 			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-			Decongestion decongestion = new Decongestion(info);
+			Decongestion decongestion = new Decongestion(new Controler(scenario), info);
 			controler = decongestion.getControler();
 		
 		} else if (pricingApproach.equals(PricingApproach.DecongestionI)) {
@@ -309,7 +309,7 @@ public class PricingRunner {
 			decongestionSettings.setKd(0.0);
 			
 			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-			Decongestion decongestion = new Decongestion(info);
+			Decongestion decongestion = new Decongestion(new Controler(scenario), info);
 			controler = decongestion.getControler();
 		
 		} else if (pricingApproach.equals(PricingApproach.DecongestionD)) {
@@ -325,7 +325,7 @@ public class PricingRunner {
 			decongestionSettings.setKd(1.0);
 			
 			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-			Decongestion decongestion = new Decongestion(info);
+			Decongestion decongestion = new Decongestion(new Controler(scenario), info);
 			controler = decongestion.getControler();	
 		
 		} else if (pricingApproach.equals(PricingApproach.DecongestionPID)) {
@@ -341,7 +341,7 @@ public class PricingRunner {
 			decongestionSettings.setKd(1.0);
 			
 			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-			Decongestion decongestion = new Decongestion(info);
+			Decongestion decongestion = new Decongestion(new Controler(scenario), info);
 			controler = decongestion.getControler();	
 			
 		} else if (pricingApproach.equals(PricingApproach.DecongestionPIDwithParameters)) {
@@ -357,7 +357,7 @@ public class PricingRunner {
 			decongestionSettings.setKd(parameterKd);
 			
 			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-			Decongestion decongestion = new Decongestion(info);
+			Decongestion decongestion = new Decongestion(new Controler(scenario), info);
 			controler = decongestion.getControler();	
 			
 		} else {
