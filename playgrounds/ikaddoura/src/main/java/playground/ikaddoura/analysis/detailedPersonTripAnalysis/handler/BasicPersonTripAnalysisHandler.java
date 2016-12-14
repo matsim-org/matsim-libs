@@ -330,42 +330,47 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			
 			log.warn("A person is stucking... This may affect the travel time calculation.");
 			
-			int currentTripNumber = this.personId2currentTripNumber.get(event.getPersonId());
+			if (this.personId2currentTripNumber.containsKey(event.getPersonId())) {
+				int currentTripNumber = this.personId2currentTripNumber.get(event.getPersonId());	
+				
+				// travel time
 
-			// travel time
+				Map<Integer, Double> tripNumber2travelTime;
+				if (this.personId2tripNumber2travelTime.containsKey(event.getPersonId())) {
+					tripNumber2travelTime = this.personId2tripNumber2travelTime.get(event.getPersonId());
 
-			Map<Integer, Double> tripNumber2travelTime;
-			if (this.personId2tripNumber2travelTime.containsKey(event.getPersonId())) {
-				tripNumber2travelTime = this.personId2tripNumber2travelTime.get(event.getPersonId());
-
+				} else {
+					tripNumber2travelTime = new HashMap<Integer, Double>();
+				}
+										
+				double traveltime = 0.;
+				if (event.getTime() == this.scenario.getConfig().qsim().getEndTime()) {
+					log.warn("The stuck event is thrown at the end of the simulation. Computing the travel time for this trip as follows: simulation end time - trip departure time");
+					traveltime = event.getTime() - this.personId2tripNumber2departureTime.get(event.getPersonId()).get(currentTripNumber);
+				} else {
+					log.warn("Stucking vehicle will be removed and teleported to the destination activity. The travel time cannot be interpreted.");
+					traveltime = Double.POSITIVE_INFINITY;
+				}
+				log.warn("The travel time is set to " + traveltime);
+				
+				tripNumber2travelTime.put(currentTripNumber, traveltime);
+				this.personId2tripNumber2travelTime.put(event.getPersonId(), tripNumber2travelTime);
+				
+				// stuck and abort 
+				
+				Map<Integer, Boolean> tripNr2StuckAbort;
+				if (this.personId2tripNumber2stuckAbort.containsKey(event.getPersonId())) {
+					tripNr2StuckAbort = this.personId2tripNumber2stuckAbort.get(event.getPersonId());
+				} else {
+					tripNr2StuckAbort = new HashMap<Integer, Boolean>();
+				}
+				
+				tripNr2StuckAbort.put(currentTripNumber, true);
+				this.personId2tripNumber2stuckAbort.put(event.getPersonId(), tripNr2StuckAbort);
+			
 			} else {
-				tripNumber2travelTime = new HashMap<Integer, Double>();
+				// the agent has not yet departed
 			}
-									
-			double traveltime = 0.;
-			if (event.getTime() == this.scenario.getConfig().qsim().getEndTime()) {
-				log.warn("The stuck event is thrown at the end of the simulation. Computing the travel time for this trip as follows: simulation end time - trip departure time");
-				traveltime = event.getTime() - this.personId2tripNumber2departureTime.get(event.getPersonId()).get(currentTripNumber);
-			} else {
-				log.warn("Stucking vehicle will be removed and teleported to the destination activity. The travel time cannot be interpreted.");
-				traveltime = Double.POSITIVE_INFINITY;
-			}
-			log.warn("The travel time is set to " + traveltime);
-			
-			tripNumber2travelTime.put(currentTripNumber, traveltime);
-			this.personId2tripNumber2travelTime.put(event.getPersonId(), tripNumber2travelTime);
-			
-			// stuck and abort 
-			
-			Map<Integer, Boolean> tripNr2StuckAbort;
-			if (this.personId2tripNumber2stuckAbort.containsKey(event.getPersonId())) {
-				tripNr2StuckAbort = this.personId2tripNumber2stuckAbort.get(event.getPersonId());
-			} else {
-				tripNr2StuckAbort = new HashMap<Integer, Boolean>();
-			}
-			
-			tripNr2StuckAbort.put(currentTripNumber, true);
-			this.personId2tripNumber2stuckAbort.put(event.getPersonId(), tripNr2StuckAbort);
 					
 		} else {
 				// The agent should arrive and a travel time can be calculated.
