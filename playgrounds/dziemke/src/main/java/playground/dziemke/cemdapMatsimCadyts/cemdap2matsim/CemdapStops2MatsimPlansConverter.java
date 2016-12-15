@@ -1,6 +1,6 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * UCSBStops2PlansConverter.java
+ * project: org.matsim.*                                                   *
+ * CemdapStops2MatsimPlansConverter.java                                   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -26,8 +26,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -39,40 +44,39 @@ import playground.dziemke.utils.LogToOutputSaver;
 
 /**
  * @author dziemke
- * based on "ucsb\demand\UCSBStops2PlansConverter.java"
  */
 public class CemdapStops2MatsimPlansConverter {
-	private static final Logger log = Logger.getLogger(CemdapStops2MatsimPlansConverter.class);
+	private static final Logger LOG = Logger.getLogger(CemdapStops2MatsimPlansConverter.class);
 	
 	// Parameters
 	private int numberOfFirstCemdapOutputFile = -1;
 	private int numberOfPlans = -1;
+	private boolean allowVariousWorkAndEducationLocations = false;
 	private boolean addStayHomePlan = false;
 	
 	// Input and output
 	private String outputDirectory;
-	private String tazShapeFile;
+	private String zonalShapeFile;
 	private String cemdapDataRoot;
 	private String cemdapStopsFilename = "stops.out";
 	
 	public static void main(String[] args) {
 		int numberOfFirstCemdapOutputFile = 87;
 		int numberOfPlans = 3;
+		boolean allowVariousWorkAndEducationLocations = false;
 		boolean addStayHomePlan = true;
 		
 		int numberOfPlansFile = 34;
 		String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/" + numberOfPlansFile + "/";
-		String tazShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenLOR_DHDN_GK4.shp";
-//		String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+		String zonalShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenLOR_DHDN_GK4.shp";
 		String cemdapDataRoot = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_output/";
 		
-		CemdapStops2MatsimPlansConverter converter = new CemdapStops2MatsimPlansConverter(
-				tazShapeFile, 
-				cemdapDataRoot);
+		CemdapStops2MatsimPlansConverter converter = new CemdapStops2MatsimPlansConverter(zonalShapeFile, cemdapDataRoot);
 		
 		converter.setOutputDirectory(outputDirectory);
 		converter.setNumberOfFirstCemdapOutputFile(numberOfFirstCemdapOutputFile);
 		converter.setNumberOfPlans(numberOfPlans);
+		converter.setAllowVariousWorkAndEducationLocations(allowVariousWorkAndEducationLocations);
 		converter.setAddStayHomePlan(addStayHomePlan);
 		
 		try {
@@ -82,114 +86,100 @@ public class CemdapStops2MatsimPlansConverter {
 		}
 	}
 	
-	public CemdapStops2MatsimPlansConverter(String tazShapeFile, String cemdapDataRoot) {
-		this.tazShapeFile = tazShapeFile;
+	public CemdapStops2MatsimPlansConverter(String zonalShapeFile, String cemdapDataRoot) {
+		this.zonalShapeFile = zonalShapeFile;
 		this.cemdapDataRoot = cemdapDataRoot;
 	}
 	
 	public void convert() throws IOException {
-		if (!areDependenciesSet()) return;
+		if (!checkIfParametersValid()) return;
 		LogToOutputSaver.setOutputDirectory(outputDirectory);
-		// find respective stops file
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		
+		// Find respective stops file
 		Map<Integer, String> cemdapStopsFilesMap = new HashMap<>();
-//		Map<Integer, String> cemdapToursFilesMap = new HashMap<>();
-//		Map<Integer, Map<String,String>> mapOfTourAttributesMaps = new HashMap<Integer, Map<String,String>>();
-		for (int i=0; i<numberOfPlans; i++) {
-			int numberOfCurrentInputFile = numberOfFirstCemdapOutputFile + i;
+		for (int planNumber = 0; planNumber < numberOfPlans; planNumber++) {
+			int numberOfCurrentInputFile = numberOfFirstCemdapOutputFile + planNumber;
 			String cemdapStopsFile = cemdapDataRoot + numberOfCurrentInputFile + "/" + cemdapStopsFilename;
-//			String cemdapToursFile = cemdapOutputRoot + numberOfCurrentInputFile + "/tours.out";
-//			Map<String,String> tourAttributesMap = new HashMap<String,String>();
-			cemdapStopsFilesMap.put(i, cemdapStopsFile);
-//			cemdapToursFilesMap.put(i, cemdapToursFile);
-//			mapOfTourAttributesMaps.put(i, tourAttributesMap);
+			cemdapStopsFilesMap.put(planNumber, cemdapStopsFile);
 		}
 	
-		// create ObjectAttrubutes for each agent
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Map<Integer, ObjectAttributes> personObjectAttributesMap = new HashMap<Integer, ObjectAttributes>();
-		for (int i=0; i<numberOfPlans; i++) {
-			ObjectAttributes personObjectAttributes = new ObjectAttributes();
-			personObjectAttributesMap.put(i, personObjectAttributes);
+		// Create ObjectAttrubutes for each agent and each plan
+		Map<Integer, ObjectAttributes> personZoneAttributesMap = new HashMap<Integer, ObjectAttributes>();
+		for (int planNumber = 0; planNumber < numberOfPlans; planNumber++) {
+			ObjectAttributes personZoneAttributes = new ObjectAttributes();
+			personZoneAttributesMap.put(planNumber, personZoneAttributes);
 		}
 		
-		// read in network
-//		new NetworkReaderMatsimV1(scenario.getNetwork()).readFile(networkFile);
+		Map<Id<Person>, Coord> homeZones = new HashMap<>();
 		
-		// write all (geographic) features of planning area to a map
-		Map<String,SimpleFeature> combinedFeatures = new HashMap<String, SimpleFeature>();
-		for (SimpleFeature feature: ShapeFileReader.getAllFeatures(tazShapeFile)) {
-			Integer schluessel = Integer.parseInt((String) feature.getAttribute("NR"));
-			String id = schluessel.toString();
-			combinedFeatures.put(id,feature);
+		// Write all (geographic) features of planning area to a map
+		Map<String,SimpleFeature> zones = new HashMap<String, SimpleFeature>();
+		for (SimpleFeature feature: ShapeFileReader.getAllFeatures(zonalShapeFile)) {
+			String shapeId = (String) feature.getAttribute("NR");
+			zones.put(shapeId,feature);
 		}
-
-//		// parse cemdap tours file
-//		for (int i=0; i<numberOfPlans; i++) {
-//			new CemdapToursParser().parse(cemdapToursFilesMap.get(i), mapOfTourAttributesMaps.get(i));
-//		}
 		
-		// parse cemdap stops file
-		for (int i=0; i<numberOfPlans; i++) {
-			new CemdapStopsParser().parse(cemdapStopsFilesMap.get(i), i, //mapOfTourAttributesMaps.get(i), 
-					scenario,
-					personObjectAttributesMap.get(i), false);
-			new Feature2Coord().assignCoords(scenario, i, personObjectAttributesMap.get(i), combinedFeatures);
+		// Parse cemdap stops file
+		for (int planNumber = 0; planNumber < numberOfPlans; planNumber++) {
+			new CemdapStopsParser().parse(cemdapStopsFilesMap.get(planNumber), planNumber, scenario, personZoneAttributesMap.get(planNumber));
+		}
+		
+		// Assign home coordinates
+		Feature2Coord feature2Coord = new Feature2Coord();
+		feature2Coord.assignHomeCoords(scenario, personZoneAttributesMap.get(0), homeZones, zones);
+		
+		// Assign coordinates to all other activities
+		for (int planNumber = 0; planNumber < numberOfPlans; planNumber++) {
+			feature2Coord.assignCoords(scenario, planNumber, personZoneAttributesMap.get(planNumber), zones, homeZones, allowVariousWorkAndEducationLocations);
 		}
 				
-		// if applicable, add a stay-home plan
+		// If applicable, add a stay-home plan
 		if (addStayHomePlan == true) {
-			int planNumber = numberOfPlans; // Thus, number of stay-home plan is one more than number of last plan.
-			new CemdapStopsParser().parse(cemdapStopsFilesMap.get(0), planNumber, //mapOfTourAttributesMaps.get(0), 
-					scenario,
-					personObjectAttributesMap.get(0), true);
-			new Feature2Coord().assignCoords(scenario, planNumber, personObjectAttributesMap.get(0), combinedFeatures);
+			numberOfPlans++;
+			Population population = scenario.getPopulation();
+			
+			for (Person person : population.getPersons().values()) {
+				Plan firstPlan = person.getPlans().get(0);
+				Activity firstActivity = (Activity) firstPlan.getPlanElements().get(0);
+				
+				Plan stayHomePlan = population.getFactory().createPlan();
+				stayHomePlan.addActivity(firstActivity);
+				person.addPlan(stayHomePlan);
+			}
 		}
 			
-		// check if number of plans that each agent has is correct
-		int counter = 0;
-		int expectedNumberOfPlans;
-		if (addStayHomePlan == true) {
-			expectedNumberOfPlans = numberOfPlans + 1;
-		} else {
-			expectedNumberOfPlans = numberOfPlans;
-		}
+		// Check if number of plans that each agent has is correct
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			if (person.getPlans().size() < expectedNumberOfPlans) {
-				log.warn("Person with ID=" + person.getId() + " has less than " + expectedNumberOfPlans + " plans");
+			if (person.getPlans().size() < numberOfPlans) {
+				LOG.warn("Person with ID " + person.getId() + " has less than " + numberOfPlans + " plans");
 			}
-			if (person.getPlans().size() > expectedNumberOfPlans) {
-				log.warn("Person with ID=" + person.getId() + " has more than " + expectedNumberOfPlans + " plans");
+			if (person.getPlans().size() > numberOfPlans) {
+				LOG.warn("Person with ID " + person.getId() + " has more than " + numberOfPlans + " plans");
 				}
-			if (person.getPlans().size() == expectedNumberOfPlans) {
-				counter++;
-			}
 		}
-		log.info(counter + " persons have " + expectedNumberOfPlans + " plans.");
 		
-		// assign activities to links
-//		new XY2Links((MutableScenario)scenario).run(scenario.getPopulation());
-		
-		// write population file
+		// Write population file
 		new File(outputDirectory).mkdir();
 		new PopulationWriter(scenario.getPopulation(), null).write(outputDirectory + "plans.xml.gz");
 		//new ObjectAttributesXmlWriter(personObjectAttributesMap.get(0)).writeFile(outputBase+"personObjectAttributes0.xml.gz");
 	}
 
-	private boolean areDependenciesSet() {
+	private boolean checkIfParametersValid() {
 		if (numberOfFirstCemdapOutputFile == -1) {
-			log.warn("NumberOfFirstCemdapOutputFile not set.");
+			LOG.warn("NumberOfFirstCemdapOutputFile not set.");
 			return false;
 		}
 		if (numberOfPlans == -1) {
-			log.warn("NumberOfPlans not set.");
+			LOG.warn("NumberOfPlans not set.");
 			return false;
 		}
 		if (outputDirectory.isEmpty()) {
-			log.warn("OutputDirectory is empty.");
+			LOG.warn("OutputDirectory is empty.");
 			return false;
 		}
 		if (cemdapStopsFilename.isEmpty()) {
-			log.warn("CemdapStopsFilename is empty.");
+			LOG.warn("CemdapStopsFilename is empty.");
 			return false;
 		}
 		return true;
@@ -217,6 +207,14 @@ public class CemdapStops2MatsimPlansConverter {
 
 	public void setAddStayHomePlan(boolean addStayHomePlan) {
 		this.addStayHomePlan = addStayHomePlan;
+	}
+	
+	public boolean isAllowVariousWorkAndEducationLocations() {
+		return allowVariousWorkAndEducationLocations;
+	}
+
+	public void setAllowVariousWorkAndEducationLocations(boolean allowVariousWorkAndEducationLocations) {
+		this.allowVariousWorkAndEducationLocations = allowVariousWorkAndEducationLocations;
 	}
 
 	public String getOutputDirectory() {
