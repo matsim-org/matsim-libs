@@ -2,7 +2,7 @@ package playground.gleich.av_bus;
 
 public class FilePaths {
 	
-	public final static String PATH_BASE_DIRECTORY = "../../../shared-svn/studies/gleich/av-bus_berlinNW/"; // 3 Levels to Workspace -> runs-svn (partly checked-out -> looks up local copy)
+	public final static String PATH_BASE_DIRECTORY = "../../../../../shared-svn/studies/gleich/av-bus_berlinNW/"; // 3 Levels to Workspace -> runs-svn (partly checked-out -> looks up local copy)
 //	public final static String PATH_BASE_DIRECTORY = "C:/Users/gleich/av_bus berlin/";
 //	public final static String PATH_BASE_DIRECTORY = "dat/Uni/av_bus berlin/";
 	
@@ -27,7 +27,7 @@ public class FilePaths {
 
 	/** Study area */
 	public final static String PATH_STUDY_AREA_SHP = PATH_BASE_DIRECTORY + "data/input/Untersuchungsraum shp/study_area.shp";
-	public final static String STUDY_AREA_SHP_KEY = "id";
-	public final static String STUDY_AREA_SHP_ELEMENT = "1";
+	public final static String STUDY_AREA_SHP_KEY = "id"; // name of the key column
+	public final static String STUDY_AREA_SHP_ELEMENT = "1"; // key for the element containing the study area
 
 }

@@ -33,7 +33,7 @@ import playground.jbischoff.utils.JbUtils;
  * @author gleich
  * 
  * Return all agents who have activities within a certain geographic area or pass through this area
- * by car (and remove all other agents).
+ * by car (and ignore all other agents).
  */
 public class ExtractAgentsInArea {
 	
