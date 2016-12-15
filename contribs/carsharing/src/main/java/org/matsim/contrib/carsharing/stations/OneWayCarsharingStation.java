@@ -61,9 +61,13 @@ public class OneWayCarsharingStation implements CarsharingStation{
 		
 		currentVehicles.add(vehicle);
 		this.vehiclesPerType.put(type, currentVehicles);
-		int currentNumberOfVehicles = this.numberOfvehiclesPerType.get(type);
-		currentNumberOfVehicles++;
-		this.numberOfvehiclesPerType.put(type, currentNumberOfVehicles);	
+		if (this.numberOfvehiclesPerType.get(type) == null)
+			this.numberOfvehiclesPerType.put(type, 1);	
+		else {
+			int currentNumberOfVehicles = this.numberOfvehiclesPerType.get(type);
+			currentNumberOfVehicles++;
+			this.numberOfvehiclesPerType.put(type, currentNumberOfVehicles);
+		}
 	}
 
 	@Override
