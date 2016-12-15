@@ -157,13 +157,13 @@ public class BerlinControler {
 			final Decongestion decongestion = new Decongestion(controler, info);
 			controler = decongestion.getControler();
 				
-		} else if (pricingApproach.toString().equals(PricingApproach.QBPV3)) {
+		} else if (pricingApproach.toString().equals(PricingApproach.QBPV3.toString())) {
 			CNEIntegration cne = new CNEIntegration(controler);
 			cne.setCongestionTollingApproach(CongestionTollingApproach.QBPV3);
 			cne.setCongestionPricing(true);
 			controler = cne.prepareControler();
 			
-		} else if (pricingApproach.toString().equals(PricingApproach.QBPV9)) {
+		} else if (pricingApproach.toString().equals(PricingApproach.QBPV9.toString())) {
 			CNEIntegration cne = new CNEIntegration(controler);
 			cne.setCongestionTollingApproach(CongestionTollingApproach.QBPV9);
 			cne.setCongestionPricing(true);
