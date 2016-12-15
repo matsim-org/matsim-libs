@@ -5,6 +5,7 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -109,7 +110,7 @@ public class PlanFileModifier {
 						for (int j=0; j < numberOfPlanElements; j++) {
 							if (plan.getPlanElements().get(j) instanceof Leg) {
 								Leg leg = (Leg) plan.getPlanElements().get(j);
-								if (!leg.getMode().equals("car")) {
+								if (!leg.getMode().equals(TransportMode.car)) {
 									considerPerson = false;
 								}
 							}
