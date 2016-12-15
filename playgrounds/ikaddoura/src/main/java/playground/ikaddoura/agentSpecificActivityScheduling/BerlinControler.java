@@ -25,6 +25,7 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -49,14 +50,18 @@ public class BerlinControler {
 	private static final Logger log = Logger.getLogger(BerlinControler.class);
 	
 	private static String configFile;
+	private static String outputBaseDirectory;
+
 	private static boolean agentSpecificActivityScheduling;
 	private static double activityDurationBin;
 	private static double tolerance;
-	private static boolean pricing;
-	private static double kp;
 	
-	private static String outputBaseDirectory;
+	private static PricingApproach pricingApproach;
 	
+	private enum PricingApproach {
+		NoPricing, PID, QBPV3, QBPV9
+	}
+		
 	public static void main(String[] args) throws IOException {
 
 		if (args.length > 0) {
@@ -76,12 +81,20 @@ public class BerlinControler {
 			tolerance = Double.parseDouble(args[4]);
 			log.info("tolerance: "+ tolerance);
 
-			pricing = Boolean.parseBoolean(args[5]);			
-			log.info("pricing: "+ pricing);
-
-			kp = Double.parseDouble(args[6]);
-			log.info("kp: "+ kp);
-			
+			String congestionTollingApproachString = args[5];
+			if (congestionTollingApproachString.equals(PricingApproach.NoPricing.toString())) {
+				pricingApproach = PricingApproach.NoPricing;
+			} else if (congestionTollingApproachString.equals(PricingApproach.QBPV3.toString())) {
+				pricingApproach = PricingApproach.QBPV3;
+			} else if (congestionTollingApproachString.equals(PricingApproach.QBPV9.toString())) {
+				pricingApproach = PricingApproach.QBPV9;
+			} else if (congestionTollingApproachString.equals(PricingApproach.PID.toString())) {
+				pricingApproach = PricingApproach.PID;
+			} else {
+				throw new RuntimeException("Unknown congestion pricing approach. Aborting...");
+			}
+			log.info("pricingApproach: " + pricingApproach);
+			 
 		} else {
 			
 			configFile = "../../../runs-svn/berlin-dz-time/input/config.xml";
@@ -91,8 +104,7 @@ public class BerlinControler {
 			activityDurationBin = 3600.;
 			tolerance = 0.;
 			
-			pricing = true;
-			kp = 2 * ( 12. / 3600.);
+			pricingApproach = PricingApproach.NoPricing;
 		}
 		
 		BerlinControler berlin = new BerlinControler();
@@ -107,16 +119,9 @@ public class BerlinControler {
 		Date currentTime = new Date();
 		String dateTime = formatter.format(currentTime);
 		
-		String outputDirectory;
-		if (pricing) {
-			outputDirectory = outputBaseDirectory + "perf" + config.planCalcScore().getPerforming_utils_hr()
+		String outputDirectory = outputBaseDirectory + "perf" + config.planCalcScore().getPerforming_utils_hr()
 					+ "_lateArrival" + config.planCalcScore().getLateArrival_utils_hr() + "_asas-" + String.valueOf(agentSpecificActivityScheduling) 
-					+ "_actBin" +  activityDurationBin + "_tolerance" + tolerance + "_pricing-" + String.valueOf(pricing) + "_Kp" + kp + "_" + dateTime + "/";
-		} else {
-			outputDirectory = outputBaseDirectory + "perf" + config.planCalcScore().getPerforming_utils_hr()
-					+ "_lateArrival" + config.planCalcScore().getLateArrival_utils_hr() + "_asas-" + String.valueOf(agentSpecificActivityScheduling) 
-					+ "_actBin" +  activityDurationBin + "_tolerance" + tolerance + "_pricing-" + String.valueOf(pricing) + "_" + dateTime + "/";
-		}
+					+ "_actDurBin" +  activityDurationBin + "_tolerance" + tolerance + "_pricing-" + pricingApproach.toString() + "_" + dateTime + "/";
 		
 		config.controler().setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -129,7 +134,14 @@ public class BerlinControler {
 			controler = aa.prepareControler();			
 		}
 				
-		if (pricing) {
+		if (pricingApproach.toString().equals(PricingApproach.NoPricing.toString())) {
+		
+		} else if (pricingApproach.toString().equals(PricingApproach.PID.toString())) {
+					
+			double kp = 2 *
+					((config.planCalcScore().getPerforming_utils_hr() - config.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling())
+							/ config.planCalcScore().getMarginalUtilityOfMoney()) / 3600.;
+			log.info("kp: " + kp);
 			
 			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 			decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
@@ -145,10 +157,19 @@ public class BerlinControler {
 			final Decongestion decongestion = new Decongestion(controler, info);
 			controler = decongestion.getControler();
 				
-//			CNEIntegration cne = new CNEIntegration(controler);
-//			cne.setCongestionTollingApproach(CongestionTollingApproach.QBPV3);
-//			cne.setCongestionPricing(true);
-//			controler = cne.prepareControler();
+		} else if (pricingApproach.toString().equals(PricingApproach.QBPV3)) {
+			CNEIntegration cne = new CNEIntegration(controler);
+			cne.setCongestionTollingApproach(CongestionTollingApproach.QBPV3);
+			cne.setCongestionPricing(true);
+			controler = cne.prepareControler();
+			
+		} else if (pricingApproach.toString().equals(PricingApproach.QBPV9)) {
+			CNEIntegration cne = new CNEIntegration(controler);
+			cne.setCongestionTollingApproach(CongestionTollingApproach.QBPV9);
+			cne.setCongestionPricing(true);
+			controler = cne.prepareControler();
+		} else {
+			throw new RuntimeException("Unknown congestion pricing approach. Aborting...");
 		}
 			
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
