@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 //import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -37,6 +38,16 @@ public class OverwriteLinkLengths {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		String input = "C:/Users/Work/Bachelor Arbeit/input/grid_network.xml";
+		String output = "C:/Users/Work/Bachelor Arbeit/input/grid_network_length300.xml";
+		overwriteGridNetworkLengthsAllToGivenLength(input, output, 300);
+	}
+
+	
+	
+	
+	
+	static void overWriteOneNetWithOther(){
 		
 		Scenario oldNetScen = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		oldNet = oldNetScen.getNetwork();
@@ -75,6 +86,31 @@ public class OverwriteLinkLengths {
 		
 		NetworkWriter writer = new NetworkWriter(nextNet);
 		writer.write(OUTPUT);
+		
+		log.info("DONE");
+	}
+
+
+	static void overwriteGridNetworkLengthsAllToGivenLength (String inputFile, String outputFile, int wantedLinkLength){
+		
+		Scenario oldNetScen = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		oldNet = oldNetScen.getNetwork();
+		
+		log.info("reading old net file");
+		MatsimNetworkReader oldReader = new MatsimNetworkReader(oldNet);
+		oldReader.readFile(inputFile);
+
+		
+		for(Id<Link> ll : oldNet.getLinks().keySet()){
+			oldNet.getLinks().get(ll).setLength(wantedLinkLength);
+		}
+				
+		log.info("---------- finished overwritung link lengths ----------- ");
+		
+		log.info("writing new net file to " + outputFile);
+		
+		NetworkWriter writer = new NetworkWriter(oldNet);
+		writer.write(outputFile);
 		
 		log.info("DONE");
 	}
