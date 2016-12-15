@@ -20,6 +20,8 @@
 package playground.ikaddoura.agentSpecificActivityScheduling;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -53,6 +55,8 @@ public class BerlinControler {
 	private static boolean pricing;
 	private static double kp;
 	
+	private static String outputBaseDirectory;
+	
 	public static void main(String[] args) throws IOException {
 
 		if (args.length > 0) {
@@ -60,32 +64,35 @@ public class BerlinControler {
 			configFile = args[0];		
 			log.info("configFile: "+ configFile);
 			
-			agentSpecificActivityScheduling = Boolean.parseBoolean(args[1]);
+			outputBaseDirectory = args[1];
+			log.info("outputBaseDirectory: "+ outputBaseDirectory);
+			
+			agentSpecificActivityScheduling = Boolean.parseBoolean(args[2]);
 			log.info("addModifiedActivities: "+ agentSpecificActivityScheduling);
 
-			activityDurationBin = Double.parseDouble(args[2]);
+			activityDurationBin = Double.parseDouble(args[3]);
 			log.info("activityDurationBin: "+ activityDurationBin);
 			
-			tolerance = Double.parseDouble(args[3]);
+			tolerance = Double.parseDouble(args[4]);
 			log.info("tolerance: "+ tolerance);
 
-			pricing = Boolean.parseBoolean(args[4]);			
+			pricing = Boolean.parseBoolean(args[5]);			
 			log.info("pricing: "+ pricing);
 
-			kp = Double.parseDouble(args[5]);
+			kp = Double.parseDouble(args[6]);
 			log.info("kp: "+ kp);
 			
 		} else {
 			
 			configFile = "../../../runs-svn/berlin-dz-time/input/config.xml";
+			outputBaseDirectory = "../../../runs-svn/berlin-dz-time/output/";
 			
 			agentSpecificActivityScheduling = true;
 			activityDurationBin = 3600.;
-			tolerance = 3600.;
+			tolerance = 0.;
 			
 			pricing = true;
 			kp = 2 * ( 12. / 3600.);
-//			kp = 999999.;
 		}
 		
 		BerlinControler berlin = new BerlinControler();
@@ -95,6 +102,23 @@ public class BerlinControler {
 	private void run() throws IOException {
 		
 		Config config = ConfigUtils.loadConfig(configFile);
+		
+		SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd_HH-mm-ss");
+		Date currentTime = new Date();
+		String dateTime = formatter.format(currentTime);
+		
+		String outputDirectory;
+		if (pricing) {
+			outputDirectory = outputBaseDirectory + "perf" + config.planCalcScore().getPerforming_utils_hr()
+					+ "_lateArrival" + config.planCalcScore().getLateArrival_utils_hr() + "_asas-" + String.valueOf(agentSpecificActivityScheduling) 
+					+ "_actBin" +  activityDurationBin + "_tolerance" + tolerance + "_pricing-" + String.valueOf(pricing) + "_Kp" + kp + "_" + dateTime + "/";
+		} else {
+			outputDirectory = outputBaseDirectory + "perf" + config.planCalcScore().getPerforming_utils_hr()
+					+ "_lateArrival" + config.planCalcScore().getLateArrival_utils_hr() + "_asas-" + String.valueOf(agentSpecificActivityScheduling) 
+					+ "_actBin" +  activityDurationBin + "_tolerance" + tolerance + "_pricing-" + String.valueOf(pricing) + "_" + dateTime + "/";
+		}
+		
+		config.controler().setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 				
