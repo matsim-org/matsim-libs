@@ -19,12 +19,16 @@
 
 package playground.ikaddoura.agentSpecificActivityScheduling;
 
+import java.io.IOException;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
 
 /**
 * @author ikaddoura
@@ -34,7 +38,7 @@ public class RunExample {
 
 	private static String configFile = "../../../runs-svn/berlin-dz-time/input/config.xml";
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		
 		Config config = ConfigUtils.loadConfig(configFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -45,6 +49,8 @@ public class RunExample {
 		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
+		
+		MATSimVideoUtils.createLegHistogramVideo(controler.getConfig().controler().getOutputDirectory());
 	}
 
 }
