@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -43,8 +44,15 @@ public class Feature2Coord {
 
 	public final void assignCoords(Population population, int planNumber, ObjectAttributes personZoneAttributes, Map<String, SimpleFeature> zones,
 			Map<Id<Person>, Coord> homeZones, boolean allowVariousWorkAndEducationLocations) {
-		LOG.info("Start assigning non-home coordinates. Plan number is " + planNumber +".");
+		int counter = 0;
+		LOG.info("Start assigning (non-home) coordinates. Plan number is " + planNumber +".");
 		for (Person person : population.getPersons().values()) {
+			counter++;
+			if (counter % 1000000 == 0) {
+				LOG.info(counter + " persons assigned with (non-home) coordinates so far.");
+				Gbl.printMemoryUsage();
+			}
+			
 			int activityIndex = 0;
 			Coord workCoord = null;
 			Coord educCoord = null;
@@ -94,8 +102,14 @@ public class Feature2Coord {
 	
 	
 	public final void assignHomeCoords(Population population, ObjectAttributes personZoneAttributes, Map<Id<Person>, Coord> homeZones, Map<String, SimpleFeature> zones) {
+		int counter = 0;
 		LOG.info("Start assigning home coordinates.");
 		for (Person person : population.getPersons().values()) {
+			counter++;
+			if (counter % 1000000 == 0) {
+				LOG.info(counter + " persons assigned with home coordinates so far.");
+				Gbl.printMemoryUsage();
+			}
 			int activityIndex = 0;
 
 			for (PlanElement planElement : person.getPlans().get(0).getPlanElements()) {
