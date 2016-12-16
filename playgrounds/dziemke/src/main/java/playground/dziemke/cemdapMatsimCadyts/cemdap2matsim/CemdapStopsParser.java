@@ -120,6 +120,7 @@ public class CemdapStopsParser {
 				}
 				
 				plan.addLeg(population.getFactory().createLeg(TransportMode.car));
+				
 				String zoneId = entries[STOP_LOC_ZONE_ID];
 
 				int actIndex = plan.getPlanElements().size()/2;
@@ -128,7 +129,11 @@ public class CemdapStopsParser {
 				String activityType = transformActType(Integer.parseInt(entries[ACT_TYPE]));
 				Activity activity = population.getFactory().createActivityFromCoord(activityType, DEFAULT_COORD);
 
-				activity.setEndTime(departureTime + Integer.parseInt(entries[TRAVEL_TIME_TO_STOP]) * 60 + Integer.parseInt(entries[STOP_DUR]) * 60);
+				double endTime = departureTime + Integer.parseInt(entries[TRAVEL_TIME_TO_STOP]) * 60 + Integer.parseInt(entries[STOP_DUR]) * 60;
+				if (endTime < 97200.) { // Set end time only if it is not the last activity of the day; 97200s = 24h+3h
+					activity.setEndTime(endTime);
+				}
+				
 				plan.addActivity(activity);
 			}
 		} catch (IOException e) {

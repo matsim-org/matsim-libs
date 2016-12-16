@@ -43,6 +43,7 @@ public class Feature2Coord {
 
 	public final void assignCoords(Scenario scenario, int planNumber, ObjectAttributes personZoneAttributes, Map<String, SimpleFeature> zones,
 			Map<Id<Person>, Coord> homeZones, boolean allowVariousWorkAndEducationLocations) {
+		LOG.info("Start assigning non-home coordinates. Plan number is " + planNumber +".");
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			int activityIndex = 0;
 			Coord workCoord = null;
@@ -88,10 +89,12 @@ public class Feature2Coord {
 				}
 			}
 		}
+		LOG.info("Finished assigning non-home coordinates.");
 	}
 	
 	
 	public final void assignHomeCoords(Scenario scenario, ObjectAttributes personZoneAttributes, Map<Id<Person>, Coord> homeZones, Map<String, SimpleFeature> zones) {
+		LOG.info("Start assigning home coordinates.");
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			int activityIndex = 0;
 
@@ -115,5 +118,6 @@ public class Feature2Coord {
 				}
 			}
 		}
+		LOG.info("Finished assigning home coordinates.");
 	}
 }

@@ -61,15 +61,21 @@ public class CemdapStops2MatsimPlansConverter {
 	private String cemdapStopsFilename = "stops.out";
 	
 	public static void main(String[] args) {
-		int numberOfFirstCemdapOutputFile = 87;
-		int numberOfPlans = 3;
-		boolean allowVariousWorkAndEducationLocations = false;
+//		int numberOfFirstCemdapOutputFile = 100;
+		int numberOfFirstCemdapOutputFile = 90;
+
+		int numberOfPlans = 2;
+		boolean allowVariousWorkAndEducationLocations = true;
 		boolean addStayHomePlan = true;
 		
-		int numberOfPlansFile = 34;
+//		int numberOfPlansFile = 101;
+		int numberOfPlansFile = 36;
+
 		String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/" + numberOfPlansFile + "/";
+//		String outputDirectory = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/matsim_initial/" + numberOfPlansFile + "/";
 		String zonalShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenLOR_DHDN_GK4.shp";
 		String cemdapDataRoot = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_output/";
+//		String cemdapDataRoot = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/cemdap_output/";
 		
 		CemdapStops2MatsimPlansConverter converter = new CemdapStops2MatsimPlansConverter(zonalShapeFile, cemdapDataRoot);
 		
@@ -116,7 +122,7 @@ public class CemdapStops2MatsimPlansConverter {
 		// Write all (geographic) features of planning area to a map
 		Map<String,SimpleFeature> zones = new HashMap<String, SimpleFeature>();
 		for (SimpleFeature feature: ShapeFileReader.getAllFeatures(zonalShapeFile)) {
-			String shapeId = (String) feature.getAttribute("NR");
+			String shapeId = Cemdap2MatsimUtils.removeLeadingZeroFromString((String) feature.getAttribute("NR"));
 			zones.put(shapeId,feature);
 		}
 		
@@ -141,10 +147,12 @@ public class CemdapStops2MatsimPlansConverter {
 			
 			for (Person person : population.getPersons().values()) {
 				Plan firstPlan = person.getPlans().get(0);
+				// Get first (i.e. presumably "home") activity from agent's first plan
 				Activity firstActivity = (Activity) firstPlan.getPlanElements().get(0);
-				
+
 				Plan stayHomePlan = population.getFactory().createPlan();
-				stayHomePlan.addActivity(firstActivity);
+				// Create new activity with type and coordinates (but without end time) and add it to stay-home plan
+				stayHomePlan.addActivity(population.getFactory().createActivityFromCoord(firstActivity.getType(), firstActivity.getCoord()));
 				person.addPlan(stayHomePlan);
 			}
 		}

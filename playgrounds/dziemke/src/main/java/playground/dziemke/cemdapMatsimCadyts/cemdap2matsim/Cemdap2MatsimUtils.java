@@ -55,4 +55,13 @@ public class Cemdap2MatsimUtils {
 		double y = envelope.getMinY() + r.nextDouble() * envelope.getHeight();
 		return geometryFactory.createPoint(new Coordinate(x,y));
 	}
+	
+	/**
+	 * CEMDAP handles all IDs incl. zone IDs internally as integers. Casting IDs as integers removes leading zeroes.
+	 * In order to be consistent and enable zones to be found, zone IDs need to have leading zeros removed.
+	 */
+	public static final String removeLeadingZeroFromString(String input) {
+		Integer zoneIdAsInt = Integer.parseInt(input); 
+		return zoneIdAsInt.toString();
+	}
 }
