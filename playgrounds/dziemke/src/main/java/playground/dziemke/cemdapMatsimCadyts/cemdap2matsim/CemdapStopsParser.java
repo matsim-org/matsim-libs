@@ -28,7 +28,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -69,8 +68,7 @@ public class CemdapStopsParser {
 	}
 
 	
-	public final void parse(String cemdapStopsFile, int planNumber, Scenario scenario, ObjectAttributes personZoneAttributes) {
-		Population population = scenario.getPopulation();
+	public final void parse(String cemdapStopsFile, int planNumber, Population population, ObjectAttributes personZoneAttributes) {
 		int lineCount = 0;
 
 		try {
@@ -82,7 +80,7 @@ public class CemdapStopsParser {
 				lineCount++;
 				
 				if (lineCount % 1000000 == 0) {
-					LOG.info("Line "+lineCount+": "+population.getPersons().size()+" persons stored so far.");
+					LOG.info("Line " + lineCount + ": " + population.getPersons().size() + " persons stored so far.");
 					Gbl.printMemoryUsage();
 				}
 
@@ -92,7 +90,7 @@ public class CemdapStopsParser {
 				Person person = population.getPersons().get(personId);
 				if (person == null) {
 					if (planNumber != 0) {
-						throw new RuntimeException("If this is not the first plan, the person must already exist!");
+						throw new RuntimeException("Person must not be null here since even home-staying personsn should have been added by now.");
 					}
 					person = population.getFactory().createPerson(personId);
 					population.addPerson(person);
@@ -104,7 +102,7 @@ public class CemdapStopsParser {
 				}
 
 				// Get plan with current number and write information from cemdap stops file to it
-				Plan plan = person.getPlans().get(planNumber);				
+				Plan plan = person.getPlans().get(planNumber);
 				int departureTime = Integer.parseInt(entries[START_TRAVEL_TO_STOP]) * 60 + TIME_OFFSET;
 				
 				// If plan is empty, create a home activity and add it to the plan

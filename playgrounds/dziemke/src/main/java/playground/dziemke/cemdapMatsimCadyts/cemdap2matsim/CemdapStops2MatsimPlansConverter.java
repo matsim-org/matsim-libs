@@ -58,13 +58,16 @@ public class CemdapStops2MatsimPlansConverter {
 	private String outputDirectory;
 	private String zonalShapeFile;
 	private String cemdapDataRoot;
-	private String cemdapStopsFilename = "stops.out";
+	private String cemdapStopsFilename = "Stops.out";
+//	private String cemdapAdultsFilename = "Adults.out";
+//	private String cemdapChildrenFilename = "Children.out";
+	private String cemdapActivityFilename = "Activity.out";
 	
 	public static void main(String[] args) {
 		int numberOfFirstCemdapOutputFile = 100;
 //		int numberOfFirstCemdapOutputFile = 90;
 
-		int numberOfPlans = 2;
+		int numberOfPlans = 1;
 		boolean allowVariousWorkAndEducationLocations = true;
 		boolean addStayHomePlan = true;
 		
@@ -126,24 +129,54 @@ public class CemdapStops2MatsimPlansConverter {
 			zones.put(shapeId,feature);
 		}
 		
-		// Parse cemdap stops file
+		// Get all persons from activity file
+//		List<Id<Person>> personsIds = new LinkedList<>();
+		Map<Id<Person>, Integer> personHomeMap = new HashMap<>();
+//		CemdapPersonParser cemdapPersonParser = new CemdapPersonParser();
+//		cemdapPersonParser.parse(cemdapDataRoot + numberOfFirstCemdapOutputFile + "/" + cemdapAdultsFilename, personsIds);
+//		cemdapPersonParser.parse(cemdapDataRoot + numberOfFirstCemdapOutputFile + "/" + cemdapChildrenFilename, personsIds);
+		CemdapActivityParser cemdapActivityParser = new CemdapActivityParser();
+		cemdapActivityParser.parse(cemdapDataRoot + numberOfFirstCemdapOutputFile + "/" + cemdapActivityFilename, personHomeMap);
+		
+		Population population = scenario.getPopulation();
+		
 		for (int planNumber = 0; planNumber < numberOfPlans; planNumber++) {
-			new CemdapStopsParser().parse(cemdapStopsFilesMap.get(planNumber), planNumber, scenario, personZoneAttributesMap.get(planNumber));
+			// Parse cemdap stops file
+			new CemdapStopsParser().parse(cemdapStopsFilesMap.get(planNumber), planNumber, population, personZoneAttributesMap.get(planNumber));
+			
+			// Add a stay-home plan for those people who have no stops (i.e. no travel) in current stop file
+			LOG.info("Start assigning stay-home plans to persons who are not in stops file.");
+			LOG.info("Size of personHomeMap = " + personHomeMap.size() + ".");
+			int counter = 0;
+			for (Id<Person> personId : personHomeMap.keySet()) {
+				Person person = population.getPersons().get(personId);
+				if (person == null) {
+					person = population.getFactory().createPerson(personId);
+					population.addPerson(person);
+				}
+				if (person.getPlans().size() <= planNumber) {
+					Plan stayHomePlan = population.getFactory().createPlan();
+					stayHomePlan.addActivity(population.getFactory().createActivityFromCoord(ActivityTypes.HOME, new Coord(-1.0, -1.0))); // TODO maybe improve later
+					person.addPlan(stayHomePlan);
+					personZoneAttributesMap.get(planNumber).putAttribute(personId.toString(), "zone" + "0", personHomeMap.get(personId)); // TODO maybe improve later
+					counter++;
+				}
+			}
+			LOG.info("For " + counter + " persons, stay-home plans have been added. Plan number is " + planNumber + ".");
 		}
 		
 		// Assign home coordinates
 		Feature2Coord feature2Coord = new Feature2Coord();
-		feature2Coord.assignHomeCoords(scenario, personZoneAttributesMap.get(0), homeZones, zones);
+		feature2Coord.assignHomeCoords(population, personZoneAttributesMap.get(0), homeZones, zones);
 		
 		// Assign coordinates to all other activities
 		for (int planNumber = 0; planNumber < numberOfPlans; planNumber++) {
-			feature2Coord.assignCoords(scenario, planNumber, personZoneAttributesMap.get(planNumber), zones, homeZones, allowVariousWorkAndEducationLocations);
+			feature2Coord.assignCoords(population, planNumber, personZoneAttributesMap.get(planNumber), zones, homeZones, allowVariousWorkAndEducationLocations);
 		}
 				
-		// If applicable, add a stay-home plan
+		// If applicable, add a stay-home plan for everybody
 		if (addStayHomePlan == true) {
 			numberOfPlans++;
-			Population population = scenario.getPopulation();
 			
 			for (Person person : population.getPersons().values()) {
 				Plan firstPlan = person.getPlans().get(0);
