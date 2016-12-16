@@ -131,7 +131,7 @@ public class CemdapStops2MatsimPlansConverter {
 		
 		// Get all persons from activity file
 //		List<Id<Person>> personsIds = new LinkedList<>();
-		Map<Id<Person>, Integer> personHomeMap = new HashMap<>();
+		Map<Id<Person>, String> personHomeMap = new HashMap<>();
 //		CemdapPersonParser cemdapPersonParser = new CemdapPersonParser();
 //		cemdapPersonParser.parse(cemdapDataRoot + numberOfFirstCemdapOutputFile + "/" + cemdapAdultsFilename, personsIds);
 //		cemdapPersonParser.parse(cemdapDataRoot + numberOfFirstCemdapOutputFile + "/" + cemdapChildrenFilename, personsIds);
@@ -167,7 +167,7 @@ public class CemdapStops2MatsimPlansConverter {
 		
 		// Assign home coordinates
 		Feature2Coord feature2Coord = new Feature2Coord();
-		feature2Coord.assignHomeCoords(population, personZoneAttributesMap.get(0), homeZones, zones);
+		feature2Coord.assignHomeCoords(population, personZoneAttributesMap.get(0), zones, homeZones);
 		
 		// Assign coordinates to all other activities
 		for (int planNumber = 0; planNumber < numberOfPlans; planNumber++) {

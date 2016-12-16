@@ -101,7 +101,7 @@ public class Feature2Coord {
 	}
 	
 	
-	public final void assignHomeCoords(Population population, ObjectAttributes personZoneAttributes, Map<Id<Person>, Coord> homeZones, Map<String, SimpleFeature> zones) {
+	public final void assignHomeCoords(Population population, ObjectAttributes personZoneAttributes, Map<String, SimpleFeature> zones, Map<Id<Person>, Coord> homeZones) {
 		int counter = 0;
 		LOG.info("Start assigning home coordinates.");
 		for (Person person : population.getPersons().values()) {
@@ -115,7 +115,7 @@ public class Feature2Coord {
 			for (PlanElement planElement : person.getPlans().get(0).getPlanElements()) {
 				if (planElement instanceof Activity) {
 					Activity activity = (Activity) planElement;
-					String zoneId = (String) personZoneAttributes.getAttribute(person.getId().toString(),CemdapStopsParser.ZONE + activityIndex);
+					String zoneId = (String) personZoneAttributes.getAttribute(person.getId().toString(), CemdapStopsParser.ZONE + activityIndex);
 					Id<Person> personId = person.getId();
 					if (zoneId == null) {
 						LOG.error("Person with ID " + person.getId() + ": Object attribute '" + CemdapStopsParser.ZONE + activityIndex + "' not found.");

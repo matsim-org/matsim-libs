@@ -48,7 +48,7 @@ public class CemdapActivityParser {
 	}
 
 	
-	public final void parse(String cemdapActivityFile, Map<Id<Person>, Integer> personHomeMap) {
+	public final void parse(String cemdapActivityFile, Map<Id<Person>, String> personHomeMap) {
 		int lineCount = 0;
 
 		try {
@@ -65,7 +65,7 @@ public class CemdapActivityParser {
 				}
 				Id<Person> personId = Id.create(Integer.parseInt(entries[P_ID]), Person.class);
 				if (!personHomeMap.containsKey(personId)) {
-					personHomeMap.put(personId, Integer.parseInt(entries[ORIG_ZONE_ID]));
+					personHomeMap.put(personId, entries[ORIG_ZONE_ID]);
 				}
 			}
 		} catch (IOException e) {
