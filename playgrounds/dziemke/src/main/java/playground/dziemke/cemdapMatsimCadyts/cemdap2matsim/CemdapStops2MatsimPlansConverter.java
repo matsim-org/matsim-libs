@@ -64,11 +64,11 @@ public class CemdapStops2MatsimPlansConverter {
 		int numberOfFirstCemdapOutputFile = 100;
 //		int numberOfFirstCemdapOutputFile = 90;
 
-		int numberOfPlans = 4;
+		int numberOfPlans = 2;
 		boolean allowVariousWorkAndEducationLocations = true;
 		boolean addStayHomePlan = true;
 		
-		int numberOfPlansFile = 10;
+		int numberOfPlansFile = 100;
 //		int numberOfPlansFile = 35;
 
 //		String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/" + numberOfPlansFile + "/";
