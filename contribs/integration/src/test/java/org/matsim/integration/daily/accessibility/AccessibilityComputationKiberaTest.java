@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package org.matsim.integration.daily.accessibility;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -47,91 +46,84 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class AccessibilityComputationKiberaTest {
 	public static final Logger log = Logger.getLogger(AccessibilityComputationKiberaTest.class);
-
+	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-	@Test
-	public void testQuick() {
-		run(1000.,false, false );
-	}
-	@Test
-	public void testLocal() {
-		run( 10., false, true ) ;
-	}
+//	@Test
+//	public void testQuick() {
+//		run(1000., false, false);
+//	}
+//	@Test
+//	public void testLocal() {
+//		run(10., false, true);
+//	}
 	@Test
 	public void testOnServer() {
-		run( 10., true, false ) ;
+		run(100., true, false);
 	}
 	
 	public void run(Double cellSize, boolean push2Geoserver, boolean createQGisOutput) {
 
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
 
-		// Network file:
+		// Network file
 		String folderStructure = "../../";
 		String networkFile = "matsimExamples/countries/ke/kibera/2015-11-05_network_paths_detailed.xml";
 		// Adapt folder structure that may be different on different machines, in particular on server
 		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
-		networkFile = folderStructure + networkFile;
-		config.network().setInputFile(networkFile);
-
+		config.network().setInputFile(folderStructure + networkFile);
+		
 		config.facilities().setInputFile(folderStructure + "matsimExamples/countries/ke/kibera/2015-11-05_facilities.xml");
-
+		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
 		config.controler().setRunId("ke_kibera_" + AccessibilityUtils.getDate() + "_" + cellSize.toString().split("\\.")[0]);
 		
-		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;	
-		acg.setCellSizeCellBasedAccessibility(cellSize.intValue()); 
-		acg.setEnvelope(new Envelope(252000, 256000, 9854000, 9856000)) ;
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
+		acg.setCellSizeCellBasedAccessibility(cellSize.intValue());
+		acg.setEnvelope(new Envelope(252000, 256000, 9854000, 9856000));
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, false);
 		acg.setOutputCrs("EPSG:21037"); // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		
 		ConfigUtils.setVspDefaults(config);
-
-		// ---
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-				
-		// activity type:
-		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.DRINKING_WATER,FacilityTypes.CLINIC}) ; 
-		log.info("Using activity types: " + activityTypes);
-
-		// Network density points (as proxy for population density):
-		final ActivityFacilities densityFacilities = AccessibilityUtils.createFacilityForEachLink(scenario.getNetwork()) ;
-		// will be aggregated in downstream code!
 		
-		// ---
-
+		// Activity types
+		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.DRINKING_WATER, FacilityTypes.CLINIC});
+		log.info("Using activity types: " + activityTypes);
+		
+		// Network density points (as proxy for population density)
+		final ActivityFacilities densityFacilities = AccessibilityUtils.createFacilityForEachLink(scenario.getNetwork()); // will be aggregated in downstream code!
+		
 		final Controler controler = new Controler(scenario);
 		
-		for ( String activityType : activityTypes ) {
-			AccessibilityModule module = new AccessibilityModule() ;
+		for (String activityType : activityTypes) {
+			AccessibilityModule module = new AccessibilityModule();
 			module.setConsideredActivityType(activityType);
 			module.addAdditionalFacilityData(densityFacilities);
 			module.setPushing2Geoserver(push2Geoserver);
 			controler.addOverridingModule(module);
 		}
 		
-		// ---
-
 		controler.run();
-
+		
 		// QGis
-		if (createQGisOutput == true) {
+		if (createQGisOutput) {
 			final boolean includeDensityLayer = false;
+			final Integer range = 9; // In the current implementation, this need always be 9
 			final Double lowerBound = 0.; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
 			final Double upperBound = 3.5;
-			final Integer range = 9; // in the current implementation, this need always be 9
-			final int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
-
+			final int populationThreshold = (int) (50 / (1000/cellSize * 1000/cellSize));
+			
 			String osName = System.getProperty("os.name");
 			String workingDirectory = config.controler().getOutputDirectory();
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
+					// TODO maybe use envelope and crs from above
 					VisualizationUtils.createQGisOutput(actType, mode.toString(), new Envelope(252000, 256000, 9854000, 9856000), workingDirectory, "EPSG:21037", includeDensityLayer,
 							lowerBound, upperBound, range, cellSize.intValue(), populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode.toString(), osName);
