@@ -212,6 +212,13 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		// yy for time being, have to assume that this is always there
 		for(double y = spatialGrid.getYmin(); y < spatialGrid.getYmax(); y += spatialGrid.getResolution()) {
 			for(double x = spatialGrid.getXmin(); x < spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
+				
+				// new
+//				log.error("This is only here temporarily! Think about long-term solution"); // TODO
+//				if (this.additionalSpatialGrids.get(FacilityTypes.HOME).getFirst().getValue(x, y) <= 50.) {
+//					continue;
+//				}
+				// end new
 
 				writer.writeField( x + 0.5*spatialGrid.getResolution());
 				writer.writeField( y + 0.5*spatialGrid.getResolution());
