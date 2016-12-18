@@ -37,9 +37,11 @@ public class TryExecutingBashCommand {
 	            tempScript));
 	    PrintWriter printWriter = new PrintWriter(streamWriter);
 
-	    printWriter.println("cd ../../../runs-svn/cemdapMatsimCadyts/run_168a/analysis_300_ber_dist_5/");
-	    printWriter.println("pwd");
-	    printWriter.println("/usr/local/bin/gnuplot ../../../../shared-svn/projects/cemdapMatsimCadyts/analysis/plot_local.gnu");
+//	    printWriter.println("cd ../../../runs-svn/cemdapMatsimCadyts/run_168a/analysis_300_ber_dist_5/");
+//	    printWriter.println("pwd");
+//	    printWriter.println("/usr/local/bin/gnuplot ../../../../shared-svn/projects/cemdapMatsimCadyts/analysis/plot_local.gnu");
+	    
+	    printWriter.println("/usr/local/bin/wget -O kibera.osm \"http://api.openstreetmap.org/api/0.6/map?bbox=36.7715,-1.3198,36.8014,-1.3055\"");
 
 	    printWriter.close();
 
