@@ -19,7 +19,8 @@ public class CalculateCompositeAccessibility {
 	
 
 	public static void main(String[] args) {
-		String directoryRoot = "../../accessibility-sa/data/18/";
+//		String directoryRoot = "../../accessibility-sa/data/18/";
+		String directoryRoot = "../../../shared-svn/projects/maxess/data/nmb/output/15test/";
 		String[] activityTypes = {"s", "l", "t", "e"};
 		boolean includeDensityLayer = true;
 		double cellSize = 200.;
@@ -183,8 +184,11 @@ public class CalculateCompositeAccessibility {
 //		writer.writeField(Labels.ACCESSIBILITY_BY_BIKE);
 //		writer.writeField(Labels.ACCESSIBILITY_BY_WALK);
 //		writer.writeField(Labels.ACCESSIBILITY_BY_PT);
+		int i = 2;
 		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
-			writer.writeField(mode.toString() + "_accessibility");
+			writer.writeField(header[i]);
+//			writer.writeField(mode.toString() + "_accessibility");
+			i++;
 		}
 		
 		
