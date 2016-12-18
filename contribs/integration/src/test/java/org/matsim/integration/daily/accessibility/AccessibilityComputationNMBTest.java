@@ -117,27 +117,11 @@ public class AccessibilityComputationNMBTest {
 //		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.EDUCATION});
 		log.info("Using activity types: " + activityTypes);
 		
-		// --- Code to combine certain activity options into one combined type
-//		String marker = "w-eq";
-//		ActivityOption wEq = new ActivityOptionImpl(marker); 
-//		final List<String> activityTypes = Arrays.asList(new String[]{marker});
-//
-//		// Memorize all facilities that have certain activity options in a activity facilities container
-//		final ActivityFacilities consideredFacilities = FacilitiesUtils.createActivityFacilities();
-//		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
-//			for (ActivityOption option : facility.getActivityOptions().values()) {
-//				if (!option.getType().equals(FacilityTypes.HOME) && !option.getType().equals(FacilityTypes.WORK) && !option.getType().equals("minor")) {
-//					if (!consideredFacilities.getFacilities().containsKey(facility.getId())) {
-//						consideredFacilities.addActivityFacility(facility);
-//					}
-//				}
-//			}
-//		}
-//		// Add "w-eg" marker option to facilities to be considered
-//		for (ActivityFacility facility : consideredFacilities.getFacilities().values()) {
-//			facility.addActivityOption(wEq);
-//		}
-		// --- End of code to combine certain activity options into one combined type
+		// Combine certain activity options into one combined computation
+//		String combinedType = "w-eq";
+//		final List<String> activityTypes = Arrays.asList(new String[]{combinedType}); // Only include the combined type into this list!
+//		final List<String> activityOptionsToBeIncluded = Arrays.asList(new String[]{FacilityTypes.SHOPPING, FacilityTypes.LEISURE, FacilityTypes.OTHER, FacilityTypes.EDUCATION});
+//		AccessibilityUtils.combineDifferentActivityOptionTypes(scenario, combinedType, activityOptionsToBeIncluded);
 		
 		// Collect homes for density layer
 		String activityFacilityType = FacilityTypes.HOME;

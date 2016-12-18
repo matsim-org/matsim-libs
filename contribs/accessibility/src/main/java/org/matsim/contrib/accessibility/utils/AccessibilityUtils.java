@@ -30,6 +30,7 @@ import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.facilities.FacilitiesUtils;
 
 /**
@@ -73,6 +74,29 @@ public class AccessibilityUtils {
 		}
 		LOG.warn("The following activity option types where found within the activity facilities: " + activityOptionTypes);
 		return activityOptionTypes;
+	}
+	
+	
+	public static void combineDifferentActivityOptionTypes(final Scenario scenario, String combinedType, final List<String> activityOptionsToBeIncluded) {
+		ActivityOption markerOption = new ActivityOptionImpl(combinedType); 
+		
+		// Memorize all facilities that have certain activity options in a activity facilities container
+		final ActivityFacilities consideredFacilities = FacilitiesUtils.createActivityFacilities();
+		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
+			for (ActivityOption option : facility.getActivityOptions().values()) {
+				if (activityOptionsToBeIncluded.contains(option.getType())) {
+					// if (!option.getType().equals(FacilityTypes.HOME) && !option.getType().equals(FacilityTypes.WORK) && !option.getType().equals("minor")) {
+					if (!consideredFacilities.getFacilities().containsKey(facility.getId())) {
+						consideredFacilities.addActivityFacility(facility);
+					}
+				}
+			}
+		}
+		
+		// Add  marker option to facilities to be considered
+		for (ActivityFacility facility : consideredFacilities.getFacilities().values()) {
+			facility.addActivityOption(markerOption);
+		}
 	}
 	
 	
