@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityModule;
+import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
@@ -112,11 +113,34 @@ public class AccessibilityComputationNMBTest {
 //		mbpcg.setPtTravelTimesInputFile(travelTimeMatrixFile);
 		
 		// Activity types
-		final List<String> activityTypes = Arrays.asList(new String[]{"education", "shopping", "leisure"}); 
+		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.SHOPPING, FacilityTypes.LEISURE, FacilityTypes.OTHER, FacilityTypes.EDUCATION});
+//		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.EDUCATION});
 		log.info("Using activity types: " + activityTypes);
 		
+		// --- Code to combine certain activity options into one combined type
+//		String marker = "w-eq";
+//		ActivityOption wEq = new ActivityOptionImpl(marker); 
+//		final List<String> activityTypes = Arrays.asList(new String[]{marker});
+//
+//		// Memorize all facilities that have certain activity options in a activity facilities container
+//		final ActivityFacilities consideredFacilities = FacilitiesUtils.createActivityFacilities();
+//		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
+//			for (ActivityOption option : facility.getActivityOptions().values()) {
+//				if (!option.getType().equals(FacilityTypes.HOME) && !option.getType().equals(FacilityTypes.WORK) && !option.getType().equals("minor")) {
+//					if (!consideredFacilities.getFacilities().containsKey(facility.getId())) {
+//						consideredFacilities.addActivityFacility(facility);
+//					}
+//				}
+//			}
+//		}
+//		// Add "w-eg" marker option to facilities to be considered
+//		for (ActivityFacility facility : consideredFacilities.getFacilities().values()) {
+//			facility.addActivityOption(wEq);
+//		}
+		// --- End of code to combine certain activity options into one combined type
+		
 		// Collect homes for density layer
-		String activityFacilityType = "home";
+		String activityFacilityType = FacilityTypes.HOME;
 		ActivityFacilities densityFacilities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityFacilityType);
 		// Network density points (as proxy for population density)
 //		final ActivityFacilities densityFacilities = AccessibilityUtils.createFacilityForEachLink(scenario.getNetwork()); // will be aggregated in downstream code!
@@ -137,8 +161,8 @@ public class AccessibilityComputationNMBTest {
 		if (createQGisOutput) {
 			final boolean includeDensityLayer = true;
 			final Integer range = 9; // In the current implementation, this must always be 9
-			final Double lowerBound = -3.5; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
-			final Double upperBound = 3.5;
+			final Double lowerBound = 0.5; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
+			final Double upperBound = 4.0;
 			final int populationThreshold = (int) (50 / (1000/cellSize * 1000/cellSize));
 			
 			String osName = System.getProperty("os.name");
@@ -147,7 +171,8 @@ public class AccessibilityComputationNMBTest {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
 					// TODO maybe use envelope and crs from above
-					VisualizationUtils.createQGisOutput(actType, mode.toString(), new Envelope(115000,161000,-3718000,-3679000), workingDirectory, TransformationFactory.WGS84_SA_Albers, includeDensityLayer,
+//					VisualizationUtils.createQGisOutput(actType, mode.toString(), new Envelope(115000,161000,-3718000,-3679000), workingDirectory, TransformationFactory.WGS84_SA_Albers, includeDensityLayer,
+					VisualizationUtils.createQGisOutput(actType, mode.toString(), new Envelope(100000,180000,-3720000,-3675000), workingDirectory, TransformationFactory.WGS84_SA_Albers, includeDensityLayer,
 							lowerBound, upperBound, range, cellSize.intValue(), populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode.toString(), osName);
 				}
