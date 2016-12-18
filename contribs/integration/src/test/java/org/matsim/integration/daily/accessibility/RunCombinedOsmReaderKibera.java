@@ -1,6 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * RunAmenityReaderForNmbm.java
+ * project: org.matsim.*                                                   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.dziemke.accessibility;
+package org.matsim.integration.daily.accessibility;
 
 import java.io.FileNotFoundException;
 import java.util.LinkedList;
@@ -32,13 +31,11 @@ import org.matsim.contrib.accessibility.osm.CombinedOsmReader;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import playground.dziemke.utils.LogToOutputSaver;
-
 /**
  * @author dziemke
  */
 public class RunCombinedOsmReaderKibera {
-	final private static Logger log = Logger.getLogger(RunCombinedOsmReaderKibera.class);
+	final private static Logger LOG = Logger.getLogger(RunCombinedOsmReaderKibera.class);
 
 	/**
 	 * Implementing the {@link CombinedOsmReader} class. 
@@ -56,18 +53,11 @@ public class RunCombinedOsmReaderKibera {
 	 * works in metres.
 	 */
 	public static void main(String[] args) {
-		// Input and output
-		String osmFile = "../../../../Workspace/data/accessibility/osm/2015-11-05_kibera.osm.xml";
-		String outputBase = "../../../../Workspace/data/accessibility/nairobi/facilities/03/";
-		String facilityFile = outputBase + "facilities.xml";
-		String attributeFile = outputBase + "facilitiy_attributes.xml";
+		String osmFile = "../../../shared-svn/projects/maxess/data/kibera/osm/2016-12-18_kibera.osm";
+		String outputBase = "../../../shared-svn/projects/maxess/data/kibera/facilities/2016-12-18/";
+		String facilityFile = outputBase + "2016-12-18_facilities.xml";
+		String attributeFile = outputBase + "2016-12-18_facilitiy_attributes.xml";
 		
-		// Logging
-		LogToOutputSaver.setOutputDirectory(outputBase);
-		log.info("Parsing land use from OpenStreetMap.");
-		
-		
-		// Parameters
 //		String outputCRS = "EPSG:31468"; // = DHDN GK4, for Berlin
 		String outputCRS = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		
@@ -75,6 +65,14 @@ public class RunCombinedOsmReaderKibera {
 		// the type of land use of the area which the build belongs to.
 		double buildingTypeFromVicinityRange = 0.;
 		
+		createFacilites(osmFile, outputBase, facilityFile, attributeFile, outputCRS, buildingTypeFromVicinityRange);
+	}
+	
+		
+	public static void createFacilites(String osmFile, String outputBase, String facilityFile, String attributeFile,
+			String outputCRS, double buildingTypeFromVicinityRange) {
+//		LogToOutputSaver.setOutputDirectory(outputBase);
+		LOG.info("Parsing land use from OpenStreetMap.");
 
 		CombinedOsmReader combinedOsmReader = new CombinedOsmReader(outputCRS,
 				buildOsmLandUseToMatsimTypeMap(), buildOsmBuildingToMatsimTypeMap(),
@@ -87,7 +85,8 @@ public class RunCombinedOsmReaderKibera {
 			combinedOsmReader.writeFacilityAttributes(attributeFile);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-		}		
+		}
+		LOG.info("Output will be wirtten to " + facilityFile);
 	}
 	
 	
