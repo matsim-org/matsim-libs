@@ -1,5 +1,11 @@
 package org.matsim.contrib.accessibility.utils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -225,5 +231,16 @@ public class AccessibilityUtils {
 		String date = cal.get(Calendar.YEAR) + "-" 
 				+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);
 		return date;
+	}
+	
+	
+	public static File createOSMDownloadScript(String regionName, String minLon, String minLat, String maxLon, String maxLat) throws IOException {
+	    File osmDownloadScript = new File("script");
+	    Writer streamWriter = new OutputStreamWriter(new FileOutputStream(osmDownloadScript));
+	    PrintWriter printWriter = new PrintWriter(streamWriter);
+	    String command = "/usr/local/bin/wget -O " + regionName + " \"http://api.openstreetmap.org/api/0.6/map?bbox=" + minLon + "," + minLat + "," + maxLon + "," + maxLat + "\"";
+	    printWriter.println(command);
+	    printWriter.close();
+	    return osmDownloadScript;
 	}
 }
