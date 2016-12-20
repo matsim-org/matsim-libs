@@ -120,7 +120,7 @@ public class CemdapStops2MatsimPlansConverter {
 		}
 	
 		// Create ObjectAttrubutes for each agent and each plan
-		Map<Integer, ObjectAttributes> personZoneAttributesMap = new HashMap<Integer, ObjectAttributes>();
+		Map<Integer, ObjectAttributes> personZoneAttributesMap = new HashMap<>();
 		for (int planNumber = 0; planNumber < numberOfPlans; planNumber++) {
 			ObjectAttributes personZoneAttributes = new ObjectAttributes();
 			personZoneAttributesMap.put(planNumber, personZoneAttributes);
@@ -129,7 +129,7 @@ public class CemdapStops2MatsimPlansConverter {
 		Map<Id<Person>, Coord> homeZones = new HashMap<>();
 		
 		// Write all (geographic) features of planning area to a map
-		Map<String,SimpleFeature> zones = new HashMap<String, SimpleFeature>();
+		Map<String,SimpleFeature> zones = new HashMap<>();
 		for (SimpleFeature feature: ShapeFileReader.getAllFeatures(zonalShapeFile)) {
 			String shapeId = Cemdap2MatsimUtils.removeLeadingZeroFromString((String) feature.getAttribute("NR"));
 			zones.put(shapeId,feature);
@@ -181,7 +181,7 @@ public class CemdapStops2MatsimPlansConverter {
 		}
 				
 		// If applicable, add a stay-home plan for everybody
-		if (addStayHomePlan == true) {
+		if (addStayHomePlan) {
 			numberOfPlans++;
 			
 			for (Person person : population.getPersons().values()) {
