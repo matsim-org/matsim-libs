@@ -37,7 +37,7 @@ import org.matsim.lanes.data.*;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
- * Test for QLinkLanes' capacity calculations
+ * Test for QLinkLanes' and QLanes capacity calculations
  *
  * @author dgrether
  */
