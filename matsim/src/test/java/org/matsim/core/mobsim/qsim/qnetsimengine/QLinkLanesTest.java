@@ -33,7 +33,10 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.*;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesFactory;
+import org.matsim.lanes.data.LanesToLinkAssignment;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -44,7 +47,6 @@ import org.matsim.testcases.MatsimTestCase;
 public class QLinkLanesTest extends MatsimTestCase {
 
   private Network initNetwork(Network network) {
-		network.setCapacityPeriod(3600.0);
 		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord((double) 1, (double) 0));
 		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord((double) 2, (double) 0));
@@ -123,25 +125,22 @@ public class QLinkLanesTest extends MatsimTestCase {
 		lanes.addLanesToLinkAssignment(lanesForLink1);
 		return lanes;
 	}
-  	
-  
+
 	public void testCapacityWoLanes() {
 		Config config = ConfigUtils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		
 		this.initNetwork(scenario.getNetwork());
 
 		QSim queueSim = QSimUtils.createDefaultQSim(scenario, EventsUtils.createEventsManager());
 		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
+		
 		QLinkImpl ql = (QLinkImpl) queueNetwork.getNetsimLink(Id.create(1, Link.class));
-
 		assertEquals(0.5, ql.getSimulatedFlowCapacityPerTimeStep());
 		assertEquals(268.0, ql.getSpaceCap());
 	}
 	
 	public void testCapacityWithOneLaneOneLane() {
-		Config config = ConfigUtils.createConfig();
-		config.qsim().setUseLanes(true);
+		Config config = ConfigUtils.createConfig();		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		this.initNetwork(scenario.getNetwork());
 		this.createOneLane(scenario, 1);
@@ -173,7 +172,6 @@ public class QLinkLanesTest extends MatsimTestCase {
 
 	public void testCapacityWithOneLaneTwoLanes() {
 		Config config = ConfigUtils.createConfig();
-		config.qsim().setUseLanes(true);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		this.initNetwork(scenario.getNetwork());
 		this.createOneLane(scenario, 2);
@@ -207,7 +205,6 @@ public class QLinkLanesTest extends MatsimTestCase {
 	
 	public void testCapacityWithLanes() {
 		Config config = ConfigUtils.createConfig();
-		config.qsim().setUseLanes(true);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		this.initNetwork(scenario.getNetwork());
 		this.createThreeLanes(scenario);
@@ -253,7 +250,6 @@ public class QLinkLanesTest extends MatsimTestCase {
 		}
 		assertEquals(ql.getSpaceCap(), totalStorageCapacity);
 		assertEquals(1.0, totalFlowCapacity);
-	}
-	
+	}	
 	
 }
