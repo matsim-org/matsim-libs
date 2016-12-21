@@ -1,6 +1,8 @@
 package org.matsim.utils.objectattributes.attributable;
 
 import java.util.Arrays;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 /**
  * This class is optimized for memory footprint and query time, at the expense of insertion time.
