@@ -29,11 +29,10 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
-
-import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusDriveWithPassengerTask;
-import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusTask;
-import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusTaskWithRequests;
-import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusTask.TaxibusTaskType;
+import playground.jbischoff.drt.scheduler.tasks.DrtDriveWithPassengerTask;
+import playground.jbischoff.drt.scheduler.tasks.DrtTask;
+import playground.jbischoff.drt.scheduler.tasks.DrtTaskWithRequests;
+import playground.jbischoff.drt.scheduler.tasks.DrtTask.DrtTaskType;
 
 /**
  * @author  jbischoff
@@ -66,11 +65,11 @@ public class TaxibusRequest extends RequestImpl   implements PassengerRequest
     private final MobsimPassengerAgent passenger;
     private final Link fromLink;
     private final Link toLink;
-	private TaxibusTaskWithRequests pickupTask = null;
-	private TaxibusTaskWithRequests dropoffTask = null;;
+	private DrtTaskWithRequests pickupTask = null;
+	private DrtTaskWithRequests dropoffTask = null;;
 
 	
-	private ArrayList<TaxibusDriveWithPassengerTask> driveWithPassengerTasks = new ArrayList<>();
+	private ArrayList<DrtDriveWithPassengerTask> driveWithPassengerTasks = new ArrayList<>();
 
     public TaxibusRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
             double t0, double submissionTime)
@@ -96,28 +95,28 @@ public class TaxibusRequest extends RequestImpl   implements PassengerRequest
 		return passenger;
 	}
 
-	public void setPickupTask(TaxibusTaskWithRequests pickupTask) {
+	public void setPickupTask(DrtTaskWithRequests pickupTask) {
         this.pickupTask = pickupTask;
 		
 	}
 
-	public void addDriveWithPassengerTask(TaxibusDriveWithPassengerTask task) {
+	public void addDriveWithPassengerTask(DrtDriveWithPassengerTask task) {
 		this.driveWithPassengerTasks.add(task);
 	}
 
-	public TaxibusTaskWithRequests getDropoffTask() {
+	public DrtTaskWithRequests getDropoffTask() {
 		return dropoffTask;
 	}
 
-	public void setDropoffTask(TaxibusTaskWithRequests dropoffTask) {
+	public void setDropoffTask(DrtTaskWithRequests dropoffTask) {
 		this.dropoffTask = dropoffTask;
 	}
 
-	public TaxibusTaskWithRequests getPickupTask() {
+	public DrtTaskWithRequests getPickupTask() {
 		return pickupTask;
 	}
 
-	public ArrayList<TaxibusDriveWithPassengerTask> getDriveWithPassengerTask() {
+	public ArrayList<DrtDriveWithPassengerTask> getDriveWithPassengerTask() {
 		return driveWithPassengerTasks;
 	}
 
@@ -129,8 +128,8 @@ public class TaxibusRequest extends RequestImpl   implements PassengerRequest
 
 		        switch (pickupTask.getStatus()) {
 		            case PLANNED:
-		                TaxibusTask currentTask = (TaxibusTask)pickupTask.getSchedule().getCurrentTask();
-		                if (currentTask.getTaxibusTaskType() == TaxibusTaskType.DRIVE_EMPTY && //
+		                DrtTask currentTask = (DrtTask)pickupTask.getSchedule().getCurrentTask();
+		                if (currentTask.getDrtTaskType() == DrtTaskType.DRIVE_EMPTY && //
 		                        pickupTask.getTaskIdx() == currentTask.getTaskIdx() + 1) {
 		                    return TaxibusRequestStatus.DISPATCHED;
 		                }
@@ -145,7 +144,7 @@ public class TaxibusRequest extends RequestImpl   implements PassengerRequest
 
 		        if (!driveWithPassengerTasks.isEmpty())
 		        {
-		        	for (TaxibusDriveWithPassengerTask t : driveWithPassengerTasks){
+		        	for (DrtDriveWithPassengerTask t : driveWithPassengerTasks){
 		        		
 		        		if (t.getStatus().equals(TaskStatus.STARTED)){
 		        			

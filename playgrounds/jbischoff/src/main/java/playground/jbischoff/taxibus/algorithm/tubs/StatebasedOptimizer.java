@@ -13,14 +13,14 @@ import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
+import playground.jbischoff.drt.scheduler.tasks.DrtDriveTask;
+import playground.jbischoff.drt.scheduler.tasks.DrtDriveWithPassengerTask;
+import playground.jbischoff.drt.scheduler.tasks.DrtPickupTask;
+import playground.jbischoff.drt.scheduler.tasks.DrtStayTask;
+import playground.jbischoff.drt.scheduler.tasks.DrtTask;
 import playground.jbischoff.taxibus.algorithm.optimizer.AbstractTaxibusOptimizer;
 import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizerContext;
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
-import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusDriveTask;
-import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusDriveWithPassengerTask;
-import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusPickupTask;
-import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusStayTask;
-import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusTask;
 import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 import playground.jbischoff.taxibus.algorithm.tubs.datastructure.StateSpace;
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
@@ -56,7 +56,7 @@ public class StatebasedOptimizer extends AbstractTaxibusOptimizer {
 	@Override
 	protected void scheduleUnplannedRequests() {
 		Set<TaxibusRequest> handledRequests = new HashSet<>();
-		Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>)veh.getSchedule();
+		Schedule<DrtTask> schedule = (Schedule<DrtTask>)veh.getSchedule();
 		for (TaxibusRequest req : this.unplannedRequests) {
 			if (!req.getToLink().getId().equals(this.commonDestination)) {
 				throw new RuntimeException("optimizer only supports one single destination");
@@ -65,21 +65,21 @@ public class StatebasedOptimizer extends AbstractTaxibusOptimizer {
 				req.getPassenger().setStateToAbort(req.getT1());
 				continue;
 			}
-			TaxibusPickupTask lastScheduledPickup = getLastPickupTask(schedule);
+			DrtPickupTask lastScheduledPickup = getLastPickupTask(schedule);
 			Path lastPickupToNextPickup = null;
 			double lastEndTime;
 			Link lastLink;
 			double oldSlack;
 			if (lastScheduledPickup == null ){
 				// this is a new dispatch
-				TaxibusStayTask lastStayTask =   (TaxibusStayTask) schedule.getTasks().get(0);
+				DrtStayTask lastStayTask =   (DrtStayTask) schedule.getTasks().get(0);
 				lastEndTime = optimContext.timer.getTimeOfDay();
 				lastLink = lastStayTask.getLink();
 				oldSlack = this.stateSpace.getCurrentLastArrivalTime(lastEndTime) - lastEndTime;
 			} else{
 			 lastEndTime = lastScheduledPickup.getEndTime();
 			 lastLink = lastScheduledPickup.getLink();
-			 TaxibusDriveWithPassengerTask alternativePassengerTask = (TaxibusDriveWithPassengerTask) schedule.getTasks().get(lastScheduledPickup.getTaskIdx()+1);
+			 DrtDriveWithPassengerTask alternativePassengerTask = (DrtDriveWithPassengerTask) schedule.getTasks().get(lastScheduledPickup.getTaskIdx()+1);
 			 oldSlack = this.stateSpace.getCurrentLastArrivalTime(lastEndTime) - alternativePassengerTask.getEndTime();
 			 }
 			lastPickupToNextPickup = router.calcLeastCostPath(lastLink.getToNode(), req.getFromLink().getFromNode(), lastEndTime, null , null);
@@ -147,12 +147,12 @@ public class StatebasedOptimizer extends AbstractTaxibusOptimizer {
 	/**
 	 * @param schedule
 	 */
-	private boolean removeAllTasksSinceLastPickup(Schedule<TaxibusTask> schedule) {
+	private boolean removeAllTasksSinceLastPickup(Schedule<DrtTask> schedule) {
 		int idx = schedule.getTaskCount()-1;
 		int lastPickupIdx = idx;
 		for (int i = idx; i>= 0; i--){
-			TaxibusTask task = schedule.getTasks().get(i);
-			if (task instanceof TaxibusPickupTask) {
+			DrtTask task = schedule.getTasks().get(i);
+			if (task instanceof DrtPickupTask) {
 				lastPickupIdx = task.getTaskIdx();
 				break;
 			}
@@ -172,21 +172,21 @@ public class StatebasedOptimizer extends AbstractTaxibusOptimizer {
 	 * @param schedule
 	 * @return
 	 */
-	private TaxibusPickupTask getLastPickupTask(Schedule<TaxibusTask> schedule) {
+	private DrtPickupTask getLastPickupTask(Schedule<DrtTask> schedule) {
 		int idx = schedule.getTaskCount()-1;
 		for (int i = idx; i>= 0; i--){
-			TaxibusTask task = schedule.getTasks().get(i);
-			if (task instanceof TaxibusPickupTask) return (TaxibusPickupTask) task;
+			DrtTask task = schedule.getTasks().get(i);
+			if (task instanceof DrtPickupTask) return (DrtPickupTask) task;
 		}
 		return null;
 	}
 	
-	private boolean isSimilarPathAlreadyInTour(Schedule<TaxibusTask> schedule, VrpPathWithTravelData path){
+	private boolean isSimilarPathAlreadyInTour(Schedule<DrtTask> schedule, VrpPathWithTravelData path){
 		int idx = schedule.getTaskCount()-1;
 		for (int i = idx; i>= 0; i--){
-			TaxibusTask task = schedule.getTasks().get(i);
-			if (task instanceof TaxibusDriveTask){
-				TaxibusDriveTask dtask = (TaxibusDriveTask) task;
+			DrtTask task = schedule.getTasks().get(i);
+			if (task instanceof DrtDriveTask){
+				DrtDriveTask dtask = (DrtDriveTask) task;
 				if ((dtask.getPath().getFromLink().equals(path.getFromLink())) &&(dtask.getPath().getToLink().equals(path.getToLink()))){
 					return true;
 				}

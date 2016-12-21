@@ -48,7 +48,7 @@ import playground.jbischoff.utils.JbUtils;
 /**
  *
  */
-public class CarUsageEvaluator {
+public class NonCarUsageEvaluator {
 public static void main(String[] args) {
 //	Geometry geo = JbUtils.readShapeFileAndExtractGeometry("C:/Users/Joschka/Documents/shared-svn/projects/bmw_carsharing/data/gis/klaus.shp","id").get("0");
 	Geometry geo = JbUtils.readShapeFileAndExtractGeometry("C:/Users/Joschka/Documents/shared-svn/projects/bmw_carsharing/data/gis/mierendorffkiez.shp","id").get("1");
@@ -69,7 +69,7 @@ public static void main(String[] args) {
 		persons++;
 		for (PlanElement pe : plan.getPlanElements()){
 			if (pe instanceof Leg){
-				if (((Leg) pe).getMode().equals("car")||((Leg) pe).getMode().equals("freefloating")){
+				if (((Leg) pe).getMode().equals("car")){
 					firstCarUsers.add(p.getId());
 					break;
 				}
@@ -87,7 +87,7 @@ public static void main(String[] args) {
 		}
 		for (PlanElement pe : plan.getPlanElements()){
 			if (pe instanceof Leg){
-				if (((Leg) pe).getMode().equals("car")||((Leg) pe).getMode().equals("freefloating")){
+				if (((Leg) pe).getMode().equals("car")){
 					secondCarUsers.add(p.getId());
 					break;
 				}

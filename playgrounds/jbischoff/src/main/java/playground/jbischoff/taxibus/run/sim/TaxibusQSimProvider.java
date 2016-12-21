@@ -36,8 +36,7 @@ import com.beust.jcommander.internal.Nullable;
 import com.google.inject.*;
 import com.google.inject.name.Named;
 
-
-import playground.jbischoff.taxibus.algorithm.TaxibusActionCreator;
+import playground.jbischoff.drt.scheduler.DrtActionCreator;
 import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizer;
 import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizerContext;
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.FifoOptimizer;
@@ -106,7 +105,7 @@ public class TaxibusQSimProvider
         }
         
         LegCreator legCreator = VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
-        TaxibusActionCreator actionCreator = new TaxibusActionCreator(passengerEngine, legCreator,
+        DrtActionCreator actionCreator = new DrtActionCreator(passengerEngine, legCreator,
                 tbcg.getPickupDuration());
         qSim.addAgentSource(new VrpAgentSource(actionCreator, vrpData, optimizer, qSim));
 

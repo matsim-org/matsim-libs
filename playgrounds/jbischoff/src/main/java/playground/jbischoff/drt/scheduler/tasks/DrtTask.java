@@ -17,20 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.algorithm.scheduler;
-import java.util.Set;
+package playground.jbischoff.drt.scheduler.tasks;
 
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
-
+import org.matsim.contrib.dvrp.schedule.*;
 
 
-public interface TaxibusTaskWithRequests
-    extends TaxibusTask
+public interface DrtTask
+    extends Task
 {
-    Set<TaxibusRequest> getRequests();
+    static enum DrtTaskType
+    {
+    	        DRIVE_EMPTY, // drive empty might be needed later.
+        STAY, //not directly related to any customer (although may be related to serving a customer; e.g. a pickup drive)
+        PICKUP, DRIVE_WITH_PASSENGER, DROPOFF;//serving n customers (TaxibusTaskWithRequests)
+    }
 
 
-    //called (when removing a task) in order to update the request2task assignment 
-    void removeFromRequest(TaxibusRequest request);
-    void removeFromAllRequests();
+    DrtTaskType getDrtTaskType();
 }
