@@ -46,7 +46,7 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class QLinkLanesTest extends MatsimTestCase {
 
-  private Network initNetwork(Network network) {
+  private static void initNetwork(Network network) {
 		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord((double) 1, (double) 0));
 		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new Coord((double) 2, (double) 0));
@@ -61,10 +61,9 @@ public class QLinkLanesTest extends MatsimTestCase {
 		network.addLink(l1);
 		Link l2 = network.getFactory().createLink(Id.create("2", Link.class), node2, node3);
 		network.addLink(l2);
-		return network;
   }
   
-	private Lanes createOneLane(Scenario scenario, int numberOfRepresentedLanes) {
+	private static void createOneLane(Scenario scenario, int numberOfRepresentedLanes) {
 		scenario.getConfig().qsim().setUseLanes(true);
 		Lanes lanes = scenario.getLanes();
 		LanesFactory builder = lanes.getFactory();
@@ -84,10 +83,9 @@ public class QLinkLanesTest extends MatsimTestCase {
 		link1lane1.setCapacityVehiclesPerHour(numberOfRepresentedLanes * 900.0);
 		lanesForLink1.addLane(link1lane1);
 		lanes.addLanesToLinkAssignment(lanesForLink1);
-		return lanes;
 	}
   
-	private Lanes createThreeLanes(Scenario scenario) {
+	private static void createThreeLanes(Scenario scenario) {
 		scenario.getConfig().qsim().setUseLanes(true);
 		Lanes lanes = scenario.getLanes();
 		LanesFactory builder = lanes.getFactory();
@@ -123,13 +121,12 @@ public class QLinkLanesTest extends MatsimTestCase {
 		lanesForLink1.addLane(link1lane3);
 		
 		lanes.addLanesToLinkAssignment(lanesForLink1);
-		return lanes;
 	}
 
 	public void testCapacityWoLanes() {
 		Config config = ConfigUtils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		this.initNetwork(scenario.getNetwork());
+		initNetwork(scenario.getNetwork());
 
 		QSim queueSim = QSimUtils.createDefaultQSim(scenario, EventsUtils.createEventsManager());
 		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
@@ -142,8 +139,8 @@ public class QLinkLanesTest extends MatsimTestCase {
 	public void testCapacityWithOneLaneOneLane() {
 		Config config = ConfigUtils.createConfig();		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		this.initNetwork(scenario.getNetwork());
-		this.createOneLane(scenario, 1);
+		initNetwork(scenario.getNetwork());
+		createOneLane(scenario, 1);
 
 		QSim queueSim = QSimUtils.createDefaultQSim(scenario, EventsUtils.createEventsManager());
 		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
@@ -173,8 +170,8 @@ public class QLinkLanesTest extends MatsimTestCase {
 	public void testCapacityWithOneLaneTwoLanes() {
 		Config config = ConfigUtils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		this.initNetwork(scenario.getNetwork());
-		this.createOneLane(scenario, 2);
+		initNetwork(scenario.getNetwork());
+		createOneLane(scenario, 2);
 
 		QSim queueSim = QSimUtils.createDefaultQSim(scenario, EventsUtils.createEventsManager());
 		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
@@ -206,8 +203,8 @@ public class QLinkLanesTest extends MatsimTestCase {
 	public void testCapacityWithLanes() {
 		Config config = ConfigUtils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		this.initNetwork(scenario.getNetwork());
-		this.createThreeLanes(scenario);
+		initNetwork(scenario.getNetwork());
+		createThreeLanes(scenario);
 
 		QSim queueSim = QSimUtils.createDefaultQSim(scenario, EventsUtils.createEventsManager());
 		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
