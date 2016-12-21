@@ -436,11 +436,7 @@ public class NetworkUtils {
      * @return the link found closest to coord
      */
     public static Link getNearestLink(Network network, final Coord coord) {
-        if (!(network instanceof Network)) {
-            throw new IllegalArgumentException("Only NetworkImpl can be queried like this.");
-        }
-        Link nearestLink = null;
-        Node nearestNode = NetworkUtils.getNearestNode(((Network) network),coord);
+        Node nearestNode = NetworkUtils.getNearestNode(network,coord);
         if ( nearestNode == null ) {
             log.warn("[nearestNode not found.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" + network) ;
             return null ;
@@ -456,9 +452,9 @@ public class NetworkUtils {
         // It would be nicer to find the nearest link on the "right" side of the coordinate.
         // (For Great Britain it would be the "left" side. Could be a global config param...)
         double shortestDistance = Double.MAX_VALUE;
+        Link nearestLink = null;
         for (Link link : getIncidentLinks(nearestNode).values()) {
-            Link r = ((Link) link);
-		double dist = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord);
+		double dist = CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
             if (dist < shortestDistance) {
                 shortestDistance = dist;
                 nearestLink = link;
@@ -644,22 +640,12 @@ public class NetworkUtils {
 		}
 	}
 
-
+	private static String ORIG_ID = "origId" ;
 	public static String getOrigId( Link link ) {
-		if ( link instanceof LinkImpl ) {
-			return ((LinkImpl)link).getOrigId2() ;
-		} else {
-			throw new RuntimeException("wrong implementation of Link interface do getOrigId" ) ;
-		}
+		return (String) link.getAttributes().getAttribute(ORIG_ID) ;
 	}
-
-
 	public static void setOrigId( Link link, String id ) {
-		if ( link instanceof LinkImpl ) {
-			((LinkImpl) link).setOrigId2(id);
-		} else {
-			throw new RuntimeException("wrong implementation of interface Link to do setOrigId") ;
-		}
+		link.getAttributes().putAttribute(ORIG_ID, id) ;
 	}
 
 
@@ -754,6 +740,7 @@ public class NetworkUtils {
 			return ((SearchableNetwork)network).getNearestNode(coord);
 		} else {
 			throw new RuntimeException( Gbl.WRONG_IMPLEMENTATION + " Network, SearchableNetwork " ) ;
+			// (could instead do a linear search. kai, dec'16)
 		}
 	}
 
