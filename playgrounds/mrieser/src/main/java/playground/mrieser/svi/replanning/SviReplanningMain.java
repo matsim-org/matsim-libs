@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
@@ -101,7 +101,7 @@ public class SviReplanningMain {
 		// stream and replan population
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population pop = (Population) scenario.getPopulation();
-		StreamingUtils.setIsStreaming(pop, true);
+		StreamingDeprecated.setIsStreaming(pop, true);
 
 //		SviReplanner replanner = new SviReplanner();
 //		DynamicODDemandCollector ods = new DynamicODDemandCollector();

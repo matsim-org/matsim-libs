@@ -53,7 +53,7 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationReader;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -379,7 +379,7 @@ public class MyRuns {
 
 //		Population reader = (Population) scenario.getPopulation();
 		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
-		StreamingUtils.setIsStreaming(reader, true);
+		StreamingDeprecated.setIsStreaming(reader, true);
 		final PersonAlgorithm algo = pa;
 		reader.addAlgorithm(algo);
 //		PopulationReader plansReader = new MatsimPopulationReader(scenario);
@@ -473,7 +473,7 @@ public class MyRuns {
 		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
 
 		System.out.println("  reading plans xml file... ");
-		StreamingUtils.setIsStreaming(reader, isStreaming);
+		StreamingDeprecated.setIsStreaming(reader, isStreaming);
 
 		if (isStreaming) {
 			// add plans algos for streaming
@@ -527,7 +527,7 @@ public class MyRuns {
 		plansAlgos.add(pa);
 
 		Population matsimAgentPopulation = (Population) scenario.getPopulation();
-		StreamingUtils.setIsStreaming(matsimAgentPopulation, true);
+		StreamingDeprecated.setIsStreaming(matsimAgentPopulation, true);
 		MatsimReader plansReader = new PopulationReader(scenario);
 		plansReader.readFile(scenario.getConfig().plans().getInputFile());
 		PopulationUtils.printPlansCount(matsimAgentPopulation) ;

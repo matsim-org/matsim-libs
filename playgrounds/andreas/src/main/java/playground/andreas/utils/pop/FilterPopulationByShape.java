@@ -43,7 +43,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -111,12 +111,12 @@ public class FilterPopulationByShape implements LinkEnterEventHandler, PersonEnt
 		
 		sc.getConfig().plans().setInputFile(popInFile);
 		Population pop = (Population) sc.getPopulation();
-		StreamingUtils.setIsStreaming(pop, true);
+		StreamingDeprecated.setIsStreaming(pop, true);
 		PopulationReader popReader = new PopulationReader(sc);
-		StreamingPopulationWriter popWriter = new StreamingPopulationWriter(pop, sc.getNetwork());
+		StreamingPopulationWriter popWriter = new StreamingPopulationWriter();
 		popWriter.startStreaming(popOutFile);
 		
-		StreamingUtils.addAlgorithm(pop, new PersonIdFilter(this.agentsToKeep, popWriter));
+		StreamingDeprecated.addAlgorithm(pop, new PersonIdFilter(this.agentsToKeep, popWriter));
 		Gbl.printMemoryUsage();
 		
 		popReader.readFile(popInFile);

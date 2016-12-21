@@ -27,7 +27,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -70,17 +70,15 @@ public class SamplePersons {
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		final Population pop = (Population) scenario.getPopulation();
-		StreamingUtils.setIsStreaming(pop, true);
+		StreamingDeprecated.setIsStreaming(pop, true);
 
 		final StreamingPopulationWriter writer =
-			new StreamingPopulationWriter(
-					scenario.getPopulation(),
-					scenario.getNetwork() );
+			new StreamingPopulationWriter( );
 		writer.writeStartPlans( outPopulation );
 
 		final Random random = new Random( 1234 );
 		final Set<Id<Person>> kept = new HashSet< >();
-		StreamingUtils.addAlgorithm(pop, new PersonAlgorithm() {
+		StreamingDeprecated.addAlgorithm(pop, new PersonAlgorithm() {
 			@Override
 			public void run(final Person person) {
 				if ( random.nextDouble() > rate ) return;

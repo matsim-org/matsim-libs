@@ -38,7 +38,7 @@ import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationReader;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -92,7 +92,7 @@ public class DistanceAnalysis {
 		
 //		final Population reader = (Population) sc.getPopulation();
 		StreamingPopulationReader reader = new StreamingPopulationReader( sc ) ;
-		StreamingUtils.setIsStreaming(reader, true);
+		StreamingDeprecated.setIsStreaming(reader, true);
 		AbstractPlan2TripsFilter planFilter = new DistPlan2TripsFilter();
 		final PersonAlgorithm algo = planFilter; 
 		reader.addAlgorithm(algo);

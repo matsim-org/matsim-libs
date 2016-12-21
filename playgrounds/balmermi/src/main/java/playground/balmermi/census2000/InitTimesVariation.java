@@ -31,7 +31,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -57,8 +57,8 @@ public class InitTimesVariation {
 		System.out.println("  setting up plans objects...");
 //		Population reader = (Population) scenario.getPopulation();
 		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ; 
-		StreamingUtils.setIsStreaming(reader, true);
-		StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(null, network);
+		StreamingDeprecated.setIsStreaming(reader, true);
+		StreamingPopulationWriter plansWriter = new StreamingPopulationWriter();
 		plansWriter.startStreaming(null);//config.plans().getOutputFile());
 //		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		System.out.println("  done.");

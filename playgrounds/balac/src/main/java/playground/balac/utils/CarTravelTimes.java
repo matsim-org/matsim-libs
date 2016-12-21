@@ -21,7 +21,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
@@ -94,25 +94,25 @@ public class CarTravelTimes {
 		
 		
 		final Population plans = (Population) sc.getPopulation();
-		StreamingUtils.setIsStreaming(plans, true);
-		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(plans, network);
+		StreamingDeprecated.setIsStreaming(plans, true);
+		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter();
 		plansWriter.startStreaming(outputPlansFile);
 		
 		// add algorithm to map coordinates to links
-		StreamingUtils.addAlgorithm(plans, new org.matsim.core.population.algorithms.XY2Links(network, null));
+		StreamingDeprecated.addAlgorithm(plans, new org.matsim.core.population.algorithms.XY2Links(network, null));
 
 		// add algorithm to estimate travel cost
 		// and which performs routing based on that
 		TravelTimeCalculator travelTimeCalculator = Events2TTCalculator.getTravelTimeCalculator(sc, eventsFile);
 		TravelDisutilityFactory travelCostCalculatorFactory = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
 		TravelDisutility travelCostCalculator = travelCostCalculatorFactory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes());
-		StreamingUtils.addAlgorithm(plans, new PlanRouter(
+		StreamingDeprecated.addAlgorithm(plans, new PlanRouter(
 		new TripRouterFactoryBuilderWithDefaults().build(
 				sc ).get(
 		) ));
 
 		// add algorithm to write out the plans
-		StreamingUtils.addAlgorithm(plans, plansWriter);
+		StreamingDeprecated.addAlgorithm(plans, plansWriter);
 		final BufferedReader readLink = IOUtils.getBufferedReader(args[3]);
 
 		//final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/coordinates.txt");

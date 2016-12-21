@@ -16,7 +16,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -53,11 +53,11 @@ public class FilterSample {
 		System.out.println(personIds.size());
 		
 		Population filterpop = (Population) filtersc.getPopulation();
-		StreamingUtils.setIsStreaming(filterpop, true);
+		StreamingDeprecated.setIsStreaming(filterpop, true);
 		
 		final MatsimReader plansReader = new PopulationReader(filtersc);
 		
-		StreamingUtils.addAlgorithm(filterpop, new PersonAlgorithm() {
+		StreamingDeprecated.addAlgorithm(filterpop, new PersonAlgorithm() {
 		
 			@Override
 			public void run(Person person) {

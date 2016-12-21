@@ -194,7 +194,7 @@ public class Counts2Plans {
 			pop.addPerson(person);
 		}
 
-		StreamingPopulationWriter popWriter = new StreamingPopulationWriter(pop, null);
+		StreamingPopulationWriter popWriter = new StreamingPopulationWriter();
 		popWriter.writeStartPlans(filename);
 		popWriter.writePersons();
 		popWriter.writeEndPlans();

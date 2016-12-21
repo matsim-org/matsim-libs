@@ -27,7 +27,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -48,10 +48,10 @@ public class PrepareModeChoicePlans {
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(inputNetworkFile);
 		Population population = (Population) scenario.getPopulation();
-		StreamingUtils.setIsStreaming(population, true);
+		StreamingDeprecated.setIsStreaming(population, true);
 		NewAgentPtPlan planGenerator = new NewAgentPtPlan(network, population, outputPlansFile);
 		final PersonAlgorithm algo = planGenerator;
-		StreamingUtils.addAlgorithm(population, algo);
+		StreamingDeprecated.addAlgorithm(population, algo);
 		new PopulationReader(scenario).readFile(inputPlansFile);
 		PopulationUtils.printPlansCount(population) ;
 		planGenerator.writeEndPlans();

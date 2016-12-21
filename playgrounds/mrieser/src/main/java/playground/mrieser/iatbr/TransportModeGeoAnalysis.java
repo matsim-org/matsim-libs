@@ -40,7 +40,7 @@ import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationReader;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -145,7 +145,7 @@ public class TransportModeGeoAnalysis extends AbstractPersonAlgorithm {
 			infoFile.write("X\tY\tID\tTYPE\tGID\tGNAME\n");
 //			Population reader = (Population) scenario.getPopulation();
 			StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
-			StreamingUtils.setIsStreaming(reader, true);
+			StreamingDeprecated.setIsStreaming(reader, true);
 			TransportModeGeoAnalysis analysis = new TransportModeGeoAnalysis(infoFile);
 			analysis.readGemeindegrenzen("/Users/cello/Desktop/Gemeindegrenzen/gemeindegrenzen2008/g1g08_shp_080606/G1G08.shp");
 			final PersonAlgorithm algo = analysis;

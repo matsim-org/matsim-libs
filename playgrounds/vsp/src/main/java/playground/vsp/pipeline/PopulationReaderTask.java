@@ -6,7 +6,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationReader;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -35,7 +35,7 @@ public class PopulationReaderTask implements PersonSource, Runnable {
 		MutableScenario scenario = ScenarioUtils.createMutableScenario(ConfigUtils.createConfig()) ;
 //		Population population = (Population) scenario.getPopulation();
 		StreamingPopulationReader population = new StreamingPopulationReader( scenario ) ;
-		StreamingUtils.setIsStreaming(population, true);
+		StreamingDeprecated.setIsStreaming(population, true);
 		population.addAlgorithm(new PersonAlgorithm() {
 		
 			@Override

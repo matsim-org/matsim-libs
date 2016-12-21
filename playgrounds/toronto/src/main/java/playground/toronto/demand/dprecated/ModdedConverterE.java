@@ -341,7 +341,7 @@ public class ModdedConverterE {
 		c.setPop(scenario.getPopulation());
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(oldPlansFilename);
-			StreamingPopulationWriter writer = new StreamingPopulationWriter(c.pop, scenario.getNetwork());
+			StreamingPopulationWriter writer = new StreamingPopulationWriter();
 			writer.writeStartPlans(newPlansFilename);
 			String line;// = reader.readLine();
 			do {

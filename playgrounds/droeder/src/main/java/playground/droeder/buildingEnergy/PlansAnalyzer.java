@@ -42,7 +42,7 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -75,10 +75,10 @@ final class PlansAnalyzer {
 		log.info("outputpath: " + outputpath);
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		StreamingUtils.setIsStreaming(((Population) sc.getPopulation()), true);
+		StreamingDeprecated.setIsStreaming(((Population) sc.getPopulation()), true);
 		MyPersonAlgorithm pa = new MyPersonAlgorithm();
 		final PersonAlgorithm algo = pa;
-		StreamingUtils.addAlgorithm(((Population) sc.getPopulation()), algo);
+		StreamingDeprecated.addAlgorithm(((Population) sc.getPopulation()), algo);
 		
 		new PopulationReader(sc).readFile(plansfile);
 		pa.dumpStatistics(outputpath, "base");

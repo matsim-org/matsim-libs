@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -55,8 +55,8 @@ public class SimplePopulationGenerator {
 
 		Population population = (Population) scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
-		StreamingUtils.setIsStreaming(population, true);
-		StreamingPopulationWriter popWriter = new StreamingPopulationWriter(population, scenario.getNetwork());
+		StreamingDeprecated.setIsStreaming(population, true);
+		StreamingPopulationWriter popWriter = new StreamingPopulationWriter();
 		popWriter.startStreaming(outputPath+"/corridorPopulation_"+populationSize+".xml");
 
 		Random generator = new Random();

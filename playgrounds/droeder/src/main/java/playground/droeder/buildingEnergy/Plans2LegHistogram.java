@@ -33,7 +33,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -65,7 +65,7 @@ public abstract class Plans2LegHistogram {
 		
 		final LegHistogram histo = new LegHistogram(300);
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		StreamingUtils.setIsStreaming(((Population) sc.getPopulation()), true);
+		StreamingDeprecated.setIsStreaming(((Population) sc.getPopulation()), true);
 		final PersonAlgorithm algo = new PersonAlgorithm() {
 			
 			@Override
@@ -79,7 +79,7 @@ public abstract class Plans2LegHistogram {
 				}
 			}
 		};
-		StreamingUtils.addAlgorithm(((Population) sc.getPopulation()), algo);
+		StreamingDeprecated.addAlgorithm(((Population) sc.getPopulation()), algo);
 		
 		new PopulationReader(sc).readFile(plansfile);
 		

@@ -26,7 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.XY2Links;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -54,13 +54,13 @@ public class DgCottbusPreprocessPlans {
 		ScenarioUtils.loadScenario(scenario);
 		
 		
-		StreamingUtils.addAlgorithm(((Population) scenario.getPopulation()), new XY2Links(scenario.getNetwork(), null));
+		StreamingDeprecated.addAlgorithm(((Population) scenario.getPopulation()), new XY2Links(scenario.getNetwork(), null));
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore());
-		StreamingUtils.addAlgorithm(((Population) scenario.getPopulation()), new PlanRouter(
+		StreamingDeprecated.addAlgorithm(((Population) scenario.getPopulation()), new PlanRouter(
 		new TripRouterFactoryBuilderWithDefaults().build(
 				scenario ).get(
 		) ));
-		StreamingUtils.runAlgorithms(((Population) scenario.getPopulation()));
+		StreamingDeprecated.runAlgorithms(((Population) scenario.getPopulation()));
 		PopulationWriter writer = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		writer.write(popOutFile);
 	}

@@ -32,7 +32,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -84,8 +84,8 @@ public class PopulationMerger {
 //		Population reader = (Population) scenario.getPopulation();
 		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
 
-		StreamingUtils.setIsStreaming(reader, true);
-		populationWriter = new StreamingPopulationWriter(null, scenario.getNetwork());
+		StreamingDeprecated.setIsStreaming(reader, true);
+		populationWriter = new StreamingPopulationWriter();
 		final PersonAlgorithm algo = populationWriter;
 		reader.addAlgorithm(algo);
 		populationWriter.startStreaming(outputPath + outputFileName);

@@ -42,7 +42,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.MainModeIdentifier;
@@ -159,8 +159,8 @@ public class ExtractTripModeSharesAroundBellevue {
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outputFile );
 		writer.write( "agentId\tmain_mode\ttotal_dist" );
 
-		StreamingUtils.setIsStreaming(pop, true);
-		StreamingUtils.addAlgorithm(pop, new PersonAlgorithm() {
+		StreamingDeprecated.setIsStreaming(pop, true);
+		StreamingDeprecated.addAlgorithm(pop, new PersonAlgorithm() {
 			final playground.ivt.utils.Filter<Id> personFilter = attributesFile != null ?
 					new SubpopulationFilter(
 						pop.getPersonAttributes(),
