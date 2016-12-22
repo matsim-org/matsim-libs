@@ -29,7 +29,7 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
@@ -63,9 +63,9 @@ public class CBPopulationPreparation {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 //		final Population population = (Population) scenario.getPopulation();
 		StreamingPopulationReader population = new StreamingPopulationReader( scenario ) ;
-		StreamingUtils.setIsStreaming(population, true);
+		StreamingDeprecated.setIsStreaming(population, true);
 		MatsimReader plansReader = new PopulationReader(scenario);
-		StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(null, scenario.getNetwork());
+		StreamingPopulationWriter plansWriter = new StreamingPopulationWriter();
 		plansWriter.startStreaming(args[1].trim());
 
 		ActivityFacilities afs = scenario.getActivityFacilities();

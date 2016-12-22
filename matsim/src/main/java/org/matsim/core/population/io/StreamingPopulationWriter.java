@@ -22,18 +22,14 @@ package org.matsim.core.population.io;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -43,140 +39,57 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-public final class StreamingPopulationWriter extends AbstractMatsimWriter implements MatsimWriter, PersonAlgorithm {
+public final class StreamingPopulationWriter implements PersonAlgorithm {
+	private final static Logger log = Logger.getLogger(StreamingPopulationWriter.class);
 
 	private final double write_person_fraction;
 
-	private final CoordinateTransformation coordinateTransformation;
 	private PopulationWriterHandler handler = null;
-	private final Population population;
-	private final Network network;
 	private Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
 
-	private final static Logger log = Logger.getLogger(StreamingPopulationWriter.class);
+	private static class DummyMatsimWriter extends AbstractMatsimWriter {
+		BufferedWriter getWriter() {
+			return writer;
+		}
+		void openHere(String filename ) {
+			super.openFile(filename);
+		}
+		void closeHere() {
+			super.close() ;
+		}
+	}
+	private DummyMatsimWriter matsimWriter = new DummyMatsimWriter() ;
 	
 	
-	public StreamingPopulationWriter(final Population population) {
-		// yyyyyy the PersonAlgorithm and the standard version of this class should be separated ...
-		// the PersonAlgorithm should be called without the Population argument.  kai, jul'16
-		this(population, null, 1.0);
+	public StreamingPopulationWriter() {
+		this(1.0);
 	}
 
 	public StreamingPopulationWriter(
-			final CoordinateTransformation coordinateTransformation,
-			final Population population) {
-		// yyyyyy the PersonAlgorithm and the standard version of this class should be separated ...
-		// the PersonAlgorithm should be called without the Population argument.  kai, jul'16
-		this(coordinateTransformation , population, null, 1.0);
+			final CoordinateTransformation coordinateTransformation) {
+		this(coordinateTransformation , 1.0);
 	}
 
 	/**
-	 * Creates a new PlansWriter to write out the specified plans to the file and with version
-	 * as specified in the {@linkplain org.matsim.core.config.groups.PlansConfigGroup configuration}.
-	 * If plans-streaming is on, the file will already be opened and the file-header be written.
-	 * If plans-streaming is off, the file will not be created until {@link #write(java.lang.String)} is called.
-	 *
-	 * @param population the population to write to file
-	 */
-	public StreamingPopulationWriter(final Population population, final Network network) {
-		// yyyyyy the PersonAlgorithm and the standard version of this class should be separated ...
-		// the PersonAlgorithm should be called without the Population argument.  kai, jul'16
-		this(population, network, 1.0);
-	}
-
-	public StreamingPopulationWriter(
-			final CoordinateTransformation coordinateTransformation,
-			final Population population,
-			final Network network) {
-		// yyyyyy the PersonAlgorithm and the standard version of this class should be separated ...
-		// the PersonAlgorithm should be called without the Population argument.  kai, jul'16
-		this(coordinateTransformation , population, network, 1.0);
-	}
-
-	/**
-	 * Creates a new PlansWriter to write out the specified plans to the specified file and with
-	 * the specified version.
-	 * If plans-streaming is on, the file will already be opened and the file-header be written.
-	 * If plans-streaming is off, the file will not be created until {@link #write(java.lang.String)} is called.
 	 *
 	 * @param coordinateTransformation transformation from the internal CRS to the CRS in which the file should be written
-	 * @param population the population to write to file
 	 * @param fraction of persons to write to the plans file
 	 */
 	public StreamingPopulationWriter(
 			final CoordinateTransformation coordinateTransformation,
-			final Population population,
-			final Network network,
 			final double fraction) {
-		// yyyyyy the PersonAlgorithm and the standard version of this class should be separated ...
-		// the PersonAlgorithm should be called without the Population argument.  kai, jul'16
-		this.coordinateTransformation = coordinateTransformation;
-		this.population = population;
-		this.network = network;
 		this.write_person_fraction = fraction;
 		this.handler = new PopulationWriterHandlerImplV5(coordinateTransformation);
 	}
 
 	/**
-	 * Creates a new PlansWriter to write out the specified plans to the specified file and with
-	 * the specified version.
-	 * If plans-streaming is on, the file will already be opened and the file-header be written.
-	 * If plans-streaming is off, the file will not be created until {@link #write(java.lang.String)} is called.
-	 *
-	 * @param population the population to write to file
 	 * @param fraction of persons to write to the plans file
 	 */
 	public StreamingPopulationWriter(
-			final Population population,
-			final Network network,
 			final double fraction) {
-		// yyyyyy the PersonAlgorithm and the standard version of this class should be separated ...
-		// the PersonAlgorithm should be called without the Population argument.  kai, jul'16
-		this( new IdentityTransformation() , population , network , fraction );
+		this( new IdentityTransformation() , fraction );
 	}
 
-	/**
-	 * Writes all plans to the file.
-	 */
-	@Override
-	public final void write(final String filename) {
-		try {
-			this.openFile(filename);
-			this.handler.writeHeaderAndStartElement(this.writer);
-			this.handler.startPlans(this.population, this.writer);
-			this.handler.writeSeparator(this.writer);
-			this.writePersons();
-			this.handler.endPlans(this.writer);
-			log.info("Population written to: " + filename);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		} finally {
-			this.close();
-			counter.printCounter();
-			counter.reset();
-		}
-	}
-
-	/**
-	 * Writes all plans to the output stream and closes it.
-	 * 
-	 */
-	public final void write(OutputStream outputStream) {
-		try {
-			this.openOutputStream(outputStream);
-			this.handler.writeHeaderAndStartElement(this.writer);
-			this.handler.startPlans(this.population, this.writer);
-			this.handler.writeSeparator(this.writer);
-			this.writePersons();
-			this.handler.endPlans(this.writer);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		} finally {
-			this.close();
-			counter.printCounter();
-			counter.reset();
-		}
-	}
 
 
 	// implementation of PersonAlgorithm
@@ -199,7 +112,7 @@ public final class StreamingPopulationWriter extends AbstractMatsimWriter implem
 	public final void closeStreaming() {
 //		if ((this.population instanceof Population) && (((Population) this.population).isStreaming())) {
 //		if ( this.population instanceof StreamingPopulationReader.StreamingPopulation ) {
-			if (this.writer != null) {
+			if (matsimWriter.getWriter() != null) {
 				writeEndPlans();
 			} else {
 				log.error("Cannot close streaming. File is not open.");
@@ -240,19 +153,25 @@ public final class StreamingPopulationWriter extends AbstractMatsimWriter implem
 
 		} ;
 		try {
-			this.openFile(filename);
-			this.handler.writeHeaderAndStartElement(this.writer);
-			this.handler.startPlans(fakepop, this.writer);
-			this.handler.writeSeparator(this.writer);
+			matsimWriter.openHere(filename);
+			this.handler.writeHeaderAndStartElement(matsimWriter.getWriter());
+			this.handler.startPlans(fakepop, matsimWriter.getWriter());
+			this.handler.writeSeparator(matsimWriter.getWriter());
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
 
+	@SuppressWarnings("static-method")
+	@Deprecated // see comments in method.  kai, dec'16
 	public final void writePersons() {
-		for (Person p : PopulationUtils.getSortedPersons(this.population).values()) {
-			writePerson(p);
-		}
+		throw new RuntimeException("this execution path does not longer exist.  See comments in code") ;
+		// you can program this yourself by using something like
+//		for (Person p : PopulationUtils.getSortedPersons(population).values()) {
+//			writePerson(p);
+//		}
+		// providing it at the level here would mean to have access to a population that is otherwise totally not needed for streaming.
+		// kai, dec'16
 	}
 
 	public final void writePerson(final Person person) {
@@ -260,7 +179,7 @@ public final class StreamingPopulationWriter extends AbstractMatsimWriter implem
 			if ((this.write_person_fraction < 1.0) && (MatsimRandom.getRandom().nextDouble() >= this.write_person_fraction)) {
 				return;
 			}
-			this.handler.writePerson(person, this.writer);
+			this.handler.writePerson(person, matsimWriter.getWriter());
 			counter.incCounter();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -269,30 +188,11 @@ public final class StreamingPopulationWriter extends AbstractMatsimWriter implem
 
 	public final void writeEndPlans() {
 		try {
-			this.handler.endPlans(this.writer);
+			this.handler.endPlans(matsimWriter.getWriter());
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-		this.close();
-	}
-
-	public final void writeV0(final String filename) {
-		this.handler = new PopulationWriterHandlerImplV0( coordinateTransformation , this.network);
-		write(filename);
-	}
-
-	public final void writeV4(final String filename) {
-		this.handler = new PopulationWriterHandlerImplV4( coordinateTransformation , this.network );
-		write(filename);
-	}
-
-	public final void writeV5(final String filename) {
-		this.handler = new PopulationWriterHandlerImplV5(coordinateTransformation);
-		write(filename);
-	}
-
-	public final BufferedWriter getWriter() {
-		return this.writer;
+		matsimWriter.closeHere();
 	}
 
 	public final void setWriterHandler(final PopulationWriterHandler handler) {

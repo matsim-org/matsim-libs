@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,21 +17,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.algorithm.scheduler;
+/**
+ * 
+ */
+package org.matsim.contrib.transEnergySim.example.car;
 
-import org.matsim.contrib.dvrp.schedule.*;
+import static org.junit.Assert.*;
 
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.testcases.MatsimTestUtils;
 
-public interface TaxibusTask
-    extends Task
-{
-    static enum TaxibusTaskType
-    {
-    	        DRIVE_EMPTY, // drive empty might be needed later.
-        STAY, //not directly related to any customer (although may be related to serving a customer; e.g. a pickup drive)
-        PICKUP, DRIVE_WITH_PASSENGER, DROPOFF;//serving n customers (TaxibusTaskWithRequests)
-    }
+/**
+ * @author  jbischoff
+ *
+ */
+/**
+ *
+ */
+public class RunTransEnergySimExampleText {
 
+	@Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-    TaxibusTaskType getTaxibusTaskType();
+	@Test
+	public void testRunTransEnegeryExample() {
+		String[] args = {testUtils.getOutputDirectory()};
+		
+		RunTransEnergySimExample.main(args);
+		Assert.assertEquals("different event files", 
+				CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "output_events.xml.gz"), 
+				CRCChecksum.getCRCFromFile(testUtils.getClassInputDirectory() + "output_events.xml.gz"));
+	}
+
 }

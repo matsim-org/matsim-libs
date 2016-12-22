@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.algorithms.XY2Links;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -47,13 +47,13 @@ public class DgOTFVisUtils {
 	}
 	
 	public static void locateAndRoutePopulation(MutableScenario scenario){
-		StreamingUtils.addAlgorithm(((Population)scenario.getPopulation()), new XY2Links(scenario));
+		StreamingDeprecated.addAlgorithm(((Population)scenario.getPopulation()), new XY2Links(scenario));
 		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore());
-		StreamingUtils.addAlgorithm(((Population)scenario.getPopulation()), new PlanRouter(
+		StreamingDeprecated.addAlgorithm(((Population)scenario.getPopulation()), new PlanRouter(
 		new TripRouterFactoryBuilderWithDefaults().build(
 				scenario ).get(
 		) ));
-		StreamingUtils.runAlgorithms(((Population)scenario.getPopulation()));
+		StreamingDeprecated.runAlgorithms(((Population)scenario.getPopulation()));
 	}
 	
 	public static void preparePopulation4Simulation(Scenario scenario) {

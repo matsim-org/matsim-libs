@@ -26,8 +26,8 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
  * @author nagel
  *
  */
-public class StreamingUtils {
-	private static final Logger log = Logger.getLogger( StreamingUtils.class ) ;
+public class StreamingDeprecated {
+	private static final Logger log = Logger.getLogger( StreamingDeprecated.class ) ;
 	
 	@SuppressWarnings("unused")
 	public static void addAlgorithm( Population pop, PersonAlgorithm algo ) {

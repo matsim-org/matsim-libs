@@ -284,7 +284,7 @@ public class CreatePlansFromTrips {
 	}
 		
 	private void writePlans(String filename){
-		StreamingPopulationWriter writer = new StreamingPopulationWriter(scenario.getPopulation(), scenario.getNetwork());
+		StreamingPopulationWriter writer = new StreamingPopulationWriter();
 		writer.writeStartPlans(filename);
 		writer.writePersons();
 		writer.writeEndPlans();

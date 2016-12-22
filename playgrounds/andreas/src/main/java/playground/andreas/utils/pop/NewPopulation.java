@@ -37,7 +37,7 @@ public abstract class NewPopulation extends AbstractPersonAlgorithm {
 	protected Network net;
 
 	public NewPopulation(final Network network, final Population population, final String filename) {
-		this.popWriter = new StreamingPopulationWriter(population, network);
+		this.popWriter = new StreamingPopulationWriter();
 		this.popWriter.writeStartPlans(filename);
 	}
 

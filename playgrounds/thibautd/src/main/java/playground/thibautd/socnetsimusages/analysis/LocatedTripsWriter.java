@@ -30,7 +30,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationReader;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
@@ -180,7 +180,7 @@ public class LocatedTripsWriter {
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 //		final Population reader = (Population) scenario.getPopulation();
 		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
-		StreamingUtils.setIsStreaming(reader, true);
+		StreamingDeprecated.setIsStreaming(reader, true);
 		reader.addAlgorithm(new InfoFiller( filter , infos ));
 
 		new PopulationReader( scenario ).readFile( inPopFile );

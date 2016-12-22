@@ -136,7 +136,7 @@ public class InitRoutes {
 
 //		StreamingUtils.setIsStreaming(reader, true);
 //		final PopulationReader plansReader = new StreamingPopulationReader(scenario);
-		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(null, network);
+		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter();
 		Gbl.assertNotNull(this.plansfile);
 		plansWriter.startStreaming(this.plansfile);
 		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());

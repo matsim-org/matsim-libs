@@ -30,9 +30,9 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
+import playground.jbischoff.drt.scheduler.tasks.DrtTask;
+import playground.jbischoff.drt.scheduler.tasks.DrtTask.DrtTaskType;
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
-import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusTask;
-import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusTask.TaxibusTaskType;
 
 
 public abstract class AbstractTaxibusOptimizer
@@ -70,7 +70,7 @@ public abstract class AbstractTaxibusOptimizer
             
 
             for (Vehicle v : optimContext.vrpData.getVehicles().values()) {
-                optimContext.scheduler.updateTimeline((Schedule<TaxibusTask>) v.getSchedule());
+                optimContext.scheduler.updateTimeline((Schedule<DrtTask>) v.getSchedule());
             }
             if (e.getSimulationTime() % 60 == 0){
             scheduleUnplannedRequests();
@@ -108,10 +108,10 @@ public abstract class AbstractTaxibusOptimizer
     public void nextTask(Schedule<? extends Task> schedule)
     {
         @SuppressWarnings("unchecked")
-		Schedule<TaxibusTask> taxibusSchedule = (Schedule<TaxibusTask>) schedule;
+		Schedule<DrtTask> taxibusSchedule = (Schedule<DrtTask>) schedule;
         optimContext.scheduler.updateBeforeNextTask(taxibusSchedule);
 
-        TaxibusTask newCurrentTask = taxibusSchedule.nextTask();
+        DrtTask newCurrentTask = taxibusSchedule.nextTask();
 
         if (!requiresReoptimization && newCurrentTask != null) {// schedule != COMPLETED
             requiresReoptimization = doReoptimizeAfterNextTask(newCurrentTask);
@@ -119,17 +119,17 @@ public abstract class AbstractTaxibusOptimizer
     }
 
 
-    protected boolean doReoptimizeAfterNextTask(TaxibusTask newCurrentTask)
+    protected boolean doReoptimizeAfterNextTask(DrtTask newCurrentTask)
     {
         return !destinationKnown
-                && newCurrentTask.getTaxibusTaskType() == TaxibusTaskType.DRIVE_WITH_PASSENGER;
+                && newCurrentTask.getDrtTaskType() == DrtTaskType.DRIVE_WITH_PASSENGER;
     }
 
 
     @Override
     public void nextLinkEntered(DriveTask driveTask)
     {
-        optimContext.scheduler.updateTimeline((Schedule<TaxibusTask>) driveTask.getSchedule());
+        optimContext.scheduler.updateTimeline((Schedule<DrtTask>) driveTask.getSchedule());
 
         //TODO we may here possibly decide whether or not to reoptimize
         //if (delays/speedups encountered) {requiresReoptimization = true;}

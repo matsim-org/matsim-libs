@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,20 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.algorithm.scheduler;
-import java.util.Set;
+package playground.jbischoff.drt.scheduler.tasks;
 
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
+
+/**
+ * @author  jbischoff
+ *	Task for driving w/o pax
+ */
+public class DrtDriveTask extends DriveTaskImpl implements DrtTask {
+
+	public DrtDriveTask(VrpPathWithTravelData path) {
+		super(path);
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public DrtTaskType getDrtTaskType() {
+		
+		return DrtTaskType.DRIVE_EMPTY;
+	}
+
+    @Override
+    protected String commonToString()
+    {
+        return "[" + getDrtTaskType().name() + "]" + super.commonToString();
+    }
 
 
-
-public interface TaxibusTaskWithRequests
-    extends TaxibusTask
-{
-    Set<TaxibusRequest> getRequests();
-
-
-    //called (when removing a task) in order to update the request2task assignment 
-    void removeFromRequest(TaxibusRequest request);
-    void removeFromAllRequests();
 }

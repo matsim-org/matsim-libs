@@ -32,8 +32,15 @@ import org.matsim.contrib.dvrp.tracker.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
+import playground.jbischoff.drt.scheduler.tasks.DrtDriveTask;
+import playground.jbischoff.drt.scheduler.tasks.DrtDriveWithPassengerTask;
+import playground.jbischoff.drt.scheduler.tasks.DrtDropoffTask;
+import playground.jbischoff.drt.scheduler.tasks.DrtPickupTask;
+import playground.jbischoff.drt.scheduler.tasks.DrtStayTask;
+import playground.jbischoff.drt.scheduler.tasks.DrtTask;
+import playground.jbischoff.drt.scheduler.tasks.DrtTaskWithRequests;
+import playground.jbischoff.drt.scheduler.tasks.DrtTask.DrtTaskType;
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
-import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusTask.TaxibusTaskType;
 import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 
 public class TaxibusScheduler {
@@ -51,8 +58,8 @@ public class TaxibusScheduler {
         vrpData.clearRequestsAndResetSchedules();
 
 		for (Vehicle veh : this.vrpData.getVehicles().values()) {
-			Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>) veh.getSchedule();
-			schedule.addTask(new TaxibusStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
+			Schedule<DrtTask> schedule = (Schedule<DrtTask>) veh.getSchedule();
+			schedule.addTask(new DrtStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
 		}
 	}
 
@@ -63,13 +70,13 @@ public class TaxibusScheduler {
 	public boolean isIdle(Vehicle vehicle) {
 		if (!isStarted(vehicle))
 			return false;
-		Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>) vehicle.getSchedule();
-		TaxibusTask currentTask = schedule.getCurrentTask();
-		return Schedules.isLastTask(currentTask) && currentTask.getTaxibusTaskType() == TaxibusTaskType.STAY;
+		Schedule<DrtTask> schedule = (Schedule<DrtTask>) vehicle.getSchedule();
+		DrtTask currentTask = schedule.getCurrentTask();
+		return Schedules.isLastTask(currentTask) && currentTask.getDrtTaskType() == DrtTaskType.STAY;
 	}
 
 	public boolean isStarted(Vehicle vehicle) {
-		Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>) vehicle.getSchedule();
+		Schedule<DrtTask> schedule = (Schedule<DrtTask>) vehicle.getSchedule();
 		if (timer.getTimeOfDay() >= vehicle.getT1() || schedule.getStatus() != ScheduleStatus.STARTED) {
 			return false;
 		} else
@@ -92,16 +99,16 @@ public class TaxibusScheduler {
 			return null;
 		}
 
-		Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>) veh.getSchedule();
+		Schedule<DrtTask> schedule = (Schedule<DrtTask>) veh.getSchedule();
 		Link link;
 		double time;
 
 		switch (schedule.getStatus()) {
 		case PLANNED:
 		case STARTED:
-			TaxibusTask lastTask = Schedules.getLastTask(schedule);
+			DrtTask lastTask = Schedules.getLastTask(schedule);
 
-			switch (lastTask.getTaxibusTaskType()) {
+			switch (lastTask.getDrtTaskType()) {
 			case STAY:
 				link = ((StayTask) lastTask).getLink();
 				time = Math.max(lastTask.getBeginTime(), timer.getTimeOfDay());// TODO
@@ -134,14 +141,14 @@ public class TaxibusScheduler {
 			throw new RuntimeException("Diversion must be on");
 		}
 
-		Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>) veh.getSchedule();
+		Schedule<DrtTask> schedule = (Schedule<DrtTask>) veh.getSchedule();
 
 		if (/* context.getTime() >= veh.getT1() || */schedule.getStatus() != ScheduleStatus.STARTED) {
 			return null;
 		}
 
-		TaxibusTask currentTask = schedule.getCurrentTask();
-		if (!Schedules.isLastTask(currentTask) || currentTask.getTaxibusTaskType() != TaxibusTaskType.DRIVE_EMPTY) {
+		DrtTask currentTask = schedule.getCurrentTask();
+		if (!Schedules.isLastTask(currentTask) || currentTask.getDrtTaskType() != DrtTaskType.DRIVE_EMPTY) {
 			return null;
 		}
 
@@ -161,9 +168,9 @@ public class TaxibusScheduler {
 
 	public void scheduleRequest(TaxibusDispatch best) {
 
-		Schedule<TaxibusTask> bestSched = (Schedule<TaxibusTask>) best.vehicle.getSchedule();
+		Schedule<DrtTask> bestSched = (Schedule<DrtTask>) best.vehicle.getSchedule();
 
-		TaxibusTask lastTask = Schedules.getLastTask(bestSched);
+		DrtTask lastTask = Schedules.getLastTask(bestSched);
 //		log.info("Bus " + best.vehicle.getId() + " Scheduled Route");
 //		for (VrpPathWithTravelData path : best.path) {
 //			log.info(path.getFromLink().getId() + " to " + path.getToLink().getId());
@@ -181,10 +188,10 @@ public class TaxibusScheduler {
 		Set<TaxibusRequest> pickedUp = new LinkedHashSet<>();
 		TreeSet<TaxibusRequest> pickUpsForLink = null;
 		TreeSet<TaxibusRequest> dropOffsForLink = null;
-		if (lastTask.getTaxibusTaskType() == TaxibusTaskType.STAY) {
+		if (lastTask.getDrtTaskType() == DrtTaskType.STAY) {
 			best.failIfAnyRequestNotUnplanned();
 			path = iterator.next();
-			scheduleDriveToFirstRequest((TaxibusStayTask) lastTask, bestSched, path);
+			scheduleDriveToFirstRequest((DrtStayTask) lastTask, bestSched, path);
 			lastEndTime = path.getArrivalTime();
 			path = iterator.next();
 			pickUpsForLink = best.getPickUpsForLink(path.getFromLink());
@@ -203,13 +210,13 @@ public class TaxibusScheduler {
 				lastEndTime = scheduleDropOffs(bestSched, onBoard, dropOffsForLink, droppedOff, lastEndTime);
 			}
 
-		} else if (lastTask.getTaxibusTaskType() == TaxibusTaskType.PICKUP) {
+		} else if (lastTask.getDrtTaskType() == DrtTaskType.PICKUP) {
 //			best.failIfRequestNotUnplannedOrDispatched();
 			lastEndTime = lastTask.getEndTime();
 			path = iterator.next();
 
 		} else {
-			for (TaxibusTask task : bestSched.getTasks()){
+			for (DrtTask task : bestSched.getTasks()){
 				log.error(task.toString()+" " +task.getType() +" "+task.getStatus() );
 			}
 			throw new IllegalStateException();
@@ -272,13 +279,13 @@ public class TaxibusScheduler {
 //		log.info("Done Scheduling");
 	}
 
-	private double scheduleDropOffs(Schedule<TaxibusTask> bestSched, Set<TaxibusRequest> onBoard,
+	private double scheduleDropOffs(Schedule<DrtTask> bestSched, Set<TaxibusRequest> onBoard,
 			TreeSet<TaxibusRequest> dropOffsForLink, Set<TaxibusRequest> droppedOff, double beginTime) {
 		for (TaxibusRequest req : dropOffsForLink) {
 			if (droppedOff.contains(req))
 				continue;
 			double endTime = beginTime + params.dropoffDuration;
-			bestSched.addTask(new TaxibusDropoffTask(beginTime, endTime, req));
+			bestSched.addTask(new DrtDropoffTask(beginTime, endTime, req));
 			// log.info("schedule dropoff" +
 			// req.getPassenger().getId().toString()+ " at link
 			// "+req.getToLink().getId());
@@ -292,14 +299,14 @@ public class TaxibusScheduler {
 		return beginTime;
 	}
 
-	private double schedulePickups(Schedule<TaxibusTask> bestSched, double beginTime, Set<TaxibusRequest> onBoard,
+	private double schedulePickups(Schedule<DrtTask> bestSched, double beginTime, Set<TaxibusRequest> onBoard,
 			Set<TaxibusRequest> pickedUp, TreeSet<TaxibusRequest> pickUpsForLink) {
 
 		for (TaxibusRequest req : pickUpsForLink) {
 			if (pickedUp.contains(req))
 				continue;
 			double t3 = Math.max(beginTime, req.getT0()) + params.pickupDuration;
-			bestSched.addTask(new TaxibusPickupTask(beginTime, t3, req));
+			bestSched.addTask(new DrtPickupTask(beginTime, t3, req));
 //			 log.info("schedule pickup" +
 //			 req.getPassenger().getId().toString() + " at link "+req.getFromLink().getId());
 			onBoard.add(req);
@@ -309,7 +316,7 @@ public class TaxibusScheduler {
 		return beginTime;
 	}
 
-	private double scheduleDriveAlongPath(Schedule<TaxibusTask> bestSched, VrpPathWithTravelData path,
+	private double scheduleDriveAlongPath(Schedule<DrtTask> bestSched, VrpPathWithTravelData path,
 			Set<TaxibusRequest> onBoard, double lastEndtime) {
 
 		// VrpPathWithTravelData updatedPath = new
@@ -317,7 +324,7 @@ public class TaxibusScheduler {
 		// path.getTravelTime(), path.getTravelCost(), path.getLinks(),
 		// path.getLinkTTs());
 
-		TaxibusDriveWithPassengerTask task = new TaxibusDriveWithPassengerTask(onBoard, path);
+		DrtDriveWithPassengerTask task = new DrtDriveWithPassengerTask(onBoard, path);
 		task.setBeginTime(lastEndtime);
 //		for (int i = 0; i < path.getLinkCount(); i++) {
 //			log.info(path.getLink(i).getId().toString());
@@ -329,7 +336,7 @@ public class TaxibusScheduler {
 		return endTime;
 	}
 
-	private void scheduleDriveToFirstRequest(TaxibusStayTask lastTask, Schedule<TaxibusTask> bestSched,
+	private void scheduleDriveToFirstRequest(DrtStayTask lastTask, Schedule<DrtTask> bestSched,
 			VrpPathWithTravelData path) {
 		switch (lastTask.getStatus()) {
 		case STARTED:
@@ -357,7 +364,7 @@ public class TaxibusScheduler {
 		}
 
 		if (path.getLinkCount() > 1) {
-			bestSched.addTask(new TaxibusDriveTask(path));
+			bestSched.addTask(new DrtDriveTask(path));
 		}
 	}
 
@@ -365,7 +372,7 @@ public class TaxibusScheduler {
 	 * Check and decide if the schedule should be updated due to if vehicle is
 	 * Update timings (i.e. beginTime and endTime) of all tasks in the schedule.
 	 */
-	public void updateBeforeNextTask(Schedule<TaxibusTask> schedule) {
+	public void updateBeforeNextTask(Schedule<DrtTask> schedule) {
 		// Assumption: there is no delay as long as the schedule has not been
 		// started (PLANNED)
 		if (schedule.getStatus() != ScheduleStatus.STARTED) {
@@ -373,26 +380,26 @@ public class TaxibusScheduler {
 		}
 
 		double endTime = timer.getTimeOfDay();
-		TaxibusTask currentTask = schedule.getCurrentTask();
+		DrtTask currentTask = schedule.getCurrentTask();
 
 		updateTimelineImpl(schedule, endTime);
 
 	}
 
-	protected void appendTasksAfterDropoff(Schedule<TaxibusTask> schedule) {
+	protected void appendTasksAfterDropoff(Schedule<DrtTask> schedule) {
 		appendStayTask(schedule);
 	}
 
-	protected void appendStayTask(Schedule<TaxibusTask> schedule) {
+	protected void appendStayTask(Schedule<DrtTask> schedule) {
 		double tBegin = schedule.getEndTime();
 		double tEnd = Math.max(tBegin, schedule.getVehicle().getT1());// even
 																		// 0-second
 																		// WAIT
 		Link link = Schedules.getLastLinkInSchedule(schedule);
-		schedule.addTask(new TaxibusStayTask(tBegin, tEnd, link));
+		schedule.addTask(new DrtStayTask(tBegin, tEnd, link));
 	}
 
-	public void updateTimeline(Schedule<TaxibusTask> schedule) {
+	public void updateTimeline(Schedule<DrtTask> schedule) {
 		if (schedule.getStatus() != ScheduleStatus.STARTED) {
 			return;
 		}
@@ -401,7 +408,7 @@ public class TaxibusScheduler {
 		updateTimelineImpl(schedule, predictedEndTime);
 	}
 
-	private void updateTimelineImpl(Schedule<TaxibusTask> schedule, double newTaskEndTime) {
+	private void updateTimelineImpl(Schedule<DrtTask> schedule, double newTaskEndTime) {
 		Task currentTask = schedule.getCurrentTask();
 		if (currentTask.getEndTime() == newTaskEndTime) {
 			return;
@@ -409,14 +416,14 @@ public class TaxibusScheduler {
 
 		currentTask.setEndTime(newTaskEndTime);
 
-		List<TaxibusTask> tasks = schedule.getTasks();
+		List<DrtTask> tasks = schedule.getTasks();
 		int startIdx = currentTask.getTaskIdx() + 1;
 		double t = newTaskEndTime;
 
 		for (int i = startIdx; i < tasks.size(); i++) {
-			TaxibusTask task = tasks.get(i);
+			DrtTask task = tasks.get(i);
 
-			switch (task.getTaxibusTaskType()) {
+			switch (task.getDrtTaskType()) {
 			case STAY: {
 				if (i == tasks.size() - 1) {// last task
 					task.setBeginTime(t);
@@ -459,7 +466,7 @@ public class TaxibusScheduler {
 
 			case PICKUP: {
 				task.setBeginTime(t);// t == taxi's arrival time
-				double t0 = ((TaxibusPickupTask) task).getRequest().getT0();// t0
+				double t0 = ((DrtPickupTask) task).getRequest().getT0();// t0
 																			// ==
 																			// passenger's
 																			// departure
@@ -493,14 +500,14 @@ public class TaxibusScheduler {
 	 * TAXI_DISPATCHED See {@link TaxiRequestStatus}
 	 */
 
-	public Set<TaxibusRequest> getCurrentlyPlannedRequests(Schedule<TaxibusTask> schedule) {
+	public Set<TaxibusRequest> getCurrentlyPlannedRequests(Schedule<DrtTask> schedule) {
 		Set<TaxibusRequest> plannedRequests = new HashSet<>();
-		List<TaxibusTask> tasks = schedule.getTasks();
+		List<DrtTask> tasks = schedule.getTasks();
 
 		for (int i = schedule.getTaskCount() - 1; i > schedule.getCurrentTask().getTaskIdx(); i--) {
-			TaxibusTask task = tasks.get(i);
-			if (task instanceof TaxibusTaskWithRequests) {
-				plannedRequests.addAll(((TaxibusTaskWithRequests) task).getRequests());
+			DrtTask task = tasks.get(i);
+			if (task instanceof DrtTaskWithRequests) {
+				plannedRequests.addAll(((DrtTaskWithRequests) task).getRequests());
 			}
 
 		}

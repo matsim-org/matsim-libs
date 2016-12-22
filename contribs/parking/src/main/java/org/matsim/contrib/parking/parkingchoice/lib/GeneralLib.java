@@ -724,7 +724,7 @@ public class GeneralLib {
 	 */
 	public static void writePersons(Collection<? extends Person> persons,
 			String outputPlansFileName, Network network) {
-		StreamingPopulationWriter popWriter = new StreamingPopulationWriter(PopulationUtils.createPopulation(((MutableScenario) null).getConfig(), ((MutableScenario) null).getNetwork()), network);
+		StreamingPopulationWriter popWriter = new StreamingPopulationWriter();
 		popWriter.writeStartPlans(outputPlansFileName);
 
 		for (Person person : persons) {
@@ -743,7 +743,7 @@ public class GeneralLib {
 	 */
 	public static void writePersons(Collection<? extends Person> persons,
 			String outputPlansFileName, Network network, MutableScenario scenario) {
-		StreamingPopulationWriter popWriter = new StreamingPopulationWriter(PopulationUtils.createPopulation(scenario.getConfig(), scenario.getNetwork()), network);
+		StreamingPopulationWriter popWriter = new StreamingPopulationWriter();
 		popWriter.writeStartPlans(outputPlansFileName);
 
 		for (Person person : persons) {

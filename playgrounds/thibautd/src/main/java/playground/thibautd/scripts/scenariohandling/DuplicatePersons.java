@@ -29,7 +29,7 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -82,12 +82,10 @@ public class DuplicatePersons {
 			throw new RuntimeException("I don't think that the following will work any more with the changed streaming api, sorry.  kai, jul'16" ) ;
 		}
 		
-		StreamingUtils.setIsStreaming(reader, true);
+		StreamingDeprecated.setIsStreaming(reader, true);
 
 		final StreamingPopulationWriter writer =
-			new StreamingPopulationWriter(
-					scenario.getPopulation(),
-					scenario.getNetwork() );
+			new StreamingPopulationWriter( );
 		writer.writeStartPlans( outPopulation );
 
 		final Map<String, Set<String>> clones = new HashMap< >();

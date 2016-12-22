@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,69 +17,68 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.algorithm.scheduler;
+package playground.jbischoff.drt.scheduler.tasks;
 
-import java.util.HashSet;
+import java.util.Set;
 
-import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
 
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 
 
-public class TaxibusPickupTask
-    extends StayTaskImpl
-    implements TaxibusTaskWithRequests
-{
-    private final TaxibusRequest request;
+/**
+ * @author  jbischoff
+ *
+ */
+public class DrtDriveWithPassengerTask extends DriveTaskImpl implements DrtTaskWithRequests {
+	
+	private Set<TaxibusRequest> requests;
+	
+	public DrtDriveWithPassengerTask(Set<TaxibusRequest> requests, VrpPathWithTravelData path) {
+		super(path);
+		this.requests = requests;
+		for (TaxibusRequest req: this.requests){
+			req.addDriveWithPassengerTask(this);
+		}
+		}
 
-
-    public TaxibusPickupTask(double beginTime, double endTime, TaxibusRequest request)
-    {
-        super(beginTime, endTime, request.getFromLink());
-
-        this.request = request;
-        request.setPickupTask(this);
-    }
-
-    @Override
-    public TaxibusTaskType getTaxibusTaskType()
-    {
-        return TaxibusTaskType.PICKUP;
-    }
-
-
-    public TaxibusRequest getRequest()
-    {
-        return request;
-    }
-
-
-    @Override
-    protected String commonToString()
-    {
-        return "[" + getTaxibusTaskType().name() + "]" + super.commonToString();
-    }
-
+	
 
 	@Override
-	public HashSet<TaxibusRequest> getRequests() {
-		HashSet<TaxibusRequest> t = new HashSet<>();
-		t.add(request);
-		return t;
+	public DrtTaskType getDrtTaskType() {
+		
+		return DrtTaskType.DRIVE_WITH_PASSENGER;
 	}
+	
+	
 
+	@Override
+	public Set<TaxibusRequest> getRequests() {
+		return requests;
+	}
+	
+
+	
 
 	@Override
 	public void removeFromRequest(TaxibusRequest request) {
-		if (request!=this.request) {
-			throw new IllegalStateException();
-		}
-		request.setPickupTask(null);
 		
+		request.addDriveWithPassengerTask(null);
+		this.requests.remove(request);
+
 	}
-	
+
 	@Override
 	public void removeFromAllRequests() {
-		removeFromRequest(this.request);
+		for (TaxibusRequest request : this.requests){
+			request.addDriveWithPassengerTask(null);
+			
+		}
+		this.requests.clear();
 	}
+
+
+	
+
 }

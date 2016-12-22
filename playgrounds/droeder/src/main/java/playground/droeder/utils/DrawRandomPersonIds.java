@@ -34,7 +34,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -62,7 +62,7 @@ final class DrawRandomPersonIds {
 		Scenario sc =  ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Set<Id> ids =  new HashSet<Id>();
 		
-		StreamingUtils.setIsStreaming(((Population) sc.getPopulation()), true);
+		StreamingDeprecated.setIsStreaming(((Population) sc.getPopulation()), true);
 		final PersonAlgorithm algo = new PersonAlgorithm() {
 			
 			private Random r = null;
@@ -96,7 +96,7 @@ final class DrawRandomPersonIds {
 				return (r.nextDouble() < sample);
 			}
 		};
-		StreamingUtils.addAlgorithm(((Population) sc.getPopulation()), algo);
+		StreamingDeprecated.addAlgorithm(((Population) sc.getPopulation()), algo);
 		new PopulationReader(sc).readFile(pFile);
 		BufferedWriter w = IOUtils.getBufferedWriter(out);
 		
