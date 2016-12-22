@@ -31,6 +31,7 @@ import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
 import org.matsim.contrib.transEnergySim.vehicles.impl.BatteryElectricVehicleImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -52,20 +53,26 @@ public class RunTransEnergySimExample {
 	
 	private static final Logger log = Logger.getLogger(RunTransEnergySimExample.class);
 	private static final String CONFIG = "test/input/org/matsim/contrib/transEnergySim/controllers/TestInductiveChargingController/config.xml";
-	private static final String ESTATS =  "output/estats.txt"; //fairly simple statistics about energy consumption on each link
+	private static  String outputDir =  "output/"; // Simulation output 
+	private static  String estats ;
+	
 	private DisChargingControler c;
-	
-		
-	
-	
+
 	public void run(){
 		c.run();
-		c.writeStatisticsToFile(ESTATS);
+		c.writeStatisticsToFile(estats);
 		
 	}
 	public static void main(String[] args){
+		if (args != null){
+			// use the given output if args is not null
+			outputDir = args[0];
+		}
+		estats = outputDir + "/estats.txt";
 		RunTransEnergySimExample runner = new RunTransEnergySimExample();
-		runner.setUpControler(CONFIG);
+		Config config = ConfigUtils.loadConfig(CONFIG);
+		config.controler().setOutputDirectory(outputDir);
+		runner.setUpControler(config);
 		runner.run();
 	}
 
@@ -74,11 +81,11 @@ public class RunTransEnergySimExample {
 
 
 
-	private void setUpControler(String configFile) {
+	private void setUpControler(Config config) {
 		log.info("Setting up emob controler");
 		int batteryCapacityInJoules = 25*1000*3600;
 		EnergyConsumptionModel faria = new EnergyConsumptionModelRicardoFaria2012();
-		this.sc = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
+		this.sc = ScenarioUtils.loadScenario(config);
 		HashMap<Id<Vehicle>,Vehicle> vehicles = new HashMap<Id<Vehicle>, Vehicle>();
 		for (Person p : this.sc.getPopulation().getPersons().values()){
 		    Id<Vehicle> vid = Id.create(p.getId(), Vehicle.class);
