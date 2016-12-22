@@ -182,9 +182,10 @@ import java.util.Set;
 			if (NetworkUtils.getOrigId( li ) != null) {
 				out.write(" origid=\"" + NetworkUtils.getOrigId( li ) + "\"");
 			}
-			if (NetworkUtils.getType(li) != null) {
-				out.write(" type=\"" + NetworkUtils.getType(li) + "\"");
-			}
+//			if (NetworkUtils.getType(li) != null) {
+//				out.write(" type=\"" + NetworkUtils.getType(li) + "\"");
+//			}
+			// is now in the attributes, no special treatment. kai, dec'16
 		}
 		out.write(" >\n");
 

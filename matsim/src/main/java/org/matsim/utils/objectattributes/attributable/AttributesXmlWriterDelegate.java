@@ -46,6 +46,9 @@ public class AttributesXmlWriterDelegate {
 
 			// write attributes
 			for (Map.Entry<String, Object> objAttribute : objAttributes.entrySet()) {
+				
+				log.warn("key=" + objAttribute.getKey() + ", value=" + objAttribute.getValue() );
+				
 				Class<?> clazz = objAttribute.getValue().getClass();
 				AttributeConverter<?> conv = this.converters.get(clazz);
 				if (conv != null) {

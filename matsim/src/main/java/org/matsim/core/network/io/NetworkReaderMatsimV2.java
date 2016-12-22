@@ -127,37 +127,35 @@ public final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 
 	private void startLinks(final Attributes atts) {
 		double capacityPeriod = 3600.0; //the default of one hour
-		if (this.network instanceof Network) {
-			String capperiod = atts.getValue("capperiod");
-			if (capperiod != null) {
-				capacityPeriod = Time.parseTime(capperiod);
-			}
-			else {
-				log.warn("capperiod was not defined. Using default value of " + Time.writeTime(capacityPeriod) + ".");
-			}
-			this.network.setCapacityPeriod(capacityPeriod);
+		String capperiod = atts.getValue("capperiod");
+		if (capperiod != null) {
+			capacityPeriod = Time.parseTime(capperiod);
+		}
+		else {
+			log.warn("capperiod was not defined. Using default value of " + Time.writeTime(capacityPeriod) + ".");
+		}
+		this.network.setCapacityPeriod(capacityPeriod);
 
-			String effectivecellsize = atts.getValue("effectivecellsize");
-			if (effectivecellsize == null){
-				this.network.setEffectiveCellSize(7.5); // we use a default cell size of 7.5 meters
-			} else {
-				this.network.setEffectiveCellSize(Double.parseDouble(effectivecellsize));
-			}
+		String effectivecellsize = atts.getValue("effectivecellsize");
+		if (effectivecellsize == null){
+			this.network.setEffectiveCellSize(7.5); // we use a default cell size of 7.5 meters
+		} else {
+			this.network.setEffectiveCellSize(Double.parseDouble(effectivecellsize));
+		}
 
-			String effectivelanewidth = atts.getValue("effectivelanewidth");
-			if (effectivelanewidth == null) {
-				this.network.setEffectiveLaneWidth(3.75); // the default lane width is 3.75
-			} else {
-				this.network.setEffectiveLaneWidth(Double.parseDouble(effectivelanewidth));
-			}
+		String effectivelanewidth = atts.getValue("effectivelanewidth");
+		if (effectivelanewidth == null) {
+			this.network.setEffectiveLaneWidth(3.75); // the default lane width is 3.75
+		} else {
+			this.network.setEffectiveLaneWidth(Double.parseDouble(effectivelanewidth));
+		}
 
-			if ((atts.getValue("capPeriod") != null) || (atts.getValue("capDivider") != null) || (atts.getValue("capdivider") != null)) {
-				log.warn("Found capPeriod, capDivider and/or capdivider in the links element.  They will be ignored, since they " +
-						"should be set in the network element. -- This is a weird warning, since setting them in the " +
-						"network element also produces a warning.");
-				log.warn("At this point, it seems that, in network.xml, one sets capperiod in the `links' section, but in the " +
-						"matsim api, the corresponding entry belongs into the `network' object. kai, jun'11") ;
-			}
+		if ((atts.getValue("capPeriod") != null) || (atts.getValue("capDivider") != null) || (atts.getValue("capdivider") != null)) {
+			log.warn("Found capPeriod, capDivider and/or capdivider in the links element.  They will be ignored, since they " +
+					"should be set in the network element. -- This is a weird warning, since setting them in the " +
+					"network element also produces a warning.");
+			log.warn("At this point, it seems that, in network.xml, one sets capperiod in the `links' section, but in the " +
+					"matsim api, the corresponding entry belongs into the `network' object. kai, jun'11") ;
 		}
 	}
 
@@ -207,10 +205,15 @@ public final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 		l.setCapacity(Double.parseDouble(atts.getValue("capacity")));
 		l.setNumberOfLanes(Double.parseDouble(atts.getValue("permlanes")));
 		this.network.addLink(l);
-		if (l instanceof Link) {
-			NetworkUtils.setOrigId( (l), atts.getValue("origid") ) ;
-			NetworkUtils.setType( (l), atts.getValue("type"));
+
+		NetworkUtils.setOrigId( (l), atts.getValue("origid") ) ;
+		{
+			final String value = atts.getValue("type");
+			if ( value != null ) {
+				NetworkUtils.setType( (l), value); // will now put it into the attributes. kai, dec'16
+			}
 		}
+		
 		if (atts.getValue("modes") != null) {
 			String[] strModes = StringUtils.explode(atts.getValue("modes"), ',');
 			if ((strModes.length == 1) && strModes[0].isEmpty()) {

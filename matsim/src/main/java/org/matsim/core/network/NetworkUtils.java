@@ -626,21 +626,30 @@ public class NetworkUtils {
 		return link.getLength() / link.getFreespeed(time) ;
 	}
 
-
+	static final String TYPE="type" ;
 	public static void setType( Link link , String type ) {
-		if ( link instanceof LinkImpl ) {
-			((LinkImpl)link).setType2( type ) ;
-		} else {
-			throw new RuntimeException("wrong implementation of interface Link to do this") ;
+//		if ( link instanceof LinkImpl ) {
+//			((LinkImpl)link).setType2( type ) ;
+//		} else {
+//			throw new RuntimeException("wrong implementation of interface Link to do this") ;
+//		}
+		if ( type != null ) {
+			link.getAttributes().putAttribute(TYPE, type) ;
 		}
 	}
 
 
 	public static String getType(Link link) {
-		if ( link instanceof LinkImpl ) {
-			return ((LinkImpl)link).getType2() ;	
+//		if ( link instanceof LinkImpl ) {
+//			return ((LinkImpl)link).getType2() ;	
+//		} else {
+//			throw new RuntimeException( "getType not possible for this implementation of interface Link" ) ;
+//		}
+		final String retval = (String) link.getAttributes().getAttribute(TYPE);
+		if ( retval != null ) {
+			return retval ;
 		} else {
-			throw new RuntimeException( "getType not possible for this implementation of interface Link" ) ;
+			return null ;
 		}
 	}
 
