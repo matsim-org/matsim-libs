@@ -60,7 +60,7 @@ public class SignalsModule extends AbstractModule {
 	}
 
 	@Provides
-	SignalSystemsManager provideSignalSystemsManager(ReplanningContext replanningContext, FromDataBuilder modelBuilder) {
+	SignalSystemsManager provideSignalSystemsManager(ReplanningContext replanningContext, SignalSystemsModelBuilder modelBuilder) {
 		SignalSystemsManager signalSystemsManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		signalSystemsManager.resetModel(replanningContext.getIteration());
 		return signalSystemsManager;
