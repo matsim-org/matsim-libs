@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.controler.SignalControlerListener;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
-import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -41,14 +40,8 @@ import playground.dgrether.signalsystems.LinkSensorManager;
 public class SensorBasedSignalControlerListener implements SignalControlerListener, IterationStartsListener,
 		ShutdownListener {
 
-	private SignalSystemsManager signalManager;
-	private LinkSensorManager sensorManager;
-	
-	@Inject SensorBasedSignalControlerListener(SignalSystemsManager signalManager, LinkSensorManager sensorManager, ControlerListenerManager clm) {
-		this.signalManager = signalManager;
-		this.sensorManager = sensorManager;
-		clm.addControlerListener(this);
-	}
+	@Inject SignalSystemsManager signalManager;
+	@Inject LinkSensorManager sensorManager;
 	
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {

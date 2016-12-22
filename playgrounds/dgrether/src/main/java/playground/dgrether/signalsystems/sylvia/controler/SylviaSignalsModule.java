@@ -73,7 +73,7 @@ public class SylviaSignalsModule extends AbstractModule {
 			
 			// bindings for sensor based signals
 			bind(LinkSensorManager.class);
-            bind(SignalControlerListener.class).to(SensorBasedSignalControlerListener.class);
+			addControlerListenerBinding().to(SensorBasedSignalControlerListener.class);
             
 			// general signal bindings
 			bind(SignalSystemsModelBuilder.class).to(FromDataBuilder.class);
