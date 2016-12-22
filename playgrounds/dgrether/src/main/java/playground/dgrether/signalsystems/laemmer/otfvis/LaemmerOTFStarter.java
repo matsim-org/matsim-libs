@@ -25,14 +25,14 @@ import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.mobsim.SignalEngine;
+import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.lanes.data.Lanes;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+
 import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalModelFactory;
 import playground.dgrether.utils.DgOTFVisUtils;
@@ -52,8 +52,7 @@ public class LaemmerOTFStarter {
 	public void playScenario(Scenario scenario){
 		EventsManager events = EventsUtils.createEventsManager();
 
-		LinkSensorManager sensorManager = new LinkSensorManager(scenario);
-		events.addHandler(sensorManager);
+		LinkSensorManager sensorManager = new LinkSensorManager(scenario, events);
 		
 		DefaultSignalModelFactory defaultSignalModelFactory = new DefaultSignalModelFactory();
 		LaemmerSignalModelFactory signalModelFactory = new LaemmerSignalModelFactory(defaultSignalModelFactory, sensorManager);

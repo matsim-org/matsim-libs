@@ -65,8 +65,7 @@ public class DgGershensonRoederLiveVisStarter {
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, new DgGershensonRoederSignalModelFactory(new DefaultSignalModelFactory()) , events);
 		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
-		LinkSensorManager sensorManager = new LinkSensorManager(scenario);
-		events.addHandler(sensorManager);
+		LinkSensorManager sensorManager = new LinkSensorManager(scenario, events);
 		for (SignalSystem ss : signalManager.getSignalSystems().values()){
 			if (ss.getSignalController() instanceof DgRoederGershensonController){
 				((DgRoederGershensonController)ss.getSignalController()).setStorageCapFactor(scenario.getConfig().qsim().getStorageCapFactor());

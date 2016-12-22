@@ -62,8 +62,7 @@ public class DgRoederGershensonControllerListener implements SignalControlerList
 
 		
 		//TODO init gershenson controller and sensor manager here
-		LinkSensorManager sensorManager = new LinkSensorManager(scenario);
-		event.getServices().getEvents().addHandler(sensorManager);
+		LinkSensorManager sensorManager = new LinkSensorManager(scenario, event.getServices().getEvents());
 		for (SignalSystem ss : this.signalManager.getSignalSystems().values()){
 			if (ss.getSignalController() instanceof DgRoederGershensonController){
 				((DgRoederGershensonController)ss.getSignalController()).initSignalGroupMetadata(scenario.getNetwork(), (Lanes) scenario.getScenarioElement(Lanes.ELEMENT_NAME));

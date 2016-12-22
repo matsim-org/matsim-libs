@@ -21,7 +21,6 @@ package playground.dgrether.signalsystems.sylvia.run;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
-import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.mobsim.SignalEngine;
@@ -71,8 +70,7 @@ public class SylviaOTFVisMain {
 		EventsManager events = EventsUtils.createEventsManager();
 //		scenario.getConfig().otfVis().setAgentSize(40.0f);
 
-		LinkSensorManager sensorManager = new LinkSensorManager(scenario);
-		events.addHandler(sensorManager);
+		LinkSensorManager sensorManager = new LinkSensorManager(scenario, events);
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 
 				new DgSylviaSignalModelFactory(sensorManager, new DgSylviaConfig()) , events);

@@ -19,6 +19,12 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.laemmer.controler;
 
+import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
+import org.matsim.contrib.signals.builder.FromDataBuilder;
+import org.matsim.contrib.signals.controler.SignalControlerListener;
+import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
+import org.matsim.contrib.signals.mobsim.SignalEngine;
+import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -26,13 +32,6 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.MutableScenario;
-import org.matsim.lanes.data.Lanes;
-import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
-import org.matsim.contrib.signals.builder.FromDataBuilder;
-import org.matsim.contrib.signals.controler.SignalControlerListener;
-import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
-import org.matsim.contrib.signals.mobsim.SignalEngine;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalModelFactory;
@@ -54,8 +53,7 @@ public class LaemmerSignalControlerListener implements SignalControlerListener ,
 	public void notifyStartup(StartupEvent event) {
 		MutableScenario scenario = (MutableScenario) event.getServices().getScenario();
 		
-		this.sensorManager = new LinkSensorManager(event.getServices().getScenario());
-		event.getServices().getEvents().addHandler(sensorManager);
+		this.sensorManager = new LinkSensorManager(event.getServices().getScenario(), event.getServices().getEvents());
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 
 				new LaemmerSignalModelFactory(new DefaultSignalModelFactory(), sensorManager) , event.getServices().getEvents());
