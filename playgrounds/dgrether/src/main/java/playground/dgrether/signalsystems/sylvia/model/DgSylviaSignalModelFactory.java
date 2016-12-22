@@ -45,13 +45,12 @@ public final class DgSylviaSignalModelFactory implements SignalModelFactory {
 	
 	private static final Logger log = Logger.getLogger(DgSylviaSignalModelFactory.class);
 	
-	// TODO how to inject this?
 	private SignalModelFactory delegate = new DefaultSignalModelFactory();
 	
 	private LinkSensorManager sensorManager;
 	private DgSylviaConfig sylviaConfig;
 
-	@Inject
+	@Inject 
 	public DgSylviaSignalModelFactory(LinkSensorManager sensorManager, DgSylviaConfig sylviaConfig) {
 		this.sensorManager = sensorManager;
 		this.sylviaConfig = sylviaConfig;
