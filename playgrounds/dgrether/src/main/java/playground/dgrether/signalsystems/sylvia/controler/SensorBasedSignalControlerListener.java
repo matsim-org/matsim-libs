@@ -61,7 +61,7 @@ public class SensorBasedSignalControlerListener implements SignalControlerListen
 		this.writeData(event.getServices().getScenario(), event.getServices().getControlerIO());
 	}
 	
-	public void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO){
+	private void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO){
 		new SignalsScenarioWriter(controlerIO).writeSignalsData(sc);
 	}	
 	
