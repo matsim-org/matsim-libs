@@ -59,11 +59,18 @@ public class FreeFloatingVehiclesContainer implements VehiclesContainer{
 		return this.freefloatingAreas;
 	}
 
-	public void reserveVehicle(CSVehicle vehicle) {
+	public boolean reserveVehicle(CSVehicle vehicle) {
 		Link link = this.availableFFvehiclesMap.get(vehicle);
+
+		if (link == null) {
+			return false;
+		}
+
 		Coord coord = link.getCoord();
 		this.availableFFvehiclesMap.remove(vehicle);
 		this.availableFFVehicleLocationQuadTree.remove(coord.getX(), coord.getY(), vehicle);
+
+		return true;
 	}
 
 	public void parkVehicle(CSVehicle vehicle, Link link) {
@@ -87,18 +94,22 @@ public class FreeFloatingVehiclesContainer implements VehiclesContainer{
 
 		CSVehicle closest = null;
 		double closestFound = searchDistance;
-		
-		for(CSVehicle vehicle: location) {
-			
+
+		for (CSVehicle vehicle: location) {
 			if (vehicle.getType().equals(typeOfVehicle)) {
-				Coord coord = this.availableFFvehiclesMap.get(vehicle).getCoord();
-				
-				if (CoordUtils.calcEuclideanDistance(startLink.getCoord(), coord) < closestFound ) {
-					closest = vehicle;
-					closestFound = CoordUtils.calcEuclideanDistance(startLink.getCoord(), coord);
+				Link vehicleLink = this.availableFFvehiclesMap.get(vehicle);
+
+				if (vehicleLink != null) {
+					Coord coord = this.availableFFvehiclesMap.get(vehicle).getCoord();
+
+					if (CoordUtils.calcEuclideanDistance(startLink.getCoord(), coord) < closestFound ) {
+						closest = vehicle;
+						closestFound = CoordUtils.calcEuclideanDistance(startLink.getCoord(), coord);
+					}
 				}
 			}
-		}		
+		}
+
 		return closest;
 	}
 
