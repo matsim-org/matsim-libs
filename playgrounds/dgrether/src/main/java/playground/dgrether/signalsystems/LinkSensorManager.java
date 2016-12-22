@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LaneEnterEventHandler;
@@ -68,11 +69,12 @@ public final class LinkSensorManager implements LinkEnterEventHandler, LinkLeave
 	private Lanes laneDefinitions = null;
 	
 	@Inject
-	public LinkSensorManager(Scenario scenario){
+	public LinkSensorManager(Scenario scenario, EventsManager events){
 		this.network = scenario.getNetwork();
 		if (scenario.getConfig().network().getLaneDefinitionsFile() != null || scenario.getConfig().qsim().isUseLanes()) {
 			laneDefinitions = scenario.getLanes();
 		}
+		events.addHandler(this);
 	}
 	
 	public void registerNumberOfCarsMonitoring(Id<Link> linkId){
