@@ -21,9 +21,12 @@ package org.matsim.contrib.signals.controler;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
+
+import com.google.inject.Inject;
 
 
 /**
@@ -34,6 +37,10 @@ import org.matsim.core.controler.listener.ShutdownListener;
  */
 final class FixedTimeSignalControlerListener implements SignalControlerListener, ShutdownListener {
 
+	@Inject FixedTimeSignalControlerListener(MatsimServices services) {
+		services.addControlerListener(this);
+	}
+	
 	@Override
 	public final void notifyShutdown(ShutdownEvent event) {
 		writeData(event.getServices().getScenario(), event.getServices().getControlerIO());

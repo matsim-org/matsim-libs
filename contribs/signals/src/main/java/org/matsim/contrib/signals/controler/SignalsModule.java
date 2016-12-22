@@ -36,35 +36,35 @@ import org.matsim.core.replanning.ReplanningContext;
 import com.google.inject.Provides;
 
 /**
- * Add this module if you want to simulate fixed-time signals.
+ * Add this module if you want to simulate fixed-time signals. 
  * It also works without signals.
  * 
  * @author tthunig
  */
 public class SignalsModule extends AbstractModule {
-    @Override
-    public void install() {
-        if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
-        	// bindings for fixed-time signals
-        	bind(SignalModelFactory.class).to(DefaultSignalModelFactory.class);
-        	bind(SignalControlerListener.class).to(FixedTimeSignalControlerListener.class);
-            addControlerListenerBinding().to(SignalControlerListener.class);
-			
-            // general signal bindings
+	@Override
+	public void install() {
+		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
+			// bindings for fixed-time signals
+			bind(SignalModelFactory.class).to(DefaultSignalModelFactory.class);
+			bind(SignalControlerListener.class).to(FixedTimeSignalControlerListener.class);
+
+			// general signal bindings
 			bind(FromDataBuilder.class);
 			bind(QSimSignalEngine.class);
 			addMobsimListenerBinding().to(QSimSignalEngine.class);
-            
-            // bind tool to write information about signal states for via
-			bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
-            addEventHandlerBinding().to(SignalEvents2ViaCSVWriter.class);
-            addControlerListenerBinding().to(SignalEvents2ViaCSVWriter.class);
-        }
-    }
 
-    @Provides SignalSystemsManager provideSignalSystemsManager(ReplanningContext replanningContext, FromDataBuilder modelBuilder) {
-        SignalSystemsManager signalSystemsManager = modelBuilder.createAndInitializeSignalSystemsManager();
-        signalSystemsManager.resetModel(replanningContext.getIteration());
-        return signalSystemsManager;
-    }
+			// bind tool to write information about signal states for via
+			bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
+			addEventHandlerBinding().to(SignalEvents2ViaCSVWriter.class);
+			addControlerListenerBinding().to(SignalEvents2ViaCSVWriter.class);
+		}
+	}
+
+	@Provides
+	SignalSystemsManager provideSignalSystemsManager(ReplanningContext replanningContext, FromDataBuilder modelBuilder) {
+		SignalSystemsManager signalSystemsManager = modelBuilder.createAndInitializeSignalSystemsManager();
+		signalSystemsManager.resetModel(replanningContext.getIteration());
+		return signalSystemsManager;
+	}
 }
