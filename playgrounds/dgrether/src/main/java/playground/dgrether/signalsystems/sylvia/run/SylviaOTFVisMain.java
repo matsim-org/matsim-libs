@@ -46,6 +46,7 @@ import playground.dgrether.utils.DgOTFVisUtils;
  * @author dgrether
  *
  */
+@Deprecated //does not use the new inject syntax for signals, see e.g. SylviaSignalsModule
 public class SylviaOTFVisMain {
 
 	public void prepare4SimAndPlay(String configFileName){
