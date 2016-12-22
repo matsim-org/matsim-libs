@@ -20,11 +20,6 @@
 
 package playground.dziemke.cemdapMatsimCadyts.cemdap2matsim;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -36,6 +31,11 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author dziemke
@@ -73,7 +73,7 @@ public class CemdapStopsParser {
 
 		try {
 			BufferedReader bufferedReader = IOUtils.getBufferedReader(cemdapStopsFile);
-			String currentLine = null;
+			String currentLine;
 
 			while ((currentLine = bufferedReader.readLine()) != null) {
 				String[] entries = currentLine.split("\t", -1);
@@ -147,7 +147,7 @@ public class CemdapStopsParser {
 	// Information from Subodh, Nov 2014
 	// see: shared-svn/projects/cemdapMatsimCadyts/cemdap_software/cemdap-11-2014/Activity_Mapping_Nov13.xlsx
 	// Also found this conversion in code from UCSB
-	private final String transformActType(int activityTypeNumber) {
+	private String transformActType(int activityTypeNumber) {
 		switch (activityTypeNumber) {
 													//	Activity 	Mapping Code
 		case 0: return ActivityTypes.SHOPPING;		//	Shopping	0
@@ -179,7 +179,7 @@ public class CemdapStopsParser {
 	}
 
 		
-	private final void cleanUp(Population population, int planNumber) {
+	private void cleanUp(Population population, int planNumber) {
 		Set<Id<Person>> idsOfPersonsToRemove = new HashSet<>();
 		for (Person person : population.getPersons().values()) {
 			Activity firstActivity = (Activity)person.getPlans().get(planNumber).getPlanElements().get(0);
