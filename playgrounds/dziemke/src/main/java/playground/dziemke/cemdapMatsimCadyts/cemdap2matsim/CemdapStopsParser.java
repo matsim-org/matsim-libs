@@ -139,7 +139,8 @@ public class CemdapStopsParser {
 		}
 		LOG.info(lineCount + " lines parsed.");
 		LOG.info(population.getPersons().size() + " persons stored.");
-		cleanUp(population, planNumber);
+//		removed this method because of unnecessary use
+//		cleanUp(population, planNumber);
 		LOG.info(population.getPersons().size()+" persons remaining.");
 	}
 	
