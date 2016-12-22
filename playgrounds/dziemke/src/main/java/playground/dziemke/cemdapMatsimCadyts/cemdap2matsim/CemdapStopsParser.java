@@ -80,7 +80,7 @@ public class CemdapStopsParser {
 				lineCount++;
 				
 				if (lineCount % 1000000 == 0) {
-					LOG.info("Line " + lineCount + ": " + population.getPersons().size() + " persons stored so far.");
+					LOG.info("Line " + lineCount);// + ": " + population.getPersons().size() + " persons stored so far.");
 					Gbl.printMemoryUsage();
 				}
 
