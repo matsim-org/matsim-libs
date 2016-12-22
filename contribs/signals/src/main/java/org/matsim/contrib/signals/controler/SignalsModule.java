@@ -27,6 +27,7 @@ import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.builder.SignalModelFactory;
+import org.matsim.contrib.signals.builder.SignalSystemsModelBuilder;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.core.config.ConfigUtils;
@@ -50,7 +51,7 @@ public class SignalsModule extends AbstractModule {
 			bind(SignalControlerListener.class).to(FixedTimeSignalControlerListener.class);
 
 			// general signal bindings
-			bind(FromDataBuilder.class);
+			bind(SignalSystemsModelBuilder.class).to(FromDataBuilder.class);
 			bind(QSimSignalEngine.class);
 			addMobsimListenerBinding().to(QSimSignalEngine.class);
 
