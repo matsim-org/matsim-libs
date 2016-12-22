@@ -31,12 +31,19 @@ public class TwoWayContainer implements VehiclesContainer{
 	}
 	
 	
-	public void reserveVehicle(CSVehicle vehicle) {		
+	public boolean reserveVehicle(CSVehicle vehicle) {
 		String stationId = ((StationBasedVehicle)vehicle).getStationId();
-		this.twvehiclesMap.remove(vehicle);		
-		
+
+		if (stationId == null) {
+			return false;
+		}
+
+		this.twvehiclesMap.remove(vehicle);
+
 		CarsharingStation station = twowaycarsharingstationsMap.get(stationId);			
 		((TwoWayCarsharingStation)station).removeCar(vehicle);				
+
+		return true;
 	}
 
 	public void parkVehicle(CSVehicle vehicle, Link link) {

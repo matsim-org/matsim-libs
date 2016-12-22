@@ -111,13 +111,19 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 						carsharingType, typeOfVehicle, companyId, searchDistance);
 				if (vehicle == null) {					
 					eventsManager.processEvent(new NoVehicleCarSharingEvent(time, startLink.getId(), carsharingType));				
+
 					return null;				
 				}
-				CompanyContainer companyContainer = this.carsharingSupplyContainer.getCompany(companyId);
 
+				CompanyContainer companyContainer = this.carsharingSupplyContainer.getCompany(companyId);
 				VehiclesContainer vehiclesContainer = companyContainer.getVehicleContainer(carsharingType);
 				Link stationLink = vehiclesContainer.getVehicleLocation(vehicle);
-				companyContainer.reserveVehicle(vehicle);
+
+				if (false == companyContainer.reserveVehicle(vehicle)) {
+					eventsManager.processEvent(new NoVehicleCarSharingEvent(time, startLink.getId(), carsharingType));
+
+					return null;
+				}
 			
 				eventsManager.processEvent(new StartRentalEvent(time, carsharingType, startLink, stationLink, person.getId(), vehicle.getVehicleId()));
 			
