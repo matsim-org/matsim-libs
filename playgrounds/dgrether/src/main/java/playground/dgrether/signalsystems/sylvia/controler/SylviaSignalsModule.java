@@ -77,7 +77,6 @@ public class SylviaSignalsModule extends AbstractModule {
             
 			// general signal bindings
 			bind(SignalSystemsModelBuilder.class).to(FromDataBuilder.class);
-			bind(QSimSignalEngine.class);
             addMobsimListenerBinding().to(QSimSignalEngine.class);
             
             // bind tool to write information about signal states for via
