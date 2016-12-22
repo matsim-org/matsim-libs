@@ -62,7 +62,7 @@ public class CemdapStops2MatsimPlansConverter {
 		int numberOfFirstCemdapOutputFile = 100;
 //		int numberOfFirstCemdapOutputFile = 90;
 
-		int numberOfPlans = 1;
+		int numberOfPlans = 5;
 		boolean allowVariousWorkAndEducationLocations = true;
 		boolean addStayHomePlan = true;
 
@@ -71,7 +71,7 @@ public class CemdapStops2MatsimPlansConverter {
 
 //		String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/" + numberOfPlansFile + "/";
 		String outputDirectory = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/matsim_initial/" + numberOfPlansFile + "/";
-		String zonalShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenLOR_DHDN_GK4.shp";
+		String zonalShapeFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/shapefiles/2013/gemeindenLOR_DHDN_GK4.shp";
 //		String cemdapDataRoot = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_output/";
 		String cemdapDataRoot = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/cemdap_output/";
 
