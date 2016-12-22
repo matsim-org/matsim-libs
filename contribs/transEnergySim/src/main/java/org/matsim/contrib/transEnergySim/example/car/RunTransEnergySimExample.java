@@ -33,6 +33,7 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria
 import org.matsim.contrib.transEnergySim.vehicles.impl.BatteryElectricVehicleImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -64,13 +65,14 @@ public class RunTransEnergySimExample {
 		
 	}
 	public static void main(String[] args){
-		if (args != null){
+		if (args.length==1){
 			// use the given output if args is not null
 			outputDir = args[0];
 		}
 		estats = outputDir + "/estats.txt";
 		RunTransEnergySimExample runner = new RunTransEnergySimExample();
 		Config config = ConfigUtils.loadConfig(CONFIG);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(outputDir);
 		runner.setUpControler(config);
 		runner.run();
@@ -84,6 +86,7 @@ public class RunTransEnergySimExample {
 	private void setUpControler(Config config) {
 		log.info("Setting up emob controler");
 		int batteryCapacityInJoules = 25*1000*3600;
+		//assuming a 25kwh battery
 		EnergyConsumptionModel faria = new EnergyConsumptionModelRicardoFaria2012();
 		this.sc = ScenarioUtils.loadScenario(config);
 		HashMap<Id<Vehicle>,Vehicle> vehicles = new HashMap<Id<Vehicle>, Vehicle>();
