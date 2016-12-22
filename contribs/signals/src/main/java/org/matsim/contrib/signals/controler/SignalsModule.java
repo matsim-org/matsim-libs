@@ -37,8 +37,7 @@ import org.matsim.core.replanning.ReplanningContext;
 import com.google.inject.Provides;
 
 /**
- * Add this module if you want to simulate fixed-time signals. 
- * It also works without signals.
+ * Add this module if you want to simulate fixed-time signals. It also works without signals.
  * 
  * @author tthunig
  */
@@ -57,8 +56,7 @@ public class SignalsModule extends AbstractModule {
 
 			// bind tool to write information about signal states for via
 			bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
-			addEventHandlerBinding().to(SignalEvents2ViaCSVWriter.class);
-			addControlerListenerBinding().to(SignalEvents2ViaCSVWriter.class);
+			/* asEagerSingleton is necessary to force creation of the SignalEvents2ViaCSVWriter class as it is never used somewhere else. theresa dec'16 */
 		}
 	}
 

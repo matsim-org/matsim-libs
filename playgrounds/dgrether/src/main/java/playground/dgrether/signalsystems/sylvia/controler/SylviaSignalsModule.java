@@ -82,8 +82,7 @@ public class SylviaSignalsModule extends AbstractModule {
             
             // bind tool to write information about signal states for via
 			bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
-            addEventHandlerBinding().to(SignalEvents2ViaCSVWriter.class);
-            addControlerListenerBinding().to(SignalEvents2ViaCSVWriter.class);
+			/* asEagerSingleton is necessary to force creation of the SignalEvents2ViaCSVWriter class as it is never used somewhere else. theresa dec'16 */
         }
 	}
 	
