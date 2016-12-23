@@ -79,7 +79,9 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 	private void createAndAddSignalSystemsFromData(SignalSystemsManager manager){
 		//process information of SignalSystemsData object
 		for (SignalSystemData ssData : this.signalsData.getSignalSystemsData().getSignalSystemData().values()){
-			manager.addSignalSystem(this.factory.createSignalSystem(ssData.getId()));
+			SignalSystem system = this.factory.createSignalSystem(ssData.getId());
+			manager.addSignalSystem(system);
+			system.setSignalSystemsManager(manager);
 		}
 	}
 	
