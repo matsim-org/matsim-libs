@@ -53,34 +53,35 @@ public class DgGershensonRoederLiveVisStarter {
 	public DgGershensonRoederLiveVisStarter(){}
 	
 	public void runCottbus(){
-		EventsManager events = EventsUtils.createEventsManager();
-		String conf = DgFigure9Runner.signalsConfigFileGershenson;
-		
-		Config config = ConfigUtils.loadConfig(conf);
-		MatsimRandom.reset(config.global().getRandomSeed());
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		ScenarioUtils.loadScenario(scenario);
-		
-		ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setAgentSize(40.0f);
-		
-		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, new DgGershensonRoederSignalModelFactory(new DefaultSignalModelFactory()) , events);
-		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
-		LinkSensorManager sensorManager = new LinkSensorManager(scenario, events);
-		for (SignalSystem ss : signalManager.getSignalSystems().values()){
-			if (ss.getSignalController() instanceof DgRoederGershensonController){
-				((DgRoederGershensonController)ss.getSignalController()).setStorageCapFactor(scenario.getConfig().qsim().getStorageCapFactor());
-				((DgRoederGershensonController)ss.getSignalController()).initSignalGroupMetadata(scenario.getNetwork(), (Lanes) scenario.getScenarioElement(Lanes.ELEMENT_NAME));
-				((DgRoederGershensonController)ss.getSignalController()).registerAndInitializeSensorManager(sensorManager);
-			}
-		}
-
-		SignalEngine engine = new QSimSignalEngine(signalManager);
-		QSim otfVisQSim = QSimUtils.createDefaultQSim(scenario, events);
-		otfVisQSim.addQueueSimulationListeners(engine);
-		
-		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
-		OTFClientLive.run(scenario.getConfig(), server);
-		otfVisQSim.run();
+//		EventsManager events = EventsUtils.createEventsManager();
+//		String conf = DgFigure9Runner.signalsConfigFileGershenson;
+//		
+//		Config config = ConfigUtils.loadConfig(conf);
+//		MatsimRandom.reset(config.global().getRandomSeed());
+//		Scenario scenario = ScenarioUtils.createScenario(config);
+//		ScenarioUtils.loadScenario(scenario);
+//		
+//		ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setAgentSize(40.0f);
+//		
+//		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, new DgGershensonRoederSignalModelFactory(new DefaultSignalModelFactory()) , events);
+//		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
+//		LinkSensorManager sensorManager = new LinkSensorManager(scenario, events);
+//		for (SignalSystem ss : signalManager.getSignalSystems().values()){
+//			if (ss.getSignalController() instanceof DgRoederGershensonController){
+//				((DgRoederGershensonController)ss.getSignalController()).setStorageCapFactor(scenario.getConfig().qsim().getStorageCapFactor());
+//				((DgRoederGershensonController)ss.getSignalController()).initSignalGroupMetadata(scenario.getNetwork(), (Lanes) scenario.getScenarioElement(Lanes.ELEMENT_NAME));
+//				((DgRoederGershensonController)ss.getSignalController()).registerAndInitializeSensorManager(sensorManager);
+//			}
+//		}
+//
+//		SignalEngine engine = new QSimSignalEngine(signalManager);
+//		QSim otfVisQSim = QSimUtils.createDefaultQSim(scenario, events);
+//		otfVisQSim.addQueueSimulationListeners(engine);
+//		
+//		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
+//		OTFClientLive.run(scenario.getConfig(), server);
+//		otfVisQSim.run();
+		throw new UnsupportedOperationException("This constructor does no longer function. Please use inject syntax insted, see e.g. SylviaSignalsModule");
 	}
 	
 	public static void main(String[] args) {

@@ -51,17 +51,17 @@ public class LaemmerSignalControlerListener implements SignalControlerListener ,
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		MutableScenario scenario = (MutableScenario) event.getServices().getScenario();
-		
-		this.sensorManager = new LinkSensorManager(event.getServices().getScenario(), event.getServices().getEvents());
-		
-		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 
-				new LaemmerSignalModelFactory(new DefaultSignalModelFactory(), sensorManager) , event.getServices().getEvents());
-		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
-		
-		SignalEngine engine = new QSimSignalEngine(this.signalManager);
+//		MutableScenario scenario = (MutableScenario) event.getServices().getScenario();
+//		
+//		this.sensorManager = new LinkSensorManager(event.getServices().getScenario(), event.getServices().getEvents());
+//		
+//		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 
+//				new LaemmerSignalModelFactory(new DefaultSignalModelFactory(), sensorManager) , event.getServices().getEvents());
+//		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
+//		
+//		SignalEngine engine = new QSimSignalEngine(this.signalManager);
 //		event.getServices().getMobsimListeners().add(engine);
-		throw new RuntimeException();
+		throw new UnsupportedOperationException("This constructor does no longer function. Please use inject syntax insted, see e.g. SylviaSignalsModule");
 	}
 
 

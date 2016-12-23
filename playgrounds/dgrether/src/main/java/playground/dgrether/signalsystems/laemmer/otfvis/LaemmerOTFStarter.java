@@ -50,23 +50,24 @@ public class LaemmerOTFStarter {
 	}
 	
 	public void playScenario(Scenario scenario){
-		EventsManager events = EventsUtils.createEventsManager();
-
-		LinkSensorManager sensorManager = new LinkSensorManager(scenario, events);
-		
-		DefaultSignalModelFactory defaultSignalModelFactory = new DefaultSignalModelFactory();
-		LaemmerSignalModelFactory signalModelFactory = new LaemmerSignalModelFactory(defaultSignalModelFactory, sensorManager);
-		
-		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, signalModelFactory , events);
-		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
-		
-		SignalEngine engine = new QSimSignalEngine(signalManager);
-		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
-		otfVisQSim.addQueueSimulationListeners(engine);
-		
-		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
-		OTFClientLive.run(scenario.getConfig(), server);
-		otfVisQSim.run();
+//		EventsManager events = EventsUtils.createEventsManager();
+//
+//		LinkSensorManager sensorManager = new LinkSensorManager(scenario, events);
+//		
+//		DefaultSignalModelFactory defaultSignalModelFactory = new DefaultSignalModelFactory();
+//		LaemmerSignalModelFactory signalModelFactory = new LaemmerSignalModelFactory(defaultSignalModelFactory, sensorManager);
+//		
+//		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, signalModelFactory , events);
+//		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
+//		
+//		SignalEngine engine = new QSimSignalEngine(signalManager);
+//		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
+//		otfVisQSim.addQueueSimulationListeners(engine);
+//		
+//		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
+//		OTFClientLive.run(scenario.getConfig(), server);
+//		otfVisQSim.run();
+		throw new UnsupportedOperationException("This constructor does no longer function. Please use inject syntax insted, see e.g. SylviaSignalsModule");
 	}
 
 }

@@ -68,23 +68,24 @@ public class SylviaOTFVisMain {
 	}
 
 	public void playScenario(Scenario scenario){
-		EventsManager events = EventsUtils.createEventsManager();
-//		scenario.getConfig().otfVis().setAgentSize(40.0f);
-
-		LinkSensorManager sensorManager = new LinkSensorManager(scenario, events);
-		
-		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 
-				new DgSylviaSignalModelFactory(sensorManager, new DgSylviaConfig()) , events);
-		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
-		
-		
-		SignalEngine engine = new QSimSignalEngine(signalManager);
-		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
-		otfVisQSim.addQueueSimulationListeners(engine);
-		
-		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
-		OTFClientLive.run(scenario.getConfig(), server);
-		otfVisQSim.run();
+		throw new UnsupportedOperationException("This constructor does no longer function. Please use inject syntax insted, see e.g. SylviaSignalsModule");
+//		EventsManager events = EventsUtils.createEventsManager();
+////		scenario.getConfig().otfVis().setAgentSize(40.0f);
+//
+//		LinkSensorManager sensorManager = new LinkSensorManager(scenario, events);
+//		
+//		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 
+//				new DgSylviaSignalModelFactory(sensorManager, new DgSylviaConfig()) , events);
+//		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
+//		
+//		
+//		SignalEngine engine = new QSimSignalEngine(signalManager);
+//		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
+//		otfVisQSim.addQueueSimulationListeners(engine);
+//		
+//		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
+//		OTFClientLive.run(scenario.getConfig(), server);
+//		otfVisQSim.run();
 	}
 	
 	

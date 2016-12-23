@@ -55,27 +55,27 @@ public class DgRoederGershensonControllerListener implements SignalControlerList
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		MutableScenario scenario = (MutableScenario) event.getServices().getScenario();
-		
-		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, new DgGershensonRoederSignalModelFactory(new DefaultSignalModelFactory()) , event.getServices().getEvents());
-		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
-
-		
-		//TODO init gershenson controller and sensor manager here
-		LinkSensorManager sensorManager = new LinkSensorManager(scenario, event.getServices().getEvents());
-		for (SignalSystem ss : this.signalManager.getSignalSystems().values()){
-			if (ss.getSignalController() instanceof DgRoederGershensonController){
-				((DgRoederGershensonController)ss.getSignalController()).initSignalGroupMetadata(scenario.getNetwork(), (Lanes) scenario.getScenarioElement(Lanes.ELEMENT_NAME));
-				((DgRoederGershensonController)ss.getSignalController()).registerAndInitializeSensorManager(sensorManager);
-			
-			}
-		}
-		
-		
-		
-		this.signalEngie = new QSimSignalEngine(this.signalManager);
+//		MutableScenario scenario = (MutableScenario) event.getServices().getScenario();
+//		
+//		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, new DgGershensonRoederSignalModelFactory(new DefaultSignalModelFactory()) , event.getServices().getEvents());
+//		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
+//
+//		
+//		//TODO init gershenson controller and sensor manager here
+//		LinkSensorManager sensorManager = new LinkSensorManager(scenario, event.getServices().getEvents());
+//		for (SignalSystem ss : this.signalManager.getSignalSystems().values()){
+//			if (ss.getSignalController() instanceof DgRoederGershensonController){
+//				((DgRoederGershensonController)ss.getSignalController()).initSignalGroupMetadata(scenario.getNetwork(), (Lanes) scenario.getScenarioElement(Lanes.ELEMENT_NAME));
+//				((DgRoederGershensonController)ss.getSignalController()).registerAndInitializeSensorManager(sensorManager);
+//			
+//			}
+//		}
+//		
+//		
+//		
+//		this.signalEngie = new QSimSignalEngine(this.signalManager);
 //		event.getServices().getMobsimListeners().add(this.signalEngie);
-		throw new RuntimeException();
+		throw new UnsupportedOperationException("This constructor does no longer function. Please use inject syntax insted, see e.g. SylviaSignalsModule");
 	}
 
 	
