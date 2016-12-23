@@ -74,7 +74,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		throw new UnsupportedOperationException("This constructor does no longer function. Please use inject syntax insted, see e.g. SylviaSignalsModule");
 	}
 	
-	public void createAndAddSignals(SignalSystem system){
+	private void createAndAddSignals(SignalSystem system){
 		SignalSystemData ssData = signalsData.getSignalSystemsData().getSignalSystemData().get(system.getId());
 		for (SignalData signalData : ssData.getSignalData().values()){
 			Signal signal = new DatabasedSignal(signalData);
@@ -82,14 +82,14 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		}
 	}
 	
-	public void createAndAddSignalSystemsFromData(SignalSystemsManager manager){
+	private void createAndAddSignalSystemsFromData(SignalSystemsManager manager){
 		//process information of SignalSystemsData object
 		for (SignalSystemData ssData : this.signalsData.getSignalSystemsData().getSignalSystemData().values()){
 			manager.addSignalSystem(this.factory.createSignalSystem(ssData.getId()));
 		}
 	}
 	
-	public void createAndAddSignalGroupsFromData(SignalSystem system){
+	private void createAndAddSignalGroupsFromData(SignalSystem system){
 		//process information of  SignalGroupsData object and create the signal groups
 		Map<Id<SignalGroup>, SignalGroupData> signalGroupDataMap = this.signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(system.getId());
 		for (SignalGroupData signalGroupData : signalGroupDataMap.values()){
@@ -102,7 +102,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		}
 	}
 	
-	public void createAndAddSignalSystemControllerFromData(SignalSystem system){
+	private void createAndAddSignalSystemControllerFromData(SignalSystem system){
 		//process information of SignalControlData
 		SignalSystemControllerData systemControlData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(system.getId());
 		SignalController controller = this.factory.createSignalSystemController(systemControlData.getControllerIdentifier());
@@ -116,7 +116,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		}
 	}
 	
-	public void createAndAddAmberLogic(SignalSystemsManager manager){
+	private void createAndAddAmberLogic(SignalSystemsManager manager){
 		//process information of AmberTimesData object
 		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseAmbertimes()){
 			AmberLogic amberLogic = new AmberLogicImpl(this.signalsData.getAmberTimesData());
@@ -124,7 +124,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		}
 	}
 	
-	public void createAndAddIntergreenTimesLogic(SignalSystemsManager manager){
+	private void createAndAddIntergreenTimesLogic(SignalSystemsManager manager){
 		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseIntergreenTimes()){
 			IntergreensLogic intergreensLogic = new IntergreensLogicImpl(this.signalsData.getIntergreenTimesData(), ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
 			this.events.addHandler(intergreensLogic);
