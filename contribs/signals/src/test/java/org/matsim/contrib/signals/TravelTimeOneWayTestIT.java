@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
@@ -102,7 +103,7 @@ public class TravelTimeOneWayTestIT {
 	}
 
 	private static SignalEngine initSignalEngine(Scenario scenario, EventsManager events) {
-		FromDataBuilder builder = new FromDataBuilder(scenario, events);
+		FromDataBuilder builder = new FromDataBuilder(scenario, new DefaultSignalModelFactory(), events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		return new QSimSignalEngine(manager);
 	}
@@ -151,7 +152,7 @@ public class TravelTimeOneWayTestIT {
 			signalPlan.setEndTime(0.0);
 
 			//build the signal model
-			FromDataBuilder builder = new FromDataBuilder(scenario, events);
+			FromDataBuilder builder = new FromDataBuilder(scenario, new DefaultSignalModelFactory(), events);
 			SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 			SignalEngine signalEngine = new QSimSignalEngine(manager);
 			//run the qsim

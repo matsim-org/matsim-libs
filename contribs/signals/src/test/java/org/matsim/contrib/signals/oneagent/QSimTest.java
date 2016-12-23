@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.mobsim.SignalEngine;
@@ -77,7 +78,7 @@ public class QSimTest implements
 		events.addHandler(this);
 		this.link2EnterTime = 38.0;
 		
-		FromDataBuilder builder = new FromDataBuilder(scenario, events);
+		FromDataBuilder builder = new FromDataBuilder(scenario, new DefaultSignalModelFactory(), events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 
@@ -110,7 +111,7 @@ public class QSimTest implements
 		events.addHandler(this);
 		this.link2EnterTime = 100.0;
 		
-		FromDataBuilder builder = new FromDataBuilder(scenario, events);
+		FromDataBuilder builder = new FromDataBuilder(scenario, new DefaultSignalModelFactory(), events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 
@@ -143,7 +144,7 @@ public class QSimTest implements
 		
 		EventsManager events = EventsUtils.createEventsManager();
 
-		FromDataBuilder builder = new FromDataBuilder(scenario, events);
+		FromDataBuilder builder = new FromDataBuilder(scenario, new DefaultSignalModelFactory(), events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 

@@ -68,11 +68,6 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		this.events = events;
 	}
 	
-	@Deprecated
-	public FromDataBuilder(Scenario scenario, EventsManager events){
-		this(scenario, new DefaultSignalModelFactory(), events);
-	}
-	
 	private void createAndAddSignals(SignalSystem system){
 		SignalSystemData ssData = signalsData.getSignalSystemsData().getSignalSystemData().get(system.getId());
 		for (SignalData signalData : ssData.getSignalData().values()){

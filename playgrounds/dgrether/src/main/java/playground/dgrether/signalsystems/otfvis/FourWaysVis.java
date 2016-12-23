@@ -21,6 +21,7 @@ package playground.dgrether.signalsystems.otfvis;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.mobsim.SignalEngine;
@@ -91,7 +92,7 @@ public class FourWaysVis {
 //		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(config.signalSystems());
 //		SignalsData signalsData = signalsLoader.loadSignalsData();
 //		scenario.addScenarioElement(SignalsData.ELEMENT_NAME , signalsData);
-		FromDataBuilder builder = new FromDataBuilder(scenario, events);
+		FromDataBuilder builder = new FromDataBuilder(scenario, new DefaultSignalModelFactory(), events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 

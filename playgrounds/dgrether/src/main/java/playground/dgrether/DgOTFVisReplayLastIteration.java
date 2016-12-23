@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
@@ -129,7 +130,7 @@ public class DgOTFVisReplayLastIteration {
 		QSim otfVisQSim = QSimUtils.createDefaultQSim(sc, events);
 		if (ConfigUtils.addOrGetModule(sc.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
 			SignalEngine engine = new QSimSignalEngine(
-					new FromDataBuilder(sc, events)
+					new FromDataBuilder(sc, new DefaultSignalModelFactory(), events)
 							.createAndInitializeSignalSystemsManager());
 			otfVisQSim.addQueueSimulationListeners(engine);
 		}

@@ -21,6 +21,7 @@ package playground.dgrether.koehlerstrehlersignal.figure9scenario;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.mobsim.SignalEngine;
@@ -56,7 +57,7 @@ public class DgFigure9OtfVis {
 		
 		ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setAgentSize(40.0f);
 		
-		FromDataBuilder builder = new FromDataBuilder(scenario, events);
+		FromDataBuilder builder = new FromDataBuilder(scenario, new DefaultSignalModelFactory(), events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 

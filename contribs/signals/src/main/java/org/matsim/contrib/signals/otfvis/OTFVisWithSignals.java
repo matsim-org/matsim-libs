@@ -25,6 +25,7 @@ package org.matsim.contrib.signals.otfvis;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
@@ -52,7 +53,7 @@ public class OTFVisWithSignals {
 		EventsManager events = EventsUtils.createEventsManager();
 		QSim qSim = QSimUtils.createDefaultQSim(scenario, events);
 		if ((boolean) ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()){
-			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario, events).createAndInitializeSignalSystemsManager());
+			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario, new DefaultSignalModelFactory(), events).createAndInitializeSignalSystemsManager());
 			qSim.addQueueSimulationListeners(engine);
 		}
 
