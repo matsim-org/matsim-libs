@@ -68,9 +68,10 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		this.events = events;
 	}
 	
-	// TODO how to bind default?
+	@Deprecated
 	public FromDataBuilder(Scenario scenario, EventsManager events){
-		this(scenario, new DefaultSignalModelFactory(), events);
+//		this(scenario, new DefaultSignalModelFactory(), events);
+		throw new UnsupportedOperationException("This constructor does no longer function. Please use inject syntax insted, see e.g. SylviaSignalsModule");
 	}
 	
 	public void createAndAddSignals(SignalSystem system){
@@ -84,13 +85,10 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 	public void createAndAddSignalSystemsFromData(SignalSystemsManager manager){
 		//process information of SignalSystemsData object
 		for (SignalSystemData ssData : this.signalsData.getSignalSystemsData().getSignalSystemData().values()){
-			SignalSystem system = this.factory.createSignalSystem(ssData.getId());
-			manager.addSignalSystem(system);
-			system.setSignalSystemsManager(manager);
+			manager.addSignalSystem(this.factory.createSignalSystem(ssData.getId()));
 		}
 	}
 	
-
 	public void createAndAddSignalGroupsFromData(SignalSystem system){
 		//process information of  SignalGroupsData object and create the signal groups
 		Map<Id<SignalGroup>, SignalGroupData> signalGroupDataMap = this.signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(system.getId());
