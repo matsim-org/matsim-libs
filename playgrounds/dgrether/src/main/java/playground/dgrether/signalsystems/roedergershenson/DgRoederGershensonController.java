@@ -26,8 +26,9 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.model.Signal;
@@ -37,7 +38,6 @@ import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.lanes.data.Lane;
-import org.matsim.lanes.data.Lanes;
 import org.matsim.lanes.data.LanesToLinkAssignment;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
@@ -118,9 +118,10 @@ public class DgRoederGershensonController implements SignalController {
 	}
 
 	
-	public void initSignalGroupMetadata(Network net, Lanes lanedefs){
+	public void initSignalGroupMetadata(Scenario scenario){
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		this.signalGroupIdMetadataMap = new HashMap<Id, SignalGroupMetadata>();
-		SignalSystemData systemData = this.system.getSignalSystemsManager().getSignalsData().getSignalSystemsData().getSignalSystemData().get(this.system.getId());
+		SignalSystemData systemData = signalsData.getSignalSystemsData().getSignalSystemData().get(this.system.getId());
 		
 		for (SignalGroup signalGroup : this.system.getSignalGroups().values()){
 			if (!this.signalGroupIdMetadataMap.containsKey(signalGroup.getId())){
@@ -129,7 +130,7 @@ public class DgRoederGershensonController implements SignalController {
 			SignalGroupMetadata metadata = this.signalGroupIdMetadataMap.get(signalGroup.getId());
 			for (Signal signal : signalGroup.getSignals().values()){
 				//inlinks
-				Link inLink = net.getLinks().get(signal.getLinkId());
+				Link inLink = scenario.getNetwork().getLinks().get(signal.getLinkId());
 				metadata.addInLink(inLink);
 				//outlinks
 				SignalData signalData = systemData.getSignalData().get(signal.getId());
@@ -138,7 +139,7 @@ public class DgRoederGershensonController implements SignalController {
 						this.addOutLinksWithoutBackLinkToMetadata(inLink, metadata);
 					}
 					else { // there are lanes
-						LanesToLinkAssignment lanes4link = lanedefs.getLanesToLinkAssignments().get(signalData.getLinkId());
+						LanesToLinkAssignment lanes4link = scenario.getLanes().getLanesToLinkAssignments().get(signalData.getLinkId());
 						for (Id  laneId : signalData.getLaneIds()){
 							Lane lane = lanes4link.getLanes().get(laneId);
 							if (lane.getToLinkIds() == null || lane.getToLinkIds().isEmpty()){
@@ -146,7 +147,7 @@ public class DgRoederGershensonController implements SignalController {
 							}
 							else{
 								for (Id toLinkId : lane.getToLinkIds()){
-									Link toLink = net.getLinks().get(toLinkId);
+									Link toLink = scenario.getNetwork().getLinks().get(toLinkId);
 									if (!toLink.getFromNode().equals(inLink.getToNode())){
 										metadata.addOutLink(toLink);
 									}
@@ -157,7 +158,7 @@ public class DgRoederGershensonController implements SignalController {
 				}
 				else {  // turning move restrictions exist
 					for (Id linkid : signalData.getTurningMoveRestrictions()){
-						Link outLink = net.getLinks().get(linkid);
+						Link outLink = scenario.getNetwork().getLinks().get(linkid);
 						metadata.addOutLink(outLink);
 					}
 				}

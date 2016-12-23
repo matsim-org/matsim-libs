@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
@@ -66,16 +67,16 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 	private Map<Id<SignalGroup>, Double> greenGroupId2OnsetMap = null;
 	private int extensionTime = 0;
 	private int secondInCycle = -1; //used for debug output
+	private DgExtensionPoint currentExtensionPoint;
 
 	private DgSylviaConfig sylviaConfig;
-	
-	private DgExtensionPoint currentExtensionPoint = null;
+	private LinkSensorManager sensorManager;
+	private SignalsData signalsData;
 
-	private LinkSensorManager sensorManager = null;
-
-	public DgSylviaController(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager) {
+	public DgSylviaController(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, SignalsData signalsData) {
 		this.sylviaConfig = sylviaConfig;
 		this.sensorManager = sensorManager;
+		this.signalsData = signalsData;
 		this.init();
 	}
 	
@@ -412,8 +413,8 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 		for (DgExtensionPoint extPoint : this.extensionPointMap.values()){
 			Set<SignalData> extPointSignals = new HashSet<SignalData>();
 			for (Id<SignalGroup> signalGroupId : extPoint.getSignalGroupIds()){
-				SignalSystemData systemData = this.system.getSignalSystemsManager().getSignalsData().getSignalSystemsData().getSignalSystemData().get(this.system.getId());
-				SignalGroupData signalGroup = this.system.getSignalSystemsManager().getSignalsData().getSignalGroupsData().getSignalGroupDataBySystemId(systemData.getId()).get(signalGroupId);
+				SignalSystemData systemData = this.signalsData.getSignalSystemsData().getSignalSystemData().get(this.system.getId());
+				SignalGroupData signalGroup = this.signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(systemData.getId()).get(signalGroupId);
 				Set<SignalData> signals = DgSignalsUtils.getSignalDataOfSignalGroup(systemData, signalGroup);
 				extPointSignals.addAll(signals);
 			}

@@ -21,8 +21,10 @@ package playground.dgrether.signalsystems.sylvia.model;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.SignalModelFactory;
+import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.model.DatabasedSignalPlan;
 import org.matsim.contrib.signals.model.SignalController;
@@ -49,11 +51,13 @@ public final class DgSylviaSignalModelFactory implements SignalModelFactory {
 	
 	private LinkSensorManager sensorManager;
 	private DgSylviaConfig sylviaConfig;
+	private SignalsData signalsData;
 
 	@Inject 
-	public DgSylviaSignalModelFactory(LinkSensorManager sensorManager, DgSylviaConfig sylviaConfig) {
+	public DgSylviaSignalModelFactory(LinkSensorManager sensorManager, DgSylviaConfig sylviaConfig, Scenario scenario) {
 		this.sensorManager = sensorManager;
 		this.sylviaConfig = sylviaConfig;
+		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 	}
 
 	@Override
@@ -65,7 +69,7 @@ public final class DgSylviaSignalModelFactory implements SignalModelFactory {
 	public SignalController createSignalSystemController(String controllerIdentifier) {
 		if (DgSylviaController.CONTROLLER_IDENTIFIER.equals(controllerIdentifier)){
 			log.info("Creating " + DgSylviaController.CONTROLLER_IDENTIFIER);
-			return new DgSylviaController(this.sylviaConfig, this.sensorManager);
+			return new DgSylviaController(this.sylviaConfig, this.sensorManager, this.signalsData);
 		}
 		return this.delegate.createSignalSystemController(controllerIdentifier);
 	}
