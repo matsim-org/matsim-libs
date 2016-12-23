@@ -1,14 +1,8 @@
 package playground.sebhoerl.ant.handlers;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.HashMapInverter;
@@ -19,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DistanceHandler extends AbstractHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler {
+public class DistanceHandler extends AbstractHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler, GenericEventHandler {
     final private Map<Id<Vehicle>, Integer> passengerCount = new HashMap();
     final private Network network;
 
@@ -74,4 +68,11 @@ public class DistanceHandler extends AbstractHandler implements PersonEntersVehi
 
     @Override
     protected void finish() {}
+
+    @Override
+    public void handleEvent(GenericEvent event) {
+        if (event.getEventType().equals("AVTransit")) {
+            data.avDistances.add(Double.parseDouble(event.getAttributes().get("distance")));
+        }
+    }
 }

@@ -17,6 +17,7 @@ public class DataFrame {
 
     final public List<Double> waitingCount;
     final public List<List<Double>> waitingTimes;
+    final public List<List<Double>> travelTimes;
 
     public double vehicleDistance = 0.0;
     public double passengerDistance = 0.0;
@@ -29,6 +30,8 @@ public class DataFrame {
 
     final public Map<Integer, List<Double>> occupancy;
 
+    final public List<Double> avDistances;
+
     public DataFrame(BinCalculator binCalculator) {
         this.binCalculator = binCalculator;
 
@@ -38,10 +41,13 @@ public class DataFrame {
         waitingCount = initialize(0.0);
 
         waitingTimes = initialize();
+        travelTimes = initialize();
 
         idleAVs = initialize(0.0);
 
         occupancy = initialize(Arrays.asList(0, 1, 2, 3, 4), 0.0);
+
+        avDistances = initialize(0.0);
     }
 
     public boolean isOrdinaryPerson(Id<Person> id) {

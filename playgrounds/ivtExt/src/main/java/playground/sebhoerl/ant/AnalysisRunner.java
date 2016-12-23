@@ -6,7 +6,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import playground.sebhoerl.ant.handlers.*;
 import playground.sebhoerl.av_paper.BinCalculator;
-import playground.sebhoerl.mexec.Scenario;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +36,7 @@ public class AnalysisRunner implements Runnable {
         events.addHandler(new DistanceHandler(dataFrame, network));
         events.addHandler(new IdleHandler(dataFrame));
         events.addHandler(new OccupancyHandler(dataFrame));
-        events.addHandler(new WaitingHandler(dataFrame));
+        events.addHandler(new TimeHandler(dataFrame));
 
         reader.readFile(eventsPath);
         events.resetHandlers(0);

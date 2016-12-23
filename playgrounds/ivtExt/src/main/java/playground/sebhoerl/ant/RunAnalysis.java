@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 public class RunAnalysis {
     final static String NETWORK_PATH = "/home/sebastian/ant/assets/network.xml";
-    final static String BASECASE = "multi";
+    final static String BASECASE = "multi_400";
 
     final static double START_TIME = 0.0;
     final static double END_TIME = 30.0 * 3600.0;
@@ -49,11 +49,26 @@ public class RunAnalysis {
 
         ExecutorService executor = Executors.newFixedThreadPool(8);
 
-        for (String name : names) {
-            AnalysisRunner runner = new AnalysisRunner(binCalculator, network, getEventsPath(name),  getOutputPath(name));
-            executor.submit(runner);
+        //for (String name : names) {
+        //    AnalysisRunner runner = new AnalysisRunner(binCalculator, network, getEventsPath(name),  getOutputPath(name));
+        //    executor.submit(runner);
             //runner.run();
-        }
+        //}
+
+        AnalysisRunner runner = new AnalysisRunner(binCalculator, network,
+                "/home/sebastian/ant/analysis/data/combined_1000veh/output_events.xml.gz",
+                "/home/sebastian/ant/analysis/data/combined_1000veh/result_pool.json");
+        runner.run();
+
+        /*AnalysisRunner runner = new AnalysisRunner(binCalculator, network,
+                "/home/sebastian/ant/analysis/data/multi_400/events_1000_nosub.xml.gz",
+                "/home/sebastian/ant/analysis/data/multi_400/result_1000_nosub.json");
+        runner.run();
+
+        runner = new AnalysisRunner(binCalculator, network,
+                "/home/sebastian/ant/analysis/data/single/events_1000_nosub.xml.gz",
+                "/home/sebastian/ant/analysis/data/single/result_1000_nosub.json");
+        runner.run();*/
 
         executor.shutdown();
         executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
