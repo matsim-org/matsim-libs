@@ -28,7 +28,6 @@ import org.matsim.contrib.signals.model.DatabasedSignalPlan;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
 
 import com.google.inject.Inject;
 
@@ -46,15 +45,15 @@ public final class DgSylviaSignalModelFactory implements SignalModelFactory {
 	
 	private static final Logger log = Logger.getLogger(DgSylviaSignalModelFactory.class);
 	
-	private SignalModelFactory delegate;
+	private SignalModelFactory delegate = new DefaultSignalModelFactory();
+	
 	private LinkSensorManager sensorManager;
 	private DgSylviaConfig sylviaConfig;
 
 	@Inject 
-	public DgSylviaSignalModelFactory(LinkSensorManager sensorManager, DgSylviaConfig sylviaConfig, SignalSystemsManager signalManager) {
+	public DgSylviaSignalModelFactory(LinkSensorManager sensorManager, DgSylviaConfig sylviaConfig) {
 		this.sensorManager = sensorManager;
 		this.sylviaConfig = sylviaConfig;
-		this.delegate = new DefaultSignalModelFactory(signalManager);
 	}
 
 	@Override

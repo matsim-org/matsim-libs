@@ -28,9 +28,6 @@ import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.model.SignalSystemImpl;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
-
-import com.google.inject.Inject;
 
 
 /**
@@ -41,16 +38,9 @@ public final class DefaultSignalModelFactory implements SignalModelFactory {
 	
 	private static final Logger log = Logger.getLogger(DefaultSignalModelFactory.class);
 
-	private SignalSystemsManager signalManager;
-	
-	@Inject 
-	public DefaultSignalModelFactory(SignalSystemsManager signalManager) {
-		this.signalManager = signalManager;
-	}
-	
 	@Override
 	public SignalSystem createSignalSystem(Id<SignalSystem> id) {
-		return new SignalSystemImpl(id, signalManager);
+		return new SignalSystemImpl(id);
 	}
 
 	@Override

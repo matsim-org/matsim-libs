@@ -49,14 +49,18 @@ public class SignalSystemImpl implements SignalSystem {
 	private Map<Id<Signal>, Signal> signals = new HashMap<>();
 	
 	
-	public SignalSystemImpl(Id<SignalSystem> id, SignalSystemsManager signalManager) {
+	public SignalSystemImpl(Id<SignalSystem> id) {
 		this.id = id;
-		this.manager = signalManager;
 	}
 
 	@Override
 	public SignalSystemsManager getSignalSystemsManager() {
 		return this.manager;
+	}
+
+	@Override
+	public void setSignalSystemsManager(SignalSystemsManager signalManager) {
+		this.manager = signalManager;
 	}
 
 	@Override

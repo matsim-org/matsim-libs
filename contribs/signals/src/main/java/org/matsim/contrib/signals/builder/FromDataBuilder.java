@@ -70,8 +70,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 	
 	@Deprecated
 	public FromDataBuilder(Scenario scenario, EventsManager events){
-//		this(scenario, new DefaultSignalModelFactory(), events);
-		throw new UnsupportedOperationException("This constructor does no longer function. Please use inject syntax insted, see e.g. SylviaSignalsModule");
+		this(scenario, new DefaultSignalModelFactory(), events);
 	}
 	
 	private void createAndAddSignals(SignalSystem system){

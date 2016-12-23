@@ -32,6 +32,8 @@ import org.matsim.api.core.v01.Identifiable;
 public interface SignalSystem extends Identifiable<SignalSystem> {
 
 	public SignalSystemsManager getSignalSystemsManager();
+	
+	public void setSignalSystemsManager(SignalSystemsManager signalManager);
 
 	public void updateState(double now);
 
