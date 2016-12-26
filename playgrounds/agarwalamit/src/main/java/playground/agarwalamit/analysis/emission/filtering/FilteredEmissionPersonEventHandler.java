@@ -36,7 +36,6 @@ import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.vehicles.Vehicle;
 import playground.agarwalamit.analysis.emission.EmissionPersonEventHandler;
-import playground.agarwalamit.munich.analysis.userGroup.EmissionsPerPersonPerUserGroup;
 import playground.agarwalamit.utils.AreaFilter;
 import playground.agarwalamit.utils.PersonFilter;
 
@@ -44,7 +43,7 @@ import playground.agarwalamit.utils.PersonFilter;
  * @author amit
  */
 
-public class FilteredEmissionPersonEventHandler implements ColdEmissionEventHandler, WarmEmissionEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler{
+public class FilteredEmissionPersonEventHandler implements ColdEmissionEventHandler, WarmEmissionEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private static final Logger LOGGER = Logger.getLogger(FilteredEmissionPersonEventHandler.class.getName());
 
 	private final EmissionPersonEventHandler delegate;
@@ -80,7 +79,7 @@ public class FilteredEmissionPersonEventHandler implements ColdEmissionEventHand
 
 	/**
 	 * User group filtering will be used, result will include all links but persons from given user group only. Another class
-	 * {@link EmissionsPerPersonPerUserGroup} could give more detailed results based on person id for all user groups.
+	 * {@link playground.agarwalamit.munich.analysis.userGroup.EmissionsPerPersonPerUserGroup} could give more detailed results based on person id for all user groups.
 	 */
 	public FilteredEmissionPersonEventHandler( final String userGroup, final PersonFilter personFilter){
 		this(userGroup,personFilter, null, null);
@@ -103,8 +102,22 @@ public class FilteredEmissionPersonEventHandler implements ColdEmissionEventHand
 
 	@Override
 	public void handleEvent(ColdEmissionEvent event) {
-		
-		Id<Person> driverId = this.delegate.getDriverOfVehicle(event.getVehicleId());
+//		Id<Person> driverId = this.delegate.getDriverOfVehicle(event.getVehicleId());
+		Id<Person> driverId ;
+		String vehicleIdString = event.getVehicleId().toString();
+
+		if( vehicleIdString.endsWith("motorbike") ){
+			int lastIndex = vehicleIdString.indexOf("_motorbike");
+			driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
+		} else if ( vehicleIdString.endsWith("bike") ){
+			int lastIndex = vehicleIdString.indexOf("_bike");
+			driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
+		} else if ( vehicleIdString.endsWith("truck") ){
+			int lastIndex = vehicleIdString.indexOf("_truck");
+			driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
+		} else {
+			driverId = Id.createPersonId(vehicleIdString);
+		}
 
 		if (this.af!=null) { // area filtering
 			Link link = network.getLinks().get(event.getLinkId());
@@ -127,7 +140,23 @@ public class FilteredEmissionPersonEventHandler implements ColdEmissionEventHand
 
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
-		Id<Person> driverId = this.delegate.getDriverOfVehicle(event.getVehicleId());
+//		Id<Person> driverId = this.delegate.getDriverOfVehicle(event.getVehicleId());
+
+		Id<Person> driverId ;
+		String vehicleIdString = event.getVehicleId().toString();
+
+		if( vehicleIdString.endsWith("motorbike") ){
+			int lastIndex = vehicleIdString.indexOf("_motorbike");
+			driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
+		} else if ( vehicleIdString.endsWith("bike") ){
+			int lastIndex = vehicleIdString.indexOf("_bike");
+			driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
+		} else if ( vehicleIdString.endsWith("truck") ){
+			int lastIndex = vehicleIdString.indexOf("_truck");
+			driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
+		} else {
+			driverId = Id.createPersonId(vehicleIdString);
+		}
 
 		if (this.af!=null) { // area filtering
 			Link link = network.getLinks().get(event.getLinkId());

@@ -54,13 +54,29 @@ public class EmissionPersonEventHandler implements WarmEmissionEventHandler, Col
 
     @Override
     public void handleEvent(WarmEmissionEvent event) {
-        Id<Person> personId = delegate.getDriverOfVehicle(event.getVehicleId());
-        Map<WarmPollutant, Double> warmEmissions = this.personId2WarmEmissions.get(personId);
+//        Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
+        Id<Person> driverId ;
+        String vehicleIdString = event.getVehicleId().toString();
+
+        if( vehicleIdString.endsWith("motorbike") ){
+            int lastIndex = vehicleIdString.indexOf("_motorbike");
+            driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
+        } else if ( vehicleIdString.endsWith("bike") ){
+            int lastIndex = vehicleIdString.indexOf("_bike");
+            driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
+        } else if ( vehicleIdString.endsWith("truck") ){
+            int lastIndex = vehicleIdString.indexOf("_truck");
+            driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
+        } else {
+            driverId = Id.createPersonId(vehicleIdString);
+        }
+
+        Map<WarmPollutant, Double> warmEmissions = this.personId2WarmEmissions.get(driverId);
 
         if (warmEmissions == null ) {
-            this.personId2WarmEmissions.put(personId, event.getWarmEmissions());
+            this.personId2WarmEmissions.put(driverId, event.getWarmEmissions());
         } else {
-            this.personId2WarmEmissions.put(personId,
+            this.personId2WarmEmissions.put(driverId,
                     Arrays.stream(WarmPollutant.values()).collect(
                             Collectors.toMap(wp -> wp,
                                     wp -> warmEmissions.get( wp ) + event.getWarmEmissions().get( wp ) ))
@@ -70,13 +86,29 @@ public class EmissionPersonEventHandler implements WarmEmissionEventHandler, Col
 
     @Override
     public void handleEvent(ColdEmissionEvent event) {
-        Id<Person> personId = delegate.getDriverOfVehicle(event.getVehicleId());
-        Map<ColdPollutant, Double> coldEmissions = this.personId2ColdEmissions.get(personId);
+//        Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
+        Id<Person> driverId ;
+        String vehicleIdString = event.getVehicleId().toString();
+
+        if( vehicleIdString.endsWith("motorbike") ){
+            int lastIndex = vehicleIdString.indexOf("_motorbike");
+            driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
+        } else if ( vehicleIdString.endsWith("bike") ){
+            int lastIndex = vehicleIdString.indexOf("_bike");
+            driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
+        } else if ( vehicleIdString.endsWith("truck") ){
+            int lastIndex = vehicleIdString.indexOf("_truck");
+            driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
+        } else {
+            driverId = Id.createPersonId(vehicleIdString);
+        }
+
+        Map<ColdPollutant, Double> coldEmissions = this.personId2ColdEmissions.get(driverId);
 
         if (coldEmissions == null ) {
-            this.personId2ColdEmissions.put(personId, event.getColdEmissions());
+            this.personId2ColdEmissions.put(driverId, event.getColdEmissions());
         } else {
-            this.personId2ColdEmissions.put(personId,
+            this.personId2ColdEmissions.put(driverId,
                     Arrays.stream(ColdPollutant.values()).collect(
                             Collectors.toMap(cp -> cp,
                                     cp -> coldEmissions.get( cp ) + event.getColdEmissions().get( cp ) ))
