@@ -89,7 +89,6 @@ public class RunCapeTownAccessibilityOnHexGrid {
 		for(String activityType : activityTypes){
 			AccessibilityModule module = new AccessibilityModule();
 			module.setConsideredActivityType(activityType);
-			module.setOutputCrs(TransformationFactory.HARTEBEESTHOEK_LO19);
 			module.setPushing2Geoserver(false);
 			module.addAdditionalFacilityData(points);
 			controler.addOverridingModule(module);
