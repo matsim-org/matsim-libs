@@ -112,7 +112,7 @@ public class ChainCounter {
 	private static void checkWholeYear(String path){
 		int chains = 0;
 		DigicoreVehicles vehicles = new DigicoreVehicles();
-		new DigicoreVehiclesReader(vehicles).readFile(path + "digicoreVehicles_201305_201405.xml.gz");
+		new DigicoreVehiclesReader(vehicles).readFile(path + "digicoreVehicles_201306_201405.xml.gz");
 		chains += countChains(vehicles);
 		LOG.info("Total number of chains on yearly basis: " + chains);
 	}
