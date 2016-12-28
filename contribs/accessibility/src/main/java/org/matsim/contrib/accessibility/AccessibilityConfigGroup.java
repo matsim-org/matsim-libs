@@ -51,9 +51,10 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	
 	private Integer cellSizeCellBasedAccessibility;
 	private String shapeFileCellBasedAccessibility;
+	private String fileBasedAccessibility;
 	
 	private static final String AREA_OF_ACC_COMP = "areaOfAccessibilityComputation" ; 
-	public static enum AreaOfAccesssibilityComputation{ fromNetwork, fromBoundingBox, fromShapeFile } 
+	public static enum AreaOfAccesssibilityComputation{ fromNetwork, fromBoundingBox, fromShapeFile, fromFile } 
 	private AreaOfAccesssibilityComputation areaOfAccessibilityComputation = AreaOfAccesssibilityComputation.fromNetwork ;
 	private Set<Modes4Accessibility> isComputingMode = EnumSet.noneOf(Modes4Accessibility.class);
 	
@@ -70,6 +71,19 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	@StringSetter(OUTPUT_CRS)
 	public final void setOutputCrs(String outputCrs) {
 		this.outputCrs = outputCrs;
+	}
+
+	private String measuringPointsFile;
+	private static final String MEASURING_POINTS_FILE="measuringPointsFile";
+	
+	@StringGetter(MEASURING_POINTS_FILE)
+	public final String getMeasuringPointsFile(){
+		return this.measuringPointsFile;
+	}
+	
+	@StringSetter(MEASURING_POINTS_FILE)
+	public final void setMeasuringPointsFile(String measuringPointsFile){
+		this.measuringPointsFile = measuringPointsFile;
 	}
 
 	public static final String TIME_OF_DAY = "timeOfDay";
@@ -102,6 +116,8 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 		}
 		map.put(AREA_OF_ACC_COMP, "method to determine the area for which the accessibility will be computed; possible values: " + stb ) ;
 		
+		map.put(MEASURING_POINTS_FILE, "if the accibility is computed using the `fromFile` option, " +
+				"the this must be the file containing the measuring points' coordinates. ");
 		return map ;
 	}
 	
@@ -140,11 +156,22 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
     public String getShapeFileCellBasedAccessibility() {
         return this.shapeFileCellBasedAccessibility;
     }
+	
 	@StringSetter("extentOfAccessibilityComputationShapeFile")
     public void setShapeFileCellBasedAccessibility(String value) {
         this.shapeFileCellBasedAccessibility = value;
     }
 
+	@StringGetter("extentOfAccessibilityComputationFile")
+	public String getFileBasedAccessibility() {
+		return this.fileBasedAccessibility;
+	}
+	
+	@StringSetter("extentOfAccessibilityComputationFile")
+	public void setFileBasedAccessibility(String value) {
+		this.fileBasedAccessibility = value;
+	}
+	
 	@StringGetter(TIME_OF_DAY)
 	public Double getTimeOfDay() {
 		return this.timeOfDay ;

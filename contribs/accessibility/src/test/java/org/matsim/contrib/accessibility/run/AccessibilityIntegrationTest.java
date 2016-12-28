@@ -206,6 +206,11 @@ public class AccessibilityIntegrationTest {
 
 		// compare some results -> done in EvaluateTestResults 
 	}
+	
+	@Test
+	public void testWithFile(){
+		/*TODO Complete - JWJ, Dec'16 */
+	}
 
 
 
