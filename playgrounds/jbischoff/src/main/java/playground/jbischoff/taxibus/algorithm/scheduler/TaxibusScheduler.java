@@ -282,8 +282,12 @@ public class TaxibusScheduler {
 	private double scheduleDropOffs(Schedule<DrtTask> bestSched, Set<TaxibusRequest> onBoard,
 			TreeSet<TaxibusRequest> dropOffsForLink, Set<TaxibusRequest> droppedOff, double beginTime) {
 		for (TaxibusRequest req : dropOffsForLink) {
-			if (droppedOff.contains(req))
+			if (!onBoard.contains(req)){
 				continue;
+			}
+			if (droppedOff.contains(req)){
+				continue;
+				}
 			double endTime = beginTime + params.dropoffDuration;
 			bestSched.addTask(new DrtDropoffTask(beginTime, endTime, req));
 			// log.info("schedule dropoff" +

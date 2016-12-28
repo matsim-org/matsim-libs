@@ -82,7 +82,7 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 	@Override
 	public void requestSubmitted(Request request) {
 		if (context.requestDeterminator.isRequestServable(request)){
-			Logger.getLogger(getClass()).info("Submitting " + request);
+//			Logger.getLogger(getClass()).info("Submitting " + request);
 			this.unplannedRequests.add((TaxibusRequest) request);
 		}
 	}
@@ -133,8 +133,8 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 			List<Request> allOpenRequests = new ArrayList<>();
 			allOpenRequests.addAll(dueRequests);
 			Collections.shuffle(allOpenRequests, r);
-			int vehiclesOnDispatch = (int) Math.min(context.vehiclesAtSameTime,allOpenRequests.size()/context.minOccupancy);
-			Logger.getLogger(getClass()).info("vehicles on dispatch "+ vehiclesOnDispatch+" requests "+ allOpenRequests);
+			int vehiclesOnDispatch = (int) Math.min(context.vehiclesAtSameTime,Math.max(1, allOpenRequests.size()/context.minOccupancy));
+//			Logger.getLogger(getClass()).info("vehicles on dispatch "+ vehiclesOnDispatch+" requests "+ allOpenRequests);
 			int occupancy = (allOpenRequests.size()/vehiclesOnDispatch);
 			for (int c = 0 ; c<vehiclesOnDispatch;c++){
 				Set<TaxibusRequest> currentBus = new HashSet<>();
