@@ -51,7 +51,6 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	
 	private Integer cellSizeCellBasedAccessibility;
 	private String shapeFileCellBasedAccessibility;
-	private String fileBasedAccessibility;
 	
 	private static final String AREA_OF_ACC_COMP = "areaOfAccessibilityComputation" ; 
 	public static enum AreaOfAccesssibilityComputation{ fromNetwork, fromBoundingBox, fromShapeFile, fromFile } 
@@ -77,12 +76,12 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	private static final String MEASURING_POINTS_FILE="measuringPointsFile";
 	
 	@StringGetter(MEASURING_POINTS_FILE)
-	public final String getMeasuringPointsFile(){
+	public String getMeasuringPointsFile(){
 		return this.measuringPointsFile;
 	}
 	
 	@StringSetter(MEASURING_POINTS_FILE)
-	public final void setMeasuringPointsFile(String measuringPointsFile){
+	public void setMeasuringPointsFile(String measuringPointsFile){
 		this.measuringPointsFile = measuringPointsFile;
 	}
 
@@ -162,15 +161,15 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
         this.shapeFileCellBasedAccessibility = value;
     }
 
-	@StringGetter("extentOfAccessibilityComputationFile")
-	public String getFileBasedAccessibility() {
-		return this.fileBasedAccessibility;
-	}
-	
-	@StringSetter("extentOfAccessibilityComputationFile")
-	public void setFileBasedAccessibility(String value) {
-		this.fileBasedAccessibility = value;
-	}
+//	@StringGetter("extentOfAccessibilityComputationFile")
+//	public String getFileBasedAccessibility() {
+//		return this.fileBasedAccessibility;
+//	}
+//	
+//	@StringSetter("extentOfAccessibilityComputationFile")
+//	public void setFileBasedAccessibility(String value) {
+//		this.fileBasedAccessibility = value;
+//	}
 	
 	@StringGetter(TIME_OF_DAY)
 	public Double getTimeOfDay() {
