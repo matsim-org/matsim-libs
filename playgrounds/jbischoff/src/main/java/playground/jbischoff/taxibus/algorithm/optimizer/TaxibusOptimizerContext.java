@@ -18,13 +18,12 @@ public class TaxibusOptimizerContext
     public final TravelDisutility travelDisutility;
     public final TaxibusScheduler scheduler;
 
-    public final String workingDirectory;
     public final TaxibusConfigGroup tbcg;
 
 
     public TaxibusOptimizerContext(VrpData vrpData, Scenario scenario, MobsimTimer timer,
             TravelTime travelTime, TravelDisutility travelDisutility, TaxibusScheduler scheduler,
-            String workingDirectory, TaxibusConfigGroup tbcg)
+             TaxibusConfigGroup tbcg)
     {
         this.vrpData = vrpData;
         this.scenario = scenario;
@@ -33,7 +32,6 @@ public class TaxibusOptimizerContext
         this.travelDisutility = travelDisutility;
         this.scheduler = scheduler;
 
-        this.workingDirectory = scenario.getConfig().controler().getOutputDirectory();
         this.tbcg = tbcg;
     }
 }

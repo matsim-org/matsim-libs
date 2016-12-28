@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,13 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines;
-
+/**
+ * 
+ */
+package playground.jbischoff.taxibus.algorithm.optimizer.clustered;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 
@@ -31,63 +32,37 @@ import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
  * @author  jbischoff
  *
  */
+/**
+ *
+ */
+public class CentroidBasedRequestDeterminator implements RequestDeterminator {
 
-public interface TaxibusLine {
-
-	public Id<TaxibusLine> getId();
-
-	public Id<TaxibusLine> getReturnRouteId();
-	
-	public void setReturnRouteId(Id<TaxibusLine> id);
-	
+	final double radius1;
+	final double radius2;
+	final Coord coord1;
+	final Coord coord2;
 	/**
-	 * @return Lambda currently applicable
+	 * 
 	 */
-	public double getCurrentLambda();
+	public CentroidBasedRequestDeterminator(Coord coord1, Coord coord2, double radius1, double radius2) {
+			this.coord1=coord1;	
+			this.coord2=coord2;
+			this.radius1=radius1;
+			this.radius2=radius2;
+	}
 	
-	
-	
-	/**
-	 * @param time 
-	 * @return Lambda for defined time
+	/* (non-Javadoc)
+	 * @see playground.jbischoff.taxibus.algorithm.optimizer.clustered.RequestDeterminator#isRequestServable(org.matsim.contrib.dvrp.data.Request)
 	 */
-	public double getLambda(double time);
-	
-	public double getCurrentOccupationRate();
-	
-	
-	/**
-	 * @return the Link's id where busses are stowed prior to dispatch
-	 */
-	public Id<Link> getHoldingPosition();
-	
-	
-	/**
-	 * @return expected TravelTime for a Single Trip w/o drop offs or pick ups
-	 */
-	public double getSingleTripTravelTime();
-	
-	
-	/**
-	 * @return maximum time spent on collecting passengers after initial dispatch
-	 */
-	public double getCurrentTwMax();
-	
-	public void addVehicleToHold(Vehicle veh);
-	
-	public boolean removeVehicleFromHold(Vehicle veh);
-	
-	public Vehicle getNextEmptyVehicle();
-	
-	public boolean lineServesRequest(TaxibusRequest request);
-	
-	public boolean lineCoversCoordinate(Coord coord);
+	@Override
+	public boolean isRequestServable(Request request) {
+		TaxibusRequest r = (TaxibusRequest) request;
+		Coord fromCoord = r.getFromLink().getCoord();
+		Coord toCoord = r.getToLink().getCoord();
+		if (((CoordUtils.calcEuclideanDistance(fromCoord, coord1)<=radius1)&&(CoordUtils.calcEuclideanDistance(toCoord, coord2)<=radius2))
+			||((CoordUtils.calcEuclideanDistance(fromCoord, coord2)<=radius2)&&(CoordUtils.calcEuclideanDistance(toCoord, coord1)<=radius1)))
+		return true;
+		else return false;
+	}
 
-	public boolean isVehicleInHold();
-
-	public int getMaximumOpenVehicles();
-
-	public void reset();
-	
-	
 }

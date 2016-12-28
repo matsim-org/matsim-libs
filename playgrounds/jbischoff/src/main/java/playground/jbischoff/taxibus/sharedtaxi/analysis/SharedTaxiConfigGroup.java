@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.jbischoff.taxibus.analysis;
+package playground.jbischoff.taxibus.sharedtaxi.analysis;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;

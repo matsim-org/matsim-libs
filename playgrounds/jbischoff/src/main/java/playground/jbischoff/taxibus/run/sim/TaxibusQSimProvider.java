@@ -21,7 +21,6 @@ package playground.jbischoff.taxibus.run.sim;
 
 import java.util.Collection;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
@@ -39,9 +38,10 @@ import com.google.inject.name.Named;
 import playground.jbischoff.drt.scheduler.DrtActionCreator;
 import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizer;
 import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizerContext;
-import playground.jbischoff.taxibus.algorithm.optimizer.fifo.FifoOptimizer;
-import playground.jbischoff.taxibus.algorithm.optimizer.fifo.MultipleFifoOptimizer;
-import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
+import playground.jbischoff.taxibus.algorithm.optimizer.clustered.ClusteringTaxibusOptimizer;
+import playground.jbischoff.taxibus.algorithm.optimizer.clustered.ClusteringTaxibusOptimizerContext;
+import playground.jbischoff.taxibus.algorithm.optimizer.clustered.SimpleDispatchCreator;
+
 import playground.jbischoff.taxibus.algorithm.optimizer.sharedTaxi.SharedTaxiOptimizer;
 import playground.jbischoff.taxibus.algorithm.passenger.*;
 import playground.jbischoff.taxibus.algorithm.scheduler.*;
@@ -64,7 +64,6 @@ public class TaxibusQSimProvider
     private final VrpData vrpData;
     private final TravelTime travelTime;
     private final TaxibusConfigGroup tbcg;
-    private final LineDispatcher dispatcher;
     private final TaxibusPassengerOrderManager orderManager;
     private final StateSpace stateSpace;
 
@@ -72,7 +71,7 @@ public class TaxibusQSimProvider
     TaxibusQSimProvider(Scenario scenario, EventsManager events,
             Collection<AbstractQSimPlugin> plugins, VrpData vrpData,
             @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, TaxibusConfigGroup tbcg,
-            @Nullable LineDispatcher dispatcher, @Nullable TaxibusPassengerOrderManager orderManager, @Nullable StateSpace stateSpace)
+            @Nullable TaxibusPassengerOrderManager orderManager, @Nullable StateSpace stateSpace)
     {
         this.scenario = scenario;
         this.events = events;
@@ -80,7 +79,6 @@ public class TaxibusQSimProvider
         this.vrpData = vrpData;
         this.travelTime = travelTime;
         this.tbcg = tbcg;
-        this.dispatcher = dispatcher;
         this.orderManager = orderManager;
         this.stateSpace = stateSpace;
     }
@@ -122,19 +120,20 @@ public class TaxibusQSimProvider
                 tbcg.getDropoffDuration());
         TaxibusScheduler scheduler = new TaxibusScheduler(vrpData, qSim.getSimTimer(), params);
         TaxibusOptimizerContext optimizerContext = new TaxibusOptimizerContext(vrpData, scenario,
-                qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg.getOutputDir(),
+                qSim.getSimTimer(), travelTime, travelDisutility, scheduler,
                 tbcg);
 
-        switch (tbcg.getAlgorithmConfig()) {
-            case "line":
-                return new FifoOptimizer(optimizerContext, dispatcher, false);
+        switch (tbcg.getAlgorithm()) {
 
-            case "multipleLine":
-                return new MultipleFifoOptimizer(optimizerContext, dispatcher, false);
             case "sharedTaxi":
             	return new SharedTaxiOptimizer(optimizerContext, false, tbcg.getDetourFactor());
             case "stateBased":
             	return new StatebasedOptimizer(optimizerContext, false, this.stateSpace , tbcg);
+            case "clustered":
+            {
+            	ClusteringTaxibusOptimizerContext context = new ClusteringTaxibusOptimizerContext(vrpData, scenario, qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg);
+            	return new ClusteringTaxibusOptimizer(context, new SimpleDispatchCreator(context));
+            }
             default:
                 throw new RuntimeException(
                         "No config parameter set for algorithm, please check and assign in config");

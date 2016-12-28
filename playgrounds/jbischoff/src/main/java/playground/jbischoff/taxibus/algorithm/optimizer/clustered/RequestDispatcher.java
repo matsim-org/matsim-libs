@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkConversionData.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,31 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.lsacvs2kml;
+package playground.jbischoff.taxibus.algorithm.optimizer.clustered;
 
-import java.util.Map;
+import java.util.Set;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.signals.model.SignalSystem;
+import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
+import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 
-public class LinkConversionData {
+/**
+ * @author  jbischoff
+ *
+ */
+public interface RequestDispatcher {
 
-	private Id<SignalSystem> ssid;
-	Map<Id<Link>,Id<Link>> convmap;
-	public Id<SignalSystem> getSsid() {
-		return ssid;
-	}
-	public void setSsid(String ssid) {
-		this.ssid = Id.create(ssid, SignalSystem.class);
-	}
-	public Map<Id<Link>, Id<Link>> getConvmap() {
-		return convmap;
-	}
-
-	
-		
-	
-	
+	TaxibusDispatch createDispatch (Set<TaxibusRequest> commonRequests);
 }
-

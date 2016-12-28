@@ -17,43 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.analysis;
+/**
+ * 
+ */
+package playground.jbischoff.taxibus.algorithm.optimizer.clustered;
 
-import javax.inject.Inject;
-
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.contrib.dvrp.data.Request;
 
 /**
  * @author  jbischoff
  *
  */
-public class SharedTaxiContolerListener implements AfterMobsimListener, ShutdownListener{
-	
-	private OutputDirectoryHierarchy controlerIO;
-	private SharedTaxiTripAnalyzer sharedTaxiTripAnalyzer;
+/**
+ *
+ */
+public interface RequestDeterminator {
 
-	@Inject
-	public SharedTaxiContolerListener(OutputDirectoryHierarchy controlerIO, SharedTaxiTripAnalyzer sharedTaxiTripAnalyzer)  {
-		this.controlerIO  = controlerIO;
-		this.sharedTaxiTripAnalyzer = sharedTaxiTripAnalyzer;
-	}
-	
-	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-		String filename = this.controlerIO.getOutputFilename("sharedTaxiStats.csv");
-		sharedTaxiTripAnalyzer.writeAverageStats(filename);
-	}
-
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		String filename = this.controlerIO.getIterationFilename(event.getIteration(), "sharedTaxiTrips.csv");
-		
-		sharedTaxiTripAnalyzer.writeStats(filename);
-		sharedTaxiTripAnalyzer.aggregateRideTimes(event.getIteration());
-	}
-
+	boolean isRequestServable(Request request);
 }
