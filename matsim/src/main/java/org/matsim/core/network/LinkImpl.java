@@ -61,7 +61,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	private Set<String> allowedModes = HashSetCache.get(new HashSet<String>());
 
-	private String type = null;
+//	private String type = null;
 
 	private String origid = null;
 
@@ -185,10 +185,10 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		return this.origid ;
 	}
 
-	/*deliberately package*/ final String getType2() {
-		// yyyyyy should now be possible to solve this with Attributable. kai, nov'16
-		return this.type ;
-	}
+//	/*deliberately package*/ final String getType2() {
+//		// yyyyyy should now be possible to solve this with Attributable. kai, nov'16
+//		return this.type ;
+//	}
 	
 	// ---
 
@@ -359,8 +359,8 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	}
 
-	/*deliberately package*/ void setType2(String type2) {
-		// yyyyyy should now be possible to solve this with Attributable. kai, nov'16
-		this.type = type2 ;
-	}
+//	/*deliberately package*/ void setType2(String type2) {
+//		// yyyyyy should now be possible to solve this with Attributable. kai, nov'16
+//		this.type = type2 ;
+//	}
 }
