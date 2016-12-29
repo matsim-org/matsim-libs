@@ -97,7 +97,7 @@ public class SignalSystemImpl implements SignalSystem {
 	@Override
 	public void switchOff(double timeSeconds) {
 		Set<SignalGroupStateChangeRequest> req = new HashSet<SignalGroupStateChangeRequest>();
-		for (Id<SignalGroup> sgId : this.getSignalGroups().keySet()){
+		for (Id<SignalGroup> sgId : this.signalGroups.keySet()){
 			req.add(new SignalGroupStateChangeRequestImpl(sgId, SignalGroupState.YELLOW, timeSeconds));
 			req.add(new SignalGroupStateChangeRequestImpl(sgId, SignalGroupState.OFF, timeSeconds + SWITCH_OFF_SEQUENCE_LENGTH));
 		}
@@ -144,7 +144,7 @@ public class SignalSystemImpl implements SignalSystem {
 	@Override
 	public void startPlan(double now) {
 		Set<SignalGroupStateChangeRequest> req = new HashSet<SignalGroupStateChangeRequest>();
-		for (Id<SignalGroup> sgId : this.getSignalGroups().keySet()){
+		for (Id<SignalGroup> sgId : this.signalGroups.keySet()){
 			req.add(new SignalGroupStateChangeRequestImpl(sgId, SignalGroupState.START_PLAN, now));
 		}
 		this.sortedRequests.addAll(req);
