@@ -29,8 +29,4 @@ import org.matsim.contrib.signals.model.SignalSystemsManager;
 public interface SignalSystemsModelBuilder {
 
 	public SignalSystemsManager createAndInitializeSignalSystemsManager();
-	
-	public SignalModelFactory getSignalModelFactory();
-	
-	public void setSignalModelFactory(SignalModelFactory factory);
 }

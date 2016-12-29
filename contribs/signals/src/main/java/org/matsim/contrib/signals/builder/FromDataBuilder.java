@@ -130,7 +130,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 	@Override
 	public SignalSystemsManager createAndInitializeSignalSystemsManager() {
 		//1.) SignalSystemsManager
-		SignalSystemsManager manager = new SignalSystemsManagerImpl((SignalsData)scenario.getScenarioElement(SignalsData.ELEMENT_NAME), events);
+		SignalSystemsManager manager = new SignalSystemsManagerImpl(signalsData, events);
 		//2.) SignalSystems
 		this.createAndAddSignalSystemsFromData(manager);
 		//3.) Signals then SignalGroups then SignalController
@@ -145,17 +145,4 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		this.createAndAddIntergreenTimesLogic(manager);
 		return manager;
 	}
-
-	@Override
-	public SignalModelFactory getSignalModelFactory() {
-		return this.factory;
-	}
-
-	@Override
-	public void setSignalModelFactory(SignalModelFactory factory) {
-		this.factory = factory;
-	}
-	
-	
-	
 }
