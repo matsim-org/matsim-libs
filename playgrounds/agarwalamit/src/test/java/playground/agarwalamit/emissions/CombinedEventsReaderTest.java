@@ -22,6 +22,7 @@ package playground.agarwalamit.emissions;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -35,6 +36,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import playground.agarwalamit.analysis.emission.caused.CausedEmissionCostHandler;
+import playground.kai.usecases.combinedEventsReader.CombinedMatsimEventsReader;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 
 /**
@@ -51,12 +53,26 @@ public class CombinedEventsReaderTest {
 
     private final String bicycleVehicleIdString = "567417.1#12425_bicycle";
 
-    @Test
+    @Test@Ignore //TODO yet to complete and fix this.
     public void readBothEventsFile() {
         String eventsFile = helper.getClassInputDirectory() + "0.events.xml.gz";
         String emissionEventsFile = helper.getClassInputDirectory() + "0.emission.events.xml.gz";
-    }
 
+        CausedEmissionCostHandler emissionHandler = new CausedEmissionCostHandler(new EmissionCostModule(1.0,true));
+
+        EventsManager events = EventsUtils.createEventsManager();
+        CombinedMatsimEventsReader reader = new CombinedMatsimEventsReader(events);
+        events.addHandler(emissionHandler);
+        reader.readFile(emissionEventsFile);
+
+//        try {
+//            reader.readStream(new GZIPInputStream(new FileInputStream(emissionEventsFile)));
+//        } catch (IOException e) {
+//            throw new RuntimeException("Data is not written/read. Reason : " + e);
+//
+//        }
+
+    }
 
     @Test
     public void readEventsFile() {
@@ -108,6 +124,6 @@ public class CombinedEventsReaderTest {
         Assert.assertFalse("For car, total emissions costs should be non-zero", personId2EmissionCosts.get(Id.createPersonId(carPersonIdString))==0.);
         Assert.assertFalse("For bicycle, total emissions costs should be zero.", personId2EmissionCosts.get(Id.createPersonId(
                 bicycleVehicleIdString))!= 0.);
-        //TODO : emission events provide vehicle id rather than person id, thus, this should be vehicle id.
+        //TODO : emission events provide vehicle id rather than person id, thus, the map keys should be vehicle ids.
     }
 }
