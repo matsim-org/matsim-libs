@@ -13,12 +13,15 @@ public class NoVehicleCarSharingEvent extends Event{
 	private final Id<Link> destinationLinkId;
 
 	private final String carsharingType;
-	
-	public NoVehicleCarSharingEvent(double time, String carsharingType, Link currentLink, Link destinationLink) {
+
+	private String companyId;
+
+	public NoVehicleCarSharingEvent(double time, String carsharingType, String companyId, Link currentLink, Link destinationLink) {
 		super(time);
 		this.originLinkId = currentLink.getId();
 		this.destinationLinkId = destinationLink.getId();
 		this.carsharingType = carsharingType;
+		this.companyId = companyId;
 	}
 
 	@Override
@@ -38,4 +41,7 @@ public class NoVehicleCarSharingEvent extends Event{
 		return this.carsharingType;
 	}
 
+	public String getCompanyId() {
+		return this.companyId;
+	}
 }
