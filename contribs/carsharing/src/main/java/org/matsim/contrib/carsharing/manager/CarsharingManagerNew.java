@@ -110,7 +110,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 				vehicle = this.carsharingSupplyContainer.findClosestAvailableVehicle(startLink,
 						carsharingType, typeOfVehicle, companyId, searchDistance);
 				if (vehicle == null) {					
-					eventsManager.processEvent(new NoVehicleCarSharingEvent(time, startLink.getId(), carsharingType));				
+					eventsManager.processEvent(new NoVehicleCarSharingEvent(time, carsharingType, startLink, destinationLink));
 
 					return null;				
 				}
@@ -120,12 +120,12 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 				Link stationLink = vehiclesContainer.getVehicleLocation(vehicle);
 
 				if (false == companyContainer.reserveVehicle(vehicle)) {
-					eventsManager.processEvent(new NoVehicleCarSharingEvent(time, startLink.getId(), carsharingType));
+					eventsManager.processEvent(new NoVehicleCarSharingEvent(time, carsharingType, startLink, destinationLink));
 
 					return null;
 				}
 			
-				eventsManager.processEvent(new StartRentalEvent(time, carsharingType, startLink, stationLink, person.getId(), vehicle.getVehicleId()));
+				eventsManager.processEvent(new StartRentalEvent(time, carsharingType, companyId, startLink, stationLink, destinationLink, person.getId(), vehicle.getVehicleId()));
 			
 				if ((willHaveATripFromLocation && keepTheCar) || (willHaveATripFromLocation && carsharingType.equals("twoway"))) {
 					return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, carsharingType, vehicle,
@@ -148,7 +148,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 				}	
 			}
 			else {
-				eventsManager.processEvent(new NoVehicleCarSharingEvent(time, startLink.getId(), carsharingType));
+				eventsManager.processEvent(new NoVehicleCarSharingEvent(time, carsharingType, startLink, destinationLink));
 				return null;
 			}
 		}					
