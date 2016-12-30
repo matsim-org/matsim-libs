@@ -34,6 +34,8 @@ import org.matsim.contrib.emissions.utils.EmissionUtils;
 /**
  * @author amit
  *
+ * TODO : fix up methods, probably using mapUtils or lambda expressions
+ *
  */
 public class EmissionUtilsExtended extends EmissionUtils{
 
