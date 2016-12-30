@@ -19,14 +19,20 @@
 
 package playground.agarwalamit.mixedTraffic.patnaIndia.policies.analysis;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Map;
 import org.matsim.contrib.emissions.events.EmissionEventsReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
+import org.matsim.core.utils.io.IOUtils;
+import playground.agarwalamit.analysis.emission.EmissionUtilsExtended;
 import playground.agarwalamit.analysis.emission.filtering.FilteredEmissionPersonEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.utils.FileUtils;
+import playground.agarwalamit.utils.MapUtils;
 
 /**
  * Created by amit on 23/12/2016.
@@ -36,13 +42,15 @@ import playground.agarwalamit.utils.FileUtils;
 public class PatnaEmissionsAnalyzer {
 
     public static void main(String[] args) {
-        String emissionEventsFile = FileUtils.RUNS_SVN+"patnaIndia/run108/jointDemand/policies/0.15pcu/bau/output_emissions_events.xml.gz";
-        String eventsFile = FileUtils.RUNS_SVN+"patnaIndia/run108/jointDemand/policies/0.15pcu/bau/output_events.xml.gz";
+        String policyCase = "bau";
+        String emissionEventsFile = FileUtils.RUNS_SVN+"patnaIndia/run108/jointDemand/policies/0.15pcu/"+policyCase+"/output_emissions_events.xml.gz";
+        String eventsFile = FileUtils.RUNS_SVN+"patnaIndia/run108/jointDemand/policies/0.15pcu/"+policyCase+"/output_events.xml.gz";
+        String outEmissionFile = FileUtils.RUNS_SVN+"patnaIndia/run108/jointDemand/policies/0.15pcu/analysis/emissions_"+policyCase+".txt";
 
-        new PatnaEmissionsAnalyzer().run(emissionEventsFile, eventsFile);
+        new PatnaEmissionsAnalyzer().run(emissionEventsFile, eventsFile, outEmissionFile);
     }
 
-    private void run(final String emissionEventsFile, final String eventsFile){
+    private void run(final String emissionEventsFile, final String eventsFile, final String outFile){
 
         FilteredEmissionPersonEventHandler emissionPersonEventHandler = new FilteredEmissionPersonEventHandler(
                 PatnaPersonFilter.PatnaUserGroup.urban.toString(), new PatnaPersonFilter());
@@ -60,9 +68,24 @@ public class PatnaEmissionsAnalyzer {
 //        eventsReader.readFile(eventsFile);
         emissionEventsReader.readFile(emissionEventsFile);
 
+        EmissionUtilsExtended emissionUtilsExtended = new EmissionUtilsExtended();
 
-        System.out.println(emissionPersonEventHandler.getPersonId2ColdEmissions().size());
-        System.out.println(emissionPersonEventHandler.getPersonId2WarmEmissions().size());
+        Map<String, Double> coldEmissions = emissionUtilsExtended.getTotalColdEmissions(emissionPersonEventHandler.getPersonId2ColdEmissions());
+        Map<String, Double> warmEmissions = emissionUtilsExtended.getTotalWarmEmissions(emissionPersonEventHandler.getPersonId2WarmEmissions());
+
+        Map<String, Double> totalEmissions = MapUtils.addMaps(coldEmissions, warmEmissions);
+
+        BufferedWriter writer = IOUtils.getBufferedWriter(outFile);
+        try {
+            writer.write("pollutant \t valueInGm \n");
+            for (String str : totalEmissions.keySet()) {
+                writer.write(str+"\t"+totalEmissions.get(str)+"\n");
+            }
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException("Data is not written/read. Reason : " + e);
+        }
+
 
     }
 }
