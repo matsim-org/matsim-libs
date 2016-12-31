@@ -50,11 +50,14 @@ public class EmissionPersonEventHandler implements WarmEmissionEventHandler, Col
     private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
     private final Map<Id<Person>, Map<ColdPollutant, Double>> personId2ColdEmissions = new HashMap<>();
+    private final Map<Id<Vehicle>, Map<ColdPollutant, Double>> vehicleId2ColdEmissions = new HashMap<>();
     private final Map<Id<Person>, Map<WarmPollutant, Double>> personId2WarmEmissions = new HashMap<>();
+    private final Map<Id<Vehicle>, Map<WarmPollutant, Double>> vehicleId2WarmEmissions = new HashMap<>();
 
     @Override
     public void handleEvent(WarmEmissionEvent event) {
 //        Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
+        //TODO : following would be gone as soon as I will be able to fix the reading of two events file.
         Id<Person> driverId ;
         String vehicleIdString = event.getVehicleId().toString();
 
@@ -71,22 +74,39 @@ public class EmissionPersonEventHandler implements WarmEmissionEventHandler, Col
             driverId = Id.createPersonId(vehicleIdString);
         }
 
-        Map<WarmPollutant, Double> warmEmissions = this.personId2WarmEmissions.get(driverId);
+        {
+            Map<WarmPollutant, Double> warmEmissions = this.personId2WarmEmissions.get(driverId);
 
-        if (warmEmissions == null ) {
-            this.personId2WarmEmissions.put(driverId, event.getWarmEmissions());
-        } else {
-            this.personId2WarmEmissions.put(driverId,
-                    Arrays.stream(WarmPollutant.values()).collect(
-                            Collectors.toMap(wp -> wp,
-                                    wp -> warmEmissions.get( wp ) + event.getWarmEmissions().get( wp ) ))
-                    );
+            if (warmEmissions == null ) {
+                this.personId2WarmEmissions.put(driverId, event.getWarmEmissions());
+            } else {
+                this.personId2WarmEmissions.put(driverId,
+                        Arrays.stream(WarmPollutant.values()).collect(
+                                Collectors.toMap(wp -> wp,
+                                        wp -> warmEmissions.get( wp ) + event.getWarmEmissions().get( wp ) ))
+                );
+            }
+        }
+
+        {
+            Map<WarmPollutant, Double> warmEmissions = this.vehicleId2WarmEmissions.get(event.getVehicleId());
+
+            if (warmEmissions == null ) {
+                this.vehicleId2WarmEmissions.put(event.getVehicleId(), event.getWarmEmissions());
+            } else {
+                this.vehicleId2WarmEmissions.put(event.getVehicleId(),
+                        Arrays.stream(WarmPollutant.values()).collect(
+                                Collectors.toMap(wp -> wp,
+                                        wp -> warmEmissions.get( wp ) + event.getWarmEmissions().get( wp ) ))
+                );
+            }
         }
     }
 
     @Override
     public void handleEvent(ColdEmissionEvent event) {
 //        Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
+        //TODO : following would be gone as soon as I will be able to fix the reading of two events file.
         Id<Person> driverId ;
         String vehicleIdString = event.getVehicleId().toString();
 
@@ -103,23 +123,42 @@ public class EmissionPersonEventHandler implements WarmEmissionEventHandler, Col
             driverId = Id.createPersonId(vehicleIdString);
         }
 
-        Map<ColdPollutant, Double> coldEmissions = this.personId2ColdEmissions.get(driverId);
+        {
+            Map<ColdPollutant, Double> coldEmissions = this.personId2ColdEmissions.get(driverId);
 
-        if (coldEmissions == null ) {
-            this.personId2ColdEmissions.put(driverId, event.getColdEmissions());
-        } else {
-            this.personId2ColdEmissions.put(driverId,
-                    Arrays.stream(ColdPollutant.values()).collect(
-                            Collectors.toMap(cp -> cp,
-                                    cp -> coldEmissions.get( cp ) + event.getColdEmissions().get( cp ) ))
-            );
+            if (coldEmissions == null ) {
+                this.personId2ColdEmissions.put(driverId, event.getColdEmissions());
+            } else {
+                this.personId2ColdEmissions.put(driverId,
+                        Arrays.stream(ColdPollutant.values()).collect(
+                                Collectors.toMap(cp -> cp,
+                                        cp -> coldEmissions.get( cp ) + event.getColdEmissions().get( cp ) ))
+                );
+            }
         }
+
+        {
+            Map<ColdPollutant, Double> coldEmissions = this.vehicleId2ColdEmissions.get(event.getVehicleId());
+
+            if (coldEmissions == null ) {
+                this.vehicleId2ColdEmissions.put(event.getVehicleId(), event.getColdEmissions());
+            } else {
+                this.vehicleId2ColdEmissions.put(event.getVehicleId(),
+                        Arrays.stream(ColdPollutant.values()).collect(
+                                Collectors.toMap(cp -> cp,
+                                        cp -> coldEmissions.get( cp ) + event.getColdEmissions().get( cp ) ))
+                );
+            }
+        }
+
     }
 
     @Override
     public void reset(int iteration) {
         this.personId2WarmEmissions.clear();
         this.personId2ColdEmissions.clear();
+        this.vehicleId2ColdEmissions.clear();
+        this.vehicleId2WarmEmissions.clear();
         this.delegate.reset(iteration);
     }
 
@@ -145,4 +184,11 @@ public class EmissionPersonEventHandler implements WarmEmissionEventHandler, Col
         return personId2WarmEmissions;
     }
 
+    public Map<Id<Vehicle>, Map<ColdPollutant, Double>> getVehicleId2ColdEmissions() {
+        return vehicleId2ColdEmissions;
+    }
+
+    public Map<Id<Vehicle>, Map<WarmPollutant, Double>> getVehicleId2WarmEmissions() {
+        return vehicleId2WarmEmissions;
+    }
 }

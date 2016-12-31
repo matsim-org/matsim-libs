@@ -102,7 +102,8 @@ public class FilteredEmissionPersonEventHandler implements ColdEmissionEventHand
 
 	@Override
 	public void handleEvent(ColdEmissionEvent event) {
-//		Id<Person> driverId = this.delegate.getDriverOfVehicle(event.getVehicleId());
+		//TODO : following would be gone as soon as I will be able to fix the reading of two events file.
+// 	Id<Person> driverId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 		Id<Person> driverId ;
 		String vehicleIdString = event.getVehicleId().toString();
 
@@ -141,7 +142,7 @@ public class FilteredEmissionPersonEventHandler implements ColdEmissionEventHand
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
 //		Id<Person> driverId = this.delegate.getDriverOfVehicle(event.getVehicleId());
-
+//TODO : following would be gone as soon as I will be able to fix the reading of two events file.
 		Id<Person> driverId ;
 		String vehicleIdString = event.getVehicleId().toString();
 
@@ -197,6 +198,14 @@ public class FilteredEmissionPersonEventHandler implements ColdEmissionEventHand
 
 	public Map<Id<Person>, Map<WarmPollutant, Double>> getPersonId2WarmEmissions() {
 		return delegate.getPersonId2WarmEmissions();
+	}
+
+	public Map<Id<Vehicle>, Map<ColdPollutant, Double>> getVehicleId2ColdEmissions() {
+		return delegate.getVehicleId2ColdEmissions();
+	}
+
+	public Map<Id<Vehicle>, Map<WarmPollutant, Double>> getVehicleId2WarmEmissions() {
+		return delegate.getVehicleId2WarmEmissions();
 	}
 
 	@Override
