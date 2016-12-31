@@ -80,23 +80,25 @@ import javax.inject.Provider;
  */
 public class SantiagoScenarioRunner {
 		
-	
+	/**GENERAL**/
 	private static String configFile;
+	private static String gantriesFile;
 	private static int policy;
 	private static int sigma;	
 	private static boolean doModeChoice; 
 	private static boolean mapActs2Links;
-	private static String gantriesFile;
+	/***/
 
+	private static String simulationStep = "Step2b";
 	private static String caseName = "baseCase1pct";
 	private static String inputPath = "../../../runs-svn/santiago/"+caseName+"/";
-	
+
 	
 	
 	public static void main(String args[]){		
 
 		if (args.length==6){ //ONLY FOR CMD CASES
-			
+
 			configFile = args[0]; //COMPLETE PATH TO CONFIG.
 			gantriesFile = args[1]; //COMPLETE PATH TO TOLL LINKS FILE
 			policy = Integer.parseInt(args[2]) ; //POLICY? - 0: BASE CASE, 1: CORDON.
@@ -106,8 +108,9 @@ public class SantiagoScenarioRunner {
 			
 		} else {
 		
-			configFile=inputPath + "config_" + caseName + ".xml" ; 
-			gantriesFile = inputPath + "input/gantries.xml";
+//			configFile=inputPath + "config_" + caseName + ".xml" ;
+			configFile = inputPath + "config" + simulationStep + ".xml";
+			gantriesFile = inputPath + "inputFor" + simulationStep + "/gantries.xml";
 			policy=0;    
 			sigma=3 ;    
 			doModeChoice=true ; 
@@ -147,28 +150,32 @@ public class SantiagoScenarioRunner {
 			config.plansCalcRoute().setRoutingRandomness(sigma); 
 
 			controler.addOverridingModule(new RoadPricingModule());	
-			controler.addOverridingModule(new CadytsCarModule());
+			
+			
+			//TODO: Uncomment this.
+//			controler.addOverridingModule(new CadytsCarModule());
 
-			// include cadyts into the plan scoring (this will add the cadyts corrections to the scores):
-			controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-				@Inject CadytsContext cadytsContext;
-				@Inject CharyparNagelScoringParametersForPerson parameters;
-				@Override
-				public ScoringFunction createNewScoringFunction(Person person) {
-					final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
-					
-					SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
-					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
-					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-
-					final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cadytsContext);
-					scoringFunction.setWeightOfCadytsCorrection(30. * config.planCalcScore().getBrainExpBeta()) ;
-					scoringFunctionAccumulator.addScoringFunction(scoringFunction );
-
-					return scoringFunctionAccumulator;
-				}
-			}) ;
+			// include cadyts into the plan scoring (this will add the cadyts corrections to the scores)
+			//TODO: Uncomment this.
+//			controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+//				@Inject CadytsContext cadytsContext;
+//				@Inject CharyparNagelScoringParametersForPerson parameters;
+//				@Override
+//				public ScoringFunction createNewScoringFunction(Person person) {
+//					final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
+//					
+//					SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
+//					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+//					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+//					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+//
+//					final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cadytsContext);
+//					scoringFunction.setWeightOfCadytsCorrection(30. * config.planCalcScore().getBrainExpBeta()) ;
+//					scoringFunctionAccumulator.addScoringFunction(scoringFunction );
+//
+//					return scoringFunctionAccumulator;
+//				}
+//			}) ;
 			
 			
 			
