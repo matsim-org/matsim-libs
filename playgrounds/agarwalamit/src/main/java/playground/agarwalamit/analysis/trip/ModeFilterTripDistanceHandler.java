@@ -33,17 +33,17 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
  */
 
 
-public class FilteredTripDistanceHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEventHandler,
+public class ModeFilterTripDistanceHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEventHandler,
         VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler{
 
-    private static final Logger LOG = Logger.getLogger(FilteredTripDistanceHandler.class);
+    private static final Logger LOG = Logger.getLogger(ModeFilterTripDistanceHandler.class);
     private final TripDistanceHandler delegate ;
     private final String mode2Consider;
     private final Map<Id<Person>,String> personId2mode = new HashMap<>(); // person id -- mode
     private final Vehicle2DriverEventHandler vehicle2DriverDelegate; // person id -- vehicle id
 
 
-    public FilteredTripDistanceHandler(final Network network, final double simulationEndTime, final int noOfTimeBins, final String mode2Consider){
+    public ModeFilterTripDistanceHandler(final Network network, final double simulationEndTime, final int noOfTimeBins, final String mode2Consider){
         this.delegate = new TripDistanceHandler(network, simulationEndTime, noOfTimeBins);
         this.vehicle2DriverDelegate = new Vehicle2DriverEventHandler();
         this.mode2Consider = mode2Consider;
@@ -53,7 +53,7 @@ public class FilteredTripDistanceHandler implements PersonDepartureEventHandler,
     /*
     * By default, this will analyze only car trips.
     */
-    public FilteredTripDistanceHandler(final Network network, final double simulationEndTime, final int noOfTimeBins){
+    public ModeFilterTripDistanceHandler(final Network network, final double simulationEndTime, final int noOfTimeBins){
         this(network,simulationEndTime,noOfTimeBins,"car");
     }
 

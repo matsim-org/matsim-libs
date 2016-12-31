@@ -40,7 +40,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.legMode.tripDistance.LegModeRouteDistanceDistributionHandler;
-import playground.agarwalamit.analysis.trip.FilteredTripDistanceHandler;
+import playground.agarwalamit.analysis.trip.ModeFilterTripDistanceHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.ListUtils;
@@ -49,19 +49,19 @@ import playground.agarwalamit.utils.ListUtils;
  * @author amit
  */
 
-public class TravelDistanceComperator {
+public class TravelDistanceForSimTimeExp {
 	
 	private final String respectiveFileDirectory ;
 	private final String netFile ;
 	private BufferedWriter writer;
 
-	TravelDistanceComperator(final String dir, final String networkFile) {
+	TravelDistanceForSimTimeExp(final String dir, final String networkFile) {
 		this.respectiveFileDirectory = dir;
 		this.netFile = networkFile;
 	}
 
 	public static void main(String[] args) {
-		TravelDistanceComperator tdc = new TravelDistanceComperator(FileUtils.RUNS_SVN+"/patnaIndia/run110/randomNrFix/fastCapacityUpdate/1pct/",
+		TravelDistanceForSimTimeExp tdc = new TravelDistanceForSimTimeExp(FileUtils.RUNS_SVN+"/patnaIndia/run110/randomNrFix/fastCapacityUpdate/1pct/",
 				FileUtils.RUNS_SVN+"/patnaIndia/inputs/network.xml");
 		tdc.run();
 	}
@@ -121,8 +121,8 @@ public class TravelDistanceComperator {
 		Scenario sc = ScenarioUtils.loadScenario(config);
 		
 		EventsManager manager = EventsUtils.createEventsManager();
-		FilteredTripDistanceHandler handler_bike = new FilteredTripDistanceHandler(sc.getNetwork(),sc.getConfig().qsim().getEndTime(),1,"bike");
-		FilteredTripDistanceHandler handler_car = new FilteredTripDistanceHandler(sc.getNetwork(),sc.getConfig().qsim().getEndTime(),1,"car");
+		ModeFilterTripDistanceHandler handler_bike = new ModeFilterTripDistanceHandler(sc.getNetwork(),sc.getConfig().qsim().getEndTime(),1,"bike");
+		ModeFilterTripDistanceHandler handler_car = new ModeFilterTripDistanceHandler(sc.getNetwork(),sc.getConfig().qsim().getEndTime(),1,"car");
 		LegModeRouteDistanceDistributionHandler handler = new LegModeRouteDistanceDistributionHandler(sc);
 		manager.addHandler(handler);
 		manager.addHandler(handler_bike);
