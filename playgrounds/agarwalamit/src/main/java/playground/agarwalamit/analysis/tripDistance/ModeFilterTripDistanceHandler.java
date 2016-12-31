@@ -37,14 +37,14 @@ public class ModeFilterTripDistanceHandler implements PersonDepartureEventHandle
         VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler{
 
     private static final Logger LOG = Logger.getLogger(ModeFilterTripDistanceHandler.class);
-    private final TripDistanceHandler delegate ;
+    private final TripRouteDistanceHandler delegate ;
     private final String mode2Consider;
     private final Map<Id<Person>,String> personId2mode = new HashMap<>(); // person id -- mode
     private final Vehicle2DriverEventHandler vehicle2DriverDelegate; // person id -- vehicle id
 
 
     public ModeFilterTripDistanceHandler(final Network network, final double simulationEndTime, final int noOfTimeBins, final String mode2Consider){
-        this.delegate = new TripDistanceHandler(network, simulationEndTime, noOfTimeBins);
+        this.delegate = new TripRouteDistanceHandler(network, simulationEndTime, noOfTimeBins);
         this.vehicle2DriverDelegate = new Vehicle2DriverEventHandler();
         this.mode2Consider = mode2Consider;
         LOG.info("Only "+this.mode2Consider +" will be considerd to calculate trip distances");

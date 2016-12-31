@@ -106,7 +106,7 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 	}
 
 	public static void main(String[] args) {
-		String scenario = "bau";
+		String scenario = "ei";
 		String eventsFile = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/ITERS/it.1500/1500.events.xml.gz";
 		String configFile = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/output_config.xml.gz";
 		String networkFile = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/output_network.xml.gz";

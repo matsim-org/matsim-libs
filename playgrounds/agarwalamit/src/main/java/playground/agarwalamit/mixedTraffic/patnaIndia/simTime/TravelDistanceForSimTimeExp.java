@@ -39,7 +39,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.tripDistance.LegModeRouteDistanceDistributionHandler;
+import playground.agarwalamit.analysis.tripDistance.TripDistanceHandler;
 import playground.agarwalamit.analysis.tripDistance.ModeFilterTripDistanceHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.FileUtils;
@@ -123,7 +123,7 @@ public class TravelDistanceForSimTimeExp {
 		EventsManager manager = EventsUtils.createEventsManager();
 		ModeFilterTripDistanceHandler handler_bike = new ModeFilterTripDistanceHandler(sc.getNetwork(),sc.getConfig().qsim().getEndTime(),1,"bike");
 		ModeFilterTripDistanceHandler handler_car = new ModeFilterTripDistanceHandler(sc.getNetwork(),sc.getConfig().qsim().getEndTime(),1,"car");
-		LegModeRouteDistanceDistributionHandler handler = new LegModeRouteDistanceDistributionHandler(sc);
+		TripDistanceHandler handler = new TripDistanceHandler(sc);
 		manager.addHandler(handler);
 		manager.addHandler(handler_bike);
 		manager.addHandler(handler_car);

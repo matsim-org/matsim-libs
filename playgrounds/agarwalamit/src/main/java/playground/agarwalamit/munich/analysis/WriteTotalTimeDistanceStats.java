@@ -37,7 +37,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.StuckAgentsFilter;
-import playground.agarwalamit.analysis.tripDistance.LegModeRouteDistanceDistributionHandler;
+import playground.agarwalamit.analysis.tripDistance.TripDistanceHandler;
 import playground.agarwalamit.analysis.tripTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
@@ -48,7 +48,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  */
 public class WriteTotalTimeDistanceStats {
 
-	private LegModeRouteDistanceDistributionHandler distHandler;
+	private TripDistanceHandler distHandler;
 	private final String outputDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
 	private final String cases [] = {"baseCaseCtd", "ei","ci","eci"};
 	private final UserGroup ug = UserGroup.REV_COMMUTER;
@@ -127,7 +127,7 @@ public class WriteTotalTimeDistanceStats {
 	}
 
 	private SortedMap<String,Map<Id<Person>, Double>> getRouteDistances(String eventsFile, Scenario scenario){
-		distHandler = new LegModeRouteDistanceDistributionHandler(scenario);
+		distHandler = new TripDistanceHandler(scenario);
 		EventsManager events = EventsUtils.createEventsManager();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		events.addHandler(distHandler);

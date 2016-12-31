@@ -30,7 +30,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.tripDistance.LegModeBeelineDistanceDistributionHandler;
-import playground.agarwalamit.analysis.tripDistance.LegModeRouteDistanceDistributionHandler;
+import playground.agarwalamit.analysis.tripDistance.TripDistanceHandler;
 import playground.agarwalamit.analysis.tripDistance.TripDistanceType;
 import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
@@ -176,7 +176,7 @@ public class ModeSwitchersTripDistance {
 
 		switch (this.tripDistanceType){
 			case ROUTE_DISTANCE:
-				LegModeRouteDistanceDistributionHandler distHandler = new LegModeRouteDistanceDistributionHandler(sc);
+				TripDistanceHandler distHandler = new TripDistanceHandler(sc);
 				events.addHandler(distHandler);
 				reader.readFile(eventsFile);
 				mode2Person2TripDists = distHandler.getMode2PersonId2TravelDistances();

@@ -52,7 +52,7 @@ public class LegModeRouteDistanceDistributionAnalyzer extends AbstractAnalysisMo
 
 	private final SortedMap<String, SortedMap<Integer, Integer>> mode2DistanceClass2LegCount ;
 	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2dist;
-	private LegModeRouteDistanceDistributionHandler lmrdh;
+	private TripDistanceHandler lmrdh;
 	private String eventsFile;
 	private UserGroup userGroup = null;
 
@@ -72,7 +72,7 @@ public class LegModeRouteDistanceDistributionAnalyzer extends AbstractAnalysisMo
 	}
 
 	public void init(final Scenario sc, final String eventsFile){
-		this.lmrdh = new LegModeRouteDistanceDistributionHandler(sc);
+		this.lmrdh = new TripDistanceHandler(sc);
 		this.eventsFile = eventsFile;
 	}
 
