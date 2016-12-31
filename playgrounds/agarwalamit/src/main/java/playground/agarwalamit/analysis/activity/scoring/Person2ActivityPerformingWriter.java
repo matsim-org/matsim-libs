@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.analysis.scoring;
+package playground.agarwalamit.analysis.activity.scoring;
 
 import java.io.BufferedWriter;
 import java.util.HashMap;

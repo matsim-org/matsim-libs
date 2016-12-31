@@ -40,7 +40,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.legMode.tripDistance.LegModeRouteDistanceDistributionHandler;
-import playground.agarwalamit.analysis.trip.ModeFilterTripDistanceHandler;
+import playground.agarwalamit.analysis.tripDistance.ModeFilterTripDistanceHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.ListUtils;

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.analysis.travelTime;
+package playground.agarwalamit.analysis.tripTime;
 
 import java.util.List;
 import java.util.Map;

@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.PersonFilter;
 

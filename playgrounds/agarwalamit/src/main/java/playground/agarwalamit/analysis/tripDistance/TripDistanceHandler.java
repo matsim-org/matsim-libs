@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.analysis.trip;
+package playground.agarwalamit.analysis.tripDistance;
 
 import java.util.*;
 import org.apache.log4j.Logger;

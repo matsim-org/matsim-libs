@@ -17,14 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.analysis.controlerListener;
+package playground.agarwalamit.analysis.modalShare;
 
-import java.util.*;
-
+import java.util.SortedMap;
+import java.util.TreeMap;
 import javax.inject.Inject;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -32,20 +29,17 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
 
-import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
-import playground.agarwalamit.utils.ListUtils;
-
 /**
  * @author amit
  */
 
-public class ModalTravelTimeControlerListener implements StartupListener, IterationEndsListener{
+public class ModalShareControlerListener implements StartupListener, IterationEndsListener{
 
 	private int firstIteration = 0;
-	private SortedMap<String, double []> mode2AvgTripTimes = new TreeMap<>();
+	private SortedMap<String, double []> mode2numberofLegs = new TreeMap<>();
 
 	@Inject
-	private ModalTripTravelTimeHandler travelTimeHandler;
+	private ModalShareEventHandler modalShareHandler;
 
 	@Inject
 	private EventsManager events;
@@ -53,66 +47,54 @@ public class ModalTravelTimeControlerListener implements StartupListener, Iterat
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.firstIteration = event.getServices().getConfig().controler().getFirstIteration();
-		this.events.addHandler(this.travelTimeHandler);
+		this.events.addHandler(this.modalShareHandler);
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
+		this.modalShareHandler.handleRemainingTransitUsers();
 
 		String outputDir = event.getServices().getConfig().controler().getOutputDirectory();
-
-		SortedMap<String, Double > mode2AvgTripTime = modalAvgTime();
+		
+		SortedMap<String, Integer > mode2legs = this.modalShareHandler.getMode2numberOflegs();
 		int itNrIndex = event.getIteration() - this.firstIteration;
 
-		for(String mode : mode2AvgTripTime.keySet()) {
-			if ( ! mode2AvgTripTimes.containsKey(mode)){
-				double [] avgTimes = new double [itNrIndex+1];
-				avgTimes[itNrIndex] = mode2AvgTripTime.get(mode);
-				mode2AvgTripTimes.put(mode, avgTimes);
+		for(String mode : mode2legs.keySet()) {
+			if ( ! mode2numberofLegs.containsKey(mode)){ // initialize
+				double [] legs = new double [itNrIndex+1];
+				legs[itNrIndex] = mode2legs.get(mode);
+				mode2numberofLegs.put(mode, legs);
 			} else {
-				double [] avgTimesSoFar = mode2AvgTripTimes.get(mode);
-				double [] avgTimesNew = new double [avgTimesSoFar.length+1];
-				System.arraycopy(avgTimesSoFar, 0, avgTimesNew, 0, avgTimesSoFar.length);
-				avgTimesNew[itNrIndex] = mode2AvgTripTime.get(mode);
-				mode2AvgTripTimes.put(mode, avgTimesNew);
+				double [] legsSoFar = mode2numberofLegs.get(mode);
+				double [] legsNew = new double[legsSoFar.length+1];
+				System.arraycopy(legsSoFar,0,legsNew,0,legsSoFar.length);
+				legsNew[itNrIndex] = mode2legs.get(mode);
+				mode2numberofLegs.put(mode,legsNew);
 			}
 		}
 
 		if(itNrIndex == 0) return;
 
 		//plot data here...
-		XYLineChart chart = new XYLineChart("Modal Travel Time", "iteration", "travel time [sec]");
+		XYLineChart chart = new XYLineChart("Modal Share", "iteration", "Number of legs");
 
 		// x-series
 		double[] iterations = new double[itNrIndex + 1];
 		for (int i = 0; i <= itNrIndex; i++) {
 			iterations[i] = i + this.firstIteration;
 		}
-
+		
 		//y series
-		for(String mode : this.mode2AvgTripTimes.keySet()){
+		for(String mode : this.mode2numberofLegs.keySet()){
 			double [] values = new double [itNrIndex+1]; // array of only available data
-			System.arraycopy(this.mode2AvgTripTimes.get(mode), 0, values, 0, itNrIndex + 1);
+			System.arraycopy(this.mode2numberofLegs.get(mode), 0, values, 0, itNrIndex + 1);
 			chart.addSeries(mode, iterations, values);
 		}
-
+		
 		// others--
 		chart.addMatsimLogo();
-		chart.saveAsPng(outputDir+"/modalTravelTime.png", 800, 600);
-	}
-
-	private SortedMap<String, Double > modalAvgTime() {
-		SortedMap<String, Double > mode2AvgTripTime = new TreeMap<>();
-		SortedMap<String, Map<Id<Person>, List<Double>>> times = travelTimeHandler.getLegMode2PesonId2TripTimes();
-		for(String mode :times.keySet()){
-			double tripTimes =0;
-			int count = 0;
-			for(Id<Person> id : times.get(mode).keySet()){
-				tripTimes += ListUtils.doubleSum(times.get(mode).get(id));
-				count += times.get(mode).get(id).size();
-			}
-			mode2AvgTripTime.put(mode, tripTimes/count);
-		}
-		return mode2AvgTripTime;
+        chart.saveAsPng(outputDir+"/modalShare.png", 800, 600);
 	}
 }
+
+

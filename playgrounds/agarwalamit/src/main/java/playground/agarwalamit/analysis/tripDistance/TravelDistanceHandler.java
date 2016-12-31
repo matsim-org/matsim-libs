@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.analysis;
+package playground.agarwalamit.analysis.tripDistance;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

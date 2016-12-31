@@ -30,7 +30,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.analysis.trip.ModeFilterTripDistanceHandler;
+import playground.agarwalamit.analysis.tripDistance.ModeFilterTripDistanceHandler;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.FileUtils;

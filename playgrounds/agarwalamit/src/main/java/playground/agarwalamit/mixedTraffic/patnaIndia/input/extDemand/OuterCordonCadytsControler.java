@@ -64,11 +64,11 @@ import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 
-import playground.agarwalamit.analysis.controlerListener.ModalShareControlerListener;
-import playground.agarwalamit.analysis.controlerListener.ModalTravelTimeControlerListener;
+import playground.agarwalamit.analysis.modalShare.ModalShareControlerListener;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeControlerListener;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
-import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.joint.JointCalibrationControler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.PatnaVehiclesGenerator;

@@ -30,10 +30,10 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.agarwalamit.analysis.controlerListener.ModalShareControlerListener;
-import playground.agarwalamit.analysis.controlerListener.ModalTravelTimeControlerListener;
+import playground.agarwalamit.analysis.modalShare.ModalShareControlerListener;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeControlerListener;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
-import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.opdyts.OpdytsModalStatsControlerListener;
 import playground.agarwalamit.opdyts.OpdytsScenarios;
 

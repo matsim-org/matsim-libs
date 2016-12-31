@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.munich.utils.UserGroupUtilsExtended;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;

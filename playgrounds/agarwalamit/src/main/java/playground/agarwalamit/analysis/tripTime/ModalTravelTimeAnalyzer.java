@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.analysis.travelTime;
+package playground.agarwalamit.analysis.tripTime;
 
 import java.io.BufferedWriter;
 import java.util.HashMap;
