@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.analysis.legMode.tripDistance;
+package playground.agarwalamit.analysis.tripDistance;
 
 import java.util.*;
 import org.apache.log4j.Logger;

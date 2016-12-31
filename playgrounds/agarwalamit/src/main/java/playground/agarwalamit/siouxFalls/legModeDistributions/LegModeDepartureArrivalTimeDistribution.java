@@ -35,7 +35,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.legMode.distributions.LegModeDepartureArrivalTimeHandler;
+import playground.agarwalamit.analysis.activity.departureArrival.LegModeDepartureArrivalTimeHandler;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 

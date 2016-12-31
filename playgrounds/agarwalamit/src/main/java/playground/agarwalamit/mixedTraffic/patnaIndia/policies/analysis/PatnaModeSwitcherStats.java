@@ -19,7 +19,7 @@
 
 package playground.agarwalamit.mixedTraffic.patnaIndia.policies.analysis;
 
-import playground.agarwalamit.analysis.legMode.tripDistance.TripDistanceType;
+import playground.agarwalamit.analysis.tripDistance.TripDistanceType;
 import playground.agarwalamit.analysis.modeSwitcherRetainer.ModeSwitchersTripDistance;
 import playground.agarwalamit.analysis.modeSwitcherRetainer.ModeSwitchersTripTime;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;

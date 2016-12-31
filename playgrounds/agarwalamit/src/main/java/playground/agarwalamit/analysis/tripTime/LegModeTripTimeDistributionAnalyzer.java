@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.analysis.legMode.distributions;
+package playground.agarwalamit.analysis.tripTime;
 
 import java.io.BufferedWriter;
 import java.util.ArrayList;
@@ -36,7 +36,6 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**

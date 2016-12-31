@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.analysis.legMode.tripDistance;
+package playground.agarwalamit.analysis.tripDistance;
 
 import java.io.BufferedWriter;
 import java.util.ArrayList;

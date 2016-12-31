@@ -23,7 +23,7 @@ import java.io.File;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 
-import playground.agarwalamit.analysis.legMode.tripDistance.LegModeRouteDistanceDistributionAnalyzer;
+import playground.agarwalamit.analysis.tripDistance.LegModeRouteDistanceDistributionAnalyzer;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;

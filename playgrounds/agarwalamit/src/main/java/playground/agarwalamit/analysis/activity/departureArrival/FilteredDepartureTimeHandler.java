@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.analysis.legMode.distributions;
+package playground.agarwalamit.analysis.activity.departureArrival;
 
 import java.util.Map;
 import java.util.SortedMap;

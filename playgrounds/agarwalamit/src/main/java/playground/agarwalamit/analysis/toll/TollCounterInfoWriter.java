@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.analysis.Toll;
+package playground.agarwalamit.analysis.toll;
 
 import java.io.BufferedWriter;
 import java.util.List;

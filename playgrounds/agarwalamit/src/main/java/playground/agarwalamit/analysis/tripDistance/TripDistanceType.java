@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.analysis.legMode.tripDistance;
+package playground.agarwalamit.analysis.tripDistance;
 
 /**
  * Created by amit on 12/12/2016.

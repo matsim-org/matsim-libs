@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.analysis.Toll;
+package playground.agarwalamit.analysis.toll;
 
 import java.util.ArrayList;
 import java.util.Collection;
