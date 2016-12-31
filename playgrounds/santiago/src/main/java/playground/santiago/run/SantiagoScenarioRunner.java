@@ -87,6 +87,7 @@ public class SantiagoScenarioRunner {
 	private static int sigma;	
 	private static boolean doModeChoice; 
 	private static boolean mapActs2Links;
+	private static boolean cadyts;
 	/***/
 
 	private static String simulationStep = "Step2b";
@@ -97,7 +98,7 @@ public class SantiagoScenarioRunner {
 	
 	public static void main(String args[]){		
 
-		if (args.length==6){ //ONLY FOR CMD CASES
+		if (args.length==7){ //ONLY FOR CMD CASES
 
 			configFile = args[0]; //COMPLETE PATH TO CONFIG.
 			gantriesFile = args[1]; //COMPLETE PATH TO TOLL LINKS FILE
@@ -105,6 +106,7 @@ public class SantiagoScenarioRunner {
 			sigma = Integer.parseInt(args[3]); //SIGMA. 
 			doModeChoice = Boolean.parseBoolean(args[4]); //DOMODECHOICE?
 			mapActs2Links = Boolean.parseBoolean(args[5]); //MAPACTS2LINKS?
+			cadyts = Boolean.parseBoolean(args[6]); //CADYTS?
 			
 		} else {
 		
@@ -113,8 +115,9 @@ public class SantiagoScenarioRunner {
 			gantriesFile = inputPath + "inputFor" + simulationStep + "/gantries.xml";
 			policy=0;    
 			sigma=3 ;    
-			doModeChoice=true ; 
-			mapActs2Links=false; 
+			doModeChoice=true; 
+			mapActs2Links=false;
+			cadyts=true;
 		
 		}	
 			
@@ -152,31 +155,33 @@ public class SantiagoScenarioRunner {
 			controler.addOverridingModule(new RoadPricingModule());	
 			
 			
-			//TODO: Uncomment this.
-//			controler.addOverridingModule(new CadytsCarModule());
 
-			// include cadyts into the plan scoring (this will add the cadyts corrections to the scores)
-			//TODO: Uncomment this.
-//			controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-//				@Inject CadytsContext cadytsContext;
-//				@Inject CharyparNagelScoringParametersForPerson parameters;
-//				@Override
-//				public ScoringFunction createNewScoringFunction(Person person) {
-//					final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
-//					
-//					SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-//					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
-//					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
-//					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-//
-//					final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cadytsContext);
-//					scoringFunction.setWeightOfCadytsCorrection(30. * config.planCalcScore().getBrainExpBeta()) ;
-//					scoringFunctionAccumulator.addScoringFunction(scoringFunction );
-//
-//					return scoringFunctionAccumulator;
-//				}
-//			}) ;
-			
+			if (cadyts){
+				controler.addOverridingModule(new CadytsCarModule());
+				// include cadyts into the plan scoring (this will add the cadyts corrections to the scores)
+				controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+					@Inject CadytsContext cadytsContext;
+					@Inject CharyparNagelScoringParametersForPerson parameters;
+					@Override
+					public ScoringFunction createNewScoringFunction(Person person) {
+						final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
+						
+						SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
+						scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+						scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+						scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+	
+						final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cadytsContext);
+						scoringFunction.setWeightOfCadytsCorrection(30. * config.planCalcScore().getBrainExpBeta()) ;
+						scoringFunctionAccumulator.addScoringFunction(scoringFunction );
+	
+						return scoringFunctionAccumulator;
+					}
+				}) ;
+				
+				
+			}
+
 			
 			
 			//Run!
