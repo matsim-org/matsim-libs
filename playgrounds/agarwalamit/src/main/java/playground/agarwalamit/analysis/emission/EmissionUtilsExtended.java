@@ -39,17 +39,17 @@ import org.matsim.contrib.emissions.utils.EmissionUtils;
  */
 public class EmissionUtilsExtended extends EmissionUtils{
 
-	public  Map<Id<Person>, SortedMap<String, Double>> convertPerPersonColdEmissions2String (final Map<Id<Person>, Map<ColdPollutant, Double>> coldEmiss) {
-		Map<Id<Person>, SortedMap<String, Double>> outColdEmiss = new HashMap<>() ;
-		for(Id<Person> personId : coldEmiss.keySet()) {
+	public  <T> Map<Id<T>, SortedMap<String, Double>> convertPerPersonColdEmissions2String (final Map<Id<T>, Map<ColdPollutant, Double>> coldEmiss) {
+		Map<Id<T>, SortedMap<String, Double>> outColdEmiss = new HashMap<>() ;
+		for(Id<T> personId : coldEmiss.keySet()) {
 			outColdEmiss.put(personId, convertColdPollutantMap2String(coldEmiss.get(personId)));
 		}
 		return outColdEmiss;
 	}
 
-	public  Map<Id<Person>, SortedMap<String, Double>> convertPerPersonWarmEmissions2String (final Map<Id<Person>, Map<WarmPollutant, Double>> warmEmiss) {
-		Map<Id<Person>, SortedMap<String, Double>> outWarmEmiss = new HashMap<>();
-		for(Id<Person> personId : warmEmiss.keySet()) {
+	public  <T> Map<Id<T>, SortedMap<String, Double>> convertPerPersonWarmEmissions2String (final Map<Id<T>, Map<WarmPollutant, Double>> warmEmiss) {
+		Map<Id<T>, SortedMap<String, Double>> outWarmEmiss = new HashMap<>();
+		for(Id<T> personId : warmEmiss.keySet()) {
 			outWarmEmiss.put(personId, convertWarmPollutantMap2String(warmEmiss.get(personId)));
 		}
 		return outWarmEmiss;
