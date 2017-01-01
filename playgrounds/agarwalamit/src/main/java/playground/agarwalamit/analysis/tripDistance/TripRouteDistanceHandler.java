@@ -37,14 +37,18 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
  * @author amit
  */
 
-public class TripRouteDistanceHandler
-implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEventHandler,
+public class TripRouteDistanceHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEventHandler,
 VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private static final Logger LOG = Logger.getLogger(TripRouteDistanceHandler.class);
 	private final SortedMap<Id<Person>,Double> personId2TripDepartTimeBin = new TreeMap<>();
 	private final SortedMap<Double, Map<Id<Person>,Integer>> timeBin2Person2TripsCount = new TreeMap<>();
 	private final SortedMap<Double, Map<Id<Person>,List<Double>>> timeBin2Person2TripsDistance = new TreeMap<>();
+
+	private final Map<Id<Person>, String> person2mode = new HashMap<>();
+	private final SortedMap<String, Double> mode2TripDistace = new TreeMap<>();
+
+
 	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 	private final Network network;
@@ -62,6 +66,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		this.timeBin2Person2TripsCount.clear();
 		this.timeBin2Person2TripsDistance.clear();
 		this.personId2TripDepartTimeBin.clear();
+		this.mode2TripDistace.clear();
 		this.delegate.reset(iteration);
 	}
 
@@ -80,6 +85,14 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 			dists.add(tripNr - 1, prevCollectedDist + linkLength);
 		} else throw new RuntimeException("Trip count and trip dist maps are initiated at departure events, thus, tripNr should be equal to "
 				+ "number of distances stored in trip dist map. Aborting ...");
+
+		// mode 2 dist
+		String mode = this.person2mode.get(driverId);
+		if (mode2TripDistace.containsKey(mode)) {
+			mode2TripDistace.put(mode, mode2TripDistace.get(mode)+linkLength);
+		} else {
+			mode2TripDistace.put(mode, linkLength);
+		}
 	}
 
 	@Override
@@ -90,10 +103,11 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		int totalTrips = timeBin2Person2TripsCount.get(time).get(personId);
 		int distancesStored = timeBin2Person2TripsDistance.get(time).get(personId).size();
 
-		if(totalTrips == distancesStored) {
-        }
-		else throw new RuntimeException("Trip count and trip dist maps are initiated at departure events, thus, tripNr should be equal to "
-				+ "number of distances stored in trip dist map. Aborting ...");
+		if(totalTrips != distancesStored) {
+			throw new RuntimeException(
+					"Trip count and trip dist maps are initiated at departure events, thus, tripNr should be equal to "
+							+ "number of distances stored in trip dist map. Aborting ...");
+		}
 	}
 
 	@Override
@@ -103,6 +117,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		Id<Person> personId = event.getPersonId();
 
 		this.personId2TripDepartTimeBin.put(personId, time);
+		this.person2mode.put(event.getPersonId(), event.getLegMode());
 
 		if(timeBin2Person2TripsCount.containsKey(time)) {
 			Map<Id<Person>,Integer> personId2TripCount = timeBin2Person2TripsCount.get(time);
@@ -141,5 +156,9 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	public SortedMap<Double, Map<Id<Person>, List<Double>>> getTimeBin2Person2TripsDistance() {
 		return timeBin2Person2TripsDistance;
+	}
+
+	public SortedMap<String, Double> getMode2TripDistace(){
+		return this.mode2TripDistace;
 	}
 }

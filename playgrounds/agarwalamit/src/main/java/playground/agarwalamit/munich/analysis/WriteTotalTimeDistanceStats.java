@@ -82,7 +82,7 @@ public class WriteTotalTimeDistanceStats {
 					Map<Id<Person>, Double> personId2TravelDist = mode2Person2dist.get(mode);
 					double travelTime = getSumOfValuesInMap(personId2TravelTime);
 					double travelDist = getSumOfValuesInMap(personId2TravelDist);
-//					timeHandler.getTravelMode2NumberOfLegs().get(mode)
+//					timeHandler.getMode2NumberOfLegs().get(mode)
 					writer.write(str+"\t"+mode+"\t"+"NA"+"\t"+travelTime+"\t"+travelDist+"\n");
 				}
 				if(str.equals("baseCaseCtd")) stuckPersonsListBAU = getStuckPersonsList(eventsFile);
