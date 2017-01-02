@@ -28,7 +28,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.analysis.linkVolume.LinkVolumeHandler;
+import playground.agarwalamit.analysis.linkVolume.FilteredLinkVolumeHandler;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.MapUtils;
 
@@ -38,7 +39,7 @@ import playground.agarwalamit.utils.MapUtils;
 
 public class PatnaPolicyLinkVolumeWriter {
 
-	private static final String dir = FileUtils.RUNS_SVN+"/patnaIndia/run108/jointDemand/policies/0.15pcu/BT-mb/";
+	private static final String dir = FileUtils.RUNS_SVN+"/patnaIndia/run108/jointDemand/policies/0.15pcu/bau/";
 	private static final String eventsFile = dir+"/output_events.xml.gz";
 	private Map<Id<Link>, Map<Integer, Double>> linkid2Volume = new HashMap<>();
 
@@ -51,7 +52,7 @@ public class PatnaPolicyLinkVolumeWriter {
 	private void processEventsFile(final String eventsFile){
 		String vehicleFile = dir+"/output_vehicles.xml.gz"; // to get PCU
 
-		LinkVolumeHandler handler = new LinkVolumeHandler(vehicleFile);
+		FilteredLinkVolumeHandler handler = new FilteredLinkVolumeHandler(vehicleFile, PatnaPersonFilter.PatnaUserGroup.urban.toString(), new PatnaPersonFilter());
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(handler);
 		MatsimEventsReader reader = new MatsimEventsReader(events);
