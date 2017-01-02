@@ -17,19 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.mixedTraffic.patnaIndia.simTime;
+package playground.agarwalamit.mixedTraffic.patnaIndia.policies.analysis;
 
 import java.io.BufferedWriter;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.agarwalamit.analysis.linkVolume.LinkVolumeHandler;
 import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.MapUtils;
@@ -38,20 +36,21 @@ import playground.agarwalamit.utils.MapUtils;
  * @author amit
  */
 
-public class LinkVolumeWriter {
+public class PatnaPolicyLinkVolumeWriter {
 
-	private static final String dir = FileUtils.RUNS_SVN+"/patnaIndia/run110/randomNrFix/slowCapacityUpdate/100pct/output_PassingQ_withHoles_2/";
+	private static final String dir = FileUtils.RUNS_SVN+"/patnaIndia/run108/jointDemand/policies/0.15pcu/BT-mb/";
 	private static final String eventsFile = dir+"/output_events.xml.gz";
 	private Map<Id<Link>, Map<Integer, Double>> linkid2Volume = new HashMap<>();
 
 	public static void main(String[] args) {
-		LinkVolumeWriter plvw = new LinkVolumeWriter();
+		PatnaPolicyLinkVolumeWriter plvw = new PatnaPolicyLinkVolumeWriter();
 		plvw.processEventsFile(eventsFile);
 		plvw.writeData(dir+"/analysis/link2Vol.txt");
 	}
 
 	private void processEventsFile(final String eventsFile){
-		String vehicleFile = dir+"/output_vehicles.xml.gz";
+		String vehicleFile = dir+"/output_vehicles.xml.gz"; // to get PCU
+
 		LinkVolumeHandler handler = new LinkVolumeHandler(vehicleFile);
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(handler);
