@@ -65,9 +65,10 @@ public class SimpleDispatchCreator implements RequestDispatcher {
 	public TaxibusDispatch createDispatch(Set<TaxibusRequest> commonRequests) {
 		Coord requestCentroid = calcRequestCentroid(commonRequests);
 		Vehicle veh = findClosestIdleVehicle(requestCentroid);
-		
-		
+		if (veh!=null){		
 		return createDispatchForVehicle(commonRequests,veh);
+		}
+		else return null;
 	}
 
 	/**

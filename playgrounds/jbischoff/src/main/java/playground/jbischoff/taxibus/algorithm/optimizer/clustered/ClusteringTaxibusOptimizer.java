@@ -115,7 +115,14 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 			Set<Set<TaxibusRequest>> clusteredRides = clusterRequests(filteredRequests);
 			for (Set<TaxibusRequest> cluster : clusteredRides){
 				TaxibusDispatch dispatch = dispatcher.createDispatch(cluster);
+				if (dispatch!=null){
 				context.scheduler.scheduleRequest(dispatch);
+				} else {
+					for (TaxibusRequest r : cluster){
+						this.unplannedRequests.add(r);
+					}
+				}
+				
 			}}
 		}
 	}
