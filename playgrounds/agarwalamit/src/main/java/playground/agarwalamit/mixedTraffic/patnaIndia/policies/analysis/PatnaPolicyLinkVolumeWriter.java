@@ -20,8 +20,8 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.policies.analysis;
 
 import java.io.BufferedWriter;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -39,37 +39,65 @@ import playground.agarwalamit.utils.MapUtils;
 
 public class PatnaPolicyLinkVolumeWriter {
 
-	private static final String dir = FileUtils.RUNS_SVN+"/patnaIndia/run108/jointDemand/policies/0.15pcu/bau/";
-	private static final String eventsFile = dir+"/output_events.xml.gz";
-	private Map<Id<Link>, Map<Integer, Double>> linkid2Volume = new HashMap<>();
+	private static final String dir = FileUtils.RUNS_SVN+"/patnaIndia/run108/jointDemand/policies/0.15pcu/";
+	private static final String eventsFileBAU = dir+"/bau/output_events.xml.gz";
+    private static final String eventsFilePolicy = dir+"/BT-b/output_events.xml.gz";
 
 	public static void main(String[] args) {
 		PatnaPolicyLinkVolumeWriter plvw = new PatnaPolicyLinkVolumeWriter();
-		plvw.processEventsFile(eventsFile);
-		plvw.writeData(dir+"/analysis/link2Vol.txt");
+		Map<Id<Link>, Map<Integer, Double>> linkid2Volume_bau = plvw.processEventsFile(eventsFileBAU, dir+"/bau/output_vehicles.xml.gz");
+		Map<Id<Link>, Double> linkVol_bau = linkid2Volume_bau.entrySet().stream().collect(
+				Collectors.toMap(
+						entry -> entry.getKey(), entry -> MapUtils.doubleValueSum(entry.getValue())
+				)
+		);
+
+//		plvw.writeData(dir+"/analysis/link2Vol_bau.txt", linkid2Volume_bau);
+		plvw.writeData(dir+"/analysis/link2Vol_bau.txt", linkVol_bau);
+
+		// diff
+		Map<Id<Link>, Map<Integer, Double>> linkid2Volume_policy = plvw.processEventsFile(eventsFilePolicy, dir+"/bau/output_vehicles.xml.gz");
+		Map<Id<Link>, Double> linkVol_policy = linkid2Volume_policy.entrySet().stream().collect(
+				Collectors.toMap(
+						entry -> entry.getKey(), entry -> MapUtils.doubleValueSum(entry.getValue())
+				)
+		);
+
+		Map<Id<Link>, Double> linkVol_policy_diff = MapUtils.subtractMaps(linkVol_policy, linkVol_bau);
+		plvw.writeData(dir+"/analysis/link2Vol_BSH-b_WRT_bau.txt", linkVol_policy_diff);
 	}
 
-	private void processEventsFile(final String eventsFile){
-		String vehicleFile = dir+"/output_vehicles.xml.gz"; // to get PCU
+	private Map<Id<Link>, Map<Integer, Double>> processEventsFile(final String eventsFile, final String vehiclesFile) {
 
-		FilteredLinkVolumeHandler handler = new FilteredLinkVolumeHandler(vehicleFile, PatnaPersonFilter.PatnaUserGroup.urban.toString(), new PatnaPersonFilter());
+		FilteredLinkVolumeHandler handler = new FilteredLinkVolumeHandler(vehiclesFile, PatnaPersonFilter.PatnaUserGroup.urban.toString(), new PatnaPersonFilter());
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(handler);
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
-		this.linkid2Volume = handler.getLinkId2TimeSlot2LinkVolumePCU();
+		return handler.getLinkId2TimeSlot2LinkVolumePCU();
 	}
 
-	private void writeData (final String outFile){
+//	private void writeData (final String outFile, final Map<Id<Link>, Map<Integer, Double>> linkid2Volume){
+//		try (BufferedWriter writer = IOUtils.getBufferedWriter(outFile)) {
+//			writer.write("linkId\tvolumePCU\n");
+//			for(Id<Link> l : linkid2Volume.keySet()){
+//				writer.write(l+"\t"+ MapUtils.doubleValueSum( linkid2Volume.get(l) )+"\n");
+//			}
+//			writer.close();
+//		} catch (Exception e) {
+//			throw new RuntimeException("Data is not written. Reason "+e );
+//		}
+//	}
+
+	private void writeData (final String outFile, final Map<Id<Link>, Double> linkid2Volume){
 		try (BufferedWriter writer = IOUtils.getBufferedWriter(outFile)) {
 			writer.write("linkId\tvolumePCU\n");
-			for(Id<Link> l : this.linkid2Volume.keySet()){
-				writer.write(l+"\t"+ MapUtils.doubleValueSum( this.linkid2Volume.get(l) )+"\n");
+			for(Id<Link> l : linkid2Volume.keySet()){
+				writer.write(l+"\t"+ linkid2Volume.get(l) +"\n");
 			}
 			writer.close();
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written. Reason "+e );
 		}
 	}
-
 }
