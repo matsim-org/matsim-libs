@@ -43,28 +43,32 @@ public class PatnaPolicyLinkVolumeWriter {
 	private static final String eventsFileBAU = dir+"/bau/output_events.xml.gz";
     private static final String eventsFilePolicy = dir+"/BT-b/output_events.xml.gz";
 
+    private static final int timeSlot = 7; // 7 to 8 am
+
 	public static void main(String[] args) {
 		PatnaPolicyLinkVolumeWriter plvw = new PatnaPolicyLinkVolumeWriter();
 		Map<Id<Link>, Map<Integer, Double>> linkid2Volume_bau = plvw.processEventsFile(eventsFileBAU, dir+"/bau/output_vehicles.xml.gz");
 		Map<Id<Link>, Double> linkVol_bau = linkid2Volume_bau.entrySet().stream().collect(
 				Collectors.toMap(
-						entry -> entry.getKey(), entry -> MapUtils.doubleValueSum(entry.getValue())
+//						entry -> entry.getKey(), entry -> MapUtils.doubleValueSum(entry.getValue())
+						entry -> entry.getKey(), entry -> entry.getValue().containsKey(timeSlot) ? entry.getValue().get(timeSlot) : 0.
 				)
 		);
 
 //		plvw.writeData(dir+"/analysis/link2Vol_bau.txt", linkid2Volume_bau);
-		plvw.writeData(dir+"/analysis/link2Vol_bau.txt", linkVol_bau);
+//		plvw.writeData(dir+"/analysis/link2Vol_7to8_bau.txt", linkVol_bau);
 
 		// diff
 		Map<Id<Link>, Map<Integer, Double>> linkid2Volume_policy = plvw.processEventsFile(eventsFilePolicy, dir+"/bau/output_vehicles.xml.gz");
 		Map<Id<Link>, Double> linkVol_policy = linkid2Volume_policy.entrySet().stream().collect(
 				Collectors.toMap(
-						entry -> entry.getKey(), entry -> MapUtils.doubleValueSum(entry.getValue())
+//						entry -> entry.getKey(), entry -> MapUtils.doubleValueSum(entry.getValue())
+						entry -> entry.getKey(), entry -> entry.getValue().containsKey(timeSlot) ? entry.getValue().get(timeSlot) : 0.
 				)
 		);
 
-		Map<Id<Link>, Double> linkVol_policy_diff = MapUtils.subtractMaps(linkVol_policy, linkVol_bau);
-		plvw.writeData(dir+"/analysis/link2Vol_BSH-b_WRT_bau.txt", linkVol_policy_diff);
+		Map<Id<Link>, Double> linkVol_policy_diff = MapUtils.subtractMaps(linkVol_bau, linkVol_policy);
+		plvw.writeData(dir+"/analysis/link2Vol_7to8_BSH-b_WRT_bau.txt", linkVol_policy_diff);
 	}
 
 	private Map<Id<Link>, Map<Integer, Double>> processEventsFile(final String eventsFile, final String vehiclesFile) {
