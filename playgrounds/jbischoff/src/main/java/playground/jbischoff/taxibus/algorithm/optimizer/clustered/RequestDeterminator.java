@@ -22,7 +22,12 @@
  */
 package playground.jbischoff.taxibus.algorithm.optimizer.clustered;
 
+import java.util.List;
+import java.util.Set;
+
 import org.matsim.contrib.dvrp.data.Request;
+
+import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 
 /**
  * @author  jbischoff
@@ -34,4 +39,11 @@ import org.matsim.contrib.dvrp.data.Request;
 public interface RequestDeterminator {
 
 	boolean isRequestServable(Request request);
+
+	/**
+	 * @param requests
+	 * @return
+	 */
+	List<Set<TaxibusRequest>> prefilterRequests(Set<TaxibusRequest> requests);
+	
 }

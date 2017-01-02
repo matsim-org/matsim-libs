@@ -22,8 +22,15 @@
  */
 package playground.jbischoff.taxibus.algorithm.optimizer.clustered;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
@@ -35,7 +42,7 @@ import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 /**
  *
  */
-public class CentroidBasedRequestDeterminator implements RequestDeterminator {
+public class CentroidBasedRequestDeterminatorAndFilter implements RequestDeterminator {
 
 	final double radius1;
 	final double radius2;
@@ -44,7 +51,7 @@ public class CentroidBasedRequestDeterminator implements RequestDeterminator {
 	/**
 	 * 
 	 */
-	public CentroidBasedRequestDeterminator(Coord coord1, Coord coord2, double radius1, double radius2) {
+	public CentroidBasedRequestDeterminatorAndFilter(Coord coord1, Coord coord2, double radius1, double radius2) {
 			this.coord1=coord1;	
 			this.coord2=coord2;
 			this.radius1=radius1;
@@ -64,5 +71,42 @@ public class CentroidBasedRequestDeterminator implements RequestDeterminator {
 		return true;
 		else return false;
 	}
+
+
+	@Override
+	public List<Set<TaxibusRequest>> prefilterRequests(Set<TaxibusRequest> requests){
+		//0-3: Centroid 1 (by quadrant)
+		//4-7: Centroid 2 (by quadrant)
+		List<Set<TaxibusRequest>> filteredRequests = new ArrayList<>();
+		for (int i =0;i<=7;i++){
+			filteredRequests.add(new HashSet<TaxibusRequest>());
+		}
+		for (TaxibusRequest r : requests){
+			final Coord fromCoord = r.getFromLink().getCoord();
+			int quad;
+			double r1_distance = DistanceUtils.calculateDistance( fromCoord,coord1); 
+			double r2_distance = DistanceUtils.calculateDistance( fromCoord,coord2);
+			if (r1_distance<=r2_distance){
+				if (fromCoord.getX()>coord1.getX()&&fromCoord.getY()>coord1.getY()) quad = 0;
+				else if (fromCoord.getX()<=coord1.getX()&&fromCoord.getY()>coord1.getY()) quad = 1;
+				else if (fromCoord.getX()<=coord1.getX()&&fromCoord.getY()<coord1.getY()) quad = 2;
+				else quad = 3;
+			} else {
+				if (fromCoord.getX()>coord2.getX()&&fromCoord.getY()>coord2.getY()) quad = 4;
+				else if (fromCoord.getX()<=coord2.getX()&&fromCoord.getY()>coord2.getY()) quad = 5;
+				else if (fromCoord.getX()<=coord2.getX()&&fromCoord.getY()<coord2.getY()) quad = 6;
+				else quad = 7;
+				
+			}
+			filteredRequests.get(quad).add(r);
+		}
+		Logger.getLogger(getClass()).info("Filtered cluster sizes: ");
+		for (int i =0;i<=7;i++){
+			Logger.getLogger(getClass()).info("Quad: "+i+" requests: "+filteredRequests.get(i).size());
+		}
+		return filteredRequests;
+	}
+	
+	
 
 }

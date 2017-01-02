@@ -53,6 +53,6 @@ public class ClusteringTaxibusOptimizerContext
         vehiclesAtSameTime = tbcg.getNumberOfVehiclesDispatchedAtSameTime();
         Coord coord1 = scenario.getNetwork().getLinks().get(Id.createLinkId(tbcg.getServiceAreaCentroid_1())).getCoord();
         Coord coord2 = scenario.getNetwork().getLinks().get(Id.createLinkId(tbcg.getServiceAreaCentroid_2())).getCoord();
-        this.requestDeterminator = new CentroidBasedRequestDeterminator(coord1,coord2,tbcg.getServiceArea_1_Radius_m(),tbcg.getServiceArea_2_Radius_m());
+        this.requestDeterminator = new CentroidBasedRequestDeterminatorAndFilter(coord1,coord2,tbcg.getServiceArea_1_Radius_m(),tbcg.getServiceArea_2_Radius_m());
     }
 }

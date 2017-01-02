@@ -31,13 +31,10 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelDataImpl;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.router.Dijkstra;
 
-import playground.jbischoff.drt.scheduler.tasks.DrtTask;
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 import playground.jbischoff.utils.JbUtils;

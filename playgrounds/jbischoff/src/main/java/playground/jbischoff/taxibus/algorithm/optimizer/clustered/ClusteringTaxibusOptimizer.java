@@ -22,7 +22,6 @@
  */
 package playground.jbischoff.taxibus.algorithm.optimizer.clustered;
 
-import java.time.chrono.MinguoChronology;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,7 +30,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
@@ -113,7 +111,8 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 			}
 			unplannedRequests.removeAll(dueRequests);
 			if (dueRequests.size()>0){
-			Set<Set<TaxibusRequest>> clusteredRides = clusterRequests(dueRequests);
+			List<Set<TaxibusRequest>> filteredRequests = context.requestDeterminator.prefilterRequests(dueRequests);
+			Set<Set<TaxibusRequest>> clusteredRides = clusterRequests(filteredRequests);
 			for (Set<TaxibusRequest> cluster : clusteredRides){
 				TaxibusDispatch dispatch = dispatcher.createDispatch(cluster);
 				context.scheduler.scheduleRequest(dispatch);
@@ -124,10 +123,11 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 	/**
 	 * @return
 	 */
-	private Set<Set<TaxibusRequest>> clusterRequests(Set<TaxibusRequest> dueRequests) {
-		HashSet<Set<TaxibusRequest>> bestSet = new HashSet<>();
-		double bestDispatchScore = Double.MAX_VALUE;
-		
+	private Set<Set<TaxibusRequest>> clusterRequests(List<Set<TaxibusRequest>> prefilteredDueRequests) {
+		HashSet<Set<TaxibusRequest>> dispatchSet = new HashSet<>();
+		for (Set<TaxibusRequest> dueRequests : prefilteredDueRequests){
+			HashSet<Set<TaxibusRequest>> bestSet = new HashSet<>();
+			double bestDispatchScore = Double.MAX_VALUE;
 		for (int i = 0; i < context.clusteringRounds;i++){
 			HashSet<Set<TaxibusRequest>> currentSet = new HashSet<>();
 			List<Request> allOpenRequests = new ArrayList<>();
@@ -159,11 +159,13 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 				bestSet=currentSet;
 			}
 		}
+		dispatchSet.addAll(bestSet);
+		}
 		
 		
 		
 
-		return bestSet;
+		return dispatchSet;
 	}
 
 	/**
@@ -195,6 +197,7 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 		}
 		return score;
 	}
+	
 	
 
 }
