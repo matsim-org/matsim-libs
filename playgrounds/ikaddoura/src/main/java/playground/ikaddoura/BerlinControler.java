@@ -119,9 +119,9 @@ public class BerlinControler {
 			
 			agentSpecificActivityScheduling = true;
 			activityDurationBin = 3600.;
-			tolerance = 0.;
+			tolerance = 3600.;
 			
-			pricingApproach = PricingApproach.QBPV10;
+			pricingApproach = PricingApproach.NoPricing;
 			blendFactor = 0.1;
 		}
 		
