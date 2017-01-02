@@ -50,7 +50,7 @@ import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.analysis.linkVolume.FilteredLinkVolumeHandler;
+import playground.agarwalamit.analysis.linkVolume.ModeFilterLinkVolumeHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 /**
@@ -70,7 +70,7 @@ public class BikeConnectorControlerListener implements StartupListener, Iteratio
     private final int initialStabilizationIterations ;
 
     private final List<Id<Link>> removedConnectorLinks = new ArrayList<>();
-    private final FilteredLinkVolumeHandler handler = new FilteredLinkVolumeHandler(allowedModes);
+    private final ModeFilterLinkVolumeHandler handler = new ModeFilterLinkVolumeHandler(allowedModes);
 
     private final List<Id<Link>> bikeConnectorLinks = new ArrayList<>(); // in total 500 links will be added to the list.
     private int totalPossibleConnectors = 0;

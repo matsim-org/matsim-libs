@@ -19,6 +19,9 @@
 
 package playground.agarwalamit.analysis.linkVolume;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
@@ -29,16 +32,12 @@ import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Created by amit on 25/09/16.
  */
 
 
-public class FilteredLinkVolumeHandler implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+public class ModeFilterLinkVolumeHandler implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
     private final LinkVolumeHandler delegate = new LinkVolumeHandler();
     private final List<Id<Vehicle>> vehicleIds = new ArrayList<>();
@@ -49,11 +48,11 @@ public class FilteredLinkVolumeHandler implements LinkLeaveEventHandler, Vehicle
      *
      * This will filter out the modes other than given mode for link volumes.
      */
-    public FilteredLinkVolumeHandler (final List<String> modes) {
+    public ModeFilterLinkVolumeHandler(final List<String> modes) {
         this.modes = modes;
     }
 
-    public FilteredLinkVolumeHandler () { this(null); }
+    public ModeFilterLinkVolumeHandler() { this(null); }
 
     @Override
     public void reset(int iteration) {
