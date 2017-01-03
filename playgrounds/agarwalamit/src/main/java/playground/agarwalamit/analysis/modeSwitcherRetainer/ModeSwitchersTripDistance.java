@@ -82,20 +82,24 @@ public class ModeSwitchersTripDistance {
 
 		for(String runCase : runCases){
 			ModeSwitchersTripDistance mstd = new ModeSwitchersTripDistance();
-			mstd.processEventsFiles(dir+runCase, 1000, 1500);
+			Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(dir+runCase+"/output_network.xml.gz", dir+runCase+"/output_config.xml");
+			sc.getConfig().controler().setOutputDirectory(dir+runCase);
+			mstd.processEventsFiles(sc);
 			mstd.writeResults(dir+runCase+"/analysis/");
 		}
 	}
 
-	public void processEventsFiles (final String eventsDir, final int firstIteration, final int lastIteration){
+	public void processEventsFiles (final Scenario scenario){
 		// data from event files
-		String eventsFileFirstIt = eventsDir+"/ITERS/it."+firstIteration+"/"+firstIteration+".events.xml.gz";
-		String eventsFileLastIt = eventsDir+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
+		String outputFilesDir = scenario.getConfig().controler().getOutputDirectory();
+		int firstIteration = scenario.getConfig().controler().getFirstIteration();
+		int lastIteration = scenario.getConfig().controler().getLastIteration();
 
-		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(eventsDir+"/output_network.xml.gz", eventsDir+"/output_config.xml");
+		String eventsFileFirstIt = outputFilesDir+"/ITERS/it."+firstIteration+"/"+firstIteration+".events.xml.gz";
+		String eventsFileLastIt = outputFilesDir+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
 
-		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelDistsItFirst = getPerson2mode2TripDistances(eventsFileFirstIt,sc);
-		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelDistsTtLast = getPerson2mode2TripDistances(eventsFileLastIt,sc);
+		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelDistsItFirst = getPerson2mode2TripDistances(eventsFileFirstIt,scenario);
+		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelDistsTtLast = getPerson2mode2TripDistances(eventsFileLastIt,scenario);
 
 		for(Id<Person> pId : person2ModeTravelDistsItFirst.keySet()){
 
@@ -194,7 +198,7 @@ public class ModeSwitchersTripDistance {
 	}
 
 	public void writeResults(final String outputFolder){
-		String outFile = outputFolder+"/modeSwitchersTripDistances_"+this.tripDistanceType+".txt";
+		String outFile = outputFolder+"_modeSwitchersTripDistances_"+this.tripDistanceType+".txt";
 		BufferedWriter writer =  IOUtils.getBufferedWriter(outFile);
 		try {
 			writer.write("firstMode \t lastMode \t numberOfLegs \t totalTripDistancesForFirstIterationInKm \t totalTripDistancesForLastIterationInKm \n");
