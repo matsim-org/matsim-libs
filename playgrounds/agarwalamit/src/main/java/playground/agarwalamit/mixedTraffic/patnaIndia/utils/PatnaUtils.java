@@ -70,6 +70,8 @@ public final class PatnaUtils {
 
 	public static final String BIKE_TRACK_CONNECTOR_PREFIX = "bikeTrackConnectorLink_";
 
+	public static final double BIKE_TRACK_LEGNTH_REDUCTION_FACTOR = 2.0;
+
 	private PatnaUtils(){} 
 
 	public static int getAverageIncome(final String incomeCode){
