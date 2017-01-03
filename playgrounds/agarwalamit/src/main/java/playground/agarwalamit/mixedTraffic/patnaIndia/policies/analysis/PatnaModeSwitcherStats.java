@@ -65,10 +65,10 @@ public class PatnaModeSwitcherStats {
         {
             ModeSwitchersTripDistance mstd = new ModeSwitchersTripDistance(userGroup, pf, TripDistanceType.ROUTE_DISTANCE);
 
-//            updateBikeTrackLinkLength(scenario);
+            updateBikeTrackLinkLength(scenario);
 
             mstd.processEventsFiles(scenario);
-            mstd.writeResults(dir+"/analysis/");
+            mstd.writeResults(dir+"/analysis/correctedBikeLinksLength_");
         }
     }
 

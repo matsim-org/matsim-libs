@@ -198,7 +198,7 @@ public class ModeSwitchersTripDistance {
 	}
 
 	public void writeResults(final String outputFolder){
-		String outFile = outputFolder+"_modeSwitchersTripDistances_"+this.tripDistanceType+".txt";
+		String outFile = outputFolder+"modeSwitchersTripDistances_"+this.tripDistanceType+".txt";
 		BufferedWriter writer =  IOUtils.getBufferedWriter(outFile);
 		try {
 			writer.write("firstMode \t lastMode \t numberOfLegs \t totalTripDistancesForFirstIterationInKm \t totalTripDistancesForLastIterationInKm \n");

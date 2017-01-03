@@ -168,7 +168,7 @@ public class ModeSwitchersTripTime {
 	}
 
 	public void writeResults(final String outputFolder){
-		String outFile = outputFolder+"_modeSwitchersTripTimes.txt";
+		String outFile = outputFolder+"modeSwitchersTripTimes.txt";
 		BufferedWriter writer =  IOUtils.getBufferedWriter(outFile);
 		try {
 			writer.write("firstMode \t lastMode \t numberOfLegs \t totalTripTimesForFirstIterationInHr \t totalTripTimesForLastIterationInHr \n");
