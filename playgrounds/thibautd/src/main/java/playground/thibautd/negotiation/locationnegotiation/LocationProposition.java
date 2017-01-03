@@ -46,7 +46,6 @@ public class LocationProposition implements Proposition {
 	 * This of course makes a difference only if proposition is still in cache when encountered for the second time...
 	 */
 	private static final SoftCache<LocationProposition,LocationProposition> cache = CACHE ? new SoftCache<>() : null;
-	private double cachedUtility = Double.NEGATIVE_INFINITY;
 
 	private LocationProposition(
 			final Person proposer,
@@ -84,11 +83,6 @@ public class LocationProposition implements Proposition {
 
 	public Type getType() {
 		return type;
-	}
-
-	double getOrUpdateUtility( final DoubleSupplier util ) {
-		if ( cachedUtility == Double.NEGATIVE_INFINITY ) this.cachedUtility = util.getAsDouble();
-		return cachedUtility;
 	}
 
 	@Override
