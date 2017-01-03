@@ -61,51 +61,76 @@ public class ChainCounter {
 		int chains = 0;
 		DigicoreVehicles vehicles = new DigicoreVehicles();
 		new DigicoreVehiclesReader(vehicles).readFile(path + "digicoreVehicles_201306.xml.gz");
-		chains += countChains(vehicles);
+		int count = countChains(vehicles);
+		LOG.info("201306: " + count);
+		chains += count;
 		
 		vehicles = null; vehicles = new DigicoreVehicles();
 		new DigicoreVehiclesReader(vehicles).readFile(path + "digicoreVehicles_201307.xml.gz");
-		chains += countChains(vehicles);
+		count = countChains(vehicles);
+		LOG.info("201307: " + count);
+		chains += count;
 		
 		vehicles = null; vehicles = new DigicoreVehicles();
 		new DigicoreVehiclesReader(vehicles).readFile(path + "digicoreVehicles_201308.xml.gz");
-		chains += countChains(vehicles);
+		count = countChains(vehicles);
+		LOG.info("201308: " + count);
+		chains += count;
 		
 		vehicles = null; vehicles = new DigicoreVehicles();
 		new DigicoreVehiclesReader(vehicles).readFile(path + "digicoreVehicles_201309.xml.gz");
-		chains += countChains(vehicles);
+		count = countChains(vehicles);
+		LOG.info("201309: " + count);
+		chains += count;
 		
 		vehicles = null; vehicles = new DigicoreVehicles();
 		new DigicoreVehiclesReader(vehicles).readFile(path + "digicoreVehicles_201310.xml.gz");
-		chains += countChains(vehicles);
+		count = countChains(vehicles);
+		LOG.info("201310: " + count);
+		chains += count;
 		
 		vehicles = null; vehicles = new DigicoreVehicles();
 		new DigicoreVehiclesReader(vehicles).readFile(path + "digicoreVehicles_201311.xml.gz");
-		chains += countChains(vehicles);
+		count = countChains(vehicles);
+		LOG.info("201311: " + count);
+		chains += count;
 		
 		vehicles = null; vehicles = new DigicoreVehicles();
 		new DigicoreVehiclesReader(vehicles).readFile(path + "digicoreVehicles_201312.xml.gz");
-		chains += countChains(vehicles);
+		count = countChains(vehicles);
+		LOG.info("201312: " + count);
+		chains += count;
 		
 		vehicles = null; vehicles = new DigicoreVehicles();
 		new DigicoreVehiclesReader(vehicles).readFile(path + "digicoreVehicles_201401.xml.gz");
-		chains += countChains(vehicles);
+		count = countChains(vehicles);
+		LOG.info("201401: " + count);
+		chains += count;
 		
 		vehicles = null; vehicles = new DigicoreVehicles();
 		new DigicoreVehiclesReader(vehicles).readFile(path + "digicoreVehicles_201402.xml.gz");
-		chains += countChains(vehicles);
+		count = countChains(vehicles);
+		LOG.info("201402: " + count);
+		chains += count;
 		
 		vehicles = null; vehicles = new DigicoreVehicles();
 		new DigicoreVehiclesReader(vehicles).readFile(path + "digicoreVehicles_201403.xml.gz");
-		chains += countChains(vehicles);
+		count = countChains(vehicles);
+		LOG.info("201403: " + count);
+		chains += count;
 		
 		vehicles = null; vehicles = new DigicoreVehicles();
 		new DigicoreVehiclesReader(vehicles).readFile(path + "digicoreVehicles_201404.xml.gz");
-		chains += countChains(vehicles);
+		count = countChains(vehicles);
+		LOG.info("201404: " + count);
+		chains += count;
 		
 		vehicles = null; vehicles = new DigicoreVehicles();
 		new DigicoreVehiclesReader(vehicles).readFile(path + "digicoreVehicles_201405.xml.gz");
-		chains += countChains(vehicles);
+		count = countChains(vehicles);
+		LOG.info("201405: " + count);
+		chains += count;
+
 		LOG.info("Total number of chains on month-by-month basis: " + chains);
 	}
 	
