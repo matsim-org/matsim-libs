@@ -40,7 +40,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
@@ -69,6 +68,7 @@ public class CNControler {
 	private static boolean noisePricing;
 	
 	private static double sigma;
+	private static double factor;
 	
 	public static void main(String[] args) throws IOException {
 		
@@ -89,6 +89,9 @@ public class CNControler {
 			sigma = Double.parseDouble(args[4]);
 			log.info("Sigma: " + sigma);
 			
+			factor = Double.parseDouble(args[5]);
+			log.info("toll factor: " + factor);
+			
 		} else {
 			
 			outputDirectory = null;
@@ -96,6 +99,7 @@ public class CNControler {
 			congestionPricing = true;
 			noisePricing = true;
 			sigma = 0.;
+			factor = 1.;
 		}
 				
 		CNControler cnControler = new CNControler();
@@ -129,7 +133,7 @@ public class CNControler {
 		
 		NoiseContext noiseContext = null;
 		
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModules().get(NoiseConfigGroup.GROUP_NAME);
 		
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
@@ -198,6 +202,8 @@ public class CNControler {
 		
 		noiseContext = new NoiseContext(controler.getScenario());
 
+		log.info("Noise cost rate: " + noiseParameters.getAnnualCostRate());
+		
 		// congestion
 		
 		final TollHandler congestionTollHandler;
@@ -234,7 +240,7 @@ public class CNControler {
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			
 			// computation of congestion events + consideration in scoring
-			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())));
+			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario()), factor));
 		
 		} else if (noisePricing && congestionPricing == false) {
 			// only noise pricing
@@ -260,7 +266,7 @@ public class CNControler {
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			
 			// computation of congestion events + NO consideration in scoring
-			controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())));
+			controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
 			
 		} else if (noisePricing == false && congestionPricing) {
 			// only congestion pricing
@@ -286,7 +292,7 @@ public class CNControler {
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			
 			// computation of congestion events + consideration in scoring
-			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())));
+			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario()), factor));
 			
 		} else if (noisePricing == false && congestionPricing == false) {
 			// base case
@@ -309,7 +315,7 @@ public class CNControler {
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			
 			// computation of congestion events + NO consideration in scoring
-			controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())));
+			controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
 
 		} else {
 			throw new RuntimeException("This setup is not considered. Aborting...");
