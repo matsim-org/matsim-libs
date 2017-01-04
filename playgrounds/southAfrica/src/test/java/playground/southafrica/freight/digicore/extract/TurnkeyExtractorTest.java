@@ -69,11 +69,15 @@ public class TurnkeyExtractorTest {
 			Assert.fail("Should extract without exceptions.");
 		}
 		
-		/* Check that the output files exist. */
-		File f1 = new File(utils.getOutputDirectory() + "Vehicles/10001.txt.gz");
-		Assert.assertTrue("Vehicle file should exist.", f1.exists());
-		File f2 = new File(utils.getOutputDirectory() + "digicoreVehicles.xml.gz");
-		Assert.assertTrue("Vehicles container file should exist.", f2.exists());
+		/* Check that the output file exist. */
+		File f = new File(utils.getOutputDirectory() + "digicoreVehicles.xml.gz");
+		Assert.assertTrue("Vehicles container file should exist.", f.exists());
+		
+		/* Check that the remaining folders DO NOT exist. */
+		File xmlFolder = new File(utils.getOutputDirectory() + "xml/");
+		Assert.assertFalse("Xml directory should not exist.", xmlFolder.exists());
+		File vehiclesFolder = new File(utils.getOutputDirectory() + "Vehicles/");
+		Assert.assertFalse("Vehicles directory should not exist.", vehiclesFolder.exists());
 		
 		/* Check the vehicles container. */
 		DigicoreVehicles vehicles = new DigicoreVehicles();
