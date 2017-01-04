@@ -96,7 +96,7 @@ public class TurnkeyExtractor {
 		MultiThreadChainExtractor.main(extractArgs);
 		
 		/* Collating */
-		String[] collateArgs = {outputFolder + "xml/", outputFolder + "digicoreVehicles.xml.gz", "WGS84_SA_Albers", descr, "true"};
+		String[] collateArgs = {outputFolder, outputFolder + "digicoreVehicles.xml.gz", "WGS84_SA_Albers", descr, "true"};
 		DigicoreVehicleCollator.main(collateArgs);
 		
 		LOG.info("Done with the turnkey extraction.");
