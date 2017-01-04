@@ -34,7 +34,7 @@ import playground.southafrica.freight.digicore.extract.step4_collate.DigicoreVeh
 import playground.southafrica.utilities.Header;
 
 /**
- * Class to perform all three extraction phases for a given month:
+ * Class to perform all four extraction phases for a given data set:
  * <ol>
  * 		<li> split the raw data into unique vehicle files;
  * 		<li> sorting the records chronologically;
@@ -57,8 +57,9 @@ public class TurnkeyExtractor {
 		String outputFolder = args[1];
 		outputFolder += outputFolder.endsWith("/") ? "" : "/";
 		String descr = args[2];
+		String statusFile = args[3];
 		
-		TurnkeyExtractor.extract(inputFile, outputFolder, descr);
+		TurnkeyExtractor.extract(inputFile, outputFolder, descr, statusFile);
 		
 		Header.printFooter();
 	}
@@ -67,11 +68,11 @@ public class TurnkeyExtractor {
 		/* Hide constructor. */
 	}
 	
-	private static void extract(String inputFile, String outputFolder, String descr){
+	private static void extract(String inputFile, String outputFolder, String descr, String statusFile){
 		LOG.info("Executing the turnkey extraction... this may take some time.");
 
 		/* Splitting */
-		String[] splitArgs = {inputFile, outputFolder, "2", "5", "0", "1", "2", "4", "3"};
+		String[] splitArgs = {inputFile, outputFolder, "1", "5", "0", "1", "2", "4", "3"};
 		DigicoreFileSplitter.main(splitArgs);
 		
 		/* Sorting */
@@ -85,7 +86,8 @@ public class TurnkeyExtractor {
 		}
 		String[] extractArgs = {
 				outputFolder + "Vehicles/",
-				"/home/share/data/digicore/2009/status.txt",
+//				"/home/share/data/digicore/2009/status.txt",
+				statusFile,
 				outputFolder + "xml/",
 				"40",
 				"18000",
