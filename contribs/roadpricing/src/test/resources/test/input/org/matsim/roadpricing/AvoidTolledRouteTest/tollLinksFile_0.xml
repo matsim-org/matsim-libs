@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE roadpricing SYSTEM "http://www.matsim.org/files/dtd/roadpricing_v1.dtd">
+
+<roadpricing type="cordon" name="cordon toll links for Berlin">
+
+	<description>Cordon links file for test network.</description>
+
+	<links>
+		<link id="link_4_5" />
+	</links>
+
+	<!-- amount: [monetary unit] / [travelling across a tolled link.] -->
+	<cost start_time="00:00" end_time="30:00" amount="999999.00" />
+</roadpricing>
