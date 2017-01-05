@@ -44,9 +44,9 @@ public class TurnkeyExtractorTest {
 
 	@Test
 	public void testInputFile(){
-		File file = new File(utils.getClassInputDirectory() + "/test.csv.gz");
-		if(!file.exists()){
-			Assert.fail("Input file doesn't exist: " + file.getAbsolutePath());
+		File f1 = new File(utils.getClassInputDirectory() + "/test.csv.gz");
+		if(!f1.exists()){
+			Assert.fail("Input file 'test' doesn't exist: " + f1.getAbsolutePath());
 		}
 	}
 	
@@ -82,19 +82,15 @@ public class TurnkeyExtractorTest {
 		/* Check the vehicles container. */
 		DigicoreVehicles vehicles = new DigicoreVehicles();
 		new DigicoreVehiclesReader(vehicles).readFile(utils.getOutputDirectory() + "digicoreVehicles.xml.gz");
-		Id<Vehicle> vid = Id.createVehicleId("10001");
-		Assert.assertTrue("Vehicle 10001 not found.", vehicles.getVehicles().containsKey(vid));
+		Id<Vehicle> vid = Id.createVehicleId("14114");
+		Assert.assertTrue("Vehicle 14114 not found.", vehicles.getVehicles().containsKey(vid));
 		Assert.assertEquals("Wrong number of vehicles.", 1l, vehicles.getVehicles().size());
 		
 		/* Check the actual vehicle's activity chains. */
 		DigicoreVehicle vehicle = vehicles.getVehicles().get(vid);
-		Assert.assertEquals("Wrong number of chains.", 9l, vehicle.getChains().size());
+		Assert.assertEquals("Wrong number of chains.", 5l, vehicle.getChains().size());
 		
 	}
-	
-	
-	
-	
 	
 	
 	private String[] getTestArguments(){

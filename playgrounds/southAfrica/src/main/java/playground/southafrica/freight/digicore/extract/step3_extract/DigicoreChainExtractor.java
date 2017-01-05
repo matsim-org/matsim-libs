@@ -164,16 +164,27 @@ public class DigicoreChainExtractor implements Runnable {
 								/* It is not considered an activity. Re-instate 
 								 * the previous (partial) trip.*/
 								tripBuffer = previousTripBuffer;
+								if(tripBuffer == null){
+									tripBuffer = new ArrayList<>();
+								}
 								
 								/* Now also remove the previous trace that was
-								 * already added to the activity chain. */
-								if(chain.get(chain.size()-1) instanceof DigicoreTrace){
-									chain.remove(chain.size()-1);
+								 * (possibly) already added to the activity chain. */
+								if(chain.size() > 0){
+									if(chain.get(chain.size()-1) instanceof DigicoreTrace){
+										chain.remove(chain.size()-1);
+									}
 								}
 								
 								/* TODO Check if the next line is indeed correct...
 								 * Is it accurate to add the (failed) activity 
 								 * records to the trip as well? Jan'17 JWJ */
+								
+								// FIXME Remove after debugging.
+								if(tripBuffer == null || activityBuffer == null){
+									log.error("Null");
+								}
+								
 								tripBuffer.addAll(activityBuffer);
 								activityBuffer = null;
 							}
@@ -214,6 +225,9 @@ public class DigicoreChainExtractor implements Runnable {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (NullPointerException e){
+			e.printStackTrace();
+			log.error("Vehicle with NullPointerException: " + vehicle.getId().toString());
 		}
 				
 		/* Write the vehicle to file if it has at least one chain. This is 
