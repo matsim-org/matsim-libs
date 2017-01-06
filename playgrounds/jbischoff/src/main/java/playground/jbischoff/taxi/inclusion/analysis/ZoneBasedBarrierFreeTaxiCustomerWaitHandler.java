@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.av.evaluation;
+package playground.jbischoff.taxi.inclusion.analysis;
 
 import java.io.*;
 import java.text.DecimalFormat;
@@ -30,7 +30,9 @@ import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.taxi.run.TaxiModule;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 
 import com.vividsolutions.jts.geom.*;
@@ -38,7 +40,7 @@ import com.vividsolutions.jts.geom.*;
 import playground.jbischoff.utils.JbUtils;
 
 
-public class ZoneBasedTaxiCustomerWaitHandler implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler {
+public class ZoneBasedBarrierFreeTaxiCustomerWaitHandler implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler {
 
 	private int numberOfTrips;
 	private double totalWaitingTime;
@@ -48,14 +50,17 @@ public class ZoneBasedTaxiCustomerWaitHandler implements PersonDepartureEventHan
 	private final Map<String,Geometry> zones;
 	private Map<String,double[]> zoneWaitTimes = new TreeMap<>();
 	private Map<String,int[]> zoneDepartures = new TreeMap<>();
+	private final boolean onlyBarrierFreeRequests;
+	private final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, "EPSG:25833");
 	
-		public ZoneBasedTaxiCustomerWaitHandler(Network network,Map<String,Geometry> zones) {
+		public ZoneBasedBarrierFreeTaxiCustomerWaitHandler(Network network,Map<String,Geometry> zones, boolean onlyBarrierFreeRequests) {
 			this.numberOfTrips = 0;
 			this.totalWaitingTime = 0.0;
 			this.personsTaxiCallTime = new HashMap<Id<Person>, Double>();
 			this.network = network;
 			this.zones = zones;
 			initializeZoneMaps();
+			this.onlyBarrierFreeRequests = onlyBarrierFreeRequests;
 			
 		}
 	
@@ -69,16 +74,21 @@ public class ZoneBasedTaxiCustomerWaitHandler implements PersonDepartureEventHan
 
 		@Override
 	    public void reset(int iteration){
-			this.numberOfTrips = 0;
-			this.totalWaitingTime = 0.0;
-			this.personsTaxiCallTime = new HashMap<Id<Person>, Double>();
-			initializeZoneMaps();
 	    }
 	    
 	    @Override
 	    public void handleEvent(PersonDepartureEvent event){
+	    	
 	        if (!event.getLegMode().equals(TaxiModule.TAXI_MODE))
 	            return;
+	        if (onlyBarrierFreeRequests){
+	        	if (!event.getPersonId().toString().startsWith("hc_")){
+	        		return;
+	        	}
+	        } else
+	        	if (event.getPersonId().toString().startsWith("hc_")){
+	        		return;
+	        	}
 	        String zoneId = getZoneForLinkId(event.getLinkId());
 	        if (zoneId!=null){
 	        	this.personsTaxiCallTime.put(event.getPersonId(), event.getTime());
@@ -129,7 +139,8 @@ public class ZoneBasedTaxiCustomerWaitHandler implements PersonDepartureEventHan
 	            System.err.println("Could not create File" + fileDir);
 	            e.printStackTrace();
 	        }
-	    	writeZoneStats(fileDir+"zoneStats.csv");
+	    	String fileName = fileDir + "zoneStats."+(this.onlyBarrierFreeRequests?"_bf":"_NonBF")+".csv";
+	    	writeZoneStats(fileName);
 	    }
 	    
 	    private void writeZoneStats(String filename) {
@@ -143,7 +154,8 @@ public class ZoneBasedTaxiCustomerWaitHandler implements PersonDepartureEventHan
 				}
 				bw.write("total;averageWait");
 				bw.newLine();
-				
+				double totalWait[] = new double[24];
+				int totalTrips[] = new int[24];
 				for (Entry<String, int[]> e : this.zoneDepartures.entrySet()){
 					double[] waitTimes = this.zoneWaitTimes.get(e.getKey());
 					bw.write(e.getKey()+";");
@@ -157,14 +169,25 @@ public class ZoneBasedTaxiCustomerWaitHandler implements PersonDepartureEventHan
 						bw.write(trips+";"+df.format(averageWaitTime)+";");
 						allTrips+=trips;
 						allWait+=waitTime;
+						totalWait[i]+=allWait;
+						totalTrips[i]+=allTrips;
 						
 					} 
+					
 					double allAv = allWait/allTrips;
 					if (allTrips == 0) allAv = 0;
 					bw.write(df.format(allTrips)+";"+df.format(allAv));
 					bw.newLine();
 					
 				}
+				bw.write("allZones;");
+				for (int i = 0; i<24; i++){
+					double waitTime = totalWait[i];
+					int trips = totalTrips[i];
+					double averageWaitTime = waitTime/trips;
+					if (trips == 0) averageWaitTime = 0;
+					bw.write(trips+";"+df.format(averageWaitTime)+";");
+					} 
 				bw.flush();
 				bw.close();
 				BufferedWriter csvt = IOUtils.getBufferedWriter(filename+"t");
@@ -180,7 +203,7 @@ public class ZoneBasedTaxiCustomerWaitHandler implements PersonDepartureEventHan
 		}
 
 		String getZoneForLinkId(Id<Link> linkId){
-	    	Coord linkCoord = network.getLinks().get(linkId).getCoord();
+	    	Coord linkCoord = ct.transform( network.getLinks().get(linkId).getCoord());
 	    	Point linkPoint = MGC.coord2Point(linkCoord);
 	    	for (Entry<String,Geometry> e : zones.entrySet()){
 	    		if (e.getValue().contains(linkPoint))

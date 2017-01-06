@@ -43,6 +43,8 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 /**
  * @author  jbischoff
@@ -70,9 +72,10 @@ public class CreateInclusionPlans {
 		new PopulationReader(orig_scen).readFile(DIR+"orig_demand/plans.xml.gz");
 		Network taxi_network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(taxi_network).readFile(DIR+"berlin_brb.xml.gz");
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:25833",TransformationFactory.DHDN_GK4);
 		for (int i = 0; i<sets; i++){
 			Scenario taxi_scen = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			new PopulationReader(taxi_scen).readFile(DIR+"orig_demand/taxi_cust_plans4to3_1.0.xml.gz");
+			new PopulationReader(taxi_scen).readFile(DIR+"orig_demand/plans4to3_1.0.xml.gz");
 			
 			Random random = new Random(4711+i);
 			ArrayList<Person> allPlans = new ArrayList<>();
@@ -83,10 +86,10 @@ public class CreateInclusionPlans {
 				Person q = orig_scen.getPopulation().getFactory().createPerson(Id.createPersonId("hc_"+p.getId().toString()));
 				Plan plan = orig_scen.getPopulation().getFactory().createPlan();
 				Activity o_act0 = (Activity) p.getSelectedPlan().getPlanElements().get(0);
-				Coord coord0 = orig_network.getLinks().get(o_act0.getLinkId()).getCoord();
+				Coord coord0 = ct.transform(orig_network.getLinks().get(o_act0.getLinkId()).getCoord());
 
 				Activity o_act1 = (Activity) p.getSelectedPlan().getPlanElements().get(2);
-				Coord coord1 = orig_network.getLinks().get(o_act1.getLinkId()).getCoord();
+				Coord coord1 = ct.transform(orig_network.getLinks().get(o_act1.getLinkId()).getCoord());
 				
 				Activity act0 = taxi_scen.getPopulation().getFactory().createActivityFromCoord("departure", coord0);
 				act0.setEndTime(o_act0.getEndTime());
