@@ -21,6 +21,9 @@ package playground.gregor.misanthrope.run;
 
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -40,7 +43,7 @@ import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer
 
 public class CTRunner implements IterationStartsListener {
 
-    public static boolean DEBUG = true;
+    public static boolean DEBUG = false;
 
 	private MatsimServices controller;
 	private QSimDensityDrawer qSimDrawer;
@@ -60,6 +63,15 @@ public class CTRunner implements IterationStartsListener {
 		c.controler().setWriteEventsInterval(1);
 		c.controler().setMobsim("ctsim");
 		final Scenario sc = ScenarioUtils.loadScenario(c);
+
+        for (Person p : sc.getPopulation().getPersons().values()) {
+            for (Plan plan : p.getPlans()) {
+                Leg leg = (Leg) plan.getPlanElements().get(1);
+                leg.setRoute(null);
+                leg.setMode("walkct");
+            }
+        }
+
 
 		final Controler controller = new Controler(sc);
 		if (vis) {
@@ -119,8 +131,8 @@ public class CTRunner implements IterationStartsListener {
 	protected static void printUsage() {
 		System.out.println();
 		System.out.println("CTRunner");
-		System.out.println("Controller for ct (pedestrian) simulations.");
-		System.out.println();
+        System.out.println("Controller for misanthrope (pedestrian) simulations.");
+        System.out.println();
 		System.out.println("usage : CARunner config");
 		System.out.println();
 		System.out.println("config:   A MATSim config file.");
