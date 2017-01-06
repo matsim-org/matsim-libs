@@ -64,6 +64,8 @@ public class PatnaSpatialPlots {
     private static double yMin=2828000.00;
     private static double yMax=2838500.00;
 
+    private static final boolean isComparing = true;
+
     private static final CoordinateReferenceSystem targetCRS = MGC.getCRS(PatnaUtils.EPSG);
 
     public static void main(String[] args) {
@@ -75,8 +77,10 @@ public class PatnaSpatialPlots {
         Map<Id<Link>,SortedMap<String,Double>> linkEmissionsBau = new HashMap<>();
         Map<Id<Link>,SortedMap<String,Double>> linkEmissionsPolicy = new HashMap<>();
 
-        SpatialDataInputs inputs = new SpatialDataInputs(SpatialDataInputs.LinkWeightMethod.line, bauDir);
-//        SpatialDataInputs inputs = new SpatialDataInputs(SpatialDataInputs.LinkWeightMethod.line, bauDir, policyDir);
+        SpatialDataInputs inputs;
+        if (isComparing)inputs = new SpatialDataInputs(SpatialDataInputs.LinkWeightMethod.line, bauDir, policyDir);
+        else inputs = new SpatialDataInputs(SpatialDataInputs.LinkWeightMethod.line, bauDir);
+
         inputs.setBoundingBox(xMin, xMax, yMin, yMax);
         inputs.setTargetCRS(targetCRS);
         inputs.setGridInfo(GeneralGrid.GridType.HEX,gridSize);
@@ -104,7 +108,7 @@ public class PatnaSpatialPlots {
         Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(inputs.initialCaseNetworkFile);
 
         EmissionTimebinDataWriter writer = new EmissionTimebinDataWriter();
-        if(inputs.isComparing) writer.openWriter(dir+"/analysis/spatialPlots/"+"viaData_NO2_"+ GeneralGrid.GridType.HEX+"_"+gridSize+"_"+smoothingRadius+"_line_"+policyName+"_diff.txt");
+        if(isComparing) writer.openWriter(dir+"/analysis/spatialPlots/"+"viaData_NO2_"+ GeneralGrid.GridType.HEX+"_"+gridSize+"_"+smoothingRadius+"_line_"+policyName+"_diff.txt");
         else writer.openWriter(dir+"/analysis/spatialPlots/"+"viaData_NO2_"+ GeneralGrid.GridType.HEX+"_"+gridSize+"_"+smoothingRadius+"_line_"+"_bau.txt");
 
         for(Link l : sc.getNetwork().getLinks().values()){
@@ -135,7 +139,7 @@ public class PatnaSpatialPlots {
             }
         }
         writer.writeData(simeEndTime, plot.getCellWeights());
-        //			plot.writeRData("NO2_"+(int)time/3600+"h",isWritingGGPLOTData);
+        plot.writeRData("NO2_", isWritingGGPLOTData);
         plot.reset();
         writer.closeWriter();
     }
