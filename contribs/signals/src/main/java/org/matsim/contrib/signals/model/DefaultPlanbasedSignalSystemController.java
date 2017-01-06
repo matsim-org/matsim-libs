@@ -48,8 +48,6 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 	private SignalPlan activePlan = null;
 	private double nextActivePlanCheckTime;
 	
-	public DefaultPlanbasedSignalSystemController(){}
-	
 	@Override
 	public void updateState(double timeSeconds) {
 		if (nextActivePlanCheckTime <= timeSeconds){
