@@ -26,14 +26,14 @@ import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalGroup;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
-import playground.dgrether.signalsystems.utils.DgAbstractSignalController;
+import playground.dgrether.signalsystems.utils.AbstractSignalController;
 
 
 /**
  * @author dgrether
  *
  */
-public class LaemmerSignalController  extends DgAbstractSignalController implements SignalController {
+public class LaemmerSignalController  extends AbstractSignalController implements SignalController {
 
 	private static final Logger log = Logger.getLogger(LaemmerSignalController.class);
 	

@@ -40,13 +40,13 @@ import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
-import playground.dgrether.signalsystems.utils.DgAbstractSignalController;
+import playground.dgrether.signalsystems.utils.AbstractSignalController;
 
 /**
  * @author tthunig
  *
  */
-public class DownstreamSignalController extends DgAbstractSignalController implements SignalController {
+public class DownstreamSignalController extends AbstractSignalController implements SignalController {
 
 	private static final Logger log = Logger.getLogger(DownstreamSignalController.class);
 
@@ -60,6 +60,7 @@ public class DownstreamSignalController extends DgAbstractSignalController imple
 	private Map<Id<Signal>, Set<Id<Link>>> signal2DownstreamLinkMap = new HashMap<>();
 	private SignalPlan activePlan;
 	private Set<Id<SignalGroup>> greenSignalGroupsAccordingToActivePlan = new HashSet<>();
+	private Set<Id<SignalGroup>> greenSignalGroupsInSimulation = new HashSet<>();
 	private Map<Id<Link>, Integer> linkMaxNoCars = new HashMap<>();
 
 	public DownstreamSignalController(LinkSensorManager sensorManager, SignalsData signalsData, Network network) {
@@ -89,18 +90,32 @@ public class DownstreamSignalController extends DgAbstractSignalController imple
 			for (Id<SignalGroup> groupId : activePlan.getDroppings(timeSeconds)) {
 				this.system.scheduleDropping(timeSeconds, groupId);
 				greenSignalGroupsAccordingToActivePlan.remove(groupId);
+				greenSignalGroupsInSimulation.remove(groupId);
 			}
 			for (Id<SignalGroup> groupId : activePlan.getOnsets(timeSeconds)) {
 				this.system.scheduleOnset(timeSeconds, groupId);
 				greenSignalGroupsAccordingToActivePlan.add(groupId);
+				greenSignalGroupsInSimulation.add(groupId);
 			}
 
 			// for all signal groups that show green/ has to show green (according to the plan)
-			for (Id<SignalGroup> signalGroup : greenSignalGroupsAccordingToActivePlan) {
-				if (allDownstreamLinksEmpty(signalGroup)) {
-					// TODO show green (switch to/ keep showing)
+			for (Id<SignalGroup> groupId : greenSignalGroupsAccordingToActivePlan) {
+				if (allDownstreamLinksEmpty(groupId)) {
+					// all downstream links 'empty'
+					if (!greenSignalGroupsInSimulation.contains(groupId)){
+						// switch to green
+						this.system.scheduleOnset(timeSeconds, groupId);
+						greenSignalGroupsInSimulation.add(groupId);
+					}
+					// else: keep showing green, i.e. do nothing
 				} else {
-					// TODO show red (switch to/ keep showing)
+					// at least one downstream link 'occupied'
+					if (greenSignalGroupsInSimulation.contains(groupId)){
+						// switch to red
+						this.system.scheduleDropping(timeSeconds, groupId);
+						greenSignalGroupsInSimulation.remove(groupId);
+					}
+					// else: keep showing red, i.e. do nothing
 				}
 			}
 		}

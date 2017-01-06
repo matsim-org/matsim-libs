@@ -42,7 +42,7 @@ import org.matsim.lanes.data.Lane;
 import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
-import playground.dgrether.signalsystems.utils.DgAbstractSignalController;
+import playground.dgrether.signalsystems.utils.AbstractSignalController;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 
 
@@ -50,7 +50,7 @@ import playground.dgrether.signalsystems.utils.DgSignalsUtils;
  * @author dgrether, tthunig
  *
  */
-public class DgSylviaController extends DgAbstractSignalController implements SignalController {
+public class DgSylviaController extends AbstractSignalController implements SignalController {
 
 	private static final Logger log = Logger.getLogger(DgSylviaController.class);
 	

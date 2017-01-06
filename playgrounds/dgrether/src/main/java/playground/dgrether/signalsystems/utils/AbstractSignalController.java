@@ -32,7 +32,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
  * @author dgrether
  *
  */
-public abstract class DgAbstractSignalController implements SignalController {
+public abstract class AbstractSignalController implements SignalController {
 
 	protected SignalSystem system = null;
 	protected Map<Id<SignalPlan>, SignalPlan> signalPlans = new HashMap<>();
