@@ -324,6 +324,7 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 		DgSylviaSignalPlan sylviaPlan = null;
 		SignalPlan fixedTimePlan = null;
 		for (Id<SignalPlan> planId : this.signalPlans.keySet()){
+			// TODO this only works without multiple signal plans
 			if (planId.toString().startsWith(DgSylviaPreprocessData.SYLVIA_PREFIX)){
 				sylviaPlan = (DgSylviaSignalPlan) this.signalPlans.get(planId);
 			}
