@@ -64,7 +64,7 @@ public class PatnaSpatialPlots {
     private static double yMin=2828000.00;
     private static double yMax=2838500.00;
 
-    private static final boolean isComparing = true;
+    private static final boolean isComparing = false;
 
     private static final CoordinateReferenceSystem targetCRS = MGC.getCRS(PatnaUtils.EPSG);
 
@@ -87,8 +87,8 @@ public class PatnaSpatialPlots {
         inputs.setSmoothingRadius(smoothingRadius);
         inputs.setShapeFile(shapeFile);
 
-//        SpatialInterpolation plot = new SpatialInterpolation(inputs, dir+"/analysis/spatialPlots/");
-        SpatialInterpolation plot = new SpatialInterpolation(inputs, dir+"/analysis/spatialPlots/", true);
+        SpatialInterpolation plot = new SpatialInterpolation(inputs, dir+"/analysis/spatialPlots/");
+//        SpatialInterpolation plot = new SpatialInterpolation(inputs, dir+"/analysis/spatialPlots/", true);
 
         double simeEndTime = LoadMyScenarios.getSimulationEndTime(inputs.initialCaseConfig);
         {
@@ -105,7 +105,7 @@ public class PatnaSpatialPlots {
             linkEmissionsPolicy = emissionLinkAnalyzerPolicy.getLink2TotalEmissions().entrySet().iterator().next().getValue();
         }
 
-        Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(inputs.initialCaseNetworkFile);
+        Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(policyDir+"/output_network.xml.gz");
 
         EmissionTimebinDataWriter writer = new EmissionTimebinDataWriter();
         if(isComparing) writer.openWriter(dir+"/analysis/spatialPlots/"+"viaData_NO2_"+ GeneralGrid.GridType.HEX+"_"+gridSize+"_"+smoothingRadius+"_line_"+policyName+"_diff.txt");
