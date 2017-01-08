@@ -34,11 +34,11 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
-import org.matsim.contrib.signals.model.AbstractSignalController;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
+import org.matsim.contrib.signals.model.SignalSystem;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
 
@@ -46,7 +46,7 @@ import playground.dgrether.signalsystems.LinkSensorManager;
  * @author tthunig
  *
  */
-public class DownstreamSignalController extends AbstractSignalController implements SignalController {
+public class DownstreamSignalController implements SignalController {
 
 	private static final Logger log = Logger.getLogger(DownstreamSignalController.class);
 
@@ -56,10 +56,11 @@ public class DownstreamSignalController extends AbstractSignalController impleme
 	private SignalsData signalsData;
 	private Network network;
 
+	private SignalSystem system;
 	private Node systemNode;
 	private Map<Id<Signal>, Set<Id<Link>>> signal2DownstreamLinkMap = new HashMap<>();
-	private SignalPlan activePlan;
-	private Set<Id<SignalGroup>> greenSignalGroupsAccordingToActivePlan = new HashSet<>();
+	private SignalPlan signalPlan;
+	private Set<Id<SignalGroup>> greenSignalGroupsAccordingToPlan = new HashSet<>();
 	private Set<Id<SignalGroup>> greenSignalGroupsInSimulation = new HashSet<>();
 	private Map<Id<Link>, Integer> linkMaxNoCars = new HashMap<>();
 
@@ -76,47 +77,65 @@ public class DownstreamSignalController extends AbstractSignalController impleme
 
 	private void initLinkMaxCars() {
 		linkMaxNoCars = new HashMap<>();
-		for (Link link : network.getLinks().values()){
+		for (Link link : network.getLinks().values()) {
 			linkMaxNoCars.put(link.getId(), (int) (link.getLength() / 15));
 		}
 	}
 
 	@Override
+	public void addPlan(SignalPlan plan) {
+		if (signalPlan != null || plan.getStartTime() != 0.0 || plan.getEndTime() != 0.0) {
+			throw new UnsupportedOperationException("This downstream signal algorithm only works with one single signal plan for each signal system that is active all day.");
+		}
+		this.signalPlan = plan;
+	}
+
+	@Override
+	public void setSignalSystem(SignalSystem system) {
+		this.system = system;
+	}
+
+	@Override
 	public void updateState(double timeSeconds) {
-		checkForActivePlan(timeSeconds);
-		// if there is an active plan, i.e. signals are switched on
-		if (activePlan != null) {
-			// schedule onsets and droppings of the plan; update greenSignalGroupsAccordingToActivePlan
-			for (Id<SignalGroup> groupId : activePlan.getDroppings(timeSeconds)) {
+		// schedule onsets and droppings of the plan; update greenSignalGroupsAccordingToActivePlan
+		for (Id<SignalGroup> groupId : signalPlan.getDroppings(timeSeconds)) {
+			greenSignalGroupsAccordingToPlan.remove(groupId);
+			// schedule dropping only if signal group still shows green
+			if (greenSignalGroupsInSimulation.contains(groupId)) {
 				this.system.scheduleDropping(timeSeconds, groupId);
-				greenSignalGroupsAccordingToActivePlan.remove(groupId);
 				greenSignalGroupsInSimulation.remove(groupId);
 			}
-			for (Id<SignalGroup> groupId : activePlan.getOnsets(timeSeconds)) {
-				this.system.scheduleOnset(timeSeconds, groupId);
-				greenSignalGroupsAccordingToActivePlan.add(groupId);
-				greenSignalGroupsInSimulation.add(groupId);
-			}
+		}
+		for (Id<SignalGroup> groupId : signalPlan.getOnsets(timeSeconds)) {
+			this.system.scheduleOnset(timeSeconds, groupId);
+			greenSignalGroupsAccordingToPlan.add(groupId);
+			greenSignalGroupsInSimulation.add(groupId);
+		}
 
-			// for all signal groups that show green/ has to show green (according to the plan)
-			for (Id<SignalGroup> groupId : greenSignalGroupsAccordingToActivePlan) {
-				if (allDownstreamLinksEmpty(groupId)) {
-					// all downstream links 'empty'
-					if (!greenSignalGroupsInSimulation.contains(groupId)){
-						// switch to green
-						this.system.scheduleOnset(timeSeconds, groupId);
-						greenSignalGroupsInSimulation.add(groupId);
-					}
-					// else: keep showing green, i.e. do nothing
-				} else {
-					// at least one downstream link 'occupied'
-					if (greenSignalGroupsInSimulation.contains(groupId)){
-						// switch to red
-						this.system.scheduleDropping(timeSeconds, groupId);
-						greenSignalGroupsInSimulation.remove(groupId);
-					}
-					// else: keep showing red, i.e. do nothing
+		// TODO use DefaultPlanbased: gehe alle signal groups durch die grün sind
+		// prüfe ob sie rot werden müssen: sobald eine unabh von plan auf rot geschaltet wird, diese merken
+		// alle durchgehen die grün sein müssten. prüfen ob wieder grün ok: aus merke entfernen
+		// TODO Was passiert, wenn signal bis dropping zeitpunkt rot ist? wird es dann nochmal rot geschaltet? (ist unten genau so problem)
+		// letzteres spricht dafür es doch ohne DefaultPlanbased.. zu machen
+
+		// for all signal groups that show green/ has to show green (according to the plan)
+		for (Id<SignalGroup> groupId : greenSignalGroupsAccordingToPlan) {
+			if (allDownstreamLinksEmpty(groupId)) {
+				// all downstream links 'empty'
+				if (!greenSignalGroupsInSimulation.contains(groupId)) {
+					// switch to green
+					this.system.scheduleOnset(timeSeconds, groupId);
+					greenSignalGroupsInSimulation.add(groupId);
 				}
+				// else: keep showing green, i.e. do nothing
+			} else {
+				// at least one downstream link 'occupied'
+				if (greenSignalGroupsInSimulation.contains(groupId)) {
+					// switch to red
+					this.system.scheduleDropping(timeSeconds, groupId);
+					greenSignalGroupsInSimulation.remove(groupId);
+				}
+				// else: keep showing red, i.e. do nothing
 			}
 		}
 
@@ -129,32 +148,15 @@ public class DownstreamSignalController extends AbstractSignalController impleme
 	 * @return true if all downstream links of all signals of the signal group are empty
 	 */
 	private boolean allDownstreamLinksEmpty(Id<SignalGroup> signalGroupId) {
-		for (Id<Signal> signalId : this.signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(this.system.getId()).get(signalGroupId).getSignalIds()){
-			for (Id<Link> downstreamLinkId : signal2DownstreamLinkMap.get(signalId)){
+		for (Id<Signal> signalId : this.signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(this.system.getId()).get(signalGroupId).getSignalIds()) {
+			for (Id<Link> downstreamLinkId : signal2DownstreamLinkMap.get(signalId)) {
 				// TODO test other parameters
-				if (this.sensorManager.getNumberOfCarsOnLink(downstreamLinkId) > linkMaxNoCars.get(downstreamLinkId)){
+				if (this.sensorManager.getNumberOfCarsOnLink(downstreamLinkId) > linkMaxNoCars.get(downstreamLinkId)) {
 					return false;
 				}
 			}
 		}
 		return true;
-	}
-	
-	private void checkForActivePlan(double now){
-		// TODO do we also need/ like to have something like signal plan validation?!
-		
-		// TODO does not work for all possible cases of multiple signal plans
-		if (activePlan == null || activePlan.getEndTime() < now ){
-			// look for the next plan
-			// TODO make more efficient: sort before, see DefaultPlanbasedSignalSystemController
-			for (SignalPlan signalPlan : this.signalPlans.values()){
-				// TODO end time is 0 when it is 12pm, see DefaultPlanbasedSignalSystemController
-				if (signalPlan.getEndTime() > now && signalPlan.getStartTime() <= now){
-					activePlan = signalPlan;
-					break;
-				}
-			}
-		}
 	}
 
 	@Override
@@ -163,8 +165,7 @@ public class DownstreamSignalController extends AbstractSignalController impleme
 	}
 
 	/**
-	 * Is called when mobsim is initialized. 
-	 * Installs sensors on all outgoing links of the systems node.
+	 * Is called when mobsim is initialized. Installs sensors on all outgoing links of the systems node.
 	 */
 	@Override
 	public void simulationInitialized(double simStartTimeSeconds) {
@@ -181,14 +182,10 @@ public class DownstreamSignalController extends AbstractSignalController impleme
 
 			this.signal2DownstreamLinkMap.put(sd.getId(), new HashSet<>());
 			if (sd.getTurningMoveRestrictions() != null) {
-				for (Id<Link> outgoingLinkId : sd.getTurningMoveRestrictions()) {
-					this.signal2DownstreamLinkMap.get(sd.getId()).add(outgoingLinkId);
-				}
+				this.signal2DownstreamLinkMap.get(sd.getId()).addAll(sd.getTurningMoveRestrictions());
 			} else {
 				// if no turning move restrictions are set, turning is allowed to all outgoing links
-				for (Id<Link> outgoingLinkId : systemNode.getOutLinks().keySet()) {
-					this.signal2DownstreamLinkMap.get(sd.getId()).add(outgoingLinkId);
-				}
+				this.signal2DownstreamLinkMap.get(sd.getId()).addAll(systemNode.getOutLinks().keySet());
 			}
 		}
 	}
