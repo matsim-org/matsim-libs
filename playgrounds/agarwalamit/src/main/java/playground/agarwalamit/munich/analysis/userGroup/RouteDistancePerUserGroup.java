@@ -36,7 +36,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.legMode.tripDistance.LegModeRouteDistanceDistributionHandler;
+import playground.agarwalamit.analysis.tripDistance.TripDistanceHandler;
 import playground.agarwalamit.munich.utils.UserGroupUtilsExtended;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
@@ -75,7 +75,7 @@ public class RouteDistancePerUserGroup {
 	}
 
 	private void run(){
-		LegModeRouteDistanceDistributionHandler	lmdfed = new LegModeRouteDistanceDistributionHandler(sc);
+		TripDistanceHandler lmdfed = new TripDistanceHandler(sc);
 		
 		EventsManager manager = EventsUtils.createEventsManager();
 		MatsimEventsReader reader = new MatsimEventsReader(manager);

@@ -48,6 +48,8 @@ public final class PatnaUtils {
 //	public static final Double SLUM_AVG_INCOME = 3109.0; // sec 5.2.4, Patna CMP 
 //	public static final Double NONSLUM_AVG_INCOME = 7175.0;
 	public static final Double MEADIAM_INCOME = 4000.0;
+
+	public static final double SAMPLE_SIZE = 0.1;
 	
 	public enum PatnaUrbanActivityTypes {
 		home, work, educational, social, other, unknown
@@ -69,6 +71,8 @@ public final class PatnaUtils {
 	public static final String BIKE_TRACK_PREFIX = "bikeTrackLink_";
 
 	public static final String BIKE_TRACK_CONNECTOR_PREFIX = "bikeTrackConnectorLink_";
+
+	public static final double BIKE_TRACK_LEGNTH_REDUCTION_FACTOR = 2.0;
 
 	private PatnaUtils(){} 
 

@@ -116,7 +116,7 @@ public class PatnaSimulationTimeWriter {
 		TravelTimeComperator time = new TravelTimeComperator(runDir+"/"+cloningFactor+"pct/");
 		time.run();
 
-		TravelDistanceComperator dist = new TravelDistanceComperator(runDir+"/"+cloningFactor+"pct/",inputFilesDir+"/network.xml.gz");
+		TravelDistanceForSimTimeExp dist = new TravelDistanceForSimTimeExp(runDir+"/"+cloningFactor+"pct/",inputFilesDir+"/network.xml.gz");
 		dist.run();
 	}
 

@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
@@ -57,8 +57,8 @@ public class PlansFilterNoRoute {
 
 	public void run(Population plans, String badPopFileName, Network network) {
 		badPop = (Population) plans;
-		StreamingUtils.setIsStreaming(badPop, true);
-		pw = new StreamingPopulationWriter(badPop, network);
+		StreamingDeprecated.setIsStreaming(badPop, true);
+		pw = new StreamingPopulationWriter();
 		pw.startStreaming(badPopFileName);
 		this.run(plans);
 	}

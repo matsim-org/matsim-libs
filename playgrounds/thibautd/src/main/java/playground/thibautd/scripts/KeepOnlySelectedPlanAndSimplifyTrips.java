@@ -31,7 +31,7 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -57,12 +57,10 @@ public class KeepOnlySelectedPlanAndSimplifyTrips {
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		final Population pop = (Population) scenario.getPopulation();
-		StreamingUtils.setIsStreaming(pop, true);
+		StreamingDeprecated.setIsStreaming(pop, true);
 
 		final StreamingPopulationWriter writer =
-			new StreamingPopulationWriter(
-					scenario.getPopulation(),
-					scenario.getNetwork() );
+			new StreamingPopulationWriter( );
 		writer.writeStartPlans( outPopulation );
 
 		final TripsToLegsAlgorithm trips2legs =
@@ -71,7 +69,7 @@ public class KeepOnlySelectedPlanAndSimplifyTrips {
 						PtConstants.TRANSIT_ACTIVITY_TYPE ),
 					new MainModeIdentifierImpl()
 					);
-		StreamingUtils.addAlgorithm(pop, new PersonAlgorithm() {
+		StreamingDeprecated.addAlgorithm(pop, new PersonAlgorithm() {
 			@Override
 			public void run(final Person person) {
 				if ( atts.getAttribute( person.getId().toString() , "subpopulation" ) != null ) return;

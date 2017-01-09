@@ -1,6 +1,6 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * UCSBTAZ2Coord.java
+ * project: org.matsim.*                                                   *
+ * Feature2Coord.java                                                      *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,97 +21,117 @@
 package playground.dziemke.cemdapMatsimCadyts.cemdap2matsim;
 
 import java.util.Map;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-
 /**
  * @author dziemke
- * based on balmermi
- *
  */
 public class Feature2Coord {
-	private final static Logger log = Logger.getLogger(Feature2Coord.class);
+	private final static Logger LOG = Logger.getLogger(Feature2Coord.class);
 	
-	public final static Random r = MatsimRandom.getRandom();
-	private final static GeometryFactory geometryFactory = new GeometryFactory();
+	public Feature2Coord() {
+	}
 
-	public final void assignCoords(Scenario scenario, int planNumber, ObjectAttributes personObjectAttributes, Map<String, SimpleFeature> features) {
-		for (Person person : scenario.getPopulation().getPersons().values()) {
-			int actIndex = 0;
-			Coord homeCoord = null;
+	public final void assignCoords(Population population, int planNumber, ObjectAttributes personZoneAttributes, Map<String, SimpleFeature> zones,
+			Map<Id<Person>, Coord> homeZones, boolean allowVariousWorkAndEducationLocations) {
+		int counter = 0;
+		LOG.info("Start assigning (non-home) coordinates. Plan number is " + planNumber +".");
+		for (Person person : population.getPersons().values()) {
+			counter++;
+			if (counter % 1000000 == 0) {
+				LOG.info(counter + " persons assigned with (non-home) coordinates so far.");
+				Gbl.printMemoryUsage();
+			}
+			
+			int activityIndex = 0;
 			Coord workCoord = null;
 			Coord educCoord = null;
-			// for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-			for (PlanElement pe : person.getPlans().get(planNumber).getPlanElements()) {
-				if (pe instanceof Activity) {
-					Activity activity = (Activity)pe;
-					String zoneId = (String)personObjectAttributes.getAttribute(person.getId().toString(),CemdapStopsParser.ZONE+actIndex);
+
+			for (PlanElement planElement : person.getPlans().get(planNumber).getPlanElements()) {
+				if (planElement instanceof Activity) {
+					Activity activity = (Activity) planElement;
+					String zoneId = (String) personZoneAttributes.getAttribute(person.getId().toString(), CemdapStopsParser.ZONE + activityIndex);
 					if (zoneId == null) {
-						log.error("pid="+person.getId()+": object attribute '"+CemdapStopsParser.ZONE+actIndex+"' not found.");
-						//Gbl.errorMsg("pid="+person.getId()+": object attribute '"+CemdapStopsParser.ZONE+actIndex+"' not found.");
+						LOG.error("Person with ID " + person.getId() + ": Object attribute '" + CemdapStopsParser.ZONE + activityIndex + "' not found.");
 					}
-					SimpleFeature zone = features.get(zoneId);
+					SimpleFeature zone = zones.get(zoneId);
 					if (zone == null) {
-						log.error("zone with id="+zoneId+" not found.");
-						//Gbl.errorMsg("zone with id="+zoneId+" not found.");
+						throw new RuntimeException("Zone with id " + zoneId + " not found.");
 					}
-					
-					if (activity.getType().startsWith("home")) {
-						// if (homeCoord == null) { homeCoord = UCSBUtils.getRandomCoordinate(zone); }
-						if (homeCoord == null) { homeCoord = getRandomCoordinate(zone); }
-						((Activity)activity).setCoord(homeCoord);
+					if (allowVariousWorkAndEducationLocations) {
+						if (activity.getType().equals(ActivityTypes.HOME)) {
+							((Activity)activity).setCoord(homeZones.get(person.getId()));
+						} else {
+							Coord coord = Cemdap2MatsimUtils.getRandomCoordinate(zone);
+							((Activity)activity).setCoord(coord);
+						}
+					} else {
+						if (activity.getType().equals(ActivityTypes.HOME)) {
+							((Activity)activity).setCoord(homeZones.get(person.getId()));
+						} else if (activity.getType().equals(ActivityTypes.WORK)) {
+							if (workCoord == null) {
+								workCoord = Cemdap2MatsimUtils.getRandomCoordinate(zone);
+							}
+							((Activity)activity).setCoord(workCoord);
+						} else if (activity.getType().equals(ActivityTypes.EDUCATION)) {
+							if (educCoord == null) {
+								educCoord = Cemdap2MatsimUtils.getRandomCoordinate(zone);
+							}
+							((Activity)activity).setCoord(educCoord);
+						} else {
+							Coord coord = Cemdap2MatsimUtils.getRandomCoordinate(zone);
+							((Activity)activity).setCoord(coord);
+						}
 					}
-					else if (activity.getType().startsWith("work")) {
-						// if (workCoord == null) { workCoord = UCSBUtils.getRandomCoordinate(zone); }
-						if (workCoord == null) { workCoord = getRandomCoordinate(zone); }
-						((Activity)activity).setCoord(workCoord);
-					}
-					else if (activity.getType().startsWith("educ")) {
-						//if (educCoord == null) { educCoord = UCSBUtils.getRandomCoordinate(zone); }
-						if (educCoord == null) { educCoord = getRandomCoordinate(zone); }
-						((Activity)activity).setCoord(educCoord);
-					}
-					else {
-						// Coord coord = UCSBUtils.getRandomCoordinate(zone);
-						Coord coord = getRandomCoordinate(zone);
-						((Activity)activity).setCoord(coord);
-					}
-					actIndex++;
+					activityIndex++;
 				}
 			}
 		}
+		LOG.info("Finished assigning non-home coordinates.");
 	}
 	
-	public static final Coord getRandomCoordinate(SimpleFeature feature) {
-		Geometry geometry = (Geometry) feature.getDefaultGeometry();
-		Envelope envelope = geometry.getEnvelopeInternal();
-		while (true) {
-			Point point = getRandomCoordinate(envelope);
-			if (point.within(geometry)) {
-				return new Coord(point.getX(), point.getY());
+	
+	public final void assignHomeCoords(Population population, ObjectAttributes personZoneAttributes, Map<String, SimpleFeature> zones, Map<Id<Person>, Coord> homeZones) {
+		int counter = 0;
+		LOG.info("Start assigning home coordinates.");
+		for (Person person : population.getPersons().values()) {
+			counter++;
+			if (counter % 1000000 == 0) {
+				LOG.info(counter + " persons assigned with home coordinates so far.");
+				Gbl.printMemoryUsage();
+			}
+			int activityIndex = 0;
+
+			for (PlanElement planElement : person.getPlans().get(0).getPlanElements()) {
+				if (planElement instanceof Activity) {
+					Activity activity = (Activity) planElement;
+					String zoneId = (String) personZoneAttributes.getAttribute(person.getId().toString(), CemdapStopsParser.ZONE + activityIndex);
+					Id<Person> personId = person.getId();
+					if (zoneId == null) {
+						LOG.error("Person with ID " + person.getId() + ": Object attribute '" + CemdapStopsParser.ZONE + activityIndex + "' not found.");
+					}
+					SimpleFeature zone = zones.get(zoneId);
+					if (zone == null) {
+						throw new RuntimeException("Zone with id " + zoneId + " not found.");
+					}
+					if (activity.getType().equals(ActivityTypes.HOME)) {
+						Coord homeCoord = Cemdap2MatsimUtils.getRandomCoordinate(zone);
+						homeZones.put(personId, homeCoord);
+					}
+					activityIndex++;
+				}
 			}
 		}
-	}
-	
-	public static final Point getRandomCoordinate(Envelope envelope) {
-		double x = envelope.getMinX() + r.nextDouble() * envelope.getWidth();
-		double y = envelope.getMinY() + r.nextDouble() * envelope.getHeight();
-		return geometryFactory.createPoint(new Coordinate(x,y));
+		LOG.info("Finished assigning home coordinates.");
 	}
 }

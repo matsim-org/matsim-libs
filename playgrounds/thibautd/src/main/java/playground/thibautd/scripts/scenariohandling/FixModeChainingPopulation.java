@@ -31,7 +31,7 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
@@ -61,18 +61,16 @@ public class FixModeChainingPopulation {
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		if ( facilitiesFile != null ) new MatsimFacilitiesReader( scenario ).readFile( facilitiesFile );
 		final Population pop = (Population) scenario.getPopulation();
-		StreamingUtils.setIsStreaming(pop, true);
+		StreamingDeprecated.setIsStreaming(pop, true);
 
 		final StreamingPopulationWriter writer =
-			new StreamingPopulationWriter(
-					scenario.getPopulation(),
-					scenario.getNetwork() );
+			new StreamingPopulationWriter( );
 //		writer.setWriterHandler( new PopulationWriterHandlerImplV4( scenario.getNetwork() ) );
 		writer.writeStartPlans( outPopulation );
 
 		final Counter correctionCounter = new Counter( "correcting plan # " );
-		StreamingUtils.addAlgorithm(pop, new PlanModeChainCorrectingAlgorithm( correctionCounter , facilitiesFile != null ));
-		StreamingUtils.addAlgorithm(pop, new PersonAlgorithm() {
+		StreamingDeprecated.addAlgorithm(pop, new PlanModeChainCorrectingAlgorithm( correctionCounter , facilitiesFile != null ));
+		StreamingDeprecated.addAlgorithm(pop, new PersonAlgorithm() {
 			@Override
 			public void run(final Person person) {
 				writer.writePerson( person );

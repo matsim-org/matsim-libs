@@ -58,7 +58,7 @@ public class DigicoreVehicleCollatorTest {
 		buildTestCase();
 		
 		/* Test without deleting the input folder. */
-		String folder = utils.getOutputDirectory() + "xml/";
+		String folder = utils.getOutputDirectory();
 		String filename = utils.getOutputDirectory() + "output.xml";
 		String[] args = {folder, filename, "Atlantis", "Test", "false"};
 		DigicoreVehicleCollator.main(args);
@@ -74,7 +74,7 @@ public class DigicoreVehicleCollatorTest {
 		buildTestCase();
 		
 		/* Test with deleting the input folder. */
-		String folder = utils.getOutputDirectory() + "xml/";
+		String folder = utils.getOutputDirectory();
 		String filename = utils.getOutputDirectory() + "output.xml";
 		String[] args = {folder, filename, "Atlantis", "Test", "true"};
 		DigicoreVehicleCollator.main(args);

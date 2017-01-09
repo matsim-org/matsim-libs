@@ -36,10 +36,10 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import playground.jbischoff.taxibus.analysis.SharedTaxiContolerListener;
-import playground.jbischoff.taxibus.analysis.SharedTaxiTripAnalyzer;
 import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
+import playground.jbischoff.taxibus.sharedtaxi.analysis.SharedTaxiContolerListener;
+import playground.jbischoff.taxibus.sharedtaxi.analysis.SharedTaxiTripAnalyzer;
 
 /**
  * @author jbischoff

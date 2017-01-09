@@ -24,8 +24,11 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
@@ -76,6 +79,23 @@ public class JbUtils {
 		return geometry;
 	}
 	
+	public static <K,V> void map2Text(Map<K,V> map, String filename, String delim, String headerLine){
+		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+		try { 
+			bw.write(headerLine);
+			for (Entry<K,V> e: map.entrySet()){
+				bw.newLine();
+				bw.write(e.getKey().toString()+delim+e.getValue().toString());
+				
+			}
+			
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static <T> void collection2Text(Collection<T> c, String filename){
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 		try {
@@ -92,4 +112,19 @@ public class JbUtils {
 			e.printStackTrace();
 		}
 	}
+	public static Coord getCoordCentroid(Set<Coord> coords){
+		double x=0;
+		double y=0;
+		for (Coord c : coords){
+			x+=c.getX();
+			y+=c.getY();
+		}
+		x = x/coords.size();
+		y = y/coords.size();
+		return new Coord(x,y);
+		
+	}
+	
+	
+
 }

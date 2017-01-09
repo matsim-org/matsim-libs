@@ -648,7 +648,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		QVehicle veh = removeFirstVehicle();
 		if (this.context.qsimConfig.isUseLanes() ) {
-			if (  this.qLink.getAcceptingQLane() != this.qLink.getOfferingQLanes().get(0) ) {
+			if (  hasMoreThanOneLane() ) {
 				this.context.getEventsManager().processEvent(new LaneLeaveEvent( now, veh.getId(), this.qLink.getLink().getId(), this.getId() ));
 			}
 		}
@@ -730,7 +730,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		double now = context.getSimTimer().getTimeOfDay() ;
 
 		if (this.context.qsimConfig.isUseLanes() ) {
-			if (  this.qLink.getAcceptingQLane() != this.qLink.getOfferingQLanes().get(0) ) {
+			if (  hasMoreThanOneLane() ) {
 				this.context.getEventsManager().processEvent(new LaneEnterEvent( now, veh.getId(), this.qLink.getLink().getId(), this.getId() ));
 			}
 		}
@@ -768,6 +768,14 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		if ( context.qsimConfig.getInflowConstraint()!=InflowConstraint.none ) {
 			this.accumulatedInflowCap -= veh.getSizeInEquivalents() ;
 		}
+	}
+
+	private boolean hasMoreThanOneLane() {
+		return this.qLink.getAcceptingQLane() != this.qLink.getOfferingQLanes().get(0);
+		// this works independent from sorting since if there is only one lane, then it has to be the one to be returned by
+		// getOfferingQLanes().get(0), and it is also the same as the accepting QLane.  If, however, "lanes" is used,
+		// there are at least two lanes in sequence, so the accepting lane is never the same as any of the offering lanes, and
+		// this will always return false independent from sorting.  kai/theresa, dec'16
 	}
 
 	 @Override

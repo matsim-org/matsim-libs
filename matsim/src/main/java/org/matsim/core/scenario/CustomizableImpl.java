@@ -71,7 +71,7 @@ final class CustomizableImpl implements Customizable {
 	@Override
 	public final Map<String,Object> getCustomAttributes() {
 		if (this.custom_attributes == null) {
-			this.custom_attributes = new HashMap<String,Object>();
+			this.custom_attributes = new HashMap<>();
 		}
 		return this.custom_attributes;
 	}

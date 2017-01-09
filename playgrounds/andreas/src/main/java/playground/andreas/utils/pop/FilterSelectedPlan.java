@@ -27,7 +27,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -57,12 +57,12 @@ public class FilterSelectedPlan {
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		final Population plans = (Population) sc.getPopulation();
-		StreamingUtils.setIsStreaming(plans, true);
-		StreamingUtils.addAlgorithm(plans, new PersonFilterSelectedPlan());
+		StreamingDeprecated.setIsStreaming(plans, true);
+		StreamingDeprecated.addAlgorithm(plans, new PersonFilterSelectedPlan());
 		
-		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(plans, sc.getNetwork());
+		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter();
 		plansWriter.startStreaming(outPlansFile);
-		StreamingUtils.addAlgorithm(plans, plansWriter);
+		StreamingDeprecated.addAlgorithm(plans, plansWriter);
 		MatsimReader plansReader = new PopulationReader(sc);		
 
 		log.info("Reading plans file from " + inPlansFile);

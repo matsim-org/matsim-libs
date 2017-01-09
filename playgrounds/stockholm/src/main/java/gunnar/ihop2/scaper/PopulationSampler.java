@@ -15,7 +15,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UnicodeInputStream;
 
@@ -62,13 +62,13 @@ public final class PopulationSampler{
 		}
 		
 		Population pop = (Population) sc.getPopulation();
-		StreamingUtils.setIsStreaming(pop, true);
+		StreamingDeprecated.setIsStreaming(pop, true);
 		StreamingPopulationWriter writer = null;
 		try {
-			writer = new StreamingPopulationWriter(pop, null, samplesize);
+			writer = new StreamingPopulationWriter(samplesize);
 			writer.startStreaming(outputPopulationFile.getAbsolutePath());
 			final PersonAlgorithm algo = writer;
-			StreamingUtils.addAlgorithm(pop, algo);
+			StreamingDeprecated.addAlgorithm(pop, algo);
 			try (FileInputStream fis = new FileInputStream(inputPopulationFile);
 				BufferedInputStream is = (inputPopulationFile.getName().toLowerCase(Locale.ROOT).endsWith(".gz")) ? 
 					new BufferedInputStream(new UnicodeInputStream(new GZIPInputStream(fis))) :

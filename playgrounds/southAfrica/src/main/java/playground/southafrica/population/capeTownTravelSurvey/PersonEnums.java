@@ -79,13 +79,13 @@ public class PersonEnums {
 			}
 		}
 		
+		
 		public static AgeGroup parseFromBirthYear(String year){
 			if(year.equalsIgnoreCase("Unknown")){
 				return UNKNOWN;
 			}
 			try{
-				double birthYear = Double.parseDouble(year);
-				double age = Math.max(0.0, 2013.0 - birthYear);
+				double age = parseAgeFromBirthYear(year);
 				if(age <= 5){
 					return INFANT;
 				} else if(age <= 12){
@@ -104,6 +104,16 @@ public class PersonEnums {
 				return UNKNOWN;
 			}
 		}
+
+		public static int parseAgeFromBirthYear(String year){
+			if(year.equalsIgnoreCase("Unknown")){
+				LOG.warn("Unknown age... returning '0'");
+				return 0;
+			}
+			double birthYear = Double.parseDouble(year);
+			double age = Math.max(0.0, 2013.0 - birthYear);
+			return (int) Math.floor(age);
+		}
 	}
 	
 	
@@ -120,11 +130,11 @@ public class PersonEnums {
 			this.description = descr;
 		}
 		
-		int getCode(){ return this.code; }
+		public int getCode(){ return this.code; }
 		
-		String getDescription(){ return this.description; }
+		public String getDescription(){ return this.description; }
 		
-		static Gender parseFromDescription(String descr){
+		public static Gender parseFromDescription(String descr){
 			if(descr.equalsIgnoreCase("Unknown")){
 				return UNKNOWN;
 			} else if(descr.equalsIgnoreCase("Male")){
@@ -136,7 +146,7 @@ public class PersonEnums {
 			}
 		}
 		
-		static Gender parseFromCode(int code){
+		public static Gender parseFromCode(int code){
 			switch (code) {
 			case 0: return UNKNOWN;
 			case 1: return MALE;
@@ -166,9 +176,9 @@ public class PersonEnums {
 		
 		int getCode(){ return this.code; }
 		
-		String getDescription(){ return this.description; }
+		public String getDescription(){ return this.description; }
 		
-		static Education parseFromDescription(String descr){
+		public static Education parseFromDescription(String descr){
 			if(descr.equalsIgnoreCase("Unknown")){
 				return UNKNOWN;
 			} else if(descr.equalsIgnoreCase("None")){
@@ -179,14 +189,14 @@ public class PersonEnums {
 				return SECONDARY10;
 			} else if (descr.equalsIgnoreCase("Secondary, Grade 12")){
 				return SECONDARY12;
-			} else if (descr.equalsIgnoreCase("Tertiray")){
+			} else if (descr.equalsIgnoreCase("Tertiary")){
 				return TERTIARY;
 			} else{
 				throw new RuntimeException("Cannot parse education from description: " + descr);
 			}
 		}
 		
-		static Education parseFromCode(int code){
+		public static Education parseFromCode(int code){
 			switch (code) {
 			case 0: return UNKNOWN;
 			case 1: return NONE;

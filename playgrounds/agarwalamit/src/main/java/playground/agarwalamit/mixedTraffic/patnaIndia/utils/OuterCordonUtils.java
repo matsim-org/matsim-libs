@@ -39,7 +39,7 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand.OuterCordo
 public class OuterCordonUtils {
 
 	public enum PatnaNetworkType {osmNetwork, shpNetwork /*shp network is from transcad files*/}
-	public static final double SAMPLE_SIZE = 0.1;
+	public static final double SAMPLE_SIZE = PatnaUtils.SAMPLE_SIZE;
 
 	/**
 	 * modal correction factor only from car/motorbike/truck/bike and not from all vehicles (additionally, walk, cycle rickshaw, pt)

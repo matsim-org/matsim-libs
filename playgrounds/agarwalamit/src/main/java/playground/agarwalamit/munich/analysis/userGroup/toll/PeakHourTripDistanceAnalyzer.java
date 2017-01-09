@@ -30,7 +30,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.analysis.trip.FilteredTripDistanceHandler;
+import playground.agarwalamit.analysis.tripDistance.ModeFilterTripDistanceHandler;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.FileUtils;
@@ -42,7 +42,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  */
 
 public class PeakHourTripDistanceAnalyzer  {
-	private final FilteredTripDistanceHandler tripDistHandler;
+	private final ModeFilterTripDistanceHandler tripDistHandler;
 	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{8., 9., 10., 16., 17., 18.,})); // => 7-10 and 15-18
 	private final MunichPersonFilter pf = new MunichPersonFilter();
 	private final Map<Id<Person>,List<Double>> person2DistsPkHr = new HashMap<>();
@@ -55,7 +55,7 @@ public class PeakHourTripDistanceAnalyzer  {
 
 	public PeakHourTripDistanceAnalyzer(Network network, double simulationEndTime, int noOfTimeBins) {
 		LOG.warn("Peak hours are assumed as 07:00-10:00 and 15:00-18:00 by looking on the travel demand for BAU scenario.");
-		this.tripDistHandler = new FilteredTripDistanceHandler(network, simulationEndTime, noOfTimeBins);
+		this.tripDistHandler = new ModeFilterTripDistanceHandler(network, simulationEndTime, noOfTimeBins);
 		throw new RuntimeException("looks, there is some problem somewhere, cant reproduce the results (Oct 2016).");
 	}
 	

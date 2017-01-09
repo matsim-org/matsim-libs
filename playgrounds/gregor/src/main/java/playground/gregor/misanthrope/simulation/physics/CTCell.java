@@ -11,10 +11,10 @@ import java.util.*;
 
 public abstract class CTCell {
 
-	public static final double RHO_M = 6.667;
-	public static final double V_0 = 1.5;
-	public static final double GAMMA = 0.3;
-	public static final double P0 = 0.2;
+	public static final double RHO_M = 4.97;
+	public static final double V_0 = 1.14;
+	public static final double GAMMA = 0.55;
+	public static final double P0 = 0.5;
 	protected static final Logger log = Logger.getLogger(CTCell.class);
 	private static int ID = 0;
 	private static double Q;

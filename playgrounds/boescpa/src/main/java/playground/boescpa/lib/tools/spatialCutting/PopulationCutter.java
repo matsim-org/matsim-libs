@@ -41,7 +41,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.boescpa.lib.tools.coordUtils.CoordFilter;
@@ -101,8 +101,8 @@ public class PopulationCutter {
         log.info(" AOI contains: " + areaOfInterest.size() + " links.");
 
         log.info(" Setting up population objects...");
-        StreamingUtils.setIsStreaming(population, true);
-        StreamingPopulationWriter pop_writer = new StreamingPopulationWriter(population, scenario.getNetwork());
+        StreamingDeprecated.setIsStreaming(population, true);
+        StreamingPopulationWriter pop_writer = new StreamingPopulationWriter();
         pop_writer.startStreaming(populationOutputFile);
         MatsimReader pop_reader = new PopulationReader(scenario);
 
@@ -110,7 +110,7 @@ public class PopulationCutter {
         PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(pop_writer, areaOfInterest, network);
         filter.setAlternativeAOI(centerAlternative, radiusAlternative);
 	final PersonAlgorithm algo = filter;
-        StreamingUtils.addAlgorithm(population, algo);
+        StreamingDeprecated.addAlgorithm(population, algo);
 
         log.info(" Reading, processing, writing plans...");
         pop_reader.readFile(populationInputFile);

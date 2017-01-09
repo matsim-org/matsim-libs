@@ -2,159 +2,101 @@ package playground.jbischoff.taxibus.run.configuration;
 
 import java.net.URL;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
-public class TaxibusConfigGroup extends ConfigGroup {
+public class TaxibusConfigGroup extends ReflectiveConfigGroup {
 
 	private static final Logger log = Logger.getLogger(TaxibusConfigGroup.class);
 
 	public static final String GROUP_NAME = "taxibusConfig";
-
+	//general
 	private static final String VEHICLES_FILE = "vehiclesFile";
-	private static final String TAXI_RANKS_FILE = "ranksFile";
 	private static final String ALGORITHM = "algorithm";
 	private static final String PICKUP_DURATION = "pickupDuration";
 	private static final String DROPOFF_DURATION = "dropoffDuration";
-	private static final String OTFVIS = "otfvis";
+
+	//clustered
 	private static final String VEHCAP = "vehicleCapacity";
-
-	private static final String LINES = "linesFile";
-	private static final String ZONESSHP = "zonesShape";
-	private static final String ZONESXML = "zonesXML";
-
-	private static final String DETOURFACTOR = "detourFactor";
-
-	private static final String BALANCING = "balanceLines";
 	private static final String VEHICLESONDISPATCH = "vehiclesDispatchedAtSameTime";
-	private static final String DISTANCEMEASURE = "distanceCalculationCostCriteria";
+	private static final String CLUSTERING_PERIOD_MIN = "clustering_period_min";
+	private static final String PREBOOK_PERIOD_MIN = "prebook_period_min";
+	private static final String CLUSTERINGROUNDS = "clusteringRounds";
+	private static final String ROUTINGROUNDS = "routingRounds";
+	private static final String MINOCCUPANCY = "minOccupancy";
+	private static final String SERVICE_AREA_1_CENTROID_LINK = "serviceAreaCentroid_1_Link";
+	private static final String SERVICE_AREA_2_CENTROID_LINK = "serviceAreaCentroid_2_Link";
+	private static final String SERVICE_AREA_1_RADIUS = "serviceArea_1_Radius_m";
+	private static final String SERVICE_AREA_2_RADIUS = "serviceArea_2_Radius_m";
 	
-	private static final String PREBOOK = "prebookTrips";
 	
+
+	//SharedTaxi
+	private static final String DETOURFACTOR = "detourFactor";
+	
+	//StateBased
 	private static final String DESTINATIONID = "commonDestinationLinkId";
 	
-	
-
+	//general
 	private String taxiIdentifier = "taxibus";
 	private String vehiclesFile = null;
-	private boolean prebookTrips = true;
-	private String ranksFile = null;
-	private String outputDir = null;
-	private String distanceCalculationCostCriteria = "beeline";
-
 	private double pickupDuration = 60.0;
 	private double dropoffDuration = 120.0;
+	private String algorithm;
+	//clustered
 	private int numberOfVehiclesDispatchedAtSameTime = 8;
 	private int vehCap = 8;
+	private double clustering_period_min = 15;
+	private double prebook_period_min = 15;
+	private int clusteringRounds = 100;
+	private int routingRounds = 100;
+	private double minOccupancy = 3;
+	private String serviceAreaCentroid_1 = null;
+	private String serviceAreaCentroid_2 = null;
+	private double serviceArea_2_Radius_m = 20000;
+	private double serviceArea_1_Radius_m = 20000;
+	//SharedTaxi
 	private double detourFactor = 1.2;
 
-	private String algorithm;
-
-	private boolean otfvis = false;
-
-	private String linesFile = null;
-	private String zonesShpFile = null;
-	private String zonesXmlFile = null;
-	
+	//State
 	private String destinationLinkId = null;
 
-	private String balancingMethod = "return";
 
 	public TaxibusConfigGroup() {
 		super(GROUP_NAME);
 		log.info("Loading Taxibus config group...");
 	}
 
-	@Override
-	public void addParam(final String key, final String value) {
-
-		if ("null".equalsIgnoreCase(value))
-			return;
-
-		if (VEHICLES_FILE.equals(key)) {
-			this.vehiclesFile = value;
-		} else if (TAXI_RANKS_FILE.equals(key)) {
-			this.ranksFile = value;
-		} else if (ALGORITHM.equals(key)) {
-			this.algorithm = value;
-		} else if (PICKUP_DURATION.equals(key)) {
-			this.pickupDuration = Double.parseDouble(value);
-		} else if (DROPOFF_DURATION.equals(key)) {
-			this.dropoffDuration = Double.parseDouble(value);
-		} else if (OTFVIS.equals(key)) {
-			this.otfvis = Boolean.parseBoolean(value);
-		} else if (ZONESSHP.equals(key)) {
-			this.zonesShpFile = value;
-		} else if (ZONESXML.equals(key)) {
-			this.zonesXmlFile = value;
-		} else if (LINES.equals(key)) {
-			this.linesFile = value;
-		} else if (BALANCING.equals(key)) {
-			this.balancingMethod = value;
-		} else if (DISTANCEMEASURE.equals(key)) {
-			this.distanceCalculationCostCriteria = value;
-		} else if (VEHICLESONDISPATCH.equals(key)) {
-			this.numberOfVehiclesDispatchedAtSameTime = Integer.parseInt(value);
-		} else if (VEHCAP.equals(key)) {
-			this.vehCap = Integer.parseInt(value);
-		} else if (DETOURFACTOR.equals(key)) {
-			this.detourFactor = Double.parseDouble(value);
-		} else if (PREBOOK.equals(key)) {
-			this.prebookTrips= Boolean.parseBoolean(value);
-		}  else if (DESTINATIONID.equals(key)) {
-			this.destinationLinkId = value ;
-		}
-		
-		else {
-			log.error("unknown parameter: " + key + "...");
-		}
-
-	}
-
-	@Override
-	public TreeMap<String, String> getParams() {
-
-		TreeMap<String, String> map = new TreeMap<>();
-
-		map.put(VEHICLES_FILE, this.vehiclesFile);
-		map.put(TAXI_RANKS_FILE, this.ranksFile);
-		map.put(ALGORITHM, algorithm);
-		map.put(OTFVIS, Boolean.toString(otfvis));
-		map.put(LINES, linesFile);
-		map.put(ZONESSHP, zonesShpFile);
-		map.put(ZONESXML, zonesXmlFile);
-		map.put(BALANCING, balancingMethod);
-		map.put(DISTANCEMEASURE, distanceCalculationCostCriteria);
-		map.put(VEHICLESONDISPATCH, Integer.toString(numberOfVehiclesDispatchedAtSameTime));
-		map.put(VEHCAP, Integer.toString(vehCap));
-		map.put(DETOURFACTOR, Double.toString(detourFactor));
-		map.put(PREBOOK, Boolean.toString(prebookTrips));
-		map.put(DESTINATIONID, destinationLinkId);
-		return map;
-
-	}
+    public static TaxibusConfigGroup get(Config config)
+    {
+        return (TaxibusConfigGroup)config.getModules().get(GROUP_NAME);
+    }
 
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
 
 		map.put(VEHICLES_FILE, "Taxi Vehicles file");
-		map.put(TAXI_RANKS_FILE, "Taxi rank file; optional if you don't use ranks");
-		map.put(ALGORITHM, "Taxibus algorithms: Possible parameters are line, multipleLine, sharedTaxi (...)");
-		map.put(PREBOOK,"Defines whether trips are prebooked at simulation / activity start");
-		map.put(OTFVIS, "show simulation in OTFVis");
-		map.put(DETOURFACTOR, "shared Taxi detour factor. Default = 1.2");
-		map.put(ZONESSHP, "Zones shape file, if required by algorithm.");
-		map.put(ZONESXML, "Zones xml file, if required by algorithm.");
-		map.put(LINES, "Lines file, if required by algorithm. Uses zone IDs for reference");
-		map.put(BALANCING,
-				"Balancing vehicles between line. Possible parameters: same (returns to same line), return (return line), balanced (balances between lines)");
-		map.put(DISTANCEMEASURE, "Mode in which distance is measured. One of: beeline, earliestArrival");
-		map.put(VEHICLESONDISPATCH, "Number of vehicles dispatched at the same time - per line");
-		map.put(VEHCAP, "Vehicle capacity per vehicle.");
-		map.put(DESTINATIONID, "Common destination link id for statebased optimizer");
+		map.put(ALGORITHM, "Taxibus algorithms: Possible parameters are clustered, sharedTaxi,stateBased"); 
+		
+		map.put(DETOURFACTOR, "[SharedTaxi] shared Taxi detour factor. Default = 1.2");
+
+		map.put(VEHICLESONDISPATCH, "[Clustered] Number of vehicles dispatched at the same time - per line");
+		map.put(VEHCAP, "[Clustered] Vehicle capacity per vehicle.");
+		map.put(CLUSTERING_PERIOD_MIN,"[Clustered]Period in minutes after which clustering is repeated. Default 15 minutes.");
+		map.put(PREBOOK_PERIOD_MIN,"[Clustered]Prebooking period for requests. Default 15 minutes.");
+		map.put(CLUSTERINGROUNDS,"[Clustered]Rounds for clustering requests together. Default is 100.");
+		map.put(ROUTINGROUNDS,"[Clustered]Rounds for generating routes. Default is 100.");
+		map.put(MINOCCUPANCY,"[Clustered]Minimum taxibus occupancy. Default is 3. If less requests occur, a single bus takes them all.");
+		map.put(SERVICE_AREA_1_CENTROID_LINK, "[Clustered] Link Id that sets taxibus service area 1 centroid. Service areas may overlap");
+		map.put(SERVICE_AREA_2_CENTROID_LINK, "[Clustered] Link Id that sets taxibus service area 2 centroid. Service areas may overlap");
+		map.put(SERVICE_AREA_1_RADIUS, "[Clustered] Radius (in meters) around service area 1 where taxibus trips are possible");
+		map.put(SERVICE_AREA_2_RADIUS, "[Clustered] Radius (in meters) around service area 2 where taxibus trips are possible");
+		
+		map.put(DESTINATIONID, "[StateBased] Common destination link id for statebased optimizer");
 
 		return map;
 	}
@@ -166,6 +108,7 @@ public class TaxibusConfigGroup extends ConfigGroup {
 	/**
 	 * @return the destinationLinkId
 	 */
+	@StringGetter(DESTINATIONID)
 	public String getDestinationLinkId() {
 		return destinationLinkId;
 	}
@@ -173,63 +116,142 @@ public class TaxibusConfigGroup extends ConfigGroup {
 	public URL getVehiclesFileUrl(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.vehiclesFile);
 	}
-	
-
-	public String getRanksFile() {
-		return ranksFile;
-	}
-
-	public String getOutputDir() {
-		return outputDir;
-	}
-
-	public String getAlgorithmConfig() {
+	@StringGetter(ALGORITHM)
+	public String getAlgorithm() {
 		return algorithm;
 	}
 
+	@StringGetter(DETOURFACTOR)
 	public double getDetourFactor() {
 		return detourFactor;
 	}
-
+	@StringGetter(PICKUP_DURATION)
 	public double getPickupDuration() {
 		return pickupDuration;
 	}
-
+	@StringGetter(DROPOFF_DURATION)
 	public double getDropoffDuration() {
 		return dropoffDuration;
 	}
-
-	public boolean isOtfvis() {
-		return otfvis;
-	}
-
-	public URL getLinesFileUrl(URL context) {
-		return ConfigGroup.getInputFileURL(context, this.linesFile);
-	}	
-
-	public URL getZonesShpFileUrl(URL context) {
-		return ConfigGroup.getInputFileURL(context, this.zonesShpFile);
-	}
-
-	public URL getZonesXmlFileUrl(URL context) {
-		return ConfigGroup.getInputFileURL(context, this.zonesXmlFile);
-	}
-	public String getBalancingMethod() {
-		return balancingMethod;
-	};
-
+	@StringGetter(VEHICLESONDISPATCH)
 	public int getNumberOfVehiclesDispatchedAtSameTime() {
 		return numberOfVehiclesDispatchedAtSameTime;
 	}
-
-	public String getDistanceCalculationMode() {
-		return distanceCalculationCostCriteria;
-	}
-
+	@StringGetter(VEHCAP)
 	public int getVehCap() {
 		return vehCap;
 	}
-	public boolean isPrebookTrips() {
-		return prebookTrips;
+	@StringGetter(VEHICLES_FILE)
+	public String getVehiclesFile() {
+		return vehiclesFile;
 	}
+	@StringSetter(VEHICLES_FILE)
+	public void setVehiclesFile(String vehiclesFile) {
+		this.vehiclesFile = vehiclesFile;
+	}
+	@StringSetter(ALGORITHM)
+	public void setAlgorithm(String algorithm) {
+		this.algorithm = algorithm;
+	}
+	@StringSetter(PICKUP_DURATION)
+	public void setPickupDuration(double pickupDuration) {
+		this.pickupDuration = pickupDuration;
+	}
+	@StringSetter(DROPOFF_DURATION)
+	public void setDropoffDuration(double dropoffDuration) {
+		this.dropoffDuration = dropoffDuration;
+	}
+	@StringSetter(VEHICLESONDISPATCH)
+	public void setNumberOfVehiclesDispatchedAtSameTime(int numberOfVehiclesDispatchedAtSameTime) {
+		this.numberOfVehiclesDispatchedAtSameTime = numberOfVehiclesDispatchedAtSameTime;
+	}
+	@StringSetter(DETOURFACTOR)
+	public void setDetourFactor(double detourFactor) {
+		this.detourFactor = detourFactor;
+	}
+	@StringSetter(DESTINATIONID)
+	public void setDestinationLinkId(String destinationLinkId) {
+		this.destinationLinkId = destinationLinkId;
+	}
+	@StringGetter(CLUSTERING_PERIOD_MIN)
+	public double getClustering_period_min() {
+		return clustering_period_min;
+	}
+	@StringSetter(CLUSTERING_PERIOD_MIN)
+	public void setClustering_period_min(double clustering_period_min) {
+		this.clustering_period_min = clustering_period_min;
+	}
+	@StringGetter(PREBOOK_PERIOD_MIN)
+	public double getPrebook_period_min() {
+		return prebook_period_min;
+	}
+	@StringSetter(PREBOOK_PERIOD_MIN)
+	public void setPrebook_period_min(double prebook_period_min) {
+		this.prebook_period_min = prebook_period_min;
+	}
+	@StringGetter(CLUSTERINGROUNDS)
+	public int getClusteringRounds() {
+		return clusteringRounds;
+	}
+	@StringSetter(CLUSTERINGROUNDS)
+	public void setClusteringRounds(int clusteringRounds) {
+		this.clusteringRounds = clusteringRounds;
+	}
+	@StringGetter(ROUTINGROUNDS)
+	public int getRoutingRounds() {
+		return routingRounds;
+	}
+	@StringSetter(ROUTINGROUNDS)
+	public void setRoutingRounds(int routingRounds) {
+		this.routingRounds = routingRounds;
+	}
+	@StringGetter(MINOCCUPANCY)
+	public double getMinOccupancy() {
+		return minOccupancy;
+	}
+	@StringSetter(MINOCCUPANCY)
+	public void setMinOccupancy(double minOccupancy) {
+		this.minOccupancy = minOccupancy;
+	}
+	
+	@StringSetter(VEHCAP)
+	public void setVehCap(int vehCap) {
+		this.vehCap = vehCap;
+	}
+	@StringGetter(SERVICE_AREA_1_CENTROID_LINK)
+	public String getServiceAreaCentroid_1() {
+		return serviceAreaCentroid_1;
+	}
+	@StringSetter(SERVICE_AREA_1_CENTROID_LINK)
+	public void setServiceAreaCentroid_1(String serviceAreaCentroid_1) {
+		this.serviceAreaCentroid_1 = serviceAreaCentroid_1;
+	}
+	@StringGetter(SERVICE_AREA_2_CENTROID_LINK)
+	public String getServiceAreaCentroid_2() {
+		return serviceAreaCentroid_2;
+	}
+	@StringSetter(SERVICE_AREA_2_CENTROID_LINK)
+	public void setServiceAreaCentroid_2(String serviceAreaCentroid_2) {
+		this.serviceAreaCentroid_2 = serviceAreaCentroid_2;
+	}
+	@StringGetter(SERVICE_AREA_2_RADIUS)
+	public double getServiceArea_2_Radius_m() {
+		return serviceArea_2_Radius_m;
+	}
+	@StringSetter(SERVICE_AREA_2_RADIUS)
+	public void setServiceArea_2_Radius_m(double serviceArea_2_Radius_m) {
+		this.serviceArea_2_Radius_m = serviceArea_2_Radius_m;
+	}
+	@StringGetter(SERVICE_AREA_1_RADIUS)
+	public double getServiceArea_1_Radius_m() {
+		return serviceArea_1_Radius_m;
+	}
+	@StringSetter(SERVICE_AREA_1_RADIUS)
+	public void setServiceArea_1_Radius_m(double serviceArea_1_Radius_m) {
+		this.serviceArea_1_Radius_m = serviceArea_1_Radius_m;
+	}
+	
+	
+	
+	
 }

@@ -41,7 +41,7 @@ import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -97,9 +97,9 @@ public class PlansPrepare {
 		log.info("  output-file: " + toFile);
 //		Population reader = (Population) ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		StreamingPopulationReader reader = new StreamingPopulationReader( ScenarioUtils.createScenario( ConfigUtils.createConfig() ) ) ;
-		StreamingUtils.setIsStreaming(reader, true);
+		StreamingDeprecated.setIsStreaming(reader, true);
 
-		StreamingPopulationWriter writer = new StreamingPopulationWriter(null, this.scenario.getNetwork());
+		StreamingPopulationWriter writer = new StreamingPopulationWriter();
 		writer.startStreaming(toFile);
 
 		final PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(writer, areaOfInterest, network);
@@ -122,8 +122,8 @@ public class PlansPrepare {
 	public void createSamplePopulation(final String fromFile, final String toFile, final double percentage) {
 //		Population reader = (Population) ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		StreamingPopulationReader reader = new StreamingPopulationReader((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
-		StreamingUtils.setIsStreaming(reader, true);
-		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(null, this.scenario.getNetwork(), percentage);
+		StreamingDeprecated.setIsStreaming(reader, true);
+		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(null, percentage);
 		plansWriter.startStreaming(toFile);
 		reader.addAlgorithm(plansWriter);
 		

@@ -60,13 +60,12 @@ public class RunTaxibusPolicyCase {
 
 	public static void main(String[] args) {
 
-		String configFileName = "../../../shared-svn/projects/vw_rufbus/scenario/input/configs/ConfigPC85.xml";
-//		String configFileName = "D:/runs-svn/vw_rufbus/VW60ML50/VW60ML50.output_config.xml.gz";
+		String configFileName = "../../../shared-svn/projects/vw_rufbus/projekt2/input/ConfigPC107.xml";
 		if (args.length>0){
 			configFileName = args[0];
 		}
 		Config config = ConfigUtils.loadConfig(configFileName, new TaxibusConfigGroup());
-		config.controler().setLastIteration(0);
+//		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);

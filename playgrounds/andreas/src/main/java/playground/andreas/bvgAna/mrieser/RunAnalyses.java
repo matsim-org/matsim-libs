@@ -56,7 +56,7 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -102,13 +102,13 @@ public class RunAnalyses {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(s.getNetwork()).readFile(networkFilename);
 		Population pop = (Population) s.getPopulation();
-		StreamingUtils.setIsStreaming(pop, true);
+		StreamingDeprecated.setIsStreaming(pop, true);
 
-		StreamingPopulationWriter writer = new StreamingPopulationWriter(pop, s.getNetwork());
+		StreamingPopulationWriter writer = new StreamingPopulationWriter();
 		writer.startStreaming("selectedPlansOnly.xml.gz");
-		StreamingUtils.addAlgorithm(pop, new PersonFilterSelectedPlan());
+		StreamingDeprecated.addAlgorithm(pop, new PersonFilterSelectedPlan());
 		final PersonAlgorithm algo = writer;
-		StreamingUtils.addAlgorithm(pop, algo);
+		StreamingDeprecated.addAlgorithm(pop, algo);
 		new PopulationReader(s).readFile(plansFilename);
 		writer.closeStreaming();
 	}
@@ -119,14 +119,14 @@ public class RunAnalyses {
 
 	public void createPersonAttributeTable(final String attributesFilename, final String idsFilename) {
 		Population pop = (Population) scenario.getPopulation();
-		StreamingUtils.setIsStreaming(pop, true);
+		StreamingDeprecated.setIsStreaming(pop, true);
 		try {
 			PersonAttributesWriter attributesWriter = new PersonAttributesWriter(attributesFilename);
 			final PersonAlgorithm algo = attributesWriter;
-			StreamingUtils.addAlgorithm(pop, algo);
+			StreamingDeprecated.addAlgorithm(pop, algo);
 			PersonIdsWriter idsWriter = new PersonIdsWriter(idsFilename);
 			final PersonAlgorithm algo1 = idsWriter;
-			StreamingUtils.addAlgorithm(pop, algo1);
+			StreamingDeprecated.addAlgorithm(pop, algo1);
 			new PopulationReader(scenario).readFile(plansFilename);
 			attributesWriter.close();
 			idsWriter.close();

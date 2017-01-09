@@ -208,7 +208,7 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 		this.scoreHistory.get( ScoreItem.average ).put( event.getIteration(), sumAvgScores / nofAvgScores ) ;
 		this.scoreHistory.get( ScoreItem.executed ).put( event.getIteration(), sumExecutedScores / nofExecutedScores ) ;
 
-		if (this.createPNG && event.getIteration() != this.minIteration) {
+		if (this.createPNG && event.getIteration() > this.minIteration) {
 			// create chart when data of more than one iteration is available.
 			XYLineChart chart = new XYLineChart("Score Statistics", "iteration", "score");
 //			double[] iterations = new double[index + 1];

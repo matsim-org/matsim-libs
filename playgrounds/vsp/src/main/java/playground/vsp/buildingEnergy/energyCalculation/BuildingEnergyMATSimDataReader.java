@@ -51,7 +51,7 @@ import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationReader;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -256,7 +256,7 @@ class BuildingEnergyMATSimDataReader {
 //		final Population reader = (Population) sc.getPopulation();
 		StreamingPopulationReader reader = new StreamingPopulationReader( sc ) ;
 		reader.addAlgorithm(algo);
-		StreamingUtils.setIsStreaming(reader, true);
+		StreamingDeprecated.setIsStreaming(reader, true);
 //		new MatsimPopulationReader(sc).readFile(plansFile);
 		reader.readFile(plansFile);
 		log.info("resulting population contains " + plansAna.getPopulation().getPersons().size() + " persons.");

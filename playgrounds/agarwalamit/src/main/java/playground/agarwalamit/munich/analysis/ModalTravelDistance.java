@@ -32,7 +32,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.legMode.tripDistance.LegModeRouteDistanceDistributionHandler;
+import playground.agarwalamit.analysis.tripDistance.TripDistanceHandler;
 import playground.agarwalamit.utils.ListUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
@@ -58,7 +58,7 @@ public class ModalTravelDistance {
 
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(outputDir+"/output_network.xml.gz", outputDir+"/output_config.xml.gz");
 		
-		LegModeRouteDistanceDistributionHandler distHandler = new LegModeRouteDistanceDistributionHandler(sc);
+		TripDistanceHandler distHandler = new TripDistanceHandler(sc);
 		events.addHandler(distHandler);
 
 		reader.readFile(eventsFile);

@@ -22,9 +22,9 @@ package playground.agarwalamit.santiago;
 import org.matsim.api.core.v01.Scenario;
 
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
-import playground.agarwalamit.analysis.legMode.distributions.FilteredDepartureTimeAnalyzer;
+import playground.agarwalamit.analysis.activity.departureArrival.FilteredDepartureTimeAnalyzer;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
-import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**

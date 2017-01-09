@@ -41,18 +41,17 @@ import playground.jbischoff.taxibus.scenario.analysis.quick.TraveltimeAndDistanc
  */
 public class KNTaxibusExample {
 	
-//	also try RunTaxibusExample
 //	also try RunSharedTaxiExample
 
 	public static void main(String[] args) {
 
 		// all vehicles start at same place; all passengers start at same place:
-//		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/vw_rufbus/scenario/input/example/configVWTB.xml", new TaxibusConfigGroup());
+
+		//TODO: Kai, in case you use this, please update your SVN first, Joschka // Dec 2016
+		// passengers live in larger area and want to go to railway station (now with nicer routes):
+		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configClustered.xml", new TaxibusConfigGroup());
 		
-		// passengers live in larger area and want to go to railway station:
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/config.xml", new TaxibusConfigGroup());
-		
-		// passengers live in larger area and have distributed destinations (which are, however, all called "train" :-( ):
+		// passengers live in larger area and have distributed destinations, shared taxi for 2 persons:
 //		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configShared.xml", new TaxibusConfigGroup());
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists) ;

@@ -70,7 +70,7 @@ final class RunPopulationStreamingExample {
 		reader.addAlgorithm( new RemoveUnselectedPlans() ) ;
 
 		// --- add writing the population needs to be explicitly added!:
-		final StreamingPopulationWriter writer = new StreamingPopulationWriter( null );
+		final StreamingPopulationWriter writer = new StreamingPopulationWriter( );
 		// with current design, PopulationWriter(...) minimally demands a population.  Which can, however, be null when used for streaming.
 		
 		writer.startStreaming(outputPopFile);

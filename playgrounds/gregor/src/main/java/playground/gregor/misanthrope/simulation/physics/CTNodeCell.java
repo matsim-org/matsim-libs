@@ -193,6 +193,8 @@ public class CTNodeCell extends CTCell {
 			}
 		}
 
+		maxCap = Math.min(maxCap, 26.6);
+
 		double width = (maxCap / 1.33);
 		if (width < CTLink.WIDTH) {
 			width = CTLink.WIDTH;

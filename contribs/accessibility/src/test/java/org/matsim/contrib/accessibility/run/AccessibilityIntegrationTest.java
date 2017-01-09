@@ -206,6 +206,36 @@ public class AccessibilityIntegrationTest {
 
 		// compare some results -> done in EvaluateTestResults 
 	}
+	
+	@Test
+	public void testWithFile(){
+		/*TODO Complete - JWJ, Dec'16 */
+		Config config = createTestConfig();
+		
+		File f = new File(this.utils.getInputDirectory() + "pointFile.csv");
+		if(!f.exists()){
+			LOG.error("Point file not found! testWithFile could not be tested...");
+			Assert.assertTrue(f.exists());
+		}
+		
+		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromFile.toString());
+		acg.setMeasuringPointsFile(f.getAbsolutePath());
+		
+		final Scenario sc = createTestScenario(config);
+		
+		Controler controler = new Controler(sc);
+		
+		final AccessibilityModule module = new AccessibilityModule();
+//		module.addSpatialGridDataExchangeListener( new EvaluateTestResults(true,true,true,true,true) ) ;
+		controler.addOverridingModule(module);
+		
+		controler.run();
+		
+		/* FIXME This currently does NOTHING... it completely ignores the 
+		 * file-based instruction.
+		 */
+	}
 
 
 
@@ -451,6 +481,7 @@ public class AccessibilityIntegrationTest {
 		return config;
 	}
 
+	
 	private static Scenario createTestScenario(final Config config) {
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 

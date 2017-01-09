@@ -33,7 +33,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.StreamingPopulationReader;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -85,7 +85,7 @@ public class RouterTester {
 
 		PtRouter ptR = new PtRouter(router);
 
-		StreamingUtils.setIsStreaming(reader, true);
+		StreamingDeprecated.setIsStreaming(reader, true);
 		final PersonAlgorithm algo = ptR;
 		reader.addAlgorithm(algo);
 

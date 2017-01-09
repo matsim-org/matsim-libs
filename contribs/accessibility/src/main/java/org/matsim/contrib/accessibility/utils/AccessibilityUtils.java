@@ -1,10 +1,14 @@
 package org.matsim.contrib.accessibility.utils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -20,15 +24,14 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.facilities.FacilitiesUtils;
-import org.matsim.facilities.SearchableActivityFacilities;
 
 /**
  * @author dziemke
@@ -38,20 +41,16 @@ public class AccessibilityUtils {
 	
 	/**
 	 * Collects all facilities of a given type that have been loaded to the sceanrio.
-	 * 
-	 * @param scenario
-	 * @param activityOptionType
-	 * @return
 	 */
 	public static ActivityFacilities collectActivityFacilitiesWithOptionOfType(Scenario scenario, String activityOptionType) {
 		ActivityFacilities activityFacilities = FacilitiesUtils.createActivityFacilities(activityOptionType) ;
-		for (ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()) {
-			if ( activityOptionType==null ) { // no activity option type for facility given, use all of them
-				activityFacilities.addActivityFacility(fac);
+		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
+			if (activityOptionType == null) { // no activity option type for facility given, use all of them
+				activityFacilities.addActivityFacility(facility);
 			} else {
-				for (ActivityOption option : fac.getActivityOptions().values()) {
+				for (ActivityOption option : facility.getActivityOptions().values()) {
 					if (option.getType().equals(activityOptionType)) {
-						activityFacilities.addActivityFacility(fac);
+						activityFacilities.addActivityFacility(facility);
 					}
 				}
 			}
@@ -62,9 +61,6 @@ public class AccessibilityUtils {
 	
 	/**
 	 * Collects the types of all facilities that have been loaded to the scenario.
-	 * 
-	 * @param scenario
-	 * @return
 	 */
 	public static List<String> collectAllFacilityOptionTypes(Scenario scenario) {
 		List<String> activityOptionTypes = new ArrayList<>() ;
@@ -80,6 +76,30 @@ public class AccessibilityUtils {
 		return activityOptionTypes;
 	}
 	
+	
+	public static void combineDifferentActivityOptionTypes(final Scenario scenario, String combinedType, final List<String> activityOptionsToBeIncluded) {
+		ActivityOption markerOption = new ActivityOptionImpl(combinedType); 
+		
+		// Memorize all facilities that have certain activity options in a activity facilities container
+		final ActivityFacilities consideredFacilities = FacilitiesUtils.createActivityFacilities();
+		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
+			for (ActivityOption option : facility.getActivityOptions().values()) {
+				if (activityOptionsToBeIncluded.contains(option.getType())) {
+					// if (!option.getType().equals(FacilityTypes.HOME) && !option.getType().equals(FacilityTypes.WORK) && !option.getType().equals("minor")) {
+					if (!consideredFacilities.getFacilities().containsKey(facility.getId())) {
+						consideredFacilities.addActivityFacility(facility);
+					}
+				}
+			}
+		}
+		
+		// Add  marker option to facilities to be considered
+		for (ActivityFacility facility : consideredFacilities.getFacilities().values()) {
+			facility.addActivityOption(markerOption);
+		}
+	}
+	
+	
 	public static final ActivityFacilities createFacilityForEachLink( Network network ) {
 		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities("LinkFacilities") ;
 		ActivityFacilitiesFactory ff = facilities.getFactory() ;
@@ -90,17 +110,13 @@ public class AccessibilityUtils {
 		return facilities ;
 	}
 	
+	
 	/**
 	 * Goes through a given set of measuring points and creates a facility on the measuring point if the
 	 * nearest link from that measure point lies within a specified maximum allowed distance. The presence
 	 * of such networkDensityFacilites can then be used to plot a density layer, e.g. to excluded tiles
 	 * from being drawn if there is no network. The network density is thereby used as a proxy for settlement
 	 * density if no information of settlement density is available.
-	 * 
-	 * @param network
-	 * @param measuringPoints
-	 * @param cellSize
-	 * @return
 	 */
 	@Deprecated
 	public static ActivityFacilities createNetworkDensityFacilities(Network network,
@@ -240,23 +256,15 @@ public class AccessibilityUtils {
 				+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);
 		return date;
 	}
-
-
-//	public static void addNetworkMode(Binder binder, MapBinder<String, AccessibilityContributionCalculator> accBinder, String mode) {
-//		binder.bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
-//		accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-//	}
-//
-//
-//	public static void addFreeSpeedNetworkMode(Binder binder, MapBinder<String, AccessibilityContributionCalculator> accBinder, String mode) {
-//		final String str = "freespeed"; // yyyyyy should really be mode+"_freespeed" but need to see where that would fail tests.  kai, dec'16
-//		binder.bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(str)).toProvider(new FreeSpeedNetworkModeProvider(mode));
-//		accBinder.addBinding(str).to(Key.get(AccessibilityContributionCalculator.class, Names.named(str)));
-//	}
-//
-//
-//	public static void addConstantSpeedMode(Binder bnd, MapBinder<String, AccessibilityContributionCalculator> accBinder, String mode) {
-//		bnd.bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
-//		accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-//	}
+	
+	
+	public static File createOSMDownloadScript(String regionName, String minLon, String minLat, String maxLon, String maxLat) throws IOException {
+	    File osmDownloadScript = new File("script");
+	    Writer streamWriter = new OutputStreamWriter(new FileOutputStream(osmDownloadScript));
+	    PrintWriter printWriter = new PrintWriter(streamWriter);
+	    String command = "/usr/local/bin/wget -O " + regionName + " \"http://api.openstreetmap.org/api/0.6/map?bbox=" + minLon + "," + minLat + "," + maxLon + "," + maxLat + "\"";
+	    printWriter.println(command);
+	    printWriter.close();
+	    return osmDownloadScript;
+	}
 }

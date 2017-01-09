@@ -296,6 +296,8 @@ import java.util.Stack;
 		this.currRoute.setStartLinkId(startLinkId);
 		this.currRoute.setEndLinkId(endLinkId);
 		this.currRoute.setRouteDescription(this.routeDescription.trim());
+
+		// yy I think that my intuition would be to put the following into prepareForSim. kai, dec'16
 		if (Double.isNaN(this.currRoute.getDistance())) {
 			if (this.currRoute instanceof NetworkRoute) {
 				if (!this.scenario.getNetwork().getLinks().isEmpty()) {
@@ -325,6 +327,7 @@ import java.util.Stack;
 	}
 
 	private Coord getCoord(Activity activity) {
+		// yy I think that my intuition would be to put the following into prepareForSim. kai, dec'16
 		if (activity == null) {
 			return null;
 		}
@@ -400,6 +403,7 @@ import java.util.Stack;
 		this.currRoute.setEndLinkId(endLinkId);
 		this.currRoute.setRouteDescription(this.routeDescription.trim());
 		
+		// yy I think that my intuition would be to put the following into prepareForSim. kai, dec'16
 		if (Double.isNaN(this.currRoute.getDistance())) {
 			if (this.currRoute instanceof NetworkRoute) {
 				if (!this.scenario.getNetwork().getLinks().isEmpty()) {

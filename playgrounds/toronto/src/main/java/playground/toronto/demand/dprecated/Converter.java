@@ -253,7 +253,7 @@ public class Converter {
 		c.setPop(((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation());
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(oldPlansFilename);
-			StreamingPopulationWriter writer = new StreamingPopulationWriter(c.pop, null);
+			StreamingPopulationWriter writer = new StreamingPopulationWriter();
 			writer.writeStartPlans(newPlansFilename);
 			String line = reader.readLine();
 			do {
