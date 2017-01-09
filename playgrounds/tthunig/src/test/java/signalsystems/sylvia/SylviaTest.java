@@ -105,8 +105,8 @@ public class SylviaTest {
 		
 		// check signal results
 		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime(); // should be more or less equal (OW direction is always favored as the first phase)
-		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerCycle(); // should be more or less equal and around 25
-		Map<Id<SignalSystem>, Double> avgCycleTimePerSystem = signalAnalyzer.calculateAvgCycleTimePerSignalSystem(); // should be 60
+		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerFlexibleCycle(); // should be more or less equal and around 25
+		Map<Id<SignalSystem>, Double> avgCycleTimePerSystem = signalAnalyzer.calculateAvgFlexibleCycleTimePerSignalSystem(); // should be 60
 		Id<SignalGroup> signalGroupId1 = Id.create("SignalGroup1", SignalGroup.class);
 		Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup2", SignalGroup.class);
 		Id<SignalSystem> signalSystemId = Id.create("SignalSystem1", SignalSystem.class);
@@ -131,8 +131,8 @@ public class SylviaTest {
 		
 		// check signal results
 		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime(); // group 1 should have more total green time than group 2
-		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerCycle(); // should be 45 vs 5 (excluding initial phase)
-		Map<Id<SignalSystem>, Double> avgCycleTimePerSystem = signalAnalyzer.calculateAvgCycleTimePerSignalSystem(); // should be 60
+		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerFlexibleCycle(); // should be 45 vs 5 (excluding initial phase)
+		Map<Id<SignalSystem>, Double> avgCycleTimePerSystem = signalAnalyzer.calculateAvgFlexibleCycleTimePerSignalSystem(); // should be 60
 		Id<SignalGroup> signalGroupId1 = Id.create("SignalGroup1", SignalGroup.class);
 		Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup2", SignalGroup.class);
 		Id<SignalSystem> signalSystemId = Id.create("SignalSystem1", SignalSystem.class);
@@ -156,8 +156,8 @@ public class SylviaTest {
 		
 		// check signal results
 		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime(); // group 1 should have less total green time than group 2
-		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerCycle(); // should be 5 vs 45 (excluding initial phase)
-		Map<Id<SignalSystem>, Double> avgCycleTimePerSystem = signalAnalyzer.calculateAvgCycleTimePerSignalSystem(); // should be 60
+		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerFlexibleCycle(); // should be 5 vs 45 (excluding initial phase)
+		Map<Id<SignalSystem>, Double> avgCycleTimePerSystem = signalAnalyzer.calculateAvgFlexibleCycleTimePerSignalSystem(); // should be 60
 		Id<SignalGroup> signalGroupId1 = Id.create("SignalGroup1", SignalGroup.class);
 		Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup2", SignalGroup.class);
 		Id<SignalSystem> signalSystemId = Id.create("SignalSystem1", SignalSystem.class);
