@@ -37,6 +37,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 import com.google.inject.Inject;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
+import signals.downstreamSensor.DownstreamSignalController.Builder;
 
 /**
  * @author tthunig
@@ -48,15 +49,13 @@ public class DownstreamSignalModelFactory implements SignalModelFactory{
 	
 	private SignalModelFactory delegate = new DefaultSignalModelFactory();
 	
-	private LinkSensorManager sensorManager;
-	private SignalsData signalsData;
-	private Network network;
+	private Builder builder;
 
 	@Inject 
 	public DownstreamSignalModelFactory(LinkSensorManager sensorManager, Scenario scenario) {
-		this.sensorManager = sensorManager;
-		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-		this.network = scenario.getNetwork();
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+		Network network = scenario.getNetwork();
+		this.builder = new DownstreamSignalController.Builder(sensorManager, signalsData, network) ;
 	}
 	
 	@Override
@@ -68,7 +67,7 @@ public class DownstreamSignalModelFactory implements SignalModelFactory{
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
 		if (DownstreamSignalController.CONTROLLER_IDENTIFIER.equals(controllerIdentifier)){
 			log.info("Creating " + DownstreamSignalController.CONTROLLER_IDENTIFIER);
-			return new DownstreamSignalController(this.sensorManager, this.signalsData, this.network, signalSystem);
+			return builder.build(signalSystem) ;
 		}
 		return this.delegate.createSignalSystemController(controllerIdentifier, signalSystem);
 	}

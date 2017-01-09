@@ -51,6 +51,20 @@ public class DownstreamSignalController implements SignalController {
 	private static final Logger log = Logger.getLogger(DownstreamSignalController.class);
 
 	public final static String CONTROLLER_IDENTIFIER = "DownstreamSignalControl";
+	
+	public final static class Builder {
+		private final LinkSensorManager sensorManager ;
+		private final SignalsData signalsData ;
+		private final Network network ;
+		public Builder( LinkSensorManager sensorManager, SignalsData signalsData, Network network ) {
+			this.sensorManager = sensorManager;
+			this.signalsData = signalsData;
+			this.network = network;
+		}
+		public DownstreamSignalController build( SignalSystem signalSystem ) {
+			return new DownstreamSignalController( sensorManager, signalsData, network, signalSystem ) ;
+		}
+	}
 
 	private LinkSensorManager sensorManager;
 	private SignalsData signalsData;
@@ -65,7 +79,7 @@ public class DownstreamSignalController implements SignalController {
 	private Map<Id<Link>, Integer> linkMaxNoCarsForStorage = new HashMap<>();
 	private Map<Id<Link>, Integer> linkMaxNoCarsForFreeSpeed = new HashMap<>();
 
-	public DownstreamSignalController(LinkSensorManager sensorManager, SignalsData signalsData, Network network, SignalSystem signalSystem) {
+	private DownstreamSignalController(LinkSensorManager sensorManager, SignalsData signalsData, Network network, SignalSystem signalSystem) {
 		this.sensorManager = sensorManager;
 		this.signalsData = signalsData;
 		this.network = network;
