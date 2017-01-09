@@ -108,7 +108,7 @@ public final class RunBraessSimulation {
 
 	/* population parameter */
 	
-	private static final int NUMBER_OF_PERSONS = 1000; // per hour
+	private static final int NUMBER_OF_PERSONS = 3600; // per hour
 	private static final int SIMULATION_PERIOD = 1; // in hours
 	private static final double SIMULATION_START_TIME = 0.0; // seconds from midnight
 	
@@ -117,9 +117,9 @@ public final class RunBraessSimulation {
 	private static final Double INIT_PLAN_SCORE = null;
 
 	// defines which kind of signals should be used. use 'SIGNAL_LOGIC = SignalControlLogic.NONE' if signals should not be used
-	private static final SignalBasePlan SIGNAL_BASE_PLAN = SignalBasePlan.SIGNAL4_X_SECOND_Z_Z2V;
+	private static final SignalBasePlan SIGNAL_BASE_PLAN = SignalBasePlan.ALL_NODES_ALL_GREEN;
 	// if SignalBasePlan SIGNAL4_X_Seconds_Z.. is used, SECONDS_Z_GREEN gives the green time for Z
-	private static final int SECONDS_Z_GREEN = 1;
+	private static final int SECONDS_Z_GREEN = 59;
 	private static final SignalControlLogic SIGNAL_LOGIC = SignalControlLogic.DOWNSTREAM_RESPONSIVE;
 	
 	// defines which kind of lanes should be used
