@@ -58,6 +58,11 @@ public class Negotiator<P extends Proposition> {
 		final LambdaCounter counter =
 				new LambdaCounter( l -> {
 					log.info( "Negotiation round # " + l + ": success fraction " + currentSuccessFraction );
+					log.info( "Average utility " +
+							agents.getAllAgents().stream()
+								.mapToDouble( NegotiationAgent::getBestUtility )
+								.average()
+								.getAsDouble() );
 					if ( logStopwatch ) stopwatch.printStats( TimeUnit.MILLISECONDS );
 				} );
 		while ( currentSuccessFraction.get() > configGroup.getImprovingFractionThreshold() ) {

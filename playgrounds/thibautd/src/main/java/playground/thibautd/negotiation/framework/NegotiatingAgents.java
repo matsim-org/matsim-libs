@@ -89,6 +89,10 @@ public class NegotiatingAgents<P extends Proposition> implements Iterable<Negoti
 		return agentList.get( currentIndex );
 	}
 
+	public Collection<NegotiationAgent<P>> getAllAgents() {
+		return agentList;
+	}
+
 	public NegotiationAgent<P> get( final Id<Person> id ) {
 		return agents.get( id );
 	}

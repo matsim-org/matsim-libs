@@ -105,4 +105,14 @@ public class LocationProposition implements Proposition {
 				( (LocationProposition) obj ).proposed.equals( proposed ) &&
 				( (LocationProposition) obj ).proposer.equals( proposer );
 	}
+
+	@Override
+	public String toString() {
+		return "LocationProposition{" +
+				"proposer=" + proposer +
+				", proposed=" + proposed +
+				", facility=" + facility +
+				", type=" + type +
+				'}';
+	}
 }
