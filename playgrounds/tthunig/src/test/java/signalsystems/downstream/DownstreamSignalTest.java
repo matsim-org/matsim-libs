@@ -24,7 +24,7 @@ package signalsystems.downstream;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jcodec.common.Assert;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -97,17 +97,62 @@ public class DownstreamSignalTest {
 		TtSignalAnalysisTool analyzerWoBottleneck = runScenario(ScenarioType.SingleStream, 3600);
 		TtSignalAnalysisTool analyzerWBottleneck = runScenario(ScenarioType.SingleStream, 900);
 
-//		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = analyzerWoBottleneck.getTotalSignalGreenTime();
-		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycleWoBottleneck = analyzerWoBottleneck.calculateAvgSignalGreenTimePerCycle();
-//		Map<Id<SignalSystem>, Double> avgCycleTimePerSystem = analyzerWoBottleneck.calculateAvgCycleTimePerSignalSystem();
-		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycleWBottleneck = analyzerWBottleneck.calculateAvgSignalGreenTimePerCycle();
-		// TODO test these values
-		// TODO test value like signalGreenTimePerCycle Map<Id<SignalGruoup>, List<Double>>
+		Map<Id<SignalGroup>, Double> signalGreenTimeRatiosWoBottleneck = analyzerWoBottleneck.calculateSignalGreenTimeRatios();
+		Map<Id<SignalGroup>, Double> signalGreenTimeRatiosWBottleneck = analyzerWBottleneck.calculateSignalGreenTimeRatios();
+		
 		Id<SignalGroup> signalGroup = Id.create("SignalGroup2_3", SignalGroup.class);
-		log.info("avg signal green time per cycle: without bottleneck " + avgSignalGreenTimePerCycleWoBottleneck.get(signalGroup)
-				+ ", with bottleneck " + avgSignalGreenTimePerCycleWBottleneck.get(signalGroup));
-		Assert.assertTrue("Signal green time without bottleneck should be higher", 
-				avgSignalGreenTimePerCycleWoBottleneck.get(signalGroup) - avgSignalGreenTimePerCycleWBottleneck.get(signalGroup) > 0);
+		log.info("signal green time ratio: without bottleneck " + signalGreenTimeRatiosWoBottleneck.get(signalGroup) + ", with bottleneck "
+				+ signalGreenTimeRatiosWBottleneck.get(signalGroup));
+		Assert.assertTrue("Signal green time ratio without bottleneck should be higher",
+				signalGreenTimeRatiosWoBottleneck.get(signalGroup) - signalGreenTimeRatiosWBottleneck.get(signalGroup) > 0);
+		Assert.assertEquals("Signal green time ratio without bottleneck should be 59s in 60s", 59/60., signalGreenTimeRatiosWoBottleneck.get(signalGroup), 0.01); // may differ by one percent
+		Assert.assertEquals("Signal green time ratio without bottleneck should be around 15s in 60s", 15/60., signalGreenTimeRatiosWBottleneck.get(signalGroup), 0.05); // may differ by five percent
+	}
+
+	@Test
+	public void testOneDirTwoStreams() {
+		TtSignalAnalysisTool analyzerWoBottleneck = runScenario(ScenarioType.OneDirTwoStreams, 3600);
+		TtSignalAnalysisTool analyzerWBottleneck = runScenario(ScenarioType.OneDirTwoStreams, 900);
+
+		Map<Id<SignalGroup>, Double> signalGreenTimeRatiosWoBottleneck = analyzerWoBottleneck.calculateSignalGreenTimeRatios();
+		Map<Id<SignalGroup>, Double> signalGreenTimeRatiosWBottleneck = analyzerWBottleneck.calculateSignalGreenTimeRatios();
+
+		Id<SignalGroup> signalGroupUp = Id.create("SignalGroup2_5", SignalGroup.class);
+		Id<SignalGroup> signalGroupDown = Id.create("SignalGroup4_5", SignalGroup.class);
+		log.info("signal green time ratios: without bottleneck: up " + signalGreenTimeRatiosWoBottleneck.get(signalGroupUp) + ", down "
+				+ signalGreenTimeRatiosWoBottleneck.get(signalGroupDown) + "; with bottleneck: up " + signalGreenTimeRatiosWBottleneck.get(signalGroupUp) + ", down "
+				+ signalGreenTimeRatiosWBottleneck.get(signalGroupDown));
+		Assert.assertTrue("Signal green time ratio without bottleneck should be higher than with bottleneck",
+				signalGreenTimeRatiosWoBottleneck.get(signalGroupUp) - signalGreenTimeRatiosWBottleneck.get(signalGroupUp) > 0);
+		Assert.assertTrue("Signal green time ratio without bottleneck should be higher than with bottleneck",
+				signalGreenTimeRatiosWoBottleneck.get(signalGroupDown) - signalGreenTimeRatiosWBottleneck.get(signalGroupDown) > 0);
+		Assert.assertEquals("Signal green time ratio without bottleneck should be 29s in 60s", 29/60., signalGreenTimeRatiosWoBottleneck.get(signalGroupUp), 0.01); // may differ by one percent
+		Assert.assertEquals("Signal green time ratio without bottleneck should be 29s in 60s", 29/60., signalGreenTimeRatiosWoBottleneck.get(signalGroupDown), 0.01); // may differ by one percent
+		Assert.assertEquals("Sum of signal green time ratios of both signals with bottleneck should be around 15s in 60s", 15/60., signalGreenTimeRatiosWBottleneck.get(signalGroupUp) + signalGreenTimeRatiosWBottleneck.get(signalGroupDown), 0.05); // may differ by five percent
+		Assert.assertEquals("Signal green time ratios of both signals should be more or less equal with bottleneck", signalGreenTimeRatiosWBottleneck.get(signalGroupUp), signalGreenTimeRatiosWBottleneck.get(signalGroupDown), 0.05); // may differ by five percent
+	}
+
+	@Test
+	public void testTwoDir() {
+		TtSignalAnalysisTool analyzerWoBottleneck = runScenario(ScenarioType.TwoDir, 3600);
+		TtSignalAnalysisTool analyzerWBottleneck = runScenario(ScenarioType.TwoDir, 900);
+
+		Map<Id<SignalGroup>, Double> signalGreenTimeRatiosWoBottleneck = analyzerWoBottleneck.calculateSignalGreenTimeRatios();
+		Map<Id<SignalGroup>, Double> signalGreenTimeRatiosWBottleneck = analyzerWBottleneck.calculateSignalGreenTimeRatios();
+
+		Id<SignalGroup> signalGroupWE = Id.create("SignalGroup2_5", SignalGroup.class);
+		Id<SignalGroup> signalGroupSN = Id.create("SignalGroup4_5", SignalGroup.class);
+		log.info("signal green time ratios: without bottleneck: W-E " + signalGreenTimeRatiosWoBottleneck.get(signalGroupWE) + ", S-N "
+				+ signalGreenTimeRatiosWoBottleneck.get(signalGroupSN) + "; with bottleneck: W-E " + signalGreenTimeRatiosWBottleneck.get(signalGroupWE) + ", S-N "
+				+ signalGreenTimeRatiosWBottleneck.get(signalGroupSN));
+		Assert.assertTrue("Signal green time ratio without bottleneck should be higher than with bottleneck for W-E direction",
+				signalGreenTimeRatiosWoBottleneck.get(signalGroupWE) - signalGreenTimeRatiosWBottleneck.get(signalGroupWE) > 0);
+		Assert.assertEquals("Signal green time ratios with and without bottleneck should be equal for S-N direction", signalGreenTimeRatiosWoBottleneck.get(signalGroupSN),
+				signalGreenTimeRatiosWBottleneck.get(signalGroupSN), 0.01); // may differ by one percent
+		Assert.assertEquals("Signal green time ratio without bottleneck should be 29s in 60s for W-E direction", 29/60., signalGreenTimeRatiosWoBottleneck.get(signalGroupWE), 0.01); // may differ by one percent
+		Assert.assertEquals("Signal green time ratio with bottleneck should be around 15s in 60s (one quarter as the bottleneck capacity) for W-E direction", 15/60., signalGreenTimeRatiosWBottleneck.get(signalGroupWE), 0.05); // may differ by five percent
+		Assert.assertEquals("Signal green time ratio with and without bottleneck should be 29s in 60s for S-N direction", 29/60., signalGreenTimeRatiosWoBottleneck.get(signalGroupSN),
+				0.01); // may differ by one percent
 	}
 
 	private TtSignalAnalysisTool runScenario(ScenarioType scenarioType, double bottleneckCap) {
@@ -122,17 +167,17 @@ public class DownstreamSignalTest {
 		case SingleStream:
 			createSingleStreamNetwork(scenario.getNetwork(), bottleneckCap);
 			createSingleStreamPopulation(scenario.getPopulation(), Id.createLinkId("1_2"), Id.createLinkId("4_5"));
-			createAllDayGreenSignal(scenario, Id.createLinkId("2_3"));
+			createAlmostAllDayGreenSignal(scenario, Id.createLinkId("2_3"));
 			break;
 		case OneDirTwoStreams:
 			createOneDirTwoStreamsNetwork(scenario.getNetwork(), bottleneckCap);
 			createTwoStreamsPopulation(scenario.getPopulation(), Id.createLinkId("1_2"), Id.createLinkId("6_7"), Id.createLinkId("3_4"), Id.createLinkId("6_7"));
-			createAlterntingSignals(scenario, Id.createLinkId("2_5"), Id.createLinkId("4_5"));
+			createAlterntingSignals(scenario, Id.createLinkId("2_5"), Id.createLinkId("4_5"), Id.createLinkId("5_6"), Id.createLinkId("5_6"));
 			break;
 		case TwoDir:
 			createTwoDirNetwork(scenario.getNetwork(), bottleneckCap);
 			createTwoStreamsPopulation(scenario.getPopulation(), Id.createLinkId("1_2"), Id.createLinkId("6_7"), Id.createLinkId("3_4"), Id.createLinkId("8_9"));
-			createAlterntingSignals(scenario, Id.createLinkId("2_5"), Id.createLinkId("4_5"));
+			createAlterntingSignals(scenario, Id.createLinkId("2_5"), Id.createLinkId("4_5"), Id.createLinkId("5_6"), Id.createLinkId("5_8"));
 			break;
 		default:
 			break;
@@ -208,8 +253,8 @@ public class DownstreamSignalTest {
 		config.qsim().setStuckTime(3600);
 		config.qsim().setRemoveStuckVehicles(false);
 
-		config.qsim().setStartTime(0);
-		config.qsim().setEndTime(6 * 3600);
+		// config.qsim().setStartTime(0);
+		// config.qsim().setEndTime(6 * 3600);
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
@@ -232,21 +277,19 @@ public class DownstreamSignalTest {
 
 	private void createSingleStreamNetwork(Network net, double bottleneckCap) {
 		NetworkFactory fac = net.getFactory();
-		
+
 		net.addNode(fac.createNode(Id.createNodeId(1), new Coord(-2000, 0)));
 		net.addNode(fac.createNode(Id.createNodeId(2), new Coord(-1000, 0)));
 		net.addNode(fac.createNode(Id.createNodeId(3), new Coord(0, 0)));
 		net.addNode(fac.createNode(Id.createNodeId(4), new Coord(1000, 0)));
 		net.addNode(fac.createNode(Id.createNodeId(5), new Coord(2000, 0)));
-		
-		String[] links = {"1_2", "2_3", "3_4", "4_5"};
-		
-		for (String linkId : links){
+
+		String[] links = { "1_2", "2_3", "3_4", "4_5" };
+
+		for (String linkId : links) {
 			String fromNodeId = linkId.split("_")[0];
 			String toNodeId = linkId.split("_")[1];
-			Link link = fac.createLink(Id.createLinkId(linkId), 
-					net.getNodes().get(Id.createNodeId(fromNodeId)), 
-					net.getNodes().get(Id.createNodeId(toNodeId)));
+			Link link = fac.createLink(Id.createLinkId(linkId), net.getNodes().get(Id.createNodeId(fromNodeId)), net.getNodes().get(Id.createNodeId(toNodeId)));
 			link.setCapacity(3600);
 			link.setLength(1000);
 			link.setFreespeed(10);
@@ -257,18 +300,62 @@ public class DownstreamSignalTest {
 	}
 
 	private void createOneDirTwoStreamsNetwork(Network net, double bottleneckCap) {
-		// TODO Auto-generated method stub
+		NetworkFactory fac = net.getFactory();
 
+		net.addNode(fac.createNode(Id.createNodeId(1), new Coord(-2000, 2000)));
+		net.addNode(fac.createNode(Id.createNodeId(2), new Coord(-1000, 1000)));
+		net.addNode(fac.createNode(Id.createNodeId(3), new Coord(-2000, -2000)));
+		net.addNode(fac.createNode(Id.createNodeId(4), new Coord(-1000, -1000)));
+		net.addNode(fac.createNode(Id.createNodeId(5), new Coord(0, 0)));
+		net.addNode(fac.createNode(Id.createNodeId(6), new Coord(1000, 0)));
+		net.addNode(fac.createNode(Id.createNodeId(7), new Coord(2000, 0)));
+
+		String[] links = { "1_2", "2_5", "3_4", "4_5", "5_6", "6_7" };
+
+		for (String linkId : links) {
+			String fromNodeId = linkId.split("_")[0];
+			String toNodeId = linkId.split("_")[1];
+			Link link = fac.createLink(Id.createLinkId(linkId), net.getNodes().get(Id.createNodeId(fromNodeId)), net.getNodes().get(Id.createNodeId(toNodeId)));
+			link.setCapacity(3600);
+			link.setLength(1000);
+			link.setFreespeed(10);
+			net.addLink(link);
+		}
+		// create bottleneck at link 5_6
+		net.getLinks().get(Id.createLinkId("5_6")).setCapacity(bottleneckCap);
 	}
 
 	private void createTwoDirNetwork(Network net, double bottleneckCap) {
-		// TODO Auto-generated method stub
+		NetworkFactory fac = net.getFactory();
 
+		net.addNode(fac.createNode(Id.createNodeId(1), new Coord(-2000, 0)));
+		net.addNode(fac.createNode(Id.createNodeId(2), new Coord(-1000, 0)));
+		net.addNode(fac.createNode(Id.createNodeId(3), new Coord(0, -2000)));
+		net.addNode(fac.createNode(Id.createNodeId(4), new Coord(0, -1000)));
+		net.addNode(fac.createNode(Id.createNodeId(5), new Coord(0, 0)));
+		net.addNode(fac.createNode(Id.createNodeId(6), new Coord(1000, 0)));
+		net.addNode(fac.createNode(Id.createNodeId(7), new Coord(2000, 0)));
+		net.addNode(fac.createNode(Id.createNodeId(8), new Coord(0, 1000)));
+		net.addNode(fac.createNode(Id.createNodeId(9), new Coord(0, 2000)));
+
+		String[] links = { "1_2", "2_5", "3_4", "4_5", "5_6", "6_7", "5_8", "8_9" };
+
+		for (String linkId : links) {
+			String fromNodeId = linkId.split("_")[0];
+			String toNodeId = linkId.split("_")[1];
+			Link link = fac.createLink(Id.createLinkId(linkId), net.getNodes().get(Id.createNodeId(fromNodeId)), net.getNodes().get(Id.createNodeId(toNodeId)));
+			link.setCapacity(3600);
+			link.setLength(1000);
+			link.setFreespeed(10);
+			net.addLink(link);
+		}
+		// create bottleneck at link 5_6
+		net.getLinks().get(Id.createLinkId("5_6")).setCapacity(bottleneckCap);
 	}
 
 	private void createSingleStreamPopulation(Population pop, Id<Link> fromLinkId, Id<Link> toLinkId) {
 		PopulationFactory fac = pop.getFactory();
-		
+
 		for (int i = 0; i < 3600; i++) {
 			// create a person
 			Person person = fac.createPerson(Id.createPersonId(fromLinkId + "-" + toLinkId + "-" + i));
@@ -298,72 +385,72 @@ public class DownstreamSignalTest {
 		createSingleStreamPopulation(pop, fromLinkId2, toLinkId2);
 	}
 
-	private void createAllDayGreenSignal(Scenario scenario, Id<Link> signalLinkId) {
+	private void createAlmostAllDayGreenSignal(Scenario scenario, Id<Link> signalLinkId) {
 		String toNodeId = signalLinkId.toString().split("_")[1];
-		
+
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
 		SignalSystemsDataFactory sysFac = signalSystems.getFactory();
-//		SignalSystemsDataFactory sysFac = new SignalSystemsDataFactoryImpl();
 		SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
 		SignalControlData signalControl = signalsData.getSignalControlData();
 		SignalControlDataFactory conFac = signalControl.getFactory();
-//		SignalControlDataFactory conFac = new SignalControlDataFactoryImpl();
-				
+
 		// create signal system
 		Id<SignalSystem> signalSystemId = Id.create("SignalSystem" + toNodeId, SignalSystem.class);
 		SignalSystemData signalSystem = sysFac.createSignalSystemData(signalSystemId);
 		signalSystems.addSignalSystemData(signalSystem);
-		
+
 		// create a signal for the given link
 		SignalData signal = sysFac.createSignalData(Id.create("Signal" + signalLinkId, Signal.class));
 		signalSystem.addSignalData(signal);
 		signal.setLinkId(signalLinkId);
-		
+
 		// create a group for the signal (one element group)
 		Id<SignalGroup> signalGroupId = Id.create("SignalGroup" + signalLinkId, SignalGroup.class);
 		SignalGroupData signalGroup = signalGroups.getFactory().createSignalGroupData(signalSystemId, signalGroupId);
 		signalGroup.addSignalId(signal.getId());
 		signalGroups.addSignalGroupData(signalGroup);
-		
+
 		// create the signal control
 		SignalSystemControllerData signalSystemControl = conFac.createSignalSystemControllerData(signalSystemId);
 		signalSystemControl.setControllerIdentifier(DownstreamSignalController.CONTROLLER_IDENTIFIER);
-		
+
 		// create a plan for the signal system (with defined cycle time and offset 0)
 		SignalPlanData signalPlan = SignalUtils.createSignalPlan(conFac, 60, 0, Id.create("SignalPlan1", SignalPlan.class));
 		signalSystemControl.addSignalPlanData(signalPlan);
 		// specify signal group setting for the single signal group
-		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId, 0, 60));
-		signalControl.addSignalSystemControllerData(signalSystemControl);		
+		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId, 0, 59));
+		signalControl.addSignalSystemControllerData(signalSystemControl);
 	}
 
-	private void createAlterntingSignals(Scenario scenario, Id<Link> signalLinkId1, Id<Link> signalLinkId2) {
-		if (signalLinkId1.toString().split("_")[1] != signalLinkId2.toString().split("_")[1]){
+	private void createAlterntingSignals(Scenario scenario, Id<Link> signalLinkId1, Id<Link> signalLinkId2, Id<Link> signalToLinkId1, Id<Link> signalToLinkId2) {
+		if (!signalLinkId1.toString().split("_")[1].equals(signalLinkId2.toString().split("_")[1])) {
 			throw new IllegalArgumentException("the two signal links should lead to the same node");
 		}
 		String toNodeId = signalLinkId1.toString().split("_")[1];
-				
+
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
 		SignalSystemsDataFactory sysFac = new SignalSystemsDataFactoryImpl();
 		SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
 		SignalControlData signalControl = signalsData.getSignalControlData();
 		SignalControlDataFactory conFac = new SignalControlDataFactoryImpl();
-				
+
 		// create signal system
 		Id<SignalSystem> signalSystemId = Id.create("SignalSystem" + toNodeId, SignalSystem.class);
 		SignalSystemData signalSystem = sysFac.createSignalSystemData(signalSystemId);
 		signalSystems.addSignalSystemData(signalSystem);
-		
+
 		// create a signal for the given links
 		SignalData signal1 = sysFac.createSignalData(Id.create("Signal" + signalLinkId1, Signal.class));
 		signalSystem.addSignalData(signal1);
 		signal1.setLinkId(signalLinkId1);
+		signal1.addTurningMoveRestriction(signalToLinkId1);
 		SignalData signal2 = sysFac.createSignalData(Id.create("Signal" + signalLinkId2, Signal.class));
 		signalSystem.addSignalData(signal2);
 		signal2.setLinkId(signalLinkId2);
-		
+		signal2.addTurningMoveRestriction(signalToLinkId2);
+
 		// create a group for both signals each (one element groups)
 		Id<SignalGroup> signalGroupId1 = Id.create("SignalGroup" + signalLinkId1, SignalGroup.class);
 		SignalGroupData signalGroup1 = signalGroups.getFactory().createSignalGroupData(signalSystemId, signalGroupId1);
@@ -373,17 +460,17 @@ public class DownstreamSignalTest {
 		SignalGroupData signalGroup2 = signalGroups.getFactory().createSignalGroupData(signalSystemId, signalGroupId2);
 		signalGroup2.addSignalId(signal2.getId());
 		signalGroups.addSignalGroupData(signalGroup2);
-		
+
 		// create the signal control
 		SignalSystemControllerData signalSystemControl = conFac.createSignalSystemControllerData(signalSystemId);
 		signalSystemControl.setControllerIdentifier(DownstreamSignalController.CONTROLLER_IDENTIFIER);
-		
+
 		// create a plan for the signal system (with defined cycle time and offset 0)
 		SignalPlanData signalPlan = SignalUtils.createSignalPlan(conFac, 60, 0, Id.create("SignalPlan1", SignalPlan.class));
 		signalSystemControl.addSignalPlanData(signalPlan);
 		// specify signal group settings for the single element signal groups
-		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId1, 0, 30));
-		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId2, 30, 60));
+		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId1, 0, 29));
+		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId2, 30, 59));
 		signalControl.addSignalSystemControllerData(signalSystemControl);
 	}
 
