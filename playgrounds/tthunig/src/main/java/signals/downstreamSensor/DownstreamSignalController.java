@@ -62,7 +62,7 @@ public class DownstreamSignalController implements SignalController {
 	private SignalPlan signalPlan;
 	private Set<Id<SignalGroup>> greenSignalGroupsAccordingToPlan = new HashSet<>();
 	private Set<Id<SignalGroup>> greenSignalGroupsInSimulation = new HashSet<>();
-	private Map<Id<Link>, Integer> linkMaxNoCarsHalfOfStorage = new HashMap<>();
+	private Map<Id<Link>, Integer> linkMaxNoCarsForStorage = new HashMap<>();
 	private Map<Id<Link>, Integer> linkMaxNoCarsForFreeSpeed = new HashMap<>();
 
 	public DownstreamSignalController(LinkSensorManager sensorManager, SignalsData signalsData, Network network) {
@@ -73,14 +73,14 @@ public class DownstreamSignalController implements SignalController {
 	}
 
 	private void init() {
-		initLinkMaxCars();
-	}
-
-	private void initLinkMaxCars() {
-		linkMaxNoCarsHalfOfStorage = new HashMap<>();
+		// determine different occupancy criterion for links, i.e. maximum number of vehicles
+		linkMaxNoCarsForStorage = new HashMap<>();
 		linkMaxNoCarsForFreeSpeed = new HashMap<>();
 		for (Link link : network.getLinks().values()) {
-			linkMaxNoCarsHalfOfStorage.put(link.getId(), (int) (link.getLength() / 15));
+			// maximum number = half of storage capacity
+			linkMaxNoCarsForStorage.put(link.getId(), (int) (link.getLength() / 15));
+			
+			// maximum number such that free speed travel time can be reached (when vehicles are distributed uniformly over time)
 			int maxNoCarsForFreeSpeedTT = (int)Math.ceil((link.getLength() / link.getFreespeed()) * (link.getCapacity()/3600));
 			linkMaxNoCarsForFreeSpeed.put(link.getId(), maxNoCarsForFreeSpeedTT);
 			log.info("setting max number of cars for free speed travel time to " + maxNoCarsForFreeSpeedTT);
@@ -165,7 +165,7 @@ public class DownstreamSignalController implements SignalController {
 
 	@Override
 	public void reset(Integer iterationNumber) {
-		// TODO nothing is to do?! init is only needed once
+		// nothing is to do. init() is only needed once
 	}
 
 	/**
