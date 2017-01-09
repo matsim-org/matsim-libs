@@ -62,7 +62,8 @@ public class DownstreamSignalController implements SignalController {
 	private SignalPlan signalPlan;
 	private Set<Id<SignalGroup>> greenSignalGroupsAccordingToPlan = new HashSet<>();
 	private Set<Id<SignalGroup>> greenSignalGroupsInSimulation = new HashSet<>();
-	private Map<Id<Link>, Integer> linkMaxNoCars = new HashMap<>();
+	private Map<Id<Link>, Integer> linkMaxNoCarsHalfOfStorage = new HashMap<>();
+	private Map<Id<Link>, Integer> linkMaxNoCarsForFreeSpeed = new HashMap<>();
 
 	public DownstreamSignalController(LinkSensorManager sensorManager, SignalsData signalsData, Network network) {
 		this.sensorManager = sensorManager;
@@ -76,9 +77,13 @@ public class DownstreamSignalController implements SignalController {
 	}
 
 	private void initLinkMaxCars() {
-		linkMaxNoCars = new HashMap<>();
+		linkMaxNoCarsHalfOfStorage = new HashMap<>();
+		linkMaxNoCarsForFreeSpeed = new HashMap<>();
 		for (Link link : network.getLinks().values()) {
-			linkMaxNoCars.put(link.getId(), (int) (link.getLength() / 15));
+			linkMaxNoCarsHalfOfStorage.put(link.getId(), (int) (link.getLength() / 15));
+			int maxNoCarsForFreeSpeedTT = (int)Math.ceil((link.getLength() / link.getFreespeed()) * (link.getCapacity()/3600));
+			linkMaxNoCarsForFreeSpeed.put(link.getId(), maxNoCarsForFreeSpeedTT);
+			log.info("setting max number of cars for free speed travel time to " + maxNoCarsForFreeSpeedTT);
 		}
 	}
 
@@ -97,26 +102,24 @@ public class DownstreamSignalController implements SignalController {
 
 	@Override
 	public void updateState(double timeSeconds) {
-		// schedule onsets and droppings of the plan; update greenSignalGroupsAccordingToActivePlan
-		for (Id<SignalGroup> groupId : signalPlan.getDroppings(timeSeconds)) {
-			greenSignalGroupsAccordingToPlan.remove(groupId);
-			// schedule dropping only if signal group still shows green
-			if (greenSignalGroupsInSimulation.contains(groupId)) {
-				this.system.scheduleDropping(timeSeconds, groupId);
-				greenSignalGroupsInSimulation.remove(groupId);
+		// schedule onsets and droppings of the plan; update greenSignalGroupsAccordingToPlan
+		if (signalPlan.getDroppings(timeSeconds) != null) {
+			for (Id<SignalGroup> groupId : signalPlan.getDroppings(timeSeconds)) {
+				greenSignalGroupsAccordingToPlan.remove(groupId);
+				// schedule dropping only if signal group still shows green
+				if (greenSignalGroupsInSimulation.contains(groupId)) {
+					this.system.scheduleDropping(timeSeconds, groupId);
+					greenSignalGroupsInSimulation.remove(groupId);
+				}
 			}
 		}
-		for (Id<SignalGroup> groupId : signalPlan.getOnsets(timeSeconds)) {
-			this.system.scheduleOnset(timeSeconds, groupId);
-			greenSignalGroupsAccordingToPlan.add(groupId);
-			greenSignalGroupsInSimulation.add(groupId);
+		if (signalPlan.getOnsets(timeSeconds) != null) {
+			for (Id<SignalGroup> groupId : signalPlan.getOnsets(timeSeconds)) {
+				this.system.scheduleOnset(timeSeconds, groupId);
+				greenSignalGroupsAccordingToPlan.add(groupId);
+				greenSignalGroupsInSimulation.add(groupId);
+			}
 		}
-
-		// TODO use DefaultPlanbased: gehe alle signal groups durch die grün sind
-		// prüfe ob sie rot werden müssen: sobald eine unabh von plan auf rot geschaltet wird, diese merken
-		// alle durchgehen die grün sein müssten. prüfen ob wieder grün ok: aus merke entfernen
-		// TODO Was passiert, wenn signal bis dropping zeitpunkt rot ist? wird es dann nochmal rot geschaltet? (ist unten genau so problem)
-		// letzteres spricht dafür es doch ohne DefaultPlanbased.. zu machen
 
 		// for all signal groups that show green/ has to show green (according to the plan)
 		for (Id<SignalGroup> groupId : greenSignalGroupsAccordingToPlan) {
@@ -151,7 +154,8 @@ public class DownstreamSignalController implements SignalController {
 		for (Id<Signal> signalId : this.signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(this.system.getId()).get(signalGroupId).getSignalIds()) {
 			for (Id<Link> downstreamLinkId : signal2DownstreamLinkMap.get(signalId)) {
 				// TODO test other parameters
-				if (this.sensorManager.getNumberOfCarsOnLink(downstreamLinkId) > linkMaxNoCars.get(downstreamLinkId)) {
+//				if (this.sensorManager.getNumberOfCarsOnLink(downstreamLinkId) > linkMaxNoCars.get(downstreamLinkId)) {
+				if (this.sensorManager.getNumberOfCarsOnLink(downstreamLinkId) > linkMaxNoCarsForFreeSpeed.get(downstreamLinkId)) {
 					return false;
 				}
 			}
