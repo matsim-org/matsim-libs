@@ -185,8 +185,7 @@ public class DownstreamSignalTest {
 
 		Controler controler = new Controler(scenario);
 		// add signal module
-		DownstreamSignalsModule signalsModule = new DownstreamSignalsModule();
-		controler.addOverridingModule(signalsModule);
+		controler.addOverridingModule(new DownstreamSignalsModule());
 
 		// add signal analysis tool
 		TtSignalAnalysisTool signalAnalyzer = new TtSignalAnalysisTool();
