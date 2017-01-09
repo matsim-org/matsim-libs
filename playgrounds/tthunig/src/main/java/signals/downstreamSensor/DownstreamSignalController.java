@@ -157,7 +157,7 @@ public class DownstreamSignalController implements SignalController {
 			}
 		}
 
-		// TODO baue Alternative ein: springe in plan zum naechsten switch
+		// TODO try alternatives: e.g. switch to next phase when downstream link occupied
 	}
 
 	/**
