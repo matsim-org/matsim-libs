@@ -92,6 +92,7 @@ import scenarios.illustrative.braess.createInput.TtCreateBraessSignals;
 import scenarios.illustrative.braess.createInput.TtCreateBraessSignals.SignalBasePlan;
 import scenarios.illustrative.braess.createInput.TtCreateBraessSignals.SignalControlLogic;
 import scenarios.illustrative.braess.signals.ResponsiveLocalDelayMinimizingSignal;
+import signals.downstreamSensor.DownstreamSignalsModule;
 
 /**
  * Class to run a simulation of the braess scenario with or without signals. 
@@ -163,7 +164,7 @@ public final class RunBraessSimulation {
 		Config config = ConfigUtils.createConfig();
 
 		// set number of iterations
-		config.controler().setLastIteration(1);
+		config.controler().setLastIteration(100);
 
 		// able or enable signals and lanes
 		config.qsim().setUseLanes(LANE_TYPE.equals(LaneType.NONE) ? false : true);
@@ -301,8 +302,8 @@ public final class RunBraessSimulation {
 		controler.addOverridingModule(sylviaSignalsModule);
 		
 		// add responsive signal controler if enabled
-		// TODO does this work together with the SylviaSignalsModule?!
-		if (SIGNAL_LOGIC.equals(SignalControlLogic.SIMPLE_RESPONSIVE)){
+		switch (SIGNAL_LOGIC){
+		case SIMPLE_RESPONSIVE:
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
@@ -313,6 +314,13 @@ public final class RunBraessSimulation {
 					/* asEagerSingleton is necessary to force creation of the SignalEvents2ViaCSVWriter class as it is never used somewhere else. theresa dec'16 */
 				}
 			});
+			break;
+		case DOWNSTREAM_RESPONSIVE:
+			controler.addOverridingModule(new DownstreamSignalsModule());
+			break;
+		default:
+			// nothing to add for sylvia and planbased signals
+			break;
 		}
 		
 		// add the module for link to link routing if enabled
