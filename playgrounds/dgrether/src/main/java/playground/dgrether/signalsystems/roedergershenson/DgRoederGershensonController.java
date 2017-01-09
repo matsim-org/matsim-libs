@@ -76,7 +76,7 @@ public class DgRoederGershensonController implements SignalController {
 
 	private static final Logger log = Logger.getLogger(DgRoederGershensonController.class);
 	
-	private SignalSystem system;
+	private final SignalSystem system;
 
 	protected int tGreenMin =  0; // time in seconds
 	protected int minCarsTime = 0; //
@@ -101,6 +101,10 @@ public class DgRoederGershensonController implements SignalController {
 	private LinkSensorManager sensorManager = null;
 
 	private Map<Id, SignalGroupMetadata> signalGroupIdMetadataMap = null;
+	
+	public DgRoederGershensonController( SignalSystem system ) {
+		this.system = system ;
+	}
 
 	
 	public void registerAndInitializeSensorManager(LinkSensorManager sensorManager) {
@@ -333,10 +337,10 @@ public class DgRoederGershensonController implements SignalController {
 		// TODO Auto-generated method stub
 	}
 
-	@Override
-	public void setSignalSystem(SignalSystem system) {
-		this.system = system;
-	}
+//	@Override
+//	public void setSignalSystem(SignalSystem system) {
+//		this.system = system;
+//	}
 
 
 	public void setStorageCapFactor(double storageCapFactor) {

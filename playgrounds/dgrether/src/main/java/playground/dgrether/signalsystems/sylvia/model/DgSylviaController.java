@@ -37,6 +37,7 @@ import org.matsim.contrib.signals.model.DatabasedSignalPlan;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
+import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.lanes.data.Lane;
 
@@ -73,7 +74,8 @@ public class DgSylviaController extends AbstractSignalController implements Sign
 	private LinkSensorManager sensorManager;
 	private SignalsData signalsData;
 
-	public DgSylviaController(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, SignalsData signalsData) {
+	public DgSylviaController(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, SignalsData signalsData, SignalSystem system) {
+		super(system) ;
 		this.sylviaConfig = sylviaConfig;
 		this.sensorManager = sensorManager;
 		this.signalsData = signalsData;

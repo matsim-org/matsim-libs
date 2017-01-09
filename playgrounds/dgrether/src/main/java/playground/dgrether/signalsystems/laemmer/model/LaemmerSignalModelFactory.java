@@ -51,11 +51,11 @@ public final class LaemmerSignalModelFactory implements SignalModelFactory {
 	}
 
 	@Override
-	public SignalController createSignalSystemController(String controllerIdentifier) {
+	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
 		if (LaemmerSignalController.IDENTIFIER.equals(controllerIdentifier)){
-			return new LaemmerSignalController(this.sensorManager);
+			return new LaemmerSignalController(this.sensorManager, signalSystem);
 		}
-		return this.delegate.createSignalSystemController(controllerIdentifier);
+		return this.delegate.createSignalSystemController(controllerIdentifier, signalSystem);
 	}
 
 	@Override

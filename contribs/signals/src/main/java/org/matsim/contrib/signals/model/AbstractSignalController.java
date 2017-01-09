@@ -31,18 +31,21 @@ import org.matsim.api.core.v01.Id;
  */
 public abstract class AbstractSignalController implements SignalController {
 
-	protected SignalSystem system = null;
+	protected final SignalSystem system ;
 	protected Map<Id<SignalPlan>, SignalPlan> signalPlans = new HashMap<>();
 
+	protected AbstractSignalController( SignalSystem system ) {
+		this.system = system ;
+	}
 	
 	@Override
 	public void addPlan(SignalPlan plan) {
 		this.signalPlans.put(plan.getId(), plan);
 	}
 
-	@Override
-	public void setSignalSystem(SignalSystem system) {
-		this.system = system;
-	}
+//	@Override
+//	public void setSignalSystem(SignalSystem system) {
+//		this.system = system;
+//	}
 
 }

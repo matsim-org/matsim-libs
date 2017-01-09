@@ -66,12 +66,12 @@ public final class DgSylviaSignalModelFactory implements SignalModelFactory {
 	}
 
 	@Override
-	public SignalController createSignalSystemController(String controllerIdentifier) {
+	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
 		if (DgSylviaController.CONTROLLER_IDENTIFIER.equals(controllerIdentifier)){
 			log.info("Creating " + DgSylviaController.CONTROLLER_IDENTIFIER);
-			return new DgSylviaController(this.sylviaConfig, this.sensorManager, this.signalsData);
+			return new DgSylviaController(this.sylviaConfig, this.sensorManager, this.signalsData, signalSystem);
 		}
-		return this.delegate.createSignalSystemController(controllerIdentifier);
+		return this.delegate.createSignalSystemController(controllerIdentifier, signalSystem);
 	}
 
 	@Override

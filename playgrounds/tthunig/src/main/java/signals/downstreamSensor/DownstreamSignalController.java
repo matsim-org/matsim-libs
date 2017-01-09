@@ -56,7 +56,7 @@ public class DownstreamSignalController implements SignalController {
 	private SignalsData signalsData;
 	private Network network;
 
-	private SignalSystem system;
+	private final SignalSystem system;
 	private Node systemNode;
 	private Map<Id<Signal>, Set<Id<Link>>> signal2DownstreamLinkMap = new HashMap<>();
 	private SignalPlan signalPlan;
@@ -65,10 +65,11 @@ public class DownstreamSignalController implements SignalController {
 	private Map<Id<Link>, Integer> linkMaxNoCarsForStorage = new HashMap<>();
 	private Map<Id<Link>, Integer> linkMaxNoCarsForFreeSpeed = new HashMap<>();
 
-	public DownstreamSignalController(LinkSensorManager sensorManager, SignalsData signalsData, Network network) {
+	public DownstreamSignalController(LinkSensorManager sensorManager, SignalsData signalsData, Network network, SignalSystem signalSystem) {
 		this.sensorManager = sensorManager;
 		this.signalsData = signalsData;
 		this.network = network;
+		this.system = signalSystem;
 		init();
 	}
 
@@ -95,10 +96,10 @@ public class DownstreamSignalController implements SignalController {
 		this.signalPlan = plan;
 	}
 
-	@Override
-	public void setSignalSystem(SignalSystem system) {
-		this.system = system;
-	}
+//	@Override
+//	public void setSignalSystem(SignalSystem system) {
+//		this.system = system;
+//	}
 
 	@Override
 	public void updateState(double timeSeconds) {

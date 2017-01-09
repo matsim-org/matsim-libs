@@ -65,12 +65,12 @@ public class DownstreamSignalModelFactory implements SignalModelFactory{
 	}
 
 	@Override
-	public SignalController createSignalSystemController(String controllerIdentifier) {
+	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
 		if (DownstreamSignalController.CONTROLLER_IDENTIFIER.equals(controllerIdentifier)){
 			log.info("Creating " + DownstreamSignalController.CONTROLLER_IDENTIFIER);
-			return new DownstreamSignalController(this.sensorManager, this.signalsData, this.network);
+			return new DownstreamSignalController(this.sensorManager, this.signalsData, this.network, signalSystem);
 		}
-		return this.delegate.createSignalSystemController(controllerIdentifier);
+		return this.delegate.createSignalSystemController(controllerIdentifier, signalSystem);
 	}
 
 	@Override

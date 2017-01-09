@@ -37,7 +37,7 @@ public interface SignalController {
 
 	public void addPlan(SignalPlan plan);
 
-	public void setSignalSystem(SignalSystem system);
+//	public void setSignalSystem(SignalSystem system);
 
 	public void reset(Integer iterationNumber);
 
