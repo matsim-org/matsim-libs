@@ -7,7 +7,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
+//import org.matsim.api.core.v01.network.Network;
+//import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -15,9 +16,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkUtils;
+//import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.network.io.NetworkWriter;
+//import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -37,16 +38,15 @@ import playground.jbischoff.utils.JbUtils;
  */
 public class ExtractAgentsInArea {
 	
-	private final String inputNetworkPath = FilePaths.PATH_NETWORK_BERLIN__10PCT;
-	private final String inputPopulationPath = FilePaths.PATH_POPULATION_BERLIN__10PCT_UNFILTERED;
+	private final String inputNetworkPath = FilePaths.PATH_NETWORK_BERLIN_100PCT;
+	private final String inputPopulationPath = FilePaths.PATH_POPULATION_BERLIN_100PCT_UNFILTERED;
 	private final String studyAreaShpPath = FilePaths.PATH_STUDY_AREA_SHP;
 	private final String studyAreaShpKey = FilePaths.STUDY_AREA_SHP_KEY;
 	private final String studyAreaShpElement = FilePaths.STUDY_AREA_SHP_ELEMENT;
-	private final String networkInAreaPath = FilePaths.PATH_NETWORK_IN_STUDY_AREA_BERLIN__10PCT;
-	private final String outputPopulationPath = FilePaths.PATH_POPULATION_BERLIN__10PCT_FILTERED_TEST;
+	private final String outputPopulationPath = FilePaths.PATH_POPULATION_BERLIN_100PCT_FILTERED;
 	private Scenario inputScenario;
 	private Scenario outputScenario;
-	private Network networkEnclosedInStudyArea;
+//	private Network networkEnclosedInStudyArea;
 	private Set<Id<Link>> linksInArea = new HashSet<Id<Link>>();
 	private Geometry geometryStudyArea;
 	
@@ -56,26 +56,41 @@ public class ExtractAgentsInArea {
 	
 	void run(){
 		initialize();
+		System.out.println("initialize done");
 		selectAgentsByActivitiesInArea();
+		System.out.println("selectAgentsByActivitiesInArea() done");
 		findLinksInArea();
+		System.out.println("findLinksInArea() done");
 		selectAgentsByRoutesThroughArea();
+		System.out.println("selectAgentsByRoutesThroughArea() done");
 		removeTransitActsAndCarRoutes();
 		new PopulationWriter(outputScenario.getPopulation()).writeV4(outputPopulationPath);
+		System.out.println(linksInArea.toString());
 	}
 	
 	/** Find all links whose start and end are situated within the area */
 	private void findLinksInArea() {
-		networkEnclosedInStudyArea = NetworkUtils.createNetwork();
+//		networkEnclosedInStudyArea = NetworkUtils.createNetwork();
 		for(Link link: inputScenario.getNetwork().getLinks().values()){
 			if(geometryStudyArea.contains(MGC.coord2Point(link.getFromNode().getCoord())) &&
 					geometryStudyArea.contains(MGC.coord2Point(link.getToNode().getCoord()))){
 				linksInArea.add(link.getId());
-				networkEnclosedInStudyArea.addNode(link.getFromNode());
-				networkEnclosedInStudyArea.addNode(link.getToNode());
-				networkEnclosedInStudyArea.addLink(link);
+//				Node fromNode = link.getFromNode();
+//				if(!networkEnclosedInStudyArea.getNodes().containsKey(fromNode.getId())){
+//					fromNode.getInLinks().clear();
+//					fromNode.getOutLinks().clear();
+//					networkEnclosedInStudyArea.addNode(fromNode);
+//				}
+//				Node toNode = link.getToNode();
+//				if(!networkEnclosedInStudyArea.getNodes().containsKey(toNode.getId())){
+//					toNode.getInLinks().clear();
+//					toNode.getOutLinks().clear();
+//					networkEnclosedInStudyArea.addNode(link.getToNode());
+//				}
+//				networkEnclosedInStudyArea.addLink(link);
 			}
 		}
-		new NetworkWriter( inputScenario.getNetwork() ).write(networkInAreaPath);
+//		new NetworkWriter( inputScenario.getNetwork() ).write(networkInAreaPath);
 	}
 
 	private void selectAgentsByRoutesThroughArea() {
