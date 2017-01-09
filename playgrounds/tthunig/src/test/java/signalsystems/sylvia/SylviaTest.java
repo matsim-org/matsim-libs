@@ -41,7 +41,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
-import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataFactoryImpl;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
@@ -53,7 +52,6 @@ import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerDa
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactory;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactoryImpl;
 import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
@@ -301,10 +299,10 @@ public class SylviaTest {
 	private void createSignals(Scenario scenario) {
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
-		SignalSystemsDataFactory sysFac = new SignalSystemsDataFactoryImpl();
+		SignalSystemsDataFactory sysFac = signalSystems.getFactory();
 		SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
 		SignalControlData signalControl = signalsData.getSignalControlData();
-		SignalControlDataFactory conFac = new SignalControlDataFactoryImpl();
+		SignalControlDataFactory conFac = signalControl.getFactory();
 		
 		// create a temporary, empty signal control object needed for sylvia
 		SignalControlData tmpSignalControl = new SignalControlDataImpl();
