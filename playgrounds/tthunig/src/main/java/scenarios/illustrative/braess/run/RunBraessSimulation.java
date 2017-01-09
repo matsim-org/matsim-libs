@@ -89,7 +89,8 @@ import scenarios.illustrative.braess.createInput.TtCreateBraessNetworkAndLanes.L
 import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation;
 import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation.InitRoutes;
 import scenarios.illustrative.braess.createInput.TtCreateBraessSignals;
-import scenarios.illustrative.braess.createInput.TtCreateBraessSignals.SignalControlType;
+import scenarios.illustrative.braess.createInput.TtCreateBraessSignals.SignalBasePlan;
+import scenarios.illustrative.braess.createInput.TtCreateBraessSignals.SignalControlLogic;
 import scenarios.illustrative.braess.signals.ResponsiveLocalDelayMinimizingSignal;
 
 /**
@@ -114,10 +115,11 @@ public final class RunBraessSimulation {
 	// initial score for all initial plans
 	private static final Double INIT_PLAN_SCORE = null;
 
-	// defines which kind of signals should be used
-	private static final SignalControlType SIGNAL_TYPE = SignalControlType.SIGNAL4_X_SECOND_Z;
-	// if SignalControlType SIGNAL4_X_Seconds_Z or SIGNAL4_RESPONSIVE is used, SECONDS_Z_GREEN gives the green time for Z
-	private static final int SECONDS_Z_GREEN = 5;
+	// defines which kind of signals should be used. use 'SIGNAL_LOGIC = SignalControlLogic.NONE' if signals should not be used
+	private static final SignalBasePlan SIGNAL_BASE_PLAN = SignalBasePlan.SIGNAL4_X_SECOND_Z_Z2V;
+	// if SignalBasePlan SIGNAL4_X_Seconds_Z.. is used, SECONDS_Z_GREEN gives the green time for Z
+	private static final int SECONDS_Z_GREEN = 1;
+	private static final SignalControlLogic SIGNAL_LOGIC = SignalControlLogic.DOWNSTREAM_RESPONSIVE;
 	
 	// defines which kind of lanes should be used
 	private static final LaneType LANE_TYPE = LaneType.NONE;
@@ -134,7 +136,7 @@ public final class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/test/";
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/downstream/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -166,7 +168,7 @@ public final class RunBraessSimulation {
 		// able or enable signals and lanes
 		config.qsim().setUseLanes(LANE_TYPE.equals(LaneType.NONE) ? false : true);
 		SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-		signalConfigGroup.setUseSignalSystems(SIGNAL_TYPE.equals(SignalControlType.NONE) ? false : true);
+		signalConfigGroup.setUseSignalSystems(SIGNAL_LOGIC.equals(SignalControlLogic.NONE) ? false : true);
 
 		// set brain exp beta
 		config.planCalcScore().setBrainExpBeta(2);
@@ -300,16 +302,15 @@ public final class RunBraessSimulation {
 		
 		// add responsive signal controler if enabled
 		// TODO does this work together with the SylviaSignalsModule?!
-		if (SIGNAL_TYPE.equals(SignalControlType.SIGNAL4_RESPONSIVE)){
+		if (SIGNAL_LOGIC.equals(SignalControlLogic.SIMPLE_RESPONSIVE)){
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
 					bind(ResponsiveLocalDelayMinimizingSignal.class).asEagerSingleton();
 					addControlerListenerBinding().to(ResponsiveLocalDelayMinimizingSignal.class);
-		            // bind tool to write information about signal states for via
+					// bind tool to write information about signal states for via
 					bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
-		            addEventHandlerBinding().to(SignalEvents2ViaCSVWriter.class);
-		            addControlerListenerBinding().to(SignalEvents2ViaCSVWriter.class);
+					/* asEagerSingleton is necessary to force creation of the SignalEvents2ViaCSVWriter class as it is never used somewhere else. theresa dec'16 */
 				}
 			});
 		}
@@ -484,7 +485,8 @@ public final class RunBraessSimulation {
 
 		TtCreateBraessSignals signalsCreator = new TtCreateBraessSignals(scenario);
 		signalsCreator.setLaneType(LANE_TYPE);
-		signalsCreator.setSignalType(SIGNAL_TYPE);
+		signalsCreator.setSignalControlLogic(SIGNAL_LOGIC);
+		signalsCreator.setBasePlanType(SIGNAL_BASE_PLAN);
 		signalsCreator.setSecondsZGreen(SECONDS_Z_GREEN);
 		signalsCreator.createSignals();
 	}
@@ -626,27 +628,41 @@ public final class RunBraessSimulation {
 
 		if (ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME,
 				SignalSystemsConfigGroup.class).isUseSignalSystems()) {
-			switch (SIGNAL_TYPE){
-			case ONE_SECOND_Z:
-				runName += "_1sZ";
+			switch (SIGNAL_LOGIC){
+			case SIMPLE_RESPONSIVE:
+				runName += "_simpleResp";
 				break;
-			case ONE_SECOND_SO:
-				runName += "_1sSO";
-				break;
-			case SIGNAL4_X_SECOND_Z:
-				runName += "_S4_" + SECONDS_Z_GREEN + "sZ";
-				break;
-			case SIGNAL4_RESPONSIVE:
-				runName += "_S4resp_init" + SECONDS_Z_GREEN + "sZ";
-				break;
-			case SIGNAL4_SYLVIA_V2Z:
-				runName += "_S4_Sylvia_V2Z";
-				break;
-			case SIGNAL4_SYLVIA_Z2V:
-				runName += "_S4_Sylvia_Z2V";
+			case DOWNSTREAM_RESPONSIVE:
+				runName += "_downstream";
 				break;
 			default:
-				runName += "_" + SIGNAL_TYPE;
+				runName += "_" + SIGNAL_LOGIC;
+				break;
+			}
+			switch (SIGNAL_BASE_PLAN){
+			case ALL_NODES_ALL_GREEN:
+				runName += "_allGreen";
+				break;
+			case ALL_NODES_GREEN_WAVE_SO:
+				runName += "_greenWaveSO";
+				break;
+			case ALL_NODES_GREEN_WAVE_Z:
+				runName += "_greenWaveZ";
+				break;
+			case ALL_NODES_ONE_SECOND_SO:
+				runName += "_1sSO";
+				break;
+			case ALL_NODES_ONE_SECOND_Z:
+				runName += "_1sZ";
+				break;
+			case SIGNAL4_X_SECOND_Z_V2Z:
+				runName += "_S4_" + SECONDS_Z_GREEN + "sZ_V2Z";
+				break;
+			case SIGNAL4_X_SECOND_Z_Z2V:
+				runName += "_S4_" + SECONDS_Z_GREEN + "sZ_Z2V";
+				break;
+			default:
+				runName += "_" + SIGNAL_BASE_PLAN;
 				break;
 			}			
 		}
@@ -696,7 +712,7 @@ public final class RunBraessSimulation {
 		new PopulationWriter(scenario.getPopulation()).write(outputDir + "plans.xml");
 		
 		// write signal files
-		if (!SIGNAL_TYPE.equals(SignalControlType.NONE)) {
+		if (!SIGNAL_LOGIC.equals(SignalControlLogic.NONE)) {
 			SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 			new SignalSystemsWriter20(signalsData.getSignalSystemsData()).write(outputDir + "signalSystems.xml");
 			new SignalControlWriter20(signalsData.getSignalControlData()).write(outputDir + "signalControl.xml");
