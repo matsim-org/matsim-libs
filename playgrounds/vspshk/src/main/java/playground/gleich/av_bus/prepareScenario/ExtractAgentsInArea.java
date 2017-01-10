@@ -1,19 +1,12 @@
 package playground.gleich.av_bus.prepareScenario;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -23,11 +16,11 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.pt.router.TransitActsRemover;
-
-import com.vividsolutions.jts.geom.Geometry;
-
 import playground.gleich.av_bus.FilePaths;
 import playground.jbischoff.utils.JbUtils;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author gleich
@@ -37,24 +30,35 @@ import playground.jbischoff.utils.JbUtils;
  */
 public class ExtractAgentsInArea {
 	
-	private final String inputNetworkPath = FilePaths.PATH_NETWORK_BERLIN__10PCT;
-	private final String inputPopulationPath = FilePaths.PATH_POPULATION_BERLIN__10PCT_UNFILTERED;
-	private final String studyAreaShpPath = FilePaths.PATH_STUDY_AREA_SHP;
-	private final String studyAreaShpKey = FilePaths.STUDY_AREA_SHP_KEY;
-	private final String studyAreaShpElement = FilePaths.STUDY_AREA_SHP_ELEMENT;
-	private final String networkInAreaPath = FilePaths.PATH_NETWORK_IN_STUDY_AREA_BERLIN__10PCT;
-	private final String outputPopulationPath = FilePaths.PATH_POPULATION_BERLIN__10PCT_FILTERED_TEST;
+	private static String inputNetworkPath = FilePaths.PATH_NETWORK_BERLIN__10PCT;
+	private static String inputPopulationPath = FilePaths.PATH_POPULATION_BERLIN__10PCT_UNFILTERED;
+	private static String studyAreaShpPath = FilePaths.PATH_STUDY_AREA_SHP;
+	private static String studyAreaShpKey = FilePaths.STUDY_AREA_SHP_KEY;
+	private static String studyAreaShpElement = FilePaths.STUDY_AREA_SHP_ELEMENT;
+	private static String networkInAreaPath = FilePaths.PATH_NETWORK_IN_STUDY_AREA_BERLIN__10PCT;
+	private static String outputPopulationPath = FilePaths.PATH_POPULATION_BERLIN__10PCT_FILTERED_TEST;
 	private Scenario inputScenario;
 	private Scenario outputScenario;
 	private Network networkEnclosedInStudyArea;
-	private Set<Id<Link>> linksInArea = new HashSet<Id<Link>>();
+	private Set<Id<Link>> linksInArea = new HashSet<>();
 	private Geometry geometryStudyArea;
 	
 	public static void main(String[] args) {
+
+		if (args.length != 0) {
+			inputNetworkPath = args[0];
+			inputPopulationPath = args[1];
+			studyAreaShpPath = args[2];
+			studyAreaShpKey = args[3];
+			studyAreaShpElement = args[4];
+			networkInAreaPath = args[5];
+			outputPopulationPath = args[6];
+		}
+
 		(new ExtractAgentsInArea()).run();
 	}
 	
-	void run(){
+	private void run(){
 		initialize();
 		selectAgentsByActivitiesInArea();
 		findLinksInArea();
