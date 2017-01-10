@@ -67,13 +67,13 @@ public class LocationUtility implements PropositionUtility<LocationProposition> 
 		final double sumOfAlterUtils =
 				alters.stream()
 						.filter( a -> !a.getId().equals( agent.getId() ) )
-						.mapToDouble( a -> seeds.getUniformErrorTerm( a, ego ) * configGroup.getMuContact() )
+						.mapToDouble( a -> configGroup.getFixedUtilContact() + seeds.getUniformErrorTerm( a, ego ) * configGroup.getMuContact() )
 						.sum();
 
 		final double utilLocation =
 				seeds.getGaussianErrorTerm( ego, asAttr( location ) ) * configGroup.getSigmaFacility();
 
-		final double utilTravelTime = getTravelTime( ego, location ) * configGroup.getBetaTime();
+		final double utilTravelTime = getTravelDistance( ego, location ) * configGroup.getBetaDistance();
 
 		return sumOfAlterUtils + utilLocation + utilTravelTime;
 	}
@@ -86,7 +86,7 @@ public class LocationUtility implements PropositionUtility<LocationProposition> 
 		return () -> (Attributes) facility.getCustomAttributes().get( "attributes" );
 	}
 
-	private double getTravelTime( final Person ego, final ActivityFacility location ) {
+	private double getTravelDistance( final Person ego, final ActivityFacility location ) {
 		switch ( configGroup.getTravelTimeType() ) {
 			case crowFly:
 				final Coord homeCoord = locations.getHomeLocation( ego ).getCoord();

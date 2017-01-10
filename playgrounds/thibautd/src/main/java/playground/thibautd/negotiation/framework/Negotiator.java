@@ -55,9 +55,12 @@ public class Negotiator<P extends Proposition> {
 			final Consumer<NegotiationAgent<P>> acceptedPropositionCallback ) {
 		final AtomicDouble currentSuccessFraction = new AtomicDouble( 1 );
 
+		final double populationSize = agents.getAllAgents().size();
 		final LambdaCounter counter =
 				new LambdaCounter( l -> {
-					log.info( "Negotiation round # " + l + ": success fraction " + currentSuccessFraction );
+					log.info( "Negotiation round # " + l );
+					log.info( "Number of rounds per agent: "+( l / populationSize ) );
+					log.info( "Success fraction "+ currentSuccessFraction );
 					log.info( "Average utility " +
 							agents.getAllAgents().stream()
 								.mapToDouble( NegotiationAgent::getBestUtility )
@@ -65,7 +68,9 @@ public class Negotiator<P extends Proposition> {
 								.getAsDouble() );
 					if ( logStopwatch ) stopwatch.printStats( TimeUnit.MILLISECONDS );
 				} );
-		while ( currentSuccessFraction.get() > configGroup.getImprovingFractionThreshold() ) {
+
+		while ( currentSuccessFraction.get() > configGroup.getImprovingFractionThreshold() &&
+				counter.getCounter() / populationSize <= configGroup.getMaxRoundsPerAgent() ) {
 			counter.incCounter();
 			final NegotiationAgent<P> agent = agents.getRandomAgent();
 			final boolean success = agent.planActivity();
