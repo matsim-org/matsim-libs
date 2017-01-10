@@ -22,7 +22,7 @@ package org.matsim.contrib.signals.router;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
-import org.matsim.core.router.LinkToLinkRoutingGuiceModule.LinkToLinkRoutingModuleProvider;
+import org.matsim.core.router.LinkToLinkRoutingGuiceModule.LinkToLinkRouting;
 
 
 public class LinkToLinkRoutingWithSignalsDataGuiceModule
@@ -33,6 +33,6 @@ public class LinkToLinkRoutingWithSignalsDataGuiceModule
     {
         bind(NetworkTurnInfoBuilder.class).to(NetworkWithSignalsTurnInfoBuilder.class);
         addRoutingModuleBinding(TransportMode.car)
-                .toProvider(new LinkToLinkRoutingModuleProvider(TransportMode.car));
+                .toProvider(new LinkToLinkRouting(TransportMode.car));
     }
 }
