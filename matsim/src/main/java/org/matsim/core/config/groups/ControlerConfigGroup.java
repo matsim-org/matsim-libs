@@ -100,7 +100,8 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 				"to a file. `0' disables events writing completely.");
 		map.put(WRITE_PLANS_INTERVAL, "iterationNumber % writePlansInterval == 0 defines (hopefully) in which iterations plans are " +
 				"written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written");
-		map.put(LINKTOLINK_ROUTING_ENABLED, "Default=false; "); // TODO: add description
+		map.put(LINKTOLINK_ROUTING_ENABLED, "Default=false. If enabled, the router takes travel times needed for turning moves into account."
+		        + " Cannot be used if the (Fast)AStarLandmarks routing or TravelTimeCalculator.separateModes is enabled.");
 		map.put(FIRST_ITERATION, "Default=0; "); // TODO: add description
 		map.put(LAST_ITERATION, "Default=1000; "); // TODO: add description
 		map.put(CREATE_GRAPHS, "Sets whether graphs showing some analyses should automatically be generated during the simulation." +

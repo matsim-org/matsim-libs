@@ -40,27 +40,28 @@ public class LinkToLinkRoutingGuiceModule
 {
     private final String mode;
 
+
     public LinkToLinkRoutingGuiceModule()
     {
         this(TransportMode.car);
     }
-    
+
+
     public LinkToLinkRoutingGuiceModule(String mode)
     {
         this.mode = mode;
     }
-    
+
 
     @Override
     public void install()
     {
         bind(NetworkTurnInfoBuilder.class);
-        addRoutingModuleBinding(mode)
-                .toProvider(new LinkToLinkRoutingModuleProvider(mode));
+        addRoutingModuleBinding(mode).toProvider(new LinkToLinkRouting(mode));
     }
 
 
-    public static class LinkToLinkRoutingModuleProvider
+    public static class LinkToLinkRouting
         implements Provider<RoutingModule>
     {
         private final String mode;
@@ -84,7 +85,7 @@ public class LinkToLinkRoutingGuiceModule
         NetworkTurnInfoBuilder networkTurnInfoBuilder;
 
 
-        public LinkToLinkRoutingModuleProvider(String mode)
+        public LinkToLinkRouting(String mode)
         {
             this.mode = mode;
         }
@@ -94,8 +95,8 @@ public class LinkToLinkRoutingGuiceModule
         public RoutingModule get()
         {
             return new LinkToLinkRoutingModule(mode, populationFactory, network,
-                    leastCostPathCalcFactory, travelDisutilities.get(mode),
-                    travelTimes, networkTurnInfoBuilder);
+                    leastCostPathCalcFactory, travelDisutilities.get(mode), travelTimes,
+                    networkTurnInfoBuilder);
         }
     }
 
