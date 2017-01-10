@@ -93,6 +93,10 @@ public class CTLinkCell extends CTCell {
 ////		log.info(meanJumpTime);
 //		double nextJumpTime = now + rnd * meanJumpTime;
 
+//		if (this.l)
+
+
+
 		this.nextCellJumpTime = now + minJumpTime;
 		CTEvent e = new CTEvent(this, nextCellJumpTime);
 		this.currentEvent = e;

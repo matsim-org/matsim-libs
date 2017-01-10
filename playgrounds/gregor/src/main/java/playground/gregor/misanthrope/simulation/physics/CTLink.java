@@ -24,10 +24,11 @@ import java.util.*;
 public class CTLink implements CTNetworkEntity {
 
 
-	public static final double WIDTH = 5;
+	public static final double WIDTH = 3;
 	private static final Logger log = Logger.getLogger(CTLink.class);
 	private static final double EPSILON = 0.00001;
 	private static double LENGTH;
+	//    private static double MX_LENGTH = ;
 	private static int WIDTH_WRN_CNT = 0;
 	private static int LENGTH_WRN_CNT = 0;
 
@@ -98,7 +99,10 @@ public class CTLink implements CTNetworkEntity {
 			width = WIDTH;
 		}
 
-
+		if (this.dsLink.getId().toString().contains("el")) {
+			length = LENGTH;
+			width = 100;
+		}
 
 
 
@@ -225,7 +229,7 @@ public class CTLink implements CTNetworkEntity {
 
 		//append cells
 
-		if (this.dsLink.getId().equals(Id.createLinkId("l1_8"))) {
+		if (CTRunner.DEBUG) {
 			debugBound(bounds);
 			for (CTCell c : this.cells) {
 				c.debug(this.em);

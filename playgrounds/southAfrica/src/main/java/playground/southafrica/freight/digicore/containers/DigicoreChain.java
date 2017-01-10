@@ -102,7 +102,9 @@ public class DigicoreChain extends ArrayList<DigicoreChainElement>{
 	/**
 	 * Checks if a chain is complete.
 	 * @return true if the chain contains at least two {@link DigicoreActivity}s,
-	 * and both the first and last {@link DigicoreActivity} is of type "major".
+	 * and both the first and last {@link DigicoreActivity} is of type "major",
+	 * and the chain is alternating between a {@link DigicoreActivity} and 
+	 * {@link DigicoreTrace}.
 	 */
 	public boolean isComplete(){
 		List<DigicoreActivity> activities = getAllActivities();

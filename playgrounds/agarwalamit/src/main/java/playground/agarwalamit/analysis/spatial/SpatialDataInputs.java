@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.analysis.spatial;
 
+import java.io.File;
 import org.apache.log4j.Logger;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -98,8 +99,20 @@ public class SpatialDataInputs {
 		this.compareToCaseConfig = this.compareToCase+"/output_config.xml";
 		this.compareToCaseNetwork = this.compareToCase+"/output_network.xml.gz";
 		int compareToCaseLastIteration = LoadMyScenarios.getLastIteration(this.compareToCaseConfig);
-		this.compareToCaseEmissionEventsFile = this.compareToCase+"/ITERS/it."+compareToCaseLastIteration+"/"+compareToCaseLastIteration+".emission.events.xml.gz";
-		this.compareToCaseEventsFile = this.compareToCase+"/ITERS/it."+compareToCaseLastIteration+"/"+compareToCaseLastIteration+".events.xml.gz";
+
+		// check for output events file
+		if ( new File(compareToCase+"/output_emissions_events.xml.gz").exists() ) {
+			compareToCaseEmissionEventsFile = compareToCase+"/output_emissions_events.xml.gz";
+		} else {
+			compareToCaseEmissionEventsFile = compareToCase+"/ITERS/it."+compareToCaseLastIteration+"/"+compareToCaseLastIteration+".emission.events.xml.gz";
+		}
+
+		if ( new File(compareToCase+"/output_events.xml.gz").exists() ) {
+			compareToCaseEventsFile = compareToCase+"/output_events.xml.gz";
+		} else {
+			compareToCaseEventsFile = compareToCase+"/ITERS/it."+compareToCaseLastIteration+"/"+compareToCaseLastIteration+".events.xml.gz";
+		}
+
 		this.compareToCasePlans = this.compareToCase+"/output_plans.xml.gz";
 	}
 	
@@ -143,8 +156,20 @@ public class SpatialDataInputs {
 		initialCaseConfig = initialCase+"/output_config.xml";
 		initialCaseNetworkFile = initialCase+"/output_network.xml.gz";
 		int initialCaseLastIteration = LoadMyScenarios.getLastIteration(initialCaseConfig);
-		initialCaseEmissionEventsFile = initialCase+"/ITERS/it."+initialCaseLastIteration+"/"+initialCaseLastIteration+".emission.events.xml.gz";
-		initialCaseEventsFile = initialCase+"/ITERS/it."+initialCaseLastIteration+"/"+initialCaseLastIteration+".events.xml.gz";
+
+		// check for output events file
+		if ( new File(initialCase+"/output_emissions_events.xml.gz").exists() ) {
+			initialCaseEmissionEventsFile = initialCase+"/output_emissions_events.xml.gz";
+		} else {
+			initialCaseEmissionEventsFile = initialCase+"/ITERS/it."+initialCaseLastIteration+"/"+initialCaseLastIteration+".emission.events.xml.gz";
+		}
+
+		if ( new File(initialCase+"/output_events.xml.gz").exists() ) {
+			initialCaseEventsFile = initialCase+"/output_events.xml.gz";
+		} else {
+			initialCaseEventsFile = initialCase+"/ITERS/it."+initialCaseLastIteration+"/"+initialCaseLastIteration+".events.xml.gz";
+		}
+
 		initialCasePlansFile = initialCase+"/output_plans.xml.gz";
 	}
 

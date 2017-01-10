@@ -70,8 +70,9 @@ public class DigicoreChainExtractor implements Runnable {
 		DigicoreChain chain = new DigicoreChain();
 		DigicoreActivity activity = null;
 		
-		List<String[]> lineBuffer = null;
+		List<String[]> activityBuffer = null;
 		List<String[]> tripBuffer = null;
+		List<String[]> previousTripBuffer = null;
 		boolean move = true;
 		boolean firstRecord = true;
 		try {
@@ -93,23 +94,23 @@ public class DigicoreChainExtractor implements Runnable {
 						if(move){
 							tripBuffer = new ArrayList<>();
 						} else{
-							lineBuffer = new ArrayList<>();
+							activityBuffer = new ArrayList<>();
 						}
 						firstRecord = false;
 					}
 					
 					/* Process the record. */
 					if(move){
-						if(lineBuffer == null && tripBuffer != null){
+						if(activityBuffer == null && tripBuffer != null){
 							/* Vehicle is still moving. */
 							tripBuffer.add(sa);
-						} else if(lineBuffer != null && tripBuffer == null){
+						} else if(activityBuffer != null && tripBuffer == null){
 							/* Vehicle has started moving. Finish activity. */
-							lineBuffer.add(sa);
+							activityBuffer.add(sa);
 							
 							/* Check if activity duration exceeds threshold. */
-							long duration = (Long.parseLong(lineBuffer.get(lineBuffer.size()-1)[1]) - 
-									Long.parseLong(lineBuffer.get(0)[1]));
+							long duration = (Long.parseLong(activityBuffer.get(activityBuffer.size()-1)[1]) - 
+									Long.parseLong(activityBuffer.get(0)[1]));
 							if(duration >= this.thresholdActivityDuration){
 								/* It qualifies as an activity. */
 								
@@ -122,17 +123,17 @@ public class DigicoreChainExtractor implements Runnable {
 								/* Calculate activity centroid */
 								double xSum = 0;
 								double ySum = 0;
-								for(String[] saa : lineBuffer){
+								for(String[] saa : activityBuffer){
 									xSum += Double.parseDouble(saa[2]);
 									ySum += Double.parseDouble(saa[3]);
 								}
-								Coord cOriginal = new Coord(xSum / (double) lineBuffer.size(), ySum / (double) lineBuffer.size());
+								Coord cOriginal = new Coord(xSum / (double) activityBuffer.size(), ySum / (double) activityBuffer.size());
 								Coord cFinal = ct.transform(cOriginal);
 								activity.setCoord(cFinal);
 								
 								/* Set start- and end time. */
-								activity.setStartTime(Double.parseDouble(lineBuffer.get(0)[1]));
-								activity.setEndTime(Double.parseDouble(lineBuffer.get(lineBuffer.size()-1)[1]));
+								activity.setStartTime(Double.parseDouble(activityBuffer.get(0)[1]));
+								activity.setEndTime(Double.parseDouble(activityBuffer.get(activityBuffer.size()-1)[1]));
 								
 								/* 
 								 * Add the activity to the chain. 
@@ -155,39 +156,63 @@ public class DigicoreChainExtractor implements Runnable {
 									chain.add(activity);
 								}
 								
+								activityBuffer = null;
+								/* Start new trip buffer. */
+								tripBuffer = new ArrayList<>();
+								tripBuffer.add(sa);
 							} else{
-								/* It is not considered an activity. */
+								/* It is not considered an activity. Re-instate 
+								 * the previous (partial) trip.*/
+								tripBuffer = previousTripBuffer;
+								if(tripBuffer == null){
+									tripBuffer = new ArrayList<>();
+								}
+								
+								/* Now also remove the previous trace that was
+								 * (possibly) already added to the activity chain. */
+								if(chain.size() > 0){
+									if(chain.get(chain.size()-1) instanceof DigicoreTrace){
+										chain.remove(chain.size()-1);
+									}
+								}
+								
+								/* TODO Check if the next line is indeed correct...
+								 * Is it accurate to add the (failed) activity 
+								 * records to the trip as well? Jan'17 JWJ */
+								
+								// FIXME Remove after debugging.
+								if(tripBuffer == null || activityBuffer == null){
+									log.error("Null");
+								}
+								
+								tripBuffer.addAll(activityBuffer);
+								activityBuffer = null;
 							}
-							lineBuffer = null;
-							
-							/* Start new trip buffer. */
-							tripBuffer = new ArrayList<>();
-							tripBuffer.add(sa);
-							
 						} else{
 							log.error("The buffer combination is problematic:");
-							log.error("  Is line buffer null?: " + (lineBuffer == null));
+							log.error("  Is line buffer null?: " + (activityBuffer == null));
 							log.error("  Is trip buffer null?: " + (tripBuffer == null));
 							throw new IllegalStateException("Buffer states seem wrong.");
 						}
 					} else {
-						if(lineBuffer == null && tripBuffer != null){
+						if(activityBuffer == null && tripBuffer != null){
 							/* Vehicle has just stopped. Finish trip.*/
 							DigicoreTrace trace = convertBufferToTrace(tripBuffer, this.crs);
 							chain.add(trace);
+							previousTripBuffer = tripBuffer;
 							tripBuffer = null;
 							
 							/* Start activity. */
-							lineBuffer = new ArrayList<String[]>();
-							lineBuffer.add(sa);
+							activityBuffer = new ArrayList<String[]>();
+							activityBuffer.add(sa);
 
-						} else if(lineBuffer != null && tripBuffer == null){
+						} else if(activityBuffer != null && tripBuffer == null){
 							/* Vehicle is still stationary. */
-							lineBuffer.add(sa);
+							activityBuffer.add(sa);
 							
 						} else{
 							log.error("The buffer combination is problematic:");
-							log.error("  Is line buffer null?: " + (lineBuffer == null));
+							log.error("  Is line buffer null?: " + (activityBuffer == null));
 							log.error("  Is trip buffer null?: " + (tripBuffer == null));
 							throw new IllegalStateException("Buffer states seem wrong.");
 						}
@@ -200,6 +225,9 @@ public class DigicoreChainExtractor implements Runnable {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (NullPointerException e){
+			e.printStackTrace();
+			log.error("Vehicle with NullPointerException: " + vehicle.getId().toString());
 		}
 				
 		/* Write the vehicle to file if it has at least one chain. This is 

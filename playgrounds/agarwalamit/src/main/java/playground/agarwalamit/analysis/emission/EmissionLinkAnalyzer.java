@@ -47,6 +47,7 @@ import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.AreaFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
+import playground.agarwalamit.utils.PersonFilter;
 import playground.vsp.airPollution.flatEmissions.EmissionCostFactors;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
@@ -54,6 +55,8 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  * @author amit
  *
  */
+//TODO :clean it.
+
 public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 	private static final Logger LOG = Logger.getLogger(EmissionLinkAnalyzer.class);
 	private final String emissionEventsFile;
@@ -68,21 +71,24 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 	/**
 	 * This will compute the emissions only from links falling inside the given shape and consider the persons belongs to the given user group.
 	 */
-	public EmissionLinkAnalyzer(final double simulationEndTime, final String emissionEventFile, final int noOfTimeBins, final String shapeFile, 
-			final Network network, final String userGroup ) {
+	public EmissionLinkAnalyzer(final double simulationEndTime, final String emissionEventFile, final int noOfTimeBins, final String shapeFile,
+								final Network network, final String userGroup, final PersonFilter personFilter) {
 		super(EmissionLinkAnalyzer.class.getSimpleName());
 		this.emissionEventsFile = emissionEventFile;
 		LOG.info("Aggregating emissions for each "+simulationEndTime/noOfTimeBins+" sec time bin.");
-		AreaFilter af = new AreaFilter(shapeFile);
-		this.warmHandler = new FilteredWarmEmissionHandler(simulationEndTime, noOfTimeBins, userGroup, new MunichPersonFilter(), network, af);
-		this.coldHandler = new FilteredColdEmissionHandler(simulationEndTime, noOfTimeBins, userGroup, new MunichPersonFilter(), network, af);
+
+		AreaFilter af = null;
+		if(shapeFile!=null)	af = new AreaFilter(shapeFile);
+
+		this.warmHandler = new FilteredWarmEmissionHandler(simulationEndTime, noOfTimeBins, userGroup, personFilter, network, af);
+		this.coldHandler = new FilteredColdEmissionHandler(simulationEndTime, noOfTimeBins, userGroup, personFilter, network, af);
 	}
 
 	/**
 	 * This will compute the emissions only from links falling inside the given shape and persons from all user groups.
 	 */
 	public EmissionLinkAnalyzer(final double simulationEndTime, final String emissionEventFile, final int noOfTimeBins, final String shapeFile, final Network network ) {
-		this(simulationEndTime,emissionEventFile,noOfTimeBins,shapeFile,network,null);
+		this(simulationEndTime,emissionEventFile,noOfTimeBins,shapeFile,network,null,null);
 	}
 
 	/**
@@ -131,7 +137,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 			for(String str : runCases){
 				for(MunichUserGroup ug :MunichUserGroup.values()) {
 					String emissionEventFile = dir+str+"/ITERS/it.1500/1500.emission.events.xml.gz";
-					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileMMA, sc.getNetwork(), ug.toString());
+					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileMMA, sc.getNetwork(), ug.toString(), new MunichPersonFilter());
 //					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileCity, sc.getNetwork(), ug.toString());
 					ela.preProcessData();
 					ela.postProcessData();

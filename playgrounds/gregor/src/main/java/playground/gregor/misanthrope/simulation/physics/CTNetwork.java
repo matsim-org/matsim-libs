@@ -85,12 +85,16 @@ public class CTNetwork {
 				}
 			}
 
+			mxCap = Math.min(mxCap, 133);
+
 			CTNode ct = new CTNode(n.getId(), n, this, mxCap / 1.33);
 			this.nodes.put(n.getId(), ct);
 		}
 
-		int cnt = 0;
+//		int cnt = 0;
 		for (Link l : this.network.getLinks().values()) {
+
+
 			if (links.get(l.getId()) != null) {
 				continue;
 			}
@@ -107,6 +111,9 @@ public class CTNetwork {
 
 		for (CTNode ctNode : this.nodes.values()) {
 			ctNode.init();
+//            if (cnt++ % 10 == 0) {
+//       				log.info(cnt);
+//       			}
 //			workers.get(cnt++ % this.cores).add(ctNode);
 
 		}
@@ -127,7 +134,7 @@ public class CTNetwork {
 //		}
 //		log.info("verifying network");
 //		checkNetwork();
-//		log.info("done.");
+		log.info("done.");
 	}
 
 	private Link getRevLink(Link l) {
@@ -179,11 +186,15 @@ public class CTNetwork {
 			}
 			e.execute();
 		}
+
 	}
 
 	private void draw(double time) {
 		for (CTLink link : getLinks().values()) {
 			Link ll = link.getDsLink();
+//			if (!accept(ll)){
+//			    continue;
+//            }
 			double dx = ll.getToNode().getCoord().getX() - ll.getFromNode().getCoord().getX();
 			double dy = ll.getToNode().getCoord().getY() - ll.getFromNode().getCoord().getY();
 			dx /= ll.getLength();
@@ -192,6 +203,28 @@ public class CTNetwork {
 				drawCell(cell, time, dx, dy);
 			}
 		}
+
+//		for (CTNode n : this.nodes.values())  {
+//		    drawCell(n.getCTCell(),time,0,0);
+//        }
+	}
+
+	private boolean accept(Link ll) {
+		if (ll.getId().toString().contains("el")) {
+			return true;
+		}
+		for (Link l : ll.getToNode().getOutLinks().values()) {
+			if (l.getId().toString().contains("el")) {
+				return true;
+			}
+		}
+
+		return false;
+//        for (Link l : ll.getToNode().getOutLinks().values() ) {
+//        	        if (l.getId().toString().contains("el")) {
+//        	            return true;
+//                    }
+//                }
 	}
 
 	private void drawCell(CTCell cell, double time, double dx, double dy) {
