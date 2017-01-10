@@ -117,7 +117,7 @@ public class PersonTripCongestionNoiseAnalysisMain {
 
 		int finalIteration = config.controler().getLastIteration();
 		String eventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
-		String outputPath = runDirectory + "ITERS/it." + finalIteration + "/person-trip-analysis/";
+		String outputPath = runDirectory + "ITERS/it." + finalIteration + "/person-trip-analysis_congestion_noise/";
 		
 		analyzeCongestionEvents = true;
 		analyzeNoiseEvents = true;
