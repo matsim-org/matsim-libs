@@ -35,17 +35,17 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.*;
 
 
-public class InvertedNetworkRoutingGuiceModule
+public class LinkToLinkRoutingGuiceModule
     extends AbstractModule
 {
     private final String mode;
 
-    public InvertedNetworkRoutingGuiceModule()
+    public LinkToLinkRoutingGuiceModule()
     {
         this(TransportMode.car);
     }
     
-    public InvertedNetworkRoutingGuiceModule(String mode)
+    public LinkToLinkRoutingGuiceModule(String mode)
     {
         this.mode = mode;
     }
@@ -56,11 +56,11 @@ public class InvertedNetworkRoutingGuiceModule
     {
         bind(NetworkTurnInfoBuilder.class);
         addRoutingModuleBinding(mode)
-                .toProvider(new InvertedNetworkRoutingModuleProvider(mode));
+                .toProvider(new LinkToLinkRoutingModuleProvider(mode));
     }
 
 
-    public static class InvertedNetworkRoutingModuleProvider
+    public static class LinkToLinkRoutingModuleProvider
         implements Provider<RoutingModule>
     {
         private final String mode;
@@ -84,7 +84,7 @@ public class InvertedNetworkRoutingGuiceModule
         NetworkTurnInfoBuilder networkTurnInfoBuilder;
 
 
-        public InvertedNetworkRoutingModuleProvider(String mode)
+        public LinkToLinkRoutingModuleProvider(String mode)
         {
             this.mode = mode;
         }
@@ -93,7 +93,7 @@ public class InvertedNetworkRoutingGuiceModule
         @Override
         public RoutingModule get()
         {
-            return new InvertedNetworkRoutingModule(mode, populationFactory, network,
+            return new LinkToLinkRoutingModule(mode, populationFactory, network,
                     leastCostPathCalcFactory, travelDisutilities.get(mode),
                     travelTimes, networkTurnInfoBuilder);
         }

@@ -32,11 +32,11 @@ import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.contrib.signals.router.InvertedNetworkWithSignalsRoutingGuiceModule;
+import org.matsim.contrib.signals.router.LinkToLinkRoutingWithSignalsDataGuiceModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.router.InvertedNetworkRoutingGuiceModule;
+import org.matsim.core.router.LinkToLinkRoutingGuiceModule;
 import org.matsim.integration.invertednetworks.InvertedNetworkRoutingTestEventHandler;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -54,7 +54,7 @@ public class InvertedNetworksSignalsIT {
 		f.scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
 		Controler c = new Controler(f.scenario);
 		c.addOverridingModule(new SignalsModule());
-		c.addOverridingModule(new InvertedNetworkWithSignalsRoutingGuiceModule());
+		c.addOverridingModule(new LinkToLinkRoutingWithSignalsDataGuiceModule());
 		c.getConfig().controler().setDumpDataAtEnd(false);
 		c.getConfig().controler().setCreateGraphs(false);
         final InvertedNetworkRoutingTestEventHandler testHandler = new InvertedNetworkRoutingTestEventHandler();
@@ -82,7 +82,7 @@ public class InvertedNetworksSignalsIT {
 		sd.addTurningMoveRestriction(Id.create(23, Link.class));
 		Controler c = new Controler(f.scenario);
 		c.addOverridingModule(new SignalsModule());
-		c.addOverridingModule(new InvertedNetworkWithSignalsRoutingGuiceModule());
+		c.addOverridingModule(new LinkToLinkRoutingWithSignalsDataGuiceModule());
 		c.getConfig().controler().setDumpDataAtEnd(false);
 		c.getConfig().controler().setCreateGraphs(false);
         final InvertedNetworkRoutingTestEventHandler testHandler = new InvertedNetworkRoutingTestEventHandler();

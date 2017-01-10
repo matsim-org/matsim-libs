@@ -12,7 +12,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.router.InvertedNetworkRoutingGuiceModule;
+import org.matsim.core.router.LinkToLinkRoutingGuiceModule;
 
 import cadyts.utilities.misc.StreamFlushHandler;
 import floetteroed.utilities.SimpleLogFormatter;
@@ -217,7 +217,7 @@ public class TransmodelerMATSim {
 				"Starting Assignment ...");
 
 		final Controler controler = new Controler(matsimConfig);
-		controler.addOverridingModule(new InvertedNetworkRoutingGuiceModule());
+		controler.addOverridingModule(new LinkToLinkRoutingGuiceModule());
 
 		if (MOBSIM.transmodeler.equals(mobsim)) {
 

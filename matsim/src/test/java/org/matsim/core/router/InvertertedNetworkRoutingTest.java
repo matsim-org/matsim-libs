@@ -56,8 +56,8 @@ public class InvertertedNetworkRoutingTest {
         Facility<?> toFacility = new LinkWrapperFacility(//
                 f.s.getNetwork().getLinks().get(Id.create("78", Link.class)));
 
-		InvertedNetworkRoutingModule router =
-				new InvertedNetworkRoutingModule(
+		LinkToLinkRoutingModule router =
+				new LinkToLinkRoutingModule(
 						"mode",
 						f.s.getPopulation().getFactory(),
 						f.s.getNetwork(), lcpFactory,tc, tt, new NetworkTurnInfoBuilder(f.s));
@@ -100,7 +100,7 @@ public class InvertertedNetworkRoutingTest {
 		
 	}
 
-	private NetworkRoute calcRoute(InvertedNetworkRoutingModule router, final Facility<?> fromFacility,
+	private NetworkRoute calcRoute(LinkToLinkRoutingModule router, final Facility<?> fromFacility,
             final Facility<?> toFacility, final Person person)
 	{
         Leg leg = (Leg)router.calcRoute(fromFacility, toFacility, 0.0, person).get(0);
