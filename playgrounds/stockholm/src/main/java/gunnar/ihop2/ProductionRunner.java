@@ -2,11 +2,11 @@ package gunnar.ihop2;
 
 import java.io.IOException;
 
-import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.router.InvertedNetworkRoutingGuiceModule;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 
@@ -144,7 +144,7 @@ public class ProductionRunner {
 			final Controler controler = new Controler(config);
 			if (useLanes) {
 				controler
-						.addOverridingModule(new InvertedNetworkRoutingModuleModule());
+						.addOverridingModule(new InvertedNetworkRoutingGuiceModule());
 			}
 			if (useRoadPricing) {
 				controler

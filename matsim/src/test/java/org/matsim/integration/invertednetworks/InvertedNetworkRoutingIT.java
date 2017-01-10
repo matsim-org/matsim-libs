@@ -17,16 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.integration.invertednetworks;
+package org.matsim.integration.invertednetworks;
 
 import junit.framework.Assert;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.router.InvertedNetworkRoutingGuiceModule;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class InvertedNetworkRoutingIT {
@@ -39,7 +39,7 @@ public class InvertedNetworkRoutingIT {
 		InvertedNetworkRoutingTestFixture f = new InvertedNetworkRoutingTestFixture(false, true, false);
 		f.scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
 		Controler c = new Controler(f.scenario);
-		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
+		c.addOverridingModule(new InvertedNetworkRoutingGuiceModule());
 		c.getConfig().controler().setDumpDataAtEnd(false);
 		c.getConfig().controler().setCreateGraphs(false);
         final InvertedNetworkRoutingTestEventHandler testHandler = new InvertedNetworkRoutingTestEventHandler();
@@ -59,7 +59,7 @@ public class InvertedNetworkRoutingIT {
 		InvertedNetworkRoutingTestFixture f = new InvertedNetworkRoutingTestFixture(true, false, false);
 		f.scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
 		Controler c = new Controler(f.scenario);
-		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
+		c.addOverridingModule(new InvertedNetworkRoutingGuiceModule());
 		c.getConfig().controler().setDumpDataAtEnd(false);
 		c.getConfig().controler().setCreateGraphs(false);
         final InvertedNetworkRoutingTestEventHandler testHandler = new InvertedNetworkRoutingTestEventHandler();
@@ -80,7 +80,7 @@ public class InvertedNetworkRoutingIT {
 		f.scenario.getConfig().controler().setLinkToLinkRoutingEnabled(false);
 		f.scenario.getConfig().travelTimeCalculator().setCalculateLinkToLinkTravelTimes(false);
 		Controler c = new Controler(f.scenario);
-		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
+		//c.addOverridingModule(new InvertedNetworkRoutingGuiceModule());
 		c.getConfig().controler().setDumpDataAtEnd(false);
 		c.getConfig().controler().setCreateGraphs(false);
         final InvertedNetworkRoutingTestEventHandler testHandler = new InvertedNetworkRoutingTestEventHandler();

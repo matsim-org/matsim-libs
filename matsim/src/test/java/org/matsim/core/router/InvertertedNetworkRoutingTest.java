@@ -17,30 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.router;
+package org.matsim.core.router;
 
 import org.junit.Test;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.api.core.v01.network.NetworkWriter;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.LinkToLinkTravelTime;
+import org.matsim.core.router.costcalculators.*;
+import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.Facility;
 
 import junit.framework.Assert;
 
@@ -50,15 +40,9 @@ import junit.framework.Assert;
  * @author dgrether
  *
  */
-public class InvertertedNetworkLegRouterTest {
+public class InvertertedNetworkRoutingTest {
 
-	
-	public void writeNetwork(){
-		Fixture f = new Fixture();
-		NetworkWriter netwriter = new NetworkWriter(f.s.getNetwork());
-		netwriter.write("/media/data/work/matsim/matsimWorkspace/matsim/test/input/org/matsim/integration/lanes/network.xml");
-	}
-	
+
 	@Test
 	public void testInvertedNetworkLegRouter() {
 		Fixture f = new Fixture();
@@ -67,20 +51,20 @@ public class InvertertedNetworkLegRouterTest {
 		LeastCostPathCalculatorFactory lcpFactory = new DijkstraFactory();
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-		Leg leg = PopulationUtils.createLeg(TransportMode.car);
-		Activity fromAct = PopulationUtils.createActivityFromLinkId("h", Id.create("12", Link.class));
-		Activity toAct = PopulationUtils.createActivityFromLinkId("h", Id.create("78", Link.class));
+        Facility<?> fromFacility = new LinkWrapperFacility(//
+                f.s.getNetwork().getLinks().get(Id.create("12", Link.class)));
+        Facility<?> toFacility = new LinkWrapperFacility(//
+                f.s.getNetwork().getLinks().get(Id.create("78", Link.class)));
 
 		InvertedNetworkRoutingModule router =
 				new InvertedNetworkRoutingModule(
 						"mode",
 						f.s.getPopulation().getFactory(),
-						f.s, lcpFactory,tc, tt);
+						f.s.getNetwork(), lcpFactory,tc, tt, new NetworkTurnInfoBuilder(f.s));
 		//test 1
 		tt.setTurningMoveCosts(0.0, 100.0, 50.0);
 		
-		router.routeLeg(person, leg, fromAct, toAct, 0.0);
-		NetworkRoute route = (NetworkRoute) leg.getRoute();
+		NetworkRoute route = calcRoute(router, fromFacility, toFacility, person);
 		Assert.assertNotNull(route);
 		Assert.assertEquals(Id.create("12", Link.class), route.getStartLinkId());
 		Assert.assertEquals(Id.create("78", Link.class), route.getEndLinkId());
@@ -91,8 +75,7 @@ public class InvertertedNetworkLegRouterTest {
 		
 		//test 2
 		tt.setTurningMoveCosts(100.0, 0.0, 50.0);
-		router.routeLeg(person, leg, fromAct, toAct, 0.0);
-		route = (NetworkRoute) leg.getRoute();
+        route = calcRoute(router, fromFacility, toFacility, person);
 		Assert.assertNotNull(route);
 		Assert.assertEquals(Id.create("12", Link.class), route.getStartLinkId());
 		Assert.assertEquals(Id.create("78", Link.class), route.getEndLinkId());
@@ -104,8 +87,7 @@ public class InvertertedNetworkLegRouterTest {
 		//test 3
 		tt.setTurningMoveCosts(50.0, 100.0, 0.0);
 		
-		router.routeLeg(person, leg, fromAct, toAct, 0.0);
-		route = (NetworkRoute) leg.getRoute();
+        route = calcRoute(router, fromFacility, toFacility, person);
 		Assert.assertNotNull(route);
 		Assert.assertEquals(Id.create("12", Link.class), route.getStartLinkId());
 		Assert.assertEquals(Id.create("78", Link.class), route.getEndLinkId());
@@ -118,6 +100,14 @@ public class InvertertedNetworkLegRouterTest {
 		
 	}
 
+	private NetworkRoute calcRoute(InvertedNetworkRoutingModule router, final Facility<?> fromFacility,
+            final Facility<?> toFacility, final Person person)
+	{
+        Leg leg = (Leg)router.calcRoute(fromFacility, toFacility, 0.0, person).get(0);
+        return (NetworkRoute) leg.getRoute();
+	}
+	
+	
 	private static class LinkToLinkTravelTimeStub implements LinkToLinkTravelTime {
 
 		private double turningMoveCosts34;

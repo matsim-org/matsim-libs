@@ -113,13 +113,12 @@ public final class NetworkRoutingModule implements RoutingModule {
 	private double routeLeg(Person person, Leg leg, Link fromLink, Link toLink, double depTime) {
 		double travTime = 0;
 
-		Node startNode = fromLink.getToNode();	// start at the end of the "current" link
-		Node endNode = toLink.getFromNode(); // the target is the start of the link
-
 //		CarRoute route = null;
 //		Path path = null;
 		if (toLink != fromLink) {
-			// (a "true" route)
+            // (a "true" route)
+	        Node startNode = fromLink.getToNode();  // start at the end of the "current" link
+	        Node endNode = toLink.getFromNode(); // the target is the start of the link
 			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());

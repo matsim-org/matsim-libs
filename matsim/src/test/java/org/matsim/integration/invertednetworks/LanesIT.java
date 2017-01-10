@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.integration.lanes;
+package org.matsim.integration.invertednetworks;
 
 import javax.inject.Inject;
 
@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -44,7 +43,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkLanesImpl;
-import org.matsim.lanes.data.v11.LaneDefinitonsV11ToV20Converter;
+import org.matsim.core.router.InvertedNetworkRoutingGuiceModule;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -73,7 +72,7 @@ public class LanesIT {
 		config.controler().setLastIteration(lastIteration);
 		// ---
 		Controler controler = new Controler(config);
-		controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
+		controler.addOverridingModule(new InvertedNetworkRoutingGuiceModule());
 		controler.getConfig().controler().setCreateGraphs(false);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
