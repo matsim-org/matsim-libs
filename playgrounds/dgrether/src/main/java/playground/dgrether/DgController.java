@@ -24,7 +24,7 @@ import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
-import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
+import org.matsim.contrib.signals.router.InvertedNetworkWithSignalsRoutingGuiceModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -56,7 +56,7 @@ public class DgController {
 		
 		// add the module for link to link routing if enabled
 		if (config.controler().isLinkToLinkRoutingEnabled()) {
-			c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
+			c.addOverridingModule(new InvertedNetworkWithSignalsRoutingGuiceModule());
 		}			
 
 		// add the signals module

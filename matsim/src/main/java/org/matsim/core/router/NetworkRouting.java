@@ -2,7 +2,6 @@ package org.matsim.core.router;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -29,9 +28,7 @@ public class NetworkRouting implements Provider<RoutingModule> {
 	SingleModeNetworksCache singleModeNetworksCache;
 
 	@Inject
-    PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
-	
-	@Inject PlansCalcRouteConfigGroup plansCalcRouteConfigGroup ;
+	PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
 
 	@Inject
     Network network;
@@ -46,7 +43,7 @@ public class NetworkRouting implements Provider<RoutingModule> {
 		this.mode = mode;
 	}
 
-	private String mode;
+	private final String mode;
 
 	@Override
 	public RoutingModule get() {

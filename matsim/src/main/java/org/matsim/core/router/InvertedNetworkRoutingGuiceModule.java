@@ -20,44 +20,53 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.contrib.signals.router;
+package org.matsim.core.router;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.LeastCostPathCalculatorModule;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.LinkToLinkTravelTime;
-import org.matsim.pt.router.TransitRouterModule;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 import java.util.Map;
 
+import javax.inject.*;
 
-public class InvertedNetworkRoutingModuleModule extends AbstractModule {
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.*;
 
-    private static Logger log = Logger.getLogger(InvertedNetworkRoutingModuleModule.class);
+
+public class InvertedNetworkRoutingGuiceModule
+    extends AbstractModule
+{
+    private final String mode;
+
+    public InvertedNetworkRoutingGuiceModule()
+    {
+        this(TransportMode.car);
+    }
+    
+    public InvertedNetworkRoutingGuiceModule(String mode)
+    {
+        this.mode = mode;
+    }
+    
 
     @Override
-    public void install() {
-        install(new LeastCostPathCalculatorModule());
-        install(new TransitRouterModule()); // yy why?  kai, jul'15
-        if (getConfig().controler().isLinkToLinkRoutingEnabled()) {
-            addRoutingModuleBinding(TransportMode.car).toProvider(new InvertedNetworkRoutingModuleProvider(TransportMode.car));
-            log.warn("Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.");
-        }
+    public void install()
+    {
+        bind(NetworkTurnInfoBuilder.class);
+        addRoutingModuleBinding(mode)
+                .toProvider(new InvertedNetworkRoutingModuleProvider(mode));
     }
 
-    private static class InvertedNetworkRoutingModuleProvider implements Provider<RoutingModule> {
 
-        String mode;
+    public static class InvertedNetworkRoutingModuleProvider
+        implements Provider<RoutingModule>
+    {
+        private final String mode;
 
         @Inject
-        Scenario scenario;
+        PopulationFactory populationFactory;
 
         @Inject
         LeastCostPathCalculatorFactory leastCostPathCalcFactory;
@@ -66,15 +75,27 @@ public class InvertedNetworkRoutingModuleModule extends AbstractModule {
         Map<String, TravelDisutilityFactory> travelDisutilities;
 
         @Inject
+        Network network;
+
+        @Inject
         LinkToLinkTravelTime travelTimes;
 
-        public InvertedNetworkRoutingModuleProvider(String mode) {
+        @Inject
+        NetworkTurnInfoBuilder networkTurnInfoBuilder;
+
+
+        public InvertedNetworkRoutingModuleProvider(String mode)
+        {
             this.mode = mode;
         }
 
+
         @Override
-        public RoutingModule get() {
-            return new InvertedNetworkRoutingModule( mode, scenario.getPopulation().getFactory(), scenario, leastCostPathCalcFactory, travelDisutilities.get(TransportMode.car), travelTimes) ;
+        public RoutingModule get()
+        {
+            return new InvertedNetworkRoutingModule(mode, populationFactory, network,
+                    leastCostPathCalcFactory, travelDisutilities.get(mode),
+                    travelTimes, networkTurnInfoBuilder);
         }
     }
 
