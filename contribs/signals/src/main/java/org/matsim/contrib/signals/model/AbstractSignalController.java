@@ -43,9 +43,4 @@ public abstract class AbstractSignalController implements SignalController {
 		this.signalPlans.put(plan.getId(), plan);
 	}
 
-//	@Override
-//	public void setSignalSystem(SignalSystem system) {
-//		this.system = system;
-//	}
-
 }

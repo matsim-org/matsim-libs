@@ -337,11 +337,6 @@ public class DgRoederGershensonController implements SignalController {
 		// TODO Auto-generated method stub
 	}
 
-//	@Override
-//	public void setSignalSystem(SignalSystem system) {
-//		this.system = system;
-//	}
-
 
 	public void setStorageCapFactor(double storageCapFactor) {
 		this.storageCapFactor = storageCapFactor;

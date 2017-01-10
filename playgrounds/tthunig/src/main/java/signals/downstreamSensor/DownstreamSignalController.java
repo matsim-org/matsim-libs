@@ -110,11 +110,6 @@ public class DownstreamSignalController implements SignalController {
 		this.signalPlan = plan;
 	}
 
-//	@Override
-//	public void setSignalSystem(SignalSystem system) {
-//		this.system = system;
-//	}
-
 	@Override
 	public void updateState(double timeSeconds) {
 		// schedule onsets and droppings of the plan; update greenSignalGroupsAccordingToPlan
