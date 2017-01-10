@@ -80,8 +80,8 @@ public class NoiseOfflineCalculationIK {
 			
 //			runDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
 //			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_gridCSVFile_heerstrasse/";
-			runDirectory = "/Users/ihab/Desktop/ils4i/kaddoura/cn_cordon/output/baseCaseCtd/";
-			outputDirectory = "/Users/ihab/Desktop/ils4i/kaddoura/cn_cordon/output/baseCaseCtd/noiseAnalysis-withEvents/";
+			runDirectory = "/Users/ihab/Desktop/ils4i/kaddoura/cn_cordon/output/cordonToll_0/";
+			outputDirectory = "/Users/ihab/Desktop/ils4i/kaddoura/cn_cordon/output/cordonToll_0/noiseAnalysis-withEvents/";
 			receiverPointGap = 100.;
 			lastIteration = 100;
 			timeBinSize = 3600.;

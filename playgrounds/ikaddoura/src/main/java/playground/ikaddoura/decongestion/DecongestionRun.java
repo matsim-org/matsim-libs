@@ -62,8 +62,8 @@ public class DecongestionRun {
 			log.info("output directory: "+ outputBaseDirectory);
 
 		} else {
-			configFile = "../../../runs-svn/decongestion/input/config.xml";
-			outputBaseDirectory = "../../../runs-svn/decongestion/output/";
+			configFile = "../../../runs-svn/vickrey-decongestion/input/config.xml";
+			outputBaseDirectory = "../../../runs-svn/vickrey-decongestion/output/";
 		}
 		
 		DecongestionRun main = new DecongestionRun();
@@ -74,6 +74,12 @@ public class DecongestionRun {
 	private void run() throws IOException {
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+		decongestionSettings.setMsa(false);
+		decongestionSettings.setTOLL_BLEND_FACTOR(0.1);
+		decongestionSettings.setKd(0.);
+		decongestionSettings.setKi(0.);
+		decongestionSettings.setKp(0.01);
+		
 		Config config = ConfigUtils.loadConfig(configFile);
 
 		String outputDirectory = outputBaseDirectory +

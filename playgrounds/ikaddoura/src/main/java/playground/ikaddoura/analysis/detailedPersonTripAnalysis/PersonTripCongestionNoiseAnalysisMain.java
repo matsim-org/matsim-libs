@@ -119,11 +119,10 @@ public class PersonTripCongestionNoiseAnalysisMain {
 		String eventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
 		String outputPath = runDirectory + "ITERS/it." + finalIteration + "/person-trip-analysis/";
 		
-		analyzeCongestionEvents = false;
-		analyzeNoiseEvents = false;
+		analyzeCongestionEvents = true;
+		analyzeNoiseEvents = true;
 		
 		String noiseEventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
-//		String noiseEventsFile = runDirectory + "noiseAnalysis/analysis_it.100/100.events_NoiseImmission_Offline.xml.gz";
 		String congestionEventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
