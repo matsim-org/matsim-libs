@@ -36,6 +36,7 @@ import com.google.inject.Inject;
 import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
+import playground.dgrether.signalsystems.sylvia.model.DgSylviaController.Builder;
 
 
 /**
@@ -49,15 +50,12 @@ public final class DgSylviaSignalModelFactory implements SignalModelFactory {
 	
 	private SignalModelFactory delegate = new DefaultSignalModelFactory();
 	
-	private LinkSensorManager sensorManager;
-	private DgSylviaConfig sylviaConfig;
-	private SignalsData signalsData;
+	private Builder builder;
 
 	@Inject 
 	public DgSylviaSignalModelFactory(LinkSensorManager sensorManager, DgSylviaConfig sylviaConfig, Scenario scenario) {
-		this.sensorManager = sensorManager;
-		this.sylviaConfig = sylviaConfig;
-		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+		this.builder = new DgSylviaController.Builder(sylviaConfig, sensorManager, signalsData);
 	}
 
 	@Override
@@ -69,7 +67,7 @@ public final class DgSylviaSignalModelFactory implements SignalModelFactory {
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
 		if (DgSylviaController.CONTROLLER_IDENTIFIER.equals(controllerIdentifier)){
 			log.info("Creating " + DgSylviaController.CONTROLLER_IDENTIFIER);
-			return new DgSylviaController(this.sylviaConfig, this.sensorManager, this.signalsData, signalSystem);
+			return builder.build(signalSystem);
 		}
 		return this.delegate.createSignalSystemController(controllerIdentifier, signalSystem);
 	}

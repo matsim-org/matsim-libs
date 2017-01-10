@@ -59,6 +59,20 @@ public class DgSylviaController extends AbstractSignalController implements Sign
 
 	private static int sylviaPlanDumpCount = 0;
 	
+	public final static class Builder {
+		private DgSylviaConfig sylviaConfig;
+		private LinkSensorManager sensorManager;
+		private SignalsData signalsData;
+		public Builder(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, SignalsData signalsData) {
+			this.sylviaConfig = sylviaConfig;
+			this.sensorManager = sensorManager;
+			this.signalsData = signalsData;
+		}
+		public DgSylviaController build(SignalSystem signalSystem){
+			return new DgSylviaController(sylviaConfig, sensorManager, signalsData, signalSystem);
+		}
+	}
+	
 	private DgSylviaSignalPlan activeSylviaPlan = null;
 	private boolean extensionActive = false;
 	private boolean forcedExtensionActive = false;
@@ -74,8 +88,8 @@ public class DgSylviaController extends AbstractSignalController implements Sign
 	private LinkSensorManager sensorManager;
 	private SignalsData signalsData;
 
-	public DgSylviaController(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, SignalsData signalsData, SignalSystem system) {
-		super(system) ;
+	private DgSylviaController(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, SignalsData signalsData, SignalSystem signalSystem) {
+		super(signalSystem) ;
 		this.sylviaConfig = sylviaConfig;
 		this.sensorManager = sensorManager;
 		this.signalsData = signalsData;
