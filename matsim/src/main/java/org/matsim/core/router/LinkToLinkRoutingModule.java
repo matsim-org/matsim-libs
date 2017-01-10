@@ -42,14 +42,14 @@ import org.matsim.vehicles.Vehicle;
  * @author dgrether
  * @author michalm
  */
-class InvertedNetworkRoutingModule
+class LinkToLinkRoutingModule
     implements RoutingModule
 {
     private final NetworkRoutingModule networkRoutingModule;
     private final InvertedNetworkLeastCostPathCalculator invertedNetworkRouteAlgo;
 
 
-    InvertedNetworkRoutingModule(final String mode, final PopulationFactory populationFactory,
+    LinkToLinkRoutingModule(final String mode, final PopulationFactory populationFactory,
             Network network, LeastCostPathCalculatorFactory leastCostPathCalcFactory,
             TravelDisutilityFactory travelCostCalculatorFactory,
             LinkToLinkTravelTime l2ltravelTimes, NetworkTurnInfoBuilder turnInfoBuilder)

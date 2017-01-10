@@ -43,7 +43,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkLanesImpl;
-import org.matsim.core.router.InvertedNetworkRoutingGuiceModule;
+import org.matsim.core.router.LinkToLinkRoutingGuiceModule;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -72,7 +72,7 @@ public class LanesIT {
 		config.controler().setLastIteration(lastIteration);
 		// ---
 		Controler controler = new Controler(config);
-		controler.addOverridingModule(new InvertedNetworkRoutingGuiceModule());
+		controler.addOverridingModule(new LinkToLinkRoutingGuiceModule());
 		controler.getConfig().controler().setCreateGraphs(false);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

@@ -22,10 +22,10 @@ package org.matsim.contrib.signals.router;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
-import org.matsim.core.router.InvertedNetworkRoutingGuiceModule.InvertedNetworkRoutingModuleProvider;
+import org.matsim.core.router.LinkToLinkRoutingGuiceModule.LinkToLinkRoutingModuleProvider;
 
 
-public class InvertedNetworkWithSignalsRoutingGuiceModule
+public class LinkToLinkRoutingWithSignalsDataGuiceModule
     extends AbstractModule
 {
     @Override
@@ -33,6 +33,6 @@ public class InvertedNetworkWithSignalsRoutingGuiceModule
     {
         bind(NetworkTurnInfoBuilder.class).to(NetworkWithSignalsTurnInfoBuilder.class);
         addRoutingModuleBinding(TransportMode.car)
-                .toProvider(new InvertedNetworkRoutingModuleProvider(TransportMode.car));
+                .toProvider(new LinkToLinkRoutingModuleProvider(TransportMode.car));
     }
 }

@@ -2,7 +2,7 @@ package playground.michalm.poznan;
 
 import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.InvertedNetworkRoutingGuiceModule;
+import org.matsim.core.router.LinkToLinkRoutingGuiceModule;
 
 
 public class PoznanControler
@@ -17,7 +17,7 @@ public class PoznanControler
         //MatsimRandom.reset(43);
         Controler controler = new Controler(config);
         if (config.controler().isLinkToLinkRoutingEnabled()) {
-            controler.addOverridingModule(new InvertedNetworkRoutingGuiceModule());
+            controler.addOverridingModule(new LinkToLinkRoutingGuiceModule());
         }
 
         //controler.addOverridingModule(new OTFVisLiveModule());
