@@ -118,10 +118,8 @@ public class NoiseTollTimeDistanceTravelDisutility implements TravelDisutility {
 			}
 
 		}
-		
-//		log.warn("Expected toll on link " + linkId + " at time " + time + " in time interval " + timeIntervalEndTime + ": " + linkExpectedToll);
-				
-		double linkExpectedTollDisutility = this.marginalUtilityOfMoney * linkExpectedToll;			
+						
+		double linkExpectedTollDisutility = this.noiseContext.getNoiseParams().getNoiseTollFactor() * this.marginalUtilityOfMoney * linkExpectedToll;			
 		return linkExpectedTollDisutility;
 	}
 	

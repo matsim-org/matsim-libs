@@ -68,7 +68,8 @@ public class CNControler {
 	private static boolean noisePricing;
 	
 	private static double sigma;
-	private static double factor;
+	private static double congestionFactor;
+	private static double noiseTollFactor;
 	
 	public static void main(String[] args) throws IOException {
 		
@@ -89,8 +90,11 @@ public class CNControler {
 			sigma = Double.parseDouble(args[4]);
 			log.info("Sigma: " + sigma);
 			
-			factor = Double.parseDouble(args[5]);
-			log.info("toll factor: " + factor);
+			congestionFactor = Double.parseDouble(args[5]);
+			log.info("congestion toll factor: " + congestionFactor);
+			
+			noiseTollFactor = Double.parseDouble(args[6]);
+			log.info("noise toll factor: " + noiseTollFactor);
 			
 		} else {
 			
@@ -99,7 +103,8 @@ public class CNControler {
 			congestionPricing = true;
 			noisePricing = true;
 			sigma = 0.;
-			factor = 1.;
+			congestionFactor = 1.;
+			noiseTollFactor = 1.;
 		}
 				
 		CNControler cnControler = new CNControler();
@@ -200,15 +205,15 @@ public class CNControler {
 		
 		noiseParameters.setWriteOutputIteration(10);
 		
+		noiseParameters.setNoiseTollFactor(noiseTollFactor);
+		
 		noiseContext = new NoiseContext(controler.getScenario());
-
-		log.info("Noise cost rate: " + noiseParameters.getAnnualCostRate());
 		
 		// congestion
 		
 		final TollHandler congestionTollHandler;
 		if (congestionPricing) {
-			congestionTollHandler = new TollHandler(controler.getScenario());
+			congestionTollHandler = new TollHandler(controler.getScenario(), congestionFactor);
 		} else {
 			congestionTollHandler = null;
 		}
@@ -240,7 +245,7 @@ public class CNControler {
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			
 			// computation of congestion events + consideration in scoring
-			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario()), factor));
+			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario()), congestionFactor));
 		
 		} else if (noisePricing && congestionPricing == false) {
 			// only noise pricing
@@ -292,7 +297,7 @@ public class CNControler {
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			
 			// computation of congestion events + consideration in scoring
-			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario()), factor));
+			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario()), congestionFactor));
 			
 		} else if (noisePricing == false && congestionPricing == false) {
 			// base case
