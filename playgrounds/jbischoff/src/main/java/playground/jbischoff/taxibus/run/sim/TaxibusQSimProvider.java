@@ -40,6 +40,8 @@ import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizer;
 import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizerContext;
 import playground.jbischoff.taxibus.algorithm.optimizer.clustered.ClusteringTaxibusOptimizer;
 import playground.jbischoff.taxibus.algorithm.optimizer.clustered.ClusteringTaxibusOptimizerContext;
+import playground.jbischoff.taxibus.algorithm.optimizer.clustered.JspritDispatchCreator;
+import playground.jbischoff.taxibus.algorithm.optimizer.clustered.JspritTaxibusOptimizer;
 import playground.jbischoff.taxibus.algorithm.optimizer.clustered.SimpleDispatchCreator;
 
 import playground.jbischoff.taxibus.algorithm.optimizer.sharedTaxi.SharedTaxiOptimizer;
@@ -133,6 +135,16 @@ public class TaxibusQSimProvider
             {
             	ClusteringTaxibusOptimizerContext context = new ClusteringTaxibusOptimizerContext(vrpData, scenario, qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg);
             	return new ClusteringTaxibusOptimizer(context, new SimpleDispatchCreator(context));
+            }
+            case "jsprit":
+            {
+            	ClusteringTaxibusOptimizerContext context = new ClusteringTaxibusOptimizerContext(vrpData, scenario, qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg);
+            	return new JspritTaxibusOptimizer(context);
+            }
+            case "clustered_jsprit":
+            {
+            	ClusteringTaxibusOptimizerContext context = new ClusteringTaxibusOptimizerContext(vrpData, scenario, qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg);
+            	return new ClusteringTaxibusOptimizer(context, new JspritDispatchCreator(context));
             }
             default:
                 throw new RuntimeException(

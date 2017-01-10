@@ -49,7 +49,8 @@ public class KNTaxibusExample {
 
 		//TODO: Kai, in case you use this, please update your SVN first, Joschka // Dec 2016
 		// passengers live in larger area and want to go to railway station (now with nicer routes):
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configClustered.xml", new TaxibusConfigGroup());
+//		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configClustered.xml", new TaxibusConfigGroup());
+		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configJsprit.xml", new TaxibusConfigGroup());
 		
 		// passengers live in larger area and have distributed destinations, shared taxi for 2 persons:
 //		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configShared.xml", new TaxibusConfigGroup());
