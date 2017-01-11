@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -95,14 +96,15 @@ public class TaxibusTourAnalyser implements ActivityEndEventHandler, ActivitySta
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		if (event.getActType().startsWith("Before schedule")){
+		
+		if (event.getActType().equals(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE)){
 			handleBeforeScheduleEvent(event);
-		} else if (event.getActType().startsWith("PassengerPickup")){
+		} else if (event.getActType().startsWith("DrtPickup")){
 			handlePickup(event);
-		} else if (event.getActType().startsWith("PassengerDropoff")){
+		} else if (event.getActType().startsWith("DrtDropoff")){
 			handleDropoff(event);
 		}
-		else if (event.getActType().startsWith("Stay")){
+		else if (event.getActType().startsWith("DrtStay")){
 			handleStay(event);
 		}
 		
@@ -164,13 +166,15 @@ public class TaxibusTourAnalyser implements ActivityEndEventHandler, ActivitySta
 		}
 		currentRidePax.put(vid, pax);
 		lastPickupOnTour.put(vid, event.getTime());
-		hourlyDepartures[hour]++;
 		if (!firstPickupOnTour.containsKey(vid)){
 			firstPickupOnTour.put(vid, event.getTime());
 			hourlyTourDepartures[hour]++;
 			pickUpDistanceOnTour.put(vid, overallDistanceOnTour.get(vid));
 			this.paxDroppedOff.put(vid, 0);
-		}
+		} 
+		int tourStartHour = JbUtils.getHour(firstPickupOnTour.get(vid));
+		hourlyDepartures[tourStartHour]++;
+
 	}
 
 	private void handleBeforeScheduleEvent(ActivityEndEvent event) {

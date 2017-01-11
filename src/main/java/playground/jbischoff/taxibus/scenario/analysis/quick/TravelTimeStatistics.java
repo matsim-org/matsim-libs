@@ -41,7 +41,7 @@ public class TravelTimeStatistics   {
 
 	public static void main(String[] args) {
 
-		String run = "run103.100";
+		String run = "run108";
 //		String folder = "D:/runs-svn/vw_rufbus/" + run + "/";
 		String folder = "D:/runs-svn/vw_rufbus/" + run + "/";
 		String inputFile = folder + run + ".output_events.xml.gz";
@@ -67,11 +67,11 @@ public class TravelTimeStatistics   {
 		Set<Id<Link>> links = new HashSet<>();
 		links.add(Id.createLinkId(57196)); // a39
 		links.add(Id.createLinkId(42571)); // L295
-
-		TraveltimeAndDistanceEventHandler carTT = new TraveltimeAndDistanceEventHandler(scenario.getNetwork());
-		TraveltimeAndDistanceEventHandler allTT = new TraveltimeAndDistanceEventHandler(scenario.getNetwork());
-		TraveltimeAndDistanceEventHandler tbTT = new TraveltimeAndDistanceEventHandler(scenario.getNetwork());
-		TraveltimeAndDistanceEventHandler ptTT = new TraveltimeAndDistanceEventHandler(scenario.getNetwork()	);
+		boolean onlyVW = false;
+		BSWOB_TraveltimeAndDistanceEventHandler carTT = new BSWOB_TraveltimeAndDistanceEventHandler(scenario.getNetwork(),onlyVW);
+		BSWOB_TraveltimeAndDistanceEventHandler allTT = new BSWOB_TraveltimeAndDistanceEventHandler(scenario.getNetwork(),onlyVW);
+		BSWOB_TaxibusTraveltimeAndDistanceEventHandler tbTT = new BSWOB_TaxibusTraveltimeAndDistanceEventHandler(scenario.getNetwork(),onlyVW);
+		BSWOB_TraveltimeAndDistanceEventHandler ptTT = new BSWOB_TraveltimeAndDistanceEventHandler(scenario.getNetwork(),onlyVW);
 		TaxibusTourAnalyser analyser = new TaxibusTourAnalyser(scenario.getNetwork());
 
 		carTT.addMode("car");
@@ -84,17 +84,14 @@ public class TravelTimeStatistics   {
 		ptTT.addMode("pt");
 		ptTT.addMode("transit_walk");
 
-		tbTT.addMode("taxibus");
 
-		TaxiBusTravelTimesAnalyzer a = new TaxiBusTravelTimesAnalyzer();
 
 		events.addHandler(carTT);
 		events.addHandler(ptTT);
 		events.addHandler(tbTT);
-//		events.addHandler(allTT);
-//		events.addHandler(analyser);
+		events.addHandler(allTT);
+		events.addHandler(analyser);
 		
-		events.addHandler(a);
 		new MatsimEventsReader(events).readFile(inputFile);
 		System.out.println(inputFile);
 
@@ -103,8 +100,7 @@ public class TravelTimeStatistics   {
 		ptTT.writeOutput(folder);
 		tbTT.writeOutput(folder);
 		analyser.writeOutput(folder);
-		a.writeOutput(folder);
-		a.printOutput();
+
 	}
 	
 	static String guessNetworkFile(String eventsFile){

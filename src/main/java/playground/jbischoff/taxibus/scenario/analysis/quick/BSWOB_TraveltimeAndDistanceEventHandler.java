@@ -47,9 +47,10 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * @author jbischoff
+ * An analyis tool to evaluate passengers going from Braunschweig to Wolfsburg.
  *
  */
-public class TraveltimeAndDistanceEventHandler implements ActivityStartEventHandler, PersonDepartureEventHandler,
+public class BSWOB_TraveltimeAndDistanceEventHandler implements ActivityStartEventHandler, PersonDepartureEventHandler,
 		ActivityEndEventHandler, LinkEnterEventHandler {
 	Map<Id<Person>, String> lastActivity = new HashMap<>();
 	Map<Id<Person>, Double> lastDeparture = new HashMap<>();
@@ -66,9 +67,11 @@ public class TraveltimeAndDistanceEventHandler implements ActivityStartEventHand
 			new String[] { "work--home", "work_vw_flexitime--home", "work_vw_shift1--home", "work_vw_shift2--home" }));
 	ArrayList<String> trips = new ArrayList<>();
 	private final Network network;
+	private boolean onlyVW;
 
-	public TraveltimeAndDistanceEventHandler(Network network) {
+	public BSWOB_TraveltimeAndDistanceEventHandler(Network network, boolean onlyVW) {
 		this.network = network;
+		this.onlyVW = onlyVW;
 	}
 
 	@Override
@@ -118,12 +121,11 @@ public class TraveltimeAndDistanceEventHandler implements ActivityStartEventHand
 	}
 
 	boolean isRelevantPerson(Id<Person> personId) {
-		// return (personId.toString().endsWith("vw") ? true : false);
-//		return ((personId.toString().startsWith("BS_WB") || (personId.toString().startsWith("WB_BS"))) ? true : false);
-		 return (personId.toString().startsWith("BS_WB") ? true : false);
-//		 return ((personId.toString().startsWith("BS_WB"))&&(personId.toString().endsWith("vw")) ? true : false);
-
-		// return true;
+		if (onlyVW){ 
+		return ((personId.toString().startsWith("BS_WB"))&&(personId.toString().endsWith("vw")) ? true : false);
+		}
+		else
+			return (personId.toString().startsWith("BS_WB") ? true : false);
 	}
 
 	@Override
