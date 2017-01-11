@@ -17,22 +17,53 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.signals.router;
+package org.matsim.core.router;
 
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.controler.AbstractModule;
+import java.util.Map;
+
+import javax.inject.*;
+
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
-import org.matsim.core.router.LinkToLinkRoutingGuiceModule.LinkToLinkRouting;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.*;
 
-
-public class LinkToLinkRoutingWithSignalsDataGuiceModule
-    extends AbstractModule
+public class LinkToLinkRouting
+    implements Provider<RoutingModule>
 {
-    @Override
-    public void install()
+    private final String mode;
+
+    @Inject
+    PopulationFactory populationFactory;
+
+    @Inject
+    LeastCostPathCalculatorFactory leastCostPathCalcFactory;
+
+    @Inject
+    Map<String, TravelDisutilityFactory> travelDisutilities;
+
+    @Inject
+    Network network;
+
+    @Inject
+    LinkToLinkTravelTime travelTimes;
+
+    @Inject
+    NetworkTurnInfoBuilder networkTurnInfoBuilder;
+
+
+    public LinkToLinkRouting(String mode)
     {
-        bind(NetworkTurnInfoBuilder.class).to(NetworkWithSignalsTurnInfoBuilder.class);
-        addRoutingModuleBinding(TransportMode.car)
-                .toProvider(new LinkToLinkRouting(TransportMode.car));
+        this.mode = mode;
+    }
+
+
+    @Override
+    public RoutingModule get()
+    {
+        return new LinkToLinkRoutingModule(mode, populationFactory, network,
+                leastCostPathCalcFactory, travelDisutilities.get(mode), travelTimes,
+                networkTurnInfoBuilder);
     }
 }

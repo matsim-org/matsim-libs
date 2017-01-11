@@ -26,16 +26,23 @@ import org.matsim.contrib.signals.*;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
 
 import com.google.inject.Inject;
 
+
 /**
- * @author nagel
+ * Do bind(NetworkTurnInfoBuilder.class).to(NetworkWithSignalsTurnInfoBuilder.class)
+ * if the extended NetworkWithSignalsTurnInfoBuilder (with
+ * SignalsData information) should be used for building turning restriction.
+ * 
+ * Otherwise the default NetworkTurnInfoBuilder is used for link to link routing.
  *
+ * @author nagel, michalm
  */
-class NetworkWithSignalsTurnInfoBuilder
+public class NetworkWithSignalsTurnInfoBuilder
     extends NetworkTurnInfoBuilder
 {
     @Inject
@@ -43,20 +50,24 @@ class NetworkWithSignalsTurnInfoBuilder
     {
         super(scenario);
     }
-    
-    @Override
-	public Map<Id<Link>, List<TurnInfo>> createAllowedTurnInfos() {
-		Map<Id<Link>, List<TurnInfo>> allowedInLinkTurnInfoMap = super.createAllowedTurnInfos();
 
-		final SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(
-		        scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-		
-		if (signalsConfig.isUseSignalSystems()) {
-			SignalSystemsData ssd = ((SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME))
-			        .getSignalSystemsData();
-			Map<Id<Link>, List<TurnInfo>> signalsTurnInfoMap = SignalsTurnInfoBuilder.createSignalsTurnInfos(ssd);
-			mergeTurnInfoMaps(allowedInLinkTurnInfoMap, signalsTurnInfoMap);
-		}
-		return allowedInLinkTurnInfoMap;
-	}
+
+    @Override
+    public Map<Id<Link>, List<TurnInfo>> createAllowedTurnInfos()
+    {
+        Map<Id<Link>, List<TurnInfo>> allowedInLinkTurnInfoMap = super.createAllowedTurnInfos();
+
+        final SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(
+                scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME,
+                SignalSystemsConfigGroup.class);
+
+        if (signalsConfig.isUseSignalSystems()) {
+            SignalSystemsData ssd = ((SignalsData)scenario
+                    .getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData();
+            Map<Id<Link>, List<TurnInfo>> signalsTurnInfoMap = SignalsTurnInfoBuilder
+                    .createSignalsTurnInfos(ssd);
+            mergeTurnInfoMaps(allowedInLinkTurnInfoMap, signalsTurnInfoMap);
+        }
+        return allowedInLinkTurnInfoMap;
+    }
 }
