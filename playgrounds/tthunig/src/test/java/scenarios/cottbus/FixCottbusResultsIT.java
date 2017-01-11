@@ -31,7 +31,6 @@ import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
-import org.matsim.contrib.signals.router.LinkToLinkRoutingWithSignalsDataGuiceModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -42,7 +41,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
-import org.matsim.core.router.LinkToLinkRoutingGuiceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -90,7 +88,6 @@ public class FixCottbusResultsIT {
 		Controler controler = new Controler(scenario);
 		// add missing modules
 		controler.addOverridingModule(new SignalsModule());
-		controler.addOverridingModule(new LinkToLinkRoutingWithSignalsDataGuiceModule());
 
 		TtTotalTravelTime handler = new TtTotalTravelTime();
 		controler.addOverridingModule(new AbstractModule() {			

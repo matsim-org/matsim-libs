@@ -18,7 +18,6 @@ import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
-import org.matsim.contrib.signals.router.LinkToLinkRoutingWithSignalsDataGuiceModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -137,10 +136,6 @@ public class Link2LinkTestRunner {
 			controler.addOverridingModule(new SignalsModule());
 		}
 
-		if (config.controler().isLinkToLinkRoutingEnabled()) {
-			// add the module for link to link routing if enabled
-			controler.addOverridingModule(new LinkToLinkRoutingWithSignalsDataGuiceModule());
-		}
 		new Link2LinkTestNetworkCreator(scenario, runSettings.isUseLanes(), runSettings.isUseSignals()).createNetwork();
 		this.createPersons(scenario);
 

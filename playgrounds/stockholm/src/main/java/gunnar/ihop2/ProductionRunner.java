@@ -6,7 +6,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.router.LinkToLinkRoutingGuiceModule;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 
@@ -142,10 +141,13 @@ public class ProductionRunner {
 			}
 
 			final Controler controler = new Controler(config);
-			if (useLanes) {
-				controler
-						.addOverridingModule(new LinkToLinkRoutingGuiceModule());
-			}
+
+			//LinkToLinkRouting is added automatically when config.controler.linkToLinkRoutingEnabled == true
+	        //michalm, jan'17
+//			if (useLanes) {
+//				controler
+//						.addOverridingModule(new LinkToLinkRoutingGuiceModule());
+//			}
 			if (useRoadPricing) {
 				controler
 						.setModules(new ControlerDefaultsWithRoadPricingModule());

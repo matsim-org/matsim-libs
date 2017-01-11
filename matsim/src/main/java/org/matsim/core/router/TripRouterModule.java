@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
-import org.matsim.core.router.LinkToLinkRoutingGuiceModule.LinkToLinkRouting;
 import org.matsim.pt.router.TransitRouterModule;
 
 

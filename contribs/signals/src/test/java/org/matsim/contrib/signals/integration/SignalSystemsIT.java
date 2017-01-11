@@ -29,7 +29,6 @@ import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
-import org.matsim.contrib.signals.router.LinkToLinkRoutingWithSignalsDataGuiceModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -79,7 +78,6 @@ public class SignalSystemsIT {
 
 		Controler c = new Controler(scenario);
 		c.addOverridingModule(new SignalsModule());
-		c.addOverridingModule(new LinkToLinkRoutingWithSignalsDataGuiceModule());
 		
 		c.getConfig().controler().setDumpDataAtEnd(false);
 		
@@ -167,7 +165,6 @@ public class SignalSystemsIT {
 
 		Controler c = new Controler(scenario);
 		c.addOverridingModule(new SignalsModule());
-		c.addOverridingModule(new LinkToLinkRoutingWithSignalsDataGuiceModule());
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
 		c.getConfig().controler().setCreateGraphs(false);
 		c.getConfig().controler().setDumpDataAtEnd(false);
