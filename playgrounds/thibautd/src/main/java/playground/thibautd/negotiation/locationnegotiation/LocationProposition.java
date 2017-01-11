@@ -24,7 +24,6 @@ import playground.ivt.utils.SoftCache;
 import playground.thibautd.negotiation.framework.Proposition;
 
 import java.util.Collection;
-import java.util.function.DoubleSupplier;
 
 /**
  * @author thibautd

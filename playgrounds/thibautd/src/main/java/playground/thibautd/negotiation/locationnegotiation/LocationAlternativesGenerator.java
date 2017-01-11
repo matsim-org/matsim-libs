@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -40,8 +39,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static org.osgeo.proj4j.parser.Proj4Keyword.a;
-
 /**
  * @author thibautd
  */
@@ -53,8 +50,6 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 	private final LocationAlternativesConfigGroup configGroup;
 	private final VPTree<Coord,ActivityFacility> facilities;
 	private final RandomSeedHelper seeds;
-
-	private final Random random = MatsimRandom.getLocalInstance();
 
 	@Inject
 	public LocationAlternativesGenerator(

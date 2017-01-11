@@ -113,8 +113,8 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 			final Map<Id, PointingAgent> agents,
 			final Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan,
 			final GroupPlans groupPlans) {
-		// Agents all point their prefered feasible plan, feasible meaning that
-		// no co-traveler was already alocated a plan.
+		// Agents all point their preferred feasible plan, feasible meaning that
+		// no co-traveler was already allocated a plan.
 		// If all participants of a joint plan point it, it is selected, as they
 		// represent a blocking coalition for other allocations of the remaining
 		// plans.
@@ -176,8 +176,8 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 		return true;
 	}
 
-	public static interface ConflictSolver {
-		public void attemptToSolveConflicts( Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan );
+	public interface ConflictSolver {
+		void attemptToSolveConflicts( Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan );
 	}
 }
 
