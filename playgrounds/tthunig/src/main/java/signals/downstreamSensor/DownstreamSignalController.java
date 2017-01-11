@@ -23,6 +23,7 @@ package signals.downstreamSensor;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,18 +52,20 @@ public class DownstreamSignalController implements SignalController {
 	private static final Logger log = Logger.getLogger(DownstreamSignalController.class);
 
 	public final static String CONTROLLER_IDENTIFIER = "DownstreamSignalControl";
-	
+
 	public final static class Builder {
-		private final LinkSensorManager sensorManager ;
-		private final SignalsData signalsData ;
-		private final Network network ;
-		public Builder( LinkSensorManager sensorManager, SignalsData signalsData, Network network ) {
+		private final LinkSensorManager sensorManager;
+		private final SignalsData signalsData;
+		private final Network network;
+
+		public Builder(LinkSensorManager sensorManager, SignalsData signalsData, Network network) {
 			this.sensorManager = sensorManager;
 			this.signalsData = signalsData;
 			this.network = network;
 		}
-		public DownstreamSignalController build( SignalSystem signalSystem ) {
-			return new DownstreamSignalController( sensorManager, signalsData, network, signalSystem ) ;
+
+		public DownstreamSignalController build(SignalSystem signalSystem) {
+			return new DownstreamSignalController(sensorManager, signalsData, network, signalSystem);
 		}
 	}
 
@@ -74,8 +77,8 @@ public class DownstreamSignalController implements SignalController {
 	private Node systemNode;
 	private Map<Id<Signal>, Set<Id<Link>>> signal2DownstreamLinkMap = new HashMap<>();
 	private SignalPlan signalPlan;
-	private Set<Id<SignalGroup>> greenSignalGroupsAccordingToPlan = new HashSet<>();
-	private Set<Id<SignalGroup>> greenSignalGroupsInSimulation = new HashSet<>();
+	private Set<Id<SignalGroup>> greenGroupsAccordingToPlan = new HashSet<>();
+	private Set<Id<SignalGroup>> greenGroupsInSimulation = new HashSet<>();
 	private Map<Id<Link>, Integer> linkMaxNoCarsForStorage = new HashMap<>();
 	private Map<Id<Link>, Integer> linkMaxNoCarsForFreeSpeed = new HashMap<>();
 
@@ -94,9 +97,9 @@ public class DownstreamSignalController implements SignalController {
 		for (Link link : network.getLinks().values()) {
 			// maximum number = half of storage capacity
 			linkMaxNoCarsForStorage.put(link.getId(), (int) (link.getLength() / 15));
-			
+
 			// maximum number such that free speed travel time can be reached (when vehicles are distributed uniformly over time)
-			int maxNoCarsForFreeSpeedTT = (int)Math.ceil((link.getLength() / link.getFreespeed()) * (link.getCapacity()/3600));
+			int maxNoCarsForFreeSpeedTT = (int) Math.ceil((link.getLength() / link.getFreespeed()) * (link.getCapacity() / 3600));
 			linkMaxNoCarsForFreeSpeed.put(link.getId(), maxNoCarsForFreeSpeedTT);
 			log.info("setting max number of cars for free speed travel time to " + maxNoCarsForFreeSpeedTT);
 		}
@@ -112,43 +115,54 @@ public class DownstreamSignalController implements SignalController {
 
 	@Override
 	public void updateState(double timeSeconds) {
-		// schedule onsets and droppings of the plan; update greenSignalGroupsAccordingToPlan
-		if (signalPlan.getDroppings(timeSeconds) != null) {
-			for (Id<SignalGroup> groupId : signalPlan.getDroppings(timeSeconds)) {
-				greenSignalGroupsAccordingToPlan.remove(groupId);
-				// schedule dropping only if signal group still shows green
-				if (greenSignalGroupsInSimulation.contains(groupId)) {
-					this.system.scheduleDropping(timeSeconds, groupId);
-					greenSignalGroupsInSimulation.remove(groupId);
+		// schedule onsets and droppings of the plan; update greenGroupsAccordingToPlan
+		{
+			List<Id<SignalGroup>> droppingsNow = signalPlan.getDroppings(timeSeconds);
+			if (droppingsNow != null) {
+				for (Id<SignalGroup> groupId : droppingsNow) {
+					greenGroupsAccordingToPlan.remove(groupId);
+					// schedule dropping only if signal group still shows green, i.e. has not already switched off by the downstream logic
+					if (greenGroupsInSimulation.contains(groupId)) { // i.e. signal group shows green in simulation
+						// switch to red
+						this.system.scheduleDropping(timeSeconds, groupId);
+						greenGroupsInSimulation.remove(groupId);
+						/* greenSignalGroupsInSimulation as data container needed because it also contains requested state changes which are needed for the downstream logic below, see (*). 
+						 * signal group states in simulation would only switch after this updateState method has finished. theresa jan'17 */
+					}
+					// else: keep showing red, i.e. do nothing
 				}
 			}
-		}
-		if (signalPlan.getOnsets(timeSeconds) != null) {
-			for (Id<SignalGroup> groupId : signalPlan.getOnsets(timeSeconds)) {
-				this.system.scheduleOnset(timeSeconds, groupId);
-				greenSignalGroupsAccordingToPlan.add(groupId);
-				greenSignalGroupsInSimulation.add(groupId);
+			if (signalPlan.getOnsets(timeSeconds) != null) {
+				for (Id<SignalGroup> groupId : signalPlan.getOnsets(timeSeconds)) {
+					// switch to green
+					this.system.scheduleOnset(timeSeconds, groupId);
+					greenGroupsAccordingToPlan.add(groupId);
+					greenGroupsInSimulation.add(groupId);
+				}
 			}
 		}
 
-		// for all signal groups that show green/ has to show green (according to the plan)
-		for (Id<SignalGroup> groupId : greenSignalGroupsAccordingToPlan) {
-			if (allDownstreamLinksEmpty(groupId)) {
-				// all downstream links 'empty'
-				if (!greenSignalGroupsInSimulation.contains(groupId)) {
-					// switch to green
-					this.system.scheduleOnset(timeSeconds, groupId);
-					greenSignalGroupsInSimulation.add(groupId);
+		/* downstream logic: switch red if downstream link occupied. (*) */
+		{
+			// check downstream links for all signal groups that show green/ has to show green (according to the plan)
+			for (Id<SignalGroup> groupId : greenGroupsAccordingToPlan) {
+				if (allDownstreamLinksEmpty(groupId)) {
+					// all downstream links 'empty'
+					if (!greenGroupsInSimulation.contains(groupId)) {
+						// switch to green
+						this.system.scheduleOnset(timeSeconds, groupId);
+						greenGroupsInSimulation.add(groupId);
+					}
+					// else: keep showing green, i.e. do nothing
+				} else {
+					// at least one downstream link 'occupied'
+					if (greenGroupsInSimulation.contains(groupId)) {
+						// switch to red
+						this.system.scheduleDropping(timeSeconds, groupId);
+						greenGroupsInSimulation.remove(groupId);
+					}
+					// else: keep showing red, i.e. do nothing
 				}
-				// else: keep showing green, i.e. do nothing
-			} else {
-				// at least one downstream link 'occupied'
-				if (greenSignalGroupsInSimulation.contains(groupId)) {
-					// switch to red
-					this.system.scheduleDropping(timeSeconds, groupId);
-					greenSignalGroupsInSimulation.remove(groupId);
-				}
-				// else: keep showing red, i.e. do nothing
 			}
 		}
 
@@ -164,7 +178,7 @@ public class DownstreamSignalController implements SignalController {
 		for (Id<Signal> signalId : this.signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(this.system.getId()).get(signalGroupId).getSignalIds()) {
 			for (Id<Link> downstreamLinkId : signal2DownstreamLinkMap.get(signalId)) {
 				// TODO test other parameters
-//				if (this.sensorManager.getNumberOfCarsOnLink(downstreamLinkId) > linkMaxNoCars.get(downstreamLinkId)) {
+				// if (this.sensorManager.getNumberOfCarsOnLink(downstreamLinkId) > linkMaxNoCars.get(downstreamLinkId)) {
 				if (this.sensorManager.getNumberOfCarsOnLink(downstreamLinkId) > linkMaxNoCarsForFreeSpeed.get(downstreamLinkId)) {
 					return false;
 				}
