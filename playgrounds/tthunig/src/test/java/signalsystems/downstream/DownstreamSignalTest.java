@@ -46,7 +46,6 @@ import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataFactor
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
@@ -99,14 +98,12 @@ public class DownstreamSignalTest {
 
 		Map<Id<SignalGroup>, Double> signalGreenTimeRatiosWoBottleneck = analyzerWoBottleneck.calculateSignalGreenTimeRatios();
 		Map<Id<SignalGroup>, Double> signalGreenTimeRatiosWBottleneck = analyzerWBottleneck.calculateSignalGreenTimeRatios();
-		
-		Id<SignalGroup> signalGroup = Id.create("SignalGroup2_3", SignalGroup.class);
-		log.info("signal green time ratio: without bottleneck " + signalGreenTimeRatiosWoBottleneck.get(signalGroup) + ", with bottleneck "
-				+ signalGreenTimeRatiosWBottleneck.get(signalGroup));
-		Assert.assertTrue("Signal green time ratio without bottleneck should be higher",
-				signalGreenTimeRatiosWoBottleneck.get(signalGroup) - signalGreenTimeRatiosWBottleneck.get(signalGroup) > 0);
-		Assert.assertEquals("Signal green time ratio without bottleneck should be 59s in 60s", 59/60., signalGreenTimeRatiosWoBottleneck.get(signalGroup), 0.01); // may differ by one percent
-		Assert.assertEquals("Signal green time ratio without bottleneck should be around 15s in 60s", 15/60., signalGreenTimeRatiosWBottleneck.get(signalGroup), 0.05); // may differ by five percent
+
+		Id<SignalGroup> signalGroup = Id.create("Signal2_3", SignalGroup.class);
+		log.info("signal green time ratio: without bottleneck " + signalGreenTimeRatiosWoBottleneck.get(signalGroup) + ", with bottleneck " + signalGreenTimeRatiosWBottleneck.get(signalGroup));
+		Assert.assertTrue("Signal green time ratio without bottleneck should be higher", signalGreenTimeRatiosWoBottleneck.get(signalGroup) - signalGreenTimeRatiosWBottleneck.get(signalGroup) > 0);
+		Assert.assertEquals("Signal green time ratio without bottleneck should be 59s in 60s", 59 / 60., signalGreenTimeRatiosWoBottleneck.get(signalGroup), 0.01); // may differ by one percent
+		Assert.assertEquals("Signal green time ratio without bottleneck should be around 15s in 60s", 15 / 60., signalGreenTimeRatiosWBottleneck.get(signalGroup), 0.05); // may differ by five percent
 	}
 
 	@Test
@@ -117,19 +114,20 @@ public class DownstreamSignalTest {
 		Map<Id<SignalGroup>, Double> signalGreenTimeRatiosWoBottleneck = analyzerWoBottleneck.calculateSignalGreenTimeRatios();
 		Map<Id<SignalGroup>, Double> signalGreenTimeRatiosWBottleneck = analyzerWBottleneck.calculateSignalGreenTimeRatios();
 
-		Id<SignalGroup> signalGroupUp = Id.create("SignalGroup2_5", SignalGroup.class);
-		Id<SignalGroup> signalGroupDown = Id.create("SignalGroup4_5", SignalGroup.class);
-		log.info("signal green time ratios: without bottleneck: up " + signalGreenTimeRatiosWoBottleneck.get(signalGroupUp) + ", down "
-				+ signalGreenTimeRatiosWoBottleneck.get(signalGroupDown) + "; with bottleneck: up " + signalGreenTimeRatiosWBottleneck.get(signalGroupUp) + ", down "
-				+ signalGreenTimeRatiosWBottleneck.get(signalGroupDown));
+		Id<SignalGroup> signalGroupUp = Id.create("Signal2_5", SignalGroup.class);
+		Id<SignalGroup> signalGroupDown = Id.create("Signal4_5", SignalGroup.class);
+		log.info("signal green time ratios: without bottleneck: up " + signalGreenTimeRatiosWoBottleneck.get(signalGroupUp) + ", down " + signalGreenTimeRatiosWoBottleneck.get(signalGroupDown)
+				+ "; with bottleneck: up " + signalGreenTimeRatiosWBottleneck.get(signalGroupUp) + ", down " + signalGreenTimeRatiosWBottleneck.get(signalGroupDown));
 		Assert.assertTrue("Signal green time ratio without bottleneck should be higher than with bottleneck",
 				signalGreenTimeRatiosWoBottleneck.get(signalGroupUp) - signalGreenTimeRatiosWBottleneck.get(signalGroupUp) > 0);
 		Assert.assertTrue("Signal green time ratio without bottleneck should be higher than with bottleneck",
 				signalGreenTimeRatiosWoBottleneck.get(signalGroupDown) - signalGreenTimeRatiosWBottleneck.get(signalGroupDown) > 0);
-		Assert.assertEquals("Signal green time ratio without bottleneck should be 29s in 60s", 29/60., signalGreenTimeRatiosWoBottleneck.get(signalGroupUp), 0.01); // may differ by one percent
-		Assert.assertEquals("Signal green time ratio without bottleneck should be 29s in 60s", 29/60., signalGreenTimeRatiosWoBottleneck.get(signalGroupDown), 0.01); // may differ by one percent
-		Assert.assertEquals("Sum of signal green time ratios of both signals with bottleneck should be around 15s in 60s", 15/60., signalGreenTimeRatiosWBottleneck.get(signalGroupUp) + signalGreenTimeRatiosWBottleneck.get(signalGroupDown), 0.05); // may differ by five percent
-		Assert.assertEquals("Signal green time ratios of both signals should be more or less equal with bottleneck", signalGreenTimeRatiosWBottleneck.get(signalGroupUp), signalGreenTimeRatiosWBottleneck.get(signalGroupDown), 0.05); // may differ by five percent
+		Assert.assertEquals("Signal green time ratio without bottleneck should be 29s in 60s", 29 / 60., signalGreenTimeRatiosWoBottleneck.get(signalGroupUp), 0.01); // may differ by one percent
+		Assert.assertEquals("Signal green time ratio without bottleneck should be 29s in 60s", 29 / 60., signalGreenTimeRatiosWoBottleneck.get(signalGroupDown), 0.01); // may differ by one percent
+		Assert.assertEquals("Sum of signal green time ratios of both signals with bottleneck should be around 15s in 60s", 15 / 60.,
+				signalGreenTimeRatiosWBottleneck.get(signalGroupUp) + signalGreenTimeRatiosWBottleneck.get(signalGroupDown), 0.05); // may differ by five percent
+		Assert.assertEquals("Signal green time ratios of both signals should be more or less equal with bottleneck", signalGreenTimeRatiosWBottleneck.get(signalGroupUp),
+				signalGreenTimeRatiosWBottleneck.get(signalGroupDown), 0.05); // may differ by five percent
 	}
 
 	@Test
@@ -140,19 +138,20 @@ public class DownstreamSignalTest {
 		Map<Id<SignalGroup>, Double> signalGreenTimeRatiosWoBottleneck = analyzerWoBottleneck.calculateSignalGreenTimeRatios();
 		Map<Id<SignalGroup>, Double> signalGreenTimeRatiosWBottleneck = analyzerWBottleneck.calculateSignalGreenTimeRatios();
 
-		Id<SignalGroup> signalGroupWE = Id.create("SignalGroup2_5", SignalGroup.class);
-		Id<SignalGroup> signalGroupSN = Id.create("SignalGroup4_5", SignalGroup.class);
-		log.info("signal green time ratios: without bottleneck: W-E " + signalGreenTimeRatiosWoBottleneck.get(signalGroupWE) + ", S-N "
-				+ signalGreenTimeRatiosWoBottleneck.get(signalGroupSN) + "; with bottleneck: W-E " + signalGreenTimeRatiosWBottleneck.get(signalGroupWE) + ", S-N "
-				+ signalGreenTimeRatiosWBottleneck.get(signalGroupSN));
+		Id<SignalGroup> signalGroupWE = Id.create("Signal2_5", SignalGroup.class);
+		Id<SignalGroup> signalGroupSN = Id.create("Signal4_5", SignalGroup.class);
+		log.info("signal green time ratios: without bottleneck: W-E " + signalGreenTimeRatiosWoBottleneck.get(signalGroupWE) + ", S-N " + signalGreenTimeRatiosWoBottleneck.get(signalGroupSN)
+				+ "; with bottleneck: W-E " + signalGreenTimeRatiosWBottleneck.get(signalGroupWE) + ", S-N " + signalGreenTimeRatiosWBottleneck.get(signalGroupSN));
 		Assert.assertTrue("Signal green time ratio without bottleneck should be higher than with bottleneck for W-E direction",
 				signalGreenTimeRatiosWoBottleneck.get(signalGroupWE) - signalGreenTimeRatiosWBottleneck.get(signalGroupWE) > 0);
 		Assert.assertEquals("Signal green time ratios with and without bottleneck should be equal for S-N direction", signalGreenTimeRatiosWoBottleneck.get(signalGroupSN),
 				signalGreenTimeRatiosWBottleneck.get(signalGroupSN), 0.01); // may differ by one percent
-		Assert.assertEquals("Signal green time ratio without bottleneck should be 29s in 60s for W-E direction", 29/60., signalGreenTimeRatiosWoBottleneck.get(signalGroupWE), 0.01); // may differ by one percent
-		Assert.assertEquals("Signal green time ratio with bottleneck should be around 15s in 60s (one quarter as the bottleneck capacity) for W-E direction", 15/60., signalGreenTimeRatiosWBottleneck.get(signalGroupWE), 0.05); // may differ by five percent
-		Assert.assertEquals("Signal green time ratio with and without bottleneck should be 29s in 60s for S-N direction", 29/60., signalGreenTimeRatiosWoBottleneck.get(signalGroupSN),
-				0.01); // may differ by one percent
+		// may differ by one percent
+		Assert.assertEquals("Signal green time ratio without bottleneck should be 29s in 60s for W-E direction", 29 / 60., signalGreenTimeRatiosWoBottleneck.get(signalGroupWE), 0.01);
+		Assert.assertEquals("Signal green time ratio with bottleneck should be around 15s in 60s (one quarter as the bottleneck capacity) for W-E direction", 15 / 60.,
+				signalGreenTimeRatiosWBottleneck.get(signalGroupWE), 0.05); // may differ by five percent
+		// may differ by one percent
+		Assert.assertEquals("Signal green time ratio with and without bottleneck should be 29s in 60s for S-N direction", 29 / 60., signalGreenTimeRatiosWoBottleneck.get(signalGroupSN), 0.01);
 	}
 
 	private TtSignalAnalysisTool runScenario(ScenarioType scenarioType, double bottleneckCap) {
@@ -171,12 +170,12 @@ public class DownstreamSignalTest {
 			break;
 		case OneDirTwoStreams:
 			createOneDirTwoStreamsNetwork(scenario.getNetwork(), bottleneckCap);
-			createTwoStreamsPopulation(scenario.getPopulation(), Id.createLinkId("1_2"), Id.createLinkId("6_7"), Id.createLinkId("3_4"), Id.createLinkId("6_7"));
+			createTwoStreamPopulation(scenario.getPopulation(), Id.createLinkId("1_2"), Id.createLinkId("6_7"), Id.createLinkId("3_4"), Id.createLinkId("6_7"));
 			createAlterntingSignals(scenario, Id.createLinkId("2_5"), Id.createLinkId("4_5"), Id.createLinkId("5_6"), Id.createLinkId("5_6"));
 			break;
 		case TwoDir:
 			createTwoDirNetwork(scenario.getNetwork(), bottleneckCap);
-			createTwoStreamsPopulation(scenario.getPopulation(), Id.createLinkId("1_2"), Id.createLinkId("6_7"), Id.createLinkId("3_4"), Id.createLinkId("8_9"));
+			createTwoStreamPopulation(scenario.getPopulation(), Id.createLinkId("1_2"), Id.createLinkId("6_7"), Id.createLinkId("3_4"), Id.createLinkId("8_9"));
 			createAlterntingSignals(scenario, Id.createLinkId("2_5"), Id.createLinkId("4_5"), Id.createLinkId("5_6"), Id.createLinkId("5_8"));
 			break;
 		default:
@@ -252,16 +251,16 @@ public class DownstreamSignalTest {
 		config.qsim().setStuckTime(3600);
 		config.qsim().setRemoveStuckVehicles(false);
 
-		// config.qsim().setStartTime(0);
-		// config.qsim().setEndTime(6 * 3600);
+		config.qsim().setStartTime(0);
+		config.qsim().setEndTime(6 * 3600);
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		config.vspExperimental().setWritingOutputEvents(false);
+		config.vspExperimental().setWritingOutputEvents(true);
 		config.planCalcScore().setWriteExperiencedPlans(false);
 		config.controler().setCreateGraphs(false);
 
-		config.controler().setWriteEventsInterval(config.controler().getLastIteration());
+		config.controler().setWriteEventsInterval(1);
 		config.controler().setWritePlansInterval(config.controler().getLastIteration());
 
 		// define activity types
@@ -379,7 +378,7 @@ public class DownstreamSignalTest {
 		}
 	}
 
-	private void createTwoStreamsPopulation(Population pop, Id<Link> fromLinkId1, Id<Link> toLinkId1, Id<Link> fromLinkId2, Id<Link> toLinkId2) {
+	private void createTwoStreamPopulation(Population pop, Id<Link> fromLinkId1, Id<Link> toLinkId1, Id<Link> fromLinkId2, Id<Link> toLinkId2) {
 		createSingleStreamPopulation(pop, fromLinkId1, toLinkId1);
 		createSingleStreamPopulation(pop, fromLinkId2, toLinkId2);
 	}
@@ -405,10 +404,7 @@ public class DownstreamSignalTest {
 		signal.setLinkId(signalLinkId);
 
 		// create a group for the signal (one element group)
-		Id<SignalGroup> signalGroupId = Id.create("SignalGroup" + signalLinkId, SignalGroup.class);
-		SignalGroupData signalGroup = signalGroups.getFactory().createSignalGroupData(signalSystemId, signalGroupId);
-		signalGroup.addSignalId(signal.getId());
-		signalGroups.addSignalGroupData(signalGroup);
+		SignalUtils.createAndAddSignalGroups4Signals(signalGroups, signalSystem);
 
 		// create the signal control
 		SignalSystemControllerData signalSystemControl = conFac.createSignalSystemControllerData(signalSystemId);
@@ -418,7 +414,7 @@ public class DownstreamSignalTest {
 		SignalPlanData signalPlan = SignalUtils.createSignalPlan(conFac, 60, 0, Id.create("SignalPlan1", SignalPlan.class));
 		signalSystemControl.addSignalPlanData(signalPlan);
 		// specify signal group setting for the single signal group
-		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId, 0, 59));
+		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signal.getId(), SignalGroup.class), 0, 59));
 		signalControl.addSignalSystemControllerData(signalSystemControl);
 	}
 
@@ -451,14 +447,7 @@ public class DownstreamSignalTest {
 		signal2.addTurningMoveRestriction(signalToLinkId2);
 
 		// create a group for both signals each (one element groups)
-		Id<SignalGroup> signalGroupId1 = Id.create("SignalGroup" + signalLinkId1, SignalGroup.class);
-		SignalGroupData signalGroup1 = signalGroups.getFactory().createSignalGroupData(signalSystemId, signalGroupId1);
-		signalGroup1.addSignalId(signal1.getId());
-		signalGroups.addSignalGroupData(signalGroup1);
-		Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup" + signalLinkId2, SignalGroup.class);
-		SignalGroupData signalGroup2 = signalGroups.getFactory().createSignalGroupData(signalSystemId, signalGroupId2);
-		signalGroup2.addSignalId(signal2.getId());
-		signalGroups.addSignalGroupData(signalGroup2);
+		SignalUtils.createAndAddSignalGroups4Signals(signalGroups, signalSystem);
 
 		// create the signal control
 		SignalSystemControllerData signalSystemControl = conFac.createSignalSystemControllerData(signalSystemId);
@@ -468,8 +457,8 @@ public class DownstreamSignalTest {
 		SignalPlanData signalPlan = SignalUtils.createSignalPlan(conFac, 60, 0, Id.create("SignalPlan1", SignalPlan.class));
 		signalSystemControl.addSignalPlanData(signalPlan);
 		// specify signal group settings for the single element signal groups
-		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId1, 0, 29));
-		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId2, 30, 59));
+		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signal1.getId(), SignalGroup.class), 0, 29));
+		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signal2.getId(), SignalGroup.class), 30, 59));
 		signalControl.addSignalSystemControllerData(signalSystemControl);
 	}
 
