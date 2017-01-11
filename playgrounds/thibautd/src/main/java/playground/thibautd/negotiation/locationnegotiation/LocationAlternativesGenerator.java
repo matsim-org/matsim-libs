@@ -57,7 +57,8 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 			final Population population,
 			final ActivityFacilities facilities,
 			final LocationHelper locations,
-			final LocationAlternativesConfigGroup configGroup, final RandomSeedHelper seeds ) {
+			final LocationAlternativesConfigGroup configGroup,
+			final RandomSeedHelper seeds ) {
 		this.socialNetwork = socialNetwork;
 		this.population = population;
 		this.locations = locations;
