@@ -294,24 +294,15 @@ public final class RunBraessSimulation {
 	private static Controler prepareController(Scenario scenario) {
 		Config config = scenario.getConfig();
 		Controler controler = new Controler(scenario);
-
-		// add the signals module
-		boolean alwaysSameMobsimSeed = false;
-		SylviaSignalsModule sylviaSignalsModule = new SylviaSignalsModule();
-		sylviaSignalsModule.setAlwaysSameMobsimSeed(alwaysSameMobsimSeed);
-		controler.addOverridingModule(sylviaSignalsModule);
-		
-		// add responsive signal controler if enabled
+	
 		switch (SIGNAL_LOGIC){
+		// add responsive signal controler if enabled
 		case SIMPLE_RESPONSIVE:
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
 					bind(ResponsiveLocalDelayMinimizingSignal.class).asEagerSingleton();
 					addControlerListenerBinding().to(ResponsiveLocalDelayMinimizingSignal.class);
-					// bind tool to write information about signal states for via
-					bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
-					/* asEagerSingleton is necessary to force creation of the SignalEvents2ViaCSVWriter class as it is never used somewhere else. theresa dec'16 */
 				}
 			});
 			break;
@@ -319,7 +310,11 @@ public final class RunBraessSimulation {
 			controler.addOverridingModule(new DownstreamSignalsModule());
 			break;
 		default:
-			// nothing to add for sylvia and planbased signals
+			// add general sylvia signals module (also works when no signals or only planbased signals are used)
+			boolean alwaysSameMobsimSeed = false;
+			SylviaSignalsModule sylviaSignalsModule = new SylviaSignalsModule();
+			sylviaSignalsModule.setAlwaysSameMobsimSeed(alwaysSameMobsimSeed);
+			controler.addOverridingModule(sylviaSignalsModule);
 			break;
 		}
 		
@@ -448,11 +443,16 @@ public final class RunBraessSimulation {
 				SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
 						SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 				if (signalsConfigGroup.isUseSignalSystems()) {
+					// bind tool to analyze signals
 					this.bind(TtSignalAnalysisTool.class).asEagerSingleton();
 					this.addEventHandlerBinding().to(TtSignalAnalysisTool.class);
 					this.addControlerListenerBinding().to(TtSignalAnalysisTool.class);
 					this.bind(TtSignalAnalysisWriter.class);
 					this.addControlerListenerBinding().to(TtSignalAnalysisListener.class);
+					
+					// bind tool to write information about signal states for via
+					bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
+					/* asEagerSingleton is necessary to force creation of the SignalEvents2ViaCSVWriter class as it is never used somewhere else. theresa dec'16 */
 				}
 			}
 		});
