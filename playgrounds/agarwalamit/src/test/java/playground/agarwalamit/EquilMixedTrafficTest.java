@@ -66,6 +66,7 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTime
 public class EquilMixedTrafficTest {
 
     private static final String EQUIL_DIR = "../../examples/scenarios/equil-mixedTraffic/";
+
     @Rule
     public MatsimTestUtils helper = new MatsimTestUtils();
 
@@ -129,7 +130,6 @@ public class EquilMixedTrafficTest {
 
         Assert.assertTrue("The spped of bike should not be less than assigned speed. It is "+bikeSpeed.getFirst(), bikeSpeed.getFirst() > Math.floor(bicycle.getMaximumVelocity()));
         Assert.assertTrue("The spped of car should not be larger than assigned speed. It is "+carSpeed.getFirst(), carSpeed.getFirst() > Math.floor(car.getMaximumVelocity()));
-
     }
 
     /*
@@ -139,7 +139,6 @@ public class EquilMixedTrafficTest {
      */
     @Test
     public void runDifferentVehiclesTypesInTrips() {
-        // TODO: fix and clean it.
         Config config = ConfigUtils.loadConfig(EQUIL_DIR + "/config.xml");
         String outDir = helper.getOutputDirectory();
         config.controler().setOutputDirectory(outDir);
@@ -178,6 +177,8 @@ public class EquilMixedTrafficTest {
                     }
                 }
             }
+            // check
+            Assert.assertFalse("Assign different modes to the legs of person "+ p.getId(), ((Leg)pes.get(1)).getMode().equals(((Leg)pes.get(3)).getMode()));
         }
 
         //
@@ -212,7 +213,6 @@ public class EquilMixedTrafficTest {
 
         Assert.assertTrue("The spped of bike should not be less than assigned speed. It is "+bikeSpeed.getFirst(), bikeSpeed.getFirst() > Math.floor(bicycle.getMaximumVelocity()));
         Assert.assertTrue("The spped of car should not be larger than assigned speed. It is "+carSpeed.getFirst(), carSpeed.getFirst() > Math.floor(car.getMaximumVelocity()));
-
     }
 
     private static class ModalMaxSpeedEventHandler implements VehicleEntersTrafficEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler {
