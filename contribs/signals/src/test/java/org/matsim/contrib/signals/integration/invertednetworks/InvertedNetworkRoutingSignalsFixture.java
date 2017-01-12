@@ -41,6 +41,7 @@ import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.integration.invertednetworks.InvertedNetworkRoutingTestFixture;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 
 /**

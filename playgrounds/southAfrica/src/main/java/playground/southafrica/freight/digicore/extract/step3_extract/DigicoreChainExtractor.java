@@ -276,9 +276,12 @@ public class DigicoreChainExtractor implements Runnable {
 	 * Default coordinate reference systems, both origin and destination, is 
 	 * assumed to be `WGS84'.
 	 * @param file
-	 * @param threshold
+	 * @param outputFolder
+	 * @param thresholdMinor
+	 * @param thresholdActivity
 	 * @param ignitionOn
 	 * @param ignitionOff
+	 * @param crs
 	 * @param threadCounter 
 	 */
 	public DigicoreChainExtractor(File file, File outputFolder, double thresholdMinor, double thresholdActivity, List<String> ignitionOn, List<String> ignitionOff, String crs, Counter threadCounter) {

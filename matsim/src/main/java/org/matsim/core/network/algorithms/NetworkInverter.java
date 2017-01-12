@@ -1,4 +1,4 @@
-package org.matsim.core.router.util;
+package org.matsim.core.network.algorithms;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,12 +55,11 @@ public class NetworkInverter {
 			numberOfNodesGenerated++;
 		}
 
-		NetworkTurnInfoBuilder turnInfoBuilder = new NetworkTurnInfoBuilder();
 		for (Node node : this.originalNetwork.getNodes().values()) {
 			for (Link inLink : node.getInLinks().values()) {
 				for (Link outLink : node.getOutLinks().values()) {
 					List<TurnInfo> turnInfos = this.inLinkTurnInfoMap.get(inLink.getId());
-					TurnInfo ti = turnInfoBuilder.getTurnInfoForOutlinkId(turnInfos, outLink.getId());
+					TurnInfo ti = NetworkTurnInfoBuilder.getTurnInfoForOutlinkId(turnInfos, outLink.getId());
 					if (ti != null){
 						numberOfLinksGenerated = this.createInvertedLink(inLink, outLink, numberOfLinksGenerated, ti.getModes());
 					}

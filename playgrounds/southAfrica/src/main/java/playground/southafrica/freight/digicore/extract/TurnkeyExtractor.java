@@ -26,6 +26,7 @@ package playground.southafrica.freight.digicore.extract;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import playground.southafrica.freight.digicore.extract.step1_split.DigicoreFileSplitter;
 import playground.southafrica.freight.digicore.extract.step2_sort.DigicoreFilesSorter;
@@ -72,7 +73,7 @@ public class TurnkeyExtractor {
 		LOG.info("Executing the turnkey extraction... this may take some time.");
 
 		/* Splitting */
-		String[] splitArgs = {inputFile, outputFolder, "1", "5", "0", "1", "2", "4", "3"};
+		String[] splitArgs = {inputFile, outputFolder, "1", "5", "0", "2", "1", "4", "3"};
 		DigicoreFileSplitter.main(splitArgs);
 		
 		/* Sorting */
@@ -92,11 +93,11 @@ public class TurnkeyExtractor {
 				"40",
 				"18000",
 				"60",
-				"WGS84_SA_Albers"};
+				TransformationFactory.HARTEBEESTHOEK94_LO29};
 		MultiThreadChainExtractor.main(extractArgs);
 		
 		/* Collating */
-		String[] collateArgs = {outputFolder, outputFolder + "digicoreVehicles.xml.gz", "WGS84_SA_Albers", descr, "true"};
+		String[] collateArgs = {outputFolder, outputFolder + "digicoreVehicles.xml.gz", TransformationFactory.HARTEBEESTHOEK94_LO29, descr, "true"};
 		DigicoreVehicleCollator.main(collateArgs);
 		
 		LOG.info("Done with the turnkey extraction.");

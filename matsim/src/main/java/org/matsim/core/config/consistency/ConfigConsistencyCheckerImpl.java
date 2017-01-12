@@ -23,11 +23,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
+import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.ScenarioConfigGroup;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -46,15 +44,15 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 
 	@Override
 	public void checkConsistency(final Config config) {
-		this.checkScenarioFeaturesEnabled(config);
-		this.checkEventsFormatLanesSignals(config);
-		this.checkTravelTimeCalculationRoutingConfiguration(config);
-		this.checkLaneDefinitionRoutingConfiguration(config);
-		this.checkPlanCalcScore(config);
-		this.checkTransit(config);
+		ConfigConsistencyCheckerImpl.checkScenarioFeaturesEnabled(config);
+		ConfigConsistencyCheckerImpl.checkEventsFormatLanesSignals(config);
+		ConfigConsistencyCheckerImpl.checkTravelTimeCalculationRoutingConfiguration(config);
+		ConfigConsistencyCheckerImpl.checkLaneDefinitionRoutingConfiguration(config);
+		ConfigConsistencyCheckerImpl.checkPlanCalcScore(config);
+		ConfigConsistencyCheckerImpl.checkTransit(config);
 	}
 
-	/*package*/ void checkPlanCalcScore(final Config c) {
+	/*package*/ static void checkPlanCalcScore(final Config c) {
 		if (c.planCalcScore().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() > 0) {
 			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingPt is > 0. This values specifies a utility. " +
 					"Typically, this should be a disutility, i.e. have a negative value.");
@@ -88,7 +86,7 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 		}
 	}
 
-	private void checkEventsFormatLanesSignals(final Config c) {
+	private static void checkEventsFormatLanesSignals(final Config c) {
 		if (c.qsim().isUseLanes()) {
 			if (!c.controler().getEventsFileFormats().contains(EventsFileFormat.xml)){
 				log.error("Xml events are not enabled, but lanes and possibly signal systems" +
@@ -98,8 +96,7 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 		}
 	}
 
-	private void checkScenarioFeaturesEnabled(final Config c) {
-		ScenarioConfigGroup scg = c.scenario();
+	private static void checkScenarioFeaturesEnabled(final Config c) {
 		if (! ("qsim".equals(c.controler().getMobsim()) ||  c.qsim() != null)){
 		  log.warn("The signal system implementation is only supported by the org.matsim.ptproject.qsim mobility simulation that is not activated. Please make sure you are using the correct" +
 		  		"mobility simulation. This warning can be ingored if a customized mobility simulation developed outside of org.matsim is used and set correctly.");
@@ -107,7 +104,7 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 	}
 
 
-	private void checkTravelTimeCalculationRoutingConfiguration(final Config config){
+	private static void checkTravelTimeCalculationRoutingConfiguration(final Config config){
 		if (config.controler().isLinkToLinkRoutingEnabled() &&
 				!config.travelTimeCalculator().isCalculateLinkToLinkTravelTimes()){
 			throw new IllegalStateException("LinkToLinkRouting is activated in config and" +
@@ -134,18 +131,22 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 					"available if using the remove stuck vehicles option!");
 		}
 
-
+		if ( config.controler().isLinkToLinkRoutingEnabled() &&
+				config.controler().getRoutingAlgorithmType() != RoutingAlgorithmType.Dijkstra ) {
+			log.warn("We don't know if non-Dijkstra routing works together with LinkToLink routing.");
+		}
+		
 	}
 
 
-	private void checkLaneDefinitionRoutingConfiguration(final Config config) {
+	private static void checkLaneDefinitionRoutingConfiguration(final Config config) {
 		if ((config.qsim().isUseLanes()) &&
 		    !config.controler().isLinkToLinkRoutingEnabled()){
 		  	log.warn("Using lanes without enabling linktolinkrouting might not lead to expected simulation results");
 		}
 	}
 
-	private void checkTransit(final Config config) {
+	private static void checkTransit(final Config config) {
 		if ( config.transit().isUseTransit() && config.transit().getVehiclesFile()==null ) {
 			log.warn("Your are using Transit but have not provided a transit vehicles file. This most likely won't work.");
 		}

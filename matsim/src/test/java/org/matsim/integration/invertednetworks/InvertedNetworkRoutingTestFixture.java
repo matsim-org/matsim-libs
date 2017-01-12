@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.integration.invertednetworks;
+package org.matsim.integration.invertednetworks;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -98,7 +97,6 @@ public class InvertedNetworkRoutingTestFixture {
 		params.setTypicalDuration(24.0 * 3600.0);
 		config.planCalcScore().addActivityParams(params);
 		config.qsim().setUseLanes(doCreateLanes);
-		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(doCreateSignals);
 
 		this.scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		createNetwork();

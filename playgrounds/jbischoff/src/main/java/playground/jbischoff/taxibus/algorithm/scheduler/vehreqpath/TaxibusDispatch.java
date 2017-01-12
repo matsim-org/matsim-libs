@@ -20,6 +20,7 @@
 package playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -57,6 +58,22 @@ public class TaxibusDispatch
         
     }
     
+    public TaxibusDispatch(Vehicle vehicle, VrpPathWithTravelData path)
+    {
+    	this.requests = new LinkedHashSet<>();
+    	this.path = new ArrayList<>();
+        this.vehicle = vehicle;
+        this.path.add(path);
+        this.earliestNextDeparture =  path.getArrivalTime();
+        
+        
+    }
+    public void addRequests(Collection<TaxibusRequest> requests){
+    	this.requests.addAll(requests);
+    }
+    public void addRequest(TaxibusRequest request){
+    	this.requests.add(request);
+    }
     
     public void addRequestAndPath(TaxibusRequest request, VrpPathWithTravelData path){
     	this.requests.add(request);

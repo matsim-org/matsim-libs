@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,33 +16,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.thibautd.negotiation.locationnegotiation;
 
-package org.matsim.contrib.dvrp.data;
+import com.google.inject.Key;
+import org.matsim.core.controler.AbstractModule;
+import playground.thibautd.negotiation.offlinecoalition.CoalitionChoiceIterator;
+import playground.thibautd.negotiation.offlinecoalition.SimpleJointPlanCreator;
 
-import java.util.Comparator;
-
-import org.matsim.contrib.dvrp.schedule.Schedules;
-
-
-public class Vehicles
-{
-    public static final Comparator<Vehicle> T0_COMPARATOR = new Comparator<Vehicle>() {
-        public int compare(Vehicle v1, Vehicle v2)
-        {
-            return Double.compare(v1.getT0(), v2.getT0());
-        }
-    };
-
-    public static final Comparator<Vehicle> T1_COMPARATOR = new Comparator<Vehicle>() {
-        public int compare(Vehicle v1, Vehicle v2)
-        {
-            return Double.compare(v1.getT1(), v2.getT1());
-        }
-    };
-
-
-    public static void changeStartLinkToLastLinkInSchedule(Vehicle vehicle)
-    {
-        vehicle.setStartLink(Schedules.getLastLinkInSchedule(vehicle.getSchedule()));
-    }
+/**
+ * @author thibautd
+ */
+public class LocationJointPlanCreatorModule extends AbstractModule {
+	@Override
+	public void install() {
+		// did not manage to generify that enough in base module...
+		bind( new Key<CoalitionChoiceIterator.JointPlanCreator<LocationProposition>>() {} )
+			.to( new Key<SimpleJointPlanCreator<LocationProposition>>() {} );
+	}
 }

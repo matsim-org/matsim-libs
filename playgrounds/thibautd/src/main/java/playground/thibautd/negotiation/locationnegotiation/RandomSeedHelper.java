@@ -51,6 +51,7 @@ public class RandomSeedHelper {
 		final long seed1 = getSeed( o1 );
 		final long seed2 = getSeed( o2 );
 
+		// symmetric
 		return seed1 ^ seed2;
 	}
 

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,33 +16,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.thibautd.negotiation.offlinecoalition;
 
-package org.matsim.contrib.dvrp.data;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.locationchoice.utils.PlanUtils;
+import org.matsim.contrib.socnetsim.framework.population.JointPlan;
+import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
+import playground.thibautd.negotiation.framework.Proposition;
 
-import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.matsim.contrib.dvrp.schedule.Schedules;
+/**
+ * @author thibautd
+ */
+public class SimpleJointPlanCreator<P extends Proposition> implements CoalitionChoiceIterator.JointPlanCreator<P> {
+	private final JointPlanFactory factory = new JointPlanFactory();
 
+	@Override
+	public JointPlan apply( final P proposition ) {
+		final Map<Id<Person>,Plan> plans = new HashMap<>();
 
-public class Vehicles
-{
-    public static final Comparator<Vehicle> T0_COMPARATOR = new Comparator<Vehicle>() {
-        public int compare(Vehicle v1, Vehicle v2)
-        {
-            return Double.compare(v1.getT0(), v2.getT0());
-        }
-    };
+		for ( Person person : proposition.getGroup() ) {
+			final Plan plan = PlanUtils.createCopy( person.getSelectedPlan() );
+			person.addPlan( plan );
+			plans.put( person.getId() , plan );
 
-    public static final Comparator<Vehicle> T1_COMPARATOR = new Comparator<Vehicle>() {
-        public int compare(Vehicle v1, Vehicle v2)
-        {
-            return Double.compare(v1.getT1(), v2.getT1());
-        }
-    };
+			plan.getCustomAttributes().put( "proposition" , proposition );
+		}
 
-
-    public static void changeStartLinkToLastLinkInSchedule(Vehicle vehicle)
-    {
-        vehicle.setStartLink(Schedules.getLastLinkInSchedule(vehicle.getSchedule()));
-    }
+		return factory.createJointPlan( plans );
+	}
 }

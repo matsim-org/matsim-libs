@@ -24,7 +24,6 @@ import playground.ivt.utils.SoftCache;
 import playground.thibautd.negotiation.framework.Proposition;
 
 import java.util.Collection;
-import java.util.function.DoubleSupplier;
 
 /**
  * @author thibautd
@@ -46,7 +45,6 @@ public class LocationProposition implements Proposition {
 	 * This of course makes a difference only if proposition is still in cache when encountered for the second time...
 	 */
 	private static final SoftCache<LocationProposition,LocationProposition> cache = CACHE ? new SoftCache<>() : null;
-	private double cachedUtility = Double.NEGATIVE_INFINITY;
 
 	private LocationProposition(
 			final Person proposer,
@@ -86,11 +84,6 @@ public class LocationProposition implements Proposition {
 		return type;
 	}
 
-	double getOrUpdateUtility( final DoubleSupplier util ) {
-		if ( cachedUtility == Double.NEGATIVE_INFINITY ) this.cachedUtility = util.getAsDouble();
-		return cachedUtility;
-	}
-
 	@Override
 	public int hashCode() {
 		int hash = proposer.hashCode();
@@ -110,5 +103,15 @@ public class LocationProposition implements Proposition {
 				( (LocationProposition) obj ).facility.equals( facility ) &&
 				( (LocationProposition) obj ).proposed.equals( proposed ) &&
 				( (LocationProposition) obj ).proposer.equals( proposer );
+	}
+
+	@Override
+	public String toString() {
+		return "LocationProposition{" +
+				"proposer=" + proposer +
+				", proposed=" + proposed +
+				", facility=" + facility +
+				", type=" + type +
+				'}';
 	}
 }

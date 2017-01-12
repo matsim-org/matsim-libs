@@ -51,7 +51,7 @@ public class CapeTownConfig {
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
-		acg.setOutputCrs(TransformationFactory.HARTEBEESTHOEK_LO19);
+		acg.setOutputCrs(TransformationFactory.HARTEBEESTHOEK94_LO19);
 		acg.setMeasuringPointsFile(baseFolder + "measuringPoints.xml.gz");
 		
 		//FIXME Why do I need the next two lines?! 
@@ -60,7 +60,7 @@ public class CapeTownConfig {
 		
 		/* Facilities */
 		config.facilities().setInputFile(baseFolder + "facilities_all.xml.gz");
-		config.facilities().setInputCRS(TransformationFactory.HARTEBEESTHOEK_LO19);
+		config.facilities().setInputCRS(TransformationFactory.HARTEBEESTHOEK94_LO19);
 	
 		/* Network */
 		config.network().setInputFile(baseFolder + "network_full.xml.gz");
@@ -68,7 +68,7 @@ public class CapeTownConfig {
 		
 		/* Plans */
 		config.plans().setInputFile(baseFolder + "persons.xml.gz");
-		config.plans().setInputCRS(TransformationFactory.HARTEBEESTHOEK_LO19);
+		config.plans().setInputCRS(TransformationFactory.HARTEBEESTHOEK94_LO19);
 		
 		/* Routed modes */
 		{
@@ -113,7 +113,7 @@ public class CapeTownConfig {
 		config.controler().setLastIteration(0);
 		config.controler().setRunId("za_cpt_" + AccessibilityUtils.getDate());
 		
-		config.global().setCoordinateSystem(TransformationFactory.HARTEBEESTHOEK_LO19);
+		config.global().setCoordinateSystem(TransformationFactory.HARTEBEESTHOEK94_LO19);
 		ConfigUtils.setVspDefaults(config);
 		
 		return config;

@@ -24,12 +24,14 @@ import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
-import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
+import org.matsim.contrib.signals.router.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.*;
+import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import com.google.inject.Binder;
 
 import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
 
@@ -54,11 +56,6 @@ public class DgController {
 		Controler c = new Controler( scenario );
 		c.addOverridingModule(new OTFVisFileWriterModule());
 		
-		// add the module for link to link routing if enabled
-		if (config.controler().isLinkToLinkRoutingEnabled()) {
-			c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
-		}			
-
 		// add the signals module
 		// note: This will check (in DgSylviaSignalModelFactory) if the controllerIdentifier equals sylvia..., otherwise the default
 		// (fixed time) signal controller will be used.  kai & theresa, oct'14

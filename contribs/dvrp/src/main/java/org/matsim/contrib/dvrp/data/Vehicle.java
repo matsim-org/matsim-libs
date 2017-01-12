@@ -32,6 +32,9 @@ public interface Vehicle
     extends Identifiable<Vehicle>
 {
     Link getStartLink();
+    
+    
+    void setStartLink(Link link);
 
 
     double getCapacity();

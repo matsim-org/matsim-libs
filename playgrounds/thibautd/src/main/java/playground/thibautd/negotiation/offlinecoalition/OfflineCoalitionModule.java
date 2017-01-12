@@ -16,33 +16,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.thibautd.negotiation.offlinecoalition;
 
-package org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator;
-
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.RunConfigurableQNetworkFactoryExample;
+import com.google.inject.Key;
+import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
+import com.google.inject.util.Types;
+import org.matsim.contrib.socnetsim.framework.replanning.selectors.LogitWeight;
+import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.gbl.MatsimRandom;
+import playground.thibautd.negotiation.framework.Proposition;
 
 /**
- * Calculates the maximum speed a vehicle can travel with on a specific link 
- * at a specific time in a specific vehicle. If the speed should be depending
- * on the person driving it, use vehicle.getDriver(). But remember that not
- * every vehicle must have a Person as a driver.
- * <br/><br/>
- * Tutorial examples:<ul>
- * <li> {@link RunConfigurableQNetworkFactoryExample}
- * </ul>
- * 
- * @author mrieser / Senozon AG
+ * @author thibautd
  */
-public interface LinkSpeedCalculator {
+public class OfflineCoalitionModule extends AbstractModule {
+	private final Class<? extends Proposition> propositionClass;
 
-	/**
-	 * @param vehicle
-	 * @param link
-	 * @param time
-	 * @return the maximum speed the vehicle can travel on the given link.
-	 */
-	public double getMaximumVelocity(QVehicle vehicle, Link link, double time);
+	public OfflineCoalitionModule( final Class<? extends Proposition> propositionClass ) {
+		this.propositionClass = propositionClass;
+	}
 
+
+	@Override
+	public void install() {
+		bind( Key.get( Types.newParameterizedType( CoalitionChoiceIterator.class , propositionClass ) ) );
+	}
+
+	@Provides
+	public CoalitionSelector createSelector( final OfflineCoalitionConfigGroup conf ) {
+		return new CoalitionSelector(
+				new LogitWeight(
+						MatsimRandom.getLocalInstance(),
+						conf.getLogitScale() ) );
+	}
 }

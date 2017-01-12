@@ -1,7 +1,6 @@
 package gunnar.ihop2.integration;
 
 import org.matsim.contrib.signals.controler.SignalsModule;
-import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -30,7 +29,6 @@ public class PlainRunner {
 
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new SignalsModule()); // TODO NEEDED?
-		controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 
 		controler.run();
 

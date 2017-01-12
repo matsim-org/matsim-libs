@@ -23,16 +23,13 @@
 package org.matsim.core.router;
 
 import com.google.inject.Key;
-import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
 import org.matsim.pt.router.TransitRouterModule;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.Map;
 
 public class TripRouterModule extends AbstractModule {
 
@@ -55,8 +52,14 @@ public class TripRouterModule extends AbstractModule {
         for (String mode : routeConfigGroup.getTeleportedModeSpeeds().keySet()) {
             addRoutingModuleBinding(mode).toProvider(new BeelineTeleportationRouting(getConfig().plansCalcRoute().getModeRoutingParams().get(mode)));
         }
+        
+        boolean linkToLinkRouting = getConfig().controler().isLinkToLinkRoutingEnabled();
+        if (linkToLinkRouting) {
+            bind(NetworkTurnInfoBuilder.class);
+        }
         for (String mode : routeConfigGroup.getNetworkModes()) {
-            addRoutingModuleBinding(mode).toProvider(new NetworkRouting(mode));
+            addRoutingModuleBinding(mode).toProvider(linkToLinkRouting ? //
+                    new LinkToLinkRouting(mode) : new NetworkRouting(mode));
         }
         if (getConfig().transit().isUseTransit()) {
             for (String mode : getConfig().transit().getTransitModes()) {
@@ -64,7 +67,5 @@ public class TripRouterModule extends AbstractModule {
             }
             addRoutingModuleBinding(TransportMode.transit_walk).to(Key.get(RoutingModule.class, Names.named(TransportMode.walk)));
         }
-
     }
-
 }

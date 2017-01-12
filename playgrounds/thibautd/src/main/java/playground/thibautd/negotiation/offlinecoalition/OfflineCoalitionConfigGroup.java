@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,33 +16,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.thibautd.negotiation.offlinecoalition;
 
-package org.matsim.contrib.dvrp.data;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
-import java.util.Comparator;
+/**
+ * @author thibautd
+ */
+public class OfflineCoalitionConfigGroup extends ReflectiveConfigGroup {
+	private static final String GROUP_NAME = "offlineCoalition";
 
-import org.matsim.contrib.dvrp.schedule.Schedules;
+	private double logitScale = 1;
+	private int iterations = 10;
 
+	public OfflineCoalitionConfigGroup() {
+		super( GROUP_NAME );
+	}
 
-public class Vehicles
-{
-    public static final Comparator<Vehicle> T0_COMPARATOR = new Comparator<Vehicle>() {
-        public int compare(Vehicle v1, Vehicle v2)
-        {
-            return Double.compare(v1.getT0(), v2.getT0());
-        }
-    };
+	@StringGetter("logitScale")
+	public double getLogitScale() {
+		return logitScale;
+	}
 
-    public static final Comparator<Vehicle> T1_COMPARATOR = new Comparator<Vehicle>() {
-        public int compare(Vehicle v1, Vehicle v2)
-        {
-            return Double.compare(v1.getT1(), v2.getT1());
-        }
-    };
+	@StringSetter("logitScale")
+	public void setLogitScale( final double logitScale ) {
+		this.logitScale = logitScale;
+	}
 
+	@StringGetter("iterations")
+	public int getIterations() {
+		return iterations;
+	}
 
-    public static void changeStartLinkToLastLinkInSchedule(Vehicle vehicle)
-    {
-        vehicle.setStartLink(Schedules.getLastLinkInSchedule(vehicle.getSchedule()));
-    }
+	@StringSetter("iterations")
+	public void setIterations( final int iterations ) {
+		this.iterations = iterations;
+	}
 }

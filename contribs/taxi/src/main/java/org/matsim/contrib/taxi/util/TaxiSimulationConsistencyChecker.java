@@ -37,12 +37,12 @@ public class TaxiSimulationConsistencyChecker
     private final TaxiData taxiData;
     private final TaxiConfigGroup tcg;
 
+
     @Inject
     public TaxiSimulationConsistencyChecker(TaxiData taxiData, Config config)
     {
         this.taxiData = taxiData;
-        this.tcg = (TaxiConfigGroup) config.getModule(TaxiConfigGroup.GROUP_NAME);
-        
+        this.tcg = TaxiConfigGroup.get(config);
     }
 
 
@@ -50,11 +50,15 @@ public class TaxiSimulationConsistencyChecker
     {
         for (TaxiRequest r : taxiData.getTaxiRequests().values()) {
             if (r.getStatus() != TaxiRequestStatus.PERFORMED) {
-            	if (tcg.isBreakSimulationIfNotAllRequestsServed()){
-                throw new IllegalStateException();
-            	}else {
-            		Logger.getLogger(getClass()).warn("Taxi request not performed. Request time:\t"+Time.writeTime(r.getT0()) +"\tPassenger:\t"+r.getPassenger().getId() );
-            	}
+                if (tcg.isBreakSimulationIfNotAllRequestsServed()) {
+                    throw new IllegalStateException();
+                }
+                else {
+                    Logger.getLogger(getClass())
+                            .warn("Taxi request not performed. Request time:\t"
+                                    + Time.writeTime(r.getT0()) + "\tPassenger:\t"
+                                    + r.getPassenger().getId());
+                }
             }
         }
     }

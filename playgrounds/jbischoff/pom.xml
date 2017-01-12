@@ -84,5 +84,10 @@
 	<artifactId>json-simple</artifactId>
 	<version>1.1.1</version>
 </dependency>
+<dependency>
+   <groupId>com.graphhopper</groupId>
+   <artifactId>jsprit-core</artifactId>
+   <version>1.7-RC1</version>
+</dependency>
   </dependencies>
 </project>

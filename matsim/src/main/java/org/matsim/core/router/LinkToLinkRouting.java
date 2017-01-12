@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +17,53 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data;
+package org.matsim.core.router;
 
-import java.util.Comparator;
+import java.util.Map;
 
-import org.matsim.contrib.dvrp.schedule.Schedules;
+import javax.inject.*;
 
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.*;
 
-public class Vehicles
+public class LinkToLinkRouting
+    implements Provider<RoutingModule>
 {
-    public static final Comparator<Vehicle> T0_COMPARATOR = new Comparator<Vehicle>() {
-        public int compare(Vehicle v1, Vehicle v2)
-        {
-            return Double.compare(v1.getT0(), v2.getT0());
-        }
-    };
+    private final String mode;
 
-    public static final Comparator<Vehicle> T1_COMPARATOR = new Comparator<Vehicle>() {
-        public int compare(Vehicle v1, Vehicle v2)
-        {
-            return Double.compare(v1.getT1(), v2.getT1());
-        }
-    };
+    @Inject
+    PopulationFactory populationFactory;
+
+    @Inject
+    LeastCostPathCalculatorFactory leastCostPathCalcFactory;
+
+    @Inject
+    Map<String, TravelDisutilityFactory> travelDisutilities;
+
+    @Inject
+    Network network;
+
+    @Inject
+    LinkToLinkTravelTime travelTimes;
+
+    @Inject
+    NetworkTurnInfoBuilder networkTurnInfoBuilder;
 
 
-    public static void changeStartLinkToLastLinkInSchedule(Vehicle vehicle)
+    public LinkToLinkRouting(String mode)
     {
-        vehicle.setStartLink(Schedules.getLastLinkInSchedule(vehicle.getSchedule()));
+        this.mode = mode;
+    }
+
+
+    @Override
+    public RoutingModule get()
+    {
+        return new LinkToLinkRoutingModule(mode, populationFactory, network,
+                leastCostPathCalcFactory, travelDisutilities.get(mode), travelTimes,
+                networkTurnInfoBuilder);
     }
 }
