@@ -56,8 +56,9 @@ public class GroupPlansWriter implements AutoCloseable {
 
 	public void writePlans( final GroupPlans plans ) {
 		iteration.incrementAndGet();
+		log.info( "write joint results for iteration # "+iteration );
 		try {
-			for ( Plan plan : plans.getIndividualPlans() ) {
+			for ( Plan plan : plans.getAllIndividualPlans() ) {
 				counter.incCounter();
 				final LocationProposition proposition = (LocationProposition) plan.getCustomAttributes().get( "proposition" );
 				writer.newLine();
@@ -70,6 +71,7 @@ public class GroupPlansWriter implements AutoCloseable {
 										locations.getHomeLocation( plan.getPerson().getId() ).getCoord(),
 										proposition.getFacility().getCoord() ) );
 			}
+			counter.printCounter();
 			writer.flush();
 		}
 		catch ( IOException e ) {
