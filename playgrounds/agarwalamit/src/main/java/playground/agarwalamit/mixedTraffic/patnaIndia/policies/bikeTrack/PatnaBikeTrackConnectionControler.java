@@ -74,7 +74,7 @@ public class PatnaBikeTrackConnectionControler {
 
 	private static int numberOfConnectors = 499;
 	private static int updateConnectorsAfterIteration = 2;
-	private static double reduceLinkLengthBy = 1.;
+	private static double reduceLinkLengthBy = PatnaUtils.BIKE_TRACK_LEGNTH_REDUCTION_FACTOR;
 	private static boolean useBikeTravelTime = true;
 
 	private static boolean modeChoiceUntilLastIteration = true;
