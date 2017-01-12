@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.fare.StageContainer;
 import org.matsim.contrib.minibus.fare.StageContainerHandler;
-import org.matsim.contrib.minibus.fare.TicketMachine;
+import org.matsim.contrib.minibus.fare.TicketMachineI;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -40,10 +40,10 @@ public final class ScorePlansHandler implements StageContainerHandler, OperatorC
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(ScorePlansHandler.class);
 	
-	private final TicketMachine ticketMachine;
+	private final TicketMachineI ticketMachine;
 	private Map<Id<Vehicle>, ScoreContainer> vehicleId2ScoreMap = new ConcurrentHashMap<>();
 
-	public ScorePlansHandler(TicketMachine ticketMachine){
+	public ScorePlansHandler(TicketMachineI ticketMachine){
 		this.ticketMachine = ticketMachine;
 	}
 	

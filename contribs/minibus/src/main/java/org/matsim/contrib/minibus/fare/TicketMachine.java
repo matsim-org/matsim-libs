@@ -25,7 +25,7 @@ package org.matsim.contrib.minibus.fare;
  * @author aneumann
  *
  */
-public final class TicketMachine {
+public final class TicketMachine implements TicketMachineI {
 	
 	private final double earningsPerBoardingPassenger;
 	private final double earningsPerMeterAndPassenger;
@@ -35,6 +35,10 @@ public final class TicketMachine {
 		this.earningsPerMeterAndPassenger = earningsPerMeterAndPassenger;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.minibus.fare.TicketMachineI#getFare(org.matsim.contrib.minibus.fare.StageContainer)
+	 */
+	@Override
 	public double getFare(StageContainer stageContainer) {
 		return this.earningsPerBoardingPassenger + this.earningsPerMeterAndPassenger * stageContainer.getDistanceTravelledInMeter();
 	}

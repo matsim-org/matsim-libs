@@ -22,7 +22,7 @@ package org.matsim.contrib.minibus.scoring;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.fare.StageContainer;
-import org.matsim.contrib.minibus.fare.TicketMachine;
+import org.matsim.contrib.minibus.fare.TicketMachineI;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -37,14 +37,14 @@ public final class ScoreContainer {
 	private final static Logger log = Logger.getLogger(ScoreContainer.class);
 
 	private final Id<Vehicle> vehicleId;
-	private final TicketMachine ticketMachine;
+	private final TicketMachineI ticketMachine;
 	private boolean isFirstTour = true;
 	
 	private int servedTrips = 0;
 	private double costs = 0;
 	private double earnings = 0;
 	
-	public ScoreContainer(Id<Vehicle> vehicleId, TicketMachine ticketMachine) {
+	public ScoreContainer(Id<Vehicle> vehicleId, TicketMachineI ticketMachine) {
 		this.vehicleId = vehicleId;
 		this.ticketMachine = ticketMachine;
 	}

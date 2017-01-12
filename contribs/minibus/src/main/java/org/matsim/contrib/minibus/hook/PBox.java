@@ -25,6 +25,7 @@ import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants.OperatorState;
 import org.matsim.contrib.minibus.fare.StageContainerCreator;
 import org.matsim.contrib.minibus.fare.TicketMachine;
+import org.matsim.contrib.minibus.fare.TicketMachineI;
 import org.matsim.contrib.minibus.operator.*;
 import org.matsim.contrib.minibus.replanning.PStrategyManager;
 import org.matsim.contrib.minibus.schedule.PStopsFactory;
@@ -73,11 +74,15 @@ final class PBox implements Operators {
 	private final WelfareAnalyzer welfareAnalyzer;
 	private final WelfareStatsContainer welfareStats;
 
-	private final TicketMachine ticketMachine;
+	private final TicketMachineI ticketMachine;
 
-    PBox(PConfigGroup pConfig) {
+	/**
+	 * Constructor that allows to set the ticketMachine.  Deliberately in constructor and not as setter to keep the variable final.  Might be
+	 * replaced by a builder and/or guice at some later point in time.  But stay with "direct" injection for the time being.  kai, jan'17
+	 */
+	PBox(PConfigGroup pConfig, TicketMachineI ticketMachine) {
 		this.pConfig = pConfig;
-		this.ticketMachine = new TicketMachine(this.pConfig.getEarningsPerBoardingPassenger(), this.pConfig.getEarningsPerKilometerAndPassenger() / 1000.0);
+		this.ticketMachine = ticketMachine ;
 		this.scorePlansHandler = new ScorePlansHandler(this.ticketMachine);
 		this.stageCollectorHandler = new StageContainerCreator(this.pConfig.getPIdentifier());
 		this.operatorCostCollectorHandler = new OperatorCostCollectorHandler(this.pConfig.getPIdentifier(), this.pConfig.getCostPerVehicleAndDay(), this.pConfig.getCostPerKilometer() / 1000.0, this.pConfig.getCostPerHour() / 3600.0);
