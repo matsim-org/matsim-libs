@@ -128,7 +128,7 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 				groupPlans.addIndividualPlan( pointedPlan );
 
 				final Id id = entry.getKey();
-				markJointPlansAsInfeasible( id , agents , recordsPerJointPlan );
+				markJointPlansAsInfeasible( id , agents , recordsPerJointPlan , jointPlans );
 				return;
 			}
 			else if ( areAllPlansPointed( recordsPerJointPlan.get( pointedJointPlan ) ) ) {
@@ -136,7 +136,7 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 				groupPlans.addJointPlan( pointedJointPlan );
 
 				for ( Id id : pointedJointPlan.getIndividualPlans().keySet() ) {
-					markJointPlansAsInfeasible( id , agents , recordsPerJointPlan );
+					markJointPlansAsInfeasible( id , agents , recordsPerJointPlan , jointPlans );
 				}
 				return;
 			}
@@ -149,17 +149,22 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 	private static void markJointPlansAsInfeasible(
 			final Id id,
 			final Map<Id, PointingAgent> agents,
-			final Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan) {
+			final Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan,
+			final JointPlans jointPlans ) {
 		final Iterator<Map.Entry<JointPlan, Collection<PlanRecord>>> it =
 			recordsPerJointPlan.entrySet().iterator();
-		while ( it.hasNext() ) {
-			final Map.Entry<JointPlan, Collection<PlanRecord>> jpEntry = it.next();
-			if ( !jpEntry.getKey().getIndividualPlans().containsKey( id ) ) continue;
 
-			for ( PlanRecord record : jpEntry.getValue() ) {
+		final PointingAgent agent = agents.get( id );
+
+		for ( PlanRecord plan : agent.getRecords() ) {
+			final JointPlan jointPlan = jointPlans.getJointPlan( plan.getPlan() );
+			if ( jointPlan == null ) continue;
+
+			// could already be handled
+			if ( !recordsPerJointPlan.containsKey( jointPlan ) ) continue;
+			for ( PlanRecord record : recordsPerJointPlan.remove( jointPlan ) ) {
 				record.setInfeasible();
 			}
-			it.remove();
 		}
 
 		agents.remove( id );
