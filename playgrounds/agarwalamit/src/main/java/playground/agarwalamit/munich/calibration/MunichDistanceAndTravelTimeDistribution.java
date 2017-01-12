@@ -67,8 +67,7 @@ public class MunichDistanceAndTravelTimeDistribution {
 		int lastItr = LoadMyScenarios.getLastIteration(configFile);
 		String eventsFile = runDir+run+"/ITERS/it."+lastItr+"/"+lastItr+".events.xml.gz";
 		
-		LegModeTripTimeDistributionAnalyzer lmttd = new LegModeTripTimeDistributionAnalyzer();
-		lmttd.init(eventsFile);
+		LegModeTripTimeDistributionAnalyzer lmttd = new LegModeTripTimeDistributionAnalyzer(eventsFile);
 		lmttd.preProcessData();
 		lmttd.postProcessData();
 		lmttd.writeResults(runDir+"/analysis/legModeDistributions/"+run);

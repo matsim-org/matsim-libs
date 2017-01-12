@@ -19,14 +19,7 @@
 package playground.agarwalamit.analysis.tripTime;
 
 import java.io.BufferedWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
+import java.util.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -35,7 +28,10 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
-
+import playground.agarwalamit.utils.FileUtils;
+import playground.agarwalamit.utils.LoadMyScenarios;
+import playground.agarwalamit.utils.PersonFilter;
+import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
@@ -44,22 +40,45 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
 public class LegModeTripTimeDistributionAnalyzer extends AbstractAnalysisModule {
 
 	private final List<Integer> timeClasses = new ArrayList<>();
-	private SortedSet<String> usedModes = new TreeSet<>();
+	private final SortedSet<String> usedModes = new TreeSet<>();
 	private static final Logger LOG = Logger.getLogger(LegModeTripTimeDistributionAnalyzer.class);
 
 	private final SortedMap<String, SortedMap<Integer, Integer>> mode2timeClass2LegCount = new TreeMap<>();
-	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2tripTimes = new TreeMap<>();
+	private final SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2tripTimes = new TreeMap<>();
 	private final ModalTripTravelTimeHandler lmtth;
-	private String eventsFile;
+	private final String eventsFile;
+	private final String userGroup;
+	private final PersonFilter personFilter;
 
-	public LegModeTripTimeDistributionAnalyzer() {
+	public LegModeTripTimeDistributionAnalyzer(final String eventsFile, final String userGroup, final PersonFilter personFilter) {
 		super(LegModeTripTimeDistributionAnalyzer.class.getSimpleName());
 		this.lmtth = new ModalTripTravelTimeHandler();
+		this.eventsFile = eventsFile;
 		LOG.info("enabled");
+
+		this.userGroup = userGroup;
+		this.personFilter = personFilter;
+		if(this.userGroup != null && this.personFilter != null) LOG.info("Results will include persons from "+this.userGroup+" only.");
 	}
 
-	public void init(final String eventsFile){
-		this.eventsFile = eventsFile;
+	public LegModeTripTimeDistributionAnalyzer(final String eventsFile) {
+		this(eventsFile, null, null);
+	}
+
+	public static void main(String[] args) {
+		String runDir = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run10/policies/";
+		String [] runs = {"bau","ei","ci","eci","10ei"};
+
+		for(String run:runs){
+			String configFile = runDir+run+"/output_config.xml.gz";
+			int lastItr = LoadMyScenarios.getLastIteration(configFile);
+			String eventsFile = runDir+run+"/ITERS/it."+lastItr+"/"+lastItr+".events.xml.gz";
+
+			LegModeTripTimeDistributionAnalyzer lmttd = new LegModeTripTimeDistributionAnalyzer(eventsFile);
+			lmttd.preProcessData();
+			lmttd.postProcessData();
+			lmttd.writeResults(runDir+"/analysis/legModeDistributions/"+run+"_it."+lastItr+"_");
+		}
 	}
 
 	@Override
@@ -74,9 +93,10 @@ public class LegModeTripTimeDistributionAnalyzer extends AbstractAnalysisModule 
 		manager.addHandler(lmtth);
 		reader.readFile(eventsFile);
 		
-		this.mode2PersonId2tripTimes = lmtth.getLegMode2PesonId2TripTimes();
+		this.mode2PersonId2tripTimes.putAll(lmtth.getLegMode2PesonId2TripTimes());
 		initializeTimeClasses();
-		this.usedModes = new TreeSet<>(this.mode2PersonId2tripTimes.keySet());
+		this.usedModes.addAll(this.mode2PersonId2tripTimes.keySet());
+
 		LOG.info("The following transport modes are considered: " + this.usedModes);
 
 		for(String mode:this.usedModes){
@@ -94,22 +114,32 @@ public class LegModeTripTimeDistributionAnalyzer extends AbstractAnalysisModule 
 	}
 
 	private void calculateMode2TimeClass2LegCount() {
-		for(String mode : mode2PersonId2tripTimes.keySet()){
-			for(Id<Person> personId :mode2PersonId2tripTimes.get(mode).keySet()){
-				for(int index=0;index<mode2PersonId2tripTimes.get(mode).get(personId).size();index++){
-					double tripTime =mode2PersonId2tripTimes.get(mode).get(personId).get(index) ;
-					for(int i=0;i<this.timeClasses.size()-1;i++){
-						if(tripTime > this.timeClasses.get(i) && tripTime <= this.timeClasses.get(i + 1)){
-							SortedMap<Integer, Integer> timeClass2NoOfLegs = this.mode2timeClass2LegCount.get(mode);	
-							int oldLeg = timeClass2NoOfLegs.get(this.timeClasses.get(i+1));
-							int newLeg = oldLeg+1;
-							timeClass2NoOfLegs.put(this.timeClasses.get(i+1), newLeg);
-						} 
+		for(String mode : this.usedModes){
+			SortedMap<Integer, Integer> timeClass2NoOfLegs = this.mode2timeClass2LegCount.get(mode);
+			for(int i=0;i<this.timeClasses.size()-1;i++){
+				int legCount = 0;
+
+				for(Id<Person> personId :mode2PersonId2tripTimes.get(mode).keySet()){
+					if (this.userGroup!=null && this.personFilter!= null){
+						for(double tripTime : mode2PersonId2tripTimes.get(mode).get(personId)){
+							if(tripTime > this.timeClasses.get(i) && tripTime <= this.timeClasses.get(i + 1)){
+								legCount++;
+							}
+						}
+					} else {
+						for(double tripTime : mode2PersonId2tripTimes.get(mode).get(personId)){
+							if(tripTime > this.timeClasses.get(i) && tripTime <= this.timeClasses.get(i + 1)){
+								legCount++;
+							}
+						}
 					}
+
 				}
+				timeClass2NoOfLegs.put(this.timeClasses.get(i+1), legCount);
 			}
 		}
 	}
+
 	@Override
 	public void writeResults(String outputFolder) {
 		String outFile = outputFolder + ".legModeTripTimeDistribution.txt";
