@@ -70,6 +70,7 @@ public class GroupPlansWriter implements AutoCloseable {
 										locations.getHomeLocation( plan.getPerson().getId() ).getCoord(),
 										proposition.getFacility().getCoord() ) );
 			}
+			writer.flush();
 		}
 		catch ( IOException e ) {
 			throw new UncheckedIOException( e );
