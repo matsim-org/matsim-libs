@@ -164,7 +164,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
             StatType theStatType = entry.getKey();  // currently only one type ;
             log.warn("statType=" + theStatType);
             Databins<String> databins = entry.getValue();
-            objectiveFnValue = objectiveFunctionEvaluator.getObjectiveFunctionValue(entry.getValue(), this.refStatsContainer.get(theStatType));
+            objectiveFnValue = objectiveFunctionEvaluator.getObjectiveFunctionValue(this.refStatsContainer.get(theStatType), entry.getValue());
         }
         return objectiveFnValue;
     }
