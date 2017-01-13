@@ -52,7 +52,7 @@ import org.matsim.contrib.signals.model.SignalPlan;
 import org.xml.sax.SAXException;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.signalsystems.sylvia.model.DgSylviaController;
+import playground.dgrether.signalsystems.sylvia.model.SylviaSignalController;
 import playground.dgrether.signalsystems.utils.DgSignalGroupSettingsDataOnsetComparator;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 
@@ -142,7 +142,7 @@ public class DgSylviaPreprocessData {
 		for (SignalSystemControllerData  controllerData: controlData.getSignalSystemControllerDataBySystemId().values()){
 			SignalSystemControllerData newControllerData = sylviaSignalControlData.getFactory().createSignalSystemControllerData(controllerData.getSignalSystemId());
 			sylviaSignalControlData.addSignalSystemControllerData(newControllerData);
-			newControllerData.setControllerIdentifier(DgSylviaController.CONTROLLER_IDENTIFIER);
+			newControllerData.setControllerIdentifier(SylviaSignalController.CONTROLLER_IDENTIFIER);
 //			log.debug("");
 //			log.debug("system: " + controllerData.getSignalSystemId());
 			for (SignalPlanData signalPlan : controllerData.getSignalPlanData().values()) {

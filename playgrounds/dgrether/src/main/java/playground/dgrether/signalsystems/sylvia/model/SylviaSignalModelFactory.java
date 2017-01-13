@@ -36,26 +36,27 @@ import com.google.inject.Inject;
 import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
-import playground.dgrether.signalsystems.sylvia.model.DgSylviaController.Builder;
+import playground.dgrether.signalsystems.sylvia.model.SylviaSignalController.Builder;
 
 
 /**
  * @author dgrether
+ * @author tthunig
  *
  */
-public final class DgSylviaSignalModelFactory implements SignalModelFactory {
+public final class SylviaSignalModelFactory implements SignalModelFactory {
 
 	
-	private static final Logger log = Logger.getLogger(DgSylviaSignalModelFactory.class);
+	private static final Logger log = Logger.getLogger(SylviaSignalModelFactory.class);
 	
 	private SignalModelFactory delegate = new DefaultSignalModelFactory();
 	
 	private Builder builder;
 
 	@Inject 
-	public DgSylviaSignalModelFactory(LinkSensorManager sensorManager, DgSylviaConfig sylviaConfig, Scenario scenario) {
+	public SylviaSignalModelFactory(LinkSensorManager sensorManager, DgSylviaConfig sylviaConfig, Scenario scenario) {
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-		this.builder = new DgSylviaController.Builder(sylviaConfig, sensorManager, signalsData);
+		this.builder = new SylviaSignalController.Builder(sylviaConfig, sensorManager, signalsData);
 	}
 
 	@Override
@@ -65,8 +66,8 @@ public final class DgSylviaSignalModelFactory implements SignalModelFactory {
 
 	@Override
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
-		if (DgSylviaController.CONTROLLER_IDENTIFIER.equals(controllerIdentifier)){
-			log.info("Creating " + DgSylviaController.CONTROLLER_IDENTIFIER);
+		if (SylviaSignalController.CONTROLLER_IDENTIFIER.equals(controllerIdentifier)){
+			log.info("Creating " + SylviaSignalController.CONTROLLER_IDENTIFIER);
 			return builder.build(signalSystem);
 		}
 		return this.delegate.createSignalSystemController(controllerIdentifier, signalSystem);

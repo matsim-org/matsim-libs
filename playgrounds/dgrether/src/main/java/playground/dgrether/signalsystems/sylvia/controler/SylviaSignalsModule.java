@@ -39,7 +39,7 @@ import org.matsim.core.replanning.ReplanningContext;
 import com.google.inject.Provides;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
-import playground.dgrether.signalsystems.sylvia.model.DgSylviaSignalModelFactory;
+import playground.dgrether.signalsystems.sylvia.model.SylviaSignalModelFactory;
 
 /**
  * Add this module if you want to simulate signals with sylvia. 
@@ -69,7 +69,7 @@ public class SylviaSignalsModule extends AbstractModule {
 		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
 			// sylvia specific bindings
 			bind(DgSylviaConfig.class).toInstance(sylviaConfig);
-			bind(SignalModelFactory.class).to(DgSylviaSignalModelFactory.class);
+			bind(SignalModelFactory.class).to(SylviaSignalModelFactory.class);
 			
 			// bindings for sensor based signals
 			bind(LinkSensorManager.class);

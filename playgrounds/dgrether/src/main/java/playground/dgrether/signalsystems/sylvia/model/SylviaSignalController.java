@@ -51,9 +51,9 @@ import playground.dgrether.signalsystems.utils.DgSignalsUtils;
  * @author dgrether, tthunig
  *
  */
-public class DgSylviaController extends AbstractSignalController implements SignalController {
+public class SylviaSignalController extends AbstractSignalController implements SignalController {
 
-	private static final Logger log = Logger.getLogger(DgSylviaController.class);
+	private static final Logger log = Logger.getLogger(SylviaSignalController.class);
 	
 	public final static String CONTROLLER_IDENTIFIER = "SylviaSignalControl";
 
@@ -68,8 +68,8 @@ public class DgSylviaController extends AbstractSignalController implements Sign
 			this.sensorManager = sensorManager;
 			this.signalsData = signalsData;
 		}
-		public DgSylviaController build(SignalSystem signalSystem){
-			return new DgSylviaController(sylviaConfig, sensorManager, signalsData, signalSystem);
+		public SylviaSignalController build(SignalSystem signalSystem){
+			return new SylviaSignalController(sylviaConfig, sensorManager, signalsData, signalSystem);
 		}
 	}
 	
@@ -88,7 +88,7 @@ public class DgSylviaController extends AbstractSignalController implements Sign
 	private LinkSensorManager sensorManager;
 	private SignalsData signalsData;
 
-	private DgSylviaController(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, SignalsData signalsData, SignalSystem signalSystem) {
+	private SylviaSignalController(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, SignalsData signalsData, SignalSystem signalSystem) {
 		super(signalSystem) ;
 		this.sylviaConfig = sylviaConfig;
 		this.sensorManager = sensorManager;
