@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.laemmer.run;
+package signals.laemmer.run;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,11 +36,12 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
-import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalsModule;
 import playground.dgrether.utils.DgOTFVisUtils;
+import signals.laemmer.model.LaemmerSignalsModule;
 
 /**
  * @author dgrether
+ * @author tthunig
  *
  */
 public class LaemmerOTFStarter {

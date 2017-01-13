@@ -19,7 +19,7 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package playground.dgrether.signalsystems.laemmer.model;
+package signals.laemmer.model;
 
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;

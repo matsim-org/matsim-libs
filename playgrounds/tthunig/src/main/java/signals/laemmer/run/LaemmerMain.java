@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.laemmer.run;
+package signals.laemmer.run;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -29,11 +29,12 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalsModule;
+import signals.laemmer.model.LaemmerSignalsModule;
 
 
 /**
  * @author dgrether
+ * @author tthunig
  */
 public class LaemmerMain {
   
@@ -52,6 +53,7 @@ public class LaemmerMain {
 		Config config = ConfigUtils.loadConfig(args[0]);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
+		
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new LaemmerSignalsModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);

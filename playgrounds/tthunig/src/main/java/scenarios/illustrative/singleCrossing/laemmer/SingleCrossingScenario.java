@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.dgrether.signalsystems.laemmer.testsinglecrossing;
+package scenarios.illustrative.singleCrossing.laemmer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -45,15 +44,46 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.Default
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalController;
+import signals.laemmer.model.LaemmerSignalController;
 
 /**
  * @author dgrether
+ * @author tthunig
  */
 public class SingleCrossingScenario {
 
 	private static final Logger log = Logger.getLogger(SingleCrossingScenario.class);
 
+	private static final Id<Link> linkN2N3Id = Id.create("N2N3", Link.class);
+	private static final Id<Link> linkN3CId = Id.create("N3C", Link.class);
+	private static final Id<Link> linkCS3Id = Id.create("CS3", Link.class);
+	private static final Id<Link> linkS3S2Id = Id.create("S3S2", Link.class);
+	private static final Id<Link> linkS2S1Id = Id.create("S2S1", Link.class);
+	private static final Id<Link> linkN1N2Id = Id.create("N1N2", Link.class);
+	private static final Id<Link> linkS1S2Id = Id.create("S1S2", Link.class);
+	private static final Id<Link> linkS2S3Id = Id.create("S2S3", Link.class);
+	private static final Id<Link> linkS3CId = Id.create("S3C", Link.class);
+	private static final Id<Link> linkCN3Id = Id.create("CN3", Link.class);
+	private static final Id<Link> linkN3N2Id = Id.create("N3N2", Link.class);
+	private static final Id<Link> linkN2N1Id = Id.create("N2N1", Link.class);
+	private static final Id<Link> linkE1E2Id = Id.create("E1E2", Link.class);
+	private static final Id<Link> linkE2E3Id = Id.create("E2E3", Link.class);
+	private static final Id<Link> linkE3CId = Id.create("E3C", Link.class);
+	private static final Id<Link> linkCW3Id = Id.create("CW3", Link.class);
+	private static final Id<Link> linkW3W2Id = Id.create("W3W2", Link.class);
+	private static final Id<Link> linkW2W1Id = Id.create("W2W1", Link.class);
+	private static final Id<Link> linkW1W2Id = Id.create("W1W2", Link.class);
+	private static final Id<Link> linkW2W3Id = Id.create("W2W3", Link.class);
+	private static final Id<Link> linkW3CId = Id.create("W3C", Link.class);
+	private static final Id<Link> linkCE3Id = Id.create("CE3", Link.class);
+	private static final Id<Link> linkE3E2Id = Id.create("E3E2", Link.class);
+	private static final Id<Link> linkE2E1Id = Id.create("E2E1", Link.class);
+	private static final Id<SignalSystem> systemId = Id.create("C", SignalSystem.class);
+	private static final Id<SignalGroup> sS = Id.create("sS", SignalGroup.class);
+	private static final Id<SignalGroup> sN = Id.create("sN", SignalGroup.class);
+	private static final Id<SignalGroup> sW = Id.create("sW", SignalGroup.class);
+	private static final Id<SignalGroup> sE = Id.create("sE", SignalGroup.class);
+	
 	private final double tCycleSec = 120.0;
 	private final double tDesired = 120.0;
 	private final double tmax = 180.0;
@@ -65,77 +95,12 @@ public class SingleCrossingScenario {
 	private final double startTimeSeconds = 0.0;
 	private final double endTimeSeconds = startTimeSeconds + runtimeSeconds;
 	private int personIdInt = 1;
-	private Id<Link> linkN2N3Id;
-	private Id<Link> linkN3CId;
-	private Id<Link> linkCS3Id;
-	private Id<Link> linkS3S2Id;
-	private Id<Link> linkS2S1Id;
-	private Id<Link> linkN1N2Id;
-	private Id<Link> linkS1S2Id;
-	private Id<Link> linkS2S3Id;
-	private Id<Link> linkS3CId;
-	private Id<Link> linkCN3Id;
-	private Id<Link> linkN3N2Id;
-	private Id<Link> linkN2N1Id;
-	private Id<Link> linkE1E2Id;
-	private Id<Link> linkE2E3Id;
-	private Id<Link> linkE3CId;
-	private Id<Link> linkCW3Id;
-	private Id<Link> linkW3W2Id;
-	private Id<Link> linkW2W1Id;
-	private Id<Link> linkW1W2Id;
-	private Id<Link> linkW2W3Id;
-	private Id<Link> linkW3CId;
-	private Id<Link> linkCE3Id;
-	private Id<Link> linkE3E2Id;
-	private Id<Link> linkE2E1Id;
-	private Id<SignalSystem> systemId;
-	private Id<SignalGroup> sS;
-	private Id<SignalGroup> sN;
-	private Id<SignalGroup> sW;
-	private Id<SignalGroup> sE;
-
-	private void createIds(Scenario scenario) {
-		this.linkN1N2Id = Id.create("N1N2", Link.class);
-		this.linkN2N3Id = Id.create("N2N3", Link.class);
-		this.linkN3CId = Id.create("N3C", Link.class);
-		this.linkCS3Id = Id.create("CS3", Link.class);
-		this.linkS3S2Id = Id.create("S3S2", Link.class);
-		this.linkS2S1Id = Id.create("S2S1", Link.class);
-
-		this.linkS1S2Id = Id.create("S1S2", Link.class);
-		this.linkS2S3Id = Id.create("S2S3", Link.class);
-		this.linkS3CId = Id.create("S3C", Link.class);
-		this.linkCN3Id = Id.create("CN3", Link.class);
-		this.linkN3N2Id = Id.create("N3N2", Link.class);
-		this.linkN2N1Id = Id.create("N2N1", Link.class);
-
-		this.linkE1E2Id = Id.create("E1E2", Link.class);
-		this.linkE2E3Id = Id.create("E2E3", Link.class);
-		this.linkE3CId = Id.create("E3C", Link.class);
-		this.linkCW3Id = Id.create("CW3", Link.class);
-		this.linkW3W2Id = Id.create("W3W2", Link.class);
-		this.linkW2W1Id = Id.create("W2W1", Link.class);
-
-		this.linkW1W2Id = Id.create("W1W2", Link.class);
-		this.linkW2W3Id = Id.create("W2W3", Link.class);
-		this.linkW3CId = Id.create("W3C", Link.class);
-		this.linkCE3Id = Id.create("CE3", Link.class);
-		this.linkE3E2Id = Id.create("E3E2", Link.class);
-		this.linkE2E1Id = Id.create("E2E1", Link.class);
-
-		this.sE = Id.create("sE", SignalGroup.class);
-		this.sW = Id.create("sW", SignalGroup.class);
-		this.sN = Id.create("sN", SignalGroup.class);
-		this.sS = Id.create("sS", SignalGroup.class);
-		this.systemId = Id.create("C", SignalSystem.class);
-	}
 
 	public Scenario createScenario(double lambdaWestEast, boolean useFixeTimeControl) {
 		Config config = this.createConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(scenario.getConfig()).loadSignalsData());
-		this.createIds(scenario);
+		
 		this.createPopulation(scenario, lambdaWestEast);
 		this.createSignals(scenario);
 		if (useFixeTimeControl) {

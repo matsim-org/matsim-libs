@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.laemmer.model;
+package signals.laemmer.model;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -35,6 +35,7 @@ import playground.dgrether.signalsystems.LinkSensorManager;
 
 /**
  * @author dgrether
+ * @author tthunig
  *
  */
 public class LaemmerSignalController  extends AbstractSignalController implements SignalController {

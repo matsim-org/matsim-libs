@@ -17,11 +17,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.laemmer.testsinglecrossing;
+package scenarios.illustrative.singleCrossing.laemmer;
 
 import org.matsim.api.core.v01.Scenario;
 
-import playground.dgrether.signalsystems.laemmer.run.LaemmerOTFStarter;
+import signals.laemmer.run.LaemmerOTFStarter;
 
 
 /**

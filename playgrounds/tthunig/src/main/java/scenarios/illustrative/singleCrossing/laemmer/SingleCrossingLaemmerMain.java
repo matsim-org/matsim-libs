@@ -17,17 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.laemmer.testsinglecrossing;
+package scenarios.illustrative.singleCrossing.laemmer;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
-import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalsModule;
+import signals.laemmer.model.LaemmerSignalsModule;
 
 
 /**
  * @author dgrether
+ * @author tthunig
  *
  */
 public class SingleCrossingLaemmerMain {
