@@ -74,7 +74,7 @@ public class DownstreamSignalModelFactory implements SignalModelFactory{
 
 	@Override
 	public SignalPlan createSignalPlan(SignalPlanData planData) {
-		return new DatabasedSignalPlan(planData);
+		return this.delegate.createSignalPlan(planData);
 	}
 
 }

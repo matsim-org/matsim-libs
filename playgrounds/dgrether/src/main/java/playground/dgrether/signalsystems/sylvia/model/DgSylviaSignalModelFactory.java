@@ -74,7 +74,7 @@ public final class DgSylviaSignalModelFactory implements SignalModelFactory {
 
 	@Override
 	public SignalPlan createSignalPlan(SignalPlanData planData) {
-		DatabasedSignalPlan plan = new DatabasedSignalPlan(planData);
+		DatabasedSignalPlan plan = (DatabasedSignalPlan) this.delegate.createSignalPlan(planData);
 		if (planData.getId().toString().startsWith(DgSylviaPreprocessData.SYLVIA_PREFIX)){
 			return new DgSylviaSignalPlan(plan);
 		}
