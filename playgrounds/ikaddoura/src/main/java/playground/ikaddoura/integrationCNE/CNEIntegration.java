@@ -614,7 +614,7 @@ public class CNEIntegration {
 			if (!airPollutionPricing) {
 				controler.addControlerListener(new EmissionControlerListener());
 			}
-			controler.addControlerListener(new EmissionAnalysisControlerListener(new ExperiencedEmissionCostHandler(emissionCostModule, personFilter)  , emissionModule));
+			controler.addControlerListener(new EmissionAnalysisControlerListener(new ExperiencedEmissionCostHandler(emissionCostModule, personFilter) ));
 		}
 		
 		return controler;

@@ -20,17 +20,16 @@
 package playground.agarwalamit.analysis.emission;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.emissions.events.EmissionEventsReader;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.utils.MapUtils;
@@ -39,65 +38,47 @@ import playground.agarwalamit.utils.MapUtils;
  * Created by amit on 01/12/2016.
  */
 
-public class EmissionAnalysisControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
+public class EmissionAnalysisControlerListener implements  ShutdownListener {
 
-    public EmissionAnalysisControlerListener(final EmissionCostHandler emissionCostHandler, final EmissionModule emissionModule) {
+    private static final Logger LOG = Logger.getLogger(EmissionAnalysisControlerListener.class);
+
+    public EmissionAnalysisControlerListener(final EmissionCostHandler emissionCostHandler) {
         this.emissionCostHandler = emissionCostHandler;
-        this.emissionModule = emissionModule;
     }
 
     private final EmissionCostHandler emissionCostHandler;
-    private final EmissionModule emissionModule;
-    private BufferedWriter writer ;
-
-    @Override
-    public void notifyStartup(StartupEvent event) {
-        this.writer = IOUtils.getBufferedWriter(event.getServices().getConfig().controler().getOutputDirectory()+"/totalEmissionsCosts.txt");
-        try {
-            this.writer.write("ItNr\t");
-            if(this.emissionCostHandler.isFiltering()) {
-                for (MunichPersonFilter.MunichUserGroup munichUserGroup : MunichPersonFilter.MunichUserGroup.values()) {
-                    this.writer.write(munichUserGroup.toString()+"\t");
-                }
-            }
-            this.writer.write("total\n");
-            this.writer.flush();
-        } catch (IOException e) {
-            throw new RuntimeException("Data is not written/read. Reason : " + e);
-        }
-
-        event.getServices().getEvents().addHandler(this.emissionModule.getWarmEmissionHandler());
-        event.getServices().getEvents().addHandler(this.emissionModule.getColdEmissionHandler());
-
-        emissionModule.getEmissionEventsManager().addHandler(this.emissionCostHandler);
-    }
-
-    @Override
-    public void notifyIterationStarts(IterationStartsEvent event) {
-        this.emissionCostHandler.reset(event.getIteration());
-    }
-
-    @Override
-    public void notifyIterationEnds(IterationEndsEvent event) {
-        Map<String, Double> userGrp2cost = this.emissionCostHandler.getUserGroup2TotalEmissionCosts();
-        try {
-            this.writer.write(event.getIteration()+"\t");
-            if(this.emissionCostHandler.isFiltering()) {
-                for (MunichPersonFilter.MunichUserGroup munichUserGroup : MunichPersonFilter.MunichUserGroup.values()) {
-                    this.writer.write(userGrp2cost.get(munichUserGroup.toString()) + "\t");
-                }
-            }
-            this.writer.write(MapUtils.doubleValueSum(userGrp2cost)+"\n");
-            this.writer.flush();
-        } catch (IOException e) {
-            throw new RuntimeException("Data is not written/read. Reason : " + e);
-        }
-    }
 
     @Override
     public void notifyShutdown(ShutdownEvent event) {
+
+        ControlerConfigGroup controlerConfigGroup = event.getServices().getConfig().controler();
+        String iterationDir = controlerConfigGroup.getOutputDirectory()+"/ITERS/it."+controlerConfigGroup.getLastIteration()+"/";
+
+        String emissionEventsFile = iterationDir+controlerConfigGroup.getLastIteration()+".emission.events.xml.gz";
+        if (! new File(emissionEventsFile).exists()) {
+            LOG.error("The emission events file for last iteration does not exists.");
+            return;
+        }
+
+        EventsManager events = EventsUtils.createEventsManager();
+        events.addHandler(this.emissionCostHandler);
+        EmissionEventsReader reader = new EmissionEventsReader(events);
+        reader.readFile(emissionEventsFile);
+
+        Map<String, Double> userGrp2cost = this.emissionCostHandler.getUserGroup2TotalEmissionCosts();
+
+        BufferedWriter writer = IOUtils.getBufferedWriter(iterationDir+controlerConfigGroup.getLastIteration()+".emissionsCostsMoneyUnits.txt");
         try {
-            this.writer.close();
+            if(this.emissionCostHandler.isFiltering()) { //TODO why only munich user group; personFilter interface can have the list of user groups.
+                writer.write("userGroup \t costsInMoneyUnits \n");
+                for ( MunichPersonFilter.MunichUserGroup munichUserGroup : MunichPersonFilter.MunichUserGroup.values()) {
+                    writer.write(munichUserGroup.toString()+"\t");
+                    writer.write(userGrp2cost.get(munichUserGroup.toString()) + "\n");
+                }
+            }
+
+            writer.write( "allPersons \t" + MapUtils.doubleValueSum(userGrp2cost)+"\n");
+            writer.close();
         } catch (IOException e) {
             throw new RuntimeException("Data is not written/read. Reason : " + e);
         }

@@ -24,15 +24,17 @@ import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.emissions.events.ColdEmissionEvent;
-import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
-import org.matsim.contrib.emissions.events.WarmEmissionEvent;
-import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
+import org.matsim.contrib.emissions.events.*;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.vehicles.Vehicle;
 import playground.agarwalamit.analysis.emission.EmissionCostHandler;
+import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
 import playground.agarwalamit.utils.PersonFilter;
 import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
+import playground.vsp.airPollution.exposure.GridTools;
+import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
 /**
  * Emission costs (air pollution exposure cost module is used).
@@ -52,6 +54,36 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 
 	public ExperiencedEmissionCostHandler(final EmissionResponsibilityCostModule emissionCostModule) {
 		this(emissionCostModule, null);
+	}
+
+	// munich specific data
+	private static final Integer noOfXCells = 270;
+	private static final Integer noOfYCells = 208;
+	private static final double xMin = 4452550.;
+	private static final double xMax = 4479550.;
+	private static final double yMin = 5324955.;
+	private static final double yMax = 5345755.;
+	private static final Double timeBinSize = 3600.;
+	private static final int noOfTimeBins = 30;
+
+	public static void main (String args []) {
+
+		String networkFile = "/Users/amit/Documents/cluster/ils4/kaddoura/cne/munich/output/output_run5_muc_cne_QBPV3/output_network.xml.gz";
+		String emissinoEvenetsFile = "/Users/amit/Documents/cluster/ils4/kaddoura/cne/munich/output/output_run5_muc_cne_QBPV3/ITERS/it.1500/1500.emission.events.xml.gz";
+
+		GridTools gt = new GridTools(LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
+		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
+		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(1.0, true, rgt, gt );
+		ExperiencedEmissionCostHandler handler = new ExperiencedEmissionCostHandler(emissionCostModule);
+
+		EventsManager events = EventsUtils.createEventsManager();
+		events.addHandler(handler);
+		EmissionEventsReader reader = new EmissionEventsReader(events);
+		reader.readFile(emissinoEvenetsFile);
+
+		for (Map.Entry<String, Double> e : handler.getUserGroup2TotalEmissionCosts().entrySet()) {
+			System.out.println(e.getKey()+"\t"+e.getValue());
+		}
 	}
 
 	public ExperiencedEmissionCostHandler(final EmissionResponsibilityCostModule emissionCostModule, final PersonFilter pf) {

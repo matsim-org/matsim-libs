@@ -55,6 +55,9 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
+import playground.agarwalamit.analysis.emission.EmissionAnalysisControlerListener;
+import playground.agarwalamit.analysis.emission.caused.CausedEmissionCostHandler;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.vsp.airPollution.flatEmissions.EmissionCostFactors;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
@@ -180,6 +183,8 @@ public class EquilMixedTrafficEmissionTest {
 				addEventHandlerBinding().toInstance(enterLeaveTimeEventHandler);
 			}
 		});
+
+		controler.addControlerListener(new EmissionAnalysisControlerListener(new CausedEmissionCostHandler(emissionCostModule, new MunichPersonFilter())));
 
 		controler.run();
 
