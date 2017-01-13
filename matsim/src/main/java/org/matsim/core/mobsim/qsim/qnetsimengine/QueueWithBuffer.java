@@ -246,8 +246,11 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		
 		if( context.qsimConfig.isUsingFastCapacityUpdate() ){
-			updateFlowAccumulation();
-			if (flowcap_accumulate.getValue() > 0.0  ) {
+		    //we do not need to call it here (it is checked before with hasFlowCapacityLeftAndBufferSpace()
+		    //in both cases i.e. when moving from wait and moving from queue to buffer)
+			//updateFlowAccumulation();
+			
+		    if (flowcap_accumulate.getValue() > 0.0  ) {
 				flowcap_accumulate.addValue(-veh.getSizeInEquivalents(), now);
 			} else {
 				throw new IllegalStateException("Buffer of link " + this.id + " has no space left!");
@@ -304,9 +307,11 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 	}
 
-	private void updateFlowAccumulation(){
+	private void updateFlowAccumulation(){//it is called 4 times a time step 
 		double now = context.getSimTimer().getTimeOfDay() ;
-		if( this.flowcap_accumulate.getTimeStep() < now && this.flowcap_accumulate.getValue() <= 0. && isNotOfferingVehicle() ){
+		
+        if( this.flowcap_accumulate.getTimeStep() < now && this.flowcap_accumulate.getValue() <= 0. && isNotOfferingVehicle() ){/////////// maybe isBufferNotFull()???????
+            //if( this.flowcap_accumulate.getTimeStep() < now && this.flowcap_accumulate.getValue() <= flowCapacityPerTimeStep && isNotOfferingVehicle() ){/////////// maybe isBufferNotFull()???????
 			
 				double flowCapSoFar = flowcap_accumulate.getValue();
 				double accumulateFlowCap = (now - flowcap_accumulate.getTimeStep()) * flowCapacityPerTimeStep;
@@ -326,8 +331,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 		this.lastUpdate = now ;
 		if(!context.qsimConfig.isUsingFastCapacityUpdate() ){
-			remainingflowCap = flowCapacityPerTimeStep;
-			if (thisTimeStepGreen && flowcap_accumulate.getValue() < 1.0 && isNotOfferingVehicle() ) {
+			remainingflowCap = flowCapacityPerTimeStep;//even if buffer is not empty???
+			if (thisTimeStepGreen && flowcap_accumulate.getValue() < 1.0 && isNotOfferingVehicle() ) {/////// maybe isBufferNotFull()???????
 				flowcap_accumulate.addValue( flowCapacityPerTimeStepFractionalPart, now);
 			}
 		}
@@ -534,7 +539,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	private void letVehicleArrive(QVehicle veh) {
-		double now = context.getSimTimer().getTimeOfDay() ;
 		qLink.addParkedVehicle(veh);
 		qLink.letVehicleArrive(veh);
 		qLink.makeVehicleAvailableToNextDriver(veh);
@@ -549,7 +553,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			return /*(this.remainingflowCap < 0.0) // still accumulating, thus active
 				|| */(!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) || ( !this.holes.isEmpty() ) ;
 		} else {
-			return (this.flowcap_accumulate.getValue() < 1.0) // still accumulating, thus active
+//            return (this.flowcap_accumulate.getValue() < 0.0) // still accumulating, thus active
+                    return (this.flowcap_accumulate.getValue() < 1.0) // still accumulating, thus active
 					|| (!this.vehQueue.isEmpty()) // vehicles are on link, thus active 
 					|| (!this.isNotOfferingVehicle()) // buffer is not empty, thus active
 					|| ( !this.holes.isEmpty() ); // need to process arrival of holes
