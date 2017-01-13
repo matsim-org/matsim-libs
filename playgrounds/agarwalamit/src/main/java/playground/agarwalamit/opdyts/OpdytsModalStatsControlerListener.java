@@ -36,9 +36,8 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.analysis.tripDistance.LegModeBeelineDistanceDistributionHandler;
 import playground.agarwalamit.analysis.modalShare.FilteredModalShareEventHandler;
-import playground.agarwalamit.opdyts.patna.PatnaCMPDistanceDistribution;
+import playground.agarwalamit.analysis.tripDistance.LegModeBeelineDistanceDistributionHandler;
 
 /**
  * Created by amit on 20/09/16.
@@ -50,20 +49,17 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
     private EventsManager events;
 
     private final FilteredModalShareEventHandler modalShareEventHandler = new FilteredModalShareEventHandler();
-    private final PatnaCMPDistanceDistribution referenceStudyDistri ;
+    private final DistanceDistribution referenceStudyDistri ;
     private LegModeBeelineDistanceDistributionHandler beelineDistanceDistributionHandler;
 
     private final SortedMap<String, SortedMap<Double, Integer>> initialMode2DistanceClass2LegCount = new TreeMap<>();
 
     private BufferedWriter writer;
     private final Set<String> mode2consider;
-    private final OpdytsScenarios opdytsScenarios ;
 
-    public OpdytsModalStatsControlerListener(final Set<String> modes2consider, final OpdytsScenarios opdytsScenarios) {
+    public OpdytsModalStatsControlerListener(final Set<String> modes2consider, final DistanceDistribution referenceStudyDistri) {
         this.mode2consider = modes2consider;
-        this.opdytsScenarios = opdytsScenarios;
-
-        this.referenceStudyDistri = new PatnaCMPDistanceDistribution(this.opdytsScenarios);
+        this.referenceStudyDistri = referenceStudyDistri;
     }
 
     public OpdytsModalStatsControlerListener() {

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.opdyts;
+package playground.agarwalamit.opdyts.equil;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -45,6 +45,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import playground.agarwalamit.opdyts.*;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
 import playground.kairuns.run.KNBerlinControler;
 
@@ -119,7 +120,8 @@ public class MatsimOpdytsEquilIntegration {
 		modes2consider.add("car");
 		modes2consider.add("bike");
 
-		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,EQUIL);
+		DistanceDistribution distanceDistribution = new EquilDistanceDistribution(OpdytsScenarios.EQUIL);
+		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,distanceDistribution);
 
 		// following is the  entry point to start a matsim controler together with opdyts
 		MATSimSimulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization);
@@ -139,7 +141,7 @@ public class MatsimOpdytsEquilIntegration {
 
 		// this is the objective Function which returns the value for given SimulatorState
 		// in my case, this will be the distance based modal split
-		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(EQUIL); // in this, the method argument (SimulatorStat) is not used.
+		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(distanceDistribution); // in this, the method argument (SimulatorStat) is not used.
 
 		//search algorithm
 		int maxIterations = 10; // this many times simulator.run(...) and thus controler.run() will be called.

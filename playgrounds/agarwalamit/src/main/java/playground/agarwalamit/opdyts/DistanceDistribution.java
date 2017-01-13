@@ -17,31 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.utils;
+package playground.agarwalamit.opdyts;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.vehicles.VehicleReaderV1;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.Vehicles;
+import java.util.SortedMap;
 
 /**
  * Created by amit on 13/01/2017.
  */
+public interface DistanceDistribution {
 
+    double [] getDistClasses();
 
-public final class VehicleUtils {
+    SortedMap<String, double []> getMode2DistanceBasedLegs();
 
-    private static final Logger LOGGER = Logger.getLogger(VehicleUtils.class);
-
-    public static void addVehiclesToScenarioFromVehicleFile(final String vehiclesFile, final Scenario scenario){
-        Vehicles vehs = org.matsim.vehicles.VehicleUtils.createVehiclesContainer();
-        new VehicleReaderV1(vehs).readFile(vehiclesFile);
-
-        for(VehicleType vt : vehs.getVehicleTypes().values()) {
-
-            scenario.getVehicles().addVehicleType(vt);
-        }
-    }
-
+    OpdytsScenarios getOpdytsScenario();
 }

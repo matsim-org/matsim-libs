@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.opdyts;
+package playground.agarwalamit.opdyts.equil;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -45,9 +45,10 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import playground.agarwalamit.opdyts.*;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
-import playground.kairuns.run.KNBerlinControler;
 
 /**
  * @author amit
@@ -55,7 +56,7 @@ import playground.kairuns.run.KNBerlinControler;
 
 public class MatsimOpdytsEquilMixedTrafficIntegration {
 
-	private static final String EQUIL_DIR = "./matsim/examples/equil-mixedTraffic/";
+	private static final String EQUIL_DIR = "./examples/scenarios/equil-mixedTraffic/";
 	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil-mixedTraffic/";
 	public static final OpdytsScenarios EQUIL_MIXEDTRAFFIC = OpdytsScenarios.EQUIL_MIXEDTRAFFIC;
 
@@ -111,9 +112,10 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		config.qsim().setUsingFastCapacityUpdate(true);
 		//==
 
-		Scenario scenario = KNBerlinControler.prepareScenario(true, false, config);
-		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
+		// following is taken from KNBerlinControler.prepareScenario(...);
+		// modify equil plans:
 		double time = 6*3600. ;
 		for ( Person person : scenario.getPopulation().getPersons().values() ) {
 			Plan plan = person.getSelectedPlan() ;
@@ -121,7 +123,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 			activity.setEndTime(time);
 			time++ ;
 		}
-
+		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		// this is something like time bin generator
 		int startTime= 0;
@@ -133,7 +135,8 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		modes2consider.add("car");
 		modes2consider.add("bike");
 
-		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,EQUIL_MIXEDTRAFFIC);
+		DistanceDistribution distanceDistribution = new EquilDistanceDistribution(OpdytsScenarios.EQUIL_MIXEDTRAFFIC);
+		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,distanceDistribution);
 
 		// following is the  entry point to start a matsim controler together with opdyts
 		MATSimSimulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization);
@@ -155,7 +158,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		// this is the objective Function which returns the value for given SimulatorState
 		// in my case, this will be the distance based modal split
-		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(EQUIL_MIXEDTRAFFIC); // in this, the method argument (SimulatorStat) is not used.
+		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(distanceDistribution); // in this, the method argument (SimulatorStat) is not used.
 
 		//search algorithm
 		int maxIterations = 10; // this many times simulator.run(...) and thus controler.run() will be called.
