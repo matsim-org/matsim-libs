@@ -449,10 +449,6 @@ public final class RunBraessSimulation {
 					this.addControlerListenerBinding().to(TtSignalAnalysisTool.class);
 					this.bind(TtSignalAnalysisWriter.class);
 					this.addControlerListenerBinding().to(TtSignalAnalysisListener.class);
-					
-					// bind tool to write information about signal states for via
-					bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
-					/* asEagerSingleton is necessary to force creation of the SignalEvents2ViaCSVWriter class as it is never used somewhere else. theresa dec'16 */
 				}
 			}
 		});
