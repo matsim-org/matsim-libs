@@ -133,7 +133,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		Set<String> modes2consider = new HashSet<>();
 		modes2consider.add("car");
-		modes2consider.add("bike");
+		modes2consider.add("bicycle");
 
 		DistanceDistribution distanceDistribution = new EquilDistanceDistribution(OpdytsScenario.EQUIL_MIXEDTRAFFIC);
 		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,distanceDistribution);
