@@ -19,73 +19,75 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.sylvia.run;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
-import org.matsim.contrib.signals.builder.FromDataBuilder;
-import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
-import org.matsim.contrib.signals.mobsim.SignalEngine;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.NewControlerModule;
+import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
-import playground.dgrether.signalsystems.LinkSensorManager;
-import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
-import playground.dgrether.signalsystems.sylvia.model.DgSylviaSignalModelFactory;
+import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
 import playground.dgrether.utils.DgOTFVisUtils;
-
-
 
 /**
  * @author dgrether
+ * @author tthunig
  *
  */
-@Deprecated //does not use the new inject syntax for signals, see e.g. SylviaSignalsModule
 public class SylviaOTFVisMain {
 
-	public void prepare4SimAndPlay(String configFileName){
+	public void playConfig(String configFileName, boolean prepare4Sim) {
 		Config config = ConfigUtils.loadConfig(configFileName);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		this.prepare4SimAndPlay(scenario);
-	}	
-
-	public void playConfig(String configFileName) {
-		Config config = ConfigUtils.loadConfig(configFileName);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(scenario.getConfig()).loadSignalsData());
+		
+		if (prepare4Sim){ 
+			DgOTFVisUtils.preparePopulation4Simulation(scenario);
+		}
+		
 		this.playScenario(scenario);
 	}
 
 	
-	public void prepare4SimAndPlay(Scenario scenario){
-		DgOTFVisUtils.preparePopulation4Simulation(scenario);
-		this.playScenario(scenario);
-	}
+	public void playScenario(Scenario scenario){		
+		Collection<AbstractModule> defaultsModules = new ArrayList<>();
+		defaultsModules.add(new ScenarioByInstanceModule(scenario));
+		defaultsModules.add(new ControlerDefaultsModule());
 
-	public void playScenario(Scenario scenario){
-		throw new UnsupportedOperationException("This constructor does no longer function. Please use inject syntax insted, see e.g. SylviaSignalsModule");
-//		EventsManager events = EventsUtils.createEventsManager();
-////		scenario.getConfig().otfVis().setAgentSize(40.0f);
-//
-//		LinkSensorManager sensorManager = new LinkSensorManager(scenario, events);
-//		
-//		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 
-//				new DgSylviaSignalModelFactory(sensorManager, new DgSylviaConfig()) , events);
-//		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
-//		
-//		
-//		SignalEngine engine = new QSimSignalEngine(signalManager);
-//		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
-//		otfVisQSim.addQueueSimulationListeners(engine);
-//		
-//		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
-//		OTFClientLive.run(scenario.getConfig(), server);
-//		otfVisQSim.run();
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+			@Override
+			public void install() {
+				install(new NewControlerModule());
+				install(new ControlerDefaultCoreListenersModule());
+				install(new ControlerDefaultsModule());
+				install(new ScenarioByInstanceModule(scenario));
+				install(new SylviaSignalsModule());
+			}
+		});
+
+		EventsManager events = injector.getInstance(EventsManager.class);
+		events.initProcessing();
+		
+		QSim otfVisQSim = (QSim) injector.getInstance(Mobsim.class);
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
+		OTFClientLive.run(scenario.getConfig(), server);
+		
+		otfVisQSim.run();
 	}
 	
 	
@@ -98,11 +100,11 @@ public class SylviaOTFVisMain {
 		String configFileName = args[0];
 		SylviaOTFVisMain sylviaMain = new SylviaOTFVisMain();
 		if (args.length < 2){
-			sylviaMain.playConfig(configFileName);
+			sylviaMain.playConfig(configFileName, false);
 		}
 		else if (args.length == 2){
 			if (args[1].equalsIgnoreCase("--doPrepare4Sim")){
-				sylviaMain.prepare4SimAndPlay(configFileName);
+				sylviaMain.playConfig(configFileName, true);
 			}
 		}
 	}
