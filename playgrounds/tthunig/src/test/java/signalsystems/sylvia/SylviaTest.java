@@ -358,33 +358,26 @@ public class SylviaTest {
 		signalConfigGroup.setUseSignalSystems(true);
 
 		// set brain exp beta
-		config.planCalcScore().setBrainExpBeta(2);
+//		config.planCalcScore().setBrainExpBeta(2);
 
 		// set travelTimeBinSize (only has effect if reRoute is used)
-		config.travelTimeCalculator().setTraveltimeBinSize(10);
+//		config.travelTimeCalculator().setTraveltimeBinSize(10);
 
-		config.travelTimeCalculator().setTravelTimeCalculatorType(TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
+//		config.travelTimeCalculator().setTravelTimeCalculatorType(TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
 		// hash map and array produce same results. only difference: memory and time.
 		// for small time bins and sparse values hash map is better. theresa, may'15
 
 		// define strategies:
 		{
 			StrategySettings strat = new StrategySettings();
-			strat.setStrategyName(DefaultStrategy.ReRoute.toString());
-			strat.setWeight(0.1);
-			strat.setDisableAfter(config.controler().getLastIteration() - 50);
-			config.strategy().addStrategySettings(strat);
-		}
-		{
-			StrategySettings strat = new StrategySettings();
-			strat.setStrategyName(DefaultSelector.ChangeExpBeta.toString());
+			strat.setStrategyName(DefaultSelector.KeepLastSelected.toString());
 			strat.setWeight(0.9);
 			strat.setDisableAfter(config.controler().getLastIteration());
 			config.strategy().addStrategySettings(strat);
 		}
 
 		// choose maximal number of plans per agent. 0 means unlimited
-		config.strategy().setMaxAgentPlanMemorySize(5);
+//		config.strategy().setMaxAgentPlanMemorySize(5);
 
 		config.qsim().setStuckTime(3600);
 		config.qsim().setRemoveStuckVehicles(false);
