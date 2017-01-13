@@ -68,7 +68,7 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
 
     @Override
     public void notifyStartup(StartupEvent event) {
-        String outFile = event.getServices().getConfig().controler().getOutputDirectory() + "/modalStats.txt";
+        String outFile = event.getServices().getConfig().controler().getOutputDirectory() + "/opdyts_modalStats.txt";
         writer = IOUtils.getBufferedWriter(outFile);
         try {
             writer.write("iterationNr" + "\t" +
