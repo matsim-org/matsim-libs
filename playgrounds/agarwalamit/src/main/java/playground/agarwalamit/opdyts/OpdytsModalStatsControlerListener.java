@@ -120,7 +120,7 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
 
         SortedMap<String, SortedMap<Double, Integer>> simCountsHandler = this.beelineDistanceDistributionHandler.getMode2DistanceClass2LegCounts();
         for (Map.Entry<String, SortedMap<Double, Integer>> e : simCountsHandler.entrySet() ) {
-            double [] counts = realCounts.get(e.getKey());
+            double [] counts = new double [realCounts.get(e.getKey()).length];
             int index = 0;
             for (Integer count : simCountsHandler.get(e.getKey()).values()) {
                 counts [index++] = count;
@@ -208,7 +208,7 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
                 writer2.write("===== begin writing distribution from objective function ===== ");
                 writer2.newLine();
 
-                SortedMap<String, double []> mode2counts = this.referenceStudyDistri.getMode2DistanceBasedLegs();
+                Map<String, double []> mode2counts = this.referenceStudyDistri.getMode2DistanceBasedLegs();
                 for (String mode : mode2counts.keySet()) {
                     writer2.write(mode + "\t");
                     for (Double d : mode2counts.get(mode)) {

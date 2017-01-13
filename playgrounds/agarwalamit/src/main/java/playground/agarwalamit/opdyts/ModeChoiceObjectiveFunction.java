@@ -114,7 +114,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
     }
 
     private void fillDatabins(final Databins<String> databins) {
-        SortedMap<String, double []> mode2distanceBasedLegs = distriInfo.getMode2DistanceBasedLegs();
+        Map<String, double []> mode2distanceBasedLegs = distriInfo.getMode2DistanceBasedLegs();
         for (String mode : mode2distanceBasedLegs.keySet()) {
             double [] distBasedLegs = mode2distanceBasedLegs.get(mode);
             for (int idx = 0; idx < databins.getDataBoundaries().length; idx++) {
@@ -163,7 +163,6 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         for ( Map.Entry<StatType, Databins<String>> entry : simStatsContainer.entrySet() ) {
             StatType theStatType = entry.getKey();  // currently only one type ;
             log.warn("statType=" + theStatType);
-            Databins<String> databins = entry.getValue();
             objectiveFnValue = objectiveFunctionEvaluator.getObjectiveFunctionValue(this.refStatsContainer.get(theStatType), entry.getValue());
         }
         return objectiveFnValue;

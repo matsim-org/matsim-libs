@@ -19,7 +19,8 @@
 
 package playground.agarwalamit.opdyts.equil;
 
-import java.util.SortedMap;
+import java.util.Collections;
+import java.util.Map;
 import java.util.TreeMap;
 import org.matsim.api.core.v01.TransportMode;
 import playground.agarwalamit.opdyts.DistanceDistribution;
@@ -32,7 +33,7 @@ import playground.agarwalamit.opdyts.patna.PatnaCMPDistanceDistribution;
 
 public class EquilDistanceDistribution implements DistanceDistribution {
 
-    private final SortedMap<String, double []> mode2legs = new TreeMap<>();
+    private final Map<String, double []> mode2legs = new TreeMap<>();
     private final double [] distClasses = new double[] {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.};
     private final OpdytsScenario opdytsScenario;
 
@@ -79,8 +80,8 @@ public class EquilDistanceDistribution implements DistanceDistribution {
     }
 
     @Override
-    public SortedMap<String, double []> getMode2DistanceBasedLegs(){
-        return this.mode2legs;
+    public Map<String, double []> getMode2DistanceBasedLegs(){
+        return Collections.unmodifiableMap(this.mode2legs);
     }
 
     @Override

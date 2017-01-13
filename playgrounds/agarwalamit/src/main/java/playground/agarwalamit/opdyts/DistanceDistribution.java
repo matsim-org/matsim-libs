@@ -19,7 +19,7 @@
 
 package playground.agarwalamit.opdyts;
 
-import java.util.SortedMap;
+import java.util.Map;
 
 /**
  * Created by amit on 13/01/2017.
@@ -28,7 +28,7 @@ public interface DistanceDistribution {
 
     double [] getDistClasses();
 
-    SortedMap<String, double []> getMode2DistanceBasedLegs();
+    Map<String, double[]> getMode2DistanceBasedLegs();
 
     OpdytsScenario getOpdytsScenario();
 }

@@ -19,7 +19,8 @@
 
 package playground.agarwalamit.opdyts.patna;
 
-import java.util.SortedMap;
+import java.util.Collections;
+import java.util.Map;
 import java.util.TreeMap;
 import playground.agarwalamit.opdyts.DistanceDistribution;
 import playground.agarwalamit.opdyts.OpdytsScenario;
@@ -32,7 +33,7 @@ import playground.agarwalamit.opdyts.equil.EquilDistanceDistribution;
 
 public final class PatnaCMPDistanceDistribution implements DistanceDistribution {
 
-    private final SortedMap<String, double []> mode2legs = new TreeMap<>();
+    private final Map<String, double []> mode2legs = new TreeMap<>();
     private final double [] distClasses = new double[] {0., 2000., 4000., 6000., 8000., 10000.};
     private double legsSumAllModes = 0;
     private final OpdytsScenario opdytsScenario;
@@ -105,8 +106,8 @@ public final class PatnaCMPDistanceDistribution implements DistanceDistribution 
     }
 
     @Override
-    public SortedMap<String, double []> getMode2DistanceBasedLegs(){
-        return this.mode2legs;
+    public Map<String, double []> getMode2DistanceBasedLegs(){
+        return Collections.unmodifiableMap(this.mode2legs);
     }
 
     @Override
