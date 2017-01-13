@@ -52,7 +52,7 @@ import java.util.Map;
  * @author aneumann
  *
  */
-final class PBox implements Operators {
+public final class PBox implements Operators {
 	
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(PBox.class);

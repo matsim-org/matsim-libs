@@ -64,11 +64,13 @@ public class PModule {
 		if ( this.ticketMachine==null ) {
 			this.ticketMachine = new TicketMachine(pConfig.getEarningsPerBoardingPassenger(), pConfig.getEarningsPerKilometerAndPassenger() / 1000.0 ) ;
 		}
-		PBox pBox = new PBox(pConfig, this.ticketMachine );
+		final PBox pBox = new PBox(pConfig, this.ticketMachine );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bindMobsim().toProvider(PQSimProvider.class) ;
+				PControlerListener pHook = new PControlerListener(controler, pBox, pTransitRouterFactory, stuckFactory, agentsStuckHandler);
+				this.addControlerListenerBinding().toInstance(pHook);
 			}
 		});
 
@@ -90,10 +92,9 @@ public class PModule {
 			}
 		}
 
-		PStatsModule.configureControler(controler, pConfig, pBox, lineSetter);
+		controler.addOverridingModule( new PStatsModule(pConfig, pBox, lineSetter) ) ;
+//		PStatsModule.configureControler(controler, pConfig, pBox, lineSetter);
 
-		PControlerListener pHook = new PControlerListener(controler, pBox, pTransitRouterFactory, stuckFactory, agentsStuckHandler);
-		controler.addControlerListener(pHook);
 
 
 	}

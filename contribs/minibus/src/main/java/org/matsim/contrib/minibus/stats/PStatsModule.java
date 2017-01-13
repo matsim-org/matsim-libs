@@ -19,17 +19,17 @@
 
 package org.matsim.contrib.minibus.stats;
 
+import java.io.File;
+
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants;
-import org.matsim.contrib.minibus.operator.Operators;
+import org.matsim.contrib.minibus.hook.PBox;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.PAnalysisManager;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.PtMode2LineSetter;
 import org.matsim.contrib.minibus.stats.operatorLogger.POperatorLogger;
-import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-
-import java.io.File;
 
 /**
  * 
@@ -38,25 +38,37 @@ import java.io.File;
  * @author aneumann
  *
  */
-public final class PStatsModule {
+public final class PStatsModule extends AbstractModule {
 
-    public static void configureControler(MatsimServices controler, PConfigGroup pConfig, Operators pBox, PtMode2LineSetter lineSetter) {
-        controler.addControlerListener(new PStatsOverview(pBox, pConfig));
-        controler.addControlerListener(new POperatorLogger(pBox, pConfig));
-        controler.addControlerListener(new GexfPStat(pConfig, false));
-        controler.addControlerListener(new GexfPStatLight(pConfig));
-        controler.addControlerListener(new Line2GexfPStat(pConfig));
-        
-        if (pConfig.getWriteMetrics()) {controler.addControlerListener(new PAnalysisManager(pConfig, lineSetter));}
-        
-        controler.addControlerListener(new ActivityLocationsParatransitUser(pConfig));
-        controler.addControlerListener(new StartupListener() {
-            @Override
-            public void notifyStartup(StartupEvent event) {
-                String outFilename = event.getServices().getControlerIO().getOutputPath() + PConstants.statsOutputFolder;
-                new File(outFilename).mkdir();
-            }
-        });
-    }
+	private PConfigGroup pConfig;
+	private PBox pBox;
+	private PtMode2LineSetter lineSetter;
+
+	public PStatsModule(PConfigGroup pConfig, PBox pBox, PtMode2LineSetter lineSetter) {
+		this.pConfig = pConfig;
+		this.pBox = pBox;
+		this.lineSetter = lineSetter;
+	}
+
+	@Override
+	public void install() {
+		this.addControlerListenerBinding().toInstance(new PStatsOverview(pBox, pConfig));
+		this.addControlerListenerBinding().toInstance(new POperatorLogger(pBox, pConfig));
+		this.addControlerListenerBinding().toInstance(new GexfPStat(pConfig, false));
+		this.addControlerListenerBinding().toInstance(new GexfPStatLight(pConfig));
+		this.addControlerListenerBinding().toInstance(new Line2GexfPStat(pConfig));
+
+		if (pConfig.getWriteMetrics()) {
+			this.addControlerListenerBinding().toInstance(new PAnalysisManager(pConfig, lineSetter));
+		}
+
+		this.addControlerListenerBinding().toInstance(new ActivityLocationsParatransitUser(pConfig));
+		this.addControlerListenerBinding().toInstance(new StartupListener() {
+			@Override public void notifyStartup(StartupEvent event) {
+				String outFilename = event.getServices().getControlerIO().getOutputPath() + PConstants.statsOutputFolder;
+				new File(outFilename).mkdir();
+			}
+		});
+	}
 
 }
