@@ -68,6 +68,7 @@ public class PModule {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				this.bind(PBox.class).toInstance(pBox);
 				bindMobsim().toProvider(PQSimProvider.class) ;
 				PControlerListener pHook = new PControlerListener(controler, pBox, pTransitRouterFactory, stuckFactory, agentsStuckHandler);
 				this.addControlerListenerBinding().toInstance(pHook);
