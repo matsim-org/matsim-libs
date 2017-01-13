@@ -224,21 +224,21 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		return stats;
 	}
 
-	public int getNrOfAllParkingSpacesOnLink (Id<Link> linkId){
-		int allSpaces = 0;
+	public double getNrOfAllParkingSpacesOnLink (Id<Link> linkId){
+		double allSpaces = 0;
 		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
 		if (parkingFacilitiesAtLink == null) {
 			return 0;
 		} else {
 			for (Id<ActivityFacility> fac : parkingFacilitiesAtLink){
-				allSpaces += (int) this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
+				allSpaces += this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
 			}
 		}
 		return allSpaces;
 	}
 	
-	public int getNrOfFreeParkingSpacesOnLink (Id<Link> linkId){
-		int allFreeSpaces = 0;
+	public double getNrOfFreeParkingSpacesOnLink (Id<Link> linkId){
+		double allFreeSpaces = 0;
 		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
 		if (parkingFacilitiesAtLink == null) {
 			return 0;
