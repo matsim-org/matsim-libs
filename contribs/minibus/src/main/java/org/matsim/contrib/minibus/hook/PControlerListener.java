@@ -46,6 +46,8 @@ import org.matsim.vehicles.Vehicles;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 /**
  * Hook to register paratransit black box with MATSim
  * 
@@ -59,17 +61,16 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 	private final PVehiclesFactory pVehiclesFactory;
 	
 	private final AgentsStuckHandlerImpl agentsStuckHandler;
-	private final PBox pBox;
+	@Inject private PBox pBox;
 
     private final PersonReRouteStuckFactory stuckFactory;
 
-    PControlerListener(MatsimServices controler, PBox pBox, PTransitRouterFactory pTransitRouterFactory, PersonReRouteStuckFactory stuckFactory, AgentsStuckHandlerImpl agentsStuckHandler){
+    PControlerListener(MatsimServices controler, PTransitRouterFactory pTransitRouterFactory, PersonReRouteStuckFactory stuckFactory, AgentsStuckHandlerImpl agentsStuckHandler){
         PConfigGroup pConfig = ConfigUtils.addOrGetModule(controler.getConfig(), PConfigGroup.GROUP_NAME, PConfigGroup.class);
         this.pTransitRouterFactory = pTransitRouterFactory;
 		this.pVehiclesFactory = new PVehiclesFactory(pConfig);
         this.agentsStuckHandler = agentsStuckHandler;
         this.stuckFactory = stuckFactory;
-		this.pBox = pBox;
 	}
 	
 	@Override

@@ -70,7 +70,7 @@ public class PModule {
 			public void install() {
 				this.bind(PBox.class).toInstance(pBox);
 				bindMobsim().toProvider(PQSimProvider.class) ;
-				PControlerListener pHook = new PControlerListener(controler, pBox, pTransitRouterFactory, stuckFactory, agentsStuckHandler);
+				PControlerListener pHook = new PControlerListener(controler, pTransitRouterFactory, stuckFactory, agentsStuckHandler);
 				this.addControlerListenerBinding().toInstance(pHook);
 			}
 		});
