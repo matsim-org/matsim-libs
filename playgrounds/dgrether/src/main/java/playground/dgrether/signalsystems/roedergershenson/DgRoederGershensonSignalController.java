@@ -49,6 +49,8 @@ import playground.dgrether.signalsystems.LinkSensorManager;
  */
 public class DgRoederGershensonSignalController implements SignalController {
 	
+	public final static String IDENTIFIER = "gretherRoederGershensonSignalControl";
+	
 	public final static class Builder {
 		private final LinkSensorManager sensorManager;
 		private final Scenario scenario;
@@ -85,8 +87,6 @@ public class DgRoederGershensonSignalController implements SignalController {
 		}
 		
 	}
-	
-	public final static String CONTROLLER_IDENTIFIER = "gretherRoederGershensonSignalControl";
 
 	private static final Logger log = Logger.getLogger(DgRoederGershensonSignalController.class);
 	

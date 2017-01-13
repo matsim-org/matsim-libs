@@ -255,7 +255,7 @@ public final class TtCreateBraessSignals {
 			// choose controller identifier
 			switch (this.signalLogic){
 			case DOWNSTREAM_RESPONSIVE:
-				signalSystemControl.setControllerIdentifier(DownstreamSignalController.CONTROLLER_IDENTIFIER);
+				signalSystemControl.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
 				break;
 			default:
 				// planbased controller identifier needed for planbased signal control, sylvia and the simple responsive signals used here

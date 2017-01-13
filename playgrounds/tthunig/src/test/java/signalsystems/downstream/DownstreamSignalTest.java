@@ -408,7 +408,7 @@ public class DownstreamSignalTest {
 
 		// create the signal control
 		SignalSystemControllerData signalSystemControl = conFac.createSignalSystemControllerData(signalSystemId);
-		signalSystemControl.setControllerIdentifier(DownstreamSignalController.CONTROLLER_IDENTIFIER);
+		signalSystemControl.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
 
 		// create a plan for the signal system (with defined cycle time and offset 0)
 		SignalPlanData signalPlan = SignalUtils.createSignalPlan(conFac, 60, 0, Id.create("SignalPlan1", SignalPlan.class));
@@ -451,7 +451,7 @@ public class DownstreamSignalTest {
 
 		// create the signal control
 		SignalSystemControllerData signalSystemControl = conFac.createSignalSystemControllerData(signalSystemId);
-		signalSystemControl.setControllerIdentifier(DownstreamSignalController.CONTROLLER_IDENTIFIER);
+		signalSystemControl.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
 
 		// create a plan for the signal system (with defined cycle time and offset 0)
 		SignalPlanData signalPlan = SignalUtils.createSignalPlan(conFac, 60, 0, Id.create("SignalPlan1", SignalPlan.class));

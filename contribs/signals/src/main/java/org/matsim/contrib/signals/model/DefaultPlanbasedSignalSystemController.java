@@ -39,6 +39,9 @@ public class DefaultPlanbasedSignalSystemController extends AbstractSignalContro
 	
 	private static final Logger log = Logger.getLogger(DefaultPlanbasedSignalSystemController.class);
 	
+	/* an identifier 'PlanbasedSignalControl' would be better analogously to all other identifiers of signal controller
+	 * but renaming would cause to much problems with old signal control input files. theresa jan'17
+	 */
 	public static final String IDENTIFIER = "DefaultPlanbasedSignalSystemController";
 	private LinkedList<SignalPlan> planQueue = null;
 	private SignalPlan activePlan = null;

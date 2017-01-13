@@ -59,8 +59,8 @@ public final class DgRoederGershensonSignalModelFactory implements SignalModelFa
 
 	@Override
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
-		if (DgRoederGershensonSignalController.CONTROLLER_IDENTIFIER.equals(controllerIdentifier)){
-			log.info("Created controller: " + DgRoederGershensonSignalController.CONTROLLER_IDENTIFIER);
+		if (DgRoederGershensonSignalController.IDENTIFIER.equals(controllerIdentifier)){
+			log.info("Created controller: " + DgRoederGershensonSignalController.IDENTIFIER);
 			return builder.build(signalSystem);
 		}
 		return this.delegate.createSignalSystemController(controllerIdentifier, signalSystem);

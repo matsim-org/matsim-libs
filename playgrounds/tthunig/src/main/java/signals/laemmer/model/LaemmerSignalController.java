@@ -42,7 +42,7 @@ public class LaemmerSignalController  extends AbstractSignalController implement
 
 	private static final Logger log = Logger.getLogger(LaemmerSignalController.class);
 	
-	public static final String IDENTIFIER = "LaemmerSignalSystemController";
+	public static final String IDENTIFIER = "LaemmerSignalControl";
 	
 	public final static class Builder {
 		private final LinkSensorManager sensorManager;

@@ -334,7 +334,7 @@ public class RunGridLock {
 		SignalSystemControllerData signalSystemControl = conFac.createSignalSystemControllerData(signalSystemId);
 		switch (SIGNALTYPE){
 		case DOWNSTREAM:
-			signalSystemControl.setControllerIdentifier(DownstreamSignalController.CONTROLLER_IDENTIFIER);
+			signalSystemControl.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
 			break;
 		case PLANBASED:
 			signalSystemControl.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);

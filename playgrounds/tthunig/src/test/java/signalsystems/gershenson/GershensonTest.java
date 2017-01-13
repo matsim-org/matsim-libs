@@ -314,7 +314,7 @@ public class GershensonTest {
 
 		// create the signal control
 		SignalSystemControllerData signalSystemControl = conFac.createSignalSystemControllerData(signalSystemId);
-		signalSystemControl.setControllerIdentifier(DgRoederGershensonSignalController.CONTROLLER_IDENTIFIER);
+		signalSystemControl.setControllerIdentifier(DgRoederGershensonSignalController.IDENTIFIER);
 		signalControl.addSignalSystemControllerData(signalSystemControl);
 
 		// no plan is needed for GershensonController

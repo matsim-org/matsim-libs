@@ -142,7 +142,7 @@ public class DgSylviaPreprocessData {
 		for (SignalSystemControllerData  controllerData: controlData.getSignalSystemControllerDataBySystemId().values()){
 			SignalSystemControllerData newControllerData = sylviaSignalControlData.getFactory().createSignalSystemControllerData(controllerData.getSignalSystemId());
 			sylviaSignalControlData.addSignalSystemControllerData(newControllerData);
-			newControllerData.setControllerIdentifier(SylviaSignalController.CONTROLLER_IDENTIFIER);
+			newControllerData.setControllerIdentifier(SylviaSignalController.IDENTIFIER);
 //			log.debug("");
 //			log.debug("system: " + controllerData.getSignalSystemId());
 			for (SignalPlanData signalPlan : controllerData.getSignalPlanData().values()) {

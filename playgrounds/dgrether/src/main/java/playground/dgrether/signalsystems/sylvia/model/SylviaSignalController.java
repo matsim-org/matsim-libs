@@ -55,7 +55,7 @@ public class SylviaSignalController extends AbstractSignalController implements 
 
 	private static final Logger log = Logger.getLogger(SylviaSignalController.class);
 	
-	public final static String CONTROLLER_IDENTIFIER = "SylviaSignalControl";
+	public final static String IDENTIFIER = "SylviaSignalControl";
 
 	private static int sylviaPlanDumpCount = 0;
 	

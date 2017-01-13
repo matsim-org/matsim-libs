@@ -51,7 +51,7 @@ public class DownstreamSignalController implements SignalController {
 
 	private static final Logger log = Logger.getLogger(DownstreamSignalController.class);
 
-	public final static String CONTROLLER_IDENTIFIER = "DownstreamSignalControl";
+	public final static String IDENTIFIER = "DownstreamSignalControl";
 
 	public final static class Builder {
 		private final LinkSensorManager sensorManager;

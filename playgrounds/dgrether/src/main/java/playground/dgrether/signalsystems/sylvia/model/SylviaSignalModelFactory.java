@@ -66,8 +66,8 @@ public final class SylviaSignalModelFactory implements SignalModelFactory {
 
 	@Override
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
-		if (SylviaSignalController.CONTROLLER_IDENTIFIER.equals(controllerIdentifier)){
-			log.info("Creating " + SylviaSignalController.CONTROLLER_IDENTIFIER);
+		if (SylviaSignalController.IDENTIFIER.equals(controllerIdentifier)){
+			log.info("Creating " + SylviaSignalController.IDENTIFIER);
 			return builder.build(signalSystem);
 		}
 		return this.delegate.createSignalSystemController(controllerIdentifier, signalSystem);
