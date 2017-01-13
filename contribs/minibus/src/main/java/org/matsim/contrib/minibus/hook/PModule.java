@@ -68,12 +68,7 @@ public class PModule {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Override
-					public Mobsim get() {
-						return new PQSimFactory().createMobsim(controler.getScenario(), controler.getEvents());
-					}
-				});
+				bindMobsim().toProvider(PQSimProvider.class) ;
 			}
 		});
 

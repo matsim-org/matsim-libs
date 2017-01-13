@@ -19,11 +19,14 @@
 
 package org.matsim.contrib.minibus.hook;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -41,41 +44,45 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
  * @author aneumann
  *
  */
-class PQSimFactory implements MobsimFactory {
+class PQSimProvider implements Provider<Mobsim> {
 
-    private final static Logger log = Logger.getLogger(PQSimFactory.class);
+	@SuppressWarnings("unused")
+	private final static Logger log = Logger.getLogger(PQSimProvider.class);
 
-    @Override
-    public Netsim createMobsim(Scenario scenario, EventsManager eventsManager) {
+	@Inject Scenario scenario ;
+	@Inject EventsManager eventsManager ;
 
-        QSimConfigGroup conf = scenario.getConfig().qsim();
-        if (conf == null) {
-            throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
-        }
+	@Override
+	public Netsim get() {
+
+		QSimConfigGroup conf = scenario.getConfig().qsim();
+		if (conf == null) {
+			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
+		}
 
 		QSim qSim = new QSim(scenario, eventsManager);
 		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
-        QNetsimEngineModule.configure(qSim);
+		QNetsimEngineModule.configure(qSim);
 		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
-        AgentFactory agentFactory;
-        
-        if (scenario.getConfig().transit().isUseTransit()) {
-            agentFactory = new PTransitAgentFactory(qSim);
-            TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-            transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-            qSim.addDepartureHandler(transitEngine);
-            qSim.addAgentSource(transitEngine);
-            qSim.addMobsimEngine(transitEngine);
-        } else {
-            agentFactory = new DefaultAgentFactory(qSim);
-        }
-        
-        PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-        qSim.addAgentSource(agentSource);
-        return qSim;
-    }
+		AgentFactory agentFactory;
+
+		if (scenario.getConfig().transit().isUseTransit()) {
+			agentFactory = new PTransitAgentFactory(qSim);
+			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
+			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+			qSim.addDepartureHandler(transitEngine);
+			qSim.addAgentSource(transitEngine);
+			qSim.addMobsimEngine(transitEngine);
+		} else {
+			agentFactory = new DefaultAgentFactory(qSim);
+		}
+
+		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
+		qSim.addAgentSource(agentSource);
+		return qSim;
+	}
 
 }
