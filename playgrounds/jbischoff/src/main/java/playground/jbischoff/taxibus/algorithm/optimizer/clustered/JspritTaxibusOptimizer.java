@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -154,6 +155,12 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 			}
 			unplannedRequests.removeAll(dueRequests);
 			if (dueRequests.size() > 0) {
+				List<Set<TaxibusRequest>> filteredRequests = context.requestDeterminator.prefilterRequests(dueRequests);
+				
+				for (Set<TaxibusRequest> requestcluster : filteredRequests  ){
+					if (requestcluster.size()>0)
+					{
+				
 				VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
 				vrpBuilder.setFleetSize(FleetSize.FINITE);
 				Map<String, Vehicle> vehicles = new HashMap<>();
@@ -181,9 +188,10 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 				}
 
 				if (vrpBuilder.getAddedVehicles().isEmpty()) {
-					this.unplannedRequests.addAll(dueRequests);
+					this.unplannedRequests.addAll(requestcluster);
 				} else {
-					for (TaxibusRequest req : dueRequests) {
+					
+					for (TaxibusRequest req : requestcluster) {
 
 						String rId = req.getId().toString();
 						requests.put(rId, req);
@@ -199,7 +207,7 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 						double pickupOffSet = Math.max(e.getSimulationTime(), req.getT0());
 						Shipment shipment = Shipment.Builder.newInstance(rId).addSizeDimension(0, 1)
 								.setPickupLocation(fromLoc).setDeliveryLocation(toLoc)
-								.setPickupTimeWindow(TimeWindow.newInstance(pickupOffSet, pickupOffSet+ 1800)).build();
+								.setPickupTimeWindow(TimeWindow.newInstance(pickupOffSet, pickupOffSet+ 3600)).build();
 
 						vrpBuilder.addJob(shipment);
 					}
@@ -232,8 +240,12 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 						dispatch.addPath(VrpPaths.calcAndCreatePath(lastDestination, veh.getStartLink(), d + 60, router,
 								context.travelTime));
 						for (Job j : vr.getTourActivities().getJobs()) {
+							if (requests.containsKey(j.getId())){
 							TaxibusRequest r = requests.remove(j.getId());
-							dispatch.addRequest(r);
+							dispatch.addRequest(r);}
+							else {
+								Logger.getLogger(getClass()).error(j.getId() + " is not a part of request list? "+ requests.toString());
+							}
 						}
 						context.scheduler.scheduleRequest(dispatch);
 
@@ -249,7 +261,7 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 					 */
 //					SolutionPrinter.print(bestSolution);
 
-				}
+				}}}
 			}
 		}
 	}

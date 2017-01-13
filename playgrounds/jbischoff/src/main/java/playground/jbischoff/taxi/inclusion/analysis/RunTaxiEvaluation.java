@@ -66,7 +66,7 @@ public class RunTaxiEvaluation {
 
 		for (int i = 50; i <= 1000; i = i + 50) {
 			String runId = "taxis_" + i;
-			String dir = "D:/runs-svn/barrierFreeTaxi/run_" + i + "/";
+			String dir = "D:/runs-svn/barrierFreeTaxi/1500_run_" + i + "/";
 			System.out.println("run " + runId);
 			ZoneBasedBarrierFreeTaxiCustomerWaitHandler zoneBasedTaxiCustomerWaitHandlerBF = new ZoneBasedBarrierFreeTaxiCustomerWaitHandler(
 					network, geo, true);

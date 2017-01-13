@@ -57,7 +57,8 @@ public class CreateInclusionPlans {
 
 	private static final String DIR = "C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/inclusion/";
 	private static final int sets = 10;
-	private static final int customers = 642;
+//	private static final int customers = 642;
+	private static final int customers = 1500;
 	/**
 	 * @param args
 	 */
@@ -75,7 +76,7 @@ public class CreateInclusionPlans {
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:25833",TransformationFactory.DHDN_GK4);
 		for (int i = 0; i<sets; i++){
 			Scenario taxi_scen = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			new PopulationReader(taxi_scen).readFile(DIR+"orig_demand/plans4to3_1.0.xml.gz");
+			new PopulationReader(taxi_scen).readFile(DIR+"orig_demand/plans4to3_1.5.xml.gz");
 			
 			Random random = new Random(4711+i);
 			ArrayList<Person> allPlans = new ArrayList<>();

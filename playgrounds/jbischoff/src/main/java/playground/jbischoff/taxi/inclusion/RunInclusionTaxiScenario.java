@@ -52,7 +52,7 @@ public class RunInclusionTaxiScenario
     	
         Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(),
                 new OTFVisConfigGroup());
-        config.controler().setOutputDirectory("D:/runs-svn/barrierFreeTaxi/run_"+i+"/");
+        config.controler().setOutputDirectory("D:/runs-svn/barrierFreeTaxi/1500_run_"+i+"/");
         config.controler().setRunId("taxis_"+i);
         TaxiConfigGroup taxi = (TaxiConfigGroup) config.getModules().get(TaxiConfigGroup.GROUP_NAME);
         taxi.setTaxisFile("hc_vehicles"+i+".xml.gz");
