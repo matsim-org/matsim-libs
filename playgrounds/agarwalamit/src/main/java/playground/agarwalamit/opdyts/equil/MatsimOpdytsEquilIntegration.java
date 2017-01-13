@@ -55,7 +55,7 @@ import playground.kairuns.run.KNBerlinControler;
 
 public class MatsimOpdytsEquilIntegration {
 
-	public static final OpdytsScenarios EQUIL = OpdytsScenarios.EQUIL;
+	public static final OpdytsScenario EQUIL = OpdytsScenario.EQUIL;
 	private static final String EQUIL_DIR = "./matsim/examples/equil/";
 	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,pt_withoutHoles_200its/";
 
@@ -120,7 +120,7 @@ public class MatsimOpdytsEquilIntegration {
 		modes2consider.add("car");
 		modes2consider.add("bike");
 
-		DistanceDistribution distanceDistribution = new EquilDistanceDistribution(OpdytsScenarios.EQUIL);
+		DistanceDistribution distanceDistribution = new EquilDistanceDistribution(OpdytsScenario.EQUIL);
 		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,distanceDistribution);
 
 		// following is the  entry point to start a matsim controler together with opdyts

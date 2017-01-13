@@ -30,5 +30,5 @@ public interface DistanceDistribution {
 
     SortedMap<String, double []> getMode2DistanceBasedLegs();
 
-    OpdytsScenarios getOpdytsScenario();
+    OpdytsScenario getOpdytsScenario();
 }

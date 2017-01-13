@@ -22,7 +22,7 @@ package playground.agarwalamit.opdyts.patna;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import playground.agarwalamit.opdyts.DistanceDistribution;
-import playground.agarwalamit.opdyts.OpdytsScenarios;
+import playground.agarwalamit.opdyts.OpdytsScenario;
 import playground.agarwalamit.opdyts.equil.EquilDistanceDistribution;
 
 /**
@@ -35,12 +35,12 @@ public final class PatnaCMPDistanceDistribution implements DistanceDistribution 
     private final SortedMap<String, double []> mode2legs = new TreeMap<>();
     private final double [] distClasses = new double[] {0., 2000., 4000., 6000., 8000., 10000.};
     private double legsSumAllModes = 0;
-    private final OpdytsScenarios opdytsScenarios;
+    private final OpdytsScenario opdytsScenario;
 
-    PatnaCMPDistanceDistribution (final OpdytsScenarios opdytsScenarios){
-        this.opdytsScenarios = opdytsScenarios;
+    PatnaCMPDistanceDistribution (final OpdytsScenario opdytsScenario){
+        this.opdytsScenario = opdytsScenario;
         double totalLegs = 0 ;
-        switch (opdytsScenarios) {
+        switch (opdytsScenario) {
             case EQUIL:
             case EQUIL_MIXEDTRAFFIC:
                 throw new RuntimeException("Use "+ EquilDistanceDistribution.class.getSimpleName()+" instead.");
@@ -110,7 +110,7 @@ public final class PatnaCMPDistanceDistribution implements DistanceDistribution 
     }
 
     @Override
-    public OpdytsScenarios getOpdytsScenario(){
-        return this.opdytsScenarios;
+    public OpdytsScenario getOpdytsScenario(){
+        return this.opdytsScenario;
     }
 }

@@ -23,7 +23,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import org.matsim.api.core.v01.TransportMode;
 import playground.agarwalamit.opdyts.DistanceDistribution;
-import playground.agarwalamit.opdyts.OpdytsScenarios;
+import playground.agarwalamit.opdyts.OpdytsScenario;
 import playground.agarwalamit.opdyts.patna.PatnaCMPDistanceDistribution;
 
 /**
@@ -34,15 +34,15 @@ public class EquilDistanceDistribution implements DistanceDistribution {
 
     private final SortedMap<String, double []> mode2legs = new TreeMap<>();
     private final double [] distClasses = new double[] {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.};
-    private final OpdytsScenarios opdytsScenarios;
+    private final OpdytsScenario opdytsScenario;
 
-    EquilDistanceDistribution(final OpdytsScenarios opdytsScenarios){
-        this.opdytsScenarios = opdytsScenarios;
+    EquilDistanceDistribution(final OpdytsScenario opdytsScenario){
+        this.opdytsScenario = opdytsScenario;
         double totalLegs = 4000;
         double carVals = 1000.;
         int bin = 8;
         String secondMode = null;
-        switch (opdytsScenarios) {
+        switch (opdytsScenario) {
             case EQUIL:
                 secondMode = TransportMode.pt;
                 break;
@@ -84,8 +84,8 @@ public class EquilDistanceDistribution implements DistanceDistribution {
     }
 
     @Override
-    public OpdytsScenarios getOpdytsScenario(){
-        return this.opdytsScenarios;
+    public OpdytsScenario getOpdytsScenario(){
+        return this.opdytsScenario;
     }
 
 }

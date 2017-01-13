@@ -34,12 +34,12 @@ public class ModeChoiceDecisionVariable implements DecisionVariable {
 
     playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable delegate ;
 
-    private final OpdytsScenarios objectiveFunctionCases;
+    private final OpdytsScenario objectiveFunctionCases;
     private final String subPopulation;
     private final PlanCalcScoreConfigGroup newScoreConfig;
 
     public ModeChoiceDecisionVariable(final PlanCalcScoreConfigGroup neScoreConfig, final Scenario scenario,
-                                      final OpdytsScenarios objectiveFunctionCases, final String subPopulatioun){
+                                      final OpdytsScenario objectiveFunctionCases, final String subPopulatioun){
         delegate = new playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable(neScoreConfig,scenario);
         this.newScoreConfig = neScoreConfig;
         this.objectiveFunctionCases = objectiveFunctionCases;
@@ -48,7 +48,7 @@ public class ModeChoiceDecisionVariable implements DecisionVariable {
     }
 
     public ModeChoiceDecisionVariable(final PlanCalcScoreConfigGroup neScoreConfig, final Scenario scenario,
-                               final OpdytsScenarios objectiveFunctionCases){
+                               final OpdytsScenario objectiveFunctionCases){
         this (neScoreConfig, scenario, objectiveFunctionCases, null);
     }
 

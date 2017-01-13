@@ -35,7 +35,7 @@ import playground.agarwalamit.analysis.tripTime.ModalTravelTimeControlerListener
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.opdyts.OpdytsModalStatsControlerListener;
-import playground.agarwalamit.opdyts.OpdytsScenarios;
+import playground.agarwalamit.opdyts.OpdytsScenario;
 
 /**
  * @author amit
@@ -75,7 +75,8 @@ public class PatnaPlansRelaxor {
 				this.bind(ModalTripTravelTimeHandler.class);
 				this.addControlerListenerBinding().to(ModalTravelTimeControlerListener.class);
 
-				this.addControlerListenerBinding().toInstance(new OpdytsModalStatsControlerListener(modes2consider, new PatnaCMPDistanceDistribution(OpdytsScenarios.PATNA_1Pct)));
+				this.addControlerListenerBinding().toInstance(new OpdytsModalStatsControlerListener(modes2consider, new PatnaCMPDistanceDistribution(
+						OpdytsScenario.PATNA_1Pct)));
 			}
 		});
 	controler.run();

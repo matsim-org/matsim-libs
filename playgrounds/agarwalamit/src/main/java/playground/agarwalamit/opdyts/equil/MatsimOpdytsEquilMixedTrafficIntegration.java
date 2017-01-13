@@ -58,7 +58,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 	private static final String EQUIL_DIR = "./examples/scenarios/equil-mixedTraffic/";
 	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil-mixedTraffic/";
-	public static final OpdytsScenarios EQUIL_MIXEDTRAFFIC = OpdytsScenarios.EQUIL_MIXEDTRAFFIC;
+	public static final OpdytsScenario EQUIL_MIXEDTRAFFIC = OpdytsScenario.EQUIL_MIXEDTRAFFIC;
 
 	public static void main(String[] args) {
 		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
@@ -135,7 +135,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		modes2consider.add("car");
 		modes2consider.add("bike");
 
-		DistanceDistribution distanceDistribution = new EquilDistanceDistribution(OpdytsScenarios.EQUIL_MIXEDTRAFFIC);
+		DistanceDistribution distanceDistribution = new EquilDistanceDistribution(OpdytsScenario.EQUIL_MIXEDTRAFFIC);
 		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,distanceDistribution);
 
 		// following is the  entry point to start a matsim controler together with opdyts
