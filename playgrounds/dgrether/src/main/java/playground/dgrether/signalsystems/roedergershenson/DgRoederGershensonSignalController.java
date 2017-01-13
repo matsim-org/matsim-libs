@@ -47,7 +47,21 @@ import playground.dgrether.signalsystems.LinkSensorManager;
  * @author dgrether
  *
  */
-public class DgRoederGershensonController implements SignalController {
+public class DgRoederGershensonSignalController implements SignalController {
+	
+	public final static class Builder {
+		private final LinkSensorManager sensorManager;
+		private final Scenario scenario;
+
+		public Builder(LinkSensorManager sensorManager, Scenario scenario) {
+			this.sensorManager = sensorManager;
+			this.scenario = scenario;
+		}
+
+		public DgRoederGershensonSignalController build(SignalSystem signalSystem) {
+			return new DgRoederGershensonSignalController(scenario, sensorManager, signalSystem);
+		}
+	}
 	
 	private class SignalGroupMetadata {
 
@@ -74,7 +88,7 @@ public class DgRoederGershensonController implements SignalController {
 	
 	public final static String CONTROLLER_IDENTIFIER = "gretherRoederGershensonSignalControl";
 
-	private static final Logger log = Logger.getLogger(DgRoederGershensonController.class);
+	private static final Logger log = Logger.getLogger(DgRoederGershensonSignalController.class);
 	
 	private final SignalSystem system;
 
@@ -98,33 +112,32 @@ public class DgRoederGershensonController implements SignalController {
 
 	private double switchedGreen = 0;
 
-	private LinkSensorManager sensorManager = null;
+	private LinkSensorManager sensorManager;
+	private Scenario scenario;
 
-	private Map<Id, SignalGroupMetadata> signalGroupIdMetadataMap = null;
+	private Map<Id<SignalGroup>, SignalGroupMetadata> signalGroupIdMetadataMap;
 	
-	public DgRoederGershensonController( SignalSystem system ) {
+	private DgRoederGershensonSignalController(Scenario scenario, LinkSensorManager sensorManager, SignalSystem system ) {
+		this.scenario = scenario;
+		this.sensorManager = sensorManager;
 		this.system = system ;
+		
+		initSignalGroupMetadata();
+		registerAndInitializeSensorManager();
 	}
 
-	
-	public void registerAndInitializeSensorManager(LinkSensorManager sensorManager) {
-		this.sensorManager = sensorManager;
+	private void registerAndInitializeSensorManager() {
 		for (SignalGroupMetadata metadata : this.signalGroupIdMetadataMap.values()){
 			for (Link outLink : metadata.getOutLinks()){
 				this.sensorManager.registerNumberOfCarsMonitoring(outLink.getId());
 			}
 			//TODO initialize inLinks
-			
-		}
-		
-
-	
+		}	
 	}
 
-	
-	public void initSignalGroupMetadata(Scenario scenario){
+	private void initSignalGroupMetadata(){
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-		this.signalGroupIdMetadataMap = new HashMap<Id, SignalGroupMetadata>();
+		this.signalGroupIdMetadataMap = new HashMap<>();
 		SignalSystemData systemData = signalsData.getSignalSystemsData().getSignalSystemData().get(this.system.getId());
 		
 		for (SignalGroup signalGroup : this.system.getSignalGroups().values()){
@@ -144,13 +157,13 @@ public class DgRoederGershensonController implements SignalController {
 					}
 					else { // there are lanes
 						LanesToLinkAssignment lanes4link = scenario.getLanes().getLanesToLinkAssignments().get(signalData.getLinkId());
-						for (Id  laneId : signalData.getLaneIds()){
+						for (Id<Lane> laneId : signalData.getLaneIds()){
 							Lane lane = lanes4link.getLanes().get(laneId);
 							if (lane.getToLinkIds() == null || lane.getToLinkIds().isEmpty()){
 								this.addOutLinksWithoutBackLinkToMetadata(inLink, metadata);
 							}
 							else{
-								for (Id toLinkId : lane.getToLinkIds()){
+								for (Id<Link> toLinkId : lane.getToLinkIds()){
 									Link toLink = scenario.getNetwork().getLinks().get(toLinkId);
 									if (!toLink.getFromNode().equals(inLink.getToNode())){
 										metadata.addOutLink(toLink);
@@ -161,7 +174,7 @@ public class DgRoederGershensonController implements SignalController {
 					}
 				}
 				else {  // turning move restrictions exist
-					for (Id linkid : signalData.getTurningMoveRestrictions()){
+					for (Id<Link> linkid : signalData.getTurningMoveRestrictions()){
 						Link outLink = scenario.getNetwork().getLinks().get(linkid);
 						metadata.addOutLink(outLink);
 					}
@@ -182,7 +195,7 @@ public class DgRoederGershensonController implements SignalController {
 	@Override
 	public void simulationInitialized(double simStartTimeSeconds) {
 		SignalGroup last = null;
-		this.groupStateMap = new HashMap<Id, GroupState>();
+		this.groupStateMap = new HashMap<>();
 		for (SignalGroup g : this.system.getSignalGroups().values()){
 			GroupState state = new GroupState();
 			state.lastDropping = simStartTimeSeconds;
@@ -206,7 +219,7 @@ public class DgRoederGershensonController implements SignalController {
 	
 	private boolean hasOutLinkJam(SignalGroup group, SignalGroupMetadata metadata){
 		for (Link link : metadata.getOutLinks()){
-			double storageCap = (link.getLength() * link.getNumberOfLanes()) / (7.5 * this.storageCapFactor);
+			double storageCap = (link.getLength() * link.getNumberOfLanes()) / (7.5 * this.scenario.getConfig().qsim().getStorageCapFactor());
 			if (this.sensorManager.getNumberOfCarsOnLink(link.getId()) > (storageCap * this.storageCapacityOutlinkJam)){
 				return true;
 			}
@@ -219,9 +232,7 @@ public class DgRoederGershensonController implements SignalController {
 	 */
 	private SignalGroup greenGroup;
 	
-	private Map<Id, GroupState> groupStateMap;
-
-	private double storageCapFactor;
+	private Map<Id<SignalGroup>, GroupState> groupStateMap;
 
 	private boolean allRed;
 	
@@ -336,11 +347,5 @@ public class DgRoederGershensonController implements SignalController {
 	public void reset(Integer iterationNumber) {
 		// TODO Auto-generated method stub
 	}
-
-
-	public void setStorageCapFactor(double storageCapFactor) {
-		this.storageCapFactor = storageCapFactor;
-	}
-
 
 }

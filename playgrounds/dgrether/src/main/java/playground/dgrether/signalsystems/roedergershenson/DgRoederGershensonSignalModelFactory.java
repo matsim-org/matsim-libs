@@ -21,25 +21,35 @@ package playground.dgrether.signalsystems.roedergershenson;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.SignalModelFactory;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 
+import com.google.inject.Inject;
+
+import playground.dgrether.signalsystems.LinkSensorManager;
+import playground.dgrether.signalsystems.roedergershenson.DgRoederGershensonSignalController.Builder;
+
 
 /**
  * @author dgrether
  *
  */
-public final class DgGershensonRoederSignalModelFactory implements SignalModelFactory {
+public final class DgRoederGershensonSignalModelFactory implements SignalModelFactory {
 	
-	private static final Logger log = Logger.getLogger(DgGershensonRoederSignalModelFactory.class);
+	private static final Logger log = Logger.getLogger(DgRoederGershensonSignalModelFactory.class);
 	
-	private SignalModelFactory delegate;
-
-	public DgGershensonRoederSignalModelFactory(SignalModelFactory delegate){
-		this.delegate = delegate;
+	private SignalModelFactory delegate = new DefaultSignalModelFactory();
+	
+	private Builder builder;
+	
+	@Inject 
+	public DgRoederGershensonSignalModelFactory(Scenario scenario, LinkSensorManager sensorManager) {
+		builder = new DgRoederGershensonSignalController.Builder(sensorManager, scenario);
 	}
 	
 	@Override
@@ -49,9 +59,9 @@ public final class DgGershensonRoederSignalModelFactory implements SignalModelFa
 
 	@Override
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
-		if (DgRoederGershensonController.CONTROLLER_IDENTIFIER.equals(controllerIdentifier)){
-			log.info("Created controller: " + DgRoederGershensonController.CONTROLLER_IDENTIFIER);
-			return new DgRoederGershensonController(signalSystem);
+		if (DgRoederGershensonSignalController.CONTROLLER_IDENTIFIER.equals(controllerIdentifier)){
+			log.info("Created controller: " + DgRoederGershensonSignalController.CONTROLLER_IDENTIFIER);
+			return builder.build(signalSystem);
 		}
 		return this.delegate.createSignalSystemController(controllerIdentifier, signalSystem);
 	}

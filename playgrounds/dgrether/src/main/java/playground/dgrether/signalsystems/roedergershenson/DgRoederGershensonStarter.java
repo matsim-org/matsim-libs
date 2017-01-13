@@ -19,7 +19,13 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.roedergershenson;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 
 
 /**
@@ -32,10 +38,11 @@ public class DgRoederGershensonStarter {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Controler controler = new Controler(args);
-		DgRoederGershensonSignalsControllerListenerFactory signalsFactory = new DgRoederGershensonSignalsControllerListenerFactory();
-        //FIXME: Take care that the normal SignalsControllerListener is NOT added.
-        controler.addControlerListener(signalsFactory.createSignalsControllerListener());
+		Config config = ConfigUtils.loadConfig(args[0]);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new DgRoederGershensonSignalsModule());
         controler.run();
 	}
 
