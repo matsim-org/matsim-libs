@@ -47,7 +47,7 @@ public class SignalsModule extends AbstractModule {
 		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
 			// bindings for fixed-time signals
 			bind(SignalModelFactory.class).to(DefaultSignalModelFactory.class);
-			addControlerListenerBinding().to(FixedTimeSignalControlerListener.class);
+			addControlerListenerBinding().to(DefaultSignalControlerListener.class);
 
 			// general signal bindings
 			bind(SignalSystemsModelBuilder.class).to(FromDataBuilder.class);

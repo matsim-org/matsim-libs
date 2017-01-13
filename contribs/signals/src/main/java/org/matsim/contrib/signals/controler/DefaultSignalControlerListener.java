@@ -32,7 +32,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
  * @author dgrether
  *
  */
-final class FixedTimeSignalControlerListener implements SignalControlerListener, ShutdownListener {
+final class DefaultSignalControlerListener implements SignalControlerListener, ShutdownListener {
 	
 	@Override
 	public final void notifyShutdown(ShutdownEvent event) {
