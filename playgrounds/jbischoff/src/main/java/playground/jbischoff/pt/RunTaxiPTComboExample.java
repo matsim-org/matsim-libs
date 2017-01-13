@@ -34,11 +34,15 @@ import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.contrib.taxi.run.TaxiQSimProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
-import playground.jbischoff.analysis.TripHistogramModule;
+import com.google.inject.name.Names;
+
 
 /**
  * @author  jbischoff
@@ -80,8 +84,16 @@ public static void main(String[] args) {
        config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
        config.checkConsistency();
 
+       
        Scenario scenario = ScenarioUtils.loadScenario(config);
-       TaxiData taxiData = new TaxiData();
+       Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+      
+       // special, second transit schedule for our special pt mode, i.e. only railway lines
+       new TransitScheduleReader(scenario2).readFile(config.transit().getTransitScheduleFileURL(config.getContext()).getFile());
+     final TransitSchedule schedule = scenario2.getTransitSchedule(); 
+
+      
+      	TaxiData taxiData = new TaxiData();
        new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
        Controler controler = new Controler(scenario);
        controler.addOverridingModule(new TaxiModule(taxiData));
@@ -91,7 +103,17 @@ public static void main(String[] args) {
        controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
        controler.addOverridingModule(new VariableAccessTransitRouterModule());
 //       controler.addOverridingModule(new TripHistogramModule());
-//       controler.addOverridingModule(new OTFVisLiveModule());
+       controler.addOverridingModule(new OTFVisLiveModule());
+       
+       controler.addOverridingModule(new AbstractModule() {
+		
+		
+		@Override
+		public void install() {
+			bind(TransitSchedule.class).annotatedWith(Names.named("variableAccess")).toInstance(schedule);
+			
+		}
+	});
 
        controler.run();
 

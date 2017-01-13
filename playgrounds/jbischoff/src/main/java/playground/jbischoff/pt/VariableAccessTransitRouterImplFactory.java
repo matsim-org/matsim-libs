@@ -37,6 +37,8 @@ import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
+import com.google.inject.name.Named;
+
 import java.util.HashSet;
 
 import javax.inject.Inject;
@@ -57,7 +59,7 @@ public class VariableAccessTransitRouterImplFactory implements Provider<TransitR
 	private final Network carnetwork;
 
 	@Inject
-	VariableAccessTransitRouterImplFactory(final TransitSchedule schedule, final Config config, final Network network) {
+	VariableAccessTransitRouterImplFactory(final @Named("variableAccess") TransitSchedule schedule, final Config config, final Network network) {
 		this.config = config;
 
 		this.transitRouterconfig = new TransitRouterConfig(config.planCalcScore(),config.plansCalcRoute(),config.transitRouter(),config.vspExperimental());

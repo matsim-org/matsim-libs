@@ -18,7 +18,7 @@ public class VariableAccessTransit implements Provider<RoutingModule> {
 	private final RoutingModule transitWalkRouter;
 
 	@Inject
-    VariableAccessTransit(TransitRouter transitRouter, Scenario scenario, @Named(TransportMode.transit_walk) RoutingModule transitWalkRouter) {
+    VariableAccessTransit(@Named("variableAccess") TransitRouter transitRouter, Scenario scenario, @Named(TransportMode.transit_walk) RoutingModule transitWalkRouter) {
 		this.transitRouter = transitRouter;
 		this.scenario = scenario;
 		this.transitWalkRouter = transitWalkRouter;

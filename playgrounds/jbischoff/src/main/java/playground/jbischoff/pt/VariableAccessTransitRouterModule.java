@@ -26,6 +26,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.pt.router.TransitRouter;
 
+import com.google.inject.name.Named;
+import com.google.inject.name.Names;
+
 
 public class VariableAccessTransitRouterModule extends AbstractModule {
 
@@ -33,7 +36,7 @@ public class VariableAccessTransitRouterModule extends AbstractModule {
     public void install() {
         if (getConfig().transit().isUseTransit()) {
         	addRoutingModuleBinding(TransportMode.pt).toProvider(VariableAccessTransit.class);
-            bind(TransitRouter.class).toProvider(VariableAccessTransitRouterImplFactory.class);
+            bind(TransitRouter.class).annotatedWith(Names.named("variableAccess")).toProvider(VariableAccessTransitRouterImplFactory.class);
         }
     }
 
