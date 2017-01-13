@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgSylviaControlerListenerFactory
+ * RunOTFVis
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,21 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.laemmer.controler;
+package playground.dgrether.signalsystems.laemmer.testsinglecrossing;
 
-import org.matsim.contrib.signals.controler.SignalControlerListener;
-import org.matsim.contrib.signals.controler.SignalsControllerListenerFactory;
+import org.matsim.api.core.v01.Scenario;
+
+import playground.dgrether.signalsystems.laemmer.run.LaemmerOTFStarter;
 
 
 /**
  * @author dgrether
  *
  */
-public class LaemmerControlerListenerFactory implements SignalsControllerListenerFactory {
+public class SingleCrossingRunOTFVis {
 
-	@Override
-	public SignalControlerListener createSignalsControllerListener() {
-		return new LaemmerSignalControlerListener();
+	public static void main(String[] args) {
+		double lambdaWestEast = 0.5;
+		Scenario scenario = new SingleCrossingScenario().createScenario(lambdaWestEast, false);
+		new LaemmerOTFStarter().playScenario(scenario);
 	}
 
 }

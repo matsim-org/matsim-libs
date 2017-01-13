@@ -17,26 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.laemmer.otfvis;
+package playground.dgrether.signalsystems.laemmer.run;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
-import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
-import org.matsim.contrib.signals.builder.FromDataBuilder;
-import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
-import org.matsim.contrib.signals.mobsim.SignalEngine;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.NewControlerModule;
+import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
-import playground.dgrether.signalsystems.LinkSensorManager;
-import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalModelFactory;
+import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalsModule;
 import playground.dgrether.utils.DgOTFVisUtils;
-
 
 /**
  * @author dgrether
@@ -44,30 +45,37 @@ import playground.dgrether.utils.DgOTFVisUtils;
  */
 public class LaemmerOTFStarter {
 
-	public void prepare4SimAndPlay(Scenario scenario){
+	public void prepare4SimAndPlay(Scenario scenario) {
 		DgOTFVisUtils.preparePopulation4Simulation(scenario);
 		this.playScenario(scenario);
 	}
-	
-	public void playScenario(Scenario scenario){
-//		EventsManager events = EventsUtils.createEventsManager();
-//
-//		LinkSensorManager sensorManager = new LinkSensorManager(scenario, events);
-//		
-//		DefaultSignalModelFactory defaultSignalModelFactory = new DefaultSignalModelFactory();
-//		LaemmerSignalModelFactory signalModelFactory = new LaemmerSignalModelFactory(defaultSignalModelFactory, sensorManager);
-//		
-//		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, signalModelFactory , events);
-//		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
-//		
-//		SignalEngine engine = new QSimSignalEngine(signalManager);
-//		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
-//		otfVisQSim.addQueueSimulationListeners(engine);
-//		
-//		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
-//		OTFClientLive.run(scenario.getConfig(), server);
-//		otfVisQSim.run();
-		throw new UnsupportedOperationException("This constructor does no longer function. Please use inject syntax insted, see e.g. SylviaSignalsModule");
+
+	public void playScenario(Scenario scenario) {
+
+		Collection<AbstractModule> defaultsModules = new ArrayList<>();
+		defaultsModules.add(new ScenarioByInstanceModule(scenario));
+		defaultsModules.add(new ControlerDefaultsModule());
+
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+			@Override
+			public void install() {
+				install(new NewControlerModule());
+				install(new ControlerDefaultCoreListenersModule());
+				install(new ControlerDefaultsModule());
+				install(new ScenarioByInstanceModule(scenario));
+				install(new LaemmerSignalsModule());
+			}
+		});
+
+		EventsManager events = injector.getInstance(EventsManager.class);
+		events.initProcessing();
+		
+		QSim otfVisQSim = (QSim) injector.getInstance(Mobsim.class);
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
+		OTFClientLive.run(scenario.getConfig(), server);
+		
+		otfVisQSim.run();
+
 	}
 
 }

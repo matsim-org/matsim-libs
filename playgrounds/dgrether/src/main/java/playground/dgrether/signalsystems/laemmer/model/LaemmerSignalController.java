@@ -21,11 +21,14 @@ package playground.dgrether.signalsystems.laemmer.model;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.model.AbstractSignalController;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.lanes.data.Lane;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
 
@@ -40,12 +43,32 @@ public class LaemmerSignalController  extends AbstractSignalController implement
 	
 	public static final String IDENTIFIER = "LaemmerSignalSystemController";
 	
-	private LinkSensorManager sensorManager = null;
+	public final static class Builder {
+		private final LinkSensorManager sensorManager;
+		private final SignalsData signalsData;
+		private final Network network;
+
+		public Builder(LinkSensorManager sensorManager, SignalsData signalsData, Network network) {
+			this.sensorManager = sensorManager;
+			this.signalsData = signalsData;
+			this.network = network;
+		}
+
+		public LaemmerSignalController build(SignalSystem signalSystem) {
+			return new LaemmerSignalController(sensorManager, signalsData, network, signalSystem);
+		}
+	}	
+	
+	private LinkSensorManager sensorManager;
+	private SignalsData signalsData;
+	private Network network;
 
 	
-	public LaemmerSignalController(LinkSensorManager sensorManager, SignalSystem system){
+	private LaemmerSignalController(LinkSensorManager sensorManager, SignalsData signalsData, Network network, SignalSystem system){
 		super(system) ;
 		this.sensorManager = sensorManager;
+		this.signalsData = signalsData;
+		this.network = network;
 	}
 	
 	@Override
@@ -108,7 +131,7 @@ public class LaemmerSignalController  extends AbstractSignalController implement
 					this.sensorManager.registerNumberOfCarsMonitoring(signal.getLinkId());
 				}
 				else {
-					for (Id laneId : signal.getLaneIds()){
+					for (Id<Lane> laneId : signal.getLaneIds()){
 						//TODO check this part again concerning implementation of CarsOnLaneHandler
 						this.sensorManager.registerNumberOfCarsMonitoringOnLane(signal.getLinkId(), laneId);
 					}

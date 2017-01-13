@@ -17,13 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.laemmer;
+package playground.dgrether.signalsystems.laemmer.run;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import playground.dgrether.DgPaths;
-import playground.dgrether.signalsystems.laemmer.controler.LaemmerControlerListenerFactory;
+import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalsModule;
 
 
 /**
@@ -37,20 +43,17 @@ public class LaemmerMain {
 	 */
 	public static void main(String[] args) {
 		log.info("Running Laemmer main method...");
-		String[] args2 = null;
 		if (args == null || args.length == 0){
 			log.info("No args given, running local config...");
-			args2 = new String[1];
-			args2[0] = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/config.xml";
-		}
-		else {
-			args2 = args;
+			args = new String[1];
+			args[0] = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/config.xml";
 		}
 
-		
-		Controler controler = new Controler(args2);
-        //FIXME: Take care that the normal SignalsControllerListener is NOT added.
-        controler.addControlerListener(new LaemmerControlerListenerFactory().createSignalsControllerListener());
+		Config config = ConfigUtils.loadConfig(args[0]);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new LaemmerSignalsModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 

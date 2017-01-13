@@ -19,15 +19,22 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.laemmer.model;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.SignalModelFactory;
+import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 
+import com.google.inject.Inject;
+
 import playground.dgrether.signalsystems.LinkSensorManager;
+import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalController.Builder;
 
 
 /**
@@ -36,13 +43,17 @@ import playground.dgrether.signalsystems.LinkSensorManager;
  */
 public final class LaemmerSignalModelFactory implements SignalModelFactory {
 
-	private LinkSensorManager sensorManager;
-	private DefaultSignalModelFactory delegate;
+	private static final Logger log = Logger.getLogger(LaemmerSignalModelFactory.class);
+	
+	private DefaultSignalModelFactory delegate = new DefaultSignalModelFactory();
 
-	public LaemmerSignalModelFactory(DefaultSignalModelFactory defaultSignalModelFactory,
-			LinkSensorManager sensorManager) {
-		this.delegate = defaultSignalModelFactory;
-		this.sensorManager = sensorManager;
+	private Builder builder;
+	
+	@Inject
+	public LaemmerSignalModelFactory(LinkSensorManager sensorManager, Scenario scenario) {
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+		Network network = scenario.getNetwork();
+		this.builder = new LaemmerSignalController.Builder(sensorManager, signalsData, network);
 	}
 
 	@Override
@@ -53,7 +64,8 @@ public final class LaemmerSignalModelFactory implements SignalModelFactory {
 	@Override
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
 		if (LaemmerSignalController.IDENTIFIER.equals(controllerIdentifier)){
-			return new LaemmerSignalController(this.sensorManager, signalSystem);
+			log.info("Creating " + LaemmerSignalController.IDENTIFIER);
+			return builder.build(signalSystem) ;
 		}
 		return this.delegate.createSignalSystemController(controllerIdentifier, signalSystem);
 	}
