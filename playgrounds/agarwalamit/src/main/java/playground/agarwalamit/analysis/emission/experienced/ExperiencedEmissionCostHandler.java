@@ -56,17 +56,17 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 		this(emissionCostModule, null);
 	}
 
-	// munich specific data
-	private static final Integer noOfXCells = 270;
-	private static final Integer noOfYCells = 208;
-	private static final double xMin = 4452550.;
-	private static final double xMax = 4479550.;
-	private static final double yMin = 5324955.;
-	private static final double yMax = 5345755.;
-	private static final Double timeBinSize = 3600.;
-	private static final int noOfTimeBins = 30;
-
 	public static void main (String args []) {
+
+		// munich CNE specific data
+		final Integer noOfXCells = 270;
+		final Integer noOfYCells = 208;
+		final double xMin = 4452550.;
+		final double xMax = 4479550.;
+		final double yMin = 5324955.;
+		final double yMax = 5345755.;
+		final Double timeBinSize = 3600.;
+		final int noOfTimeBins = 30;
 
 		String networkFile = "/Users/amit/Documents/cluster/ils4/kaddoura/cne/munich/output/output_run5_muc_cne_QBPV3/output_network.xml.gz";
 		String emissinoEvenetsFile = "/Users/amit/Documents/cluster/ils4/kaddoura/cne/munich/output/output_run5_muc_cne_QBPV3/ITERS/it.1500/1500.emission.events.xml.gz";

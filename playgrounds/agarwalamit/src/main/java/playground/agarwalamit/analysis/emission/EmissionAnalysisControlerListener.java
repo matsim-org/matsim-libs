@@ -60,6 +60,7 @@ public class EmissionAnalysisControlerListener implements  ShutdownListener {
             return;
         }
 
+        this.emissionCostHandler.reset(0); // resetting everything.
         EventsManager events = EventsUtils.createEventsManager();
         events.addHandler(this.emissionCostHandler);
         EmissionEventsReader reader = new EmissionEventsReader(events);
