@@ -31,10 +31,10 @@ import org.matsim.vehicles.Vehicle;
  * @author aneumann
  *
  */
-public final class ScoreContainer {
+public final class PScoreContainer {
 	
 	@SuppressWarnings("unused")
-	private final static Logger log = Logger.getLogger(ScoreContainer.class);
+	private final static Logger log = Logger.getLogger(PScoreContainer.class);
 
 	private final Id<Vehicle> vehicleId;
 	private final TicketMachineI ticketMachine;
@@ -44,7 +44,7 @@ public final class ScoreContainer {
 	private double costs = 0;
 	private double earnings = 0;
 	
-	public ScoreContainer(Id<Vehicle> vehicleId, TicketMachineI ticketMachine) {
+	public PScoreContainer(Id<Vehicle> vehicleId, TicketMachineI ticketMachine) {
 		this.vehicleId = vehicleId;
 		this.ticketMachine = ticketMachine;
 	}

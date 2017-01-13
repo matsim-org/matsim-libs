@@ -35,26 +35,26 @@ import org.matsim.vehicles.Vehicle;
  * @author aneumann
  *
  */
-public final class ScorePlansHandler implements StageContainerHandler, OperatorCostContainerHandler{
+public final class PScorePlansHandler implements StageContainerHandler, OperatorCostContainerHandler{
 	
 	@SuppressWarnings("unused")
-	private final static Logger log = Logger.getLogger(ScorePlansHandler.class);
+	private final static Logger log = Logger.getLogger(PScorePlansHandler.class);
 	
 	private final TicketMachineI ticketMachine;
-	private Map<Id<Vehicle>, ScoreContainer> vehicleId2ScoreMap = new ConcurrentHashMap<>();
+	private Map<Id<Vehicle>, PScoreContainer> vehicleId2ScoreMap = new ConcurrentHashMap<>();
 
-	public ScorePlansHandler(TicketMachineI ticketMachine){
+	public PScorePlansHandler(TicketMachineI ticketMachine){
 		this.ticketMachine = ticketMachine;
 	}
 	
-	public Map<Id<Vehicle>, ScoreContainer> getDriverId2ScoreMap() {
+	public Map<Id<Vehicle>, PScoreContainer> getDriverId2ScoreMap() {
 		return this.vehicleId2ScoreMap;
 	}
 
 	@Override
 	public void handleFareContainer(StageContainer fareContainer) {
 		if (this.vehicleId2ScoreMap.get(fareContainer.getVehicleId()) == null) {
-			this.vehicleId2ScoreMap.put(fareContainer.getVehicleId(), new ScoreContainer(fareContainer.getVehicleId(), this.ticketMachine));
+			this.vehicleId2ScoreMap.put(fareContainer.getVehicleId(), new PScoreContainer(fareContainer.getVehicleId(), this.ticketMachine));
 		}
 
 		// TODO debugging, got a single null pointer here?! 
@@ -72,7 +72,7 @@ public final class ScorePlansHandler implements StageContainerHandler, OperatorC
     @Override
 	public void handleOperatorCostContainer(OperatorCostContainer operatorCostContainer) {
 		if (this.vehicleId2ScoreMap.get(operatorCostContainer.getVehicleId()) == null) {
-			this.vehicleId2ScoreMap.put(operatorCostContainer.getVehicleId(), new ScoreContainer(operatorCostContainer.getVehicleId(), this.ticketMachine));
+			this.vehicleId2ScoreMap.put(operatorCostContainer.getVehicleId(), new PScoreContainer(operatorCostContainer.getVehicleId(), this.ticketMachine));
 		}
 		
 		// TODO debugging, got a single null pointer here?! 
