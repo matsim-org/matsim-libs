@@ -19,22 +19,22 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.population;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.socnetsim.utils.CompactUnmodifiablePlanMap;
+
+import java.util.Map;
 
 /**
  * class for handling synchronized plans.
  * @author thibautd
  */
 public class JointPlan {
-	private final Map<Id<Person>,Plan> individualPlans = new LinkedHashMap< >();
+	private final CompactUnmodifiablePlanMap individualPlans;
 
 	JointPlan( final Map<Id<Person>, ? extends Plan> plans ) {
-		this.individualPlans.putAll( plans );
+		this.individualPlans = new CompactUnmodifiablePlanMap( plans.values() );
 	}
 
 	public Plan getIndividualPlan(final Id<Person> id) {
