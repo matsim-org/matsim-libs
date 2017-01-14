@@ -168,61 +168,6 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         return objectiveFnValue;
     }
 
-//    private double getSumOfAbsoluteErrorsObjectiveFunctionValue() {
-//        double objective = 0. ;
-//        for ( Map.Entry<StatType, Databins<String>> entry : simStatsContainer.entrySet() ) {
-//            StatType theStatType = entry.getKey() ;  // currently only one type ;
-//            log.warn( "statType=" + theStatType );
-//            if(! theStatType.equals(StatType.tripBeelineDistances)) throw new RuntimeException("not implemented yet.");
-//
-//            Databins<String> databins = entry.getValue() ;
-//            for ( Map.Entry<String, double[]> theEntry : databins.entrySet() ) {
-//                String mode = theEntry.getKey() ;
-//                log.warn("mode=" + mode);
-//
-//                double[] simValue = theEntry.getValue() ;
-//                double[] reaVal = this.refStatsContainer.get( theStatType).getValues(mode) ;
-//                for ( int ii=0 ; ii<simValue.length ; ii++ ) {
-//                    double diff = Math.abs( simValue[ii] - reaVal[ii] ) ;
-//                    if ( reaVal[ii]>0.1 || simValue[ii]>0.1 ) {
-//                        log.warn( "distanceBnd=" + databins.getDataBoundaries()[ii] + "; objVal=" + reaVal[ii] + "; simVal=" + simValue[ii] ) ;
-//                    }
-//                    objective +=  diff ;
-//                }
-//            }
-//        }
-//        log.warn( "objective=" + objective );
-//        return objective ;
-//    }
-//
-//    private double getSumOfSquareObjectiveFunctionValue(){
-//        log.error("This should be used with great caution, with Patna, it was not a good experience. See email from GF on 24.11.2016");
-//        double objective = 0. ;
-//        double sum = 0.;
-//        for ( Map.Entry<StatType, Databins<String>> entry : simStatsContainer.entrySet() ) {
-//            StatType theStatType = entry.getKey() ;  // currently only one type ;
-//            log.warn( "statType=" + theStatType );
-//            Databins<String> databins = entry.getValue() ;
-//            for ( Map.Entry<String, double[]> theEntry : databins.entrySet() ) {
-//                String mode = theEntry.getKey() ;
-//                log.warn("mode=" + mode);
-//                double[] simValue = theEntry.getValue() ;
-//                double[] reaVal = this.refStatsContainer.get( theStatType).getValues(mode) ;
-//                for ( int ii=0 ; ii<simValue.length ; ii++ ) {
-//                    double diff = simValue[ii] - reaVal[ii] ;
-//                    if ( reaVal[ii]>0.1 || simValue[ii]>0.1 ) {
-//                        log.warn( "distanceBnd=" + databins.getDataBoundaries()[ii] + "; objVal=" + reaVal[ii] + "; simVal=" + simValue[ii] ) ;
-//                    }
-//                    objective += diff * diff ;
-//                    sum += reaVal[ii] ;
-//                }
-//            }
-//        }
-//        objective /= (sum*sum) ;
-//        log.warn( "objective=" + objective );
-//        return objective ;
-//    }
-
     private void resetContainers() {
         for ( StatType statType : StatType.values() ) {
             this.simStatsContainer.get(statType).clear() ;
