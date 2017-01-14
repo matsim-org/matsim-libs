@@ -23,11 +23,12 @@ package playground.agarwalamit.opdyts;
 /**
  * Created by amit on 03/10/16.
  */
+@SuppressWarnings("DefaultFileTemplate")
 public enum OpdytsScenario {
 
     EQUIL,
     EQUIL_MIXEDTRAFFIC,
     PATNA_1Pct,
-    PATNA_10Pct;
+    PATNA_10Pct
 
 }

@@ -41,7 +41,7 @@ import playground.agarwalamit.opdyts.OpdytsScenario;
  * @author amit
  */
 
-public class PatnaPlansRelaxor {
+class PatnaPlansRelaxor {
 
 	public void run (String[] args) {
 

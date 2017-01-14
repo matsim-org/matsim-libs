@@ -43,6 +43,7 @@ import playground.agarwalamit.analysis.tripDistance.LegModeBeelineDistanceDistri
  * Created by amit on 20/09/16.
  */
 
+@SuppressWarnings("DefaultFileTemplate")
 public class OpdytsModalStatsControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 
     @Inject
@@ -116,7 +117,7 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
         Map<String, double []> simCounts = new TreeMap<>();
 
         // initialize simcounts array for each mode
-        realCounts.entrySet().stream().forEach(entry -> simCounts.put(entry.getKey(), new double[entry.getValue().length]));
+        realCounts.entrySet().forEach(entry -> simCounts.put(entry.getKey(), new double[entry.getValue().length]));
 
         SortedMap<String, SortedMap<Double, Integer>> simCountsHandler = this.beelineDistanceDistributionHandler.getMode2DistanceClass2LegCounts();
         for (Map.Entry<String, SortedMap<Double, Integer>> e : simCountsHandler.entrySet() ) {

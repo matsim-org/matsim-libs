@@ -31,6 +31,7 @@ import playground.agarwalamit.opdyts.equil.EquilDistanceDistribution;
  */
 
 
+@SuppressWarnings("DefaultFileTemplate")
 public final class PatnaCMPDistanceDistribution implements DistanceDistribution {
 
     private final Map<String, double []> mode2legs = new TreeMap<>();
@@ -40,7 +41,7 @@ public final class PatnaCMPDistanceDistribution implements DistanceDistribution 
 
     PatnaCMPDistanceDistribution (final OpdytsScenario opdytsScenario){
         this.opdytsScenario = opdytsScenario;
-        double totalLegs = 0 ;
+        double totalLegs ;
         switch (opdytsScenario) {
             case EQUIL:
             case EQUIL_MIXEDTRAFFIC:

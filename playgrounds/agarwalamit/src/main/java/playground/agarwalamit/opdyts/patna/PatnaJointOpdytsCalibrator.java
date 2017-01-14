@@ -55,8 +55,8 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 
 public class PatnaJointOpdytsCalibrator {
 
-	public static final String SUB_POP_NAME = PatnaPersonFilter.PatnaUserGroup.urban.toString();
-	public static final OpdytsScenario PATNA_10_PCT = OpdytsScenario.PATNA_10Pct;
+	private static final String SUB_POP_NAME = PatnaPersonFilter.PatnaUserGroup.urban.toString();
+	private static final OpdytsScenario PATNA_10_PCT = OpdytsScenario.PATNA_10Pct;
 	private static String OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/output222/";
 	private static final String configDir = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/input/";
 

@@ -31,6 +31,7 @@ import playground.agarwalamit.opdyts.patna.PatnaCMPDistanceDistribution;
  * Created by amit on 13/01/2017.
  */
 
+@SuppressWarnings("ALL")
 public class EquilDistanceDistribution implements DistanceDistribution {
 
     private final Map<String, double []> mode2legs = new TreeMap<>();
@@ -42,7 +43,7 @@ public class EquilDistanceDistribution implements DistanceDistribution {
         double totalLegs = 4000;
         double carVals = 1000.;
         int bin = 8;
-        String secondMode = null;
+        String secondMode ;
         switch (opdytsScenario) {
             case EQUIL:
                 secondMode = TransportMode.pt;

@@ -30,9 +30,10 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
  */
 
 
+@SuppressWarnings("DefaultFileTemplate")
 public class ModeChoiceDecisionVariable implements DecisionVariable {
 
-    playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable delegate ;
+    private final playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable delegate ;
 
     private final OpdytsScenario objectiveFunctionCases;
     private final String subPopulation;

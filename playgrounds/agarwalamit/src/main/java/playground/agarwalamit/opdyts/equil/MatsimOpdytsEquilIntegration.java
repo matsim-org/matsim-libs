@@ -56,7 +56,7 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 
 public class MatsimOpdytsEquilIntegration {
 
-	public static final OpdytsScenario EQUIL = OpdytsScenario.EQUIL;
+	private static final OpdytsScenario EQUIL = OpdytsScenario.EQUIL;
 	private static final String EQUIL_DIR = "./examples/scenarios/equil/";
 	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,pt_holes_KWM_200its/";
 
