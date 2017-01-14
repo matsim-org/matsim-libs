@@ -88,7 +88,7 @@ public class ObjectiveFunctionEvaluator {
                         break;
                     case SUM_SQR_DIFF_NORMALIZED:
                         objective += diff * diff;
-                        realValueSum += simValue[ii];
+                        realValueSum += realValue[ii];
                         break;
                     default:
                         throw new RuntimeException("not implemented yet.");
@@ -107,7 +107,7 @@ public class ObjectiveFunctionEvaluator {
                 throw new RuntimeException("not implemented yet.");
         }
 
-//        LOG.warn( "objective=" + objective );
+        LOG.warn( "objective=" + objective );
         return objective;
     }
 }

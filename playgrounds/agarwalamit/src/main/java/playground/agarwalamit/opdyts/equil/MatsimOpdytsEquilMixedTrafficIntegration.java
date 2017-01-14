@@ -61,6 +61,10 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 	public static final OpdytsScenario EQUIL_MIXEDTRAFFIC = OpdytsScenario.EQUIL_MIXEDTRAFFIC;
 
 	public static void main(String[] args) {
+		Set<String> modes2consider = new HashSet<>();
+		modes2consider.add("car");
+		modes2consider.add("bicycle");
+
 		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
 		Config config = ConfigUtils.loadConfig(EQUIL_DIR+"/config.xml");
 
@@ -71,7 +75,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		StrategyConfigGroup strategies = config.strategy();
 		strategies.clearStrategySettings();
 
-		config.changeMode().setModes(new String [] {"car","bicycle"});
+		config.changeMode().setModes( modes2consider.toArray(new String [modes2consider.size()]));
 		StrategySettings modeChoice = new StrategySettings();
 		modeChoice.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.name()); // dont know, how it will work
 		modeChoice.setWeight(0.1);
@@ -131,10 +135,6 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		int binCount = 24; // to me, binCount and binSize must be related
 		TimeDiscretization timeDiscretization = new TimeDiscretization(startTime, binSize, binCount);
 
-		Set<String> modes2consider = new HashSet<>();
-		modes2consider.add("car");
-		modes2consider.add("bicycle");
-
 		DistanceDistribution distanceDistribution = new EquilDistanceDistribution(OpdytsScenario.EQUIL_MIXEDTRAFFIC);
 		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,distanceDistribution);
 
@@ -145,8 +145,8 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 			@Override
 			public void install() {
 				// add here whatever should be attached to matsim controler
-				addTravelTimeBinding("bicycle").to(networkTravelTime());
-				addTravelDisutilityFactoryBinding("bicycle").to(carTravelDisutilityFactoryKey());
+//				addTravelTimeBinding("bicycle").to(networkTravelTime());
+//				addTravelDisutilityFactoryBinding("bicycle").to(carTravelDisutilityFactoryKey());
 
 				// some stats
 				addControlerListenerBinding().to(KaiAnalysisListener.class);
