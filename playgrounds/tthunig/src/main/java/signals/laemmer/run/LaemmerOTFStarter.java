@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package signals.laemmer.run;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -53,17 +50,16 @@ public class LaemmerOTFStarter {
 
 	public void playScenario(Scenario scenario) {
 
-		Collection<AbstractModule> defaultsModules = new ArrayList<>();
-		defaultsModules.add(new ScenarioByInstanceModule(scenario));
-		defaultsModules.add(new ControlerDefaultsModule());
-
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
 			@Override
 			public void install() {
+				// defaults
 				install(new NewControlerModule());
 				install(new ControlerDefaultCoreListenersModule());
 				install(new ControlerDefaultsModule());
 				install(new ScenarioByInstanceModule(scenario));
+				
+				// signal specific module
 				install(new LaemmerSignalsModule());
 			}
 		});
