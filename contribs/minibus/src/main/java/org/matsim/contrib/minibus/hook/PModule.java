@@ -25,6 +25,7 @@ package org.matsim.contrib.minibus.hook;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.fare.TicketMachine;
 import org.matsim.contrib.minibus.fare.TicketMachineI;
+import org.matsim.contrib.minibus.operator.Operators;
 import org.matsim.contrib.minibus.stats.PStatsModule;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.PtMode2LineSetter;
 import org.matsim.core.config.ConfigUtils;
@@ -68,7 +69,7 @@ public class PModule {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				this.bind(PBox.class).toInstance(pBox);
+				this.bind(Operators.class).toInstance(pBox);
 				bindMobsim().toProvider(PQSimProvider.class) ;
 				PControlerListener pHook = new PControlerListener(controler, pTransitRouterFactory, stuckFactory, agentsStuckHandler);
 				this.addControlerListenerBinding().toInstance(pHook);
