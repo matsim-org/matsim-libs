@@ -70,9 +70,8 @@ public class QSimTest implements
 	 */
 	@Test
 	public void testTrafficLightIntersection2arms1AgentV20() {
-		Fixture fixture = new Fixture();
-		//configure and load standard scenario
-		Scenario scenario = fixture.createAndLoadTestScenario(true);
+		// configure and load standard scenario
+		Scenario scenario = new Fixture().createAndLoadTestScenario(true);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(this);
@@ -93,11 +92,10 @@ public class QSimTest implements
 	 */
 	@Test
 	public void testSignalSystems1AgentGreenAtSec100() {
-		//configure and load standard scenario
-		Fixture fixture = new Fixture();
-		Scenario scenario = fixture.createAndLoadTestScenario(false);
+		// configure and load standard scenario
+		Scenario scenario = new Fixture().createAndLoadTestScenario(false);
+		// modify scenario
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-	
 		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Fixture.signalSystemId2);
 		SignalPlanData planData = controllerData.getSignalPlanData().get(Fixture.signalPlanId2);
 		planData.setStartTime(0.0);
@@ -124,23 +122,22 @@ public class QSimTest implements
 	
 	
 	/**
-	 * Tests the setup with a traffic light that shows all the time green
+	 * Tests the setup with a traffic light that shows red less than the specified intergreen time of five seconds.
 	 */
 	@Test
 	public void testIntergreensAbortOneAgentDriving() {
 		//configure and load standard scenario
-		Fixture fixture = new Fixture();
-		Scenario scenario = fixture.createAndLoadTestScenario(true);
+		Scenario scenario = new Fixture().createAndLoadTestScenario(true);
+		// modify scenario
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-		
 		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Fixture.signalSystemId2);
 		SignalPlanData planData = controllerData.getSignalPlanData().get(Fixture.signalPlanId2);
 		planData.setStartTime(0.0);
 		planData.setEndTime(0.0);
 		planData.setCycleTime(60);
 		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(Fixture.signalGroupId100);
-		groupData.setDropping(0);
-		groupData.setOnset(30);
+		groupData.setOnset(0);
+		groupData.setDropping(59);	
 		
 		EventsManager events = EventsUtils.createEventsManager();
 
@@ -158,6 +155,37 @@ public class QSimTest implements
 			ex = e;
 		}
 		Assert.assertNotNull(ex);
+	}
+	
+	/**
+	 * Tests the setup with a traffic light which red time corresponds to the specified intergreen time of five seconds.
+	 */
+	@Test
+	public void testIntergreensNoAbortOneAgentDriving() {
+		//configure and load standard scenario
+		Scenario scenario = new Fixture().createAndLoadTestScenario(true);
+		// modify scenario
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Fixture.signalSystemId2);
+		SignalPlanData planData = controllerData.getSignalPlanData().get(Fixture.signalPlanId2);
+		planData.setStartTime(0.0);
+		planData.setEndTime(0.0);
+		planData.setCycleTime(60);
+		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(Fixture.signalGroupId100);
+		groupData.setOnset(30);
+		groupData.setDropping(25);	
+		
+		EventsManager events = EventsUtils.createEventsManager();
+		events.addHandler(this);
+		this.link2EnterTime = 38.0;
+		
+		FromDataBuilder builder = new FromDataBuilder(scenario, new DefaultSignalModelFactory(), events);
+		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
+		SignalEngine engine = new QSimSignalEngine(manager);
+
+		QSim qsim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
+		qsim.addQueueSimulationListeners(engine);
+		qsim.run();
 	}
 
 	
