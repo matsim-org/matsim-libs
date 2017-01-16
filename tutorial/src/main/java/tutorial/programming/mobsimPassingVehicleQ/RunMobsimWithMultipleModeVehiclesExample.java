@@ -40,7 +40,7 @@ class RunMobsimWithMultipleModeVehiclesExample {
 
 		// prepare the config:
 		Config config = ConfigUtils.loadConfig( args[0] ) ;
-		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ.toString());
+		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 		config.plans().setRemovingUnneccessaryPlanAttributes(true) ;
 
 		// prepare the scenario

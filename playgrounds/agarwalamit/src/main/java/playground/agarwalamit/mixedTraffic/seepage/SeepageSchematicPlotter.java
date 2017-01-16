@@ -201,7 +201,7 @@ public class SeepageSchematicPlotter {
 			config.qsim().setFlowCapFactor(1.0);
 			config.qsim().setStorageCapFactor(1.0);
 			config.qsim().setMainModes(Arrays.asList(TransportMode.car,TransportMode.bike,"motorbike"));
-			config.qsim().setLinkDynamics(LinkDynamics.SeepageQ.name());
+			config.qsim().setLinkDynamics(LinkDynamics.SeepageQ);
 
 			config.qsim().setSeepModes(Arrays.asList(TransportMode.bike,"motorbike") );
 			config.qsim().setSeepModeStorageFree(false);

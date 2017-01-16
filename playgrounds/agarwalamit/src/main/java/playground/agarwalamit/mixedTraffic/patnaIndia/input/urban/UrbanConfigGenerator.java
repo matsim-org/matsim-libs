@@ -40,7 +40,7 @@ public class UrbanConfigGenerator {
 		config.qsim().setFlowCapFactor(0.011); //1.06% sample
 		config.qsim().setStorageCapFactor(0.033);
 		config.qsim().setEndTime(36*3600);
-		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.toString());
+		config.qsim().setLinkDynamics(LinkDynamics.PassingQ);
 		config.qsim().setMainModes(PatnaUtils.URBAN_MAIN_MODES);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		

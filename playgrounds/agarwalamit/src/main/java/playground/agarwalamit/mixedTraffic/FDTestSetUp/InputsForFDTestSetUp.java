@@ -100,7 +100,7 @@ public class InputsForFDTestSetUp {
 		config.qsim().setEndTime(END_TIME);
 		config.qsim().setUsingFastCapacityUpdate(true);
 
-		config.qsim().setLinkDynamics(linkDynamics.toString());
+		config.qsim().setLinkDynamics(linkDynamics);
 		GenerateFundamentalDiagramData.LOG.info("==========The chosen link dynamics is "+linkDynamics+". =========="); 
 
 		config.qsim().setTrafficDynamics(trafficDynamics);

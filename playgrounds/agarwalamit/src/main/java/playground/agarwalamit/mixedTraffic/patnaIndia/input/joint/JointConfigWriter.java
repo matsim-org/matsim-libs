@@ -92,7 +92,7 @@ public class JointConfigWriter {
 		config.qsim().setFlowCapFactor(OuterCordonUtils.SAMPLE_SIZE); //1.06% sample
 		config.qsim().setStorageCapFactor(3*OuterCordonUtils.SAMPLE_SIZE);
 		config.qsim().setEndTime(30*3600);
-		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.toString());
+		config.qsim().setLinkDynamics(LinkDynamics.PassingQ);
 		config.qsim().setMainModes(PatnaUtils.ALL_MAIN_MODES);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 

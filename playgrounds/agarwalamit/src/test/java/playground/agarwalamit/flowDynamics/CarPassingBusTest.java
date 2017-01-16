@@ -117,7 +117,7 @@ public class CarPassingBusTest {
 		config.qsim().setSnapshotStyle( SnapshotStyle.queue );
 		config.qsim().setEndTime(24.0*3600);
 		config.qsim().setMainModes(Arrays.asList(TransportMode.car));
-		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
+		config.qsim().setLinkDynamics(LinkDynamics.PassingQ);
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 	}
 

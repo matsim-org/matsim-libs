@@ -41,7 +41,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -70,7 +69,6 @@ import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeCalculatorType;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -79,18 +77,15 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
-import org.matsim.pt.transitSchedule.api.Departure;
 
 import playground.santiago.SantiagoScenarioConstants;
 import playground.santiago.SantiagoScenarioConstants.SubpopulationName;
-import playground.santiago.population.ActivityClassifier;
 import playground.santiago.population.CSVToPlans;
 
 /**
@@ -687,7 +682,7 @@ public class ScenarioBuilderTry {
 //		qsim.setStorageCapFactor(0.015);
 		qsim.setStorageCapFactor(flowCapFactor * 3.);
 		qsim.setInsertingWaitingVehiclesBeforeDrivingVehicles(false);
-		qsim.setLinkDynamics(LinkDynamics.FIFO.name());
+		qsim.setLinkDynamics(LinkDynamics.FIFO);
 //		qsim.setLinkWidth(30);
 		Set<String> mainModes = new HashSet<String>();
 		mainModes.add(TransportMode.car);

@@ -164,7 +164,7 @@ public class CreateAutomatedFDTest {
 		final Config config = ConfigUtils.createConfig();
 		config.qsim().setMainModes(Arrays.asList(travelModes));
 		config.qsim().setEndTime(14*3600);
-		config.qsim().setLinkDynamics(linkDynamics.name());
+		config.qsim().setLinkDynamics(linkDynamics);
 		config.qsim().setInflowConstraint(inflowConstraint);
 	
 		if(linkDynamics.equals(LinkDynamics.SeepageQ)){

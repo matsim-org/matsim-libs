@@ -136,7 +136,7 @@ public class EquilMixedTrafficEmissionTest {
 		vehs.addVehicle(bikeVeh);
 
 		sc.getConfig().qsim().setMainModes(mainModes);
-		sc.getConfig().qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ.name());
+		sc.getConfig().qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 		sc.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData); //TODO the test will fail for VehiclesSource.modeVehicleTypesFromVehiclesData; Amit Oct 2016
 		sc.getConfig().qsim().setUsePersonIdForMissingVehicleId(true);
 
