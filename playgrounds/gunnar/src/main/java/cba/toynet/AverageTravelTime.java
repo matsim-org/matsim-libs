@@ -18,6 +18,7 @@ import org.matsim.vehicles.Vehicle;
  * 
  * @author Gunnar Flötteröd
  *
+ * @deprecated
  */
 class AverageTravelTime implements TravelTime {
 

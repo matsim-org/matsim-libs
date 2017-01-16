@@ -32,9 +32,9 @@ class TourSequence {
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	static final String homeLoc = "1_2";
-	static final String dest1 = "3_2";
-	static final String dest2 = "5_4";
+	static final String homeLoc = "home"; // "1_2";
+	static final String dest1 = "dest1"; // "3_2";
+	static final String dest2 = "dest2"; // "5_4";
 
 	private void addHomeAct(final Plan plan, final String homeActType, final Double endTime_s,
 			final Scenario scenario) {
