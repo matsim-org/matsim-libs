@@ -217,8 +217,9 @@ public class QNode implements NetsimNode {
 		for (QLaneI lane : link.getOfferingQLanes()) {
 			while (! lane.isNotOfferingVehicle()) {
 				QVehicle veh = lane.getFirstVehicle();
-				Id<Link> nextLink = veh.getDriver().chooseNextLinkId();
-				if (! (lane.hasGreenForToLink(nextLink) && moveVehicleOverNode(veh, lane, now))) {
+				//the commented out code is also executed within moveVehicleOverNode()
+//				Id<Link> nextLink = veh.getDriver().chooseNextLinkId();
+                if (! (/*lane.hasGreenForToLink(nextLink) &&*/ moveVehicleOverNode(veh, lane, now))) {
 					break;
 				}
 			}

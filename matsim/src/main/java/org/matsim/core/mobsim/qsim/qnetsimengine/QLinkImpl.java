@@ -110,6 +110,8 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 //		((QueueWithBuffer)qlane).updateRemainingFlowCapacity(); 
 		
 		double now = context.getSimTimer().getTimeOfDay() ;
+		qlane.initBeforeSimStep();
+		
 		if ( context.qsimConfig.isInsertingWaitingVehiclesBeforeDrivingVehicles() ) {
 			this.moveWaitToRoad();
 			this.getTransitQLink().handleTransitVehiclesInStopQueue(now);

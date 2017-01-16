@@ -587,15 +587,15 @@ public class QSimTest {
 		System.out.println("#vehicles 7-8: " + Integer.toString(volume[7]));
 		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
 
-		if(this.isUsingFastCapacityUpdate) {
+//		if(this.isUsingFastCapacityUpdate) {
 			Assert.assertEquals(3001, volume[6]); // we should have half of the maximum flow in this hour
 			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
 			Assert.assertEquals(999, volume[8]); // all the rest
-		} else {
-			Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
-			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-			Assert.assertEquals(1000, volume[8]); // all the rest
-		}
+//		} else {
+//			Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
+//			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
+//			Assert.assertEquals(1000, volume[8]); // all the rest
+//		}
 	}
 
 	
@@ -692,15 +692,15 @@ public class QSimTest {
 		System.out.println("#vehicles 7-8: " + Integer.toString(volume[7]));
 		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
 
-		if(this.isUsingFastCapacityUpdate) {
+//		if(this.isUsingFastCapacityUpdate) {
 			Assert.assertEquals(3001, volume[6]); // we should have half of the maximum flow in this hour
 			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
 			Assert.assertEquals(999, volume[8]); // all the rest
-		} else {
-			Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
-			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-			Assert.assertEquals(1000, volume[8]); // all the rest
-		}
+//		} else {
+//			Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
+//			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
+//			Assert.assertEquals(1000, volume[8]); // all the rest
+//		}
 	}
 
 	/**
@@ -756,15 +756,15 @@ public class QSimTest {
 		System.out.println("#vehicles 7-8: " + Integer.toString(volume[7]));
 		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
 
-		if(this.isUsingFastCapacityUpdate) {
+//		if(this.isUsingFastCapacityUpdate) {
 			Assert.assertEquals(3001, volume[6]); // we should have half of the maximum flow in this hour
 			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
 			Assert.assertEquals(999, volume[8]); // all the rest
-		} else {
-			Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
-			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-			Assert.assertEquals(1000, volume[8]); // all the rest	
-		}
+//		} else {
+//			Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
+//			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
+//			Assert.assertEquals(1000, volume[8]); // all the rest	
+//		}
 		
 	}
 
