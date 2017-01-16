@@ -378,8 +378,8 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 	 * currently set. Currently, this checks that for at least one activity type opening AND closing
 	 * times are defined. */
 	@Override
-	public void checkConsistency() {
-		super.checkConsistency();
+	public void checkConsistency(Config config) {
+		super.checkConsistency(config);
 		boolean hasOpeningAndClosingTime = false;
 		boolean hasOpeningTimeAndLatePenalty = false ;
 

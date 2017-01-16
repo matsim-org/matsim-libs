@@ -86,12 +86,12 @@ public class StrategyConfigGroupTest {
 		configGroup.addParam("Module_1", "ReRoute");
 		configGroup.addParam("ModuleProbability_1", "0.5");
 		configGroup.addParam("ModuleDisableAfterIteration_1", "20");
-		configGroup.checkConsistency();
+		configGroup.checkConsistency(ConfigUtils.createConfig());
 
 		// add a 2nd module
 		configGroup.addParam("Module_2", "TimeAllocationMutator");
 		configGroup.addParam("ModuleProbability_2", "0.4");
-		configGroup.checkConsistency();
+		configGroup.checkConsistency(ConfigUtils.createConfig());
 
 		// add a 3rd module, but inconsistent with the enumeration
 		// --- no restrictions on indices anymore. td, sep'14
@@ -107,12 +107,12 @@ public class StrategyConfigGroupTest {
 		// fix the configuration by adding the missing module
 		configGroup.addParam("Module_3", "KeepLastSelected");
 		configGroup.addParam("ModuleProbability_3", "0.2");
-		configGroup.checkConsistency();
+		configGroup.checkConsistency(ConfigUtils.createConfig());
 
 		// break the configuration by adding an incomplete module
 		configGroup.addParam("Module_5", "SelectBest");
 		try {
-			configGroup.checkConsistency();
+			configGroup.checkConsistency(ConfigUtils.createConfig());
 			fail("Expected to fail consistency check with incomplete Module_5, but did not fail.");
 		} catch (RuntimeException e) {
 			log.info("Catched RuntimeException, as expected: " + e.getMessage());
@@ -120,12 +120,12 @@ public class StrategyConfigGroupTest {
 
 		// fix Module_5
 		configGroup.addParam("ModuleProbability_5", "0.0");
-		configGroup.checkConsistency();
+		configGroup.checkConsistency(ConfigUtils.createConfig());
 
 		// add another incomplete module
 		configGroup.addParam("ModuleProbability_6", "0.1");
 		try {
-			configGroup.checkConsistency();
+			configGroup.checkConsistency(ConfigUtils.createConfig());
 			fail("Expected to fail consistency check with incomplete Module_6, but did not fail.");
 		} catch (RuntimeException e) {
 			log.info("Catched RuntimeException, as expected: " + e.getMessage());
@@ -133,7 +133,7 @@ public class StrategyConfigGroupTest {
 
 		// fix Module_6
 		configGroup.addParam("Module_6", "SelectExpBeta");
-		configGroup.checkConsistency();
+		configGroup.checkConsistency(ConfigUtils.createConfig());
 
 		// add forbidden Module_0
 		// --- no restrictions on indices anymore. td, sep'14

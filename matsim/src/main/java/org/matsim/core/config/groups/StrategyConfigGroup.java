@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimParameters;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
@@ -115,8 +116,8 @@ public final class StrategyConfigGroup extends ConfigGroup {
 		}
 
 		@Override
-		protected void checkConsistency() {
-			super.checkConsistency();
+		protected void checkConsistency(Config config) {
+			super.checkConsistency(config);
 
 			if ( getStrategyName() == null || getStrategyName().length() == 0 ) {
 				throw new RuntimeException("Strategy strategyName is not set");
@@ -320,9 +321,9 @@ public final class StrategyConfigGroup extends ConfigGroup {
 	}
 
 	@Override
-	protected void checkConsistency() {
+	protected void checkConsistency(Config config) {
 		// to make available to tests
-		super.checkConsistency();
+		super.checkConsistency(config);
 	}
 
 	public void setMaxAgentPlanMemorySize(int maxAgentPlanMemorySize) {

@@ -48,7 +48,7 @@
  *    you will never call this method.</li>
  * <li>{@link org.matsim.core.config.ConfigGroup#getName()} should return the name of your config-group, as it
  *    appears in the configuration file.</li>
- * <li>Optionally: {@link org.matsim.core.config.ConfigGroup#checkConsistency()} to check that all the settings make
+ * <li>Optionally: {@link org.matsim.core.config.ConfigGroup#checkConsistency(Config)} to check that all the settings make
  *    some sense together after being read from a file.</li> 
  * </ul> 
  * The custom config-group must be 
