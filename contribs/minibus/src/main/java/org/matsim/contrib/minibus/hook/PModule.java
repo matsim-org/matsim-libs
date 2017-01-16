@@ -94,10 +94,7 @@ public class PModule {
 			}
 		}
 
-		controler.addOverridingModule( new PStatsModule(pConfig, pBox, lineSetter) ) ;
-//		PStatsModule.configureControler(controler, pConfig, pBox, lineSetter);
-
-
+		controler.addOverridingModule( new PStatsModule(pConfig, lineSetter) ) ;
 
 	}
 }
