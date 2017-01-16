@@ -122,11 +122,11 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		//==
 
 		//==
-		config.qsim().setTrafficDynamics( QSimConfigGroup.TrafficDynamics.withHoles );
+		config.qsim().setTrafficDynamics( QSimConfigGroup.TrafficDynamics.KWM );
 
-		if ( config.qsim().getTrafficDynamics()== QSimConfigGroup.TrafficDynamics.withHoles ) {
-			config.qsim().setInflowConstraint(QSimConfigGroup.InflowConstraint.maxflowFromFdiag);
-		}
+//		if ( config.qsim().getTrafficDynamics()== QSimConfigGroup.TrafficDynamics.withHoles ) {
+//			config.qsim().setInflowConstraint(QSimConfigGroup.InflowConstraint.maxflowFromFdiag);
+//		}
 
 		config.qsim().setUsingFastCapacityUpdate(true);
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);

@@ -19,12 +19,7 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Queue;
-
+import java.util.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -34,7 +29,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup.InflowConstraint;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.gbl.Gbl;
@@ -215,7 +209,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		this.calculateFlowCapacity();
 		this.calculateStorageCapacity();
 		
-		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles ) {
+		if ( context.qsimConfig.getTrafficDynamics() != TrafficDynamics.queue ) {
 			remainingHolesStorageCapacity = this.storageCapacity;
 		}
 
@@ -331,7 +325,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 				flowcap_accumulate.addValue( flowCapacityPerTimeStepFractionalPart, now);
 			}
 		}
-		if ( context.qsimConfig.getInflowConstraint()!=InflowConstraint.none ) {
+		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.KWM ) {
 			this.accumulatedInflowCap += this.maxFlowFromFdiag ;
 			if ( this.accumulatedInflowCap > Math.ceil( this.maxFlowFromFdiag ) ) {
 				this.accumulatedInflowCap = Math.ceil( this.maxFlowFromFdiag ) ;
@@ -346,7 +340,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		inverseFlowCapacityPerTimeStep = 1.0 / flowCapacityPerTimeStep;
 		flowCapacityPerTimeStepFractionalPart = flowCapacityPerTimeStep - (int) flowCapacityPerTimeStep;
 		
-		if ( context.qsimConfig.getInflowConstraint()==InflowConstraint.maxflowFromFdiag ) {
+		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.KWM ) {
 			// uncongested branch: q = vmax * rho
 			// congested branch: q = vhole * (rhojam - rho)
 			// equal: rho * (vmax + vhole) = vhole * rhojam
@@ -401,7 +395,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		 * 
 		 */
 		
-		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles ) {
+		if ( context.qsimConfig.getTrafficDynamics() != TrafficDynamics.queue ) {
 //			final double minStorCapForHoles = 2. * flowCapacityPerTimeStep * context.getSimTimer().getSimTimestepSize();
 			final double freeSpeed = qLink.getLink().getFreespeed() ;
 			final double holeSpeed = HOLE_SPEED_KM_H/3.6;
@@ -423,7 +417,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	@Override
 	final boolean doSimStep( ) {
 		this.updateRemainingFlowCapacity();
-		if(context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles) this.processArrivalOfHoles( ) ;
+		if(context.qsimConfig.getTrafficDynamics()!=TrafficDynamics.queue) this.processArrivalOfHoles( ) ;
 		this.moveQueueToBuffer();
 		return true ;
 	}
@@ -508,7 +502,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			usedStorageCapacity -= veh.getSizeInEquivalents();
 		}
 
-		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles ) {
+		if ( context.qsimConfig.getTrafficDynamics()!=TrafficDynamics.queue ) {
 			QueueWithBuffer.Hole hole = new QueueWithBuffer.Hole() ;
 			double ttimeOfHoles = length*3600./HOLE_SPEED_KM_H/1000. ;
 			
@@ -573,18 +567,17 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	 final boolean isAcceptingFromUpstream() {
 		boolean storageOk = usedStorageCapacity < storageCapacity ;
 		
-		if ( ! (context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles) 
-				&& context.qsimConfig.getInflowConstraint()==InflowConstraint.none ) {
+		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.queue )  {
 			return storageOk ;
 		}
 		// (continue only if HOLES and/or inflow constraing)
 
-		if( ! (context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles)
-				&& !storageOk) { // irrespective of inflow constrain, storageOk must be respected; amit Aug 2016
-			return storageOk;
-		}
+//		if( ! (context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles)
+//				&& !storageOk) { // irrespective of inflow constrain, storageOk must be respected; amit Aug 2016
+//			return storageOk;
+//		}
 		
-		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles   
+		if ( context.qsimConfig.getTrafficDynamics() != TrafficDynamics.queue
 				&& remainingHolesStorageCapacity <= 0. ) { 
 			// check the holes storage capacity if using holes only (amit, Aug 2016)
 			return false ;
@@ -594,7 +587,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		// * reduced by entering vehicles
 		// * increased by holes arriving at upstream end of link
 		
-		if ( context.qsimConfig.getInflowConstraint()==InflowConstraint.none ) {
+		if ( context.qsimConfig.getTrafficDynamics() != TrafficDynamics.KWM ) {
 			return true ;
 		}
 		
@@ -762,10 +755,10 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		veh.setCurrentLink(qLink.getLink());
 		vehQueue.add(veh);
 
-		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles ) {
+		if ( context.qsimConfig.getTrafficDynamics()!=TrafficDynamics.queue ) {
 			remainingHolesStorageCapacity -= veh.getSizeInEquivalents();
 		}
-		if ( context.qsimConfig.getInflowConstraint()!=InflowConstraint.none ) {
+		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.KWM ) {
 			this.accumulatedInflowCap -= veh.getSizeInEquivalents() ;
 		}
 	}
