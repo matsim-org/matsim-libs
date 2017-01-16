@@ -62,10 +62,10 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  * @author dgrether
  */
-public class QSimTest implements
+public class QSimSignalTest implements
 		LinkEnterEventHandler, SignalGroupStateChangedEventHandler, LaneEnterEventHandler, LaneLeaveEventHandler {
 
-	private static final Logger log = Logger.getLogger(QSimTest.class);
+	private static final Logger log = Logger.getLogger(QSimSignalTest.class);
 
 	private double link2EnterTime = Double.NaN;
 
