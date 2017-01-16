@@ -47,7 +47,7 @@ public final class PModule {
 		// ScoreStatsControlerListener.  Presumably, the manually constructed build procedure here conflicts with the (newer) standard guice
 		// procedure.  For the time being, the following two lines seem to fix it.  kai, nov'16
 		pTransitRouterFactory.createTransitRouterConfig(controler.getConfig());
-		pTransitRouterFactory.updateTransitSchedule(controler.getScenario().getTransitSchedule());
+		pTransitRouterFactory.updateTransitSchedule();
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override public void install() {

@@ -31,6 +31,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 
 /**
@@ -50,7 +51,7 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 	private boolean needToUpdateRouter = true;
 	private TransitRouterNetwork routerNetwork = null;
 	private Provider<TransitRouter> routerFactory = null;
-	private TransitSchedule schedule;
+	@Inject private TransitSchedule schedule;
 	private RaptorDisutility raptorDisutility;
 	private TransitRouterQuadTree transitRouterQuadTree;
 	
@@ -65,9 +66,8 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 		this.transitRouterConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 	}
 	
-	public void updateTransitSchedule(TransitSchedule schedule1) {
+	public void updateTransitSchedule() {
 		this.needToUpdateRouter = true;
-		this.schedule = schedule1;
 //		this.schedule = PTransitLineMerger.mergeSimilarRoutes(schedule);
 		
 		if (this.ptRouter.equalsIgnoreCase("raptor")) {
