@@ -121,9 +121,23 @@ public class DigicoreActivityReaderRunnable implements Runnable {
 				 * efficient, is to check the number of MyZones in the QT. If 
 				 * only one, then check that one zone. Alternatively, follow 
 				 * the original procedure of looking for only the surrounding 
-				 * zones. */
+				 * zones. 
+				 * 
+				 * !! This is VERY BAD (Johan, Jan '17... the radius is 
+				 * hard-coded, and it seems to only be compatible with GAP 
+				 * zones.) */
 				if(zoneQT.size() > 1){
-					Collection<MyZone> neighbourhood =  zoneQT.getDisk(p.getX(), p.getY(), 10000);
+					double radius = 10000.;
+					Collection<MyZone> neighbourhood =  zoneQT.getDisk(p.getX(), p.getY(), radius);
+					while(neighbourhood.size() < .1*zoneQT.size()){
+						/* This threshold is again hard-coded, but should at 
+						 * least provide more useful clustering, albeit at the
+						 * price of the computational burden, especially when 
+						 * there are many zone, like GAP. */
+						radius *= 2.;
+						neighbourhood =  zoneQT.getDisk(p.getX(), p.getY(), radius);
+					}
+					
 					boolean found = false;
 					Iterator<MyZone> iterator = neighbourhood.iterator();
 					while(iterator.hasNext() && !found){
