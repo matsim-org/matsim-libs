@@ -59,63 +59,53 @@ import org.matsim.pt.router.TransitRouter;
  */
 class PTripRouterFactoryImpl implements Provider<TripRouter> {
 	private static final Logger log =
-		Logger.getLogger(PTripRouterFactoryImpl.class);
+			Logger.getLogger(PTripRouterFactoryImpl.class);
 
 	private final MatsimServices controler;
-    private final Provider<TransitRouter> transitRouterFactory;
+	private final Provider<TransitRouter> transitRouterFactory;
 
-    public PTripRouterFactoryImpl(final MatsimServices controler, Provider<TransitRouter> transitRouterFactory) {
+	public PTripRouterFactoryImpl(final MatsimServices controler, Provider<TransitRouter> transitRouterFactory) {
 		this.controler = controler;
 		this.transitRouterFactory = transitRouterFactory;
 	}
 
-
-	/**
-	 * Hook provided to change the {@link TripRouter}
-	 * implementation without changing the configuration.
-	 *
-	 * @return a new unconfigured instance
-	 */
-    private TripRouter instanciateTripRouter() {
-		return new TripRouter();
-	}
 
 	@Override
 	public TripRouter get() {
 		// initialize here - controller should be fully initialized by now
 		// use fields to keep the rest of the code clean and comparable
 
-        Config config = controler.getScenario().getConfig();
-        Network network = controler.getScenario().getNetwork();
-        TravelDisutilityFactory travelDisutilityFactory = controler.getTravelDisutilityFactory();
-        TravelTime travelTime = controler.getLinkTravelTimes();
-        LeastCostPathCalculatorFactory leastCostPathAlgorithmFactory = createDefaultLeastCostPathCalculatorFactory(controler.getScenario());
-        RouteFactories modeRouteFactory = ((PopulationFactory) controler.getScenario().getPopulation().getFactory()).getRouteFactories();
-        PopulationFactory populationFactory = controler.getScenario().getPopulation().getFactory();
-        Scenario scenario = controler.getScenario();
-		
+		Config config = controler.getScenario().getConfig();
+		Network network = controler.getScenario().getNetwork();
+		TravelDisutilityFactory travelDisutilityFactory = controler.getTravelDisutilityFactory();
+		TravelTime travelTime = controler.getLinkTravelTimes();
+		LeastCostPathCalculatorFactory leastCostPathAlgorithmFactory = createDefaultLeastCostPathCalculatorFactory(controler.getScenario());
+		RouteFactories modeRouteFactory = ((PopulationFactory) controler.getScenario().getPopulation().getFactory()).getRouteFactories();
+		PopulationFactory populationFactory = controler.getScenario().getPopulation().getFactory();
+		Scenario scenario = controler.getScenario();
+
 		// end of own code
-		
-		TripRouter tripRouter = instanciateTripRouter();
+
+		TripRouter tripRouter = new TripRouter();
 
 		PlansCalcRouteConfigGroup routeConfigGroup = config.plansCalcRoute();
 		TravelDisutility travelCost =
-			travelDisutilityFactory.createTravelDisutility(
-                    travelTime);
+				travelDisutilityFactory.createTravelDisutility(
+						travelTime);
 
 		LeastCostPathCalculator routeAlgo =
-			leastCostPathAlgorithmFactory.createPathCalculator(
-                    network,
-                    travelCost,
-                    travelTime);
+				leastCostPathAlgorithmFactory.createPathCalculator(
+						network,
+						travelCost,
+						travelTime);
 
 		FreespeedTravelTimeAndDisutility ptTimeCostCalc =
-			new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
+				new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
 		LeastCostPathCalculator routeAlgoPtFreeFlow =
-			leastCostPathAlgorithmFactory.createPathCalculator(
-                    network,
-                    ptTimeCostCalc,
-                    ptTimeCostCalc);
+				leastCostPathAlgorithmFactory.createPathCalculator(
+						network,
+						ptTimeCostCalc,
+						ptTimeCostCalc);
 
 		if ( NetworkUtils.isMultimodal(network) ) {
 			// note: LinkImpl has a default allowed mode of "car" so that all links
@@ -125,9 +115,9 @@ class PTripRouterFactoryImpl implements Provider<TripRouter> {
 			// so it is not worth doing it if it is not necessary. (td, oct. 2012)
 			if (routeAlgo instanceof Dijkstra) {
 				((Dijkstra) routeAlgo).setModeRestriction(
-					Collections.singleton( TransportMode.car ));
+						Collections.singleton( TransportMode.car ));
 				((Dijkstra) routeAlgoPtFreeFlow).setModeRestriction(
-					Collections.singleton( TransportMode.car ));
+						Collections.singleton( TransportMode.car ));
 			}
 			else {
 				// this is impossible to reach when using the algorithms of org.matsim.*
@@ -141,59 +131,59 @@ class PTripRouterFactoryImpl implements Provider<TripRouter> {
 			tripRouter.setRoutingModule(
 					mainMode,
 					DefaultRoutingModules.createPseudoTransitRouter( mainMode, populationFactory,
-					        network,
-						routeAlgoPtFreeFlow,
-						routeConfigGroup.getModeRoutingParams().get( mainMode ) ) ) ;
+							network,
+							routeAlgoPtFreeFlow,
+							routeConfigGroup.getModeRoutingParams().get( mainMode ) ) ) ;
 		}
 
 		for (String mainMode : routeConfigGroup.getTeleportedModeSpeeds().keySet()) {
 			tripRouter.setRoutingModule(
 					mainMode,
 					DefaultRoutingModules.createTeleportationRouter(mainMode, populationFactory, 
-						routeConfigGroup.getModeRoutingParams().get( mainMode ) ));
+							routeConfigGroup.getModeRoutingParams().get( mainMode ) ));
 		}
 
 		for ( String mainMode : routeConfigGroup.getNetworkModes() ) {
 			tripRouter.setRoutingModule(
 					mainMode,
 					DefaultRoutingModules.createPureNetworkRouter(mainMode, populationFactory, 
-					        network,
-						routeAlgo));
+							network,
+							routeAlgo));
 		}
 
 		if ( config.transit().isUseTransit() ) {
 			tripRouter.setRoutingModule(
 					TransportMode.pt,
-					 new TransitRouterWrapper(
-						transitRouterFactory.get(),
-						
-						// this line is the reason why this class exists in my playground 
-						scenario.getTransitSchedule(),
-						// end of modification
-						
-						scenario.getNetwork(), // use a walk router in case no PT path is found
-						DefaultRoutingModules.createTeleportationRouter( TransportMode.transit_walk, populationFactory,
-							routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ) )));
+					new TransitRouterWrapper(
+							transitRouterFactory.get(),
+
+							// this line is the reason why this class exists in my playground 
+							scenario.getTransitSchedule(),
+							// end of modification
+
+							scenario.getNetwork(), // use a walk router in case no PT path is found
+							DefaultRoutingModules.createTeleportationRouter( TransportMode.transit_walk, populationFactory,
+									routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ) )));
 		}
 
 		return tripRouter;
 	}
-	
+
 	private LeastCostPathCalculatorFactory createDefaultLeastCostPathCalculatorFactory(Scenario scenario) {
 		Config config = scenario.getConfig();
 		if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra)) {
-            return new DijkstraFactory();
-        } else if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.AStarLandmarks)) {
-            return new AStarLandmarksFactory(
-                    scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()), config.global().getNumberOfThreads());
-        } else if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.FastDijkstra)) {
-            return new FastDijkstraFactory();
-        } else if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks)) {
-            return new FastAStarLandmarksFactory(
-                    scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
-        } else {
-            throw new IllegalStateException("Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
-        }
+			return new DijkstraFactory();
+		} else if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.AStarLandmarks)) {
+			return new AStarLandmarksFactory(
+					scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()), config.global().getNumberOfThreads());
+		} else if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.FastDijkstra)) {
+			return new FastDijkstraFactory();
+		} else if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks)) {
+			return new FastAStarLandmarksFactory(
+					scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
+		} else {
+			throw new IllegalStateException("Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
+		}
 	}
 }
 

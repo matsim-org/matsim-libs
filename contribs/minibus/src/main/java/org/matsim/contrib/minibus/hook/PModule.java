@@ -33,6 +33,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.TripRouter;
+import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.router.TransitRouterImplFactory;
 
 public final class PModule {
 
@@ -50,6 +52,8 @@ public final class PModule {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override public void install() {
 				bind(PTransitRouterFactory.class).toInstance( pTransitRouterFactory ) ;
+				
+		            bind(TransitRouter.class).toProvider(pTransitRouterFactory);
 
 				// yyyy the following two should only be bound when pConfig.getReRouteAgentsStuck() is true.  But this
 				// does not work without problems (the binding needs to be optional).  kai, jan'17
@@ -68,7 +72,7 @@ public final class PModule {
 				
 				// yyyyyy my intuition is that it should (now) be possible to do the following in a less involved way (using more default material).
 				// kai, jan'17
-				bind(TripRouter.class).toProvider(new PTripRouterFactoryImpl(controler, pTransitRouterFactory)) ;
+//				bind(TripRouter.class).toProvider(new PTripRouterFactoryImpl(controler, pTransitRouterFactory)) ;
 
 				install( new PStatsModule() ) ;
 			}

@@ -65,9 +65,9 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 		this.transitRouterConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 	}
 	
-	public void updateTransitSchedule(TransitSchedule schedule) {
+	public void updateTransitSchedule(TransitSchedule schedule1) {
 		this.needToUpdateRouter = true;
-		this.schedule = schedule;
+		this.schedule = schedule1;
 //		this.schedule = PTransitLineMerger.mergeSimilarRoutes(schedule);
 		
 		if (this.ptRouter.equalsIgnoreCase("raptor")) {
