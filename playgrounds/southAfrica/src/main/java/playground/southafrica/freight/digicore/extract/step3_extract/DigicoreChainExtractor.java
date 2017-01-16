@@ -240,7 +240,9 @@ public class DigicoreChainExtractor implements Runnable {
 			log.error("Vehicle with NullPointerException: " + vehicle.getId().toString());
 		}
 
-		log.warn("Records with invalid GPS positions: " + invalidGps);
+		if(invalidGps > 0){
+			log.warn("Vehicle " + name + " has " + invalidGps + " records with invalid GPS positions.");
+		}
 		/* Write the vehicle to file if it has at least one chain. This is 
 		 * currently (Nov'16) writing version 2 vehicles. When using the
 		 * TurnkeyExtractor these files will be removed anyway. */
@@ -256,6 +258,8 @@ public class DigicoreChainExtractor implements Runnable {
 		
 		if(x >= 0.0 && x <= 45.0 && y >= -36.0 && y <= 0.0){
 			valid = true;
+		} else{
+			log.warn("Out-of-bounds coordinate");
 		}
 		return valid;
 	}
