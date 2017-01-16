@@ -19,13 +19,40 @@
 
 package org.matsim.contrib.minibus.stats;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
+
+import javax.inject.Inject;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.minibus.PConfigGroup;
-import org.matsim.contrib.minibus.genericUtils.gexf.*;
+import org.matsim.contrib.minibus.genericUtils.gexf.ObjectFactory;
+import org.matsim.contrib.minibus.genericUtils.gexf.XMLAttributeContent;
+import org.matsim.contrib.minibus.genericUtils.gexf.XMLAttributesContent;
+import org.matsim.contrib.minibus.genericUtils.gexf.XMLAttrtypeType;
+import org.matsim.contrib.minibus.genericUtils.gexf.XMLAttvalue;
+import org.matsim.contrib.minibus.genericUtils.gexf.XMLAttvaluesContent;
+import org.matsim.contrib.minibus.genericUtils.gexf.XMLClassType;
+import org.matsim.contrib.minibus.genericUtils.gexf.XMLDefaultedgetypeType;
+import org.matsim.contrib.minibus.genericUtils.gexf.XMLEdgeContent;
+import org.matsim.contrib.minibus.genericUtils.gexf.XMLEdgesContent;
+import org.matsim.contrib.minibus.genericUtils.gexf.XMLGexfContent;
+import org.matsim.contrib.minibus.genericUtils.gexf.XMLGraphContent;
+import org.matsim.contrib.minibus.genericUtils.gexf.XMLIdtypeType;
+import org.matsim.contrib.minibus.genericUtils.gexf.XMLModeType;
+import org.matsim.contrib.minibus.genericUtils.gexf.XMLNodeContent;
+import org.matsim.contrib.minibus.genericUtils.gexf.XMLNodesContent;
+import org.matsim.contrib.minibus.genericUtils.gexf.XMLTimeformatType;
 import org.matsim.contrib.minibus.genericUtils.gexf.viz.PositionContent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -35,16 +62,6 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
 
 /**
  * Uses a {@link CountPPaxHandler} to count passengers per paratransit vehicle and link, and writes them to a gexf network as dynamic link attributes.
@@ -74,7 +91,7 @@ final class GexfPStatLight extends MatsimJaxbXmlWriter implements StartupListene
 	private HashMap<Id<Link>, Integer> linkId2VehCountsFromLastIteration;
 
 
-	public GexfPStatLight(PConfigGroup pConfig){
+	@Inject GexfPStatLight(PConfigGroup pConfig){
 		this.getWriteGexfStatsInterval = pConfig.getGexfInterval();
 		this.pIdentifier = pConfig.getPIdentifier();
 		

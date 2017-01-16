@@ -56,7 +56,7 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
 	private boolean firstIteration = true;
 	private final PtMode2LineSetter lineSetter;
 
-	public PAnalysisManager(PConfigGroup pConfig, PtMode2LineSetter lineSetter){
+	public PAnalysisManager(PtMode2LineSetter lineSetter, PConfigGroup pConfig){
 		log.info("enabled");
 		this.pIdentifier = pConfig.getPIdentifier();
 		if (lineSetter == null) {

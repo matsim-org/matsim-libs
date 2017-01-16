@@ -51,15 +51,16 @@ public final class PStatsModule extends AbstractModule {
 	public void install() {
 		this.addControlerListenerBinding().to(PStatsOverview.class);
 		this.addControlerListenerBinding().toInstance(new POperatorLogger());
-		this.addControlerListenerBinding().toInstance(new GexfPStat(pConfig, false));
-		this.addControlerListenerBinding().toInstance(new GexfPStatLight(pConfig));
-		this.addControlerListenerBinding().toInstance(new Line2GexfPStat(pConfig));
+		this.addControlerListenerBinding().toInstance(new GexfPStat(false, pConfig));
+		this.addControlerListenerBinding().to(GexfPStatLight.class);
+		this.addControlerListenerBinding().to(Line2GexfPStat.class);
 
 		if (pConfig.getWriteMetrics()) {
-			this.addControlerListenerBinding().toInstance(new PAnalysisManager(pConfig, lineSetter));
+			this.addControlerListenerBinding().toInstance(new PAnalysisManager(lineSetter, pConfig));
 		}
 
-		this.addControlerListenerBinding().toInstance(new ActivityLocationsParatransitUser(pConfig));
+		this.addControlerListenerBinding().to(ActivityLocationsParatransitUser.class);
+
 		this.addControlerListenerBinding().toInstance(new StartupListener() {
 			@Override public void notifyStartup(StartupEvent event) {
 				String outFilename = event.getServices().getControlerIO().getOutputPath() + PConstants.statsOutputFolder;
