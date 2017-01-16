@@ -33,7 +33,7 @@ import java.util.HashMap;
  * @author aneumann
  *
  */
-public interface PtMode2LineSetter {
+public interface LineId2PtMode {
 
 	/**
 	 * 

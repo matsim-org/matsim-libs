@@ -56,7 +56,7 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
 	private final List<PAnalysisModule> pAnalyzesList = new LinkedList<>();
 	private final HashMap<String, BufferedWriter> pAnalyis2Writer = new HashMap<>();
 	private boolean firstIteration = true;
-	@Inject private PtMode2LineSetter lineSetter;
+	@Inject private LineId2PtMode lineSetter;
 
 	public PAnalysisManager(PConfigGroup pConfig){
 		log.info("enabled");

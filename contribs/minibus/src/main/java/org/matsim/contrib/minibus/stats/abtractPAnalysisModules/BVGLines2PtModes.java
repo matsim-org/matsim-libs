@@ -35,7 +35,7 @@ import java.util.Map.Entry;
  * @author aneumann
  *
  */
-public final class BVGLines2PtModes implements PtMode2LineSetter{
+public final class BVGLines2PtModes implements LineId2PtMode{
 	
 	private final static Logger log = Logger.getLogger(BVGLines2PtModes.class);
 	

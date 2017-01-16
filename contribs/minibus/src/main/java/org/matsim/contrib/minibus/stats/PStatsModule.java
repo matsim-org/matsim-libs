@@ -24,7 +24,7 @@ import java.io.File;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.PAnalysisManager;
-import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.PtMode2LineSetter;
+import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.LineId2PtMode;
 import org.matsim.contrib.minibus.stats.operatorLogger.POperatorLogger;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
