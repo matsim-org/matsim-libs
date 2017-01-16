@@ -56,11 +56,22 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 
 public class MatsimOpdytsEquilMixedTrafficIntegration {
 
-	private static final String EQUIL_DIR = "./examples/scenarios/equil-mixedTraffic/";
-	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,bicycle_holes_KWM_variance4_600its/";
+	private static int randomVariance = 2;
+	private static int iterationsToConvergence = 400;
+
+	private static String EQUIL_DIR = "./examples/scenarios/equil-mixedTraffic/";
+	private static String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,bicycle_holes_KWM_variance"+randomVariance+"_"+iterationsToConvergence+"its/";
 	private static final OpdytsScenario EQUIL_MIXEDTRAFFIC = OpdytsScenario.EQUIL_MIXEDTRAFFIC;
 
 	public static void main(String[] args) {
+
+		if (args.length > 0) {
+			randomVariance = Integer.valueOf(args[0]);
+			iterationsToConvergence = Integer.valueOf(args[1]);
+			EQUIL_DIR = args[2];
+			OUT_DIR = args[3]+"/equil_car,bicycle_holes_KWM_variance"+randomVariance+"_"+iterationsToConvergence+"its/";
+		}
+
 		Set<String> modes2consider = new HashSet<>();
 		modes2consider.add("car");
 		modes2consider.add("bicycle");
@@ -171,13 +182,13 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
-				RandomizedUtilityParametersChoser.ONLY_ASC, 4.0,  EQUIL_MIXEDTRAFFIC, null);
+				RandomizedUtilityParametersChoser.ONLY_ASC,  Double.valueOf(randomVariance),  EQUIL_MIXEDTRAFFIC, null);
 
 		// what would be the decision variables to optimize the objective function.
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, EQUIL_MIXEDTRAFFIC);
 
 		// what would decide the convergence of the objective function
-		final int iterationsToConvergence = 600; //
+//		final int iterationsToConvergence = 600; //
 		final int averagingIterations = 10;
 		ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(iterationsToConvergence, averagingIterations);
 
