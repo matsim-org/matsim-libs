@@ -28,23 +28,31 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
-import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
-import org.matsim.contrib.signals.mobsim.SignalEngine;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LaneEnterEvent;
-import org.matsim.core.api.experimental.events.LaneLeaveEvent;
-import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
-import org.matsim.core.api.experimental.events.handler.LaneEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
-import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
+import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
+import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
+import org.matsim.contrib.signals.mobsim.SignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.LaneEnterEvent;
+import org.matsim.core.api.experimental.events.LaneLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.LaneEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.NewControlerModule;
+import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -116,10 +124,45 @@ public class QSimTest implements
 		QSim qsim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
 		qsim.addQueueSimulationListeners(engine);
 		qsim.run();
+		
+//		// configure and load standard scenario
+//		Scenario scenario = new Fixture().createAndLoadTestScenario(false);
+//
+//		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+//		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Fixture.signalSystemId2);
+//		SignalPlanData planData = controllerData.getSignalPlanData().get(Fixture.signalPlanId2);
+//		planData.setStartTime(0.0);
+//		planData.setEndTime(0.0);
+//		planData.setCycleTime(5 * 3600);
+//		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(Fixture.signalGroupId100);
+//		groupData.setDropping(1);
+//		groupData.setOnset(100);
+//
+//		com.google.inject.Injector injector = createInjector(scenario);
+//
+//		EventsManager events = injector.getInstance(EventsManager.class);
+//		events.addHandler(this);
+//		this.link2EnterTime = 100.0;
+//		events.initProcessing();
+//		
+//		injector.getInstance(Mobsim.class).run();
+//		// TODO why are there no signal events?
 	}
 	
-
-	
+	private com.google.inject.Injector createInjector(final Scenario scenario) {
+		return Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+			@Override
+			public void install() {
+				// defaults
+				install(new NewControlerModule());
+				install(new ControlerDefaultCoreListenersModule());
+				install(new ControlerDefaultsModule());
+				install(new ScenarioByInstanceModule(scenario));
+				// signal specific module
+				install(new SignalsModule());
+			}
+		});
+	}
 	
 	/**
 	 * Tests the setup with a traffic light that shows red less than the specified intergreen time of five seconds.
