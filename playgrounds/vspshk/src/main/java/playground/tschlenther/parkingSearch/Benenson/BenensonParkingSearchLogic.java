@@ -5,6 +5,7 @@ package playground.tschlenther.parkingSearch.Benenson;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -12,6 +13,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.parking.parkingsearch.search.ParkingSearchLogic;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -30,6 +32,7 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	private static final double THRESHOLD_ALL_EXPECTED_PARKINGSPACES_TO_DEST = 290/TSParkingUtils.AVGPARKINGSLOTLENGTH;
 	private static final double ACCEPTED_DISTANCE_INCREASING_RATE_PER_MIN = 30;
 	private static final double ACCEPTED_DISTANCE_MAX = 600;
+	private final Random random = MatsimRandom.getLocalInstance();
 
 	public BenensonParkingSearchLogic(Network network) {
 		this.network = network;
@@ -48,7 +51,7 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 		
 		
 		/*
-		 * TODO: Problem /beim grid-Net):
+		 * TODO: Problem (beim grid-Net):
 		 * wenn agent auf destLink fährt wird er immer umkehren und immer "auf der selben Seite" der aktivität suchen. => generelles Benenson-Problem.
 		 * 
 		 */
@@ -79,7 +82,12 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	@Override
 	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId) {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("i don't want this to happen");
+		//throw new RuntimeException("i don't want this to happen");
+		
+		Link currentLink = network.getLinks().get(currentLinkId);
+		List<Id<Link>> keys = new ArrayList<>(currentLink.getToNode().getOutLinks().keySet());
+		Id<Link> randomKey = keys.get(random.nextInt(keys.size()));
+		return randomKey;
 	}
 
 	
@@ -164,8 +172,13 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	public boolean isDriverInAcceptableDistance(Id<Link> currentLinkId, Id<Link> endLinkId,	double firstDestLinkEnterTimer, double timeOfDay) {
 		/*
 		 * PROBLEM: am Anfang von PHASE3 wird selbst der DestLink nicht akzeptiert, da Distanz zwischen fromNode und toNode zu groß
+		 * (wenn LinkLength > 100m)
+		 *
+		 *
+		 *PROBLEM: die Distanzen werden aufgrund der Koordinaten berechnet und haben erstmal nicht mit den Linklenghts zu tun!!!
 		 */
-		
+
+		// if we're on the destinationLink, we always want to park
 		if(currentLinkId.equals(endLinkId)) return true;
 		
 		double distToDest = NetworkUtils.getEuclideanDistance(
@@ -175,6 +188,9 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 		double acceptedDistance = 100 + ACCEPTED_DISTANCE_INCREASING_RATE_PER_MIN * (timeSpent / 60);
 		
 		if (acceptedDistance > ACCEPTED_DISTANCE_MAX) acceptedDistance = ACCEPTED_DISTANCE_MAX;
+		
+		//logger.error("\n Distanz zum Ziel: " + distToDest + "\n Anfang Phase 3 : " + firstDestLinkEnterTimer + "\n Jetzt: " + timeOfDay +  "\n Zeit (s) in Phase3: " + timeSpent + "\n akzeptierte Distanz: " + acceptedDistance);
+		
 		if (distToDest <= acceptedDistance) return true;		
 		
 		return false;

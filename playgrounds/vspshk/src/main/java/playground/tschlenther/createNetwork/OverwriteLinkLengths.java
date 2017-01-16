@@ -39,8 +39,8 @@ public class OverwriteLinkLengths {
 	 */
 	public static void main(String[] args) {
 		String input = "C:/Users/Work/Bachelor Arbeit/input/grid_network.xml";
-		String output = "C:/Users/Work/Bachelor Arbeit/input/grid_network_length300.xml";
-		overwriteGridNetworkLengthsAllToGivenLength(input, output, 300);
+		String output = "C:/Users/Work/Bachelor Arbeit/input/grid_network_length200.xml";
+		overwriteGridNetworkLengthsAllToGivenLength(input, output, 200);
 	}
 
 	
